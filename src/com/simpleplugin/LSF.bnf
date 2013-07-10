@@ -1,0 +1,153 @@
+
+{
+  parserClass="com.simpleplugin.parser.LSFParser"
+  stubParserClass="com.simpleplugin.parser.GeneratedParserUtilBase"
+ 
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+ 
+  psiClassPrefix="LSF"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.simpleplugin.psi"
+  psiImplPackage="com.simpleplugin.psi.impl"
+ 
+  elementTypeHolderClass="com.simpleplugin.psi.LSFTypes"
+  elementTypeClass="com.simpleplugin.psi.LSFElementType"
+  tokenTypeClass="com.simpleplugin.psi.LSFTokenType"
+}
+ 
+simpleFile ::= statement*
+
+private statement ::= ( classStatement
+		|	propertyStatement
+		|	emptyStatement
+		|   COMMENTS
+		)
+
+emptyStatement ::= SEMI
+
+compoundID ::= ID
+
+simpleNameWithCaption ::= compoundID
+{mixin="com.simpleplugin.psi.impl.LSFNamedElementImpl" implements="com.simpleplugin.psi.LSFNamedElement"}
+
+classIdUsage ::= compoundID
+{mixin="com.simpleplugin.psi.impl.LSFClassReferenceImpl" implements="com.simpleplugin.psi.LSFClassReference"}
+propIdUsage ::= compoundID
+{mixin="com.simpleplugin.psi.impl.LSFPropReferenceImpl" implements="com.simpleplugin.psi.LSFPropReference"}
+
+nonEmptyClassIdUsageList ::= classIdUsage (COMMA classIdUsage)*
+classIdUsageList ::= (nonEmptyClassIdUsageList)?
+
+paramDeclare ::= ID
+nonEmptyParamDeclareList ::= paramDeclare (COMMA paramDeclare)*
+
+paramDeclareList ::= (nonEmptyParamDeclareList)?
+
+classParentsList ::= COLUMN nonEmptyClassIdUsageList
+
+classStatement ::=
+    CLASS (ABSTRACT)?
+		simpleNameWithCaption
+		(classParentsList)? SEMI
+
+propertyDeclaration ::= simpleNameWithCaption (LBRAC paramDeclareList RBRAC)?
+
+propertyStatement ::= propertyDeclaration EQUALS
+		(	expressionUnfriendlyPD
+		|	propertyExpression
+		) SEMI
+
+propertyExpression ::= ifPE;
+
+REL_OPERAND::= LESS | GREATER | LESS_EQUALS | GREATER_EQUALS
+ADDOR_OPERAND ::= BRSUM | BRMINUS;
+
+parameterUsage ::= ID // | NUMBERED_PARAM | RECURSIVE_PARAM
+{mixin="com.simpleplugin.psi.impl.LSFParamReferenceImpl" implements="com.simpleplugin.psi.LSFParamReference"}
+
+ifPE ::= orPE (IF orPE)*
+orPE ::= xorPE (OR xorPE)*
+xorPE ::= andPE (XOR andPE)*
+andPE ::= notPE (AND notPE)*
+notPE ::= NOT notPE | equalityPE;
+equalityPE ::= relationalPE ((CMPEQUALS | CMPNOTEQUALS) relationalPE)?
+relationalPE ::= additiveORPE (
+			(   REL_OPERAND additiveORPE
+			)
+		|	typePropertyDefinition
+		)?
+	;
+typePropertyDefinition ::= (IS | AS) classIdUsage
+additiveORPE ::= additivePE (ADDOR_OPERAND additivePE)*
+additivePE ::= multiplicativePE ( (SUM | MINUS) multiplicativePE)*
+multiplicativePE ::= unaryMinusPE (MULT unaryMinusPE)*
+unaryMinusPE ::= MINUS unaryMinusPE | postfixUnaryPE;
+postfixUnaryPE ::= simplePE(LSQBR DECIMAL_INTEGER_LITERAL RSQBR)?
+simplePE ::= LBRAC propertyExpression RBRAC | expressionPrimitive
+singleParameterUsage ::= parameterUsage
+expressionPrimitive ::= expressionFriendlyPD | singleParameterUsage;
+
+expressionFriendlyPD ::= joinPropertyDefinition
+	    |	multiPropertyDefinition
+	    |	overridePropertyDefinition
+	    |	ifElsePropertyDefinition
+	    |	maxPropertyDefinition
+	    |	casePropertyDefinition
+	    |	partitionPropertyDefinition
+	    |	recursivePropertyDefinition
+	    |	structCreationPropertyDefinition
+	    |	concatPropertyDefinition
+	    |	castPropertyDefinition
+	    |	sessionPropertyDefinition
+	    |	signaturePropertyDefinition
+	    |	QUOTED_LITERAL
+
+joinPropertyDefinition ::= JOIN? propertyObject LBRAC propertyExpressionList RBRAC
+multiPropertyDefinition ::= MULTI nonEmptyPropertyExpressionList (OVERRIDE | EXCLUSIVE)?
+overridePropertyDefinition ::= (OVERRIDE | EXCLUSIVE) nonEmptyPropertyExpressionList
+ifElsePropertyDefinition ::= IF propertyExpression THEN propertyExpression (ELSE propertyExpression)?
+maxPropertyDefinition ::= (MAX | MIN) nonEmptyPropertyExpressionList
+casePropertyDefinition ::= CASE (OVERRIDE | EXCLUSIVE)? caseBranchBody (caseBranchBody)* (ELSE propertyExpression)?
+caseBranchBody ::= WHEN propertyExpression THEN propertyExpression
+partitionPropertyDefinition ::= PARTITION ((SUM | PREV) |
+                    UNGROUP propertyObject (PROPORTION (STRICT)? ROUND LBRAC DECIMAL_INTEGER_LITERAL RBRAC | LIMIT (STRICT)?))
+                    propertyExpression (BY nonEmptyPropertyExpressionList)?
+                    (ORDER (DESC )? nonEmptyPropertyExpressionList)? (WINDOW EXCEPTLAST)?
+recursivePropertyDefinition ::= RECURSION propertyExpression STEP propertyExpression (CYCLES (YES |	NO | IMPOSSIBLE))?
+structCreationPropertyDefinition ::= STRUCT LBRAC nonEmptyPropertyExpressionList RBRAC
+castPropertyDefinition ::= PRIMITIVE_TYPE LBRAC propertyExpression RBRAC
+concatPropertyDefinition ::= CONCAT QUOTED_LITERAL COMMA nonEmptyPropertyExpressionList
+sessionPropertyDefinition ::= (PREV | CHANGED | SET | DROPPED | SETCHANGED |	DROPCHANGED | DROPSET) LBRAC propertyExpression RBRAC
+signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
+
+propertyObject ::= propIdUsage
+	|	LSQBR (	propertyExpression
+			|	expressionUnfriendlyPD
+			)
+		RSQBR
+
+expressionUnfriendlyPD ::= contextIndependentPD
+
+contextIndependentPD ::= dataPropertyDefinition
+	|	abstractPropertyDefinition
+	|	formulaPropertyDefinition
+	|	groupPropertyDefinition
+
+dataPropertyDefinition ::= DATA (SESSION )? classIdUsage LBRAC classIdUsageList RBRAC
+abstractPropertyDefinition ::= ABSTRACT (CASE |	MULTI | OVERRIDE | EXCLUSIVE)? (CHECKED)? classIdUsage LBRAC classIdUsageList RBRAC
+formulaPropertyDefinition ::= FORMULA (classIdUsage)? QUOTED_LITERAL
+
+groupingType ::= GSUM | MAX | MIN | CONCAT | AGGR | EQUAL
+
+groupPropertyDefinition ::= GROUP
+		groupingType
+		nonEmptyPropertyExpressionList
+		(BY
+		nonEmptyPropertyExpressionList)?
+		(ORDER (DESC)?
+		nonEmptyPropertyExpressionList)?
+		(WHERE propertyExpression)?
+
+
+propertyExpressionList ::= (nonEmptyPropertyExpressionList)?
+nonEmptyPropertyExpressionList ::= propertyExpression (COMMA propertyExpression)*
