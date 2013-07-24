@@ -745,7 +745,7 @@ metaCodeDeclarationStatement ::= META ID LBRAC idList RBRAC DUMMY* {pin=5 recove
 
 private rule_recover ::= !(END)
 
-metaCodeStatement ::= ATSIGN compoundID LBRAC metaCodeIdList RBRAC SEMI
+metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC SEMI
 
 metaCodeIdList ::=  metaCodeId (COMMA metaCodeId)*
 
@@ -798,9 +798,6 @@ nonEmptyPropertyUsageList ::= propertyUsage (COMMA propertyUsage)*
 formUsageList ::= (nonEmptyFormUsageList)?
 nonEmptyFormUsageList ::= formUsage (COMMA formUsage)*
 
-compoundIDList ::= (nonEmptyCompoundIdList)?
-nonEmptyCompoundIdList ::= compoundID (COMMA compoundID)*
-
 singleParameterList ::= (singleParameter (COMMA singleParameter)*)?
 singleParameter ::= ID
 
@@ -841,6 +838,7 @@ groupUsage ::= compoundID
 formUsage ::= compoundID
 windowUsage ::= compoundID
 navigatorElementUsage ::= compoundID
+metacodeUsage ::= compoundID
 
 typeId ::= PRIMITIVE_TYPE | OBJECT
 
