@@ -33,12 +33,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
-    public void visitPropIdUsage(@NotNull LSFPropIdUsage o) {
+    public void visitPropertyUsage(@NotNull LSFPropertyUsage o) {
         checkReference(o);
     }
 
     @Override
-    public void visitClassIdUsage(@NotNull LSFClassIdUsage o) {
+    public void visitCustomClassUsage(@NotNull LSFCustomClassUsage o) {
         checkReference(o);
     }
 

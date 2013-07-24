@@ -20,102 +20,309 @@ import static com.simpleplugin.psi.LSFTypes.*;
 %eof{ return;
 %eof}
 
-EOL="\r"|"\n"|"\r\n"
-LINE_WS=[\ \t\f]
-WHITE_SPACE=({LINE_WS}|{EOL})+
-COMMENTS=("//")[^\r\n]*
-FIRST_ID_LETTER	= ([a-zA-Z])
-NEXT_ID_LETTER = ([a-zA-Z_0-9])
-ID = {FIRST_ID_LETTER} {NEXT_ID_LETTER}*
-DIGITS = ([0-9])+
-DECIMAL_INTEGER_LITERAL = {DIGITS}
-STR_LITERAL_CHAR = [a-zA-Z]
-QUOTED_LITERAL = '\'' {STR_LITERAL_CHAR}* '\''
-PRIMITIVE_TYPE  = 'INTEGER' | 'DOUBLE' | 'LONG'
+////////////////////MACRO///////////////////////
+
+EOL = \r|\n|\r\n
+LINE_WS = [ \t\f]
+STR_LITERAL_CHAR = "\\'"|[^'\n\r]
+DIGIT = [0-9]
+DIGITS = [0-9]+
+EDIGITS	= [0-9]*
+HEX_DIGIT =	[0-9a-fA-F]
+FIRST_ID_LETTER	= [a-zA-Z]
+NEXT_ID_LETTER = [a-zA-Z_0-9]
 
 %%
 <YYINITIAL> {
-  {WHITE_SPACE}                { return com.intellij.psi.TokenType.WHITE_SPACE; }
+  ({LINE_WS} | {EOL})+                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
+  "//" [^\n\r]* {EOL}                   { return COMMENTS; }
 
-  {COMMENTS}               { return COMMENTS; }
-  ";"                          { return SEMI; }
-  ","                      { return COMMA; }
-  ":"                     { return COLUMN; }
-  "CLASS"                      { return CLASS; }
-  "ABSTRACT"                   { return ABSTRACT; }
-  "("                      { return LBRAC; }
-  ")"                      { return RBRAC; }
-  "="                     { return EQUALS; }
-  "<"                       { return LESS; }
-  ">"                    { return GREATER; }
-  "<="                { return LESS_EQUALS; }
-  ">="             { return GREATER_EQUALS; }
-  "(+)"                      { return BRSUM; }
-  "(-)"                    { return BRMINUS; }
-  "IF"                         { return IF; }
-  "OR"                         { return OR; }
-  "XOR"                        { return XOR; }
-  "AND"                        { return AND; }
-  "NOT"                        { return NOT; }
-  "=="                  { return CMPEQUALS; }
-  "!="               { return CMPNOTEQUALS; }
-  "IS"                         { return IS; }
-  "AS"                         { return AS; }
-  "+"                        { return SUM; }
-  "-"                      { return MINUS; }
-  "*"                       { return MULT; }
-  "["                      { return LSQBR; }
-  {DECIMAL_INTEGER_LITERAL}    { return DECIMAL_INTEGER_LITERAL; }
-  "]"                      { return RSQBR; }
-  {QUOTED_LITERAL}             { return QUOTED_LITERAL; }
-  "MULTI"                      { return MULTI; }
-  "JOIN"                       { return JOIN; }
-  "OVERRIDE"                   { return OVERRIDE; }
-  "EXCLUSIVE"                  { return EXCLUSIVE; }
-  "THEN"                       { return THEN; }
-  "ELSE"                       { return ELSE; }
-  "SUM"                        { return GSUM; }
-  "MAX"                        { return MAX; }
-  "MIN"                        { return MIN; }
-  "CASE"                       { return CASE; }
-  "WHEN"                       { return WHEN; }
-  "PARTITION"                  { return PARTITION; }
-  "PREV"                       { return PREV; }
-  "UNGROUP"                    { return UNGROUP; }
-  "PROPORTION"                 { return PROPORTION; }
-  "STRICT"                     { return STRICT; }
-  "ROUND"                      { return ROUND; }
-  "LIMIT"                      { return LIMIT; }
-  "BY"                         { return BY; }
-  "ORDER"                      { return ORDER; }
-  "DESC"                       { return DESC; }
-  "WINDOW"                     { return WINDOW; }
-  "EXCEPTLAST"                 { return EXCEPTLAST; }
-  "RECURSION"                  { return RECURSION; }
-  "STEP"                       { return STEP; }
-  "CYCLES"                     { return CYCLES; }
-  "YES"                        { return YES; }
-  "NO"                         { return NO; }
-  "IMPOSSIBLE"                 { return IMPOSSIBLE; }
-  "STRUCT"                     { return STRUCT; }
-  {PRIMITIVE_TYPE}             { return PRIMITIVE_TYPE; }
-  "CONCAT"                     { return CONCAT; }
-  "CHANGED"                    { return CHANGED; }
-  "SET"                        { return SET; }
-  "DROPPED"                    { return DROPPED; }
-  "SETCHANGED"                 { return SETCHANGED; }
-  "DROPCHANGED"                { return DROPCHANGED; }
-  "DROPSET"                    { return DROPSET; }
-  "DATA"                       { return DATA; }
-  "SESSION"                    { return SESSION; }
-  "CHECKED"                    { return CHECKED; }
-  "FORMULA"                    { return FORMULA; }
-  "AGGR"                       { return AGGR; }
-  "EQUAL"                      { return EQUAL; }
-  "GROUP"                      { return GROUP; }
-  "WHERE"                      { return WHERE; }
-  {ID}                         { return ID; }
 
+  ("TRUE" | "FALSE")                    { return LEX_LOGICAL_LITERAL; }
+
+    "INTEGER" | "LONG" | "NUMERIC[" {DIGITS} "," {DIGITS} "]" | "DOUBLE"
+  | "DATE" | "DATETIME" | "TIME"
+  | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]" | "VARSTRING[" {DIGITS} "]" | "VARISTRING[" {DIGITS} "]" | "TEXT"
+  | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "CUSTOMFILE" | "EXCELFILE"
+  | "BOOLEAN"
+  | "COLOR"                             { return PRIMITIVE_TYPE; }
+
+
+  "'" {STR_LITERAL_CHAR}* "'"           { return LEX_STRING_LITERAL; }
+
+  {DIGITS}                              { return LEX_UINT_LITERAL; }
+  {DIGITS}[Ll]                          { return LEX_ULONG_LITERAL; }
+  {DIGITS} "." {EDIGITS}[Dd]            { return LEX_UDOUBLE_LITERAL; }
+  {DIGITS} "." {EDIGITS}                { return LEX_UNUMERIC_LITERAL; }
+  {DIGIT}{4} _ {DIGIT}{2} _ {DIGIT}{2}  { return LEX_DATE_LITERAL; }
+  {DIGIT}{4} _ {DIGIT}{2} _ {DIGIT}{2} _ {DIGIT}{2} : {DIGIT}{2}  { return LEX_DATETIME_LITERAL; }
+  {DIGIT}{2} : {DIGIT}{2}               { return LEX_TIME_LITERAL; }
+  "#" {HEX_DIGIT}{6}                    { return LEX_COLOR_LITERAL; }
+
+  "$" {DIGITS}                            { return NUMBERED_PARAM; }
+  "$" {FIRST_ID_LETTER} {NEXT_ID_LETTER}* { return RECURSIVE_PARAM; }
+
+  "==" | "!="                           { return EQ_OPERAND; }
+  "<" | ">" | "<=" | ">="               { return REL_OPERAND; }
+
+  "-"                                   { return MINUS; }
+  "+"                                   { return PLUS; }
+  "*" | "/"                             { return MULT_OPERAND; }
+  "(+)" | "(-)"                         { return ADDOR_OPERAND; }
+
+  ";"                                   { return SEMI; }
+  ":"                                   { return COLON; }
+  ","                                   { return COMMA; }
+  "."                                   { return POINT; }
+
+  "="                                   { return EQUAL; }
+  "+="                                  { return PLUSEQ; }
+  "<-"                                  { return ARROW; }
+  "=>"                                  { return FOLLOWS; }
+
+  "("                                   { return LBRAC; }
+  ")"                                   { return RBRAC; }
+
+  "{"                                   { return LBRACE; }
+  "}"                                   { return RBRACE; }
+
+  "["                                   { return LSQBR; }
+  "]"                                   { return RSQBR; }
+
+  "@"                                   { return ATSIGN; }
+
+  "ABSTRACT"                			{ return ABSTRACT; }
+  "ACTION"                  			{ return ACTION; }
+  "ADD"                     			{ return ADD; }
+  "ADDFORM"                 			{ return ADDFORM; }
+  "ADDOBJ"                  			{ return ADDOBJ; }
+  "ADDSESSIONFORM"          			{ return ADDSESSIONFORM; }
+  "AFTER"                   			{ return AFTER; }
+  "AGGPROP"                 			{ return AGGPROP; }
+  "AGGR"                    			{ return AGGR; }
+  "ALL"                     			{ return ALL; }
+  "AND"                     			{ return AND; }
+  "APPLY"                   			{ return APPLY; }
+  "AS"                      			{ return AS; }
+  "ASC"                     			{ return ASC; }
+  "ASONCHANGE"              			{ return ASONCHANGE; }
+  "ASONCHANGEWYS"           			{ return ASONCHANGEWYS; }
+  "ASONEDIT"                			{ return ASONEDIT; }
+  "ASSIGN"                  			{ return ASSIGN; }
+  "ASYNCUPDATE"             			{ return ASYNCUPDATE; }
+  "ATTACH"                  			{ return ATTACH; }
+  "AUTOAPPLY"               			{ return AUTOAPPLY; }
+  "AUTOSET"                 			{ return AUTOSET; }
+  "BACKGROUND"              			{ return BACKGROUND; }
+  "BCC"                     			{ return BCC; }
+  "BEFORE"                  			{ return BEFORE; }
+  "BOTTOM"                  			{ return BOTTOM; }
+  "BREAK"                   			{ return BREAK; }
+  "BY"                      			{ return BY; }
+  "CANCEL"                  			{ return CANCEL; }
+  "CASCADE"                 			{ return CASCADE; }
+  "CASE"                    			{ return CASE; }
+  "CC"                      			{ return CC; }
+  "CENTER"                  			{ return CENTER; }
+  "CHANGE"                  			{ return CHANGE; }
+  "CHANGECLASS"             			{ return CHANGECLASS; }
+  "CHANGED"                 			{ return CHANGED; }
+  "CHANGEWYS"               			{ return CHANGEWYS; }
+  "CHECK"                   			{ return CHECK; }
+  "CHECKED"                 			{ return CHECKED; }
+  "CLASS"                   			{ return CLASS; }
+  "CLOSE"                   			{ return CLOSE; }
+  "COLUMNS"                 			{ return COLUMNS; }
+  "COMPLEX"                 			{ return COMPLEX; }
+  "CONCAT"                  			{ return CONCAT; }
+  "CONFIRM"                 			{ return CONFIRM; }
+  "CONSTRAINT"              			{ return CONSTRAINT; }
+  "CONTAINERH"              			{ return CONTAINERH; }
+  "CONTAINERV"              			{ return CONTAINERV; }
+  "CONTAINERVH"             			{ return CONTAINERVH; }
+  "CUSTOM"                  			{ return CUSTOM; }
+  "CYCLES"                  			{ return CYCLES; }
+  "DATA"                    			{ return DATA; }
+  "DEFAULT"                 			{ return DEFAULT; }
+  "DELETE"                  			{ return DELETE; }
+  "DELETESESSION"           			{ return DELETESESSION; }
+  "DESC"                    			{ return DESC; }
+  "DESIGN"                  			{ return DESIGN; }
+  "DIALOG"                  			{ return DIALOG; }
+  "DO"                      			{ return DO; }
+  "DOCKED"                  			{ return DOCKED; }
+  "DOCKEDMODAL"             			{ return DOCKEDMODAL; }
+  "DOCX"                    			{ return DOCX; }
+  "DRAWROOT"                			{ return DRAWROOT; }
+  "DROP"                    			{ return DROP; }
+  "DROPCHANGED"             			{ return DROPCHANGED; }
+  "DROPPED"                 			{ return DROPPED; }
+  "DROPSET"                 			{ return DROPSET; }
+  "ECHO"                    			{ return ECHO; }
+  "EDIT"                    			{ return EDIT; }
+  "EDITABLE"                			{ return EDITABLE; }
+  "EDITFORM"                			{ return EDITFORM; }
+  "EDITKEY"                 			{ return EDITKEY; }
+  "EDITSESSIONFORM"         			{ return EDITSESSIONFORM; }
+  "ELSE"                    			{ return ELSE; }
+  "EMAIL"                   			{ return EMAIL; }
+  "END"                     			{ return END; }
+  "EVAL"                    			{ return EVAL; }
+  "EVENTID"                 			{ return EVENTID; }
+  "EVENTS"                  			{ return EVENTS; }
+  "EXCEPTLAST"              			{ return EXCEPTLAST; }
+  "EXCLUSIVE"               			{ return EXCLUSIVE; }
+  "EXEC"                    			{ return EXEC; }
+  "EXTEND"                  			{ return EXTEND; }
+  "FILTER"                  			{ return FILTER; }
+  "FILTERGROUP"             			{ return FILTERGROUP; }
+  "FILTERS"                 			{ return FILTERS; }
+  "FIRST"                   			{ return FIRST; }
+  "FIXED"                   			{ return FIXED; }
+  "FIXEDCHARWIDTH"          			{ return FIXEDCHARWIDTH; }
+  "FOOTER"                  			{ return FOOTER; }
+  "FOR"                     			{ return FOR; }
+  "FORCE"                   			{ return FORCE; }
+  "FOREGROUND"              			{ return FOREGROUND; }
+  "FORM"                    			{ return FORM; }
+  "FORMS"                   			{ return FORMS; }
+  "FORMULA"                 			{ return FORMULA; }
+  "FROM"                    			{ return FROM; }
+  "FULLSCREEN"              			{ return FULLSCREEN; }
+  "GRID"                    			{ return GRID; }
+  "GROUP"                   			{ return GROUP; }
+  "HALIGN"                  			{ return HALIGN; }
+  "HEADER"                  			{ return HEADER; }
+  "HIDE"                    			{ return HIDE; }
+  "HIDESCROLLBARS"          			{ return HIDESCROLLBARS; }
+  "HIDETITLE"               			{ return HIDETITLE; }
+  "HINTNOUPDATE"            			{ return HINTNOUPDATE; }
+  "HINTTABLE"               			{ return HINTTABLE; }
+  "HORIZONTAL"              			{ return HORIZONTAL; }
+  "HTML"                    			{ return HTML; }
+  "IF"                      			{ return IF; }
+  "IMAGE"                   			{ return IMAGE; }
+  "IMPOSSIBLE"              			{ return IMPOSSIBLE; }
+  "IN"                      			{ return IN; }
+  "INDEX"                   			{ return INDEX; }
+  "INDEXED"                 			{ return INDEXED; }
+  "INIT"                    			{ return INIT; }
+  "INLINE"                  			{ return INLINE; }
+  "INPUT"                   			{ return INPUT; }
+  "INTERSECT"               			{ return INTERSECT; }
+  "IS"                      			{ return IS; }
+  "JOIN"                    			{ return JOIN; }
+  "LEFT"                    			{ return LEFT; }
+  "LIMIT"                   			{ return LIMIT; }
+  "LIST"                    			{ return LIST; }
+  "LOADFILE"                			{ return LOADFILE; }
+  "LOCAL"                   			{ return LOCAL; }
+  "LOGGABLE"                			{ return LOGGABLE; }
+  "MANAGESESSION"           			{ return MANAGESESSION; }
+  "MAX"                     			{ return MAX; }
+  "MAXCHARWIDTH"            			{ return MAXCHARWIDTH; }
+  "MENU"                    			{ return MENU; }
+  "MESSAGE"                 			{ return MESSAGE; }
+  "META"                    			{ return META; }
+  "MIN"                     			{ return MIN; }
+  "MINCHARWIDTH"            			{ return MINCHARWIDTH; }
+  "MODAL"                   			{ return MODAL; }
+  "MODULE"                  			{ return MODULE; }
+  "MULTI"                   			{ return MULTI; }
+  "NAME"                    			{ return NAME; }
+  "NAMESPACE"               			{ return NAMESPACE; }
+  "NAVIGATOR"               			{ return NAVIGATOR; }
+  "NEW"                     			{ return NEW; }
+  "NEWSESSION"              			{ return NEWSESSION; }
+  "NO"                      			{ return NO; }
+  "NOINLINE"                			{ return NOINLINE; }
+  "NOT"                     			{ return NOT; }
+  "NOTHING"                 			{ return NOTHING; }
+  "NULL"                    			{ return NULL; }
+  "OBJECT"                  			{ return OBJECT; }
+  "OBJECTS"                 			{ return OBJECTS; }
+  "OBJVALUE"                			{ return OBJVALUE; }
+  "OK"                      			{ return OK; }
+  "OLDSESSION"              			{ return OLDSESSION; }
+  "ON"                      			{ return ON; }
+  "OPENFILE"                			{ return OPENFILE; }
+  "OR"                      			{ return OR; }
+  "ORDER"                   			{ return ORDER; }
+  "OVERRIDE"                			{ return OVERRIDE; }
+  "PAGESIZE"                			{ return PAGESIZE; }
+  "PANEL"                   			{ return PANEL; }
+  "PARENT"                  			{ return PARENT; }
+  "PARTITION"               			{ return PARTITION; }
+  "PDF"                     			{ return PDF; }
+  "PERSISTENT"              			{ return PERSISTENT; }
+  "POSITION"                			{ return POSITION; }
+  "PREFCHARWIDTH"           			{ return PREFCHARWIDTH; }
+  "PREV"                    			{ return PREV; }
+  "PRINT"                   			{ return PRINT; }
+  "PRIORITY"                			{ return PRIORITY; }
+  "PROPERTIES"              			{ return PROPERTIES; }
+  "PROPERTY"                			{ return PROPERTY; }
+  "PROPORTION"              			{ return PROPORTION; }
+  "QUERYCLOSE"              			{ return QUERYCLOSE; }
+  "QUERYOK"                 			{ return QUERYOK; }
+  "READONLY"                			{ return READONLY; }
+  "READONLYIF"              			{ return READONLYIF; }
+  "RECURSION"               			{ return RECURSION; }
+  "REGEXP"                  			{ return REGEXP; }
+  "REMOVE"                  			{ return REMOVE; }
+  "REPORTFILE"              			{ return REPORTFILE; }
+  "REQUEST"                 			{ return REQUEST; }
+  "REQUIRE"                 			{ return REQUIRE; }
+  "RESOLVE"                 			{ return RESOLVE; }
+  "RETURN"                  			{ return RETURN; }
+  "RGB"                     			{ return RGB; }
+  "RIGHT"                   			{ return RIGHT; }
+  "RIGHTBOTTOM"             			{ return RIGHTBOTTOM; }
+  "ROUND"                   			{ return ROUND; }
+  "RTF"                     			{ return RTF; }
+  "SEEK"                    			{ return SEEK; }
+  "SELECTION"               			{ return SELECTION; }
+  "SELECTOR"                			{ return SELECTOR; }
+  "SESSION"                 			{ return SESSION; }
+  "SET"                     			{ return SET; }
+  "SETCHANGED"              			{ return SETCHANGED; }
+  "SHORTCUT"                			{ return SHORTCUT; }
+  "SHOW"                    			{ return SHOW; }
+  "SHOWDEP"                 			{ return SHOWDEP; }
+  "SHOWDROP"                			{ return SHOWDROP; }
+  "SHOWIF"                  			{ return SHOWIF; }
+  "SINGLE"                  			{ return SINGLE; }
+  "SPLITH"                  			{ return SPLITH; }
+  "SPLITV"                  			{ return SPLITV; }
+  "STEP"                    			{ return STEP; }
+  "STRICT"                  			{ return STRICT; }
+  "STRUCT"                  			{ return STRUCT; }
+  "SUBJECT"                 			{ return SUBJECT; }
+  "SUM"                     			{ return SUM; }
+  "TABBED"                  			{ return TABBED; }
+  "TABLE"                   			{ return TABLE; }
+  "TEXTHALIGN"              			{ return TEXTHALIGN; }
+  "TEXTVALIGN"              			{ return TEXTVALIGN; }
+  "THE"                     			{ return THE; }
+  "THEN"                    			{ return THEN; }
+  "TITLE"                   			{ return TITLE; }
+  "TO"                      			{ return TO; }
+  "TODRAW"                  			{ return TODRAW; }
+  "TOOLBAR"                 			{ return TOOLBAR; }
+  "TOP"                     			{ return TOP; }
+  "TREE"                    			{ return TREE; }
+  "UNGROUP"                 			{ return UNGROUP; }
+  "VALIGN"                  			{ return VALIGN; }
+  "VERTICAL"                			{ return VERTICAL; }
+  "VIEW"                    			{ return VIEW; }
+  "WHEN"                    			{ return WHEN; }
+  "WHERE"                   			{ return WHERE; }
+  "WHILE"                   			{ return WHILE; }
+  "WINDOW"                  			{ return WINDOW; }
+  "XOR"                     			{ return XOR; }
+  "YES"                     			{ return YES; }
+
+  {FIRST_ID_LETTER} {NEXT_ID_LETTER}*   { return ID; }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

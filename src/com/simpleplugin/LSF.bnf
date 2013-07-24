@@ -1,6 +1,7 @@
 
 {
   parserClass="com.simpleplugin.parser.LSFParser"
+  parserUtilClass="com.simpleplugin.parser.LSFParserUtil"
   stubParserClass="com.simpleplugin.parser.GeneratedParserUtilBase"
  
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
@@ -14,78 +15,98 @@
   elementTypeClass="com.simpleplugin.psi.LSFElementType"
   tokenTypeClass="com.simpleplugin.psi.LSFTokenType"
 }
- 
-simpleFile ::= statement*
 
-private statement ::= ( classStatement
-		|	propertyStatement
-		|	emptyStatement
-		|   COMMENTS
-		)
+script ::= moduleHeader statements
 
-emptyStatement ::= SEMI
+statements ::= statement*
 
-compoundID ::= ID
+moduleHeader ::= MODULE ID SEMI
+                 (REQUIRE nonEmptyIdList SEMI)?
+                 (PRIORITY nonEmptyIdList SEMI)?
+                 (NAMESPACE ID SEMI)?
 
-simpleNameWithCaption ::= compoundID
-{mixin="com.simpleplugin.psi.impl.LSFNamedElementImpl" implements="com.simpleplugin.psi.LSFNamedElement"}
+// fake rules to generate types
+fake_comments ::= COMMENTS
+//fake_whitespaces ::= WHITESPACES
 
-classIdUsage ::= compoundID
-{mixin="com.simpleplugin.psi.impl.LSFClassReferenceImpl" implements="com.simpleplugin.psi.LSFClassReference"}
-propIdUsage ::= compoundID
-{mixin="com.simpleplugin.psi.impl.LSFPropReferenceImpl" implements="com.simpleplugin.psi.LSFPropReference"}
+private statement ::=   classStatement
+                    |	extendClassStatement
+                    |	groupStatement
+                    |	propertyStatement
+                    |	overrideStatement
+                    |	constraintStatement
+                    |	followsStatement
+                    |	writeWhenStatement
+                    |	eventStatement
+                    |   showDepStatement
+                    |	globalEventStatement
+                    |	aspectStatement
+                    |	tableStatement
+                    |	loggableStatement
+                    |	indexStatement
+                    |	formStatement
+                    |	designStatement
+                    |	windowStatement
+                    |	navigatorStatement
+                    |	metaCodeStatement
+                    |	metaCodeDeclarationStatement
+                    |   END
+                    |	emptyStatement
 
-nonEmptyClassIdUsageList ::= classIdUsage (COMMA classIdUsage)*
-classIdUsageList ::= (nonEmptyClassIdUsageList)?
 
-paramDeclare ::= ID
-nonEmptyParamDeclareList ::= paramDeclare (COMMA paramDeclare)*
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// CLASS STATEMENT /////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-paramDeclareList ::= (nonEmptyParamDeclareList)?
+classStatement ::= CLASS (ABSTRACT)? simpleNameWithCaption classInstancesAndParents
 
-classParentsList ::= COLUMN nonEmptyClassIdUsageList
+extendClassStatement ::= EXTEND CLASS customClassUsage classInstancesAndParents
 
-classStatement ::=
-    CLASS (ABSTRACT)?
-		simpleNameWithCaption
-		(classParentsList)? SEMI
+private classInstancesAndParents ::=    LBRACE simpleNameWithCaptionList RBRACE (classParentsList SEMI)?
+		                            |   (classParentsList)? SEMI
+
+classParentsList ::= COLON nonEmptyCustomClassUsageList
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// GROUP STATEMENT /////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+groupStatement ::= GROUP simpleNameWithCaption (COLON groupUsage)? SEMI
+
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// PROPERTY STATEMENT ////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+propertyStatement ::= propertyDeclaration EQUAL
+                      (expressionUnfriendlyPD | propertyExpression)
+                      propertyOptions
+                      (SEMI)?
 
 propertyDeclaration ::= simpleNameWithCaption (LBRAC paramDeclareList RBRAC)?
 
-propertyStatement ::= propertyDeclaration EQUALS
-		(	expressionUnfriendlyPD
-		|	propertyExpression
-		) SEMI
+paramDeclare ::= ID
+paramDeclareList ::= (nonEmptyParamDeclareList)?
+nonEmptyParamDeclareList ::= paramDeclare (COMMA paramDeclare)*
+
 
 propertyExpression ::= ifPE;
-
-REL_OPERAND::= LESS | GREATER | LESS_EQUALS | GREATER_EQUALS
-ADDOR_OPERAND ::= BRSUM | BRMINUS;
-
-parameterUsage ::= ID // | NUMBERED_PARAM | RECURSIVE_PARAM
-{mixin="com.simpleplugin.psi.impl.LSFParamReferenceImpl" implements="com.simpleplugin.psi.LSFParamReference"}
 
 ifPE ::= orPE (IF orPE)*
 orPE ::= xorPE (OR xorPE)*
 xorPE ::= andPE (XOR andPE)*
 andPE ::= notPE (AND notPE)*
-notPE ::= NOT notPE | equalityPE;
-equalityPE ::= relationalPE ((CMPEQUALS | CMPNOTEQUALS) relationalPE)?
-relationalPE ::= additiveORPE (
-			(   REL_OPERAND additiveORPE
-			)
-		|	typePropertyDefinition
-		)?
-	;
-typePropertyDefinition ::= (IS | AS) classIdUsage
+notPE ::= (NOT notPE) | equalityPE;
+
+equalityPE ::= relationalPE (EQ_OPERAND relationalPE)?
+relationalPE ::= additiveORPE ((REL_OPERAND additiveORPE) | typePropertyDefinition)?
 additiveORPE ::= additivePE (ADDOR_OPERAND additivePE)*
-additivePE ::= multiplicativePE ( (SUM | MINUS) multiplicativePE)*
-multiplicativePE ::= unaryMinusPE (MULT unaryMinusPE)*
-unaryMinusPE ::= MINUS unaryMinusPE | postfixUnaryPE;
-postfixUnaryPE ::= simplePE(LSQBR DECIMAL_INTEGER_LITERAL RSQBR)?
-simplePE ::= LBRAC propertyExpression RBRAC | expressionPrimitive
-singleParameterUsage ::= parameterUsage
+additivePE ::= multiplicativePE ((PLUS | MINUS) multiplicativePE)*
+multiplicativePE ::= unaryMinusPE (MULT_OPERAND unaryMinusPE)*
+unaryMinusPE ::= (MINUS unaryMinusPE) | postfixUnaryPE;
+postfixUnaryPE ::= simplePE (LSQBR LEX_UINT_LITERAL RSQBR)?
+simplePE ::= (LBRAC propertyExpression RBRAC) | expressionPrimitive
 expressionPrimitive ::= expressionFriendlyPD | singleParameterUsage;
+singleParameterUsage ::= parameterUsage
 
 expressionFriendlyPD ::= joinPropertyDefinition
 	    |	multiPropertyDefinition
@@ -100,54 +121,784 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	castPropertyDefinition
 	    |	sessionPropertyDefinition
 	    |	signaturePropertyDefinition
-	    |	QUOTED_LITERAL
+	    |	literal
 
-joinPropertyDefinition ::= JOIN? propertyObject LBRAC propertyExpressionList RBRAC
-multiPropertyDefinition ::= MULTI nonEmptyPropertyExpressionList (OVERRIDE | EXCLUSIVE)?
-overridePropertyDefinition ::= (OVERRIDE | EXCLUSIVE) nonEmptyPropertyExpressionList
-ifElsePropertyDefinition ::= IF propertyExpression THEN propertyExpression (ELSE propertyExpression)?
-maxPropertyDefinition ::= (MAX | MIN) nonEmptyPropertyExpressionList
-casePropertyDefinition ::= CASE (OVERRIDE | EXCLUSIVE)? caseBranchBody (caseBranchBody)* (ELSE propertyExpression)?
-caseBranchBody ::= WHEN propertyExpression THEN propertyExpression
-partitionPropertyDefinition ::= PARTITION ((SUM | PREV) |
-                    UNGROUP propertyObject (PROPORTION (STRICT)? ROUND LBRAC DECIMAL_INTEGER_LITERAL RBRAC | LIMIT (STRICT)?))
-                    propertyExpression (BY nonEmptyPropertyExpressionList)?
-                    (ORDER (DESC )? nonEmptyPropertyExpressionList)? (WINDOW EXCEPTLAST)?
-recursivePropertyDefinition ::= RECURSION propertyExpression STEP propertyExpression (CYCLES (YES |	NO | IMPOSSIBLE))?
-structCreationPropertyDefinition ::= STRUCT LBRAC nonEmptyPropertyExpressionList RBRAC
-castPropertyDefinition ::= PRIMITIVE_TYPE LBRAC propertyExpression RBRAC
-concatPropertyDefinition ::= CONCAT QUOTED_LITERAL COMMA nonEmptyPropertyExpressionList
-sessionPropertyDefinition ::= (PREV | CHANGED | SET | DROPPED | SETCHANGED |	DROPCHANGED | DROPSET) LBRAC propertyExpression RBRAC
-signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
-
-propertyObject ::= propIdUsage
-	|	LSQBR (	propertyExpression
-			|	expressionUnfriendlyPD
-			)
-		RSQBR
-
-expressionUnfriendlyPD ::= contextIndependentPD
+expressionUnfriendlyPD ::= contextIndependentPD | actionPropertyDefinition
 
 contextIndependentPD ::= dataPropertyDefinition
-	|	abstractPropertyDefinition
-	|	formulaPropertyDefinition
-	|	groupPropertyDefinition
+	                |   abstractActionPropertyDefinition
+                    |   abstractPropertyDefinition
+	                |   formulaPropertyDefinition
+	                |   groupPropertyDefinition
+                    |   filterPropertyDefinition
 
-dataPropertyDefinition ::= DATA (SESSION )? classIdUsage LBRAC classIdUsageList RBRAC
-abstractPropertyDefinition ::= ABSTRACT (CASE |	MULTI | OVERRIDE | EXCLUSIVE)? (CHECKED)? classIdUsage LBRAC classIdUsageList RBRAC
-formulaPropertyDefinition ::= FORMULA (classIdUsage)? QUOTED_LITERAL
+joinPropertyDefinition ::= JOIN? propertyObject LBRAC propertyExpressionList RBRAC
 
-groupingType ::= GSUM | MAX | MIN | CONCAT | AGGR | EQUAL
+overridePropertyDefinition ::= (OVERRIDE | EXCLUSIVE) nonEmptyPropertyExpressionList
 
-groupPropertyDefinition ::= GROUP
-		groupingType
-		nonEmptyPropertyExpressionList
-		(BY
-		nonEmptyPropertyExpressionList)?
-		(ORDER (DESC)?
-		nonEmptyPropertyExpressionList)?
-		(WHERE propertyExpression)?
+ifElsePropertyDefinition ::= IF propertyExpression
+                                    THEN propertyExpression
+                                    (ELSE propertyExpression)?   // check greedy
 
+maxPropertyDefinition ::= (MAX | MIN) nonEmptyPropertyExpressionList
+
+caseBranchBody ::= WHEN propertyExpression THEN propertyExpression
+casePropertyDefinition ::= CASE (exclusiveOverrideOption)?
+                           (caseBranchBody)+
+                           (ELSE propertyExpression)?
+
+multiPropertyDefinition ::= MULTI nonEmptyPropertyExpressionList (exclusiveOverrideOption)?
+
+partitionPropertyDefinition ::= PARTITION
+                                (   (SUM | PREV)
+                                |   UNGROUP propertyObject
+                                    (   PROPORTION (STRICT)? ROUND LBRAC LEX_UINT_LITERAL RBRAC
+                                    |   LIMIT (STRICT)?
+                                    )
+                                )
+                                propertyExpression (BY nonEmptyPropertyExpressionList)?
+                                (ORDER (DESC )? nonEmptyPropertyExpressionList)?
+                                (WINDOW EXCEPTLAST)?
+
+recursivePropertyDefinition ::= RECURSION propertyExpression STEP propertyExpression (CYCLES (YES |	NO | IMPOSSIBLE))?
+
+structCreationPropertyDefinition ::= STRUCT LBRAC nonEmptyPropertyExpressionList RBRAC
+
+castPropertyDefinition ::= PRIMITIVE_TYPE LBRAC propertyExpression RBRAC
+
+concatPropertyDefinition ::= CONCAT stringLiteral COMMA nonEmptyPropertyExpressionList
+
+sessionPropertyDefinition ::= (PREV | CHANGED | SET | DROPPED | SETCHANGED | DROPCHANGED | DROPSET) LBRAC propertyExpression RBRAC
+
+signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
+
+propertyObject ::=  propertyUsage
+	            |   (LSQBR (propertyExpression | expressionUnfriendlyPD) RSQBR)
+
+
+
+dataPropertyDefinition ::= DATA (SESSION)? className LBRAC classNameList RBRAC
+
+abstractPropertyDefinition ::= ABSTRACT (CASE |	MULTI | OVERRIDE | EXCLUSIVE)? (CHECKED)? className LBRAC classNameList RBRAC
+
+formulaPropertyDefinition ::= FORMULA (builtInClassName)? stringLiteral
+
+groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | EQUAL
+groupPropertyDefinition ::= GROUP groupingType
+		                    nonEmptyPropertyExpressionList
+		                    (BY nonEmptyPropertyExpressionList)?
+		                    (ORDER (DESC)? nonEmptyPropertyExpressionList)?
+		                    (WHERE propertyExpression)?
+
+filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID
+
+typePropertyDefinition ::= (IS | AS) className
+
+
+propertyOptions ::= (   IN groupUsage
+                    |	PERSISTENT
+                    |   COMPLEX
+                    |	TABLE tableUsage
+                    |	shortcutSetting
+                    |	asEditActionSetting
+                    |	toolbarSetting
+                    |	fixedCharWidthSetting
+                    |	minCharWidthSetting
+                    |	maxCharWidthSetting
+                    |	prefCharWidthSetting
+                    |	imageSetting
+                    |	editKeySetting
+                    |	autosetSetting
+                    |	confirmSetting
+                    |	regexpSetting
+                    |	loggableSetting
+                    |	echoSymbolsSetting
+                    |	indexSetting
+                    |	aggPropSetting
+                    |	notNullSetting
+                    |	onEditEventSetting
+                    |	eventIdSetting
+                    )*
+
+shortcutSetting ::= SHORTCUT propertyUsage
+asEditActionSetting ::= (ASONCHANGE | ASONCHANGEWYS | ASONEDIT) propertyUsage
+toolbarSetting ::= TOOLBAR
+fixedCharWidthSetting ::= FIXEDCHARWIDTH intLiteral
+minCharWidthSetting ::= MINCHARWIDTH intLiteral
+maxCharWidthSetting ::= MAXCHARWIDTH intLiteral
+prefCharWidthSetting ::= PREFCHARWIDTH intLiteral
+imageSetting ::= IMAGE stringLiteral
+editKeySetting ::= EDITKEY stringLiteral (SHOW | HIDE)?
+autosetSetting ::= AUTOSET
+confirmSetting ::= CONFIRM
+regexpSetting ::= REGEXP stringLiteral (stringLiteral)?
+loggableSetting ::= LOGGABLE
+echoSymbolsSetting ::= ECHO
+indexSetting ::= INDEXED
+aggPropSetting ::= AGGPROP
+notNullSetting ::= NOT nullOption (DELETE)? baseEvent
+onEditEventSetting ::= ON (CHANGE | CHANGEWYS | EDIT) actionPropertyDefinitionBody
+eventIdSetting ::= EVENTID stringLiteral
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// ACTION PROPERTIES ///////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+actionPropertyDefinition ::= ACTION
+		                    (LBRAC paramDeclareList RBRAC)?
+		                    actionPropertyDefinitionBody
+
+abstractActionPropertyDefinition ::= ABSTRACT ACTION
+                                    (   CASE (exclusiveOverrideOption)?
+                                    |	MULTI (exclusiveOverrideOption )?
+                                    |	LIST
+                                    )?
+                                    (CHECKED)?
+                                    LBRAC classNameList RBRAC
+
+// extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
+actionPropertyDefinitionBody ::=    customActionPDB
+                                |   extendContextActionPDB
+                                |	keepContextActionPDB
+
+extendContextActionPDB ::=  assignActionPropertyDefinitionBody
+                        |	forActionPropertyDefinitionBody
+                        |   whileActionPropertyDefinitionBody
+                        |	changeClassActionPropertyDefinitionBody
+                        |	deleteActionPropertyDefinitionBody
+                        |	addObjectActionPropertyDefinitionBody
+
+keepContextActionPDB ::=    listActionPropertyDefinitionBody
+                        |	requestInputActionPropertyDefinitionBody
+                        |	execActionPropertyDefinitionBody
+                        |	ifActionPropertyDefinitionBody
+                        |	caseActionPropertyDefinitionBody
+                        |	multiActionPropertyDefinitionBody
+                        |	terminalFlowActionPropertyDefinitionBody
+
+customActionPDB ::= formActionPropertyDefinitionBody
+                |	addFormActionPropertyDefinitionBody
+                |	editFormActionPropertyDefinitionBody
+                |	customActionPropertyDefinitionBody
+                |   messageActionPropertyDefinitionBody
+                |   asyncUpdateActionPropertyDefinitionBody
+                |   seekObjectActionPropertyDefinitionBody
+                |   confirmActionPropertyDefinitionBody
+                |   emailActionPropertyDefinitionBody
+                |	fileActionPropertyDefinitionBody
+                |	evalActionPropertyDefinitionBody
+
+formActionPropertyDefinitionBody ::=
+	    FORM formUsage
+		(OBJECTS formActionObjectList)?
+		(formSessionScopeLiteral)?
+		(modalityTypeLiteral)?
+		(CHECK)? (SHOWDROP)?
+
+formActionObjectList ::=
+		ID EQUAL propertyExpression
+		(COMMA ID EQUAL propertyExpression)*
+
+customActionPropertyDefinitionBody ::= CUSTOM stringLiteral
+
+addFormActionPropertyDefinitionBody ::= ADDFORM (SESSION)? customClassUsage
+editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION)? customClassUsage
+
+addObjectActionPropertyDefinitionBody ::= ADDOBJ customClassUsage
+		                                    (WHERE propertyExpression)?
+		                                    (TO propertyUsage LBRAC singleParameterList RBRAC)?
+
+
+emailActionPropertyDefinitionBody ::=
+		EMAIL
+		(FROM propertyExpression)?
+		SUBJECT propertyExpression
+		(emailRecipientTypeLiteral propertyExpression)*
+		(	INLINE formUsage emailActionFormObjects
+		|	ATTACH emailAttachFormat (NAME propertyExpression)? formUsage emailActionFormObjects
+		)*
+
+emailActionFormObjects ::=
+        (   OBJECTS
+			ID EQUAL propertyExpression
+			(COMMA ID EQUAL propertyExpression)*
+		)?
+	;
+
+confirmActionPropertyDefinitionBody ::= CONFIRM propertyExpression
+messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression
+
+asyncUpdateActionPropertyDefinitionBody ::= ASYNCUPDATE propertyExpression
+
+seekObjectActionPropertyDefinitionBody ::= SEEK groupObjectID propertyExpression
+
+fileActionPropertyDefinitionBody ::= (LOADFILE | OPENFILE) propertyExpression
+
+changeClassActionPropertyDefinitionBody ::= CHANGECLASS parameterUsage TO customClassUsage (WHERE propertyExpression)?
+deleteActionPropertyDefinitionBody ::= DELETE parameterUsage (WHERE propertyExpression)?
+
+evalActionPropertyDefinitionBody ::= EVAL propertyExpression
+
+requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)
+
+listActionPropertyDefinitionBody ::=    (NEWSESSION (AUTOAPPLY)? (SINGLE)?)?
+		                                LBRACE
+			                            (	actionPropertyDefinitionBody (SEMI)? // ;?
+			                            |	localDataPropertyDefinition SEMI
+			                            |	emptyStatement
+			                            )*
+		                                RBRACE
+
+localDataPropertyDefinition ::= LOCAL ID EQUAL className LBRAC classNameList RBRAC
+
+execActionPropertyDefinitionBody ::= (EXEC)? propertyObject LBRAC propertyExpressionList RBRAC
+
+assignActionPropertyDefinitionBody ::= (ASSIGN)?
+                                       propertyUsage LBRAC singleParameterList RBRAC
+                                       ARROW
+                                       propertyExpression (WHERE propertyExpression)?
+
+ifActionPropertyDefinitionBody ::= IF propertyExpression
+		                                THEN actionPropertyDefinitionBody
+		                                (ELSE actionPropertyDefinitionBody)?
+
+caseActionPropertyDefinitionBody ::= CASE (exclusiveOverrideOption)?
+			                            (actionCaseBranchBody)+
+			                            (ELSE actionPropertyDefinitionBody)?
+
+actionCaseBranchBody ::= WHEN propertyExpression THEN actionPropertyDefinitionBody
+
+multiActionPropertyDefinitionBody ::= MULTI (exclusiveOverrideOption)? nonEmptyActionPDBList
+
+forAddObjClause ::= ADDOBJ (ID EQUAL)? customClassUsage
+
+forActionPropertyDefinitionBody ::= FOR (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
+		                            inlineStatement
+		                            (forAddObjClause)?
+		                            DO actionPropertyDefinitionBody
+		                            (ELSE actionPropertyDefinitionBody)?
+
+whileActionPropertyDefinitionBody ::= WHILE (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
+		                              inlineStatement
+		                              (forAddObjClause)?
+		                              DO actionPropertyDefinitionBody
+
+terminalFlowActionPropertyDefinitionBody ::= BREAK | RETURN
+
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// FORM STATEMENT /////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+formStatement ::=	(	formDeclaration
+            		|	extendingFormDeclaration
+		            )
+                    (	formGroupObjectsList
+                    |	formTreeGroupObjectList
+                    |	formFiltersList
+                    |	formPropertiesList
+                    |	formHintsList
+                    |	formEventsList
+                    |	filterGroupDeclaration
+                    |	formOrderByList
+                    |	dialogFormDeclaration
+                    |	editFormDeclaration
+                    |	listFormDeclaration
+                    )*
+                    SEMI
+
+dialogFormDeclaration ::= DIALOG customClassUsage OBJECT ID
+editFormDeclaration ::= EDIT customClassUsage OBJECT ID
+listFormDeclaration ::= LIST customClassUsage OBJECT ID
+
+formDeclaration ::= FORM simpleNameWithCaption
+		            (TITLE stringLiteral)?
+		            (PRINT)?
+		            (modalityTypeLiteral)?
+		            (IMAGE stringLiteral)?
+
+extendingFormDeclaration ::= EXTEND FORM formUsage
+
+formGroupObjectsList ::= OBJECTS formGroupObjectDeclaration
+		                         (COMMA formGroupObjectDeclaration)*
+
+formTreeGroupObjectList ::= TREE (ID)? formTreeGroupObjectDeclaration
+		                               (COMMA formTreeGroupObjectDeclaration)*
+
+formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectReportPath)? (formGroupObjectViewType)? (formGroupObjectPageSize)?
+formTreeGroupObjectDeclaration ::= formCommonGroupObject (treeGroupParentDeclaration)?
+
+treeGroupParentDeclaration ::= PARENT (propertyUsage | LBRAC nonEmptyPropertyUsageList RBRAC)
+
+formCommonGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDeclaration
+
+formGroupObjectReportPath ::= REPORTFILE mappedProperty
+
+formGroupObjectViewType ::= (INIT | FIXED ) classViewType
+
+classViewType ::= PANEL | HIDE | GRID
+
+formGroupObjectPageSize ::= PAGESIZE intLiteral
+
+formSingleGroupObjectDeclaration ::= formObjectDeclaration
+
+formMultiGroupObjectDeclaration ::= (ID EQUAL)?
+		                            LBRAC
+			                        formObjectDeclaration (COMMA formObjectDeclaration)+
+		                            RBRAC
+
+formObjectDeclaration ::= (ID EQUAL)?
+		                  className (stringLiteral)?
+		                  (ON CHANGE formActionPropertyObject)?
+
+formPropertiesList ::=  PROPERTIES LBRAC idList RBRAC formPropertyOptionsList formPropertiesNamesList
+	                |	PROPERTIES formPropertyOptionsList formMappedPropertiesList
+
+formPropertyOptionsList ::= (	propertyEditTypeLiteral
+                            |	HINTNOUPDATE
+                            |   HINTTABLE
+                            |   TOOLBAR
+                            |	COLUMNS LBRAC nonEmptyIdList RBRAC
+                            |	SHOWIF formCalcPropertyObject
+                            |	READONLYIF formCalcPropertyObject
+                            |	BACKGROUND formCalcPropertyObject
+                            |	FOREGROUND formCalcPropertyObject
+                            |	HEADER formCalcPropertyObject
+                            |	FOOTER formCalcPropertyObject
+                            |	FORCE classViewType
+                            |	TODRAW formGroupObjectEntity
+                            |	BEFORE formPropertyDraw
+                            |	AFTER  formPropertyDraw
+                            |	ON EDIT formActionPropertyObject
+                            |	ON CHANGE formActionPropertyObject
+                            |	ON CHANGEWYS formActionPropertyObject
+                            |	ON SHORTCUT (stringLiteral)? formActionPropertyObject
+                            |	EVENTID stringLiteral
+                            )*
+
+formPropertyDraw ::= mappedProperty | ID
+
+formMappedPropertiesList ::= (ID EQUAL)? formMappedProperty formPropertyOptionsList
+		                     (COMMA (ID EQUAL)? formMappedProperty formPropertyOptionsList)*
+
+formCalcPropertyObject ::= mappedProperty
+formActionPropertyObject ::= mappedProperty
+
+formGroupObjectEntity ::= ID
+formMappedProperty ::= formPropertyName LBRAC idList RBRAC
+
+formPropertiesNamesList ::=	(ID EQUAL)?	formPropertyName formPropertyOptionsList
+		                    (COMMA (ID EQUAL)? formPropertyName formPropertyOptionsList)*
+
+formPropertyName ::=    propertyUsage
+                    |	OBJVALUE
+                    |	SELECTION
+                    |	ADDOBJ
+                    |	ADDFORM
+                    |	ADDSESSIONFORM
+                    |	EDITFORM
+                    |	EDITSESSIONFORM
+                    |	DELETE
+                    |	DELETESESSION
+
+formFiltersList ::= FILTERS formFilterDeclaration (COMMA formFilterDeclaration)*
+
+formHintsList ::= (HINTNOUPDATE | HINTTABLE) LIST nonEmptyPropertyUsageList
+
+formEventsList ::= EVENTS formEventDeclaration (COMMA formEventDeclaration)*
+
+formEventDeclaration ::= ON
+                        (	OK
+                        |	APPLY
+                        |	CLOSE
+                        |	INIT
+                        |	CANCEL
+                        |	DROP
+                        |	QUERYOK
+                        |	QUERYCLOSE
+                        | 	CHANGE ID
+                        )
+                        formActionPropertyObject
+
+filterGroupDeclaration ::= FILTERGROUP ID
+		                   (FILTER stringLiteral stringLiteral formFilterDeclaration filterSetDefault)+
+
+formFilterDeclaration ::= propertyExpression
+filterSetDefault ::= (DEFAULT)?
+
+formOrderByList ::= ORDER BY formPropertyDrawWithOrder
+		                     (COMMA formPropertyDrawWithOrder)*
+
+formPropertyDrawWithOrder ::= formPropertyDraw (ASC | DESC)?
+
+
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////OVERRIDE STATEMENT/////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+overrideStatement ::= propertyUsage LBRAC idList RBRAC PLUSEQ
+		                (WHEN propertyExpression THEN)?
+		                (	propertyExpression
+		                |	actionPropertyDefinition
+		                )
+		                (SEMI)? // ;?
+
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// CONSTRAINT STATEMENT //////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+constraintStatement ::= CONSTRAINT baseEvent propertyExpression
+		                (CHECKED (BY nonEmptyPropertyUsageList)? )?
+		                MESSAGE stringLiteral
+		                SEMI
+
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// FOLLOWS STATEMENT ////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+followsStatement ::= mappedProperty FOLLOWS
+                     propertyExpression (RESOLVE followsResolveType baseEvent)?
+		             (COMMA propertyExpression (RESOLVE followsResolveType baseEvent)?)*
+		             SEMI
+
+followsResolveType ::= LEX_LOGICAL_LITERAL | ALL | NOTHING
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// WRITE STATEMENT /////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+writeWhenStatement ::= mappedProperty ARROW propertyExpression WHEN (DO)? propertyExpression SEMI
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// EVENT STATEMENT /////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+eventStatement ::= WHEN baseEvent propertyExpression inlineStatement
+		                DO actionPropertyDefinitionBody (ORDER (DESC)? nonEmptyPropertyExpressionList)?
+		           (SEMI)? // Разобраться с точкой с запятой
+
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////// GLOBAL EVENT STATEMENT ////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody (SEMI)? // ;?
+
+baseEvent ::= (APPLY | SESSION)? (FORMS nonEmptyFormUsageList)?
+
+inlineStatement ::=   (NOINLINE (LBRAC singleParameterList RBRAC)? )? (INLINE)?
+
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// SHOWDEP STATEMENT //////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+showDepStatement ::= SHOWDEP propertyUsage FROM propertyUsage SEMI
+
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// ASPECT STATEMENT //////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+aspectStatement ::= (BEFORE | AFTER) mappedProperty DO actionPropertyDefinitionBody (SEMI)? // ;?
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// TABLE STATEMENT /////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+tableStatement ::= TABLE ID LBRAC nonEmptyClassNameList RBRAC SEMI;
+
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// LOGGABLE STATEMENT /////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+loggableStatement ::= LOGGABLE nonEmptyPropertyUsageList SEMI
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// INDEX STATEMENT /////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+indexStatement ::= INDEX nonEmptyPropertyUsageList SEMI
+
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// WINDOW STATEMENT ////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+windowStatement ::= windowCreateStatement | windowHideStatement
+
+windowCreateStatement ::= WINDOW windowType ID stringLiteral windowOptions SEMI
+
+windowHideStatement ::= HIDE WINDOW windowUsage SEMI
+
+windowType ::= MENU | PANEL | TOOLBAR | TREE
+
+windowOptions ::=   (	HIDETITLE
+                    |	DRAWROOT
+                    |	HIDESCROLLBARS
+                    |	orientation
+                    |	dockPosition
+                    |	borderPosition
+                    |	HALIGN LBRAC horizontalAlignment RBRAC
+                    |	VALIGN LBRAC verticalAlignment RBRAC
+                    |	TEXTHALIGN LBRAC horizontalAlignment RBRAC
+                    |	TEXTVALIGN LBRAC verticalAlignment RBRAC
+                    )*
+
+borderPosition ::= LEFT	| RIGHT | TOP | BOTTOM
+verticalAlignment ::= TOP | CENTER | BOTTOM
+horizontalAlignment ::= LEFT | CENTER | RIGHT
+orientation ::= VERTICAL | HORIZONTAL
+dockPosition ::= POSITION LBRAC intLiteral COMMA intLiteral COMMA intLiteral COMMA intLiteral RBRAC
+
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// NAVIGATOR STATEMENT ////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+navigatorStatement ::= NAVIGATOR navigatorElementStatementBody
+
+navigatorElementStatementBody ::=   (   LBRACE
+                                        (	addNavigatorElementStatement
+                                        |	newNavigatorElementStatement
+                                        |	setupNavigatorElementStatement
+                                        |	emptyStatement
+                                        )*
+                                        RBRACE
+                                    ) | emptyStatement
+
+addNavigatorElementStatement ::= ADD navigatorElementSelector (stringLiteral)? navigatorElementInsertPositionSelector (TO windowUsage)? navigatorElementStatementBody
+
+newNavigatorElementStatement ::= NEW ID (ACTION propertyUsage)? stringLiteral navigatorElementInsertPositionSelector (TO windowUsage)? (IMAGE stringLiteral)? navigatorElementStatementBody
+
+navigatorElementInsertPositionSelector ::=	(IN navigatorElementSelector)?
+                                            (   insertRelativePositionLiteral navigatorElementSelector
+                                            |	FIRST
+                                            )?
+
+setupNavigatorElementStatement ::= navigatorElementSelector (stringLiteral)? (TO windowUsage)? navigatorElementStatementBody
+
+navigatorElementSelector ::= navigatorElementUsage
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// DESIGN STATEMENT ////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+designStatement ::=	(designDeclaration | extendDesignDeclaration) componentStatementBody
+
+designDeclaration ::= DESIGN formUsage (stringLiteral)? (FROM DEFAULT)?
+
+extendDesignDeclaration ::= EXTEND DESIGN formUsage
+
+componentStatementBody ::=  LBRACE
+                            (	setObjectPropertyStatement
+                            |	positionComponentsStatement
+                            |	setupComponentStatement
+                            |	setupGroupObjectStatement
+                            |	newComponentStatement
+                            |	addComponentStatement
+                            |	removeComponentStatement
+                            |	emptyStatement
+                            )*
+		                    RBRACE
+	                    |	emptyStatement
+
+setupComponentStatement ::= componentSelector componentStatementBody
+
+setupGroupObjectStatement ::= GROUP LBRAC ID RBRAC
+                              LBRACE
+                              (   setObjectPropertyStatement
+                              |   emptyStatement
+                              )*
+                              RBRACE
+
+newComponentStatement ::= NEW multiCompoundID componentInsertPositionSelector componentStatementBody
+addComponentStatement ::= ADD componentSelector componentInsertPositionSelector componentStatementBody
+
+componentInsertPositionSelector ::= (IN componentSelector)?
+                                    (   insertRelativePositionLiteral componentSelector
+                                    |	FIRST
+                                    )?
+
+removeComponentStatement ::= REMOVE componentSelector (CASCADE)? SEMI
+
+componentSelector ::=   PARENT LBRAC componentSelector RBRAC
+                	|	PROPERTY LBRAC propertySelector RBRAC
+                    |	multiCompoundID
+
+propertySelector ::= mappedProperty | compoundID // compoundID?
+
+positionComponentsStatement ::= POSITION componentSelector simplexConstraintLiteral (componentSelector)? SEMI
+
+setObjectPropertyStatement ::= ID EQUAL componentPropertyValue SEMI
+
+componentPropertyValue ::=  colorLiteral
+                        |	stringLiteral
+                        |	intLiteral
+                        |	doubleLiteral
+                        |	dimensionLiteral
+                        |	booleanLiteral
+                        |	simplexConstraintLiteral
+                        |	boundsIntLiteral
+                        |	boundsDoubleLiteral
+                        |   containerTypeLiteral
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// META STATEMENT //////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+metaCodeDeclarationStatement ::= META ID LBRAC idList RBRAC DUMMY* {pin=5 recoverUntil=rule_recover}
+
+private rule_recover ::= !(END)
+
+metaCodeStatement ::= ATSIGN compoundID LBRAC metaCodeIdList RBRAC SEMI
+
+metaCodeIdList ::=  metaCodeId (COMMA metaCodeId)*
+
+metaCodeId ::=  PRIMITIVE_TYPE
+	        |	compoundID
+	        |	metaCodeLiteral
+	        |
+
+metaCodeLiteral ::= LEX_STRING_LITERAL
+                | 	LEX_UINT_LITERAL
+                |	LEX_UNUMERIC_LITERAL
+                |	LEX_UDOUBLE_LITERAL
+                |	LEX_ULONG_LITERAL
+                |	LEX_LOGICAL_LITERAL
+                |	LEX_DATE_LITERAL
+                |	LEX_DATETIME_LITERAL
+                |	LEX_TIME_LITERAL
+                |	LEX_COLOR_LITERAL
+                |	NULL
+
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////// COMMON /////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+emptyStatement ::= SEMI;
+
+mappedProperty ::= propertyUsage LBRAC idList RBRAC // temporary
+
+parameterUsage ::= ID | NUMBERED_PARAM | RECURSIVE_PARAM
+{mixin="com.simpleplugin.psi.impl.LSFParamReferenceImpl" implements="com.simpleplugin.psi.LSFParamReference"}
+
+simpleNameWithCaption ::= simpleName (stringLiteral)?
+{mixin="com.simpleplugin.psi.impl.LSFNamedElementImpl" implements="com.simpleplugin.psi.LSFNamedElement"}
+
+simpleName ::= ID
+
+idList ::= (nonEmptyIdList)?
+nonEmptyIdList ::= ID (COMMA ID)*
+
+customClassUsageList ::= (nonEmptyCustomClassUsageList)?
+nonEmptyCustomClassUsageList ::= customClassUsage (COMMA customClassUsage)*
+
+classNameList ::= (nonEmptyClassNameList)?
+nonEmptyClassNameList ::= className (COMMA className)*
+
+
+propertyUsageList ::= (nonEmptyPropertyUsageList)?
+nonEmptyPropertyUsageList ::= propertyUsage (COMMA propertyUsage)*
+
+formUsageList ::= (nonEmptyFormUsageList)?
+nonEmptyFormUsageList ::= formUsage (COMMA formUsage)*
+
+compoundIDList ::= (nonEmptyCompoundIdList)?
+nonEmptyCompoundIdList ::= compoundID (COMMA compoundID)*
+
+singleParameterList ::= (singleParameter (COMMA singleParameter)*)?
+singleParameter ::= ID
+
+simpleNameWithCaptionList ::= (nonEmtySimpleNameWithCaptionList)?
+nonEmtySimpleNameWithCaptionList ::= simpleNameWithCaption (COMMA simpleNameWithCaption)*
+
+actionPDBList ::= (nonEmptyActionPDBList)?
+nonEmptyActionPDBList ::= actionPropertyDefinitionBody (COMMA actionPropertyDefinitionBody)*
 
 propertyExpressionList ::= (nonEmptyPropertyExpressionList)?
 nonEmptyPropertyExpressionList ::= propertyExpression (COMMA propertyExpression)*
+
+literal ::=
+        ulongLiteral
+	|	uintLiteral
+	|	udoubleLiteral
+	|	LEX_UNUMERIC_LITERAL
+	|	stringLiteral
+	|	booleanLiteral
+	|	dateTimeLiteral
+	|	dateLiteral
+	|	timeLiteral
+	|	nullLiteral
+	|	staticObjectID
+	|	colorLiteral
+
+builtInClassName ::= PRIMITIVE_TYPE
+className ::= builtInClassName | customClassUsage
+
+customClassUsage ::= compoundID
+{mixin="com.simpleplugin.psi.impl.LSFClassReferenceImpl" implements="com.simpleplugin.psi.LSFClassReference"}
+
+propertyUsage ::= compoundID
+{mixin="com.simpleplugin.psi.impl.LSFPropReferenceImpl" implements="com.simpleplugin.psi.LSFPropReference"}
+
+tableUsage ::= compoundID
+groupUsage ::= compoundID
+formUsage ::= compoundID
+windowUsage ::= compoundID
+navigatorElementUsage ::= compoundID
+
+typeId ::= PRIMITIVE_TYPE | OBJECT
+
+compoundID ::= ID (POINT ID)?
+
+//staticObjectID ::= (ID POINT)? ID POINT ID
+staticObjectID ::= ID POINT ID (POINT ID)?
+
+//groupObjectID ::= (ID POINT)? ID POINT ID
+groupObjectID ::= ID POINT ID (POINT ID)?
+
+multiCompoundID ::= ID (POINT ID)*
+
+exclusiveOverrideOption ::= OVERRIDE | EXCLUSIVE
+
+colorLiteral ::= LEX_COLOR_LITERAL | (RGB LBRAC uintLiteral COMMA uintLiteral COMMA uintLiteral RBRAC)
+stringLiteral ::= LEX_STRING_LITERAL
+intLiteral ::= (MINUS)? uintLiteral
+longLiteral ::=  (MINUS)? ulongLiteral
+doubleLiteral ::= (MINUS)? LEX_UNUMERIC_LITERAL
+dateLiteral ::= LEX_DATE_LITERAL
+dateTimeLiteral ::= LEX_DATETIME_LITERAL
+timeLiteral ::= LEX_TIME_LITERAL
+booleanLiteral ::= LEX_LOGICAL_LITERAL
+udoubleLiteral ::= LEX_UDOUBLE_LITERAL
+uintLiteral ::= LEX_UINT_LITERAL
+ulongLiteral ::= LEX_ULONG_LITERAL
+nullLiteral ::= NULL
+
+nullOption ::= NULL
+
+dimensionLiteral ::= LBRAC intLiteral COMMA intLiteral RBRAC
+boundsIntLiteral ::= LBRAC intLiteral COMMA intLiteral COMMA intLiteral COMMA intLiteral RBRAC
+boundsDoubleLiteral ::= LBRAC doubleLiteral COMMA doubleLiteral COMMA doubleLiteral COMMA doubleLiteral RBRAC
+
+simplexConstraintLiteral ::=
+        TO THE LEFT
+	|	TO THE RIGHT
+	|	TO THE BOTTOM
+	|	TO THE RIGHTBOTTOM
+	|	TO NOT INTERSECT
+
+insertRelativePositionLiteral ::= BEFORE | AFTER
+
+containerTypeLiteral ::=    CONTAINERV
+	                    |	CONTAINERH
+	                    |	CONTAINERVH
+	                    |	TABBED
+	                    |	SPLITH
+	                    |	SPLITV
+
+propertyEditTypeLiteral ::= EDITABLE | READONLY | SELECTOR
+
+modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN
+
+formSessionScopeLiteral ::= OLDSESSION | NEWSESSION | MANAGESESSION
+
+emailRecipientTypeLiteral ::= TO | CC | BCC
+
+emailAttachFormat ::= PDF | DOCX | HTML | RTF
+

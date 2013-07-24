@@ -38,14 +38,14 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFElementRefe
                 if(declaration instanceof LSFClassStatement) {
                     LSFClassStatement classStatement = (LSFClassStatement) declaration;
                     LSFSimpleNameWithCaption decl = classStatement.getSimpleNameWithCaption();
-                    if(refText.equals(decl.getCompoundID().getText()))
+                    if(refText.equals(decl.getSimpleName().getText()))
                         result.add(decl);
                 }
             } else if(reference instanceof LSFPropReference) {
                 if(declaration instanceof LSFPropertyStatement) {
                     LSFPropertyStatement propStatement = (LSFPropertyStatement) declaration;
                     LSFSimpleNameWithCaption decl = propStatement.getPropertyDeclaration().getSimpleNameWithCaption();
-                    if(refText.equals(decl.getCompoundID().getText()))
+                    if(refText.equals(decl.getSimpleName().getText()))
                         result.add(decl);
                 }
             }
