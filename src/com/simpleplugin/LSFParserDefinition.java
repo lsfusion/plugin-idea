@@ -13,6 +13,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
+import com.intellij.psi.tree.IStubFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.simpleplugin.parser.LSFParser;
 import com.simpleplugin.psi.LSFFile;
@@ -25,8 +26,7 @@ public class LSFParserDefinition implements ParserDefinition{
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(LSFTypes.COMMENTS);
 
-    public static final IFileElementType FILE = new IFileElementType(Language.<LSFLanguage>findInstance(LSFLanguage.class));
-
+    public static final IStubFileElementType FILE = new IStubFileElementType(Language.<LSFLanguage>findInstance(LSFLanguage.class));
     @NotNull
     @Override
     public Lexer createLexer(Project project) {

@@ -30,7 +30,7 @@ DIGITS = [0-9]+
 EDIGITS	= [0-9]*
 HEX_DIGIT =	[0-9a-fA-F]
 FIRST_ID_LETTER	= [a-zA-Z]
-NEXT_ID_LETTER = [a-zA-Z_0-9]
+NEXT_ID_LETTER = [a-zA-Z_0-9#]
 
 %%
 <YYINITIAL> {

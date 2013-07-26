@@ -10,7 +10,6 @@ import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.TokenSet;
 import com.simpleplugin.psi.LSFSimpleNameWithCaption;
 import com.simpleplugin.psi.LSFTypes;
-import com.simpleplugin.psi.impl.LSFSimpleNameWithCaptionImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -30,6 +30,11 @@
 
   <project-components>
     <!-- Add your project components here -->
+      <component>
+          <implementation-class>com.simpleplugin.psi.MetaChangeDetector</implementation-class>
+          <skipForDefaultProject/>
+      </component>
+
   </project-components>
 
   <actions>
@@ -42,5 +47,13 @@
       <lang.parserDefinition language="Lsf" implementationClass="com.simpleplugin.LSFParserDefinition"/>
       <lang.findUsagesProvider language="Lsf" implementationClass="com.simpleplugin.LSFFindUsagesProvider"/>
       <annotator language="Lsf" implementationClass="com.simpleplugin.LSFReferenceAnnotator" />
+
+      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.MetaIndex"/>
+      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ModuleIndex"/>
+      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.PropIndex"/>
+      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ClassIndex"/>
+      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ExplicitNamespaceIndex"/>
+
+      <stubElementTypeHolder class="com.simpleplugin.psi.LSFTypes"/>
   </extensions>
 </idea-plugin>

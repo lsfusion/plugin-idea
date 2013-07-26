@@ -7,14 +7,15 @@ import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.simpleplugin.psi.LSFCompoundID;
+import com.simpleplugin.psi.LSFSimpleName;
 import org.jetbrains.annotations.Nullable;
 
 public class LSFElementGenerator {
 
     @Nullable
-    public static LSFCompoundID createIdentifierFromText(Project myProject, String name) {
-        final PsiFile dummyFile = createDummyFile(myProject, "dummy() = " + name + "();");
-        for(LSFCompoundID child : PsiTreeUtil.findChildrenOfType(dummyFile, LSFCompoundID.class))
+    public static LSFSimpleName createIdentifierFromText(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, name + "() = dummy();");
+        for(LSFSimpleName child : PsiTreeUtil.findChildrenOfType(dummyFile, LSFSimpleName.class))
             if(!child.getText().equals("dummy"))
                 return child;
         return null;
@@ -29,4 +30,8 @@ public class LSFElementGenerator {
         return psiFile;
     }
 
+/*    public static LSFMetaCodeBody createMetaBodyFromText(Project myProject, String text) {
+        final PsiFile dummyFile = createDummyFile(myProject, "@dummy() " + text + ";");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFMetaCodeBody.class).iterator().next();
+    }*/
 }

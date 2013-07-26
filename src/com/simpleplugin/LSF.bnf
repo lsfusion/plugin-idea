@@ -20,10 +20,24 @@ script ::= moduleHeader statements
 
 statements ::= statement*
 
-moduleHeader ::= MODULE ID SEMI
-                 (REQUIRE nonEmptyIdList SEMI)?
-                 (PRIORITY nonEmptyIdList SEMI)?
-                 (NAMESPACE ID SEMI)?
+simpleName ::= ID
+
+moduleName ::= simpleName;
+requireList ::= REQUIRE nonEmptyModuleUsageList SEMI;
+priorityList ::= PRIORITY nonEmptyNamespaceUsageList SEMI;
+namespaceName ::= NAMESPACE namespaceUsage SEMI {
+    mixin="com.simpleplugin.psi.declarations.impl.LSFExplicitNamespaceDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFExplicitNamespaceDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.ExplicitNamespaceStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+}
+moduleHeader ::= MODULE moduleName SEMI
+                 requireList?
+                 priorityList?
+                 namespaceName?
+{mixin="com.simpleplugin.psi.declarations.impl.LSFModuleDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFModuleDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.ModuleStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+}
 
 // fake rules to generate types
 fake_comments ::= COMMENTS
@@ -50,7 +64,6 @@ private statement ::=   classStatement
                     |	navigatorStatement
                     |	metaCodeStatement
                     |	metaCodeDeclarationStatement
-                    |   END
                     |	emptyStatement
 
 
@@ -58,7 +71,11 @@ private statement ::=   classStatement
 ////////////////////////////////// CLASS STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-classStatement ::= CLASS (ABSTRACT)? simpleNameWithCaption classInstancesAndParents
+classStatement ::= CLASS (ABSTRACT)? simpleNameWithCaption classInstancesAndParents {
+    mixin = "com.simpleplugin.psi.declarations.impl.LSFClassDeclarationImpl" implements = "com.simpleplugin.psi.declarations.LSFClassDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.ClassStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+}
 
 extendClassStatement ::= EXTEND CLASS customClassUsage classInstancesAndParents
 
@@ -81,6 +98,10 @@ propertyStatement ::= propertyDeclaration EQUAL
                       (expressionUnfriendlyPD | propertyExpression)
                       propertyOptions
                       (SEMI)?
+{mixin="com.simpleplugin.psi.declarations.impl.LSFPropDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFPropDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.PropStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+}
 
 propertyDeclaration ::= simpleNameWithCaption (LBRAC paramDeclareList RBRAC)?
 
@@ -349,7 +370,7 @@ listActionPropertyDefinitionBody ::=    (NEWSESSION (AUTOAPPLY)? (SINGLE)?)?
 			                            )*
 		                                RBRACE
 
-localDataPropertyDefinition ::= LOCAL ID EQUAL className LBRAC classNameList RBRAC
+localDataPropertyDefinition ::= LOCAL simpleName EQUAL className LBRAC classNameList RBRAC
 
 execActionPropertyDefinitionBody ::= (EXEC)? propertyObject LBRAC propertyExpressionList RBRAC
 
@@ -741,11 +762,18 @@ componentPropertyValue ::=  colorLiteral
 ////////////////////////////////// META STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-metaCodeDeclarationStatement ::= META ID LBRAC idList RBRAC DUMMY* {pin=5 recoverUntil=rule_recover}
+metaCodeBody ::= statements END
 
-private rule_recover ::= !(END)
+metaCodeDeclarationStatement ::= META simpleName LBRAC idList RBRAC metaCodeBody {pin=5 recoverUntil=rule_recover
+    mixin = "com.simpleplugin.psi.declarations.impl.LSFMetaDeclarationImpl" implements = "com.simpleplugin.psi.declarations.LSFMetaDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.MetaStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+}
 
-metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC SEMI
+metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI {pin=1 recoverUntil=rule_recover
+mixin="com.simpleplugin.psi.references.impl.LSFMetaReferenceImpl" implements="com.simpleplugin.psi.references.LSFMetaReference"}
+
+private rule_recover ::= !(AFTER | ATSIGN | BEFORE | CLASS | CONSTRAINT | DESIGN | END | EXTEND | FORM | GROUP | HIDE | ID | INDEX | LOGGABLE | META | NAVIGATOR | ON | SEMI | SHOWDEP | TABLE | WHEN | WINDOW)
 
 metaCodeIdList ::=  metaCodeId (COMMA metaCodeId)*
 
@@ -775,18 +803,21 @@ emptyStatement ::= SEMI;
 mappedProperty ::= propertyUsage LBRAC idList RBRAC // temporary
 
 parameterUsage ::= ID | NUMBERED_PARAM | RECURSIVE_PARAM
-{mixin="com.simpleplugin.psi.impl.LSFParamReferenceImpl" implements="com.simpleplugin.psi.LSFParamReference"}
+{mixin="com.simpleplugin.psi.references.impl.LSFParamReferenceImpl" implements="com.simpleplugin.psi.references.LSFParamReference"}
 
 simpleNameWithCaption ::= simpleName (stringLiteral)?
-{mixin="com.simpleplugin.psi.impl.LSFNamedElementImpl" implements="com.simpleplugin.psi.LSFNamedElement"}
-
-simpleName ::= ID
 
 idList ::= (nonEmptyIdList)?
 nonEmptyIdList ::= ID (COMMA ID)*
 
 customClassUsageList ::= (nonEmptyCustomClassUsageList)?
 nonEmptyCustomClassUsageList ::= customClassUsage (COMMA customClassUsage)*
+
+moduleUsageList ::= (nonEmptyModuleUsageList)?
+nonEmptyModuleUsageList ::= moduleUsage (COMMA moduleUsage)*
+
+namespaceUsageList ::= (nonEmptyModuleUsageList)?
+nonEmptyNamespaceUsageList ::= namespaceUsage (COMMA namespaceUsage)*
 
 classNameList ::= (nonEmptyClassNameList)?
 nonEmptyClassNameList ::= className (COMMA className)*
@@ -828,10 +859,16 @@ builtInClassName ::= PRIMITIVE_TYPE
 className ::= builtInClassName | customClassUsage
 
 customClassUsage ::= compoundID
-{mixin="com.simpleplugin.psi.impl.LSFClassReferenceImpl" implements="com.simpleplugin.psi.LSFClassReference"}
+{mixin="com.simpleplugin.psi.references.impl.LSFClassReferenceImpl" implements="com.simpleplugin.psi.references.LSFClassReference"}
+
+moduleUsage ::= simpleName
+{mixin="com.simpleplugin.psi.references.impl.LSFModuleReferenceImpl" implements="com.simpleplugin.psi.references.LSFModuleReference"}
+
+namespaceUsage ::= simpleName
+{mixin="com.simpleplugin.psi.references.impl.LSFNamespaceReferenceImpl" implements="com.simpleplugin.psi.references.LSFNamespaceReference"}
 
 propertyUsage ::= compoundID
-{mixin="com.simpleplugin.psi.impl.LSFPropReferenceImpl" implements="com.simpleplugin.psi.LSFPropReference"}
+{mixin="com.simpleplugin.psi.references.impl.LSFPropReferenceImpl" implements="com.simpleplugin.psi.references.LSFPropReference"}
 
 tableUsage ::= compoundID
 groupUsage ::= compoundID
@@ -842,7 +879,7 @@ metacodeUsage ::= compoundID
 
 typeId ::= PRIMITIVE_TYPE | OBJECT
 
-compoundID ::= ID (POINT ID)?
+compoundID ::= simpleName (POINT simpleName)?
 
 //staticObjectID ::= (ID POINT)? ID POINT ID
 staticObjectID ::= ID POINT ID (POINT ID)?

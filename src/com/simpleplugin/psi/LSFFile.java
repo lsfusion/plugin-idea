@@ -6,6 +6,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
 import com.simpleplugin.LSFFileType;
 import com.simpleplugin.LSFLanguage;
+import com.simpleplugin.psi.declarations.LSFModuleDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -19,6 +20,10 @@ public class LSFFile extends PsiFileBase {
     @Override
     public FileType getFileType() {
         return LSFFileType.INSTANCE;
+    }
+
+    public LSFModuleDeclaration getModuleDeclaration() {
+        return findChildByClass(LSFModuleHeader.class);
     }
 
     @Override
