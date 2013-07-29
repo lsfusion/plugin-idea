@@ -23,14 +23,21 @@ public class LSFGlobalResolver {
         Set<VirtualFile> result = new HashSet<VirtualFile>();
         result.add(declaration.getContainingFile().getVirtualFile());
         for(LSFModuleReference ref : declaration.getRequireRefs()) {
-            LSFModuleDeclaration resolve = ref.resolve();
+            LSFModuleDeclaration resolve = ref.resolveDecl();
             if(resolve!=null)
                 result.addAll(getRequireModules(resolve));
         }
         return result;
     }
 
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Query<T> findElements(String name, String fqName, LSFFile file, FullNameStubElementType<S, T> type) {
+    private static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Query<T> findInNamespace(Collection<T> decls, Condition<T> condition) {
+        for(T decl : decls)
+            if(condition.value(decl))
+                return new CollectionQuery<T>(Collections.singleton(decl));
+        return null;
+    }
+
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Query<T> findElements(String name, String fqName, LSFFile file, FullNameStubElementType<S, T> type, Condition<T> condition) {
         StringStubIndexExtension<T> index = type.getGlobalIndex();
 
         LSFModuleDeclaration moduleDeclaration = file.getModuleDeclaration();
@@ -38,30 +45,36 @@ public class LSFGlobalResolver {
 
         Collection<T> decls = index.get(name, project, GlobalSearchScope.filesScope(project, getRequireModules(moduleDeclaration)));
 
-        Map<LSFNamespaceDeclaration, T> mapDecls = new HashMap<LSFNamespaceDeclaration, T>();
+        Map<LSFNamespaceDeclaration, Collection<T>> mapDecls = new HashMap<LSFNamespaceDeclaration, Collection<T>>();
         for(T decl : decls) {
             LSFNamespaceDeclaration namespace = ((LSFFile) decl.getContainingFile()).getModuleDeclaration().getNamespace();
-            if(fqName!=null && namespace.getGlobalName().equals(fqName))
+            if(fqName!=null && namespace.getGlobalName().equals(fqName) && condition.value(decl))
                 return new CollectionQuery<T>(Collections.singleton(decl));
-            mapDecls.put(namespace, decl);
+
+            Collection<T> nameList = mapDecls.get(namespace);
+            if(nameList==null) {
+                nameList = new ArrayList<T>();
+                mapDecls.put(namespace, nameList);
+            }
+            nameList.add(decl);
         }
 
         if(fqName!=null) // должны были найти на прошлом шаге
             return new EmptyQuery<T>();
 
         if(decls.size()>1) { // смотрим на priority
-            T decl = mapDecls.get(moduleDeclaration.getNamespace());
-            if(decl==null) {
-                for(LSFNamespaceReference priority : moduleDeclaration.getPriorityRefs()) {
-                    LSFNamespaceDeclaration resolve = priority.resolve();
-                    if(resolve!=null) {
-                        decl = mapDecls.get(resolve);
-                        break;
-                    }
+            Query<T> result = findInNamespace(mapDecls.get(moduleDeclaration.getNamespace()), condition);
+            if(result!=null)
+                return result;
+
+            for(LSFNamespaceReference priority : moduleDeclaration.getPriorityRefs()) {
+                LSFNamespaceDeclaration resolve = priority.resolveDecl();
+                if(resolve!=null) {
+                    result = findInNamespace(mapDecls.get(resolve), condition);
+                    if(result!=null)
+                        return result;
                 }
             }
-            if(decl!=null)
-                return new CollectionQuery<T>(Collections.singleton(decl));
         }
 
         return new CollectionQuery<T>(decls);

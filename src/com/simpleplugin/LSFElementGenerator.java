@@ -7,15 +7,16 @@ import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.simpleplugin.psi.LSFCompoundID;
+import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
 import org.jetbrains.annotations.Nullable;
 
 public class LSFElementGenerator {
 
     @Nullable
-    public static LSFSimpleName createIdentifierFromText(Project myProject, String name) {
-        final PsiFile dummyFile = createDummyFile(myProject, name + "() = dummy();");
-        for(LSFSimpleName child : PsiTreeUtil.findChildrenOfType(dummyFile, LSFSimpleName.class))
+    public static LSFId createIdentifierFromText(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + name + ";");
+        for(LSFId child : PsiTreeUtil.findChildrenOfType(dummyFile, LSFId.class))
             if(!child.getText().equals("dummy"))
                 return child;
         return null;

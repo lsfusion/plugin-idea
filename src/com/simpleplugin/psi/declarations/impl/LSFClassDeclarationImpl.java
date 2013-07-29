@@ -3,6 +3,7 @@ package com.simpleplugin.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
+import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.LSFSimpleNameWithCaption;
 import com.simpleplugin.psi.declarations.LSFClassDeclaration;
@@ -22,7 +23,7 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
     protected abstract LSFSimpleNameWithCaption getSimpleNameWithCaption();
 
     @Override
-    public LSFSimpleName getNameIdentifier() {
+    public LSFId getNameIdentifier() {
         return getSimpleNameWithCaption().getSimpleName();
     }
 }

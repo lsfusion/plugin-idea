@@ -21,6 +21,10 @@ script ::= moduleHeader statements
 statements ::= statement*
 
 simpleName ::= ID
+{
+    mixin="com.simpleplugin.psi.LSFIdImpl"
+    implements="com.simpleplugin.psi.LSFId"
+}
 
 moduleName ::= simpleName;
 requireList ::= REQUIRE nonEmptyModuleUsageList SEMI;
@@ -764,7 +768,7 @@ componentPropertyValue ::=  colorLiteral
 
 metaCodeBody ::= statements END
 
-metaCodeDeclarationStatement ::= META simpleName LBRAC idList RBRAC metaCodeBody {pin=5 recoverUntil=rule_recover
+metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC metaCodeBody {pin=5 recoverUntil=rule_recover
     mixin = "com.simpleplugin.psi.declarations.impl.LSFMetaDeclarationImpl" implements = "com.simpleplugin.psi.declarations.LSFMetaDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.MetaStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
@@ -774,6 +778,9 @@ metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBo
 mixin="com.simpleplugin.psi.references.impl.LSFMetaReferenceImpl" implements="com.simpleplugin.psi.references.LSFMetaReference"}
 
 private rule_recover ::= !(AFTER | ATSIGN | BEFORE | CLASS | CONSTRAINT | DESIGN | END | EXTEND | FORM | GROUP | HIDE | ID | INDEX | LOGGABLE | META | NAVIGATOR | ON | SEMI | SHOWDEP | TABLE | WHEN | WINDOW)
+
+metaDeclId ::=  ID
+metaDeclIdList ::=  (metaDeclId (COMMA metaDeclId)*)?
 
 metaCodeIdList ::=  metaCodeId (COMMA metaCodeId)*
 

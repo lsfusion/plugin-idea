@@ -32,12 +32,12 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     }
 
     @Override
-    protected Query<LSFMetaDeclaration> adjustResolve(Query<LSFMetaDeclaration> resolved) {
+    protected Condition<LSFMetaDeclaration> getCondition() {
         final int paramCount = getMetaCodeIdList().getMetaCodeIdList().size();
-        return new FilteredQuery<LSFMetaDeclaration>(resolved, new Condition<LSFMetaDeclaration>() {
+        return new Condition<LSFMetaDeclaration>() {
             public boolean value(LSFMetaDeclaration decl) {
                 return decl.getParamCount()==paramCount;
             }
-        });
+        };
     }
 }

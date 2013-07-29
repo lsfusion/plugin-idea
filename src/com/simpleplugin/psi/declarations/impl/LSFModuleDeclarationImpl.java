@@ -44,7 +44,7 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
         LSFNamespaceName namespace = getNamespaceName();
         if(namespace==null)
             return this;
-        return namespace.getNamespaceUsage().resolve();
+        return namespace.getNamespaceUsage().resolveDecl();
     }
 
     @Override

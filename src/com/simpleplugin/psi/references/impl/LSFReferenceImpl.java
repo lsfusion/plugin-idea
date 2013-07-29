@@ -29,7 +29,12 @@ public abstract class LSFReferenceImpl extends ASTWrapperPsiElement implements L
     @Override
     public TextRange getRangeInElement() {
         final TextRange textRange = getTextRange();
-        return new TextRange(0, textRange.getEndOffset() - textRange.getStartOffset());
+        TextRange nameRange = getSimpleName().getTextRange();
+
+        return new TextRange(
+                nameRange.getStartOffset() - textRange.getStartOffset(),
+                nameRange.getEndOffset() - textRange.getStartOffset()
+        );
     }
 
     @NotNull
@@ -40,7 +45,7 @@ public abstract class LSFReferenceImpl extends ASTWrapperPsiElement implements L
 
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-        LSFDeclarationImpl.setName(getSimpleName(), getProject(), newElementName);
+        getSimpleName().setName(newElementName);
         return this;
     }
 

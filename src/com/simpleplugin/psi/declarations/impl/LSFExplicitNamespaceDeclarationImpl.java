@@ -3,6 +3,7 @@ package com.simpleplugin.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
+import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFNamespaceUsage;
 import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.declarations.LSFExplicitNamespaceDeclaration;
@@ -22,7 +23,7 @@ public abstract class LSFExplicitNamespaceDeclarationImpl extends LSFNamespaceDe
     protected abstract LSFNamespaceUsage getNamespaceUsage();
 
     @Override
-    public LSFSimpleName getNameIdentifier() {
+    public LSFId getNameIdentifier() {
         return getNamespaceUsage().getSimpleName();
     }
 }

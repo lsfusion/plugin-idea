@@ -3,9 +3,7 @@ package com.simpleplugin.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
-import com.simpleplugin.psi.LSFIdList;
-import com.simpleplugin.psi.LSFResolver;
-import com.simpleplugin.psi.LSFSimpleName;
+import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.stubs.MetaStubElement;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +20,7 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
 
     protected abstract LSFSimpleName getSimpleName();
 
-    protected abstract LSFIdList getIdList();
+    public abstract LSFMetaDeclIdList getMetaDeclIdList();
 
     @Override
     public int getParamCount() {
@@ -30,11 +28,11 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
         if(stub != null)
             return stub.getParamCount();
 
-        return LSFResolver.getIDs(getIdList()).size();
+        return getMetaDeclIdList().getMetaDeclIdList().size();
     }
 
     @Override
-    public LSFSimpleName getNameIdentifier() {
+    public LSFId getNameIdentifier() {
         return getSimpleName();
     }
 }

@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
 import com.simpleplugin.LSFElementGenerator;
 import com.simpleplugin.psi.LSFCompoundID;
+import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.LSFTypes;
@@ -22,17 +23,11 @@ public abstract class LSFDeclarationImpl extends ASTWrapperPsiElement implements
 
     // множественное наследование
     public static String getName(LSFDeclaration element) {
-        return element.getNameIdentifier().getText();
+        return element.getNameIdentifier().getName();
     }
-    public static void setName(LSFSimpleName keyNode, Project project, @NonNls @NotNull String name) throws IncorrectOperationException {
-        if (keyNode != null) {
-            LSFSimpleName genId = LSFElementGenerator.createIdentifierFromText(project, name);
-            keyNode.getNode().getTreeParent().replaceChild(keyNode.getNode(), genId.getNode());
-        }
-    }
+
     public static PsiElement setName(LSFDeclaration element, @NonNls @NotNull String name) throws IncorrectOperationException {
-        LSFSimpleName keyNode = element.getNameIdentifier();
-        setName(keyNode, element.getProject(), name);
+        element.getNameIdentifier().setName(name);
         return element;
     }
 

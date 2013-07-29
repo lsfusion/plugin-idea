@@ -8,8 +8,12 @@ import com.intellij.lexer.FlexAdapter;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.TokenSet;
+import com.simpleplugin.psi.LSFId;
+import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.LSFSimpleNameWithCaption;
 import com.simpleplugin.psi.LSFTypes;
+import com.simpleplugin.psi.declarations.LSFDeclaration;
+import com.simpleplugin.psi.declarations.LSFGlobalDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +32,7 @@ public class LSFFindUsagesProvider implements FindUsagesProvider {
 
     @Override
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-        return psiElement instanceof PsiNamedElement;
+        return psiElement instanceof LSFId;
     }
 
     @Nullable

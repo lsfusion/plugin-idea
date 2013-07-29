@@ -29,15 +29,10 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFGlobalRefer
         return new ArrayList<String>();
     }
 
-    public static List<String> getIDs(LSFIdList idList) {
-        PsiElement psiChild = idList.getFirstChild();
-        if (psiChild == null) return new ArrayList<String>();
-
-        List<String> result = new ArrayList<String>();
-        while (psiChild != null) {
-            result.add(psiChild.getText());
-            psiChild = psiChild.getNextSibling();
-        }
+    public static List<String> getIDs(LSFMetaDeclIdList idList) {
+        List<String> result = new ArrayList();
+        for(LSFMetaDeclId id : idList.getMetaDeclIdList())
+            result.add(id.getText());
         return result;
     }
     public static Query<PsiReference> searchWordUsages(Project project, String compoundID) {

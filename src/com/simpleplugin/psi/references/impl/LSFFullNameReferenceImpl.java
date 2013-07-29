@@ -1,11 +1,9 @@
 package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Condition;
 import com.intellij.util.Query;
-import com.simpleplugin.psi.LSFCompoundID;
-import com.simpleplugin.psi.LSFFile;
-import com.simpleplugin.psi.LSFGlobalResolver;
-import com.simpleplugin.psi.LSFSimpleName;
+import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFFullNameDeclaration;
 import com.simpleplugin.psi.references.LSFFullNameReference;
 import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
@@ -22,7 +20,7 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFFullNameDeclaration>
     protected abstract LSFCompoundID getCompoundID();
 
     @Override
-    public LSFSimpleName getSimpleName() {
+    public LSFId getSimpleName() {
         Iterator<LSFSimpleName> compoundID = getCompoundID().getSimpleNameList().iterator();
         LSFSimpleName firstChild = compoundID.next();
         if(!compoundID.hasNext())
@@ -40,12 +38,11 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFFullNameDeclaration>
     }
 
     protected abstract FullNameStubElementType getType();
-    protected Query<T> adjustResolve(Query<T> resolved) {
-        return resolved;
+    protected Condition<T> getCondition() {
+        return Condition.TRUE;
     }
-
     @Override
     public Query<T> resolveNoCache() {
-        return adjustResolve(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), getType()));
+        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), getType(), getCondition());
     }
 }
