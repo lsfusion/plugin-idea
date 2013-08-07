@@ -1,7 +1,7 @@
 
 {
   parserClass="com.simpleplugin.parser.LSFParser"
-  parserUtilClass="com.simpleplugin.parser.LSFParserUtil"
+  parserUtilClass="com.simpleplugin.parser.GeneratedParserUtilBase"
   stubParserClass="com.simpleplugin.parser.GeneratedParserUtilBase"
  
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
@@ -208,7 +208,7 @@ abstractPropertyDefinition ::= ABSTRACT (CASE |	MULTI | OVERRIDE | EXCLUSIVE)? (
 
 formulaPropertyDefinition ::= FORMULA (builtInClassName)? stringLiteral
 
-groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | EQUAL
+groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | EQUAL | LAST
 groupPropertyDefinition ::= GROUP groupingType
 		                    nonEmptyPropertyExpressionList
 		                    (BY nonEmptyPropertyExpressionList)?
@@ -316,6 +316,7 @@ customActionPDB ::= formActionPropertyDefinitionBody
 formActionPropertyDefinitionBody ::=
 	    FORM formUsage
 		(OBJECTS formActionObjectList)?
+        (CONTEXTFILTER ID EQUAL propertyExpression)?
 		(formSessionScopeLiteral)?
 		(modalityTypeLiteral)?
 		(CHECK)? (SHOWDROP)?
@@ -766,15 +767,21 @@ componentPropertyValue ::=  colorLiteral
 ////////////////////////////////// META STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-metaCodeBody ::= statements END
-
-metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC metaCodeBody {pin=5 recoverUntil=rule_recover
+// recoverUntil=rule_recover
+metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC anyTokens END {pin=5
     mixin = "com.simpleplugin.psi.declarations.impl.LSFMetaDeclarationImpl" implements = "com.simpleplugin.psi.declarations.LSFMetaDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.MetaStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
-metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI {pin=1 recoverUntil=rule_recover
+anyTokens ::= (<< readAny >>)*
+fakeTwoDashes ::= FAKETWODASHES
+fakeThreeDashes ::= FAKETHREEDASHES
+
+metaCodeBody ::= LBRACE statements RBRACE
+
+//recoverUntil=rule_recover
+metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI {pin=1
 mixin="com.simpleplugin.psi.references.impl.LSFMetaReferenceImpl" implements="com.simpleplugin.psi.references.LSFMetaReference"}
 
 private rule_recover ::= !(AFTER | ATSIGN | BEFORE | CLASS | CONSTRAINT | DESIGN | END | EXTEND | FORM | GROUP | HIDE | ID | INDEX | LOGGABLE | META | NAVIGATOR | ON | SEMI | SHOWDEP | TABLE | WHEN | WINDOW)
@@ -782,7 +789,7 @@ private rule_recover ::= !(AFTER | ATSIGN | BEFORE | CLASS | CONSTRAINT | DESIGN
 metaDeclId ::=  ID
 metaDeclIdList ::=  (metaDeclId (COMMA metaDeclId)*)?
 
-metaCodeIdList ::=  metaCodeId (COMMA metaCodeId)*
+metaCodeIdList ::=  (metaCodeId (COMMA metaCodeId)*)?
 
 metaCodeId ::=  PRIMITIVE_TYPE
 	        |	compoundID
@@ -809,7 +816,7 @@ emptyStatement ::= SEMI;
 
 mappedProperty ::= propertyUsage LBRAC idList RBRAC // temporary
 
-parameterUsage ::= ID | NUMBERED_PARAM | RECURSIVE_PARAM
+parameterUsage ::= simpleName | NUMBERED_PARAM | RECURSIVE_PARAM
 {mixin="com.simpleplugin.psi.references.impl.LSFParamReferenceImpl" implements="com.simpleplugin.psi.references.LSFParamReference"}
 
 simpleNameWithCaption ::= simpleName (stringLiteral)?

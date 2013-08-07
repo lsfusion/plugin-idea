@@ -18,11 +18,6 @@ public abstract class LSFParamReferenceImpl extends LSFReferenceImpl implements 
         return true;
     }
 
-    @Override
-    public LSFSimpleName getSimpleName() {
-        throw new RuntimeException("not supported");
-    }
-
     @Nullable
     @Override
     public PsiElement resolve() {

@@ -6,6 +6,7 @@ import com.intellij.psi.stubs.*;
 import com.simpleplugin.LSFLanguage;
 import com.simpleplugin.psi.declarations.LSFGlobalDeclaration;
 import com.simpleplugin.psi.stubs.GlobalStubElement;
+import com.simpleplugin.psi.stubs.impl.MetaStubImpl;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -30,7 +30,7 @@ DIGITS = [0-9]+
 EDIGITS	= [0-9]*
 HEX_DIGIT =	[0-9a-fA-F]
 FIRST_ID_LETTER	= [a-zA-Z]
-NEXT_ID_LETTER = [a-zA-Z_0-9#]
+NEXT_ID_LETTER = [a-zA-Z_0-9]
 
 %%
 <YYINITIAL> {
@@ -220,6 +220,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9#]
   "LOGGABLE"                			{ return LOGGABLE; }
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "MAX"                     			{ return MAX; }
+  "LAST"                     			{ return LAST; }
   "MAXCHARWIDTH"            			{ return MAXCHARWIDTH; }
   "MENU"                    			{ return MENU; }
   "MESSAGE"                 			{ return MESSAGE; }
@@ -241,6 +242,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9#]
   "NULL"                    			{ return NULL; }
   "OBJECT"                  			{ return OBJECT; }
   "OBJECTS"                 			{ return OBJECTS; }
+  "CONTEXTFILTER"              			{ return CONTEXTFILTER; }
   "OBJVALUE"                			{ return OBJVALUE; }
   "OK"                      			{ return OK; }
   "OLDSESSION"              			{ return OLDSESSION; }
@@ -321,6 +323,8 @@ NEXT_ID_LETTER = [a-zA-Z_0-9#]
   "WINDOW"                  			{ return WINDOW; }
   "XOR"                     			{ return XOR; }
   "YES"                     			{ return YES; }
+  "##"                                  { return FAKETWODASHES;}
+  "###"                                 { return FAKETHREEDASHES;}
 
   {FIRST_ID_LETTER} {NEXT_ID_LETTER}*   { return ID; }
 

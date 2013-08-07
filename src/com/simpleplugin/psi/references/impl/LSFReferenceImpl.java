@@ -6,11 +6,12 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
+import com.simpleplugin.psi.LSFElementImpl;
 import com.simpleplugin.psi.declarations.impl.LSFDeclarationImpl;
 import com.simpleplugin.psi.references.LSFReference;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class LSFReferenceImpl extends ASTWrapperPsiElement implements LSFReference {
+public abstract class LSFReferenceImpl extends LSFElementImpl implements LSFReference {
 
     public LSFReferenceImpl(@NotNull ASTNode node) {
         super(node);

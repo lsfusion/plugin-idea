@@ -1,15 +1,17 @@
 package com.simpleplugin.psi;
 
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.*;
 import com.intellij.util.Processor;
 import com.intellij.util.Query;
-import com.simpleplugin.psi.references.LSFClassReference;
+import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
+import com.simpleplugin.psi.impl.LSFMetaCodeDeclarationStatementImpl;
 import com.simpleplugin.psi.references.LSFGlobalReference;
 import com.simpleplugin.psi.references.LSFMetaReference;
-import com.simpleplugin.psi.references.LSFPropReference;
+import com.simpleplugin.psi.stubs.impl.MetaStubImpl;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,9 +37,9 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFGlobalRefer
             result.add(id.getText());
         return result;
     }
-    public static Query<PsiReference> searchWordUsages(Project project, String compoundID) {
+    public static Query<PsiReference> searchWordUsages(GlobalSearchScope scope, String compoundID) {
         SearchRequestCollector request = new SearchRequestCollector(new SearchSession());
-        request.searchWord(compoundID, GlobalSearchScope.projectScope(project), UsageSearchContext.IN_CODE, true, new RequestResultProcessor() {
+        request.searchWord(compoundID, scope, UsageSearchContext.IN_CODE, true, new RequestResultProcessor() {
             public boolean processTextOccurrence(@NotNull PsiElement element, int offsetInElement, @NotNull Processor<PsiReference> consumer) {
                 for (PsiReference ref : element.getReferences())
                     if (ReferenceRange.containsOffsetInElement(ref, offsetInElement) && !consumer.process(ref)) {
@@ -46,20 +48,28 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFGlobalRefer
                 return true;
             }
         });
-        return new SearchRequestQuery(project, request);
+        return new SearchRequestQuery(scope.getProject(), request);
     }
 
-    public static List<LSFMetaCodeStatement> findMetaUsages(final Project project, final String compoundID) {
-/*        final List<LSFMetaCodeStatement> result = new ArrayList<LSFMetaCodeStatement>();
-        searchWordUsages(project, compoundID).forEach(new Processor<PsiReference>() {
+    public static List<LSFMetaCodeStatement> findMetaUsages(final String name, int paramCount, final LSFFile file) {
+
+        // песец не надежно, но что поделаешь
+        final LSFMetaDeclaration virtDecl = new LSFMetaCodeDeclarationStatementImpl(new MetaStubImpl(name, paramCount), LSFStubElementTypes.META) {
+            public LSFFile getLSFFile() {
+                return file;
+            }
+        };
+        final List<LSFMetaCodeStatement> result = new ArrayList<LSFMetaCodeStatement>();
+        searchWordUsages(file.getScope(), name).forEach(new Processor<PsiReference>() {
             public boolean process(PsiReference ref) {
-                if (ref instanceof LSFMetaIdUsage && ((LSFMetaIdUsage) ref).getText().equals(compoundID))
-                    result.add((LSFMetaCodeStatement) ((LSFMetaIdUsage) ref).getParent());
+                if (ref instanceof LSFMetaReference && ((LSFMetaReference) ref).isResolveToVirt(virtDecl))
+                    synchronized (result) {
+                        result.add((LSFMetaCodeStatement) ref);
+                    }
                 return true;
             }
         });
-        return result;*/
-        return null;
+        return result;
     }
 
 }

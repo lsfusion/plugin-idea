@@ -12,4 +12,6 @@ public interface GlobalStubElement<This extends GlobalStubElement<This, Decl>, D
     public void serialize(StubOutputStream dataStream) throws IOException;
 
     public String getGlobalName();
+    
+    public boolean isCorrect();
 }

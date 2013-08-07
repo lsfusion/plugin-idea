@@ -12,6 +12,7 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.intellij.psi.tree.TokenSet;
@@ -25,6 +26,13 @@ import java.io.Reader;
 public class LSFParserDefinition implements ParserDefinition{
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(LSFTypes.COMMENTS);
+
+    public static boolean isWhiteSpace(IElementType type) {
+        return WHITE_SPACES.contains(type);
+    }
+    public static boolean isWhiteSpaceOrComment(IElementType type) {
+        return WHITE_SPACES.contains(type) || COMMENTS.contains(type);
+    }
 
     public static final IStubFileElementType FILE = new IStubFileElementType(Language.<LSFLanguage>findInstance(LSFLanguage.class));
     @NotNull

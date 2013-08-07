@@ -43,6 +43,6 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFFullNameDeclaration>
     }
     @Override
     public Query<T> resolveNoCache() {
-        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), getType(), getCondition());
+        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getType(), getCondition());
     }
 }

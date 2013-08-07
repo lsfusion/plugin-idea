@@ -1,7 +1,6 @@
 package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.BaseUtils;
 import com.simpleplugin.psi.*;
@@ -39,16 +38,31 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
     @Nullable
     protected abstract LSFNamespaceName getNamespaceName();
 
-    @Override
-    public LSFNamespaceDeclaration getNamespace() {
+    public LSFNamespaceReference getExplicitNamespaceRef() {
+        ModuleStubElement stub = getStub();
+        if(stub != null)
+            return stub.getExplicitNamespaceRef();
+                
         LSFNamespaceName namespace = getNamespaceName();
         if(namespace==null)
+            return null;
+        return namespace.getNamespaceUsage();
+    }
+    
+    @Override
+    public LSFNamespaceDeclaration getNamespace() {
+        LSFNamespaceReference explicitNamespace = getExplicitNamespaceRef();
+        if(explicitNamespace==null)
             return this;
-        return namespace.getNamespaceUsage().resolveDecl();
+        return explicitNamespace.resolveDecl();
     }
 
     @Override
     public List<LSFNamespaceReference> getPriorityRefs() {
+        ModuleStubElement stub = getStub();
+        if(stub != null)
+            return stub.getPriorityRefs();
+        
         LSFPriorityList priorityList = getPriorityList();
         if(priorityList==null)
             return new ArrayList<LSFNamespaceReference>();
@@ -57,6 +71,10 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
 
     @Override
     public List<LSFModuleReference> getRequireRefs() {
+        ModuleStubElement stub = getStub();
+        if(stub != null)
+            return stub.getRequireRefs();
+        
         LSFRequireList requireList = getRequireList();
         if(requireList==null)
             return new ArrayList<LSFModuleReference>();

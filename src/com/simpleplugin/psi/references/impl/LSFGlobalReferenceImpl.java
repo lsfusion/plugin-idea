@@ -64,7 +64,7 @@ public abstract class LSFGlobalReferenceImpl<T extends LSFGlobalDeclaration> ext
         for (final String property : elements) {
             variants.add(LookupElementBuilder.create(property).
                     withIcon(LSFIcons.FILE).
-                    withTypeText(getContainingFile().getName())
+                    withTypeText(getLSFFile().getName())
             );
         }
         return variants.toArray();

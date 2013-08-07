@@ -27,7 +27,7 @@ public class LSFFindUsagesProvider implements FindUsagesProvider {
     @Nullable
     @Override
     public WordsScanner getWordsScanner() {
-        return WORDS_SCANNER;
+        return null;
     }
 
     @Override

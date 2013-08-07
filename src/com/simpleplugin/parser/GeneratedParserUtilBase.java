@@ -20,6 +20,8 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.Function;
 import com.intellij.util.containers.LimitedPool;
+import com.simpleplugin.psi.LSFTokenType;
+import com.simpleplugin.psi.LSFTypes;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -762,5 +764,13 @@ public class GeneratedParserUtilBase {
         public Language getLanguage() {
             return getParent().getLanguage();
         }
+    }
+
+    public static boolean readAny(PsiBuilder builder_, int level_) {
+        if(nextTokenIs(builder_, LSFTypes.END))
+            return false;
+
+        builder_.advanceLexer();
+        return true;
     }
 }

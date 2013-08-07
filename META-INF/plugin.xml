@@ -46,6 +46,7 @@
       <fileTypeFactory implementation="com.simpleplugin.LSFFileTypeFactory"/>
       <lang.parserDefinition language="Lsf" implementationClass="com.simpleplugin.LSFParserDefinition"/>
       <lang.findUsagesProvider language="Lsf" implementationClass="com.simpleplugin.LSFFindUsagesProvider"/>
+      <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.simpleplugin.LSFSyntaxHighlighterFactory"/>
       <annotator language="Lsf" implementationClass="com.simpleplugin.LSFReferenceAnnotator" />
 
       <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.MetaIndex"/>
@@ -55,5 +56,7 @@
       <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ExplicitNamespaceIndex"/>
 
       <stubElementTypeHolder class="com.simpleplugin.psi.LSFTypes"/>
+
+      <fileDocumentSynchronizationVetoer implementation="com.simpleplugin.JarDocumentSavingVetoer"/>
   </extensions>
 </idea-plugin>

@@ -4,8 +4,10 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
+import com.intellij.util.io.StringRef;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.stubs.MetaStubElement;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import com.simpleplugin.psi.stubs.types.MetaStubElementType;
 
 import java.io.IOException;
@@ -18,6 +20,12 @@ public class MetaStubImpl extends FullNameStubImpl<MetaStubElement, LSFMetaDecla
         super(parent, psi);
 
         paramCount = psi.getParamCount();
+    }
+
+    // виртуальный конструктор для гененрац
+    public MetaStubImpl(String name, int paramCount) {
+        super(null, LSFStubElementTypes.META, StringRef.fromString(name));
+        this.paramCount = paramCount;
     }
 
     public void serialize(StubOutputStream dataStream) throws IOException {
