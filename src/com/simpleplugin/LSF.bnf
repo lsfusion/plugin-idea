@@ -16,9 +16,9 @@
   tokenTypeClass="com.simpleplugin.psi.LSFTokenType"
 }
 
-script ::= moduleHeader statements
-
-statements ::= statement*
+script ::= moduleHeader (scriptStatement*)
+private scriptStatement ::= statement { recoverUntil = "script_statement_recover" }
+private script_statement_recover ::= !def_statement_recover_start 
 
 simpleName ::= ID
 {
@@ -41,6 +41,7 @@ moduleHeader ::= MODULE moduleName SEMI
 {mixin="com.simpleplugin.psi.declarations.impl.LSFModuleDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFModuleDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.ModuleStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+    recoverUntil = "script_statement_recover"
 }
 
 // fake rules to generate types
@@ -50,11 +51,11 @@ fake_comments ::= COMMENTS
 private statement ::=   classStatement
                     |	extendClassStatement
                     |	groupStatement
-                    |	propertyStatement
-                    |	overrideStatement
+                    |	overrideStatement // starts with ID
                     |	constraintStatement
-                    |	followsStatement
-                    |	writeWhenStatement
+                    |	followsStatement // starts with ID
+                    |	writeWhenStatement // starts with ID
+                    |	propertyStatement // important to eat ID
                     |	eventStatement
                     |   showDepStatement
                     |	globalEventStatement
@@ -66,22 +67,23 @@ private statement ::=   classStatement
                     |	designStatement
                     |	windowStatement
                     |	navigatorStatement
-                    |	metaCodeStatement
-                    |	metaCodeDeclarationStatement
+                    |	metaCodeStatement // ?
+                    |	metaCodeDeclarationStatement // ?
                     |	emptyStatement
-
+// Important ! after recover the rule should mandatory be pinned (matched)
+private def_statement_recover_start ::= AFTER | BEFORE | (((CLASS (ABSTRACT | NATIVE)?) | ATSIGN | FORM | GROUP | META | TABLE | (WINDOW windowType))? ID) | CONSTRAINT | DESIGN | (EXTEND (CLASS | FORM | DESIGN)) | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SEMI | SHOWDEP | WHEN
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// CLASS STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-classStatement ::= CLASS (ABSTRACT)? simpleNameWithCaption classInstancesAndParents {
+classStatement ::= CLASS (ABSTRACT | NATIVE)? simpleNameWithCaption classInstancesAndParents { pin=3
     mixin = "com.simpleplugin.psi.declarations.impl.LSFClassDeclarationImpl" implements = "com.simpleplugin.psi.declarations.LSFClassDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.ClassStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
-extendClassStatement ::= EXTEND CLASS customClassUsage classInstancesAndParents
+extendClassStatement ::= EXTEND CLASS customClassUsage classInstancesAndParents {pin=2}
 
 private classInstancesAndParents ::=    LBRACE simpleNameWithCaptionList RBRACE (classParentsList SEMI)?
 		                            |   (classParentsList)? SEMI
@@ -93,18 +95,25 @@ classParentsList ::= COLON nonEmptyCustomClassUsageList
 ////////////////////////////////////////////////////////////////////////////////
 
 groupStatement ::= GROUP simpleNameWithCaption (COLON groupUsage)? SEMI
+{mixin="com.simpleplugin.psi.declarations.impl.LSFGroupDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFGroupDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.GroupStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+    pin = 2
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// PROPERTY STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 propertyStatement ::= propertyDeclaration EQUAL
-                      (expressionUnfriendlyPD | propertyExpression)
+                      (expressionUnfriendlyPD | propertyExpression | NATIVE)
                       propertyOptions
                       (SEMI)?
-{mixin="com.simpleplugin.psi.declarations.impl.LSFPropDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFPropDeclaration"
+{mixin="com.simpleplugin.psi.declarations.impl.LSFGlobalPropDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.PropStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+    pin = 1
 }
 
 propertyDeclaration ::= simpleNameWithCaption (LBRAC paramDeclareList RBRAC)?
@@ -204,7 +213,7 @@ propertyObject ::=  propertyUsage
 
 dataPropertyDefinition ::= DATA (SESSION)? className LBRAC classNameList RBRAC
 
-abstractPropertyDefinition ::= ABSTRACT (CASE |	MULTI | OVERRIDE | EXCLUSIVE)? (CHECKED)? className LBRAC classNameList RBRAC
+abstractPropertyDefinition ::= ABSTRACT (((CASE | MULTI) (OVERRIDE | EXCLUSIVE)?) | OVERRIDE | EXCLUSIVE)? (CHECKED)? className LBRAC classNameList RBRAC
 
 formulaPropertyDefinition ::= FORMULA (builtInClassName)? stringLiteral
 
@@ -374,8 +383,10 @@ listActionPropertyDefinitionBody ::=    (NEWSESSION (AUTOAPPLY)? (SINGLE)?)?
 			                            |	emptyStatement
 			                            )*
 		                                RBRACE
+{mixin="com.simpleplugin.psi.LSFListActionImpl" implements="com.simpleplugin.psi.LSFListAction"}
 
 localDataPropertyDefinition ::= LOCAL simpleName EQUAL className LBRAC classNameList RBRAC
+{mixin="com.simpleplugin.psi.declarations.impl.LSFLocalPropDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFLocalPropDeclaration"}
 
 execActionPropertyDefinitionBody ::= (EXEC)? propertyObject LBRAC propertyExpressionList RBRAC
 
@@ -415,7 +426,7 @@ terminalFlowActionPropertyDefinitionBody ::= BREAK | RETURN
 /////////////////////////////////// FORM STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-formStatement ::=	(	formDeclaration
+formStatement ::=	(	formDecl
             		|	extendingFormDeclaration
 		            )
                     (	formGroupObjectsList
@@ -430,19 +441,24 @@ formStatement ::=	(	formDeclaration
                     |	editFormDeclaration
                     |	listFormDeclaration
                     )*
-                    SEMI
+                    SEMI {pin=1}
 
 dialogFormDeclaration ::= DIALOG customClassUsage OBJECT ID
 editFormDeclaration ::= EDIT customClassUsage OBJECT ID
 listFormDeclaration ::= LIST customClassUsage OBJECT ID
 
-formDeclaration ::= FORM simpleNameWithCaption
+formDecl ::= FORM simpleNameWithCaption
 		            (TITLE stringLiteral)?
 		            (PRINT)?
 		            (modalityTypeLiteral)?
 		            (IMAGE stringLiteral)?
+{mixin="com.simpleplugin.psi.declarations.impl.LSFFormDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFFormDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.FormStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+    pin = 2
+}
 
-extendingFormDeclaration ::= EXTEND FORM formUsage
+extendingFormDeclaration ::= EXTEND FORM formUsage {pin=2}
 
 formGroupObjectsList ::= OBJECTS formGroupObjectDeclaration
 		                         (COMMA formGroupObjectDeclaration)*
@@ -575,7 +591,7 @@ overrideStatement ::= propertyUsage LBRAC idList RBRAC PLUSEQ
 constraintStatement ::= CONSTRAINT baseEvent propertyExpression
 		                (CHECKED (BY nonEmptyPropertyUsageList)? )?
 		                MESSAGE stringLiteral
-		                SEMI
+		                SEMI {pin = 1}
 
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// FOLLOWS STATEMENT ////////////////////////////
@@ -600,13 +616,13 @@ writeWhenStatement ::= mappedProperty ARROW propertyExpression WHEN (DO)? proper
 
 eventStatement ::= WHEN baseEvent propertyExpression inlineStatement
 		                DO actionPropertyDefinitionBody (ORDER (DESC)? nonEmptyPropertyExpressionList)?
-		           (SEMI)? // Разобраться с точкой с запятой
+		           (SEMI)? {pin = 1} // Разобраться с точкой с запятой
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// GLOBAL EVENT STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody (SEMI)? // ;?
+globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody (SEMI)? {pin=1} // ;?
 
 baseEvent ::= (APPLY | SESSION)? (FORMS nonEmptyFormUsageList)?
 
@@ -616,31 +632,37 @@ inlineStatement ::=   (NOINLINE (LBRAC singleParameterList RBRAC)? )? (INLINE)?
 //////////////////////////////// SHOWDEP STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-showDepStatement ::= SHOWDEP propertyUsage FROM propertyUsage SEMI
+showDepStatement ::= SHOWDEP propertyUsage FROM propertyUsage SEMI {pin=1}
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// ASPECT STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-aspectStatement ::= (BEFORE | AFTER) mappedProperty DO actionPropertyDefinitionBody (SEMI)? // ;?
+aspectStatement ::= (BEFORE | AFTER) mappedProperty DO actionPropertyDefinitionBody (SEMI)? {pin=1} // ;?
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// TABLE STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-tableStatement ::= TABLE ID LBRAC nonEmptyClassNameList RBRAC SEMI;
+tableStatement ::= TABLE simpleName LBRAC nonEmptyClassNameList RBRAC SEMI 
+{mixin="com.simpleplugin.psi.declarations.impl.LSFTableDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFTableDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.TableStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+    pin = 2
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// LOGGABLE STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-loggableStatement ::= LOGGABLE nonEmptyPropertyUsageList SEMI
+loggableStatement ::= LOGGABLE nonEmptyPropertyUsageList SEMI {pin=1}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// INDEX STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-indexStatement ::= INDEX nonEmptyPropertyUsageList SEMI
+indexStatement ::= INDEX nonEmptyPropertyUsageList SEMI {pin=1}
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// WINDOW STATEMENT ////////////////////////////
@@ -648,9 +670,14 @@ indexStatement ::= INDEX nonEmptyPropertyUsageList SEMI
 
 windowStatement ::= windowCreateStatement | windowHideStatement
 
-windowCreateStatement ::= WINDOW windowType ID stringLiteral windowOptions SEMI
+windowCreateStatement ::= WINDOW windowType simpleName stringLiteral windowOptions SEMI
+{mixin="com.simpleplugin.psi.declarations.impl.LSFWindowDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFWindowDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.WindowStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+    pin = 3
+}
 
-windowHideStatement ::= HIDE WINDOW windowUsage SEMI
+windowHideStatement ::= HIDE WINDOW windowUsage SEMI {pin=2}
 
 windowType ::= MENU | PANEL | TOOLBAR | TREE
 
@@ -660,15 +687,13 @@ windowOptions ::=   (	HIDETITLE
                     |	orientation
                     |	dockPosition
                     |	borderPosition
-                    |	HALIGN LBRAC horizontalAlignment RBRAC
-                    |	VALIGN LBRAC verticalAlignment RBRAC
-                    |	TEXTHALIGN LBRAC horizontalAlignment RBRAC
-                    |	TEXTVALIGN LBRAC verticalAlignment RBRAC
+                    |	HALIGN LBRAC alignmentLiteral RBRAC
+                    |	VALIGN LBRAC alignmentLiteral RBRAC
+                    |	TEXTHALIGN LBRAC alignmentLiteral RBRAC
+                    |	TEXTVALIGN LBRAC alignmentLiteral RBRAC
                     )*
 
 borderPosition ::= LEFT	| RIGHT | TOP | BOTTOM
-verticalAlignment ::= TOP | CENTER | BOTTOM
-horizontalAlignment ::= LEFT | CENTER | RIGHT
 orientation ::= VERTICAL | HORIZONTAL
 dockPosition ::= POSITION LBRAC intLiteral COMMA intLiteral COMMA intLiteral COMMA intLiteral RBRAC
 
@@ -676,7 +701,7 @@ dockPosition ::= POSITION LBRAC intLiteral COMMA intLiteral COMMA intLiteral COM
 /////////////////////////////// NAVIGATOR STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-navigatorStatement ::= NAVIGATOR navigatorElementStatementBody
+navigatorStatement ::= NAVIGATOR navigatorElementStatementBody {pin=1}
 
 navigatorElementStatementBody ::=   (   LBRACE
                                         (	addNavigatorElementStatement
@@ -689,7 +714,12 @@ navigatorElementStatementBody ::=   (   LBRACE
 
 addNavigatorElementStatement ::= ADD navigatorElementSelector (stringLiteral)? navigatorElementInsertPositionSelector (TO windowUsage)? navigatorElementStatementBody
 
-newNavigatorElementStatement ::= NEW ID (ACTION propertyUsage)? stringLiteral navigatorElementInsertPositionSelector (TO windowUsage)? (IMAGE stringLiteral)? navigatorElementStatementBody
+newNavigatorElementStatement ::= NEW simpleName (ACTION propertyUsage)? stringLiteral navigatorElementInsertPositionSelector (TO windowUsage)? (IMAGE stringLiteral)? navigatorElementStatementBody
+{mixin="com.simpleplugin.psi.declarations.impl.LSFNavigatorElementDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFNavigatorElementDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.NavigatorElementStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+    pin = 2
+}
 
 navigatorElementInsertPositionSelector ::=	(IN navigatorElementSelector)?
                                             (   insertRelativePositionLiteral navigatorElementSelector
@@ -704,11 +734,11 @@ navigatorElementSelector ::= navigatorElementUsage
 ////////////////////////////////// DESIGN STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-designStatement ::=	(designDeclaration | extendDesignDeclaration) componentStatementBody
+designStatement ::=	(designDeclaration | extendDesignDeclaration) componentStatementBody {pin=1}
 
-designDeclaration ::= DESIGN formUsage (stringLiteral)? (FROM DEFAULT)?
+designDeclaration ::= DESIGN formUsage (stringLiteral)? (FROM DEFAULT)? {pin=1}
 
-extendDesignDeclaration ::= EXTEND DESIGN formUsage
+extendDesignDeclaration ::= EXTEND DESIGN formUsage {pin=2}
 
 componentStatementBody ::=  LBRACE
                             (	setObjectPropertyStatement
@@ -762,13 +792,14 @@ componentPropertyValue ::=  colorLiteral
                         |	boundsIntLiteral
                         |	boundsDoubleLiteral
                         |   containerTypeLiteral
+                        |   flexAlignmentLiteral
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// META STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 // recoverUntil=rule_recover
-metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC anyTokens END {pin=5
+metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC anyTokens END {pin=2
     mixin = "com.simpleplugin.psi.declarations.impl.LSFMetaDeclarationImpl" implements = "com.simpleplugin.psi.declarations.LSFMetaDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.MetaStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
@@ -778,10 +809,13 @@ anyTokens ::= (<< readAny >>)*
 fakeTwoDashes ::= FAKETWODASHES
 fakeThreeDashes ::= FAKETHREEDASHES
 
-metaCodeBody ::= LBRACE statements RBRACE
+private metaStatement ::= statement { recoverUntil = "meta_statement_recover" }
+private meta_statement_recover ::= !(def_statement_recover_start | RBRACE) 
+metaCodeBody ::= LBRACE (metaStatement*) RBRACE
+
 
 //recoverUntil=rule_recover
-metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI {pin=1
+metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI {pin=2
 mixin="com.simpleplugin.psi.references.impl.LSFMetaReferenceImpl" implements="com.simpleplugin.psi.references.LSFMetaReference"}
 
 private rule_recover ::= !(AFTER | ATSIGN | BEFORE | CLASS | CONSTRAINT | DESIGN | END | EXTEND | FORM | GROUP | HIDE | ID | INDEX | LOGGABLE | META | NAVIGATOR | ON | SEMI | SHOWDEP | TABLE | WHEN | WINDOW)
@@ -885,10 +919,20 @@ propertyUsage ::= compoundID
 {mixin="com.simpleplugin.psi.references.impl.LSFPropReferenceImpl" implements="com.simpleplugin.psi.references.LSFPropReference"}
 
 tableUsage ::= compoundID
+{mixin="com.simpleplugin.psi.references.impl.LSFTableReferenceImpl" implements="com.simpleplugin.psi.references.LSFTableReference"}
+
 groupUsage ::= compoundID
+{mixin="com.simpleplugin.psi.references.impl.LSFGroupReferenceImpl" implements="com.simpleplugin.psi.references.LSFGroupReference"}
+
 formUsage ::= compoundID
+{mixin="com.simpleplugin.psi.references.impl.LSFFormReferenceImpl" implements="com.simpleplugin.psi.references.LSFFormReference"}
+
 windowUsage ::= compoundID
+{mixin="com.simpleplugin.psi.references.impl.LSFWindowReferenceImpl" implements="com.simpleplugin.psi.references.LSFWindowReference"}
+
 navigatorElementUsage ::= compoundID
+{mixin="com.simpleplugin.psi.references.impl.LSFNavigatorElementReferenceImpl" implements="com.simpleplugin.psi.references.LSFNavigatorElementReference"}
+
 metacodeUsage ::= compoundID
 
 typeId ::= PRIMITIVE_TYPE | OBJECT
@@ -936,10 +980,15 @@ insertRelativePositionLiteral ::= BEFORE | AFTER
 
 containerTypeLiteral ::=    CONTAINERV
 	                    |	CONTAINERH
-	                    |	CONTAINERVH
+	                    |	COLUMNS
 	                    |	TABBED
 	                    |	SPLITH
 	                    |	SPLITV
+	                    
+alignmentLiteral ::= LEADING | CENTER | TRAILING
+
+flexAlignmentLiteral ::= LEADING | CENTER | TRAILING | STRETCH
+
 
 propertyEditTypeLiteral ::= EDITABLE | READONLY | SELECTOR
 

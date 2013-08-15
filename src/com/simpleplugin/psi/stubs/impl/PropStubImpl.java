@@ -1,18 +1,16 @@
 package com.simpleplugin.psi.stubs.impl;
 
-import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.simpleplugin.psi.declarations.LSFPropDeclaration;
-import com.simpleplugin.psi.stubs.FullNameStubElement;
+import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
 import com.simpleplugin.psi.stubs.PropStubElement;
 import com.simpleplugin.psi.stubs.types.PropStubElementType;
 
 import java.io.IOException;
 
-public class PropStubImpl extends FullNameStubImpl<PropStubElement, LSFPropDeclaration> implements PropStubElement {
+public class PropStubImpl extends FullNameStubImpl<PropStubElement, LSFGlobalPropDeclaration> implements PropStubElement {
 
-    public PropStubImpl(StubElement parent, LSFPropDeclaration psi) {
+    public PropStubImpl(StubElement parent, LSFGlobalPropDeclaration psi) {
         super(parent, psi);
     }
 

@@ -1,17 +1,28 @@
 package com.simpleplugin.psi.references.impl;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveResult;
+import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.util.IncorrectOperationException;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.LSFElementImpl;
-import com.simpleplugin.psi.declarations.impl.LSFDeclarationImpl;
+import com.simpleplugin.psi.LSFId;
+import com.simpleplugin.psi.LSFResolveUtil;
+import com.simpleplugin.psi.LSFResolver;
+import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.references.LSFReference;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class LSFReferenceImpl extends LSFElementImpl implements LSFReference {
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElementImpl implements LSFReference<T> {
 
     public LSFReferenceImpl(@NotNull ASTNode node) {
         super(node);
@@ -60,9 +71,49 @@ public abstract class LSFReferenceImpl extends LSFElementImpl implements LSFRefe
         return resolve() == element;
     }
 
+    @Override
+    public String getNameRef() {
+        return getSimpleName().getText();
+    }
+
+    @Override
+    public LSFId resolve() {
+        T decl = resolveDecl();
+        if(decl == null)
+            return null;
+        return decl.getNameIdentifier();
+    }
+
+    public T resolveDecl() {
+        final ResolveResult[] resolveResults = multiResolveDecl(true);
+
+        return resolveResults.length == 0 ||
+                resolveResults.length > 1 ||
+                !resolveResults[0].isValidResult() ? null : (T) resolveResults[0].getElement();
+    }
+
+    @NotNull
+    public ResolveResult[] multiResolveDecl(boolean incompleteCode) {
+        final List<? extends PsiElement> elements =
+                ResolveCache.getInstance(getProject()).resolveWithCaching(this, LSFResolver.INSTANCE, true, incompleteCode);
+        return LSFResolveUtil.toCandidateInfoArray(elements);
+    }
+    
+    protected abstract void fillListVariants(Collection<String> variants);
+
     @NotNull
     @Override
     public Object[] getVariants() {
-        return new Object[0];
+        List<String> stringVariants = new ArrayList<String>();
+        fillListVariants(stringVariants);
+        
+        List<LookupElement> variants = new ArrayList<LookupElement>();
+        for (final String property : stringVariants) {
+            variants.add(LookupElementBuilder.create(property).
+                    withIcon(LSFIcons.FILE).
+                    withTypeText(getLSFFile().getName())
+            );
+        }
+        return variants.toArray();
     }
 }

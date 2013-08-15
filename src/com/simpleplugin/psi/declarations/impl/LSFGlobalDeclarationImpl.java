@@ -2,6 +2,7 @@ package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
@@ -12,6 +13,8 @@ import com.simpleplugin.psi.declarations.LSFGlobalDeclaration;
 import com.simpleplugin.psi.stubs.GlobalStubElement;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
 
 // множественное наследова
 public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration<This, Stub>, Stub extends GlobalStubElement<Stub, This>> extends StubBasedPsiElementBase<Stub> implements LSFGlobalDeclaration<This, Stub> {
@@ -25,7 +28,7 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
     }
 
     @Override
-    public String getGlobalName() {
+    public String getDeclName() {
         Stub stub = getStub();
         if(stub!=null)
             return stub.getGlobalName();
@@ -60,5 +63,25 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
     @Override
     public GlobalSearchScope getScope() {
         return LSFElementImpl.getScope(this);
+    }
+
+    @Override
+    public Icon getIcon(boolean unused) {
+        return LSFDeclarationImpl.getIcon(this, unused);
+    }
+
+    @Override
+    public String getLocationString() {
+        return LSFDeclarationImpl.getLocationString(this);
+    }
+
+    @Override
+    public String getPresentableText() {
+        return LSFDeclarationImpl.getPresentableText(this);
+    }
+
+    @Override
+    public ItemPresentation getPresentation() {
+        return this;
     }
 }

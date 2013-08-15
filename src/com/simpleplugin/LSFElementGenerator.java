@@ -88,7 +88,7 @@ public class LSFElementGenerator {
                 }
                 LSFMetaCodeBody body = childrenOfType.iterator().next();
 
-                List<LSFMetaCodeStatement> recMetaStatements = ((LSFMetaCodeBody)body).getStatements().getMetaCodeStatementList(); 
+                List<LSFMetaCodeStatement> recMetaStatements = ((LSFMetaCodeBody)body).getMetaCodeStatementList(); 
 
                 ApplicationImpl.setExceptionalThreadWithReadAccessFlag(old);
 

@@ -39,7 +39,7 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
         if(stub != null)
             return stub.getParamCount();
 
-        return getMetaDeclIdList().getMetaDeclIdList().size();
+        return getDeclParams().size();
     }
 
     private void recReadMetaWhiteSpaceOrComments(ASTNode node, boolean prev, List<String> tokens) {
@@ -73,8 +73,11 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     @Override
     public List<String> getDeclParams() {
         List<String> result = new ArrayList<String>();
-        for(LSFMetaDeclId decl : getMetaDeclIdList().getMetaDeclIdList())
-            result.add(decl.getText());
+        LSFMetaDeclIdList metaDeclIdList = getMetaDeclIdList();
+        if(metaDeclIdList != null) {
+            for(LSFMetaDeclId decl : metaDeclIdList.getMetaDeclIdList())
+                result.add(decl.getText());
+        }
         return result;
     }
 

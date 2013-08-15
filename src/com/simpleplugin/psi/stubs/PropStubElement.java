@@ -1,7 +1,6 @@
 package com.simpleplugin.psi.stubs;
 
-import com.simpleplugin.psi.LSFPropertyDeclaration;
-import com.simpleplugin.psi.declarations.LSFPropDeclaration;
+import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
 
-public interface PropStubElement extends FullNameStubElement<PropStubElement, LSFPropDeclaration> {
+public interface PropStubElement extends FullNameStubElement<PropStubElement, LSFGlobalPropDeclaration> {
 }

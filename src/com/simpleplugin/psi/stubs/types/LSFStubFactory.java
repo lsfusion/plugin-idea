@@ -1,5 +1,7 @@
 package com.simpleplugin.psi.stubs.types;
 
+import com.intellij.psi.tree.IElementType;
+
 public class LSFStubFactory {
 
     public static GlobalStubElementType create(String ID) {
@@ -13,6 +15,17 @@ public class LSFStubFactory {
             return LSFStubElementTypes.PROP;
         if(ID.equals("META_CODE_DECLARATION_STATEMENT"))
             return LSFStubElementTypes.META;
+        if(ID.equals("FORM_DECL"))
+            return LSFStubElementTypes.FORM;
+        if(ID.equals("GROUP_STATEMENT"))
+            return LSFStubElementTypes.GROUP;
+        if(ID.equals("TABLE_STATEMENT"))
+            return LSFStubElementTypes.TABLE;
+        if(ID.equals("WINDOW_CREATE_STATEMENT"))
+            return LSFStubElementTypes.WINDOW;
+        if(ID.equals("NEW_NAVIGATOR_ELEMENT_STATEMENT"))
+            return LSFStubElementTypes.NAVIGATORELEMENT;
+
         throw new UnsupportedOperationException();
     }
 

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-public abstract class LSFClassReferenceImpl extends LSFFullNameReferenceImpl<LSFClassDeclaration> implements LSFClassReference {
+public abstract class LSFClassReferenceImpl extends LSFFullNameReferenceImpl<LSFClassDeclaration, LSFClassDeclaration> implements LSFClassReference {
 
     public LSFClassReferenceImpl(@NotNull ASTNode node) {
         super(node);

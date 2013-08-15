@@ -14,7 +14,7 @@ public interface LSFModuleDeclaration extends LSFNamespaceDeclaration<LSFModuleD
 
     LSFNamespaceReference getExplicitNamespaceRef();
 
-    LSFNamespaceDeclaration getNamespace();
+    String getNamespace();
 
     List<LSFNamespaceReference> getPriorityRefs();
 

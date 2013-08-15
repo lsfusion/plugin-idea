@@ -7,7 +7,7 @@ import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 
 import java.util.List;
 
-public interface LSFMetaReference extends LSFFullNameReference<LSFMetaDeclaration> {
+public interface LSFMetaReference extends LSFFullNameReference<LSFMetaDeclaration, LSFMetaDeclaration> {
 
     List<String> getUsageParams();
 
@@ -17,6 +17,7 @@ public interface LSFMetaReference extends LSFFullNameReference<LSFMetaDeclaratio
     
     String getPreceedingTab();
     void setInlinedBody(LSFMetaCodeBody parsed);
+    void dropInlinedBody();
 
     boolean isResolveToVirt(LSFMetaDeclaration virtDecl);
 }

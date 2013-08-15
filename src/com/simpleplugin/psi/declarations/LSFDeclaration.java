@@ -1,5 +1,6 @@
 package com.simpleplugin.psi.declarations;
 
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.tree.IElementType;
@@ -9,7 +10,9 @@ import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.references.LSFReference;
 import org.jetbrains.annotations.Nullable;
 
-public interface LSFDeclaration extends LSFElement, PsiNameIdentifierOwner {
+public interface LSFDeclaration extends LSFElement, PsiNameIdentifierOwner, ItemPresentation {
+
+    String getDeclName();
 
     @Nullable
     @Override

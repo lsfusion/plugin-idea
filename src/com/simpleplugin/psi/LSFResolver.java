@@ -10,6 +10,7 @@ import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.impl.LSFMetaCodeDeclarationStatementImpl;
 import com.simpleplugin.psi.references.LSFGlobalReference;
 import com.simpleplugin.psi.references.LSFMetaReference;
+import com.simpleplugin.psi.references.LSFReference;
 import com.simpleplugin.psi.stubs.impl.MetaStubImpl;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
@@ -18,17 +19,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LSFResolver implements ResolveCache.AbstractResolver<LSFGlobalReference, List<? extends PsiElement>> {
+public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, List<? extends PsiElement>> {
     public static final LSFResolver INSTANCE = new LSFResolver();
 
     @Nullable
     @Override
-    public List<? extends PsiElement> resolve(@NotNull LSFGlobalReference reference, boolean incompleteCode) {
+    public List<? extends PsiElement> resolve(@NotNull LSFReference reference, boolean incompleteCode) {
         return new ArrayList<PsiElement>(reference.resolveNoCache().findAll());
-    }
-
-    public List<String> getStatements(LSFGlobalReference ref) {
-        return new ArrayList<String>();
     }
 
     public static List<String> getIDs(LSFMetaDeclIdList idList) {

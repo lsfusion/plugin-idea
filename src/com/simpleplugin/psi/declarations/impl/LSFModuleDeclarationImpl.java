@@ -50,11 +50,11 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
     }
     
     @Override
-    public LSFNamespaceDeclaration getNamespace() {
+    public String getNamespace() {
         LSFNamespaceReference explicitNamespace = getExplicitNamespaceRef();
         if(explicitNamespace==null)
-            return this;
-        return explicitNamespace.resolveDecl();
+            return getDeclName();
+        return explicitNamespace.getNameRef();
     }
 
     @Override

@@ -1,13 +1,16 @@
 package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.simpleplugin.psi.LSFSimpleName;
+import com.intellij.util.EmptyQuery;
+import com.intellij.util.Query;
+import com.simpleplugin.psi.declarations.LSFParamDeclaration;
 import com.simpleplugin.psi.references.LSFParamReference;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public abstract class LSFParamReferenceImpl extends LSFReferenceImpl implements LSFParamReference {
+import java.util.ArrayList;
+import java.util.Collection;
+
+public abstract class LSFParamReferenceImpl extends LSFReferenceImpl<LSFParamDeclaration> implements LSFParamReference {
 
     public LSFParamReferenceImpl(@NotNull ASTNode node) {
         super(node);
@@ -18,9 +21,12 @@ public abstract class LSFParamReferenceImpl extends LSFReferenceImpl implements 
         return true;
     }
 
-    @Nullable
     @Override
-    public PsiElement resolve() {
-        return null;
+    public Query<LSFParamDeclaration> resolveNoCache() {
+        return new EmptyQuery<LSFParamDeclaration>();
+    }
+
+    @Override
+    protected void fillListVariants(Collection<String> variants) {
     }
 }

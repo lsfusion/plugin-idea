@@ -17,6 +17,7 @@ import com.intellij.psi.search.ProjectScopeBuilder;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.PsiFileStub;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.simpleplugin.LSFFileType;
 import com.simpleplugin.LSFLanguage;
 import com.simpleplugin.psi.declarations.LSFModuleDeclaration;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.List;
 
 public class LSFFile extends PsiFileBase {
     public LSFFile(@NotNull FileViewProvider viewProvider) {
@@ -67,8 +69,8 @@ public class LSFFile extends PsiFileBase {
         return getStubOrPsiChild(LSFStubElementTypes.MODULE);
     }
 
-    public LSFStatements getStatements() {
-        return findChildByClass(LSFStatements.class);
+    public List<LSFMetaCodeStatement> getMetaCodeStatementList() {
+        return PsiTreeUtil.getChildrenOfTypeAsList(this, LSFMetaCodeStatement.class);
     }
 
     @Override

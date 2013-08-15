@@ -41,7 +41,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   ("TRUE" | "FALSE")                    { return LEX_LOGICAL_LITERAL; }
 
     "INTEGER" | "LONG" | "NUMERIC[" {DIGITS} "," {DIGITS} "]" | "DOUBLE"
-  | "DATE" | "DATETIME" | "TIME"
+  | "DATE" | "DATETIME" | "TIME" | "YEAR"
   | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]" | "VARSTRING[" {DIGITS} "]" | "VARISTRING[" {DIGITS} "]" | "TEXT"
   | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "CUSTOMFILE" | "EXCELFILE"
   | "BOOLEAN"
@@ -92,6 +92,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "@"                                   { return ATSIGN; }
 
   "ABSTRACT"                			{ return ABSTRACT; }
+  "NATIVE"                			    { return NATIVE; }
   "ACTION"                  			{ return ACTION; }
   "ADD"                     			{ return ADD; }
   "ADDFORM"                 			{ return ADDFORM; }
@@ -139,7 +140,10 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "CONSTRAINT"              			{ return CONSTRAINT; }
   "CONTAINERH"              			{ return CONTAINERH; }
   "CONTAINERV"              			{ return CONTAINERV; }
-  "CONTAINERVH"             			{ return CONTAINERVH; }
+  "COLUMNS"             			    { return COLUMNS; }
+  "LEADING"             			    { return LEADING; }
+  "TRAILING"             			    { return TRAILING; }
+  "STRETCH"             			    { return STRETCH; }
   "CUSTOM"                  			{ return CUSTOM; }
   "CYCLES"                  			{ return CYCLES; }
   "DATA"                    			{ return DATA; }

@@ -12,4 +12,9 @@ public interface LSFStubElementTypes {
     ExplicitNamespaceStubElementType EXPLICIT_NAMESPACE = new ExplicitNamespaceStubElementType();
     MetaStubElementType META = new MetaStubElementType();
     PropStubElementType PROP = new PropStubElementType();
+    FormStubElementType FORM = new FormStubElementType();
+    GroupStubElementType GROUP = new GroupStubElementType();
+    TableStubElementType TABLE = new TableStubElementType();
+    WindowStubElementType WINDOW = new WindowStubElementType();
+    NavigatorElementStubElementType NAVIGATORELEMENT = new NavigatorElementStubElementType();
 }

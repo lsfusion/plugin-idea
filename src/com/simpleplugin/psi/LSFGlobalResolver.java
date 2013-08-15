@@ -1,6 +1,5 @@
 package com.simpleplugin.psi;
 
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -63,12 +62,12 @@ public class LSFGlobalResolver {
         if(virtDecl!=null)
             decls.add(virtDecl);
 
-        Map<LSFNamespaceDeclaration, Collection<T>> mapDecls = new HashMap<LSFNamespaceDeclaration, Collection<T>>();
+        Map<String, Collection<T>> mapDecls = new HashMap<String, Collection<T>>();
         Collection<T> fitDecls = new ArrayList<T>();
         for(T decl : decls) 
             if(condition.value(decl)) {
-                LSFNamespaceDeclaration namespace = decl.getNamespace();
-                if(fqName!=null && namespace.getGlobalName().equals(fqName))
+                String namespace = decl.getNamespaceName();
+                if(fqName!=null && namespace.equals(fqName))
                     return new CollectionQuery<T>(Collections.singleton(decl));
     
                 Collection<T> nameList = mapDecls.get(namespace);
@@ -90,12 +89,12 @@ public class LSFGlobalResolver {
                 return result;
 
             for(LSFNamespaceReference priority : moduleDeclaration.getPriorityRefs()) {
-                LSFNamespaceDeclaration resolve = priority.resolveDecl();
-                if(resolve!=null) {
+                String resolve = priority.getNameRef();
+//                if(resolve!=null) {
                     result = findInNamespace(mapDecls.get(resolve));
                     if(result!=null)
                         return result;
-                }
+//                }
             }
         }
 
@@ -123,7 +122,7 @@ public class LSFGlobalResolver {
         LSFExplicitNamespaceDeclaration minDeclaration = null;
         String minName = null;
         for(LSFExplicitNamespaceDeclaration explicitDecl : explicitDeclarations) {
-            String moduleName = explicitDecl.getLSFFile().getModuleDeclaration().getGlobalName();
+            String moduleName = explicitDecl.getLSFFile().getModuleDeclaration().getDeclName();
             if(minName == null || minName.compareTo(moduleName) > 0) {
                 minDeclaration = explicitDecl;
                 minName = moduleName;

@@ -15,7 +15,7 @@ public abstract class GlobalStubImpl<This extends GlobalStubElement<This, Decl>,
     protected GlobalStubImpl(StubElement parent, Decl psi) {
         super(parent, psi.getElementType());
 
-        name = StringRef.fromString(psi.getGlobalName());
+        name = StringRef.fromString(psi.getDeclName());
         isCorrect = psi.isCorrect();
     }
 

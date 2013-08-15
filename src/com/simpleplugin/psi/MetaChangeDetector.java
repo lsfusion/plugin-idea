@@ -1,27 +1,32 @@
 package com.simpleplugin.psi;
 
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.impl.ApplicationImpl;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.progress.*;
+import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.cache.impl.id.IdIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.containers.ConcurrentHashMap;
 import com.intellij.util.containers.ConcurrentHashSet;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.simpleplugin.LSFElementGenerator;
 import com.simpleplugin.MetaCodeFragment;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.declarations.LSFModuleDeclaration;
-import com.simpleplugin.psi.declarations.LSFNamespaceDeclaration;
 import com.simpleplugin.psi.stubs.types.indexes.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 
 public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent { //, EditorFactoryListener
@@ -55,6 +60,31 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
 //    private final Map<VirtualFile, MyDocumentChangeAdapter> myListenerMap = new HashMap<VirtualFile, MyDocumentChangeAdapter>();
 
+    private final TimerTask indexUpdater = new TimerTask() {
+        @Override
+        public void run() {
+            if(enabled && !reprocessing && finishedReprocessing) {
+                ApplicationManager.getApplication().runReadAction(new Runnable() {
+                    @Override
+                    public void run() {
+//                FileBasedIndex.getInstance().ensureUpToDate(StubUpdatingIndex.INDEX_ID, myProject, GlobalSearchScope.allScope(myProject));
+                        ModuleIndex.getInstance().get("dumb", myProject, GlobalSearchScope.allScope(myProject));
+                    }
+                });
+//                ApplicationManager.getApplication().runReadAction(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        FileBasedIndex.getInstance().ensureUpToDate(IdIndex.NAME, myProject, GlobalSearchScope.allScope(myProject));
+//                    }
+//                });
+            }
+        }
+    };
+    
+    private Timer timer;
+    private final static String ENABLED_META = "ENABLED_META";
+    private final static String META_SYNC_MODE = "META_SYNC_MODE";
+    
     @Override
     public void projectOpened() {
         myPsiManager.addPsiTreeChangeListener(this);
@@ -70,13 +100,21 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         DumbService.getInstance(myProject).smartInvokeLater(
                 new Runnable() {
                     public void run() {
-                        reprocessAllDocuments();
+                        setMetaSyncMode(PropertiesComponent.getInstance(myProject).getBoolean(META_SYNC_MODE, true));
+                        setMetaEnabled(PropertiesComponent.getInstance(myProject).getBoolean(ENABLED_META, false));
+
+                        timer = new Timer();
+                        timer.schedule(indexUpdater, 10, 30);
                     }
                 });
     }
 
     @Override
     public void projectClosed() {
+        if(timer!=null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 
     @NotNull
@@ -185,7 +223,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private static LongLivingMeta getLongLivingDecl(LSFMetaDeclaration decl) {
-        return new LongLivingMeta(decl.getGlobalName(), decl.getParamCount(), decl.getLSFFile());
+        return new LongLivingMeta(decl.getDeclName(), decl.getParamCount(), decl.getLSFFile());
     }
 
     private static class ToParse {
@@ -239,21 +277,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     private static long version;
 
-    private static String getFInlineName(PsiElement element, Result<Integer> cresult) {
-        String result = "";
-        int count = 1;
-        while (!(element instanceof LSFFile)) {
-            if(element instanceof LSFMetaCodeStatement) {
-                result = ((LSFMetaCodeStatement)element).getSimpleName().getText() + "(" + ((LSFMetaCodeStatement)element).getMetaCodeIdList().getText() + ")." + result;
-                count++;
-            }
-            element = element.getParent();
-        }
-        result = ((LSFFile)element).getName() + "." + result + " " + count;
-        cresult.setResult(count);
-        return result;
-    }
-
     // без блокировок, так как во временном файле делается
     // дублирует код по сравнению с асинхронным, но обобщать их себе дороже
     // предполагается что usages из dumb файла
@@ -287,13 +310,93 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             }
     }
     
+    private LinkedHashMap<Document, Long> changedDocs = new LinkedHashMap<Document, Long>(16, 0.75f, true);
+    private int inlinePending = 0;
+    private void inlinePend(LSFFile file, boolean sync) {
+        synchronized (displaySync) {
+            if(inlinePending==inlineProceeded) {
+                if(!sync && !displayRunning) {
+                    displayRunning = true;
+
+                    final BackgroundableProcessIndicator indicator = new BackgroundableProcessIndicator(myProject, "Inlining metacode", PerformInBackgroundOption.ALWAYS_BACKGROUND, "cancel", "stop", false);
+                    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+                        public void run() {
+                        ProgressManager.getInstance().runProcess(new Runnable() {
+                        public void run() {
+                            assert displayRunning;
+
+                            int idleTimes = 0;
+                            while (true) {
+                                try {
+                                    Thread.sleep(200);
+                                } catch (InterruptedException e) {
+                                }
+                                synchronized (displaySync) {
+                                    if (inlinePending == inlineProceeded && idleTimes > 4) {
+                                        displayRunning = false;
+                                        return;
+                                    } else {
+                                        idleTimes++;
+                                        indicator.setFraction(inlinePending == 0 ? 1.0d : (double) inlineProceeded / (double) inlinePending);
+                                        indicator.setText((lastProceeded !=null ? "Last inlined : " + lastProceeded : "") + " " + inlineProceeded + "/" + inlinePending);
+                                    }
+                                }
+                            }
+                        }
+                        }, indicator);
+                        }
+                    });
+                }
+            }
+            inlinePending++;
+        }
+    } 
+    private int inlineProceeded = 0;
+    private String lastProceeded;
+    private void inlineProceed(boolean easy, LSFFile file, boolean sync) {
+        synchronized (displaySync) {
+            if(easy)
+                inlinePending--;
+            else {
+                inlineProceeded++;
+                lastProceeded = file.getName();
+            }
+
+            if(inlinePending==inlineProceeded) {
+                 inlinePending = 0;
+                 inlineProceeded = 0;
+
+                 finishedReprocessing = true;
+            }
+        }
+    }
+    
+    private void inlinePostpone(final Runnable run) {
+        javax.swing.Timer timer = new javax.swing.Timer(200, new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                ApplicationManager.getApplication().invokeLater(run);
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
+    
+    private boolean displayRunning;
+    private final Object displaySync = new Object();
+
+    private boolean actual(GenParse gen) {
+        return gen.version >= gen.usage.getVersion() && !usagesPending.processing.contains(gen.usage);        
+    }
+    
     public class MetaUsageProcessing implements Runnable {
         private LSFFile file;
         private Set<LSFMetaCodeStatement> usages;
+        private boolean sync;
 
-        private MetaUsageProcessing(LSFFile file, Set<LSFMetaCodeStatement> usages) {
+        private MetaUsageProcessing(LSFFile file, Set<LSFMetaCodeStatement> usages, boolean sync) {
             this.file = file;
             this.usages = usages;
+            this.sync = sync;
         }
 
         public void run() {
@@ -304,7 +407,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     public void run() {
                         version++; // синхронизация не волнует может быть и одна версия (если в рамках нескольких read'ов но не write'ов)
                         if(metaUsage.isValid() && metaUsage.isCorrect()) {
-                            LSFMetaDeclaration metaDecl = metaUsage.resolveDecl();
+                            LSFMetaDeclaration metaDecl = enabled ? metaUsage.resolveDecl() : null;
                             assert metaDecl == null || metaDecl.isValid();
                             if(metaDecl==null || !declPending.processing.contains(getLongLivingDecl(metaDecl))) { // не обновляем, потому как все равно обновится при обработке metaDeclChanged
                                 if(metaDecl==null || !metaDecl.isCorrect())
@@ -313,6 +416,8 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                     toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), version, metaUsage.getPreceedingTab()));
                             }
                         }
+                        metaUsage.setVersion(version);
+
                         boolean removed = usagesPending.processing.remove(metaUsage); // все равно плохо, изменение еще не "сохранено", а declPending уже обработаться и не найти этот usage
                         assert removed;
                     }
@@ -323,35 +428,81 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             }
             final Document document = myPsiDocumentManager.getDocument(file);
             for(final GenParse gen : genUsages) {
-                final Runnable runMetaText = new Runnable() {
+                final Result<Runnable> runMetaText = new Result<Runnable>();
+                runMetaText.setResult(new Runnable() {
                     public void run() {
-                        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                            @Override
+                        myPsiDocumentManager.performForCommittedDocument(document, new Runnable() { // без perform for commited постоянно рассинхронизируется дерево с текстом
                             public void run() {
-                            if (gen.usage.isValid() && gen.usage.getVersion() < gen.version) { // can become not valid
-                                myPsiDocumentManager.commitDocument(document);
-                                        
-                                generating = true;
+                                if(!actual(gen)) { // оптимизация
+                                    inlineProceed(true, file, sync);
+                                    return;
+                                }
+                                
+                                if(reprocessing) {
+                                    inlinePostpone(runMetaText.getResult());
+                                    return;
+                                }                                    
+                        
+                                if(!sync) { // в синхронном режиме не нужны задержки
+                                    long current = System.currentTimeMillis();
+        
+                                    long lastTime = 0;
+                                    if(!(changedDocs.size() < 2 || changedDocs.containsKey(document))) {
+                                        Map.Entry<Document, Long> lastChanged = changedDocs.entrySet().iterator().next();
+                                        lastTime = lastChanged.getValue();
+                                        long timeElapsed = current - lastTime; 
+                                        if(timeElapsed <= 200) {
+            //                                System.out.println("postponed " + file.getName() + " " + lastTime + " " + current);
+                                            inlinePostpone(runMetaText.getResult());
+                                            return;
+                                        }
+                                        changedDocs.remove(lastChanged.getKey());
+                                    }
     
-                                gen.usage.setInlinedBody(gen.body);
-    
-                                generating = false;
-    
-                                gen.usage.setVersion(gen.version);
-                            }
+    //                                String docs = "";
+    //                                for(Document d : changedDocs.keySet())
+    //                                    docs += "," + myPsiDocumentManager.getPsiFile(d).getVirtualFile().getName();
+    //                                System.out.println("proceeded " + file.getName() + " " + lastTime + " " + current + " " + docs);
+                                    changedDocs.put(document, current);
+                                }
+
+                                inlineProceed(false, file, sync);
+                  
+                                CommandProcessor.getInstance().runUndoTransparentAction(new Runnable() {
+                                    public void run() {
+                                        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                                            public void run() {
+                                                if (gen.usage.isValid() && gen.usage.isCorrect() && actual(gen)) { // can become not valid
+//                                                    myPsiDocumentManager.commitDocument(document);
+                
+                                                    boolean prevEnabled = enabled;
+                                                    enabled = false; // выключаем чтобы каскадно не вызывались события
+                
+                                                    gen.usage.setInlinedBody(gen.body);
+                
+                                                    enabled = prevEnabled;
+
+//                                                    myPsiDocumentManager.commitDocument(document);
+                                                }
+                                            }                                
+                                        });
+                                    }
+                                });
                             }
                         });
                     }
+                });
+
+                Runnable runGenUsage = new Runnable() {
+                    public void run() {
+                        inlinePend(file, sync);
+                        runMetaText.getResult().run();
+                    }
                 };
 
-                ApplicationManager.getApplication().invokeLater(runMetaText);
+                ApplicationManager.getApplication().invokeLater(runGenUsage);
             }
-/*            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                public void run() { // без perform for commited постоянно рассинхронизируется дерево с текстом
-                    myPsiDocumentManager.performForCommittedDocument(myPsiDocumentManager.getDocument(file), runMetaText); 
-                }
-            });*/
-    }
+        }
     }
 
     private abstract class MetaPending<T, G> {
@@ -432,29 +583,33 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         }
 
         protected Runnable createAction(LSFFile file, Set<LSFMetaCodeStatement> elements) {
-            return new MetaUsageProcessing(file, elements);
+            return new MetaUsageProcessing(file, elements, false);
         }
     }
     private final MetaUsagesPending usagesPending = new MetaUsagesPending();
 
     private void addUsageProcessing(Collection<LSFMetaCodeStatement> used) { // в синхронном режиме может вызываться должен быть достаточно быстрым
+        assert enabled;
         usagesPending.add(used);
     }
 
-    private void addForcedUsageProcessing(LSFFile file, List<LSFMetaCodeStatement> used) { // в синхронном режиме может вызываться должен быть достаточно быстрым
+    private void addForcedUsageProcessing(LSFFile file, List<LSFMetaCodeStatement> used, boolean sync) { // в синхронном режиме может вызываться должен быть достаточно быстрым
         usagesPending.processing.addAll(used);
-        new MetaUsageProcessing(file, new HashSet<LSFMetaCodeStatement>(used)).run();
+        if(used.size() > 0)
+            finishedReprocessing = false;
+        new MetaUsageProcessing(file, new HashSet<LSFMetaCodeStatement>(used), sync).run();
     }
 
     private void addUsageProcessing(LSFMetaCodeStatement statement) { // в синхронном режиме может вызываться должен быть достаточно быстрым
-/*        Result<Integer> cresult = new Result<Integer>();
-        String name = getFInlineName(statement, cresult);
-        if(proceeded.contains(name))
-            statement = statement;
-        System.out.println(name);*/
         addUsageProcessing(Collections.singleton(statement));
     }
 
+    private ConcurrentHashMap<LongLivingMeta, List<LSFMetaCodeStatement>> cacheUsages = new ConcurrentHashMap<LongLivingMeta, List<LSFMetaCodeStatement>>();
+    
+    void fireChangedNotMetaBody() {
+        cacheUsages.clear();        
+    }
+    
     private class MetaDeclProcessing implements Runnable {
         private Set<LongLivingMeta> decls;
 
@@ -468,14 +623,19 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     public void run() {                        
                         List<LSFMetaCodeStatement> usages = null;
                         if(metaDecl.file.isValid()) {
-                            usages = LSFResolver.findMetaUsages(metaDecl.name, metaDecl.paramCount, metaDecl.file);
+                            usages = cacheUsages.get(metaDecl);
+                            if(usages==null) {
+                                usages = LSFResolver.findMetaUsages(metaDecl.name, metaDecl.paramCount, metaDecl.file);
+                                cacheUsages.put(metaDecl, usages);
+                            }
+                        }
                         boolean removed = declPending.processing.remove(metaDecl);
                         assert removed;
                             
                         if(usages!=null)
                             addUsageProcessing(usages);
                     }
-                }});
+                });
             }
         }
     }
@@ -500,51 +660,130 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         declPending.add(getLongLivingDecl(decl));
     }
 
-    private boolean generating = false;
+    private boolean reprocessing = false;
+    private boolean finishedReprocessing = true;
 
-    public void reprocessAllDocuments() {
-        final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction(new Computable<Collection<String>>() {
-            public Collection<String> compute() {
-                return ModuleIndex.getInstance().getAllKeys(myProject);
-            }
-        });
-        ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Inlining metacode") {
-            public void run(@NotNull ProgressIndicator indicator) {
-                int i=0;
-                for(final String module : allKeys) {
+    private boolean enabled = false;
+    
+    public void toggleMetaEnabled() {
+        setMetaEnabled(!enabled);
+    }
+
+    public void setMetaEnabled(boolean enabled) {
+        this.enabled = enabled;
+        PropertiesComponent.getInstance(myProject).setValue(ENABLED_META, Boolean.toString(enabled));
+
+        reprocessAllDocuments(syncMode);
+    }
+
+    public boolean getMetaEnabled() {
+        return enabled;
+    }    
+
+    public void toggleMetaSyncMode() {
+        setMetaSyncMode(!syncMode);
+    } 
+    
+    private boolean syncMode;
+    public void setMetaSyncMode(boolean syncMode) {
+        this.syncMode = syncMode;
+        PropertiesComponent.getInstance(myProject).setValue(META_SYNC_MODE, Boolean.toString(syncMode));        
+    }
+    
+    public boolean getMetaSyncMode() {
+        return syncMode;
+    }
+
+    public void reprocessAllDocuments(final boolean sync) {
+        final Progressive run = new Progressive() {
+            public void run(final @NotNull ProgressIndicator indicator) {
+                reprocessing = true;
+
+                final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction(new Computable<Collection<String>>() {
+                    public Collection<String> compute() {
+                        return ModuleIndex.getInstance().getAllKeys(myProject);
+                    }
+                });
+                
+                double coeff = sync ? 0.5d : 1.0d;
+
+                int i = 0;
+                for (final String module : allKeys) {
+                    indicator.setText("Processing : " + module);
                     ApplicationManager.getApplication().runReadAction(new Runnable() {
                         @Override
                         public void run() {
                             Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, GlobalSearchScope.allScope(myProject));
-                            for(LSFModuleDeclaration declaration : moduleDeclarations) {
+                            for (LSFModuleDeclaration declaration : moduleDeclarations) {
                                 LSFFile file = declaration.getLSFFile();
-                                addForcedUsageProcessing(file, file.getStatements().getMetaCodeStatementList());
+                                List<LSFMetaCodeStatement> metaStatements = file.getMetaCodeStatementList();
+                                indicator.setText2("Statements : " + metaStatements.size());
+                                addForcedUsageProcessing(file, metaStatements, sync);
+                                indicator.setText2("");
                             }
                         }
                     });
-                    indicator.setFraction(((double)i++)/allKeys.size());
+                    indicator.setFraction(((double) i++) * coeff / allKeys.size());
+                }
+
+                reprocessing = false;
+
+                if (sync) {
+                    while (!finishedReprocessing) {
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                        }
+
+                        indicator.setFraction((inlinePending == 0 ? 1.0d : (double) inlineProceeded / (double) inlinePending)*coeff + coeff);
+                        indicator.setText((lastProceeded !=null ? "Last inlined : " + lastProceeded : "") + " " + inlineProceeded + "/" + inlinePending);
+                    }
                 }
             }
-        });
+        };
+
+        Task task;
+        if(sync) {
+            task = new Task.Modal(myProject, "Updating metacode", true) {
+                public void run(final @NotNull ProgressIndicator indicator) {
+                    run.run(indicator);
+                }
+            };
+        } else {
+            task = new Task.Backgroundable(myProject, "Marking metacode") {
+                public void run(final @NotNull ProgressIndicator indicator) {
+                    run.run(indicator);
+                }
+            };
+        }
+        ProgressManager.getInstance().run(task);
     }
 
     private void fireChanged(PsiElement element) {
-        if(generating)
+        if(!enabled)
             return;
 
+        boolean inMetaBody = false;
         while(element != null && !(element instanceof LSFFile)) {
             if(element instanceof LSFMetaCodeDeclarationStatement)
                 addDeclProcessing((LSFMetaCodeDeclarationStatement)element);
+            
+            if(element instanceof LSFAnyTokens || element instanceof LSFMetaCodeBody) {
+                inMetaBody = true;
+            }
 
             if(element instanceof LSFMetaCodeStatement)
                 addUsageProcessing((LSFMetaCodeStatement)element);
 
             element = element.getParent();
         }
+
+        if(!inMetaBody)
+            fireChangedNotMetaBody();
     }
 
     private void fireAdded(PsiElement element) {
-        if(generating) {
+        if(!enabled) {
 /*            assert !(element instanceof LSFStatements);
             if(element instanceof LSFMetaCodeBody) // нужно перегенерировать тело использования
                 for(PsiElement child : ((LSFMetaCodeBody)element).getStatements().getChildren())
@@ -560,11 +799,8 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         if(element instanceof LSFMetaCodeDeclarationStatement) // нужно перегенерить все usage'ы этого метакода
             addDeclProcessing((LSFMetaCodeDeclarationStatement)element);
 
-        if(element instanceof LSFFile)
-            element = ((LSFFile)element).getStatements();
-
-        if(element instanceof LSFStatements) { // перегенерировать все внутренние использования
-            for(PsiElement child : ((LSFStatements)element).getChildren()) {
+        if(element instanceof LSFFile) { // перегенерировать все внутренние использования
+            for(PsiElement child : element.getChildren()) {
                 if(child instanceof LSFMetaCodeStatement)
                     addUsageProcessing((LSFMetaCodeStatement)child);
                 if(child instanceof LSFMetaCodeDeclarationStatement)
@@ -574,17 +810,14 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private void fireRemoved(PsiElement element) {
-        if(generating)
+        if(!enabled)
             return;
 
         if(element instanceof LSFMetaCodeDeclarationStatement) // нужно перегенерить все usage'ы этого метакода
             addDeclProcessing((LSFMetaCodeDeclarationStatement)element);
 
-        if(element instanceof LSFFile)
-            element = ((LSFFile)element).getStatements();
-
-        if(element instanceof LSFStatements) { // перегенерировать все внутренние использования
-            for(PsiElement child : ((LSFStatements)element).getChildren()) {
+        if(element instanceof LSFFile) { // перегенерировать все внутренние использования
+            for(PsiElement child : element.getChildren()) {
                 if(child instanceof LSFMetaCodeDeclarationStatement)
                     addDeclProcessing((LSFMetaCodeDeclarationStatement)child);
             }

@@ -2,6 +2,7 @@ package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
@@ -11,6 +12,8 @@ import com.simpleplugin.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDeclaration {
 
@@ -34,5 +37,42 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
 
     public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
         return setName(this, name);
+    }
+
+    @Override
+    public String getDeclName() {
+        return getName();
+    }
+
+    public static Icon getIcon(LSFDeclaration decl, boolean unused) {
+        return null;
+    }
+
+    public static String getLocationString(LSFDeclaration decl) {
+        return decl.getLSFFile().getModuleDeclaration().getDeclName();
+    }
+
+    public static String getPresentableText(LSFDeclaration decl) {
+        return decl.getDeclName();
+    }
+
+    @Override
+    public Icon getIcon(boolean unused) {
+        return getIcon(this, unused);
+    }
+
+    @Override
+    public String getLocationString() {
+        return getLocationString(this);
+    }
+
+    @Override
+    public String getPresentableText() {
+        return getPresentableText(this);
+    }
+
+    @Override
+    public ItemPresentation getPresentation() {
+        return this;
     }
 }

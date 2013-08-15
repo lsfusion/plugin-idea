@@ -1,4 +1,6 @@
 package com.simpleplugin.psi.references;
 
-public interface LSFParamReference extends LSFReference {
+import com.simpleplugin.psi.declarations.LSFParamDeclaration;
+
+public interface LSFParamReference extends LSFReference<LSFParamDeclaration> {
 }
