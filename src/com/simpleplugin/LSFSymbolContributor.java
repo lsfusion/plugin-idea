@@ -17,6 +17,11 @@ public class LSFSymbolContributor extends LSFNameContributor {
         indices.add(ExplicitNamespaceIndex.getInstance());
         indices.add(MetaIndex.getInstance());
         indices.add(PropIndex.getInstance());
+        indices.add(FormIndex.getInstance());
+        indices.add(GroupIndex.getInstance());
+        indices.add(TableIndex.getInstance());
+        indices.add(WindowIndex.getInstance());
+        indices.add(NavigatorElementIndex.getInstance());
         return indices;
     }
 }
