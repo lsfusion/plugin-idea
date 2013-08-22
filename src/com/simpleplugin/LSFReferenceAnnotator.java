@@ -15,6 +15,7 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.references.LSFGlobalReference;
+import com.simpleplugin.psi.references.LSFReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -32,9 +33,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private final static TextAttributes META_USAGE = new TextAttributes(null, Gray._239, null, EffectType.BOXED, Font.PLAIN);
-    private final static TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(0, 0, 64)), null, EffectType.BOXED, Font.PLAIN);
-    private final static TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(0, 255, 255)), null, null, EffectType.BOXED, Font.PLAIN);
+    private final static TextAttributes META_USAGE = new TextAttributes(null, Gray._239, null, null, Font.PLAIN);
+    private final static TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(0, 0, 64)), null, null, Font.PLAIN);
+    private final static TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(0, 255, 255)), null, null, null, Font.PLAIN);
+    private final static TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
 
     @Override
     public void visitElement(@NotNull PsiElement o) {
@@ -91,6 +93,23 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         checkReference(o);
     }
 
+    @Override
+    public void visitExprParameterNameUsage(@NotNull LSFExprParameterNameUsage o) {
+        super.visitExprParameterNameUsage(o);
+        
+        checkReference(o);
+        
+        if(o.resolveDecl()==o.getParamDeclare())
+            addImplicitDecl(o);
+    }
+
+    @Override
+    public void visitObjectUsage(@NotNull LSFObjectUsage o) {
+        super.visitObjectUsage(o);
+
+        checkReference(o);
+    }
+
     private boolean isInMetaUsage(PsiElement o) {
         return PsiTreeUtil.getParentOfType(o, LSFMetaCodeBody.class) != null;
         //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
@@ -107,8 +126,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         checkReference(o);
     }
 
-    private void checkReference(LSFGlobalReference reference) {
-        if (!isInMetaDecl(reference) && !reference.isSoft() && reference.resolve() == null)
+    private void checkReference(LSFReference reference) {
+        if (!isInMetaDecl(reference) && reference.resolve() == null)
             addError(reference);
     }
 
@@ -122,9 +141,17 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private void addError(LSFGlobalReference reference) {
+    private void addError(LSFReference reference) {
         final Annotation annotation = myHolder.createErrorAnnotation(reference.getTextRange(), "Cannot resolve symbol");
         TextAttributes error = ERROR;
+        if(isInMetaUsage(reference))
+            error = TextAttributes.merge(error, META_USAGE);
+        annotation.setEnforcedTextAttributes(error);
+    }
+
+    private void addImplicitDecl(LSFReference reference) {
+        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Implicit declaration");
+        TextAttributes error = IMPLICIT_DECL;
         if(isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);

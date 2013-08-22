@@ -41,6 +41,8 @@ public class LSFFile extends PsiFileBase {
 
     public GlobalSearchScope getScope() {
         Project project = getProject();
+        if(getVirtualFile()==null) // в fillVariants не узнаешь какой конкретно сейчас файл
+            return GlobalSearchScope.allScope(project);  
         Module moduleForFile = ModuleUtilCore.findModuleForFile(getVirtualFile(), project);
         if(moduleForFile==null) // library
             return ProjectScope.getLibrariesScope(project);

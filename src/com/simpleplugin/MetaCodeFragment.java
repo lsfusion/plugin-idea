@@ -17,9 +17,33 @@ public class MetaCodeFragment {
     }
 
     public String getCode(List<String> params) {
+        List<String> newTokens = getNewTokens(params, new ArrayList<Integer>());
+        return getTransformedCode(newTokens, tokens);
+    }
+    
+    public int mapOffset(int offset, List<String> params) {
+        List<Integer> oldTokensCnt = new ArrayList<Integer>();
+        List<String> newTokens = getNewTokens(params, oldTokensCnt);
+        int mapOffset = 0;
+        int j=0;
+        for(int i=0;i<newTokens.size();i++) {
+            offset = offset - newTokens.get(i).length();
+
+            if(offset < 0)
+                return mapOffset;
+
+            for(int k=0;k<oldTokensCnt.get(i);k++) {
+                mapOffset = mapOffset + tokens.get(j).length();
+                j++;
+            }
+        }
+        
+        return mapOffset;
+    }
+
+    private List<String> getNewTokens(List<String> params, List<Integer> oldTokensCnt) {
         assert params.size() == parameters.size();
         ArrayList<String> newTokens = new ArrayList<String>();
-        ArrayList<Integer> oldTokensCnt = new ArrayList<Integer>();
 
         for (int i = 0; i < tokens.size(); i++) {
             String tokenStr = transformedToken(params, tokens.get(i));
@@ -36,14 +60,12 @@ public class MetaCodeFragment {
                 oldTokensCnt.add(1);
             }
         }
-
-        return getTransformedCode(newTokens, tokens, oldTokensCnt);
+        return newTokens;
     }
 
-    private String getTransformedCode(ArrayList<String> newTokens, List<String> oldTokens, ArrayList<Integer> oldTokensCnt) {
+    private String getTransformedCode(List<String> newTokens, List<String> oldTokens) {
         StringBuilder transformedCode = new StringBuilder();
-        for (int i = 0; i < newTokens.size(); i++)
-            transformedCode.append(newTokens.get(i));
+        for (String newToken : newTokens) transformedCode.append(newToken);
         return transformedCode.toString();
     }
 

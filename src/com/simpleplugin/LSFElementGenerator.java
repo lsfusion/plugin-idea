@@ -60,9 +60,7 @@ public class LSFElementGenerator {
         return it==' ' || it=='\t';
     }
 
-    public static LSFMetaCodeBody createMetaBodyFromText(final LSFFile file, final String text, String whitespace) {
-        final String tab = whitespace.substring(whitespace.lastIndexOf('\n') +1);
-
+    public static LSFMetaCodeBody createMetaBodyFromText(final LSFFile file, final String text, String tab) {
         final StringBuilder tabbedText = new StringBuilder();
         tabbedText.append("MODULE x; @dummy() {");
         for (char symbol : text.toCharArray()) {

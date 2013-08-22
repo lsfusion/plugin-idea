@@ -96,8 +96,10 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
             assert parent instanceof LSFStatements;
             treePrev = parent.getNode().getTreePrev(); // предполагается что тут statements будут
         }*/
-        if(treePrev!=null && LSFParserDefinition.isWhiteSpace(treePrev.getElementType())) // сохраним табуляцию
-            return treePrev.getText();
+        if(treePrev!=null && LSFParserDefinition.isWhiteSpace(treePrev.getElementType())) { // сохраним табуляцию
+            String whitespace = treePrev.getText();
+            return whitespace.substring(whitespace.lastIndexOf('\n') +1);
+        }
         return "";
     }
 

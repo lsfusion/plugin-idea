@@ -9,7 +9,7 @@ public class LSFStubFactory {
             return LSFStubElementTypes.EXPLICIT_NAMESPACE;
         if(ID.equals("MODULE_HEADER"))
             return LSFStubElementTypes.MODULE;
-        if(ID.equals("CLASS_STATEMENT"))
+        if(ID.equals("CLASS_DECL"))
             return LSFStubElementTypes.CLASS;
         if(ID.equals("PROPERTY_STATEMENT"))
             return LSFStubElementTypes.PROP;
@@ -25,7 +25,9 @@ public class LSFStubFactory {
             return LSFStubElementTypes.WINDOW;
         if(ID.equals("NEW_NAVIGATOR_ELEMENT_STATEMENT"))
             return LSFStubElementTypes.NAVIGATORELEMENT;
-
+        if(ID.equals("FORM_STATEMENT"))
+            return LSFStubElementTypes.EXTENDFORM;
+        
         throw new UnsupportedOperationException();
     }
 

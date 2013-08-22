@@ -9,6 +9,7 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
 import com.simpleplugin.psi.LSFElementImpl;
 import com.simpleplugin.psi.LSFFile;
+import com.simpleplugin.psi.LSFStubBasedPsiElement;
 import com.simpleplugin.psi.declarations.LSFGlobalDeclaration;
 import com.simpleplugin.psi.stubs.GlobalStubElement;
 import org.jetbrains.annotations.NonNls;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 // множественное наследова
-public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration<This, Stub>, Stub extends GlobalStubElement<Stub, This>> extends StubBasedPsiElementBase<Stub> implements LSFGlobalDeclaration<This, Stub> {
+public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration<This, Stub>, Stub extends GlobalStubElement<Stub, This>> extends LSFStubBasedPsiElement<This, Stub> implements LSFGlobalDeclaration<This, Stub> {
 
     protected LSFGlobalDeclarationImpl(@NotNull ASTNode node) {
         super(node);
@@ -47,25 +48,6 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
     }
 
     @Override
-    public boolean isCorrect() { // множественное наследование по сути
-        Stub stub = getStub();
-        if(stub!=null)
-            return stub.isCorrect();
-        
-        return LSFElementImpl.isCorrect(this);
-    }
-
-    @Override
-    public LSFFile getLSFFile() {
-        return (LSFFile) getContainingFile();
-    }
-
-    @Override
-    public GlobalSearchScope getScope() {
-        return LSFElementImpl.getScope(this);
-    }
-
-    @Override
     public Icon getIcon(boolean unused) {
         return LSFDeclarationImpl.getIcon(this, unused);
     }
@@ -83,5 +65,10 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
     @Override
     public ItemPresentation getPresentation() {
         return this;
+    }
+
+    @Override
+    public String getGlobalName() {
+        return getDeclName();
     }
 }

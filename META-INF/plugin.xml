@@ -43,6 +43,17 @@
           <add-to-group group-id="CodeMenu"/>
           <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
       </action>
+      <action id="MetaCode.Refresh" class="com.simpleplugin.MetaRefreshAction" text="Refresh _meta" description="Refresh meta code">
+          <add-to-group group-id="CodeMenu"/>
+      </action>
+      <action id="MetaCode.ShowFile" class="com.simpleplugin.MetaShowFileAction" text="Show _meta for file" description="Show meta code for current file">
+          <add-to-group group-id="CodeMenu"/>
+          <keyboard-shortcut first-keystroke="control alt shift J" keymap="$default"/>
+      </action>
+      <action id="MetaCode.HideFile" class="com.simpleplugin.MetaHideFileAction" text="Hide _meta for file" description="Hide meta code for current file">
+          <add-to-group group-id="CodeMenu"/>
+          <keyboard-shortcut first-keystroke="control alt shift K" keymap="$default"/>
+      </action>
       <action id="MetaCode.SyncMode" class="com.simpleplugin.MetaSyncModeAction" text="Meta sync mode" description="Toggle meta code sync mode">
           <add-to-group group-id="CodeMenu"/>
       </action>
@@ -54,7 +65,12 @@
       <lang.parserDefinition language="Lsf" implementationClass="com.simpleplugin.LSFParserDefinition"/>
       <lang.findUsagesProvider language="Lsf" implementationClass="com.simpleplugin.LSFFindUsagesProvider"/>
       <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.simpleplugin.LSFSyntaxHighlighterFactory"/>
+      <lang.braceMatcher language="Lsf" implementationClass="com.simpleplugin.LSFBraceMatcher"/>
+      <lang.commenter language="Lsf" implementationClass="com.simpleplugin.LSFCommenter"/>
+      <lang.foldingBuilder language="Lsf" implementationClass="com.simpleplugin.folding.LSFFoldingBuilder"/>
       <annotator language="Lsf" implementationClass="com.simpleplugin.LSFReferenceAnnotator" />
+
+      <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
 
       <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.MetaIndex"/>
       <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ModuleIndex"/>
@@ -67,9 +83,13 @@
       <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.WindowIndex"/>
       <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.NavigatorElementIndex"/>
 
+      <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendFormIndex"/>
+
       <stubElementTypeHolder class="com.simpleplugin.psi.LSFTypes"/>
       <gotoClassContributor implementation="com.simpleplugin.LSFClassContributor"/>
       <gotoSymbolContributor implementation="com.simpleplugin.LSFSymbolContributor"/>
+
+      <checkinHandlerFactory implementation="com.simpleplugin.LSFCheckInHandlerFactory"/>
 
       <fileDocumentSynchronizationVetoer implementation="com.simpleplugin.JarDocumentSavingVetoer"/>
   </extensions>

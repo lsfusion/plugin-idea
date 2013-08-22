@@ -9,9 +9,12 @@ import com.intellij.util.*;
 import com.intellij.util.containers.ConcurrentHashMap;
 import com.simpleplugin.BaseUtils;
 import com.simpleplugin.psi.declarations.*;
+import com.simpleplugin.psi.extend.LSFExtend;
 import com.simpleplugin.psi.references.LSFModuleReference;
 import com.simpleplugin.psi.references.LSFNamespaceReference;
 import com.simpleplugin.psi.stubs.FullNameStubElement;
+import com.simpleplugin.psi.stubs.extend.ExtendStubElement;
+import com.simpleplugin.psi.stubs.extend.types.ExtendStubElementType;
 import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 
@@ -19,7 +22,7 @@ import java.util.*;
 
 public class LSFGlobalResolver {
 
-    private static ConcurrentHashMap<LSFModuleDeclaration, Set<VirtualFile>> cached = new ConcurrentHashMap<LSFModuleDeclaration, Set<VirtualFile>>();
+    public static ConcurrentHashMap<LSFModuleDeclaration, Set<VirtualFile>> cached = new ConcurrentHashMap<LSFModuleDeclaration, Set<VirtualFile>>();
     // вот эту хрень надо по хорошему кэшировать
     private static Set<VirtualFile> getRequireModules(LSFModuleDeclaration declaration) {
         Set<VirtualFile> cachedFiles = cached.get(declaration);
@@ -129,5 +132,30 @@ public class LSFGlobalResolver {
             }
         }
         return new MergeQuery<LSFNamespaceDeclaration>(modules, new CollectionQuery<LSFNamespaceDeclaration>(Collections.<LSFNamespaceDeclaration>singleton(minDeclaration)));
+    }
+    
+    // этот элемент и все "выше"
+    public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(T element) {
+        return findExtendElements(element.resolveDecl(), (ExtendStubElementType<T, E>) element.getElementType(), element.getLSFFile());
+    }
+    public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, LSFFile file) {
+        if(decl==null)
+            return new EmptyQuery<T>();
+
+        StringStubIndexExtension<T> index = type.getGlobalIndex();
+
+        LSFModuleDeclaration module = file.getModuleDeclaration();
+        Project project = file.getProject();
+
+        String name = decl.getGlobalName();
+
+//        int elementOffset = element.getTextOffset();
+        Collection<T> decls = index.get(name, project, GlobalSearchScope.filesScope(project, getRequireModules(module)));
+
+        return new FilteredQuery<T>(new CollectionQuery<T>(decls), new Condition<T>() {
+            public boolean value(T t) {
+                return t.resolveDecl().equals(decl); // проверяем что resolve'ся куда надо
+            }
+        });
     }
 }

@@ -58,6 +58,10 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
         recReadMetaWhiteSpaceOrComments(prev ? node.getTreePrev() : node.getTreeNext(), prev, tokens);
     }
 
+    public PsiElement findOffsetInCode(int offset) {
+        return getAnyTokens().findElementAt(offset);        
+    }
+
     @Override
     public List<String> getMetaCode() {
         List<String> tokens = new ArrayList<String>();
