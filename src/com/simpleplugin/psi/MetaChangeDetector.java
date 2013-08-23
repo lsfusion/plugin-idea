@@ -68,7 +68,8 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     @Override
                     public void run() {
 //                FileBasedIndex.getInstance().ensureUpToDate(StubUpdatingIndex.INDEX_ID, myProject, GlobalSearchScope.allScope(myProject));
-                        ModuleIndex.getInstance().get("dumb", myProject, GlobalSearchScope.allScope(myProject));
+                        if(!DumbService.isDumb(myProject))
+                            ModuleIndex.getInstance().get("dumb", myProject, GlobalSearchScope.allScope(myProject));
                     }
                 });
 //                ApplicationManager.getApplication().runReadAction(new Runnable() {
@@ -234,10 +235,14 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             return null;
 
         String preceedingTab = metaUsage.getPreceedingTab();
+        int actualOffset = offset;
         offset -= adjustMetaTabOffset(metaBody.getText().substring(0, offset), preceedingTab);
 
         for(PsiElement child : metaBody.getChildren()) {
             if(child instanceof LSFMetaCodeStatement) {
+                if(child.getStartOffsetInParent() >= actualOffset - 1) // -1 потому как скобка
+                    break;                    
+                    
                 LSFMetaCodeBody innerBody = ((LSFMetaCodeStatement) child).getMetaCodeBody();
                 if(innerBody!=null) {
                     String text = innerBody.getText();
@@ -744,7 +749,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         this.enabled = enabled;
         PropertiesComponent.getInstance(myProject).setValue(ENABLED_META, Boolean.toString(enabled));
 
-        final ProjectLevelVcsManager vcsManager = ProjectLevelVcsManager.getInstance(myProject);
+/*        final ProjectLevelVcsManager vcsManager = ProjectLevelVcsManager.getInstance(myProject);
         if(enabled)
             vcsManager.startBackgroundVcsOperation();
         else {
@@ -755,7 +760,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     }
                 });
             }
-        }
+        }*/
 
         if(reprocess)
             reprocessAllDocuments(syncMode);
