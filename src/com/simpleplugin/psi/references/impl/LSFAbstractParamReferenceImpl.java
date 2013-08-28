@@ -6,13 +6,17 @@ import com.intellij.util.CollectionQuery;
 import com.intellij.util.EmptyQuery;
 import com.intellij.util.Processor;
 import com.intellij.util.Query;
+import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.context.ExtendParamContext;
+import com.simpleplugin.psi.context.ModifyParamContext;
 import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
 import com.simpleplugin.psi.declarations.LSFObjectDeclaration;
 import com.simpleplugin.psi.extend.LSFFormExtend;
 import com.simpleplugin.psi.references.LSFAbstractParamReference;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -27,7 +31,7 @@ public abstract class LSFAbstractParamReferenceImpl<T extends LSFExprParamDeclar
         return false;
     }
 
-    private static boolean processModifyContextParams(PsiElement modifier, int offset, Set<String> foundParams, Processor<LSFExprParamDeclaration> processor) {
+    public static boolean processModifyContextParams(PsiElement modifier, int offset, Set<String> foundParams, Processor<LSFExprParamDeclaration> processor) {
 
         if(modifier.getTextOffset() > offset) // если идет после искомого элемента, не интересует
             return true;
@@ -94,9 +98,23 @@ public abstract class LSFAbstractParamReferenceImpl<T extends LSFExprParamDeclar
         
         return true;
     }
+    
+    protected PsiElement getParamDeclare() {
+        return this;
+    }
 
-    private boolean processParams(Processor<LSFExprParamDeclaration> processor) {        
-        return processParams(this, getTextOffset(), new HashSet<String>(), processor);
+    private boolean processParams(Processor<LSFExprParamDeclaration> processor) {
+        PsiElement paramDecl = getParamDeclare();
+        return processParams(paramDecl, paramDecl.getTextOffset(), new HashSet<String>(), processor);
+    }
+
+    @Nullable
+    @Override
+    public LSFClassSet resolveClass() {
+        T decl = resolveDecl();
+        if(decl == null)
+            return null;
+        return decl.resolveClass();
     }
 
     @Override

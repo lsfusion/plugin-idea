@@ -1,6 +1,7 @@
 package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
@@ -8,6 +9,9 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.CollectionQuery;
 import com.intellij.util.Query;
+import com.simpleplugin.LSFPsiImplUtil;
+import com.simpleplugin.classes.LSFClassSet;
+import com.simpleplugin.psi.context.PropertyUsageContext;
 import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
 import com.simpleplugin.psi.declarations.LSFLocalPropDeclaration;
 import com.simpleplugin.psi.declarations.LSFPropDeclaration;
@@ -35,15 +39,17 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         
         private final String name;
         private LSFLocalPropDeclaration found;
+        private final Condition<LSFPropDeclaration> condition; 
 
-        private LocalResolveProcessor(String name) {
+        private LocalResolveProcessor(String name, Condition<LSFPropDeclaration> condition) {
             this.name = name;
+            this.condition = condition;
         }
 
         @Override
         public boolean execute(@NotNull PsiElement element, ResolveState state) {
             LSFLocalPropDeclaration decl = (LSFLocalPropDeclaration) element;
-            if(decl.getName().equals(name)) {
+            if(decl.getName().equals(name) && condition.value(decl)) {
                 found = decl;
                 return false;
             }
@@ -63,7 +69,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     @Override
     public Query<LSFPropDeclaration> resolveNoCache() {
         if(getFullNameRef() == null) {
-            LocalResolveProcessor processor = new LocalResolveProcessor(getNameRef());
+            LocalResolveProcessor processor = new LocalResolveProcessor(getNameRef(), getDeclCondition());
             PsiTreeUtil.treeWalkUp(processor, this, null, new ResolveState());
             if(processor.found!=null)
                 return new CollectionQuery<LSFPropDeclaration>(Collections.<LSFPropDeclaration>singleton(processor.found));
@@ -104,5 +110,30 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
             PsiTreeUtil.treeWalkUp(processor, this, null, new ResolveState());
         }
         super.fillListVariants(variants);
+    }
+
+    private List<LSFClassSet> getUsageContext() {
+        return PsiTreeUtil.getParentOfType(this, PropertyUsageContext.class).resolveParamClasses();        
+    }
+    
+    private Condition<LSFPropDeclaration> getDeclCondition() {
+        final List<LSFClassSet> usageClasses = getUsageContext();
+        return new Condition<LSFPropDeclaration>() {
+            public boolean value(LSFPropDeclaration decl) {
+                List<LSFClassSet> declClasses = decl.resolveParamClasses();
+                if(declClasses.size()!=usageClasses.size())
+                    return false;
+                
+                for(int i=0,size=declClasses.size();i<size;i++)
+                    if(!LSFPsiImplUtil.containsAll(declClasses.get(i), usageClasses.get(i)))
+                        return false;
+                return true;
+            }
+        };
+    }
+            
+    @Override
+    protected Condition<LSFGlobalPropDeclaration> getCondition() {
+        return (Condition<LSFGlobalPropDeclaration>)((Condition<? extends LSFPropDeclaration>)getDeclCondition());
     }
 }

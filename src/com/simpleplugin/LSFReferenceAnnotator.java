@@ -99,7 +99,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         
         checkReference(o);
         
-        if(o.resolveDecl()==o.getParamDeclare())
+        if(o.resolveDecl()==o.getClassParamDeclare().getParamDeclare())
             addImplicitDecl(o);
     }
 

@@ -3,6 +3,7 @@ package com.simpleplugin.psi.stubs.types;
 import com.intellij.psi.*;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubIndexKey;
+import com.simpleplugin.psi.stubs.extend.types.ExtendClassStubElementType;
 import com.simpleplugin.psi.stubs.extend.types.ExtendFormStubElementType;
 import com.simpleplugin.psi.stubs.types.ClassStubElementType;
 
@@ -20,4 +21,5 @@ public interface LSFStubElementTypes {
     NavigatorElementStubElementType NAVIGATORELEMENT = new NavigatorElementStubElementType();
 
     ExtendFormStubElementType EXTENDFORM = new ExtendFormStubElementType();
+    ExtendClassStubElementType EXTENDCLASS = new ExtendClassStubElementType();
 }

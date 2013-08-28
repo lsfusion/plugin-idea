@@ -27,6 +27,8 @@ public class LSFStubFactory {
             return LSFStubElementTypes.NAVIGATORELEMENT;
         if(ID.equals("FORM_STATEMENT"))
             return LSFStubElementTypes.EXTENDFORM;
+        if(ID.equals("CLASS_STATEMENT"))
+            return LSFStubElementTypes.EXTENDCLASS;
         
         throw new UnsupportedOperationException();
     }

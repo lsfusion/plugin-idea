@@ -1,6 +1,8 @@
 package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.simpleplugin.psi.LSFClassParamDeclare;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFParamDeclare;
 import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
@@ -13,10 +15,15 @@ public abstract class LSFExprParamReferenceImpl extends LSFAbstractParamReferenc
     }
 
     @NotNull
-    protected abstract LSFParamDeclare getParamDeclare();
+    protected abstract LSFClassParamDeclare getClassParamDeclare();
+
+    @Override
+    protected PsiElement getParamDeclare() {
+        return getClassParamDeclare().getParamDeclare();
+    }
 
     @Override
     public LSFId getSimpleName() {
-        return getParamDeclare().getSimpleName();
+        return getClassParamDeclare().getParamDeclare().getSimpleName();
     }
 }

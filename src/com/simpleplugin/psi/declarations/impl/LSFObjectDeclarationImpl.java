@@ -1,6 +1,8 @@
 package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.simpleplugin.LSFPsiImplUtil;
+import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.LSFBuiltInClassName;
 import com.simpleplugin.psi.LSFClassName;
 import com.simpleplugin.psi.LSFId;
@@ -20,6 +22,11 @@ public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationIm
 
     @NotNull
     protected abstract LSFClassName getClassName();
+
+    @Nullable
+    public LSFClassSet resolveClass() {
+        return LSFPsiImplUtil.resolveClass(getClassName());
+    }
 
     @Nullable
     @Override

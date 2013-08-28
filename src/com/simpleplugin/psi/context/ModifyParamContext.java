@@ -1,4 +1,4 @@
-package com.simpleplugin.psi;
+package com.simpleplugin.psi.context;
 
 import com.intellij.psi.PsiElement;
 

@@ -1,8 +1,11 @@
 package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
+import com.simpleplugin.psi.context.ClassParamDeclareContext;
 import com.simpleplugin.psi.declarations.LSFParamDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,5 +22,10 @@ public abstract class LSFParamDeclarationImpl extends LSFExprParamDeclarationImp
     @Override
     public LSFId getNameIdentifier() {
         return getSimpleName();
+    }
+
+    @Nullable
+    public LSFClassSet resolveClass() {
+        return PsiTreeUtil.getParentOfType(this, ClassParamDeclareContext.class).resolveClass();
     }
 }

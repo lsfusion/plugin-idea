@@ -139,18 +139,19 @@ public class LSFGlobalResolver {
         return findExtendElements(element.resolveDecl(), (ExtendStubElementType<T, E>) element.getElementType(), element.getLSFFile());
     }
     public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, LSFFile file) {
+        Project project = file.getProject();
+        return findExtendElements(decl, type, project, GlobalSearchScope.filesScope(project, getRequireModules(file.getModuleDeclaration())));
+    }
+    public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, Project project, GlobalSearchScope scope) {
         if(decl==null)
             return new EmptyQuery<T>();
 
         StringStubIndexExtension<T> index = type.getGlobalIndex();
 
-        LSFModuleDeclaration module = file.getModuleDeclaration();
-        Project project = file.getProject();
-
         String name = decl.getGlobalName();
 
 //        int elementOffset = element.getTextOffset();
-        Collection<T> decls = index.get(name, project, GlobalSearchScope.filesScope(project, getRequireModules(module)));
+        Collection<T> decls = index.get(name, project, scope);
 
         return new FilteredQuery<T>(new CollectionQuery<T>(decls), new Condition<T>() {
             public boolean value(T t) {
