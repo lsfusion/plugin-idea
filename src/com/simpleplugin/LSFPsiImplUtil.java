@@ -554,7 +554,7 @@ public class LSFPsiImplUtil {
         LSFContextIndependentPD contextIndependentPD = sourceStatement.getContextIndependentPD();
         if(contextIndependentPD!=null)
             return ((UnfriendlyPE)contextIndependentPD.getChildren()[0]).resolveValueParamClasses();
-        return null;
+        return new ArrayList<LSFClassSet>(); // потом с action'ами надо дореализовать
     }
 
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement) {
