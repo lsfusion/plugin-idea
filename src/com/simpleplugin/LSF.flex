@@ -112,7 +112,9 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "ASSIGN"                  			{ return ASSIGN; }
   "ASYNCUPDATE"             			{ return ASYNCUPDATE; }
   "ATTACH"                  			{ return ATTACH; }
+  "AUTO"                                { return AUTO; }
   "AUTOAPPLY"               			{ return AUTOAPPLY; }
+  "AUTOREFRESH"                         { return AUTOREFRESH; }
   "AUTOSET"                 			{ return AUTOSET; }
   "BACKGROUND"              			{ return BACKGROUND; }
   "BCC"                     			{ return BCC; }
@@ -271,6 +273,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "PROPORTION"              			{ return PROPORTION; }
   "QUERYCLOSE"              			{ return QUERYCLOSE; }
   "QUERYOK"                 			{ return QUERYOK; }
+  "QUICKFILTER"                         { return QUICKFILTER; }
   "READONLY"                			{ return READONLY; }
   "READONLYIF"              			{ return READONLYIF; }
   "RECURSION"               			{ return RECURSION; }

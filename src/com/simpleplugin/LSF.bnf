@@ -384,6 +384,7 @@ formActionPropertyDefinitionBody ::=
 		(formSessionScopeLiteral)?
 		(modalityTypeLiteral)?
 		(CHECK)? (SHOWDROP)?
+		(formPrintTypeLiteral)?
 
 formActionObjectList ::=
 		ID EQUAL propertyExpression
@@ -520,6 +521,7 @@ formDecl ::= FORM simpleNameWithCaption
 		            (PRINT)?
 		            (modalityTypeLiteral)?
 		            (IMAGE stringLiteral)?
+		            (AUTOREFRESH intLiteral)?
 {mixin="com.simpleplugin.psi.declarations.impl.LSFFormDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFFormDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.FormStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
@@ -583,6 +585,7 @@ formPropertyOptionsList ::= (	propertyEditTypeLiteral
                             |	TODRAW formGroupObjectEntity
                             |	BEFORE formPropertyDraw
                             |	AFTER  formPropertyDraw
+                            |   QUICKFILTER formPropertyDraw
                             |	ON EDIT formActionPropertyObject
                             |	ON CHANGE formActionPropertyObject
                             |	ON CHANGEWYS formActionPropertyObject
@@ -1105,6 +1108,8 @@ flexAlignmentLiteral ::= LEADING | CENTER | TRAILING | STRETCH
 propertyEditTypeLiteral ::= EDITABLE | READONLY | SELECTOR
 
 modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN
+
+formPrintTypeLiteral ::= PRINT (AUTO)?
 
 formSessionScopeLiteral ::= OLDSESSION | NEWSESSION | MANAGESESSION
 
