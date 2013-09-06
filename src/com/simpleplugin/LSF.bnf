@@ -518,7 +518,6 @@ listFormDeclaration ::= LIST customClassUsage OBJECT ID
 
 formDecl ::= FORM simpleNameWithCaption
 		            (TITLE stringLiteral)?
-		            (PRINT)?
 		            (modalityTypeLiteral)?
 		            (IMAGE stringLiteral)?
 		            (AUTOREFRESH intLiteral)?
