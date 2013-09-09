@@ -3,6 +3,7 @@ package com.simpleplugin.psi.references.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.stubs.StringStubIndexExtension;
+import com.intellij.util.CollectionQuery;
 import com.intellij.util.EmptyQuery;
 import com.intellij.util.MergeQuery;
 import com.intellij.util.Query;
@@ -23,14 +24,19 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
 
     protected abstract LSFCompoundID getCompoundID();
 
-    @Override
-    public LSFId getSimpleName() {
-        Iterator<LSFSimpleName> compoundID = getCompoundID().getSimpleNameList().iterator();
-        LSFSimpleName firstChild = compoundID.next();
-        if(!compoundID.hasNext())
+    public static LSFId getSimpleName(LSFCompoundID compoundID) {
+        Iterator<LSFSimpleName> nameIt = compoundID.getSimpleNameList().iterator();
+        LSFSimpleName firstChild = nameIt.next();
+        if(!nameIt.hasNext())
             return firstChild;
         else
-            return compoundID.next();
+            return nameIt.next();
+                
+    }
+    
+    @Override
+    public LSFId getSimpleName() {
+        return getSimpleName(getCompoundID());
     }
 
     public String getFullNameRef() {
@@ -52,17 +58,14 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     protected Condition<G> getCondition() {
         return Condition.TRUE;
     }
+
+    protected Finalizer<G> getFinalizer() {
+        return Finalizer.EMPTY;
+    }
+
     @Override
     public Query<T> resolveNoCache() {
-        Query<T> result = null;
-        for(FullNameStubElementType type : getTypes()) {
-            Query<T> typeFind = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), type, getCondition());
-            if(result == null)
-                result = typeFind;
-            else            
-                result = new MergeQuery<T>(result, typeFind);
-        }
-        return result;
+        return new CollectionQuery<T>((Collection<T>) LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), getCondition(), getFinalizer()));
     }
     
     @Override

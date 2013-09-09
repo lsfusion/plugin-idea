@@ -15,6 +15,7 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.references.LSFGlobalReference;
+import com.simpleplugin.psi.references.LSFPropReference;
 import com.simpleplugin.psi.references.LSFReference;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +50,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitPropertyUsage(@NotNull LSFPropertyUsage o) {
         super.visitPropertyUsage(o);
-        checkReference(o);
+        if(checkReference(o) && !o.isDirect())
+            addIndirectProp(o);
     }
 
     @Override
@@ -126,9 +128,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         checkReference(o);
     }
 
-    private void checkReference(LSFReference reference) {
-        if (!isInMetaDecl(reference) && reference.resolve() == null)
+    private boolean checkReference(LSFReference reference) {
+        if (!isInMetaDecl(reference) && reference.resolve() == null) {
             addError(reference);
+            return false;
+        }
+        return true;
     }
 
     public void visitMetaCodeDeclarationStatement(@NotNull LSFMetaCodeDeclarationStatement o) {
@@ -144,6 +149,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void addError(LSFReference reference) {
         final Annotation annotation = myHolder.createErrorAnnotation(reference.getTextRange(), "Cannot resolve symbol");
         TextAttributes error = ERROR;
+        if(isInMetaUsage(reference))
+            error = TextAttributes.merge(error, META_USAGE);
+        annotation.setEnforcedTextAttributes(error);
+    }
+
+    private void addIndirectProp(LSFPropReference reference) {
+        final Annotation annotation = myHolder.createWarningAnnotation(reference.getTextRange(), "Indirect usage");
+        TextAttributes error = IMPLICIT_DECL;
         if(isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);

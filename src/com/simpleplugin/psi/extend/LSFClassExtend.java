@@ -8,4 +8,6 @@ import java.util.List;
 public interface LSFClassExtend extends LSFExtend<LSFClassExtend, ExtendClassStubElement> {
     
     List<LSFClassDeclaration> resolveExtends();
+
+    List<String> getShortExtends();
 }

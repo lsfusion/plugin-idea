@@ -8,10 +8,7 @@ import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import com.simpleplugin.psi.extend.LSFClassExtend;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class CustomClassSet implements LSFClassSet {
     
@@ -36,20 +33,73 @@ public class CustomClassSet implements LSFClassSet {
         return LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDCLASS, project, GlobalSearchScope.allScope(project));
     }
     
-    public boolean recContainsAll(LSFClassDeclaration decl) {
+    public static Collection<LSFClassDeclaration> getChildren(LSFClassDeclaration decl) {
+        Project project = decl.getProject();
+        return LSFGlobalResolver.findClassExtends(decl, project, GlobalSearchScope.allScope(project));
+    }
+
+    public LSFClassDeclaration haveCommonChilds(CustomClassSet set) {
+        for(LSFClassDeclaration setClass : set.classes) // оптимизация
+            if(containsAll(setClass))
+                return setClass;
+        for(LSFClassDeclaration setClass : classes) // оптимизация
+            if(set.containsAll(setClass))
+                return setClass;
+        
+        Map<LSFClassDeclaration, Boolean> map = new HashMap<LSFClassDeclaration, Boolean>();
+        for(LSFClassDeclaration aClass : classes)
+            map.put(aClass, true);
+        for(LSFClassDeclaration aClass : set.classes)
+            map.put(aClass, false);
+        
+        int i=0;
+        List<LSFClassDeclaration> list = new ArrayList<LSFClassDeclaration>();
+        list.addAll(classes);
+        list.addAll(set.classes);
+        while(i < list.size()) {
+            LSFClassDeclaration decl = list.get(i);
+            boolean side = map.get(decl);
+
+            for(LSFClassDeclaration child : getChildren(decl)) {
+                Boolean childSide = map.get(child);
+                if(childSide != null && side != childSide)
+                    return child;
+                if(childSide == null) {
+                    list.add(child);
+                    map.put(child, side);
+                }                
+            }
+
+            i++;
+        }
+        return null;
+    }
+
+    public boolean containsAll(LSFClassDeclaration decl) {
+        for(LSFClassDeclaration declClass : classes)
+            if(declClass.getGlobalName().equals("Object") && declClass.getLSFFile().getModuleDeclaration().getGlobalName().equals("System"))
+                return true;                
+        
+        return recContainsAll(decl, new HashSet<LSFClassDeclaration>());
+    }
+    
+    public boolean recContainsAll(LSFClassDeclaration decl, Set<LSFClassDeclaration> recursionGuard) {
+        if(!recursionGuard.add(decl))
+            return false;
+        
         if(classes.contains(decl))
             return true;
         
         for(LSFClassExtend extDecl : resolveExtendElements(decl))
             for(LSFClassDeclaration inhDecl : extDecl.resolveExtends())
-                if(recContainsAll(inhDecl))
+                if(recContainsAll(inhDecl, recursionGuard))
                     return true;
         return false;
     }
     
     public boolean containsAll(CustomClassSet set) {
         for(LSFClassDeclaration setClass : set.classes)
-            if(!recContainsAll(setClass))
+            if(!containsAll(setClass))
                 return false;
         return true;
     }

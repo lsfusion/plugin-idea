@@ -86,6 +86,8 @@
       <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendFormIndex"/>
       <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendClassIndex"/>
 
+      <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ClassExtendsClassIndex"/>
+
       <stubElementTypeHolder class="com.simpleplugin.psi.LSFTypes"/>
       <gotoClassContributor implementation="com.simpleplugin.LSFClassContributor"/>
       <gotoSymbolContributor implementation="com.simpleplugin.LSFSymbolContributor"/>

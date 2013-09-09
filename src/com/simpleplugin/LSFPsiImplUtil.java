@@ -148,11 +148,37 @@ public class LSFPsiImplUtil {
         
         return ((CustomClassSet)class1).or((CustomClassSet)class2);
     }
+
+    public static boolean containsAll(@NotNull List<LSFClassSet> who, @NotNull List<LSFClassSet> what, boolean falseImplicitClass) {
+        for(int i=0,size=who.size();i<size;i++) {
+            LSFClassSet whoClass = who.get(i);
+            LSFClassSet whatClass = what.get(i);
+            if(whoClass==null && whatClass==null)
+                continue;
+            
+            if(whoClass!=null && whatClass!=null && !LSFPsiImplUtil.containsAll(whoClass, whatClass))
+                return false;
+            
+            if(whatClass!=null)
+                continue;
+
+            if(falseImplicitClass)
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean haveCommonChilds(@NotNull List<LSFClassSet> classes1, @NotNull List<LSFClassSet> classes2) {
+        for(int i=0,size=classes1.size();i<size;i++) {
+            LSFClassSet class1 = classes1.get(i);
+            LSFClassSet class2 = classes2.get(i);
+            if(class1!=null && class2!=null && !LSFPsiImplUtil.haveCommonChilds(class1, class2)) // потом переделать haveCommonChilds
+                return false;
+        }
+        return true;
+    }
     
-    public static boolean containsAll(@Nullable LSFClassSet who, @Nullable LSFClassSet what) {
-        if(who==null || what==null)
-            return true;
-        
+    public static boolean containsAll(@NotNull LSFClassSet who, @NotNull LSFClassSet what) {
         if(who instanceof DataClass) {
             if(what instanceof DataClass)
                 return ((DataClass)who).or((DataClass) what) != null;
@@ -162,6 +188,18 @@ public class LSFPsiImplUtil {
             return false;
         
         return ((CustomClassSet)who).containsAll((CustomClassSet)what);         
+    }
+
+    public static boolean haveCommonChilds(@NotNull LSFClassSet who, @NotNull LSFClassSet what) {
+        if(who instanceof DataClass) {
+            if(what instanceof DataClass)
+                return ((DataClass)who).or((DataClass) what) != null;
+            return false;
+        }
+        if(what instanceof DataClass)
+            return false;
+
+        return ((CustomClassSet)who).haveCommonChilds((CustomClassSet)what) != null;
     }
 
     public static boolean allClassesDeclared(List<LSFClassSet> classes) {
@@ -550,25 +588,30 @@ public class LSFPsiImplUtil {
 
     // UnfriendlyPE.resolveValueParamClasses
     
+    @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement) {
         LSFContextIndependentPD contextIndependentPD = sourceStatement.getContextIndependentPD();
         if(contextIndependentPD!=null)
             return ((UnfriendlyPE)contextIndependentPD.getChildren()[0]).resolveValueParamClasses();
-        return new ArrayList<LSFClassSet>(); // потом с action'ами надо дореализовать
+        return null; // потом с action'ами надо дореализовать
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement) {
         return resolveClass(sourceStatement.getClassNameList());
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
         return resolveClass(sourceStatement.getClassNameList());
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
         return resolveClass(sourceStatement.getClassNameList());
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if(groupBy == null)
@@ -582,7 +625,7 @@ public class LSFPsiImplUtil {
         String text = sourceStatement.getStringLiteral().getText();
         int i=0;
         List<LSFClassSet> result = new ArrayList<LSFClassSet>();
-        while(text.contains("$"+i)) {
+        while(text.contains("$"+(i+1))) {
             i++;
             result.add(null);
         }
@@ -591,11 +634,12 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement) {
-        return new ArrayList<LSFClassSet>();
+        return null;
     }
 
     // LSFPropertyExpression.resolveValueParamClasses
 
+    @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFPropertyExpression sourceStatement) {
 
         final List<LSFClassSet> result = new ArrayList<LSFClassSet>();
@@ -665,19 +709,23 @@ public class LSFPsiImplUtil {
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFExprParameterUsageList sourceStatement) {
         return resolveParamExprClasses(sourceStatement.getExprParameterUsageList());
     }
-
+    
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFJoinPropertyDefinition sourceStatement) {
         return resolveParamClasses(sourceStatement.getPropertyExpressionList());
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFExecActionPropertyDefinitionBody sourceStatement) {
         return resolveParamClasses(sourceStatement.getPropertyExpressionList());
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFNoContextPropertyUsage sourceStatement) {
-        return new ArrayList<LSFClassSet>();
+        return null;
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFPartitionPropertyDefinition sourceStatement) {
         LSFPartitionPropertyBy by = sourceStatement.getPartitionPropertyBy();
         if(by != null)
@@ -685,33 +733,40 @@ public class LSFPsiImplUtil {
         return new ArrayList<LSFClassSet>();
     }
 
+    
     private static List<LSFFormObjectDeclaration> getObjectDecls(LSFFormCommonGroupObject commonGroup) {
         LSFFormSingleGroupObjectDeclaration singleGroup = commonGroup.getFormSingleGroupObjectDeclaration();
         if(singleGroup != null)
             return Collections.singletonList(singleGroup.getFormObjectDeclaration());
         return commonGroup.getFormMultiGroupObjectDeclaration().getFormObjectDeclarationList();
     }
-    
+
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFFormTreeGroupObjectDeclaration sourceStatement) {
         return resolveParamDeclClasses(getObjectDecls(sourceStatement.getFormCommonGroupObject()));
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFFormMappedProperty sourceStatement) {
         return resolveParamClasses(sourceStatement.getObjectUsageList());
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFFormMappedNamePropertiesList sourceStatement) {
         return resolveParamClasses(sourceStatement.getObjectUsageList());
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFMappedPropertyObject sourceStatement) {
         return resolveParamClasses(sourceStatement.getObjectUsageList());
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFMappedPropertyClassParamDeclare sourceStatement) {
         return resolveParamClasses(sourceStatement.getClassParamDeclareList());
     }
 
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFMappedPropertyExprParam sourceStatement) {
         return resolveParamClasses(sourceStatement.getExprParameterUsageList());
     }

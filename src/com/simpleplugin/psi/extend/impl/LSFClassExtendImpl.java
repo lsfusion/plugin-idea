@@ -6,6 +6,7 @@ import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import com.simpleplugin.psi.declarations.LSFFullNameDeclaration;
 import com.simpleplugin.psi.extend.LSFClassExtend;
+import com.simpleplugin.psi.references.impl.LSFFullNameReferenceImpl;
 import com.simpleplugin.psi.stubs.extend.ExtendClassStubElement;
 import com.simpleplugin.psi.stubs.extend.ExtendFormStubElement;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +65,21 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
             if(decl!=null)
                 result.add(decl);
         }
+        return result;
+    }
+
+    public List<String> getShortExtends() {
+        ExtendClassStubElement stub = getStub();
+        if(stub != null)
+            return stub.getShortExtends();
+
+        LSFClassParentsList parents = getClassParentsList();
+        if(parents==null)
+            return new ArrayList<String>();
+
+        List<String> result = new ArrayList<String>();
+        for(LSFCustomClassUsage usage : parents.getNonEmptyCustomClassUsageList().getCustomClassUsageList())
+            result.add(LSFFullNameReferenceImpl.getSimpleName(usage.getCompoundID()).getText());
         return result;
     }
 }

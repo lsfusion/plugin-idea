@@ -50,6 +50,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return null; 
     }
     
+    @Nullable
     private List<LSFClassSet> resolveValueParamClasses() {
         LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
         if(unfr!=null)
@@ -59,11 +60,12 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         if(expr!=null)
             return expr.resolveValueParamClasses();
 
-        return new ArrayList<LSFClassSet>();
+        return null;
 
     }
 
     @Override
+    @Nullable
     public List<LSFClassSet> resolveParamClasses() {
         LSFPropertyDeclaration decl = getPropertyDeclaration();
         LSFClassParamDeclareList cpd = decl.getClassParamDeclareList();
@@ -75,6 +77,9 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         }
 
         List<LSFClassSet> valueClasses = resolveValueParamClasses();
+        if(valueClasses == null)
+            return declareClasses;
+            
         if(declareClasses == null)
             return valueClasses;
 

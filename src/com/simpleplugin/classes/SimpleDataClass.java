@@ -13,4 +13,12 @@ public class SimpleDataClass extends DataClass {
             return this;
         return null;
     }
+
+    public boolean equals(Object o) {
+        return this == o || o instanceof SimpleDataClass && dataName.equals(((SimpleDataClass) o).dataName);
+    }
+
+    public int hashCode() {
+        return dataName.hashCode();
+    }
 }

@@ -16,6 +16,7 @@ import com.simpleplugin.psi.stubs.types.MetaStubElementType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFMetaDeclaration, LSFMetaDeclaration> implements LSFMetaReference {
@@ -85,7 +86,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public boolean isResolveToVirt(LSFMetaDeclaration virtDecl) {
-        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), getType(), virtDecl, getCondition()).findAll().contains(virtDecl);
+        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), Collections.singleton(getType()), virtDecl, getCondition()).contains(virtDecl);
     }
 
     @Override

@@ -17,7 +17,11 @@ public class BaseUtils {
     public static <G, I extends G> Query<G> immutableCast(Query<I> object) {
         return (Query<G>) object;
     }
-    
+
+    public static <T> T immutableCast(Object object) {
+        return (T) object;
+    }
+
     public static int max(int a, int b) {
         return a > b ? a : b; 
     }
