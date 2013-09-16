@@ -26,10 +26,7 @@ import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * @author gregsh
@@ -773,4 +770,26 @@ public class GeneratedParserUtilBase {
         builder_.advanceLexer();
         return true;
     }
+
+    private static Key<Boolean> INNERID = Key.create("lsf.inner.id");
+
+    public static boolean innerIDStop(PsiBuilder builder_, int level_) {
+        Boolean userData = builder_.getUserData(INNERID);
+        if(userData != null && userData) {
+            builder_.putUserData(INNERID, false);
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean innerIDCheck(PsiBuilder builder_, int level_) {
+        if(builder_.getTokenType() == LSFTypes.ID && 
+                builder_.lookAhead(1) == LSFTypes.POINT && 
+                builder_.lookAhead(2) == LSFTypes.ID &&
+                builder_.lookAhead(3) != LSFTypes.POINT) {
+            builder_.putUserData(INNERID, true);
+        }
+        return true;
+    }
+
 }
