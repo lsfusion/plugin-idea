@@ -4,8 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.CollectionQuery;
-import com.intellij.util.EmptyQuery;
-import com.intellij.util.MergeQuery;
 import com.intellij.util.Query;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
@@ -25,12 +23,7 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     protected abstract LSFCompoundID getCompoundID();
 
     public static LSFId getSimpleName(LSFCompoundID compoundID) {
-        Iterator<LSFSimpleName> nameIt = compoundID.getSimpleNameList().iterator();
-        LSFSimpleName firstChild = nameIt.next();
-        if(!nameIt.hasNext())
-            return firstChild;
-        else
-            return nameIt.next();
+        return compoundID.getSimpleName();
                 
     }
     
@@ -40,11 +33,8 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     }
 
     public String getFullNameRef() {
-        Iterator<LSFSimpleName> compoundID = getCompoundID().getSimpleNameList().iterator();
-        LSFSimpleName firstChild = compoundID.next();
-        if(compoundID.hasNext())
-            return firstChild.getText();
-        return null;
+        LSFNamespaceUsage namespace = getCompoundID().getNamespaceUsage();
+        return namespace == null ? null : namespace.getText();
     }
 
     protected FullNameStubElementType getType() {

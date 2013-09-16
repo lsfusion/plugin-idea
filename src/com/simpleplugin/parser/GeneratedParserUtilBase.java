@@ -777,9 +777,9 @@ public class GeneratedParserUtilBase {
         Boolean userData = builder_.getUserData(INNERID);
         if(userData != null && userData) {
             builder_.putUserData(INNERID, false);
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     public static boolean innerIDCheck(PsiBuilder builder_, int level_) {

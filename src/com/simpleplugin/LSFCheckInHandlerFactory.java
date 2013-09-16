@@ -15,8 +15,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.PairConsumer;
-import com.maddyhome.idea.copyright.actions.UpdateCopyrightCheckinHandlerState;
-import com.maddyhome.idea.copyright.actions.UpdateCopyrightProcessor;
 import com.simpleplugin.psi.MetaChangeDetector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

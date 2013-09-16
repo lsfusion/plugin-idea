@@ -5,6 +5,7 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import com.simpleplugin.psi.declarations.LSFFullNameDeclaration;
+import com.simpleplugin.psi.declarations.LSFStaticObjectDeclaration;
 import com.simpleplugin.psi.extend.LSFClassExtend;
 import com.simpleplugin.psi.references.impl.LSFFullNameReferenceImpl;
 import com.simpleplugin.psi.stubs.extend.ExtendClassStubElement;
@@ -31,6 +32,9 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
     protected abstract LSFClassParentsList getClassParentsList();
 
     protected abstract LSFExtendingClassDeclaration getExtendingClassDeclaration();
+    
+    @Nullable
+    protected abstract LSFStaticObjectDeclList getStaticObjectDeclList();
 
     @Override
     public String getGlobalName() {
@@ -80,6 +84,18 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         List<String> result = new ArrayList<String>();
         for(LSFCustomClassUsage usage : parents.getNonEmptyCustomClassUsageList().getCustomClassUsageList())
             result.add(LSFFullNameReferenceImpl.getSimpleName(usage.getCompoundID()).getText());
+        return result;
+    }
+
+    @Override
+    public List<LSFStaticObjectDeclaration> getStaticObjects() {
+        LSFStaticObjectDeclList listDecl = getStaticObjectDeclList();
+        List<LSFStaticObjectDeclaration> result = new ArrayList<LSFStaticObjectDeclaration>();
+        if (listDecl != null && listDecl.getNonEmptyStaticObjectDeclList() != null) {
+            for (LSFStaticObjectDecl decl : listDecl.getNonEmptyStaticObjectDeclList().getStaticObjectDeclList()) {
+                result.add(decl);
+            }
+        }
         return result;
     }
 }

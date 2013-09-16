@@ -92,10 +92,17 @@ classStatement ::= (classDecl | extendingClassDeclaration) classInstancesAndPare
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
-private classInstancesAndParents ::=    LBRACE simpleNameWithCaptionList RBRACE (classParentsList SEMI)?
+private classInstancesAndParents ::=    LBRACE staticObjectDeclList RBRACE (classParentsList SEMI)?
 		                            |   (classParentsList)? SEMI
 
 classParentsList ::= COLON nonEmptyCustomClassUsageList
+
+staticObjectDeclList ::= (nonEmptyStaticObjectDeclList)?
+
+nonEmptyStaticObjectDeclList ::= staticObjectDecl (COMMA staticObjectDecl)*
+
+staticObjectDecl ::= simpleNameWithCaption
+{mixin="com.simpleplugin.psi.declarations.impl.LSFStaticObjectDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFStaticObjectDeclaration"}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// GROUP STATEMENT /////////////////////////////
@@ -1051,10 +1058,10 @@ metacodeUsage ::= compoundID
 
 typeId ::= PRIMITIVE_TYPE | OBJECT
 
-compoundID ::= simpleName (POINT simpleName)?
+compoundID ::= (<<innerIDStop>> namespaceUsage POINT simpleName) | simpleName
 
-//staticObjectID ::= (ID POINT)? ID POINT ID
-staticObjectID ::= ID POINT ID (POINT ID)?
+staticObjectID ::= <<innerIDCheck>> customClassUsage POINT simpleName
+{mixin="com.simpleplugin.psi.references.impl.LSFStaticObjectReferenceImpl" implements="com.simpleplugin.psi.references.LSFStaticObjectReference"}
 
 //groupObjectID ::= (ID POINT)? ID POINT ID
 groupObjectID ::= ID POINT ID (POINT ID)?
