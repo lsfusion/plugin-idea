@@ -188,8 +188,9 @@ public class LSFGlobalResolver {
 
         return new FilteredQuery<T>(new CollectionQuery<T>(decls), new Condition<T>() {
             public boolean value(T t) {
-                return t.resolveDecl().equals(decl); // проверяем что resolve'ся куда надо
-            }
+                LSFFullNameDeclaration resolveDecl = t.resolveDecl();
+                return resolveDecl != null && resolveDecl.equals(decl); // проверяем что resolve'ся куда надо
+            }                         
         });
     }
     

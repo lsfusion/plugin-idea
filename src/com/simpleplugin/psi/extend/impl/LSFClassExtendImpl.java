@@ -1,5 +1,6 @@
 package com.simpleplugin.psi.extend.impl;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.psi.*;
@@ -9,10 +10,10 @@ import com.simpleplugin.psi.declarations.LSFStaticObjectDeclaration;
 import com.simpleplugin.psi.extend.LSFClassExtend;
 import com.simpleplugin.psi.references.impl.LSFFullNameReferenceImpl;
 import com.simpleplugin.psi.stubs.extend.ExtendClassStubElement;
-import com.simpleplugin.psi.stubs.extend.ExtendFormStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,5 +98,11 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
             }
         }
         return result;
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return AllIcons.Nodes.Class;
     }
 }

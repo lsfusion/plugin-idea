@@ -1,5 +1,6 @@
 package com.simpleplugin.psi.declarations.impl;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.psi.LSFId;
@@ -8,6 +9,8 @@ import com.simpleplugin.psi.declarations.LSFWindowDeclaration;
 import com.simpleplugin.psi.stubs.WindowStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public abstract class LSFWindowDeclarationImpl extends LSFFullNameDeclarationImpl<LSFWindowDeclaration, WindowStubElement> implements LSFWindowDeclaration {
 
@@ -25,5 +28,11 @@ public abstract class LSFWindowDeclarationImpl extends LSFFullNameDeclarationImp
     @Override
     public LSFId getNameIdentifier() {
         return getSimpleName();
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return AllIcons.Modules.TestRoot;
     }
 }

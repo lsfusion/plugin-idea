@@ -1,5 +1,6 @@
 package com.simpleplugin.psi.extend.impl;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -14,6 +15,7 @@ import com.simpleplugin.psi.stubs.extend.ExtendFormStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -70,5 +72,11 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         for(LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFObjectDeclaration.class));
         return result;
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return AllIcons.FileTypes.UiForm;
     }
 }

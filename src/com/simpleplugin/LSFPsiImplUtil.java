@@ -1,5 +1,6 @@
 package com.simpleplugin;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Processor;
 import com.simpleplugin.classes.*;
@@ -10,11 +11,11 @@ import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
 import com.simpleplugin.psi.declarations.LSFPropDeclaration;
 import com.simpleplugin.psi.references.LSFAbstractParamReference;
-import com.simpleplugin.psi.references.LSFExprParamReference;
 import com.simpleplugin.psi.references.impl.LSFAbstractParamReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -771,4 +772,63 @@ public class LSFPsiImplUtil {
         return resolveParamClasses(sourceStatement.getExprParameterUsageList());
     }
 
+    @Nullable
+      public static Icon getIcon(@NotNull LSFNavigatorStatement navigatorStatement, int flags) {
+        return AllIcons.ObjectBrowser.FlattenPackages;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFOverrideStatement overrideStatement, int flags) {
+        return AllIcons.General.OverridingMethod;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFConstraintStatement constraintStatement, int flags) {
+        return AllIcons.Ide.Warning_notifications;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFFollowsStatement followsStatement, int flags) {
+        return AllIcons.Duplicates.SendToTheRight;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFWriteWhenStatement writeWhenStatement, int flags) {
+        return AllIcons.Nodes.PropertyWrite;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFEventStatement eventStatement, int flags) {
+        return AllIcons.Actions.Execute;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFShowDepStatement showDepStatement, int flags) {
+        return AllIcons.Nodes.DataView;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFGlobalEventStatement globalEventStatement, int flags) {
+        return AllIcons.Actions.Execute;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFAspectStatement aspectStatement, int flags) {
+        return AllIcons.Actions.Execute;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFLoggableStatement loggableStatement, int flags) {
+        return AllIcons.FileTypes.Archive;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFIndexStatement indexStatement, int flags) {
+        return AllIcons.Graph.PrintPreview;
+    }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFDesignStatement designStatement, int flags) {
+        return AllIcons.Actions.Edit;
+    }
 }

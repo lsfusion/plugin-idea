@@ -1,20 +1,18 @@
 package com.simpleplugin.psi.references.impl;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.util.FilteredQuery;
-import com.intellij.util.Query;
 import com.simpleplugin.LSFParserDefinition;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.references.LSFMetaReference;
-import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import com.simpleplugin.psi.stubs.types.MetaStubElementType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -125,5 +123,11 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
         LSFMetaCodeBody body = getMetaCodeBody();
         if(body != null)
             body.delete();
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return AllIcons.Nodes.Method;
     }
 }

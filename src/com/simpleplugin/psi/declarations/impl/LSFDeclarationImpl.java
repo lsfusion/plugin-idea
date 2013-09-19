@@ -1,17 +1,13 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
-import com.simpleplugin.LSFElementGenerator;
-import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.LSFElementImpl;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -45,7 +41,7 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
     }
 
     public static Icon getIcon(LSFDeclaration decl, boolean unused) {
-        return null;
+        return decl.getIcon(0);
     }
 
     public static String getLocationString(LSFDeclaration decl) {

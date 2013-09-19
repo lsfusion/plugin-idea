@@ -1,15 +1,16 @@
 package com.simpleplugin.psi.declarations.impl;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
-import com.simpleplugin.psi.LSFGlobalResolver;
 import com.simpleplugin.psi.LSFId;
-import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.LSFSimpleNameWithCaption;
 import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import com.simpleplugin.psi.stubs.ClassStubElement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl<LSFClassDeclaration, ClassStubElement> implements LSFClassDeclaration {
 
@@ -26,5 +27,11 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
     @Override
     public LSFId getNameIdentifier() {
         return getSimpleNameWithCaption().getSimpleName();
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return AllIcons.Nodes.Class;
     }
 }

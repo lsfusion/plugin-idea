@@ -1,5 +1,6 @@
 package com.simpleplugin.psi.declarations.impl;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
@@ -8,7 +9,9 @@ import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.stubs.MetaStubElement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,5 +91,11 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     @Override
     public LSFId getNameIdentifier() {
         return getSimpleName();
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return AllIcons.Nodes.AbstractMethod;
     }
 }

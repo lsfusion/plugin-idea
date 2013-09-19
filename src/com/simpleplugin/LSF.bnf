@@ -666,7 +666,7 @@ overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 		                |	actionPropertyDefinition
 		                )
 		                (SEMI)?
-{implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier ]}		                    
+{implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getIcon ]}		                    
 
 		                // ;?
 
@@ -677,7 +677,7 @@ overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 constraintStatement ::= CONSTRAINT baseEvent propertyExpression
 		                (CHECKED (BY nonEmptyNoContextPropertyUsageList)? )?
 		                MESSAGE stringLiteral
-		                SEMI {pin = 1 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier ] }
+		                SEMI {pin = 1 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getIcon ] }
 
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// FOLLOWS STATEMENT ////////////////////////////
@@ -687,7 +687,7 @@ followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS
                      propertyExpression (RESOLVE followsResolveType baseEvent)?
 		             (COMMA propertyExpression (RESOLVE followsResolveType baseEvent)?)*
 		             SEMI
-		             {pin = 2 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier ] }
+		             {pin = 2 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getIcon ] }
 
 followsResolveType ::= LEX_LOGICAL_LITERAL | ALL | NOTHING
 
@@ -696,7 +696,7 @@ followsResolveType ::= LEX_LOGICAL_LITERAL | ALL | NOTHING
 ////////////////////////////////////////////////////////////////////////////////
 
 writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression WHEN (DO)? propertyExpression SEMI
-{pin = 2 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier ] }
+{pin = 2 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getIcon ] }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// EVENT STATEMENT /////////////////////////////
@@ -704,14 +704,14 @@ writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression 
 
 eventStatement ::= WHEN baseEvent propertyExpression inlineStatement
 		                DO actionPropertyDefinitionBody (ORDER (DESC)? nonEmptyPropertyExpressionList)?
-		           (SEMI)? {pin = 1 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier ] } // Разобраться с точкой с запятой
+		           (SEMI)? {pin = 1 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getIcon ] } // Разобраться с точкой с запятой
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// GLOBAL EVENT STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody (SEMI)? {pin=1
-implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier ] } // ;?
+implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getIcon ] } // ;?
 
 baseEvent ::= (APPLY | SESSION)? (FORMS nonEmptyFormUsageList)?
 
@@ -721,14 +721,14 @@ inlineStatement ::=   (NOINLINE (LBRAC exprParameterUsageList RBRAC)? )? (INLINE
 //////////////////////////////// SHOWDEP STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-showDepStatement ::= SHOWDEP noContextPropertyUsage FROM noContextPropertyUsage SEMI {pin=1}
+showDepStatement ::= SHOWDEP noContextPropertyUsage FROM noContextPropertyUsage SEMI {pin=1 methods = [ getIcon ]}
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// ASPECT STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPropertyDefinitionBody (SEMI)? {pin=1 
- implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier ] } // ;?
+ implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getIcon ] } // ;?
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -747,13 +747,13 @@ tableStatement ::= TABLE simpleName LBRAC nonEmptyClassNameList RBRAC SEMI
 /////////////////////////////// LOGGABLE STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-loggableStatement ::= LOGGABLE nonEmptyNoContextPropertyUsageList SEMI {pin=1}
+loggableStatement ::= LOGGABLE nonEmptyNoContextPropertyUsageList SEMI {pin=1 methods = [ getIcon ]}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// INDEX STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-indexStatement ::= INDEX nonEmptyNoContextPropertyUsageList SEMI {pin=1}
+indexStatement ::= INDEX nonEmptyNoContextPropertyUsageList SEMI {pin=1 methods = [ getIcon ]}
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// WINDOW STATEMENT ////////////////////////////
@@ -792,7 +792,7 @@ dockPosition ::= POSITION LBRAC intLiteral COMMA intLiteral COMMA intLiteral COM
 /////////////////////////////// NAVIGATOR STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-navigatorStatement ::= NAVIGATOR navigatorElementStatementBody {pin=1}
+navigatorStatement ::= NAVIGATOR navigatorElementStatementBody {pin=1 methods = [ getIcon ]}
 
 navigatorElementStatementBody ::=   (   LBRACE
                                         (	addNavigatorElementStatement
@@ -825,7 +825,7 @@ navigatorElementSelector ::= navigatorElementUsage
 ////////////////////////////////// DESIGN STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-designStatement ::=	(designDeclaration | extendDesignDeclaration) componentStatementBody {pin=1}
+designStatement ::=	(designDeclaration | extendDesignDeclaration) componentStatementBody {pin=1 methods = [ getIcon ]}
 
 designDeclaration ::= DESIGN formUsage (stringLiteral)? (FROM DEFAULT)? {pin=2}
 

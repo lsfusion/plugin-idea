@@ -1,5 +1,6 @@
 package com.simpleplugin.psi.declarations.impl;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.psi.LSFId;
@@ -8,6 +9,8 @@ import com.simpleplugin.psi.declarations.LSFNavigatorElementDeclaration;
 import com.simpleplugin.psi.stubs.NavigatorElementStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDeclarationImpl<LSFNavigatorElementDeclaration, NavigatorElementStubElement> implements LSFNavigatorElementDeclaration {
 
@@ -25,5 +28,11 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
     @Override
     public LSFId getNameIdentifier() {
         return getSimpleName();
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return AllIcons.ObjectBrowser.FlattenPackages;
     }
 }

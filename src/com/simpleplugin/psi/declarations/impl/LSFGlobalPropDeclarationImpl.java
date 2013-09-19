@@ -1,5 +1,6 @@
 package com.simpleplugin.psi.declarations.impl;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.LSFPsiImplUtil;
@@ -10,6 +11,7 @@ import com.simpleplugin.psi.stubs.PropStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,5 +94,11 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                 mixed.set(i, valueClasses.get(i));
         }
         return mixed;
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return AllIcons.Nodes.Property;
     }
 }

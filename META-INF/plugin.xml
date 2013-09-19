@@ -69,6 +69,8 @@
       <lang.commenter language="Lsf" implementationClass="com.simpleplugin.LSFCommenter"/>
       <lang.foldingBuilder language="Lsf" implementationClass="com.simpleplugin.folding.LSFFoldingBuilder"/>
       <annotator language="Lsf" implementationClass="com.simpleplugin.LSFReferenceAnnotator" />
+      <readWriteAccessDetector implementation="com.simpleplugin.LSFReadWriteAccessDetector"/>
+      <fileStructureGroupRuleProvider implementation="com.simpleplugin.LSFStatementGroupRuleProvider"/>
 
       <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
 
