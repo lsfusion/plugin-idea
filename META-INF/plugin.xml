@@ -57,6 +57,10 @@
       <action id="MetaCode.SyncMode" class="com.simpleplugin.MetaSyncModeAction" text="Meta sync mode" description="Toggle meta code sync mode">
           <add-to-group group-id="CodeMenu"/>
       </action>
+      <action id="Errors" class="com.simpleplugin.ShowErrorsAction" text="Show errors" description="Show all current errors in all files">
+          <add-to-group group-id="CodeMenu"/>
+          <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
+      </action>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">

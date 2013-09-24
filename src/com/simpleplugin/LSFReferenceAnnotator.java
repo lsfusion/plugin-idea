@@ -1,12 +1,8 @@
 package com.simpleplugin;
 
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
-import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
@@ -14,7 +10,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.simpleplugin.psi.*;
-import com.simpleplugin.psi.references.LSFGlobalReference;
 import com.simpleplugin.psi.references.LSFPropReference;
 import com.simpleplugin.psi.references.LSFReference;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +18,7 @@ import java.awt.*;
 
 public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private AnnotationHolder myHolder;
+    public boolean errorsSearchMode = false;
 
     @Override
     public synchronized void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder holder) {
@@ -31,7 +27,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             psiElement.accept(this);
         } finally {
             myHolder = null;
+            errorsSearchMode = false;
         }
+    }
+    
+    public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder holder, boolean errorsSearchMode) {
+        this.errorsSearchMode = errorsSearchMode;
+        annotate(psiElement, holder);
     }
 
     private final static TextAttributes META_USAGE = new TextAttributes(null, Gray._239, null, null, Font.PLAIN);
@@ -148,6 +150,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void addError(LSFReference reference) {
         final Annotation annotation = myHolder.createErrorAnnotation(reference.getTextRange(), "Cannot resolve symbol");
+        if (errorsSearchMode) {
+            ShowErrorsAction.showErrorMessage(reference, "Cannot resolve symbol", reference.getText());
+        }
         TextAttributes error = ERROR;
         if(isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
