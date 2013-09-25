@@ -831,4 +831,9 @@ public class LSFPsiImplUtil {
     public static Icon getIcon(@NotNull LSFDesignStatement designStatement, int flags) {
         return AllIcons.Actions.Edit;
     }
+
+    @Nullable
+    public static Icon getIcon(@NotNull LSFWindowStatement designStatement, int flags) {
+        return AllIcons.RunConfigurations.Applet;
+    }
 }

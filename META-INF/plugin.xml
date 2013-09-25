@@ -75,6 +75,8 @@
       <annotator language="Lsf" implementationClass="com.simpleplugin.LSFReferenceAnnotator" />
       <readWriteAccessDetector implementation="com.simpleplugin.LSFReadWriteAccessDetector"/>
       <fileStructureGroupRuleProvider implementation="com.simpleplugin.LSFStatementGroupRuleProvider"/>
+      <usageGroupingRuleProvider implementation="com.simpleplugin.LSFUsageGroupingRuleProvider"/>
+      <usageTypeProvider implementation="com.simpleplugin.LSFUsageTypeProvider"/>
 
       <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
 

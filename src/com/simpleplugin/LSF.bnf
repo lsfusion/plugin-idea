@@ -759,7 +759,7 @@ indexStatement ::= INDEX nonEmptyNoContextPropertyUsageList SEMI {pin=1 methods 
 /////////////////////////////// WINDOW STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-windowStatement ::= windowCreateStatement | windowHideStatement
+windowStatement ::= windowCreateStatement | windowHideStatement {pin=1 methods = [ getIcon ]}
 
 windowCreateStatement ::= WINDOW windowType simpleName stringLiteral windowOptions SEMI
 {mixin="com.simpleplugin.psi.declarations.impl.LSFWindowDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFWindowDeclaration"

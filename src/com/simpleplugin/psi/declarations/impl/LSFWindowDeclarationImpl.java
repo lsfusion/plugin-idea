@@ -33,6 +33,6 @@ public abstract class LSFWindowDeclarationImpl extends LSFFullNameDeclarationImp
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.Modules.TestRoot;
+        return AllIcons.RunConfigurations.Applet;
     }
 }
