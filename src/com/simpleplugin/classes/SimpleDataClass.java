@@ -21,4 +21,9 @@ public class SimpleDataClass extends DataClass {
     public int hashCode() {
         return dataName.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return dataName;
+    }
 }

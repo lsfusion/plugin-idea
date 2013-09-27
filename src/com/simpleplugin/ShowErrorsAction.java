@@ -5,6 +5,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.lang.annotation.AnnotationSession;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.notification.*;
+import com.intellij.notification.impl.NotificationsConfigurationImpl;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -20,7 +21,6 @@ import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Segment;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.simpleplugin.psi.LSFFile;
@@ -51,6 +51,9 @@ public class ShowErrorsAction extends AnAction {
     }
     
     private void executeSearchTask(final List<Module> excludedModules) {
+        final boolean showBalloonsState = NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS;
+        NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = false;
+        
         final Progressive progress = new Progressive() {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
@@ -63,6 +66,13 @@ public class ShowErrorsAction extends AnAction {
 
 
                 Notifications.Bus.notify(new Notification("", "", "Searching for errors started", NotificationType.INFORMATION));
+
+                GlobalSearchScope searchScope = GlobalSearchScope.allScope(project);
+                for (Module excludedModule : excludedModules) {
+                    searchScope = searchScope.intersectWith(GlobalSearchScope.notScope(GlobalSearchScope.moduleScope(excludedModule)));
+                }
+                final GlobalSearchScope finalSearchScope = searchScope;
+                
                 int i = 0;
                 for (final String module : allKeys) {
                     i++;
@@ -71,12 +81,7 @@ public class ShowErrorsAction extends AnAction {
                     ApplicationManager.getApplication().runReadAction(new Runnable() {
                         @Override
                         public void run() {
-                            GlobalSearchScope searchScope = GlobalSearchScope.allScope(project);
-                            for (Module module : excludedModules) {
-                                searchScope = searchScope.intersectWith(GlobalSearchScope.notScope(GlobalSearchScope.moduleScope(module)));
-                            }
-
-                            Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, project, searchScope);
+                            Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, project, finalSearchScope);
                             for (LSFModuleDeclaration declaration : moduleDeclarations) {
 
                                 LSFFile file = declaration.getLSFFile();
@@ -99,8 +104,15 @@ public class ShowErrorsAction extends AnAction {
 
         ProgressManager.getInstance().run(task);
 
-        ToolWindow window = EventLog.getEventLog(project);
-        window.activate(null);
+        EventLog.getEventLog(project).activate(null);
+        
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = showBalloonsState;    
+            }
+        });
+//        NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = showBalloonsState;
     }
     
     private void findErrors(final PsiElement element) {
@@ -159,7 +171,7 @@ public class ShowErrorsAction extends AnAction {
         protected JComponent createCenterPanel() {
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-            JLabel label = new JLabel("Modules to be excluded:");
+            JLabel label = new JLabel("Modules to be excluded from scanning:");
 
             modulesToExclude = new JTextField(PropertiesComponent.getInstance(project).getValue(EXCLUDED_MODULES));
             modulesToExclude.setColumns(30);

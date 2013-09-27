@@ -19,4 +19,9 @@ public class LongClass extends IntegralClass {
     public int hashCode() {
         return 9;
     }
+
+    @Override
+    public String toString() {
+        return "LONG";
+    }
 }

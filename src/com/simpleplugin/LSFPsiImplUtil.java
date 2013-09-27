@@ -178,6 +178,18 @@ public class LSFPsiImplUtil {
         }
         return true;
     }
+
+    public static int getCommonChildrenCount(@NotNull List<LSFClassSet> classes1, @NotNull List<LSFClassSet> classes2) {
+        int count = 0;
+        for(int i=0,size=Math.min(classes1.size(), classes2.size());i<size;i++) {
+            LSFClassSet class1 = classes1.get(i);
+            LSFClassSet class2 = classes2.get(i);
+            if (class1 == null || class2 == null || LSFPsiImplUtil.haveCommonChilds(class1, class2)) { // потом переделать haveCommonChilds
+                count ++;
+            }
+        }
+        return count;
+    }
     
     public static boolean containsAll(@NotNull LSFClassSet who, @NotNull LSFClassSet what) {
         if(who instanceof DataClass) {
@@ -521,11 +533,11 @@ public class LSFPsiImplUtil {
         if(sourceStatement.getBooleanLiteral() != null)
             return DataClass.BOOLEAN;
         if(sourceStatement.getUlongLiteral() != null)
-            return new SimpleDataClass("LONG");
+            return new LongClass();
         if(sourceStatement.getUintLiteral() != null)
-            return new SimpleDataClass("INTEGER");
+            return new IntegerClass();
         if(sourceStatement.getUdoubleLiteral() != null)
-            return new SimpleDataClass("DOUBLE");
+            return new DoubleClass();
         LSFStringLiteral stringLiteral = sourceStatement.getStringLiteral();
         if(stringLiteral != null)
             return new StringClass(false, true, new ExtInt(stringLiteral.getText().length()));

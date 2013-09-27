@@ -29,4 +29,9 @@ public class NumericClass extends IntegralClass {
     public int hashCode() {
         return length * 31 + precision;
     }
+
+    @Override
+    public String toString() {
+        return "NUMERIC";
+    }
 }

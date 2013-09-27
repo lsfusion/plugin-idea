@@ -2,8 +2,12 @@ package com.simpleplugin.psi.references.impl;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
+import com.intellij.util.CollectionQuery;
 import com.simpleplugin.LSFParserDefinition;
+import com.simpleplugin.LSFReferenceAnnotator;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.references.LSFMetaReference;
@@ -15,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFMetaDeclaration, LSFMetaDeclaration> implements LSFMetaReference {
@@ -72,6 +77,29 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
                 return decl.getParamCount()==paramCount;
             }
         };
+    }
+
+    @Override
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder) {
+        CollectionQuery<LSFMetaDeclaration> declarations = new CollectionQuery<LSFMetaDeclaration >(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), Condition.TRUE, Finalizer.EMPTY));
+
+        if (declarations.findAll().isEmpty()) {
+            return super.resolveNotFoundErrorAnnotation(holder);
+        }
+
+        String errorText = "Unable to resolve metacode: ";
+        for (Iterator<LSFMetaDeclaration> iterator = declarations.iterator(); iterator.hasNext();) {
+            errorText += iterator.next().getParamCount();
+            if (iterator.hasNext()) {
+                errorText += ", ";
+            }
+        }
+
+        int paramCount = getMetaCodeIdList().getMetaCodeIdList().size();
+        Annotation error = holder.createErrorAnnotation(getMetaCodeIdList(), errorText + " parameters expected; " + paramCount + " found");
+        error.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+
+        return error;
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.simpleplugin.psi.references.impl;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -10,6 +12,7 @@ import com.intellij.psi.ResolveResult;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.util.IncorrectOperationException;
 import com.simpleplugin.LSFIcons;
+import com.simpleplugin.LSFReferenceAnnotator;
 import com.simpleplugin.psi.LSFElementImpl;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFResolveUtil;
@@ -97,6 +100,29 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
         final List<? extends PsiElement> elements =
                 ResolveCache.getInstance(getProject()).resolveWithCaching(this, LSFResolver.INSTANCE, true, incompleteCode);
         return LSFResolveUtil.toCandidateInfoArray(elements);
+    }
+
+    @Override
+    public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+        ResolveResult[] resolveResults = multiResolveDecl(true);
+        if (resolveResults.length == 0) {
+            return resolveNotFoundErrorAnnotation(holder);
+        } else if (resolveResults.length > 1) {
+            String ambError = "Ambiguous reference: ";
+            for (ResolveResult result : resolveResults) {
+//                ambError += "\n" + getNameRef() + result.  
+            }
+            
+            Annotation annotation = holder.createErrorAnnotation(getTextRange(), ambError);
+            annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+            return annotation; 
+        }
+        
+        return null;
+    }
+    
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder) {
+        return holder.createErrorAnnotation(getTextRange(), "Cannot resolve symbol");
     }
     
     protected abstract void fillListVariants(Collection<String> variants);

@@ -17,4 +17,9 @@ public class DoubleClass extends IntegralClass {
     public int hashCode() {
         return 6;
     }
+
+    @Override
+    public String toString() {
+        return "DOUBLE";
+    }
 }

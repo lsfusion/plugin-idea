@@ -17,4 +17,9 @@ public class IntegerClass extends IntegralClass {
     public int hashCode() {
         return 7;
     }
+
+    @Override
+    public String toString() {
+        return "INTEGER";
+    }
 }

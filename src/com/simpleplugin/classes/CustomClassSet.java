@@ -111,4 +111,13 @@ public class CustomClassSet implements LSFClassSet {
     public int hashCode() {
         return classes.hashCode();
     }
+
+    @Override
+    public String toString() {
+        String result = "";
+        for (Iterator<LSFClassDeclaration> iterator = classes.iterator(); iterator.hasNext();) {
+            result += iterator.next().getDeclName() + (iterator.hasNext() ? ", " : "");
+        }
+        return result;
+    }
 }

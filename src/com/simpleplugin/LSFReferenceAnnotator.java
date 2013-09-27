@@ -3,6 +3,7 @@ package com.simpleplugin;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
+import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
@@ -36,9 +37,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         annotate(psiElement, holder);
     }
 
-    private final static TextAttributes META_USAGE = new TextAttributes(null, Gray._239, null, null, Font.PLAIN);
-    private final static TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(0, 0, 64)), null, null, Font.PLAIN);
-    private final static TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(0, 255, 255)), null, null, null, Font.PLAIN);
+    private final static TextAttributes META_USAGE = new TextAttributes(null, new JBColor(Gray._239, Gray._61), null, null, Font.PLAIN);
+    private final static TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(37, 49, 37)), null, null, Font.PLAIN);
+    private final static TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), null, null, null, Font.PLAIN);
+    public final static TextAttributes WAVE_UNDERSCORED_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
     private final static TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
 
     @Override
@@ -130,14 +132,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         checkReference(o);
     }
 
-    private boolean checkReference(LSFReference reference) {
-        if (!isInMetaDecl(reference) && reference.resolve() == null) {
-            addError(reference);
-            return false;
-        }
-        return true;
-    }
-
     public void visitMetaCodeDeclarationStatement(@NotNull LSFMetaCodeDeclarationStatement o) {
         super.visitMetaCodeDeclarationStatement(o);
 
@@ -148,12 +142,20 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private void addError(LSFReference reference) {
-        final Annotation annotation = myHolder.createErrorAnnotation(reference.getTextRange(), "Cannot resolve symbol");
-        if (errorsSearchMode) {
-            ShowErrorsAction.showErrorMessage(reference, "Cannot resolve symbol", reference.getText());
+    private boolean checkReference(LSFReference reference) {
+        Annotation errorAnnotation = reference.resolveErrorAnnotation(myHolder);
+        if (!isInMetaDecl(reference) && errorAnnotation != null) {
+            addError(reference, errorAnnotation);
+            return false;
         }
-        TextAttributes error = ERROR;
+        return true;
+    }
+
+    private void addError(LSFReference reference, Annotation annotation) {
+        if (errorsSearchMode) {
+            ShowErrorsAction.showErrorMessage(reference, annotation.getMessage(), reference.getText());
+        }
+        TextAttributes error = annotation.getEnforcedTextAttributes() == null ? ERROR : annotation.getEnforcedTextAttributes();
         if(isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);

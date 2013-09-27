@@ -1,6 +1,8 @@
 package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
@@ -11,8 +13,10 @@ import com.intellij.util.CollectionQuery;
 import com.intellij.util.Query;
 import com.simpleplugin.BaseUtils;
 import com.simpleplugin.LSFPsiImplUtil;
+import com.simpleplugin.LSFReferenceAnnotator;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.Finalizer;
+import com.simpleplugin.psi.LSFGlobalResolver;
 import com.simpleplugin.psi.context.PropertyUsageContext;
 import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
 import com.simpleplugin.psi.declarations.LSFLocalPropDeclaration;
@@ -117,6 +121,10 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         return PsiTreeUtil.getParentOfType(this, PropertyUsageContext.class).resolveParamClasses();        
     }
     
+    private PropertyUsageContext getPropertyUsageContext() {
+        return PsiTreeUtil.getParentOfType(this, PropertyUsageContext.class);
+    }
+    
     private Finalizer<LSFPropDeclaration> getDeclFinalizer() {
         return new Finalizer<LSFPropDeclaration>() {
             public Collection<LSFPropDeclaration> finalize(Collection<LSFPropDeclaration> decls) {
@@ -178,6 +186,29 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
             }
         };
     }
+
+    private Map<LSFPropDeclaration, Integer> getDeclarations() {
+        final List<LSFClassSet> usageClasses = getUsageContext();
+        if(usageClasses == null)
+            return null;
+        
+        Map<LSFPropDeclaration, Integer> result = new HashMap<LSFPropDeclaration, Integer>();
+
+        CollectionQuery<LSFPropDeclaration> declarations = new CollectionQuery<LSFPropDeclaration >(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), Condition.TRUE, Finalizer.EMPTY));
+
+        for (Iterator<LSFPropDeclaration> iterator = declarations.iterator(); iterator.hasNext();) {
+            LSFPropDeclaration decl = iterator.next();
+            List<LSFClassSet> declClasses = decl.resolveParamClasses();
+            if(declClasses == null) {
+                result.put(decl, 0);
+                continue;
+            }
+
+            result.put(decl, LSFPsiImplUtil.getCommonChildrenCount(declClasses, usageClasses));    
+        }
+        
+        return result;
+    }
     
     public boolean isDirect() {
         List<LSFClassSet> usageContext = getUsageContext();
@@ -205,5 +236,43 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     @Override
     protected Finalizer<LSFGlobalPropDeclaration> getFinalizer() {
         return BaseUtils.immutableCast(getDeclFinalizer());
+    }
+
+    @Override
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder) {
+        Map<LSFPropDeclaration, Integer> declarations = getDeclarations();
+        if (declarations == null) {
+            return null;
+        }
+        
+        int commonClasses = 0;
+        List<LSFPropDeclaration> decls = new ArrayList<LSFPropDeclaration>();
+        for (Map.Entry<LSFPropDeclaration, Integer> entry : declarations.entrySet()) {
+            if (entry.getValue() > commonClasses) {
+                commonClasses = entry.getValue();
+                decls = new ArrayList<LSFPropDeclaration>();
+                decls.add(entry.getKey());
+            } else if (entry.getValue() == commonClasses) {
+                decls.add(entry.getKey());
+            }
+        }
+        
+        if (decls.size() != 1) {
+            return holder.createErrorAnnotation(getTextRange(), "Cannot resolve property reference");  
+        } else {
+            Annotation error = holder.createErrorAnnotation(getTextRange(), listClassesToString(decls.get(0).resolveParamClasses()) + " cannot be applied to " + listClassesToString(getUsageContext()));
+            error.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+            return error;
+        }
+    }
+    
+    private String listClassesToString(List<LSFClassSet> classes) {
+        String result = "(";
+        for (Iterator<LSFClassSet> iterator = classes.iterator(); iterator.hasNext();) {
+            LSFClassSet set = iterator.next();
+            result += set == null ? "?" : set;
+            result += iterator.hasNext() ? ", " : "";
+        }
+        return result += ")";
     }
 }

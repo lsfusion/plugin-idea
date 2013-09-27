@@ -1,11 +1,11 @@
 package com.simpleplugin.psi.references;
 
-import com.intellij.psi.PsiElement;
+import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.Query;
 import com.simpleplugin.psi.LSFElement;
 import com.simpleplugin.psi.LSFId;
-import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,4 +20,6 @@ public interface LSFReference<T extends LSFDeclaration> extends LSFElement, PsiR
     String getNameRef();
 
     Query<T> resolveNoCache();
+    
+    Annotation resolveErrorAnnotation(AnnotationHolder holder);
 }

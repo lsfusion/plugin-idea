@@ -27,4 +27,9 @@ public class StringClass extends DataClass {
     public int hashCode() {
         return (length.hashCode() * 31 + (blankPadded ? 1 : 0)) * 31 + (caseInsensitive ? 1 : 0);  
     }
+
+    @Override
+    public String toString() {
+        return "STRING";
+    }
 }

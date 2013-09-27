@@ -11,4 +11,9 @@ public class YearClass extends IntegerClass {
     public int hashCode() {
         return 3233;
     }
+
+    @Override
+    public String toString() {
+        return "YEAR";
+    }
 }
