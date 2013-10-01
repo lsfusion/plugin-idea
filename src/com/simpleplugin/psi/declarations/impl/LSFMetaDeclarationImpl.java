@@ -2,8 +2,10 @@ package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.IElementType;
 import com.simpleplugin.LSFParserDefinition;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
@@ -45,19 +47,26 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
         return getDeclParams().size();
     }
 
-    private void recReadMetaWhiteSpaceOrComments(ASTNode node, boolean prev, List<String> tokens) {
+    private void recReadMetaWhiteSpaceOrComments(ASTNode node, boolean prev, List<Pair<String, IElementType>> tokens) {
         if(LSFParserDefinition.isWhiteSpaceOrComment(node.getElementType())) {
             if(prev) {
                 recReadMetaWhiteSpaceOrComments(node.getTreePrev(), prev, tokens);
-                tokens.add(node.getText());
+                tokens.add(new Pair<String, IElementType>(node.getText(), node.getElementType()));
             } else {
-                tokens.add(node.getText());
+                tokens.add(new Pair<String, IElementType>(node.getText(), node.getElementType()));
                 recReadMetaWhiteSpaceOrComments(node.getTreeNext(), prev, tokens);
             }
         }
     }
 
-    private void readMetaWhiteSpaceOrComments(ASTNode node, boolean prev, List<String> tokens) {
+    public void setBody(LSFAnyTokens parsed) {
+        LSFAnyTokens body = getAnyTokens();
+        if (body != null) {
+            body.replace(parsed);
+        }
+    }
+
+    private void readMetaWhiteSpaceOrComments(ASTNode node, boolean prev, List<Pair<String, IElementType>> tokens) {
         recReadMetaWhiteSpaceOrComments(prev ? node.getTreePrev() : node.getTreeNext(), prev, tokens);
     }
 
@@ -66,13 +75,13 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     }
 
     @Override
-    public List<String> getMetaCode() {
-        List<String> tokens = new ArrayList<String>();
+    public List<Pair<String,IElementType>> getMetaCode() {
+        List<Pair<String, IElementType>> tokens = new ArrayList<Pair<String, IElementType>>();
         ASTNode node = getAnyTokens().getNode();
 
         readMetaWhiteSpaceOrComments(node, true, tokens);
         for(ASTNode anyToken : node.getChildren(null))
-            tokens.add(anyToken.getText());
+            tokens.add(new Pair<String, IElementType>(anyToken.getText(), anyToken.getElementType()));
         readMetaWhiteSpaceOrComments(node, false, tokens);
         return tokens;
     }

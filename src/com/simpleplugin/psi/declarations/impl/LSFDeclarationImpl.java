@@ -5,6 +5,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
 import com.simpleplugin.psi.LSFElementImpl;
+import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,10 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
 
     // множественное наследование
     public static String getName(LSFDeclaration element) {
-        return element.getNameIdentifier().getName();
+        LSFId nameID = element.getNameIdentifier();
+        if(nameID == null) // есть declaration'ы с неявным ID и для них не всегда удобно подстраивать правила 
+            return null;
+        return nameID.getName();
     }
 
     public static PsiElement setName(LSFDeclaration element, @NonNls @NotNull String name) throws IncorrectOperationException {

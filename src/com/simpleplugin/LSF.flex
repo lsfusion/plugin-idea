@@ -197,6 +197,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "FULLSCREEN"              			{ return FULLSCREEN; }
   "GRID"                    			{ return GRID; }
   "GROUP"                   			{ return GROUP; }
+  "EQUAL"                               { return GEQUAL; }
   "HALIGN"                  			{ return HALIGN; }
   "HEADER"                  			{ return HEADER; }
   "HIDE"                    			{ return HIDE; }

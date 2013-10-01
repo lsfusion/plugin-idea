@@ -8,6 +8,7 @@ import com.intellij.openapi.util.Condition;
 import com.intellij.util.CollectionQuery;
 import com.simpleplugin.LSFParserDefinition;
 import com.simpleplugin.LSFReferenceAnnotator;
+import com.simpleplugin.meta.MetaTransaction;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.references.LSFMetaReference;
@@ -103,10 +104,10 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     }
 
     @Override
-    public List<String> getUsageParams() {
-        List<String> result = new ArrayList<String>();
+    public List<MetaTransaction.InToken> getUsageParams() {
+        List<MetaTransaction.InToken> result = new ArrayList<MetaTransaction.InToken>();
         for(LSFMetaCodeId id : getMetaCodeIdList().getMetaCodeIdList())
-            result.add(id.getText());
+            result.add(MetaTransaction.parseToken(id));
         return result;
     }
 

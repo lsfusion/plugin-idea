@@ -20,8 +20,7 @@ public class LongClass extends IntegralClass {
         return 9;
     }
 
-    @Override
-    public String toString() {
+    protected String getName() {
         return "LONG";
     }
 }

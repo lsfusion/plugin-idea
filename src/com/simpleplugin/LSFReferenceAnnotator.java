@@ -11,8 +11,13 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.context.ExtendParamContext;
+import com.simpleplugin.psi.context.ModifyParamContext;
+import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.references.LSFPropReference;
 import com.simpleplugin.psi.references.LSFReference;
+import com.simpleplugin.typeinfer.MetaTypeInferAction;
+import com.simpleplugin.typeinfer.TypeInferAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -85,6 +90,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         checkReference(o);
     }
 
+/*    @Override
+    public void visitModifyParamContext(@NotNull ModifyParamContext o) {
+        super.visitModifyParamContext(o);
+        
+        if(!(o instanceof ExtendParamContext) && PsiTreeUtil.getParentOfType(o, ModifyParamContext.class) == null) {
+            Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Infer type");
+            annotation.registerFix(new TypeInferAction(o));
+        }
+    }
+*/
     @Override
     public void visitWindowUsage(@NotNull LSFWindowUsage o) {
         super.visitWindowUsage(o);
@@ -116,10 +131,18 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         checkReference(o);
     }
 
-    private boolean isInMetaUsage(PsiElement o) {
+    public static boolean isInMetaUsage(PsiElement o) {
         return PsiTreeUtil.getParentOfType(o, LSFMetaCodeBody.class) != null;
         //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
     }
+/*
+    @Override
+    public void visitMetaDeclaration(@NotNull LSFMetaDeclaration o) {
+        super.visitMetaDeclaration(o);
+
+        Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Infer type");
+        annotation.registerFix(new MetaTypeInferAction(o));
+    }*/
 
     private boolean isInMetaDecl(PsiElement o) {
         return PsiTreeUtil.getParentOfType(o, LSFMetaCodeDeclarationStatement.class) != null;

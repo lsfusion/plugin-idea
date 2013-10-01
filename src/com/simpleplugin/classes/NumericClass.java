@@ -30,8 +30,7 @@ public class NumericClass extends IntegralClass {
         return length * 31 + precision;
     }
 
-    @Override
-    public String toString() {
-        return "NUMERIC";
+    protected String getName() {
+        return "NUMERIC[" + length + "," + precision + "]";
     }
 }

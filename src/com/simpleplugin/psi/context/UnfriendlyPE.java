@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface UnfriendlyPE extends PsiElement {
     
-    LSFClassSet resolveValueClass();
+    LSFClassSet resolveUnfriendValueClass(boolean infer);
     
     List<LSFClassSet> resolveValueParamClasses();
     

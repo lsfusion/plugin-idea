@@ -18,8 +18,7 @@ public class DoubleClass extends IntegralClass {
         return 6;
     }
 
-    @Override
-    public String toString() {
+    protected String getName() {
         return "DOUBLE";
     }
 }

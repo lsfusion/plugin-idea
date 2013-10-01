@@ -48,6 +48,10 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
         return new SearchRequestQuery(scope.getProject(), request);
     }
 
+    public static List<LSFMetaCodeStatement> findMetaUsages(LSFMetaDeclaration metaDecl) {
+        return findMetaUsages(metaDecl.getGlobalName(), metaDecl.getParamCount(), metaDecl.getLSFFile());
+    }
+    
     public static List<LSFMetaCodeStatement> findMetaUsages(final String name, int paramCount, final LSFFile file) {
 
         // песец не надежно, но что поделаешь

@@ -9,6 +9,7 @@ import com.simpleplugin.psi.LSFFormDecl;
 import com.simpleplugin.psi.LSFFormGroupObjectsList;
 import com.simpleplugin.psi.LSFFormTreeGroupObjectList;
 import com.simpleplugin.psi.declarations.LSFFullNameDeclaration;
+import com.simpleplugin.psi.declarations.LSFGroupObjectDeclaration;
 import com.simpleplugin.psi.declarations.LSFObjectDeclaration;
 import com.simpleplugin.psi.extend.LSFFormExtend;
 import com.simpleplugin.psi.stubs.extend.ExtendFormStubElement;
@@ -71,6 +72,16 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
             result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFObjectDeclaration.class));
         for(LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFObjectDeclaration.class));
+        return result;
+    }
+
+    @Override
+    public Collection<LSFGroupObjectDeclaration> getGroupObjectDecls() {
+        Collection<LSFGroupObjectDeclaration> result = new ArrayList<LSFGroupObjectDeclaration>();
+        for(LSFFormGroupObjectsList formGroupObject : getFormGroupObjectsListList())
+            result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFGroupObjectDeclaration.class));
+        for(LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())
+            result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFGroupObjectDeclaration.class));
         return result;
     }
 

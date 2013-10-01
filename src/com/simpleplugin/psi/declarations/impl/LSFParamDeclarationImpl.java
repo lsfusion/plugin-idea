@@ -3,6 +3,8 @@ package com.simpleplugin.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.simpleplugin.classes.LSFClassSet;
+import com.simpleplugin.classes.LSFValueClass;
+import com.simpleplugin.meta.MetaTransaction;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.context.ClassParamDeclareContext;
@@ -27,5 +29,10 @@ public abstract class LSFParamDeclarationImpl extends LSFExprParamDeclarationImp
     @Nullable
     public LSFClassSet resolveClass() {
         return PsiTreeUtil.getParentOfType(this, ClassParamDeclareContext.class).resolveClass();
+    }
+
+    @Override
+    public void ensureClass(LSFValueClass decl, MetaTransaction metaTrans) {
+        PsiTreeUtil.getParentOfType(this, ClassParamDeclareContext.class).ensureClass(decl, metaTrans);
     }
 }

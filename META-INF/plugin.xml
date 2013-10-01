@@ -61,6 +61,14 @@
           <add-to-group group-id="CodeMenu"/>
           <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
       </action>
+      <action id="TypeInfer.File" class="com.simpleplugin.typeinfer.FileTypeInferAction" text="Infer _types for file" description="Infer types for file">
+          <add-to-group group-id="CodeMenu"/>
+          <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>
+      </action>
+      <action id="TypeInfer.Project" class="com.simpleplugin.typeinfer.ProjectTypeInferAction" text="Infer _types for project" description="Infer types for project">
+          <add-to-group group-id="CodeMenu"/>
+          <keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>
+      </action>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
@@ -75,8 +83,6 @@
       <annotator language="Lsf" implementationClass="com.simpleplugin.LSFReferenceAnnotator" />
       <readWriteAccessDetector implementation="com.simpleplugin.LSFReadWriteAccessDetector"/>
       <fileStructureGroupRuleProvider implementation="com.simpleplugin.LSFStatementGroupRuleProvider"/>
-      <usageGroupingRuleProvider implementation="com.simpleplugin.LSFUsageGroupingRuleProvider"/>
-      <usageTypeProvider implementation="com.simpleplugin.LSFUsageTypeProvider"/>
 
       <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
 

@@ -23,8 +23,10 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.io.StringRef;
 import com.simpleplugin.parser.GeneratedParserUtilBase;
 import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.references.LSFClassReference;
 import com.simpleplugin.psi.references.LSFModuleReference;
 import com.simpleplugin.psi.references.LSFNamespaceReference;
+import com.simpleplugin.psi.references.impl.LSFClassReferenceImpl;
 import com.simpleplugin.psi.references.impl.LSFModuleReferenceImpl;
 import com.simpleplugin.psi.references.impl.LSFNamespaceReferenceImpl;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +47,12 @@ public class LSFElementGenerator {
             if(!child.getText().equals("dummy"))
                 return child;
         return null;
+    }
+
+    @NotNull
+    public static LSFClassName createClassNameFromText(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; f(" + name + " t)=t;");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFClassName.class).iterator().next();
     }
 
     public static PsiFile createDummyFile(Project myProject, String text) {
@@ -95,6 +103,11 @@ public class LSFElementGenerator {
                 return body;
 //            }
 //        });
+    }
+
+    public static LSFAnyTokens createMetaCodeFromText(final Project project, final String text) {
+        final PsiFile dummyFile = createDummyFile(project, "MODULE x; META dummy() " + text + " END");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFAnyTokens.class).iterator().next();
     }
     
     public static void format(Project project, PsiElement element) {
@@ -161,4 +174,28 @@ public class LSFElementGenerator {
             }
         };
     }
+
+    public static LSFClassReference createClassRefFromText(final String name, final String fname, final LSFFile file) {
+        return new LSFClassReferenceImpl(dummy) {
+            public LSFCompoundID getCompoundID() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String getNameRef() {
+                return name;
+            }
+
+            @Override
+            public String getFullNameRef() {
+                return fname;
+            }
+
+            @Override
+            public LSFFile getLSFFile() {
+                return file;
+            }
+        };
+    }
+
 }

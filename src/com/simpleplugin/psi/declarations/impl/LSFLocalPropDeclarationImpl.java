@@ -33,15 +33,22 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     @Override
-    public LSFClassSet resolveValueClass() {
+    public LSFClassSet resolveValueClass(boolean infer) {
         return LSFPsiImplUtil.resolveClass(getClassName());
     }
 
     @Override
+    @NotNull
     public List<LSFClassSet> resolveParamClasses() {
         return LSFPsiImplUtil.resolveClass(getClassNameList());
     }
 
+    @Override
+    @NotNull
+    public List<LSFClassSet> inferParamClasses(LSFClassSet valueClass) {
+        return resolveParamClasses(); 
+    }
+    
     @Nullable
     @Override
     public Icon getIcon(int flags) {

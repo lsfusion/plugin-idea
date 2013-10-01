@@ -12,13 +12,15 @@ import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
-import com.intellij.openapi.vcs.ProjectLevelVcsManager;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ConcurrentHashMap;
 import com.intellij.util.containers.ConcurrentHashSet;
 import com.simpleplugin.LSFElementGenerator;
 import com.simpleplugin.MetaCodeFragment;
+import com.simpleplugin.meta.MetaTransaction;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.declarations.LSFModuleDeclaration;
 import com.simpleplugin.psi.references.LSFMetaReference;
@@ -199,11 +201,15 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     private static int min(int a, int b) {
         return a>b?b:a;
     }
-    private static String parseText(List<String> tokens, List<String> usages, List<String> decls) {
+    private static String parseText(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls) {
         return new MetaCodeFragment(decls, tokens).getCode(usages);
     }
 
-    private static int mapOffset(int offset, List<String> tokens, List<String> usages, List<String> decls) {
+    public static List<MetaTransaction.InToken> getNewTokens(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, List<List<MetaTransaction.ExtToken>> oldTokens) {
+        return new MetaCodeFragment(decls, tokens).getNewTokens(usages, oldTokens);
+    }
+
+    private static int mapOffset(int offset, List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls) {
         return new MetaCodeFragment(decls, tokens).mapOffset(offset, usages);
     }
     
@@ -284,13 +290,13 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     private static class ToParse {
 
-        private final List<String> tokens;
-        private final List<String> usages;
+        private final List<Pair<String, IElementType>> tokens;
+        private final List<MetaTransaction.InToken> usages;
         private final List<String> decls;
         public final long version;
         public final String whitespace;
 
-        private ToParse(List<String> tokens, List<String> usages, List<String> decls, long version, String whitespace) {
+        private ToParse(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, long version, String whitespace) {
             this.tokens = tokens;
             this.usages = usages;
             this.decls = decls;
@@ -617,9 +623,13 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             }
         };
 
+        protected boolean extraCheck(T element) {
+            return true;
+        }
+        
         public void add(Collection<T> elements) {
             for(T statement : elements) {
-                if(!processing.contains(statement)) {
+                if(!processing.contains(statement) && extraCheck(statement)) {
                     synchronized (flush) {
                         G group = group(statement);
                         Set<T> pendEls = pending.get(group);
@@ -648,6 +658,11 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     private class MetaUsagesPending extends MetaPending<LSFMetaCodeStatement, LSFFile> {
         private MetaUsagesPending() {
+        }
+
+        @Override
+        protected boolean extraCheck(LSFMetaCodeStatement element) {
+            return element.getContainingFile() instanceof LSFFile; // почему то DummyHolder'ы попадают
         }
 
         protected LSFFile group(LSFMetaCodeStatement element) {
@@ -694,25 +709,28 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         }
 
         public void run() {
-            for(final LongLivingMeta metaDecl : decls) {
-                ApplicationManager.getApplication().runReadAction(new Runnable() {
-                    public void run() {                        
-                        List<LSFMetaCodeStatement> usages = null;
-                        if(metaDecl.file.isValid()) {
-                            usages = cacheUsages.get(metaDecl);
-                            if(usages==null) {
-                                usages = LSFResolver.findMetaUsages(metaDecl.name, metaDecl.paramCount, metaDecl.file);
-                                cacheUsages.put(metaDecl, usages);
+            if(!DumbService.isDumb(myProject)) {
+                for(final LongLivingMeta metaDecl : decls) {
+                    ApplicationManager.getApplication().runReadAction(new Runnable() {
+                        public void run() {                        
+                            List<LSFMetaCodeStatement> usages = null;
+                            if(metaDecl.file.isValid()) {
+                                usages = cacheUsages.get(metaDecl);
+                                if(usages==null) {
+                                    usages = LSFResolver.findMetaUsages(metaDecl.name, metaDecl.paramCount, metaDecl.file);
+                                    cacheUsages.put(metaDecl, usages);
+                                }
                             }
+                            boolean removed = declPending.processing.remove(metaDecl);
+                            assert removed;
+                                
+                            if(usages!=null)
+                                addUsageProcessing(usages);
                         }
-                        boolean removed = declPending.processing.remove(metaDecl);
-                        assert removed;
-                            
-                        if(usages!=null)
-                            addUsageProcessing(usages);
-                    }
-                });
-            }
+                    });
+                }
+            } else
+                inlinePostpone(this, false);
         }
     }
 

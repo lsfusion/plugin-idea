@@ -149,13 +149,14 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                         LSFPropDeclaration decl = listMapClasses.get(i);
                         List<LSFClassSet> classesI = mapClasses.get(decl);
                         boolean found = false;
-                        for(int j=i+1;j<size;j++) {
-                            List<LSFClassSet> classesJ = mapClasses.get(listMapClasses.get(j));
-                            if(LSFPsiImplUtil.containsAll(classesI, classesJ, true)) {
-                                found = true;
-                                break;
+                        for(int j=0;j<size;j++) 
+                            if(i!=j) {
+                                List<LSFClassSet> classesJ = mapClasses.get(listMapClasses.get(j));
+                                if(LSFPsiImplUtil.containsAll(classesI, classesJ, true)) {
+                                    found = true;
+                                    break;
+                                }
                             }
-                        }
                         if(!found)
                             result.add(decl);
                     }

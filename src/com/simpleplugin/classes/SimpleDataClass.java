@@ -8,7 +8,7 @@ public class SimpleDataClass extends DataClass {
         this.dataName = dataName;
     }
 
-    public DataClass or(DataClass compClass) {
+    public DataClass op(DataClass compClass, boolean or) {
         if(compClass.equals(this))
             return this;
         return null;
@@ -22,8 +22,7 @@ public class SimpleDataClass extends DataClass {
         return dataName.hashCode();
     }
 
-    @Override
-    public String toString() {
+    protected String getName() {
         return dataName;
     }
 }

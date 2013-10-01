@@ -2,18 +2,25 @@ package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
+import com.simpleplugin.BaseUtils;
 import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
 import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
 import com.simpleplugin.psi.stubs.PropStubElement;
+import com.simpleplugin.typeinfer.InferResult;
+import com.simpleplugin.typeinfer.Inferred;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclarationImpl<LSFGlobalPropDeclaration, PropStubElement> implements LSFGlobalPropDeclaration {
 
@@ -33,25 +40,24 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Nullable
     protected abstract LSFPropertyExpression getPropertyExpression();
 
-
     @Override
     public LSFId getNameIdentifier() {
         return getPropertyDeclaration().getSimpleNameWithCaption().getSimpleName();
     }
 
     @Override
-    public LSFClassSet resolveValueClass() {
+    public LSFClassSet resolveValueClass(boolean infer) {
         LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
         if(unfr!=null)
-            return unfr.resolveValueClass();
+            return unfr.resolveUnfriendValueClass(infer);
 
         LSFPropertyExpression expr = getPropertyExpression();
         if(expr!=null)
-            return expr.resolveValueClass();
+            return expr.resolveValueClass(infer);
 
         return null; 
     }
-    
+
     @Nullable
     private List<LSFClassSet> resolveValueParamClasses() {
         LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
@@ -60,7 +66,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
         LSFPropertyExpression expr = getPropertyExpression();
         if(expr!=null)
-            return expr.resolveValueParamClasses();
+            return LSFPsiImplUtil.resolveValueParamClasses(expr);
 
         return null;
 
@@ -94,6 +100,64 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                 mixed.set(i, valueClasses.get(i));
         }
         return mixed;
+    }
+
+    @Override
+    @Nullable
+    public List<LSFClassSet> inferParamClasses(LSFClassSet valueClass) {
+
+        List<LSFClassSet> resultClasses = resolveParamClasses();
+        if(resultClasses == null)
+            return null;
+
+        //        LSFActionPropertyDefinition action = sourceStatement.getActionPropertyDefinition();
+//        return 
+
+        List<LSFExprParamDeclaration> params = null;
+        LSFPropertyDeclaration decl = getPropertyDeclaration();
+        LSFClassParamDeclareList cpd = decl.getClassParamDeclareList();
+        if(cpd!=null)
+            params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(cpd));
+
+        InferResult inferredClasses = null;
+        LSFExpressionUnfriendlyPD unfriendlyPD = getExpressionUnfriendlyPD();
+        if(unfriendlyPD != null) {
+            LSFActionPropertyDefinition actionDef = unfriendlyPD.getActionPropertyDefinition();
+            if(actionDef != null) {
+                if(params == null)
+                    params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(actionDef.getExprParameterUsageList()));
+                if(params == null)
+                    throw new UnsupportedOperationException();
+                inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finish(); 
+            } else {
+                PsiElement element = unfriendlyPD.getContextIndependentPD().getChildren()[0]; // лень создавать отдельный параметр или интерфейс
+                if(element instanceof LSFGroupPropertyDefinition) {
+                    List<LSFClassSet> inferredValueClasses = LSFPsiImplUtil.inferValueParamClasses((LSFGroupPropertyDefinition) element);
+                    for(int i=0;i<resultClasses.size();i++)
+                        if(resultClasses.get(i) == null && i<inferredValueClasses.size()) { // не определены, возьмем выведенные
+                            resultClasses.set(i, inferredValueClasses.get(i));
+                        }
+                    return resultClasses;
+                }
+            }
+        } else {
+            LSFPropertyExpression expr = getPropertyExpression();
+            if(expr!=null) {
+                if(params == null)        
+                    params = expr.resolveParams();            
+                
+                inferredClasses = LSFPsiImplUtil.inferParamClasses(expr, valueClass).finish();
+            }
+        }
+        if(inferredClasses != null) {
+            assert resultClasses.size() == params.size();
+            for(int i=0;i<resultClasses.size();i++)
+                if(resultClasses.get(i) == null) { // не определены, возьмем выведенные
+                    resultClasses.set(i, inferredClasses.get(params.get(i)));
+                }
+        }
+
+        return resultClasses;
     }
 
     @Nullable

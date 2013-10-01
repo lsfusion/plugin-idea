@@ -18,8 +18,7 @@ public class IntegerClass extends IntegralClass {
         return 7;
     }
 
-    @Override
-    public String toString() {
+    protected String getName() {
         return "INTEGER";
     }
 }

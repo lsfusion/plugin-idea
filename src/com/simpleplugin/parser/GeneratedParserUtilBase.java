@@ -20,6 +20,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.Function;
 import com.intellij.util.containers.LimitedPool;
+import com.simpleplugin.LSFParserDefinition;
 import com.simpleplugin.psi.LSFTokenType;
 import com.simpleplugin.psi.LSFTypes;
 import gnu.trove.THashSet;
@@ -792,4 +793,24 @@ public class GeneratedParserUtilBase {
         return true;
     }
 
+    private static Key<Boolean> FULLCOMPOUND = Key.create("lsf.full.compound.param.declare");
+
+    public static boolean fullCompoundParamDeclareStop(PsiBuilder builder_, int level_) {
+        Boolean userData = builder_.getUserData(FULLCOMPOUND);
+        if(userData != null && userData) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean fullCompoundParamDeclareCheck(PsiBuilder builder_, int level_) {
+        if(builder_.getTokenType() == LSFTypes.ID &&
+                builder_.lookAhead(1) == LSFTypes.POINT &&
+                builder_.lookAhead(2) == LSFTypes.ID &&
+                builder_.lookAhead(3) == LSFTypes.ID) {
+            builder_.putUserData(FULLCOMPOUND, true);
+        } else
+            builder_.putUserData(FULLCOMPOUND, false);
+        return true;
+    }
 }

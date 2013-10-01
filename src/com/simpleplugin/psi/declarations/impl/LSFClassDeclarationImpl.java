@@ -2,10 +2,12 @@ package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
-import com.simpleplugin.psi.LSFId;
-import com.simpleplugin.psi.LSFSimpleNameWithCaption;
+import com.simpleplugin.LSFElementGenerator;
+import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFClassDeclaration;
+import com.simpleplugin.psi.references.LSFClassReference;
 import com.simpleplugin.psi.stubs.ClassStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +29,15 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
     @Override
     public LSFId getNameIdentifier() {
         return getSimpleNameWithCaption().getSimpleName();
+    }
+
+    @Override
+    public String getQName(PsiElement context) {
+        String globalName = getGlobalName();
+        LSFClassReference ref = LSFElementGenerator.createClassRefFromText(globalName, null, (LSFFile) context.getContainingFile());
+        if(ref.resolveDecl() == this)
+            return globalName;
+        return getNamespaceName() + "." + globalName;
     }
 
     @Nullable

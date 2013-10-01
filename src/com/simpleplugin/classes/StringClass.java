@@ -1,5 +1,7 @@
 package com.simpleplugin.classes;
 
+import com.simpleplugin.BaseUtils;
+
 public class StringClass extends DataClass {
 
     public final boolean blankPadded;
@@ -12,11 +14,11 @@ public class StringClass extends DataClass {
         this.length = length;
     }
     
-    public DataClass or(DataClass compClass) {
+    public DataClass op(DataClass compClass, boolean or) {
         if (!(compClass instanceof StringClass)) return null;
 
         StringClass stringClass = (StringClass) compClass;
-        return new StringClass(blankPadded || stringClass.blankPadded, caseInsensitive || stringClass.caseInsensitive, length.max(stringClass.length));
+        return new StringClass(BaseUtils.cmp(blankPadded, stringClass.blankPadded, or), BaseUtils.cmp(caseInsensitive, stringClass.caseInsensitive, or), length.cmp(stringClass.length, or));
     }
 
     @Override
@@ -26,6 +28,10 @@ public class StringClass extends DataClass {
 
     public int hashCode() {
         return (length.hashCode() * 31 + (blankPadded ? 1 : 0)) * 31 + (caseInsensitive ? 1 : 0);  
+    }
+
+    protected String getName() {
+        return length.isUnlimited() ? "TEXT" : (blankPadded ? "" : "VAR") + (caseInsensitive ? "I" : "") + "STRING[" + length.getValue() + "]";
     }
 
     @Override
