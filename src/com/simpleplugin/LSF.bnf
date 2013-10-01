@@ -132,6 +132,7 @@ propertyStatement ::= propertyDeclaration EQUAL
 }
 
 propertyDeclaration ::= simpleNameWithCaption (LBRAC classParamDeclareList RBRAC)?
+{methods = [ resolveParamDecls ]}
 
 paramDeclare ::= simpleName
 {mixin="com.simpleplugin.psi.declarations.impl.LSFParamDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFParamDeclaration"}
@@ -188,7 +189,7 @@ contextIndependentPD ::= dataPropertyDefinition
                     |   filterPropertyDefinition
 
 joinPropertyDefinition ::= JOIN? propertyObject LBRAC propertyExpressionList RBRAC
-{implements = "com.simpleplugin.psi.context.FriendlyPE, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses]}
+{implements = "com.simpleplugin.psi.context.FriendlyPE, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList ]}
 
 overridePropertyDefinition ::= (OVERRIDE | EXCLUSIVE) nonEmptyPropertyExpressionList
 {implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
@@ -221,7 +222,7 @@ partitionPropertyDefinition ::= PARTITION
                                 propertyExpression (partitionPropertyBy)?
                                 (ORDER (DESC )? nonEmptyPropertyExpressionList)?
                                 (WINDOW EXCEPTLAST)?
-{implements = "com.simpleplugin.psi.context.FriendlyPE, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses]}
+{implements = "com.simpleplugin.psi.context.FriendlyPE, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList ]}
 
 recursivePropertyDefinition ::= RECURSION propertyExpression STEP propertyExpression (CYCLES (YES |	NO | IMPOSSIBLE))?
 {implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
@@ -247,7 +248,7 @@ propertyExprObject ::= (LSQBR (propertyExpression | expressionUnfriendlyPD) RSQB
 
 propertyObject ::=  propertyUsage | propertyExprObject
 noContextPropertyUsage ::= propertyUsage
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses ]}
+{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 
 dataPropertyDefinition ::= DATA (SESSION)? className LBRAC classNameList RBRAC
@@ -458,7 +459,7 @@ localDataPropertyDefinition ::= LOCAL simpleName EQUAL className LBRAC className
 {mixin="com.simpleplugin.psi.declarations.impl.LSFLocalPropDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFLocalPropDeclaration"}
 
 execActionPropertyDefinitionBody ::= (EXEC)? propertyObject LBRAC propertyExpressionList RBRAC
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext, com.simpleplugin.psi.context.ActionExpression" methods = [ resolveParamClasses inferActionParamClasses ]}
+{implements = "com.simpleplugin.psi.context.PropertyUsageContext, com.simpleplugin.psi.context.ActionExpression" methods = [ resolveParamClasses inferActionParamClasses getParamList ]}
 
 assignActionPropertyDefinitionBody ::= (ASSIGN)?
                                        mappedPropertyExprParam
@@ -551,7 +552,7 @@ formTreeGroupObjectList ::= TREE (ID)? formTreeGroupObjectDeclaration
 
 formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectReportPath)? (formGroupObjectViewType)? (formGroupObjectPageSize)?
 formTreeGroupObjectDeclaration ::= formCommonGroupObject (treeGroupParentDeclaration)?
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses ]}
+{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 treeGroupParentDeclaration ::= PARENT (propertyUsage | LBRAC nonEmptyPropertyUsageList RBRAC)
 
@@ -581,7 +582,7 @@ formObjectDeclaration ::= (simpleName EQUAL)?
 formPropertyDrawNameDecl ::= (simpleName EQUAL)? formPropertyName formPropertyOptionsList  
 formPropertiesNamesDeclList ::=	formPropertyDrawNameDecl (COMMA formPropertyDrawNameDecl)*
 formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptionsList formPropertiesNamesDeclList 
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses ]}
+{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 formPropertiesList ::=  PROPERTIES formMappedNamePropertiesList 
 	                |	PROPERTIES formPropertyOptionsList formMappedPropertiesList
@@ -622,7 +623,7 @@ formActionPropertyObject ::= mappedPropertyObject
 
 formGroupObjectEntity ::= groupObjectUsage
 formMappedProperty ::= formPropertyName LBRAC objectUsageList RBRAC
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses ]}
+{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 formPropertyName ::=    propertyUsage
                     |	OBJVALUE
@@ -950,11 +951,11 @@ metaCodeLiteral ::= LEX_STRING_LITERAL
 emptyStatement ::= SEMI;
 
 mappedPropertyObject ::= propertyUsage LBRAC objectUsageList RBRAC // temporary presentation logic
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses ]}
+{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 mappedPropertyClassParamDeclare ::= propertyUsage LBRAC classParamDeclareList RBRAC // temporary domain logic
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses ]}
+{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 mappedPropertyExprParam ::= propertyUsage LBRAC exprParameterUsageList RBRAC // temporary mixed logic 
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses ]}
+{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList]}
 
 simpleNameWithCaption ::= simpleName (stringLiteral)?
 

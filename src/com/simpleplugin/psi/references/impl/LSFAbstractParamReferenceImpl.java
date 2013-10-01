@@ -2,23 +2,18 @@ package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.CollectionQuery;
-import com.intellij.util.EmptyQuery;
-import com.intellij.util.Processor;
-import com.intellij.util.Query;
 import com.simpleplugin.BaseUtils;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.classes.LSFClassSet;
-import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.LSFFile;
 import com.simpleplugin.psi.context.ContextModifier;
 import com.simpleplugin.psi.context.ExtendParamContext;
-import com.simpleplugin.psi.context.FormContext;
 import com.simpleplugin.psi.context.ModifyParamContext;
 import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
 import com.simpleplugin.psi.declarations.LSFObjectDeclaration;
 import com.simpleplugin.psi.extend.LSFFormExtend;
 import com.simpleplugin.psi.references.LSFAbstractParamReference;
 import com.simpleplugin.psi.references.LSFObjectReference;
-import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import com.simpleplugin.typeinfer.InferResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,16 +94,16 @@ public abstract class LSFAbstractParamReferenceImpl<T extends LSFExprParamDeclar
     }
 
     @Override
-    public Query<T> resolveNoCache() {
-        if(getSimpleName()==null)
-            return new EmptyQuery<T>(); 
-        
-        final String nameRef = getNameRef();
+    public LSFDeclarationResolveResult resolveNoCache() {
         final List<T> objects = new ArrayList<T>();
-        for(LSFExprParamDeclaration decl : processParams())
-            if(decl.getDeclName().equals(nameRef))
-                objects.add((T) decl);
-        return new CollectionQuery<T>(objects);
+            if(getSimpleName() != null) {
+            
+            final String nameRef = getNameRef();
+            for(LSFExprParamDeclaration decl : processParams())
+                if(decl.getDeclName().equals(nameRef))
+                    objects.add((T) decl);
+        }
+        return new LSFDeclarationResolveResult(objects, resolveDefaultErrorAnnotator(objects));
     }
 
     @Override

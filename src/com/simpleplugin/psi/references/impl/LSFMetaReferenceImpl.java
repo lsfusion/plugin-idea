@@ -5,11 +5,12 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
-import com.intellij.util.CollectionQuery;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.LSFParserDefinition;
 import com.simpleplugin.LSFReferenceAnnotator;
 import com.simpleplugin.meta.MetaTransaction;
 import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.references.LSFMetaReference;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
@@ -18,10 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFMetaDeclaration, LSFMetaDeclaration> implements LSFMetaReference {
 
@@ -81,23 +79,78 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     }
 
     @Override
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder) {
-        CollectionQuery<LSFMetaDeclaration> declarations = new CollectionQuery<LSFMetaDeclaration >(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), Condition.TRUE, Finalizer.EMPTY));
+    public LSFDeclarationResolveResult resolveNoCache() {
+        Collection<LSFMetaCodeDeclarationStatement> declarations = new ArrayList<LSFMetaCodeDeclarationStatement>((Collection<? extends LSFMetaCodeDeclarationStatement>) super.resolveNoCache().declarations);
+        
+        LSFDeclarationResolveResult.ErrorAnnotator errorAnnotator = null;
+        if (declarations.size() > 1) {
+            final Collection<LSFMetaCodeDeclarationStatement> finalDeclarations = declarations;
+            errorAnnotator = new LSFDeclarationResolveResult.ErrorAnnotator() {
+                @Override
+                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+                    return resolveAmbiguousErrorAnnotation(holder, finalDeclarations);    
+                }
+            };    
+        } else if (declarations.isEmpty()) {
+            declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), Condition.TRUE, Finalizer.EMPTY);
 
-        if (declarations.findAll().isEmpty()) {
-            return super.resolveNotFoundErrorAnnotation(holder);
+            final Collection<LSFMetaCodeDeclarationStatement> finalDeclarations = declarations;
+            errorAnnotator = new LSFDeclarationResolveResult.ErrorAnnotator() {
+                @Override
+                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+                    return resolveNotFoundErrorAnnotation(holder, finalDeclarations);
+                }
+            };
         }
 
-        String errorText = "Unable to resolve metacode: ";
-        for (Iterator<LSFMetaDeclaration> iterator = declarations.iterator(); iterator.hasNext();) {
-            errorText += iterator.next().getParamCount();
+        return new LSFDeclarationResolveResult(declarations, errorAnnotator);
+    }
+
+    @Override
+    public Annotation resolveAmbiguousErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> declarations) {
+        String ambError = "Ambiguous reference";
+
+        String description = "";
+        int i = 1;
+        List<LSFMetaCodeDeclarationStatement> decls = new ArrayList<LSFMetaCodeDeclarationStatement>((Collection<? extends LSFMetaCodeDeclarationStatement>) declarations);
+        for (LSFMetaCodeDeclarationStatement decl : decls) {
+            description += decl.getPresentableText();
+
+            if (i < decls.size() - 1) {
+                description += ", ";
+            } else if (i == decls.size() - 1) {
+                description += " and ";
+            }
+
+            i++;
+        }
+
+        if (!description.isEmpty()) {
+            ambError += ": " + description + " match";
+        }
+
+        Annotation annotation = holder.createErrorAnnotation(getMetaCodeIdList(), ambError);
+        annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+        return annotation;
+    }
+
+    @Override
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations) {
+        if (similarDeclarations.isEmpty()) {
+            return super.resolveNotFoundErrorAnnotation(holder, similarDeclarations);
+        }
+
+        String errorText = "Unable to resolve '" + getNameRef() + "' meta: ";
+        for (Iterator<? extends LSFDeclaration> iterator = similarDeclarations.iterator(); iterator.hasNext();) {
+            errorText += ((LSFMetaDeclaration) iterator.next()).getParamCount();
             if (iterator.hasNext()) {
                 errorText += ", ";
             }
         }
 
         int paramCount = getMetaCodeIdList().getMetaCodeIdList().size();
-        Annotation error = holder.createErrorAnnotation(getMetaCodeIdList(), errorText + " parameters expected; " + paramCount + " found");
+        errorText += " parameter(s) expected; " + paramCount + " found";
+        Annotation error = holder.createErrorAnnotation(getMetaCodeIdList(), errorText);
         error.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
 
         return error;

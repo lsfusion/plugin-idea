@@ -1,17 +1,12 @@
 package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.util.CollectionQuery;
-import com.intellij.util.Query;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.psi.LSFCustomClassUsage;
 import com.simpleplugin.psi.LSFGlobalResolver;
-import com.simpleplugin.psi.declarations.LSFClassDeclaration;
-import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.declarations.LSFStaticObjectDeclaration;
 import com.simpleplugin.psi.extend.LSFClassExtend;
 import com.simpleplugin.psi.references.LSFStaticObjectReference;
-import com.simpleplugin.psi.stubs.extend.ExtendClassStubElement;
-import com.simpleplugin.psi.stubs.extend.impl.ExtendClassStubImpl;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +26,7 @@ public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFS
     }
 
     @Override
-    public Query resolveNoCache() {
+    public LSFDeclarationResolveResult resolveNoCache() {
         List<LSFStaticObjectDeclaration> decls = new ArrayList<LSFStaticObjectDeclaration>();
         for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(getCustomClassUsage().resolveDecl(), LSFStubElementTypes.EXTENDCLASS, getProject(), getScope())) {
             for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {
@@ -40,7 +35,7 @@ public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFS
                 }
             }
         }
-        return new CollectionQuery<LSFStaticObjectDeclaration>(decls);
+        return new LSFDeclarationResolveResult(decls, resolveDefaultErrorAnnotator(decls));
     }
 
     @Override

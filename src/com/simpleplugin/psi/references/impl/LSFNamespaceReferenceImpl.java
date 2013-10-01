@@ -2,7 +2,7 @@ package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.StringStubIndexExtension;
-import com.intellij.util.Query;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.psi.LSFGlobalResolver;
 import com.simpleplugin.psi.declarations.LSFNamespaceDeclaration;
 import com.simpleplugin.psi.references.LSFNamespaceReference;
@@ -21,8 +21,9 @@ public abstract class LSFNamespaceReferenceImpl extends LSFGlobalReferenceImpl<L
     }
 
     @Override
-    public Query<LSFNamespaceDeclaration> resolveNoCache() {
-        return LSFGlobalResolver.findNamespaces(getNameRef(), getScope());
+    public LSFDeclarationResolveResult resolveNoCache() {
+        Collection<LSFNamespaceDeclaration> decls = LSFGlobalResolver.findNamespaces(getNameRef(), getScope()).findAll();
+        return new LSFDeclarationResolveResult(decls, resolveDefaultErrorAnnotator(decls));
     }
 
     @Override

@@ -107,4 +107,9 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     public Icon getIcon(int flags) {
         return AllIcons.Nodes.AbstractMethod;
     }
+
+    @Override
+    public String getPresentableText() {
+        return getDeclName() + "(" + getMetaDeclIdList().getText() + ")";
+    }
 }

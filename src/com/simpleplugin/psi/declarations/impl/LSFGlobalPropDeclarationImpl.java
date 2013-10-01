@@ -12,15 +12,15 @@ import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
 import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
 import com.simpleplugin.psi.stubs.PropStubElement;
 import com.simpleplugin.typeinfer.InferResult;
-import com.simpleplugin.typeinfer.Inferred;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclarationImpl<LSFGlobalPropDeclaration, PropStubElement> implements LSFGlobalPropDeclaration {
 
@@ -164,5 +164,37 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     public Icon getIcon(int flags) {
         return AllIcons.Nodes.Property;
+    }
+
+    @Override
+    public String getPresentableText() {
+        List<? extends LSFExprParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
+        LSFPropertyExpression pExpression = getPropertyExpression();
+        if (params == null && pExpression != null) {
+            params = pExpression.resolveParams();
+        }
+
+        List<LSFClassSet> paramClasses = resolveParamClasses();
+        String paramsString = "";
+        if (paramClasses != null) {
+            int i = 0;
+            for (Iterator<LSFClassSet> iterator = paramClasses.iterator(); iterator.hasNext();) {
+                LSFClassSet classSet = iterator.next();
+                if (classSet != null) {
+                    paramsString += classSet;
+                }
+                if (params != null && params.get(i) != null) {
+                    paramsString += (classSet != null ? " " : "") + params.get(i).getDeclName();
+                }
+                if (iterator.hasNext()) {
+                    paramsString += ", ";
+                }
+                i++;
+            }
+        } else if (params != null) {
+            paramsString += StringUtils.join(params, ", ");
+        }
+        
+        return getDeclName() + "(" + paramsString + ")";
     }
 }

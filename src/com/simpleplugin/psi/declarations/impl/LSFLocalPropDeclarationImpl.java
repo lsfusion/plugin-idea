@@ -9,6 +9,7 @@ import com.simpleplugin.psi.LSFClassNameList;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.declarations.LSFLocalPropDeclaration;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,5 +54,11 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     @Override
     public Icon getIcon(int flags) {
         return AllIcons.Nodes.Property;
+    }
+
+    @Override
+    public String getPresentableText() {
+        List<LSFClassSet> classes = resolveParamClasses();
+        return getDeclName() + "(" + StringUtils.join(classes, ", ") + ")";
     }
 }

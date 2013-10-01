@@ -7,10 +7,12 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.util.IncorrectOperationException;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.LSFIcons;
 import com.simpleplugin.LSFReferenceAnnotator;
 import com.simpleplugin.psi.LSFElementImpl;
@@ -25,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElementImpl implements LSFReference<T> {
+public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElementImpl implements LSFReference<T>, PsiPolyVariantReference {
 
     public LSFReferenceImpl(@NotNull ASTNode node) {
         super(node);
@@ -88,41 +90,54 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     }
 
     public T resolveDecl() {
-        final ResolveResult[] resolveResults = multiResolveDecl(true);
+        LSFDeclarationResolveResult decls = multiResolveDecl(true);
+        if (decls == null) {
+            return null;
+        }
+        final ResolveResult[] resolveResults = LSFResolveUtil.toCandidateInfoArray(new ArrayList<PsiElement>(decls.declarations));
 
         return resolveResults.length == 0 ||
                 resolveResults.length > 1 ||
                 !resolveResults[0].isValidResult() ? null : (T) resolveResults[0].getElement();
     }
 
-    @NotNull
-    public ResolveResult[] multiResolveDecl(boolean incompleteCode) {
-        final List<? extends PsiElement> elements =
-                ResolveCache.getInstance(getProject()).resolveWithCaching(this, LSFResolver.INSTANCE, true, incompleteCode);
-        return LSFResolveUtil.toCandidateInfoArray(elements);
+    public LSFDeclarationResolveResult multiResolveDecl(boolean incompleteCode) {
+        return ResolveCache.getInstance(getProject()).resolveWithCaching(this, LSFResolver.INSTANCE, true, incompleteCode);
+    }
+    
+    public LSFDeclarationResolveResult.ErrorAnnotator resolveDefaultErrorAnnotator(final Collection<? extends LSFDeclaration> decls) {
+        LSFDeclarationResolveResult.ErrorAnnotator errorAnnotator = null;
+        if (decls.isEmpty()) {
+            errorAnnotator = new LSFDeclarationResolveResult.ErrorAnnotator() {
+                @Override
+                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+                    return resolveNotFoundErrorAnnotation(holder, decls);
+                }
+            };
+        } else if (decls.size() > 1) {
+            errorAnnotator = new LSFDeclarationResolveResult.ErrorAnnotator() {
+                @Override
+                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+                    return resolveAmbiguousErrorAnnotation(holder, decls);
+                }
+            };
+        }
+        return errorAnnotator;
     }
 
     @Override
-    public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-        ResolveResult[] resolveResults = multiResolveDecl(true);
-        if (resolveResults.length == 0) {
-            return resolveNotFoundErrorAnnotation(holder);
-        } else if (resolveResults.length > 1) {
-            String ambError = "Ambiguous reference: ";
-            for (ResolveResult result : resolveResults) {
-//                ambError += "\n" + getNameRef() + result.  
-            }
-            
-            Annotation annotation = holder.createErrorAnnotation(getTextRange(), ambError);
-            annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-            return annotation; 
-        }
-        
-        return null;
+    public Annotation resolveErrorAnnotation(final AnnotationHolder holder) {
+        return multiResolveDecl(true).resolveErrorAnnotation(holder);
     }
     
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder) {
-        return holder.createErrorAnnotation(getTextRange(), "Cannot resolve symbol");
+    public Annotation resolveAmbiguousErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> declarations) {
+        Annotation annotation = holder.createErrorAnnotation(getTextRange(), "Ambiguous reference");
+        annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+        return annotation;   
+    }
+    
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations) {
+        return holder.createErrorAnnotation(getTextRange(), "Cannot resolve symbol '" + getNameRef() + "'");
     }
     
     protected abstract void fillListVariants(Collection<String> variants);
@@ -141,5 +156,12 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
             );
         }
         return variants.toArray();
+    }
+
+    @NotNull
+    @Override
+    public ResolveResult[] multiResolve(boolean incompleteCode) {
+        LSFDeclarationResolveResult decls = multiResolveDecl(true);
+        return LSFResolveUtil.toCandidateInfoArray(new ArrayList<PsiElement>(decls.declarations));
     }
 }

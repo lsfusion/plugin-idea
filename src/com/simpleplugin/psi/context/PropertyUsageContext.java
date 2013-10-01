@@ -10,4 +10,7 @@ public interface PropertyUsageContext extends PsiElement {
     
     @Nullable
     List<LSFClassSet> resolveParamClasses();
+    
+    @Nullable
+    PsiElement getParamList();
 }

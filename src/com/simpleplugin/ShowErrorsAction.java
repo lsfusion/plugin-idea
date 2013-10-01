@@ -112,14 +112,13 @@ public class ShowErrorsAction extends AnAction {
                 NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = showBalloonsState;    
             }
         });
-//        NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = showBalloonsState;
     }
     
     private void findErrors(final PsiElement element) {
         annotator.annotate(element, new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile())), true);
         
         if (element instanceof PsiErrorElement) {
-            showErrorMessage(element, "Parsing error", ((PsiErrorElement) element).getErrorDescription());
+            showErrorMessage(element, "Parsing error: " + ((PsiErrorElement) element).getErrorDescription());
         }
         for (PsiElement child : element.getChildren()) {
             findErrors(child);
@@ -127,7 +126,7 @@ public class ShowErrorsAction extends AnAction {
         
     }
     
-    public static void showErrorMessage(final PsiElement element, final String errorType, final String errorMessage) {
+    public static void showErrorMessage(final PsiElement element, final String errorMessage) {
         final PsiFile file = element.getContainingFile();
         final Document document = PsiDocumentManager.getInstance(element.getProject()).getDocument(file);
         final SmartPsiElementPointer pointer = SmartPointerManager.getInstance(element.getProject()).createSmartPsiElementPointer(element);
@@ -143,7 +142,8 @@ public class ShowErrorsAction extends AnAction {
         final int finalLinePosition = linePosition;
         
         String moduleName = ModuleUtilCore.findModuleForPsiElement(element).getName();
-        Notifications.Bus.notify(new Notification("LSF errors", errorType + " - <a href=\"\">(" + moduleName + ") " + file.getName() + "(" + finalLineNumber + ":" + finalLinePosition + ")</a>", errorMessage, NotificationType.ERROR, new NotificationListener.Adapter() {
+        String linkToTheElement = "<a href=\"\">(" + moduleName + ") " + file.getName() + "(" + finalLineNumber + ":" + finalLinePosition + ")</a>";
+        Notifications.Bus.notify(new Notification("LSF errors", linkToTheElement, errorMessage, NotificationType.ERROR, new NotificationListener.Adapter() {
             @Override
             protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
                 ((NavigationItem) element).navigate(true);

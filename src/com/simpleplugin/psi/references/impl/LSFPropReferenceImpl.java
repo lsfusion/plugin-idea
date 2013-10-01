@@ -10,14 +10,15 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.CollectionQuery;
-import com.intellij.util.Query;
 import com.simpleplugin.BaseUtils;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.LSFReferenceAnnotator;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.Finalizer;
 import com.simpleplugin.psi.LSFGlobalResolver;
 import com.simpleplugin.psi.context.PropertyUsageContext;
+import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
 import com.simpleplugin.psi.declarations.LSFLocalPropDeclaration;
 import com.simpleplugin.psi.declarations.LSFPropDeclaration;
@@ -69,16 +70,84 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         }
     }
     @Override
-    public Query<LSFPropDeclaration> resolveNoCache() {
+    public LSFDeclarationResolveResult resolveNoCache() {
+        Collection<? extends LSFDeclaration> declarations = new ArrayList<LSFDeclaration>();
+        
         if(getFullNameRef() == null) {
             LocalResolveProcessor processor = new LocalResolveProcessor(getNameRef(), getDeclCondition());
             PsiTreeUtil.treeWalkUp(processor, this, null, new ResolveState());
             if(processor.found.size() > 0) {
                 Finalizer<LSFLocalPropDeclaration> finalizer = BaseUtils.immutableCast(getDeclFinalizer());
-                return new CollectionQuery<LSFPropDeclaration>(BaseUtils.<LSFPropDeclaration, LSFLocalPropDeclaration>immutableCast(finalizer.finalize(processor.found)));
+                declarations = finalizer.finalize(processor.found);
+            } else {
+                declarations = super.resolveNoCache().declarations;
             }
-        }                       
-        return super.resolveNoCache();
+        } else {      
+            declarations = super.resolveNoCache().declarations;
+        }
+
+        LSFDeclarationResolveResult.ErrorAnnotator errorAnnotator = null;
+        if (declarations.size() > 1) {
+            final Collection<? extends LSFDeclaration> finalDeclarations = declarations;
+            errorAnnotator = new LSFDeclarationResolveResult.ErrorAnnotator() {
+                @Override
+                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+                    return resolveAmbiguousErrorAnnotation(holder, finalDeclarations);
+                }
+            };
+        } else if (declarations.isEmpty()) {
+            declarations = resolveNoConditionDeclarations();
+
+            final Collection<? extends LSFDeclaration> finalDeclarations = declarations;
+            errorAnnotator = new LSFDeclarationResolveResult.ErrorAnnotator() {
+                @Override
+                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+                    return resolveNotFoundErrorAnnotation(holder, finalDeclarations);
+                }
+            };
+        }
+        
+        return new LSFDeclarationResolveResult(declarations, errorAnnotator);
+    }
+    
+    private Collection<LSFPropDeclaration> resolveNoConditionDeclarations() {
+        final List<LSFClassSet> usageClasses = getUsageContext();
+        if(usageClasses != null) {
+            CollectionQuery<LSFPropDeclaration> declarations = new CollectionQuery<LSFPropDeclaration >(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), Condition.TRUE, new Finalizer() {
+                @Override
+                public Collection finalize(Collection decls) {
+                    Map<LSFPropDeclaration, Integer> declMap = new HashMap<LSFPropDeclaration, Integer>();
+                    
+                    for (Iterator<LSFPropDeclaration> iterator = decls.iterator(); iterator.hasNext();) {
+                        LSFPropDeclaration decl = iterator.next();
+                        List<LSFClassSet> declClasses = decl.resolveParamClasses();
+                        if(declClasses == null) {
+                            declMap.put(decl, 0);
+                            continue;
+                        }
+
+                        declMap.put(decl, LSFPsiImplUtil.getCommonChildrenCount(declClasses, usageClasses));
+                    }
+
+                    int commonClasses = 0;
+                    List<LSFDeclaration> result = new ArrayList<LSFDeclaration>();
+                    for (Map.Entry<LSFPropDeclaration, Integer> entry : declMap.entrySet()) {
+                        if (entry.getValue() > commonClasses) {
+                            commonClasses = entry.getValue();
+                            result = new ArrayList<LSFDeclaration>();
+                            result.add(entry.getKey());
+                        } else if (entry.getValue() == commonClasses) {
+                            result.add(entry.getKey());
+                        }
+                    }
+                    return result;
+                }
+            }));
+    
+            return declarations.findAll();
+            
+        }
+        return new ArrayList<LSFPropDeclaration>();
     }
 
     private static class VariantsProcessor implements PsiScopeProcessor {
@@ -188,29 +257,6 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         };
     }
 
-    private Map<LSFPropDeclaration, Integer> getDeclarations() {
-        final List<LSFClassSet> usageClasses = getUsageContext();
-        if(usageClasses == null)
-            return null;
-        
-        Map<LSFPropDeclaration, Integer> result = new HashMap<LSFPropDeclaration, Integer>();
-
-        CollectionQuery<LSFPropDeclaration> declarations = new CollectionQuery<LSFPropDeclaration >(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), Condition.TRUE, Finalizer.EMPTY));
-
-        for (Iterator<LSFPropDeclaration> iterator = declarations.iterator(); iterator.hasNext();) {
-            LSFPropDeclaration decl = iterator.next();
-            List<LSFClassSet> declClasses = decl.resolveParamClasses();
-            if(declClasses == null) {
-                result.put(decl, 0);
-                continue;
-            }
-
-            result.put(decl, LSFPsiImplUtil.getCommonChildrenCount(declClasses, usageClasses));    
-        }
-        
-        return result;
-    }
-    
     public boolean isDirect() {
         List<LSFClassSet> usageContext = getUsageContext();
         if(usageContext == null)
@@ -240,40 +286,68 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     }
 
     @Override
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder) {
-        Map<LSFPropDeclaration, Integer> declarations = getDeclarations();
-        if (declarations == null) {
-            return null;
+    public Annotation resolveAmbiguousErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> declarations) {
+        String ambError = "Ambiguous reference";
+
+        String description = "";
+        int i = 1;
+        List<LSFPropDeclaration> decls = new ArrayList<LSFPropDeclaration>((Collection<? extends LSFPropDeclaration>) declarations);
+        for (LSFPropDeclaration decl : decls) {
+            description += decl.getPresentableText();
+
+            if (i < decls.size() - 1) {
+                description += ", ";
+            } else if (i == decls.size() - 1) {
+                description += " and ";
+            }
+
+            i++;
         }
-        
-        int commonClasses = 0;
-        List<LSFPropDeclaration> decls = new ArrayList<LSFPropDeclaration>();
-        for (Map.Entry<LSFPropDeclaration, Integer> entry : declarations.entrySet()) {
-            if (entry.getValue() > commonClasses) {
-                commonClasses = entry.getValue();
-                decls = new ArrayList<LSFPropDeclaration>();
-                decls.add(entry.getKey());
-            } else if (entry.getValue() == commonClasses) {
-                decls.add(entry.getKey());
+
+        if (!description.isEmpty()) {
+            ambError += ": " + description + " match";
+        }
+
+        Annotation annotation = resolveErrorTarget(holder, ambError);
+        annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+        return annotation;
+    }
+
+    @Override
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations) {
+        String errorText;
+        if (similarDeclarations.size() != 1) {
+            errorText = "Cannot resolve property " + getNameRef() + listClassesToString(getUsageContext());    
+        } else {
+            errorText = similarDeclarations.iterator().next().getPresentableText() + " cannot be applied to " +
+                    getNameRef() + listClassesToString(getUsageContext());
+        }
+
+        Annotation error = resolveErrorTarget(holder, errorText);
+        error.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+        return error;
+    }
+
+    public String listClassesToString(List<LSFClassSet> classes) {
+        String result = "(";
+        if (classes != null) {
+            for (Iterator<LSFClassSet> iterator = classes.iterator(); iterator.hasNext();) {
+                LSFClassSet set = iterator.next();
+                result += set == null ? "?" : set;
+                result += iterator.hasNext() ? ", " : "";
             }
         }
-        
-        if (decls.size() != 1) {
-            return holder.createErrorAnnotation(getTextRange(), "Cannot resolve property reference");  
-        } else {
-            Annotation error = holder.createErrorAnnotation(getTextRange(), listClassesToString(decls.get(0).resolveParamClasses()) + " cannot be applied to " + listClassesToString(getUsageContext()));
-            error.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-            return error;
-        }
-    }
-    
-    private String listClassesToString(List<LSFClassSet> classes) {
-        String result = "(";
-        for (Iterator<LSFClassSet> iterator = classes.iterator(); iterator.hasNext();) {
-            LSFClassSet set = iterator.next();
-            result += set == null ? "?" : set;
-            result += iterator.hasNext() ? ", " : "";
-        }
         return result += ")";
+    }
+
+    public Annotation resolveErrorTarget(AnnotationHolder holder, String errorText) {
+        Annotation annotation;
+        PsiElement paramList = getPropertyUsageContext().getParamList();
+        if (paramList != null) {
+            annotation = holder.createErrorAnnotation(paramList, errorText);
+        } else {
+            annotation = holder.createErrorAnnotation(getTextRange(), errorText);
+        }
+        return annotation;
     }
 }

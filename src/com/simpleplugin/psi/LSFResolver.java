@@ -1,14 +1,15 @@
 package com.simpleplugin.psi;
 
-import com.intellij.openapi.module.Module;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.ReferenceRange;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.*;
 import com.intellij.util.Processor;
 import com.intellij.util.Query;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.impl.LSFMetaCodeDeclarationStatementImpl;
-import com.simpleplugin.psi.references.LSFGlobalReference;
 import com.simpleplugin.psi.references.LSFMetaReference;
 import com.simpleplugin.psi.references.LSFReference;
 import com.simpleplugin.psi.stubs.impl.MetaStubImpl;
@@ -19,13 +20,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, List<? extends PsiElement>> {
+public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, LSFDeclarationResolveResult> {
     public static final LSFResolver INSTANCE = new LSFResolver();
 
     @Nullable
     @Override
-    public List<? extends PsiElement> resolve(@NotNull LSFReference reference, boolean incompleteCode) {
-        return new ArrayList<PsiElement>(reference.resolveNoCache().findAll());
+    public LSFDeclarationResolveResult resolve(@NotNull LSFReference reference, boolean incompleteCode) {
+        return reference.resolveNoCache();
     }
 
     public static List<String> getIDs(LSFMetaDeclIdList idList) {

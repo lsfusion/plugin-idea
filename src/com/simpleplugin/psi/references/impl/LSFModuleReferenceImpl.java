@@ -2,7 +2,7 @@ package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.StringStubIndexExtension;
-import com.intellij.util.Query;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.psi.LSFGlobalResolver;
 import com.simpleplugin.psi.declarations.LSFModuleDeclaration;
 import com.simpleplugin.psi.references.LSFModuleReference;
@@ -19,8 +19,9 @@ public abstract class LSFModuleReferenceImpl extends LSFGlobalReferenceImpl<LSFM
     }
 
     @Override
-    public Query<LSFModuleDeclaration> resolveNoCache() {
-        return LSFGlobalResolver.findModules(getNameRef(), getScope());
+    public LSFDeclarationResolveResult resolveNoCache() {
+        Collection<LSFModuleDeclaration> decls = LSFGlobalResolver.findModules(getNameRef(), getScope()).findAll();
+        return new LSFDeclarationResolveResult(decls, resolveDefaultErrorAnnotator(decls));
     }
 
     @Override

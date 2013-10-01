@@ -2,9 +2,8 @@ package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.CollectionQuery;
-import com.intellij.util.EmptyQuery;
 import com.intellij.util.Query;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.context.FormContext;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
@@ -80,16 +79,16 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
     }
 
     @Override
-    public Query<T> resolveNoCache() {
-        if(getSimpleName()==null)
-            return new EmptyQuery<T>();
-
-        final String nameRef = getNameRef();
+    public LSFDeclarationResolveResult resolveNoCache() {
         final List<T> objects = new ArrayList<T>();
-        for(T decl : processParams())
-            if(decl.getDeclName().equals(nameRef))
-                objects.add((T) decl);
-        return new CollectionQuery<T>(objects);
+        if(getSimpleName() != null) {
+            final String nameRef = getNameRef();
+            
+            for(T decl : processParams())
+                if(decl.getDeclName().equals(nameRef))
+                    objects.add((T) decl);
+        }
+        return new LSFDeclarationResolveResult(objects, resolveDefaultErrorAnnotator(objects));
     }
 
     @Override

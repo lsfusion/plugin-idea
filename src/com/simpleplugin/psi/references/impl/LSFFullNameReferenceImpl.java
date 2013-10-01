@@ -3,8 +3,7 @@ package com.simpleplugin.psi.references.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.stubs.StringStubIndexExtension;
-import com.intellij.util.CollectionQuery;
-import com.intellij.util.Query;
+import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.declarations.LSFFullNameDeclaration;
@@ -12,7 +11,10 @@ import com.simpleplugin.psi.references.LSFFullNameReference;
 import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G extends LSFFullNameDeclaration> extends LSFGlobalReferenceImpl<T> implements LSFFullNameReference<T, G> {
 
@@ -54,8 +56,9 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     }
 
     @Override
-    public Query<T> resolveNoCache() {
-        return new CollectionQuery<T>((Collection<T>) LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), getCondition(), getFinalizer()));
+    public LSFDeclarationResolveResult resolveNoCache() {
+        Collection<G> decls = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), getCondition(), getFinalizer()); 
+        return new LSFDeclarationResolveResult(decls, resolveDefaultErrorAnnotator(decls));
     }
     
     @Override

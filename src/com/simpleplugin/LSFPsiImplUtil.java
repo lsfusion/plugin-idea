@@ -3,15 +3,16 @@ package com.simpleplugin;
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTFactory;
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafElement;
-import com.intellij.psi.tree.IElementType;
 import com.simpleplugin.classes.*;
 import com.simpleplugin.meta.MetaTransaction;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.context.*;
-import com.simpleplugin.psi.declarations.*;
+import com.simpleplugin.psi.declarations.LSFClassDeclaration;
+import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
+import com.simpleplugin.psi.declarations.LSFParamDeclaration;
+import com.simpleplugin.psi.declarations.LSFPropDeclaration;
 import com.simpleplugin.psi.references.LSFAbstractParamReference;
 import com.simpleplugin.typeinfer.*;
 import org.jetbrains.annotations.NotNull;
@@ -851,6 +852,20 @@ public class LSFPsiImplUtil {
         }
         return result;
     }
+    
+    @Nullable
+    public static List<LSFParamDeclaration> resolveParamDecls(@NotNull LSFPropertyDeclaration propertyDeclaration) {
+        List<LSFParamDeclaration> result = null;
+        if (propertyDeclaration.getClassParamDeclareList() != null) {
+            LSFNonEmptyClassParamDeclareList paramDeclareList = propertyDeclaration.getClassParamDeclareList().getNonEmptyClassParamDeclareList();
+            if (paramDeclareList != null) {
+                result = new ArrayList<LSFParamDeclaration>();
+                for (LSFClassParamDeclare paramDeclare : paramDeclareList.getClassParamDeclareList())
+                result.add(paramDeclare.getParamDeclare());
+            }
+        }
+        return result;
+    }
 
     // PROPERTYUSAGECONTEXT.RESOLVEPARAMCLASSES
     
@@ -942,6 +957,56 @@ public class LSFPsiImplUtil {
         if(by != null)
             return resolveParamClasses(by.getNonEmptyPropertyExpressionList());
         return new ArrayList<LSFClassSet>();
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFJoinPropertyDefinition sourceStatement) {
+        return sourceStatement.getPropertyExpressionList();
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFPartitionPropertyDefinition sourceStatement) {
+        return null;
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFNoContextPropertyUsage sourceStatement) {
+        return null;
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFExecActionPropertyDefinitionBody sourceStatement) {
+        return sourceStatement.getPropertyExpressionList();
+    }
+    
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFFormMappedProperty sourceStatement) {
+        return sourceStatement.getObjectUsageList();
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFFormTreeGroupObjectDeclaration sourceStatement) {
+        return null;
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFFormMappedNamePropertiesList sourceStatement) {
+        return null;
+    }
+    
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFMappedPropertyObject sourceStatement) {
+        return sourceStatement.getObjectUsageList();
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFMappedPropertyClassParamDeclare sourceStatement) {
+        return sourceStatement.getClassParamDeclareList();
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFMappedPropertyExprParam sourceStatement) {
+        return sourceStatement.getExprParameterUsageList();
     }
 
     
