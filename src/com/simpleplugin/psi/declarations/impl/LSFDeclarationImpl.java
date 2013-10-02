@@ -53,7 +53,7 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
     }
 
     public static String getPresentableText(LSFDeclaration decl) {
-        return decl.getPresentableText();
+        return decl.getPresentableDeclText();
     }
 
     @Override
@@ -69,6 +69,11 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
     @Override
     public String getPresentableText() {
         return getPresentableText(this);
+    }
+
+    @Override
+    public String getPresentableDeclText() {
+        return getDeclName();
     }
 
     @Override

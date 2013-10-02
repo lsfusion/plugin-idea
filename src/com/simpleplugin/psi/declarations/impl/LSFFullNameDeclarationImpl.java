@@ -4,7 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.psi.LSFSimpleNameWithCaption;
 import com.simpleplugin.psi.declarations.LSFFullNameDeclaration;
-import com.simpleplugin.psi.declarations.LSFNamespaceDeclaration;
 import com.simpleplugin.psi.stubs.FullNameStubElement;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,5 +24,10 @@ public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclara
     @Override
     public String getNamespaceName() {
         return getLSFFile().getModuleDeclaration().getNamespace();
+    }
+
+    @Override
+    public String getPresentableDeclText() {
+        return getDeclName();
     }
 }

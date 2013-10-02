@@ -57,7 +57,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     @Override
-    public String getPresentableText() {
+    public String getPresentableDeclText() {
         List<LSFClassSet> classes = resolveParamClasses();
         return getDeclName() + "(" + StringUtils.join(classes, ", ") + ")";
     }

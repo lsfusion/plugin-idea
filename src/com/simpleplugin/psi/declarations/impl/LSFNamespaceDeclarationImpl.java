@@ -25,4 +25,9 @@ public abstract class LSFNamespaceDeclarationImpl<This extends LSFNamespaceDecla
     public Icon getIcon(int flags) {
         return AllIcons.Actions.Module;
     }
+
+    @Override
+    public String getPresentableDeclText() {
+        return getDeclName();
+    }
 }

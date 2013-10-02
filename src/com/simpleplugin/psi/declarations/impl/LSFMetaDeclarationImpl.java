@@ -109,7 +109,7 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     }
 
     @Override
-    public String getPresentableText() {
+    public String getPresentableDeclText() {
         return getDeclName() + "(" + getMetaDeclIdList().getText() + ")";
     }
 }

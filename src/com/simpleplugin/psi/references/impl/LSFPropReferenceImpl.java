@@ -308,24 +308,25 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
             ambError += ": " + description + " match";
         }
 
-        Annotation annotation = resolveErrorTarget(holder, ambError);
-        annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-        return annotation;
+        return resolveErrorTarget(holder, ambError, false);
     }
 
     @Override
     public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations) {
         String errorText;
+        boolean noSuchProperty = similarDeclarations.size() == 0;
         if (similarDeclarations.size() != 1) {
-            errorText = "Cannot resolve property " + getNameRef() + listClassesToString(getUsageContext());    
+            if (noSuchProperty) {
+                errorText = "Property '" + getNameRef() + "' not found";
+            } else {
+                errorText = "Cannot resolve property " + getNameRef() + listClassesToString(getUsageContext());
+            }
         } else {
             errorText = similarDeclarations.iterator().next().getPresentableText() + " cannot be applied to " +
                     getNameRef() + listClassesToString(getUsageContext());
         }
 
-        Annotation error = resolveErrorTarget(holder, errorText);
-        error.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-        return error;
+        return resolveErrorTarget(holder, errorText, noSuchProperty);
     }
 
     public String listClassesToString(List<LSFClassSet> classes) {
@@ -340,13 +341,16 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         return result += ")";
     }
 
-    public Annotation resolveErrorTarget(AnnotationHolder holder, String errorText) {
+    public Annotation resolveErrorTarget(AnnotationHolder holder, String errorText, boolean noSuchProperty) {
         Annotation annotation;
         PsiElement paramList = getPropertyUsageContext().getParamList();
-        if (paramList != null) {
-            annotation = holder.createErrorAnnotation(paramList, errorText);
+        if (noSuchProperty || paramList == null) {
+            annotation = holder.createErrorAnnotation(getTextRange(), errorText);    
         } else {
-            annotation = holder.createErrorAnnotation(getTextRange(), errorText);
+            annotation = holder.createErrorAnnotation(paramList, errorText);
+        }
+        if (!noSuchProperty) {
+            annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
         }
         return annotation;
     }

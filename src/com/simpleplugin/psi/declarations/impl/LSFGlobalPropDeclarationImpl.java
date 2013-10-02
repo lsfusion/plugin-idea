@@ -167,7 +167,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     @Override
-    public String getPresentableText() {
+    public String getPresentableDeclText() {
         List<? extends LSFExprParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
         LSFPropertyExpression pExpression = getPropertyExpression();
         if (params == null && pExpression != null) {
