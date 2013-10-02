@@ -909,12 +909,15 @@ public class LSFPsiImplUtil {
         return new ArrayList<LSFClassSet>();
     }
 
+    public static List<LSFObjectUsage> getObjectUsageList(LSFObjectUsageList objectUsageList) {
+        LSFNonEmptyObjectUsageList neList = objectUsageList.getNonEmptyObjectUsageList();
+        if(neList != null)
+            return neList.getObjectUsageList();
+        return new ArrayList<LSFObjectUsage>();
+    }
+
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFObjectUsageList sourceStatement) {
-        LSFNonEmptyObjectUsageList ne = sourceStatement.getNonEmptyObjectUsageList();
-        if(ne != null)
-            return resolveParamRefClasses(ne.getObjectUsageList());
-        
-        return new ArrayList<LSFClassSet>();
+        return resolveParamRefClasses(getObjectUsageList(sourceStatement));
     }
 
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFNonEmptyPropertyExpressionList sourceStatement, @Nullable InferResult inferred) {

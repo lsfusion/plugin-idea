@@ -26,7 +26,6 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
 
     public static LSFId getSimpleName(LSFCompoundID compoundID) {
         return compoundID.getSimpleName();
-                
     }
     
     @Override

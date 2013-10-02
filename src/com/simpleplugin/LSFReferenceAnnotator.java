@@ -11,8 +11,13 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.context.ExtendParamContext;
+import com.simpleplugin.psi.context.ModifyParamContext;
+import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.references.LSFPropReference;
 import com.simpleplugin.psi.references.LSFReference;
+import com.simpleplugin.typeinfer.MetaTypeInferAction;
+import com.simpleplugin.typeinfer.TypeInferAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -56,6 +61,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitPropertyUsage(o);
         if(checkReference(o) && !o.isDirect())
             addIndirectProp(o);
+    }
+
+    @Override
+    public void visitPropertySelector(@NotNull LSFPropertySelector o) {
+        super.visitPropertySelector(o);
+        
+        checkReference(o);
     }
 
     @Override

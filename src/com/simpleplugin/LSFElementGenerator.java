@@ -23,6 +23,7 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.io.StringRef;
 import com.simpleplugin.parser.GeneratedParserUtilBase;
 import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.declarations.LSFPropertyDrawDeclaration;
 import com.simpleplugin.psi.references.LSFClassReference;
 import com.simpleplugin.psi.references.LSFModuleReference;
 import com.simpleplugin.psi.references.LSFNamespaceReference;
@@ -109,7 +110,16 @@ public class LSFElementGenerator {
         final PsiFile dummyFile = createDummyFile(project, "MODULE x; META dummy() " + text + " END");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFAnyTokens.class).iterator().next();
     }
-    
+
+    private static List<? extends LSFPropertyDrawDeclaration> builtInFormProps = null;
+    public static List<? extends LSFPropertyDrawDeclaration> getBuiltInFormProps(final Project project) {
+        if(builtInFormProps == null) {
+            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
+            builtInFormProps = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
+        }
+        return builtInFormProps;
+    }
+
     public static void format(Project project, PsiElement element) {
         final CodeFormatterFacade codeFormatter = new CodeFormatterFacade(CodeStyleSettingsManager.getSettings(project));
         codeFormatter.processText(element.getContainingFile(), new FormatTextRanges(element.getTextRange(), true), false);

@@ -1,5 +1,6 @@
 package com.simpleplugin.psi;
 
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -19,21 +20,22 @@ import com.simpleplugin.psi.stubs.extend.types.ExtendStubElementType;
 import com.simpleplugin.psi.stubs.extend.types.indexes.ClassExtendsClassIndex;
 import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class LSFGlobalResolver {
 
-    public static ConcurrentHashMap<LSFModuleDeclaration, Set<VirtualFile>> cached = new ConcurrentHashMap<LSFModuleDeclaration, Set<VirtualFile>>();
+    public static ConcurrentHashMap<LSFModuleDeclaration, Set<LSFFile>> cached = new ConcurrentHashMap<LSFModuleDeclaration, Set<LSFFile>>();
     // вот эту хрень надо по хорошему кэшировать
-    private static Set<VirtualFile> getRequireModules(LSFModuleDeclaration declaration) {
-        Set<VirtualFile> cachedFiles = cached.get(declaration);
+    private static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration) {
+        Set<LSFFile> cachedFiles = cached.get(declaration);
         if(cachedFiles!=null)
             return cachedFiles;
 
-        Set<VirtualFile> result = new HashSet<VirtualFile>();
+        Set<LSFFile> result = new HashSet<LSFFile>();
 
-        result.add(declaration.getContainingFile().getVirtualFile());
+        result.add(declaration.getLSFFile());
         for(LSFModuleReference ref : declaration.getRequireRefs()) {
             LSFModuleDeclaration resolve = ref.resolveDecl();
             if(resolve!=null)
@@ -44,6 +46,23 @@ public class LSFGlobalResolver {
         return result;
     }
 
+    private static GlobalSearchScope getRequireScope(Project project, LSFModuleDeclaration declaration) {
+        LSFFile file = declaration.getLSFFile();
+        VirtualFile vfile = file.getVirtualFile();
+        if(vfile == null) {
+            Query<LSFModuleDeclaration> modules = findModules(declaration.getGlobalName(), GlobalSearchScope.allScope(project));
+            LSFModuleDeclaration first = modules.findFirst();
+            if(first != null)
+                declaration = first;
+        }
+
+        Set<VirtualFile> vFiles = new HashSet<VirtualFile>();
+        for(LSFFile lsfFile : getRequireModules(declaration)) {
+            vFiles.add(lsfFile.getVirtualFile()); // null может быть только для dumb
+        }
+        return GlobalSearchScope.filesScope(project, vFiles);
+    }
+    
     private static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findInNamespace(Collection<T> decls, Finalizer<T> finalizer) {
         if(decls==null)
             return null;
@@ -121,7 +140,7 @@ public class LSFGlobalResolver {
 
         LSFModuleDeclaration moduleDeclaration = file.getModuleDeclaration();
         Project project = file.getProject();
-        GlobalSearchScope scope = GlobalSearchScope.filesScope(project, getRequireModules(moduleDeclaration));
+        GlobalSearchScope scope = getRequireScope(project, moduleDeclaration);
 
         Collection<T> decls = new ArrayList<T>();
         for(FullNameStubElementType<S, T> type : types)
@@ -173,7 +192,7 @@ public class LSFGlobalResolver {
     }
     public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, LSFFile file) {
         Project project = file.getProject();
-        return findExtendElements(decl, type, project, GlobalSearchScope.filesScope(project, getRequireModules(file.getModuleDeclaration())));
+        return findExtendElements(decl, type, project, getRequireScope(project, file.getModuleDeclaration()));
     }
     public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, Project project, GlobalSearchScope scope) {
         if(decl==null)

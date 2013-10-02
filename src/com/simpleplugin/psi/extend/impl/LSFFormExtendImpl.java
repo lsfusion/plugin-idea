@@ -4,13 +4,13 @@ import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.simpleplugin.psi.LSFExtendingFormDeclaration;
-import com.simpleplugin.psi.LSFFormDecl;
-import com.simpleplugin.psi.LSFFormGroupObjectsList;
-import com.simpleplugin.psi.LSFFormTreeGroupObjectList;
+import com.simpleplugin.LSFElementGenerator;
+import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFFullNameDeclaration;
 import com.simpleplugin.psi.declarations.LSFGroupObjectDeclaration;
 import com.simpleplugin.psi.declarations.LSFObjectDeclaration;
+import com.simpleplugin.psi.declarations.LSFPropertyDrawDeclaration;
+import com.simpleplugin.psi.declarations.impl.LSFPropertyDrawDeclarationImpl;
 import com.simpleplugin.psi.extend.LSFFormExtend;
 import com.simpleplugin.psi.stubs.extend.ExtendFormStubElement;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +39,9 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
 
     @NotNull
     protected abstract List<LSFFormGroupObjectsList> getFormGroupObjectsListList();
+
+    @NotNull
+    protected abstract List<LSFFormPropertiesList> getFormPropertiesListList();
 
     @NotNull
     protected abstract List<LSFFormTreeGroupObjectList> getFormTreeGroupObjectListList();
@@ -82,6 +85,16 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
             result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFGroupObjectDeclaration.class));
         for(LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFGroupObjectDeclaration.class));
+        return result;
+    }
+
+    
+    @Override
+    public Collection<LSFPropertyDrawDeclaration> getPropertyDrawDecls() {
+        Collection<LSFPropertyDrawDeclaration> result = new ArrayList<LSFPropertyDrawDeclaration>();
+        result.addAll(LSFElementGenerator.getBuiltInFormProps(getProject()));
+        for(LSFFormPropertiesList formProperties : getFormPropertiesListList())
+            result.addAll(PsiTreeUtil.findChildrenOfType(formProperties, LSFPropertyDrawDeclaration.class));
         return result;
     }
 

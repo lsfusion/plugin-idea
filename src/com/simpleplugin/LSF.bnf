@@ -23,10 +23,7 @@ private scriptStatement ::= statement { recoverUntil = "script_statement_recover
 private script_statement_recover ::= !def_statement_recover_start 
 
 simpleName ::= ID
-{
-    mixin="com.simpleplugin.psi.LSFIdImpl"
-    implements="com.simpleplugin.psi.LSFId"
-}
+{mixin="com.simpleplugin.psi.LSFIdImpl" implements="com.simpleplugin.psi.LSFId"}
 
 moduleName ::= simpleName;
 requireList ::= REQUIRE nonEmptyModuleUsageList SEMI;
@@ -579,7 +576,8 @@ formObjectDeclaration ::= (simpleName EQUAL)?
 		                  (ON CHANGE formActionPropertyObject)?
 {mixin="com.simpleplugin.psi.declarations.impl.LSFObjectDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFObjectDeclaration"}
 
-formPropertyDrawNameDecl ::= (simpleName EQUAL)? formPropertyName formPropertyOptionsList  
+formPropertyDrawNameDecl ::= (simpleName EQUAL)? formPropertyName formPropertyOptionsList
+{mixin="com.simpleplugin.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFPropertyDrawNameDeclaration"}
 formPropertiesNamesDeclList ::=	formPropertyDrawNameDecl (COMMA formPropertyDrawNameDecl)*
 formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptionsList formPropertiesNamesDeclList 
 {implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
@@ -613,7 +611,7 @@ formPropertyOptionsList ::= (	propertyEditTypeLiteral
 formPropertyDraw ::= mappedPropertyObject | ID
 
 formPropertyDrawMappedDecl ::= (simpleName EQUAL)? formMappedProperty formPropertyOptionsList
-
+{mixin="com.simpleplugin.psi.declarations.impl.LSFPropertyDrawMappedDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFPropertyDrawMappedDeclaration"}
 
 formMappedPropertiesList ::= formPropertyDrawMappedDecl
 		                     (COMMA formPropertyDrawMappedDecl)*
@@ -625,16 +623,18 @@ formGroupObjectEntity ::= groupObjectUsage
 formMappedProperty ::= formPropertyName LBRAC objectUsageList RBRAC
 {implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
-formPropertyName ::=    propertyUsage
-                    |	OBJVALUE
-                    |	SELECTION
-                    |	ADDOBJ
-                    |	ADDFORM
-                    |	ADDSESSIONFORM
-                    |	EDITFORM
-                    |	EDITSESSIONFORM
-                    |	DELETE
-                    |	DELETESESSION
+predefinedFormPropertyName ::= OBJVALUE
+                           |	SELECTION
+                           |	ADDOBJ
+                           |	ADDFORM
+                           |	ADDSESSIONFORM
+                           |	EDITFORM
+                           |	EDITSESSIONFORM
+                           |	DELETE
+                           |	DELETESESSION
+{mixin="com.simpleplugin.psi.LSFIdImpl" implements="com.simpleplugin.psi.LSFId"}
+ 
+formPropertyName ::= propertyUsage |	predefinedFormPropertyName
 
 formFiltersList ::= FILTERS formFilterDeclaration (COMMA formFilterDeclaration)*
 
@@ -878,7 +878,8 @@ componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                 	|	PROPERTY LBRAC propertySelector RBRAC
                     |	multiCompoundID
 
-propertySelector ::= mappedPropertyObject | compoundID // compoundID?
+propertySelector ::= formMappedProperty | compoundID // compoundID?
+{mixin="com.simpleplugin.psi.references.impl.LSFPropertyDrawReferenceImpl" implements="com.simpleplugin.psi.references.LSFPropertyDrawReference"}
 
 positionComponentsStatement ::= POSITION componentSelector simplexConstraintLiteral (componentSelector)? SEMI
 

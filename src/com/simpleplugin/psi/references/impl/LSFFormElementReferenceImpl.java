@@ -1,6 +1,7 @@
 package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Query;
 import com.simpleplugin.LSFDeclarationResolveResult;
@@ -73,6 +74,15 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
     }
 
     protected abstract Processor<T> getProcessor();
+    
+    protected Condition<T> getCondition() {
+        final String nameRef = getNameRef();
+        return new Condition<T>() {
+            public boolean value(T decl) {
+                return decl.getDeclName().equals(nameRef);
+            }
+        };
+    }
 
     private Set<T> processParams() {
         return processParams(this, getTextOffset(), getProcessor());
@@ -82,10 +92,10 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
     public LSFDeclarationResolveResult resolveNoCache() {
         final List<T> objects = new ArrayList<T>();
         if(getSimpleName() != null) {
-            final String nameRef = getNameRef();
-            
+            Condition<T> condition = getCondition();
+
             for(T decl : processParams())
-                if(decl.getDeclName().equals(nameRef))
+                if(condition.value(decl))
                     objects.add((T) decl);
         }
         return new LSFDeclarationResolveResult(objects, resolveDefaultErrorAnnotator(objects));
