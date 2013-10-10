@@ -7,6 +7,8 @@ import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.declarations.LSFNavigatorElementDeclaration;
 import com.simpleplugin.psi.stubs.NavigatorElementStubElement;
+import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,5 +36,10 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
     @Override
     public Icon getIcon(int flags) {
         return AllIcons.ObjectBrowser.FlattenPackages;
+    }
+
+    @Override
+    protected FullNameStubElementType getType() {
+        return LSFStubElementTypes.NAVIGATORELEMENT;
     }
 }

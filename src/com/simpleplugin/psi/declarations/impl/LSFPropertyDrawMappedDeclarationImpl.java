@@ -3,7 +3,6 @@ package com.simpleplugin.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFPropertyDrawMappedDeclaration;
-import com.simpleplugin.psi.references.LSFPropReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,8 +14,6 @@ public abstract class LSFPropertyDrawMappedDeclarationImpl extends LSFPropertyDr
 
     @NotNull
     protected abstract LSFFormMappedProperty getFormMappedProperty();
-
-    protected abstract LSFSimpleName getSimpleName();
 
     @Nullable
     @Override

@@ -2,6 +2,7 @@ package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.BaseUtils;
@@ -11,6 +12,8 @@ import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
 import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
 import com.simpleplugin.psi.stubs.PropStubElement;
+import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import com.simpleplugin.typeinfer.InferResult;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -166,7 +169,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     @Override
-    public String getPresentableDeclText() {
+    public String getPresentableText() {
         List<? extends LSFExprParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
         LSFPropertyExpression pExpression = getPropertyExpression();
         if (params == null && pExpression != null) {
@@ -195,5 +198,44 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         }
         
         return getDeclName() + "(" + paramsString + ")";
+    }
+
+    @Override
+    protected FullNameStubElementType getType() {
+        return LSFStubElementTypes.PROP;
+    }
+
+    @Override
+    protected Condition<LSFGlobalPropDeclaration> getFindDuplicatesCondition() {
+        return new Condition<LSFGlobalPropDeclaration>() {
+            @Override
+            public boolean value(LSFGlobalPropDeclaration decl) {
+                return getNameIdentifier().getText().equals(decl.getNameIdentifier().getText()) && 
+                        resolveEquals(resolveParamClasses(),  decl.resolveParamClasses());
+            }
+        };
+    }
+    
+    public static boolean resolveEquals(List<LSFClassSet> list1, List<LSFClassSet> list2) {
+        if (list1 == null && list2 == null) {
+            return true;
+        }
+        if (list1 == null || list2 == null || list1.size() != list2.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < list1.size(); i++) {
+            if (list1.get(i) == null) {
+                if (list2.get(i) != null) {
+                    return false;
+                }
+            } else {
+                if (!list1.get(i).equals(list2.get(i))) {
+                    return false;
+                }
+            }
+        }
+
+        return true;    
     }
 }

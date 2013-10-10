@@ -7,6 +7,8 @@ import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleNameWithCaption;
 import com.simpleplugin.psi.declarations.LSFFormDeclaration;
 import com.simpleplugin.psi.stubs.FormStubElement;
+import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,5 +35,10 @@ public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<
     @Override
     public Icon getIcon(int flags) {
         return AllIcons.FileTypes.UiForm;
+    }
+
+    @Override
+    protected FullNameStubElementType getType() {
+        return LSFStubElementTypes.FORM;
     }
 }

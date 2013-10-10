@@ -5,10 +5,14 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.LSFElementGenerator;
-import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.LSFFile;
+import com.simpleplugin.psi.LSFId;
+import com.simpleplugin.psi.LSFSimpleNameWithCaption;
 import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import com.simpleplugin.psi.references.LSFClassReference;
 import com.simpleplugin.psi.stubs.ClassStubElement;
+import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,5 +48,10 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
     @Override
     public Icon getIcon(int flags) {
         return AllIcons.Nodes.Class;
+    }
+
+    @Override
+    protected FullNameStubElementType getType() {
+        return LSFStubElementTypes.CLASS;
     }
 }

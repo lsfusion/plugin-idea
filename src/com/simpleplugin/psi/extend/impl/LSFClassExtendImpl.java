@@ -10,12 +10,15 @@ import com.simpleplugin.psi.declarations.LSFStaticObjectDeclaration;
 import com.simpleplugin.psi.extend.LSFClassExtend;
 import com.simpleplugin.psi.references.impl.LSFFullNameReferenceImpl;
 import com.simpleplugin.psi.stubs.extend.ExtendClassStubElement;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, ExtendClassStubElement> implements LSFClassExtend {
 
@@ -95,6 +98,40 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         if (listDecl != null && listDecl.getNonEmptyStaticObjectDeclList() != null) {
             for (LSFStaticObjectDecl decl : listDecl.getNonEmptyStaticObjectDeclList().getStaticObjectDeclList()) {
                 result.add(decl);
+            }
+        }
+        return result;
+    }
+    
+    public Set<LSFStaticObjectDeclaration> resolveStaticObjectDuplicates() {
+        Set<LSFStaticObjectDeclaration> result = new HashSet<LSFStaticObjectDeclaration>();
+
+        List<LSFStaticObjectDeclaration> localDecls = getStaticObjects();
+        for (int i = 0; i < localDecls.size(); i++) {
+            LSFStaticObjectDeclaration decl1 = localDecls.get(i);
+            for (int j = 0; j < localDecls.size(); j++) {
+                if (i != j) {
+                    if (decl1.getNameIdentifier().getText().equals(localDecls.get(j).getNameIdentifier().getText())) {
+                        result.add(decl1);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        List<LSFStaticObjectDeclaration> parentObjects = new ArrayList<LSFStaticObjectDeclaration>();
+        for (LSFClassExtend extend : LSFGlobalResolver.findExtendElements(resolveDecl(), LSFStubElementTypes.EXTENDCLASS, getLSFFile()).findAll()) {
+            if (!this.equals(extend)) {
+                parentObjects.addAll(extend.getStaticObjects());
+            }
+        }
+        
+        for (LSFStaticObjectDeclaration decl : localDecls) {
+            for (LSFStaticObjectDeclaration parentDecl : parentObjects) {
+                if (decl.getNameIdentifier().getText().equals(parentDecl.getNameIdentifier().getText())) {
+                    result.add(decl);
+                    break;
+                }    
             }
         }
         return result;

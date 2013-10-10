@@ -4,7 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFPropertyDrawNameDeclaration;
-import com.simpleplugin.psi.references.LSFPropReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,8 +12,6 @@ public abstract class LSFPropertyDrawNameDeclarationImpl extends LSFPropertyDraw
     protected LSFPropertyDrawNameDeclarationImpl(@NotNull ASTNode node) {
         super(node);
     }
-
-    protected abstract LSFSimpleName getSimpleName();
 
     public abstract LSFFormPropertyName getFormPropertyName();
 

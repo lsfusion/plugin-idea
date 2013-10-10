@@ -14,5 +14,5 @@ public interface LSFDeclaration extends LSFElement, PsiNameIdentifierOwner, Item
     @Override
     LSFId getNameIdentifier();
     
-    String getPresentableDeclText();
+    boolean resolveDuplicates();
 }

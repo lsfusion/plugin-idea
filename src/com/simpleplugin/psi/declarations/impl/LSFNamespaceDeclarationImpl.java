@@ -27,7 +27,12 @@ public abstract class LSFNamespaceDeclarationImpl<This extends LSFNamespaceDecla
     }
 
     @Override
-    public String getPresentableDeclText() {
+    public String getPresentableText() {
         return getDeclName();
+    }
+
+    @Override
+    public boolean resolveDuplicates() {
+        return false;
     }
 }

@@ -44,8 +44,13 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
         return getName();
     }
 
-    public static Icon getIcon(LSFDeclaration decl, boolean unused) {
-        return decl.getIcon(0);
+    @Override
+    public boolean resolveDuplicates() {
+        return false;
+    }
+
+    public static Icon getIcon(LSFDeclaration decl, int flags) {
+        return null;
     }
 
     public static String getLocationString(LSFDeclaration decl) {
@@ -53,12 +58,17 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
     }
 
     public static String getPresentableText(LSFDeclaration decl) {
-        return decl.getPresentableDeclText();
+        return decl.getDeclName();
+    }
+    
+    @Override
+    public Icon getIcon(boolean unused) {
+        return getIcon(this, 0);
     }
 
     @Override
-    public Icon getIcon(boolean unused) {
-        return getIcon(this, unused);
+    public Icon getIcon(int flags) {
+        return getIcon(this, flags);
     }
 
     @Override
@@ -69,11 +79,6 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
     @Override
     public String getPresentableText() {
         return getPresentableText(this);
-    }
-
-    @Override
-    public String getPresentableDeclText() {
-        return getDeclName();
     }
 
     @Override

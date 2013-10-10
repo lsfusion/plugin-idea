@@ -1,17 +1,22 @@
 package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Condition;
 import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.LSFBuiltInClassName;
 import com.simpleplugin.psi.LSFClassName;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
+import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.declarations.LSFObjectDeclaration;
+import com.simpleplugin.psi.extend.LSFFormExtend;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationImpl implements LSFObjectDeclaration {
+import java.util.Collection;
+
+public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationImpl implements LSFObjectDeclaration, LSFFormExtendElement {
 
     public LSFObjectDeclarationImpl(@NotNull ASTNode node) {
         super(node);
@@ -41,5 +46,23 @@ public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationIm
             return builtInClassName;
         
         return className.getCustomClassUsage().getSimpleName();
+    }
+
+    public static LSFFormElementDeclarationImpl.Processor getProcessor() {
+        return new LSFFormElementDeclarationImpl.Processor<LSFObjectDeclaration>() {
+            public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
+                return formExtend.getObjectDecls();
+            }
+        };
+    }
+
+    @Override
+    public Condition<? extends LSFDeclaration> getDuplicateCondition() {
+        return new Condition<LSFObjectDeclaration>() {
+            @Override
+            public boolean value(LSFObjectDeclaration lsfDeclaration) {
+                return getNameIdentifier().getText().equals(lsfDeclaration.getNameIdentifier().getText());
+            }
+        };
     }
 }

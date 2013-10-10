@@ -1,14 +1,10 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
-import com.simpleplugin.psi.LSFElementImpl;
-import com.simpleplugin.psi.LSFFile;
 import com.simpleplugin.psi.LSFStubBasedPsiElement;
 import com.simpleplugin.psi.declarations.LSFGlobalDeclaration;
 import com.simpleplugin.psi.stubs.GlobalStubElement;
@@ -49,7 +45,12 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
 
     @Override
     public Icon getIcon(boolean unused) {
-        return LSFDeclarationImpl.getIcon(this, unused);
+        return LSFDeclarationImpl.getIcon(this, 0);
+    }
+
+    @Override
+    public Icon getIcon(int flags) {
+        return LSFDeclarationImpl.getIcon(this, flags);
     }
 
     @Override

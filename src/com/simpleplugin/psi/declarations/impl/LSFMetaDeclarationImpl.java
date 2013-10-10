@@ -2,6 +2,7 @@ package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
@@ -10,6 +11,8 @@ import com.simpleplugin.LSFParserDefinition;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
 import com.simpleplugin.psi.stubs.MetaStubElement;
+import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,7 +112,22 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     }
 
     @Override
-    public String getPresentableDeclText() {
+    public String getPresentableText() {
         return getDeclName() + "(" + getMetaDeclIdList().getText() + ")";
+    }
+
+    @Override
+    protected FullNameStubElementType getType() {
+        return LSFStubElementTypes.META;
+    }
+
+    @Override
+    protected Condition<LSFMetaDeclaration> getFindDuplicatesCondition() {
+        final int paramCount = getMetaDeclIdList().getMetaDeclIdList().size();
+        return new Condition<LSFMetaDeclaration>() {
+            public boolean value(LSFMetaDeclaration decl) {
+                return decl.getParamCount()==paramCount;
+            }
+        };
     }
 }

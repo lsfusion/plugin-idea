@@ -7,6 +7,8 @@ import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleNameWithCaption;
 import com.simpleplugin.psi.declarations.LSFGroupDeclaration;
 import com.simpleplugin.psi.stubs.GroupStubElement;
+import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,5 +35,10 @@ public abstract class LSFGroupDeclarationImpl extends LSFFullNameDeclarationImpl
     @Override
     public Icon getIcon(int flags) {
         return AllIcons.Actions.GroupByModuleGroup;
+    }
+
+    @Override
+    protected FullNameStubElementType getType() {
+        return LSFStubElementTypes.GROUP;
     }
 }

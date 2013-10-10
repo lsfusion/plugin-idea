@@ -2,12 +2,10 @@ package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.classes.LSFClassSet;
-import com.simpleplugin.psi.LSFClassName;
-import com.simpleplugin.psi.LSFClassNameList;
-import com.simpleplugin.psi.LSFId;
-import com.simpleplugin.psi.LSFSimpleName;
+import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFLocalPropDeclaration;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -57,8 +55,31 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     @Override
-    public String getPresentableDeclText() {
+    public String getPresentableText() {
         List<LSFClassSet> classes = resolveParamClasses();
         return getDeclName() + "(" + StringUtils.join(classes, ", ") + ")";
     }
+
+    @Override
+    public boolean resolveDuplicates() {
+        return resolveLocalDuplicates(this);
+    }
+    
+    private boolean resolveLocalDuplicates(PsiElement current) {
+        if (current instanceof LSFListAction) {
+            LSFListAction action = (LSFListAction) current;
+            for (PsiElement child : action.getChildren()) {
+                if (child instanceof LSFLocalPropDeclaration && !(this.equals(child))) {
+                    LSFLocalPropDeclaration local = (LSFLocalPropDeclaration) child;
+                    if (getDeclName().equals(local.getDeclName()) && LSFGlobalPropDeclarationImpl.resolveEquals(resolveParamClasses(), local.resolveParamClasses())) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        PsiElement parent = current.getParent();
+        
+        return !(parent == null || parent instanceof LSFFile) && resolveLocalDuplicates(parent);
+    } 
 }

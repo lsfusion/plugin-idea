@@ -11,16 +11,15 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.simpleplugin.psi.*;
-import com.simpleplugin.psi.context.ExtendParamContext;
-import com.simpleplugin.psi.context.ModifyParamContext;
-import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
+import com.simpleplugin.psi.declarations.*;
+import com.simpleplugin.psi.extend.LSFClassExtend;
+import com.simpleplugin.psi.extend.LSFFormExtend;
 import com.simpleplugin.psi.references.LSFPropReference;
 import com.simpleplugin.psi.references.LSFReference;
-import com.simpleplugin.typeinfer.MetaTypeInferAction;
-import com.simpleplugin.typeinfer.TypeInferAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.Set;
 
 public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private AnnotationHolder myHolder;
@@ -172,6 +171,129 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
+    @Override
+    public void visitPropertyStatement(@NotNull LSFPropertyStatement o) {
+        super.visitPropertyStatement(o);
+
+        if (o.resolveDuplicates()) {
+            addAlreadyDefinedError(o.getPropertyDeclaration(), o.getPresentableText());
+        }
+    }
+
+    @Override
+    public void visitNavigatorElementDeclaration(@NotNull LSFNavigatorElementDeclaration o) {
+        super.visitNavigatorElementDeclaration(o);
+
+        checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitWindowDeclaration(@NotNull LSFWindowDeclaration o) {
+        super.visitWindowDeclaration(o);
+
+        checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitGroupDeclaration(@NotNull LSFGroupDeclaration o) {
+        super.visitGroupDeclaration(o);
+
+        checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitClassDeclaration(@NotNull LSFClassDeclaration o) {
+        super.visitClassDeclaration(o);
+
+        checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitFormDeclaration(@NotNull LSFFormDeclaration o) {
+        super.visitFormDeclaration(o);
+
+        checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitTableDeclaration(@NotNull LSFTableDeclaration o) {
+        super.visitTableDeclaration(o);
+        
+        checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitMetaDeclaration(@NotNull LSFMetaDeclaration o) {
+        super.visitMetaDeclaration(o);
+        
+        checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitClassExtend(@NotNull LSFClassExtend o) {
+        super.visitClassExtend(o);
+        
+        Set<LSFStaticObjectDeclaration> staticObjectDuplicates = o.resolveStaticObjectDuplicates();
+        for (LSFStaticObjectDeclaration so : staticObjectDuplicates) {
+            addAlreadyDefinedError(so);
+        }
+    }
+
+    @Override
+    public void visitFormExtend(@NotNull LSFFormExtend o) {
+        super.visitFormExtend(o);
+
+//        java.util.Set<? extends LSFDeclaration> duplicates = o.resolveDuplicates();
+//        for (LSFDeclaration decl : duplicates) {
+//            addAlreadyDefinedError(decl);
+//        }
+    }
+
+    @Override
+    public void visitFormDecl(@NotNull LSFFormDecl o) {
+        super.visitFormDecl(o);
+
+        java.util.Set<? extends LSFDeclaration> duplicates = ((LSFFormExtend) o.getParent()).resolveDuplicates();
+        for (LSFDeclaration decl : duplicates) {
+            addAlreadyDefinedError(decl);
+        }
+    }
+
+    @Override
+    public void visitExtendingFormDeclaration(@NotNull LSFExtendingFormDeclaration o) {
+        super.visitExtendingFormDeclaration(o);
+
+        java.util.Set<? extends LSFDeclaration> duplicates = ((LSFFormExtend) o.getParent()).resolveDuplicates();
+        for (LSFDeclaration decl : duplicates) {
+            addAlreadyDefinedError(decl);
+        }
+    }
+
+    @Override
+    public void visitNonEmptyClassParamDeclareList(@NotNull LSFNonEmptyClassParamDeclareList o) {
+        super.visitNonEmptyClassParamDeclareList(o);
+
+        java.util.List<LSFClassParamDeclare> params = o.getClassParamDeclareList();
+        for (int i = 0; i < params.size(); i++) {
+            LSFId id1 = params.get(i).getParamDeclare().getNameIdentifier();
+            for (int j = 0; j < params.size(); j++) {
+                if (i != j) {
+                    if (id1.getText().equals(params.get(j).getParamDeclare().getNameIdentifier().getText())) {
+                        addAlreadyDefinedError(id1, id1.getText());
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void visitLocalPropDeclaration(@NotNull LSFLocalPropDeclaration o) {
+        super.visitLocalPropDeclaration(o);
+
+        checkAlreadyDefined(o);
+    }
+
     private boolean checkReference(LSFReference reference) {
         Annotation errorAnnotation = reference.resolveErrorAnnotation(myHolder);
         if (!isInMetaDecl(reference) && errorAnnotation != null) {
@@ -180,13 +302,29 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
         return true;
     }
+    
+    private void checkAlreadyDefined(LSFDeclaration declaration) {
+        if (declaration.resolveDuplicates()) {
+            addAlreadyDefinedError(declaration);
+        }
+    }
+    
+    private void addAlreadyDefinedError(LSFDeclaration decl) {
+        addAlreadyDefinedError(decl.getNameIdentifier(), decl.getPresentableText());
+    }
+    
+    private void addAlreadyDefinedError(PsiElement element, String elementPresentableText) {
+        Annotation annotation = myHolder.createErrorAnnotation(element, "'" + elementPresentableText + "' is already defined");
+        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+        addError(element, annotation);
+    }
 
-    private void addError(LSFReference reference, Annotation annotation) {
+    private void addError(PsiElement element, Annotation annotation) {
         if (errorsSearchMode) {
-            ShowErrorsAction.showErrorMessage(reference, annotation.getMessage());
+            ShowErrorsAction.showErrorMessage(element, annotation.getMessage());
         }
         TextAttributes error = annotation.getEnforcedTextAttributes() == null ? ERROR : annotation.getEnforcedTextAttributes();
-        if(isInMetaUsage(reference))
+        if(isInMetaUsage(element))
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);
     }

@@ -15,7 +15,9 @@ import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.LSFReferenceAnnotator;
 import com.simpleplugin.classes.LSFClassSet;
-import com.simpleplugin.psi.*;
+import com.simpleplugin.psi.Finalizer;
+import com.simpleplugin.psi.LSFClassName;
+import com.simpleplugin.psi.LSFGlobalResolver;
 import com.simpleplugin.psi.context.PropertyUsageContext;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
@@ -238,7 +240,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                         for(int j=0;j<size;j++) 
                             if(i!=j) {
                                 List<LSFClassSet> classesJ = mapClasses.get(listMapClasses.get(j));
-                                if(LSFPsiImplUtil.containsAll(classesI, classesJ, true)) {
+                                if(LSFPsiImplUtil.containsAll(classesI, classesJ, true) && !LSFPsiImplUtil.containsAll(classesJ, classesI, true)) {
                                     found = true;
                                     break;
                                 }

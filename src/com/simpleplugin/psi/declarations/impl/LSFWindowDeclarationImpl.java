@@ -7,6 +7,8 @@ import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.declarations.LSFWindowDeclaration;
 import com.simpleplugin.psi.stubs.WindowStubElement;
+import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
+import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,5 +36,10 @@ public abstract class LSFWindowDeclarationImpl extends LSFFullNameDeclarationImp
     @Override
     public Icon getIcon(int flags) {
         return AllIcons.RunConfigurations.Applet;
+    }
+
+    @Override
+    protected FullNameStubElementType getType() {
+        return LSFStubElementTypes.WINDOW;
     }
 }
