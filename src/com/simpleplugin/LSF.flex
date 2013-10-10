@@ -59,11 +59,15 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   {DIGIT}{2} : {DIGIT}{2}               { return LEX_TIME_LITERAL; }
   "#" {HEX_DIGIT}{6}                    { return LEX_COLOR_LITERAL; }
 
-  "$" {DIGITS}                            { return NUMBERED_PARAM; }
-  "$" {FIRST_ID_LETTER} {NEXT_ID_LETTER}* { return RECURSIVE_PARAM; }
+  "$"                                   { return DOLLAR; }
 
   "==" | "!="                           { return EQ_OPERAND; }
-  "<" | ">" | "<=" | ">="               { return REL_OPERAND; }
+  "<="                                  { return LESS_EQUALS; }
+  "<"                                   { return LESS; }
+  ">="                                  { return GREATER_EQUALS; }
+  ">"                                   { return GREATER; }
+  
+  "?"                                   { return QUESTION;}
 
   "-"                                   { return MINUS; }
   "+"                                   { return PLUS; }
@@ -99,6 +103,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "ADDOBJ"                  			{ return ADDOBJ; }
   "ADDSESSIONFORM"          			{ return ADDSESSIONFORM; }
   "AFTER"                   			{ return AFTER; }
+  "GOAFTER"                   			{ return GOAFTER; }
   "AGGPROP"                 			{ return AGGPROP; }
   "AGGR"                    			{ return AGGR; }
   "ALL"                     			{ return ALL; }

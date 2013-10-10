@@ -45,7 +45,7 @@ public class LSFSyntaxHighlighter extends SyntaxHighlighterBase {
         return new FlexAdapter(new LSFLexer((Reader) null));
     }
 
-    Set<IElementType> operands = new HashSet<IElementType>(Arrays.asList(new IElementType[] {LSFTypes.RBRAC, LSFTypes.EQ_OPERAND, LSFTypes.REL_OPERAND, LSFTypes.MINUS, 
+    Set<IElementType> operands = new HashSet<IElementType>(Arrays.asList(new IElementType[] {LSFTypes.RBRAC, LSFTypes.EQ_OPERAND, LSFTypes.LESS, LSFTypes.GREATER, LSFTypes.LESS_EQUALS, LSFTypes.GREATER_EQUALS, LSFTypes.MINUS, 
                         LSFTypes.PLUS, LSFTypes.MULT_OPERAND, LSFTypes.ADDOR_OPERAND, LSFTypes.SEMI, LSFTypes.COLON, LSFTypes.COMMA, LSFTypes.POINT, LSFTypes.EQUAL, LSFTypes.PLUSEQ, LSFTypes.ARROW, LSFTypes.FOLLOWS, LSFTypes.LBRAC, LSFTypes.RBRAC, LSFTypes.LBRACE, LSFTypes.RBRACE, LSFTypes.LSQBR, LSFTypes.RSQBR, LSFTypes.ATSIGN}));
            
     Set<IElementType> nonStringLiterals = new HashSet<IElementType>(Arrays.asList(new IElementType[] {LSFTypes.LEX_UINT_LITERAL, 

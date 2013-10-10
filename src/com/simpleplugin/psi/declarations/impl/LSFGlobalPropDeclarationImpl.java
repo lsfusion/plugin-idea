@@ -126,9 +126,8 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             if(actionDef != null) {
                 if(params == null)
                     params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(actionDef.getExprParameterUsageList()));
-                if(params == null)
-                    throw new UnsupportedOperationException();
-                inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finish(); 
+                if(params != null) // может быть action unfriendly
+                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finish(); 
             } else {
                 PsiElement element = unfriendlyPD.getContextIndependentPD().getChildren()[0]; // лень создавать отдельный параметр или интерфейс
                 if(element instanceof LSFGroupPropertyDefinition) {

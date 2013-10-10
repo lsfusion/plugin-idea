@@ -3,6 +3,7 @@ package com.simpleplugin.typeinfer;
 import com.intellij.openapi.util.Pair;
 import com.simpleplugin.BaseUtils;
 import com.simpleplugin.LSFPsiImplUtil;
+import com.simpleplugin.classes.DataClass;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
 
@@ -29,8 +30,19 @@ public class Inferred {
         return result;
     }
     
+    private static Map<LSFExprParamDeclaration, LSFClassSet> overrideClasses(Map<LSFExprParamDeclaration, LSFClassSet> oldClasses, Map<LSFExprParamDeclaration, LSFClassSet> newClasses) {
+        Map<LSFExprParamDeclaration, LSFClassSet> result = new HashMap<LSFExprParamDeclaration, LSFClassSet>(oldClasses);
+        for(Map.Entry<LSFExprParamDeclaration, LSFClassSet> paramClass : newClasses.entrySet()) {
+            LSFExprParamDeclaration param = paramClass.getKey();
+            LSFClassSet newClass = paramClass.getValue();
+            if(!(newClass == null && (result.get(param) instanceof DataClass)))
+                result.put(param, newClass);
+        }
+        return result;
+
+    }
     public InferResult finish() {
-        final Map<LSFExprParamDeclaration, LSFClassSet> result = BaseUtils.override(applyCompared(notParams, notCompared), applyCompared(params, compared));
+        final Map<LSFExprParamDeclaration, LSFClassSet> result = overrideClasses(applyCompared(notParams, notCompared), applyCompared(params, compared));
         return new InferResult() {
             public LSFClassSet get(LSFExprParamDeclaration decl) {
                 return result.get(decl);
@@ -103,15 +115,15 @@ public class Inferred {
     }
     
     public Inferred override(Inferred inferred) {
-        return new Inferred(BaseUtils.override(params, inferred.params), inferred.compared, BaseUtils.override(notParams, inferred.notParams), inferred.notCompared); 
+        return new Inferred(overrideClasses(applyCompared(params, compared), inferred.params), inferred.compared, overrideClasses(applyCompared(notParams, notCompared), inferred.notParams), inferred.notCompared); 
     }
 
     private static Map<LSFExprParamDeclaration, LSFClassSet> opParams(Map<LSFExprParamDeclaration, LSFClassSet> or1, Map<LSFExprParamDeclaration, LSFClassSet> or2, boolean or) {
         Map<LSFExprParamDeclaration, LSFClassSet> result = new HashMap<LSFExprParamDeclaration, LSFClassSet>(or1);
         for(Map.Entry<LSFExprParamDeclaration, LSFClassSet> decl : or2.entrySet()) {
-            LSFClassSet orClass = result.get(decl.getKey());
-            if(orClass!=null)
-                orClass = LSFPsiImplUtil.op(orClass, decl.getValue(), or);
+            LSFClassSet orClass;
+            if(result.containsKey(decl.getKey()))
+                orClass = LSFPsiImplUtil.op(result.get(decl.getKey()), decl.getValue(), or);
             else
                 orClass = decl.getValue();
             result.put(decl.getKey(), orClass);

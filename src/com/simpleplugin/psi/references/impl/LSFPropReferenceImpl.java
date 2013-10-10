@@ -15,8 +15,7 @@ import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.LSFReferenceAnnotator;
 import com.simpleplugin.classes.LSFClassSet;
-import com.simpleplugin.psi.Finalizer;
-import com.simpleplugin.psi.LSFGlobalResolver;
+import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.context.PropertyUsageContext;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration;
@@ -189,7 +188,25 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     private List<LSFClassSet> getUsageContext() {
         return PsiTreeUtil.getParentOfType(this, PropertyUsageContext.class).resolveParamClasses();        
     }
-    
+
+    protected abstract LSFNonEmptyExplicitPropClassList getNonEmptyExplicitPropClassList();
+
+    @Nullable
+    private List<LSFClassSet> getExplicitClasses() {
+        LSFNonEmptyExplicitPropClassList neList = getNonEmptyExplicitPropClassList();
+        if(neList == null)
+            return null;
+        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        for(LSFExplicitPropClass explPropClass : neList.getExplicitPropClassList()) {
+            LSFClassName className = explPropClass.getClassName();
+            if(className != null)
+                result.add(LSFPsiImplUtil.resolveClass(className));
+            else
+                result.add(null);
+        }
+        return result;
+    }
+
     private PropertyUsageContext getPropertyUsageContext() {
         return PsiTreeUtil.getParentOfType(this, PropertyUsageContext.class);
     }
@@ -240,13 +257,26 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
 
     private Condition<LSFPropDeclaration> getDeclCondition() {
         final List<LSFClassSet> usageClasses = getUsageContext();
-        if(usageClasses == null)
+        final List<LSFClassSet> explicitClasses = getExplicitClasses();
+                
+        if(usageClasses == null && explicitClasses == null)
             return Condition.TRUE;
 
         return new Condition<LSFPropDeclaration>() {
             public boolean value(LSFPropDeclaration decl) {
                 List<LSFClassSet> declClasses = decl.resolveParamClasses();
                 if(declClasses == null)
+                    return true;
+                
+                if(explicitClasses != null) {
+                    if(declClasses.size() != explicitClasses.size())
+                        return false;
+
+                    if(!LSFPsiImplUtil.containsAll(declClasses, explicitClasses, false)) // подходят по классам
+                        return false;                        
+                }                    
+                
+                if(usageClasses == null)
                     return true;
                 
                 if(declClasses.size()!=usageClasses.size())

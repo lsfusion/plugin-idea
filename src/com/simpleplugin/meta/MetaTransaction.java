@@ -304,7 +304,7 @@ public class MetaTransaction {
 
         @Override
         public String toString() {
-            return super.toString();    //To change body of overridden methods use File | Settings | File Templates.
+            return text;
         }
     }
     
@@ -357,7 +357,11 @@ public class MetaTransaction {
                 declChanged.add(metaDecl);
             }                
         }
+        
+        int current = 0;
         for(LSFMetaDeclaration decl : declChanged) {
+            System.out.println("META " + ((double)current++)/declChanged.size());
+            
             // для meta Decl генерим мета-код, "разбавляем" его табуляциями и строим "обратное" отображение - изменения в базовом ASTNode
             List<Pair<String, IElementType>> texts = decl.getMetaCode();
             List<String> declParams = decl.getDeclParams();

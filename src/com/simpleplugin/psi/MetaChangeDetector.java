@@ -487,7 +487,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                             metaUsage.setVersion(version);
 
                             boolean removed = usagesPending.processing.remove(metaUsage); // все равно плохо, изменение еще не "сохранено", а declPending уже обработаться и не найти этот usage
-                            assert removed;
+//                            assert removed;
                             
                             iterator.remove();
                         }

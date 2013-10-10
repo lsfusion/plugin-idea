@@ -1,5 +1,8 @@
 package com.simpleplugin.typeinfer;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.psi.PsiElement;
 import com.simpleplugin.BaseUtils;
 import com.simpleplugin.classes.LSFClassSet;
@@ -62,4 +65,42 @@ public class TypeInferer {
             else
                 typeInfer(child, transaction);        
     }
+
+    private static void recFindNotInferred(PsiElement element, Set<LSFExprParamDeclaration> currentParams, LSFMetaCodeStatement statement) {
+        if(element instanceof ModifyParamContext) {
+            if(!(element instanceof ExtendParamContext))
+                currentParams = new HashSet<LSFExprParamDeclaration>();
+
+            boolean unfr = false;
+            ModifyParamContext modifyContext = (ModifyParamContext)element;
+            if(element instanceof LSFPropertyStatement) {
+                LSFPropertyStatement ps = (LSFPropertyStatement)element;
+                if(ps.getExpressionUnfriendlyPD()!=null)
+                    unfr = true;
+            }
+            
+            ContextModifier contextModifier = modifyContext.getContextModifier();
+            Set<LSFExprParamDeclaration> params = new HashSet<LSFExprParamDeclaration>(contextModifier.resolveParams(Integer.MAX_VALUE, currentParams));
+            if(!unfr) {
+                for(LSFExprParamDeclaration param : params) {
+                    LSFClassSet resClass = param.resolveClass();
+                    if(resClass == null) {
+    //                    Notifications.Bus.notify(new Notificati(on("unResolved", "Unresolved", element.getContainingFile().getName() + " " + element.getTextRange(), NotificationType.INFORMATION));
+                        
+                        System.out.println(element.getContainingFile().getName() + " " + (statement == null ? "NO" : statement.getMetacodeUsage().getText()) + " " + element.getText());
+                        break;
+                    }
+                }
+            }
+            currentParams = BaseUtils.merge(currentParams, params);
+        }
+
+        for(PsiElement child : element.getChildren())
+            recFindNotInferred(child, currentParams, element instanceof LSFMetaCodeStatement ? (LSFMetaCodeStatement)element : statement);
+    }
+
+    public static void findNotInferred(LSFFile file) {
+        recFindNotInferred(file, new HashSet<LSFExprParamDeclaration>(), null);
+    }
+
 }

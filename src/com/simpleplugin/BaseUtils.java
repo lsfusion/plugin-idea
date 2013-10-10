@@ -57,6 +57,10 @@ public class BaseUtils {
         result.putAll(override);
         return result;
     }
+    
+    public static <K> K nvl(K el1, K el2) {
+        return el1 != null ? el1 : el2; 
+    }
 
     public static <K> Set<K> merge(Set<K> set1, Set<K> set2) {
         Set<K> result = new HashSet<K>(set1);

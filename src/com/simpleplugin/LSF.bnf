@@ -118,7 +118,7 @@ groupStatement ::= GROUP simpleNameWithCaption (COLON groupUsage)? SEMI
 ////////////////////////////////////////////////////////////////////////////////
 
 propertyStatement ::= propertyDeclaration EQUAL
-                      (expressionUnfriendlyPD | propertyExpression | NATIVE)
+                      (expressionUnfriendlyPD | propertyExpression)
                       propertyOptions
                       (SEMI)?
 {mixin="com.simpleplugin.psi.declarations.impl.LSFGlobalPropDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration, com.simpleplugin.psi.context.ModifyParamContext"
@@ -151,7 +151,7 @@ andPE ::= notPE (AND notPE)*
 notPE ::= (NOT notPE) | equalityPE
 
 equalityPE ::= relationalPE (EQ_OPERAND relationalPE)?
-relationalPE ::= additiveORPE ((REL_OPERAND additiveORPE) | typePropertyDefinition)?
+relationalPE ::= additiveORPE (((LESS | GREATER | LESS_EQUALS | GREATER_EQUALS) additiveORPE) | typePropertyDefinition)?
 additiveORPE ::= additivePE (ADDOR_OPERAND additivePE)*
 additivePE ::= multiplicativePE ((PLUS | MINUS) multiplicativePE)*
 multiplicativePE ::= unaryMinusPE (MULT_OPERAND unaryMinusPE)*
@@ -179,6 +179,7 @@ expressionUnfriendlyPD ::= contextIndependentPD | actionPropertyDefinition
 {methods = [ resolveUnfriendValueClass resolveValueParamClasses]}
 
 contextIndependentPD ::= dataPropertyDefinition
+                    |   nativePropertyDefinition
 	                |   abstractActionPropertyDefinition
                     |   abstractPropertyDefinition
 	                |   formulaPropertyDefinition
@@ -251,6 +252,9 @@ noContextPropertyUsage ::= propertyUsage
 dataPropertyDefinition ::= DATA (SESSION)? className LBRAC classNameList RBRAC
 {implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
 
+nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
+{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
+
 abstractPropertyDefinition ::= ABSTRACT (((CASE | MULTI) (OVERRIDE | EXCLUSIVE)?) | OVERRIDE | EXCLUSIVE)? (CHECKED)? className LBRAC classNameList RBRAC
 {implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
 
@@ -258,11 +262,12 @@ formulaPropertyDefinition ::= FORMULA (builtInClassName)? stringLiteral
 {implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
 
 groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | GEQUAL | LAST
-groupPropertyBy ::= BY nonEmptyPropertyExpressionList; 
+groupPropertyBy ::= BY nonEmptyPropertyExpressionList;
+orderPropertyBy ::= ORDER (DESC)? nonEmptyPropertyExpressionList 
 groupPropertyDefinition ::= GROUP groupingType
 		                    nonEmptyPropertyExpressionList
 		                    (groupPropertyBy)?
-		                    (ORDER (DESC)? nonEmptyPropertyExpressionList)?
+		                    (orderPropertyBy)?
 		                    (WHERE propertyExpression)?
 {implements="com.simpleplugin.psi.context.ModifyParamContext, com.simpleplugin.psi.context.UnfriendlyPE" methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses ] }		                    
 
@@ -385,7 +390,7 @@ formActionObjectList ::=
 		formActionObjectUsage
 		(COMMA formActionObjectUsage)*
 
-customActionPropertyDefinitionBody ::= CUSTOM stringLiteral
+customActionPropertyDefinitionBody ::= CUSTOM stringLiteral (LBRAC classNameList RBRAC)?
 {implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
 
 addFormActionPropertyDefinitionBody ::= ADDFORM (SESSION)? customClassUsage
@@ -724,7 +729,7 @@ eventStatement ::= WHEN baseEvent propertyExpression inlineStatement
 globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody (SEMI)? {pin=1
 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer getIcon ] } // ;?
 
-baseEvent ::= (APPLY | SESSION)? (FORMS nonEmptyFormUsageList)?
+baseEvent ::= (APPLY | SESSION)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmptyNoContextPropertyUsageList)?
 
 inlineStatement ::=   (NOINLINE (LBRAC exprParameterUsageList RBRAC)? )? (INLINE)?
 
@@ -1004,7 +1009,7 @@ literal ::=
         ulongLiteral
 	|	uintLiteral
 	|	udoubleLiteral
-	|	LEX_UNUMERIC_LITERAL
+	|	unumericLiteral
 	|	stringLiteral
 	|	booleanLiteral
 	|	dateTimeLiteral
@@ -1036,7 +1041,7 @@ groupObjectUsage ::= simpleName
 exprParameterNameUsage ::= classParamDeclare
 {mixin="com.simpleplugin.psi.references.impl.LSFExprParamReferenceImpl" implements="com.simpleplugin.psi.references.LSFExprParamReference"}
 
-exprParameterUsage ::= exprParameterNameUsage | NUMBERED_PARAM | RECURSIVE_PARAM // can be used for param and object simultaneously, for use in exprs
+exprParameterUsage ::= ((DOLLAR)? exprParameterNameUsage) | (DOLLAR LEX_UINT_LITERAL) // can be used for param and object simultaneously, for use in exprs
 
 // global
 
@@ -1049,7 +1054,9 @@ moduleUsage ::= simpleName
 namespaceUsage ::= simpleName
 {mixin="com.simpleplugin.psi.references.impl.LSFNamespaceReferenceImpl" implements="com.simpleplugin.psi.references.LSFNamespaceReference"}
 
-propertyUsage ::= compoundID
+explicitPropClass ::= className | QUESTION 
+nonEmptyExplicitPropClassList ::= explicitPropClass (COMMA explicitPropClass)*
+propertyUsage ::= compoundID (LESS nonEmptyExplicitPropClassList GREATER)?
 {mixin="com.simpleplugin.psi.references.impl.LSFPropReferenceImpl" implements="com.simpleplugin.psi.references.LSFPropReference"}
 
 tableUsage ::= compoundID
@@ -1090,12 +1097,13 @@ colorLiteral ::= LEX_COLOR_LITERAL | (RGB LBRAC uintLiteral COMMA uintLiteral CO
 stringLiteral ::= LEX_STRING_LITERAL
 intLiteral ::= (MINUS)? uintLiteral
 longLiteral ::=  (MINUS)? ulongLiteral
-doubleLiteral ::= (MINUS)? LEX_UNUMERIC_LITERAL
+doubleLiteral ::= (MINUS)? unumericLiteral
 dateLiteral ::= LEX_DATE_LITERAL
 dateTimeLiteral ::= LEX_DATETIME_LITERAL
 timeLiteral ::= LEX_TIME_LITERAL
 booleanLiteral ::= LEX_LOGICAL_LITERAL
 udoubleLiteral ::= LEX_UDOUBLE_LITERAL
+unumericLiteral ::= LEX_UNUMERIC_LITERAL
 uintLiteral ::= LEX_UINT_LITERAL
 ulongLiteral ::= LEX_ULONG_LITERAL
 nullLiteral ::= NULL
