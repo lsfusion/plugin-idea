@@ -1,6 +1,7 @@
 package com.simpleplugin.psi.declarations;
 
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.simpleplugin.psi.LSFElement;
 import com.simpleplugin.psi.LSFId;
@@ -13,6 +14,10 @@ public interface LSFDeclaration extends LSFElement, PsiNameIdentifierOwner, Item
     @Nullable
     @Override
     LSFId getNameIdentifier();
-    
+
     boolean resolveDuplicates();
+
+    PsiElement[] processImplementationsSearch();
+
+    PsiElement[] processExtensionsSearch();
 }

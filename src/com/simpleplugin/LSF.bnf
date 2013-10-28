@@ -1139,7 +1139,7 @@ propertyEditTypeLiteral ::= EDITABLE | READONLY | SELECTOR
 
 modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN
 
-formPrintTypeLiteral ::= PRINT (AUTO)?
+formPrintTypeLiteral ::= PRINT (AUTO | XLS | PDF)?
 
 formSessionScopeLiteral ::= OLDSESSION | NEWSESSION | MANAGESESSION
 

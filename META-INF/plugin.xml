@@ -1,116 +1,131 @@
 <idea-plugin version="2">
-  <id>com.yourcompany.unique.plugin.id</id>
-  <name>Plugin display name here</name>
-  <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <id>com.yourcompany.unique.plugin.id</id>
+    <name>Plugin display name here</name>
+    <version>1.0</version>
+    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
       Enter short description for your plugin here.<br>
       <small>most HTML tags may be used</small>
       ]]></description>
 
-  <change-notes><![CDATA[
+    <change-notes><![CDATA[
       Add change notes here.<br>
       <small>most HTML tags may be used</small>
       ]]>
-  </change-notes>
+    </change-notes>
 
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="107.105"/>
+    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="107.105"/>
 
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
+    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-      <component>
-          <implementation-class>com.simpleplugin.psi.MetaChangeDetector</implementation-class>
-          <skipForDefaultProject/>
-      </component>
+    <project-components>
+        <!-- Add your project components here -->
+        <component>
+            <implementation-class>com.simpleplugin.psi.MetaChangeDetector</implementation-class>
+            <skipForDefaultProject/>
+        </component>
 
-  </project-components>
+    </project-components>
 
-  <actions>
-    <!-- Add your actions here -->
-      <action id="MetaCode.Enable" class="com.simpleplugin.MetaCodeEnableAction" text="Toggle _meta" description="Toggle meta code mode">
-          <add-to-group group-id="CodeMenu"/>
-          <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
-      </action>
-      <action id="MetaCode.Refresh" class="com.simpleplugin.MetaRefreshAction" text="Refresh _meta" description="Refresh meta code">
-          <add-to-group group-id="CodeMenu"/>
-      </action>
-      <action id="MetaCode.ShowFile" class="com.simpleplugin.MetaShowFileAction" text="Show _meta for file" description="Show meta code for current file">
-          <add-to-group group-id="CodeMenu"/>
-          <keyboard-shortcut first-keystroke="control alt shift J" keymap="$default"/>
-      </action>
-      <action id="MetaCode.HideFile" class="com.simpleplugin.MetaHideFileAction" text="Hide _meta for file" description="Hide meta code for current file">
-          <add-to-group group-id="CodeMenu"/>
-          <keyboard-shortcut first-keystroke="control alt shift K" keymap="$default"/>
-      </action>
-      <action id="MetaCode.SyncMode" class="com.simpleplugin.MetaSyncModeAction" text="Meta sync mode" description="Toggle meta code sync mode">
-          <add-to-group group-id="CodeMenu"/>
-      </action>
-      <action id="Errors" class="com.simpleplugin.ShowErrorsAction" text="Show errors" description="Show all current errors in all files">
-          <add-to-group group-id="CodeMenu"/>
-          <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
-      </action>
-      <action id="TypeInfer.File" class="com.simpleplugin.typeinfer.FileTypeInferAction" text="Infer _types for file" description="Infer types for file">
-          <add-to-group group-id="CodeMenu"/>
-          <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>
-      </action>
-      <action id="TypeInfer.Project" class="com.simpleplugin.typeinfer.ProjectTypeInferAction" text="Infer _types for project" description="Infer types for project">
-          <add-to-group group-id="CodeMenu"/>
-          <keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>
-      </action>
-      <action id="TypeInfer.Check" class="com.simpleplugin.typeinfer.FindNotInferredAction" text="Find not inferred" description="Find not inferred elements for project">
-          <add-to-group group-id="CodeMenu"/>
-      </action>
-  </actions>
+    <actions>
+        <!-- Add your actions here -->
+        <action id="MetaCode.Enable" class="com.simpleplugin.MetaCodeEnableAction" text="Toggle _meta"
+                description="Toggle meta code mode">
+            <add-to-group group-id="CodeMenu"/>
+            <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
+        </action>
+        <action id="MetaCode.Refresh" class="com.simpleplugin.MetaRefreshAction" text="Refresh _meta"
+                description="Refresh meta code">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
+        <action id="MetaCode.ShowFile" class="com.simpleplugin.MetaShowFileAction" text="Show _meta for file"
+                description="Show meta code for current file">
+            <add-to-group group-id="CodeMenu"/>
+            <keyboard-shortcut first-keystroke="control alt shift J" keymap="$default"/>
+        </action>
+        <action id="MetaCode.HideFile" class="com.simpleplugin.MetaHideFileAction" text="Hide _meta for file"
+                description="Hide meta code for current file">
+            <add-to-group group-id="CodeMenu"/>
+            <keyboard-shortcut first-keystroke="control alt shift K" keymap="$default"/>
+        </action>
+        <action id="MetaCode.SyncMode" class="com.simpleplugin.MetaSyncModeAction" text="Meta sync mode"
+                description="Toggle meta code sync mode">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
+        <action id="Errors" class="com.simpleplugin.ShowErrorsAction" text="Show errors"
+                description="Show all current errors in all files">
+            <add-to-group group-id="CodeMenu"/>
+            <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
+        </action>
+        <action id="TypeInfer.File" class="com.simpleplugin.typeinfer.FileTypeInferAction" text="Infer _types for file"
+                description="Infer types for file">
+            <add-to-group group-id="CodeMenu"/>
+            <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>
+        </action>
+        <action id="TypeInfer.Project" class="com.simpleplugin.typeinfer.ProjectTypeInferAction"
+                text="Infer _types for project" description="Infer types for project">
+            <add-to-group group-id="CodeMenu"/>
+            <keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>
+        </action>
+        <action id="TypeInfer.Check" class="com.simpleplugin.typeinfer.FindNotInferredAction" text="Find not inferred"
+                description="Find not inferred elements for project">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
+        <action id="GoToExtension" class="com.simpleplugin.GoToExtensionAction" text="Extension(s)"
+                description="Navigate to the extension(s) of the selected element">
+            <add-to-group group-id="GoToCodeGroup"/>
+            <keyboard-shortcut first-keystroke="control alt E" keymap="$default"/>
+        </action>
+    </actions>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
-      <fileTypeFactory implementation="com.simpleplugin.LSFFileTypeFactory"/>
-      <lang.parserDefinition language="Lsf" implementationClass="com.simpleplugin.LSFParserDefinition"/>
-      <lang.findUsagesProvider language="Lsf" implementationClass="com.simpleplugin.LSFFindUsagesProvider"/>
-      <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.simpleplugin.LSFSyntaxHighlighterFactory"/>
-      <lang.braceMatcher language="Lsf" implementationClass="com.simpleplugin.LSFBraceMatcher"/>
-      <lang.commenter language="Lsf" implementationClass="com.simpleplugin.LSFCommenter"/>
-      <lang.foldingBuilder language="Lsf" implementationClass="com.simpleplugin.folding.LSFFoldingBuilder"/>
-      <annotator language="Lsf" implementationClass="com.simpleplugin.LSFReferenceAnnotator" />
-      <readWriteAccessDetector implementation="com.simpleplugin.LSFReadWriteAccessDetector"/>
-      <fileStructureGroupRuleProvider implementation="com.simpleplugin.LSFStatementGroupRuleProvider"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <fileTypeFactory implementation="com.simpleplugin.LSFFileTypeFactory"/>
+        <lang.parserDefinition language="Lsf" implementationClass="com.simpleplugin.LSFParserDefinition"/>
+        <lang.findUsagesProvider language="Lsf" implementationClass="com.simpleplugin.LSFFindUsagesProvider"/>
+        <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.simpleplugin.LSFSyntaxHighlighterFactory"/>
+        <lang.braceMatcher language="Lsf" implementationClass="com.simpleplugin.LSFBraceMatcher"/>
+        <lang.commenter language="Lsf" implementationClass="com.simpleplugin.LSFCommenter"/>
+        <lang.foldingBuilder language="Lsf" implementationClass="com.simpleplugin.folding.LSFFoldingBuilder"/>
+        <annotator language="Lsf" implementationClass="com.simpleplugin.LSFReferenceAnnotator"/>
+        <readWriteAccessDetector implementation="com.simpleplugin.LSFReadWriteAccessDetector"/>
+        <fileStructureGroupRuleProvider implementation="com.simpleplugin.LSFStatementGroupRuleProvider"/>
+        <definitionsSearch implementation="com.simpleplugin.ImplementationsSearch"/>
 
-      <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
+        <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
 
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.MetaIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ModuleIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.PropIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ClassIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ExplicitNamespaceIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.FormIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.GroupIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.TableIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.WindowIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.NavigatorElementIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.MetaIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ModuleIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.PropIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ClassIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ExplicitNamespaceIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.FormIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.GroupIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.TableIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.WindowIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.NavigatorElementIndex"/>
 
-      <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendFormIndex"/>
-      <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendClassIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendFormIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendClassIndex"/>
 
-      <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ClassExtendsClassIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ClassExtendsClassIndex"/>
 
-      <stubElementTypeHolder class="com.simpleplugin.psi.LSFTypes"/>
-      <gotoClassContributor implementation="com.simpleplugin.LSFClassContributor"/>
-      <gotoSymbolContributor implementation="com.simpleplugin.LSFSymbolContributor"/>
+        <stubElementTypeHolder class="com.simpleplugin.psi.LSFTypes"/>
+        <gotoClassContributor implementation="com.simpleplugin.LSFClassContributor"/>
+        <gotoSymbolContributor implementation="com.simpleplugin.LSFSymbolContributor"/>
 
-      <checkinHandlerFactory implementation="com.simpleplugin.LSFCheckInHandlerFactory"/>
+        <checkinHandlerFactory implementation="com.simpleplugin.LSFCheckInHandlerFactory"/>
 
-      <fileDocumentSynchronizationVetoer implementation="com.simpleplugin.JarDocumentSavingVetoer"/>
-  </extensions>
+        <fileDocumentSynchronizationVetoer implementation="com.simpleplugin.JarDocumentSavingVetoer"/>
+    </extensions>
 </idea-plugin>

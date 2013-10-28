@@ -1,9 +1,12 @@
 package com.simpleplugin.psi.declarations.impl;
 
+import com.intellij.find.findUsages.DefaultFindUsagesHandlerFactory;
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.BaseUtils;
 import com.simpleplugin.LSFPsiImplUtil;
@@ -20,10 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclarationImpl<LSFGlobalPropDeclaration, PropStubElement> implements LSFGlobalPropDeclaration {
 
@@ -51,24 +51,24 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     public LSFClassSet resolveValueClass(boolean infer) {
         LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
-        if(unfr!=null)
+        if (unfr != null)
             return unfr.resolveUnfriendValueClass(infer);
 
         LSFPropertyExpression expr = getPropertyExpression();
-        if(expr!=null)
+        if (expr != null)
             return expr.resolveValueClass(infer);
 
-        return null; 
+        return null;
     }
 
     @Nullable
     private List<LSFClassSet> resolveValueParamClasses() {
         LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
-        if(unfr!=null)
+        if (unfr != null)
             return unfr.resolveValueParamClasses();
 
         LSFPropertyExpression expr = getPropertyExpression();
-        if(expr!=null)
+        if (expr != null)
             return LSFPsiImplUtil.resolveValueParamClasses(expr);
 
         return null;
@@ -81,25 +81,25 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         LSFPropertyDeclaration decl = getPropertyDeclaration();
         LSFClassParamDeclareList cpd = decl.getClassParamDeclareList();
         List<LSFClassSet> declareClasses = null;
-        if(cpd!=null) {
+        if (cpd != null) {
             declareClasses = LSFPsiImplUtil.resolveClass(cpd);
-            if(LSFPsiImplUtil.allClassesDeclared(declareClasses)) // оптимизация
+            if (LSFPsiImplUtil.allClassesDeclared(declareClasses)) // оптимизация
                 return declareClasses;
         }
 
         List<LSFClassSet> valueClasses = resolveValueParamClasses();
-        if(valueClasses == null)
+        if (valueClasses == null)
             return declareClasses;
-            
-        if(declareClasses == null)
+
+        if (declareClasses == null)
             return valueClasses;
 
         List<LSFClassSet> mixed = new ArrayList<LSFClassSet>(declareClasses);
-        for(int i=0,size=declareClasses.size();i<size;i++) {
-            if(i >= valueClasses.size())
+        for (int i = 0, size = declareClasses.size(); i < size; i++) {
+            if (i >= valueClasses.size())
                 break;
-            
-            if(declareClasses.get(i) == null)
+
+            if (declareClasses.get(i) == null)
                 mixed.set(i, valueClasses.get(i));
         }
         return mixed;
@@ -110,7 +110,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     public List<LSFClassSet> inferParamClasses(LSFClassSet valueClass) {
 
         List<LSFClassSet> resultClasses = resolveParamClasses();
-        if(resultClasses == null)
+        if (resultClasses == null)
             return null;
 
         //        LSFActionPropertyDefinition action = sourceStatement.getActionPropertyDefinition();
@@ -119,24 +119,24 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         List<LSFExprParamDeclaration> params = null;
         LSFPropertyDeclaration decl = getPropertyDeclaration();
         LSFClassParamDeclareList cpd = decl.getClassParamDeclareList();
-        if(cpd!=null)
+        if (cpd != null)
             params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(cpd));
 
         InferResult inferredClasses = null;
         LSFExpressionUnfriendlyPD unfriendlyPD = getExpressionUnfriendlyPD();
-        if(unfriendlyPD != null) {
+        if (unfriendlyPD != null) {
             LSFActionPropertyDefinition actionDef = unfriendlyPD.getActionPropertyDefinition();
-            if(actionDef != null) {
-                if(params == null)
+            if (actionDef != null) {
+                if (params == null)
                     params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(actionDef.getExprParameterUsageList()));
-                if(params != null) // может быть action unfriendly
-                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finish(); 
+                if (params != null) // может быть action unfriendly
+                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finish();
             } else {
                 PsiElement element = unfriendlyPD.getContextIndependentPD().getChildren()[0]; // лень создавать отдельный параметр или интерфейс
-                if(element instanceof LSFGroupPropertyDefinition) {
+                if (element instanceof LSFGroupPropertyDefinition) {
                     List<LSFClassSet> inferredValueClasses = LSFPsiImplUtil.inferValueParamClasses((LSFGroupPropertyDefinition) element);
-                    for(int i=0;i<resultClasses.size();i++)
-                        if(resultClasses.get(i) == null && i<inferredValueClasses.size()) { // не определены, возьмем выведенные
+                    for (int i = 0; i < resultClasses.size(); i++)
+                        if (resultClasses.get(i) == null && i < inferredValueClasses.size()) { // не определены, возьмем выведенные
                             resultClasses.set(i, inferredValueClasses.get(i));
                         }
                     return resultClasses;
@@ -144,17 +144,17 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             }
         } else {
             LSFPropertyExpression expr = getPropertyExpression();
-            if(expr!=null) {
-                if(params == null)        
-                    params = expr.resolveParams();            
-                
+            if (expr != null) {
+                if (params == null)
+                    params = expr.resolveParams();
+
                 inferredClasses = LSFPsiImplUtil.inferParamClasses(expr, valueClass).finish();
             }
         }
-        if(inferredClasses != null) {
+        if (inferredClasses != null) {
             assert resultClasses.size() == params.size();
-            for(int i=0;i<resultClasses.size();i++)
-                if(resultClasses.get(i) == null) { // не определены, возьмем выведенные
+            for (int i = 0; i < resultClasses.size(); i++)
+                if (resultClasses.get(i) == null) { // не определены, возьмем выведенные
                     resultClasses.set(i, inferredClasses.get(params.get(i)));
                 }
         }
@@ -180,7 +180,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         String paramsString = "";
         if (paramClasses != null) {
             int i = 0;
-            for (Iterator<LSFClassSet> iterator = paramClasses.iterator(); iterator.hasNext();) {
+            for (Iterator<LSFClassSet> iterator = paramClasses.iterator(); iterator.hasNext(); ) {
                 LSFClassSet classSet = iterator.next();
                 if (classSet != null) {
                     paramsString += classSet;
@@ -196,7 +196,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         } else if (params != null) {
             paramsString += StringUtils.join(params, ", ");
         }
-        
+
         return getDeclName() + "(" + paramsString + ")";
     }
 
@@ -210,12 +210,12 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return new Condition<LSFGlobalPropDeclaration>() {
             @Override
             public boolean value(LSFGlobalPropDeclaration decl) {
-                return getNameIdentifier().getText().equals(decl.getNameIdentifier().getText()) && 
-                        resolveEquals(resolveParamClasses(),  decl.resolveParamClasses());
+                return getNameIdentifier().getText().equals(decl.getNameIdentifier().getText()) &&
+                        resolveEquals(resolveParamClasses(), decl.resolveParamClasses());
             }
         };
     }
-    
+
     public static boolean resolveEquals(List<LSFClassSet> list1, List<LSFClassSet> list2) {
         if (list1 == null && list2 == null) {
             return true;
@@ -236,6 +236,21 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             }
         }
 
-        return true;    
+        return true;
+    }
+
+    @Override
+    public PsiElement[] processExtensionsSearch() {
+        DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
+        Collection<PsiReference> refs = fact.createFindUsagesHandler(getNameIdentifier(), false).findReferencesToHighlight(getNameIdentifier(), GlobalSearchScope.allScope(getProject()));
+
+        List<PsiElement> result = new ArrayList<PsiElement>();
+        for (PsiReference ref : refs) {
+            if (((PsiElement) ref).getParent().getParent() instanceof LSFOverrideStatement) {
+                LSFOverrideStatement override = (LSFOverrideStatement) ((PsiElement) ref).getParent().getParent();
+                result.add(override.getMappedPropertyClassParamDeclare().getPropertyUsage());
+            }
+        }
+        return result.toArray(new PsiElement[result.size()]);
     }
 }

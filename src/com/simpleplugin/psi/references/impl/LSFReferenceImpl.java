@@ -5,11 +5,11 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiPolyVariantReference;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.ResolveResult;
+import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.util.IncorrectOperationException;
 import com.simpleplugin.LSFDeclarationResolveResult;
@@ -21,8 +21,11 @@ import com.simpleplugin.psi.LSFResolveUtil;
 import com.simpleplugin.psi.LSFResolver;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
 import com.simpleplugin.psi.references.LSFReference;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -84,7 +87,7 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     @Override
     public LSFId resolve() {
         T decl = resolveDecl();
-        if(decl == null)
+        if (decl == null)
             return null;
         return decl.getNameIdentifier();
     }
@@ -104,7 +107,7 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     public LSFDeclarationResolveResult multiResolveDecl(boolean incompleteCode) {
         return ResolveCache.getInstance(getProject()).resolveWithCaching(this, LSFResolver.INSTANCE, true, incompleteCode);
     }
-    
+
     public LSFDeclarationResolveResult.ErrorAnnotator resolveDefaultErrorAnnotator(final Collection<? extends LSFDeclaration> decls) {
         LSFDeclarationResolveResult.ErrorAnnotator errorAnnotator = null;
         if (decls.isEmpty()) {
@@ -129,17 +132,17 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     public Annotation resolveErrorAnnotation(final AnnotationHolder holder) {
         return multiResolveDecl(true).resolveErrorAnnotation(holder);
     }
-    
+
     public Annotation resolveAmbiguousErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> declarations) {
         Annotation annotation = holder.createErrorAnnotation(getTextRange(), "Ambiguous reference");
         annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-        return annotation;   
+        return annotation;
     }
-    
+
     public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations) {
         return holder.createErrorAnnotation(getTextRange(), "Cannot resolve symbol '" + getNameRef() + "'");
     }
-    
+
     protected abstract void fillListVariants(Collection<String> variants);
 
     @NotNull
@@ -147,7 +150,7 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     public Object[] getVariants() {
         List<String> stringVariants = new ArrayList<String>();
         fillListVariants(stringVariants);
-        
+
         List<LookupElement> variants = new ArrayList<LookupElement>();
         for (final String property : stringVariants) {
             variants.add(LookupElementBuilder.create(property).
@@ -163,5 +166,69 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         LSFDeclarationResolveResult decls = multiResolveDecl(true);
         return LSFResolveUtil.toCandidateInfoArray(new ArrayList<PsiElement>(decls.declarations));
+    }
+
+    public static String getPresentableText(LSFReference ref) {
+        return ref.getNameRef();
+    }
+
+    public static String getLocationString(LSFReference ref) {
+        final PsiFile file = ref.getLSFFile();
+        final Document document = PsiDocumentManager.getInstance(ref.getProject()).getDocument(file);
+        final SmartPsiElementPointer pointer = SmartPointerManager.getInstance(ref.getProject()).createSmartPsiElementPointer(ref);
+        final Segment range = pointer.getRange();
+        int lineNumber = -1;
+        int linePosition = -1;
+        if (document != null && range != null) {
+            lineNumber = document.getLineNumber(range.getStartOffset()) + 1;
+            linePosition = range.getStartOffset() - document.getLineStartOffset(lineNumber - 1) + 1;
+        }
+
+        return file.getName() + "(" + lineNumber + ":" + linePosition + ")";
+    }
+
+    public static Icon getIcon(LSFReference ref, boolean unused) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public String getPresentableText() {
+        return getPresentableText(this);
+    }
+
+    @Nullable
+    @Override
+    public String getLocationString() {
+        return getLocationString(this);
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(boolean unused) {
+        return getIcon(this, unused);
+    }
+
+    @Override
+    public ItemPresentation getPresentation() {
+        return this;
+    }
+
+    public static PsiElement setName(LSFReference element, @NonNls @NotNull String name) throws IncorrectOperationException {
+        throw new IncorrectOperationException();
+    }
+
+    @Override
+    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
+        return setName(this, name);
+    }
+
+    public static String getName(LSFReference ref) {
+        return ref.getNameRef();
+    }
+
+    @Override
+    public String getName() {
+        return getName(this);
     }
 }

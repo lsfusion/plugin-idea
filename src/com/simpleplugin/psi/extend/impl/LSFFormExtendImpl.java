@@ -30,10 +30,10 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     }
 
     @Nullable
-    protected abstract LSFExtendingFormDeclaration getExtendingFormDeclaration();
+    public abstract LSFExtendingFormDeclaration getExtendingFormDeclaration();
 
     @Nullable
-    protected abstract LSFFormDecl getFormDecl();
+    public abstract LSFFormDecl getFormDecl();
 
     @NotNull
     protected abstract List<LSFFormGroupObjectsList> getFormGroupObjectsListList();
@@ -47,31 +47,31 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     @Override
     public String getGlobalName() {
         ExtendFormStubElement stub = getStub();
-        if(stub!=null)
+        if (stub != null)
             return stub.getGlobalName();
 
         LSFExtendingFormDeclaration extend = getExtendingFormDeclaration();
-        if(extend!=null)
+        if (extend != null)
             return extend.getFormUsage().getNameRef();
-        
-        return getFormDecl().getGlobalName(); 
+
+        return getFormDecl().getGlobalName();
     }
 
     @Override
     public LSFFullNameDeclaration resolveDecl() {
         LSFFormDecl formDecl = getFormDecl();
-        if(formDecl!=null)
+        if (formDecl != null)
             return formDecl;
-        
+
         return getExtendingFormDeclaration().getFormUsage().resolveDecl();
     }
 
     @Override
     public Collection<LSFObjectDeclaration> getObjectDecls() {
         Collection<LSFObjectDeclaration> result = new ArrayList<LSFObjectDeclaration>();
-        for(LSFFormGroupObjectsList formGroupObject : getFormGroupObjectsListList())
+        for (LSFFormGroupObjectsList formGroupObject : getFormGroupObjectsListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFObjectDeclaration.class));
-        for(LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())
+        for (LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFObjectDeclaration.class));
         return result;
     }
@@ -79,23 +79,23 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     @Override
     public Collection<LSFGroupObjectDeclaration> getGroupObjectDecls() {
         Collection<LSFGroupObjectDeclaration> result = new ArrayList<LSFGroupObjectDeclaration>();
-        for(LSFFormGroupObjectsList formGroupObject : getFormGroupObjectsListList())
+        for (LSFFormGroupObjectsList formGroupObject : getFormGroupObjectsListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFGroupObjectDeclaration.class));
-        for(LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())
+        for (LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFGroupObjectDeclaration.class));
         return result;
     }
 
-    
+
     @Override
     public Collection<LSFPropertyDrawDeclaration> getPropertyDrawDecls() {
         Collection<LSFPropertyDrawDeclaration> result = new ArrayList<LSFPropertyDrawDeclaration>();
         result.addAll(LSFElementGenerator.getBuiltInFormProps(getProject()));
-        for(LSFFormPropertiesList formProperties : getFormPropertiesListList())
+        for (LSFFormPropertiesList formProperties : getFormPropertiesListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formProperties, LSFPropertyDrawDeclaration.class));
         return result;
     }
-    
+
     public Set<LSFDeclaration> resolveDuplicates() {
         Query<LSFFormExtend> extendForms = LSFGlobalResolver.findExtendElements(resolveDecl(), LSFStubElementTypes.EXTENDFORM, getLSFFile());
 
@@ -103,7 +103,7 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         duplicates.addAll(resolveDuplicates((List<LSFGroupObjectDeclaration>) getGroupObjectDecls(), LSFGroupObjectDeclarationImpl.getProcessor(), extendForms));
         duplicates.addAll(resolveDuplicates((List<LSFPropertyDrawDeclaration>) getPropertyDrawDecls(), LSFPropertyDrawDeclarationImpl.getProcessor(), extendForms));
         duplicates.addAll(resolveDuplicates((List<LSFObjectDeclaration>) getObjectDecls(), LSFObjectDeclarationImpl.getProcessor(), extendForms));
-        
+
         return duplicates;
     }
 
@@ -145,12 +145,12 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
 
         return duplicates;
     }
-    
+
     private void checkAndAddDuplicate(Set<LSFDeclaration> duplicates, LSFDeclaration decl) {
         if (decl.getContainingFile().equals(getContainingFile()) &&
                 !(decl instanceof LSFObjectDeclaration && decl.getParent() instanceof LSFFormSingleGroupObjectDeclaration)) {// 
             duplicates.add(decl);
-        }   
+        }
     }
 
     @Nullable

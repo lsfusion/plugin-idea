@@ -35,7 +35,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             errorsSearchMode = false;
         }
     }
-    
+
     public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder holder, boolean errorsSearchMode) {
         this.errorsSearchMode = errorsSearchMode;
         annotate(psiElement, holder);
@@ -49,7 +49,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitElement(@NotNull PsiElement o) {
-        if(o instanceof LeafPsiElement && isInMetaUsage(o)) { // фокус в том что побеждает наибольший приоритет, но важно следить что у верхнего правила всегда приоритет выше, так как в противном случае annotator просто херится
+        if (o instanceof LeafPsiElement && isInMetaUsage(o)) { // фокус в том что побеждает наибольший приоритет, но важно следить что у верхнего правила всегда приоритет выше, так как в противном случае annotator просто херится
             Annotation annotation = myHolder.createInfoAnnotation(o.getTextRange(), null);
             annotation.setEnforcedTextAttributes(META_USAGE);
         }
@@ -58,14 +58,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitPropertyUsage(@NotNull LSFPropertyUsage o) {
         super.visitPropertyUsage(o);
-        if(checkReference(o) && !o.isDirect())
+        if (checkReference(o) && !o.isDirect())
             addIndirectProp(o);
     }
 
     @Override
     public void visitPropertySelector(@NotNull LSFPropertySelector o) {
         super.visitPropertySelector(o);
-        
+
         checkReference(o);
     }
 
@@ -78,55 +78,55 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitFormUsage(@NotNull LSFFormUsage o) {
         super.visitFormUsage(o);
-        
+
         checkReference(o);
     }
 
     @Override
     public void visitTableUsage(@NotNull LSFTableUsage o) {
         super.visitTableUsage(o);
-        
+
         checkReference(o);
     }
 
     @Override
     public void visitGroupUsage(@NotNull LSFGroupUsage o) {
         super.visitGroupUsage(o);
-        
+
         checkReference(o);
     }
 
-/*    @Override
-    public void visitModifyParamContext(@NotNull ModifyParamContext o) {
-        super.visitModifyParamContext(o);
-        
-        if(!(o instanceof ExtendParamContext) && PsiTreeUtil.getParentOfType(o, ModifyParamContext.class) == null) {
-            Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Infer type");
-            annotation.registerFix(new TypeInferAction(o));
+    /*    @Override
+        public void visitModifyParamContext(@NotNull ModifyParamContext o) {
+            super.visitModifyParamContext(o);
+            
+            if(!(o instanceof ExtendParamContext) && PsiTreeUtil.getParentOfType(o, ModifyParamContext.class) == null) {
+                Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Infer type");
+                annotation.registerFix(new TypeInferAction(o));
+            }
         }
-    }
-*/
+    */
     @Override
     public void visitWindowUsage(@NotNull LSFWindowUsage o) {
         super.visitWindowUsage(o);
-        
+
         checkReference(o);
     }
 
     @Override
     public void visitNavigatorElementUsage(@NotNull LSFNavigatorElementUsage o) {
         super.visitNavigatorElementUsage(o);
-        
+
         checkReference(o);
     }
 
     @Override
     public void visitExprParameterNameUsage(@NotNull LSFExprParameterNameUsage o) {
         super.visitExprParameterNameUsage(o);
-        
+
         checkReference(o);
-        
-        if(o.resolveDecl()==o.getClassParamDeclare().getParamDeclare())
+
+        if (o.resolveDecl() == o.getClassParamDeclare().getParamDeclare())
             addImplicitDecl(o);
     }
 
@@ -154,6 +154,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         return PsiTreeUtil.getParentOfType(o, LSFMetaCodeDeclarationStatement.class) != null;
         //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
     }
+
     @Override
     public void visitMetaCodeStatement(@NotNull LSFMetaCodeStatement o) {
         super.visitMetaCodeStatement(o);
@@ -165,7 +166,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitMetaCodeDeclarationStatement(o);
 
         LSFAnyTokens statements = o.getAnyTokens();
-        if(statements!=null) {
+        if (statements != null) {
             Annotation annotation = myHolder.createInfoAnnotation(statements.getTextRange(), "");
             annotation.setEnforcedTextAttributes(META_DECL);
         }
@@ -218,35 +219,25 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitTableDeclaration(@NotNull LSFTableDeclaration o) {
         super.visitTableDeclaration(o);
-        
+
         checkAlreadyDefined(o);
     }
 
     @Override
     public void visitMetaDeclaration(@NotNull LSFMetaDeclaration o) {
         super.visitMetaDeclaration(o);
-        
+
         checkAlreadyDefined(o);
     }
 
     @Override
     public void visitClassExtend(@NotNull LSFClassExtend o) {
         super.visitClassExtend(o);
-        
+
         Set<LSFStaticObjectDeclaration> staticObjectDuplicates = o.resolveStaticObjectDuplicates();
         for (LSFStaticObjectDeclaration so : staticObjectDuplicates) {
             addAlreadyDefinedError(so);
         }
-    }
-
-    @Override
-    public void visitFormExtend(@NotNull LSFFormExtend o) {
-        super.visitFormExtend(o);
-
-//        java.util.Set<? extends LSFDeclaration> duplicates = o.resolveDuplicates();
-//        for (LSFDeclaration decl : duplicates) {
-//            addAlreadyDefinedError(decl);
-//        }
     }
 
     @Override
@@ -302,17 +293,17 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
         return true;
     }
-    
+
     private void checkAlreadyDefined(LSFDeclaration declaration) {
         if (declaration.resolveDuplicates()) {
             addAlreadyDefinedError(declaration);
         }
     }
-    
+
     private void addAlreadyDefinedError(LSFDeclaration decl) {
         addAlreadyDefinedError(decl.getNameIdentifier(), decl.getPresentableText());
     }
-    
+
     private void addAlreadyDefinedError(PsiElement element, String elementPresentableText) {
         Annotation annotation = myHolder.createErrorAnnotation(element, "'" + elementPresentableText + "' is already defined");
         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
@@ -324,7 +315,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             ShowErrorsAction.showErrorMessage(element, annotation.getMessage());
         }
         TextAttributes error = annotation.getEnforcedTextAttributes() == null ? ERROR : annotation.getEnforcedTextAttributes();
-        if(isInMetaUsage(element))
+        if (isInMetaUsage(element))
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);
     }
@@ -332,7 +323,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void addIndirectProp(LSFPropReference reference) {
         final Annotation annotation = myHolder.createWarningAnnotation(reference.getTextRange(), "Indirect usage");
         TextAttributes error = IMPLICIT_DECL;
-        if(isInMetaUsage(reference))
+        if (isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);
     }
@@ -340,7 +331,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void addImplicitDecl(LSFReference reference) {
         final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Implicit declaration");
         TextAttributes error = IMPLICIT_DECL;
-        if(isInMetaUsage(reference))
+        if (isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);
     }

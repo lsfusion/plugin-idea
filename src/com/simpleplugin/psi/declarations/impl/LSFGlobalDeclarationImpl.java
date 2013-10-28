@@ -27,7 +27,7 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
     @Override
     public String getDeclName() {
         Stub stub = getStub();
-        if(stub!=null)
+        if (stub != null)
             return stub.getGlobalName();
 
         return getName();
@@ -71,5 +71,15 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
     @Override
     public String getGlobalName() {
         return getDeclName();
+    }
+
+    @Override
+    public PsiElement[] processImplementationsSearch() {
+        return processExtensionsSearch();
+    }
+
+    @Override
+    public PsiElement[] processExtensionsSearch() {
+        return PsiElement.EMPTY_ARRAY;
     }
 }
