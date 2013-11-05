@@ -106,6 +106,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "GOAFTER"                   			{ return GOAFTER; }
   "AGGPROP"                 			{ return AGGPROP; }
   "AGGR"                    			{ return AGGR; }
+  "NAGGR"                    			{ return NAGGR; }
   "ALL"                     			{ return ALL; }
   "AND"                     			{ return AND; }
   "APPLY"                   			{ return APPLY; }

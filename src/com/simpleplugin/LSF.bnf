@@ -261,7 +261,7 @@ abstractPropertyDefinition ::= ABSTRACT (((CASE | MULTI) (OVERRIDE | EXCLUSIVE)?
 formulaPropertyDefinition ::= FORMULA (builtInClassName)? stringLiteral
 {implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
 
-groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | GEQUAL | LAST
+groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | GEQUAL | LAST | NAGGR
 groupPropertyBy ::= BY nonEmptyPropertyExpressionList;
 orderPropertyBy ::= ORDER (DESC)? nonEmptyPropertyExpressionList 
 groupPropertyDefinition ::= GROUP groupingType
