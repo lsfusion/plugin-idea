@@ -225,6 +225,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "INTERSECT"               			{ return INTERSECT; }
   "IS"                      			{ return IS; }
   "JOIN"                    			{ return JOIN; }
+  "LAST"                                { return LAST; }
   "LEFT"                    			{ return LEFT; }
   "LIMIT"                   			{ return LIMIT; }
   "LIST"                    			{ return LIST; }

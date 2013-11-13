@@ -241,7 +241,7 @@ sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 {implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
 
-propertyExprObject ::= (LSQBR (propertyExpression | expressionUnfriendlyPD) RSQBR)
+propertyExprObject ::= (LSQBR EQUAL (propertyExpression | expressionUnfriendlyPD) RSQBR)
 {implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
 
 propertyObject ::=  propertyUsage | propertyExprObject
@@ -1056,7 +1056,7 @@ namespaceUsage ::= simpleName
 
 explicitPropClass ::= className | QUESTION 
 nonEmptyExplicitPropClassList ::= explicitPropClass (COMMA explicitPropClass)*
-propertyUsage ::= compoundID (LESS nonEmptyExplicitPropClassList GREATER)?
+propertyUsage ::= compoundID (LSQBR nonEmptyExplicitPropClassList RSQBR)?
 {mixin="com.simpleplugin.psi.references.impl.LSFPropReferenceImpl" implements="com.simpleplugin.psi.references.LSFPropReference"}
 
 tableUsage ::= compoundID
