@@ -380,11 +380,14 @@ formActionPropertyDefinitionBody ::=
 	    FORM formUsage
 		(OBJECTS formActionObjectList)?
         (CONTEXTFILTER formActionObjectUsage)?
+		(initFilterDefinition)?
 		(formSessionScopeLiteral)?
 		(modalityTypeLiteral)?
 		(CHECK)? (SHOWDROP)?
 		(formPrintTypeLiteral)?
 {implements="com.simpleplugin.psi.context.ActionExpression, com.simpleplugin.psi.context.FormContext" methods = [inferActionParamClasses] }
+
+initFilterDefinition ::= INITFILTER formPropertyDraw
 
 formActionObjectList ::=
 		formActionObjectUsage
@@ -594,6 +597,7 @@ formPropertyOptionsList ::= (	propertyEditTypeLiteral
                             |	HINTNOUPDATE
                             |   HINTTABLE
                             |   TOOLBAR
+                            |   OPTIMISTICASYNC
                             |	COLUMNS LBRAC nonEmptyGroupObjectUsageList RBRAC
                             |	SHOWIF formCalcPropertyObject
                             |	READONLYIF formCalcPropertyObject
@@ -849,7 +853,6 @@ extendDesignDeclaration ::= EXTEND DESIGN formUsage
 
 componentStatementBody ::=  LBRACE
                             (	setObjectPropertyStatement
-                            |	positionComponentsStatement
                             |	setupComponentStatement
                             |	setupGroupObjectStatement
                             |	newComponentStatement
@@ -886,8 +889,6 @@ componentSelector ::=   PARENT LBRAC componentSelector RBRAC
 propertySelector ::= formMappedProperty | compoundID // compoundID?
 {mixin="com.simpleplugin.psi.references.impl.LSFPropertyDrawReferenceImpl" implements="com.simpleplugin.psi.references.LSFPropertyDrawReference"}
 
-positionComponentsStatement ::= POSITION componentSelector simplexConstraintLiteral (componentSelector)? SEMI
-
 setObjectPropertyStatement ::= ID EQUAL componentPropertyValue SEMI
 
 componentPropertyValue ::=  colorLiteral
@@ -896,7 +897,6 @@ componentPropertyValue ::=  colorLiteral
                         |	doubleLiteral
                         |	dimensionLiteral
                         |	booleanLiteral
-                        |	simplexConstraintLiteral
                         |	boundsIntLiteral
                         |	boundsDoubleLiteral
                         |   containerTypeLiteral
@@ -1113,13 +1113,6 @@ nullOption ::= NULL
 dimensionLiteral ::= LBRAC intLiteral COMMA intLiteral RBRAC
 boundsIntLiteral ::= LBRAC intLiteral COMMA intLiteral COMMA intLiteral COMMA intLiteral RBRAC
 boundsDoubleLiteral ::= LBRAC doubleLiteral COMMA doubleLiteral COMMA doubleLiteral COMMA doubleLiteral RBRAC
-
-simplexConstraintLiteral ::=
-        TO THE LEFT
-	|	TO THE RIGHT
-	|	TO THE BOTTOM
-	|	TO THE RIGHTBOTTOM
-	|	TO NOT INTERSECT
 
 insertRelativePositionLiteral ::= BEFORE | AFTER
 

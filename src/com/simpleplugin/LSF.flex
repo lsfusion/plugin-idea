@@ -222,7 +222,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "INIT"                    			{ return INIT; }
   "INLINE"                  			{ return INLINE; }
   "INPUT"                   			{ return INPUT; }
-  "INTERSECT"               			{ return INTERSECT; }
   "IS"                      			{ return IS; }
   "JOIN"                    			{ return JOIN; }
   "LAST"                                { return LAST; }
@@ -262,6 +261,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "OLDSESSION"              			{ return OLDSESSION; }
   "ON"                      			{ return ON; }
   "OPENFILE"                			{ return OPENFILE; }
+  "OPTIMISTICASYNC"                     { return OPTIMISTICASYNC; }
   "OR"                      			{ return OR; }
   "ORDER"                   			{ return ORDER; }
   "OVERRIDE"                			{ return OVERRIDE; }
@@ -294,7 +294,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "RETURN"                  			{ return RETURN; }
   "RGB"                     			{ return RGB; }
   "RIGHT"                   			{ return RIGHT; }
-  "RIGHTBOTTOM"             			{ return RIGHTBOTTOM; }
   "ROUND"                   			{ return ROUND; }
   "RTF"                     			{ return RTF; }
   "SEEK"                    			{ return SEEK; }
@@ -320,7 +319,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "TABLE"                   			{ return TABLE; }
   "TEXTHALIGN"              			{ return TEXTHALIGN; }
   "TEXTVALIGN"              			{ return TEXTVALIGN; }
-  "THE"                     			{ return THE; }
   "THEN"                    			{ return THEN; }
   "TITLE"                   			{ return TITLE; }
   "TO"                      			{ return TO; }
