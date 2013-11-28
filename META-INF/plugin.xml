@@ -1,17 +1,16 @@
 <idea-plugin version="2">
     <id>com.yourcompany.unique.plugin.id</id>
-    <name>Plugin display name here</name>
+    <name>lsFusion support</name>
     <version>1.0</version>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <small>most HTML tags may be used</small>
+      Plugin adds editing and navigation support for lsFusion scripting files (*.lsf)
       ]]></description>
 
     <change-notes><![CDATA[
-      Add change notes here.<br>
-      <small>most HTML tags may be used</small>
+      <b>Version 1.0.</b><br>
+      <p>Initial version</p>
       ]]>
     </change-notes>
 

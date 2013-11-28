@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/plugin-idea.iml" filepath="$PROJECT_DIR$/plugin-idea.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lsfusion-idea-plugin.iml" filepath="$PROJECT_DIR$/lsfusion-idea-plugin.iml" />
     </modules>
   </component>
 </project>
