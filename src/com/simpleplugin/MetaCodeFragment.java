@@ -57,7 +57,6 @@ public class MetaCodeFragment {
     }
 
     public List<MetaTransaction.InToken> getNewTokens(List<MetaTransaction.InToken> params, List<List<MetaTransaction.ExtToken>> oldTokens) {
-        assert params.size() == parameters.size();
         ArrayList<MetaTransaction.InToken> newTokens = new ArrayList<MetaTransaction.InToken>();
         List<IElementType> newTokTypes = new ArrayList<IElementType>();
 
@@ -119,9 +118,12 @@ public class MetaCodeFragment {
 
     private MetaTransaction.InToken transformedToken(List<MetaTransaction.InToken> actualParams, String token, Result<Boolean> transformed) {
         int index = parameters.indexOf(token);
-        transformed.setResult(index >= 0);
-        if (index >= 0)
+        if(index >= 0 && index < actualParams.size()) {
+            transformed.setResult(true);
             return actualParams.get(index);
+        }
+
+        transformed.setResult(false);
         return new MetaTransaction.InToken(token, 1);
     }
 
