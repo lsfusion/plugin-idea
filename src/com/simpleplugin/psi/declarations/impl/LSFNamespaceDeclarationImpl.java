@@ -1,8 +1,8 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.declarations.LSFNamespaceDeclaration;
 import com.simpleplugin.psi.stubs.NamespaceStubElement;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ public abstract class LSFNamespaceDeclarationImpl<This extends LSFNamespaceDecla
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.Actions.Module;
+        return LSFIcons.NAMESPACE;
     }
 
     @Override

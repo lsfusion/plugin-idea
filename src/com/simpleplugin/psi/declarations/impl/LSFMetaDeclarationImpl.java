@@ -1,12 +1,12 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.LSFParserDefinition;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFMetaDeclaration;
@@ -38,21 +38,21 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
 
     @Override
     public boolean isCorrect() {
-        return super.isCorrect() && getAnyTokens()!=null;
+        return super.isCorrect() && getAnyTokens() != null;
     }
 
     @Override
     public int getParamCount() {
         MetaStubElement stub = getStub();
-        if(stub != null)
+        if (stub != null)
             return stub.getParamCount();
 
         return getDeclParams().size();
     }
 
     private void recReadMetaWhiteSpaceOrComments(ASTNode node, boolean prev, List<Pair<String, IElementType>> tokens) {
-        if(LSFParserDefinition.isWhiteSpaceOrComment(node.getElementType())) {
-            if(prev) {
+        if (LSFParserDefinition.isWhiteSpaceOrComment(node.getElementType())) {
+            if (prev) {
                 recReadMetaWhiteSpaceOrComments(node.getTreePrev(), prev, tokens);
                 tokens.add(new Pair<String, IElementType>(node.getText(), node.getElementType()));
             } else {
@@ -74,16 +74,16 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     }
 
     public PsiElement findOffsetInCode(int offset) {
-        return getAnyTokens().findElementAt(offset);        
+        return getAnyTokens().findElementAt(offset);
     }
 
     @Override
-    public List<Pair<String,IElementType>> getMetaCode() {
+    public List<Pair<String, IElementType>> getMetaCode() {
         List<Pair<String, IElementType>> tokens = new ArrayList<Pair<String, IElementType>>();
         ASTNode node = getAnyTokens().getNode();
 
         readMetaWhiteSpaceOrComments(node, true, tokens);
-        for(ASTNode anyToken : node.getChildren(null))
+        for (ASTNode anyToken : node.getChildren(null))
             tokens.add(new Pair<String, IElementType>(anyToken.getText(), anyToken.getElementType()));
         readMetaWhiteSpaceOrComments(node, false, tokens);
         return tokens;
@@ -93,8 +93,8 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     public List<String> getDeclParams() {
         List<String> result = new ArrayList<String>();
         LSFMetaDeclIdList metaDeclIdList = getMetaDeclIdList();
-        if(metaDeclIdList != null) {
-            for(LSFMetaDeclId decl : metaDeclIdList.getMetaDeclIdList())
+        if (metaDeclIdList != null) {
+            for (LSFMetaDeclId decl : metaDeclIdList.getMetaDeclIdList())
                 result.add(decl.getText());
         }
         return result;
@@ -108,7 +108,7 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.Nodes.AbstractMethod;
+        return LSFIcons.META_DECLARATION;
     }
 
     @Override
@@ -126,7 +126,7 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
         final int paramCount = getMetaDeclIdList().getMetaDeclIdList().size();
         return new Condition<LSFMetaDeclaration>() {
             public boolean value(LSFMetaDeclaration decl) {
-                return decl.getParamCount()==paramCount;
+                return decl.getParamCount() == paramCount;
             }
         };
     }

@@ -1,10 +1,10 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.LSFGlobalResolver;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleNameWithCaption;
@@ -42,7 +42,7 @@ public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.FileTypes.UiForm;
+        return LSFIcons.FORM;
     }
 
     @Override

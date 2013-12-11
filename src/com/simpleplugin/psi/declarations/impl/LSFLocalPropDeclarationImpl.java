@@ -1,8 +1,8 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.*;
@@ -21,7 +21,9 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     public abstract LSFSimpleName getSimpleName();
+
     protected abstract LSFClassName getClassName();
+
     protected abstract LSFClassNameList getClassNameList();
 
 
@@ -45,13 +47,13 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     @Override
     @NotNull
     public List<LSFClassSet> inferParamClasses(LSFClassSet valueClass) {
-        return resolveParamClasses(); 
+        return resolveParamClasses();
     }
-    
+
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.Nodes.Property;
+        return LSFIcons.PROPERTY;
     }
 
     @Override
@@ -64,7 +66,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     public boolean resolveDuplicates() {
         return resolveLocalDuplicates(this);
     }
-    
+
     private boolean resolveLocalDuplicates(PsiElement current) {
         if (current instanceof LSFListAction) {
             LSFListAction action = (LSFListAction) current;
@@ -79,7 +81,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
         }
 
         PsiElement parent = current.getParent();
-        
+
         return !(parent == null || parent instanceof LSFFile) && resolveLocalDuplicates(parent);
-    } 
+    }
 }

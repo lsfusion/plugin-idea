@@ -1,12 +1,12 @@
 package com.simpleplugin.psi.extend.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Query;
 import com.simpleplugin.LSFElementGenerator;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.*;
 import com.simpleplugin.psi.declarations.impl.*;
@@ -156,6 +156,6 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.FileTypes.UiForm;
+        return LSFIcons.FORM;
     }
 }

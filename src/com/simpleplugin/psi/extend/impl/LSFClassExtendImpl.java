@@ -1,8 +1,8 @@
 package com.simpleplugin.psi.extend.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import com.simpleplugin.psi.declarations.LSFFullNameDeclaration;
@@ -140,6 +140,6 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.Nodes.Class;
+        return LSFIcons.CLASS;
     }
 }

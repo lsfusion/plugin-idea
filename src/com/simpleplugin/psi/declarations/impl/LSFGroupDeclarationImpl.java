@@ -1,8 +1,8 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleNameWithCaption;
 import com.simpleplugin.psi.declarations.LSFGroupDeclaration;
@@ -34,7 +34,7 @@ public abstract class LSFGroupDeclarationImpl extends LSFFullNameDeclarationImpl
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.Actions.GroupByModuleGroup;
+        return LSFIcons.GROUP;
     }
 
     @Override

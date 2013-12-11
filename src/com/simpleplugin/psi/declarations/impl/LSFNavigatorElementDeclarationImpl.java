@@ -1,8 +1,8 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.declarations.LSFNavigatorElementDeclaration;
@@ -35,7 +35,7 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.ObjectBrowser.FlattenPackages;
+        return LSFIcons.NAVIGATOR_ELEMENT;
     }
 
     @Override

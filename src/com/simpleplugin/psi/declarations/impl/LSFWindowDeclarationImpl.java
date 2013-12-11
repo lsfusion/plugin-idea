@@ -1,8 +1,8 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.LSFId;
 import com.simpleplugin.psi.LSFSimpleName;
 import com.simpleplugin.psi.declarations.LSFWindowDeclaration;
@@ -35,7 +35,7 @@ public abstract class LSFWindowDeclarationImpl extends LSFFullNameDeclarationImp
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.RunConfigurations.Applet;
+        return LSFIcons.WINDOW;
     }
 
     @Override

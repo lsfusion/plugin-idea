@@ -1,8 +1,8 @@
 package com.simpleplugin.psi.declarations.impl;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.LSFObjectUsageList;
 import com.simpleplugin.psi.declarations.LSFPropertyDrawDeclaration;
 import com.simpleplugin.psi.extend.LSFFormExtend;
@@ -22,7 +22,7 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.Nodes.PropertyRead;
+        return LSFIcons.PROPERTY_DRAW;
     }
 
     public static Processor getProcessor() {
@@ -36,7 +36,7 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
     @Override
     public Condition getDuplicateCondition() {
         final LSFObjectUsageList objectUsageList = getObjectUsageList();
-        if(objectUsageList == null)
+        if (objectUsageList == null)
             return super.getDuplicateCondition();
 
         return new Condition<LSFPropertyDrawDeclaration>() {
@@ -44,7 +44,7 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
                 if (getSimpleName() == null && decl.getSimpleName() == null) {
                     return false;
                 }
-                return getNameIdentifier().getText().equals(decl.getNameIdentifier().getText()) && 
+                return getNameIdentifier().getText().equals(decl.getNameIdentifier().getText()) &&
                         LSFPropertyDrawReferenceImpl.resolveEquals(objectUsageList, decl.getObjectUsageList());
             }
         };

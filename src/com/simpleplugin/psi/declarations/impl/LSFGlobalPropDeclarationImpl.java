@@ -1,7 +1,6 @@
 package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.find.findUsages.DefaultFindUsagesHandlerFactory;
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
@@ -9,6 +8,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.BaseUtils;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.*;
@@ -165,7 +165,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return AllIcons.Nodes.Property;
+        return LSFIcons.PROPERTY;
     }
 
     @Override
