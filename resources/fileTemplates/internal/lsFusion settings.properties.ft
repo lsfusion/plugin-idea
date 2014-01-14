@@ -1,0 +1,14 @@
+# database server or 'server:port'
+db.server=${DB_SERVER}
+# database name
+db.name=${DB_NAME}
+# database username
+db.user=${DB_USER}
+# dtabase password
+db.password=${DB_PASSWORD}
+
+# lsfusion server port
+rmi.registryPort=${SERVER_PORT}
+
+# initial admin password
+logics.initialAdminPassword=${INITIAL_PASSWORD}

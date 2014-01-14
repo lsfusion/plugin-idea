@@ -11,6 +11,10 @@ public class LSFIcons {
     public static final Icon DESIGN = AllIcons.Actions.Edit;
     public static final Icon EVENT = AllIcons.Actions.Execute;
     public static final Icon FILE = IconLoader.getIcon("/com/simpleplugin/icons/lsf_file.png");
+    public static final Icon MODULE = IconLoader.getIcon("/com/simpleplugin/icons/lsf_module.png");
+    public static final Icon MODULE_2X = IconLoader.getIcon("/com/simpleplugin/icons/lsf_module_2x.png");
+    public static final Icon LIBRARY = IconLoader.getIcon("/com/simpleplugin/icons/lsf_module.png"); //todo:library.png
+    public static final Icon RUN = IconLoader.getIcon("/com/simpleplugin/icons/lsf_file.png"); //todo:run.png
     public static final Icon FOLLOWS = AllIcons.Duplicates.SendToTheRight;
     public static final Icon FORM = AllIcons.FileTypes.UiForm;
     public static final Icon GROUP = AllIcons.Actions.GroupByModuleGroup;

@@ -18,19 +18,23 @@ public class LSFFoldingBuilder implements FoldingBuilder {
     @Override
     public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
         List<FoldingDescriptor> list = new ArrayList<FoldingDescriptor>();
-        buildFolding(node, list);
+        buildFolding(document, node, list);
         FoldingDescriptor[] descriptors = new FoldingDescriptor[list.size()];
         return list.toArray(descriptors);
     }
 
-    private static void buildFolding(ASTNode node, List<FoldingDescriptor> list) {
+    private static void buildFolding(Document document, ASTNode node, List<FoldingDescriptor> list) {
         boolean isBlock = node.getElementType() == LSFTypes.META_CODE_BODY;
         if (isBlock && !node.getTextRange().isEmpty()) {
             final TextRange range = node.getTextRange();
+
+            //todo: найти правильное место для выставления read-only
+            document.createGuardedBlock(range.getStartOffset(), range.getEndOffset());
+
             list.add(new FoldingDescriptor(node, range));
         }
         for (ASTNode child : node.getChildren(null)) {
-            buildFolding(child, list);
+            buildFolding(document, child, list);
         }
     }
 

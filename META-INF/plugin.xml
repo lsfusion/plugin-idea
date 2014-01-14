@@ -1,7 +1,7 @@
 <idea-plugin version="2">
-    <id>com.yourcompany.unique.plugin.id</id>
+    <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,13 +9,15 @@
       ]]></description>
 
     <change-notes><![CDATA[
-      <b>Version 1.0.</b><br>
+      <b>Version 1.0</b><br>
       <p>Initial version</p>
+      <b>Version 1.0.1</b><br>
+      <p>New module type support</p>
       ]]>
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="107.105"/>
+    <idea-version since-build="133.331"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -85,6 +87,10 @@
             <add-to-group group-id="GoToCodeGroup"/>
             <keyboard-shortcut first-keystroke="control alt E" keymap="$default"/>
         </action>
+
+        <action id="NewLsfFile" class="com.simpleplugin.module.NewLsfFileAction">
+            <add-to-group group-id="NewGroup" anchor="first"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -102,6 +108,13 @@
         <definitionsSearch implementation="com.simpleplugin.ImplementationsSearch"/>
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
+
+        <internalFileTemplate name="lsFusion script"/>
+        <internalFileTemplate name="lsFusion settings"/>
+
+        <moduleBuilder builderClass="com.simpleplugin.module.LSFusionModuleBuilder"/>
+        <library.presentationProvider implementation="com.simpleplugin.module.LSFusionLibraryPresentationProvider"/>
+        <configurationType implementation="com.simpleplugin.module.run.LSFusionRunConfigurationType" />
 
         <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.MetaIndex"/>
         <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ModuleIndex"/>
