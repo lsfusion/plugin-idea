@@ -55,4 +55,8 @@ public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunCo
     protected JComponent createEditor() {
         return myWholePanel;
     }
+
+    @Override
+    protected void disposeEditor() {
+    }
 }

@@ -1,9 +1,9 @@
 package com.simpleplugin.module;
 
 import com.intellij.facet.impl.ui.libraries.LibraryCompositionSettings;
-import com.intellij.facet.impl.ui.libraries.LibraryOptionsPanel;
 import com.intellij.framework.library.FrameworkLibraryVersionFilter;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.ide.util.newProjectWizard.SelectTemplateStep;
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.SettingsStep;
@@ -14,7 +14,6 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainer;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainerFactory;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.io.FileUtil;
 import com.simpleplugin.LSFBundle;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +57,7 @@ public class LSFusionLibrarySettingsStep extends ModuleWizardStep {
         javaSettingsStep = JavaModuleType.getModuleType().modifySettingsStep(settingsStep, moduleBuilder);
         libraryPanel = createLibraryPanel();
 
-        JTextField moduleNameField = settingsStep.getModuleNameField();
+        JTextField moduleNameField = settingsStep instanceof SelectTemplateStep ? ((SelectTemplateStep) settingsStep).getModuleNameField() : null;
         settingsPanel = createSettingsPanel(moduleNameField);
 
         settingsStep.addSettingsField(LSFBundle.message("module.wizard.lsfusion.library"), libraryPanel.getSimplePanel());
@@ -69,7 +68,7 @@ public class LSFusionLibrarySettingsStep extends ModuleWizardStep {
         final LSFusionLibraryDescription libraryDescription = new LSFusionLibraryDescription();
         final String basePath = moduleBuilder.getContentEntryPath();
         final String baseDirPath = basePath != null ? FileUtil.toSystemIndependentName(basePath) : "";
-        return new LibraryOptionsPanel(libraryDescription, baseDirPath, FrameworkLibraryVersionFilter.ALL, librariesContainer, false);
+        return new LibraryOptionsPanel(libraryDescription, baseDirPath, FrameworkLibraryVersionFilter.ALL, librariesContainer);
     }
 
     private SettingsPanel createSettingsPanel(JTextField moduleNameField) {
@@ -117,6 +116,5 @@ public class LSFusionLibrarySettingsStep extends ModuleWizardStep {
     @Override
     public void disposeUIResources() {
         javaSettingsStep.disposeUIResources();
-        Disposer.dispose(libraryPanel);
     }
 }

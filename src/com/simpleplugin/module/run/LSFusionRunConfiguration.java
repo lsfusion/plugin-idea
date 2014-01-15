@@ -157,6 +157,11 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
         PathMacroManager.getInstance(getProject()).collapsePathsRecursively(element);
     }
 
+    @Override
+    protected ModuleBasedConfiguration createInstance() {
+        return new LSFusionRunConfiguration(getName(), getProject(), LSFusionRunConfigurationType.getInstance().getConfigurationFactory());
+    }
+
     public static class LSFServerCommandLineState extends JavaCommandLineState {
 
         private final LSFusionRunConfiguration myConfiguration;

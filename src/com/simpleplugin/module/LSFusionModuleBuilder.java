@@ -2,6 +2,7 @@ package com.simpleplugin.module;
 
 import com.intellij.CommonBundle;
 import com.intellij.execution.RunManager;
+import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
@@ -153,8 +154,10 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
                 RunnerAndConfigurationSettings runConfiguration = runManager.createRunConfiguration("Run lsFusion server", LSFusionRunConfigurationType.getInstance().getConfigurationFactory());
                 ((LSFusionRunConfiguration)runConfiguration.getConfiguration()).setModule(rootModel.getModule());
                 ((LSFusionRunConfiguration)runConfiguration.getConfiguration()).setWorkingDirectory(contentEntryPath);
-                runManager.addConfiguration(runConfiguration, false);
-                runManager.setSelectedConfiguration(runConfiguration);
+                if (runManager instanceof RunManagerEx) {
+                    ((RunManagerEx) runManager).addConfiguration(runConfiguration, false);
+                    ((RunManagerEx) runManager).setSelectedConfiguration(runConfiguration);
+                }
             }
 
             List<Pair<String, String>> sourcePaths = getSourcePaths();

@@ -36,12 +36,14 @@ public class SettingsPanel {
                 propertiesPanel.setVisible(cbCreateSettingsFile.isSelected());
             }
         });
-        moduleNameField.getDocument().addDocumentListener(new DocumentAdapter() {
-            @Override
-            protected void textChanged(DocumentEvent e) {
-                setDbNameFromModuleName(moduleNameField.getText());
-            }
-        });
+        if (moduleNameField != null) {
+            moduleNameField.getDocument().addDocumentListener(new DocumentAdapter() {
+                @Override
+                protected void textChanged(DocumentEvent e) {
+                    setDbNameFromModuleName(moduleNameField.getText());
+                }
+            });
+        }
         databaseNameTextField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(DocumentEvent e) {
