@@ -49,6 +49,12 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     @Override
+    public String getCaption() {
+        LSFStringLiteral stringLiteral = getPropertyDeclaration().getSimpleNameWithCaption().getStringLiteral();
+        return stringLiteral != null ? stringLiteral.getText() : null;
+    }
+
+    @Override
     public LSFClassSet resolveValueClass(boolean infer) {
         LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
         if (unfr != null)
@@ -162,19 +168,43 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return resultClasses;
     }
 
+    public boolean isAbstract() {
+        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = getExpressionUnfriendlyPD();
+        if (expressionUnfriendlyPD != null) {
+            LSFContextIndependentPD contextIndependentPD = expressionUnfriendlyPD.getContextIndependentPD();
+            if (contextIndependentPD != null) {
+                if (contextIndependentPD.getAbstractPropertyDefinition() != null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isAction() {
+        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = getExpressionUnfriendlyPD();
+        if (expressionUnfriendlyPD != null) {
+            LSFContextIndependentPD contextIndependentPD = expressionUnfriendlyPD.getContextIndependentPD();
+            if (contextIndependentPD != null) {
+                if (contextIndependentPD.getAbstractActionPropertyDefinition() != null) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return LSFIcons.PROPERTY;
+        return isAction() ? LSFIcons.ACTION : isAbstract() ? LSFIcons.ABSTRACT_PROPERTY : LSFIcons.PROPERTY;
     }
 
     @Override
     public String getPresentableText() {
-        List<? extends LSFExprParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
-        LSFPropertyExpression pExpression = getPropertyExpression();
-        if (params == null && pExpression != null) {
-            params = pExpression.resolveParams();
-        }
+        List<? extends LSFExprParamDeclaration> params = getExplicitParams();
 
         List<LSFClassSet> paramClasses = resolveParamClasses();
         String paramsString = "";
@@ -198,6 +228,15 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         }
 
         return getDeclName() + "(" + paramsString + ")";
+    }
+
+    public List<? extends LSFExprParamDeclaration> getExplicitParams() {
+        List<? extends LSFExprParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
+        LSFPropertyExpression pExpression = getPropertyExpression();
+        if (params == null && pExpression != null) {
+            params = pExpression.resolveParams();
+        }
+        return params;
     }
 
     @Override

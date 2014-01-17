@@ -106,6 +106,7 @@
         <readWriteAccessDetector implementation="com.simpleplugin.LSFReadWriteAccessDetector"/>
         <fileStructureGroupRuleProvider implementation="com.simpleplugin.LSFStatementGroupRuleProvider"/>
         <definitionsSearch implementation="com.simpleplugin.ImplementationsSearch"/>
+        <structureViewBuilder factoryClass="com.simpleplugin.structure.LSFInterfacesStructureViewBuilderFactory"/>
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
 
@@ -131,6 +132,8 @@
         <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendClassIndex"/>
 
         <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ClassExtendsClassIndex"/>
+
+        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ExplicitInterfaceIndex"/>
 
         <stubElementTypeHolder class="com.simpleplugin.psi.LSFTypes"/>
         <gotoClassContributor implementation="com.simpleplugin.LSFClassContributor"/>

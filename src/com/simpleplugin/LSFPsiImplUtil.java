@@ -897,6 +897,67 @@ public class LSFPsiImplUtil {
         return null;
     }
 
+    // UnfriendlyPE.getValueParamClasses
+
+    public static List<String> getValueParamClassNames(@NotNull LSFExpressionUnfriendlyPD sourceStatement) {
+        LSFContextIndependentPD contextIndependentPD = sourceStatement.getContextIndependentPD();
+        if (contextIndependentPD != null)
+            return ((UnfriendlyPE) contextIndependentPD.getChildren()[0]).getValueParamClassNames();
+        return null;
+    }
+
+    public static List<String> getValueParamClassNames(@NotNull LSFDataPropertyDefinition sourceStatement) {
+        return getClassNames(sourceStatement.getClassNameList());
+    }
+
+    public static List<String> getValueParamClassNames(@NotNull LSFNativePropertyDefinition sourceStatement) {
+        return getClassNames(sourceStatement.getClassNameList());
+    }
+
+    public static List<String> getValueParamClassNames(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
+        return getClassNames(sourceStatement.getClassNameList());
+    }
+
+    public static List<String> getValueParamClassNames(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
+        return getClassNames(sourceStatement.getClassNameList());
+    }
+
+    public static List<String> getValueParamClassNames(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
+        return null;
+    }
+
+    public static List<String> getValueParamClassNames(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+        return null;
+    }
+
+    public static List<String> getValueParamClassNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {
+        return null;
+    }
+
+    @NotNull
+    public static List<String> getClassNames(LSFClassNameList classNameList) {
+        List<String> result = new ArrayList<String>();
+
+        LSFNonEmptyClassNameList ne = classNameList.getNonEmptyClassNameList();
+        if (ne == null) {
+            return result;
+        }
+        for (LSFClassName className : ne.getClassNameList()) {
+            result.add(getClassName(className));
+        }
+        return result;
+    }
+
+    @Nullable
+    public static String getClassName(LSFClassName className) {
+        LSFBuiltInClassName builtInClassName = className.getBuiltInClassName();
+        if (builtInClassName != null) {
+            return builtInClassName.getName();
+        }
+        LSFCustomClassUsage customClassUsage = className.getCustomClassUsage();
+        return customClassUsage != null ? customClassUsage.getName() : null;
+    }
+
     // LSFPropertyExpression.resolveValueParamClasses
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFPropertyExpression sourceStatement) {
         List<LSFClassSet> result = new ArrayList<LSFClassSet>();

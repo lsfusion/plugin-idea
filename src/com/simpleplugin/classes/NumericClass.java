@@ -22,7 +22,7 @@ public class NumericClass extends IntegralClass {
 
     @Override
     public boolean equals(Object obj) {
-        return this==obj || (obj instanceof NumericClass && length == ((NumericClass)obj).length && precision == ((NumericClass)obj).precision);
+        return this == obj || (obj instanceof NumericClass && length == ((NumericClass) obj).length && precision == ((NumericClass) obj).precision);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class NumericClass extends IntegralClass {
         return length * 31 + precision;
     }
 
-    protected String getName() {
+    public String getName() {
         return "NUMERIC[" + length + "," + precision + "]";
     }
 }

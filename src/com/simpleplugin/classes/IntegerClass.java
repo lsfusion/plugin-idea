@@ -11,14 +11,14 @@ public class IntegerClass extends IntegralClass {
     }
 
     public boolean equals(Object obj) {
-        return obj instanceof IntegerClass; 
+        return obj instanceof IntegerClass;
     }
 
     public int hashCode() {
         return 7;
     }
 
-    protected String getName() {
+    public String getName() {
         return "INTEGER";
     }
 }

@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 
-public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclaration<This,Stub>, Stub extends FullNameStubElement<Stub, This>> extends LSFGlobalDeclarationImpl<This, Stub> implements LSFFullNameDeclaration<This, Stub> {
+public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclaration<This, Stub>, Stub extends FullNameStubElement<Stub, This>> extends LSFGlobalDeclarationImpl<This, Stub> implements LSFFullNameDeclaration<This, Stub> {
 
     public LSFFullNameDeclarationImpl(@NotNull ASTNode node) {
         super(node);

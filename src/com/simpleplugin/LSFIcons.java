@@ -6,6 +6,8 @@ import com.intellij.openapi.util.IconLoader;
 import javax.swing.*;
 
 public class LSFIcons {
+    public static final Icon ABSTRACT_PROPERTY = IconLoader.getIcon("/com/simpleplugin/icons/abstract_property.png");
+    public static final Icon ACTION = IconLoader.getIcon("/com/simpleplugin/icons/action.png");
     public static final Icon CLASS = AllIcons.Nodes.Class;
     public static final Icon CONSTRAINT = AllIcons.Ide.Warning_notifications;
     public static final Icon DESIGN = AllIcons.Actions.Edit;
@@ -18,12 +20,15 @@ public class LSFIcons {
     public static final Icon FOLLOWS = AllIcons.Duplicates.SendToTheRight;
     public static final Icon FORM = AllIcons.FileTypes.UiForm;
     public static final Icon GROUP = AllIcons.Actions.GroupByModuleGroup;
+    public static final Icon GROUP_BY_CLASS = IconLoader.getIcon("/com/simpleplugin/icons/group_by_class.png");
+    public static final Icon GROUP_BY_MODULE = AllIcons.Actions.GroupByModule;
     public static final Icon INDEX = AllIcons.Graph.PrintPreview;
     public static final Icon LOGGABLE = AllIcons.FileTypes.Archive;
     public static final Icon META_DECLARATION = AllIcons.Nodes.AbstractMethod;
     public static final Icon META_REFERENCE = AllIcons.Nodes.Method;
     public static final Icon NAMESPACE = AllIcons.Actions.Module;
     public static final Icon NAVIGATOR_ELEMENT = AllIcons.ObjectBrowser.FlattenPackages;
+    public static final Icon NUMBER_SORT = IconLoader.getIcon("/com/simpleplugin/icons/number_sort.png");
     public static final Icon OVERRIDE = AllIcons.General.OverridingMethod;
     public static final Icon PROPERTY = AllIcons.Nodes.Property;
     public static final Icon PROPERTY_DRAW = AllIcons.Nodes.PropertyRead;

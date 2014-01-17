@@ -1,7 +1,7 @@
 package com.simpleplugin.classes;
 
 public class SimpleDataClass extends DataClass {
-    
+
     private String dataName;
 
     public SimpleDataClass(String dataName) {
@@ -9,7 +9,7 @@ public class SimpleDataClass extends DataClass {
     }
 
     public DataClass op(DataClass compClass, boolean or) {
-        if(compClass.equals(this))
+        if (compClass.equals(this))
             return this;
         return null;
     }
@@ -22,7 +22,7 @@ public class SimpleDataClass extends DataClass {
         return dataName.hashCode();
     }
 
-    protected String getName() {
+    public String getName() {
         return dataName;
     }
 }

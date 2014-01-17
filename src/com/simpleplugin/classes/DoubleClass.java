@@ -18,7 +18,7 @@ public class DoubleClass extends IntegralClass {
         return 6;
     }
 
-    protected String getName() {
+    public String getName() {
         return "DOUBLE";
     }
 }

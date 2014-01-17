@@ -13,7 +13,7 @@ public class YearClass extends IntegerClass {
     }
 
     @Override
-    protected String getName() {
+    public String getName() {
         return "YEAR";
     }
 }

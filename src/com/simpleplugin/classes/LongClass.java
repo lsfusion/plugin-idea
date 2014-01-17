@@ -20,7 +20,7 @@ public class LongClass extends IntegralClass {
         return 9;
     }
 
-    protected String getName() {
+    public String getName() {
         return "LONG";
     }
 }

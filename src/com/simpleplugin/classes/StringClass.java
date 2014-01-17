@@ -13,7 +13,7 @@ public class StringClass extends DataClass {
         this.caseInsensitive = caseInsensitive;
         this.length = length;
     }
-    
+
     public DataClass op(DataClass compClass, boolean or) {
         if (!(compClass instanceof StringClass)) return null;
 
@@ -23,14 +23,14 @@ public class StringClass extends DataClass {
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj || (obj instanceof StringClass && blankPadded == ((StringClass)obj).blankPadded && caseInsensitive == ((StringClass)obj).caseInsensitive && length.equals(((StringClass)obj).length));
+        return this == obj || (obj instanceof StringClass && blankPadded == ((StringClass) obj).blankPadded && caseInsensitive == ((StringClass) obj).caseInsensitive && length.equals(((StringClass) obj).length));
     }
 
     public int hashCode() {
-        return (length.hashCode() * 31 + (blankPadded ? 1 : 0)) * 31 + (caseInsensitive ? 1 : 0);  
+        return (length.hashCode() * 31 + (blankPadded ? 1 : 0)) * 31 + (caseInsensitive ? 1 : 0);
     }
 
-    protected String getName() {
+    public String getName() {
         return length.isUnlimited() ? "TEXT" : (blankPadded ? "" : "VAR") + (caseInsensitive ? "I" : "") + "STRING[" + length.getValue() + "]";
     }
 

@@ -1,4 +1,3 @@
-
 {
   psiImplUtilClass="com.simpleplugin.LSFPsiImplUtil"
 
@@ -53,7 +52,8 @@ private statement ::=   classStatement
                     |	constraintStatement
                     |	followsStatement // starts with ID
                     |	writeWhenStatement // starts with ID
-                    |	propertyStatement // important to eat ID
+//                    |	propertyStatement // important to eat ID
+                    |	explicitInterfacePropertyStatement
                     |	eventStatement
                     |   showDepStatement
                     |	globalEventStatement
@@ -117,8 +117,14 @@ groupStatement ::= GROUP simpleNameWithCaption (COLON groupUsage)? SEMI
 //////////////////////////////// PROPERTY STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+explicitInterfacePropertyStatement ::= propertyStatement
+{mixin="com.simpleplugin.psi.declarations.impl.LSFExplicitInterfacePropStatementImpl" implements="com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement"
+    stubClass="com.simpleplugin.psi.stubs.ExplicitInterfaceStubElement"
+    elementTypeFactory="com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+}
+
 propertyStatement ::= propertyDeclaration EQUAL
-                      (expressionUnfriendlyPD | propertyExpression)
+                      (expressionUnfriendlyPD | propertyExpression) 
                       propertyOptions
                       (SEMI)?
 {mixin="com.simpleplugin.psi.declarations.impl.LSFGlobalPropDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration, com.simpleplugin.psi.context.ModifyParamContext"
@@ -250,16 +256,16 @@ noContextPropertyUsage ::= propertyUsage
 
 
 dataPropertyDefinition ::= DATA (SESSION)? className LBRAC classNameList RBRAC
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
+{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames ]}
 
 nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
+{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames ]}
 
 abstractPropertyDefinition ::= ABSTRACT (((CASE | MULTI) (OVERRIDE | EXCLUSIVE)?) | OVERRIDE | EXCLUSIVE)? (CHECKED)? className LBRAC classNameList RBRAC
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
+{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames ]}
 
 formulaPropertyDefinition ::= FORMULA (builtInClassName)? stringLiteral
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
+{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames ]}
 
 groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | GEQUAL | LAST | NAGGR
 groupPropertyBy ::= BY nonEmptyPropertyExpressionList;
@@ -269,10 +275,10 @@ groupPropertyDefinition ::= GROUP groupingType
 		                    (groupPropertyBy)?
 		                    (orderPropertyBy)?
 		                    (WHERE propertyExpression)?
-{implements="com.simpleplugin.psi.context.ModifyParamContext, com.simpleplugin.psi.context.UnfriendlyPE" methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses ] }		                    
+{implements="com.simpleplugin.psi.context.ModifyParamContext, com.simpleplugin.psi.context.UnfriendlyPE" methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames ] }		                    
 
 filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
+{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames ]}
 
 typeIs ::= IS | AS
 typePropertyDefinition ::= typeIs className
@@ -340,7 +346,7 @@ abstractActionPropertyDefinition ::= ABSTRACT ACTION
                                     )?
                                     (CHECKED)?
                                     LBRAC classNameList RBRAC
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses ]}
+{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames ]}
 
 // extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
 actionPropertyDefinitionBody ::=    customActionPDB

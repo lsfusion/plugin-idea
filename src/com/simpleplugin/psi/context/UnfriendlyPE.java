@@ -10,5 +10,6 @@ public interface UnfriendlyPE extends PsiElement {
     LSFClassSet resolveUnfriendValueClass(boolean infer);
     
     List<LSFClassSet> resolveValueParamClasses();
-    
+
+    List<String> getValueParamClassNames();
 }

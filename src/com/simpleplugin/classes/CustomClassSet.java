@@ -15,7 +15,7 @@ import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import java.util.*;
 
 public class CustomClassSet implements LSFClassSet {
-    
+
     private final Set<LSFClassDeclaration> classes;
 
     public CustomClassSet(LSFClassDeclaration classDecl) {
@@ -27,19 +27,19 @@ public class CustomClassSet implements LSFClassSet {
     }
 
     public CustomClassSet op(CustomClassSet set, boolean or) {
-        if(or) {
+        if (or) {
             Set<LSFClassDeclaration> orSet = new HashSet<LSFClassDeclaration>(classes);
             orSet.addAll(set.classes);
             return new CustomClassSet(orSet);
         } else {
             Set<LSFClassDeclaration> andSet = new HashSet<LSFClassDeclaration>();
-            for(LSFClassDeclaration aClass : classes)
-                for(LSFClassDeclaration bClass : set.classes)
+            for (LSFClassDeclaration aClass : classes)
+                for (LSFClassDeclaration bClass : set.classes)
                     andSet.addAll(commonChilds(aClass, bClass));
             return new CustomClassSet(andSet);
         }
     }
-    
+
     private static Query<LSFClassExtend> resolveExtendElements(LSFClassDeclaration decl) {
         Project project = decl.getProject();
         return LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDCLASS, project, GlobalSearchScope.allScope(project));
@@ -47,8 +47,17 @@ public class CustomClassSet implements LSFClassSet {
 
     public static Collection<LSFClassDeclaration> getParents(LSFClassDeclaration decl) {
         Set<LSFClassDeclaration> result = new HashSet<LSFClassDeclaration>();
-        for(LSFClassExtend extDecl : resolveExtendElements(decl))
+        for (LSFClassExtend extDecl : resolveExtendElements(decl))
             result.addAll(extDecl.resolveExtends());
+        return result;
+    }
+
+    public static Collection<LSFClassDeclaration> getParentsRecursively(LSFClassDeclaration decl) {
+        Set<LSFClassDeclaration> result = new HashSet<LSFClassDeclaration>();
+        for (LSFClassDeclaration parent : getParents(decl)) {
+            result.add(parent);
+            result.addAll(getParentsRecursively(parent));
+        }
         return result;
     }
 
@@ -58,35 +67,35 @@ public class CustomClassSet implements LSFClassSet {
     }
 
     public LSFClassDeclaration getCommonChild(CustomClassSet set) {
-        for(LSFClassDeclaration setClass : set.classes) // оптимизация
-            if(containsAll(setClass))
+        for (LSFClassDeclaration setClass : set.classes) // оптимизация
+            if (containsAll(setClass))
                 return setClass;
-        for(LSFClassDeclaration setClass : classes) // оптимизация
-            if(set.containsAll(setClass))
+        for (LSFClassDeclaration setClass : classes) // оптимизация
+            if (set.containsAll(setClass))
                 return setClass;
-        
+
         Map<LSFClassDeclaration, Boolean> map = new HashMap<LSFClassDeclaration, Boolean>();
-        for(LSFClassDeclaration aClass : classes)
+        for (LSFClassDeclaration aClass : classes)
             map.put(aClass, true);
-        for(LSFClassDeclaration aClass : set.classes)
+        for (LSFClassDeclaration aClass : set.classes)
             map.put(aClass, false);
-        
-        int i=0;
+
+        int i = 0;
         List<LSFClassDeclaration> list = new ArrayList<LSFClassDeclaration>();
         list.addAll(classes);
         list.addAll(set.classes);
-        while(i < list.size()) {
+        while (i < list.size()) {
             LSFClassDeclaration decl = list.get(i);
             boolean side = map.get(decl);
 
-            for(LSFClassDeclaration child : getChildren(decl)) {
+            for (LSFClassDeclaration child : getChildren(decl)) {
                 Boolean childSide = map.get(child);
-                if(childSide != null && side != childSide)
+                if (childSide != null && side != childSide)
                     return child;
-                if(childSide == null) {
+                if (childSide == null) {
                     list.add(child);
                     map.put(child, side);
-                }                
+                }
             }
 
             i++;
@@ -97,31 +106,31 @@ public class CustomClassSet implements LSFClassSet {
     private static boolean isObject(LSFClassDeclaration decl) {
         return decl.getGlobalName().equals("Object") && decl.getLSFFile().getModuleDeclaration().getGlobalName().equals("System");
     }
-    
+
     public boolean containsAll(LSFClassDeclaration decl) {
-        for(LSFClassDeclaration declClass : classes)
-            if(isObject(declClass))
-                return true;                
-        
+        for (LSFClassDeclaration declClass : classes)
+            if (isObject(declClass))
+                return true;
+
         return recContainsAll(decl, new HashSet<LSFClassDeclaration>());
     }
-    
+
     public boolean recContainsAll(LSFClassDeclaration decl, Set<LSFClassDeclaration> recursionGuard) {
-        if(!recursionGuard.add(decl))
+        if (!recursionGuard.add(decl))
             return false;
-        
-        if(classes.contains(decl))
+
+        if (classes.contains(decl))
             return true;
-        
-        for(LSFClassDeclaration inhDecl : getParents(decl))
-            if(recContainsAll(inhDecl, recursionGuard))
+
+        for (LSFClassDeclaration inhDecl : getParents(decl))
+            if (recContainsAll(inhDecl, recursionGuard))
                 return true;
         return false;
     }
-    
+
     public boolean containsAll(CustomClassSet set) {
-        for(LSFClassDeclaration setClass : set.classes)
-            if(!containsAll(setClass))
+        for (LSFClassDeclaration setClass : set.classes)
+            if (!containsAll(setClass))
                 return false;
         return true;
     }
@@ -138,7 +147,7 @@ public class CustomClassSet implements LSFClassSet {
 
     private static int getCheck(LSFClassDeclaration decl, Map<LSFClassDeclaration, Integer> checks) {
         Integer result = checks.get(decl);
-        if(result==null)
+        if (result == null)
             return 0;
         return result;
     }
@@ -150,23 +159,23 @@ public class CustomClassSet implements LSFClassSet {
         commonClassSet2(toCommon, checks, false, null, true);
 
         Set<LSFClassDeclaration> result = new HashSet<LSFClassDeclaration>();
-        commonClassSet3(decl, checks, result,null,true);
+        commonClassSet3(decl, checks, result, null, true);
         return result;
     }
 
     public static Set<LSFClassDeclaration> commonChilds(LSFClassDeclaration decl, LSFClassDeclaration toCommon) {
-        if(isObject(decl))
+        if (isObject(decl))
             return Collections.singleton(toCommon);
-        if(isObject(toCommon))
+        if (isObject(toCommon))
             return Collections.singleton(decl);
-            
+
         Map<LSFClassDeclaration, Integer> checks = new HashMap<LSFClassDeclaration, Integer>();
 
         commonClassSet1(decl, checks, false);
         commonClassSet2(toCommon, checks, false, null, false);
 
         Set<LSFClassDeclaration> result = new HashSet<LSFClassDeclaration>();
-        commonClassSet3(decl, checks, result,null,false);
+        commonClassSet3(decl, checks, result, null, false);
         return result;
     }
 
@@ -174,28 +183,27 @@ public class CustomClassSet implements LSFClassSet {
     // 1-й шаг расставляем пометки 1
     protected static void commonClassSet1(LSFClassDeclaration decl, Map<LSFClassDeclaration, Integer> checks, boolean up) {
         int check = getCheck(decl, checks);
-                
-        if(check ==1) return;
+
+        if (check == 1) return;
         checks.put(decl, 1);
-        for(LSFClassDeclaration child : (up? getParents(decl) : getChildren(decl)))
+        for (LSFClassDeclaration child : (up ? getParents(decl) : getChildren(decl)))
             commonClassSet1(child, checks, up);
     }
 
     // 2-й шаг пометки
     // 2 - верхний общий класс
     // 3 - просто общий класс
-    protected static void commonClassSet2(LSFClassDeclaration decl, Map<LSFClassDeclaration, Integer> checks, boolean set, Set<LSFClassDeclaration> free,boolean up) {
+    protected static void commonClassSet2(LSFClassDeclaration decl, Map<LSFClassDeclaration, Integer> checks, boolean set, Set<LSFClassDeclaration> free, boolean up) {
         int check = getCheck(decl, checks);
 
-        if(!set) {
-            if(check >0) {
-                if(check !=1) return;
+        if (!set) {
+            if (check > 0) {
+                if (check != 1) return;
                 checks.put(decl, 2);
                 set = true;
-            } else
-            if(free!=null) free.add(decl);
+            } else if (free != null) free.add(decl);
         } else {
-            if(check ==3 || check ==2) {
+            if (check == 3 || check == 2) {
                 checks.put(decl, 3);
                 return;
             }
@@ -203,52 +211,52 @@ public class CustomClassSet implements LSFClassSet {
             checks.put(decl, 3);
         }
 
-        for(LSFClassDeclaration child : (up? getParents(decl) : getChildren(decl)))
+        for (LSFClassDeclaration child : (up ? getParents(decl) : getChildren(decl)))
             commonClassSet2(child, checks, set, free, up);
     }
 
     // 3-й шаг выводит в Set, и сбрасывает пометки
-    protected static void commonClassSet3(LSFClassDeclaration decl, Map<LSFClassDeclaration, Integer> checks, Set<LSFClassDeclaration> common,Set<LSFClassDeclaration> free,boolean up) {
+    protected static void commonClassSet3(LSFClassDeclaration decl, Map<LSFClassDeclaration, Integer> checks, Set<LSFClassDeclaration> common, Set<LSFClassDeclaration> free, boolean up) {
         int check = getCheck(decl, checks);
 
-        if(check ==0) return;
-        if(common!=null && check ==2) common.add(decl);
-        if(free!=null && check ==1) free.add(decl);
+        if (check == 0) return;
+        if (common != null && check == 2) common.add(decl);
+        if (free != null && check == 1) free.add(decl);
 
         checks.put(decl, 0);
 
-        for(LSFClassDeclaration child : (up? getParents(decl) : getChildren(decl)))
+        for (LSFClassDeclaration child : (up ? getParents(decl) : getChildren(decl)))
             commonClassSet3(child, checks, common, free, up);
     }
 
     private static void addMinInt(Map<LSFClassDeclaration, Integer> mPathes, LSFClassDeclaration decl, Integer add) {
         Integer value = mPathes.get(decl);
-        if(value!=null)
+        if (value != null)
             add = BaseUtils.min(add, value);
         mPathes.put(decl, add);
     }
-    
+
     // возвращает до каких путей можно дойти и с каким минимальным путем
     private static Map<LSFClassDeclaration, Integer> recCommonClass(LSFClassDeclaration customClass, Set<LSFClassDeclaration> used, Set<LSFClassDeclaration> commonSet, Map<LSFClassDeclaration, Map<LSFClassDeclaration, Integer>> mPathes, Set<LSFClassDeclaration> firstFulls, Set<LSFClassDeclaration> firstChildren) {
         Map<LSFClassDeclaration, Integer> cachedResult = mPathes.get(customClass);
-        if(cachedResult!=null)
+        if (cachedResult != null)
             return cachedResult;
 
         Map<LSFClassDeclaration, Integer> childPathes = new HashMap<LSFClassDeclaration, Integer>();
-        if(commonSet.contains(customClass))
+        if (commonSet.contains(customClass))
             addMinInt(childPathes, customClass, 0);
 
         boolean hasFullChild = false;
-        for(LSFClassDeclaration childClass : (firstChildren != null ? firstChildren : getChildren(customClass)))
-            if(used.contains(childClass)) {
+        for (LSFClassDeclaration childClass : (firstChildren != null ? firstChildren : getChildren(customClass)))
+            if (used.contains(childClass)) {
                 Map<LSFClassDeclaration, Integer> recChildPathes = recCommonClass(childClass, used, commonSet, mPathes, firstFulls, null);
                 hasFullChild = hasFullChild || recChildPathes.keySet().containsAll(commonSet);
-                for(Map.Entry<LSFClassDeclaration, Integer> recChildPath : recChildPathes.entrySet())
+                for (Map.Entry<LSFClassDeclaration, Integer> recChildPath : recChildPathes.entrySet())
                     addMinInt(childPathes, recChildPath.getKey(), recChildPath.getValue() + 1);
             } else
                 addMinInt(childPathes, childClass, 1);
 
-        if(!hasFullChild && childPathes.keySet().containsAll(commonSet))
+        if (!hasFullChild && childPathes.keySet().containsAll(commonSet))
             firstFulls.add(customClass);
         mPathes.put(customClass, childPathes);
         return childPathes;
@@ -258,12 +266,12 @@ public class CustomClassSet implements LSFClassSet {
         if (!parentSet.add(decl)) return;
 
         Collection<LSFClassDeclaration> declParents = getParents(decl);
-        if(declParents.size()==0)
+        if (declParents.size() == 0)
             topParents.add(decl);
-        for(LSFClassDeclaration parent : declParents)
+        for (LSFClassDeclaration parent : declParents)
             fillParents(parent, parentSet, topParents);
     }
-    
+
     public static LSFClassDeclaration getBaseClass(Project project) {
         LSFModuleDeclaration systemModule = LSFGlobalResolver.findModules("System", GlobalSearchScope.allScope(project)).findFirst();
         Collection<LSFClassDeclaration> objects = LSFGlobalResolver.findElements("Object", systemModule.getLSFFile(), Collections.singleton(LSFStubElementTypes.CLASS), null, Condition.TRUE, Finalizer.EMPTY);
@@ -276,14 +284,14 @@ public class CustomClassSet implements LSFClassSet {
         commonSet = classes;
 
         LSFClassDeclaration firstClass = commonSet.iterator().next();
-        if(commonSet.size()==1) // иначе firstFulls не заполнится
+        if (commonSet.size() == 1) // иначе firstFulls не заполнится
             return firstClass;
 
         LSFClassDeclaration baseClass = getBaseClass(firstClass.getProject()); // базовая вершина
 
         Set<LSFClassDeclaration> used = new HashSet<LSFClassDeclaration>();
         Set<LSFClassDeclaration> topParents = new HashSet<LSFClassDeclaration>();
-        for(LSFClassDeclaration commonClass : commonSet) // ищем все использованные вершины
+        for (LSFClassDeclaration commonClass : commonSet) // ищем все использованные вершины
             fillParents(commonClass, used, topParents);
 
         Map<LSFClassDeclaration, Map<LSFClassDeclaration, Integer>> pathes = new HashMap<LSFClassDeclaration, Map<LSFClassDeclaration, Integer>>();
@@ -291,8 +299,8 @@ public class CustomClassSet implements LSFClassSet {
         recCommonClass(baseClass, used, commonSet, pathes, firstFulls, topParents);
 
         final Map<LSFClassDeclaration, Integer> pathCounts = new HashMap<LSFClassDeclaration, Integer>();
-        for(Map.Entry<LSFClassDeclaration, Map<LSFClassDeclaration, Integer>> path : pathes.entrySet()) {
-            LSFClassDeclaration key = path.getKey(); 
+        for (Map.Entry<LSFClassDeclaration, Map<LSFClassDeclaration, Integer>> path : pathes.entrySet()) {
+            LSFClassDeclaration key = path.getKey();
             Map<LSFClassDeclaration, Integer> value = path.getValue();
 
             assert !firstFulls.contains(key) || value.keySet().containsAll(commonSet);
@@ -308,8 +316,8 @@ public class CustomClassSet implements LSFClassSet {
 
             pathCounts.put(path.getKey(), countOthers * 1000 + countCommon);
         }
-        
-        List<LSFClassDeclaration> sortFirstFulls = new ArrayList<LSFClassDeclaration>(firstFulls); 
+
+        List<LSFClassDeclaration> sortFirstFulls = new ArrayList<LSFClassDeclaration>(firstFulls);
         Collections.sort(sortFirstFulls, new Comparator<LSFClassDeclaration>() {
             public int compare(LSFClassDeclaration o1, LSFClassDeclaration o2) {
                 int cnt1 = pathCounts.get(o1);
@@ -325,20 +333,20 @@ public class CustomClassSet implements LSFClassSet {
     }
 
     public LSFClassSet op(LSFClassSet set, boolean or) {
-        if(!(set instanceof CustomClassSet))
+        if (!(set instanceof CustomClassSet))
             return null;
-        return op((CustomClassSet)set, or);
+        return op((CustomClassSet) set, or);
     }
 
     public boolean containsAll(LSFClassSet set) {
-        if(!(set instanceof CustomClassSet))
+        if (!(set instanceof CustomClassSet))
             return false;
         return containsAll((CustomClassSet) set);
     }
 
     @Override
     public boolean haveCommonChilds(LSFClassSet set) {
-        if(!(set instanceof CustomClassSet))
+        if (!(set instanceof CustomClassSet))
             return false;
         return getCommonChild((CustomClassSet) set) != null;
     }
@@ -346,7 +354,7 @@ public class CustomClassSet implements LSFClassSet {
     @Override
     public String toString() {
         String result = "";
-        for (Iterator<LSFClassDeclaration> iterator = classes.iterator(); iterator.hasNext();) {
+        for (Iterator<LSFClassDeclaration> iterator = classes.iterator(); iterator.hasNext(); ) {
             result += iterator.next().getDeclName() + (iterator.hasNext() ? ", " : "");
         }
         return result;
