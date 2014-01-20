@@ -248,6 +248,8 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "NAVIGATOR"               			{ return NAVIGATOR; }
   "NEW"                     			{ return NEW; }
   "NEWSESSION"              			{ return NEWSESSION; }
+  "NEWTHREAD"              			    { return NEWTHREAD; }
+  "DELAY"              			        { return DELAY; }
   "NO"                      			{ return NO; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOT"                     			{ return NOT; }

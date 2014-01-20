@@ -457,7 +457,7 @@ evalActionPropertyDefinitionBody ::= EVAL propertyExpression
 requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)
 {implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
 
-listActionPropertyDefinitionBody ::=    (NEWSESSION (AUTOAPPLY)? (SINGLE)?)?
+listActionPropertyDefinitionBody ::=    ((NEWSESSION | (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)) (AUTOAPPLY)? (SINGLE)?)?
 		                                LBRACE
 			                            (	actionPropertyDefinitionBody (SEMI)? // ;?
 			                            |	localDataPropertyDefinition SEMI
