@@ -2,8 +2,8 @@
   psiImplUtilClass="com.simpleplugin.LSFPsiImplUtil"
 
   parserClass="com.simpleplugin.parser.LSFParser"
-  parserUtilClass="com.simpleplugin.parser.GeneratedParserUtilBase"
-  stubParserClass="com.simpleplugin.parser.GeneratedParserUtilBase"
+  parserUtilClass="com.simpleplugin.parser.LSFParserUtil"
+  stubParserClass="com.simpleplugin.parser.LSFParserUtil"
  
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
  
@@ -18,7 +18,7 @@
 }
 
 script ::= moduleHeader (scriptStatement*)
-private scriptStatement ::= statement { recoverUntil = "script_statement_recover" }
+private scriptStatement ::= statement { recoverWhile = "script_statement_recover" }
 private script_statement_recover ::= !def_statement_recover_start 
 
 simpleName ::= ID
@@ -39,7 +39,7 @@ moduleHeader ::= MODULE moduleName SEMI
 {mixin="com.simpleplugin.psi.declarations.impl.LSFModuleDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFModuleDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.ModuleStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
-    recoverUntil = "script_statement_recover"
+    recoverWhile = "script_statement_recover"
 }
 
 // fake rules to generate types
@@ -596,7 +596,7 @@ formPropertiesNamesDeclList ::=	formPropertyDrawNameDecl (COMMA formPropertyDraw
 formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptionsList formPropertiesNamesDeclList 
 {implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
-formPropertiesList ::=  PROPERTIES formMappedNamePropertiesList 
+formPropertiesList ::=  PROPERTIES formMappedNamePropertiesList
 	                |	PROPERTIES formPropertyOptionsList formMappedPropertiesList
 
 formPropertyOptionsList ::= (	propertyEditTypeLiteral
@@ -912,7 +912,7 @@ componentPropertyValue ::=  colorLiteral
 ////////////////////////////////// META STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-// recoverUntil=rule_recover
+// recoverWhile=rule_recover
 metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC anyTokens END {pin=2
     mixin = "com.simpleplugin.psi.declarations.impl.LSFMetaDeclarationImpl" implements = "com.simpleplugin.psi.declarations.LSFMetaDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.MetaStubElement"
@@ -923,12 +923,12 @@ anyTokens ::= (<< readAny >>)*
 fakeTwoDashes ::= FAKETWODASHES
 fakeThreeDashes ::= FAKETHREEDASHES
 
-private metaStatement ::= statement { recoverUntil = "meta_statement_recover" }
+private metaStatement ::= statement { recoverWhile = "meta_statement_recover" }
 private meta_statement_recover ::= !(def_statement_recover_start | RBRACE) 
 metaCodeBody ::= LBRACE (metaStatement*) RBRACE
 
 
-//recoverUntil=rule_recover
+//recoverWhile=rule_recover
 metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI {pin=2
 mixin="com.simpleplugin.psi.references.impl.LSFMetaReferenceImpl" implements="com.simpleplugin.psi.references.LSFMetaReference"}
 

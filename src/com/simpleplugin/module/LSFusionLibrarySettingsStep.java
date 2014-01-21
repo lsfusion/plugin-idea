@@ -57,6 +57,7 @@ public class LSFusionLibrarySettingsStep extends ModuleWizardStep {
         javaSettingsStep = JavaModuleType.getModuleType().modifySettingsStep(settingsStep, moduleBuilder);
         libraryPanel = createLibraryPanel();
 
+        //noinspection RedundantCast
         JTextField moduleNameField = settingsStep instanceof SelectTemplateStep ? ((SelectTemplateStep) settingsStep).getModuleNameField() : null;
         settingsPanel = createSettingsPanel(moduleNameField);
 
