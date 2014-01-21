@@ -7,7 +7,6 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.TextEditorBasedStructureViewModel;
 import com.intellij.ide.util.treeView.smartTree.Grouper;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.simpleplugin.psi.LSFClassDecl;
@@ -17,8 +16,8 @@ import org.jetbrains.annotations.NotNull;
 public class LSFClassInterfacesTreeModel extends TextEditorBasedStructureViewModel implements StructureViewModel.ElementInfoProvider {
     private LSFStructureTreeElementBase rootElement;
 
-    protected LSFClassInterfacesTreeModel(Editor editor, PsiFile file) {
-        super(editor, file);
+    protected LSFClassInterfacesTreeModel(PsiFile file) {
+        super(file);
     }
 
     @Override

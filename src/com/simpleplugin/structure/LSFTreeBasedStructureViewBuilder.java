@@ -10,6 +10,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.simpleplugin.LSFFileCaretListener;
 import com.simpleplugin.psi.LSFClassDecl;
@@ -41,7 +42,6 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
         this.file = file;
     }
 
-    @Override
     @NotNull
     public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
         editor.getCaretModel().removeCaretListener(caretListener);
@@ -49,7 +49,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
         caretListener.setFile(file);
 
         if (model == null) {
-            model = new LSFClassInterfacesTreeModel(editor, file);
+            model = new LSFClassInterfacesTreeModel(file);
             needTotalExpansion = false;
             return model;
         }
@@ -61,7 +61,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
             PsiElement parent = targetElement;
             while (parent != null) {
                 if (parent instanceof LSFClassDecl) {
-                    model = new LSFClassInterfacesTreeModel(editor, file);
+                    model = new LSFClassInterfacesTreeModel(file);
                     needTotalExpansion = false;
                     break;
                 }
@@ -70,6 +70,12 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
         }
 
         return model;
+    }
+
+    @NotNull
+    @Override
+    public StructureViewModel createStructureViewModel() {
+        return createStructureViewModel(PsiUtilBase.findEditor(file));
     }
 
     @NotNull
