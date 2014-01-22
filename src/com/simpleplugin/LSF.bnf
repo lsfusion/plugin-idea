@@ -380,6 +380,7 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |   emailActionPropertyDefinitionBody
                 |	fileActionPropertyDefinitionBody
                 |	evalActionPropertyDefinitionBody
+                |	drillDownActionPropertyDefinitionBody
 
 formActionObjectUsage ::= objectUsage EQUAL propertyExpression 
 formActionPropertyDefinitionBody ::=
@@ -452,6 +453,9 @@ deleteActionPropertyDefinitionBody ::= DELETE exprParameterUsage (WHERE property
 {implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression" methods = [ getContextModifier getContextInferrer inferActionParamClasses ] }
 
 evalActionPropertyDefinitionBody ::= EVAL propertyExpression
+{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+
+drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
 {implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
 
 requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)

@@ -1783,6 +1783,10 @@ public class LSFPsiImplUtil {
         return inferParamClasses(body.getPropertyExpression(), null).filter(params);
     }
 
+    public static Inferred inferActionParamClasses(LSFDrillDownActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return inferParamClasses(body.getPropertyExpression(), null).filter(params);
+    }
+
     @Nullable
     public static Icon getIcon(@NotNull LSFNavigatorStatement navigatorStatement, int flags) {
         return LSFIcons.NAVIGATOR_ELEMENT;

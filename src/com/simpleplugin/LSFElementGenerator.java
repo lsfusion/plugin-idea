@@ -3,25 +3,19 @@ package com.simpleplugin;
 import com.intellij.formatting.FormatTextRanges;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.impl.ApplicationImpl;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.impl.source.codeStyle.CodeFormatterFacade;
 import com.intellij.psi.impl.source.tree.CompositePsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.io.StringRef;
-import com.simpleplugin.parser.GeneratedParserUtilBase;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFPropertyDrawDeclaration;
 import com.simpleplugin.psi.references.LSFClassReference;
@@ -30,14 +24,11 @@ import com.simpleplugin.psi.references.LSFNamespaceReference;
 import com.simpleplugin.psi.references.impl.LSFClassReferenceImpl;
 import com.simpleplugin.psi.references.impl.LSFModuleReferenceImpl;
 import com.simpleplugin.psi.references.impl.LSFNamespaceReferenceImpl;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class LSFElementGenerator {
 

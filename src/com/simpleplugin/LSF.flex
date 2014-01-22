@@ -166,6 +166,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "DOCKEDMODAL"             			{ return DOCKEDMODAL; }
   "DOCX"                    			{ return DOCX; }
   "DRAWROOT"                			{ return DRAWROOT; }
+  "DRILLDOWN"                    	    { return DRILLDOWN; }
   "DROP"                    			{ return DROP; }
   "DROPCHANGED"             			{ return DROPCHANGED; }
   "DROPPED"                 			{ return DROPPED; }
