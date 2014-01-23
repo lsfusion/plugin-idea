@@ -939,14 +939,11 @@ mixin="com.simpleplugin.psi.references.impl.LSFMetaReferenceImpl" implements="co
 private rule_recover ::= !(AFTER | ATSIGN | BEFORE | CLASS | CONSTRAINT | DESIGN | END | EXTEND | FORM | GROUP | HIDE | ID | INDEX | LOGGABLE | META | NAVIGATOR | ON | SEMI | SHOWDEP | TABLE | WHEN | WINDOW)
 
 metaDeclId ::=  ID
-metaDeclIdList ::=  (metaDeclId (COMMA metaDeclId)*)?
+metaDeclIdList ::= (metaDeclId (COMMA metaDeclId)*)?
 
-metaCodeIdList ::=  (metaCodeId (COMMA metaCodeId)*)?
+metaCodeIdList ::= (metaCodeId (COMMA metaCodeId)*)?
 
-metaCodeId ::=  PRIMITIVE_TYPE
-	        |	compoundID
-	        |	metaCodeLiteral
-	        |
+metaCodeId ::= (PRIMITIVE_TYPE | compoundID | metaCodeLiteral)?
 
 metaCodeLiteral ::= LEX_STRING_LITERAL
                 | 	LEX_UINT_LITERAL
