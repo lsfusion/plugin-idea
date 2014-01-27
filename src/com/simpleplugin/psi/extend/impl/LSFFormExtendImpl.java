@@ -90,7 +90,9 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     @Override
     public Collection<LSFPropertyDrawDeclaration> getPropertyDrawDecls() {
         Collection<LSFPropertyDrawDeclaration> result = new ArrayList<LSFPropertyDrawDeclaration>();
-        result.addAll(LSFElementGenerator.getBuiltInFormProps(getProject()));
+        if (getFormDecl() != null) {
+            result.addAll(LSFElementGenerator.getBuiltInFormProps(getProject()));
+        }
         for (LSFFormPropertiesList formProperties : getFormPropertiesListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formProperties, LSFPropertyDrawDeclaration.class));
         return result;
