@@ -3,12 +3,13 @@ package com.simpleplugin.psi.stubs.impl;
 import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
 import com.simpleplugin.psi.LSFGlobalElement;
-import com.simpleplugin.psi.declarations.LSFGlobalDeclaration;
 import com.simpleplugin.psi.stubs.GlobalStubElement;
 
 import java.io.IOException;
 
-public abstract class GlobalStubImpl<This extends GlobalStubElement<This, Decl>, Decl extends LSFGlobalElement<Decl, This>> extends StubBase<Decl> implements GlobalStubElement<This, Decl> {
+public abstract class GlobalStubImpl<This extends GlobalStubElement<This, Decl>, Decl extends LSFGlobalElement<Decl, This>>
+        extends StubBase<Decl>
+        implements GlobalStubElement<This, Decl> {
 
     protected StringRef name;
     protected boolean isCorrect;

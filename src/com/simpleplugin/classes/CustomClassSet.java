@@ -45,10 +45,12 @@ public class CustomClassSet implements LSFClassSet {
         return LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDCLASS, project, GlobalSearchScope.allScope(project));
     }
 
-    public static Collection<LSFClassDeclaration> getParents(LSFClassDeclaration decl) {
-        Set<LSFClassDeclaration> result = new HashSet<LSFClassDeclaration>();
-        for (LSFClassExtend extDecl : resolveExtendElements(decl))
-            result.addAll(extDecl.resolveExtends());
+    public static Collection<LSFValueClass> getClassParentsRecursively(LSFValueClass valueClass) {
+        Set<LSFValueClass> result = new LinkedHashSet<LSFValueClass>();
+        result.add(valueClass);
+        if (valueClass instanceof LSFClassDeclaration) {
+            result.addAll(getParentsRecursively((LSFClassDeclaration) valueClass));
+        }
         return result;
     }
 
@@ -58,6 +60,13 @@ public class CustomClassSet implements LSFClassSet {
             result.add(parent);
             result.addAll(getParentsRecursively(parent));
         }
+        return result;
+    }
+
+    public static Collection<LSFClassDeclaration> getParents(LSFClassDeclaration decl) {
+        Set<LSFClassDeclaration> result = new HashSet<LSFClassDeclaration>();
+        for (LSFClassExtend extDecl : resolveExtendElements(decl))
+            result.addAll(extDecl.resolveExtends());
         return result;
     }
 

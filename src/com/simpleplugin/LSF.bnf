@@ -151,19 +151,44 @@ propertyExpression ::= ifPE
 {methods = [ resolveValueClass resolveInferredValueClass resolveParams inferParamClasses]}
 
 ifPE ::= orPE (IF orPE)*
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 orPE ::= xorPE (OR xorPE)*
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 xorPE ::= andPE (XOR andPE)*
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 andPE ::= notPE (AND notPE)*
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 notPE ::= (NOT notPE) | equalityPE
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
 
 equalityPE ::= relationalPE (EQ_OPERAND relationalPE)?
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 relationalPE ::= additiveORPE (((LESS | GREATER | LESS_EQUALS | GREATER_EQUALS) additiveORPE) | typePropertyDefinition)?
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 additiveORPE ::= additivePE (ADDOR_OPERAND additivePE)*
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 additivePE ::= multiplicativePE ((PLUS | MINUS) multiplicativePE)*
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 multiplicativePE ::= unaryMinusPE (MULT_OPERAND unaryMinusPE)*
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 unaryMinusPE ::= (MINUS unaryMinusPE) | postfixUnaryPE
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 postfixUnaryPE ::= simplePE (LSQBR uintLiteral RSQBR)?
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 simplePE ::= (LBRAC propertyExpression RBRAC) | expressionPrimitive
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
+
 expressionPrimitive ::= <<fullCompoundParamDeclareCheck>> expressionFriendlyPD | exprParameterUsage
 
 expressionFriendlyPD ::= joinPropertyDefinition
@@ -193,27 +218,27 @@ contextIndependentPD ::= dataPropertyDefinition
                     |   filterPropertyDefinition
 
 joinPropertyDefinition ::= JOIN? propertyObject LBRAC propertyExpressionList RBRAC
-{implements = "com.simpleplugin.psi.context.FriendlyPE, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList ]}
+{implements = "com.simpleplugin.psi.context.LSFExpression, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList ]}
 
 overridePropertyDefinition ::= (OVERRIDE | EXCLUSIVE) nonEmptyPropertyExpressionList
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
 
 ifElsePropertyDefinition ::= IF propertyExpression
                                     THEN propertyExpression
                                     (ELSE propertyExpression)?   // check greedy
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
 
 maxPropertyDefinition ::= (MAX | MIN) nonEmptyPropertyExpressionList
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses ]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses ]}
 
 caseBranchBody ::= WHEN propertyExpression THEN propertyExpression
 casePropertyDefinition ::= CASE (exclusiveOverrideOption)?
                            (caseBranchBody)+
                            (ELSE propertyExpression)?
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses ]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses ]}
 
 multiPropertyDefinition ::= MULTI nonEmptyPropertyExpressionList (exclusiveOverrideOption)?
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses ]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses ]}
 
 partitionPropertyBy ::= BY nonEmptyPropertyExpressionList 
 partitionPropertyDefinition ::= PARTITION
@@ -226,28 +251,28 @@ partitionPropertyDefinition ::= PARTITION
                                 propertyExpression (partitionPropertyBy)?
                                 (ORDER (DESC )? nonEmptyPropertyExpressionList)?
                                 (WINDOW EXCEPTLAST)?
-{implements = "com.simpleplugin.psi.context.FriendlyPE, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList ]}
+{implements = "com.simpleplugin.psi.context.LSFExpression, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList ]}
 
 recursivePropertyDefinition ::= RECURSION propertyExpression STEP propertyExpression (CYCLES (YES |	NO | IMPOSSIBLE))?
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
 
 structCreationPropertyDefinition ::= STRUCT LBRAC nonEmptyPropertyExpressionList RBRAC
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
 
 castPropertyDefinition ::= builtInClassName LBRAC propertyExpression RBRAC
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
 
 concatPropertyDefinition ::= CONCAT stringLiteral COMMA nonEmptyPropertyExpressionList
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
 
 sessionPropertyType ::= PREV | CHANGED | SET | DROPPED | SETCHANGED | DROPCHANGED | DROPSET 
 sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
 
-signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses]}
+signaturePropertyDefinition ::= CLASS LBRAC propertyExpression RBRAC
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses]}
 
-propertyExprObject ::= (LSQBR EQUAL (propertyExpression | expressionUnfriendlyPD) RSQBR)
+propertyExprObject ::= LSQBR EQUAL (propertyExpression | expressionUnfriendlyPD) RSQBR
 {implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
 
 propertyObject ::=  propertyUsage | propertyExprObject
@@ -536,7 +561,9 @@ formStatement ::=	(	formDecl
                     |	editFormDeclaration
                     |	listFormDeclaration
                     )*
-                    SEMI {pin=1
+                    SEMI
+{
+    pin=1
     mixin="com.simpleplugin.psi.extend.impl.LSFFormExtendImpl" implements="com.simpleplugin.psi.extend.LSFFormExtend"
     stubClass = "com.simpleplugin.psi.stubs.extend.ExtendFormStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
@@ -597,11 +624,17 @@ formObjectDeclaration ::= (simpleName EQUAL)?
 formPropertyDrawNameDecl ::= (simpleName EQUAL)? formPropertyName formPropertyOptionsList
 {mixin="com.simpleplugin.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFPropertyDrawNameDeclaration"}
 formPropertiesNamesDeclList ::=	formPropertyDrawNameDecl (COMMA formPropertyDrawNameDecl)*
-formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptionsList formPropertiesNamesDeclList 
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
+formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptionsList formPropertiesNamesDeclList
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList ]
+}
 
-formPropertiesList ::=  PROPERTIES formMappedNamePropertiesList
-	                |	PROPERTIES formPropertyOptionsList formMappedPropertiesList
+formPropertiesList ::=  PROPERTIES (formMappedNamePropertiesList | formPropertyOptionsList formMappedPropertiesList)
+{
+    pin = 1
+}
 
 formPropertyOptionsList ::= (	propertyEditTypeLiteral
                             |	HINTNOUPDATE
@@ -1025,7 +1058,7 @@ literal ::=
 	|	nullLiteral
 	|	staticObjectID
 	|	colorLiteral
-{implements = "com.simpleplugin.psi.context.FriendlyPE" methods = [ resolveInferredValueClass inferParamClasses ]}
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses ]}
 
 builtInClassName ::= PRIMITIVE_TYPE
 {

@@ -13,6 +13,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.simpleplugin.LSFFileCaretListener;
+import com.simpleplugin.classes.LSFValueClass;
 import com.simpleplugin.psi.LSFClassDecl;
 import com.simpleplugin.psi.LSFFile;
 import com.simpleplugin.psi.LSFId;
@@ -24,52 +25,52 @@ import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 
 public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuilder {
-    public static final LSFTreeBasedStructureViewBuilder INSTANCE = new LSFTreeBasedStructureViewBuilder();
+    private final LSFFile file;
 
-    private LSFFileCaretListener caretListener = new LSFFileCaretListener();
+    private final LSFValueClass valueClass;
 
-    private LSFFile file;
+    private final LSFFileCaretListener caretListener;
 
-    private LSFClassInterfacesTreeModel model;
+    private final LSFStructureViewNavigationHandler navigationHandler;
 
-    private boolean needTotalExpansion = false;
+    private boolean needTotalExpansion = true;
 
-    public void setFile(LSFFile file) {
+    public LSFTreeBasedStructureViewBuilder(LSFFile file) {
+        this(file, null, null);
+    }
 
-        if (this.file != file) {
-            needTotalExpansion = false;
-        }
+    public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler) {
         this.file = file;
+        this.valueClass = valueClass;
+        this.navigationHandler = navigationHandler;
+        caretListener = new LSFFileCaretListener(file);
     }
 
     @NotNull
     public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
-        editor.getCaretModel().removeCaretListener(caretListener);
-        editor.getCaretModel().addCaretListener(caretListener);
-        caretListener.setFile(file);
-
-        if (model == null) {
-            model = new LSFClassInterfacesTreeModel(file);
-            needTotalExpansion = false;
-            return model;
+        if (editor != null) {
+            editor.getCaretModel().removeCaretListener(caretListener);
+            editor.getCaretModel().addCaretListener(caretListener);
         }
 
-        PsiElement targetElement = TargetElementUtilBase.findTargetElement(editor, ImplementationSearcher.getFlags());
-
-        if (targetElement instanceof LSFId) {
-
-            PsiElement parent = targetElement;
-            while (parent != null) {
-                if (parent instanceof LSFClassDecl) {
-                    model = new LSFClassInterfacesTreeModel(file);
-                    needTotalExpansion = false;
-                    break;
+        LSFValueClass currentClass = valueClass;
+        if (currentClass == null) {
+            PsiElement targetElement = TargetElementUtilBase.findTargetElement(editor, ImplementationSearcher.getFlags());
+            if (targetElement instanceof LSFId) {
+                PsiElement parent = targetElement;
+                while (parent != null) {
+                    //!! для классов, которые берутся из эдитора, не используем PRIMITIVE TYPES
+                    if (parent instanceof LSFClassDecl) {
+                        currentClass = (LSFClassDecl) parent;
+                        break;
+                    }
+                    parent = parent.getParent();
                 }
-                parent = parent.getParent();
             }
         }
 
-        return model;
+        needTotalExpansion = true;
+        return new LSFClassInterfacesTreeModel(file, currentClass, navigationHandler);
     }
 
     @NotNull
@@ -91,9 +92,9 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (!needTotalExpansion) {
+                        if (needTotalExpansion) {
                             TreeUtil.expandAll(tree);
-                            needTotalExpansion = true;
+                            needTotalExpansion = false;
                         }
                     }
                 });

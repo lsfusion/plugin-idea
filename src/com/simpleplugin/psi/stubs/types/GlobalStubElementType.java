@@ -1,16 +1,11 @@
 package com.simpleplugin.psi.stubs.types;
 
-import com.intellij.lang.Language;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.simpleplugin.LSFLanguage;
 import com.simpleplugin.psi.LSFGlobalElement;
-import com.simpleplugin.psi.declarations.LSFGlobalDeclaration;
 import com.simpleplugin.psi.stubs.GlobalStubElement;
-import com.simpleplugin.psi.stubs.impl.MetaStubImpl;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -22,6 +17,7 @@ public abstract class GlobalStubElementType<StubT extends GlobalStubElement<Stub
         key = StubIndexKey.createIndexKey(getExternalId());
     }
 
+    @NotNull
     @Override
     public String getExternalId() {
         return "lsf." + toString();

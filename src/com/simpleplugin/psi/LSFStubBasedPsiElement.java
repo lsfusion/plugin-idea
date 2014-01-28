@@ -4,11 +4,12 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.psi.stubs.StubElement;
 import com.simpleplugin.psi.stubs.GlobalStubElement;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class LSFStubBasedPsiElement<This extends LSFGlobalElement<This, Stub>, Stub extends GlobalStubElement<Stub, This>> extends StubBasedPsiElementBase<Stub> implements LSFElement {
+public abstract class LSFStubBasedPsiElement<This extends LSFGlobalElement<This, Stub>, Stub extends GlobalStubElement<Stub, This>>
+        extends StubBasedPsiElementBase<Stub>
+        implements LSFElement {
     
     protected LSFStubBasedPsiElement(@NotNull Stub stub, @NotNull IStubElementType nodeType) {
         super(stub, nodeType);

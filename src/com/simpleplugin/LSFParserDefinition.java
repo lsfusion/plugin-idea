@@ -26,6 +26,7 @@ import java.io.Reader;
 public class LSFParserDefinition implements ParserDefinition{
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(LSFTypes.COMMENTS);
+    public static final TokenSet STRINGS = TokenSet.create(LSFTypes.STRING_LITERAL);
 
     public static boolean isWhiteSpace(IElementType type) {
         return WHITE_SPACES.contains(type);
@@ -53,7 +54,7 @@ public class LSFParserDefinition implements ParserDefinition{
 
     @NotNull
     public TokenSet getStringLiteralElements() {
-        return TokenSet.EMPTY;
+        return STRINGS;
     }
 
     @NotNull

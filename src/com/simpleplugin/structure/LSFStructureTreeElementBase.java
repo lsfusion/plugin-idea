@@ -3,13 +3,11 @@ package com.simpleplugin.structure;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.simpleplugin.classes.CustomClassSet;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.classes.LSFValueClass;
-import com.simpleplugin.psi.LSFClassDecl;
-import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement;
 import com.simpleplugin.psi.stubs.types.indexes.ExplicitInterfaceIndex;
 import org.jetbrains.annotations.NotNull;
@@ -17,49 +15,60 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiElement> {
-    private PsiElement baseElement;
+public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
+
+    private final LSFValueClass valueClass;
+    private final LSFStructureViewNavigationHandler navigationHandler;
+
     private List<StructureViewTreeElement> children;
 
-    protected LSFStructureTreeElementBase(PsiElement psiElement) {
-        super(psiElement.getContainingFile());
-        baseElement = psiElement;
+    protected LSFStructureTreeElementBase(PsiFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler) {
+        super(file);
+        this.valueClass = valueClass;
+        this.navigationHandler = navigationHandler;
     }
 
     @NotNull
     @Override
     public Collection<StructureViewTreeElement> getChildrenBase() {
         if (children == null) {
-            children = new ArrayList<StructureViewTreeElement>();
-
-            if (baseElement instanceof LSFClassDecl) {
-                children.addAll(getPropertyTreeElements((LSFClassDecl) baseElement));
-
-                for (LSFClassDeclaration decl : CustomClassSet.getParentsRecursively((LSFClassDeclaration) baseElement)) {
-                    children.addAll(getPropertyTreeElements((LSFClassDecl) decl));
+            if (valueClass != null) {
+                children = new ArrayList<StructureViewTreeElement>();
+                for (LSFValueClass vc : CustomClassSet.getClassParentsRecursively(valueClass)) {
+                    children.addAll(getPropertyTreeElements(vc));
                 }
+            } else {
+                children = Collections.emptyList();
             }
         }
 
         return children;
     }
 
-    private Collection<LSFPropertyStatementTreeElement> getPropertyTreeElements(LSFClassDecl classDecl) {
-        String name = classDecl.getName();
-        Project project = classDecl.getProject();
+    private Collection<LSFPropertyStatementTreeElement> getPropertyTreeElements(LSFValueClass valueClass) {
+        if (getElement() == null || valueClass == null) {
+            return Collections.emptyList();
+        }
+
+        String name = valueClass.getName();
+        Project project = getElement().getProject();
         Collection<LSFExplicitInterfacePropStatement> statements = ExplicitInterfaceIndex.getInstance().get(name, project, GlobalSearchScope.allScope(project));
 
         List<LSFPropertyStatementTreeElement> result = new ArrayList<LSFPropertyStatementTreeElement>();
 
         for (LSFExplicitInterfacePropStatement statement : statements) {
-            for (LSFClassSet classSet : statement.getPropertyStatement().resolveParamClasses()) {
-                if (classSet != null) {
-                    LSFValueClass paramClass = classSet.getCommonClass();
-                    if (paramClass instanceof LSFClassDecl && paramClass == classDecl) {
-                        result.add(new LSFPropertyStatementTreeElement(classDecl, statement));
-                        break;
+            List<LSFClassSet> statementClasses = statement.getPropertyStatement().resolveParamClasses();
+            if (statementClasses != null) {
+                for (LSFClassSet classSet : statementClasses) {
+                    if (classSet != null) {
+                        LSFValueClass paramClass = classSet.getCommonClass();
+                        if (valueClass.equals(paramClass)) {
+                            result.add(new LSFPropertyStatementTreeElement(valueClass, statement, navigationHandler));
+                            break;
+                        }
                     }
                 }
             }

@@ -20,8 +20,8 @@ public class ParameterNumberSorter implements Sorter {
             @Override
             public int compare(Object o1, Object o2) {
                 if (o1 instanceof LSFPropertyStatementTreeElement && o2 instanceof LSFPropertyStatementTreeElement) {
-                    LSFExplicitInterfacePropStatement el1 = (LSFExplicitInterfacePropStatement) ((LSFPropertyStatementTreeElement) o1).getElement();
-                    LSFExplicitInterfacePropStatement el2 = (LSFExplicitInterfacePropStatement) ((LSFPropertyStatementTreeElement) o2).getElement();
+                    LSFExplicitInterfacePropStatement el1 =  ((LSFPropertyStatementTreeElement) o1).getElement();
+                    LSFExplicitInterfacePropStatement el2 = ((LSFPropertyStatementTreeElement) o2).getElement();
                     String class1Name = ((LSFPropertyStatementTreeElement) o1).getClassName();
                     String class2Name = ((LSFPropertyStatementTreeElement) o2).getClassName();
 

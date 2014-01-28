@@ -82,6 +82,10 @@
                 description="Find not inferred elements for project">
             <add-to-group group-id="CodeMenu"/>
         </action>
+        <action id="InsertComposition" class="com.simpleplugin.actions.InsertCompositionAction">
+            <add-to-group group-id="CodeMenu"/>
+            <keyboard-shortcut first-keystroke="control alt shift B" keymap="$default"/>
+        </action>
         <action id="GoToExtension" class="com.simpleplugin.GoToExtensionAction" text="Extension(s)"
                 description="Navigate to the extension(s) of the selected element">
             <add-to-group group-id="GoToCodeGroup"/>
@@ -109,6 +113,8 @@
         <structureViewBuilder factoryClass="com.simpleplugin.structure.LSFInterfacesStructureViewBuilderFactory"/>
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
+
+        <!--<completion.contributor language="Lsf" implementationClass="com.simpleplugin.completion.KeywordCompletionContributor"/>-->
 
         <internalFileTemplate name="lsFusion script"/>
         <internalFileTemplate name="lsFusion settings"/>

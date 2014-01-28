@@ -1,11 +1,8 @@
 package com.simpleplugin.psi.stubs;
 
-import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubOutputStream;
-import com.simpleplugin.psi.LSFStubElement;
-import com.simpleplugin.psi.declarations.LSFGlobalDeclaration;
-import com.simpleplugin.psi.declarations.LSFNamespaceDeclaration;
 import com.simpleplugin.psi.LSFGlobalElement;
+import com.simpleplugin.psi.LSFStubElement;
 
 import java.io.IOException;
 

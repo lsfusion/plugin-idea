@@ -1,23 +1,20 @@
 package com.simpleplugin.structure;
 
-import com.intellij.codeInsight.TargetElementUtilBase;
-import com.intellij.codeInsight.navigation.ImplementationSearcher;
 import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.TextEditorBasedStructureViewModel;
 import com.intellij.ide.util.treeView.smartTree.Grouper;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.simpleplugin.psi.LSFClassDecl;
-import com.simpleplugin.psi.LSFId;
+import com.simpleplugin.classes.LSFValueClass;
 import org.jetbrains.annotations.NotNull;
 
 public class LSFClassInterfacesTreeModel extends TextEditorBasedStructureViewModel implements StructureViewModel.ElementInfoProvider {
-    private LSFStructureTreeElementBase rootElement;
+    private final LSFStructureTreeElementBase rootElement;
 
-    protected LSFClassInterfacesTreeModel(PsiFile file) {
+    protected LSFClassInterfacesTreeModel(PsiFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler) {
         super(file);
+        this.rootElement = new LSFStructureTreeElementBase(file, valueClass, navigationHandler);
     }
 
     @Override
@@ -51,25 +48,6 @@ public class LSFClassInterfacesTreeModel extends TextEditorBasedStructureViewMod
     @NotNull
     @Override
     public StructureViewTreeElement getRoot() {
-        if (rootElement == null) {
-            PsiElement targetElement = TargetElementUtilBase.findTargetElement(getEditor(), ImplementationSearcher.getFlags());
-
-            if (targetElement instanceof LSFId) {
-
-                PsiElement parent = targetElement;
-                while (parent.getParent() != null) {
-                    if (parent instanceof LSFClassDecl) {
-                        rootElement = new LSFStructureTreeElementBase(parent);
-                        return rootElement;
-                    }
-                    parent = parent.getParent();
-                }
-
-            }
-
-            rootElement = new LSFStructureTreeElementBase(getPsiFile());
-
-        }
         return rootElement;
     }
 }

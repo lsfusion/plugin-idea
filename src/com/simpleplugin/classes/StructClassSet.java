@@ -60,11 +60,16 @@ public class StructClassSet implements LSFClassSet, LSFValueClass {
     // пока не поддерживаем
 
     public LSFValueClass getCommonClass() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("getCommonClass() isn't supproted for StructClassSet");
     }
 
     public String getQName(PsiElement context) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("getQName(PsiElement context) isn't supproted for StructClassSet");
+    }
+
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException("getName() isn't supproted for StructClassSet");
     }
 
     public boolean equals(Object o) {

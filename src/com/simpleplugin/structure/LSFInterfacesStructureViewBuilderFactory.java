@@ -21,8 +21,6 @@ public class LSFInterfacesStructureViewBuilderFactory implements StructureViewBu
         final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
         if (psiFile == null || !(psiFile instanceof LSFFile)) return null;
 
-        LSFTreeBasedStructureViewBuilder.INSTANCE.setFile((LSFFile) psiFile);
-
-        return LSFTreeBasedStructureViewBuilder.INSTANCE;
+        return new LSFTreeBasedStructureViewBuilder((LSFFile) psiFile);
     }
 }                                                       

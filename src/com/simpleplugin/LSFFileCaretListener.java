@@ -12,14 +12,11 @@ import com.simpleplugin.psi.LSFFile;
 import com.simpleplugin.psi.LSFId;
 
 public class LSFFileCaretListener implements CaretListener {
-    private LSFFile file;
+    private final LSFFile file;
 
     private PsiElement latestClassElement;
 
-    public LSFFileCaretListener() {
-    }
-
-    public void setFile(LSFFile file) {
+    public LSFFileCaretListener(LSFFile file) {
         this.file = file;
     }
 
@@ -28,7 +25,6 @@ public class LSFFileCaretListener implements CaretListener {
         PsiElement targetElement = TargetElementUtilBase.findTargetElement(e.getEditor(), ImplementationSearcher.getFlags());
 
         if (targetElement instanceof LSFId) {
-
             PsiElement parent = targetElement;
             while (parent != null) {
                 if (parent instanceof LSFClassDecl) {

@@ -10,6 +10,10 @@ public class LSFTokenType extends IElementType {
         super(debugName, LSFLanguage.INSTANCE);
     }
 
+    public String tokenText() {
+        return super.toString();
+    }
+
     @Override
     public String toString() {
         return "LSFTokenType." + super.toString();

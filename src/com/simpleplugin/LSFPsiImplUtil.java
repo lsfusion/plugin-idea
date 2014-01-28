@@ -8,6 +8,7 @@ import com.simpleplugin.classes.*;
 import com.simpleplugin.meta.MetaTransaction;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.context.*;
+import com.simpleplugin.psi.context.LSFExpression;
 import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
 import com.simpleplugin.psi.declarations.LSFParamDeclaration;
@@ -581,7 +582,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFClassSet resolveInferredValueClass(@NotNull LSFExpressionFriendlyPD sourceStatement, @Nullable InferResult inferred) {
-        return ((FriendlyPE) sourceStatement.getChildren()[0]).resolveInferredValueClass(inferred);
+        return ((LSFExpression) sourceStatement.getChildren()[0]).resolveInferredValueClass(inferred);
     }
 
     private static LSFClassSet resolveValueClass(LSFPropertyUsage usage, boolean infer) {
@@ -1360,7 +1361,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFExpressionFriendlyPD sourceStatement, @Nullable LSFClassSet valueClass) {
-        return ((FriendlyPE) sourceStatement.getChildren()[0]).inferParamClasses(valueClass);
+        return ((LSFExpression) sourceStatement.getChildren()[0]).inferParamClasses(valueClass);
     }
 
     public static Inferred inferJoinParamClasses(@NotNull LSFPropertyObject propertyObject, LSFPropertyExpressionList peList, @Nullable LSFClassSet valueClass) {

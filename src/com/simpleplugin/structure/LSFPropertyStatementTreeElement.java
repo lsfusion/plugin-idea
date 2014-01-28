@@ -2,32 +2,31 @@ package com.simpleplugin.structure;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.psi.PsiElement;
-import com.simpleplugin.classes.LSFClassSet;
-import com.simpleplugin.psi.LSFClassDecl;
-import com.simpleplugin.psi.LSFPropertyStatement;
+import com.simpleplugin.classes.LSFValueClass;
 import com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement;
+import com.simpleplugin.util.PsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class LSFPropertyStatementTreeElement extends PsiTreeElementBase<PsiElement> {
-    private LSFClassDecl targetClass;
+public class LSFPropertyStatementTreeElement extends PsiTreeElementBase<LSFExplicitInterfacePropStatement> {
+    private final LSFStructureViewNavigationHandler navigationHandler;
+    private final LSFValueClass valueClass;
 
-    protected LSFPropertyStatementTreeElement(LSFClassDecl targetClass, PsiElement element) {
+    public LSFPropertyStatementTreeElement(@NotNull LSFValueClass valueClass, LSFExplicitInterfacePropStatement element, LSFStructureViewNavigationHandler navigationHandler) {
         super(element);
-
-        this.targetClass = targetClass;
+        this.valueClass = valueClass;
+        this.navigationHandler = navigationHandler;
     }
 
-    public LSFClassDecl getTargetClass() {
-        return targetClass;
+    public LSFValueClass getValueClass() {
+        return valueClass;
     }
 
     public String getClassName() {
-        return targetClass.getName();
+        return valueClass.getName();
     }
 
     @NotNull
@@ -39,30 +38,18 @@ public class LSFPropertyStatementTreeElement extends PsiTreeElementBase<PsiEleme
     @Nullable
     @Override
     public String getPresentableText() {
-        LSFPropertyStatement propertyStatement = ((LSFExplicitInterfacePropStatement) getElement()).getPropertyStatement();
-
-        String text = propertyStatement.getPresentableText();
-
-        String caption = propertyStatement.getCaption();
-        if (caption != null) {
-            text += " " + caption;
-        }
-
-        LSFClassSet valueClass = propertyStatement.resolveValueClass(false);
-        if (!propertyStatement.isAction()) {
-            text += ": " + valueClass;
-        }
-
-        return text;
+        return PsiUtils.getPropertyStatementPresentableText(getElement());
     }
 
     @Override
     public void navigate(boolean requestFocus) {
-        super.navigate(false);
+        if (navigationHandler != null) {
+            navigationHandler.navigate(this, requestFocus);
+        }
     }
 
     @Override
     public boolean canNavigateToSource() { // автоматом при навигации по дереву
-        return false;
+        return navigationHandler != null;
     }
 }

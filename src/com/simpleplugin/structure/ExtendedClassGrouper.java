@@ -3,7 +3,7 @@ package com.simpleplugin.structure;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.ide.util.treeView.smartTree.*;
 import com.simpleplugin.LSFIcons;
-import com.simpleplugin.psi.LSFClassDecl;
+import com.simpleplugin.classes.LSFValueClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -18,11 +18,11 @@ public class ExtendedClassGrouper implements Grouper {
             return Collections.emptyList();
         }
 
-        LinkedHashMap<LSFClassDecl, Group> groupMap = new LinkedHashMap<LSFClassDecl, Group>();
+        LinkedHashMap<LSFValueClass, Group> groupMap = new LinkedHashMap<LSFValueClass, Group>();
         for (TreeElement child : children) {
             if (child instanceof LSFPropertyStatementTreeElement) {
                 LSFPropertyStatementTreeElement psChild = (LSFPropertyStatementTreeElement) child;
-                LSFClassDecl psClass = psChild.getTargetClass();
+                LSFValueClass psClass = psChild.getValueClass();
                 ExtendedClassesGroup classGroup = (ExtendedClassesGroup) groupMap.get(psClass);
                 if (classGroup == null) {
                     classGroup = new ExtendedClassesGroup(psClass.getName());
