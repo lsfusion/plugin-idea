@@ -35,22 +35,25 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
 
     private boolean needTotalExpansion = true;
 
-    public LSFTreeBasedStructureViewBuilder(LSFFile file) {
-        this(file, null, null);
+    public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFFileCaretListener caretListener) {
+        this(file, null, caretListener, null);
     }
 
     public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler) {
+        this(file, valueClass, null, navigationHandler);
+    }
+
+    public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFFileCaretListener caretListener, LSFStructureViewNavigationHandler navigationHandler) {
         this.file = file;
         this.valueClass = valueClass;
         this.navigationHandler = navigationHandler;
-        caretListener = new LSFFileCaretListener(file);
+        this.caretListener = caretListener;
     }
 
     @NotNull
     public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
-        if (editor != null) {
-            editor.getCaretModel().removeCaretListener(caretListener);
-            editor.getCaretModel().addCaretListener(caretListener);
+        if (caretListener != null) {
+            caretListener.install(editor);
         }
 
         LSFValueClass currentClass = valueClass;

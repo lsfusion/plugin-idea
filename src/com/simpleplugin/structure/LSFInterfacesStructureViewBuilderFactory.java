@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.simpleplugin.LSFFileCaretListener;
 import com.simpleplugin.LSFFileType;
 import com.simpleplugin.psi.LSFFile;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,12 @@ public class LSFInterfacesStructureViewBuilderFactory implements StructureViewBu
         final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
         if (psiFile == null || !(psiFile instanceof LSFFile)) return null;
 
-        return new LSFTreeBasedStructureViewBuilder((LSFFile) psiFile);
+        LSFFileCaretListener caretListener = project.getUserData(LSFFileCaretListener.PROJECT_COMPONENT_KEY);
+        if (caretListener == null) {
+            caretListener = new LSFFileCaretListener(project);
+            project.putUserData(LSFFileCaretListener.PROJECT_COMPONENT_KEY, caretListener);
+        }
+
+        return new LSFTreeBasedStructureViewBuilder((LSFFile) psiFile, caretListener);
     }
 }                                                       
