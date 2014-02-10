@@ -31,6 +31,12 @@ public class LSFStubFactory {
             return LSFStubElementTypes.EXTENDCLASS;
         if (ID.equals("EXPLICIT_INTERFACE_PROPERTY_STATEMENT"))
             return LSFStubElementTypes.EXPLICIT_INTERFACE;
+        if (ID.equals("EXPLICIT_VALUE_PROPERTY_STATEMENT"))
+            return LSFStubElementTypes.EXPLICIT_VALUE;
+        if (ID.equals("IMPLICIT_VALUE_PROPERTY_STATEMENT"))
+            return LSFStubElementTypes.IMPLICIT_VALUE;
+        if (ID.equals("IMPLICIT_INTERFACE_PROPERTY_STATEMENT"))
+            return LSFStubElementTypes.IMPLICIT_INTERFACE;
 
         throw new UnsupportedOperationException();
     }

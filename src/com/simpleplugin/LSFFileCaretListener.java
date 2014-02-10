@@ -11,6 +11,7 @@ import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
+import com.simpleplugin.psi.LSFBuiltInClassName;
 import com.simpleplugin.psi.LSFClassDecl;
 import com.simpleplugin.psi.LSFId;
 
@@ -39,7 +40,7 @@ public class LSFFileCaretListener implements CaretListener {
         if (targetElement instanceof LSFId) {
             PsiElement parent = targetElement;
             while (parent != null) {
-                if (parent instanceof LSFClassDecl) {
+                if (parent instanceof LSFClassDecl || parent instanceof LSFBuiltInClassName) {
                     break;
                 }
                 parent = parent.getParent();

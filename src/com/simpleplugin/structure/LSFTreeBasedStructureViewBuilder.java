@@ -13,7 +13,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.simpleplugin.LSFFileCaretListener;
+import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.classes.LSFValueClass;
+import com.simpleplugin.psi.LSFBuiltInClassName;
 import com.simpleplugin.psi.LSFClassDecl;
 import com.simpleplugin.psi.LSFFile;
 import com.simpleplugin.psi.LSFId;
@@ -62,9 +64,11 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
             if (targetElement instanceof LSFId) {
                 PsiElement parent = targetElement;
                 while (parent != null) {
-                    //!! для классов, которые берутся из эдитора, не используем PRIMITIVE TYPES
                     if (parent instanceof LSFClassDecl) {
                         currentClass = (LSFClassDecl) parent;
+                        break;
+                    } else if (parent instanceof LSFBuiltInClassName) {
+                        currentClass = LSFPsiImplUtil.resolve((LSFBuiltInClassName) parent).getCommonClass();
                         break;
                     }
                     parent = parent.getParent();

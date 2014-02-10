@@ -1,4 +1,4 @@
-package com.simpleplugin.psi.stubs.types;
+package com.simpleplugin.psi.stubs.interfaces.types;
 
 import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
@@ -10,8 +10,8 @@ import com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement;
 import com.simpleplugin.psi.declarations.LSFParamDeclaration;
 import com.simpleplugin.psi.declarations.impl.LSFGlobalPropDeclarationImpl;
 import com.simpleplugin.psi.impl.LSFExplicitInterfacePropertyStatementImpl;
-import com.simpleplugin.psi.stubs.ExplicitInterfaceStubElement;
-import com.simpleplugin.psi.stubs.impl.ExplicitInterfaceStubImpl;
+import com.simpleplugin.psi.stubs.interfaces.ExplicitInterfaceStubElement;
+import com.simpleplugin.psi.stubs.interfaces.impl.ExplicitInterfaceStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -41,9 +41,13 @@ public class ExplicitInterfaceStubElementType extends IStubElementType<ExplicitI
         List<LSFParamDeclaration> explicitParams = (List<LSFParamDeclaration>) ((LSFGlobalPropDeclarationImpl) psi.getPropertyStatement()).getExplicitParams();
         if (explicitParams != null) {
             for (LSFParamDeclaration param : explicitParams) {
-                classNames.add(param.getClassName());
+                String className = param.getClassName();
+                if (className != null) {
+                    classNames.add(className);
+                }
             }
-        } else {
+        }
+        if (classNames.isEmpty()) {
             LSFExpressionUnfriendlyPD expressionUnfriendlyPD = psi.getPropertyStatement().getExpressionUnfriendlyPD();
             if (expressionUnfriendlyPD != null) {
                 LSFContextIndependentPD contextIndependentPD = expressionUnfriendlyPD.getContextIndependentPD();
@@ -53,14 +57,14 @@ public class ExplicitInterfaceStubElementType extends IStubElementType<ExplicitI
             }
         }
 
-        stub.paramClasses = classNames;
+        stub.setParamClasses(classNames);
 
         return stub;
     }
 
     @Override
     public String getExternalId() {
-        return "lsf.ExplicitInterfaceClasses";
+        return "lsf.ExplicitInterface";
     }
 
     @Override
@@ -95,7 +99,7 @@ public class ExplicitInterfaceStubElementType extends IStubElementType<ExplicitI
     public void indexStub(ExplicitInterfaceStubElement stub, IndexSink sink) {
         List<String> paramClasses = stub.getParamClasses();
         if (paramClasses != null) {
-            Set<String> set = new HashSet<String>(stub.getParamClasses()); // избегаем повторного добавления при многократном вхождении класса
+            Set<String> set = new HashSet<String>(paramClasses); // избегаем повторного добавления при многократном вхождении класса
             for (String paramClass : set) {
                 if (paramClass != null) {
                     sink.occurrence(key, paramClass);

@@ -1,6 +1,5 @@
 package com.simpleplugin.psi;
 
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -20,25 +19,25 @@ import com.simpleplugin.psi.stubs.extend.types.ExtendStubElementType;
 import com.simpleplugin.psi.stubs.extend.types.indexes.ClassExtendsClassIndex;
 import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class LSFGlobalResolver {
 
     public static ConcurrentHashMap<LSFModuleDeclaration, Set<LSFFile>> cached = new ConcurrentHashMap<LSFModuleDeclaration, Set<LSFFile>>();
+
     // вот эту хрень надо по хорошему кэшировать
     private static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration) {
         Set<LSFFile> cachedFiles = cached.get(declaration);
-        if(cachedFiles!=null)
+        if (cachedFiles != null)
             return cachedFiles;
 
         Set<LSFFile> result = new HashSet<LSFFile>();
 
         result.add(declaration.getLSFFile());
-        for(LSFModuleReference ref : declaration.getRequireRefs()) {
+        for (LSFModuleReference ref : declaration.getRequireRefs()) {
             LSFModuleDeclaration resolve = ref.resolveDecl();
-            if(resolve!=null)
+            if (resolve != null)
                 result.addAll(getRequireModules(resolve));
         }
 //        System.out.println("CACHED "+declaration.getName()+" "+System.identityHashCode(declaration));
@@ -46,28 +45,28 @@ public class LSFGlobalResolver {
         return result;
     }
 
-    private static GlobalSearchScope getRequireScope(Project project, LSFModuleDeclaration declaration) {
+    public static GlobalSearchScope getRequireScope(Project project, LSFModuleDeclaration declaration) {
         LSFFile file = declaration.getLSFFile();
         VirtualFile vfile = file.getVirtualFile();
-        if(vfile == null) {
+        if (vfile == null) {
             Query<LSFModuleDeclaration> modules = findModules(declaration.getGlobalName(), GlobalSearchScope.allScope(project));
             LSFModuleDeclaration first = modules.findFirst();
-            if(first != null)
+            if (first != null)
                 declaration = first;
         }
 
         Set<VirtualFile> vFiles = new HashSet<VirtualFile>();
-        for(LSFFile lsfFile : getRequireModules(declaration)) {
+        for (LSFFile lsfFile : getRequireModules(declaration)) {
             vFiles.add(lsfFile.getVirtualFile()); // null может быть только для dumb
         }
         return GlobalSearchScope.filesScope(project, vFiles);
     }
-    
+
     private static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findInNamespace(Collection<T> decls, Finalizer<T> finalizer) {
-        if(decls==null)
+        if (decls == null)
             return null;
 
-        if(decls.size()>0)
+        if (decls.size() > 0)
             return finalizer.finalize(decls);
         return null;
     }
@@ -79,9 +78,9 @@ public class LSFGlobalResolver {
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, T virtDecl, Condition<T> condition) {
         return findElements(name, fqName, file, types, virtDecl, condition, Finalizer.EMPTY);
     }
-    
+
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, T virtDecl, Condition<T> condition, Finalizer<T> finalizer) {
-        if(fqName!=null) {
+        if (fqName != null) {
             final Condition<T> fCondition = condition;
             condition = new Condition<T>() {
                 public boolean value(T t) {
@@ -91,9 +90,9 @@ public class LSFGlobalResolver {
             };
         } else
             finalizer = new NamespaceFinalizer<T>(file.getModuleDeclaration(), finalizer);
-        return findElements(name, file, types, virtDecl, condition, finalizer);  
+        return findElements(name, file, types, virtDecl, condition, finalizer);
     }
-    
+
     private static class NamespaceFinalizer<T extends LSFFullNameDeclaration> implements Finalizer<T> {
 
         private final LSFModuleDeclaration moduleDeclaration;
@@ -105,15 +104,15 @@ public class LSFGlobalResolver {
         }
 
         public Collection<T> finalize(Collection<T> decls) {
-            if(decls.size()==1) // оптимизация
+            if (decls.size() == 1) // оптимизация
                 return decls;
-            
+
             Map<String, Collection<T>> mapDecls = new HashMap<String, Collection<T>>();
-            for(T decl : decls) {
+            for (T decl : decls) {
                 String namespace = decl.getNamespaceName();
 
                 Collection<T> nameList = mapDecls.get(namespace);
-                if(nameList==null) {
+                if (nameList == null) {
                     nameList = new ArrayList<T>();
                     mapDecls.put(namespace, nameList);
                 }
@@ -122,16 +121,16 @@ public class LSFGlobalResolver {
 
             // смотрим на priority
             Collection<T> result = findInNamespace(mapDecls.get(moduleDeclaration.getNamespace()), finalizer);
-            if(result!=null)
+            if (result != null)
                 return result;
 
-            for(LSFNamespaceReference priority : moduleDeclaration.getPriorityRefs()) {
+            for (LSFNamespaceReference priority : moduleDeclaration.getPriorityRefs()) {
                 String resolve = priority.getNameRef();
                 result = findInNamespace(mapDecls.get(resolve), finalizer);
-                if(result!=null)
+                if (result != null)
                     return result;
             }
-            
+
             return finalizer.finalize(decls);
         }
     }
@@ -143,14 +142,14 @@ public class LSFGlobalResolver {
         GlobalSearchScope scope = getRequireScope(project, moduleDeclaration);
 
         Collection<T> decls = new ArrayList<T>();
-        for(FullNameStubElementType<S, T> type : types)
+        for (FullNameStubElementType<S, T> type : types)
             decls.addAll(type.getGlobalIndex().get(name, project, scope));
-        if(virtDecl!=null)
+        if (virtDecl != null)
             decls.add(virtDecl);
 
         Collection<T> fitDecls = new ArrayList<T>();
-        for(T decl : decls) 
-            if(condition.value(decl))
+        for (T decl : decls)
+            if (condition.value(decl))
                 fitDecls.add(decl);
 
         return finalizer.finalize(fitDecls);
@@ -163,39 +162,41 @@ public class LSFGlobalResolver {
     }
 
     public static Query<LSFNamespaceDeclaration> findNamespaces(String name, GlobalSearchScope scope) {
-        
+
         Query<LSFNamespaceDeclaration> modules = BaseUtils.<LSFNamespaceDeclaration, LSFModuleDeclaration>immutableCast(findModules(name, scope));
-        if(modules.findFirst()!=null)
+        if (modules.findFirst() != null)
             return modules;
 
         // модуля нет, ищем namespace'ы
         StringStubIndexExtension<LSFExplicitNamespaceDeclaration> explicitIndex = LSFStubElementTypes.EXPLICIT_NAMESPACE.getGlobalIndex();
         Collection<LSFExplicitNamespaceDeclaration> explicitDeclarations = explicitIndex.get(name, scope.getProject(), scope);
-        if(explicitDeclarations.size() == 0)
+        if (explicitDeclarations.size() == 0)
             return modules;
 
         LSFExplicitNamespaceDeclaration minDeclaration = null;
         String minName = null;
-        for(LSFExplicitNamespaceDeclaration explicitDecl : explicitDeclarations) {
+        for (LSFExplicitNamespaceDeclaration explicitDecl : explicitDeclarations) {
             String moduleName = explicitDecl.getLSFFile().getModuleDeclaration().getDeclName();
-            if(minName == null || minName.compareTo(moduleName) > 0) {
+            if (minName == null || minName.compareTo(moduleName) > 0) {
                 minDeclaration = explicitDecl;
                 minName = moduleName;
             }
         }
         return new MergeQuery<LSFNamespaceDeclaration>(modules, new CollectionQuery<LSFNamespaceDeclaration>(Collections.<LSFNamespaceDeclaration>singleton(minDeclaration)));
     }
-    
+
     // этот элемент и все "выше"
     public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(T element) {
         return findExtendElements(element.resolveDecl(), (ExtendStubElementType<T, E>) element.getElementType(), element.getLSFFile());
     }
+
     public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, LSFFile file) {
         Project project = file.getProject();
         return findExtendElements(decl, type, project, getRequireScope(project, file.getModuleDeclaration()));
     }
+
     public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, Project project, GlobalSearchScope scope) {
-        if(decl==null)
+        if (decl == null)
             return new EmptyQuery<T>();
 
         StringStubIndexExtension<T> index = type.getGlobalIndex();
@@ -209,10 +210,10 @@ public class LSFGlobalResolver {
             public boolean value(T t) {
                 LSFFullNameDeclaration resolveDecl = t.resolveDecl();
                 return resolveDecl != null && resolveDecl.equals(decl); // проверяем что resolve'ся куда надо
-            }                         
+            }
         });
     }
-    
+
     public static Collection<LSFClassDeclaration> findClassExtends(LSFClassDeclaration decl, Project project, GlobalSearchScope scope) {
         ClassExtendsClassIndex index = ClassExtendsClassIndex.getInstance();
 
@@ -221,18 +222,18 @@ public class LSFGlobalResolver {
         Collection<LSFClassExtend> classExtends = index.get(name, project, scope);
 
         Collection<LSFClassDeclaration> result = new ArrayList<LSFClassDeclaration>();
-        for(LSFClassExtend classExtend : classExtends) {
+        for (LSFClassExtend classExtend : classExtends) {
             boolean found = false;
-            for(LSFClassDeclaration classExtendClass : classExtend.resolveExtends())
-                if(classExtendClass.equals(decl)) { // проверяем что resolve'ся куда надо
+            for (LSFClassDeclaration classExtendClass : classExtend.resolveExtends())
+                if (classExtendClass.equals(decl)) { // проверяем что resolve'ся куда надо
                     found = true;
-                    break;                            
+                    break;
                 }
-            if(found) {
-                LSFClassDeclaration thisDecl = (LSFClassDeclaration)classExtend.resolveDecl();
-                if(thisDecl!=null)
+            if (found) {
+                LSFClassDeclaration thisDecl = (LSFClassDeclaration) classExtend.resolveDecl();
+                if (thisDecl != null)
                     result.add(thisDecl);
-            }                
+            }
         }
         return result;
     }

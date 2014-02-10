@@ -56,6 +56,11 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
     @Override
     public LSFClassSet resolveValueClass(boolean infer) {
+        return LSFResolveCache.getValueClassInstance().resolveWithCaching(this, infer ? LSFValueClassResolver.INFER_INSTANCE : LSFValueClassResolver.NO_INFER_INSTANCE, true, false);
+    }
+
+    @Override
+    public LSFClassSet resolveValueClassNoCache(boolean infer) {
         LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
         if (unfr != null)
             return unfr.resolveUnfriendValueClass(infer);
@@ -84,6 +89,11 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     @Nullable
     public List<LSFClassSet> resolveParamClasses() {
+        return LSFResolveCache.getParamClassesInstance().resolveWithCaching(this, LSFParamClassesResolver.INSTANCE, true, false);
+    }
+
+    @Override
+    public List<LSFClassSet> resolveParamClassesNoCache() {
         LSFPropertyDeclaration decl = getPropertyDeclaration();
         LSFClassParamDeclareList cpd = decl.getClassParamDeclareList();
         List<LSFClassSet> declareClasses = null;

@@ -4,15 +4,12 @@ import com.intellij.lang.ASTFactory;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.simpleplugin.classes.*;
 import com.simpleplugin.meta.MetaTransaction;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.context.*;
-import com.simpleplugin.psi.context.LSFExpression;
-import com.simpleplugin.psi.declarations.LSFClassDeclaration;
-import com.simpleplugin.psi.declarations.LSFExprParamDeclaration;
-import com.simpleplugin.psi.declarations.LSFParamDeclaration;
-import com.simpleplugin.psi.declarations.LSFPropDeclaration;
+import com.simpleplugin.psi.declarations.*;
 import com.simpleplugin.psi.references.LSFAbstractParamReference;
 import com.simpleplugin.psi.references.LSFExprParamReference;
 import com.simpleplugin.typeinfer.*;
@@ -301,22 +298,23 @@ public class LSFPsiImplUtil {
         return true;
     }
 
-    public static boolean haveCommonChilds(@NotNull List<LSFClassSet> classes1, @NotNull List<LSFClassSet> classes2) {
+    public static boolean haveCommonChilds(@NotNull List<LSFClassSet> classes1, @NotNull List<LSFClassSet> classes2, GlobalSearchScope scope) {
+
         for (int i = 0, size = classes1.size(); i < size; i++) {
             LSFClassSet class1 = classes1.get(i);
             LSFClassSet class2 = classes2.get(i);
-            if (class1 != null && class2 != null && !class1.haveCommonChilds(class2)) // потом переделать haveCommonChilds
+            if (class1 != null && class2 != null && !class1.haveCommonChilds(class2, scope)) // потом переделать haveCommonChilds
                 return false;
         }
         return true;
     }
 
-    public static int getCommonChildrenCount(@NotNull List<LSFClassSet> classes1, @NotNull List<LSFClassSet> classes2) {
+    public static int getCommonChildrenCount(@NotNull List<LSFClassSet> classes1, @NotNull List<LSFClassSet> classes2, GlobalSearchScope scope) {
         int count = 0;
         for (int i = 0, size = Math.min(classes1.size(), classes2.size()); i < size; i++) {
             LSFClassSet class1 = classes1.get(i);
             LSFClassSet class2 = classes2.get(i);
-            if (class1 == null || class2 == null || class1.haveCommonChilds(class2)) { // потом переделать haveCommonChilds
+            if (class1 == null || class2 == null || class1.haveCommonChilds(class2, scope)) { // потом переделать haveCommonChilds
                 count++;
             }
         }
@@ -330,7 +328,7 @@ public class LSFPsiImplUtil {
         return true;
     }
 
-    private static LSFClassSet resolve(LSFBuiltInClassName builtIn) {
+    public static LSFClassSet resolve(LSFBuiltInClassName builtIn) {
         String name = builtIn.getText();
         if (name.equals("DOUBLE"))
             return new DoubleClass();
@@ -707,6 +705,18 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFClassSet resolveInferredValueClass(@NotNull LSFLiteral sourceStatement, @Nullable InferResult inferred) {
+        DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
+        if (builtInClass != null) {
+            return builtInClass;
+        }
+        LSFStaticObjectID staticObject = sourceStatement.getStaticObjectID();
+        if (staticObject != null)
+            return resolveClass(staticObject.getCustomClassUsage());
+        return null;
+    }
+
+    @Nullable
+    public static DataClass resolveBuiltInValueClass(@NotNull LSFLiteral sourceStatement) {
         if (sourceStatement.getBooleanLiteral() != null)
             return DataClass.BOOLEAN;
         if (sourceStatement.getUlongLiteral() != null)
@@ -724,21 +734,14 @@ public class LSFPsiImplUtil {
         LSFStringLiteral stringLiteral = sourceStatement.getStringLiteral();
         if (stringLiteral != null)
             return new StringClass(false, true, new ExtInt(stringLiteral.getText().length()));
-        LSFDateTimeLiteral dateTimeLiteral = sourceStatement.getDateTimeLiteral();
-        if (dateTimeLiteral != null)
+        if (sourceStatement.getDateTimeLiteral() != null)
             return new SimpleDataClass("DATETIME");
-        LSFDateLiteral dateLiteral = sourceStatement.getDateLiteral();
-        if (dateLiteral != null)
+        if (sourceStatement.getDateLiteral() != null)
             return new SimpleDataClass("DATE");
-        LSFTimeLiteral timeLiteral = sourceStatement.getTimeLiteral();
-        if (timeLiteral != null)
+        if (sourceStatement.getTimeLiteral() != null)
             return new SimpleDataClass("TIME");
-        LSFColorLiteral colorLiteral = sourceStatement.getColorLiteral();
-        if (colorLiteral != null)
+        if (sourceStatement.getColorLiteral() != null)
             return new SimpleDataClass("COLOR");
-        LSFStaticObjectID staticObject = sourceStatement.getStaticObjectID();
-        if (staticObject != null)
-            return resolveClass(staticObject.getCustomClassUsage());
         return null;
     }
 
@@ -796,6 +799,586 @@ public class LSFPsiImplUtil {
     public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFFilterPropertyDefinition sourceStatement, boolean infer) {
         return DataClass.BOOLEAN;
     }
+
+    // PropertyExpression.getValueClassNames
+
+    public static List<String> getValueClassNames(@NotNull LSFPropertyExpression sourceStatement) {
+        return getValueClassNames(sourceStatement.getIfPE());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFIfPE sourceStatement) {
+        return getValueClassNames(sourceStatement.getOrPEList().get(0));
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFOrPE sourceStatement) {
+        List<LSFXorPE> xorPEList = sourceStatement.getXorPEList();
+        if (xorPEList.size() == 1) {
+            List<String> result = new ArrayList<String>();
+            result.addAll(getValueClassNames(xorPEList.get(0)));
+            return result;
+        }
+        return Arrays.asList(DataClass.BOOLEAN.getName());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFXorPE sourceStatement) {
+        List<LSFAndPE> andPEList = sourceStatement.getAndPEList();
+        if (andPEList.size() == 1) {
+            List<String> result = new ArrayList<String>();
+            result.addAll(getValueClassNames(andPEList.get(0)));
+            return result;
+        }
+        return Arrays.asList(DataClass.BOOLEAN.getName());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFAndPE sourceStatement) {
+        List<LSFNotPE> notPEList = sourceStatement.getNotPEList();
+        if (notPEList.size() == 1) {
+            List<String> result = new ArrayList<String>();
+            result.addAll(getValueClassNames(notPEList.get(0)));
+            return result;
+        }
+        return Arrays.asList(DataClass.BOOLEAN.getName());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFNotPE sourceStatement) {
+        LSFEqualityPE equalityPE = sourceStatement.getEqualityPE();
+        if (equalityPE != null) {
+            return getValueClassNames(equalityPE);
+        }
+        return Arrays.asList(DataClass.BOOLEAN.getName());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFEqualityPE sourceStatement) {
+        List<LSFRelationalPE> relationalPEList = sourceStatement.getRelationalPEList();
+        if (relationalPEList.size() == 2) {
+            return Arrays.asList(DataClass.BOOLEAN.getName());
+        }
+        return getValueClassNames(relationalPEList.get(0));
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFRelationalPE sourceStatement) {
+        List<LSFAdditiveORPE> additiveORPEs = sourceStatement.getAdditiveORPEList();
+        if (additiveORPEs.size() == 2) {
+            return Arrays.asList(DataClass.BOOLEAN.getName());
+        }
+
+        List<String> result = getValueClassNames(additiveORPEs.get(0));
+
+        LSFTypePropertyDefinition typePD = sourceStatement.getTypePropertyDefinition();
+        if (typePD != null) {
+            if (typePD.getTypeIs().getText().equals("IS")) {
+                return Arrays.asList(DataClass.BOOLEAN.getName());
+            } else {
+                String typeDefClass = getClassName(typePD.getClassName());
+                if (typeDefClass != null) {
+                    if (result == null) {
+                        result = Arrays.asList(typeDefClass);
+                    } else {
+                        result.add(typeDefClass);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFAdditiveORPE sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        for (LSFAdditivePE addPE : sourceStatement.getAdditivePEList()) {
+            result.addAll(getValueClassNames(addPE));
+        }
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFAdditivePE sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        for (LSFMultiplicativePE multPE : sourceStatement.getMultiplicativePEList()) {
+            result.addAll(getValueClassNames(multPE));
+        }
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFMultiplicativePE sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        for (LSFUnaryMinusPE umPE : sourceStatement.getUnaryMinusPEList()) {
+            result.addAll(getValueClassNames(umPE));
+        }
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFUnaryMinusPE sourceStatement) {
+        LSFUnaryMinusPE unaryMinusPE = sourceStatement.getUnaryMinusPE();
+        if (unaryMinusPE != null) {
+            return getValueClassNames(unaryMinusPE);
+        }
+
+        return getValueClassNames(sourceStatement.getPostfixUnaryPE());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFPostfixUnaryPE sourceStatement) {
+        return getValueClassNames(sourceStatement.getSimplePE());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFSimplePE sourceStatement) {
+        LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
+        if (pe != null) {
+            return getValueClassNames(pe);
+        }
+
+        return getValueClassNames(sourceStatement.getExpressionPrimitive());
+    }
+
+    private static List<String> getValueClassNames(@NotNull LSFExpressionPrimitive sourceStatement) {
+        LSFExprParameterUsage ep = sourceStatement.getExprParameterUsage();
+        if (ep != null) {
+            return getValueClassNames(ep);
+        }
+        return getValueClassNames(sourceStatement.getExpressionFriendlyPD());
+    }
+
+    private static List<String> getValueClassNames(LSFExprParameterUsage sourceStatement) {
+        LSFExprParameterNameUsage exprParameterNameUsage = sourceStatement.getExprParameterNameUsage();
+        LSFDeclarationResolveResult lsfDeclarationResolveResult = exprParameterNameUsage.resolveNoCache();
+        List<String> result = new ArrayList<String>();
+        for (LSFDeclaration decl : lsfDeclarationResolveResult.declarations) {
+            String className = ((LSFParamDeclare) decl).getClassName();
+            if (className != null) {
+                result.add(className);
+            }
+        }
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFExpressionUnfriendlyPD sourceStatement) {
+        LSFContextIndependentPD contextIndependentPD = sourceStatement.getContextIndependentPD();
+        if (contextIndependentPD != null) {
+            return ((UnfriendlyPE) contextIndependentPD.getFirstChild()).getValueClassNames();
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFDataPropertyDefinition sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        LSFClassName className = sourceStatement.getClassName();
+        result.add(getClassName(className));
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFNativePropertyDefinition sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        LSFClassName className = sourceStatement.getClassName();
+        result.add(getClassName(className));
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        LSFClassName className = sourceStatement.getClassName();
+        result.add(getClassName(className));
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
+        LSFBuiltInClassName builtIn = sourceStatement.getBuiltInClassName();
+        if (builtIn != null) {
+            return Arrays.asList(builtIn.getName());
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+        return getValueClassNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {
+        return Arrays.asList(DataClass.BOOLEAN.getName());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFExpressionFriendlyPD sourceStatement) {
+        return ((LSFExpression) sourceStatement.getFirstChild()).getValueClassNames();
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFJoinPropertyDefinition sourceStatement) {
+        LSFPropertyObject propertyObject = sourceStatement.getPropertyObject();
+        LSFPropertyUsage usage = propertyObject.getPropertyUsage();
+        if (usage != null) {
+            return Collections.EMPTY_LIST;
+        }
+
+        LSFPropertyExprObject exprObject = propertyObject.getPropertyExprObject();
+        LSFPropertyExpression pe = exprObject.getPropertyExpression();
+        if (pe != null) {
+            return getValueClassNames(pe);
+        }
+        return getValueClassNames(exprObject.getExpressionUnfriendlyPD());
+    }
+
+    @Nullable
+    private static List<String> getValueClassNames(List<LSFPropertyExpression> list) {
+        if (list.size() == 0) {
+            return Collections.EMPTY_LIST;
+        }
+
+        List<String> result = null;
+        for (int i = 0; i < list.size(); i++) {
+            List<String> valueClass = getValueClassNames(list.get(i));
+            if (i == 0) {
+                result = valueClass;
+            } else {
+                result.addAll(valueClass);
+            }
+        }
+        return result;
+    }
+
+    private static List<String> getValueClassNames(LSFNonEmptyPropertyExpressionList list) {
+        return getValueClassNames(list.getPropertyExpressionList());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFMultiPropertyDefinition sourceStatement) {
+        return getValueClassNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFOverridePropertyDefinition sourceStatement) {
+        return getValueClassNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFIfElsePropertyDefinition sourceStatement) {
+        List<LSFPropertyExpression> propertyExpressionList = sourceStatement.getPropertyExpressionList();
+        return getValueClassNames(propertyExpressionList.subList(1, propertyExpressionList.size()));
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFMaxPropertyDefinition sourceStatement) {
+        return getValueClassNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFCasePropertyDefinition sourceStatement) {
+        List<LSFPropertyExpression> list = new ArrayList<LSFPropertyExpression>();
+        for (LSFCaseBranchBody caseBranch : sourceStatement.getCaseBranchBodyList()) {
+            list.add(caseBranch.getPropertyExpressionList().get(1));
+        }
+        LSFPropertyExpression elseExpr = sourceStatement.getPropertyExpression();
+        if (elseExpr != null) {
+            list.add(elseExpr);
+        }
+        return getValueClassNames(list);
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFPartitionPropertyDefinition sourceStatement) {
+        return getValueClassNames(sourceStatement.getPropertyExpression());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFRecursivePropertyDefinition sourceStatement) {
+        return getValueClassNames(sourceStatement.getPropertyExpressionList());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFStructCreationPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFConcatPropertyDefinition sourceStatement) {
+        return getValueClassNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFCastPropertyDefinition sourceStatement) {
+        return Arrays.asList(sourceStatement.getBuiltInClassName().getName());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFSessionPropertyDefinition sourceStatement) {
+        LSFSessionPropertyType type = sourceStatement.getSessionPropertyType();
+        if (type.getText().equals("PREV")) {
+            return getValueClassNames(sourceStatement.getPropertyExpression());
+        }
+        return Arrays.asList(DataClass.BOOLEAN.getName());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFSignaturePropertyDefinition sourceStatement) {
+        return Arrays.asList(DataClass.BOOLEAN.getName());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFLiteral sourceStatement) {
+        DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
+        if (builtInClass != null) {
+            return Arrays.asList(builtInClass.getName());
+        }
+        LSFStaticObjectID staticObjectID = sourceStatement.getStaticObjectID();
+        if (staticObjectID != null) {
+            return Arrays.asList(staticObjectID.getCustomClassUsage().getName());
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+
+    // PropertyExpression.getValuePropertyNames
+
+    public static List<String> getValuePropertyNames(@NotNull LSFPropertyExpression sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getIfPE());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFIfPE sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getOrPEList().get(0));
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFOrPE sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        List<LSFXorPE> xorPEList = sourceStatement.getXorPEList();
+        if (xorPEList.size() == 1) {
+            result.addAll(getValuePropertyNames(xorPEList.get(0)));
+        }
+        return result;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFXorPE sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        List<LSFAndPE> andPEList = sourceStatement.getAndPEList();
+        if (andPEList.size() == 1) {
+            result.addAll(getValuePropertyNames(andPEList.get(0)));
+        }
+        return result;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFAndPE sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        List<LSFNotPE> notPEList = sourceStatement.getNotPEList();
+        if (notPEList.size() == 1) {
+            result.addAll(getValuePropertyNames(notPEList.get(0)));
+        }
+        return result;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFNotPE sourceStatement) {
+        LSFEqualityPE equalityPE = sourceStatement.getEqualityPE();
+        if (equalityPE != null) {
+            return getValuePropertyNames(equalityPE);
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFEqualityPE sourceStatement) {
+        List<LSFRelationalPE> relationalPEList = sourceStatement.getRelationalPEList();
+        if (relationalPEList.size() == 2) {
+            return Collections.EMPTY_LIST;
+        }
+        return getValuePropertyNames(relationalPEList.get(0));
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFRelationalPE sourceStatement) {
+        List<LSFAdditiveORPE> additiveORPEs = sourceStatement.getAdditiveORPEList();
+        if (additiveORPEs.size() == 2) {
+            return Collections.EMPTY_LIST;
+        }
+
+        LSFTypePropertyDefinition typePD = sourceStatement.getTypePropertyDefinition();
+        if (typePD != null) {
+            return Collections.EMPTY_LIST;
+        }
+
+        return getValuePropertyNames(additiveORPEs.get(0));
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFAdditiveORPE sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        for (LSFAdditivePE addPE : sourceStatement.getAdditivePEList()) {
+            result.addAll(getValuePropertyNames(addPE));
+        }
+        return result;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFAdditivePE sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        for (LSFMultiplicativePE multPE : sourceStatement.getMultiplicativePEList()) {
+            result.addAll(getValuePropertyNames(multPE));
+        }
+        return result;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFMultiplicativePE sourceStatement) {
+        List<String> result = new ArrayList<String>();
+        for (LSFUnaryMinusPE umPE : sourceStatement.getUnaryMinusPEList()) {
+            result.addAll(getValuePropertyNames(umPE));
+        }
+        return result;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFUnaryMinusPE sourceStatement) {
+        LSFUnaryMinusPE unaryMinusPE = sourceStatement.getUnaryMinusPE();
+        if (unaryMinusPE != null) {
+            return getValuePropertyNames(unaryMinusPE);
+        }
+
+        return getValuePropertyNames(sourceStatement.getPostfixUnaryPE());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFPostfixUnaryPE sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getSimplePE());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFSimplePE sourceStatement) {
+        LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
+        if (pe != null) {
+            return getValuePropertyNames(pe);
+        }
+
+        return getValuePropertyNames(sourceStatement.getExpressionPrimitive());
+    }
+
+    private static List<String> getValuePropertyNames(@NotNull LSFExpressionPrimitive sourceStatement) {
+        LSFExprParameterUsage ep = sourceStatement.getExprParameterUsage();
+        if (ep != null) {
+            return getValuePropertyNames(ep);
+        }
+
+        return getValuePropertyNames(sourceStatement.getExpressionFriendlyPD());
+    }
+
+    private static List<String> getValuePropertyNames(LSFExprParameterUsage sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFExpressionUnfriendlyPD sourceStatement) {
+        LSFContextIndependentPD contextIndependentPD = sourceStatement.getContextIndependentPD();
+        if (contextIndependentPD != null) {
+            return ((UnfriendlyPE) contextIndependentPD.getFirstChild()).getValuePropertyNames();
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFDataPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFNativePropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFExpressionFriendlyPD sourceStatement) {
+        return ((LSFExpression) sourceStatement.getFirstChild()).getValuePropertyNames();
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFJoinPropertyDefinition sourceStatement) {
+        LSFPropertyObject propertyObject = sourceStatement.getPropertyObject();
+        LSFPropertyUsage usage = propertyObject.getPropertyUsage();
+        if (usage != null) {
+            return Arrays.asList(usage.getName());
+        }
+
+        LSFPropertyExprObject exprObject = propertyObject.getPropertyExprObject();
+        LSFPropertyExpression pe = exprObject.getPropertyExpression();
+        if (pe != null) {
+            return getValuePropertyNames(pe);
+        }
+        return getValuePropertyNames(exprObject.getExpressionUnfriendlyPD());
+    }
+
+    private static List<String> getValuePropertyNames(List<LSFPropertyExpression> list) {
+        if (list.size() == 0)
+            return Collections.EMPTY_LIST;
+
+        List<String> result = null;
+        for (int i = 0; i < list.size(); i++) {
+            List<String> valueProperty = getValuePropertyNames(list.get(i));
+            if (i == 0) {
+                result = valueProperty;
+            } else {
+                result.addAll(valueProperty);
+            }
+        }
+        return result;
+    }
+
+    private static List<String> getValuePropertyNames(LSFNonEmptyPropertyExpressionList list) {
+        return getValuePropertyNames(list.getPropertyExpressionList());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFMultiPropertyDefinition sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFOverridePropertyDefinition sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFIfElsePropertyDefinition sourceStatement) {
+        List<LSFPropertyExpression> propertyExpressionList = sourceStatement.getPropertyExpressionList();
+        return getValuePropertyNames(propertyExpressionList.subList(1, propertyExpressionList.size()));
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFMaxPropertyDefinition sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFCasePropertyDefinition sourceStatement) {
+        List<LSFPropertyExpression> list = new ArrayList<LSFPropertyExpression>();
+        for (LSFCaseBranchBody caseBranch : sourceStatement.getCaseBranchBodyList()) {
+            list.add(caseBranch.getPropertyExpressionList().get(1));
+        }
+        LSFPropertyExpression elseExpr = sourceStatement.getPropertyExpression();
+        if (elseExpr != null) {
+            list.add(elseExpr);
+        }
+        return getValuePropertyNames(list);
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFPartitionPropertyDefinition sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getPropertyExpression());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFRecursivePropertyDefinition sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getPropertyExpressionList());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFStructCreationPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFConcatPropertyDefinition sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFCastPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFSessionPropertyDefinition sourceStatement) {
+        LSFSessionPropertyType type = sourceStatement.getSessionPropertyType();
+        if (type.getText().equals("PREV")) {
+            return getValuePropertyNames(sourceStatement.getPropertyExpression());
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFSignaturePropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFLiteral sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
 
     // UnfriendlyPE.resolveValueParamClasses
 
@@ -928,7 +1511,15 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueParamClassNames(@NotNull LSFGroupPropertyDefinition sourceStatement) {
-        return null;
+        LSFGroupPropertyBy groupPropertyBy = sourceStatement.getGroupPropertyBy();
+        if (groupPropertyBy != null) {
+            List<String> valueClasses = new ArrayList<String>();
+            for (LSFPropertyExpression pe : groupPropertyBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList()) {
+                valueClasses.addAll(getValueClassNames(pe));
+            }
+            return valueClasses;
+        }
+        return Collections.EMPTY_LIST;
     }
 
     public static List<String> getValueParamClassNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {

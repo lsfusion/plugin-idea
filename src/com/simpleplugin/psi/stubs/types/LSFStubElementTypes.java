@@ -2,6 +2,10 @@ package com.simpleplugin.psi.stubs.types;
 
 import com.simpleplugin.psi.stubs.extend.types.ExtendClassStubElementType;
 import com.simpleplugin.psi.stubs.extend.types.ExtendFormStubElementType;
+import com.simpleplugin.psi.stubs.interfaces.types.ExplicitInterfaceStubElementType;
+import com.simpleplugin.psi.stubs.interfaces.types.ExplicitValueStubElementType;
+import com.simpleplugin.psi.stubs.interfaces.types.ImplicitInterfaceStubElementType;
+import com.simpleplugin.psi.stubs.interfaces.types.ImplicitValueStubElementType;
 
 public interface LSFStubElementTypes {
 
@@ -20,4 +24,7 @@ public interface LSFStubElementTypes {
     ExtendClassStubElementType EXTENDCLASS = new ExtendClassStubElementType();
 
     ExplicitInterfaceStubElementType EXPLICIT_INTERFACE = new ExplicitInterfaceStubElementType();
+    ExplicitValueStubElementType EXPLICIT_VALUE = new ExplicitValueStubElementType();
+    ImplicitValueStubElementType IMPLICIT_VALUE = new ImplicitValueStubElementType();
+    ImplicitInterfaceStubElementType IMPLICIT_INTERFACE = new ImplicitInterfaceStubElementType();
 }

@@ -31,8 +31,8 @@ import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.classes.LSFValueClass;
 import com.simpleplugin.classes.StructClassSet;
 import com.simpleplugin.psi.LSFFile;
+import com.simpleplugin.psi.LSFPropertyStatement;
 import com.simpleplugin.psi.context.LSFExpression;
-import com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement;
 import com.simpleplugin.structure.LSFPropertyStatementTreeElement;
 import com.simpleplugin.structure.LSFStructureViewNavigationHandler;
 import com.simpleplugin.structure.LSFTreeBasedStructureViewBuilder;
@@ -143,7 +143,7 @@ public class InsertCompositionAction extends BaseRefactoringAction {
             showErrorMessage(project, editor, LSFBundle.message("insert.composition.cant.determine.type"));
         }
 
-        private void insertComposition(final Editor editor, final LSFExpression expr, final LSFValueClass valueClass, final LSFExplicitInterfacePropStatement composition) {
+        private void insertComposition(final Editor editor, final LSFExpression expr, final LSFValueClass valueClass, final LSFPropertyStatement composition) {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 @Override
                 public void run() {
@@ -153,10 +153,10 @@ public class InsertCompositionAction extends BaseRefactoringAction {
                     rangeMarker.setGreedyToLeft(false);
                     rangeMarker.setGreedyToRight(false);
 
-                    List<LSFClassSet> paramClasses = composition.getPropertyStatement().resolveParamClasses();
+                    List<LSFClassSet> paramClasses = composition.resolveParamClasses();
                     int newCaretPosition;
                     if (paramClasses == null || paramClasses.size() == 1) {
-                        String newText = composition.getPropertyStatement().getDeclName() + "(" + expr.getText() + ")";
+                        String newText = composition.getDeclName() + "(" + expr.getText() + ")";
                         document.replaceString(rangeMarker.getStartOffset(), rangeMarker.getEndOffset(), newText);
                         newCaretPosition = rangeMarker.getEndOffset();
                     } else {
@@ -179,7 +179,7 @@ public class InsertCompositionAction extends BaseRefactoringAction {
                             }
                         }
 
-                        document.insertString(rangeMarker.getStartOffset(), composition.getPropertyStatement().getDeclName() + "(" + commaPrefix);
+                        document.insertString(rangeMarker.getStartOffset(), composition.getDeclName() + "(" + commaPrefix);
                         document.insertString(rangeMarker.getEndOffset(), commaPostfix + ")");
 
                         if (exprIndex != 0) {

@@ -36,6 +36,10 @@
             <skipForDefaultProject/>
         </component>
 
+        <component>
+            <implementation-class>com.simpleplugin.psi.LSFProjectComponent</implementation-class>
+        </component>
+
     </project-components>
 
     <actions>
@@ -121,7 +125,7 @@
 
         <moduleBuilder builderClass="com.simpleplugin.module.LSFusionModuleBuilder"/>
         <library.presentationProvider implementation="com.simpleplugin.module.LSFusionLibraryPresentationProvider"/>
-        <configurationType implementation="com.simpleplugin.module.run.LSFusionRunConfigurationType" />
+        <configurationType implementation="com.simpleplugin.module.run.LSFusionRunConfigurationType"/>
 
         <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.MetaIndex"/>
         <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ModuleIndex"/>
@@ -139,7 +143,10 @@
 
         <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ClassExtendsClassIndex"/>
 
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ExplicitInterfaceIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.interfaces.types.indexes.ExplicitInterfaceIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.interfaces.types.indexes.ExplicitValueIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.interfaces.types.indexes.ImplicitValueIndex"/>
+        <stubIndex implementation="com.simpleplugin.psi.stubs.interfaces.types.indexes.ImplicitInterfaceIndex"/>
 
         <stubElementTypeHolder class="com.simpleplugin.psi.LSFTypes"/>
         <gotoClassContributor implementation="com.simpleplugin.LSFClassContributor"/>

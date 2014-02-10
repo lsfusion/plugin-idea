@@ -35,12 +35,22 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
 
     @Override
     public LSFClassSet resolveValueClass(boolean infer) {
+        return LSFResolveCache.getValueClassInstance().resolveWithCaching(this, infer ? LSFValueClassResolver.INFER_INSTANCE : LSFValueClassResolver.NO_INFER_INSTANCE, true, false);
+    }
+
+    @Override
+    public LSFClassSet resolveValueClassNoCache(boolean infer) {
         return LSFPsiImplUtil.resolveClass(getClassName());
     }
 
     @Override
     @NotNull
     public List<LSFClassSet> resolveParamClasses() {
+        return LSFResolveCache.getParamClassesInstance().resolveWithCaching(this, LSFParamClassesResolver.INSTANCE, true, false);
+    }
+
+    @Override
+    public List<LSFClassSet> resolveParamClassesNoCache() {
         return LSFPsiImplUtil.resolveClass(getClassNameList());
     }
 

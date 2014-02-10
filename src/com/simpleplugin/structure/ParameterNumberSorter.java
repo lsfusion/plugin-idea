@@ -5,7 +5,7 @@ import com.intellij.ide.util.treeView.smartTree.ActionPresentationData;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.simpleplugin.LSFIcons;
 import com.simpleplugin.classes.LSFClassSet;
-import com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement;
+import com.simpleplugin.psi.LSFPropertyStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -20,12 +20,12 @@ public class ParameterNumberSorter implements Sorter {
             @Override
             public int compare(Object o1, Object o2) {
                 if (o1 instanceof LSFPropertyStatementTreeElement && o2 instanceof LSFPropertyStatementTreeElement) {
-                    LSFExplicitInterfacePropStatement el1 =  ((LSFPropertyStatementTreeElement) o1).getElement();
-                    LSFExplicitInterfacePropStatement el2 = ((LSFPropertyStatementTreeElement) o2).getElement();
+                    LSFPropertyStatement el1 = ((LSFPropertyStatementTreeElement) o1).getElement();
+                    LSFPropertyStatement el2 = ((LSFPropertyStatementTreeElement) o2).getElement();
                     String class1Name = ((LSFPropertyStatementTreeElement) o1).getClassName();
                     String class2Name = ((LSFPropertyStatementTreeElement) o2).getClassName();
 
-                    List<LSFClassSet> classes1 = el1.getPropertyStatement().resolveParamClasses();
+                    List<LSFClassSet> classes1 = el1.resolveParamClasses();
                     int index1 = 0;
                     for (; index1 < classes1.size(); index1++) {
                         LSFClassSet paramClass1 = classes1.get(index1);
@@ -33,10 +33,10 @@ public class ParameterNumberSorter implements Sorter {
                             break;
                         }
                     }
-                    List<LSFClassSet> classes2 = el2.getPropertyStatement().resolveParamClasses();
+                    List<LSFClassSet> classes2 = el2.resolveParamClasses();
                     int index2 = 0;
                     for (; index2 < classes2.size(); index2++) {
-                        LSFClassSet paramClass2 = classes1.get(index2);
+                        LSFClassSet paramClass2 = classes2.get(index2);
                         if (paramClass2 != null && class2Name.equals(paramClass2.toString())) {
                             break;
                         }

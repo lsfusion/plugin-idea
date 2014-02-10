@@ -8,6 +8,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.CollectionQuery;
 import com.simpleplugin.BaseUtils;
@@ -117,6 +118,8 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                 public Collection finalize(Collection decls) {
                     Map<LSFPropDeclaration, Integer> declMap = new HashMap<LSFPropDeclaration, Integer>();
 
+                    GlobalSearchScope scope = GlobalSearchScope.allScope(getProject());
+
                     for (Iterator<LSFPropDeclaration> iterator = decls.iterator(); iterator.hasNext(); ) {
                         LSFPropDeclaration decl = iterator.next();
                         List<LSFClassSet> declClasses = decl.resolveParamClasses();
@@ -125,7 +128,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                             continue;
                         }
 
-                        declMap.put(decl, LSFPsiImplUtil.getCommonChildrenCount(declClasses, usageClasses));
+                        declMap.put(decl, LSFPsiImplUtil.getCommonChildrenCount(declClasses, usageClasses, scope));
                     }
 
                     int commonClasses = 0;
@@ -282,7 +285,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                 if (declClasses.size() != usageClasses.size())
                     return false;
 
-                return LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses);
+                return LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject()));
             }
         };
     }

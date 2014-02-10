@@ -4,7 +4,7 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.ide.util.treeView.smartTree.*;
 import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.LSFFile;
-import com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement;
+import com.simpleplugin.psi.LSFPropertyStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -24,8 +24,8 @@ public class ModuleGrouper implements Grouper {
         for (TreeElement child : children) {
             if (child instanceof LSFPropertyStatementTreeElement) {
                 LSFPropertyStatementTreeElement psChild = (LSFPropertyStatementTreeElement) child;
-                LSFExplicitInterfacePropStatement explicitInterfacePropStatement = (LSFExplicitInterfacePropStatement) psChild.getElement();
-                String moduleName = ((LSFFile) explicitInterfacePropStatement.getContainingFile()).getModuleDeclaration().getName();
+                LSFPropertyStatement propStatement = psChild.getElement();
+                String moduleName = ((LSFFile) propStatement.getContainingFile()).getModuleDeclaration().getName();
                 ModuleGroup group = (ModuleGroup) map.get(moduleName);
                 if (group == null) {
                     group = new ModuleGroup(moduleName);

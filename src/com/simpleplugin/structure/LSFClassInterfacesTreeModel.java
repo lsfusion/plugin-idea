@@ -31,8 +31,7 @@ public class LSFClassInterfacesTreeModel extends TextEditorBasedStructureViewMod
     @Override
     public Sorter[] getSorters() {
         return new Sorter[]{
-                ParameterNumberSorter.INSTANCE,
-                Sorter.ALPHA_SORTER
+                ParameterNumberSorter.INSTANCE
         };
     }
 

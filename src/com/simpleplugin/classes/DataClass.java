@@ -1,6 +1,7 @@
 package com.simpleplugin.classes;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
 
 public abstract class DataClass implements LSFClassSet, LSFValueClass {
 
@@ -37,7 +38,7 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     }
 
     @Override
-    public boolean haveCommonChilds(LSFClassSet set) {
+    public boolean haveCommonChilds(LSFClassSet set, GlobalSearchScope scope) {
         if (!(set instanceof DataClass))
             return false;
 
