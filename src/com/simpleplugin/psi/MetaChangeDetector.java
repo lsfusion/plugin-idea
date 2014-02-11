@@ -876,32 +876,36 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private void fireChanged(PsiElement element) {
-        if(!enabled)
-            return;
-
         boolean inMetaBody = false;
         boolean inModuleHeader = false;
-        while(element != null && !(element instanceof LSFFile)) {
-            if(element instanceof LSFMetaCodeDeclarationStatement)
-                addDeclProcessing((LSFMetaCodeDeclarationStatement)element);
-            
-            if(element instanceof LSFAnyTokens || element instanceof LSFMetaCodeBody) {
-                inMetaBody = true;
+        while (element != null && !(element instanceof LSFFile)) {
+            if (enabled) {
+                if (element instanceof LSFMetaCodeDeclarationStatement) {
+                    addDeclProcessing((LSFMetaCodeDeclarationStatement) element);
+                }
+
+                if (element instanceof LSFAnyTokens || element instanceof LSFMetaCodeBody) {
+                    inMetaBody = true;
+                }
+
+                if (element instanceof LSFMetaCodeStatement) {
+                    addUsageProcessing((LSFMetaCodeStatement) element);
+                }
             }
 
-            if(element instanceof LSFMetaCodeStatement)
-                addUsageProcessing((LSFMetaCodeStatement)element);
-            
-            if(element instanceof LSFModuleHeader)
-                inModuleHeader = true; 
+            if (element instanceof LSFModuleHeader) {
+                inModuleHeader = true;
+            }
 
             element = element.getParent();
         }
 
-        if(!inMetaBody)
+        if (!inMetaBody) {
             fireChangedNotMetaBody();
-        if(inModuleHeader)
+        }
+        if (inModuleHeader) {
             fireChangedModuleHeader();
+        }
     }
 
     private void fireAdded(PsiElement element) {
