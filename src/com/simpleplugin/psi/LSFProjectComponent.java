@@ -34,20 +34,20 @@ public class LSFProjectComponent implements ProjectComponent {
             @Override
             public void run() {
                 // прогоняем ресолвинг классов параметров свойств на старте, чтобы не терять время на парсинг потом, в частности на Ctrl+Alt+Shift+N
-                ProgressManager.getInstance().run(new Task.Backgroundable(project, "Resolving properties param classes") {
+                ProgressManager.getInstance().run(new Task.Backgroundable(project, "Resolving properties' param classes") {
                     @Override
                     public void run(@NotNull final ProgressIndicator indicator) {
-                        ApplicationManager.getApplication().runReadAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                PropIndex propIndex = PropIndex.getInstance();
-                                for (String key : propIndex.getAllKeys(project)) {
+                        final PropIndex propIndex = PropIndex.getInstance();
+                        for (final String key : propIndex.getAllKeys(project)) {
+                            ApplicationManager.getApplication().runReadAction(new Runnable() {
+                                @Override
+                                public void run() {
                                     for (LSFGlobalPropDeclaration decl : propIndex.get(key, project, GlobalSearchScope.projectScope(project))) {
                                         decl.resolveParamClasses();
                                     }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 });
             }
