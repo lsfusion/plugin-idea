@@ -204,8 +204,8 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         public void quickLog(String message) {
-            System.out.println("--------------------------------------------------- : " + (System.nanoTime() - startTime) / 1000000000.0);
-            System.out.println("   : " + message);
+//            System.out.println("--------------------------------------------------- : " + (System.nanoTime() - startTime) / 1000000000.0);
+//            System.out.println("   : " + message);
         }
 
         @Override
