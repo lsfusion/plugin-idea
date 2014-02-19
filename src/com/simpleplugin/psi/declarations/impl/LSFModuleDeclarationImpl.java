@@ -3,16 +3,18 @@ package com.simpleplugin.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.simpleplugin.BaseUtils;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFModuleDeclaration;
-import com.simpleplugin.psi.declarations.LSFNamespaceDeclaration;
 import com.simpleplugin.psi.references.LSFModuleReference;
 import com.simpleplugin.psi.references.LSFNamespaceReference;
 import com.simpleplugin.psi.stubs.ModuleStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 // extends NamespaceDeclaration, при assertion'е что getNamespaceName==null
@@ -66,7 +68,11 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
         LSFPriorityList priorityList = getPriorityList();
         if(priorityList==null)
             return new ArrayList<LSFNamespaceReference>();
-        return BaseUtils.<LSFNamespaceReference, LSFNamespaceUsage>immutableCast(priorityList.getNonEmptyNamespaceUsageList().getNamespaceUsageList());
+        LSFNonEmptyNamespaceUsageList nonEmptyNamespaceUsageList = priorityList.getNonEmptyNamespaceUsageList();
+        if (nonEmptyNamespaceUsageList == null) {
+            return Collections.emptyList();
+        }
+        return BaseUtils.<LSFNamespaceReference, LSFNamespaceUsage>immutableCast(nonEmptyNamespaceUsageList.getNamespaceUsageList());
     }
 
     @Override
@@ -78,11 +84,21 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
         LSFRequireList requireList = getRequireList();
         if(requireList==null)
             return new ArrayList<LSFModuleReference>();
-        return BaseUtils.<LSFModuleReference, LSFModuleUsage>immutableCast(requireList.getNonEmptyModuleUsageList().getModuleUsageList());
+        LSFNonEmptyModuleUsageList nonEmptyModuleUsageList = requireList.getNonEmptyModuleUsageList();
+        if (nonEmptyModuleUsageList == null) {
+            return Collections.emptyList();
+        }
+        return BaseUtils.<LSFModuleReference, LSFModuleUsage>immutableCast(nonEmptyModuleUsageList.getModuleUsageList());
     }
 
     @Override
     public LSFSimpleName getNameIdentifier() {
         return getModuleName().getSimpleName();
+    }
+
+    @Nullable
+    @Override
+    public Icon getIcon(int flags) {
+        return LSFIcons.MODULE;
     }
 }

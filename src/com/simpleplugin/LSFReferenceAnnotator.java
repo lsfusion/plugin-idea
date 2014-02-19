@@ -63,9 +63,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
-    public void visitPropertySelector(@NotNull LSFPropertySelector o) {
-        super.visitPropertySelector(o);
-
+    public void visitFormPropertyDrawUsage(@NotNull LSFFormPropertyDrawUsage o) {
+        super.visitFormPropertyDrawUsage(o);
         checkReference(o);
     }
 
@@ -295,7 +294,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void checkAlreadyDefined(LSFDeclaration declaration) {
-        if (declaration.resolveDuplicates()) {
+        if (declaration.getName() != null && declaration.resolveDuplicates()) {
             addAlreadyDefinedError(declaration);
         }
     }

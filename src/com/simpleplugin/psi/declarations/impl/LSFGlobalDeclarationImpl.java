@@ -45,12 +45,12 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
 
     @Override
     public Icon getIcon(boolean unused) {
-        return LSFDeclarationImpl.getIcon(this, 0);
+        return getIcon(0);
     }
 
     @Override
     public Icon getIcon(int flags) {
-        return LSFDeclarationImpl.getIcon(this, flags);
+        return null;
     }
 
     @Override

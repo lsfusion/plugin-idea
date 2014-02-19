@@ -8,24 +8,30 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.simpleplugin.BaseUtils;
+import com.simpleplugin.LSFPsiImplUtil;
 import com.simpleplugin.classes.CustomClassSet;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.classes.LSFValueClass;
+import com.simpleplugin.psi.LSFFile;
 import com.simpleplugin.psi.LSFImplicitValuePropertyStatement;
 import com.simpleplugin.psi.LSFPropertyStatement;
+import com.simpleplugin.psi.context.ContextModifier;
+import com.simpleplugin.psi.context.ExtendParamContext;
 import com.simpleplugin.psi.context.LSFExpression;
-import com.simpleplugin.psi.declarations.LSFClassDeclaration;
-import com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement;
-import com.simpleplugin.psi.declarations.LSFExplicitValuePropStatement;
-import com.simpleplugin.psi.declarations.LSFImplicitInterfacePropStatement;
+import com.simpleplugin.psi.context.ModifyParamContext;
+import com.simpleplugin.psi.declarations.*;
+import com.simpleplugin.psi.extend.LSFFormExtend;
+import com.simpleplugin.psi.references.impl.LSFFormElementReferenceImpl;
 import com.simpleplugin.psi.stubs.interfaces.types.indexes.ExplicitInterfaceIndex;
 import com.simpleplugin.psi.stubs.interfaces.types.indexes.ExplicitValueIndex;
 import com.simpleplugin.psi.stubs.interfaces.types.indexes.ImplicitInterfaceIndex;
 import com.simpleplugin.psi.stubs.interfaces.types.indexes.ImplicitValueIndex;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class PsiUtils {
+public class LSFPsiUtils {
 
     public static List<LSFExpression> collectExpressions(final PsiFile file, final Editor editor, int offset) {
         Document document = editor.getDocument();
@@ -75,12 +81,62 @@ public class PsiUtils {
             text += " " + caption;
         }
 
-        LSFClassSet valueClass = property.resolveValueClass(false);
         if (!property.isAction()) {
-            text += ": " + valueClass;
+            LSFClassSet valueClass = property.resolveValueClass(false);
+            text += ": " + (valueClass == null ? "?" : valueClass);
         }
 
         return text;
+    }
+
+    @NotNull
+    public static Set<LSFExprParamDeclaration> getContextParams(@NotNull PsiElement current, boolean objectRef) {
+        return getContextParams(current, current.getTextOffset(), objectRef);
+    }
+
+    @NotNull
+    public static Set<LSFExprParamDeclaration> getContextParams(PsiElement current, int offset, boolean objectRef) {
+        if (current instanceof ModifyParamContext) {
+            ContextModifier contextModifier = ((ModifyParamContext) current).getContextModifier();
+
+            Set<LSFExprParamDeclaration> upParams;
+            Set<LSFExprParamDeclaration> result = new HashSet<LSFExprParamDeclaration>();
+            if (current instanceof ExtendParamContext) {
+                upParams = getContextParams(current.getParent(), offset, objectRef);
+                result.addAll(upParams);
+            } else { // не extend - останавливаемся
+                upParams = new HashSet<LSFExprParamDeclaration>();
+            }
+            result.addAll(contextModifier.resolveParams(offset, upParams));
+            return result;
+        } else {
+            // current instanceof FormContext || current instancof LSFFormStatement
+            Set<LSFObjectDeclaration> objects = LSFFormElementReferenceImpl.processFormContext(current, new LSFFormElementReferenceImpl.FormExtendProcessor<LSFObjectDeclaration>() {
+                public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
+                    return formExtend.getObjectDecls();
+                }
+            }, objectRef);
+            if (objects != null) {
+                return BaseUtils.<LSFExprParamDeclaration, LSFObjectDeclaration>immutableCast(objects);
+            }
+        }
+
+        PsiElement parent = current.getParent();
+        if (!(parent == null || parent instanceof LSFFile)) {
+            return getContextParams(parent, offset, objectRef); // бежим выше
+        }
+
+        return new HashSet<LSFExprParamDeclaration>();
+    }
+
+    @NotNull
+    public static List<LSFClassSet> getContextClasses(PsiElement psiElement, boolean objectRef) {
+        return LSFPsiImplUtil.resolveParamDeclClasses(getContextParams(psiElement, objectRef));
+    }
+
+    @NotNull
+    public static List<LSFClassSet> getContextClasses(PsiElement psiElement, int offset, boolean objectRef) {
+        return LSFPsiImplUtil.resolveParamDeclClasses(getContextParams(psiElement, offset, objectRef));
     }
 
     public abstract static class ResultHandler<T> {

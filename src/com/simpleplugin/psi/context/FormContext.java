@@ -1,9 +1,10 @@
 package com.simpleplugin.psi.context;
 
 import com.intellij.psi.PsiElement;
-import com.simpleplugin.psi.LSFFormUsage;
+import com.simpleplugin.psi.declarations.LSFFormDeclaration;
+import org.jetbrains.annotations.Nullable;
 
 public interface FormContext extends PsiElement {
-    
-    LSFFormUsage getFormUsage();
+    @Nullable
+    LSFFormDeclaration resolveFormDecl();
 }

@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface LSFPropDeclaration extends LSFDeclaration {
 
+    String getSignaturePresentableText();
+
     LSFClassSet resolveValueClass(boolean infer);
 
     LSFClassSet resolveValueClassNoCache(boolean infer);

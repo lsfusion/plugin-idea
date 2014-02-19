@@ -118,7 +118,7 @@
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
 
-        <!--<completion.contributor language="Lsf" implementationClass="com.simpleplugin.completion.KeywordCompletionContributor"/>-->
+        <completion.contributor language="Lsf" implementationClass="com.simpleplugin.completion.ASTCompletionContributor"/>
 
         <internalFileTemplate name="lsFusion script"/>
         <internalFileTemplate name="lsFusion settings"/>

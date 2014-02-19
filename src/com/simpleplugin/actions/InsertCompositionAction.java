@@ -37,7 +37,7 @@ import com.simpleplugin.structure.LSFPropertyStatementTreeElement;
 import com.simpleplugin.structure.LSFStructureViewNavigationHandler;
 import com.simpleplugin.structure.LSFTreeBasedStructureViewBuilder;
 import com.simpleplugin.typeinfer.InferResult;
-import com.simpleplugin.util.PsiUtils;
+import com.simpleplugin.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -90,7 +90,7 @@ public class InsertCompositionAction extends BaseRefactoringAction {
             LSFExpression selectedExpression = null;
             if (!selectionModel.hasSelection()) {
                 final int offset = editor.getCaretModel().getOffset();
-                final List<LSFExpression> expressions = PsiUtils.collectExpressions(file, editor, offset);
+                final List<LSFExpression> expressions = LSFPsiUtils.collectExpressions(file, editor, offset);
                 if (expressions.isEmpty()) {
                     selectionModel.selectLineAtCaret();
                 } else if (expressions.size() == 1) {

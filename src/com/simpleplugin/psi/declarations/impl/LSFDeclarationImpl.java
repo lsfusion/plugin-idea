@@ -51,10 +51,6 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
         return false;
     }
 
-    public static Icon getIcon(LSFDeclaration decl, int flags) {
-        return null;
-    }
-
     public static String getLocationString(LSFDeclaration decl) {
         final PsiFile file = decl.getLSFFile();
         final Document document = PsiDocumentManager.getInstance(decl.getProject()).getDocument(file);
@@ -76,12 +72,12 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
 
     @Override
     public Icon getIcon(boolean unused) {
-        return getIcon(this, 0);
+        return getIcon(0);
     }
 
     @Override
     public Icon getIcon(int flags) {
-        return getIcon(this, flags);
+        return null;
     }
 
     @Override

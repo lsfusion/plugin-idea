@@ -2,7 +2,6 @@ package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.simpleplugin.LSFDeclarationResolveResult;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFDeclaration;
@@ -11,10 +10,8 @@ import com.simpleplugin.psi.references.LSFFullNameReference;
 import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G extends LSFFullNameDeclaration> extends LSFGlobalReferenceImpl<T> implements LSFFullNameReference<T, G> {
 
@@ -38,12 +35,12 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
         return namespace == null ? null : namespace.getText();
     }
 
-    protected FullNameStubElementType getType() {
-        return null;
+    protected Collection<FullNameStubElementType> getStubElementTypes() {
+        return Collections.singleton(getStubElementType());
     }
 
-    protected Collection<FullNameStubElementType> getTypes() {
-        return Collections.singleton(getType());
+    protected FullNameStubElementType getStubElementType() {
+        return null;
     }
 
     protected Condition<G> getCondition() {
@@ -56,15 +53,7 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
 
     @Override
     public LSFDeclarationResolveResult resolveNoCache() {
-        Collection<G> decls = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), getCondition(), getFinalizer()); 
+        Collection<G> decls = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), getCondition(), getFinalizer());
         return new LSFDeclarationResolveResult(decls, resolveDefaultErrorAnnotator(decls));
-    }
-    
-    @Override
-    protected Collection<StringStubIndexExtension> getGlobalIndices() {
-        List<StringStubIndexExtension> result = new ArrayList<StringStubIndexExtension>();
-        for(FullNameStubElementType type : getTypes())
-            result.add(type.getGlobalIndex());
-        return result;
     }
 }

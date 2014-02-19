@@ -1,6 +1,7 @@
 package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.simpleplugin.LSFIcons;
 import com.simpleplugin.classes.LSFClassSet;
 import com.simpleplugin.psi.*;
 import com.simpleplugin.psi.declarations.LSFGroupObjectDeclaration;
@@ -8,6 +9,7 @@ import com.simpleplugin.psi.extend.LSFFormExtend;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,6 +49,11 @@ public abstract class LSFGroupObjectDeclarationImpl extends LSFFormElementDeclar
         if(name!=null)
             return name;
         return null;    
+    }
+
+    @Override
+    public Icon getIcon(int flags) {
+        return LSFIcons.GROUP_OBJECT;
     }
 
     public static Processor getProcessor() {

@@ -5,9 +5,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.ResolveResult;
 import com.intellij.util.containers.ContainerUtil;
+import com.simpleplugin.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 public class LSFResolveUtil {
@@ -30,4 +32,17 @@ public class LSFResolveUtil {
         return result;
     }
 
+    public static <T extends LSFDeclaration> T singleResolve(Collection<? extends LSFDeclaration> declarations) {
+        if (declarations == null) {
+            return null;
+        }
+
+        declarations = ContainerUtil.filter(declarations, new Condition<LSFDeclaration>() {
+            @Override
+            public boolean value(LSFDeclaration lsfDeclaration) {
+                return lsfDeclaration != null;
+            }
+        });
+        return (T) (declarations.size() != 1 ? null : declarations.iterator().next());
+    }
 }

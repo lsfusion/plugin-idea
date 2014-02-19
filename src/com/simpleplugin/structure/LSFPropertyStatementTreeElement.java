@@ -4,7 +4,7 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.simpleplugin.classes.LSFValueClass;
 import com.simpleplugin.psi.LSFPropertyStatement;
-import com.simpleplugin.util.PsiUtils;
+import com.simpleplugin.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +38,7 @@ public class LSFPropertyStatementTreeElement extends PsiTreeElementBase<LSFPrope
     @Nullable
     @Override
     public String getPresentableText() {
-        return PsiUtils.getPropertyStatementPresentableText(getElement());
+        return LSFPsiUtils.getPropertyStatementPresentableText(getElement());
     }
 
     @Override

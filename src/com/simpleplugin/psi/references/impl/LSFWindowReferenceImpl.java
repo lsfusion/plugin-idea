@@ -1,7 +1,6 @@
 package com.simpleplugin.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.simpleplugin.psi.declarations.LSFGroupDeclaration;
 import com.simpleplugin.psi.declarations.LSFWindowDeclaration;
 import com.simpleplugin.psi.references.LSFWindowReference;
 import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
@@ -15,8 +14,7 @@ public abstract class LSFWindowReferenceImpl extends LSFFullNameReferenceImpl<LS
     }
 
     @Override
-    protected FullNameStubElementType<?, LSFWindowDeclaration> getType() {
+    protected FullNameStubElementType<?, LSFWindowDeclaration> getStubElementType() {
         return LSFStubElementTypes.WINDOW;
     }
-
 }

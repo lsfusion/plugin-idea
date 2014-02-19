@@ -26,10 +26,6 @@ public class LSFElementImpl extends ASTWrapperPsiElement implements LSFElement {
         return (LSFFile) getContainingFile();
     }
     
-    public static GlobalSearchScope getScope(LSFElement element) {
-        return element.getLSFFile().getScope();
-    }
-    
     public GlobalSearchScope getScope() {
         return getScope(this);
     }
@@ -38,5 +34,9 @@ public class LSFElementImpl extends ASTWrapperPsiElement implements LSFElement {
     @Override
     public Project getProject() {
         return getLSFFile().getProject();
+    }
+
+    public static GlobalSearchScope getScope(LSFElement element) {
+        return element.getLSFFile().getScope();
     }
 }

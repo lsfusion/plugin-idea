@@ -2,19 +2,17 @@ package com.simpleplugin.psi.stubs.extend.types;
 
 import com.intellij.psi.stubs.*;
 import com.simpleplugin.psi.extend.LSFClassExtend;
-import com.simpleplugin.psi.extend.LSFFormExtend;
 import com.simpleplugin.psi.impl.LSFClassStatementImpl;
 import com.simpleplugin.psi.stubs.extend.ExtendClassStubElement;
-import com.simpleplugin.psi.stubs.extend.ExtendFormStubElement;
 import com.simpleplugin.psi.stubs.extend.impl.ExtendClassStubImpl;
-import com.simpleplugin.psi.stubs.extend.types.indexes.ClassExtendsClassIndex;
 import com.simpleplugin.psi.stubs.extend.types.indexes.ExtendClassIndex;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 public class ExtendClassStubElementType extends ExtendStubElementType<LSFClassExtend, ExtendClassStubElement> {
+
+    public final StubIndexKey<String, LSFClassExtend> extendKey = StubIndexKey.createIndexKey("CLASSEXTENDSCLASS");
 
     public ExtendClassStubElementType() {
         super("EXTEND_CLASS");
@@ -38,8 +36,6 @@ public class ExtendClassStubElementType extends ExtendStubElementType<LSFClassEx
     public ExtendClassStubElement deserialize(StubInputStream dataStream, StubElement parentStub) throws IOException {
         return new ExtendClassStubImpl(dataStream, parentStub, this);
     }
-
-    public final StubIndexKey<String, LSFClassExtend> extendKey = StubIndexKey.createIndexKey("CLASSEXTENDSCLASS");
 
     @Override
     public void indexStub(ExtendClassStubElement stub, IndexSink sink) {

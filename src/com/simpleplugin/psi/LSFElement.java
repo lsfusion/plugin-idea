@@ -1,6 +1,5 @@
 package com.simpleplugin.psi;
 
-import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 
@@ -11,5 +10,4 @@ public interface LSFElement extends PsiElement {
     LSFFile getLSFFile();
 
     GlobalSearchScope getScope();
-
 }

@@ -58,9 +58,9 @@ public class TypeInferer {
     }
 
     public static void typeInfer(LSFFile file, MetaTransaction transaction) {
-        for (PsiElement child : file.getChildren())
-            if (child instanceof LSFMetaDeclaration)
-                metaTypeInfer((LSFMetaDeclaration) child, transaction);
+        for(PsiElement child : file.getStatements())
+            if(child instanceof LSFMetaDeclaration)
+                metaTypeInfer((LSFMetaDeclaration)child, transaction);
             else
                 typeInfer(child, transaction);
     }

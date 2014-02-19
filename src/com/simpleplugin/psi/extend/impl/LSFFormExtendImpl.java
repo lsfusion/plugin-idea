@@ -12,6 +12,7 @@ import com.simpleplugin.psi.declarations.*;
 import com.simpleplugin.psi.declarations.impl.*;
 import com.simpleplugin.psi.extend.LSFFormExtend;
 import com.simpleplugin.psi.stubs.extend.ExtendFormStubElement;
+import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,16 +55,32 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         if (extend != null)
             return extend.getFormUsage().getNameRef();
 
-        return getFormDecl().getGlobalName();
+        LSFFormDecl formDecl = getFormDecl();
+
+        assert formDecl != null;
+
+        return formDecl.getGlobalName();
     }
 
     @Override
-    public LSFFullNameDeclaration resolveDecl() {
-        LSFFormDecl formDecl = getFormDecl();
-        if (formDecl != null)
-            return formDecl;
+    protected LSFFormDeclaration getOwnDeclaration() {
+        return getFormDecl();
+    }
 
-        return getExtendingFormDeclaration().getFormUsage().resolveDecl();
+    @Nullable
+    @Override
+    protected LSFFormDeclaration resolveExtendingDeclaration() {
+        LSFExtendingFormDeclaration extendingFormDeclaration = getExtendingFormDeclaration();
+        if (extendingFormDeclaration != null) {
+            return extendingFormDeclaration.getFormUsage().resolveDecl();
+        }
+
+        return null;
+    }
+
+    @Override
+    protected FullNameStubElementType getStubType() {
+        return LSFStubElementTypes.FORM;
     }
 
     @Override

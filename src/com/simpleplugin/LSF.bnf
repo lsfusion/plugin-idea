@@ -3,10 +3,9 @@
 
   parserClass="com.simpleplugin.parser.LSFParser"
   parserUtilClass="com.simpleplugin.parser.LSFParserUtil"
-  stubParserClass="com.simpleplugin.parser.LSFParserUtil"
- 
+
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
- 
+
   psiClassPrefix="LSF"
   psiImplClassSuffix="Impl"
   psiPackage="com.simpleplugin.psi"
@@ -15,46 +14,57 @@
   elementTypeHolderClass="com.simpleplugin.psi.LSFTypes"
   elementTypeClass="com.simpleplugin.psi.LSFElementType"
   tokenTypeClass="com.simpleplugin.psi.LSFTokenType"
+
+  extendedPin = false
 }
 
 script ::= moduleHeader (scriptStatement*)
-private scriptStatement ::= statement { recoverWhile = "script_statement_recover" }
-private script_statement_recover ::= !def_statement_recover_start 
+scriptStatement ::= statement { recoverWhile = "script_statement_recover" }
+private script_statement_recover ::= !statement_start
 
 simpleName ::= ID
-{mixin="com.simpleplugin.psi.LSFIdImpl" implements="com.simpleplugin.psi.LSFId"}
-
-moduleName ::= simpleName;
-requireList ::= REQUIRE nonEmptyModuleUsageList SEMI;
-priorityList ::= PRIORITY nonEmptyNamespaceUsageList SEMI;
-namespaceName ::= NAMESPACE namespaceUsage SEMI {
-    mixin="com.simpleplugin.psi.declarations.impl.LSFExplicitNamespaceDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFExplicitNamespaceDeclaration"
-    stubClass = "com.simpleplugin.psi.stubs.ExplicitNamespaceStubElement"
-    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+{
+    mixin="com.simpleplugin.psi.LSFIdImpl"
+    implements="com.simpleplugin.psi.LSFId"
 }
+
 moduleHeader ::= MODULE moduleName SEMI
                  requireList?
                  priorityList?
                  namespaceName?
-{mixin="com.simpleplugin.psi.declarations.impl.LSFModuleDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFModuleDeclaration"
+{
+    pin = 2
+    mixin="com.simpleplugin.psi.declarations.impl.LSFModuleDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFModuleDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.ModuleStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
     recoverWhile = "script_statement_recover"
+}
+
+moduleName ::= simpleName;
+requireList ::= REQUIRE nonEmptyModuleUsageList SEMI {pin = 1};
+priorityList ::= PRIORITY nonEmptyNamespaceUsageList SEMI {pin = 1};
+namespaceName ::= NAMESPACE namespaceUsage SEMI
+{
+    mixin="com.simpleplugin.psi.declarations.impl.LSFExplicitNamespaceDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFExplicitNamespaceDeclaration"
+    stubClass = "com.simpleplugin.psi.stubs.ExplicitNamespaceStubElement"
+    elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
 // fake rules to generate types
 fake_comments ::= COMMENTS
 //fake_whitespaces ::= WHITESPACES
 
-private statement ::=   classStatement
+private statement ::=   constraintStatement
                     |	groupStatement
                     |	overrideStatement // starts with ID
-                    |	constraintStatement
+                    |	classStatement
                     |	followsStatement // starts with ID
                     |	writeWhenStatement // starts with ID
                     |	explicitInterfacePropertyStatement
                     |	eventStatement
-                    |   showDepStatement
+                    |	showDepStatement
                     |	globalEventStatement
                     |	aspectStatement
                     |	tableStatement
@@ -67,31 +77,46 @@ private statement ::=   classStatement
                     |	metaCodeStatement // ?
                     |	metaCodeDeclarationStatement // ?
                     |	emptyStatement
+                    |   stubStatement
+
+// some statements are pinned after the first token, so we need these fake rules to pin incomplete statements
+stubStatement ::=
+    EXTEND (CLASS | FORM | DESIGN) ID
+    | CLASS (ABSTRACT | NATIVE)? ID
+    | (ATSIGN | FORM | GROUP | META | DESIGN | TABLE) ID
+    | WINDOW windowType ID
+    {pin(".*") = 1}
+
 // Important ! after recover the rule should mandatory be pinned (matched)
-private def_statement_recover_start ::= AFTER | BEFORE | (((CLASS (ABSTRACT | NATIVE)?) | ATSIGN | FORM | GROUP | META | DESIGN | TABLE | (WINDOW windowType))? ID) | CONSTRAINT | (EXTEND (CLASS | FORM | DESIGN) ID) | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SEMI | SHOWDEP | WHEN
+private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT
+                            | CLASS | ATSIGN | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// CLASS STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-classDecl ::= CLASS (ABSTRACT | NATIVE)? simpleNameWithCaption {
-     mixin = "com.simpleplugin.psi.declarations.impl.LSFClassDeclarationImpl" implements = "com.simpleplugin.psi.declarations.LSFClassDeclaration"
+classDecl ::= CLASS (ABSTRACT | NATIVE)? simpleNameWithCaption
+{
+     mixin = "com.simpleplugin.psi.declarations.impl.LSFClassDeclarationImpl"
+     implements = "com.simpleplugin.psi.declarations.LSFClassDeclaration"
      stubClass = "com.simpleplugin.psi.stubs.ClassStubElement"
      elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
 extendingClassDeclaration ::= EXTEND CLASS customClassUsage
 
-classStatement ::= (classDecl | extendingClassDeclaration) classInstancesAndParents {pin = 1
-    mixin="com.simpleplugin.psi.extend.impl.LSFClassExtendImpl" implements="com.simpleplugin.psi.extend.LSFClassExtend"
+classStatement ::= (classDecl | extendingClassDeclaration) classInstancesAndParents {
+    pin = 1
+    mixin="com.simpleplugin.psi.extend.impl.LSFClassExtendImpl"
+    implements="com.simpleplugin.psi.extend.LSFClassExtend"
     stubClass = "com.simpleplugin.psi.stubs.extend.ExtendClassStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
-private classInstancesAndParents ::=    LBRACE staticObjectDeclList RBRACE (classParentsList SEMI)?
-		                            |   (classParentsList)? SEMI
+private classInstancesAndParents ::=    LBRACE staticObjectDeclList RBRACE (classParentsList SEMI)? | (classParentsList)? SEMI {pin(".*") = 1}
 
-classParentsList ::= COLON nonEmptyCustomClassUsageList
+classParentsList ::= COLON nonEmptyCustomClassUsageList {pin = 1}
 
 staticObjectDeclList ::= (nonEmptyStaticObjectDeclList)?
 
@@ -105,10 +130,12 @@ staticObjectDecl ::= simpleNameWithCaption
 ////////////////////////////////////////////////////////////////////////////////
 
 groupStatement ::= GROUP simpleNameWithCaption (COLON groupUsage)? SEMI
-{mixin="com.simpleplugin.psi.declarations.impl.LSFGroupDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFGroupDeclaration"
+{
+    pin = 2
+    implements="com.simpleplugin.psi.declarations.LSFGroupDeclaration"
+    mixin="com.simpleplugin.psi.declarations.impl.LSFGroupDeclarationImpl"
     stubClass = "com.simpleplugin.psi.stubs.GroupStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
-    pin = 2
 }
 
 
@@ -117,37 +144,47 @@ groupStatement ::= GROUP simpleNameWithCaption (COLON groupUsage)? SEMI
 ////////////////////////////////////////////////////////////////////////////////
 
 explicitInterfacePropertyStatement ::= explicitValuePropertyStatement
-{mixin="com.simpleplugin.psi.declarations.impl.LSFExplicitInterfacePropStatementImpl" implements="com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement"
+{
+    mixin="com.simpleplugin.psi.declarations.impl.LSFExplicitInterfacePropStatementImpl"
+    implements="com.simpleplugin.psi.declarations.LSFExplicitInterfacePropStatement"
     stubClass="com.simpleplugin.psi.stubs.interfaces.ExplicitInterfaceStubElement"
     elementTypeFactory="com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
 explicitValuePropertyStatement ::= implicitValuePropertyStatement
-{mixin="com.simpleplugin.psi.declarations.impl.LSFExplicitValuePropStatementImpl" implements="com.simpleplugin.psi.declarations.LSFExplicitValuePropStatement"
+{
+    mixin="com.simpleplugin.psi.declarations.impl.LSFExplicitValuePropStatementImpl"
+    implements="com.simpleplugin.psi.declarations.LSFExplicitValuePropStatement"
     stubClass="com.simpleplugin.psi.stubs.interfaces.ExplicitValueStubElement"
     elementTypeFactory="com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
 implicitValuePropertyStatement ::= implicitInterfacePropertyStatement
-{mixin="com.simpleplugin.psi.declarations.impl.LSFImplicitValuePropStatementImpl" implements="com.simpleplugin.psi.declarations.LSFImplicitValuePropStatement"
+{
+    mixin="com.simpleplugin.psi.declarations.impl.LSFImplicitValuePropStatementImpl"
+    implements="com.simpleplugin.psi.declarations.LSFImplicitValuePropStatement"
     stubClass="com.simpleplugin.psi.stubs.interfaces.ImplicitValueStubElement"
     elementTypeFactory="com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
 implicitInterfacePropertyStatement ::= propertyStatement
-{mixin="com.simpleplugin.psi.declarations.impl.LSFImplicitInterfacePropStatementImpl" implements="com.simpleplugin.psi.declarations.LSFImplicitInterfacePropStatement"
+{
+    mixin="com.simpleplugin.psi.declarations.impl.LSFImplicitInterfacePropStatementImpl"
+    implements="com.simpleplugin.psi.declarations.LSFImplicitInterfacePropStatement"
     stubClass="com.simpleplugin.psi.stubs.interfaces.ImplicitInterfaceStubElement"
     elementTypeFactory="com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
-propertyStatement ::= propertyDeclaration EQUAL
+propertyStatement ::= propertyDeclaration EQUALS
                       (expressionUnfriendlyPD | propertyExpression) 
                       propertyOptions
-                      (SEMI)?
-{mixin="com.simpleplugin.psi.declarations.impl.LSFGlobalPropDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration, com.simpleplugin.psi.context.ModifyParamContext"
+                      << semicolonIfNeeded >>
+{
+    pin = 1
+    mixin="com.simpleplugin.psi.declarations.impl.LSFGlobalPropDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFGlobalPropDeclaration,com.simpleplugin.psi.context.ModifyParamContext"
     stubClass = "com.simpleplugin.psi.stubs.PropStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
-    pin = 1
     methods = [ getContextModifier getContextInferrer ]
 }
 
@@ -155,17 +192,25 @@ propertyDeclaration ::= simpleNameWithCaption (LBRAC classParamDeclareList RBRAC
 {methods = [ resolveParamDecls ]}
 
 paramDeclare ::= simpleName
-{mixin="com.simpleplugin.psi.declarations.impl.LSFParamDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFParamDeclaration"}
+{
+    mixin="com.simpleplugin.psi.declarations.impl.LSFParamDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFParamDeclaration"
+}
 
 classParamDeclare ::= (className paramDeclare) | paramDeclare
-{implements="com.simpleplugin.psi.context.ClassParamDeclareContext"
- methods = [ resolveClass ensureClass ]}
+{
+    implements="com.simpleplugin.psi.context.ClassParamDeclareContext"
+    methods = [ resolveClass ensureClass ]
+}
 
 classParamDeclareList ::= (nonEmptyClassParamDeclareList)?
 nonEmptyClassParamDeclareList ::= classParamDeclare (COMMA classParamDeclare)*
 
 propertyExpression ::= ifPE
-{methods = [ resolveValueClass resolveInferredValueClass resolveParams inferParamClasses]}
+{
+    implements = "com.simpleplugin.psi.context.LSFExpression"
+    methods = [ resolveValueClass resolveInferredValueClass resolveParams inferParamClasses getValueClassNames getValuePropertyNames]
+}
 
 ifPE ::= orPE (IF orPE)*
 {implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
@@ -207,6 +252,7 @@ simplePE ::= (LBRAC propertyExpression RBRAC) | expressionPrimitive
 {implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 expressionPrimitive ::= <<fullCompoundParamDeclareCheck>> expressionFriendlyPD | exprParameterUsage
+{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 expressionFriendlyPD ::= joinPropertyDefinition
 	    |	multiPropertyDefinition
@@ -222,6 +268,10 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	sessionPropertyDefinition
 	    |	signaturePropertyDefinition
 	    |	literal
+{
+    implements = "com.simpleplugin.psi.context.LSFExpression"
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
+}
 
 expressionUnfriendlyPD ::= contextIndependentPD | actionPropertyDefinition
 {methods = [ resolveUnfriendValueClass resolveValueParamClasses]}
@@ -235,7 +285,10 @@ contextIndependentPD ::= dataPropertyDefinition
                     |   filterPropertyDefinition
 
 joinPropertyDefinition ::= JOIN? propertyObject LBRAC propertyExpressionList RBRAC
-{implements = "com.simpleplugin.psi.context.LSFExpression, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList getValueClassNames getValuePropertyNames ]}
+{
+    implements = "com.simpleplugin.psi.context.LSFExpression, com.simpleplugin.psi.context.PropertyUsageContext"
+    methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList getValueClassNames getValuePropertyNames ]
+}
 
 overridePropertyDefinition ::= (OVERRIDE | EXCLUSIVE) nonEmptyPropertyExpressionList
 {implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
@@ -243,21 +296,37 @@ overridePropertyDefinition ::= (OVERRIDE | EXCLUSIVE) nonEmptyPropertyExpression
 ifElsePropertyDefinition ::= IF propertyExpression
                                     THEN propertyExpression
                                     (ELSE propertyExpression)?   // check greedy
-{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.LSFExpression"
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
+}
 
 maxPropertyDefinition ::= (MAX | MIN) nonEmptyPropertyExpressionList
-{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.LSFExpression"
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
+}
 
-caseBranchBody ::= WHEN propertyExpression THEN propertyExpression
+caseBranchBody ::= WHEN propertyExpression (THEN propertyExpression) {pin(".*") = 1}
 casePropertyDefinition ::= CASE (exclusiveOverrideOption)?
                            (caseBranchBody)+
                            (ELSE propertyExpression)?
-{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.LSFExpression"
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
+}
 
 multiPropertyDefinition ::= MULTI nonEmptyPropertyExpressionList (exclusiveOverrideOption)?
-{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.LSFExpression"
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
+}
 
-partitionPropertyBy ::= BY nonEmptyPropertyExpressionList 
+partitionPropertyBy ::= BY nonEmptyPropertyExpressionList
 partitionPropertyDefinition ::= PARTITION
                                 (   (SUM | PREV)
                                 |   UNGROUP propertyObject
@@ -268,13 +337,25 @@ partitionPropertyDefinition ::= PARTITION
                                 propertyExpression (partitionPropertyBy)?
                                 (ORDER (DESC )? nonEmptyPropertyExpressionList)?
                                 (WINDOW EXCEPTLAST)?
-{implements = "com.simpleplugin.psi.context.LSFExpression, com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList getValueClassNames getValuePropertyNames ]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.LSFExpression, com.simpleplugin.psi.context.PropertyUsageContext"
+    methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList getValueClassNames getValuePropertyNames ]
+}
 
 recursivePropertyDefinition ::= RECURSION propertyExpression STEP propertyExpression (CYCLES (YES |	NO | IMPOSSIBLE))?
-{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.LSFExpression"
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
+}
 
 structCreationPropertyDefinition ::= STRUCT LBRAC nonEmptyPropertyExpressionList RBRAC
-{implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.LSFExpression"
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
+}
 
 castPropertyDefinition ::= builtInClassName LBRAC propertyExpression RBRAC
 {implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
@@ -289,7 +370,7 @@ sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 {implements = "com.simpleplugin.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
-propertyExprObject ::= LSQBR EQUAL (propertyExpression | expressionUnfriendlyPD) RSQBR
+propertyExprObject ::= LSQBR EQUALS (propertyExpression | expressionUnfriendlyPD) RSQBR
 {implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
 
 propertyObject ::=  propertyUsage | propertyExprObject
@@ -297,19 +378,34 @@ noContextPropertyUsage ::= propertyUsage
 {implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 
-dataPropertyDefinition ::= DATA (SESSION)? className LBRAC classNameList RBRAC
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]}
+dataPropertyDefinition ::= DATA (SESSION)? className (LBRAC classNameList RBRAC)
+{
+    pin(".*") = 1;
+    implements = "com.simpleplugin.psi.context.UnfriendlyPE"
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+}
 
 nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.UnfriendlyPE"
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+}
 
 abstractPropertyDefinition ::= ABSTRACT (((CASE | MULTI) (OVERRIDE | EXCLUSIVE)?) | OVERRIDE | EXCLUSIVE)? (CHECKED)? className LBRAC classNameList RBRAC
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]}
+{
+    implements = "com.simpleplugin.psi.context.UnfriendlyPE"
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+}
 
 formulaPropertyDefinition ::= FORMULA (builtInClassName)? stringLiteral
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.UnfriendlyPE"
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+}
 
-groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | GEQUAL | LAST | NAGGR
+groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | EQUAL | LAST | NAGGR
 groupPropertyBy ::= BY nonEmptyPropertyExpressionList;
 orderPropertyBy ::= ORDER (DESC)? nonEmptyPropertyExpressionList 
 groupPropertyDefinition ::= GROUP groupingType
@@ -317,15 +413,19 @@ groupPropertyDefinition ::= GROUP groupingType
 		                    (groupPropertyBy)?
 		                    (orderPropertyBy)?
 		                    (WHERE propertyExpression)?
-{implements="com.simpleplugin.psi.context.ModifyParamContext, com.simpleplugin.psi.context.UnfriendlyPE" 
+{
+    implements="com.simpleplugin.psi.context.ModifyParamContext, com.simpleplugin.psi.context.UnfriendlyPE"
     methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ] 
 }		                    
 
 filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]}
+{
+    implements = "com.simpleplugin.psi.context.UnfriendlyPE"
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+}
 
 typeIs ::= IS | AS
-typePropertyDefinition ::= typeIs className
+typePropertyDefinition ::= typeIs className {pin = 1}
 
 
 propertyOptions ::= (   IN groupUsage
@@ -353,7 +453,7 @@ propertyOptions ::= (   IN groupUsage
                     |	eventIdSetting
                     )*
 
-shortcutSetting ::= SHORTCUT noContextPropertyUsage
+shortcutSetting ::= SHORTCUT noContextPropertyUsage {pin = 1}
 asEditActionSetting ::= (ASONCHANGE | ASONCHANGEWYS | ASONEDIT) noContextPropertyUsage
 toolbarSetting ::= TOOLBAR
 fixedCharWidthSetting ::= FIXEDCHARWIDTH intLiteral
@@ -380,7 +480,12 @@ eventIdSetting ::= EVENTID stringLiteral
 actionPropertyDefinition ::= ACTION
 		                    (LBRAC exprParameterUsageList RBRAC)?
 		                    actionPropertyDefinitionBody
-{implements="com.simpleplugin.psi.context.ExtendParamContext" methods = [ getContextModifier getContextInferrer ] } // actually declare context, but it's pretty difficult to implement using only classes
+{
+    pin = 1
+    // actually declare context, but it's pretty difficult to implement using only classes
+    implements="com.simpleplugin.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer ]
+}
 
 
 abstractActionPropertyDefinition ::= ABSTRACT ACTION
@@ -390,13 +495,19 @@ abstractActionPropertyDefinition ::= ABSTRACT ACTION
                                     )?
                                     (CHECKED)?
                                     LBRAC classNameList RBRAC
-{implements = "com.simpleplugin.psi.context.UnfriendlyPE" methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]}
+{
+    implements = "com.simpleplugin.psi.context.UnfriendlyPE"
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+}
 
 // extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
 actionPropertyDefinitionBody ::=    customActionPDB
                                 |   extendContextActionPDB
                                 |	keepContextActionPDB
-{implements = "com.simpleplugin.psi.context.ActionExpression" methods = [ inferActionParamClasses ]}
+{
+    implements = "com.simpleplugin.psi.context.ActionExpression"
+    methods = [ inferActionParamClasses ]
+}
 
 private extendContextActionPDB ::=  assignActionPropertyDefinitionBody
                         |	forActionPropertyDefinitionBody
@@ -426,36 +537,55 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |	evalActionPropertyDefinitionBody
                 |	drillDownActionPropertyDefinitionBody
 
-formActionObjectUsage ::= objectUsage EQUAL propertyExpression 
+formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
 	    FORM formUsage
-		(OBJECTS formActionObjectList)?
-        (CONTEXTFILTER formActionObjectUsage)?
+		(formActionObjectList)?
+        (contextFilterDefinition)?
 		(initFilterDefinition)?
 		(formSessionScopeLiteral)?
 		(modalityTypeLiteral)?
 		(CHECK)? (SHOWDROP)?
 		(formPrintTypeLiteral)?
-{implements="com.simpleplugin.psi.context.ActionExpression, com.simpleplugin.psi.context.FormContext" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression, com.simpleplugin.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
 
-initFilterDefinition ::= INITFILTER formPropertyDraw
+contextFilterDefinition ::= CONTEXTFILTER formActionObjectUsage {pin = 1}
 
-formActionObjectList ::=
-		formActionObjectUsage
-		(COMMA formActionObjectUsage)*
+initFilterDefinition ::= INITFILTER formPropertyDrawUsage {pin = 1}
+
+formActionObjectList ::= OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)* {pin(".*") = 1}
 
 customActionPropertyDefinitionBody ::= CUSTOM stringLiteral (LBRAC classNameList RBRAC)?
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
 addFormActionPropertyDefinitionBody ::= ADDFORM (SESSION)? customClassUsage
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
-editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION)? customClassUsage
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
-addObjectActionPropertyDefinitionBody ::= ADDOBJ customClassUsage
-		                                    (WHERE propertyExpression)?
-		                                    (TO mappedPropertyExprParam)?
-{implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression" methods = [ getContextModifier getContextInferrer inferActionParamClasses ] }
+editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION)? customClassUsage
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+addObjectActionPropertyDefinitionBody ::= ADDOBJ customClassUsage (WHERE propertyExpression)? (TO mappedPropertyExprParam)?
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+}
 
 emailActionPropertyDefinitionBody ::=
 		EMAIL
@@ -465,101 +595,209 @@ emailActionPropertyDefinitionBody ::=
 		(	INLINE formEmailToObjects
 		|	ATTACH emailAttachFormat (NAME propertyExpression)? formEmailToObjects
 		)*
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
-formEmailToObjects ::= formUsage emailActionFormObjects
-{implements="com.simpleplugin.psi.context.FormContext"}
-
-emailActionFormObjects ::=
-        (   OBJECTS
-			formActionObjectList
-		)?
-	;
+formEmailToObjects ::= formUsage formActionObjectList?
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
 
 confirmActionPropertyDefinitionBody ::= CONFIRM propertyExpression
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
 messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
 asyncUpdateActionPropertyDefinitionBody ::= ASYNCUPDATE propertyExpression
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
 seekObjectActionPropertyDefinitionBody ::= SEEK objectID propertyExpression
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
 fileActionPropertyDefinitionBody ::= (LOADFILE | OPENFILE) propertyExpression
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
 changeClassActionPropertyDefinitionBody ::= CHANGECLASS exprParameterUsage TO customClassUsage (WHERE propertyExpression)?
-{implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression" methods = [ getContextModifier getContextInferrer inferActionParamClasses ] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+}
 
 deleteActionPropertyDefinitionBody ::= DELETE exprParameterUsage (WHERE propertyExpression)?
-{implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression" methods = [ getContextModifier getContextInferrer inferActionParamClasses ] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+}
 
 evalActionPropertyDefinitionBody ::= EVAL propertyExpression
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
 drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
 requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
+//listActionPropertyDefinitionBody ::=    ((NEWSESSION | (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)) (AUTOAPPLY)? (SINGLE)?)?
+//		                                LBRACE
+//			                            (	actionPropertyDefinitionBody << semicolonIfNeeded >>  //  } => ;
+//			                            |	localDataPropertyDefinition SEMI
+//			                            |	emptyStatement
+//			                            )*
+//		                                RBRACE
+//{
+//    pin = 2
+//    mixin="com.simpleplugin.psi.LSFListActionImpl"
+//    implements="com.simpleplugin.psi.LSFListAction, com.simpleplugin.psi.context.ActionExpression"
+//    methods = [inferActionParamClasses]
+//}
 listActionPropertyDefinitionBody ::=    ((NEWSESSION | (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)) (AUTOAPPLY)? (SINGLE)?)?
 		                                LBRACE
-			                            (	actionPropertyDefinitionBody (SEMI)? // ;?
-			                            |	localDataPropertyDefinition SEMI
-			                            |	emptyStatement
-			                            )*
+			                            listActionStatement*
 		                                RBRACE
-{mixin="com.simpleplugin.psi.LSFListActionImpl" implements="com.simpleplugin.psi.LSFListAction, com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 2
+    mixin="com.simpleplugin.psi.LSFListActionImpl"
+    implements="com.simpleplugin.psi.LSFListAction, com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
-localDataPropertyDefinition ::= LOCAL simpleName EQUAL className LBRAC classNameList RBRAC
-{mixin="com.simpleplugin.psi.declarations.impl.LSFLocalPropDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFLocalPropDeclaration"}
+private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfNeeded >>  //  !} => ;
+                                |   localDataPropertyDefinition SEMI
+                                |   emptyStatement
+                                )
+{
+    pin(".*") = 1
+    recoverWhile = "list_action_statement_recover"
+}
 
-execActionPropertyDefinitionBody ::= (EXEC)? propertyObject LBRAC propertyExpressionList RBRAC
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext, com.simpleplugin.psi.context.ActionExpression" methods = [ resolveParamClasses inferActionParamClasses getParamList ]}
+private list_action_statement_recover ::= !(list_action_statement_start | RBRACE)
+private list_action_statement_start ::= ADDFORM | ADDOBJ | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
+                                        | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | FORM | IF | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
+                                        | REQUEST | RETURN | SEEK | WHILE
+                                        | ID | SEMI
 
-assignActionPropertyDefinitionBody ::= (ASSIGN)?
-                                       mappedPropertyExprParam
-                                       ARROW
-                                       propertyExpression (WHERE propertyExpression)?
-{implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression" methods = [ getContextModifier getContextInferrer inferActionParamClasses ] }
+localDataPropertyDefinition ::= LOCAL simpleName EQUALS className LBRAC classNameList RBRAC
+{
+    pin = 1
+    mixin="com.simpleplugin.psi.declarations.impl.LSFLocalPropDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFLocalPropDeclaration"
+}
 
-ifActionPropertyDefinitionBody ::= IF propertyExpression
-		                                THEN actionPropertyDefinitionBody
-		                                (ELSE actionPropertyDefinitionBody)?
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+//Разбиваем правило, чтобы была возможность запинить по EXEC
+execActionPropertyDefinitionBody ::= execActionPropertyDefinitionBody1 | execActionPropertyDefinitionBody2
+{
+    implements = "com.simpleplugin.psi.context.PropertyUsageContext, com.simpleplugin.psi.context.ActionExpression"
+    methods = [ resolveParamClasses inferActionParamClasses getParamList ]
+}
+private execActionPropertyDefinitionBody1 ::= EXEC propertyObject LBRAC propertyExpressionList RBRAC {pin = 1}
+//EXEC - последнее правило, которое может начинаться с ID, поэтому спокойно пиним
+private execActionPropertyDefinitionBody2 ::= propertyObject LBRAC propertyExpressionList RBRAC {pin = 1}
 
-caseActionPropertyDefinitionBody ::= CASE (exclusiveOverrideOption)?
-			                            (actionCaseBranchBody)+
-			                            (ELSE actionPropertyDefinitionBody)?
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+//Разбиваем правило, чтобы была возможность запинить по ASSIGN
+assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | assignActionPropertyDefinitionBody2
+{
+    implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+}
 
-actionCaseBranchBody ::= WHEN propertyExpression THEN actionPropertyDefinitionBody
+private assignActionPropertyDefinitionBody1 ::= ASSIGN mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 1}
+private assignActionPropertyDefinitionBody2 ::= mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 2}
+
+ifActionPropertyDefinitionBody ::= IF propertyExpression THEN actionPropertyDefinitionBody (ELSE actionPropertyDefinitionBody)?
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses]
+}
+
+caseActionPropertyDefinitionBody ::= CASE (exclusiveOverrideOption)? (actionCaseBranchBody)+ (ELSE actionPropertyDefinitionBody)?
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+actionCaseBranchBody ::= WHEN propertyExpression (THEN actionPropertyDefinitionBody) {pin(".*") = 1}
 
 multiActionPropertyDefinitionBody ::= MULTI (exclusiveOverrideOption)? nonEmptyActionPDBList
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
-forAddObjClause ::= ADDOBJ (paramDeclare EQUAL)? customClassUsage
-{implements="com.simpleplugin.psi.context.ClassParamDeclareContext"
- methods = [ resolveClass ensureClass ]}
+forAddObjClause ::= ADDOBJ (paramDeclare EQUALS)? customClassUsage
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ClassParamDeclareContext"
+    methods = [ resolveClass ensureClass ]
+}
 
 forActionPropertyDefinitionBody ::= FOR (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
 		                            inlineStatement
 		                            (forAddObjClause)?
 		                            DO actionPropertyDefinitionBody
 		                            (ELSE actionPropertyDefinitionBody)?
-{implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression" methods = [ getContextModifier getContextInferrer inferActionParamClasses ] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+}
                                                        
 whileActionPropertyDefinitionBody ::= WHILE (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
 		                              inlineStatement
 		                              (forAddObjClause)?
 		                              DO actionPropertyDefinitionBody
-{implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression" methods = [ getContextModifier getContextInferrer inferActionParamClasses ] }
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ExtendParamContext, com.simpleplugin.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+}
 
 terminalFlowActionPropertyDefinitionBody ::= BREAK | RETURN
-{implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses] }
+{
+    implements="com.simpleplugin.psi.context.ActionExpression" methods = [inferActionParamClasses]
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// FORM STATEMENT /////////////////////////////
@@ -583,44 +821,46 @@ formStatement ::=	(	formDecl
                     SEMI
 {
     pin=1
-    mixin="com.simpleplugin.psi.extend.impl.LSFFormExtendImpl" implements="com.simpleplugin.psi.extend.LSFFormExtend"
-    stubClass = "com.simpleplugin.psi.stubs.extend.ExtendFormStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
+    stubClass = "com.simpleplugin.psi.stubs.extend.ExtendFormStubElement"
+    implements="com.simpleplugin.psi.extend.LSFFormExtend, com.simpleplugin.psi.context.FormContext"
+    mixin="com.simpleplugin.psi.extend.impl.LSFFormExtendImpl"
+    methods = [resolveFormDecl]
 }
 
-dialogFormDeclaration ::= DIALOG customClassUsage OBJECT ID
-editFormDeclaration ::= EDIT customClassUsage OBJECT ID
-listFormDeclaration ::= LIST customClassUsage OBJECT ID
+dialogFormDeclaration ::= DIALOG customClassUsage OBJECT objectUsage {pin = 1}
+editFormDeclaration ::= EDIT customClassUsage OBJECT objectUsage {pin = 1}
+listFormDeclaration ::= LIST customClassUsage OBJECT objectUsage {pin = 1}
 
 formDecl ::= FORM simpleNameWithCaption
 		            (TITLE stringLiteral)?
 		            (modalityTypeLiteral)?
 		            (IMAGE stringLiteral)?
 		            (AUTOREFRESH intLiteral)?
-{mixin="com.simpleplugin.psi.declarations.impl.LSFFormDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFFormDeclaration"
+{
+    pin = 2
+    mixin ="com.simpleplugin.psi.declarations.impl.LSFFormDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFFormDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.FormStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
-    pin = 2
 }
 
 extendingFormDeclaration ::= EXTEND FORM formUsage
 
-formGroupObjectsList ::= OBJECTS formGroupObjectDeclaration
-		                         (COMMA formGroupObjectDeclaration)*
+formGroupObjectsList ::= OBJECTS formGroupObjectDeclaration (COMMA formGroupObjectDeclaration)* {pin = 1}
 
-formTreeGroupObjectList ::= TREE (ID)? formTreeGroupObjectDeclaration
-		                               (COMMA formTreeGroupObjectDeclaration)*
+formTreeGroupObjectList ::= TREE (ID)? formTreeGroupObjectDeclaration (COMMA formTreeGroupObjectDeclaration)* {pin = 1}
 
 formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectReportPath)? (formGroupObjectViewType)? (formGroupObjectPageSize)?
 formTreeGroupObjectDeclaration ::= formCommonGroupObject (treeGroupParentDeclaration)?
 {implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
-treeGroupParentDeclaration ::= PARENT (propertyUsage | LBRAC nonEmptyPropertyUsageList RBRAC)
+treeGroupParentDeclaration ::= PARENT (propertyUsage | LBRAC nonEmptyPropertyUsageList RBRAC) { pin = 1 }
 
 formCommonGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDeclaration
 {mixin="com.simpleplugin.psi.declarations.impl.LSFGroupObjectDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFGroupObjectDeclaration"}
 
-formGroupObjectReportPath ::= REPORTFILE mappedPropertyObject
+formGroupObjectReportPath ::= REPORTFILE formPropertyObject
 
 formGroupObjectViewType ::= (INIT | FIXED ) classViewType
 
@@ -630,113 +870,136 @@ formGroupObjectPageSize ::= PAGESIZE intLiteral
 
 formSingleGroupObjectDeclaration ::= formObjectDeclaration
 
-formMultiGroupObjectDeclaration ::= (simpleName EQUAL)?
+formMultiGroupObjectDeclaration ::= (simpleName EQUALS)?
 		                            LBRAC
 			                        formObjectDeclaration (COMMA formObjectDeclaration)+
 		                            RBRAC
 
-formObjectDeclaration ::= (simpleName EQUAL)?
+formObjectDeclaration ::= (simpleName EQUALS)?
 		                  className (stringLiteral)?
 		                  (ON CHANGE formActionPropertyObject)?
-{mixin="com.simpleplugin.psi.declarations.impl.LSFObjectDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFObjectDeclaration"}
+{
+    mixin="com.simpleplugin.psi.declarations.impl.LSFObjectDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFObjectDeclaration"
+}
 
-formPropertyDrawNameDecl ::= (simpleName EQUAL)? formPropertyName formPropertyOptionsList
-{mixin="com.simpleplugin.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFPropertyDrawNameDeclaration"}
+formPropertyDrawNameDecl ::= (simpleName EQUALS)? formPropertyName formPropertyOptionsList
+{
+    mixin="com.simpleplugin.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFPropertyDrawNameDeclaration"
+}
+
 formPropertiesNamesDeclList ::=	formPropertyDrawNameDecl (COMMA formPropertyDrawNameDecl)*
+
+formPropertiesList ::=  PROPERTIES (formMappedNamePropertiesList | formPropertyOptionsList formMappedPropertiesList) { pin = 1 }
+
 formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptionsList formPropertiesNamesDeclList
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList]
+}
+
+formPropertyOptionsList ::= (    EDITABLE
+                            |    READONLY
+                            |    SELECTOR
+                            |    HINTNOUPDATE
+                            |    HINTTABLE
+                            |    TOOLBAR
+                            |    OPTIMISTICASYNC
+                            |    formOptionForce
+                            |    formOptionToDraw
+                            |    formOptionEventId
+                            |    formOptionColumns
+                            |    formOptionsWithCalcPropertyObject
+                            |    formOptionsWithFormPropertyDraw
+                            |    formOptionsOnEvents
+                            )*
+
+formOptionColumns ::= COLUMNS LBRAC nonEmptyGroupObjectUsageList RBRAC {pin = 1}
+formOptionForce ::= FORCE classViewType {pin = 1}
+formOptionToDraw ::= TODRAW groupObjectUsage {pin = 1}
+formOptionEventId ::= EVENTID stringLiteral {pin = 1}
+formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
+formOptionsWithFormPropertyDraw ::= (BEFORE | AFTER | QUICKFILTER) formPropertyDrawUsage {pin = 1}
+formOptionsOnEvents ::= ON (EDIT | CHANGE | CHANGEWYS | (SHORTCUT (stringLiteral)?) ) formActionPropertyObject
+{
+    pin = 1
+}
+
+formCalcPropertyObject ::= formPropertyObject
+formActionPropertyObject ::= formPropertyObject
+
+formPropertyDrawMappedDecl ::= (simpleName EQUALS)? formPropertyObject formPropertyOptionsList
+{
+    mixin="com.simpleplugin.psi.declarations.impl.LSFPropertyDrawMappedDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFPropertyDrawMappedDeclaration"}
+
+formMappedPropertiesList ::= formPropertyDrawMappedDecl (COMMA formPropertyDrawMappedDecl)* {pin = 1}
+
+formFiltersList ::= FILTERS formFilterDeclaration (COMMA formFilterDeclaration)* {pin(".*") = 1}
+
+formHintsList ::= (HINTNOUPDATE | HINTTABLE) LIST nonEmptyNoContextPropertyUsageList {pin = 1}
+
+formEventsList ::= EVENTS formEventDeclaration (COMMA formEventDeclaration)* {pin = 1}
+
+formEventDeclaration ::= ON
+                        (    OK
+                        |    APPLY
+                        |    CLOSE
+                        |    INIT
+                        |    CANCEL
+                        |    DROP
+                        |    QUERYOK
+                        |    QUERYCLOSE
+                        |    CHANGE ID
+                        )
+                        formActionPropertyObject
+{
+    pin = 1
+}
+
+filterGroupDeclaration ::= FILTERGROUP ID
+                                (FILTER stringLiteral stringLiteral formFilterDeclaration filterSetDefault)+
+{pin(".*") = 1}
+
+formFilterDeclaration ::= propertyExpression
+filterSetDefault ::= (DEFAULT)?
+
+formOrderByList ::= ORDER BY formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
+
+formPropertyDrawWithOrder ::= formPropertyDrawUsage (ASC | DESC)?
+
+predefinedFormPropertyName ::= OBJVALUE
+                           |    SELECTION
+                           |    ADDOBJ
+                           |    ADDFORM
+                           |    ADDSESSIONFORM
+                           |    EDITFORM
+                           |    EDITSESSIONFORM
+                           |    DELETE
+                           |    DELETESESSION
+{
+    mixin="com.simpleplugin.psi.LSFIdImpl"
+    implements="com.simpleplugin.psi.LSFId"
+}
+
+formPropertyName ::= propertyUsage | predefinedFormPropertyName
+
+formPropertyObject ::= formPropertyName LBRAC objectUsageList RBRAC
 {
     pin = 1
     implements = "com.simpleplugin.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList ]
 }
 
-formPropertiesList ::=  PROPERTIES (formMappedNamePropertiesList | formPropertyOptionsList formMappedPropertiesList)
+aliasUsage ::= simpleName
+
+formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyObject) | aliasUsage
 {
-    pin = 1
+    implements="com.simpleplugin.psi.references.LSFPropertyDrawReference"
+    mixin="com.simpleplugin.psi.references.impl.LSFPropertyDrawReferenceImpl"
 }
-
-formPropertyOptionsList ::= (	propertyEditTypeLiteral
-                            |	HINTNOUPDATE
-                            |   HINTTABLE
-                            |   TOOLBAR
-                            |   OPTIMISTICASYNC
-                            |	COLUMNS LBRAC nonEmptyGroupObjectUsageList RBRAC
-                            |	SHOWIF formCalcPropertyObject
-                            |	READONLYIF formCalcPropertyObject
-                            |	BACKGROUND formCalcPropertyObject
-                            |	FOREGROUND formCalcPropertyObject
-                            |	HEADER formCalcPropertyObject
-                            |	FOOTER formCalcPropertyObject
-                            |	FORCE classViewType
-                            |	TODRAW formGroupObjectEntity
-                            |	BEFORE formPropertyDraw
-                            |	AFTER  formPropertyDraw
-                            |   QUICKFILTER formPropertyDraw
-                            |	ON EDIT formActionPropertyObject
-                            |	ON CHANGE formActionPropertyObject
-                            |	ON CHANGEWYS formActionPropertyObject
-                            |	ON SHORTCUT (stringLiteral)? formActionPropertyObject
-                            |	EVENTID stringLiteral
-                            )*
-
-formPropertyDraw ::= mappedPropertyObject | ID
-
-formPropertyDrawMappedDecl ::= (simpleName EQUAL)? formMappedProperty formPropertyOptionsList
-{mixin="com.simpleplugin.psi.declarations.impl.LSFPropertyDrawMappedDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFPropertyDrawMappedDeclaration"}
-
-formMappedPropertiesList ::= formPropertyDrawMappedDecl
-		                     (COMMA formPropertyDrawMappedDecl)*
-
-formCalcPropertyObject ::= mappedPropertyObject
-formActionPropertyObject ::= mappedPropertyObject
-
-formGroupObjectEntity ::= groupObjectUsage
-formMappedProperty ::= formPropertyName LBRAC objectUsageList RBRAC
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
-
-predefinedFormPropertyName ::= OBJVALUE
-                           |	SELECTION
-                           |	ADDOBJ
-                           |	ADDFORM
-                           |	ADDSESSIONFORM
-                           |	EDITFORM
-                           |	EDITSESSIONFORM
-                           |	DELETE
-                           |	DELETESESSION
-{mixin="com.simpleplugin.psi.LSFIdImpl" implements="com.simpleplugin.psi.LSFId"}
- 
-formPropertyName ::= propertyUsage |	predefinedFormPropertyName
-
-formFiltersList ::= FILTERS formFilterDeclaration (COMMA formFilterDeclaration)*
-
-formHintsList ::= (HINTNOUPDATE | HINTTABLE) LIST nonEmptyNoContextPropertyUsageList
-
-formEventsList ::= EVENTS formEventDeclaration (COMMA formEventDeclaration)*
-
-formEventDeclaration ::= ON
-                        (	OK
-                        |	APPLY
-                        |	CLOSE
-                        |	INIT
-                        |	CANCEL
-                        |	DROP
-                        |	QUERYOK
-                        |	QUERYCLOSE
-                        | 	CHANGE ID
-                        )
-                        formActionPropertyObject
-
-filterGroupDeclaration ::= FILTERGROUP ID
-		                   (FILTER stringLiteral stringLiteral formFilterDeclaration filterSetDefault)+
-
-formFilterDeclaration ::= propertyExpression
-filterSetDefault ::= (DEFAULT)?
-
-formOrderByList ::= ORDER BY formPropertyDrawWithOrder
-		                     (COMMA formPropertyDrawWithOrder)*
-
-formPropertyDrawWithOrder ::= formPropertyDraw (ASC | DESC)?
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////OVERRIDE STATEMENT/////////////////////////////////
@@ -747,10 +1010,12 @@ overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 		                (	propertyExpression
 		                |	actionPropertyDefinition
 		                )
-		                (SEMI)?
-{implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer getIcon ]}		                    
-
-		                // ;?
+		                << semicolonIfNeeded >>
+{
+    pin = 2;
+    implements="com.simpleplugin.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon ]
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// CONSTRAINT STATEMENT //////////////////////////
@@ -759,7 +1024,12 @@ overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 constraintStatement ::= CONSTRAINT baseEvent propertyExpression
 		                (CHECKED (BY nonEmptyNoContextPropertyUsageList)? )?
 		                MESSAGE stringLiteral
-		                SEMI {pin = 1 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer getIcon ] }
+		                SEMI
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon ]
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// FOLLOWS STATEMENT ////////////////////////////
@@ -769,7 +1039,11 @@ followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS
                      propertyExpression (RESOLVE followsResolveType baseEvent)?
 		             (COMMA propertyExpression (RESOLVE followsResolveType baseEvent)?)*
 		             SEMI
-		             {pin = 2 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer getIcon ] }
+{
+    pin = 2
+    implements="com.simpleplugin.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon ]
+}
 
 followsResolveType ::= LEX_LOGICAL_LITERAL | ALL | NOTHING
 
@@ -778,7 +1052,11 @@ followsResolveType ::= LEX_LOGICAL_LITERAL | ALL | NOTHING
 ////////////////////////////////////////////////////////////////////////////////
 
 writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression WHEN (DO)? propertyExpression SEMI
-{pin = 2 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer getIcon ] }
+{
+    pin = 2
+    implements="com.simpleplugin.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon ]
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// EVENT STATEMENT /////////////////////////////
@@ -786,14 +1064,23 @@ writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression 
 
 eventStatement ::= WHEN baseEvent propertyExpression inlineStatement
 		                DO actionPropertyDefinitionBody (ORDER (DESC)? nonEmptyPropertyExpressionList)?
-		           (SEMI)? {pin = 1 implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer getIcon ] } // Разобраться с точкой с запятой
+		           << semicolonIfNeeded >>
+{
+    pin = 1
+    implements="com.simpleplugin.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon ]
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// GLOBAL EVENT STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody (SEMI)? {pin=1
-implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer getIcon ] } // ;?
+globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody << semicolonIfNeeded >>
+{
+    pin=1
+    implements="com.simpleplugin.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon ]
+}
 
 baseEvent ::= (APPLY | SESSION)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmptyNoContextPropertyUsageList)?
 
@@ -809,8 +1096,12 @@ showDepStatement ::= SHOWDEP noContextPropertyUsage FROM noContextPropertyUsage 
 //////////////////////////////// ASPECT STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPropertyDefinitionBody (SEMI)? {pin=1 
- implements="com.simpleplugin.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer getIcon ] } // ;?
+aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPropertyDefinitionBody << semicolonIfNeeded >>
+{
+    pin=1
+    implements="com.simpleplugin.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon ]
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -818,10 +1109,12 @@ aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPr
 ////////////////////////////////////////////////////////////////////////////////
 
 tableStatement ::= TABLE simpleName LBRAC nonEmptyClassNameList RBRAC SEMI 
-{mixin="com.simpleplugin.psi.declarations.impl.LSFTableDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFTableDeclaration"
+{
+    pin = 2
+    mixin="com.simpleplugin.psi.declarations.impl.LSFTableDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFTableDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.TableStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
-    pin = 2
 }
 
 
@@ -886,12 +1179,17 @@ navigatorElementStatementBody ::=   (   LBRACE
                                     ) | emptyStatement
 
 addNavigatorElementStatement ::= ADD navigatorElementSelector (stringLiteral)? navigatorElementInsertPositionSelector (TO windowUsage)? navigatorElementStatementBody
+{
+    pin = 1
+}
 
 newNavigatorElementStatement ::= NEW simpleName (ACTION noContextPropertyUsage)? stringLiteral navigatorElementInsertPositionSelector (TO windowUsage)? (IMAGE stringLiteral)? navigatorElementStatementBody
-{mixin="com.simpleplugin.psi.declarations.impl.LSFNavigatorElementDeclarationImpl" implements="com.simpleplugin.psi.declarations.LSFNavigatorElementDeclaration"
+{
+    pin = 2
+    mixin="com.simpleplugin.psi.declarations.impl.LSFNavigatorElementDeclarationImpl"
+    implements="com.simpleplugin.psi.declarations.LSFNavigatorElementDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.NavigatorElementStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
-    pin = 2
 }
 
 navigatorElementInsertPositionSelector ::=	(IN navigatorElementSelector)?
@@ -907,7 +1205,11 @@ navigatorElementSelector ::= navigatorElementUsage
 ////////////////////////////////// DESIGN STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-designStatement ::=	(designDeclaration | extendDesignDeclaration) componentStatementBody {pin=1 methods = [ getIcon ]}
+designStatement ::=	(designDeclaration | extendDesignDeclaration) componentStatementBody {
+    pin = 1
+    implements = "com.simpleplugin.psi.context.FormContext"
+    methods = [ getIcon resolveFormDecl]
+}
 
 designDeclaration ::= DESIGN formUsage (stringLiteral)? (FROM DEFAULT)? {pin=2}
 
@@ -927,7 +1229,7 @@ componentStatementBody ::=  LBRACE
 
 setupComponentStatement ::= componentSelector componentStatementBody
 
-setupGroupObjectStatement ::= GROUP LBRAC ID RBRAC
+setupGroupObjectStatement ::= GROUP LBRAC groupObjectUsage RBRAC
                               LBRACE
                               (   setObjectPropertyStatement
                               |   emptyStatement
@@ -948,10 +1250,9 @@ componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                 	|	PROPERTY LBRAC propertySelector RBRAC
                     |	multiCompoundID
 
-propertySelector ::= formMappedProperty | compoundID // compoundID?
-{mixin="com.simpleplugin.psi.references.impl.LSFPropertyDrawReferenceImpl" implements="com.simpleplugin.psi.references.LSFPropertyDrawReference"}
+propertySelector ::= formPropertyDrawUsage
 
-setObjectPropertyStatement ::= ID EQUAL componentPropertyValue SEMI
+setObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 2}
 
 componentPropertyValue ::=  colorLiteral
                         |	stringLiteral
@@ -968,27 +1269,29 @@ componentPropertyValue ::=  colorLiteral
 ////////////////////////////////// META STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-// recoverWhile=rule_recover
-metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC anyTokens END {pin=2
-    mixin = "com.simpleplugin.psi.declarations.impl.LSFMetaDeclarationImpl" implements = "com.simpleplugin.psi.declarations.LSFMetaDeclaration"
+metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC anyTokens END {
+    pin=2
+    mixin = "com.simpleplugin.psi.declarations.impl.LSFMetaDeclarationImpl"
+    implements = "com.simpleplugin.psi.declarations.LSFMetaDeclaration"
     stubClass = "com.simpleplugin.psi.stubs.MetaStubElement"
     elementTypeFactory = "com.simpleplugin.psi.stubs.types.LSFStubFactory.create"
 }
 
 anyTokens ::= (<< readAny >>)*
+
 fakeTwoDashes ::= FAKETWODASHES
 fakeThreeDashes ::= FAKETHREEDASHES
 
 private metaStatement ::= statement { recoverWhile = "meta_statement_recover" }
-private meta_statement_recover ::= !(def_statement_recover_start | RBRACE) 
+private meta_statement_recover ::= !(statement_start | RBRACE)
 metaCodeBody ::= LBRACE (metaStatement*) RBRACE
 
-
-//recoverWhile=rule_recover
-metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI {pin=2
-mixin="com.simpleplugin.psi.references.impl.LSFMetaReferenceImpl" implements="com.simpleplugin.psi.references.LSFMetaReference"}
-
-private rule_recover ::= !(AFTER | ATSIGN | BEFORE | CLASS | CONSTRAINT | DESIGN | END | EXTEND | FORM | GROUP | HIDE | ID | INDEX | LOGGABLE | META | NAVIGATOR | ON | SEMI | SHOWDEP | TABLE | WHEN | WINDOW)
+metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI
+{
+    pin=2
+    mixin="com.simpleplugin.psi.references.impl.LSFMetaReferenceImpl"
+    implements="com.simpleplugin.psi.references.LSFMetaReference"
+}
 
 metaDeclId ::=  ID
 metaDeclIdList ::= (metaDeclId (COMMA metaDeclId)*)?
@@ -1015,12 +1318,18 @@ metaCodeLiteral ::= LEX_STRING_LITERAL
 
 emptyStatement ::= SEMI;
 
-mappedPropertyObject ::= propertyUsage LBRAC objectUsageList RBRAC // temporary presentation logic
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 mappedPropertyClassParamDeclare ::= propertyUsage LBRAC classParamDeclareList RBRAC // temporary domain logic
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
-mappedPropertyExprParam ::= propertyUsage LBRAC exprParameterUsageList RBRAC // temporary mixed logic 
-{implements = "com.simpleplugin.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList]}
+{
+    pin = 1
+    implements = "com.simpleplugin.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList ]
+}
+
+mappedPropertyExprParam ::= propertyUsage LBRAC exprParameterUsageList RBRAC // temporary mixed logic
+{
+    implements = "com.simpleplugin.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList]
+}
 
 simpleNameWithCaption ::= simpleName (stringLiteral)?
 
@@ -1032,37 +1341,27 @@ nonEmptyObjectUsageList ::= objectUsage (COMMA objectUsage)*
 nonEmptyGroupObjectUsageList ::= groupObjectUsage (COMMA groupObjectUsage)*
 
 // global
-customClassUsageList ::= (nonEmptyCustomClassUsageList)?
-nonEmptyCustomClassUsageList ::= customClassUsage (COMMA customClassUsage)*
+nonEmptyCustomClassUsageList ::= customClassUsage (COMMA customClassUsage)*  { pin(".*") = 1}
 
-moduleUsageList ::= (nonEmptyModuleUsageList)?
-nonEmptyModuleUsageList ::= moduleUsage (COMMA moduleUsage)*
+nonEmptyModuleUsageList ::= moduleUsage (COMMA moduleUsage)* { pin(".*") = 1}
 
-namespaceUsageList ::= (nonEmptyModuleUsageList)?
-nonEmptyNamespaceUsageList ::= namespaceUsage (COMMA namespaceUsage)*
+nonEmptyNamespaceUsageList ::= namespaceUsage (COMMA namespaceUsage)*  { pin(".*") = 1}
 
 classNameList ::= (nonEmptyClassNameList)?
-nonEmptyClassNameList ::= className (COMMA className)*
+nonEmptyClassNameList ::= className (COMMA className)* { pin(".*") = 1}
 
+nonEmptyPropertyUsageList ::= propertyUsage (COMMA propertyUsage)*  { pin(".*") = 1}
 
-propertyUsageList ::= (nonEmptyPropertyUsageList)?
-nonEmptyPropertyUsageList ::= propertyUsage (COMMA propertyUsage)*
+nonEmptyNoContextPropertyUsageList ::= noContextPropertyUsage (COMMA noContextPropertyUsage)*  { pin(".*") = 1}
 
-nonEmptyNoContextPropertyUsageList ::= noContextPropertyUsage (COMMA noContextPropertyUsage)*
+nonEmptyFormUsageList ::= formUsage (COMMA formUsage)*  { pin(".*") = 1}
 
-formUsageList ::= (nonEmptyFormUsageList)?
-nonEmptyFormUsageList ::= formUsage (COMMA formUsage)*
+exprParameterUsageList ::= (exprParameterUsage (COMMA exprParameterUsage)*)? { pin(".*") = 1}
 
-exprParameterUsageList ::= (exprParameterUsage (COMMA exprParameterUsage)*)?
-
-simpleNameWithCaptionList ::= (nonEmtySimpleNameWithCaptionList)?
-nonEmtySimpleNameWithCaptionList ::= simpleNameWithCaption (COMMA simpleNameWithCaption)*
-
-actionPDBList ::= (nonEmptyActionPDBList)?
-nonEmptyActionPDBList ::= actionPropertyDefinitionBody (COMMA actionPropertyDefinitionBody)*
+nonEmptyActionPDBList ::= actionPropertyDefinitionBody (COMMA actionPropertyDefinitionBody)* { pin(".*") = 1}
 
 propertyExpressionList ::= (nonEmptyPropertyExpressionList)?
-nonEmptyPropertyExpressionList ::= propertyExpression (COMMA propertyExpression)*
+nonEmptyPropertyExpressionList ::= propertyExpression (COMMA propertyExpression)* { pin(".*") = 1}
 
 literal ::=
         ulongLiteral
@@ -1100,7 +1399,8 @@ groupObjectUsage ::= simpleName
 exprParameterNameUsage ::= classParamDeclare
 {mixin="com.simpleplugin.psi.references.impl.LSFExprParamReferenceImpl" implements="com.simpleplugin.psi.references.LSFExprParamReference"}
 
-exprParameterUsage ::= ((DOLLAR)? exprParameterNameUsage) | (DOLLAR LEX_UINT_LITERAL) // can be used for param and object simultaneously, for use in exprs
+// can be used for param and object simultaneously, for use in exprs
+exprParameterUsage ::= ((DOLLAR)? exprParameterNameUsage) | (DOLLAR LEX_UINT_LITERAL)
 
 // global
 
@@ -1114,7 +1414,9 @@ namespaceUsage ::= simpleName
 {mixin="com.simpleplugin.psi.references.impl.LSFNamespaceReferenceImpl" implements="com.simpleplugin.psi.references.LSFNamespaceReference"}
 
 explicitPropClass ::= className | QUESTION 
+
 nonEmptyExplicitPropClassList ::= explicitPropClass (COMMA explicitPropClass)*
+
 propertyUsage ::= compoundID (LSQBR nonEmptyExplicitPropClassList RSQBR)?
 {mixin="com.simpleplugin.psi.references.impl.LSFPropReferenceImpl" implements="com.simpleplugin.psi.references.LSFPropReference"}
 
@@ -1143,10 +1445,18 @@ staticObjectID ::= <<fullCompoundParamDeclareStop>> <<innerIDCheck>> customClass
 {mixin="com.simpleplugin.psi.references.impl.LSFStaticObjectReferenceImpl" implements="com.simpleplugin.psi.references.LSFStaticObjectReference"}
 
 groupObjectID ::= <<innerIDCheck>> formUsage POINT groupObjectUsage
-{implements="com.simpleplugin.psi.context.FormContext" }
+{
+    pin = 3
+    implements="com.simpleplugin.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
 
 objectID ::= <<innerIDCheck>> formUsage POINT objectUsage
-{implements="com.simpleplugin.psi.context.FormContext" }
+{
+    pin = 3
+    implements="com.simpleplugin.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
 
 multiCompoundID ::= ID (POINT ID)*
 
@@ -1186,12 +1496,9 @@ alignmentLiteral ::= LEADING | CENTER | TRAILING
 
 flexAlignmentLiteral ::= LEADING | CENTER | TRAILING | STRETCH
 
-
-propertyEditTypeLiteral ::= EDITABLE | READONLY | SELECTOR
-
 modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN
 
-formPrintTypeLiteral ::= PRINT (AUTO | XLS | PDF)?
+formPrintTypeLiteral ::= PRINT (AUTO | XLS | PDF)? {pin = 1}
 
 formSessionScopeLiteral ::= OLDSESSION | NEWSESSION | MANAGESESSION
 

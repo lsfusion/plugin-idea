@@ -3,14 +3,13 @@ package com.simpleplugin.structure;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.simpleplugin.classes.LSFValueClass;
 import com.simpleplugin.psi.LSFFile;
 import com.simpleplugin.psi.LSFGlobalResolver;
 import com.simpleplugin.psi.LSFPropertyStatement;
-import com.simpleplugin.util.PsiUtils;
+import com.simpleplugin.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,10 +34,9 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
         final ArrayList<StructureViewTreeElement> children = new ArrayList<StructureViewTreeElement>();
 
         if (valueClass != null && getElement() != null) {
-            Project project = getElement().getProject();
-            GlobalSearchScope scope = LSFGlobalResolver.getRequireScope(project, ((LSFFile) getElement()).getModuleDeclaration());
+            GlobalSearchScope scope = LSFGlobalResolver.getRequireScope((LSFFile) getElement());
 
-            for (LSFPropertyStatementTreeElement statement : PsiUtils.getClassInterfaces(valueClass, project, scope, new PsiUtils.ResultHandler<LSFPropertyStatementTreeElement>() {
+            for (LSFPropertyStatementTreeElement statement : LSFPsiUtils.getClassInterfaces(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ResultHandler<LSFPropertyStatementTreeElement>() {
                 @Override
                 public LSFPropertyStatementTreeElement getResult(LSFPropertyStatement statement, LSFValueClass valueClass) {
                     return new LSFPropertyStatementTreeElement(valueClass, statement, navigationHandler);

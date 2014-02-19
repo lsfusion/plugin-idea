@@ -1,7 +1,5 @@
 package com.simpleplugin.psi.references.impl;
 
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
@@ -13,7 +11,6 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.util.IncorrectOperationException;
 import com.simpleplugin.LSFDeclarationResolveResult;
-import com.simpleplugin.LSFIcons;
 import com.simpleplugin.LSFReferenceAnnotator;
 import com.simpleplugin.psi.LSFElementImpl;
 import com.simpleplugin.psi.LSFId;
@@ -28,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElementImpl implements LSFReference<T>, PsiPolyVariantReference {
 
@@ -93,15 +89,11 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     }
 
     public T resolveDecl() {
-        LSFDeclarationResolveResult decls = multiResolveDecl(true);
-        if (decls == null) {
+        LSFDeclarationResolveResult resolveResult = multiResolveDecl(true);
+        if (resolveResult == null) {
             return null;
         }
-        final ResolveResult[] resolveResults = LSFResolveUtil.toCandidateInfoArray(new ArrayList<PsiElement>(decls.declarations));
-
-        return resolveResults.length == 0 ||
-                resolveResults.length > 1 ||
-                !resolveResults[0].isValidResult() ? null : (T) resolveResults[0].getElement();
+        return LSFResolveUtil.singleResolve(resolveResult.declarations);
     }
 
     public LSFDeclarationResolveResult multiResolveDecl(boolean incompleteCode) {
@@ -143,22 +135,11 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
         return holder.createErrorAnnotation(getTextRange(), "Cannot resolve symbol '" + getNameRef() + "'");
     }
 
-    protected abstract void fillListVariants(Collection<String> variants);
-
     @NotNull
     @Override
     public Object[] getVariants() {
-        List<String> stringVariants = new ArrayList<String>();
-        fillListVariants(stringVariants);
-
-        List<LookupElement> variants = new ArrayList<LookupElement>();
-        for (final String property : stringVariants) {
-            variants.add(LookupElementBuilder.create(property).
-                    withIcon(LSFIcons.FILE).
-                    withTypeText(getLSFFile().getName())
-            );
-        }
-        return variants.toArray();
+        // handled by ASTCompletionContributor
+        return new Object[0];
     }
 
     @NotNull

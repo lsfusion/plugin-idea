@@ -21,10 +21,13 @@ public abstract class LSFFormElementDeclarationImpl<T extends LSFDeclaration> ex
 
     public Condition<T> getDuplicateCondition() {
         final String declName = getDeclName();
-        return new Condition<T>() {
-            public boolean value(T decl) {
-                return decl.getDeclName().equals(declName);
-            }
-        };
+        return declName == null
+               ? Condition.FALSE
+               :
+               new Condition<T>() {
+                   public boolean value(T decl) {
+                       return declName.equals(decl.getDeclName());
+                   }
+               };
     }
 }

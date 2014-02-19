@@ -45,10 +45,15 @@ public class LSFGlobalResolver {
         return result;
     }
 
-    public static GlobalSearchScope getRequireScope(Project project, LSFModuleDeclaration declaration) {
-        LSFFile file = declaration.getLSFFile();
-        VirtualFile vfile = file.getVirtualFile();
-        if (vfile == null) {
+    public static GlobalSearchScope getRequireScope(LSFElement lsfElement) {
+        return getRequireScope(lsfElement.getLSFFile());
+    }
+
+    public static GlobalSearchScope getRequireScope(LSFFile lsfFile) {
+        Project project = lsfFile.getProject();
+        LSFModuleDeclaration declaration = lsfFile.getModuleDeclaration();
+        VirtualFile vfile = lsfFile.getVirtualFile();
+        if(vfile == null) {
             Query<LSFModuleDeclaration> modules = findModules(declaration.getGlobalName(), GlobalSearchScope.allScope(project));
             LSFModuleDeclaration first = modules.findFirst();
             if (first != null)
@@ -56,8 +61,8 @@ public class LSFGlobalResolver {
         }
 
         Set<VirtualFile> vFiles = new HashSet<VirtualFile>();
-        for (LSFFile lsfFile : getRequireModules(declaration)) {
-            vFiles.add(lsfFile.getVirtualFile()); // null может быть только для dumb
+        for(LSFFile f : getRequireModules(declaration)) {
+            vFiles.add(f.getVirtualFile()); // null может быть только для dumb
         }
         return GlobalSearchScope.filesScope(project, vFiles);
     }
@@ -137,14 +142,12 @@ public class LSFGlobalResolver {
 
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, T virtDecl, Condition<T> condition, Finalizer<T> finalizer) {
 
-        LSFModuleDeclaration moduleDeclaration = file.getModuleDeclaration();
-        Project project = file.getProject();
-        GlobalSearchScope scope = getRequireScope(project, moduleDeclaration);
+        GlobalSearchScope scope = getRequireScope(file);
 
         Collection<T> decls = new ArrayList<T>();
-        for (FullNameStubElementType<S, T> type : types)
-            decls.addAll(type.getGlobalIndex().get(name, project, scope));
-        if (virtDecl != null)
+        for(FullNameStubElementType<S, T> type : types)
+            decls.addAll(type.getGlobalIndex().get(name, file.getProject(), scope));
+        if(virtDecl!=null)
             decls.add(virtDecl);
 
         Collection<T> fitDecls = new ArrayList<T>();
@@ -191,8 +194,7 @@ public class LSFGlobalResolver {
     }
 
     public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, LSFFile file) {
-        Project project = file.getProject();
-        return findExtendElements(decl, type, project, getRequireScope(project, file.getModuleDeclaration()));
+        return findExtendElements(decl, type, file.getProject(), getRequireScope(file));
     }
 
     public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, Project project, GlobalSearchScope scope) {

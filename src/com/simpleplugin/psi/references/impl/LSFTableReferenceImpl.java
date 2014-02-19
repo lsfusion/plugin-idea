@@ -15,7 +15,7 @@ public abstract class LSFTableReferenceImpl extends LSFFullNameReferenceImpl<LSF
     }
 
     @Override
-    protected FullNameStubElementType<?, LSFTableDeclaration> getType() {
+    protected FullNameStubElementType<?, LSFTableDeclaration> getStubElementType() {
         return LSFStubElementTypes.TABLE;
     }
 

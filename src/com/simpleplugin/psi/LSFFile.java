@@ -7,19 +7,18 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.UserDataHolderEx;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
-import com.intellij.psi.search.ProjectScopeBuilder;
 import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.psi.stubs.PsiFileStub;
 import com.intellij.psi.stubs.StubElement;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.SmartList;
 import com.simpleplugin.LSFFileType;
 import com.simpleplugin.LSFLanguage;
+import com.simpleplugin.psi.context.ContextInferrer;
+import com.simpleplugin.psi.context.ContextModifier;
+import com.simpleplugin.psi.context.ModifyParamContext;
 import com.simpleplugin.psi.declarations.LSFModuleDeclaration;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.List;
 
-public class LSFFile extends PsiFileBase {
+public class LSFFile extends PsiFileBase implements ModifyParamContext {
     public LSFFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, LSFLanguage.INSTANCE);
     }
@@ -47,6 +46,10 @@ public class LSFFile extends PsiFileBase {
         if(moduleForFile==null) // library
             return ProjectScope.getLibrariesScope(project);
         return GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(moduleForFile);
+    }
+
+    public GlobalSearchScope getRequireScope() {
+        return LSFGlobalResolver.getRequireScope(this);
     }
 
     @Nullable
@@ -71,8 +74,24 @@ public class LSFFile extends PsiFileBase {
         return getStubOrPsiChild(LSFStubElementTypes.MODULE);
     }
 
+    public List<PsiElement> getStatements() {
+        List<PsiElement> result = new SmartList<PsiElement>();
+        for (PsiElement child = getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof LSFScriptStatement) {
+                result.add(child.getFirstChild());
+            }
+        }
+        return result;
+    }
+
     public List<LSFMetaCodeStatement> getMetaCodeStatementList() {
-        return PsiTreeUtil.getChildrenOfTypeAsList(this, LSFMetaCodeStatement.class);
+        List<LSFMetaCodeStatement> result = new SmartList<LSFMetaCodeStatement>();
+        for (PsiElement statement : getStatements()) {
+            if (statement instanceof LSFMetaCodeStatement) {
+                result.add((LSFMetaCodeStatement) statement);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -83,5 +102,15 @@ public class LSFFile extends PsiFileBase {
     @Override
     public Icon getIcon(int flags) {
         return super.getIcon(flags);
+    }
+
+    @Override
+    public ContextModifier getContextModifier() {
+        return ContextModifier.EMPTY;
+    }
+
+    @Override
+    public ContextInferrer getContextInferrer() {
+        return ContextInferrer.EMPTY;
     }
 }

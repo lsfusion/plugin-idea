@@ -28,7 +28,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     }
 
     @Override
-    protected MetaStubElementType getType() {
+    protected MetaStubElementType getStubElementType() {
         return LSFStubElementTypes.META;
     }
 
@@ -95,7 +95,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
                 }
             };
         } else if (declarations.isEmpty()) {
-            declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), Condition.TRUE, Finalizer.EMPTY);
+            declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), Condition.TRUE, Finalizer.EMPTY);
 
             final Collection<LSFMetaCodeDeclarationStatement> finalDeclarations = declarations;
             errorAnnotator = new LSFDeclarationResolveResult.ErrorAnnotator() {
@@ -169,7 +169,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public boolean isResolveToVirt(LSFMetaDeclaration virtDecl) {
-        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), Collections.singleton(getType()), virtDecl, getCondition()).contains(virtDecl);
+        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), Collections.singleton(getStubElementType()), virtDecl, getCondition()).contains(virtDecl);
     }
 
     @Override

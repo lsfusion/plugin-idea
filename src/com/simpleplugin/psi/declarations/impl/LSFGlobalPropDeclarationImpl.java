@@ -1,6 +1,7 @@
 package com.simpleplugin.psi.declarations.impl;
 
 import com.intellij.find.findUsages.DefaultFindUsagesHandlerFactory;
+import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
@@ -44,6 +45,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     protected abstract LSFPropertyExpression getPropertyExpression();
 
     @Override
+    @Nullable
     public LSFId getNameIdentifier() {
         return getPropertyDeclaration().getSimpleNameWithCaption().getSimpleName();
     }
@@ -148,7 +150,11 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                 if (params != null) // может быть action unfriendly
                     inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finish();
             } else {
-                PsiElement element = unfriendlyPD.getContextIndependentPD().getChildren()[0]; // лень создавать отдельный параметр или интерфейс
+                LSFContextIndependentPD contextIndependentPD = unfriendlyPD.getContextIndependentPD();
+
+                assert contextIndependentPD != null;
+
+                PsiElement element = contextIndependentPD.getChildren()[0]; // лень создавать отдельный параметр или интерфейс
                 if (element instanceof LSFGroupPropertyDefinition) {
                     List<LSFClassSet> inferredValueClasses = LSFPsiImplUtil.inferValueParamClasses((LSFGroupPropertyDefinition) element);
                     for (int i = 0; i < resultClasses.size(); i++)
@@ -214,6 +220,10 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
     @Override
     public String getPresentableText() {
+        return getDeclName() + getParamsPresentableText();
+    }
+
+    private String getParamsPresentableText() {
         List<? extends LSFExprParamDeclaration> params = getExplicitParams();
 
         List<LSFClassSet> paramClasses = resolveParamClasses();
@@ -237,7 +247,18 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             paramsString += StringUtils.join(params, ", ");
         }
 
-        return getDeclName() + "(" + paramsString + ")";
+        return "(" + paramsString + ")";
+    }
+
+    @Override
+    public String getSignaturePresentableText() {
+        String valueClassString = "";
+        if (!isAction()) {
+            LSFClassSet valueClass = resolveValueClass(false);
+            valueClassString = ": " + (valueClass == null ? "?" : valueClass);
+        }
+
+        return getParamsPresentableText() + valueClassString;
     }
 
     public List<? extends LSFExprParamDeclaration> getExplicitParams() {
@@ -259,8 +280,11 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return new Condition<LSFGlobalPropDeclaration>() {
             @Override
             public boolean value(LSFGlobalPropDeclaration decl) {
-                return getNameIdentifier().getText().equals(decl.getNameIdentifier().getText()) &&
-                        resolveEquals(resolveParamClasses(), decl.resolveParamClasses());
+                LSFId nameIdentifier = getNameIdentifier();
+                LSFId otherNameIdentifier = decl.getNameIdentifier();
+                return nameIdentifier != null && otherNameIdentifier != null &&
+                       nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
+                       resolveEquals(resolveParamClasses(), decl.resolveParamClasses());
             }
         };
     }
@@ -291,7 +315,16 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     public PsiElement[] processExtensionsSearch() {
         DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
-        Collection<PsiReference> refs = fact.createFindUsagesHandler(getNameIdentifier(), false).findReferencesToHighlight(getNameIdentifier(), GlobalSearchScope.allScope(getProject()));
+        LSFId nameIdentifier = getNameIdentifier();
+        if (nameIdentifier == null) {
+            return PsiElement.EMPTY_ARRAY;
+        }
+
+        FindUsagesHandler handler = fact.createFindUsagesHandler(nameIdentifier, false);
+        if (handler == null) {
+            return PsiElement.EMPTY_ARRAY;
+        }
+        Collection<PsiReference> refs = handler.findReferencesToHighlight(nameIdentifier, GlobalSearchScope.allScope(getProject()));
 
         List<PsiElement> result = new ArrayList<PsiElement>();
         for (PsiReference ref : refs) {

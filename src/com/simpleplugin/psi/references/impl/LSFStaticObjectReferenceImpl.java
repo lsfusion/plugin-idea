@@ -11,7 +11,6 @@ import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFStaticObjectDeclaration> implements LSFStaticObjectReference {
@@ -20,10 +19,6 @@ public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFS
     }
     
     protected abstract LSFCustomClassUsage getCustomClassUsage();
-
-    @Override
-    protected void fillListVariants(Collection<String> variants) {
-    }
 
     @Override
     public LSFDeclarationResolveResult resolveNoCache() {

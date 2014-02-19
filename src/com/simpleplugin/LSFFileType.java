@@ -28,7 +28,7 @@ public class LSFFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getDefaultExtension() {
-        return "simple";
+        return "lsf";
     }
 
     @Nullable

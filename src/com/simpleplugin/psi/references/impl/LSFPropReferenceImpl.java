@@ -36,7 +36,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         super(node);
     }
 
-    protected FullNameStubElementType<?, LSFGlobalPropDeclaration> getType() {
+    protected FullNameStubElementType<?, LSFGlobalPropDeclaration> getStubElementType() {
         return LSFStubElementTypes.PROP;
     }
 
@@ -113,7 +113,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     private Collection<LSFPropDeclaration> resolveNoConditionDeclarations() {
         final List<LSFClassSet> usageClasses = getUsageContext();
         if (usageClasses != null) {
-            CollectionQuery<LSFPropDeclaration> declarations = new CollectionQuery<LSFPropDeclaration>(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getTypes(), Condition.TRUE, new Finalizer() {
+            CollectionQuery<LSFPropDeclaration> declarations = new CollectionQuery<LSFPropDeclaration>(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), Condition.TRUE, new Finalizer() {
                 @Override
                 public Collection finalize(Collection decls) {
                     Map<LSFPropDeclaration, Integer> declMap = new HashMap<LSFPropDeclaration, Integer>();
@@ -152,44 +152,15 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         return new ArrayList<LSFPropDeclaration>();
     }
 
-    private static class VariantsProcessor implements PsiScopeProcessor {
-
-        private Collection<String> found;
-
-        private VariantsProcessor(Collection<String> found) {
-            this.found = found;
-        }
-
-        @Override
-        public boolean execute(@NotNull PsiElement element, ResolveState state) {
-            LSFLocalPropDeclaration decl = (LSFLocalPropDeclaration) element;
-            found.add(decl.getDeclName());
-            return true;
-        }
-
-        @Nullable
-        @Override
-        public <T> T getHint(@NotNull Key<T> hintKey) {
-            return null;
-        }
-
-        @Override
-        public void handleEvent(Event event, @Nullable Object associated) {
-        }
-    }
-
-    @Override
-    protected void fillListVariants(Collection<String> variants) {
-        if (getFullNameRef() == null) {
-            VariantsProcessor processor = new VariantsProcessor(variants);
-            PsiTreeUtil.treeWalkUp(processor, this, null, new ResolveState());
-        }
-        super.fillListVariants(variants);
+    @Nullable
+    private PropertyUsageContext getPropertyUsageContext() {
+        return PsiTreeUtil.getParentOfType(this, PropertyUsageContext.class);
     }
 
     @Nullable
     private List<LSFClassSet> getUsageContext() {
-        return PsiTreeUtil.getParentOfType(this, PropertyUsageContext.class).resolveParamClasses();
+        PropertyUsageContext propertyUsageContext = getPropertyUsageContext();
+        return propertyUsageContext == null ? null : propertyUsageContext.resolveParamClasses();
     }
 
     protected abstract LSFNonEmptyExplicitPropClassList getNonEmptyExplicitPropClassList();
@@ -208,10 +179,6 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                 result.add(null);
         }
         return result;
-    }
-
-    private PropertyUsageContext getPropertyUsageContext() {
-        return PsiTreeUtil.getParentOfType(this, PropertyUsageContext.class);
     }
 
     private Finalizer<LSFPropDeclaration> getDeclFinalizer() {
@@ -376,7 +343,8 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
 
     public Annotation resolveErrorTarget(AnnotationHolder holder, String errorText, boolean noSuchProperty) {
         Annotation annotation;
-        PsiElement paramList = getPropertyUsageContext().getParamList();
+        PropertyUsageContext propertyUsageContext = getPropertyUsageContext();
+        PsiElement paramList = propertyUsageContext == null ? null : propertyUsageContext.getParamList();
         if (noSuchProperty || paramList == null) {
             annotation = holder.createErrorAnnotation(getTextRange(), errorText);
         } else {

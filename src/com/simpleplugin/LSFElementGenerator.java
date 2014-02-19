@@ -49,7 +49,7 @@ public class LSFElementGenerator {
 
     public static PsiFile createDummyFile(Project myProject, String text) {
         final PsiFileFactory factory = PsiFileFactory.getInstance(myProject);
-        final String name = "dummy." + LSFFileType.INSTANCE.getDefaultExtension();
+        final String name = "internal." + LSFFileType.INSTANCE.getDefaultExtension();
         final LightVirtualFile virtualFile = new LightVirtualFile(name, LSFFileType.INSTANCE, text);
         final PsiFile psiFile = ((PsiFileFactoryImpl)factory).trySetupPsiForFile(virtualFile, LSFLanguage.INSTANCE, false, true);
         assert psiFile != null;

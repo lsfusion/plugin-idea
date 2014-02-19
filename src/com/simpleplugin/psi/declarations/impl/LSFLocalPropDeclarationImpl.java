@@ -20,10 +20,13 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
         super(node);
     }
 
+    @Nullable
     public abstract LSFSimpleName getSimpleName();
 
+    @Nullable
     protected abstract LSFClassName getClassName();
 
+    @Nullable
     protected abstract LSFClassNameList getClassNameList();
 
 
@@ -44,7 +47,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     @Override
-    @NotNull
+    @Nullable
     public List<LSFClassSet> resolveParamClasses() {
         return LSFResolveCache.getParamClassesInstance().resolveWithCaching(this, LSFParamClassesResolver.INSTANCE, true, false);
     }
@@ -55,7 +58,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     @Override
-    @NotNull
+    @Nullable
     public List<LSFClassSet> inferParamClasses(LSFClassSet valueClass) {
         return resolveParamClasses();
     }
@@ -63,13 +66,23 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return LSFIcons.PROPERTY;
+        return LSFIcons.LOCAL_PROPERTY;
     }
 
     @Override
     public String getPresentableText() {
+        return getDeclName() + getParamsPresentableText();
+    }
+
+    private String getParamsPresentableText() {
         List<LSFClassSet> classes = resolveParamClasses();
-        return getDeclName() + "(" + StringUtils.join(classes, ", ") + ")";
+        return "(" + StringUtils.join(classes, ", ") + ")";
+    }
+
+    @Override
+    public String getSignaturePresentableText() {
+        LSFClassSet valueClass = resolveValueClass(false);
+        return getParamsPresentableText() + ": " + (valueClass == null ? "?" : valueClass);
     }
 
     @Override

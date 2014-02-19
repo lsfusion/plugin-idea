@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<LSFMetaDeclaration, MetaStubElement> implements LSFMetaDeclaration {
@@ -32,8 +33,10 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
 
     public abstract LSFSimpleName getSimpleName();
 
+    @Nullable
     public abstract LSFMetaDeclIdList getMetaDeclIdList();
 
+    @Nullable
     public abstract LSFAnyTokens getAnyTokens();
 
     @Override
@@ -74,13 +77,20 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     }
 
     public PsiElement findOffsetInCode(int offset) {
-        return getAnyTokens().findElementAt(offset);
+        LSFAnyTokens anyTokens = getAnyTokens();
+        return anyTokens == null ? null : anyTokens.findElementAt(offset);
     }
 
     @Override
     public List<Pair<String, IElementType>> getMetaCode() {
+        LSFAnyTokens anyTokens = getAnyTokens();
+        if (anyTokens == null) {
+            return Collections.emptyList();
+        }
+
         List<Pair<String, IElementType>> tokens = new ArrayList<Pair<String, IElementType>>();
-        ASTNode node = getAnyTokens().getNode();
+
+        ASTNode node = anyTokens.getNode();
 
         readMetaWhiteSpaceOrComments(node, true, tokens);
         for (ASTNode anyToken : node.getChildren(null))
@@ -113,7 +123,8 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
 
     @Override
     public String getPresentableText() {
-        return getDeclName() + "(" + getMetaDeclIdList().getText() + ")";
+        LSFMetaDeclIdList metaDeclIdList = getMetaDeclIdList();
+        return getDeclName() + "(" + (metaDeclIdList == null ? "" : metaDeclIdList.getText()) + ")";
     }
 
     @Override
@@ -123,7 +134,11 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
 
     @Override
     protected Condition<LSFMetaDeclaration> getFindDuplicatesCondition() {
-        final int paramCount = getMetaDeclIdList().getMetaDeclIdList().size();
+        LSFMetaDeclIdList metaDeclIdList = getMetaDeclIdList();
+        if (metaDeclIdList == null) {
+            return Condition.FALSE;
+        }
+        final int paramCount = metaDeclIdList.getMetaDeclIdList().size();
         return new Condition<LSFMetaDeclaration>() {
             public boolean value(LSFMetaDeclaration decl) {
                 return decl.getParamCount() == paramCount;

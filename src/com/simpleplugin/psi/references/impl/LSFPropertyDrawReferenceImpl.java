@@ -21,8 +21,8 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
     }
 
     @Override
-    protected Processor<LSFPropertyDrawDeclaration> getProcessor() {
-        return new Processor<LSFPropertyDrawDeclaration>() {
+    protected FormExtendProcessor<LSFPropertyDrawDeclaration> getElementsCollector() {
+        return new FormExtendProcessor<LSFPropertyDrawDeclaration>() {
             public Collection<LSFPropertyDrawDeclaration> process(LSFFormExtend formExtend) {
                 return formExtend.getPropertyDrawDecls();
             }
@@ -57,30 +57,35 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
 
     }
     @Override
-    protected Condition<LSFPropertyDrawDeclaration> getCondition() {
-        final LSFFormMappedProperty mappedObject = getFormMappedProperty();
-        if(mappedObject == null)
-            return super.getCondition();
+    protected Condition<LSFPropertyDrawDeclaration> getResolvedDeclarationsFilter() {
+        final LSFFormPropertyObject propertyObject = getFormPropertyObject();
+        if(propertyObject == null)
+            return super.getResolvedDeclarationsFilter();
         
         return new Condition<LSFPropertyDrawDeclaration>() {
             public boolean value(LSFPropertyDrawDeclaration decl) {
                 // проверим что resolve'ся туда же свойства и все объекты
-                return resolveEquals(mappedObject.getFormPropertyName(), decl.getFormPropertyName()) && resolveEquals(mappedObject.getObjectUsageList(), decl.getObjectUsageList());
+                return resolveEquals(propertyObject.getFormPropertyName(), decl.getFormPropertyName()) && resolveEquals(propertyObject.getObjectUsageList(), decl.getObjectUsageList());
             }
         };
     }
 
     @Nullable
-    protected abstract LSFCompoundID getCompoundID();
+    protected abstract LSFAliasUsage getAliasUsage();
 
     @Nullable
-    protected abstract LSFFormMappedProperty getFormMappedProperty();
+    protected abstract LSFFormPropertyObject getFormPropertyObject();
 
     @Override
     public LSFId getSimpleName() {
-        LSFFormMappedProperty mappedPropertyObject = getFormMappedProperty();
-        if(mappedPropertyObject != null)
-            return LSFPropertyDrawNameDeclarationImpl.getNameIdentifier(mappedPropertyObject.getFormPropertyName());
-        return LSFFullNameReferenceImpl.getSimpleName(getCompoundID());
+        LSFFormPropertyObject formPropertyObject = getFormPropertyObject();
+        if(formPropertyObject != null)
+            return LSFPropertyDrawNameDeclarationImpl.getNameIdentifier(formPropertyObject.getFormPropertyName());
+
+        LSFAliasUsage aliasUsage = getAliasUsage();
+
+        assert aliasUsage != null;
+
+        return aliasUsage.getSimpleName();
     }
 }

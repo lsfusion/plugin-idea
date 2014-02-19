@@ -28,6 +28,9 @@ public class MappedPropertyContextInferrer implements ContextInferrer {
                 return Inferred.EMPTY;
             
             LSFClassParamDeclareList declList = prop.getClassParamDeclareList();
+            if (declList == null) {
+                return Inferred.EMPTY;
+            }
 
             List<LSFClassParamDeclare> paramDecls;
             LSFNonEmptyClassParamDeclareList neList = declList.getNonEmptyClassParamDeclareList();

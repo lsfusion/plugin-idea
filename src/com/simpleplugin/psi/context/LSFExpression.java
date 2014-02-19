@@ -12,7 +12,7 @@ public interface LSFExpression extends PsiElement {
 
     LSFClassSet resolveInferredValueClass(@Nullable InferResult inferred);
 
-    Inferred inferParamClasses(LSFClassSet valueClass);
+    Inferred inferParamClasses(@Nullable LSFClassSet valueClass);
 
     List<String> getValueClassNames();
 

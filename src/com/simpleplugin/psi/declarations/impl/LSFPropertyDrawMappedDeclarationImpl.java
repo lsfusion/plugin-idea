@@ -13,7 +13,7 @@ public abstract class LSFPropertyDrawMappedDeclarationImpl extends LSFPropertyDr
     }
 
     @NotNull
-    protected abstract LSFFormMappedProperty getFormMappedProperty();
+    protected abstract LSFFormPropertyObject getFormPropertyObject();
 
     @Nullable
     @Override
@@ -22,14 +22,14 @@ public abstract class LSFPropertyDrawMappedDeclarationImpl extends LSFPropertyDr
         if(simpleName != null)
             return simpleName;
         
-        return LSFPropertyDrawNameDeclarationImpl.getNameIdentifier(getFormMappedProperty().getFormPropertyName());
+        return LSFPropertyDrawNameDeclarationImpl.getNameIdentifier(getFormPropertyObject().getFormPropertyName());
     }
 
     public LSFObjectUsageList getObjectUsageList() {
-        return getFormMappedProperty().getObjectUsageList();
+        return getFormPropertyObject().getObjectUsageList();
     }
 
     public LSFFormPropertyName getFormPropertyName() {
-        return getFormMappedProperty().getFormPropertyName();
+        return getFormPropertyObject().getFormPropertyName();
     }
 }

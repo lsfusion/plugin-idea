@@ -14,7 +14,7 @@ public abstract class LSFFormReferenceImpl extends LSFFullNameReferenceImpl<LSFF
     }
 
     @Override
-    protected FullNameStubElementType getType() {
+    protected FullNameStubElementType getStubElementType() {
         return LSFStubElementTypes.FORM;
     }
 }

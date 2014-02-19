@@ -3,7 +3,6 @@ package com.simpleplugin;
 import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
-import com.intellij.openapi.editor.SyntaxHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
@@ -46,7 +45,7 @@ public class LSFSyntaxHighlighter extends SyntaxHighlighterBase {
     }
 
     Set<IElementType> operands = new HashSet<IElementType>(Arrays.asList(new IElementType[] {LSFTypes.RBRAC, LSFTypes.EQ_OPERAND, LSFTypes.LESS, LSFTypes.GREATER, LSFTypes.LESS_EQUALS, LSFTypes.GREATER_EQUALS, LSFTypes.MINUS, 
-                        LSFTypes.PLUS, LSFTypes.MULT_OPERAND, LSFTypes.ADDOR_OPERAND, LSFTypes.SEMI, LSFTypes.COLON, LSFTypes.COMMA, LSFTypes.POINT, LSFTypes.EQUAL, LSFTypes.PLUSEQ, LSFTypes.ARROW, LSFTypes.FOLLOWS, LSFTypes.LBRAC, LSFTypes.RBRAC, LSFTypes.LBRACE, LSFTypes.RBRACE, LSFTypes.LSQBR, LSFTypes.RSQBR, LSFTypes.ATSIGN}));
+                        LSFTypes.PLUS, LSFTypes.MULT_OPERAND, LSFTypes.ADDOR_OPERAND, LSFTypes.SEMI, LSFTypes.COLON, LSFTypes.COMMA, LSFTypes.POINT, LSFTypes.EQUALS, LSFTypes.PLUSEQ, LSFTypes.ARROW, LSFTypes.FOLLOWS, LSFTypes.LBRAC, LSFTypes.RBRAC, LSFTypes.LBRACE, LSFTypes.RBRACE, LSFTypes.LSQBR, LSFTypes.RSQBR, LSFTypes.ATSIGN}));
            
     Set<IElementType> nonStringLiterals = new HashSet<IElementType>(Arrays.asList(new IElementType[] {LSFTypes.LEX_UINT_LITERAL, 
             LSFTypes.LEX_ULONG_LITERAL, LSFTypes.LEX_UDOUBLE_LITERAL, LSFTypes.LEX_UNUMERIC_LITERAL, LSFTypes.LEX_DATE_LITERAL, LSFTypes.LEX_DATETIME_LITERAL, LSFTypes.LEX_TIME_LITERAL, LSFTypes.LEX_COLOR_LITERAL}));

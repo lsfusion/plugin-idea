@@ -24,6 +24,7 @@ public abstract class LSFTableDeclarationImpl extends LSFFullNameDeclarationImpl
         super(tableStubElement, nodeType);
     }
 
+    @Nullable
     protected abstract LSFSimpleName getSimpleName();
 
     @Nullable

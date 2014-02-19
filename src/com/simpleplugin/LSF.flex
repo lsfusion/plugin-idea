@@ -35,7 +35,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
 %%
 <YYINITIAL> {
   ({LINE_WS} | {EOL})+                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
-  "//" [^\n\r]* {EOL}                   { return COMMENTS; }
+  "//" [^\n\r]*                         { return COMMENTS; }
 
 
   ("TRUE" | "FALSE")                    { return LEX_LOGICAL_LITERAL; }
@@ -79,7 +79,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   ","                                   { return COMMA; }
   "."                                   { return POINT; }
 
-  "="                                   { return EQUAL; }
+  "="                                   { return EQUALS; }
   "+="                                  { return PLUSEQ; }
   "<-"                                  { return ARROW; }
   "=>"                                  { return FOLLOWS; }
@@ -204,7 +204,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "FULLSCREEN"              			{ return FULLSCREEN; }
   "GRID"                    			{ return GRID; }
   "GROUP"                   			{ return GROUP; }
-  "EQUAL"                               { return GEQUAL; }
+  "EQUAL"                               { return EQUAL; }
   "HALIGN"                  			{ return HALIGN; }
   "HEADER"                  			{ return HEADER; }
   "HIDE"                    			{ return HIDE; }
@@ -221,6 +221,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "INDEX"                   			{ return INDEX; }
   "INDEXED"                 			{ return INDEXED; }
   "INIT"                    			{ return INIT; }
+  "INITFILTER"                 			{ return INITFILTER; }
   "INLINE"                  			{ return INLINE; }
   "INPUT"                   			{ return INPUT; }
   "IS"                      			{ return IS; }

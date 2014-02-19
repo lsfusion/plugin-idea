@@ -10,6 +10,7 @@ import com.simpleplugin.psi.declarations.LSFStaticObjectDeclaration;
 import com.simpleplugin.psi.extend.LSFClassExtend;
 import com.simpleplugin.psi.references.impl.LSFFullNameReferenceImpl;
 import com.simpleplugin.psi.stubs.extend.ExtendClassStubElement;
+import com.simpleplugin.psi.stubs.types.FullNameStubElementType;
 import com.simpleplugin.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,16 +63,40 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         return getExtendingClassDeclaration().getCustomClassUsage().resolveDecl();
     }
 
+    @Nullable
+    @Override
+    protected LSFFullNameDeclaration getOwnDeclaration() {
+        return getClassDecl();
+    }
+
+    @Nullable
+    @Override
+    protected LSFFullNameDeclaration resolveExtendingDeclaration() {
+        LSFExtendingClassDeclaration extendingClassDeclaration = getExtendingClassDeclaration();
+        if (extendingClassDeclaration != null) {
+            return extendingClassDeclaration.getCustomClassUsage().resolveDecl();
+        }
+        return null;
+    }
+
+    @Override
+    protected FullNameStubElementType<?, LSFClassDeclaration> getStubType() {
+        return LSFStubElementTypes.CLASS;
+    }
+
     @Override
     public List<LSFClassDeclaration> resolveExtends() {
         LSFClassParentsList parents = getClassParentsList();
         if (parents == null)
             return new ArrayList<LSFClassDeclaration>();
         List<LSFClassDeclaration> result = new ArrayList<LSFClassDeclaration>();
-        for (LSFCustomClassUsage usage : parents.getNonEmptyCustomClassUsageList().getCustomClassUsageList()) {
-            LSFClassDeclaration decl = usage.resolveDecl();
-            if (decl != null)
-                result.add(decl);
+        LSFNonEmptyCustomClassUsageList nonEmptyCustomClassUsageList = parents.getNonEmptyCustomClassUsageList();
+        if (nonEmptyCustomClassUsageList != null) {
+            for (LSFCustomClassUsage usage : nonEmptyCustomClassUsageList.getCustomClassUsageList()) {
+                LSFClassDeclaration decl = usage.resolveDecl();
+                if (decl != null)
+                    result.add(decl);
+            }
         }
         return result;
     }
@@ -86,8 +111,12 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
             return new ArrayList<String>();
 
         List<String> result = new ArrayList<String>();
-        for (LSFCustomClassUsage usage : parents.getNonEmptyCustomClassUsageList().getCustomClassUsageList())
-            result.add(LSFFullNameReferenceImpl.getSimpleName(usage.getCompoundID()).getText());
+        LSFNonEmptyCustomClassUsageList nonEmptyCustomClassUsageList = parents.getNonEmptyCustomClassUsageList();
+        if (nonEmptyCustomClassUsageList != null) {
+            for (LSFCustomClassUsage usage : nonEmptyCustomClassUsageList.getCustomClassUsageList()) {
+                result.add(LSFFullNameReferenceImpl.getSimpleName(usage.getCompoundID()).getText());
+            }
+        }
         return result;
     }
 
