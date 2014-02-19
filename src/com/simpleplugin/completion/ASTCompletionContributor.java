@@ -92,7 +92,6 @@ public class ASTCompletionContributor extends CompletionContributor {
         extend(completionType, psiElement().inFile(PlatformPatterns.instanceOf(LSFFile.class)), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-                System.out.println("Start completion");
                 result = result.withPrefixMatcher(new CamelHumpMatcher(result.getPrefixMatcher().getPrefix(), false));
                 suggestByGuessingTokens(parameters, result);
             }
