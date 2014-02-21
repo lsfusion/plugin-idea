@@ -48,13 +48,19 @@ public class LSFPsiUtils {
 
         CharSequence documentText = document.getCharsSequence();
 
-        if (!isLsfIdentifierPart(documentText.charAt(offset)) && offset > 0 && isLsfIdentifierPart(documentText.charAt(offset - 1))) {
-            offset--;
+        final List<TextRange> ranges = new ArrayList<TextRange>();
+        final List<LSFExpression> expressions = new ArrayList<LSFExpression>();
+
+        fillLsfExpressions(file, offset, ranges, expressions);
+        if (!isLsfIdentifierPart(documentText.charAt(offset)) && offset > 0) {
+            fillLsfExpressions(file, offset - 1, ranges, expressions);
         }
 
+        return expressions;
+    }
+
+    private static void fillLsfExpressions(PsiFile file, int offset, List<TextRange> ranges, List<LSFExpression> expressions) {
         final PsiElement elementAtCaret = file.findElementAt(offset);
-        final List<LSFExpression> expressions = new ArrayList<LSFExpression>();
-        final List<TextRange> ranges = new ArrayList<TextRange>();
 
         LSFExpression expression = PsiTreeUtil.getParentOfType(elementAtCaret, LSFExpression.class);
         while (expression != null) {
@@ -66,7 +72,6 @@ public class LSFPsiUtils {
             }
             expression = PsiTreeUtil.getParentOfType(expression, LSFExpression.class);
         }
-        return expressions;
     }
 
     public static boolean isLsfIdentifierPart(char ch) {

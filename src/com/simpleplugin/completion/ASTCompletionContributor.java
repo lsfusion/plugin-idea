@@ -416,8 +416,11 @@ public class ASTCompletionContributor extends CompletionContributor {
                     parameterCompleted = true;
                     PsiElement psi = getLastPsiOfType(PsiElement.class);
                     if (psi != null) {
+                        LSFExprParamDeclaration currentParamDeclaration = getPsiOfTypeForFrame(paramDeclare, LSFExprParamDeclaration.class);
                         for (LSFExprParamDeclaration paramDeclaration : LSFPsiUtils.getContextParams(psi, false)) {
-                            addLookupElement(createLookupElement(paramDeclaration));
+                            if (paramDeclaration != currentParamDeclaration) {
+                                addLookupElement(createLookupElement(paramDeclaration));
+                            }
                         }
                     }
                 }
