@@ -4,6 +4,7 @@ import com.intellij.codeInsight.TailType;
 import com.intellij.codeInsight.completion.InsertHandler;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -22,6 +23,16 @@ import static com.intellij.codeInsight.lookup.LookupElementDecorator.withInsertH
 import static com.intellij.codeInsight.lookup.TailTypeDecorator.withTail;
 
 public class CompletionUtils {
+
+    public static final String LSF_COMPLETION_ENABLED = "lsfusion.completion.enabled";
+    
+    public static boolean isCompletionEnabled(Project project) {
+        return PropertiesComponent.getInstance(project).getBoolean(CompletionUtils.LSF_COMPLETION_ENABLED, true);
+    }
+
+    public static void setCompletionEnabled(Project project, boolean enabled) {
+        PropertiesComponent.getInstance(project).setValue(CompletionUtils.LSF_COMPLETION_ENABLED, Boolean.toString(enabled));
+    }
 
     public static LookupElement createLookupElement(LSFDeclaration declaration) {
         return createLookupElement(declaration, 5);

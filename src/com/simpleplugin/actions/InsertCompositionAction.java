@@ -124,7 +124,7 @@ public class InsertCompositionAction extends BaseRefactoringAction {
         protected void invokeImpl(final LSFFile file, final Project project, final Editor editor, final FileEditor fileEditor, final @NotNull LSFExpression expr) {
             InferResult inferResult = expr.inferParamClasses(null).finish();
             LSFClassSet classSet = expr.resolveInferredValueClass(inferResult);
-            if (!(classSet instanceof StructClassSet)) {
+            if (classSet != null && !(classSet instanceof StructClassSet)) {
                 final LSFValueClass valueClass = classSet.getCommonClass();
                 LSFStructureViewNavigationHandler navigationHandler = new LSFStructureViewNavigationHandler() {
                     @Override

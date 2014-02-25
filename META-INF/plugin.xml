@@ -67,6 +67,10 @@
                 description="Toggle meta code sync mode">
             <add-to-group group-id="CodeMenu"/>
         </action>
+        <action id="ToggleLSFCompletion" class="com.simpleplugin.ToggleCompletionAction" text="lsFusion completion support"
+                description="Toggle lsFusion completion support">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
         <action id="Errors" class="com.simpleplugin.ShowErrorsAction" text="Show errors"
                 description="Show all current errors in all files">
             <add-to-group group-id="CodeMenu"/>
