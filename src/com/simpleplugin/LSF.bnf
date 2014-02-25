@@ -812,7 +812,7 @@ formStatement ::=	(	formDecl
                     |	formPropertiesList
                     |	formHintsList
                     |	formEventsList
-                    |	filterGroupDeclaration
+                    |	formFilterGroupDeclaration
                     |	formOrderByList
                     |	dialogFormDeclaration
                     |	editFormDeclaration
@@ -959,7 +959,7 @@ formEventDeclaration ::= ON
     pin = 1
 }
 
-filterGroupDeclaration ::= FILTERGROUP ID
+formFilterGroupDeclaration ::= FILTERGROUP ID
                                 (FILTER stringLiteral stringLiteral formFilterDeclaration filterSetDefault)+
 {pin(".*") = 1}
 

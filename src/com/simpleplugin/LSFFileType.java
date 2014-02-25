@@ -16,13 +16,13 @@ public class LSFFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getName() {
-        return "Simple file";
+        return "lsFusion script file";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Simple language file";
+        return "lsFusion language file";
     }
 
     @NotNull

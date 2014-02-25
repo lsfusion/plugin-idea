@@ -365,16 +365,12 @@ public class GeneratedParserUtilBase {
                 state.clearVariants(false, 0);
                 state.lastExpectedVariantOffset = -1;
             }
-            if (errorReported) {
-                state.stopCompletionIfAlreadyTriggered();
-            }
         }
         else if (!result && pinned && frame.errorReportedAt < 0) {
             // do not report if there're errors after current offset
             if (getLastVariantOffset(state, initialOffset) == initialOffset) {
                 // do not force, inner recoverRoot might have skipped some tokens
                 reportError(builder_, state, frame, false, false);
-                state.stopCompletionIfAlreadyTriggered();
             }
         }
         // propagate errorReportedAt up the stack to avoid duplicate reporting
@@ -488,6 +484,7 @@ public class GeneratedParserUtilBase {
                 builder_.error(message);
             }
             frame.errorReportedAt = builder_.getCurrentOffset();
+            state.stopCompletionIfAlreadyTriggered();
             return true;
         }
         return false;
