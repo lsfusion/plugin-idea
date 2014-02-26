@@ -4,6 +4,7 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.ide.util.treeView.smartTree.*;
 import com.simpleplugin.LSFIcons;
 import com.simpleplugin.classes.LSFValueClass;
+import com.simpleplugin.psi.declarations.LSFClassDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -25,7 +26,11 @@ public class ExtendedClassGrouper implements Grouper {
                 LSFValueClass psClass = psChild.getValueClass();
                 ExtendedClassesGroup classGroup = (ExtendedClassesGroup) groupMap.get(psClass);
                 if (classGroup == null) {
-                    classGroup = new ExtendedClassesGroup(psClass.getName());
+                    String namespace = null;
+                    if (psClass instanceof LSFClassDeclaration) {
+                        namespace = ((LSFClassDeclaration) psClass).getLSFFile().getModuleDeclaration().getNamespace();
+                    }
+                    classGroup = new ExtendedClassesGroup(psClass.getName(), namespace);
                     groupMap.put(psClass, classGroup);
                 }
                 classGroup.addChild(psChild);

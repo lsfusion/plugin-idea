@@ -42,6 +42,11 @@ public class LSFPropertyStatementTreeElement extends PsiTreeElementBase<LSFPrope
     }
 
     @Override
+    public String getLocationString() {
+        return getElement().getLSFFile().getModuleDeclaration().getNamespace();
+    }
+
+    @Override
     public void navigate(boolean requestFocus) {
         if (navigationHandler != null) {
             navigationHandler.navigate(this, requestFocus);

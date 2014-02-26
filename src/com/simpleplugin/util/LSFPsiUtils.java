@@ -222,7 +222,7 @@ public class LSFPsiUtils {
                     if (paramClass != null) {
                         LSFClassSet valueClassSet = valueClass instanceof LSFClassDeclaration ? new CustomClassSet((LSFClassDeclaration) valueClass) : (LSFClassSet) valueClass;
                         if (paramClass.containsAll(valueClassSet)) {
-                            result.add((T) resultHandler.getResult(statement, valueClass));
+                            result.add((T) resultHandler.getResult(statement, paramClass.getCommonClass()));
                             break;
                         }
                     }

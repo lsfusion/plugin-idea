@@ -7,9 +7,11 @@ import javax.swing.*;
 
 public class ExtendedClassesGroup extends PropertyStatementGroup {
     private String className;
+    private String namespace;
 
-    public ExtendedClassesGroup(String className) {
+    public ExtendedClassesGroup(String className, String namespace) {
         this.className = className;
+        this.namespace = namespace;
     }
 
     @Nullable
@@ -22,5 +24,11 @@ public class ExtendedClassesGroup extends PropertyStatementGroup {
     @Override
     public Icon getIcon(boolean unused) {
         return LSFIcons.CLASS;
+    }
+
+    @Nullable
+    @Override
+    public String getLocationString() {
+        return namespace;
     }
 }
