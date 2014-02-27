@@ -1,8 +1,8 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
 import com.intellij.psi.PsiElement;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.typeinfer.Inferred;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.typeinfer.Inferred;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;

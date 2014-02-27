@@ -1,10 +1,10 @@
-package com.lsfusion.psi.stubs.impl;
+package com.lsfusion.lang.psi.stubs.impl;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFTableDeclaration;
-import com.lsfusion.psi.stubs.TableStubElement;
-import com.lsfusion.psi.stubs.types.TableStubElementType;
+import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
+import com.lsfusion.lang.psi.stubs.TableStubElement;
+import com.lsfusion.lang.psi.stubs.types.TableStubElementType;
 
 import java.io.IOException;
 

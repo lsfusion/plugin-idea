@@ -1,10 +1,10 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.lsfusion.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.psi.references.LSFNavigatorElementReference;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.references.LSFNavigatorElementReference;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

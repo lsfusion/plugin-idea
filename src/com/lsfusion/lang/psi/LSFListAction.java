@@ -1,4 +1,4 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 public interface LSFListAction extends LSFElement {
 }

@@ -1,10 +1,10 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.lsfusion.psi.LSFResolveResult;
-import com.lsfusion.psi.LSFGlobalResolver;
-import com.lsfusion.psi.declarations.LSFNamespaceDeclaration;
-import com.lsfusion.psi.references.LSFNamespaceReference;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFResolveResult;
+import com.lsfusion.lang.psi.declarations.LSFNamespaceDeclaration;
+import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

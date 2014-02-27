@@ -1,10 +1,10 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.LSFSimpleNameWithCaption;
-import com.lsfusion.psi.declarations.LSFStaticObjectDeclaration;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
+import com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

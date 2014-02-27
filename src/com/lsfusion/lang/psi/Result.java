@@ -1,4 +1,4 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 public class Result<T> {
     private T result;

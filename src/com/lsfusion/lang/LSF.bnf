@@ -1,21 +1,21 @@
 {
-  psiImplUtilClass="com.lsfusion.psi.LSFPsiImplUtil"
+  psiImplUtilClass="com.lsfusion.lang.psi.LSFPsiImplUtil"
 
-  parserClass="com.lsfusion.parser.LSFParser"
-  parserUtilClass="com.lsfusion.parser.LSFParserUtil"
+  parserClass="com.lsfusion.lang.parser.LSFParser"
+  parserUtilClass="com.lsfusion.lang.parser.LSFParserUtil"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="LSF"
   psiImplClassSuffix="Impl"
-  psiPackage="com.lsfusion.psi"
-  psiImplPackage="com.lsfusion.psi.impl"
+  psiPackage="com.lsfusion.lang.psi"
+  psiImplPackage="com.lsfusion.lang.psi.impl"
  
-  elementTypeHolderClass="com.lsfusion.psi.LSFTypes"
-  elementTypeClass="com.lsfusion.psi.LSFElementType"
-  elementTypeFactory = "com.lsfusion.LSFElementTypeFactory.create"
+  elementTypeHolderClass="com.lsfusion.lang.psi.LSFTypes"
+  elementTypeClass="com.lsfusion.lang.psi.LSFElementType"
+  elementTypeFactory = "com.lsfusion.lang.psi.LSFElementTypeFactory.create"
 
-  tokenTypeClass="com.lsfusion.psi.LSFTokenType"
+  tokenTypeClass="com.lsfusion.lang.psi.LSFTokenType"
 
   extendedPin = false
 }
@@ -26,8 +26,8 @@ private script_statement_recover ::= !statement_start
 
 simpleName ::= ID
 {
-    mixin="com.lsfusion.psi.LSFIdImpl"
-    implements="com.lsfusion.psi.LSFId"
+    mixin="com.lsfusion.lang.psi.LSFIdImpl"
+    implements="com.lsfusion.lang.psi.LSFId"
 }
 
 moduleHeader ::= MODULE moduleName SEMI
@@ -36,10 +36,10 @@ moduleHeader ::= MODULE moduleName SEMI
                  namespaceName?
 {
     pin = 2
-    mixin="com.lsfusion.psi.declarations.impl.LSFModuleDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFModuleDeclaration"
-    stubClass = "com.lsfusion.psi.stubs.ModuleStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFModuleDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFModuleDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.ModuleStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
     recoverWhile = "script_statement_recover"
 }
 
@@ -48,10 +48,10 @@ requireList ::= REQUIRE nonEmptyModuleUsageList SEMI {pin = 1};
 priorityList ::= PRIORITY nonEmptyNamespaceUsageList SEMI {pin = 1};
 namespaceName ::= NAMESPACE namespaceUsage SEMI
 {
-    mixin="com.lsfusion.psi.declarations.impl.LSFExplicitNamespaceDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFExplicitNamespaceDeclaration"
-    stubClass = "com.lsfusion.psi.stubs.ExplicitNamespaceStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFExplicitNamespaceDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFExplicitNamespaceDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.ExplicitNamespaceStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 // fake rules to generate types
@@ -100,20 +100,20 @@ private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVI
 
 classDecl ::= CLASS (ABSTRACT | NATIVE)? simpleNameWithCaption
 {
-     mixin = "com.lsfusion.psi.declarations.impl.LSFClassDeclarationImpl"
-     implements = "com.lsfusion.psi.declarations.LSFClassDeclaration"
-     stubClass = "com.lsfusion.psi.stubs.ClassStubElement"
-     elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+     mixin = "com.lsfusion.lang.psi.declarations.impl.LSFClassDeclarationImpl"
+     implements = "com.lsfusion.lang.psi.declarations.LSFClassDeclaration"
+     stubClass = "com.lsfusion.lang.psi.stubs.ClassStubElement"
+     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 extendingClassDeclaration ::= EXTEND CLASS customClassUsage
 
 classStatement ::= (classDecl | extendingClassDeclaration) classInstancesAndParents {
     pin = 1
-    mixin="com.lsfusion.psi.extend.impl.LSFClassExtendImpl"
-    implements="com.lsfusion.psi.extend.LSFClassExtend"
-    stubClass = "com.lsfusion.psi.stubs.extend.ExtendClassStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.extend.impl.LSFClassExtendImpl"
+    implements="com.lsfusion.lang.psi.extend.LSFClassExtend"
+    stubClass = "com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 private classInstancesAndParents ::=    LBRACE staticObjectDeclList RBRACE (classParentsList SEMI)? | (classParentsList)? SEMI {pin(".*") = 1}
@@ -125,7 +125,7 @@ staticObjectDeclList ::= (nonEmptyStaticObjectDeclList)?
 nonEmptyStaticObjectDeclList ::= staticObjectDecl (COMMA staticObjectDecl)*
 
 staticObjectDecl ::= simpleNameWithCaption
-{mixin="com.lsfusion.psi.declarations.impl.LSFStaticObjectDeclarationImpl" implements="com.lsfusion.psi.declarations.LSFStaticObjectDeclaration"}
+{mixin="com.lsfusion.lang.psi.declarations.impl.LSFStaticObjectDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration"}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// GROUP STATEMENT /////////////////////////////
@@ -134,10 +134,10 @@ staticObjectDecl ::= simpleNameWithCaption
 groupStatement ::= GROUP simpleNameWithCaption (COLON groupUsage)? SEMI
 {
     pin = 2
-    implements="com.lsfusion.psi.declarations.LSFGroupDeclaration"
-    mixin="com.lsfusion.psi.declarations.impl.LSFGroupDeclarationImpl"
-    stubClass = "com.lsfusion.psi.stubs.GroupStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    implements="com.lsfusion.lang.psi.declarations.LSFGroupDeclaration"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFGroupDeclarationImpl"
+    stubClass = "com.lsfusion.lang.psi.stubs.GroupStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 
@@ -147,34 +147,34 @@ groupStatement ::= GROUP simpleNameWithCaption (COLON groupUsage)? SEMI
 
 explicitInterfacePropertyStatement ::= explicitValuePropertyStatement
 {
-    mixin="com.lsfusion.psi.declarations.impl.LSFExplicitInterfacePropStatementImpl"
-    implements="com.lsfusion.psi.declarations.LSFExplicitInterfacePropStatement"
-    stubClass="com.lsfusion.psi.stubs.interfaces.ExplicitInterfaceStubElement"
-    elementTypeFactory="com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFExplicitInterfacePropStatementImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement"
+    stubClass="com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceStubElement"
+    elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 explicitValuePropertyStatement ::= implicitValuePropertyStatement
 {
-    mixin="com.lsfusion.psi.declarations.impl.LSFExplicitValuePropStatementImpl"
-    implements="com.lsfusion.psi.declarations.LSFExplicitValuePropStatement"
-    stubClass="com.lsfusion.psi.stubs.interfaces.ExplicitValueStubElement"
-    elementTypeFactory="com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFExplicitValuePropStatementImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement"
+    stubClass="com.lsfusion.lang.psi.stubs.interfaces.ExplicitValueStubElement"
+    elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 implicitValuePropertyStatement ::= implicitInterfacePropertyStatement
 {
-    mixin="com.lsfusion.psi.declarations.impl.LSFImplicitValuePropStatementImpl"
-    implements="com.lsfusion.psi.declarations.LSFImplicitValuePropStatement"
-    stubClass="com.lsfusion.psi.stubs.interfaces.ImplicitValueStubElement"
-    elementTypeFactory="com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFImplicitValuePropStatementImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFImplicitValuePropStatement"
+    stubClass="com.lsfusion.lang.psi.stubs.interfaces.ImplicitValueStubElement"
+    elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 implicitInterfacePropertyStatement ::= propertyStatement
 {
-    mixin="com.lsfusion.psi.declarations.impl.LSFImplicitInterfacePropStatementImpl"
-    implements="com.lsfusion.psi.declarations.LSFImplicitInterfacePropStatement"
-    stubClass="com.lsfusion.psi.stubs.interfaces.ImplicitInterfaceStubElement"
-    elementTypeFactory="com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFImplicitInterfacePropStatementImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFImplicitInterfacePropStatement"
+    stubClass="com.lsfusion.lang.psi.stubs.interfaces.ImplicitInterfaceStubElement"
+    elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 propertyStatement ::= propertyDeclaration EQUALS
@@ -183,10 +183,10 @@ propertyStatement ::= propertyDeclaration EQUALS
                       << semicolonIfNeeded >>
 {
     pin = 1
-    mixin="com.lsfusion.psi.declarations.impl.LSFGlobalPropDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFGlobalPropDeclaration,com.lsfusion.psi.context.ModifyParamContext"
-    stubClass = "com.lsfusion.psi.stubs.PropStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFGlobalPropDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext"
+    stubClass = "com.lsfusion.lang.psi.stubs.PropStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
     methods = [ getContextModifier getContextInferrer ]
 }
 
@@ -195,13 +195,13 @@ propertyDeclaration ::= simpleNameWithCaption (LBRAC classParamDeclareList RBRAC
 
 paramDeclare ::= simpleName
 {
-    mixin="com.lsfusion.psi.declarations.impl.LSFParamDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFParamDeclaration"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFParamDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFParamDeclaration"
 }
 
 classParamDeclare ::= (className paramDeclare) | paramDeclare
 {
-    implements="com.lsfusion.psi.context.ClassParamDeclareContext"
+    implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext"
     methods = [ resolveClass ensureClass ]
 }
 
@@ -210,51 +210,51 @@ nonEmptyClassParamDeclareList ::= classParamDeclare (COMMA classParamDeclare)*
 
 propertyExpression ::= ifPE
 {
-    implements = "com.lsfusion.psi.context.LSFExpression"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveValueClass resolveInferredValueClass resolveParams inferParamClasses getValueClassNames getValuePropertyNames]
 }
 
 ifPE ::= orPE (IF orPE)*
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 orPE ::= xorPE (OR xorPE)*
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 xorPE ::= andPE (XOR andPE)*
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 andPE ::= notPE (AND notPE)*
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 notPE ::= (NOT notPE) | equalityPE
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 equalityPE ::= relationalPE (EQ_OPERAND relationalPE)?
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 relationalPE ::= additiveORPE (((LESS | GREATER | LESS_EQUALS | GREATER_EQUALS) additiveORPE) | typePropertyDefinition)?
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 additiveORPE ::= additivePE (ADDOR_OPERAND additivePE)*
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 additivePE ::= multiplicativePE ((PLUS | MINUS) multiplicativePE)*
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 multiplicativePE ::= unaryMinusPE (MULT_OPERAND unaryMinusPE)*
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 unaryMinusPE ::= (MINUS unaryMinusPE) | postfixUnaryPE
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 postfixUnaryPE ::= simplePE (LSQBR uintLiteral RSQBR)?
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 simplePE ::= (LBRAC propertyExpression RBRAC) | expressionPrimitive
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 expressionPrimitive ::= <<fullCompoundParamDeclareCheck>> expressionFriendlyPD | exprParameterUsage
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 expressionFriendlyPD ::= joinPropertyDefinition
 	    |	multiPropertyDefinition
@@ -271,7 +271,7 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	signaturePropertyDefinition
 	    |	literal
 {
-    implements = "com.lsfusion.psi.context.LSFExpression"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
 }
 
@@ -288,26 +288,26 @@ contextIndependentPD ::= dataPropertyDefinition
 
 joinPropertyDefinition ::= JOIN? propertyObject LBRAC propertyExpressionList RBRAC
 {
-    implements = "com.lsfusion.psi.context.LSFExpression, com.lsfusion.psi.context.PropertyUsageContext"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList getValueClassNames getValuePropertyNames ]
 }
 
 overridePropertyDefinition ::= (OVERRIDE | EXCLUSIVE) nonEmptyPropertyExpressionList
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 ifElsePropertyDefinition ::= IF propertyExpression
                                     THEN propertyExpression
                                     (ELSE propertyExpression)?   // check greedy
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.LSFExpression"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
 }
 
 maxPropertyDefinition ::= (MAX | MIN) nonEmptyPropertyExpressionList
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.LSFExpression"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
 }
 
@@ -317,14 +317,14 @@ casePropertyDefinition ::= CASE (exclusiveOverrideOption)?
                            (ELSE propertyExpression)?
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.LSFExpression"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
 }
 
 multiPropertyDefinition ::= MULTI nonEmptyPropertyExpressionList (exclusiveOverrideOption)?
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.LSFExpression"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
 }
 
@@ -341,69 +341,69 @@ partitionPropertyDefinition ::= PARTITION
                                 (WINDOW EXCEPTLAST)?
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.LSFExpression, com.lsfusion.psi.context.PropertyUsageContext"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList getValueClassNames getValuePropertyNames ]
 }
 
 recursivePropertyDefinition ::= RECURSION propertyExpression STEP propertyExpression (CYCLES (YES |	NO | IMPOSSIBLE))?
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.LSFExpression"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
 }
 
 structCreationPropertyDefinition ::= STRUCT LBRAC nonEmptyPropertyExpressionList RBRAC
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.LSFExpression"
+    implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
 }
 
 castPropertyDefinition ::= builtInClassName LBRAC propertyExpression RBRAC
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 concatPropertyDefinition ::= CONCAT stringLiteral COMMA nonEmptyPropertyExpressionList
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 sessionPropertyType ::= PREV | CHANGED | SET | DROPPED | SETCHANGED | DROPCHANGED | DROPSET 
 sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 propertyExprObject ::= LSQBR EQUALS (propertyExpression | expressionUnfriendlyPD) RSQBR
-{implements="com.lsfusion.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
+{implements="com.lsfusion.lang.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
 
 propertyObject ::=  propertyUsage | propertyExprObject
 noContextPropertyUsage ::= propertyUsage
-{implements = "com.lsfusion.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
+{implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 
 dataPropertyDefinition ::= DATA (SESSION)? className (LBRAC classNameList RBRAC)
 {
     pin(".*") = 1;
-    implements = "com.lsfusion.psi.context.UnfriendlyPE"
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
 nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.UnfriendlyPE"
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
 abstractPropertyDefinition ::= ABSTRACT (((CASE | MULTI) (OVERRIDE | EXCLUSIVE)?) | OVERRIDE | EXCLUSIVE)? (CHECKED)? className LBRAC classNameList RBRAC
 {
-    implements = "com.lsfusion.psi.context.UnfriendlyPE"
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
 formulaPropertyDefinition ::= FORMULA (builtInClassName)? stringLiteral
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.UnfriendlyPE"
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
@@ -416,13 +416,13 @@ groupPropertyDefinition ::= GROUP groupingType
 		                    (orderPropertyBy)?
 		                    (WHERE propertyExpression)?
 {
-    implements="com.lsfusion.psi.context.ModifyParamContext, com.lsfusion.psi.context.UnfriendlyPE"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext, com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ] 
 }		                    
 
 filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID
 {
-    implements = "com.lsfusion.psi.context.UnfriendlyPE"
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
@@ -485,7 +485,7 @@ actionPropertyDefinition ::= ACTION
 {
     pin = 1
     // actually declare context, but it's pretty difficult to implement using only classes
-    implements="com.lsfusion.psi.context.ExtendParamContext"
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer ]
 }
 
@@ -498,7 +498,7 @@ abstractActionPropertyDefinition ::= ABSTRACT ACTION
                                     (CHECKED)?
                                     LBRAC classNameList RBRAC
 {
-    implements = "com.lsfusion.psi.context.UnfriendlyPE"
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
@@ -507,7 +507,7 @@ actionPropertyDefinitionBody ::=    customActionPDB
                                 |   extendContextActionPDB
                                 |	keepContextActionPDB
 {
-    implements = "com.lsfusion.psi.context.ActionExpression"
+    implements = "com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ inferActionParamClasses ]
 }
 
@@ -551,7 +551,7 @@ formActionPropertyDefinitionBody ::=
 		(formPrintTypeLiteral)?
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression, com.lsfusion.psi.context.FormContext"
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
@@ -564,28 +564,28 @@ formActionObjectList ::= OBJECTS formActionObjectUsage (COMMA formActionObjectUs
 customActionPropertyDefinitionBody ::= CUSTOM stringLiteral (LBRAC classNameList RBRAC)?
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 addFormActionPropertyDefinitionBody ::= ADDFORM (SESSION)? customClassUsage
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION)? customClassUsage
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 addObjectActionPropertyDefinitionBody ::= ADDOBJ customClassUsage (WHERE propertyExpression)? (TO mappedPropertyExprParam)?
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ExtendParamContext, com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
@@ -599,84 +599,84 @@ emailActionPropertyDefinitionBody ::=
 		)*
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 formEmailToObjects ::= formUsage formActionObjectList?
 {
     pin = 1
-    implements="com.lsfusion.psi.context.FormContext"
+    implements="com.lsfusion.lang.psi.context.FormContext"
     methods = [resolveFormDecl]
 }
 
 confirmActionPropertyDefinitionBody ::= CONFIRM propertyExpression
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 asyncUpdateActionPropertyDefinitionBody ::= ASYNCUPDATE propertyExpression
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 seekObjectActionPropertyDefinitionBody ::= SEEK objectID propertyExpression
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 fileActionPropertyDefinitionBody ::= (LOADFILE | OPENFILE) propertyExpression
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 changeClassActionPropertyDefinitionBody ::= CHANGECLASS exprParameterUsage TO customClassUsage (WHERE propertyExpression)?
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ExtendParamContext, com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
 deleteActionPropertyDefinitionBody ::= DELETE exprParameterUsage (WHERE propertyExpression)?
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ExtendParamContext, com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
 evalActionPropertyDefinitionBody ::= EVAL propertyExpression
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
@@ -699,8 +699,8 @@ listActionPropertyDefinitionBody ::=    ((NEWSESSION | (NEWTHREAD uintLiteral? (
 		                                RBRACE
 {
     pin = 2
-    mixin="com.lsfusion.psi.LSFListActionImpl"
-    implements="com.lsfusion.psi.LSFListAction, com.lsfusion.psi.context.ActionExpression"
+    mixin="com.lsfusion.lang.psi.LSFListActionImpl"
+    implements="com.lsfusion.lang.psi.LSFListAction, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
@@ -722,14 +722,14 @@ private list_action_statement_start ::= ADDFORM | ADDOBJ | ASSIGN | ASYNCUPDATE 
 localDataPropertyDefinition ::= LOCAL simpleName EQUALS className LBRAC classNameList RBRAC
 {
     pin = 1
-    mixin="com.lsfusion.psi.declarations.impl.LSFLocalPropDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFLocalPropDeclaration"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFLocalPropDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration"
 }
 
 //Разбиваем правило, чтобы была возможность запинить по EXEC
 execActionPropertyDefinitionBody ::= execActionPropertyDefinitionBody1 | execActionPropertyDefinitionBody2
 {
-    implements = "com.lsfusion.psi.context.PropertyUsageContext, com.lsfusion.psi.context.ActionExpression"
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ resolveParamClasses inferActionParamClasses getParamList ]
 }
 private execActionPropertyDefinitionBody1 ::= EXEC propertyObject LBRAC propertyExpressionList RBRAC {pin = 1}
@@ -739,7 +739,7 @@ private execActionPropertyDefinitionBody2 ::= propertyObject LBRAC propertyExpre
 //Разбиваем правило, чтобы была возможность запинить по ASSIGN
 assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | assignActionPropertyDefinitionBody2
 {
-    implements="com.lsfusion.psi.context.ExtendParamContext, com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
@@ -749,13 +749,13 @@ private assignActionPropertyDefinitionBody2 ::= mappedPropertyExprParam ARROW pr
 ifActionPropertyDefinitionBody ::= IF propertyExpression THEN actionPropertyDefinitionBody (ELSE actionPropertyDefinitionBody)?
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression" methods = [inferActionParamClasses]
+    implements="com.lsfusion.lang.psi.context.ActionExpression" methods = [inferActionParamClasses]
 }
 
 caseActionPropertyDefinitionBody ::= CASE (exclusiveOverrideOption)? (actionCaseBranchBody)+ (ELSE actionPropertyDefinitionBody)?
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
@@ -764,14 +764,14 @@ actionCaseBranchBody ::= WHEN propertyExpression (THEN actionPropertyDefinitionB
 multiActionPropertyDefinitionBody ::= MULTI (exclusiveOverrideOption)? nonEmptyActionPDBList
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
 forAddObjClause ::= ADDOBJ (paramDeclare EQUALS)? customClassUsage
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ClassParamDeclareContext"
+    implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext"
     methods = [ resolveClass ensureClass ]
 }
 
@@ -782,7 +782,7 @@ forActionPropertyDefinitionBody ::= FOR (propertyExpression (ORDER (DESC)? nonEm
 		                            (ELSE actionPropertyDefinitionBody)?
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ExtendParamContext, com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
                                                        
@@ -792,13 +792,13 @@ whileActionPropertyDefinitionBody ::= WHILE (propertyExpression (ORDER (DESC)? n
 		                              DO actionPropertyDefinitionBody
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ExtendParamContext, com.lsfusion.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
 terminalFlowActionPropertyDefinitionBody ::= BREAK | RETURN
 {
-    implements="com.lsfusion.psi.context.ActionExpression" methods = [inferActionParamClasses]
+    implements="com.lsfusion.lang.psi.context.ActionExpression" methods = [inferActionParamClasses]
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -823,10 +823,10 @@ formStatement ::=	(	formDecl
                     SEMI
 {
     pin=1
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
-    stubClass = "com.lsfusion.psi.stubs.extend.ExtendFormStubElement"
-    implements="com.lsfusion.psi.extend.LSFFormExtend, com.lsfusion.psi.context.FormContext"
-    mixin="com.lsfusion.psi.extend.impl.LSFFormExtendImpl"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
+    stubClass = "com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement"
+    implements="com.lsfusion.lang.psi.extend.LSFFormExtend, com.lsfusion.lang.psi.context.FormContext"
+    mixin="com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl"
     methods = [resolveFormDecl]
 }
 
@@ -841,10 +841,10 @@ formDecl ::= FORM simpleNameWithCaption
 		            (AUTOREFRESH intLiteral)?
 {
     pin = 2
-    mixin ="com.lsfusion.psi.declarations.impl.LSFFormDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFFormDeclaration"
-    stubClass = "com.lsfusion.psi.stubs.FormStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin ="com.lsfusion.lang.psi.declarations.impl.LSFFormDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFFormDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.FormStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 extendingFormDeclaration ::= EXTEND FORM formUsage
@@ -855,12 +855,12 @@ formTreeGroupObjectList ::= TREE (ID)? formTreeGroupObjectDeclaration (COMMA for
 
 formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectReportPath)? (formGroupObjectViewType)? (formGroupObjectPageSize)?
 formTreeGroupObjectDeclaration ::= formCommonGroupObject (treeGroupParentDeclaration)?
-{implements = "com.lsfusion.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
+{implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 treeGroupParentDeclaration ::= PARENT (propertyUsage | LBRAC nonEmptyPropertyUsageList RBRAC) { pin = 1 }
 
 formCommonGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDeclaration
-{mixin="com.lsfusion.psi.declarations.impl.LSFGroupObjectDeclarationImpl" implements="com.lsfusion.psi.declarations.LSFGroupObjectDeclaration"}
+{mixin="com.lsfusion.lang.psi.declarations.impl.LSFGroupObjectDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration"}
 
 formGroupObjectReportPath ::= REPORTFILE formPropertyObject
 
@@ -881,14 +881,14 @@ formObjectDeclaration ::= (simpleName EQUALS)?
 		                  className (stringLiteral)?
 		                  (ON CHANGE formActionPropertyObject)?
 {
-    mixin="com.lsfusion.psi.declarations.impl.LSFObjectDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFObjectDeclaration"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFObjectDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFObjectDeclaration"
 }
 
 formPropertyDrawNameDecl ::= (simpleName EQUALS)? formPropertyName formPropertyOptionsList
 {
-    mixin="com.lsfusion.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFPropertyDrawNameDeclaration"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFPropertyDrawNameDeclaration"
 }
 
 formPropertiesNamesDeclList ::=	formPropertyDrawNameDecl (COMMA formPropertyDrawNameDecl)*
@@ -898,7 +898,7 @@ formPropertiesList ::=  PROPERTIES (formMappedNamePropertiesList | formPropertyO
 formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptionsList formPropertiesNamesDeclList
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.PropertyUsageContext"
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList]
 }
 
@@ -934,8 +934,8 @@ formActionPropertyObject ::= formPropertyObject
 
 formPropertyDrawMappedDecl ::= (simpleName EQUALS)? formPropertyObject formPropertyOptionsList
 {
-    mixin="com.lsfusion.psi.declarations.impl.LSFPropertyDrawMappedDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFPropertyDrawMappedDeclaration"}
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFPropertyDrawMappedDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFPropertyDrawMappedDeclaration"}
 
 formMappedPropertiesList ::= formPropertyDrawMappedDecl (COMMA formPropertyDrawMappedDecl)* {pin = 1}
 
@@ -982,8 +982,8 @@ predefinedFormPropertyName ::= OBJVALUE
                            |    DELETE
                            |    DELETESESSION
 {
-    mixin="com.lsfusion.psi.LSFIdImpl"
-    implements="com.lsfusion.psi.LSFId"
+    mixin="com.lsfusion.lang.psi.LSFIdImpl"
+    implements="com.lsfusion.lang.psi.LSFId"
 }
 
 formPropertyName ::= propertyUsage | predefinedFormPropertyName
@@ -991,7 +991,7 @@ formPropertyName ::= propertyUsage | predefinedFormPropertyName
 formPropertyObject ::= formPropertyName LBRAC objectUsageList RBRAC
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.PropertyUsageContext"
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList ]
 }
 
@@ -999,8 +999,8 @@ aliasUsage ::= simpleName
 
 formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyObject) | aliasUsage
 {
-    implements="com.lsfusion.psi.references.LSFPropertyDrawReference"
-    mixin="com.lsfusion.psi.references.impl.LSFPropertyDrawReferenceImpl"
+    implements="com.lsfusion.lang.psi.references.LSFPropertyDrawReference"
+    mixin="com.lsfusion.lang.psi.references.impl.LSFPropertyDrawReferenceImpl"
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1015,7 +1015,7 @@ overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 		                << semicolonIfNeeded >>
 {
     pin = 2;
-    implements="com.lsfusion.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
@@ -1029,7 +1029,7 @@ constraintStatement ::= CONSTRAINT baseEvent propertyExpression
 		                SEMI
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
@@ -1043,7 +1043,7 @@ followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS
 		             SEMI
 {
     pin = 2
-    implements="com.lsfusion.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
@@ -1056,7 +1056,7 @@ followsResolveType ::= LEX_LOGICAL_LITERAL | ALL | NOTHING
 writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression WHEN (DO)? propertyExpression SEMI
 {
     pin = 2
-    implements="com.lsfusion.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
@@ -1069,7 +1069,7 @@ eventStatement ::= WHEN baseEvent propertyExpression inlineStatement
 		           << semicolonIfNeeded >>
 {
     pin = 1
-    implements="com.lsfusion.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
@@ -1080,7 +1080,7 @@ eventStatement ::= WHEN baseEvent propertyExpression inlineStatement
 globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody << semicolonIfNeeded >>
 {
     pin=1
-    implements="com.lsfusion.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
@@ -1101,7 +1101,7 @@ showDepStatement ::= SHOWDEP noContextPropertyUsage FROM noContextPropertyUsage 
 aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPropertyDefinitionBody << semicolonIfNeeded >>
 {
     pin=1
-    implements="com.lsfusion.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
@@ -1113,10 +1113,10 @@ aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPr
 tableStatement ::= TABLE simpleName LBRAC nonEmptyClassNameList RBRAC SEMI 
 {
     pin = 2
-    mixin="com.lsfusion.psi.declarations.impl.LSFTableDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFTableDeclaration"
-    stubClass = "com.lsfusion.psi.stubs.TableStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFTableDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFTableDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.TableStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 
@@ -1139,9 +1139,9 @@ indexStatement ::= INDEX nonEmptyNoContextPropertyUsageList SEMI {pin=1 methods 
 windowStatement ::= windowCreateStatement | windowHideStatement {pin=1 methods = [ getIcon ]}
 
 windowCreateStatement ::= WINDOW windowType simpleName stringLiteral windowOptions SEMI
-{mixin="com.lsfusion.psi.declarations.impl.LSFWindowDeclarationImpl" implements="com.lsfusion.psi.declarations.LSFWindowDeclaration"
-    stubClass = "com.lsfusion.psi.stubs.WindowStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+{mixin="com.lsfusion.lang.psi.declarations.impl.LSFWindowDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFWindowDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.WindowStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
     pin = 3
 }
 
@@ -1188,10 +1188,10 @@ addNavigatorElementStatement ::= ADD navigatorElementSelector (stringLiteral)? n
 newNavigatorElementStatement ::= NEW simpleName (ACTION noContextPropertyUsage)? stringLiteral navigatorElementInsertPositionSelector (TO windowUsage)? (IMAGE stringLiteral)? navigatorElementStatementBody
 {
     pin = 2
-    mixin="com.lsfusion.psi.declarations.impl.LSFNavigatorElementDeclarationImpl"
-    implements="com.lsfusion.psi.declarations.LSFNavigatorElementDeclaration"
-    stubClass = "com.lsfusion.psi.stubs.NavigatorElementStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFNavigatorElementDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFNavigatorElementDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.NavigatorElementStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 navigatorElementInsertPositionSelector ::=	(IN navigatorElementSelector)?
@@ -1209,7 +1209,7 @@ navigatorElementSelector ::= navigatorElementUsage
 
 designStatement ::=	(designDeclaration | extendDesignDeclaration) componentStatementBody {
     pin = 1
-    implements = "com.lsfusion.psi.context.FormContext"
+    implements = "com.lsfusion.lang.psi.context.FormContext"
     methods = [ getIcon resolveFormDecl]
 }
 
@@ -1273,10 +1273,10 @@ componentPropertyValue ::=  colorLiteral
 
 metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC anyTokens END {
     pin=2
-    mixin = "com.lsfusion.psi.declarations.impl.LSFMetaDeclarationImpl"
-    implements = "com.lsfusion.psi.declarations.LSFMetaDeclaration"
-    stubClass = "com.lsfusion.psi.stubs.MetaStubElement"
-    elementTypeFactory = "com.lsfusion.stubs.types.LSFStubElementTypeFactoryTypeFactory.create"
+    mixin = "com.lsfusion.lang.psi.declarations.impl.LSFMetaDeclarationImpl"
+    implements = "com.lsfusion.lang.psi.declarations.LSFMetaDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.MetaStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 anyTokens ::= (<< readAny >>)*
@@ -1291,8 +1291,8 @@ metaCodeBody ::= LBRACE (metaStatement*) RBRACE
 metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI
 {
     pin=2
-    mixin="com.lsfusion.psi.references.impl.LSFMetaReferenceImpl"
-    implements="com.lsfusion.psi.references.LSFMetaReference"
+    mixin="com.lsfusion.lang.psi.references.impl.LSFMetaReferenceImpl"
+    implements="com.lsfusion.lang.psi.references.LSFMetaReference"
 }
 
 metaDeclId ::=  ID
@@ -1323,13 +1323,13 @@ emptyStatement ::= SEMI;
 mappedPropertyClassParamDeclare ::= propertyUsage LBRAC classParamDeclareList RBRAC // temporary domain logic
 {
     pin = 1
-    implements = "com.lsfusion.psi.context.PropertyUsageContext"
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList ]
 }
 
 mappedPropertyExprParam ::= propertyUsage LBRAC exprParameterUsageList RBRAC // temporary mixed logic
 {
-    implements = "com.lsfusion.psi.context.PropertyUsageContext"
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList]
 }
 
@@ -1378,12 +1378,12 @@ literal ::=
 	|	nullLiteral
 	|	staticObjectID
 	|	colorLiteral
-{implements = "com.lsfusion.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 builtInClassName ::= PRIMITIVE_TYPE
 {
-    mixin="com.lsfusion.psi.LSFIdImpl"
-    implements="com.lsfusion.psi.LSFId"
+    mixin="com.lsfusion.lang.psi.LSFIdImpl"
+    implements="com.lsfusion.lang.psi.LSFId"
 }
 
 className ::= builtInClassName | customClassUsage
@@ -1393,13 +1393,13 @@ className ::= builtInClassName | customClassUsage
 // parameterUsage is not needed yet, there is either declaration (mappedPropertyParamDeclare), or exprUsage (exprParameterUsage) 
 
 objectUsage ::= simpleName
-{mixin="com.lsfusion.psi.references.impl.LSFObjectReferenceImpl" implements="com.lsfusion.psi.references.LSFObjectReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFObjectReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFObjectReference"}
 
 groupObjectUsage ::= simpleName
-{mixin="com.lsfusion.psi.references.impl.LSFGroupObjectReferenceImpl" implements="com.lsfusion.psi.references.LSFGroupObjectReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFGroupObjectReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFGroupObjectReference"}
 
 exprParameterNameUsage ::= classParamDeclare
-{mixin="com.lsfusion.psi.references.impl.LSFExprParamReferenceImpl" implements="com.lsfusion.psi.references.LSFExprParamReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFExprParamReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFExprParamReference"}
 
 // can be used for param and object simultaneously, for use in exprs
 exprParameterUsage ::= ((DOLLAR)? exprParameterNameUsage) | (DOLLAR LEX_UINT_LITERAL)
@@ -1407,35 +1407,35 @@ exprParameterUsage ::= ((DOLLAR)? exprParameterNameUsage) | (DOLLAR LEX_UINT_LIT
 // global
 
 customClassUsage ::= compoundID
-{mixin="com.lsfusion.psi.references.impl.LSFClassReferenceImpl" implements="com.lsfusion.psi.references.LSFClassReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFClassReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFClassReference"}
 
 moduleUsage ::= simpleName
-{mixin="com.lsfusion.psi.references.impl.LSFModuleReferenceImpl" implements="com.lsfusion.psi.references.LSFModuleReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFModuleReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFModuleReference"}
 
 namespaceUsage ::= simpleName
-{mixin="com.lsfusion.psi.references.impl.LSFNamespaceReferenceImpl" implements="com.lsfusion.psi.references.LSFNamespaceReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFNamespaceReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFNamespaceReference"}
 
 explicitPropClass ::= className | QUESTION 
 
 nonEmptyExplicitPropClassList ::= explicitPropClass (COMMA explicitPropClass)*
 
 propertyUsage ::= compoundID (LSQBR nonEmptyExplicitPropClassList RSQBR)?
-{mixin="com.lsfusion.psi.references.impl.LSFPropReferenceImpl" implements="com.lsfusion.psi.references.LSFPropReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFPropReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFPropReference"}
 
 tableUsage ::= compoundID
-{mixin="com.lsfusion.psi.references.impl.LSFTableReferenceImpl" implements="com.lsfusion.psi.references.LSFTableReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFTableReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFTableReference"}
 
 groupUsage ::= compoundID
-{mixin="com.lsfusion.psi.references.impl.LSFGroupReferenceImpl" implements="com.lsfusion.psi.references.LSFGroupReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFGroupReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFGroupReference"}
 
 formUsage ::= compoundID
-{mixin="com.lsfusion.psi.references.impl.LSFFormReferenceImpl" implements="com.lsfusion.psi.references.LSFFormReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFFormReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFFormReference"}
 
 windowUsage ::= compoundID
-{mixin="com.lsfusion.psi.references.impl.LSFWindowReferenceImpl" implements="com.lsfusion.psi.references.LSFWindowReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFWindowReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFWindowReference"}
 
 navigatorElementUsage ::= compoundID
-{mixin="com.lsfusion.psi.references.impl.LSFNavigatorElementReferenceImpl" implements="com.lsfusion.psi.references.LSFNavigatorElementReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFNavigatorElementReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFNavigatorElementReference"}
 
 metacodeUsage ::= compoundID
 
@@ -1444,19 +1444,19 @@ typeId ::= PRIMITIVE_TYPE | OBJECT
 compoundID ::= (<<innerIDStop>> namespaceUsage POINT simpleName) | simpleName
 
 staticObjectID ::= <<fullCompoundParamDeclareStop>> <<innerIDCheck>> customClassUsage POINT simpleName
-{mixin="com.lsfusion.psi.references.impl.LSFStaticObjectReferenceImpl" implements="com.lsfusion.psi.references.LSFStaticObjectReference"}
+{mixin="com.lsfusion.lang.psi.references.impl.LSFStaticObjectReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFStaticObjectReference"}
 
 groupObjectID ::= <<innerIDCheck>> formUsage POINT groupObjectUsage
 {
     pin = 3
-    implements="com.lsfusion.psi.context.FormContext"
+    implements="com.lsfusion.lang.psi.context.FormContext"
     methods = [resolveFormDecl]
 }
 
 objectID ::= <<innerIDCheck>> formUsage POINT objectUsage
 {
     pin = 3
-    implements="com.lsfusion.psi.context.FormContext"
+    implements="com.lsfusion.lang.psi.context.FormContext"
     methods = [resolveFormDecl]
 }
 

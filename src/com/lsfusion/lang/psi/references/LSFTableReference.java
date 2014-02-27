@@ -1,6 +1,6 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.psi.declarations.LSFTableDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 
 public interface LSFTableReference extends LSFFullNameReference<LSFTableDeclaration, LSFTableDeclaration> {
 }

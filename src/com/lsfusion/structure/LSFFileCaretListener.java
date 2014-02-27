@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.structure;
 
 import com.intellij.codeInsight.TargetElementUtilBase;
 import com.intellij.codeInsight.navigation.ImplementationSearcher;
@@ -11,9 +11,9 @@ import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
-import com.lsfusion.psi.LSFBuiltInClassName;
-import com.lsfusion.psi.LSFClassDecl;
-import com.lsfusion.psi.LSFId;
+import com.lsfusion.lang.psi.LSFBuiltInClassName;
+import com.lsfusion.lang.psi.LSFClassDecl;
+import com.lsfusion.lang.psi.LSFId;
 
 public class LSFFileCaretListener implements CaretListener {
     public final static Key<LSFFileCaretListener> PROJECT_COMPONENT_KEY = Key.create("lsfusion.structureview.caret.listener");

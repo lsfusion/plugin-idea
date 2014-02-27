@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.ui.SizedIcon;
 import com.intellij.util.ui.EmptyIcon;
-import com.lsfusion.meta.MetaChangeDetector;
+import com.lsfusion.lang.meta.MetaChangeDetector;
 
 import javax.swing.*;
 

@@ -1,10 +1,10 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.lsfusion.psi.LSFClassParamDeclare;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.LSFClassParamDeclare;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class LSFExprParamReferenceImpl extends LSFAbstractParamReferenceImpl<LSFExprParamDeclaration> {

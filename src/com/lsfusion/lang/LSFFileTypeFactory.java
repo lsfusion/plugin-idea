@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.lang;
 
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
 import com.intellij.openapi.fileTypes.FileTypeFactory;

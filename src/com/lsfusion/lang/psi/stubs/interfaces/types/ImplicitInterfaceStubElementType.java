@@ -1,14 +1,13 @@
-package com.lsfusion.psi.stubs.interfaces.types;
+package com.lsfusion.lang.psi.stubs.interfaces.types;
 
 import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.LSFLanguage;
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.LSFImplicitInterfacePropStatement;
-import com.lsfusion.psi.impl.LSFImplicitInterfacePropertyStatementImpl;
-import com.lsfusion.psi.stubs.interfaces.ImplicitInterfaceStubElement;
-import com.lsfusion.psi.stubs.interfaces.impl.ImplicitInterfaceStubImpl;
+import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFImplicitInterfacePropStatement;
+import com.lsfusion.lang.psi.impl.LSFImplicitInterfacePropertyStatementImpl;
+import com.lsfusion.lang.psi.stubs.interfaces.ImplicitInterfaceStubElement;
+import com.lsfusion.lang.psi.stubs.interfaces.impl.ImplicitInterfaceStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

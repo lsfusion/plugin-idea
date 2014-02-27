@@ -8,8 +8,8 @@ import com.intellij.usages.UsageGroup;
 import com.intellij.usages.UsageView;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageGroupingRule;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.LSFMetaCodeBody;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFMetaCodeBody;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

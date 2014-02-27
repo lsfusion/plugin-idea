@@ -1,20 +1,19 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
-import com.lsfusion.psi.LSFResolveResult;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.LSFParserDefinition;
-import com.lsfusion.LSFReferenceAnnotator;
-import com.lsfusion.meta.MetaTransaction;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.LSFDeclaration;
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
-import com.lsfusion.psi.references.LSFMetaReference;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
-import com.lsfusion.psi.stubs.types.MetaStubElementType;
+import com.lsfusion.lang.LSFParserDefinition;
+import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.meta.MetaTransaction;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.references.LSFMetaReference;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.stubs.types.MetaStubElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

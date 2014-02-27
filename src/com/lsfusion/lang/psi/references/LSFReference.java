@@ -1,14 +1,14 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
-import com.lsfusion.psi.LSFResolveResult;
-import com.lsfusion.psi.LSFElement;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.LSFElement;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFResolveResult;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.Nullable;
 
 public interface LSFReference<T extends LSFDeclaration> extends LSFElement, PsiReference, ItemPresentation, PsiNamedElement {

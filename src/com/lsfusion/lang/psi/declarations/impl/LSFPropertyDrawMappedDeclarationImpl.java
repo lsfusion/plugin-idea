@@ -1,8 +1,8 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.LSFPropertyDrawMappedDeclaration;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawMappedDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

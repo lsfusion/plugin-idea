@@ -2,7 +2,7 @@ package com.lsfusion.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.lsfusion.meta.MetaChangeDetector;
+import com.lsfusion.lang.meta.MetaChangeDetector;
 
 public class MetaRefreshAction extends AnAction {
     

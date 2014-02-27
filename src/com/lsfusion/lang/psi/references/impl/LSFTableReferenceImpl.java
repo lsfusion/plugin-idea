@@ -1,10 +1,10 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.lsfusion.psi.declarations.LSFTableDeclaration;
-import com.lsfusion.psi.references.LSFTableReference;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
+import com.lsfusion.lang.psi.references.LSFTableReference;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class LSFTableReferenceImpl extends LSFFullNameReferenceImpl<LSFTableDeclaration, LSFTableDeclaration> implements LSFTableReference {

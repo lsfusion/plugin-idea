@@ -1,6 +1,6 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 
 public interface LSFFormReference extends LSFFullNameReference<LSFFormDeclaration, LSFFormDeclaration> {
 }

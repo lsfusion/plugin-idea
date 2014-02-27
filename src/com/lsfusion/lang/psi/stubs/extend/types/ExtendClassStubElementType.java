@@ -1,11 +1,11 @@
-package com.lsfusion.psi.stubs.extend.types;
+package com.lsfusion.lang.psi.stubs.extend.types;
 
 import com.intellij.psi.stubs.*;
-import com.lsfusion.psi.extend.LSFClassExtend;
-import com.lsfusion.psi.impl.LSFClassStatementImpl;
-import com.lsfusion.psi.stubs.extend.ExtendClassStubElement;
-import com.lsfusion.psi.stubs.extend.impl.ExtendClassStubImpl;
-import com.lsfusion.psi.stubs.extend.types.indexes.ExtendClassIndex;
+import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.impl.LSFClassStatementImpl;
+import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
+import com.lsfusion.lang.psi.stubs.extend.impl.ExtendClassStubImpl;
+import com.lsfusion.lang.psi.stubs.extend.types.indexes.ExtendClassIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

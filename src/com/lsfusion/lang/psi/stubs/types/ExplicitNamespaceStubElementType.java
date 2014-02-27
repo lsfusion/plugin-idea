@@ -1,13 +1,13 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFExplicitNamespaceDeclaration;
-import com.lsfusion.psi.impl.LSFNamespaceNameImpl;
-import com.lsfusion.psi.stubs.ExplicitNamespaceStubElement;
-import com.lsfusion.psi.stubs.impl.ExplicitNamespaceStubImpl;
-import com.lsfusion.psi.stubs.types.indexes.ExplicitNamespaceIndex;
+import com.lsfusion.lang.psi.declarations.LSFExplicitNamespaceDeclaration;
+import com.lsfusion.lang.psi.impl.LSFNamespaceNameImpl;
+import com.lsfusion.lang.psi.stubs.ExplicitNamespaceStubElement;
+import com.lsfusion.lang.psi.stubs.impl.ExplicitNamespaceStubImpl;
+import com.lsfusion.lang.psi.stubs.types.indexes.ExplicitNamespaceIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

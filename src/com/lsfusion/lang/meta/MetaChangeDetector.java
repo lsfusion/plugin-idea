@@ -1,4 +1,4 @@
-package com.lsfusion.meta;
+package com.lsfusion.lang.meta;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -18,12 +18,12 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ConcurrentHashMap;
 import com.intellij.util.containers.ConcurrentHashSet;
-import com.lsfusion.LSFElementGenerator;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
-import com.lsfusion.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.psi.references.LSFMetaReference;
-import com.lsfusion.psi.stubs.types.indexes.ModuleIndex;
+import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.references.LSFMetaReference;
+import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;

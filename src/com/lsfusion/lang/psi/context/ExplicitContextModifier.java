@@ -1,11 +1,11 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
+import com.lsfusion.lang.psi.LSFClassParamDeclareList;
+import com.lsfusion.lang.psi.LSFMappedPropertyClassParamDeclare;
+import com.lsfusion.lang.psi.LSFPsiImplUtil;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.psi.LSFClassParamDeclareList;
-import com.lsfusion.psi.LSFMappedPropertyClassParamDeclare;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.psi.declarations.LSFParamDeclaration;
 
 import java.util.List;
 import java.util.Set;

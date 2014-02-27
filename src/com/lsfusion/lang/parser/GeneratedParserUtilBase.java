@@ -1,4 +1,4 @@
-package com.lsfusion.parser;
+package com.lsfusion.lang.parser;
 
 import com.intellij.lang.*;
 import com.intellij.lang.impl.PsiBuilderAdapter;
@@ -32,7 +32,7 @@ import java.util.List;
 @SuppressWarnings("UnusedParameters")
 public class GeneratedParserUtilBase {
 
-    private static final Logger LOG = Logger.getInstance("com.lsfusion.parser.GeneratedParserUtilBase");
+    private static final Logger LOG = Logger.getInstance("com.lsfusion.lang.parser.GeneratedParserUtilBase");
 
     private static final int MAX_RECURSION_LEVEL = 1000;
     private static final int MAX_VARIANTS_SIZE = 10000;

@@ -1,16 +1,16 @@
-package com.lsfusion.classes;
+package com.lsfusion.lang.classes;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.Query;
+import com.lsfusion.lang.psi.Finalizer;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.psi.Finalizer;
-import com.lsfusion.psi.LSFGlobalResolver;
-import com.lsfusion.psi.declarations.LSFClassDeclaration;
-import com.lsfusion.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.psi.extend.LSFClassExtend;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
 
 import java.util.*;
 

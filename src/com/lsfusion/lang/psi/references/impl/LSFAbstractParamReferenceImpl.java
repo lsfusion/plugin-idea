@@ -1,13 +1,13 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.lsfusion.psi.LSFResolveResult;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.psi.references.LSFAbstractParamReference;
-import com.lsfusion.psi.references.LSFObjectReference;
-import com.lsfusion.typeinfer.InferResult;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFResolveResult;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
+import com.lsfusion.lang.psi.references.LSFObjectReference;
+import com.lsfusion.lang.typeinfer.InferResult;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

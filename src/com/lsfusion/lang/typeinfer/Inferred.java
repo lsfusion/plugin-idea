@@ -1,11 +1,11 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
 import com.intellij.openapi.util.Pair;
+import com.lsfusion.lang.classes.DataClass;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFPsiImplUtil;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.classes.DataClass;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
 
 import java.util.*;
 

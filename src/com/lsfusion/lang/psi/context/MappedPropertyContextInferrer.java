@@ -1,14 +1,14 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFClassParamDeclare;
+import com.lsfusion.lang.psi.LSFClassParamDeclareList;
+import com.lsfusion.lang.psi.LSFMappedPropertyClassParamDeclare;
+import com.lsfusion.lang.psi.LSFNonEmptyClassParamDeclareList;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.typeinfer.Inferred;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.LSFClassParamDeclare;
-import com.lsfusion.psi.LSFClassParamDeclareList;
-import com.lsfusion.psi.LSFMappedPropertyClassParamDeclare;
-import com.lsfusion.psi.LSFNonEmptyClassParamDeclareList;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.psi.declarations.LSFPropDeclaration;
-import com.lsfusion.typeinfer.Inferred;
 
 import java.util.*;
 

@@ -1,8 +1,8 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.typeinfer.InferResult;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.typeinfer.InferResult;
 import org.jetbrains.annotations.Nullable;
 
 public interface LSFAbstractParamReference<T extends LSFExprParamDeclaration> extends LSFReference<T> {

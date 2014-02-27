@@ -1,8 +1,8 @@
-package com.lsfusion.psi.extend;
+package com.lsfusion.lang.psi.extend;
 
-import com.lsfusion.psi.declarations.LSFClassDeclaration;
-import com.lsfusion.psi.declarations.LSFStaticObjectDeclaration;
-import com.lsfusion.psi.stubs.extend.ExtendClassStubElement;
+import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration;
+import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
 
 import java.util.List;
 import java.util.Set;

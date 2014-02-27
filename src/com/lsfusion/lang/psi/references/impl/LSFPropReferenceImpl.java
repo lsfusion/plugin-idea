@@ -1,4 +1,4 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
@@ -11,20 +11,18 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.CollectionQuery;
+import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.context.PropertyUsageContext;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.psi.references.LSFPropReference;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.psi.LSFResolveResult;
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.LSFReferenceAnnotator;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.context.PropertyUsageContext;
-import com.lsfusion.psi.declarations.LSFDeclaration;
-import com.lsfusion.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.psi.declarations.LSFLocalPropDeclaration;
-import com.lsfusion.psi.declarations.LSFPropDeclaration;
-import com.lsfusion.psi.references.LSFPropReference;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,12 +1,11 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.LSFLocalPropDeclaration;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

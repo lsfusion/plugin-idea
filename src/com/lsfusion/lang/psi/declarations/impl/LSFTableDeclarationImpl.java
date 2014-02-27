@@ -1,14 +1,14 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.LSFSimpleName;
-import com.lsfusion.psi.declarations.LSFTableDeclaration;
-import com.lsfusion.psi.stubs.TableStubElement;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFSimpleName;
+import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
+import com.lsfusion.lang.psi.stubs.TableStubElement;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

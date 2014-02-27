@@ -1,13 +1,13 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
-import com.lsfusion.psi.impl.LSFMetaCodeDeclarationStatementImpl;
-import com.lsfusion.psi.stubs.MetaStubElement;
-import com.lsfusion.psi.stubs.impl.MetaStubImpl;
-import com.lsfusion.psi.stubs.types.indexes.MetaIndex;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.impl.LSFMetaCodeDeclarationStatementImpl;
+import com.lsfusion.lang.psi.stubs.MetaStubElement;
+import com.lsfusion.lang.psi.stubs.impl.MetaStubImpl;
+import com.lsfusion.lang.psi.stubs.types.indexes.MetaIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

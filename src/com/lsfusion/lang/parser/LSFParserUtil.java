@@ -1,11 +1,11 @@
-package com.lsfusion.parser;
+package com.lsfusion.lang.parser;
 
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.impl.PsiBuilderAdapter;
 import com.intellij.lang.impl.PsiBuilderImpl;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.tree.IElementType;
-import com.lsfusion.psi.LSFTypes;
+import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("StringEquality")

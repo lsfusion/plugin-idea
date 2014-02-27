@@ -1,13 +1,12 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
-import com.lsfusion.psi.LSFResolveResult;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.LSFDeclaration;
-import com.lsfusion.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.psi.references.LSFFullNameReference;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.references.LSFFullNameReference;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

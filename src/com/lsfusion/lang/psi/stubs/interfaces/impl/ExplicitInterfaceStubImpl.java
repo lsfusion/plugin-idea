@@ -1,11 +1,11 @@
-package com.lsfusion.psi.stubs.interfaces.impl;
+package com.lsfusion.lang.psi.stubs.interfaces.impl;
 
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
-import com.lsfusion.psi.declarations.LSFExplicitInterfacePropStatement;
-import com.lsfusion.psi.stubs.interfaces.ExplicitInterfaceStubElement;
-import com.lsfusion.psi.stubs.interfaces.types.ExplicitInterfaceStubElementType;
+import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
+import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceStubElement;
+import com.lsfusion.lang.psi.stubs.interfaces.types.ExplicitInterfaceStubElementType;
 
 import java.io.IOException;
 import java.util.List;

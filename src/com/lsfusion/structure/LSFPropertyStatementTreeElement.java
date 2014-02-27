@@ -2,8 +2,8 @@ package com.lsfusion.structure;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.lsfusion.classes.LSFValueClass;
-import com.lsfusion.psi.LSFPropertyStatement;
+import com.lsfusion.lang.classes.LSFValueClass;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

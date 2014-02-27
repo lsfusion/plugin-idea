@@ -9,7 +9,7 @@ import com.intellij.openapi.vcs.changes.CommitExecutor;
 import com.intellij.openapi.vcs.checkin.CheckinHandler;
 import com.intellij.openapi.vcs.checkin.CheckinHandlerFactory;
 import com.intellij.util.PairConsumer;
-import com.lsfusion.meta.MetaChangeDetector;
+import com.lsfusion.lang.meta.MetaChangeDetector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

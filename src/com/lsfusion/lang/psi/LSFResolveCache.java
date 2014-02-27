@@ -1,4 +1,4 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -18,7 +18,7 @@ public class LSFResolveCache {
     private static final LSFResolveCache VALUE_CLASS_INSTANCE = new LSFResolveCache();
     private static final LSFResolveCache PARAM_CLASSES_INSTANCE = new LSFResolveCache();
 
-    private static final Logger LOG = Logger.getInstance("#com.lsfusion.psi.LSFResolveCache");
+    private static final Logger LOG = Logger.getInstance("#com.lsfusion.lang.psi.LSFResolveCache");
     private final ConcurrentMap[] myMaps = new ConcurrentMap[2 * 2]; //boolean physical, boolean incompleteCode
     private final RecursionGuard myGuard = RecursionManager.createGuard("lsfResolveCache");
 

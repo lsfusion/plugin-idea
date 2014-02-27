@@ -1,11 +1,11 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
-import com.lsfusion.psi.LSFPropertyStatement;
-import com.lsfusion.psi.declarations.LSFImplicitValuePropStatement;
-import com.lsfusion.psi.stubs.interfaces.ImplicitValueStubElement;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.declarations.LSFImplicitValuePropStatement;
+import com.lsfusion.lang.psi.stubs.interfaces.ImplicitValueStubElement;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class LSFImplicitValuePropStatementImpl extends StubBasedPsiElementBase<ImplicitValueStubElement> implements LSFImplicitValuePropStatement {

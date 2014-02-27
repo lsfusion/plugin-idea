@@ -1,19 +1,19 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
 import com.intellij.psi.PsiElement;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.meta.MetaTransaction;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFMetaCodeStatement;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.LSFResolver;
+import com.lsfusion.lang.psi.context.ContextModifier;
+import com.lsfusion.lang.psi.context.ExtendParamContext;
+import com.lsfusion.lang.psi.context.ModifyParamContext;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.meta.MetaTransaction;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.LSFMetaCodeStatement;
-import com.lsfusion.psi.LSFPropertyStatement;
-import com.lsfusion.psi.LSFResolver;
-import com.lsfusion.psi.context.ContextModifier;
-import com.lsfusion.psi.context.ExtendParamContext;
-import com.lsfusion.psi.context.ModifyParamContext;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
-import com.lsfusion.psi.declarations.LSFParamDeclaration;
 
 import java.util.HashSet;
 import java.util.List;

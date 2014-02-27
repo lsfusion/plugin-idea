@@ -1,7 +1,7 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 
 import java.util.HashMap;
 import java.util.Map;

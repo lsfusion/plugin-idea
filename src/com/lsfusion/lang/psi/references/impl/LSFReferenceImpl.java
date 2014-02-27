@@ -1,4 +1,4 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
@@ -10,11 +10,10 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.util.IncorrectOperationException;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.LSFResolveResult;
-import com.lsfusion.LSFReferenceAnnotator;
-import com.lsfusion.psi.declarations.LSFDeclaration;
-import com.lsfusion.psi.references.LSFReference;
+import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.references.LSFReference;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,10 +1,10 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.psi.declarations.LSFNamespaceDeclaration;
-import com.lsfusion.psi.stubs.NamespaceStubElement;
+import com.lsfusion.lang.psi.declarations.LSFNamespaceDeclaration;
+import com.lsfusion.lang.psi.stubs.NamespaceStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

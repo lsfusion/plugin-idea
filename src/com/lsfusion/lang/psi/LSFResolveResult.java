@@ -1,8 +1,8 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
-import com.lsfusion.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 
 import java.util.Collection;
 

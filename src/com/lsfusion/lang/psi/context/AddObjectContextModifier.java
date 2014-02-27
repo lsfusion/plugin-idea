@@ -1,8 +1,8 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
-import com.lsfusion.psi.LSFForAddObjClause;
-import com.lsfusion.psi.LSFParamDeclare;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.LSFForAddObjClause;
+import com.lsfusion.lang.psi.LSFParamDeclare;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 
 import java.util.ArrayList;
 import java.util.Collections;

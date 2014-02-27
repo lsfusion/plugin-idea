@@ -7,9 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.lsfusion.LSFFileCaretListener;
-import com.lsfusion.LSFFileType;
-import com.lsfusion.psi.LSFFile;
+import com.lsfusion.lang.LSFFileType;
+import com.lsfusion.lang.psi.LSFFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

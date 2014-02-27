@@ -1,6 +1,6 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
-import com.lsfusion.classes.LSFClassSet;
+import com.lsfusion.lang.classes.LSFClassSet;
 
 public abstract class Compared<T> {
     

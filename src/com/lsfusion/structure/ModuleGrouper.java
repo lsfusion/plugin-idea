@@ -3,8 +3,8 @@ package com.lsfusion.structure;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.ide.util.treeView.smartTree.*;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

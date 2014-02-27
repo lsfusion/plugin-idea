@@ -1,7 +1,7 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
-import com.lsfusion.psi.declarations.LSFNamespaceDeclaration;
-import com.lsfusion.psi.stubs.NamespaceStubElement;
+import com.lsfusion.lang.psi.declarations.LSFNamespaceDeclaration;
+import com.lsfusion.lang.psi.stubs.NamespaceStubElement;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

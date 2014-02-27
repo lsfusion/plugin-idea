@@ -1,5 +1,5 @@
 
-package com.lsfusion;
+package com.lsfusion.lang;
 
 import com.intellij.lang.Language;
 

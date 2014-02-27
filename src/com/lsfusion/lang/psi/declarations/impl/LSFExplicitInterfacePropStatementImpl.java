@@ -1,11 +1,11 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
-import com.lsfusion.psi.LSFPropertyStatement;
-import com.lsfusion.psi.declarations.LSFExplicitInterfacePropStatement;
-import com.lsfusion.psi.stubs.interfaces.ExplicitInterfaceStubElement;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
+import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

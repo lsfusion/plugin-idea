@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.lang.highlight;
 
 import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.Lexer;
@@ -9,7 +9,8 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.ui.JBColor;
-import com.lsfusion.psi.LSFTypes;
+import com.lsfusion.lang.LSFLexer;
+import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;

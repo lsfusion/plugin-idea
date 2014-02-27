@@ -11,8 +11,8 @@ import com.intellij.usages.impl.rules.UsageType;
 import com.intellij.usages.impl.rules.UsageTypeProvider;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageGroupingRuleEx;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.LSFMetaCodeBody;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFMetaCodeBody;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

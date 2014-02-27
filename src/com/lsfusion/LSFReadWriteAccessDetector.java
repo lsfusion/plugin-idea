@@ -3,10 +3,10 @@ package com.lsfusion;
 import com.intellij.codeInsight.highlighting.ReadWriteAccessDetector;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.lsfusion.psi.LSFAssignActionPropertyDefinitionBody;
-import com.lsfusion.psi.LSFMappedPropertyClassParamDeclare;
-import com.lsfusion.psi.LSFMappedPropertyExprParam;
-import com.lsfusion.psi.LSFWriteWhenStatement;
+import com.lsfusion.lang.psi.LSFAssignActionPropertyDefinitionBody;
+import com.lsfusion.lang.psi.LSFMappedPropertyClassParamDeclare;
+import com.lsfusion.lang.psi.LSFMappedPropertyExprParam;
+import com.lsfusion.lang.psi.LSFWriteWhenStatement;
 
 public class LSFReadWriteAccessDetector extends ReadWriteAccessDetector {
     @Override

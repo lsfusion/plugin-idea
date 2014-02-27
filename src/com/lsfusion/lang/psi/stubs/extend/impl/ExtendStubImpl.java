@@ -1,10 +1,11 @@
-package com.lsfusion.psi.stubs.extend.impl;
+package com.lsfusion.lang.psi.stubs.extend.impl;
 
-import com.intellij.psi.stubs.*;
-import com.lsfusion.psi.extend.LSFExtend;
-import com.lsfusion.psi.stubs.extend.ExtendStubElement;
-import com.lsfusion.psi.stubs.extend.types.ExtendStubElementType;
-import com.lsfusion.psi.stubs.impl.GlobalStubImpl;
+import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubInputStream;
+import com.lsfusion.lang.psi.extend.LSFExtend;
+import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
+import com.lsfusion.lang.psi.stubs.impl.GlobalStubImpl;
 
 import java.io.IOException;
 

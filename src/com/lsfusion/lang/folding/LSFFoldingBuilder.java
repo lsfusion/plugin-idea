@@ -1,4 +1,4 @@
-package com.lsfusion.folding;
+package com.lsfusion.lang.folding;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.folding.FoldingBuilder;
@@ -6,7 +6,7 @@ import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.tree.IElementType;
-import com.lsfusion.psi.LSFTypes;
+import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

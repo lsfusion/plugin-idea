@@ -1,4 +1,4 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
 import com.intellij.psi.PsiElement;
 

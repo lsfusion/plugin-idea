@@ -1,7 +1,7 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
 import com.intellij.psi.PsiElement;
-import com.lsfusion.classes.LSFClassSet;
+import com.lsfusion.lang.classes.LSFClassSet;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

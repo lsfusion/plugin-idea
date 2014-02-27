@@ -1,7 +1,7 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

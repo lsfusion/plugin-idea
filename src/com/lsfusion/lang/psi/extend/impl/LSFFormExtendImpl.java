@@ -1,19 +1,19 @@
-package com.lsfusion.psi.extend.impl;
+package com.lsfusion.lang.psi.extend.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Query;
-import com.lsfusion.LSFElementGenerator;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.*;
-import com.lsfusion.psi.declarations.impl.*;
-import com.lsfusion.psi.extend.LSFFormExtend;
-import com.lsfusion.psi.stubs.extend.ExtendFormStubElement;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.impl.*;
+import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,4 +1,4 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;

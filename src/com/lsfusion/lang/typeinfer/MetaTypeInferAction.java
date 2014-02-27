@@ -1,12 +1,12 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
-import com.lsfusion.meta.MetaTransaction;
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.meta.MetaTransaction;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 public class MetaTypeInferAction implements IntentionAction {

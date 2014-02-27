@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.module;
 
 public class LSFusionTemplates {
     //должны совпадать с именеми файлов в /resources/fileTemplates/internal/<name>.<ext>.ft

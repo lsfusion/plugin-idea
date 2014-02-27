@@ -1,13 +1,13 @@
-package com.lsfusion.psi.stubs.extend.types;
+package com.lsfusion.lang.psi.stubs.extend.types;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.extend.LSFFormExtend;
-import com.lsfusion.psi.impl.LSFFormStatementImpl;
-import com.lsfusion.psi.stubs.extend.ExtendFormStubElement;
-import com.lsfusion.psi.stubs.extend.impl.ExtendFormStubImpl;
-import com.lsfusion.psi.stubs.extend.types.indexes.ExtendFormIndex;
+import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
+import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
+import com.lsfusion.lang.psi.stubs.extend.impl.ExtendFormStubImpl;
+import com.lsfusion.lang.psi.stubs.extend.types.indexes.ExtendFormIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

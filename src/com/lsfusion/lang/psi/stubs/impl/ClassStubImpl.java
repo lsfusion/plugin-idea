@@ -1,10 +1,10 @@
-package com.lsfusion.psi.stubs.impl;
+package com.lsfusion.lang.psi.stubs.impl;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFClassDeclaration;
-import com.lsfusion.psi.stubs.ClassStubElement;
-import com.lsfusion.psi.stubs.types.ClassStubElementType;
+import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
+import com.lsfusion.lang.psi.stubs.ClassStubElement;
+import com.lsfusion.lang.psi.stubs.types.ClassStubElementType;
 
 import java.io.IOException;
 

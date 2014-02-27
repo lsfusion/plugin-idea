@@ -1,8 +1,8 @@
-package com.lsfusion.psi.stubs;
+package com.lsfusion.lang.psi.stubs;
 
-import com.lsfusion.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.psi.references.LSFModuleReference;
-import com.lsfusion.psi.references.LSFNamespaceReference;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.references.LSFModuleReference;
+import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 
 import java.util.List;
 

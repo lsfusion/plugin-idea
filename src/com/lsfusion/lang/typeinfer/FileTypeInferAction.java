@@ -1,4 +1,4 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -7,8 +7,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
-import com.lsfusion.meta.MetaTransaction;
-import com.lsfusion.psi.LSFFile;
+import com.lsfusion.lang.meta.MetaTransaction;
+import com.lsfusion.lang.psi.LSFFile;
 
 public class FileTypeInferAction extends AnAction {
 

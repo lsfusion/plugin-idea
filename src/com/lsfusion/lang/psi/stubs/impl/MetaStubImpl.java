@@ -1,13 +1,13 @@
-package com.lsfusion.psi.stubs.impl;
+package com.lsfusion.lang.psi.stubs.impl;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
-import com.lsfusion.psi.stubs.MetaStubElement;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
-import com.lsfusion.psi.stubs.types.MetaStubElementType;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.stubs.MetaStubElement;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.stubs.types.MetaStubElementType;
 
 import java.io.IOException;
 

@@ -1,13 +1,13 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.psi.impl.LSFModuleHeaderImpl;
-import com.lsfusion.psi.stubs.ModuleStubElement;
-import com.lsfusion.psi.stubs.impl.ModuleStubImpl;
-import com.lsfusion.psi.stubs.types.indexes.ModuleIndex;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.impl.LSFModuleHeaderImpl;
+import com.lsfusion.lang.psi.stubs.ModuleStubElement;
+import com.lsfusion.lang.psi.stubs.impl.ModuleStubImpl;
+import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

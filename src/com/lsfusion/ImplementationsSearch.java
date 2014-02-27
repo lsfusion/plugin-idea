@@ -4,8 +4,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.QueryExecutorBase;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Processor;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 //import com.intellij.psi.search.searches.DefinitionsScopedSearch;

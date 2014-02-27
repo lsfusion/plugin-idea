@@ -1,5 +1,5 @@
 
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.lang.ASTNode;
@@ -14,13 +14,13 @@ import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.util.SmartList;
-import com.lsfusion.LSFFileType;
-import com.lsfusion.LSFLanguage;
-import com.lsfusion.psi.context.ContextInferrer;
-import com.lsfusion.psi.context.ContextModifier;
-import com.lsfusion.psi.context.ModifyParamContext;
-import com.lsfusion.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.LSFFileType;
+import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.psi.context.ContextInferrer;
+import com.lsfusion.lang.psi.context.ContextModifier;
+import com.lsfusion.lang.psi.context.ModifyParamContext;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

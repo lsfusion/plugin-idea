@@ -1,11 +1,11 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
-import com.lsfusion.psi.context.ModifyParamContext;
+import com.lsfusion.lang.psi.context.ModifyParamContext;
 import org.jetbrains.annotations.NotNull;
 
 public class TypeInferAction implements IntentionAction {

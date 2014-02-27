@@ -1,8 +1,8 @@
-package com.lsfusion.psi.declarations;
+package com.lsfusion.lang.psi.declarations;
 
-import com.lsfusion.psi.LSFFormPropertyName;
-import com.lsfusion.psi.LSFObjectUsageList;
-import com.lsfusion.psi.LSFSimpleName;
+import com.lsfusion.lang.psi.LSFFormPropertyName;
+import com.lsfusion.lang.psi.LSFObjectUsageList;
+import com.lsfusion.lang.psi.LSFSimpleName;
 
 public interface LSFPropertyDrawDeclaration extends LSFFormElementDeclaration {
     

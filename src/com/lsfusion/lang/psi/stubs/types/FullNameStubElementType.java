@@ -1,7 +1,7 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
-import com.lsfusion.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.psi.stubs.FullNameStubElement;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

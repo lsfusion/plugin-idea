@@ -6,8 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.lsfusion.LSFLanguage;
-import com.lsfusion.meta.MetaChangeDetector;
+import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.meta.MetaChangeDetector;
 import org.jetbrains.annotations.NotNull;
 
 public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {

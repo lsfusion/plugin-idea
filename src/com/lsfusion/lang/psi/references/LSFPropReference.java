@@ -1,7 +1,7 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 
 public interface LSFPropReference extends LSFFullNameReference<LSFPropDeclaration, LSFGlobalPropDeclaration> {
 

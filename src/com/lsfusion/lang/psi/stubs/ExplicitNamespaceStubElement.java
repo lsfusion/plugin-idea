@@ -1,6 +1,6 @@
-package com.lsfusion.psi.stubs;
+package com.lsfusion.lang.psi.stubs;
 
-import com.lsfusion.psi.declarations.LSFExplicitNamespaceDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFExplicitNamespaceDeclaration;
 
 public interface ExplicitNamespaceStubElement extends NamespaceStubElement<ExplicitNamespaceStubElement, LSFExplicitNamespaceDeclaration> {
 }

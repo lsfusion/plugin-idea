@@ -32,7 +32,7 @@
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <implementation-class>com.lsfusion.meta.MetaChangeDetector</implementation-class>
+            <implementation-class>com.lsfusion.lang.meta.MetaChangeDetector</implementation-class>
             <skipForDefaultProject/>
         </component>
 
@@ -107,14 +107,14 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <fileTypeFactory implementation="com.lsfusion.LSFFileTypeFactory"/>
-        <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.LSFParserDefinition"/>
+        <fileTypeFactory implementation="com.lsfusion.lang.LSFFileTypeFactory"/>
+        <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.lang.LSFParserDefinition"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.LSFFindUsagesProvider"/>
-        <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.lsfusion.LSFSyntaxHighlighterFactory"/>
-        <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.LSFBraceMatcher"/>
-        <lang.commenter language="Lsf" implementationClass="com.lsfusion.LSFCommenter"/>
+        <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
+        <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
+        <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
         <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
-        <annotator language="Lsf" implementationClass="com.lsfusion.LSFReferenceAnnotator"/>
+        <annotator language="Lsf" implementationClass="com.lsfusion.lang.LSFReferenceAnnotator"/>
         <readWriteAccessDetector implementation="com.lsfusion.LSFReadWriteAccessDetector"/>
         <fileStructureGroupRuleProvider implementation="com.lsfusion.LSFStatementGroupRuleProvider"/>
         <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>

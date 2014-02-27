@@ -1,7 +1,7 @@
-package com.lsfusion.psi.declarations;
+package com.lsfusion.lang.psi.declarations;
 
-import com.lsfusion.classes.LSFValueClass;
-import com.lsfusion.meta.MetaTransaction;
+import com.lsfusion.lang.classes.LSFValueClass;
+import com.lsfusion.lang.meta.MetaTransaction;
 
 public interface LSFParamDeclaration extends LSFExprParamDeclaration {
 

@@ -4,21 +4,22 @@ import com.intellij.find.impl.HelpID;
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.lang.findUsages.FindUsagesProvider;
-import com.intellij.lexer.FlexAdapter;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.LSFSimpleNameWithCaption;
-import com.lsfusion.psi.LSFTypes;
+import com.lsfusion.lang.LSFLexerAdapter;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
+import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.Reader;
-
 public class LSFFindUsagesProvider implements FindUsagesProvider {
     private static final DefaultWordsScanner WORDS_SCANNER =
-            new DefaultWordsScanner(new FlexAdapter(new LSFLexer((Reader) null)),
-                    TokenSet.create(LSFTypes.ID), TokenSet.create(LSFTypes.COMMENTS), TokenSet.EMPTY);
+            new DefaultWordsScanner(
+                    new LSFLexerAdapter(), 
+                    TokenSet.create(LSFTypes.ID), TokenSet.create(LSFTypes.COMMENTS),
+                    TokenSet.EMPTY
+            );
 
     @Nullable
     @Override

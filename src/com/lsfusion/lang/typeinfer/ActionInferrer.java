@@ -1,9 +1,9 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.psi.LSFActionPropertyDefinition;
-import com.lsfusion.psi.context.ContextInferrer;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.LSFActionPropertyDefinition;
+import com.lsfusion.lang.psi.LSFPsiImplUtil;
+import com.lsfusion.lang.psi.context.ContextInferrer;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 
 import java.util.Set;
 

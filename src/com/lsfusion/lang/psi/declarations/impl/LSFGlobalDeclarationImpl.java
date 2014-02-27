@@ -1,13 +1,13 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
-import com.lsfusion.psi.LSFStubBasedPsiElement;
-import com.lsfusion.psi.declarations.LSFGlobalDeclaration;
-import com.lsfusion.psi.stubs.GlobalStubElement;
+import com.lsfusion.lang.psi.LSFStubBasedPsiElement;
+import com.lsfusion.lang.psi.declarations.LSFGlobalDeclaration;
+import com.lsfusion.lang.psi.stubs.GlobalStubElement;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

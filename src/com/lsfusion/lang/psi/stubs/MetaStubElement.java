@@ -1,6 +1,6 @@
-package com.lsfusion.psi.stubs;
+package com.lsfusion.lang.psi.stubs;
 
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 
 public interface MetaStubElement extends FullNameStubElement<MetaStubElement, LSFMetaDeclaration> {
 

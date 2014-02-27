@@ -1,17 +1,17 @@
-package com.lsfusion.psi.stubs.interfaces.types;
+package com.lsfusion.lang.psi.stubs.interfaces.types;
 
 import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.LSFLanguage;
-import com.lsfusion.psi.LSFContextIndependentPD;
-import com.lsfusion.psi.LSFExpressionUnfriendlyPD;
-import com.lsfusion.psi.context.UnfriendlyPE;
-import com.lsfusion.psi.declarations.LSFExplicitInterfacePropStatement;
-import com.lsfusion.psi.declarations.LSFParamDeclaration;
-import com.lsfusion.psi.declarations.impl.LSFGlobalPropDeclarationImpl;
-import com.lsfusion.psi.impl.LSFExplicitInterfacePropertyStatementImpl;
-import com.lsfusion.psi.stubs.interfaces.ExplicitInterfaceStubElement;
-import com.lsfusion.psi.stubs.interfaces.impl.ExplicitInterfaceStubImpl;
+import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.psi.LSFContextIndependentPD;
+import com.lsfusion.lang.psi.LSFExpressionUnfriendlyPD;
+import com.lsfusion.lang.psi.context.UnfriendlyPE;
+import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
+import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
+import com.lsfusion.lang.psi.declarations.impl.LSFGlobalPropDeclarationImpl;
+import com.lsfusion.lang.psi.impl.LSFExplicitInterfacePropertyStatementImpl;
+import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceStubElement;
+import com.lsfusion.lang.psi.stubs.interfaces.impl.ExplicitInterfaceStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

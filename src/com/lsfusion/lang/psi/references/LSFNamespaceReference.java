@@ -1,6 +1,6 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.psi.declarations.LSFNamespaceDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFNamespaceDeclaration;
 
 public interface LSFNamespaceReference extends LSFGlobalReference<LSFNamespaceDeclaration> {
 }

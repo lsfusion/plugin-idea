@@ -1,6 +1,6 @@
-package com.lsfusion.psi.stubs;
+package com.lsfusion.lang.psi.stubs;
 
-import com.lsfusion.psi.declarations.LSFTableDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 
 public interface TableStubElement extends FullNameStubElement<TableStubElement, LSFTableDeclaration> {
 }

@@ -1,9 +1,12 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
 import com.intellij.psi.PsiElement;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class ElementsContextModifier implements ContextModifier {
 

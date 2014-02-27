@@ -1,20 +1,20 @@
-package com.lsfusion.psi.references.impl;
+package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.EmptyQuery;
 import com.intellij.util.Query;
-import com.lsfusion.psi.LSFResolveResult;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.LSFFormStatement;
-import com.lsfusion.psi.LSFGlobalResolver;
-import com.lsfusion.psi.context.FormContext;
-import com.lsfusion.psi.declarations.LSFDeclaration;
-import com.lsfusion.psi.declarations.LSFFormDeclaration;
-import com.lsfusion.psi.extend.LSFFormExtend;
-import com.lsfusion.psi.references.LSFFormElementReference;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFFormStatement;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFResolveResult;
+import com.lsfusion.lang.psi.context.FormContext;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.references.LSFFormElementReference;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

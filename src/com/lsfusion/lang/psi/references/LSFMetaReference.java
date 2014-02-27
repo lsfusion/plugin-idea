@@ -1,9 +1,9 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.meta.MetaTransaction;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.LSFMetaCodeBody;
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.meta.MetaTransaction;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFMetaCodeBody;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 
 import java.util.List;
 

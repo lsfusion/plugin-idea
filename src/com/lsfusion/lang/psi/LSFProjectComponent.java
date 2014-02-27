@@ -1,4 +1,4 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
@@ -10,8 +10,8 @@ import com.intellij.openapi.startup.StartupManager;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.PsiManagerEx;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.lsfusion.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.psi.stubs.types.indexes.PropIndex;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.lang.psi.stubs.types.indexes.PropIndex;
 import org.jetbrains.annotations.NotNull;
 
 public class LSFProjectComponent implements ProjectComponent {

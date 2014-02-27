@@ -1,15 +1,15 @@
-package com.lsfusion.psi.stubs.interfaces.types;
+package com.lsfusion.lang.psi.stubs.interfaces.types;
 
 import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.LSFLanguage;
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.psi.LSFExpressionUnfriendlyPD;
-import com.lsfusion.psi.LSFPropertyExpression;
-import com.lsfusion.psi.declarations.LSFExplicitValuePropStatement;
-import com.lsfusion.psi.impl.LSFExplicitValuePropertyStatementImpl;
-import com.lsfusion.psi.stubs.interfaces.ExplicitValueStubElement;
-import com.lsfusion.psi.stubs.interfaces.impl.ExplicitValueStubImpl;
+import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.psi.LSFExpressionUnfriendlyPD;
+import com.lsfusion.lang.psi.LSFPropertyExpression;
+import com.lsfusion.lang.psi.LSFPsiImplUtil;
+import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
+import com.lsfusion.lang.psi.impl.LSFExplicitValuePropertyStatementImpl;
+import com.lsfusion.lang.psi.stubs.interfaces.ExplicitValueStubElement;
+import com.lsfusion.lang.psi.stubs.interfaces.impl.ExplicitValueStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

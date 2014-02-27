@@ -1,6 +1,6 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 
 public interface LSFNavigatorElementReference extends LSFFullNameReference<LSFFullNameDeclaration, LSFFullNameDeclaration> {
 }

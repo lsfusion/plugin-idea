@@ -1,6 +1,6 @@
-package com.lsfusion.psi.stubs;
+package com.lsfusion.lang.psi.stubs;
 
-import com.lsfusion.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 
 public interface PropStubElement extends FullNameStubElement<PropStubElement, LSFGlobalPropDeclaration> {
 }

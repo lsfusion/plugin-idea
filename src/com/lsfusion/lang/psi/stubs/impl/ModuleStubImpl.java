@@ -1,16 +1,16 @@
-package com.lsfusion.psi.stubs.impl;
+package com.lsfusion.lang.psi.stubs.impl;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.LSFElementGenerator;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.psi.references.LSFModuleReference;
-import com.lsfusion.psi.references.LSFNamespaceReference;
-import com.lsfusion.psi.stubs.ModuleStubElement;
-import com.lsfusion.psi.stubs.types.ModuleStubElementType;
+import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.references.LSFModuleReference;
+import com.lsfusion.lang.psi.references.LSFNamespaceReference;
+import com.lsfusion.lang.psi.stubs.ModuleStubElement;
+import com.lsfusion.lang.psi.stubs.types.ModuleStubElementType;
 
 import java.io.IOException;
 import java.util.ArrayList;

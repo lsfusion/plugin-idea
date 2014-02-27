@@ -1,12 +1,12 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.psi.LSFObjectUsageList;
-import com.lsfusion.psi.declarations.LSFPropertyDrawDeclaration;
-import com.lsfusion.psi.extend.LSFFormExtend;
-import com.lsfusion.psi.references.impl.LSFPropertyDrawReferenceImpl;
+import com.lsfusion.lang.psi.LSFObjectUsageList;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.references.impl.LSFPropertyDrawReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

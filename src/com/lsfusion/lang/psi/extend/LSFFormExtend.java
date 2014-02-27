@@ -1,10 +1,10 @@
-package com.lsfusion.psi.extend;
+package com.lsfusion.lang.psi.extend;
 
-import com.lsfusion.psi.declarations.LSFDeclaration;
-import com.lsfusion.psi.declarations.LSFGroupObjectDeclaration;
-import com.lsfusion.psi.declarations.LSFObjectDeclaration;
-import com.lsfusion.psi.declarations.LSFPropertyDrawDeclaration;
-import com.lsfusion.psi.stubs.extend.ExtendFormStubElement;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFObjectDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
 
 import java.util.Collection;
 import java.util.Set;

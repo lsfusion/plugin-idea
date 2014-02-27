@@ -1,4 +1,4 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -7,12 +7,12 @@ import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.*;
 import com.intellij.util.Processor;
 import com.intellij.util.Query;
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
-import com.lsfusion.psi.impl.LSFMetaCodeDeclarationStatementImpl;
-import com.lsfusion.psi.references.LSFMetaReference;
-import com.lsfusion.psi.references.LSFReference;
-import com.lsfusion.psi.stubs.impl.MetaStubImpl;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.impl.LSFMetaCodeDeclarationStatementImpl;
+import com.lsfusion.lang.psi.references.LSFMetaReference;
+import com.lsfusion.lang.psi.references.LSFReference;
+import com.lsfusion.lang.psi.stubs.impl.MetaStubImpl;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

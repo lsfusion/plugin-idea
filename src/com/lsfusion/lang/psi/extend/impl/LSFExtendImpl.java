@@ -1,13 +1,13 @@
-package com.lsfusion.psi.extend.impl;
+package com.lsfusion.lang.psi.extend.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.stubs.IStubElementType;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.psi.extend.LSFExtend;
-import com.lsfusion.psi.stubs.extend.ExtendStubElement;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.extend.LSFExtend;
+import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

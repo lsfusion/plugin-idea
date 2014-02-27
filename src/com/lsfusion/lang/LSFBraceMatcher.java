@@ -1,10 +1,10 @@
-package com.lsfusion;
+package com.lsfusion.lang;
 
 import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
-import com.lsfusion.psi.LSFTypes;
+import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

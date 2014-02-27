@@ -1,4 +1,4 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
@@ -7,18 +7,18 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.*;
 import com.intellij.util.containers.ConcurrentHashMap;
+import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.LSFExtend;
+import com.lsfusion.lang.psi.references.LSFModuleReference;
+import com.lsfusion.lang.psi.references.LSFNamespaceReference;
+import com.lsfusion.lang.psi.stubs.FullNameStubElement;
+import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.indexes.ClassExtendsClassIndex;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.psi.declarations.*;
-import com.lsfusion.psi.extend.LSFClassExtend;
-import com.lsfusion.psi.extend.LSFExtend;
-import com.lsfusion.psi.references.LSFModuleReference;
-import com.lsfusion.psi.references.LSFNamespaceReference;
-import com.lsfusion.psi.stubs.FullNameStubElement;
-import com.lsfusion.psi.stubs.extend.ExtendStubElement;
-import com.lsfusion.psi.stubs.extend.types.ExtendStubElementType;
-import com.lsfusion.psi.stubs.extend.types.indexes.ClassExtendsClassIndex;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
 
 import java.util.*;
 

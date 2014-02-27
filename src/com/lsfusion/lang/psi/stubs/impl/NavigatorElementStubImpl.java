@@ -1,10 +1,10 @@
-package com.lsfusion.psi.stubs.impl;
+package com.lsfusion.lang.psi.stubs.impl;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFNavigatorElementDeclaration;
-import com.lsfusion.psi.stubs.NavigatorElementStubElement;
-import com.lsfusion.psi.stubs.types.NavigatorElementStubElementType;
+import com.lsfusion.lang.psi.declarations.LSFNavigatorElementDeclaration;
+import com.lsfusion.lang.psi.stubs.NavigatorElementStubElement;
+import com.lsfusion.lang.psi.stubs.types.NavigatorElementStubElementType;
 
 import java.io.IOException;
 

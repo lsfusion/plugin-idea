@@ -1,6 +1,6 @@
-package com.lsfusion.psi.declarations;
+package com.lsfusion.lang.psi.declarations;
 
-import com.lsfusion.classes.LSFClassSet;
+import com.lsfusion.lang.classes.LSFClassSet;
 
 import java.util.List;
 

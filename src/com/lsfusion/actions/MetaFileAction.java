@@ -6,8 +6,8 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.meta.MetaChangeDetector;
+import com.lsfusion.lang.meta.MetaChangeDetector;
+import com.lsfusion.lang.psi.LSFFile;
 
 public abstract class MetaFileAction extends AnAction {
     

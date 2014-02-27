@@ -1,11 +1,11 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
-import com.lsfusion.psi.stubs.extend.types.ExtendClassStubElementType;
-import com.lsfusion.psi.stubs.extend.types.ExtendFormStubElementType;
-import com.lsfusion.psi.stubs.interfaces.types.ExplicitInterfaceStubElementType;
-import com.lsfusion.psi.stubs.interfaces.types.ExplicitValueStubElementType;
-import com.lsfusion.psi.stubs.interfaces.types.ImplicitInterfaceStubElementType;
-import com.lsfusion.psi.stubs.interfaces.types.ImplicitValueStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendClassStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendFormStubElementType;
+import com.lsfusion.lang.psi.stubs.interfaces.types.ExplicitInterfaceStubElementType;
+import com.lsfusion.lang.psi.stubs.interfaces.types.ExplicitValueStubElementType;
+import com.lsfusion.lang.psi.stubs.interfaces.types.ImplicitInterfaceStubElementType;
+import com.lsfusion.lang.psi.stubs.interfaces.types.ImplicitValueStubElementType;
 
 public interface LSFStubElementTypes {
 

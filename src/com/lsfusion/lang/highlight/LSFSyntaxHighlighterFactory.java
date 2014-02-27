@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.lang.highlight;
 
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;
 import com.intellij.openapi.project.Project;

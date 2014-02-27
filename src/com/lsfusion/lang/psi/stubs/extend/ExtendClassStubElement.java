@@ -1,6 +1,6 @@
-package com.lsfusion.psi.stubs.extend;
+package com.lsfusion.lang.psi.stubs.extend;
 
-import com.lsfusion.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.LSFClassExtend;
 
 import java.util.List;
 

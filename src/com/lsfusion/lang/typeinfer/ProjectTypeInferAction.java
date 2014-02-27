@@ -1,4 +1,4 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -9,10 +9,10 @@ import com.intellij.openapi.progress.Progressive;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.lsfusion.meta.MetaTransaction;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.psi.stubs.types.indexes.ModuleIndex;
+import com.lsfusion.lang.meta.MetaTransaction;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

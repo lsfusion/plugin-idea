@@ -1,6 +1,6 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 
 public interface LSFModuleReference extends LSFGlobalReference<LSFModuleDeclaration> {
 }

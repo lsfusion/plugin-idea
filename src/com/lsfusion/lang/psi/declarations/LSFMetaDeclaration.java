@@ -1,10 +1,10 @@
-package com.lsfusion.psi.declarations;
+package com.lsfusion.lang.psi.declarations;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import com.lsfusion.psi.LSFAnyTokens;
-import com.lsfusion.psi.stubs.MetaStubElement;
+import com.lsfusion.lang.psi.LSFAnyTokens;
+import com.lsfusion.lang.psi.stubs.MetaStubElement;
 
 import java.util.List;
 

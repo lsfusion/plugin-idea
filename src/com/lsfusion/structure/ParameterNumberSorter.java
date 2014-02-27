@@ -4,8 +4,8 @@ import com.intellij.ide.util.treeView.smartTree.ActionPresentation;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentationData;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.LSFPropertyStatement;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;

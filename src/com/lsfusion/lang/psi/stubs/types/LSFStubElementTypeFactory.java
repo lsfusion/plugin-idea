@@ -1,4 +1,4 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.IStubElementType;
 

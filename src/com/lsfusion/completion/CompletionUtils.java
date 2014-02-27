@@ -9,9 +9,9 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.declarations.LSFDeclaration;
-import com.lsfusion.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 
 import javax.swing.*;
 import java.util.ArrayList;

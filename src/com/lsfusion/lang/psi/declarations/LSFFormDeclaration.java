@@ -1,6 +1,6 @@
-package com.lsfusion.psi.declarations;
+package com.lsfusion.lang.psi.declarations;
 
-import com.lsfusion.psi.stubs.FormStubElement;
+import com.lsfusion.lang.psi.stubs.FormStubElement;
 
 public interface LSFFormDeclaration extends LSFFullNameDeclaration<LSFFormDeclaration, FormStubElement> {
 }

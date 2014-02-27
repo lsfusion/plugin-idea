@@ -1,12 +1,12 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFFormDeclaration;
-import com.lsfusion.psi.stubs.FormStubElement;
-import com.lsfusion.psi.stubs.impl.FormStubImpl;
-import com.lsfusion.psi.stubs.types.indexes.FormIndex;
+import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.stubs.FormStubElement;
+import com.lsfusion.lang.psi.stubs.impl.FormStubImpl;
+import com.lsfusion.lang.psi.stubs.types.indexes.FormIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class FormStubElementType extends FullNameStubElementType<FormStubElement
 
     @Override
     public LSFFormDeclaration createPsi(@NotNull FormStubElement stub) {
-        return new com.lsfusion.psi.impl.LSFFormDeclImpl(stub, this);
+        return new com.lsfusion.lang.psi.impl.LSFFormDeclImpl(stub, this);
     }
 
     @Override

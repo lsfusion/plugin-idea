@@ -8,7 +8,7 @@ import com.intellij.psi.PsiDirectory;
 import com.lsfusion.LSFBundle;
 import com.lsfusion.LSFIcons;
 
-import static com.lsfusion.LSFusionTemplates.TEMPLATE_LSFUSION_SCRIPT;
+import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_SCRIPT;
 
 public class NewLsfFileAction extends CreateFileFromTemplateAction implements DumbAware {
     public NewLsfFileAction() {

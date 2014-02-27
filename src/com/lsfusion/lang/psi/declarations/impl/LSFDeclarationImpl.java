@@ -1,4 +1,4 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
@@ -6,9 +6,9 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.Segment;
 import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
-import com.lsfusion.psi.LSFElementImpl;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.LSFElementImpl;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

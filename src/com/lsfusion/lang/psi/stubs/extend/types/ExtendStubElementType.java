@@ -1,8 +1,8 @@
-package com.lsfusion.psi.stubs.extend.types;
+package com.lsfusion.lang.psi.stubs.extend.types;
 
-import com.lsfusion.psi.extend.LSFExtend;
-import com.lsfusion.psi.stubs.extend.ExtendStubElement;
-import com.lsfusion.psi.stubs.types.GlobalStubElementType;
+import com.lsfusion.lang.psi.extend.LSFExtend;
+import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
+import com.lsfusion.lang.psi.stubs.types.GlobalStubElementType;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

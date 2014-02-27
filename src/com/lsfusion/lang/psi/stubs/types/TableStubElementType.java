@@ -1,13 +1,13 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFTableDeclaration;
-import com.lsfusion.psi.impl.LSFTableStatementImpl;
-import com.lsfusion.psi.stubs.TableStubElement;
-import com.lsfusion.psi.stubs.impl.TableStubImpl;
-import com.lsfusion.psi.stubs.types.indexes.TableIndex;
+import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
+import com.lsfusion.lang.psi.impl.LSFTableStatementImpl;
+import com.lsfusion.lang.psi.stubs.TableStubElement;
+import com.lsfusion.lang.psi.stubs.impl.TableStubImpl;
+import com.lsfusion.lang.psi.stubs.types.indexes.TableIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

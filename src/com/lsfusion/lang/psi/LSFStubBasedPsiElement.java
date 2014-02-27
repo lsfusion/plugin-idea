@@ -1,10 +1,10 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
-import com.lsfusion.psi.stubs.GlobalStubElement;
+import com.lsfusion.lang.psi.stubs.GlobalStubElement;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class LSFStubBasedPsiElement<This extends LSFGlobalElement<This, Stub>, Stub extends GlobalStubElement<Stub, This>>

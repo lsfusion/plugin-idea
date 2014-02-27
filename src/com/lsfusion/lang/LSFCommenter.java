@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.lang;
 
 import com.intellij.lang.Commenter;
 import org.jetbrains.annotations.Nullable;

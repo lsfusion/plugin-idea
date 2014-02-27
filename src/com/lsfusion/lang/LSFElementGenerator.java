@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.lang;
 
 import com.intellij.formatting.FormatTextRanges;
 import com.intellij.lang.ASTNode;
@@ -16,15 +16,15 @@ import com.intellij.psi.impl.source.tree.CompositePsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.meta.MetaChangeDetector;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.LSFPropertyDrawDeclaration;
-import com.lsfusion.psi.references.LSFClassReference;
-import com.lsfusion.psi.references.LSFModuleReference;
-import com.lsfusion.psi.references.LSFNamespaceReference;
-import com.lsfusion.psi.references.impl.LSFClassReferenceImpl;
-import com.lsfusion.psi.references.impl.LSFModuleReferenceImpl;
-import com.lsfusion.psi.references.impl.LSFNamespaceReferenceImpl;
+import com.lsfusion.lang.meta.MetaChangeDetector;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.references.LSFClassReference;
+import com.lsfusion.lang.psi.references.LSFModuleReference;
+import com.lsfusion.lang.psi.references.LSFNamespaceReference;
+import com.lsfusion.lang.psi.references.impl.LSFClassReferenceImpl;
+import com.lsfusion.lang.psi.references.impl.LSFModuleReferenceImpl;
+import com.lsfusion.lang.psi.references.impl.LSFNamespaceReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

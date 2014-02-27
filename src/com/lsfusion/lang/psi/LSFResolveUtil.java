@@ -1,11 +1,11 @@
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.ResolveResult;
 import com.intellij.util.containers.ContainerUtil;
-import com.lsfusion.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

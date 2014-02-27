@@ -1,7 +1,7 @@
-package com.lsfusion;
+package com.lsfusion.lang;
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
-import static com.lsfusion.psi.LSFTypes.*;
+import static com.lsfusion.lang.psi.LSFTypes.*;
 
 %%
 

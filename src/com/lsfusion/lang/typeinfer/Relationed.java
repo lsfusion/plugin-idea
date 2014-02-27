@@ -1,9 +1,9 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.classes.DataClass;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.LSFAdditiveORPE;
+import com.lsfusion.lang.classes.DataClass;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFAdditiveORPE;
+import com.lsfusion.lang.psi.LSFPsiImplUtil;
 
 public class Relationed extends Compared<LSFAdditiveORPE> {
 

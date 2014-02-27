@@ -4,9 +4,9 @@ import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.psi.stubs.types.indexes.*;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.lang.psi.stubs.types.indexes.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

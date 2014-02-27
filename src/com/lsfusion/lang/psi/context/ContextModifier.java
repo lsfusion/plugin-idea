@@ -1,6 +1,6 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 
 import java.util.Collections;
 import java.util.List;

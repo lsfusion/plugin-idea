@@ -1,10 +1,12 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
-import com.lsfusion.psi.LSFPropertyExpression;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.typeinfer.Inferred;
+import com.lsfusion.lang.psi.LSFPropertyExpression;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.typeinfer.Inferred;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class ExprsContextInferrer implements ContextInferrer {
 

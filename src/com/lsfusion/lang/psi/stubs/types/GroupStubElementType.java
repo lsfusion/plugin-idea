@@ -1,13 +1,13 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFGroupDeclaration;
-import com.lsfusion.psi.impl.LSFGroupStatementImpl;
-import com.lsfusion.psi.stubs.GroupStubElement;
-import com.lsfusion.psi.stubs.impl.GroupStubImpl;
-import com.lsfusion.psi.stubs.types.indexes.GroupIndex;
+import com.lsfusion.lang.psi.declarations.LSFGroupDeclaration;
+import com.lsfusion.lang.psi.impl.LSFGroupStatementImpl;
+import com.lsfusion.lang.psi.stubs.GroupStubElement;
+import com.lsfusion.lang.psi.stubs.impl.GroupStubImpl;
+import com.lsfusion.lang.psi.stubs.types.indexes.GroupIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

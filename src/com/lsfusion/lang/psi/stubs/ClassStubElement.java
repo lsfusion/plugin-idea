@@ -1,6 +1,6 @@
-package com.lsfusion.psi.stubs;
+package com.lsfusion.lang.psi.stubs;
 
-import com.lsfusion.psi.declarations.LSFClassDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 
 public interface ClassStubElement extends FullNameStubElement<ClassStubElement, LSFClassDeclaration> {
 }

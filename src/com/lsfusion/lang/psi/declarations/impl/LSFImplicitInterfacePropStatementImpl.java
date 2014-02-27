@@ -1,10 +1,10 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
-import com.lsfusion.psi.declarations.LSFImplicitInterfacePropStatement;
-import com.lsfusion.psi.stubs.interfaces.ImplicitInterfaceStubElement;
+import com.lsfusion.lang.psi.declarations.LSFImplicitInterfacePropStatement;
+import com.lsfusion.lang.psi.stubs.interfaces.ImplicitInterfaceStubElement;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class LSFImplicitInterfacePropStatementImpl extends StubBasedPsiElementBase<ImplicitInterfaceStubElement> implements LSFImplicitInterfacePropStatement {

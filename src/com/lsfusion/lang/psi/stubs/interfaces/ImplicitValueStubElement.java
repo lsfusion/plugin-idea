@@ -1,7 +1,7 @@
-package com.lsfusion.psi.stubs.interfaces;
+package com.lsfusion.lang.psi.stubs.interfaces;
 
 import com.intellij.psi.stubs.StubElement;
-import com.lsfusion.psi.declarations.LSFImplicitValuePropStatement;
+import com.lsfusion.lang.psi.declarations.LSFImplicitValuePropStatement;
 
 import java.util.List;
 

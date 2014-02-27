@@ -1,22 +1,22 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
-import com.lsfusion.LSFElementGenerator;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.LSFGlobalResolver;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.LSFSimpleNameWithCaption;
-import com.lsfusion.psi.declarations.LSFClassDeclaration;
-import com.lsfusion.psi.extend.LSFClassExtend;
-import com.lsfusion.psi.extend.impl.LSFClassExtendImpl;
-import com.lsfusion.psi.references.LSFClassReference;
-import com.lsfusion.psi.stubs.ClassStubElement;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
+import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
+import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.impl.LSFClassExtendImpl;
+import com.lsfusion.lang.psi.references.LSFClassReference;
+import com.lsfusion.lang.psi.stubs.ClassStubElement;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

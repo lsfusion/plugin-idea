@@ -1,8 +1,8 @@
-package com.lsfusion.typeinfer;
+package com.lsfusion.lang.typeinfer;
 
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.LSFRelationalPE;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFPsiImplUtil;
+import com.lsfusion.lang.psi.LSFRelationalPE;
 
 public class Equals extends Compared<LSFRelationalPE> {
 

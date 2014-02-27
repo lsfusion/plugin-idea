@@ -1,4 +1,4 @@
-package com.lsfusion.meta;
+package com.lsfusion.lang.meta;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.notification.Notification;
@@ -9,11 +9,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.LSFParserDefinition;
+import com.lsfusion.lang.psi.LSFMetaCodeBody;
+import com.lsfusion.lang.psi.LSFMetaCodeStatement;
+import com.lsfusion.lang.psi.LSFResolver;
+import com.lsfusion.lang.psi.Result;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.LSFElementGenerator;
-import com.lsfusion.LSFParserDefinition;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.LSFMetaDeclaration;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;

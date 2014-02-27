@@ -31,8 +31,8 @@ import java.io.*;
 import java.util.List;
 import java.util.Properties;
 
-import static com.lsfusion.LSFusionTemplates.TEMPLATE_LSFUSION_SCRIPT;
-import static com.lsfusion.LSFusionTemplates.TEMPLATE_LSFUSION_SETTINGS;
+import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_SCRIPT;
+import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_SETTINGS;
 
 public class LSFusionModuleBuilder extends JavaModuleBuilder {
     public static final String BOOTSTRAP_CLASS_NAME = "lsfusion.server.logics.BusinessLogicsBootstrap";

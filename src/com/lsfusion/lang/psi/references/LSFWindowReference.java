@@ -1,6 +1,6 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.psi.declarations.LSFWindowDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 
 public interface LSFWindowReference extends LSFFullNameReference<LSFWindowDeclaration, LSFWindowDeclaration> {
 }

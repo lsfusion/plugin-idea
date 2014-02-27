@@ -23,10 +23,10 @@ import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Segment;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.lsfusion.LSFReferenceAnnotator;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.psi.stubs.types.indexes.ModuleIndex;
+import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

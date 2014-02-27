@@ -1,15 +1,15 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.CollectionQuery;
-import com.lsfusion.psi.Finalizer;
-import com.lsfusion.psi.LSFGlobalResolver;
-import com.lsfusion.psi.LSFSimpleNameWithCaption;
-import com.lsfusion.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.psi.stubs.FullNameStubElement;
-import com.lsfusion.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.Finalizer;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.stubs.FullNameStubElement;
+import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

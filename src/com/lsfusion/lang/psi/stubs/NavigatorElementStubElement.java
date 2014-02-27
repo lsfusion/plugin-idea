@@ -1,6 +1,6 @@
-package com.lsfusion.psi.stubs;
+package com.lsfusion.lang.psi.stubs;
 
-import com.lsfusion.psi.declarations.LSFNavigatorElementDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFNavigatorElementDeclaration;
 
 public interface NavigatorElementStubElement extends FullNameStubElement<NavigatorElementStubElement, LSFNavigatorElementDeclaration> {
 }

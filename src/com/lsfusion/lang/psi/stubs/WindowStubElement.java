@@ -1,6 +1,6 @@
-package com.lsfusion.psi.stubs;
+package com.lsfusion.lang.psi.stubs;
 
-import com.lsfusion.psi.declarations.LSFWindowDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 
 public interface WindowStubElement extends FullNameStubElement<WindowStubElement, LSFWindowDeclaration> {
 }

@@ -1,4 +1,4 @@
-package com.lsfusion.psi.declarations;
+package com.lsfusion.lang.psi.declarations;
 
 public interface LSFPropertyDrawNameDeclaration extends LSFPropertyDrawDeclaration {
 }

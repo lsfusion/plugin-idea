@@ -1,9 +1,12 @@
-package com.lsfusion.psi.context;
+package com.lsfusion.lang.psi.context;
 
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.psi.declarations.LSFExprParamDeclaration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class AndContextModifier implements ContextModifier {
 

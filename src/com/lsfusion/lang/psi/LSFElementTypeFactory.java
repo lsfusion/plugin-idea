@@ -1,5 +1,5 @@
 
-package com.lsfusion.psi;
+package com.lsfusion.lang.psi;
 
 import com.intellij.psi.tree.IElementType;
 

@@ -1,10 +1,10 @@
-package com.lsfusion.psi.stubs.impl;
+package com.lsfusion.lang.psi.stubs.impl;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFExplicitNamespaceDeclaration;
-import com.lsfusion.psi.stubs.ExplicitNamespaceStubElement;
-import com.lsfusion.psi.stubs.types.ExplicitNamespaceStubElementType;
+import com.lsfusion.lang.psi.declarations.LSFExplicitNamespaceDeclaration;
+import com.lsfusion.lang.psi.stubs.ExplicitNamespaceStubElement;
+import com.lsfusion.lang.psi.stubs.types.ExplicitNamespaceStubElementType;
 
 import java.io.IOException;
 

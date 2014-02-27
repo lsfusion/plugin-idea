@@ -1,9 +1,9 @@
-package com.lsfusion.psi.stubs.types;
+package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.*;
-import com.lsfusion.LSFLanguage;
-import com.lsfusion.psi.LSFGlobalElement;
-import com.lsfusion.psi.stubs.GlobalStubElement;
+import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.psi.LSFGlobalElement;
+import com.lsfusion.lang.psi.stubs.GlobalStubElement;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

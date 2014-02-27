@@ -1,6 +1,7 @@
-package com.lsfusion;
+package com.lsfusion.lang;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.lsfusion.LSFIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

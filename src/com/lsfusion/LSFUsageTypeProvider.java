@@ -4,11 +4,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.usages.UsageTarget;
 import com.intellij.usages.impl.rules.UsageType;
 import com.intellij.usages.impl.rules.UsageTypeProviderEx;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.*;
-import com.lsfusion.psi.extend.LSFClassExtend;
-import com.lsfusion.psi.extend.LSFFormExtend;
-import com.lsfusion.psi.references.LSFMetaReference;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.references.LSFMetaReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

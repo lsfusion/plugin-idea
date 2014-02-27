@@ -7,8 +7,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;

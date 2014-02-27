@@ -1,10 +1,10 @@
-package com.lsfusion.psi.stubs.impl;
+package com.lsfusion.lang.psi.stubs.impl;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.psi.declarations.LSFFormDeclaration;
-import com.lsfusion.psi.stubs.FormStubElement;
-import com.lsfusion.psi.stubs.types.FormStubElementType;
+import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.stubs.FormStubElement;
+import com.lsfusion.lang.psi.stubs.types.FormStubElementType;
 
 import java.io.IOException;
 

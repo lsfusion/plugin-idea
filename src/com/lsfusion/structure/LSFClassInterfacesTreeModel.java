@@ -6,7 +6,7 @@ import com.intellij.ide.structureView.TextEditorBasedStructureViewModel;
 import com.intellij.ide.util.treeView.smartTree.Grouper;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.psi.PsiFile;
-import com.lsfusion.classes.LSFValueClass;
+import com.lsfusion.lang.classes.LSFValueClass;
 import org.jetbrains.annotations.NotNull;
 
 public class LSFClassInterfacesTreeModel extends TextEditorBasedStructureViewModel implements StructureViewModel.ElementInfoProvider {

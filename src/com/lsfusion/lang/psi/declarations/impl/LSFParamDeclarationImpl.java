@@ -1,18 +1,14 @@
-package com.lsfusion.psi.declarations.impl;
+package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.lsfusion.psi.LSFPsiImplUtil;
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.classes.LSFValueClass;
-import com.lsfusion.meta.MetaTransaction;
-import com.lsfusion.psi.LSFClassName;
-import com.lsfusion.psi.LSFClassParamDeclare;
-import com.lsfusion.psi.LSFId;
-import com.lsfusion.psi.LSFSimpleName;
-import com.lsfusion.psi.context.ClassParamDeclareContext;
-import com.lsfusion.psi.declarations.LSFParamDeclaration;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.classes.LSFValueClass;
+import com.lsfusion.lang.meta.MetaTransaction;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.context.ClassParamDeclareContext;
+import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.lang;
 
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
@@ -11,12 +11,12 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.lsfusion.actions.ShowErrorsAction;
-import com.lsfusion.psi.*;
-import com.lsfusion.psi.declarations.*;
-import com.lsfusion.psi.extend.LSFClassExtend;
-import com.lsfusion.psi.extend.LSFFormExtend;
-import com.lsfusion.psi.references.LSFPropReference;
-import com.lsfusion.psi.references.LSFReference;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.references.LSFPropReference;
+import com.lsfusion.lang.psi.references.LSFReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;

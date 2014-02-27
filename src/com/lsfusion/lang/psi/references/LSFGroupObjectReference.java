@@ -1,7 +1,7 @@
-package com.lsfusion.psi.references;
+package com.lsfusion.lang.psi.references;
 
-import com.lsfusion.classes.LSFClassSet;
-import com.lsfusion.psi.declarations.LSFGroupObjectDeclaration;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
 
 import java.util.List;
 

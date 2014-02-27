@@ -1,4 +1,4 @@
-package com.lsfusion.classes;
+package com.lsfusion.lang.classes;
 
 import com.intellij.psi.search.GlobalSearchScope;
 

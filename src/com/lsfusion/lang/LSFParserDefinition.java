@@ -1,5 +1,5 @@
 
-package com.lsfusion;
+package com.lsfusion.lang;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
@@ -15,12 +15,12 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.lsfusion.parser.LSFParser;
-import com.lsfusion.psi.LSFFile;
-import com.lsfusion.psi.LSFTypes;
+import com.lsfusion.lang.parser.LSFParser;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 
-import static com.lsfusion.psi.LSFTypes.*;
+import static com.lsfusion.lang.psi.LSFTypes.*;
 
 public class LSFParserDefinition implements ParserDefinition {
     public static final IStubFileElementType FILE = new IStubFileElementType(Language.findInstance(LSFLanguage.class));
