@@ -1,0 +1,68 @@
+package com.lsfusion.psi.declarations.impl;
+
+import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Condition;
+import com.lsfusion.psi.LSFPsiImplUtil;
+import com.lsfusion.classes.LSFClassSet;
+import com.lsfusion.psi.LSFBuiltInClassName;
+import com.lsfusion.psi.LSFClassName;
+import com.lsfusion.psi.LSFId;
+import com.lsfusion.psi.LSFSimpleName;
+import com.lsfusion.psi.declarations.LSFDeclaration;
+import com.lsfusion.psi.declarations.LSFObjectDeclaration;
+import com.lsfusion.psi.extend.LSFFormExtend;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+
+public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationImpl implements LSFObjectDeclaration, LSFFormExtendElement {
+
+    public LSFObjectDeclarationImpl(@NotNull ASTNode node) {
+        super(node);
+    }
+
+    @Nullable
+    protected abstract LSFSimpleName getSimpleName();
+
+    @NotNull
+    protected abstract LSFClassName getClassName();
+
+    @Nullable
+    public LSFClassSet resolveClass() {
+        return LSFPsiImplUtil.resolveClass(getClassName());
+    }
+
+    @Nullable
+    @Override
+    public LSFId getNameIdentifier() {
+        LSFSimpleName simpleName = getSimpleName();
+        if(simpleName!=null)
+            return simpleName;
+
+        LSFClassName className = getClassName();
+        LSFBuiltInClassName builtInClassName = className.getBuiltInClassName();
+        if(builtInClassName!=null)
+            return builtInClassName;
+        
+        return className.getCustomClassUsage().getSimpleName();
+    }
+
+    public static LSFFormElementDeclarationImpl.Processor getProcessor() {
+        return new LSFFormElementDeclarationImpl.Processor<LSFObjectDeclaration>() {
+            public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
+                return formExtend.getObjectDecls();
+            }
+        };
+    }
+
+    @Override
+    public Condition<? extends LSFDeclaration> getDuplicateCondition() {
+        return new Condition<LSFObjectDeclaration>() {
+            @Override
+            public boolean value(LSFObjectDeclaration lsfDeclaration) {
+                return getNameIdentifier().getText().equals(lsfDeclaration.getNameIdentifier().getText());
+            }
+        };
+    }
+}

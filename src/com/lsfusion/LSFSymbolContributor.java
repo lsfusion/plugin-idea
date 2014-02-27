@@ -1,0 +1,79 @@
+package com.lsfusion;
+
+import com.intellij.navigation.NavigationItem;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.stubs.StringStubIndexExtension;
+import com.lsfusion.classes.LSFClassSet;
+import com.lsfusion.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.psi.stubs.types.indexes.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
+
+public class LSFSymbolContributor extends LSFNameContributor {
+    // полагаем, что состояние не меняется между вызовами getNames() и getItemsByName()
+    // оба вызова осуществляются в рамках одного метода. (см. DefaultChooseByNameItemProvider.filterElements(), SearchEverywhereAction.buildSymbols())
+    private Map<String, LSFGlobalPropDeclaration> propertyDeclarationsMap = new HashMap<String, LSFGlobalPropDeclaration>();
+
+    @Override
+    protected Collection<StringStubIndexExtension> getIndices() {
+        List<StringStubIndexExtension> indices = new ArrayList<StringStubIndexExtension>();
+        indices.add(ClassIndex.getInstance());
+        indices.add(ModuleIndex.getInstance());
+        indices.add(ExplicitNamespaceIndex.getInstance());
+        indices.add(MetaIndex.getInstance());
+        indices.add(PropIndex.getInstance());
+        indices.add(FormIndex.getInstance());
+        indices.add(GroupIndex.getInstance());
+        indices.add(TableIndex.getInstance());
+        indices.add(WindowIndex.getInstance());
+        indices.add(NavigatorElementIndex.getInstance());
+        return indices;
+    }
+
+    @NotNull
+    @Override
+    public String[] getNames(Project project, boolean includeNonProjectItems) {
+        propertyDeclarationsMap = new HashMap<String, LSFGlobalPropDeclaration>();
+        return super.getNames(project, includeNonProjectItems);
+    }
+
+    @Override
+    protected Collection<String> getIndexKeys(StringStubIndexExtension index, Project project, boolean includeNonProjectItems) {
+        if (index instanceof PropIndex) {
+            List<String> result = new ArrayList<String>();
+            Collection<String> allKeys = index.getAllKeys(project);
+            final GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
+            for (String key : allKeys) {
+                for (LSFGlobalPropDeclaration decl : ((PropIndex) index).get(key, project, scope)) {
+                    List<LSFClassSet> paramClasses = decl.resolveParamClasses();
+                    String paramsString = "";
+                    if (paramClasses != null) {
+                        for (LSFClassSet classSet : paramClasses) {
+                            if (classSet != null) {
+                                paramsString += classSet;
+                            }
+                        }
+                    }
+
+                    String withParams = key + paramsString;
+                    propertyDeclarationsMap.put(withParams, decl);
+                    result.add(withParams);
+                }
+            }
+            return result;
+        } else {
+            return super.getIndexKeys(index, project, includeNonProjectItems);
+        }
+    }
+
+    @Override
+    protected Collection<NavigationItem> getItemsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {
+        if (index instanceof PropIndex && propertyDeclarationsMap.containsKey(name)) {
+            return Arrays.asList((NavigationItem) propertyDeclarationsMap.get(name));
+        } else {
+            return super.getItemsFromIndex(index, name, project, scope);
+        }
+    }
+}

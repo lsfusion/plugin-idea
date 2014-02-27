@@ -1,0 +1,40 @@
+package com.lsfusion.psi.stubs.types;
+
+import com.intellij.psi.stubs.StringStubIndexExtension;
+import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubInputStream;
+import com.lsfusion.psi.declarations.LSFClassDeclaration;
+import com.lsfusion.psi.impl.LSFClassDeclImpl;
+import com.lsfusion.psi.stubs.ClassStubElement;
+import com.lsfusion.psi.stubs.impl.ClassStubImpl;
+import com.lsfusion.psi.stubs.types.indexes.ClassIndex;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+
+public class ClassStubElementType extends FullNameStubElementType<ClassStubElement, LSFClassDeclaration> {
+
+    public ClassStubElementType() {
+        super("CLASS");
+    }
+
+    @Override
+    public LSFClassDeclaration createPsi(@NotNull ClassStubElement stub) {
+        return new LSFClassDeclImpl(stub, this);
+    }
+
+    @Override
+    public ClassStubElement createStub(@NotNull LSFClassDeclaration psi, StubElement parentStub) {
+        return new ClassStubImpl(parentStub, psi);
+    }
+
+    @Override
+    public ClassStubElement deserialize(StubInputStream dataStream, StubElement parentStub) throws IOException {
+        return new ClassStubImpl(dataStream, parentStub, this);
+    }
+
+    @Override
+    public StringStubIndexExtension<LSFClassDeclaration> getGlobalIndex() {
+        return ClassIndex.getInstance();
+    }
+}

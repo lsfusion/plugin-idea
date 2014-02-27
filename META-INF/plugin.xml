@@ -32,132 +32,132 @@
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <implementation-class>com.simpleplugin.psi.MetaChangeDetector</implementation-class>
+            <implementation-class>com.lsfusion.meta.MetaChangeDetector</implementation-class>
             <skipForDefaultProject/>
         </component>
 
         <component>
-            <implementation-class>com.simpleplugin.psi.LSFProjectComponent</implementation-class>
+            <implementation-class>com.lsfusion.lang.psi.LSFProjectComponent</implementation-class>
         </component>
 
     </project-components>
 
     <actions>
         <!-- Add your actions here -->
-        <action id="MetaCode.Enable" class="com.simpleplugin.MetaCodeEnableAction" text="Toggle _meta"
+        <action id="MetaCode.Enable" class="com.lsfusion.actions.MetaCodeEnableAction" text="Toggle _meta"
                 description="Toggle meta code mode">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
         </action>
-        <action id="MetaCode.Refresh" class="com.simpleplugin.MetaRefreshAction" text="Refresh _meta"
+        <action id="MetaCode.Refresh" class="com.lsfusion.actions.MetaRefreshAction" text="Refresh _meta"
                 description="Refresh meta code">
             <add-to-group group-id="CodeMenu"/>
         </action>
-        <action id="MetaCode.ShowFile" class="com.simpleplugin.MetaShowFileAction" text="Show _meta for file"
+        <action id="MetaCode.ShowFile" class="com.lsfusion.actions.MetaShowFileAction" text="Show _meta for file"
                 description="Show meta code for current file">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift J" keymap="$default"/>
         </action>
-        <action id="MetaCode.HideFile" class="com.simpleplugin.MetaHideFileAction" text="Hide _meta for file"
+        <action id="MetaCode.HideFile" class="com.lsfusion.actions.MetaHideFileAction" text="Hide _meta for file"
                 description="Hide meta code for current file">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift K" keymap="$default"/>
         </action>
-        <action id="MetaCode.SyncMode" class="com.simpleplugin.MetaSyncModeAction" text="Meta sync mode"
+        <action id="MetaCode.SyncMode" class="com.lsfusion.actions.MetaSyncModeAction" text="Meta sync mode"
                 description="Toggle meta code sync mode">
             <add-to-group group-id="CodeMenu"/>
         </action>
-        <action id="ToggleLSFCompletion" class="com.simpleplugin.ToggleCompletionAction" text="lsFusion completion support"
+        <action id="ToggleLSFCompletion" class="com.lsfusion.actions.ToggleCompletionAction" text="lsFusion completion support"
                 description="Toggle lsFusion completion support">
             <add-to-group group-id="CodeMenu"/>
         </action>
-        <action id="Errors" class="com.simpleplugin.ShowErrorsAction" text="Show errors"
+        <action id="Errors" class="com.lsfusion.actions.ShowErrorsAction" text="Show errors"
                 description="Show all current errors in all files">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
         </action>
-        <action id="TypeInfer.File" class="com.simpleplugin.typeinfer.FileTypeInferAction" text="Infer _types for file"
+        <action id="TypeInfer.File" class="com.lsfusion.lang.typeinfer.FileTypeInferAction" text="Infer _types for file"
                 description="Infer types for file">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>
         </action>
-        <action id="TypeInfer.Project" class="com.simpleplugin.typeinfer.ProjectTypeInferAction"
+        <action id="TypeInfer.Project" class="com.lsfusion.lang.typeinfer.ProjectTypeInferAction"
                 text="Infer _types for project" description="Infer types for project">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>
         </action>
-        <action id="TypeInfer.Check" class="com.simpleplugin.typeinfer.FindNotInferredAction" text="Find not inferred"
+        <action id="TypeInfer.Check" class="com.lsfusion.lang.typeinfer.FindNotInferredAction" text="Find not inferred"
                 description="Find not inferred elements for project">
             <add-to-group group-id="CodeMenu"/>
         </action>
-        <action id="InsertComposition" class="com.simpleplugin.actions.InsertCompositionAction">
+        <action id="InsertComposition" class="com.lsfusion.actions.InsertCompositionAction">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift B" keymap="$default"/>
         </action>
-        <action id="GoToExtension" class="com.simpleplugin.GoToExtensionAction" text="Extension(s)"
+        <action id="GoToExtension" class="com.lsfusion.actions.GoToExtensionAction" text="Extension(s)"
                 description="Navigate to the extension(s) of the selected element">
             <add-to-group group-id="GoToCodeGroup"/>
             <keyboard-shortcut first-keystroke="control alt E" keymap="$default"/>
         </action>
 
-        <action id="NewLsfFile" class="com.simpleplugin.module.NewLsfFileAction">
+        <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <fileTypeFactory implementation="com.simpleplugin.LSFFileTypeFactory"/>
-        <lang.parserDefinition language="Lsf" implementationClass="com.simpleplugin.LSFParserDefinition"/>
-        <lang.findUsagesProvider language="Lsf" implementationClass="com.simpleplugin.LSFFindUsagesProvider"/>
-        <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.simpleplugin.LSFSyntaxHighlighterFactory"/>
-        <lang.braceMatcher language="Lsf" implementationClass="com.simpleplugin.LSFBraceMatcher"/>
-        <lang.commenter language="Lsf" implementationClass="com.simpleplugin.LSFCommenter"/>
-        <lang.foldingBuilder language="Lsf" implementationClass="com.simpleplugin.folding.LSFFoldingBuilder"/>
-        <annotator language="Lsf" implementationClass="com.simpleplugin.LSFReferenceAnnotator"/>
-        <readWriteAccessDetector implementation="com.simpleplugin.LSFReadWriteAccessDetector"/>
-        <fileStructureGroupRuleProvider implementation="com.simpleplugin.LSFStatementGroupRuleProvider"/>
-        <definitionsSearch implementation="com.simpleplugin.ImplementationsSearch"/>
-        <structureViewBuilder factoryClass="com.simpleplugin.structure.LSFInterfacesStructureViewBuilderFactory"/>
+        <fileTypeFactory implementation="com.lsfusion.LSFFileTypeFactory"/>
+        <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.LSFParserDefinition"/>
+        <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.LSFFindUsagesProvider"/>
+        <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.lsfusion.LSFSyntaxHighlighterFactory"/>
+        <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.LSFBraceMatcher"/>
+        <lang.commenter language="Lsf" implementationClass="com.lsfusion.LSFCommenter"/>
+        <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
+        <annotator language="Lsf" implementationClass="com.lsfusion.LSFReferenceAnnotator"/>
+        <readWriteAccessDetector implementation="com.lsfusion.LSFReadWriteAccessDetector"/>
+        <fileStructureGroupRuleProvider implementation="com.lsfusion.LSFStatementGroupRuleProvider"/>
+        <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>
+        <structureViewBuilder factoryClass="com.lsfusion.structure.LSFInterfacesStructureViewBuilderFactory"/>
 
-        <codeInsight.gotoSuper language="Lsf" implementationClass="com.simpleplugin.actions.LSFGoToSuperHandler"/>
+        <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
 
-        <completion.contributor language="Lsf" implementationClass="com.simpleplugin.completion.ASTCompletionContributor"/>
+        <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
 
         <internalFileTemplate name="lsFusion script"/>
         <internalFileTemplate name="lsFusion settings"/>
 
-        <moduleBuilder builderClass="com.simpleplugin.module.LSFusionModuleBuilder"/>
-        <library.presentationProvider implementation="com.simpleplugin.module.LSFusionLibraryPresentationProvider"/>
-        <configurationType implementation="com.simpleplugin.module.run.LSFusionRunConfigurationType"/>
+        <moduleBuilder builderClass="com.lsfusion.module.LSFusionModuleBuilder"/>
+        <library.presentationProvider implementation="com.lsfusion.module.LSFusionLibraryPresentationProvider"/>
+        <configurationType implementation="com.lsfusion.module.run.LSFusionRunConfigurationType"/>
 
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.MetaIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ModuleIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.PropIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ClassIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.ExplicitNamespaceIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.FormIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.GroupIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.TableIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.WindowIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.types.indexes.NavigatorElementIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.MetaIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.PropIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.ClassIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.ExplicitNamespaceIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.FormIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.GroupIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.TableIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.WindowIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.NavigatorElementIndex"/>
 
-        <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendFormIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ExtendClassIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.extend.types.indexes.ExtendFormIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.extend.types.indexes.ExtendClassIndex"/>
 
-        <stubIndex implementation="com.simpleplugin.psi.stubs.extend.types.indexes.ClassExtendsClassIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.extend.types.indexes.ClassExtendsClassIndex"/>
 
-        <stubIndex implementation="com.simpleplugin.psi.stubs.interfaces.types.indexes.ExplicitInterfaceIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.interfaces.types.indexes.ExplicitValueIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.interfaces.types.indexes.ImplicitValueIndex"/>
-        <stubIndex implementation="com.simpleplugin.psi.stubs.interfaces.types.indexes.ImplicitInterfaceIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ExplicitInterfaceIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ExplicitValueIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ImplicitValueIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ImplicitInterfaceIndex"/>
 
-        <stubElementTypeHolder class="com.simpleplugin.psi.LSFTypes"/>
-        <gotoClassContributor implementation="com.simpleplugin.LSFClassContributor"/>
-        <gotoSymbolContributor implementation="com.simpleplugin.LSFSymbolContributor"/>
+        <stubElementTypeHolder class="com.lsfusion.lang.psi.LSFTypes"/>
+        <gotoClassContributor implementation="com.lsfusion.LSFClassContributor"/>
+        <gotoSymbolContributor implementation="com.lsfusion.LSFSymbolContributor"/>
 
-        <checkinHandlerFactory implementation="com.simpleplugin.LSFCheckInHandlerFactory"/>
+        <checkinHandlerFactory implementation="com.lsfusion.LSFCheckInHandlerFactory"/>
 
-        <fileDocumentSynchronizationVetoer implementation="com.simpleplugin.JarDocumentSavingVetoer"/>
+        <fileDocumentSynchronizationVetoer implementation="com.lsfusion.JarDocumentSavingVetoer"/>
     </extensions>
 </idea-plugin>
