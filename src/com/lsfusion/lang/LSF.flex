@@ -17,7 +17,8 @@ import static com.lsfusion.lang.psi.LSFTypes.*;
 %function advance
 %type IElementType
 %unicode
-%eof{ return;
+%eof{
+ return;
 %eof}
 
 ////////////////////MACRO///////////////////////
