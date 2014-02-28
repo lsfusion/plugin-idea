@@ -191,6 +191,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "FILTER"                  			{ return FILTER; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
   "FILTERS"                 			{ return FILTERS; }
+  "FINALLY"                             { return FINALLY; }
   "FIRST"                   			{ return FIRST; }
   "FIXED"                   			{ return FIXED; }
   "FIXEDCHARWIDTH"          			{ return FIXEDCHARWIDTH; }
@@ -203,6 +204,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "FORMULA"                 			{ return FORMULA; }
   "FROM"                    			{ return FROM; }
   "FULLSCREEN"              			{ return FULLSCREEN; }
+  "GLOBAL"                              { return GLOBAL; }
   "GRID"                    			{ return GRID; }
   "GROUP"                   			{ return GROUP; }
   "EQUAL"                               { return EQUAL; }
@@ -331,6 +333,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "TOOLBAR"                 			{ return TOOLBAR; }
   "TOP"                     			{ return TOP; }
   "TREE"                    			{ return TREE; }
+  "TRY"                                 { return TRY; }
   "UNGROUP"                 			{ return UNGROUP; }
   "VALIGN"                  			{ return VALIGN; }
   "VERTICAL"                			{ return VERTICAL; }

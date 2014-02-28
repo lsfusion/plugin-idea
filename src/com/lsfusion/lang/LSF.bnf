@@ -521,10 +521,12 @@ private extendContextActionPDB ::=  assignActionPropertyDefinitionBody
 private keepContextActionPDB ::=    listActionPropertyDefinitionBody
                         |	requestInputActionPropertyDefinitionBody
                         |	execActionPropertyDefinitionBody
+                        |   tryActionPropertyDefinitionBody
                         |	ifActionPropertyDefinitionBody
                         |	caseActionPropertyDefinitionBody
                         |	multiActionPropertyDefinitionBody
                         |	terminalFlowActionPropertyDefinitionBody
+                        |   applyActionPropertyDefinitionBody
 
 private customActionPDB ::= formActionPropertyDefinitionBody
                 |	addFormActionPropertyDefinitionBody
@@ -714,8 +716,8 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 }
 
 private list_action_statement_recover ::= !(list_action_statement_start | RBRACE)
-private list_action_statement_start ::= ADDFORM | ADDOBJ | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
-                                        | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | FORM | IF | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
+private list_action_statement_start ::= ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
+                                        | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | FORM | TRY | IF | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                         | REQUEST | RETURN | SEEK | WHILE
                                         | ID | SEMI
 
@@ -746,6 +748,12 @@ assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | ass
 private assignActionPropertyDefinitionBody1 ::= ASSIGN mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 1}
 private assignActionPropertyDefinitionBody2 ::= mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 2}
 
+tryActionPropertyDefinitionBody ::= TRY actionPropertyDefinitionBody (FINALLY actionPropertyDefinitionBody)?
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression" methods = [inferActionParamClasses]
+}
+
 ifActionPropertyDefinitionBody ::= IF propertyExpression THEN actionPropertyDefinitionBody (ELSE actionPropertyDefinitionBody)?
 {
     pin = 1
@@ -762,6 +770,13 @@ caseActionPropertyDefinitionBody ::= CASE (exclusiveOverrideOption)? (actionCase
 actionCaseBranchBody ::= WHEN propertyExpression (THEN actionPropertyDefinitionBody) {pin(".*") = 1}
 
 multiActionPropertyDefinitionBody ::= MULTI (exclusiveOverrideOption)? nonEmptyActionPDBList
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+applyActionPropertyDefinitionBody ::= APPLY propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1084,7 +1099,7 @@ globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefi
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
-baseEvent ::= (APPLY | SESSION)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmptyNoContextPropertyUsageList)?
+baseEvent ::= (GLOBAL | SESSION)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmptyNoContextPropertyUsageList)?
 
 inlineStatement ::=   (NOINLINE (LBRAC exprParameterUsageList RBRAC)? )? (INLINE)?
 

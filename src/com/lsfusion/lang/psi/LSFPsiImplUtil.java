@@ -2629,6 +2629,20 @@ public class LSFPsiImplUtil {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
     }
 
+    public static Inferred inferActionParamClasses(LSFApplyActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+    }
+
+    public static Inferred inferActionParamClasses(LSFTryActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        
+        List<LSFActionPropertyDefinitionBody> actions = body.getActionPropertyDefinitionBodyList();
+        
+        Inferred result = inferActionParamClasses(actions.get(0), params);
+        if (actions.size() == 2)
+            result = result.or(inferActionParamClasses(actions.get(1), params));
+        return result;        
+    }
+
     @Nullable
     public static Icon getIcon(@NotNull LSFNavigatorStatement navigatorStatement, int flags) {
         return LSFIcons.NAVIGATOR_ELEMENT;
