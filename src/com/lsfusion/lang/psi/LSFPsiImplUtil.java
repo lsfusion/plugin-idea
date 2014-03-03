@@ -2485,8 +2485,6 @@ public class LSFPsiImplUtil {
 
     public static Inferred inferActionParamClasses(LSFIfActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         // берем условия for, если есть, для остальных из внутреннего action'а
-
-
         Inferred forClasses = inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
 
         List<LSFActionPropertyDefinitionBody> actions = body.getActionPropertyDefinitionBodyList();
@@ -2636,6 +2634,9 @@ public class LSFPsiImplUtil {
     public static Inferred inferActionParamClasses(LSFTryActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         
         List<LSFActionPropertyDefinitionBody> actions = body.getActionPropertyDefinitionBodyList();
+        if (actions.isEmpty()) {
+            return Inferred.EMPTY;
+        }
         
         Inferred result = inferActionParamClasses(actions.get(0), params);
         if (actions.size() == 2)
