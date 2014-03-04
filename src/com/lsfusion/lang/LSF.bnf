@@ -21,8 +21,14 @@
 }
 
 script ::= moduleHeader (scriptStatement*)
-scriptStatement ::= statement { recoverWhile = "script_statement_recover" }
-private script_statement_recover ::= !statement_start
+
+scriptStatement ::= statement
+{
+    recoverWhile = "script_statement_recover"
+
+//    reparsable = true
+//    extends = "com.lsfusion.lang.psi.LSFReparsableElement"
+}
 
 simpleName ::= ID
 {
@@ -48,6 +54,7 @@ requireList ::= REQUIRE nonEmptyModuleUsageList SEMI {pin = 1};
 priorityList ::= PRIORITY nonEmptyNamespaceUsageList SEMI {pin = 1};
 namespaceName ::= NAMESPACE namespaceUsage SEMI
 {
+    pin = 2;
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFExplicitNamespaceDeclarationImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFExplicitNamespaceDeclaration"
     stubClass = "com.lsfusion.lang.psi.stubs.ExplicitNamespaceStubElement"
@@ -89,6 +96,7 @@ stubStatement ::=
     | WINDOW windowType ID
     {pin(".*") = 1}
 
+private script_statement_recover ::= !statement_start
 // Important ! after recover the rule should mandatory be pinned (matched)
 private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT
                             | CLASS | ATSIGN | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
@@ -682,19 +690,6 @@ requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actio
     methods = [inferActionParamClasses]
 }
 
-//listActionPropertyDefinitionBody ::=    ((NEWSESSION | (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)) (AUTOAPPLY)? (SINGLE)?)?
-//		                                LBRACE
-//			                            (	actionPropertyDefinitionBody << semicolonIfNeeded >>  //  } => ;
-//			                            |	localDataPropertyDefinition SEMI
-//			                            |	emptyStatement
-//			                            )*
-//		                                RBRACE
-//{
-//    pin = 2
-//    mixin="com.lsfusion.LSFListActionImpl"
-//    implements="com.lsfusion.LSFListAction, com.lsfusion.context.ActionExpression"
-//    methods = [inferActionParamClasses]
-//}
 listActionPropertyDefinitionBody ::=    ((NEWSESSION | (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)) (AUTOAPPLY)? (SINGLE)?)?
 		                                LBRACE
 			                            listActionStatement*
@@ -715,11 +710,13 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
     recoverWhile = "list_action_statement_recover"
 }
 
-private list_action_statement_recover ::= !(list_action_statement_start | RBRACE)
-private list_action_statement_start ::= ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
-                                        | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | FORM | TRY | IF | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
-                                        | REQUEST | RETURN | SEEK | WHILE
-                                        | ID | SEMI
+private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
+                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | FORM | TRY | IF | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
+                                            | REQUEST | RETURN | SEEK | WHILE
+                                            | ID
+                                            | SEMI
+                                            | RBRACE
+                                           )
 
 localDataPropertyDefinition ::= LOCAL simpleName EQUALS className LBRAC classNameList RBRAC
 {
@@ -1222,7 +1219,7 @@ navigatorElementSelector ::= navigatorElementUsage
 ////////////////////////////////// DESIGN STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-designStatement ::=	(designDeclaration | extendDesignDeclaration) componentStatementBody {
+designStatement ::=	(designDeclaration | extendDesignDeclaration) componentBody {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.FormContext"
     methods = [ getIcon resolveFormDecl]
@@ -1232,40 +1229,72 @@ designDeclaration ::= DESIGN formUsage (stringLiteral)? (FROM DEFAULT)? {pin=2}
 
 extendDesignDeclaration ::= EXTEND DESIGN formUsage
 
-componentStatementBody ::=  LBRACE
-                            (	setObjectPropertyStatement
-                            |	setupComponentStatement
-                            |	setupGroupObjectStatement
-                            |	newComponentStatement
-                            |	addComponentStatement
-                            |	removeComponentStatement
-                            |	emptyStatement
-                            )*
-		                    RBRACE
-	                    |	emptyStatement
+componentBody ::= componentBlockStatement | emptyStatement
 
-setupComponentStatement ::= componentSelector componentStatementBody
+componentBlockStatement ::= LBRACE componentStatement* RBRACE
+{
+    pin = 1
+    reparsable = true
+    extends = "com.lsfusion.lang.psi.LSFReparsableElement"
+}
 
-setupGroupObjectStatement ::= GROUP LBRAC groupObjectUsage RBRAC
-                              LBRACE
-                              (   setObjectPropertyStatement
-                              |   emptyStatement
-                              )*
-                              RBRACE
+componentStatement ::=      setObjectPropertyStatement
+                        |	setupComponentStatement
+                        |	setupGroupObject
+                        |	newComponentStatement
+                        |	addComponentStatement
+                        |	removeComponentStatement
+                        |	emptyStatement
+                        |   componentStubStatement
+{
+    recoverWhile = "component_statement_recover"
+}
 
-newComponentStatement ::= NEW multiCompoundID componentInsertPositionSelector componentStatementBody
-addComponentStatement ::= ADD componentSelector componentInsertPositionSelector componentStatementBody
+private component_statement_recover ::= !component_statement_recover_start 
+private component_statement_recover_start ::= ID | GROUP | PARENT | PROPERTY | NEW | ADD | REMOVE | SEMI | RBRACE 
+
+componentStubStatement ::= GROUP LBRAC ID RBRAC LBRACE  
+{
+    pin = 1
+}
+
+setupComponentStatement ::= componentSelector componentBody
+{
+    pin = 1
+}
+
+setupGroupObject ::= GROUP LBRAC groupObjectUsage RBRAC
+                           LBRACE setupGroupObjectStatement* RBRACE
+{
+    pin = 5
+}
+
+setupGroupObjectStatement ::=   setGroupObjectPropertyStatement
+                            |   emptyStatement
+{
+    recoverWhile = "setup_group_object_statement_recover"
+}
+                                
+private setup_group_object_statement_recover ::= !(ID | SEMI | RBRACE)
+
+setGroupObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 1}
+                              
+newComponentStatement ::= NEW multiCompoundID componentInsertPositionSelector componentBody {pin = 1}
+addComponentStatement ::= ADD componentSelector componentInsertPositionSelector componentBody {pin = 1}
 
 componentInsertPositionSelector ::= (IN componentSelector)?
                                     (   insertRelativePositionLiteral componentSelector
                                     |	FIRST
                                     )?
 
-removeComponentStatement ::= REMOVE componentSelector (CASCADE)? SEMI
+removeComponentStatement ::= REMOVE componentSelector (CASCADE)? SEMI {pin = 1}
 
 componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                 	|	PROPERTY LBRAC propertySelector RBRAC
                     |	multiCompoundID
+{
+    pin(".*") = 1
+}
 
 propertySelector ::= formPropertyDrawUsage
 

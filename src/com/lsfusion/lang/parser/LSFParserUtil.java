@@ -12,8 +12,9 @@ import org.jetbrains.annotations.Nullable;
 public class LSFParserUtil extends GeneratedParserUtilBase {
 
     public static boolean readAny(PsiBuilder builder_, int level_) {
-        if(builder_.eof() || nextTokenIs(builder_, LSFTypes.END))
+        if (builder_.eof() || nextTokenIs(builder_, LSFTypes.END)) {
             return false;
+        }
 
         builder_.advanceLexer();
         return true;
@@ -28,7 +29,7 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
 
     public static boolean innerIDStop(PsiBuilder builder_, int level_) {
         Boolean userData = builder_.getUserData(INNERID);
-        if(userData != null && userData) {
+        if (userData != null && userData) {
             builder_.putUserData(INNERID, false);
             return false;
         }
@@ -37,11 +38,11 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
 
     public static boolean innerIDCheck(PsiBuilder builder_, int level_) {
         boolean predictNamespace = builder_.getTokenType() == LSFTypes.ID &&
-                            builder_.lookAhead(1) == LSFTypes.POINT &&
-                            builder_.lookAhead(2) == LSFTypes.ID &&
-                            builder_.lookAhead(3) == LSFTypes.POINT;
+                                   builder_.lookAhead(1) == LSFTypes.POINT &&
+                                   builder_.lookAhead(2) == LSFTypes.ID &&
+                                   builder_.lookAhead(3) == LSFTypes.POINT;
 
-        if(!predictNamespace) {
+        if (!predictNamespace) {
             builder_.putUserData(INNERID, true);
         }
         return true;
@@ -51,20 +52,21 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
 
     public static boolean fullCompoundParamDeclareStop(PsiBuilder builder_, int level_) {
         Boolean userData = builder_.getUserData(FULLCOMPOUND);
-        if(userData != null && userData) {
+        if (userData != null && userData) {
             return false;
         }
         return true;
     }
 
     public static boolean fullCompoundParamDeclareCheck(PsiBuilder builder_, int level_) {
-        if(builder_.getTokenType() == LSFTypes.ID &&
-                builder_.lookAhead(1) == LSFTypes.POINT &&
-                builder_.lookAhead(2) == LSFTypes.ID &&
-                builder_.lookAhead(3) == LSFTypes.ID) {
+        if (builder_.getTokenType() == LSFTypes.ID &&
+            builder_.lookAhead(1) == LSFTypes.POINT &&
+            builder_.lookAhead(2) == LSFTypes.ID &&
+            builder_.lookAhead(3) == LSFTypes.ID) {
             builder_.putUserData(FULLCOMPOUND, true);
-        } else
+        } else {
             builder_.putUserData(FULLCOMPOUND, false);
+        }
         return true;
     }
 
