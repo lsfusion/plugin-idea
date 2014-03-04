@@ -18,6 +18,13 @@
   tokenTypeClass="com.lsfusion.lang.psi.LSFTokenType"
 
   extendedPin = false
+
+  // additional tokens
+  tokens = [
+    COMMENTS='COMMENTS'
+    FAKETWODASHES='##'
+    FAKETHREEDASHES='###'
+  ]
 }
 
 script ::= moduleHeader (scriptStatement*)
@@ -60,10 +67,6 @@ namespaceName ::= NAMESPACE namespaceUsage SEMI
     stubClass = "com.lsfusion.lang.psi.stubs.ExplicitNamespaceStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
-
-// fake rules to generate types
-fake_comments ::= COMMENTS
-//fake_whitespaces ::= WHITESPACES
 
 private statement ::=   constraintStatement
                     |	groupStatement
@@ -1324,9 +1327,6 @@ metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC anyT
 }
 
 anyTokens ::= (<< readAny >>)*
-
-fakeTwoDashes ::= FAKETWODASHES
-fakeThreeDashes ::= FAKETHREEDASHES
 
 private metaStatement ::= statement { recoverWhile = "meta_statement_recover" }
 private meta_statement_recover ::= !(statement_start | RBRACE)
