@@ -2623,6 +2623,10 @@ public class LSFPsiImplUtil {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
     }
 
+    public static Inferred inferActionParamClasses(LSFFocusActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
     public static Inferred inferActionParamClasses(LSFDrillDownActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
     }
@@ -2750,6 +2754,11 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFObjectID objectID) {
         return resolveFormDecl(objectID.getFormUsage());
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormPropertyDrawID formPropertyDrawID) {
+        return resolveFormDecl(formPropertyDrawID.getFormUsage());
     }
 
     @Nullable

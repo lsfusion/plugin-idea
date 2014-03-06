@@ -551,6 +551,7 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |	fileActionPropertyDefinitionBody
                 |	evalActionPropertyDefinitionBody
                 |	drillDownActionPropertyDefinitionBody
+                |	focusActionPropertyDefinitionBody
 
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
@@ -673,6 +674,13 @@ deleteActionPropertyDefinitionBody ::= DELETE exprParameterUsage (WHERE property
 }
 
 evalActionPropertyDefinitionBody ::= EVAL propertyExpression
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+focusActionPropertyDefinitionBody ::= FOCUS formPropertyDrawID
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1498,6 +1506,13 @@ groupObjectID ::= <<innerIDCheck>> formUsage POINT groupObjectUsage
 }
 
 objectID ::= <<innerIDCheck>> formUsage POINT objectUsage
+{
+    pin = 3
+    implements="com.lsfusion.lang.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
+
+formPropertyDrawID ::= <<innerIDCheck>> formUsage POINT formPropertyDrawUsage
 {
     pin = 3
     implements="com.lsfusion.lang.psi.context.FormContext"

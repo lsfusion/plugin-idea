@@ -195,6 +195,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "FIRST"                   			{ return FIRST; }
   "FIXED"                   			{ return FIXED; }
   "FIXEDCHARWIDTH"          			{ return FIXEDCHARWIDTH; }
+  "FOCUS"                  				{ return FOCUS; }
   "FOOTER"                  			{ return FOOTER; }
   "FOR"                     			{ return FOR; }
   "FORCE"                   			{ return FORCE; }
