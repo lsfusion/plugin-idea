@@ -159,5 +159,7 @@
         <checkinHandlerFactory implementation="com.lsfusion.LSFCheckInHandlerFactory"/>
 
         <fileDocumentSynchronizationVetoer implementation="com.lsfusion.JarDocumentSavingVetoer"/>
+
+        <!--<xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />-->
     </extensions>
 </idea-plugin>

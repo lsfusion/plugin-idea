@@ -1264,9 +1264,11 @@ componentStatement ::=      setObjectPropertyStatement
 private component_statement_recover ::= !component_statement_recover_start 
 private component_statement_recover_start ::= ID | GROUP | PARENT | PROPERTY | NEW | ADD | REMOVE | SEMI | RBRACE 
 
-componentStubStatement ::= GROUP LBRAC ID RBRAC LBRACE  
+componentStubStatement ::=      GROUP LBRAC ID RBRAC LBRACE
+                            |   NEW ID
+  
 {
-    pin = 1
+    pin(".*") = 1
 }
 
 setupComponentStatement ::= componentSelector componentBody
@@ -1290,7 +1292,7 @@ private setup_group_object_statement_recover ::= !(ID | SEMI | RBRACE)
 
 setGroupObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 1}
                               
-newComponentStatement ::= NEW multiCompoundID componentInsertPositionSelector componentBody {pin = 1}
+newComponentStatement ::= NEW multiCompoundID componentInsertPositionSelector componentBody {pin = 2}
 addComponentStatement ::= ADD componentSelector componentInsertPositionSelector componentBody {pin = 1}
 
 componentInsertPositionSelector ::= (IN componentSelector)?
