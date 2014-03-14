@@ -8,6 +8,7 @@ import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
+import com.lsfusion.lang.psi.LSFStringLiteral;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
@@ -37,6 +38,13 @@ public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<
     @Override
     public LSFId getNameIdentifier() {
         return getSimpleNameWithCaption().getSimpleName();
+    }
+    
+    @Override
+    @NotNull
+    public String getCaption() {
+        LSFStringLiteral stringLiteral = getSimpleNameWithCaption().getStringLiteral();
+        return stringLiteral == null ? "" : stringLiteral.getText();
     }
 
     @Nullable

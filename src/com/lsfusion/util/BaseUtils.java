@@ -1,8 +1,15 @@
 package com.lsfusion.util;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Query;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class BaseUtils {
     public static <G, I extends G> List<G> immutableCast(List<I> object) {
@@ -118,5 +125,57 @@ public class BaseUtils {
     public static <K> K single(Collection<K> col) {
         assert col.size() == 1;
         return col.iterator().next();
+    }
+
+    public static String getKeyStrokeCaption(KeyStroke editKey) {
+        return editKey.toString().replaceAll("typed ", "").replaceAll("pressed ", "").replaceAll("released ", "");
+    }
+
+    public static boolean isRedundantString(String toolTip) {
+        return toolTip == null || toolTip.trim().isEmpty();
+    }
+
+    public static Dimension overrideSize(Dimension base, Dimension override) {
+        if (override != null) {
+            if (override.width >= 0) {
+                base.width = override.width;
+            }
+            if (override.height >= 0) {
+                base.height = override.height;
+            }
+        }
+        return base;
+    }
+
+    @Nullable
+    private static Icon loadIcon(@Nullable VirtualFile file) {
+        if (file == null || file.isDirectory()) {
+            return null;
+        }
+        try {
+            return new ImageIcon(file.contentsToByteArray());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static Icon loadIcon(Project project, String iconPath) {
+        ProjectRootManager rootManager = ProjectRootManager.getInstance(project);
+        Icon result = loadIcon(rootManager.orderEntries().getAllLibrariesAndSdkClassesRoots(), iconPath);
+        if (result != null) {
+            return result;
+        }
+        return loadIcon(rootManager.orderEntries().getSourceRoots(), iconPath);
+    }
+
+    private static Icon loadIcon(VirtualFile[] roots, String iconPath) {
+        for (VirtualFile root : roots) {
+            VirtualFile child = root.findFileByRelativePath(iconPath);
+            Icon result = loadIcon(child);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 }

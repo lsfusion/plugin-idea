@@ -2705,7 +2705,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static Icon getIcon(@NotNull LSFDesignStatement designStatement, int flags) {
-        return LSFIcons.DESIGN;
+        return LSFIcons.Design.DESIGN;
     }
 
     @Nullable
