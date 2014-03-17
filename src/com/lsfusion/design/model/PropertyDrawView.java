@@ -95,6 +95,7 @@ public class PropertyDrawView extends ComponentView {
     }
 
     public String getEditCaption() {
+        String caption = this.caption == null ? "" : this.caption; 
         return showEditKey && editKey != null
                ? caption + " (" + getKeyStrokeCaption(editKey) + ")"
                : caption;
@@ -262,7 +263,7 @@ public class PropertyDrawView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection) {
+    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
         if (isAction) {
             return new ActionPanelView(project);
         } else {
@@ -327,7 +328,6 @@ public class PropertyDrawView extends ComponentView {
             add(label);
             add(table);
         }
-
     }
 
     private class DataPanelViewLayout extends CachableLayout {

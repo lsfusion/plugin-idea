@@ -29,7 +29,7 @@ public class ShowTypeView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection) {
+    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
         JBPanel panel = new JBPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setAlignmentY(Component.TOP_ALIGNMENT);

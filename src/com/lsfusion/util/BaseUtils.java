@@ -178,4 +178,16 @@ public class BaseUtils {
         }
         return null;
     }
+
+    public static <K, V> Map<V, K> reverse(Map<K, V> fromMap) {
+        HashMap<V, K> reverseMap = new HashMap<V, K>();
+        reverse(fromMap, reverseMap);
+        return reverseMap;
+    }
+    
+    public static <K, V> void reverse(Map<K, V> fromMap, Map<V, K> toMap) {
+        for (Map.Entry<K, V> e : fromMap.entrySet()) {
+            toMap.put(e.getValue(), e.getKey());
+        }
+    }
 }

@@ -4,7 +4,6 @@ import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBPanel;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.*;
@@ -54,26 +53,23 @@ public class FilterView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection) {
-        JBPanel topPanel = new JBPanel();
-        topPanel.setLayout(new FlexLayout(topPanel, false));
-        topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER), new FlexConstraints());
-        topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_ADD), new FlexConstraints());
+    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+        FlexPanel topPanel = new FlexPanel(false);
+        topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER));
+        topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_ADD));
 
-        JBPanel bottomPanel = new JBPanel();
-        bottomPanel.setLayout(new FlexLayout(bottomPanel, false));
-        bottomPanel.add(createComboBox(220, "someproperty(id)", "otherprop(id)", "..."), new FlexConstraints(FlexAlignment.CENTER, 0));
-        bottomPanel.add(new JBCheckBox("NOT"), new FlexConstraints(FlexAlignment.CENTER, 0));
-        bottomPanel.add(createComboBox(40, "=", "!=", "..."), new FlexConstraints(FlexAlignment.CENTER, 0));
-        bottomPanel.add(createComboBox(70, "Value", "Object", "..."), new FlexConstraints(FlexAlignment.CENTER, 0));
-        bottomPanel.add(Box.createHorizontalStrut(5), new FlexConstraints(FlexAlignment.CENTER, 0));
-        bottomPanel.add(new SingleCellTable(), new FlexConstraints(FlexAlignment.CENTER, 0));
-        bottomPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_DEL), new FlexConstraints(FlexAlignment.CENTER, 0));
+        FlexPanel bottomPanel = new FlexPanel(false);
+        bottomPanel.add(createComboBox(220, "someproperty(id)", "otherprop(id)", "..."), 0, FlexAlignment.CENTER);
+        bottomPanel.add(new JBCheckBox("NOT"), 0, FlexAlignment.CENTER);
+        bottomPanel.add(createComboBox(40, "=", "!=", "..."), 0, FlexAlignment.CENTER);
+        bottomPanel.add(createComboBox(70, "Value", "Object", "..."), 0, FlexAlignment.CENTER);
+        bottomPanel.add(Box.createHorizontalStrut(5), 0, FlexAlignment.CENTER);
+        bottomPanel.add(new SingleCellTable(), 0, FlexAlignment.CENTER);
+        bottomPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_DEL), 0, FlexAlignment.CENTER);
 
-        JBPanel panel = new JBPanel();
-        panel.setLayout(new FlexLayout(panel, true));
-        panel.add(topPanel, new FlexConstraints(FlexAlignment.LEADING, 0));
-        panel.add(bottomPanel, new FlexConstraints(FlexAlignment.LEADING, 0));
+        FlexPanel panel = new FlexPanel(true);
+        panel.add(topPanel, 0, FlexAlignment.LEADING);
+        panel.add(bottomPanel, 0, FlexAlignment.LEADING);
 
         return panel;
     }

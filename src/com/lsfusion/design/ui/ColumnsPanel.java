@@ -4,15 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class ColumnsPanel extends JPanel {
+public class ColumnsPanel extends FlexPanel {
     private final int columnsCount;
     private final JPanel[] columns;
 
     public ColumnsPanel(int columnCount, List<Component> children) {
-        super(null);
+        super(false, Alignment.LEADING);
         this.columnsCount = columnCount;
-
-        setLayout(new FlexLayout(this, false, Alignment.LEADING));
 
         columns = new JPanel[columnsCount];
         for (int i = 0; i < columnsCount; ++i) {

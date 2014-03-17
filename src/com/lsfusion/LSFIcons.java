@@ -55,6 +55,8 @@ public final class LSFIcons {
         public static final Icon TOOLBAR = AllIcons.Ide.Macro.Recording_1;
         public static final Icon GRID = AllIcons.Nodes.DataTables;
         public static final Icon PROPERTY = AllIcons.Css.Property;
+
+        public static final Icon FIND = AllIcons.Actions.Find;
         
         public static final Icon VIEW_GRID = IconLoader.getIcon("/images/design/view_grid.png");
         public static final Icon VIEW_HIDE = IconLoader.getIcon("/images/design/view_hide.png");

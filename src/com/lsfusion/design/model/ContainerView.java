@@ -9,6 +9,7 @@ import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.Alignment;
 import com.lsfusion.design.ui.ColumnsPanel;
 import com.lsfusion.design.ui.FlexPanel;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,6 +31,7 @@ public class ContainerView extends ComponentView {
 
     public String caption;
     public String description;
+    @NotNull
     public ContainerType type = ContainerType.CONTAINERV;
     public Alignment childrenAlignment = Alignment.LEADING;
     public int columns = 4;
@@ -108,33 +110,49 @@ public class ContainerView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection) {
-
-        JComponent widget;
-        if (type.isLinear()) {
-            widget = createLinearPanel(project, selection);
-        } else if (type.isTabbed()) {
-            widget = createTabbedPanel(project, selection);
-        } else if (type.isSplit()) {
-            widget = createSplitPanel(project, selection);
-        } else if (type.isColumns()) {
-            widget = createColumnsPanel(project, selection);
-        } else {
-            throw new IllegalStateException("shouldn't be");
-        }
+    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
         
-        if (widget != null && caption != null && parent != null && !type.isTabbed() && !parent.type.isTabbed()) {
+        JComponent widget = null;
+        
+        if (type.isTabbed() || type.isSplit()) {
+            if (oldWidget != null) {
+                ContainerType oldType = (ContainerType) oldWidget.getClientProperty("containerType");
+                if (oldType != type) {
+                    oldWidget = null;
+                }
+            }
+            
+            if (type.isTabbed()) {
+                widget = createTabbedPanel(project, selection, componentToWidget, oldWidget);
+            } else if (type.isSplit()) {
+                widget = createSplitPanel(project, selection, componentToWidget, oldWidget);
+            }
+        } else {
+            if (type.isLinear()) {
+                widget = createLinearPanel(project, selection, componentToWidget);
+            } else if (type.isColumns()) {
+                widget = createColumnsPanel(project, selection, componentToWidget);
+            }
+        }
+
+        if (widget == null) {
+            return null;
+        }
+
+        if (caption != null && parent != null && !type.isTabbed() && !parent.type.isTabbed()) {
             widget.setBorder(BorderFactory.createTitledBorder(caption));
         }
         
-        return widget == null ? null : widget;
+        widget.putClientProperty("containerType", type);
+
+        return widget;
     }
 
-    private FlexPanel createLinearPanel(Project project, Map<ComponentView, Boolean> selection) {
+    private FlexPanel createLinearPanel(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget) {
         FlexPanel flexPanel = new FlexPanel(type.isVertical(), childrenAlignment);
         boolean hasChildren = false;
         for (ComponentView child : children) {
-            JComponent childWidget = child.createWidget(project, selection);
+            JComponent childWidget = child.createWidget(project, selection, componentToWidget);
             if (childWidget != null) {
                 hasChildren = true;
                 flexPanel.add(childWidget, child.flex, child.alignment);
@@ -143,18 +161,18 @@ public class ContainerView extends ComponentView {
         return hasChildren ? flexPanel : null;
     }
 
-    private JBSplitter createSplitPanel(Project project, Map<ComponentView, Boolean> selection) {
+    private JBSplitter createSplitPanel(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
         JBSplitter splitPane = new JBSplitter(type.isVerticalSplit());
         boolean hasChildren = false;
         if (children.size() > 0) {
-            JComponent childWidget = children.get(0).createWidget(project, selection);
+            JComponent childWidget = children.get(0).createWidget(project, selection, componentToWidget);
             if (childWidget != null) {
                 hasChildren = true;
                 splitPane.setFirstComponent(childWidget);
             }
         }
         if (children.size() > 1) {
-            JComponent childWidget = children.get(1).createWidget(project, selection);
+            JComponent childWidget = children.get(1).createWidget(project, selection, componentToWidget);
             if (childWidget != null) {
                 hasChildren = true;
                 splitPane.setSecondComponent(childWidget);
@@ -163,28 +181,46 @@ public class ContainerView extends ComponentView {
         return hasChildren ? splitPane : null;
     }
 
-    private JTabbedPane createTabbedPanel(Project project, Map<ComponentView, Boolean> selection) {
-        JTabbedPane tabbedPane = new JBTabbedPane();
+    private JTabbedPane createTabbedPanel(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+        ComponentView selectedChild = null;
+        if (oldWidget != null) {
+            JBTabbedPane oldTabbedPane = (JBTabbedPane) oldWidget;
+            selectedChild = (ComponentView) ((JComponent)oldTabbedPane.getSelectedComponent()).getClientProperty("componentView");
+        }
+        
+        JComponent selectedWidget = null;
+        JBTabbedPane tabbedPane = new JBTabbedPane();
         boolean hasChildren = false;
         for (ComponentView child : children) {
-            Component childWidget = child.createWidget(project, selection);
+            JComponent childWidget = child.createWidget(project, selection, componentToWidget);
             if (childWidget != null) {
                 hasChildren = true;
                 String caption = child.getCaption();
                 if (caption == null) {
                     caption = "";
                 }
+                childWidget.putClientProperty("componentView", child);
                 tabbedPane.addTab(caption, childWidget);
+                if (child == selectedChild) {
+                    selectedWidget = childWidget;
+                }
             }
         }
-        return hasChildren ? tabbedPane : null;
+        
+        if (hasChildren) {
+            if (selectedWidget != null) {
+                tabbedPane.setSelectedComponent(selectedWidget);
+            }
+            return tabbedPane;
+        }
+        return null;
     }
 
-    private JComponent createColumnsPanel(Project project, Map<ComponentView, Boolean> selection) {
+    private JComponent createColumnsPanel(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget) {
         List<Component> childrenWidgets = new ArrayList<Component>();
         boolean hasChildren = false;
         for (ComponentView child : children) {
-            Component childWidget = child.createWidget(project, selection);
+            Component childWidget = child.createWidget(project, selection, componentToWidget);
             childrenWidgets.add(childWidget);
             if (childWidget != null) {
                 hasChildren = true;

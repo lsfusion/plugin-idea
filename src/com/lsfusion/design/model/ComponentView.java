@@ -5,6 +5,7 @@ import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.ui.components.JBPanel;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.FlexAlignment;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +60,8 @@ public abstract class ComponentView extends PropertiesContainer {
     public String iconPath;
     
     public ContainerView parent;
+    
+    public boolean forceHide = false;
 
     public ComponentView() {
         this("");
@@ -342,24 +345,29 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public abstract Icon getIcon();
 
-    public JComponent createWidget(Project project, Map<ComponentView, Boolean> selection) {
-        if (!selection.get(this)) {
+    public JComponent createWidget(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget) {
+        if (forceHide || !selection.get(this)) {
             return null;
         }
-        
-        JComponent widget = createWidgetImpl(project, selection);
+
+        JComponent oldPanel = componentToWidget.get(this);
+        JComponent oldWidget = oldPanel == null ? null : (JComponent) oldPanel.getComponent(0);
+
+        JComponent widget = createWidgetImpl(project, selection, componentToWidget, oldWidget);
         if (widget == null) {
             return null;
         }
 
-        JPanel panel = new JPanel(new BorderLayout());
+        JBPanel panel = new JBPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(marginTop, marginLeft, marginBottom, marginRight));
         panel.add(widget);
+        
+        componentToWidget.put(this, panel);
 
         return panel;
     }
 
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection) {
+    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
         JLabel jLabel = new JLabel(getClass().getSimpleName());
         jLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         return jLabel;

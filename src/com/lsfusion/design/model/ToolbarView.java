@@ -34,6 +34,8 @@ public class ToolbarView extends ComponentView {
     public boolean showPrint = true;
     public boolean showXls = true;
     public boolean showSettings = true;
+    
+    public boolean isTreeToolbar = false;
 
     public ToolbarView() {
         this("");
@@ -123,21 +125,26 @@ public class ToolbarView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection) {
+    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+        if (!visible) {
+            return null;
+        }
         JBPanel panel = new JBPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
         
         panel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_ADD));
-        panel.add(Box.createHorizontalStrut(5));
-        panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP_CHANGE));
-        panel.add(new ToolbarGridButton(LSFIcons.Design.QUANTITY));
-        panel.add(new ToolbarGridButton(LSFIcons.Design.SUM));
-        panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP));
-        panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_GROUP));
-        panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_XLS));
-        panel.add(Box.createHorizontalStrut(5));
-        panel.add(new ToolbarGridButton(LSFIcons.Design.PREFERENCES));
+        if (!isTreeToolbar) {
+            panel.add(Box.createHorizontalStrut(5));
+            panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP_CHANGE));
+            panel.add(new ToolbarGridButton(LSFIcons.Design.QUANTITY));
+            panel.add(new ToolbarGridButton(LSFIcons.Design.SUM));
+            panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP));
+            panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_GROUP));
+            panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_XLS));
+            panel.add(Box.createHorizontalStrut(5));
+            panel.add(new ToolbarGridButton(LSFIcons.Design.PREFERENCES));
+        }
         return panel;
     }
 }

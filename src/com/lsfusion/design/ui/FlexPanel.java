@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class FlexPanel extends JPanel {
+    private static final FlexConstraints DEFAULT_CONSTRAINTS = new FlexConstraints();
+    
     private final boolean vertical;
 
     public FlexPanel(boolean vertical) {
@@ -16,7 +18,7 @@ public class FlexPanel extends JPanel {
 
         setLayout(new FlexLayout(this, vertical, childrenAlignment));
     }
-    
+
     public void add(Component child, double flex) {
         add(child, flex, FlexAlignment.LEADING);
     }
@@ -27,5 +29,13 @@ public class FlexPanel extends JPanel {
 
     public void add(Component child, double flex, FlexAlignment align) {
         add(child, new FlexConstraints(align, flex));
+    }
+
+    @Override
+    protected void addImpl(Component comp, Object constraints, int index) {
+        if (constraints == null) {
+            constraints = DEFAULT_CONSTRAINTS;
+        }
+        super.addImpl(comp, constraints, index);
     }
 }

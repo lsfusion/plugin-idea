@@ -23,7 +23,7 @@ public class GridView extends ComponentView {
 
     public boolean tabVertical = false;
     public boolean autoHide = false;
-    private boolean quickSearch = false;
+    public boolean quickSearch = false;
 
     public GridView() {
         this("");
@@ -75,7 +75,7 @@ public class GridView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection) {
+    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
         JBTable table = new JBTable(new DefaultTableModel(15, 7));
         return new JBScrollPane(table);
     }
