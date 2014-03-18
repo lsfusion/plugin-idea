@@ -2,6 +2,7 @@ package com.lsfusion.design.model;
 
 import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.table.JBTable;
@@ -10,6 +11,7 @@ import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.CachableLayout;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.SingleCellTable;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.util.BaseUtils;
 
 import javax.swing.*;
@@ -75,8 +77,48 @@ public class PropertyDrawView extends ComponentView {
     public boolean isAction;
     public boolean isForcedPanel;
 
+    public boolean toolbar = false;
+
     public PropertyDrawView() {
         this("");
+    }
+
+    public PropertyDrawView(String sID, LSFPropertyOptions propertyOptions, Pair<LSFFormPropertyOptionsList, LSFFormPropertyOptionsList> formOptions) {
+        this(sID);
+
+        if (propertyOptions != null) {
+            toolbar = !propertyOptions.getToolbarSettingList().isEmpty();
+
+            List<LSFFixedCharWidthSetting> fixedCharWidthSettings = propertyOptions.getFixedCharWidthSettingList();
+            if (!fixedCharWidthSettings.isEmpty()) {
+                setFixedCharWidth(Integer.parseInt(fixedCharWidthSettings.get(fixedCharWidthSettings.size() - 1).getIntLiteral().getText()));
+            }
+
+            List<LSFMinCharWidthSetting> minCharWidthSettings = propertyOptions.getMinCharWidthSettingList();
+            if (!minCharWidthSettings.isEmpty()) {
+                setMinimumCharWidth(Integer.parseInt(minCharWidthSettings.get(minCharWidthSettings.size() - 1).getIntLiteral().getText()));
+            }
+
+            List<LSFMaxCharWidthSetting> maxCharWidthSettings = propertyOptions.getMaxCharWidthSettingList();
+            if (!maxCharWidthSettings.isEmpty()) {
+                setMaximumCharWidth(Integer.parseInt(maxCharWidthSettings.get(maxCharWidthSettings.size() - 1).getIntLiteral().getText()));
+            }
+
+            List<LSFPrefCharWidthSetting> prefCharWidthSettings = propertyOptions.getPrefCharWidthSettingList();
+            if (!prefCharWidthSettings.isEmpty()) {
+                setPreferredCharWidth(Integer.parseInt(prefCharWidthSettings.get(prefCharWidthSettings.size() - 1).getIntLiteral().getText()));
+            }
+        }
+
+        LSFFormPropertyOptionsList commonFormOptions = formOptions != null ? formOptions.first : null;
+        LSFFormPropertyOptionsList propertyFormOptions = formOptions != null ? formOptions.second : null;
+
+        //todo: toDraw, force, before, after 
+        if (propertyFormOptions != null && !propertyFormOptions.getFormOptionsWithFormPropertyDrawList().isEmpty()) {
+
+        } else if (commonFormOptions != null && !commonFormOptions.getFormOptionsWithFormPropertyDrawList().isEmpty()) {
+
+        }
     }
 
     public PropertyDrawView(String sID) {
@@ -143,6 +185,12 @@ public class PropertyDrawView extends ComponentView {
 
     public void setPreferredCharWidth(int preferredCharWidth) {
         this.preferredCharWidth = preferredCharWidth;
+    }
+
+    public void setFixedCharWidth(int charWidth) {
+        setMinimumCharWidth(charWidth);
+        setMaximumCharWidth(charWidth);
+        setPreferredCharWidth(charWidth);
     }
 
     public void setEditKey(KeyStroke editKey) {

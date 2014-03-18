@@ -15,6 +15,7 @@ public class ClassChooserView extends ComponentView {
     );
 
     public boolean visible = true;
+    private ObjectView objectView;
 
     public ClassChooserView() {
         this("");
@@ -24,6 +25,10 @@ public class ClassChooserView extends ComponentView {
         super(sID);
         flex = 0.2;
         alignment = FlexAlignment.STRETCH;
+    }
+
+    public ClassChooserView(ObjectView objectView) {
+        this.objectView = objectView;
     }
 
     @Override

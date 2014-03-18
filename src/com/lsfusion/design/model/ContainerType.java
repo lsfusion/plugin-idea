@@ -5,19 +5,19 @@ public enum ContainerType {
     CONTAINERV,
     COLUMNS,
     TABBED_PANE,
-    VERTICAL_SPLIT_PANE,
-    HORIZONTAL_SPLIT_PANE;
+    SPLITV,
+    SPLITH;
 
     public boolean isTabbed() {
         return this == TABBED_PANE;
     }
 
     public boolean isSplit() {
-        return this == HORIZONTAL_SPLIT_PANE || this == VERTICAL_SPLIT_PANE;
+        return this == SPLITH || this == SPLITV;
     }
 
     public boolean isVerticalSplit() {
-        return this == VERTICAL_SPLIT_PANE;
+        return this == SPLITV;
     }
 
     public boolean isVertical() {

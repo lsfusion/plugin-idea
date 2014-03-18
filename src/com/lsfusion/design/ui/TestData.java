@@ -89,7 +89,7 @@ public class TestData {
         documentContainer.iconPath = null;
         documentContainer.childrenAlignment = Alignment.LEADING;
         documentContainer.columns = 4;
-        documentContainer.type = ContainerType.VERTICAL_SPLIT_PANE;
+        documentContainer.type = ContainerType.SPLITV;
         documentContainer.caption = null;
         documentContainer.description = null;
         ContainerView filtersBox = new ContainerView("filtersBox");
@@ -440,7 +440,7 @@ public class TestData {
         o_grid_box.iconPath = null;
         o_grid_box.childrenAlignment = Alignment.LEADING;
         o_grid_box.columns = 4;
-        o_grid_box.type = ContainerType.HORIZONTAL_SPLIT_PANE;
+        o_grid_box.type = ContainerType.SPLITH;
         o_grid_box.caption = null;
         o_grid_box.description = "Табличная часть";
         ClassChooserView o_classChooser = new ClassChooserView("o.classChooser");
@@ -1914,7 +1914,7 @@ public class TestData {
         d_grid_box.iconPath = null;
         d_grid_box.childrenAlignment = Alignment.LEADING;
         d_grid_box.columns = 4;
-        d_grid_box.type = ContainerType.HORIZONTAL_SPLIT_PANE;
+        d_grid_box.type = ContainerType.SPLITH;
         d_grid_box.caption = null;
         d_grid_box.description = "Табличная часть";
         ClassChooserView d_classChooser = new ClassChooserView("d.classChooser");
@@ -3898,12 +3898,12 @@ public class TestData {
 
         return main;
     }
-    
+
     public static ContainerView create0() {
         ContainerView main = new ContainerView("main");
 
         ContainerView splitter = new ContainerView("splitter");
-        splitter.setType(ContainerType.HORIZONTAL_SPLIT_PANE);
+        splitter.setType(ContainerType.SPLITH);
 
         ContainerView tabbed = new ContainerView("tabbed");
         tabbed.setType(ContainerType.TABBED_PANE);

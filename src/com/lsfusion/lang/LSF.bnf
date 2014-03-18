@@ -874,7 +874,13 @@ extendingFormDeclaration ::= EXTEND FORM formUsage
 
 formGroupObjectsList ::= OBJECTS formGroupObjectDeclaration (COMMA formGroupObjectDeclaration)* {pin = 1}
 
-formTreeGroupObjectList ::= TREE (ID)? formTreeGroupObjectDeclaration (COMMA formTreeGroupObjectDeclaration)* {pin = 1}
+formTreeGroupObjectList ::= TREE (treeGroupDeclaration)? formTreeGroupObjectDeclaration (COMMA formTreeGroupObjectDeclaration)* {pin = 1}
+
+treeGroupDeclaration ::= simpleName
+{
+    implements="com.lsfusion.lang.psi.declarations.LSFTreeGroupDecl"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFTreeGroupDeclImpl"
+}
 
 formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectReportPath)? (formGroupObjectViewType)? (formGroupObjectPageSize)?
 formTreeGroupObjectDeclaration ::= formCommonGroupObject (treeGroupParentDeclaration)?
@@ -1292,21 +1298,43 @@ private setup_group_object_statement_recover ::= !(ID | SEMI | RBRACE)
 
 setGroupObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 1}
                               
-newComponentStatement ::= NEW multiCompoundID componentInsertPositionSelector componentBody {pin = 2}
+newComponentStatement ::= NEW componentStubDecl componentInsertPositionSelector componentBody {pin = 2}
 addComponentStatement ::= ADD componentSelector componentInsertPositionSelector componentBody {pin = 1}
 
-componentInsertPositionSelector ::= (IN componentSelector)?
+componentInsertPositionSelector ::= (IN inPositionComponent)?
                                     (   insertRelativePositionLiteral componentSelector
                                     |	FIRST
                                     )?
 
 removeComponentStatement ::= REMOVE componentSelector (CASCADE)? SEMI {pin = 1}
 
+inPositionComponent ::= componentSelector
+
 componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                 	|	PROPERTY LBRAC propertySelector RBRAC
-                    |	multiCompoundID
+                    |	componentUsage
 {
     pin(".*") = 1
+}
+
+componentStubDecl ::= componentDecl
+{
+    implements="com.lsfusion.lang.psi.declarations.LSFComponentStubDeclaration"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFComponentStubDeclarationImpl"
+    stubClass = "com.lsfusion.lang.psi.stubs.ComponentStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
+}
+
+componentDecl ::= multiCompoundID
+{
+    implements="com.lsfusion.lang.psi.declarations.LSFComponentDeclaration"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFComponentDeclarationImpl"
+}
+
+componentUsage ::= multiCompoundID
+{
+    implements="com.lsfusion.lang.psi.references.LSFComponentReference"
+    mixin="com.lsfusion.lang.psi.references.impl.LSFComponentReferenceImpl"
 }
 
 propertySelector ::= formPropertyDrawUsage
@@ -1522,6 +1550,10 @@ formPropertyDrawID ::= <<innerIDCheck>> formUsage POINT formPropertyDrawUsage
 }
 
 multiCompoundID ::= ID (POINT ID)*
+{
+    mixin="com.lsfusion.lang.psi.LSFIdImpl"
+    implements="com.lsfusion.lang.psi.LSFId"
+}
 
 exclusiveOverrideOption ::= OVERRIDE | EXCLUSIVE
 

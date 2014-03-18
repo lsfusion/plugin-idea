@@ -2,6 +2,7 @@ package com.lsfusion.design.model;
 
 import com.intellij.designer.model.PropertiesContainer;
 import com.intellij.designer.model.Property;
+import com.intellij.designer.propertyTable.PropertyTable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
@@ -93,6 +94,17 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public List<Property> getProperties() {
         return PROPERTIES;
+    }
+
+    public void setProperty(String propertyName, Object value) {
+        try {
+            Property property = PropertyTable.findProperty(getProperties(), propertyName);
+            if (property != null) {
+                // todo: set property
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setMinimumSize(Dimension minimumSize) {

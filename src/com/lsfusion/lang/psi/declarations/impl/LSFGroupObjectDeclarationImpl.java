@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
@@ -28,27 +29,31 @@ public abstract class LSFGroupObjectDeclarationImpl extends LSFFormElementDeclar
     public List<LSFClassSet> resolveClasses() {
         List<LSFFormObjectDeclaration> objectDecls = new ArrayList<LSFFormObjectDeclaration>();
         LSFFormSingleGroupObjectDeclaration single = getFormSingleGroupObjectDeclaration();
-        if(single != null)
+        if (single != null)
             objectDecls.add(single.getFormObjectDeclaration());
         else
             objectDecls.addAll(getFormMultiGroupObjectDeclaration().getFormObjectDeclarationList());
-        
+
         List<LSFClassSet> result = new ArrayList<LSFClassSet>();
-        for(LSFFormObjectDeclaration objectDecl : objectDecls)
+        for (LSFFormObjectDeclaration objectDecl : objectDecls)
             result.add(objectDecl.resolveClass());
-        return result;            
+        return result;
     }
 
     @Nullable
     public LSFId getNameIdentifier() {
         LSFFormSingleGroupObjectDeclaration single = getFormSingleGroupObjectDeclaration();
-        if(single != null)
+        if (single != null)
             return single.getFormObjectDeclaration().getNameIdentifier();
         LSFFormMultiGroupObjectDeclaration multi = getFormMultiGroupObjectDeclaration();
         LSFSimpleName name = multi.getSimpleName();
-        if(name!=null)
+        if (name != null)
             return name;
-        return null;    
+        return null;
+    }
+
+    public Collection<LSFFormObjectDeclaration> findObjectDecarations() {
+        return PsiTreeUtil.findChildrenOfType(this, LSFFormObjectDeclaration.class);
     }
 
     @Override

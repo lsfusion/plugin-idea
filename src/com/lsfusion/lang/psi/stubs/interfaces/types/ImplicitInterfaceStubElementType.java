@@ -72,8 +72,9 @@ public class ImplicitInterfaceStubElementType extends IStubElementType<ImplicitI
         }
     }
 
+    @NotNull
     @Override
-    public ImplicitInterfaceStubElement deserialize(StubInputStream dataStream, StubElement parentStub) throws IOException {
+    public ImplicitInterfaceStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         int paramsCount = dataStream.readInt();
         List<String> params = new ArrayList<String>();
         if (paramsCount != 0) {

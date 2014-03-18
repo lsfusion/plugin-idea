@@ -67,7 +67,8 @@
                 description="Toggle meta code sync mode">
             <add-to-group group-id="CodeMenu"/>
         </action>
-        <action id="ToggleLSFCompletion" class="com.lsfusion.actions.ToggleCompletionAction" text="lsFusion completion support"
+        <action id="ToggleLSFCompletion" class="com.lsfusion.actions.ToggleCompletionAction"
+                text="lsFusion completion support"
                 description="Toggle lsFusion completion support">
             <add-to-group group-id="CodeMenu"/>
         </action>
@@ -110,7 +111,8 @@
         <fileTypeFactory implementation="com.lsfusion.lang.LSFFileTypeFactory"/>
         <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.lang.LSFParserDefinition"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.LSFFindUsagesProvider"/>
-        <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory key="Lsf"
+                                       implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
         <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
@@ -144,6 +146,7 @@
         <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.TableIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.WindowIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.NavigatorElementIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.ComponentIndex"/>
 
         <stubIndex implementation="com.lsfusion.lang.psi.stubs.extend.types.indexes.ExtendFormIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.stubs.extend.types.indexes.ExtendClassIndex"/>

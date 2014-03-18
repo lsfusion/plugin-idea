@@ -12,7 +12,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.util.Map;
 
-public class TreeGroupView extends ComponentView {
+public class TreeGroupView extends ComponentView implements GroupView {
+    public ToolbarView toolbar = new ToolbarView();
+    public FilterView filter = new FilterView();
+
     public TreeGroupView() {
         this("");
     }
@@ -56,7 +59,7 @@ public class TreeGroupView extends ComponentView {
 
             category2.add(new DefaultMutableTreeNode("subCategory21"));
             category2.add(new DefaultMutableTreeNode("subCategory22"));
-            
+
             setRoot(root);
         }
 

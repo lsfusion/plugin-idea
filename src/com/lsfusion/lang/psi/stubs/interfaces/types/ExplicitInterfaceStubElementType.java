@@ -80,8 +80,9 @@ public class ExplicitInterfaceStubElementType extends IStubElementType<ExplicitI
         }
     }
 
+    @NotNull
     @Override
-    public ExplicitInterfaceStubElement deserialize(StubInputStream dataStream, StubElement parentStub) throws IOException {
+    public ExplicitInterfaceStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         int paramsCount = dataStream.readInt();
         List<String> params = new ArrayList<String>();
         if (paramsCount != 0) {

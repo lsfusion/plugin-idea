@@ -48,16 +48,6 @@ public class ContainerView extends ComponentView {
         return children;
     }
 
-    public void add(ComponentView child) {
-        child.removeFromParent();
-        child.setParent(this);
-        children.add(child);
-    }
-
-    public boolean remove(ComponentView child) {
-        return children.remove(child);
-    }
-
     @Override
     public List<Property> getProperties() {
         return PROPERTIES;
@@ -109,11 +99,59 @@ public class ContainerView extends ComponentView {
         return LSFIcons.Design.CONTAINER;
     }
 
+    public void add(ComponentView comp) {
+        changeContainer(comp);
+        children.add(comp);
+    }
+
+    private void changeContainer(ComponentView comp) {
+        if (comp.getParent() != null)
+            comp.getParent().remove(comp);
+
+        comp.setParent(this);
+    }
+
+    public boolean remove(ComponentView comp) {
+        if (children.remove(comp)) {
+            comp.setParent(null);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void add(int index, ComponentView comp) {
+        changeContainer(comp);
+        children.add(index, comp);
+    }
+
+    public void addBefore(ComponentView comp, ComponentView compBefore) {
+        if (!children.contains(compBefore)) {
+            add(comp);
+        } else {
+            remove(comp);
+            add(children.indexOf(compBefore), comp);
+        }
+    }
+
+    public void addAfter(ComponentView comp, ComponentView compAfter) {
+        if (!children.contains(compAfter)) {
+            add(comp);
+        } else {
+            remove(comp);
+            add(children.indexOf(compAfter) + 1, comp);
+        }
+    }
+
+    public void addFirst(ComponentView comp) {
+        add(0, comp);
+    }
+
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
-        
+
         JComponent widget = null;
-        
+
         if (type.isTabbed() || type.isSplit()) {
             if (oldWidget != null) {
                 ContainerType oldType = (ContainerType) oldWidget.getClientProperty("containerType");
@@ -121,7 +159,7 @@ public class ContainerView extends ComponentView {
                     oldWidget = null;
                 }
             }
-            
+
             if (type.isTabbed()) {
                 widget = createTabbedPanel(project, selection, componentToWidget, oldWidget);
             } else if (type.isSplit()) {
@@ -142,7 +180,7 @@ public class ContainerView extends ComponentView {
         if (caption != null && parent != null && !type.isTabbed() && !parent.type.isTabbed()) {
             widget.setBorder(BorderFactory.createTitledBorder(caption));
         }
-        
+
         widget.putClientProperty("containerType", type);
 
         return widget;
@@ -185,9 +223,9 @@ public class ContainerView extends ComponentView {
         ComponentView selectedChild = null;
         if (oldWidget != null) {
             JBTabbedPane oldTabbedPane = (JBTabbedPane) oldWidget;
-            selectedChild = (ComponentView) ((JComponent)oldTabbedPane.getSelectedComponent()).getClientProperty("componentView");
+            selectedChild = (ComponentView) ((JComponent) oldTabbedPane.getSelectedComponent()).getClientProperty("componentView");
         }
-        
+
         JComponent selectedWidget = null;
         JBTabbedPane tabbedPane = new JBTabbedPane();
         boolean hasChildren = false;
@@ -206,7 +244,7 @@ public class ContainerView extends ComponentView {
                 }
             }
         }
-        
+
         if (hasChildren) {
             if (selectedWidget != null) {
                 tabbedPane.setSelectedComponent(selectedWidget);

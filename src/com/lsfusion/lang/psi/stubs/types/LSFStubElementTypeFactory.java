@@ -37,6 +37,8 @@ public class LSFStubElementTypeFactory {
             return LSFStubElementTypes.IMPLICIT_VALUE;
         } else if (ID.equals("IMPLICIT_INTERFACE_PROPERTY_STATEMENT")) {
             return LSFStubElementTypes.IMPLICIT_INTERFACE;
+        } else if (ID.equals("COMPONENT_STUB_DECL")) {
+            return LSFStubElementTypes.COMPONENT;
         }
 
         throw new UnsupportedOperationException();
