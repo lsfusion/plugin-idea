@@ -34,11 +34,11 @@ import static javax.swing.BorderFactory.*;
         - свойства, за исключением тех, которые FORCE PANEL
         - formEdit, formDrop, formOk, formClose
             - просто не делать им force panel при создании
-     - просетать при создании модели
+    - просетать при создании модели
         - RegularFilterGroupView.isSingle
         - forceHide
             - гриды, тулбары, фильтры, showtype для групп дерева
-            
+    - учесть отсутствие FROM DEFAULT
  */
 public class EditorPanel extends JPanel {
 
@@ -51,6 +51,7 @@ public class EditorPanel extends JPanel {
             
     private JLayer formLayer;
     private JPanel formPanel;
+    private ActionToolbar toolbar;
     private ComponentTree componentTree;
     private PropertyTable propertyTable;
     private boolean selecting = false;
@@ -65,6 +66,7 @@ public class EditorPanel extends JPanel {
         this.project = project;
 
         rootComponent = TestData.create();
+//        rootComponent = file.getDesignInfo().formView.mainContainer;
         
         createLayout();
         initUiHandlers();
@@ -94,7 +96,8 @@ public class EditorPanel extends JPanel {
                 selecting = state;
             }
         });
-       
+        
+        toolbar.updateActionsImmediately();
        
         componentTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
@@ -125,7 +128,7 @@ public class EditorPanel extends JPanel {
         treeAndTable.setFirstComponent(createComponentTree());
         treeAndTable.setSecondComponent(createComponentPropertyTable());
 
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
+        toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
 
         FlexPanel leftPanel = new FlexPanel(true);
         leftPanel.add(toolbar.getComponent());

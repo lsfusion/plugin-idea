@@ -2719,7 +2719,6 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFFormDeclaration resolveFormDecl(@Nullable LSFFormUsage formUsage) {
         return formUsage == null ? null : formUsage.resolveDecl();
-
     }
 
     @Nullable

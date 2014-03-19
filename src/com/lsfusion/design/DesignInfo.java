@@ -30,17 +30,19 @@ public class DesignInfo {
         formView = new DefaultFormView();
         for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {
             formView.extendForm(formExtend);
-            DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
-            Collection<PsiReference> refs = fact.createFindUsagesHandler(formDecl.getNameIdentifier(), false).findReferencesToHighlight(formDecl.getNameIdentifier(), formDecl.getLSFFile().getRequireScope());
+        }
 
-            for (PsiReference ref : refs) {
-                if (ref instanceof LSFFormUsage) {
-                    PsiElement parent = ((LSFFormUsage) ref).getParent();
-                    if (parent instanceof LSFDesignDeclaration || parent instanceof LSFExtendDesignDeclaration) {
-                        LSFDesignStatement designStatement = (LSFDesignStatement) parent.getParent();
+        DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
+        Collection<PsiReference> refs = fact.createFindUsagesHandler(formDecl.getNameIdentifier(), false)
+                .findReferencesToHighlight(formDecl.getNameIdentifier(), formDecl.getLSFFile().getRequireScope());
 
-                        processComponentBody(formView, formView.getMainContainer(), designStatement.getComponentBody());
-                    }
+        for (PsiReference ref : refs) {
+            if (ref instanceof LSFFormUsage) {
+                PsiElement parent = ((LSFFormUsage) ref).getParent();
+                if (parent instanceof LSFDesignDeclaration || parent instanceof LSFExtendDesignDeclaration) {
+                    LSFDesignStatement designStatement = (LSFDesignStatement) parent.getParent();
+
+                    processComponentBody(formView, formView.getMainContainer(), designStatement.getComponentBody());
                 }
             }
         }
