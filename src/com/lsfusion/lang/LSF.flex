@@ -43,7 +43,8 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
 
     "INTEGER" | "LONG" | "NUMERIC[" {DIGITS} "," {DIGITS} "]" | "DOUBLE"
   | "DATE" | "DATETIME" | "TIME" | "YEAR"
-  | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]" | "VARSTRING[" {DIGITS} "]" | "VARISTRING[" {DIGITS} "]" | "TEXT"
+  | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]" | "VARSTRING[" {DIGITS} "]" | "VARISTRING[" {DIGITS} "]"
+  | "TEXT" | "RICHTEXT"
   | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "CUSTOMFILE" | "EXCELFILE"
   | "BOOLEAN"
   | "COLOR"                             { return PRIMITIVE_TYPE; }
