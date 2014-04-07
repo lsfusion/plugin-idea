@@ -32,7 +32,6 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("regexpMessage"),
             new ReflectionProperty("maxValue"),
             new ReflectionProperty("echoSymbols"),
-            new ReflectionProperty("contentType").setExpert(),
             new ReflectionProperty("minimumCharWidth").setExpert(),
             new ReflectionProperty("maximumCharWidth").setExpert(),
             new ReflectionProperty("preferredCharWidth"),
@@ -54,7 +53,6 @@ public class PropertyDrawView extends ComponentView {
     public String regexpMessage;
     public Long maxValue;
     public boolean echoSymbols;
-    public String contentType;
 
     public int minimumCharWidth;
     public int maximumCharWidth;
@@ -171,10 +169,6 @@ public class PropertyDrawView extends ComponentView {
         this.echoSymbols = echoSymbols;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
     public void setMinimumCharWidth(int minimumCharWidth) {
         this.minimumCharWidth = minimumCharWidth;
     }
@@ -255,10 +249,6 @@ public class PropertyDrawView extends ComponentView {
 
     public boolean isEchoSymbols() {
         return echoSymbols;
-    }
-
-    public String getContentType() {
-        return contentType;
     }
 
     public int getMinimumCharWidth() {

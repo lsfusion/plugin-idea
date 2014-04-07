@@ -313,7 +313,6 @@ public class TestData {
         nameGroup_g_.regexpMessage = null;
         nameGroup_g_.maxValue = null;
         nameGroup_g_.echoSymbols = false;
-        nameGroup_g_.contentType = null;
         nameGroup_g_.minimumCharWidth = 0;
         nameGroup_g_.maximumCharWidth = 0;
         nameGroup_g_.preferredCharWidth = 0;
@@ -702,7 +701,6 @@ public class TestData {
         nameGroupType_gt_.regexpMessage = null;
         nameGroupType_gt_.maxValue = null;
         nameGroupType_gt_.echoSymbols = false;
-        nameGroupType_gt_.contentType = null;
         nameGroupType_gt_.minimumCharWidth = 0;
         nameGroupType_gt_.maximumCharWidth = 0;
         nameGroupType_gt_.preferredCharWidth = 0;
@@ -944,7 +942,6 @@ public class TestData {
         imageItem_i_.regexpMessage = null;
         imageItem_i_.maxValue = null;
         imageItem_i_.echoSymbols = false;
-        imageItem_i_.contentType = null;
         imageItem_i_.minimumCharWidth = 0;
         imageItem_i_.maximumCharWidth = 0;
         imageItem_i_.preferredCharWidth = 0;
@@ -1026,7 +1023,6 @@ public class TestData {
         seekBarcode__.regexpMessage = null;
         seekBarcode__.maxValue = null;
         seekBarcode__.echoSymbols = false;
-        seekBarcode__.contentType = null;
         seekBarcode__.minimumCharWidth = 0;
         seekBarcode__.maximumCharWidth = 0;
         seekBarcode__.preferredCharWidth = 0;
@@ -1064,7 +1060,6 @@ public class TestData {
         replaceItem_i_.regexpMessage = null;
         replaceItem_i_.maxValue = null;
         replaceItem_i_.echoSymbols = false;
-        replaceItem_i_.contentType = null;
         replaceItem_i_.minimumCharWidth = 0;
         replaceItem_i_.maximumCharWidth = 0;
         replaceItem_i_.preferredCharWidth = 0;
@@ -1319,7 +1314,6 @@ public class TestData {
         addForm_Item_Item__.regexpMessage = null;
         addForm_Item_Item__.maxValue = null;
         addForm_Item_Item__.echoSymbols = false;
-        addForm_Item_Item__.contentType = null;
         addForm_Item_Item__.minimumCharWidth = 0;
         addForm_Item_Item__.maximumCharWidth = 0;
         addForm_Item_Item__.preferredCharWidth = 0;
@@ -1357,7 +1351,6 @@ public class TestData {
         editForm_Item_Item_i_.regexpMessage = null;
         editForm_Item_Item_i_.maxValue = null;
         editForm_Item_Item_i_.echoSymbols = false;
-        editForm_Item_Item_i_.contentType = null;
         editForm_Item_Item_i_.minimumCharWidth = 0;
         editForm_Item_Item_i_.maximumCharWidth = 0;
         editForm_Item_Item_i_.preferredCharWidth = 0;
@@ -1395,7 +1388,6 @@ public class TestData {
         deletei.regexpMessage = null;
         deletei.maxValue = null;
         deletei.echoSymbols = false;
-        deletei.contentType = null;
         deletei.minimumCharWidth = 0;
         deletei.maximumCharWidth = 0;
         deletei.preferredCharWidth = 0;
@@ -1433,7 +1425,6 @@ public class TestData {
         copyItem_i_.regexpMessage = null;
         copyItem_i_.maxValue = null;
         copyItem_i_.echoSymbols = false;
-        copyItem_i_.contentType = null;
         copyItem_i_.minimumCharWidth = 0;
         copyItem_i_.maximumCharWidth = 0;
         copyItem_i_.preferredCharWidth = 0;
@@ -1551,7 +1542,6 @@ public class TestData {
         idBarcodeSku_i_.regexpMessage = null;
         idBarcodeSku_i_.maxValue = null;
         idBarcodeSku_i_.echoSymbols = false;
-        idBarcodeSku_i_.contentType = null;
         idBarcodeSku_i_.minimumCharWidth = 15;
         idBarcodeSku_i_.maximumCharWidth = 15;
         idBarcodeSku_i_.preferredCharWidth = 15;
@@ -1589,7 +1579,6 @@ public class TestData {
         idItem_i_.regexpMessage = null;
         idItem_i_.maxValue = null;
         idItem_i_.echoSymbols = false;
-        idItem_i_.contentType = null;
         idItem_i_.minimumCharWidth = 10;
         idItem_i_.maximumCharWidth = 0;
         idItem_i_.preferredCharWidth = 15;
@@ -1627,7 +1616,6 @@ public class TestData {
         nameAttributeItem_i_.regexpMessage = null;
         nameAttributeItem_i_.maxValue = null;
         nameAttributeItem_i_.echoSymbols = false;
-        nameAttributeItem_i_.contentType = null;
         nameAttributeItem_i_.minimumCharWidth = 40;
         nameAttributeItem_i_.maximumCharWidth = 0;
         nameAttributeItem_i_.preferredCharWidth = 80;
@@ -1665,7 +1653,6 @@ public class TestData {
         canonicalNameGroupGroupTypeSku_gt_i_.regexpMessage = null;
         canonicalNameGroupGroupTypeSku_gt_i_.maxValue = null;
         canonicalNameGroupGroupTypeSku_gt_i_.echoSymbols = false;
-        canonicalNameGroupGroupTypeSku_gt_i_.contentType = null;
         canonicalNameGroupGroupTypeSku_gt_i_.minimumCharWidth = 50;
         canonicalNameGroupGroupTypeSku_gt_i_.maximumCharWidth = 100;
         canonicalNameGroupGroupTypeSku_gt_i_.preferredCharWidth = 100;
@@ -1703,7 +1690,6 @@ public class TestData {
         inItem_i_.regexpMessage = null;
         inItem_i_.maxValue = null;
         inItem_i_.echoSymbols = false;
-        inItem_i_.contentType = null;
         inItem_i_.minimumCharWidth = 0;
         inItem_i_.maximumCharWidth = 0;
         inItem_i_.preferredCharWidth = 0;
@@ -1763,7 +1749,6 @@ public class TestData {
         captionItem_i_.regexpMessage = null;
         captionItem_i_.maxValue = null;
         captionItem_i_.echoSymbols = false;
-        captionItem_i_.contentType = null;
         captionItem_i_.minimumCharWidth = 0;
         captionItem_i_.maximumCharWidth = 0;
         captionItem_i_.preferredCharWidth = 0;
@@ -1801,7 +1786,6 @@ public class TestData {
         nameUOMItem_i_.regexpMessage = null;
         nameUOMItem_i_.maxValue = null;
         nameUOMItem_i_.echoSymbols = false;
-        nameUOMItem_i_.contentType = null;
         nameUOMItem_i_.minimumCharWidth = 7;
         nameUOMItem_i_.maximumCharWidth = 0;
         nameUOMItem_i_.preferredCharWidth = 14;
@@ -1839,7 +1823,6 @@ public class TestData {
         nameBrandItem_i_.regexpMessage = null;
         nameBrandItem_i_.maxValue = null;
         nameBrandItem_i_.echoSymbols = false;
-        nameBrandItem_i_.contentType = null;
         nameBrandItem_i_.minimumCharWidth = 0;
         nameBrandItem_i_.maximumCharWidth = 0;
         nameBrandItem_i_.preferredCharWidth = 0;
@@ -1877,7 +1860,6 @@ public class TestData {
         nameCountryItem_i_.regexpMessage = null;
         nameCountryItem_i_.maxValue = null;
         nameCountryItem_i_.echoSymbols = false;
-        nameCountryItem_i_.contentType = null;
         nameCountryItem_i_.minimumCharWidth = 0;
         nameCountryItem_i_.maximumCharWidth = 0;
         nameCountryItem_i_.preferredCharWidth = 0;
@@ -1915,7 +1897,6 @@ public class TestData {
         nameManufacturerItem_i_.regexpMessage = null;
         nameManufacturerItem_i_.maxValue = null;
         nameManufacturerItem_i_.echoSymbols = false;
-        nameManufacturerItem_i_.contentType = null;
         nameManufacturerItem_i_.minimumCharWidth = 15;
         nameManufacturerItem_i_.maximumCharWidth = 0;
         nameManufacturerItem_i_.preferredCharWidth = 25;
@@ -1953,7 +1934,6 @@ public class TestData {
         compositionItem_i_.regexpMessage = null;
         compositionItem_i_.maxValue = null;
         compositionItem_i_.echoSymbols = false;
-        compositionItem_i_.contentType = null;
         compositionItem_i_.minimumCharWidth = 0;
         compositionItem_i_.maximumCharWidth = 0;
         compositionItem_i_.preferredCharWidth = 0;
@@ -1991,7 +1971,6 @@ public class TestData {
         nameWareItem_i_.regexpMessage = null;
         nameWareItem_i_.maxValue = null;
         nameWareItem_i_.echoSymbols = false;
-        nameWareItem_i_.contentType = null;
         nameWareItem_i_.minimumCharWidth = 0;
         nameWareItem_i_.maximumCharWidth = 0;
         nameWareItem_i_.preferredCharWidth = 0;
@@ -2051,7 +2030,6 @@ public class TestData {
         originalCaptionItem_i_.regexpMessage = null;
         originalCaptionItem_i_.maxValue = null;
         originalCaptionItem_i_.echoSymbols = false;
-        originalCaptionItem_i_.contentType = null;
         originalCaptionItem_i_.minimumCharWidth = 0;
         originalCaptionItem_i_.maximumCharWidth = 0;
         originalCaptionItem_i_.preferredCharWidth = 0;
@@ -2089,7 +2067,6 @@ public class TestData {
         originalCompositionItem_i_.regexpMessage = null;
         originalCompositionItem_i_.maxValue = null;
         originalCompositionItem_i_.echoSymbols = false;
-        originalCompositionItem_i_.contentType = null;
         originalCompositionItem_i_.minimumCharWidth = 0;
         originalCompositionItem_i_.maximumCharWidth = 0;
         originalCompositionItem_i_.preferredCharWidth = 0;
@@ -2127,7 +2104,6 @@ public class TestData {
         originalCustomsGroupItem_i_.regexpMessage = null;
         originalCustomsGroupItem_i_.maxValue = null;
         originalCustomsGroupItem_i_.echoSymbols = false;
-        originalCustomsGroupItem_i_.contentType = null;
         originalCustomsGroupItem_i_.minimumCharWidth = 0;
         originalCustomsGroupItem_i_.maximumCharWidth = 0;
         originalCustomsGroupItem_i_.preferredCharWidth = 0;
@@ -2187,7 +2163,6 @@ public class TestData {
         netWeightItem_i_.regexpMessage = null;
         netWeightItem_i_.maxValue = null;
         netWeightItem_i_.echoSymbols = false;
-        netWeightItem_i_.contentType = null;
         netWeightItem_i_.minimumCharWidth = 0;
         netWeightItem_i_.maximumCharWidth = 0;
         netWeightItem_i_.preferredCharWidth = 0;
@@ -2225,7 +2200,6 @@ public class TestData {
         grossWeightItem_i_.regexpMessage = null;
         grossWeightItem_i_.maxValue = null;
         grossWeightItem_i_.echoSymbols = false;
-        grossWeightItem_i_.contentType = null;
         grossWeightItem_i_.minimumCharWidth = 0;
         grossWeightItem_i_.maximumCharWidth = 0;
         grossWeightItem_i_.preferredCharWidth = 0;
@@ -2263,7 +2237,6 @@ public class TestData {
         lengthItem_i_.regexpMessage = null;
         lengthItem_i_.maxValue = null;
         lengthItem_i_.echoSymbols = false;
-        lengthItem_i_.contentType = null;
         lengthItem_i_.minimumCharWidth = 0;
         lengthItem_i_.maximumCharWidth = 0;
         lengthItem_i_.preferredCharWidth = 0;
@@ -2301,7 +2274,6 @@ public class TestData {
         widthItem_i_.regexpMessage = null;
         widthItem_i_.maxValue = null;
         widthItem_i_.echoSymbols = false;
-        widthItem_i_.contentType = null;
         widthItem_i_.minimumCharWidth = 0;
         widthItem_i_.maximumCharWidth = 0;
         widthItem_i_.preferredCharWidth = 0;
@@ -2339,7 +2311,6 @@ public class TestData {
         heightItem_i_.regexpMessage = null;
         heightItem_i_.maxValue = null;
         heightItem_i_.echoSymbols = false;
-        heightItem_i_.contentType = null;
         heightItem_i_.minimumCharWidth = 0;
         heightItem_i_.maximumCharWidth = 0;
         heightItem_i_.preferredCharWidth = 0;
@@ -2377,7 +2348,6 @@ public class TestData {
         volumeItem_i_.regexpMessage = null;
         volumeItem_i_.maxValue = null;
         volumeItem_i_.echoSymbols = false;
-        volumeItem_i_.contentType = null;
         volumeItem_i_.minimumCharWidth = 0;
         volumeItem_i_.maximumCharWidth = 0;
         volumeItem_i_.preferredCharWidth = 0;
@@ -2437,7 +2407,6 @@ public class TestData {
         idArticleItem_i_.regexpMessage = null;
         idArticleItem_i_.maxValue = null;
         idArticleItem_i_.echoSymbols = false;
-        idArticleItem_i_.contentType = null;
         idArticleItem_i_.minimumCharWidth = 10;
         idArticleItem_i_.maximumCharWidth = 0;
         idArticleItem_i_.preferredCharWidth = 15;
@@ -2475,7 +2444,6 @@ public class TestData {
         nameColorItem_i_.regexpMessage = null;
         nameColorItem_i_.maxValue = null;
         nameColorItem_i_.echoSymbols = false;
-        nameColorItem_i_.contentType = null;
         nameColorItem_i_.minimumCharWidth = 0;
         nameColorItem_i_.maximumCharWidth = 0;
         nameColorItem_i_.preferredCharWidth = 0;
@@ -2513,7 +2481,6 @@ public class TestData {
         nameSizeItem_i_.regexpMessage = null;
         nameSizeItem_i_.maxValue = null;
         nameSizeItem_i_.echoSymbols = false;
-        nameSizeItem_i_.contentType = null;
         nameSizeItem_i_.minimumCharWidth = 0;
         nameSizeItem_i_.maximumCharWidth = 0;
         nameSizeItem_i_.preferredCharWidth = 0;
@@ -2551,7 +2518,6 @@ public class TestData {
         nameSeasonYearItem_i_.regexpMessage = null;
         nameSeasonYearItem_i_.maxValue = null;
         nameSeasonYearItem_i_.echoSymbols = false;
-        nameSeasonYearItem_i_.contentType = null;
         nameSeasonYearItem_i_.minimumCharWidth = 10;
         nameSeasonYearItem_i_.maximumCharWidth = 0;
         nameSeasonYearItem_i_.preferredCharWidth = 15;
@@ -2589,7 +2555,6 @@ public class TestData {
         nameSeasonItem_i_.regexpMessage = null;
         nameSeasonItem_i_.maxValue = null;
         nameSeasonItem_i_.echoSymbols = false;
-        nameSeasonItem_i_.contentType = null;
         nameSeasonItem_i_.minimumCharWidth = 20;
         nameSeasonItem_i_.maximumCharWidth = 0;
         nameSeasonItem_i_.preferredCharWidth = 30;
@@ -2627,7 +2592,6 @@ public class TestData {
         nameCollectionItem_i_.regexpMessage = null;
         nameCollectionItem_i_.maxValue = null;
         nameCollectionItem_i_.echoSymbols = false;
-        nameCollectionItem_i_.contentType = null;
         nameCollectionItem_i_.minimumCharWidth = 10;
         nameCollectionItem_i_.maximumCharWidth = 0;
         nameCollectionItem_i_.preferredCharWidth = 15;
@@ -2687,7 +2651,6 @@ public class TestData {
         nameTypeItem_i_.regexpMessage = null;
         nameTypeItem_i_.maxValue = null;
         nameTypeItem_i_.echoSymbols = false;
-        nameTypeItem_i_.contentType = null;
         nameTypeItem_i_.minimumCharWidth = 0;
         nameTypeItem_i_.maximumCharWidth = 0;
         nameTypeItem_i_.preferredCharWidth = 0;
@@ -2725,7 +2688,6 @@ public class TestData {
         nameSortItem_i_.regexpMessage = null;
         nameSortItem_i_.maxValue = null;
         nameSortItem_i_.echoSymbols = false;
-        nameSortItem_i_.contentType = null;
         nameSortItem_i_.minimumCharWidth = 0;
         nameSortItem_i_.maximumCharWidth = 0;
         nameSortItem_i_.preferredCharWidth = 0;
@@ -2763,7 +2725,6 @@ public class TestData {
         nameFormItem_i_.regexpMessage = null;
         nameFormItem_i_.maxValue = null;
         nameFormItem_i_.echoSymbols = false;
-        nameFormItem_i_.contentType = null;
         nameFormItem_i_.minimumCharWidth = 0;
         nameFormItem_i_.maximumCharWidth = 0;
         nameFormItem_i_.preferredCharWidth = 0;
@@ -2801,7 +2762,6 @@ public class TestData {
         nameFeatureItem_i_.regexpMessage = null;
         nameFeatureItem_i_.maxValue = null;
         nameFeatureItem_i_.echoSymbols = false;
-        nameFeatureItem_i_.contentType = null;
         nameFeatureItem_i_.minimumCharWidth = 0;
         nameFeatureItem_i_.maximumCharWidth = 0;
         nameFeatureItem_i_.preferredCharWidth = 0;
@@ -2839,7 +2799,6 @@ public class TestData {
         namePackItem_i_.regexpMessage = null;
         namePackItem_i_.maxValue = null;
         namePackItem_i_.echoSymbols = false;
-        namePackItem_i_.contentType = null;
         namePackItem_i_.minimumCharWidth = 0;
         namePackItem_i_.maximumCharWidth = 0;
         namePackItem_i_.preferredCharWidth = 0;
@@ -2877,7 +2836,6 @@ public class TestData {
         propertyItem_i_.regexpMessage = null;
         propertyItem_i_.maxValue = null;
         propertyItem_i_.echoSymbols = false;
-        propertyItem_i_.contentType = null;
         propertyItem_i_.minimumCharWidth = 0;
         propertyItem_i_.maximumCharWidth = 0;
         propertyItem_i_.preferredCharWidth = 0;
@@ -2915,7 +2873,6 @@ public class TestData {
         numberComponentsItem_i_.regexpMessage = null;
         numberComponentsItem_i_.maxValue = null;
         numberComponentsItem_i_.echoSymbols = false;
-        numberComponentsItem_i_.contentType = null;
         numberComponentsItem_i_.minimumCharWidth = 0;
         numberComponentsItem_i_.maximumCharWidth = 0;
         numberComponentsItem_i_.preferredCharWidth = 0;
@@ -2975,7 +2932,6 @@ public class TestData {
         sizeHeightItem_i_.regexpMessage = null;
         sizeHeightItem_i_.maxValue = null;
         sizeHeightItem_i_.echoSymbols = false;
-        sizeHeightItem_i_.contentType = null;
         sizeHeightItem_i_.minimumCharWidth = 0;
         sizeHeightItem_i_.maximumCharWidth = 0;
         sizeHeightItem_i_.preferredCharWidth = 0;
@@ -3013,7 +2969,6 @@ public class TestData {
         sizeChestItem_i_.regexpMessage = null;
         sizeChestItem_i_.maxValue = null;
         sizeChestItem_i_.echoSymbols = false;
-        sizeChestItem_i_.contentType = null;
         sizeChestItem_i_.minimumCharWidth = 0;
         sizeChestItem_i_.maximumCharWidth = 0;
         sizeChestItem_i_.preferredCharWidth = 0;
@@ -3051,7 +3006,6 @@ public class TestData {
         sizeUnderChestItem_i_.regexpMessage = null;
         sizeUnderChestItem_i_.maxValue = null;
         sizeUnderChestItem_i_.echoSymbols = false;
-        sizeUnderChestItem_i_.contentType = null;
         sizeUnderChestItem_i_.minimumCharWidth = 0;
         sizeUnderChestItem_i_.maximumCharWidth = 0;
         sizeUnderChestItem_i_.preferredCharWidth = 0;
@@ -3089,7 +3043,6 @@ public class TestData {
         sizeCupBraItem_i_.regexpMessage = null;
         sizeCupBraItem_i_.maxValue = null;
         sizeCupBraItem_i_.echoSymbols = false;
-        sizeCupBraItem_i_.contentType = null;
         sizeCupBraItem_i_.minimumCharWidth = 0;
         sizeCupBraItem_i_.maximumCharWidth = 0;
         sizeCupBraItem_i_.preferredCharWidth = 0;
@@ -3127,7 +3080,6 @@ public class TestData {
         sizeHipsItem_i_.regexpMessage = null;
         sizeHipsItem_i_.maxValue = null;
         sizeHipsItem_i_.echoSymbols = false;
-        sizeHipsItem_i_.contentType = null;
         sizeHipsItem_i_.minimumCharWidth = 0;
         sizeHipsItem_i_.maximumCharWidth = 0;
         sizeHipsItem_i_.preferredCharWidth = 0;
@@ -3165,7 +3117,6 @@ public class TestData {
         sizeWaistItem_i_.regexpMessage = null;
         sizeWaistItem_i_.maxValue = null;
         sizeWaistItem_i_.echoSymbols = false;
-        sizeWaistItem_i_.contentType = null;
         sizeWaistItem_i_.minimumCharWidth = 0;
         sizeWaistItem_i_.maximumCharWidth = 0;
         sizeWaistItem_i_.preferredCharWidth = 0;
@@ -3203,7 +3154,6 @@ public class TestData {
         sizeNeckItem_i_.regexpMessage = null;
         sizeNeckItem_i_.maxValue = null;
         sizeNeckItem_i_.echoSymbols = false;
-        sizeNeckItem_i_.contentType = null;
         sizeNeckItem_i_.minimumCharWidth = 0;
         sizeNeckItem_i_.maximumCharWidth = 0;
         sizeNeckItem_i_.preferredCharWidth = 0;
@@ -3241,7 +3191,6 @@ public class TestData {
         sizeHeadItem_i_.regexpMessage = null;
         sizeHeadItem_i_.maxValue = null;
         sizeHeadItem_i_.echoSymbols = false;
-        sizeHeadItem_i_.contentType = null;
         sizeHeadItem_i_.minimumCharWidth = 0;
         sizeHeadItem_i_.maximumCharWidth = 0;
         sizeHeadItem_i_.preferredCharWidth = 0;
@@ -3279,7 +3228,6 @@ public class TestData {
         sizeHandItem_i_.regexpMessage = null;
         sizeHandItem_i_.maxValue = null;
         sizeHandItem_i_.echoSymbols = false;
-        sizeHandItem_i_.contentType = null;
         sizeHandItem_i_.minimumCharWidth = 0;
         sizeHandItem_i_.maximumCharWidth = 0;
         sizeHandItem_i_.preferredCharWidth = 0;
@@ -3317,7 +3265,6 @@ public class TestData {
         footLengthItem_i_.regexpMessage = null;
         footLengthItem_i_.maxValue = null;
         footLengthItem_i_.echoSymbols = false;
-        footLengthItem_i_.contentType = null;
         footLengthItem_i_.minimumCharWidth = 0;
         footLengthItem_i_.maximumCharWidth = 0;
         footLengthItem_i_.preferredCharWidth = 0;
@@ -3355,7 +3302,6 @@ public class TestData {
         insoleLengthItem_i_.regexpMessage = null;
         insoleLengthItem_i_.maxValue = null;
         insoleLengthItem_i_.echoSymbols = false;
-        insoleLengthItem_i_.contentType = null;
         insoleLengthItem_i_.minimumCharWidth = 0;
         insoleLengthItem_i_.maximumCharWidth = 0;
         insoleLengthItem_i_.preferredCharWidth = 0;
@@ -3415,7 +3361,6 @@ public class TestData {
         compositionStickerItem_i_.regexpMessage = null;
         compositionStickerItem_i_.maxValue = null;
         compositionStickerItem_i_.echoSymbols = false;
-        compositionStickerItem_i_.contentType = null;
         compositionStickerItem_i_.minimumCharWidth = 0;
         compositionStickerItem_i_.maximumCharWidth = 0;
         compositionStickerItem_i_.preferredCharWidth = 0;
@@ -3475,7 +3420,6 @@ public class TestData {
         nameTasteItem_i_.regexpMessage = null;
         nameTasteItem_i_.maxValue = null;
         nameTasteItem_i_.echoSymbols = false;
-        nameTasteItem_i_.contentType = null;
         nameTasteItem_i_.minimumCharWidth = 0;
         nameTasteItem_i_.maximumCharWidth = 0;
         nameTasteItem_i_.preferredCharWidth = 0;
@@ -3513,7 +3457,6 @@ public class TestData {
         nameCoolingDegreeItem_i_.regexpMessage = null;
         nameCoolingDegreeItem_i_.maxValue = null;
         nameCoolingDegreeItem_i_.echoSymbols = false;
-        nameCoolingDegreeItem_i_.contentType = null;
         nameCoolingDegreeItem_i_.minimumCharWidth = 0;
         nameCoolingDegreeItem_i_.maximumCharWidth = 0;
         nameCoolingDegreeItem_i_.preferredCharWidth = 0;
@@ -3551,7 +3494,6 @@ public class TestData {
         percentFatItem_i_.regexpMessage = null;
         percentFatItem_i_.maxValue = null;
         percentFatItem_i_.echoSymbols = false;
-        percentFatItem_i_.contentType = null;
         percentFatItem_i_.minimumCharWidth = 0;
         percentFatItem_i_.maximumCharWidth = 0;
         percentFatItem_i_.preferredCharWidth = 0;
@@ -3589,7 +3531,6 @@ public class TestData {
         percentAlcoholItem_i_.regexpMessage = null;
         percentAlcoholItem_i_.maxValue = null;
         percentAlcoholItem_i_.echoSymbols = false;
-        percentAlcoholItem_i_.contentType = null;
         percentAlcoholItem_i_.minimumCharWidth = 0;
         percentAlcoholItem_i_.maximumCharWidth = 0;
         percentAlcoholItem_i_.preferredCharWidth = 0;
@@ -3674,7 +3615,6 @@ public class TestData {
         formPrint__.regexpMessage = null;
         formPrint__.maxValue = null;
         formPrint__.echoSymbols = false;
-        formPrint__.contentType = null;
         formPrint__.minimumCharWidth = 0;
         formPrint__.maximumCharWidth = 0;
         formPrint__.preferredCharWidth = 0;
@@ -3712,7 +3652,6 @@ public class TestData {
         formXls__.regexpMessage = null;
         formXls__.maxValue = null;
         formXls__.echoSymbols = false;
-        formXls__.contentType = null;
         formXls__.minimumCharWidth = 0;
         formXls__.maximumCharWidth = 0;
         formXls__.preferredCharWidth = 0;
@@ -3750,7 +3689,6 @@ public class TestData {
         formEdit__.regexpMessage = null;
         formEdit__.maxValue = null;
         formEdit__.echoSymbols = false;
-        formEdit__.contentType = null;
         formEdit__.minimumCharWidth = 0;
         formEdit__.maximumCharWidth = 0;
         formEdit__.preferredCharWidth = 0;
@@ -3788,7 +3726,6 @@ public class TestData {
         formDrop__.regexpMessage = null;
         formDrop__.maxValue = null;
         formDrop__.echoSymbols = false;
-        formDrop__.contentType = null;
         formDrop__.minimumCharWidth = 0;
         formDrop__.maximumCharWidth = 0;
         formDrop__.preferredCharWidth = 0;
@@ -3827,7 +3764,6 @@ public class TestData {
         isEditable__.regexpMessage = null;
         isEditable__.maxValue = null;
         isEditable__.echoSymbols = false;
-        isEditable__.contentType = null;
         isEditable__.minimumCharWidth = 0;
         isEditable__.maximumCharWidth = 0;
         isEditable__.preferredCharWidth = 0;
@@ -3886,7 +3822,6 @@ public class TestData {
         formRefresh__.regexpMessage = null;
         formRefresh__.maxValue = null;
         formRefresh__.echoSymbols = false;
-        formRefresh__.contentType = null;
         formRefresh__.minimumCharWidth = 0;
         formRefresh__.maximumCharWidth = 0;
         formRefresh__.preferredCharWidth = 0;
@@ -3924,7 +3859,6 @@ public class TestData {
         formApply__.regexpMessage = null;
         formApply__.maxValue = null;
         formApply__.echoSymbols = false;
-        formApply__.contentType = null;
         formApply__.minimumCharWidth = 0;
         formApply__.maximumCharWidth = 0;
         formApply__.preferredCharWidth = 0;
@@ -3962,7 +3896,6 @@ public class TestData {
         formCancel__.regexpMessage = null;
         formCancel__.maxValue = null;
         formCancel__.echoSymbols = false;
-        formCancel__.contentType = null;
         formCancel__.minimumCharWidth = 0;
         formCancel__.maximumCharWidth = 0;
         formCancel__.preferredCharWidth = 0;
@@ -4000,7 +3933,6 @@ public class TestData {
         formOk__.regexpMessage = null;
         formOk__.maxValue = null;
         formOk__.echoSymbols = false;
-        formOk__.contentType = null;
         formOk__.minimumCharWidth = 0;
         formOk__.maximumCharWidth = 0;
         formOk__.preferredCharWidth = 0;
@@ -4038,7 +3970,6 @@ public class TestData {
         formClose__.regexpMessage = null;
         formClose__.maxValue = null;
         formClose__.echoSymbols = false;
-        formClose__.contentType = null;
         formClose__.minimumCharWidth = 0;
         formClose__.maximumCharWidth = 0;
         formClose__.preferredCharWidth = 0;
