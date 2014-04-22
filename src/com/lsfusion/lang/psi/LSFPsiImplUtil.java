@@ -346,13 +346,13 @@ public class LSFPsiImplUtil {
     public static LSFClassSet resolve(LSFBuiltInClassName builtIn) {
         String name = builtIn.getText();
         if (name.equals("DOUBLE"))
-            return new DoubleClass();
+            return DoubleClass.instance;
         if (name.equals("INTEGER"))
-            return new IntegerClass();
+            return IntegerClass.instance;
         if (name.equals("LONG"))
-            return new LongClass();
+            return LongClass.instance;
         if (name.equals("YEAR"))
-            return new YearClass();
+            return YearClass.instance;
 
         if (name.startsWith("STRING[")) {
             name = name.substring("STRING[".length(), name.length() - 1);
@@ -370,6 +370,32 @@ public class LSFPsiImplUtil {
             String length = name.substring("NUMERIC[".length(), name.indexOf(","));
             String precision = name.substring(name.indexOf(",") + 1, name.length() - 1);
             return new NumericClass(Integer.parseInt(length), Integer.parseInt(precision));
+        } else if (name.equals("TEXT")) {
+            return new StringClass(false, false, false, ExtInt.UNLIMITED);
+        } else if (name.equals("RICHTEXT")) {
+            return new StringClass(false, false, true, ExtInt.UNLIMITED);
+        }
+
+        if (name.equals("WORDFILE")) {
+            return WordClass.instance;
+        } else if (name.equals("IMAGEFILE")) {
+            return ImageClass.instance;
+        } else if (name.equals("PDFFILE")) {
+            return PDFClass.instance;
+        } else if (name.equals("CUSTOMFILE")) {
+            return DynamicFormatFileClass.instance;
+        } else if (name.equals("EXCELFILE")) {
+            return ExcelClass.instance;
+        } else if (name.equals("BOOLEAN")) {
+            return LogicalClass.instance;
+        } else if (name.equals("DATE")) {
+            return DateClass.instance;
+        } else if (name.equals("TIME")) {
+            return TimeClass.instance;
+        } else if (name.equals("DATETIME")) {
+            return DateTimeClass.instance;
+        } else if (name.equals("COLOR")) {
+            return ColorClass.instance;
         }
 
         return new SimpleDataClass(name);
@@ -463,7 +489,7 @@ public class LSFPsiImplUtil {
     public static LSFClassSet resolveInferredValueClass(@NotNull LSFOrPE sourceStatement, @Nullable InferResult inferred) {
         List<LSFXorPE> list = sourceStatement.getXorPEList();
         if (list.size() > 1)
-            return DataClass.BOOLEAN;
+            return LogicalClass.instance;
         return resolveInferredValueClass(list.get(0), inferred);
     }
 
@@ -471,7 +497,7 @@ public class LSFPsiImplUtil {
     public static LSFClassSet resolveInferredValueClass(@NotNull LSFXorPE sourceStatement, @Nullable InferResult inferred) {
         List<LSFAndPE> list = sourceStatement.getAndPEList();
         if (list.size() > 1)
-            return DataClass.BOOLEAN;
+            return LogicalClass.instance;
         return resolveInferredValueClass(list.get(0), inferred);
     }
 
@@ -479,7 +505,7 @@ public class LSFPsiImplUtil {
     public static LSFClassSet resolveInferredValueClass(@NotNull LSFAndPE sourceStatement, @Nullable InferResult inferred) {
         List<LSFNotPE> list = sourceStatement.getNotPEList();
         if (list.size() > 1)
-            return DataClass.BOOLEAN;
+            return LogicalClass.instance;
         return resolveInferredValueClass(list.get(0), inferred);
     }
 
@@ -488,14 +514,14 @@ public class LSFPsiImplUtil {
         LSFEqualityPE eqPE = sourceStatement.getEqualityPE();
         if (eqPE != null)
             return resolveInferredValueClass(eqPE, inferred);
-        return DataClass.BOOLEAN;
+        return LogicalClass.instance;
     }
 
     @Nullable
     public static LSFClassSet resolveInferredValueClass(@NotNull LSFEqualityPE sourceStatement, @Nullable InferResult inferred) {
         List<LSFRelationalPE> list = sourceStatement.getRelationalPEList();
         if (list.size() == 2)
-            return DataClass.BOOLEAN;
+            return LogicalClass.instance;
         return resolveInferredValueClass(list.get(0), inferred);
     }
 
@@ -503,14 +529,14 @@ public class LSFPsiImplUtil {
     public static LSFClassSet resolveInferredValueClass(@NotNull LSFRelationalPE sourceStatement, @Nullable InferResult inferred) {
         List<LSFAdditiveORPE> list = sourceStatement.getAdditiveORPEList();
         if (list.size() == 2)
-            return DataClass.BOOLEAN;
+            return LogicalClass.instance;
 
         LSFClassSet result = resolveInferredValueClass(list.get(0), inferred);
 
         LSFTypePropertyDefinition typeDef = sourceStatement.getTypePropertyDefinition();
         if (typeDef != null) {
             if (typeDef.getTypeIs().getText().equals("IS"))
-                return DataClass.BOOLEAN;
+                return LogicalClass.instance;
             else {
                 LSFClassSet resolveClass = resolveClass(typeDef.getClassName());
                 if (resolveClass != null) {
@@ -751,12 +777,12 @@ public class LSFPsiImplUtil {
         LSFSessionPropertyType type = sourceStatement.getSessionPropertyType();
         if (type.getText().equals("PREV"))
             return resolveInferredValueClass(sourceStatement.getPropertyExpression(), inferred);
-        return DataClass.BOOLEAN;
+        return LogicalClass.instance;
     }
 
     @Nullable
     public static LSFClassSet resolveInferredValueClass(@NotNull LSFSignaturePropertyDefinition sourceStatement, @Nullable InferResult inferred) {
-        return DataClass.BOOLEAN;
+        return LogicalClass.instance;
     }
 
     @Nullable
@@ -774,13 +800,13 @@ public class LSFPsiImplUtil {
     @Nullable
     public static DataClass resolveBuiltInValueClass(@NotNull LSFLiteral sourceStatement) {
         if (sourceStatement.getBooleanLiteral() != null)
-            return DataClass.BOOLEAN;
+            return LogicalClass.instance;
         if (sourceStatement.getUlongLiteral() != null)
-            return new LongClass();
+            return LongClass.instance;
         if (sourceStatement.getUintLiteral() != null)
-            return new IntegerClass();
+            return IntegerClass.instance;
         if (sourceStatement.getUdoubleLiteral() != null)
-            return new DoubleClass();
+            return DoubleClass.instance;
         if (sourceStatement.getUnumericLiteral() != null) {
             String name = sourceStatement.getText();
             String whole = name.substring(0, name.indexOf("."));
@@ -789,7 +815,7 @@ public class LSFPsiImplUtil {
         }
         LSFStringLiteral stringLiteral = sourceStatement.getStringLiteral();
         if (stringLiteral != null)
-            return new StringClass(false, true, new ExtInt(stringLiteral.getText().length()));
+            return new StringClass(false, true, new ExtInt(stringLiteral.getValue().length()));
         if (sourceStatement.getDateTimeLiteral() != null)
             return new SimpleDataClass("DATETIME");
         if (sourceStatement.getDateLiteral() != null)
@@ -853,7 +879,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFFilterPropertyDefinition sourceStatement, boolean infer) {
-        return DataClass.BOOLEAN;
+        return LogicalClass.instance;
     }
 
     // PropertyExpression.getValueClassNames
@@ -877,7 +903,7 @@ public class LSFPsiImplUtil {
             result.addAll(getValueClassNames(xorPEList.get(0)));
             return result;
         }
-        return Arrays.asList(DataClass.BOOLEAN.getName());
+        return Arrays.asList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFXorPE sourceStatement) {
@@ -887,7 +913,7 @@ public class LSFPsiImplUtil {
             result.addAll(getValueClassNames(andPEList.get(0)));
             return result;
         }
-        return Arrays.asList(DataClass.BOOLEAN.getName());
+        return Arrays.asList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFAndPE sourceStatement) {
@@ -897,7 +923,7 @@ public class LSFPsiImplUtil {
             result.addAll(getValueClassNames(notPEList.get(0)));
             return result;
         }
-        return Arrays.asList(DataClass.BOOLEAN.getName());
+        return Arrays.asList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFNotPE sourceStatement) {
@@ -905,13 +931,13 @@ public class LSFPsiImplUtil {
         if (equalityPE != null) {
             return getValueClassNames(equalityPE);
         }
-        return Arrays.asList(DataClass.BOOLEAN.getName());
+        return Arrays.asList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFEqualityPE sourceStatement) {
         List<LSFRelationalPE> relationalPEList = sourceStatement.getRelationalPEList();
         if (relationalPEList.size() == 2) {
-            return Arrays.asList(DataClass.BOOLEAN.getName());
+            return Arrays.asList(LogicalClass.instance.getName());
         }
         return getValueClassNames(relationalPEList.get(0));
     }
@@ -919,7 +945,7 @@ public class LSFPsiImplUtil {
     public static List<String> getValueClassNames(@NotNull LSFRelationalPE sourceStatement) {
         List<LSFAdditiveORPE> additiveORPEs = sourceStatement.getAdditiveORPEList();
         if (additiveORPEs.size() == 2) {
-            return Arrays.asList(DataClass.BOOLEAN.getName());
+            return Arrays.asList(LogicalClass.instance.getName());
         }
 
         List<String> result = getValueClassNames(additiveORPEs.get(0));
@@ -927,7 +953,7 @@ public class LSFPsiImplUtil {
         LSFTypePropertyDefinition typePD = sourceStatement.getTypePropertyDefinition();
         if (typePD != null) {
             if (typePD.getTypeIs().getText().equals("IS")) {
-                return Arrays.asList(DataClass.BOOLEAN.getName());
+                return Arrays.asList(LogicalClass.instance.getName());
             } else {
                 String typeDefClass = getClassName(typePD.getClassName());
                 if (typeDefClass != null) {
@@ -1060,7 +1086,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {
-        return Arrays.asList(DataClass.BOOLEAN.getName());
+        return Arrays.asList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFExpressionFriendlyPD sourceStatement) {
@@ -1170,11 +1196,11 @@ public class LSFPsiImplUtil {
         if (type.getText().equals("PREV")) {
             return getValueClassNames(sourceStatement.getPropertyExpression());
         }
-        return Arrays.asList(DataClass.BOOLEAN.getName());
+        return Arrays.asList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFSignaturePropertyDefinition sourceStatement) {
-        return Arrays.asList(DataClass.BOOLEAN.getName());
+        return Arrays.asList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFLiteral sourceStatement) {
@@ -1571,7 +1597,7 @@ public class LSFPsiImplUtil {
             return null;
         }
 
-        String text = stringLiteral.getText();
+        String text = stringLiteral.getValue();
         int i = 0;
         List<LSFClassSet> result = new ArrayList<LSFClassSet>();
         while (text.contains("$" + (i + 1))) {
@@ -2636,16 +2662,16 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFTryActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        
+
         List<LSFActionPropertyDefinitionBody> actions = body.getActionPropertyDefinitionBodyList();
         if (actions.isEmpty()) {
             return Inferred.EMPTY;
         }
-        
+
         Inferred result = inferActionParamClasses(actions.get(0), params);
         if (actions.size() == 2)
             result = result.or(inferActionParamClasses(actions.get(1), params));
-        return result;        
+        return result;
     }
 
     @Nullable

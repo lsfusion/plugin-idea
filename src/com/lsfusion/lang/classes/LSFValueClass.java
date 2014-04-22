@@ -6,4 +6,6 @@ public interface LSFValueClass {
     public String getName();
 
     public String getQName(PsiElement context);
+
+    String getCaption();
 }

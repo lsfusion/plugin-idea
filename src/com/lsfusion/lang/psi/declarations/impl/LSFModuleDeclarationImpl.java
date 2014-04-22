@@ -76,6 +76,18 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
     }
 
     @Override
+    public boolean requires(LSFModuleDeclaration module) {
+        return LSFGlobalResolver.getRequireModules(this).contains(module.getLSFFile());
+//        for (LSFModuleReference ref : getRequireRefs()) {
+//            LSFModuleDeclaration decl = ref.resolveDecl();
+//            if (decl != null && (module.equals(decl) || decl.requires(module))) {
+//                return true;
+//            }
+//        }
+//        return false;
+    }
+
+    @Override
     public List<LSFModuleReference> getRequireRefs() {
         ModuleStubElement stub = getStub();
         if(stub != null)

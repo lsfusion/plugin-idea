@@ -3,6 +3,7 @@ package com.lsfusion.lang.classes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 
+import java.awt.*;
 import java.util.Arrays;
 
 public class StructClassSet implements LSFClassSet, LSFValueClass {
@@ -58,6 +59,31 @@ public class StructClassSet implements LSFClassSet, LSFValueClass {
         return true;
     }
 
+    @Override
+    public int getMinimumWidth(int minCharWidth, FontMetrics fontMetrics) {
+        return fontMetrics.stringWidth("999 999") + 8;
+    }
+
+    @Override
+    public int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics) {
+        return fontMetrics.stringWidth("9 999 999") + 8;
+    }
+
+    @Override
+    public int getMaximumWidth(int maxCharWidth, FontMetrics fontMetrics) {
+        return getPreferredWidth(0, fontMetrics);
+    }
+
+    @Override
+    public int getPreferredHeight(FontMetrics fontMetrics) {
+        return fontMetrics.getHeight() + 1;
+    }
+
+    @Override
+    public int getMaximumHeight(FontMetrics fontMetrics) {
+        return getPreferredHeight(fontMetrics);
+    }
+
     // пока не поддерживаем
 
     public LSFValueClass getCommonClass() {
@@ -66,6 +92,11 @@ public class StructClassSet implements LSFClassSet, LSFValueClass {
 
     public String getQName(PsiElement context) {
         throw new UnsupportedOperationException("getQName(PsiElement context) isn't supproted for StructClassSet");
+    }
+
+    @Override
+    public String getCaption() {
+        return null;
     }
 
     @Override

@@ -143,7 +143,7 @@ public class TestData {
         g_toolbar.foreground = null;
         g_toolbar.iconPath = null;
         g_toolbar.forceHide = true;
-        g_toolbar.isTreeToolbar = false;
+//        g_toolbar.isTreeToolbar = false;
         g_controls.add(g_toolbar);
         ContainerView g_controls_right = new ContainerView("g.controls.right");
         g_controls_right.minimumSize = null;
@@ -305,7 +305,7 @@ public class TestData {
         nameGroup_g_.background = null;
         nameGroup_g_.foreground = null;
         nameGroup_g_.iconPath = null;
-        nameGroup_g_.isAction = false;
+//        nameGroup_g_.isAction = false;
         nameGroup_g_.showTableFirst = false;
         nameGroup_g_.editOnSingleClick = false;
         nameGroup_g_.hide = false;
@@ -531,7 +531,7 @@ public class TestData {
         gt_toolbar.foreground = null;
         gt_toolbar.iconPath = null;
         gt_toolbar.forceHide = false;
-        gt_toolbar.isTreeToolbar = false;
+//        gt_toolbar.isTreeToolbar = false;
         gt_controls.add(gt_toolbar);
         ContainerView gt_controls_right = new ContainerView("gt.controls.right");
         gt_controls_right.minimumSize = null;
@@ -693,7 +693,7 @@ public class TestData {
         nameGroupType_gt_.background = null;
         nameGroupType_gt_.foreground = null;
         nameGroupType_gt_.iconPath = null;
-        nameGroupType_gt_.isAction = false;
+//        nameGroupType_gt_.isAction = false;
         nameGroupType_gt_.showTableFirst = false;
         nameGroupType_gt_.editOnSingleClick = false;
         nameGroupType_gt_.hide = false;
@@ -759,23 +759,23 @@ public class TestData {
         groupTree_tree_box.type = ContainerType.CONTAINERV;
         groupTree_tree_box.caption = "Дерево";
         groupTree_tree_box.description = "Дерево";
-        TreeGroupView groupTree_tree = new TreeGroupView("groupTree.tree");
-        groupTree_tree.minimumSize = null;
-        groupTree_tree.maximumSize = null;
-        groupTree_tree.preferredSize = null;
-        groupTree_tree.flex = 1.0;
-        groupTree_tree.alignment = FlexAlignment.STRETCH;
-        groupTree_tree.marginTop = 0;
-        groupTree_tree.marginBottom = 0;
-        groupTree_tree.marginLeft = 0;
-        groupTree_tree.marginRight = 0;
-        groupTree_tree.defaultComponent = false;
-//groupTree_tree.font = null;
-//groupTree_tree.headerFont = null;
-        groupTree_tree.background = null;
-        groupTree_tree.foreground = null;
-        groupTree_tree.iconPath = null;
-        groupTree_tree_box.add(groupTree_tree);
+//        TreeGroupView groupTree_tree = new TreeGroupView("groupTree.tree");
+//        groupTree_tree.minimumSize = null;
+//        groupTree_tree.maximumSize = null;
+//        groupTree_tree.preferredSize = null;
+//        groupTree_tree.flex = 1.0;
+//        groupTree_tree.alignment = FlexAlignment.STRETCH;
+//        groupTree_tree.marginTop = 0;
+//        groupTree_tree.marginBottom = 0;
+//        groupTree_tree.marginLeft = 0;
+//        groupTree_tree.marginRight = 0;
+//        groupTree_tree.defaultComponent = false;
+////groupTree_tree.font = null;
+////groupTree_tree.headerFont = null;
+//        groupTree_tree.background = null;
+//        groupTree_tree.foreground = null;
+//        groupTree_tree.iconPath = null;
+//        groupTree_tree_box.add(groupTree_tree);
         ContainerView groupTree_tree_controls = new ContainerView("groupTree.tree.controls");
         groupTree_tree_controls.minimumSize = null;
         groupTree_tree_controls.maximumSize = null;
@@ -814,7 +814,7 @@ public class TestData {
         groupTree_toolbar.foreground = null;
         groupTree_toolbar.iconPath = null;
         groupTree_toolbar.forceHide = false;
-        groupTree_toolbar.isTreeToolbar = true;
+//        groupTree_toolbar.isTreeToolbar = true;
         groupTree_tree_controls.add(groupTree_toolbar);
         ContainerView groupTree_tree_controls_right = new ContainerView("groupTree.tree.controls.right");
         groupTree_tree_controls_right.minimumSize = null;
@@ -858,23 +858,23 @@ public class TestData {
         groupTree_tree_filters.type = ContainerType.CONTAINERH;
         groupTree_tree_filters.caption = null;
         groupTree_tree_filters.description = "Контейнер фильтров";
-        RegularFilterGroupView filters_inactive = new RegularFilterGroupView("filters.inactive");
-        filters_inactive.minimumSize = null;
-        filters_inactive.maximumSize = null;
-        filters_inactive.preferredSize = null;
-        filters_inactive.flex = 0.0;
-        filters_inactive.alignment = FlexAlignment.LEADING;
-        filters_inactive.marginTop = 0;
-        filters_inactive.marginBottom = 0;
-        filters_inactive.marginLeft = 0;
-        filters_inactive.marginRight = 0;
-        filters_inactive.defaultComponent = false;
-//filters_inactive.font = null;
-//filters_inactive.headerFont = null;
-        filters_inactive.background = null;
-        filters_inactive.foreground = null;
-        filters_inactive.iconPath = null;
-        groupTree_tree_filters.add(filters_inactive);
+//        RegularFilterGroupView filters_inactive = new RegularFilterGroupView("filters.inactive");
+//        filters_inactive.minimumSize = null;
+//        filters_inactive.maximumSize = null;
+//        filters_inactive.preferredSize = null;
+//        filters_inactive.flex = 0.0;
+//        filters_inactive.alignment = FlexAlignment.LEADING;
+//        filters_inactive.marginTop = 0;
+//        filters_inactive.marginBottom = 0;
+//        filters_inactive.marginLeft = 0;
+//        filters_inactive.marginRight = 0;
+//        filters_inactive.defaultComponent = false;
+////filters_inactive.font = null;
+////filters_inactive.headerFont = null;
+//        filters_inactive.background = null;
+//        filters_inactive.foreground = null;
+//        filters_inactive.iconPath = null;
+//        groupTree_tree_filters.add(filters_inactive);
         groupTree_tree_controls_right.add(groupTree_tree_filters);
         ContainerView groupTree_tree_toolbar_props_box = new ContainerView("groupTree.tree.toolbar.props.box");
         groupTree_tree_toolbar_props_box.minimumSize = null;
@@ -934,7 +934,7 @@ public class TestData {
         imageItem_i_.background = null;
         imageItem_i_.foreground = null;
         imageItem_i_.iconPath = null;
-        imageItem_i_.isAction = false;
+//        imageItem_i_.isAction = false;
         imageItem_i_.showTableFirst = false;
         imageItem_i_.editOnSingleClick = false;
         imageItem_i_.hide = false;
@@ -1015,7 +1015,7 @@ public class TestData {
         seekBarcode__.background = null;
         seekBarcode__.foreground = null;
         seekBarcode__.iconPath = null;
-        seekBarcode__.isAction = false;
+//        seekBarcode__.isAction = false;
         seekBarcode__.showTableFirst = false;
         seekBarcode__.editOnSingleClick = false;
         seekBarcode__.hide = false;
@@ -1052,7 +1052,7 @@ public class TestData {
         replaceItem_i_.background = null;
         replaceItem_i_.foreground = null;
         replaceItem_i_.iconPath = null;
-        replaceItem_i_.isAction = true;
+//        replaceItem_i_.isAction = true;
         replaceItem_i_.showTableFirst = false;
         replaceItem_i_.editOnSingleClick = false;
         replaceItem_i_.hide = false;
@@ -1190,7 +1190,7 @@ public class TestData {
         i_toolbar.foreground = null;
         i_toolbar.iconPath = null;
         i_toolbar.forceHide = false;
-        i_toolbar.isTreeToolbar = false;
+//        i_toolbar.isTreeToolbar = false;
         i_controls.add(i_toolbar);
         ContainerView i_controls_right = new ContainerView("i.controls.right");
         i_controls_right.minimumSize = null;
@@ -1234,40 +1234,40 @@ public class TestData {
         i_filters.type = ContainerType.CONTAINERH;
         i_filters.caption = null;
         i_filters.description = "Контейнер фильтров";
-        RegularFilterGroupView filters_inactive2 = new RegularFilterGroupView("filters.inactive");
-        filters_inactive2.minimumSize = null;
-        filters_inactive2.maximumSize = null;
-        filters_inactive2.preferredSize = null;
-        filters_inactive2.flex = 0.0;
-        filters_inactive2.alignment = FlexAlignment.LEADING;
-        filters_inactive2.marginTop = 0;
-        filters_inactive2.marginBottom = 0;
-        filters_inactive2.marginLeft = 0;
-        filters_inactive2.marginRight = 0;
-        filters_inactive2.defaultComponent = false;
-//filters_inactive.font = null;
-//filters_inactive.headerFont = null;
-        filters_inactive2.background = null;
-        filters_inactive2.foreground = null;
-        filters_inactive2.iconPath = null;
-        i_filters.add(filters_inactive2);
-        RegularFilterGroupView filters_groupFilters = new RegularFilterGroupView("filters.groupFilters");
-        filters_groupFilters.minimumSize = null;
-        filters_groupFilters.maximumSize = null;
-        filters_groupFilters.preferredSize = null;
-        filters_groupFilters.flex = 0.0;
-        filters_groupFilters.alignment = FlexAlignment.LEADING;
-        filters_groupFilters.marginTop = 0;
-        filters_groupFilters.marginBottom = 0;
-        filters_groupFilters.marginLeft = 0;
-        filters_groupFilters.marginRight = 0;
-        filters_groupFilters.defaultComponent = false;
-//filters_groupFilters.font = null;
-//filters_groupFilters.headerFont = null;
-        filters_groupFilters.background = null;
-        filters_groupFilters.foreground = null;
-        filters_groupFilters.iconPath = null;
-        i_filters.add(filters_groupFilters);
+//        RegularFilterGroupView filters_inactive2 = new RegularFilterGroupView("filters.inactive");
+//        filters_inactive2.minimumSize = null;
+//        filters_inactive2.maximumSize = null;
+//        filters_inactive2.preferredSize = null;
+//        filters_inactive2.flex = 0.0;
+//        filters_inactive2.alignment = FlexAlignment.LEADING;
+//        filters_inactive2.marginTop = 0;
+//        filters_inactive2.marginBottom = 0;
+//        filters_inactive2.marginLeft = 0;
+//        filters_inactive2.marginRight = 0;
+//        filters_inactive2.defaultComponent = false;
+////filters_inactive.font = null;
+////filters_inactive.headerFont = null;
+//        filters_inactive2.background = null;
+//        filters_inactive2.foreground = null;
+//        filters_inactive2.iconPath = null;
+//        i_filters.add(filters_inactive2);
+//        RegularFilterGroupView filters_groupFilters = new RegularFilterGroupView("filters.groupFilters");
+//        filters_groupFilters.minimumSize = null;
+//        filters_groupFilters.maximumSize = null;
+//        filters_groupFilters.preferredSize = null;
+//        filters_groupFilters.flex = 0.0;
+//        filters_groupFilters.alignment = FlexAlignment.LEADING;
+//        filters_groupFilters.marginTop = 0;
+//        filters_groupFilters.marginBottom = 0;
+//        filters_groupFilters.marginLeft = 0;
+//        filters_groupFilters.marginRight = 0;
+//        filters_groupFilters.defaultComponent = false;
+////filters_groupFilters.font = null;
+////filters_groupFilters.headerFont = null;
+//        filters_groupFilters.background = null;
+//        filters_groupFilters.foreground = null;
+//        filters_groupFilters.iconPath = null;
+//        i_filters.add(filters_groupFilters);
         i_controls_right.add(i_filters);
         ContainerView i_toolbar_props_box = new ContainerView("i.toolbar.props.box");
         i_toolbar_props_box.minimumSize = null;
@@ -1306,7 +1306,7 @@ public class TestData {
         addForm_Item_Item__.background = null;
         addForm_Item_Item__.foreground = null;
         addForm_Item_Item__.iconPath = "add.png";
-        addForm_Item_Item__.isAction = true;
+//        addForm_Item_Item__.isAction = true;
         addForm_Item_Item__.showTableFirst = false;
         addForm_Item_Item__.editOnSingleClick = false;
         addForm_Item_Item__.hide = false;
@@ -1343,7 +1343,7 @@ public class TestData {
         editForm_Item_Item_i_.background = null;
         editForm_Item_Item_i_.foreground = null;
         editForm_Item_Item_i_.iconPath = "edit.png";
-        editForm_Item_Item_i_.isAction = true;
+//        editForm_Item_Item_i_.isAction = true;
         editForm_Item_Item_i_.showTableFirst = false;
         editForm_Item_Item_i_.editOnSingleClick = false;
         editForm_Item_Item_i_.hide = false;
@@ -1380,7 +1380,7 @@ public class TestData {
         deletei.background = null;
         deletei.foreground = null;
         deletei.iconPath = "delete.png";
-        deletei.isAction = true;
+//        deletei.isAction = true;
         deletei.showTableFirst = false;
         deletei.editOnSingleClick = false;
         deletei.hide = false;
@@ -1417,7 +1417,7 @@ public class TestData {
         copyItem_i_.background = null;
         copyItem_i_.foreground = null;
         copyItem_i_.iconPath = null;
-        copyItem_i_.isAction = true;
+//        copyItem_i_.isAction = true;
         copyItem_i_.showTableFirst = false;
         copyItem_i_.editOnSingleClick = false;
         copyItem_i_.hide = false;
@@ -1534,7 +1534,7 @@ public class TestData {
         idBarcodeSku_i_.background = null;
         idBarcodeSku_i_.foreground = null;
         idBarcodeSku_i_.iconPath = null;
-        idBarcodeSku_i_.isAction = false;
+//        idBarcodeSku_i_.isAction = false;
         idBarcodeSku_i_.showTableFirst = false;
         idBarcodeSku_i_.editOnSingleClick = false;
         idBarcodeSku_i_.hide = false;
@@ -1571,7 +1571,7 @@ public class TestData {
         idItem_i_.background = null;
         idItem_i_.foreground = null;
         idItem_i_.iconPath = null;
-        idItem_i_.isAction = false;
+//        idItem_i_.isAction = false;
         idItem_i_.showTableFirst = false;
         idItem_i_.editOnSingleClick = false;
         idItem_i_.hide = false;
@@ -1608,7 +1608,7 @@ public class TestData {
         nameAttributeItem_i_.background = null;
         nameAttributeItem_i_.foreground = null;
         nameAttributeItem_i_.iconPath = null;
-        nameAttributeItem_i_.isAction = false;
+//        nameAttributeItem_i_.isAction = false;
         nameAttributeItem_i_.showTableFirst = false;
         nameAttributeItem_i_.editOnSingleClick = false;
         nameAttributeItem_i_.hide = false;
@@ -1645,7 +1645,7 @@ public class TestData {
         canonicalNameGroupGroupTypeSku_gt_i_.background = null;
         canonicalNameGroupGroupTypeSku_gt_i_.foreground = null;
         canonicalNameGroupGroupTypeSku_gt_i_.iconPath = null;
-        canonicalNameGroupGroupTypeSku_gt_i_.isAction = false;
+//        canonicalNameGroupGroupTypeSku_gt_i_.isAction = false;
         canonicalNameGroupGroupTypeSku_gt_i_.showTableFirst = false;
         canonicalNameGroupGroupTypeSku_gt_i_.editOnSingleClick = false;
         canonicalNameGroupGroupTypeSku_gt_i_.hide = false;
@@ -1682,7 +1682,7 @@ public class TestData {
         inItem_i_.background = null;
         inItem_i_.foreground = null;
         inItem_i_.iconPath = null;
-        inItem_i_.isAction = false;
+//        inItem_i_.isAction = false;
         inItem_i_.showTableFirst = false;
         inItem_i_.editOnSingleClick = false;
         inItem_i_.hide = false;
@@ -1741,7 +1741,7 @@ public class TestData {
         captionItem_i_.background = null;
         captionItem_i_.foreground = null;
         captionItem_i_.iconPath = null;
-        captionItem_i_.isAction = false;
+//        captionItem_i_.isAction = false;
         captionItem_i_.showTableFirst = false;
         captionItem_i_.editOnSingleClick = false;
         captionItem_i_.hide = false;
@@ -1778,7 +1778,7 @@ public class TestData {
         nameUOMItem_i_.background = null;
         nameUOMItem_i_.foreground = null;
         nameUOMItem_i_.iconPath = null;
-        nameUOMItem_i_.isAction = false;
+//        nameUOMItem_i_.isAction = false;
         nameUOMItem_i_.showTableFirst = false;
         nameUOMItem_i_.editOnSingleClick = false;
         nameUOMItem_i_.hide = false;
@@ -1815,7 +1815,7 @@ public class TestData {
         nameBrandItem_i_.background = null;
         nameBrandItem_i_.foreground = null;
         nameBrandItem_i_.iconPath = null;
-        nameBrandItem_i_.isAction = false;
+//        nameBrandItem_i_.isAction = false;
         nameBrandItem_i_.showTableFirst = false;
         nameBrandItem_i_.editOnSingleClick = false;
         nameBrandItem_i_.hide = false;
@@ -1852,7 +1852,7 @@ public class TestData {
         nameCountryItem_i_.background = null;
         nameCountryItem_i_.foreground = null;
         nameCountryItem_i_.iconPath = null;
-        nameCountryItem_i_.isAction = false;
+//        nameCountryItem_i_.isAction = false;
         nameCountryItem_i_.showTableFirst = false;
         nameCountryItem_i_.editOnSingleClick = false;
         nameCountryItem_i_.hide = false;
@@ -1889,7 +1889,7 @@ public class TestData {
         nameManufacturerItem_i_.background = null;
         nameManufacturerItem_i_.foreground = null;
         nameManufacturerItem_i_.iconPath = null;
-        nameManufacturerItem_i_.isAction = false;
+//        nameManufacturerItem_i_.isAction = false;
         nameManufacturerItem_i_.showTableFirst = false;
         nameManufacturerItem_i_.editOnSingleClick = false;
         nameManufacturerItem_i_.hide = false;
@@ -1926,7 +1926,7 @@ public class TestData {
         compositionItem_i_.background = null;
         compositionItem_i_.foreground = null;
         compositionItem_i_.iconPath = null;
-        compositionItem_i_.isAction = false;
+//        compositionItem_i_.isAction = false;
         compositionItem_i_.showTableFirst = false;
         compositionItem_i_.editOnSingleClick = false;
         compositionItem_i_.hide = false;
@@ -1963,7 +1963,7 @@ public class TestData {
         nameWareItem_i_.background = null;
         nameWareItem_i_.foreground = null;
         nameWareItem_i_.iconPath = null;
-        nameWareItem_i_.isAction = false;
+//        nameWareItem_i_.isAction = false;
         nameWareItem_i_.showTableFirst = false;
         nameWareItem_i_.editOnSingleClick = false;
         nameWareItem_i_.hide = false;
@@ -2022,7 +2022,7 @@ public class TestData {
         originalCaptionItem_i_.background = null;
         originalCaptionItem_i_.foreground = null;
         originalCaptionItem_i_.iconPath = null;
-        originalCaptionItem_i_.isAction = false;
+//        originalCaptionItem_i_.isAction = false;
         originalCaptionItem_i_.showTableFirst = false;
         originalCaptionItem_i_.editOnSingleClick = false;
         originalCaptionItem_i_.hide = false;
@@ -2059,7 +2059,7 @@ public class TestData {
         originalCompositionItem_i_.background = null;
         originalCompositionItem_i_.foreground = null;
         originalCompositionItem_i_.iconPath = null;
-        originalCompositionItem_i_.isAction = false;
+//        originalCompositionItem_i_.isAction = false;
         originalCompositionItem_i_.showTableFirst = false;
         originalCompositionItem_i_.editOnSingleClick = false;
         originalCompositionItem_i_.hide = false;
@@ -2096,7 +2096,7 @@ public class TestData {
         originalCustomsGroupItem_i_.background = null;
         originalCustomsGroupItem_i_.foreground = null;
         originalCustomsGroupItem_i_.iconPath = null;
-        originalCustomsGroupItem_i_.isAction = false;
+//        originalCustomsGroupItem_i_.isAction = false;
         originalCustomsGroupItem_i_.showTableFirst = false;
         originalCustomsGroupItem_i_.editOnSingleClick = false;
         originalCustomsGroupItem_i_.hide = false;
@@ -2155,7 +2155,7 @@ public class TestData {
         netWeightItem_i_.background = null;
         netWeightItem_i_.foreground = null;
         netWeightItem_i_.iconPath = null;
-        netWeightItem_i_.isAction = false;
+//        netWeightItem_i_.isAction = false;
         netWeightItem_i_.showTableFirst = false;
         netWeightItem_i_.editOnSingleClick = false;
         netWeightItem_i_.hide = false;
@@ -2192,7 +2192,7 @@ public class TestData {
         grossWeightItem_i_.background = null;
         grossWeightItem_i_.foreground = null;
         grossWeightItem_i_.iconPath = null;
-        grossWeightItem_i_.isAction = false;
+//        grossWeightItem_i_.isAction = false;
         grossWeightItem_i_.showTableFirst = false;
         grossWeightItem_i_.editOnSingleClick = false;
         grossWeightItem_i_.hide = false;
@@ -2229,7 +2229,7 @@ public class TestData {
         lengthItem_i_.background = null;
         lengthItem_i_.foreground = null;
         lengthItem_i_.iconPath = null;
-        lengthItem_i_.isAction = false;
+//        lengthItem_i_.isAction = false;
         lengthItem_i_.showTableFirst = false;
         lengthItem_i_.editOnSingleClick = false;
         lengthItem_i_.hide = false;
@@ -2266,7 +2266,7 @@ public class TestData {
         widthItem_i_.background = null;
         widthItem_i_.foreground = null;
         widthItem_i_.iconPath = null;
-        widthItem_i_.isAction = false;
+//        widthItem_i_.isAction = false;
         widthItem_i_.showTableFirst = false;
         widthItem_i_.editOnSingleClick = false;
         widthItem_i_.hide = false;
@@ -2303,7 +2303,7 @@ public class TestData {
         heightItem_i_.background = null;
         heightItem_i_.foreground = null;
         heightItem_i_.iconPath = null;
-        heightItem_i_.isAction = false;
+//        heightItem_i_.isAction = false;
         heightItem_i_.showTableFirst = false;
         heightItem_i_.editOnSingleClick = false;
         heightItem_i_.hide = false;
@@ -2340,7 +2340,7 @@ public class TestData {
         volumeItem_i_.background = null;
         volumeItem_i_.foreground = null;
         volumeItem_i_.iconPath = null;
-        volumeItem_i_.isAction = false;
+//        volumeItem_i_.isAction = false;
         volumeItem_i_.showTableFirst = false;
         volumeItem_i_.editOnSingleClick = false;
         volumeItem_i_.hide = false;
@@ -2399,7 +2399,7 @@ public class TestData {
         idArticleItem_i_.background = null;
         idArticleItem_i_.foreground = null;
         idArticleItem_i_.iconPath = null;
-        idArticleItem_i_.isAction = false;
+//        idArticleItem_i_.isAction = false;
         idArticleItem_i_.showTableFirst = false;
         idArticleItem_i_.editOnSingleClick = false;
         idArticleItem_i_.hide = false;
@@ -2436,7 +2436,7 @@ public class TestData {
         nameColorItem_i_.background = null;
         nameColorItem_i_.foreground = null;
         nameColorItem_i_.iconPath = null;
-        nameColorItem_i_.isAction = false;
+//        nameColorItem_i_.isAction = false;
         nameColorItem_i_.showTableFirst = false;
         nameColorItem_i_.editOnSingleClick = false;
         nameColorItem_i_.hide = false;
@@ -2473,7 +2473,7 @@ public class TestData {
         nameSizeItem_i_.background = null;
         nameSizeItem_i_.foreground = null;
         nameSizeItem_i_.iconPath = null;
-        nameSizeItem_i_.isAction = false;
+//        nameSizeItem_i_.isAction = false;
         nameSizeItem_i_.showTableFirst = false;
         nameSizeItem_i_.editOnSingleClick = false;
         nameSizeItem_i_.hide = false;
@@ -2510,7 +2510,7 @@ public class TestData {
         nameSeasonYearItem_i_.background = null;
         nameSeasonYearItem_i_.foreground = null;
         nameSeasonYearItem_i_.iconPath = null;
-        nameSeasonYearItem_i_.isAction = false;
+//        nameSeasonYearItem_i_.isAction = false;
         nameSeasonYearItem_i_.showTableFirst = false;
         nameSeasonYearItem_i_.editOnSingleClick = false;
         nameSeasonYearItem_i_.hide = false;
@@ -2547,7 +2547,7 @@ public class TestData {
         nameSeasonItem_i_.background = null;
         nameSeasonItem_i_.foreground = null;
         nameSeasonItem_i_.iconPath = null;
-        nameSeasonItem_i_.isAction = false;
+//        nameSeasonItem_i_.isAction = false;
         nameSeasonItem_i_.showTableFirst = false;
         nameSeasonItem_i_.editOnSingleClick = false;
         nameSeasonItem_i_.hide = false;
@@ -2584,7 +2584,7 @@ public class TestData {
         nameCollectionItem_i_.background = null;
         nameCollectionItem_i_.foreground = null;
         nameCollectionItem_i_.iconPath = null;
-        nameCollectionItem_i_.isAction = false;
+//        nameCollectionItem_i_.isAction = false;
         nameCollectionItem_i_.showTableFirst = false;
         nameCollectionItem_i_.editOnSingleClick = false;
         nameCollectionItem_i_.hide = false;
@@ -2643,7 +2643,7 @@ public class TestData {
         nameTypeItem_i_.background = null;
         nameTypeItem_i_.foreground = null;
         nameTypeItem_i_.iconPath = null;
-        nameTypeItem_i_.isAction = false;
+//        nameTypeItem_i_.isAction = false;
         nameTypeItem_i_.showTableFirst = false;
         nameTypeItem_i_.editOnSingleClick = false;
         nameTypeItem_i_.hide = false;
@@ -2680,7 +2680,7 @@ public class TestData {
         nameSortItem_i_.background = null;
         nameSortItem_i_.foreground = null;
         nameSortItem_i_.iconPath = null;
-        nameSortItem_i_.isAction = false;
+//        nameSortItem_i_.isAction = false;
         nameSortItem_i_.showTableFirst = false;
         nameSortItem_i_.editOnSingleClick = false;
         nameSortItem_i_.hide = false;
@@ -2717,7 +2717,7 @@ public class TestData {
         nameFormItem_i_.background = null;
         nameFormItem_i_.foreground = null;
         nameFormItem_i_.iconPath = null;
-        nameFormItem_i_.isAction = false;
+//        nameFormItem_i_.isAction = false;
         nameFormItem_i_.showTableFirst = false;
         nameFormItem_i_.editOnSingleClick = false;
         nameFormItem_i_.hide = false;
@@ -2754,7 +2754,7 @@ public class TestData {
         nameFeatureItem_i_.background = null;
         nameFeatureItem_i_.foreground = null;
         nameFeatureItem_i_.iconPath = null;
-        nameFeatureItem_i_.isAction = false;
+//        nameFeatureItem_i_.isAction = false;
         nameFeatureItem_i_.showTableFirst = false;
         nameFeatureItem_i_.editOnSingleClick = false;
         nameFeatureItem_i_.hide = false;
@@ -2791,7 +2791,7 @@ public class TestData {
         namePackItem_i_.background = null;
         namePackItem_i_.foreground = null;
         namePackItem_i_.iconPath = null;
-        namePackItem_i_.isAction = false;
+//        namePackItem_i_.isAction = false;
         namePackItem_i_.showTableFirst = false;
         namePackItem_i_.editOnSingleClick = false;
         namePackItem_i_.hide = false;
@@ -2828,7 +2828,7 @@ public class TestData {
         propertyItem_i_.background = null;
         propertyItem_i_.foreground = null;
         propertyItem_i_.iconPath = null;
-        propertyItem_i_.isAction = false;
+//        propertyItem_i_.isAction = false;
         propertyItem_i_.showTableFirst = false;
         propertyItem_i_.editOnSingleClick = false;
         propertyItem_i_.hide = false;
@@ -2865,7 +2865,7 @@ public class TestData {
         numberComponentsItem_i_.background = null;
         numberComponentsItem_i_.foreground = null;
         numberComponentsItem_i_.iconPath = null;
-        numberComponentsItem_i_.isAction = false;
+//        numberComponentsItem_i_.isAction = false;
         numberComponentsItem_i_.showTableFirst = false;
         numberComponentsItem_i_.editOnSingleClick = false;
         numberComponentsItem_i_.hide = false;
@@ -2924,7 +2924,7 @@ public class TestData {
         sizeHeightItem_i_.background = null;
         sizeHeightItem_i_.foreground = null;
         sizeHeightItem_i_.iconPath = null;
-        sizeHeightItem_i_.isAction = false;
+//        sizeHeightItem_i_.isAction = false;
         sizeHeightItem_i_.showTableFirst = false;
         sizeHeightItem_i_.editOnSingleClick = false;
         sizeHeightItem_i_.hide = false;
@@ -2961,7 +2961,7 @@ public class TestData {
         sizeChestItem_i_.background = null;
         sizeChestItem_i_.foreground = null;
         sizeChestItem_i_.iconPath = null;
-        sizeChestItem_i_.isAction = false;
+//        sizeChestItem_i_.isAction = false;
         sizeChestItem_i_.showTableFirst = false;
         sizeChestItem_i_.editOnSingleClick = false;
         sizeChestItem_i_.hide = false;
@@ -2998,7 +2998,7 @@ public class TestData {
         sizeUnderChestItem_i_.background = null;
         sizeUnderChestItem_i_.foreground = null;
         sizeUnderChestItem_i_.iconPath = null;
-        sizeUnderChestItem_i_.isAction = false;
+//        sizeUnderChestItem_i_.isAction = false;
         sizeUnderChestItem_i_.showTableFirst = false;
         sizeUnderChestItem_i_.editOnSingleClick = false;
         sizeUnderChestItem_i_.hide = false;
@@ -3035,7 +3035,7 @@ public class TestData {
         sizeCupBraItem_i_.background = null;
         sizeCupBraItem_i_.foreground = null;
         sizeCupBraItem_i_.iconPath = null;
-        sizeCupBraItem_i_.isAction = false;
+//        sizeCupBraItem_i_.isAction = false;
         sizeCupBraItem_i_.showTableFirst = false;
         sizeCupBraItem_i_.editOnSingleClick = false;
         sizeCupBraItem_i_.hide = false;
@@ -3072,7 +3072,7 @@ public class TestData {
         sizeHipsItem_i_.background = null;
         sizeHipsItem_i_.foreground = null;
         sizeHipsItem_i_.iconPath = null;
-        sizeHipsItem_i_.isAction = false;
+//        sizeHipsItem_i_.isAction = false;
         sizeHipsItem_i_.showTableFirst = false;
         sizeHipsItem_i_.editOnSingleClick = false;
         sizeHipsItem_i_.hide = false;
@@ -3109,7 +3109,7 @@ public class TestData {
         sizeWaistItem_i_.background = null;
         sizeWaistItem_i_.foreground = null;
         sizeWaistItem_i_.iconPath = null;
-        sizeWaistItem_i_.isAction = false;
+//        sizeWaistItem_i_.isAction = false;
         sizeWaistItem_i_.showTableFirst = false;
         sizeWaistItem_i_.editOnSingleClick = false;
         sizeWaistItem_i_.hide = false;
@@ -3146,7 +3146,7 @@ public class TestData {
         sizeNeckItem_i_.background = null;
         sizeNeckItem_i_.foreground = null;
         sizeNeckItem_i_.iconPath = null;
-        sizeNeckItem_i_.isAction = false;
+//        sizeNeckItem_i_.isAction = false;
         sizeNeckItem_i_.showTableFirst = false;
         sizeNeckItem_i_.editOnSingleClick = false;
         sizeNeckItem_i_.hide = false;
@@ -3183,7 +3183,7 @@ public class TestData {
         sizeHeadItem_i_.background = null;
         sizeHeadItem_i_.foreground = null;
         sizeHeadItem_i_.iconPath = null;
-        sizeHeadItem_i_.isAction = false;
+//        sizeHeadItem_i_.isAction = false;
         sizeHeadItem_i_.showTableFirst = false;
         sizeHeadItem_i_.editOnSingleClick = false;
         sizeHeadItem_i_.hide = false;
@@ -3220,7 +3220,7 @@ public class TestData {
         sizeHandItem_i_.background = null;
         sizeHandItem_i_.foreground = null;
         sizeHandItem_i_.iconPath = null;
-        sizeHandItem_i_.isAction = false;
+//        sizeHandItem_i_.isAction = false;
         sizeHandItem_i_.showTableFirst = false;
         sizeHandItem_i_.editOnSingleClick = false;
         sizeHandItem_i_.hide = false;
@@ -3257,7 +3257,7 @@ public class TestData {
         footLengthItem_i_.background = null;
         footLengthItem_i_.foreground = null;
         footLengthItem_i_.iconPath = null;
-        footLengthItem_i_.isAction = false;
+//        footLengthItem_i_.isAction = false;
         footLengthItem_i_.showTableFirst = false;
         footLengthItem_i_.editOnSingleClick = false;
         footLengthItem_i_.hide = false;
@@ -3294,7 +3294,7 @@ public class TestData {
         insoleLengthItem_i_.background = null;
         insoleLengthItem_i_.foreground = null;
         insoleLengthItem_i_.iconPath = null;
-        insoleLengthItem_i_.isAction = false;
+//        insoleLengthItem_i_.isAction = false;
         insoleLengthItem_i_.showTableFirst = false;
         insoleLengthItem_i_.editOnSingleClick = false;
         insoleLengthItem_i_.hide = false;
@@ -3353,7 +3353,7 @@ public class TestData {
         compositionStickerItem_i_.background = null;
         compositionStickerItem_i_.foreground = null;
         compositionStickerItem_i_.iconPath = null;
-        compositionStickerItem_i_.isAction = false;
+//        compositionStickerItem_i_.isAction = false;
         compositionStickerItem_i_.showTableFirst = false;
         compositionStickerItem_i_.editOnSingleClick = false;
         compositionStickerItem_i_.hide = false;
@@ -3412,7 +3412,7 @@ public class TestData {
         nameTasteItem_i_.background = null;
         nameTasteItem_i_.foreground = null;
         nameTasteItem_i_.iconPath = null;
-        nameTasteItem_i_.isAction = false;
+//        nameTasteItem_i_.isAction = false;
         nameTasteItem_i_.showTableFirst = false;
         nameTasteItem_i_.editOnSingleClick = false;
         nameTasteItem_i_.hide = false;
@@ -3449,7 +3449,7 @@ public class TestData {
         nameCoolingDegreeItem_i_.background = null;
         nameCoolingDegreeItem_i_.foreground = null;
         nameCoolingDegreeItem_i_.iconPath = null;
-        nameCoolingDegreeItem_i_.isAction = false;
+//        nameCoolingDegreeItem_i_.isAction = false;
         nameCoolingDegreeItem_i_.showTableFirst = false;
         nameCoolingDegreeItem_i_.editOnSingleClick = false;
         nameCoolingDegreeItem_i_.hide = false;
@@ -3486,7 +3486,7 @@ public class TestData {
         percentFatItem_i_.background = null;
         percentFatItem_i_.foreground = null;
         percentFatItem_i_.iconPath = null;
-        percentFatItem_i_.isAction = false;
+//        percentFatItem_i_.isAction = false;
         percentFatItem_i_.showTableFirst = false;
         percentFatItem_i_.editOnSingleClick = false;
         percentFatItem_i_.hide = false;
@@ -3523,7 +3523,7 @@ public class TestData {
         percentAlcoholItem_i_.background = null;
         percentAlcoholItem_i_.foreground = null;
         percentAlcoholItem_i_.iconPath = null;
-        percentAlcoholItem_i_.isAction = false;
+//        percentAlcoholItem_i_.isAction = false;
         percentAlcoholItem_i_.showTableFirst = false;
         percentAlcoholItem_i_.editOnSingleClick = false;
         percentAlcoholItem_i_.hide = false;
@@ -3607,7 +3607,7 @@ public class TestData {
         formPrint__.background = null;
         formPrint__.foreground = null;
         formPrint__.iconPath = "print.png";
-        formPrint__.isAction = true;
+//        formPrint__.isAction = true;
         formPrint__.showTableFirst = false;
         formPrint__.editOnSingleClick = false;
         formPrint__.hide = false;
@@ -3644,7 +3644,7 @@ public class TestData {
         formXls__.background = null;
         formXls__.foreground = null;
         formXls__.iconPath = "xls.png";
-        formXls__.isAction = true;
+//        formXls__.isAction = true;
         formXls__.showTableFirst = false;
         formXls__.editOnSingleClick = false;
         formXls__.hide = false;
@@ -3681,7 +3681,7 @@ public class TestData {
         formEdit__.background = null;
         formEdit__.foreground = null;
         formEdit__.iconPath = "editReport.png";
-        formEdit__.isAction = true;
+//        formEdit__.isAction = true;
         formEdit__.showTableFirst = false;
         formEdit__.editOnSingleClick = false;
         formEdit__.hide = false;
@@ -3718,7 +3718,7 @@ public class TestData {
         formDrop__.background = null;
         formDrop__.foreground = null;
         formDrop__.iconPath = null;
-        formDrop__.isAction = true;
+//        formDrop__.isAction = true;
         formDrop__.showTableFirst = false;
         formDrop__.editOnSingleClick = false;
         formDrop__.hide = false;
@@ -3756,7 +3756,7 @@ public class TestData {
         isEditable__.background = null;
         isEditable__.foreground = null;
         isEditable__.iconPath = null;
-        isEditable__.isAction = false;
+//        isEditable__.isAction = false;
         isEditable__.showTableFirst = false;
         isEditable__.editOnSingleClick = false;
         isEditable__.hide = false;
@@ -3814,7 +3814,7 @@ public class TestData {
         formRefresh__.background = null;
         formRefresh__.foreground = null;
         formRefresh__.iconPath = "refresh.png";
-        formRefresh__.isAction = true;
+//        formRefresh__.isAction = true;
         formRefresh__.showTableFirst = false;
         formRefresh__.editOnSingleClick = false;
         formRefresh__.hide = false;
@@ -3851,7 +3851,7 @@ public class TestData {
         formApply__.background = null;
         formApply__.foreground = null;
         formApply__.iconPath = null;
-        formApply__.isAction = true;
+//        formApply__.isAction = true;
         formApply__.showTableFirst = false;
         formApply__.editOnSingleClick = false;
         formApply__.hide = false;
@@ -3888,7 +3888,7 @@ public class TestData {
         formCancel__.background = null;
         formCancel__.foreground = null;
         formCancel__.iconPath = null;
-        formCancel__.isAction = true;
+//        formCancel__.isAction = true;
         formCancel__.showTableFirst = false;
         formCancel__.editOnSingleClick = false;
         formCancel__.hide = false;
@@ -3925,7 +3925,7 @@ public class TestData {
         formOk__.background = null;
         formOk__.foreground = null;
         formOk__.iconPath = null;
-        formOk__.isAction = true;
+//        formOk__.isAction = true;
         formOk__.showTableFirst = false;
         formOk__.editOnSingleClick = false;
         formOk__.hide = false;
@@ -3962,7 +3962,7 @@ public class TestData {
         formClose__.background = null;
         formClose__.foreground = null;
         formClose__.iconPath = null;
-        formClose__.isAction = true;
+//        formClose__.isAction = true;
         formClose__.showTableFirst = false;
         formClose__.editOnSingleClick = false;
         formClose__.hide = false;
@@ -3988,7 +3988,7 @@ public class TestData {
 
         return main;
     }
-    
+
     public static ContainerView create0() {
         ContainerView main = new ContainerView("main");
 
@@ -3996,7 +3996,7 @@ public class TestData {
         splitter.setType(ContainerType.SPLITH);
 
         ContainerView tabbed = new ContainerView("tabbed");
-        tabbed.setType(ContainerType.TABBED_PANE);
+        tabbed.setType(ContainerType.TABBED);
 
         ContainerView columns = new ContainerView("columns");
         columns.setType(ContainerType.COLUMNS);

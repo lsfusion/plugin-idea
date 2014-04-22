@@ -2,28 +2,30 @@ package com.lsfusion.design.model;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.treeStructure.treetable.TreeTable;
-import com.intellij.ui.treeStructure.treetable.TreeTableModel;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.model.entity.GroupObjectEntity;
+import com.lsfusion.design.model.entity.TreeGroupEntity;
 import com.lsfusion.design.ui.FlexAlignment;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import java.util.List;
 import java.util.Map;
 
 public class TreeGroupView extends ComponentView implements GroupView {
-    public ToolbarView toolbar = new ToolbarView();
+    public TreeGroupEntity entity;
+
+    public ToolbarView toolbar;
     public FilterView filter = new FilterView();
 
-    public TreeGroupView() {
-        this("");
-    }
+    private TreeGroupTableModel model = new TreeGroupTableModel();
 
-    public TreeGroupView(String sID) {
-        super(sID);
+    public TreeGroupView(TreeGroupEntity entity) {
+        super(entity.sID);
         flex = 1;
         alignment = FlexAlignment.STRETCH;
+
+        this.entity = entity;
+        toolbar = new ToolbarView(true, true);
     }
 
     @Override
@@ -38,71 +40,18 @@ public class TreeGroupView extends ComponentView implements GroupView {
 
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
-        TreeTable tree = new TreeTable(new DumbTreeTableModel());
-        tree.setShowGrid(true);
-        return new JBScrollPane(tree);
+        return new JBScrollPane(new TreeGroupTable(this, model));
     }
 
-    private static class DumbTreeTableModel extends DefaultTreeModel implements TreeTableModel {
-        public DumbTreeTableModel() {
-            super(null);
-            DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+    public void addPropertyDraw(GroupObjectView groupObject, PropertyDrawView property, List<PropertyDrawView> formProperties) {
+        model.addPropertyDraw(groupObject, property, formProperties);
+    }
 
-            DefaultMutableTreeNode category1 = new DefaultMutableTreeNode("category1");
-            DefaultMutableTreeNode category2 = new DefaultMutableTreeNode("category2");
-
-            root.add(category1);
-            root.add(category2);
-
-            category1.add(new DefaultMutableTreeNode("subCategory11"));
-            category1.add(new DefaultMutableTreeNode("subCategory12"));
-
-            category2.add(new DefaultMutableTreeNode("subCategory21"));
-            category2.add(new DefaultMutableTreeNode("subCategory22"));
-
-            setRoot(root);
+    public int calculatePreferredSize() {
+        int size = 0;
+        for (GroupObjectEntity groupObject : entity.groups) {
+            size += groupObject.isParent ? 35 * 4 : 35;
         }
-
-        @Override
-        public int getColumnCount() {
-            return 5;
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            if (column == 0) {
-                return "Tree";
-            }
-            return "property";
-        }
-
-        @Override
-        public Class getColumnClass(int column) {
-            if (column == 0) {
-                return TreeTableModel.class;
-            }
-            return String.class;
-        }
-
-        @Override
-        public Object getValueAt(Object node, int column) {
-            if (column == 0) {
-                return node;
-            }
-            return "";
-        }
-
-        @Override
-        public boolean isCellEditable(Object node, int column) {
-            return false;
-        }
-
-        @Override
-        public void setValueAt(Object aValue, Object node, int column) {
-        }
-
-        @Override
-        public void setTree(JTree tree) {
-        }
+        return size;
     }
 }

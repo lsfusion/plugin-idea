@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public final class FontInfo implements Serializable {
     public static final Integer DEFAULT_FONT_SIZE = 11;
-    
+
     public final String fontFamily;
     public final int fontSize;
     public final boolean bold;
@@ -28,6 +28,40 @@ public final class FontInfo implements Serializable {
         this.fontSize = fontSize;
         this.bold = bold;
         this.italic = italic;
+    }
+
+    @SuppressWarnings("MagicConstant")
+    public Font deriveFrom(Component component) {
+        assert component != null;
+        if (fontFamily != null && fontSize > 0) {
+            return new Font(fontFamily, getAWTFontStyle(), fontSize);
+        }
+
+        Font compFont = component.getFont();
+        if (fontFamily != null) {
+            return new Font(fontFamily, getAWTFontStyle(), compFont.getSize());
+        }
+
+        if (compFont.getSize() == fontSize && compFont.isBold() == bold && compFont.isItalic() == italic) {
+            return compFont;
+        }
+
+        if (fontSize > 0) {
+            return compFont.deriveFont(getAWTFontStyle(), fontSize);
+        }
+
+        return compFont.deriveFont(getAWTFontStyle());
+    }
+
+    public int getAWTFontStyle() {
+        int style = 0;
+        if (bold) {
+            style |= Font.BOLD;
+        }
+        if (italic) {
+            style |= Font.ITALIC;
+        }
+        return style;
     }
 
     public String getFontFamily() {
@@ -61,8 +95,8 @@ public final class FontInfo implements Serializable {
     @Override
     public String toString() {
         return (fontFamily != null ? fontFamily : "") +
-               (bold ? " bold" : "") +
-               (italic ? " italic" : "") +
-               (fontSize > 0 ? " size:" + fontSize : "");
+                (bold ? " bold" : "") +
+                (italic ? " italic" : "") +
+                (fontSize > 0 ? " size:" + fontSize : "");
     }
 }

@@ -12,7 +12,9 @@ import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class CustomClassSet implements LSFClassSet {
 
@@ -369,5 +371,30 @@ public class CustomClassSet implements LSFClassSet {
             result += iterator.next().getDeclName() + (iterator.hasNext() ? ", " : "");
         }
         return result;
+    }
+
+    @Override
+    public int getMinimumWidth(int minCharWidth, FontMetrics fontMetrics) {
+        return fontMetrics.stringWidth("999 999") + 8;
+    }
+
+    @Override
+    public int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics) {
+        return fontMetrics.stringWidth("9 999 999") + 8;
+    }
+
+    @Override
+    public int getMaximumWidth(int maxCharWidth, FontMetrics fontMetrics) {
+        return getPreferredWidth(0, fontMetrics);
+    }
+
+    @Override
+    public int getPreferredHeight(FontMetrics fontMetrics) {
+        return fontMetrics.getHeight() + 1;
+    }
+
+    @Override
+    public int getMaximumHeight(FontMetrics fontMetrics) {
+        return getPreferredHeight(fontMetrics);
     }
 }

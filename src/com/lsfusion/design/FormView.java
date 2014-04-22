@@ -1,14 +1,8 @@
 package com.lsfusion.design;
 
-import com.intellij.openapi.util.Pair;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.design.model.*;
-import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.references.LSFPropReference;
+import com.lsfusion.design.model.entity.*;
+import com.lsfusion.design.ui.ClassViewType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +10,23 @@ import java.util.List;
 import java.util.Map;
 
 public class FormView {
+    public String caption = "";
+
+    public FormEntity entity;
+
     public ContainerView mainContainer;
+
+    public Integer overridePageWidth;
+
+    protected PropertyDrawView printButton;
+    protected PropertyDrawView editButton;
+    protected PropertyDrawView xlsButton;
+    protected PropertyDrawView dropButton;
+    protected PropertyDrawView refreshButton;
+    protected PropertyDrawView applyButton;
+    protected PropertyDrawView cancelButton;
+    protected PropertyDrawView okButton;
+    protected PropertyDrawView closeButton;
 
     private final Map<String, ComponentView> sidToComponent = new HashMap<String, ComponentView>();
 
@@ -25,50 +35,89 @@ public class FormView {
     public List<TreeGroupView> treeGroups = new ArrayList<TreeGroupView>();
     public List<GroupObjectView> groupObjects = new ArrayList<GroupObjectView>();
     public List<PropertyDrawView> properties = new ArrayList<PropertyDrawView>();
+    public List<RegularFilterGroupView> regularFilters = new ArrayList<RegularFilterGroupView>();
 
-    public FormView() {
+    protected Map<TreeGroupEntity, TreeGroupView> mtreeGroups = new HashMap<TreeGroupEntity, TreeGroupView>();
+
+    public TreeGroupView get(TreeGroupEntity treeGroup) {
+        return mtreeGroups.get(treeGroup);
+    }
+
+    protected Map<GroupObjectEntity, GroupObjectView> mgroupObjects = new HashMap<GroupObjectEntity, GroupObjectView>();
+
+    public GroupObjectView get(GroupObjectEntity groupObject) {
+        return mgroupObjects.get(groupObject);
+    }
+
+    protected Map<ObjectEntity, ObjectView> mobjects = new HashMap<ObjectEntity, ObjectView>();
+
+    public ObjectView get(ObjectEntity object) {
+        return mobjects.get(object);
+    }
+
+    protected Map<PropertyDrawEntity, PropertyDrawView> mproperties = new HashMap<PropertyDrawEntity, PropertyDrawView>();
+
+    public PropertyDrawView get(PropertyDrawEntity property) {
+        return mproperties.get(property);
+    }
+
+    protected Map<RegularFilterGroupEntity, RegularFilterGroupView> mfilters = new HashMap<RegularFilterGroupEntity, RegularFilterGroupView>();
+
+    public RegularFilterGroupView get(RegularFilterGroupEntity filterGroup) {
+        return mfilters.get(filterGroup);
+    }
+
+    public static FormView create(FormEntity entity) {
+        FormView form = new FormView(entity);
+        form.initProperties();
+        return form;
+    }
+
+    protected FormView(FormEntity entity) {
+        this.entity = entity;
+
         mainContainer = new ContainerView("main");
         setComponentSID(mainContainer, getMainContainerSID());
 
         containerFactory = new ContainerFactory();
+
+        for (TreeGroupEntity treeGroup : entity.treeGroups) {
+            addTreeGroupBase(treeGroup);
+        }
+
+        for (GroupObjectEntity group : entity.groups) {
+            addGroupObjectBase(group);
+        }
+
+        for (PropertyDrawEntity property : entity.propertyDraws) {
+            addPropertyDrawBase(property);
+        }
+
+        for (RegularFilterGroupEntity filterGroup : entity.regularFilterGroups) {
+            addRegularFilterGroupBase(filterGroup);
+        }
     }
 
-    public void extendForm(LSFFormExtend formExtend) {
-        for (LSFGroupObjectDeclaration gobjDecl : formExtend.getGroupObjectDecls()) {
-            LSFFormGroupObjectDeclaration parent = null;
-            if (gobjDecl.getParent() instanceof LSFFormGroupObjectDeclaration) {
-                parent = (LSFFormGroupObjectDeclaration) gobjDecl.getParent();
-            }
-            addGroupObjectBase(new GroupObjectView(gobjDecl.getDeclName(), parent != null ? parent.getFormGroupObjectViewType() : null, parent != null ? parent.getFormGroupObjectPageSize() : null));
-        }
+    private void initProperties() {
+        initButtons();
 
-        for (LSFFormTreeGroupObjectDeclaration tgobjDecl : formExtend.getTreeGroupDecls()) {
-            addTreeGroupBase(new TreeGroupView(tgobjDecl.getFormCommonGroupObject().getDeclName()));
+        for (PropertyDrawView property : properties) {
+            addPropertyDrawView(property);
         }
+    }
 
-        for (Map.Entry<LSFPropertyDrawDeclaration, Pair<LSFFormPropertyOptionsList, LSFFormPropertyOptionsList>> entry : formExtend.getPropertyDrawDeclsWithOptions().entrySet()) {
-            LSFPropReference propUsage = PsiTreeUtil.findChildOfType(entry.getKey(), LSFPropReference.class);
-            LSFPropertyOptions propertyOptions = null;
-            if (propUsage != null) {
-                LSFPropDeclaration propDeclaration = propUsage.resolveDecl();
-                if (propDeclaration != null) {
-                    propertyOptions = ((LSFPropertyStatement) propDeclaration).getPropertyOptions();
-                }
-            }
-            addPropertyDrawBase(new PropertyDrawView(entry.getKey().getDeclName(), propertyOptions, entry.getValue()));
-        }
+    public String getCaption() {
+        return !caption.isEmpty() ? caption : entity.sID;
     }
 
     public ContainerView getMainContainer() {
         return mainContainer;
     }
 
-    public GroupObjectView addGroupObject(LSFGroupObjectDeclaration groupObject) {
-        return addGroupObjectBase(new GroupObjectView(groupObject.getDeclName()));
-    }
-
-    private GroupObjectView addGroupObjectBase(GroupObjectView groupObjectView) {
+    private GroupObjectView addGroupObjectBase(GroupObjectEntity groupObjectEntity) {
+        GroupObjectView groupObjectView = new GroupObjectView(groupObjectEntity);
         groupObjects.add(groupObjectView);
+
         setComponentSID(groupObjectView.grid, getGridSID(groupObjectView));
         setComponentSID(groupObjectView.showType, getShowTypeSID(groupObjectView));
         setComponentSID(groupObjectView.toolbar, getToolbarSID(groupObjectView));
@@ -76,53 +125,104 @@ public class FormView {
 
         for (ObjectView object : groupObjectView) {
             setComponentSID(object.classChooser, getClassChooserSID(object));
+            mobjects.put(object.entity, object);
         }
-        addGroupObjectView(groupObjectView);
+
+        mgroupObjects.put(groupObjectView.entity, groupObjectView);
         return groupObjectView;
     }
 
-    public void addGroupObjectView(GroupObjectView goView) {
-    }
-
-    public TreeGroupView addTreeGroup(LSFFormTreeGroupObjectDeclaration treeGroup) {
-        return addTreeGroupBase(new TreeGroupView(treeGroup.getFormCommonGroupObject().getDeclName()));
-    }
-
-    private TreeGroupView addTreeGroupBase(TreeGroupView treeGroupView) {
+    private void addTreeGroupBase(TreeGroupEntity treeGroupEntity) {
+        TreeGroupView treeGroupView = new TreeGroupView(treeGroupEntity);
         treeGroups.add(treeGroupView);
-        addTreeGroupView(treeGroupView);
-        return treeGroupView;
+
+        setComponentSID(treeGroupView, getTreeSID(treeGroupView));
+        setComponentSID(treeGroupView.toolbar, getToolbarSID(treeGroupView));
+        setComponentSID(treeGroupView.filter, getFilterSID(treeGroupView));
+        mtreeGroups.put(treeGroupEntity, treeGroupView);
     }
 
-    public void addTreeGroupView(TreeGroupView treeGroup) {
+    private void addRegularFilterGroupView(RegularFilterGroupView filterGroupView) {
+        mfilters.put(filterGroupView.entity, filterGroupView);
+        setComponentSID(filterGroupView, getRegularFilterGroupSID(filterGroupView));
     }
 
-    public PropertyDrawView addPropertyDraw(LSFPropertyDrawDeclaration property) {
-        PropertyDrawView propertyDrawView = addPropertyDrawBase(new PropertyDrawView(property.getDeclName()));
-        addPropertyDrawView(propertyDrawView);
-        return propertyDrawView;
+    private RegularFilterGroupView addRegularFilterGroupBase(RegularFilterGroupEntity filterGroup) {
+        RegularFilterGroupView filterGroupView = new RegularFilterGroupView(filterGroup);
+        regularFilters.add(filterGroupView);
+        addRegularFilterGroupView(filterGroupView);
+
+        mfilters.put(filterGroupView.entity, filterGroupView);
+        setComponentSID(filterGroupView, getRegularFilterGroupSID(filterGroupView));
+        return filterGroupView;
     }
 
-    private PropertyDrawView addPropertyDrawBase(PropertyDrawView propertyDrawView) {
+    private PropertyDrawView addPropertyDrawBase(PropertyDrawEntity propertyDrawEntity/*, Pair<Boolean, PropertyDrawView> relative*/) {
+        PropertyDrawView propertyDrawView = new PropertyDrawView(propertyDrawEntity);
         properties.add(propertyDrawView);
-        sidToComponent.put(propertyDrawView.sID, propertyDrawView);
+
+        sidToComponent.put(propertyDrawView.getSID(), propertyDrawView);
+        mproperties.put(propertyDrawEntity, propertyDrawView);
+
         return propertyDrawView;
     }
 
-    public void addPropertyDrawView(PropertyDrawView pdView) {
+    private void addPropertyDrawView(PropertyDrawView propertyDraw) {
+        GroupObjectEntity groupObject = propertyDraw.entity.getToDraw(entity);
+        GroupObjectView groupObjectView = mgroupObjects.get(groupObject);
+
+        if (groupObject != null && groupObject.treeGroup != null) {
+            TreeGroupView treeGroupView = mtreeGroups.get(groupObject.treeGroup);
+            if (treeGroupView != null) {
+                treeGroupView.addPropertyDraw(groupObjectView, propertyDraw, properties);
+            }
+        } else if (putInGrid(propertyDraw, groupObjectView)) {
+            groupObjectView.addGridPropertyDraw(propertyDraw);
+        }
     }
 
-    public ContainerView createContainer() {
-        return createContainer(null);
+    public boolean putInGrid(PropertyDrawView property, GroupObjectView groupObjectView) {
+        if (groupObjectView != null) {
+            if (!groupObjectView.entity.isFixedPanel() && groupObjectView.entity.initClassView == ClassViewType.GRID && !property.isForcedPanel()) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public ContainerView createContainer(String caption) {
-        return createContainer(caption, null);
+    public PropertyDrawView getProperty(PropertyDrawEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        for (PropertyDrawView property : properties) {
+            if (entity.equals(property.entity)) {
+                return property;
+            }
+        }
+        return null;
+    }
+
+    private void initButtons() {
+        printButton = setupFormButton(entity.printActionPropertyDraw, "print");
+        editButton = setupFormButton(entity.editActionPropertyDraw, "edit");
+        xlsButton = setupFormButton(entity.xlsActionPropertyDraw, "xls");
+        refreshButton = setupFormButton(entity.refreshActionPropertyDraw, "refresh");
+        applyButton = setupFormButton(entity.applyActionPropertyDraw, "apply");
+        cancelButton = setupFormButton(entity.cancelActionPropertyDraw, "cancel");
+        okButton = setupFormButton(entity.okActionPropertyDraw, "ok");
+        closeButton = setupFormButton(entity.closeActionPropertyDraw, "close");
+        dropButton = setupFormButton(entity.dropActionPropertyDraw, "drop");
+    }
+
+    private PropertyDrawView setupFormButton(PropertyDrawEntity function, String type) {
+        PropertyDrawView functionView = getProperty(function);
+        setComponentSID(functionView, getClientFunctionSID(type));
+        return functionView;
     }
 
     public ContainerView createContainer(String caption, String sID) {
         ContainerView container = new ContainerView();
-//        container.setCaption(caption);
+        container.setCaption(caption);
         container.setSID(sID);
         if (sID != null) {
             sidToComponent.put(sID, container);
@@ -147,12 +247,32 @@ public class FormView {
         return (ContainerView) component;
     }
 
+    public void removeComponent(ComponentView component, boolean cascade) {
+
+        component.parent.remove(component);
+
+        //не удаляем компоненты (не-контейнеры) из пула, чтобы можно было опять их использовать в настройке
+        if (component instanceof ContainerView) {
+            removeContainerFromMapping((ContainerView) component);
+            if (cascade) {
+                List<ComponentView> children = new ArrayList<ComponentView>(((ContainerView) component).getChildren());
+                for (ComponentView child : children) {
+                    removeComponent(child, true);
+                }
+            }
+        }
+    }
+
+    public void removeContainerFromMapping(ContainerView container) {
+        sidToComponent.remove(container.getSID());
+    }
+
     public static String getMainContainerSID() {
         return "main";
     }
 
     private static String getTreeSID(TreeGroupView component) {
-        return getTreeSID(component.sID);
+        return getTreeSID(component.getSID());
     }
 
     public static String getTreeSID(String sID) {
@@ -168,7 +288,7 @@ public class FormView {
     }
 
     private static String getGridSID(GroupObjectView component) {
-        return getGridSID(component.sID);
+        return getGridSID(component.getSID());
     }
 
     public static String getGridSID(String sID) {
@@ -192,7 +312,7 @@ public class FormView {
     }
 
     private static String getShowTypeSID(GroupObjectView component) {
-        return getShowTypeSID(component.sID);
+        return getShowTypeSID(component.getSID());
     }
 
     public static String getShowTypeSID(String sID) {
@@ -200,7 +320,7 @@ public class FormView {
     }
 
     private static String getClassChooserSID(ObjectView component) {
-        return getClassChooserSID(component.sID);
+        return getClassChooserSID(component.getSID());
     }
 
     public static String getClassChooserSID(String sID) {

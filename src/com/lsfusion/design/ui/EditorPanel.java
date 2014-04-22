@@ -10,6 +10,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.DesignInfo;
 import com.lsfusion.design.model.*;
 import com.lsfusion.design.vfs.LSFDesignVirtualFileImpl;
 import com.lsfusion.util.BaseUtils;
@@ -44,7 +45,8 @@ public class EditorPanel extends JPanel {
 
     @NotNull
     private final Project project;
-    private final ContainerView rootComponent;
+    private LSFDesignVirtualFileImpl file;
+    private ContainerView rootComponent;
     private ComponentTreeNode rootNode;
 
     private SimpleActionGroup actions = new SimpleActionGroup();
@@ -64,10 +66,10 @@ public class EditorPanel extends JPanel {
         super(null);
         
         this.project = project;
+        this.file = file;
 
-        rootComponent = TestData.create();
-//        rootComponent = file.getDesignInfo().formView.mainContainer;
-        
+        rootComponent = file.getDesignInfo().formView.mainContainer;
+
         createLayout();
         initUiHandlers();
     }
@@ -96,9 +98,26 @@ public class EditorPanel extends JPanel {
                 selecting = state;
             }
         });
-        
+
+        actions.add(new AnAction(null, "Refresh", LSFIcons.Design.REFRESH) {
+            @Override
+            public void actionPerformed(AnActionEvent e) {
+                DesignInfo designInfo = file.getDesignInfo();
+                if (designInfo != null) {
+                    removeAll();
+                    rootComponent = designInfo.formView.mainContainer;
+                    createLayout();
+                    initListeners();
+                }
+            }
+        });
+
         toolbar.updateActionsImmediately();
-       
+
+        initListeners();
+    }
+
+    private void initListeners() {
         componentTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
@@ -186,8 +205,8 @@ public class EditorPanel extends JPanel {
             return false;
         } else if (component instanceof PropertyDrawView) {
             PropertyDrawView property = (PropertyDrawView) component;
-            if (!property.isForcedPanel) {
-                return false;
+            if (!property.isForcedPanel()) {
+//                return false;
             }
         }
         return true;
@@ -212,7 +231,7 @@ public class EditorPanel extends JPanel {
 
     private void selectInTree(ComponentView component) {
         ComponentTreeNode[] nodes = componentTree.getSelectedNodes(ComponentTreeNode.class, null);
-        if (nodes.length == 1 && nodes[0].getComponent() == component) {
+        if ((nodes.length == 1 && nodes[0].getComponent() == component) || component == null) {
             return;
         }
         

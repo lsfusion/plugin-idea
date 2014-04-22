@@ -33,4 +33,9 @@ public class NumericClass extends IntegralClass {
     public String getName() {
         return "NUMERIC[" + length + "," + precision + "]";
     }
+
+    @Override
+    public String getCaption() {
+        return "Число" + '[' + length + ',' + precision + ']';
+    }
 }

@@ -27,7 +27,7 @@ public class LSFGlobalResolver {
     public static ConcurrentHashMap<LSFModuleDeclaration, Set<LSFFile>> cached = new ConcurrentHashMap<LSFModuleDeclaration, Set<LSFFile>>();
 
     // вот эту хрень надо по хорошему кэшировать
-    private static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration) {
+    public static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration) {
         Set<LSFFile> cachedFiles = cached.get(declaration);
         if (cachedFiles != null)
             return cachedFiles;

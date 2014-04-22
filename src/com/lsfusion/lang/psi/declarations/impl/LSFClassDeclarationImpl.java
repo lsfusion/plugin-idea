@@ -6,10 +6,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFElementGenerator;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFGlobalResolver;
-import com.lsfusion.lang.psi.LSFId;
-import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFClassExtendImpl;
@@ -82,5 +79,14 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
             }
         }
         return names.toArray(new PsiElement[names.size()]);
+    }
+
+    @Override
+    public String getCaption() {
+        LSFStringLiteral stringLiteral = getSimpleNameWithCaption().getStringLiteral();
+        if (stringLiteral != null) {
+            return stringLiteral.getValue();
+        }
+        return null;
     }
 }

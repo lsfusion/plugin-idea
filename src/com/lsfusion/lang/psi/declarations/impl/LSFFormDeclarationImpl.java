@@ -39,12 +39,12 @@ public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<
     public LSFId getNameIdentifier() {
         return getSimpleNameWithCaption().getSimpleName();
     }
-    
+
     @Override
     @NotNull
     public String getCaption() {
         LSFStringLiteral stringLiteral = getSimpleNameWithCaption().getStringLiteral();
-        return stringLiteral == null ? "" : stringLiteral.getText();
+        return stringLiteral == null ? "" : stringLiteral.getValue();
     }
 
     @Nullable

@@ -10,8 +10,11 @@ import java.awt.*;
 import java.util.Map;
 
 public class ShowTypeView extends ComponentView {
-    public ShowTypeView() {
+    private GroupObjectView groupObject;
+
+    public ShowTypeView(GroupObjectView groupObject) {
         this("");
+        this.groupObject = groupObject;
     }
 
     public ShowTypeView(String sID) {
@@ -30,6 +33,10 @@ public class ShowTypeView extends ComponentView {
 
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+        if (groupObject.entity.banClassView.size() > 1) {
+            return null;
+        }
+
         JBPanel panel = new JBPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setAlignmentY(Component.TOP_ALIGNMENT);

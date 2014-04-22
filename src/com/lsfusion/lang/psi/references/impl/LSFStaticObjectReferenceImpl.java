@@ -17,13 +17,13 @@ public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFS
     public LSFStaticObjectReferenceImpl(@NotNull ASTNode node) {
         super(node);
     }
-    
+
     protected abstract LSFCustomClassUsage getCustomClassUsage();
 
     @Override
     public LSFResolveResult resolveNoCache() {
         List<LSFStaticObjectDeclaration> decls = new ArrayList<LSFStaticObjectDeclaration>();
-        for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(getCustomClassUsage().resolveDecl(), LSFStubElementTypes.EXTENDCLASS, getProject(), getScope())) {
+        for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(getCustomClassUsage().resolveDecl(), LSFStubElementTypes.EXTENDCLASS, getLSFFile())) {
             for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {
                 if (getSimpleName().getName() != null && staticDecl != null && getSimpleName().getName().equals(staticDecl.getName())) {
                     decls.add(staticDecl);

@@ -62,35 +62,35 @@ public class GroupObjectContainerSet {
         GroupObjectContainerSet set = new GroupObjectContainerSet();
 
         set.groupContainer = factory.createContainer();
-//        set.groupContainer.setCaption(group.getCaption());
+        set.groupContainer.setCaption(group.getCaption());
 //        set.groupContainer.setDescription(getString("form.layout.group.objects"));
-        set.groupContainer.setSID(group.sID + GROUP_CONTAINER);
+        set.groupContainer.setSID(group.getSID() + GROUP_CONTAINER);
 
         set.gridContainer = factory.createContainer();
 //        set.gridContainer.setDescription(getString("form.layout.grid.part"));
-        set.gridContainer.setSID(group.sID + GRID_CONTAINER);
+        set.gridContainer.setSID(group.getSID() + GRID_CONTAINER);
 
         set.panelContainer = factory.createContainer();
 //        set.panelContainer.setDescription(getString("form.layout.panel"));
-        set.panelContainer.setSID(group.sID + PANEL_CONTAINER);
+        set.panelContainer.setSID(group.getSID() + PANEL_CONTAINER);
 
         set.panelPropsContainer = factory.createContainer();
-        set.panelPropsContainer.setSID(group.sID + PANEL_PROPS_CONTAINER);
+        set.panelPropsContainer.setSID(group.getSID() + PANEL_PROPS_CONTAINER);
 
         set.controlsContainer = factory.createContainer();
 //        set.controlsContainer.setDescription(getString("form.layout.control.objects"));
-        set.controlsContainer.setSID(group.sID + CONTROLS_CONTAINER);
+        set.controlsContainer.setSID(group.getSID() + CONTROLS_CONTAINER);
 
         set.toolbarPropsContainer = factory.createContainer();
 //        set.toolbarPropsContainer.setDescription(getString("form.layout.toolbar.props.container"));
-        set.toolbarPropsContainer.setSID(group.sID + TOOLBAR_PROPS_CONTAINER);
+        set.toolbarPropsContainer.setSID(group.getSID() + TOOLBAR_PROPS_CONTAINER);
 
         set.filtersContainer = factory.createContainer();
 //        set.filtersContainer.setDescription(getString("form.layout.filters.container"));
-        set.filtersContainer.setSID(group.sID + FILTERS_CONTAINER);
+        set.filtersContainer.setSID(group.getSID() + FILTERS_CONTAINER);
 
         set.rightControlsContainer = factory.createContainer();
-        set.rightControlsContainer.setSID(group.sID + CONTROLS_RIGHT_CONTAINER);
+        set.rightControlsContainer.setSID(group.getSID() + CONTROLS_RIGHT_CONTAINER);
 
         set.groupContainer.setType(ContainerType.CONTAINERV);
         set.groupContainer.setChildrenAlignment(Alignment.LEADING);

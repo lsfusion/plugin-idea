@@ -1,20 +1,27 @@
 package com.lsfusion.design;
 
 import com.intellij.find.findUsages.DefaultFindUsagesHandlerFactory;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.Query;
 import com.lsfusion.design.model.ComponentView;
 import com.lsfusion.design.model.ContainerType;
 import com.lsfusion.design.model.ContainerView;
+import com.lsfusion.design.model.entity.FormEntity;
+import com.lsfusion.design.model.proxy.ViewProxyUtil;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.impl.LSFFormPropertyDrawUsageImpl;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 
 import java.awt.*;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class DesignInfo {
@@ -22,43 +29,85 @@ public class DesignInfo {
 
     public FormView formView;
 
-    public DesignInfo(LSFFormDeclaration formDecl) {
+    public DesignInfo(LSFFormDeclaration formDecl, LSFFile lsfFile) {
         this.formDecl = formDecl;
 
-        Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, formDecl.getLSFFile());
+        Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile);
 
-        formView = new DefaultFormView();
-        for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {
-            formView.extendForm(formExtend);
+        List<LSFFormExtend> formExtends = new ArrayList<LSFFormExtend>(lsfFormExtends.findAll());
+        Collections.sort(formExtends, REQUIRES_COMPARATOR);
+
+        FormEntity formEntity = new FormEntity(lsfFile);
+
+        for (LSFFormExtend formExtend : formExtends) {
+            formEntity.extendForm(formExtend);
         }
 
         DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
-        Collection<PsiReference> refs = fact.createFindUsagesHandler(formDecl.getNameIdentifier(), false)
-                .findReferencesToHighlight(formDecl.getNameIdentifier(), formDecl.getLSFFile().getRequireScope());
+        List<PsiReference> refs = new ArrayList<PsiReference>(fact.createFindUsagesHandler(formDecl.getNameIdentifier(), false)
+                .findReferencesToHighlight(formDecl.getNameIdentifier(), lsfFile.getRequireScope()));
 
+        List<LSFFormUsage> formUsages = new ArrayList<LSFFormUsage>();
         for (PsiReference ref : refs) {
             if (ref instanceof LSFFormUsage) {
-                PsiElement parent = ((LSFFormUsage) ref).getParent();
-                if (parent instanceof LSFDesignDeclaration || parent instanceof LSFExtendDesignDeclaration) {
-                    LSFDesignStatement designStatement = (LSFDesignStatement) parent.getParent();
-
-                    processComponentBody(formView, formView.getMainContainer(), designStatement.getComponentBody());
-                }
+                formUsages.add((LSFFormUsage) ref);
             }
         }
+        Collections.sort(formUsages, REQUIRES_COMPARATOR);
 
-        System.out.println();
+        for (LSFFormUsage ref : formUsages) {
+            PsiElement parent = ref.getParent();
+            if (parent instanceof LSFDesignDeclaration) {
+                formView = ((LSFDesignDeclaration) parent).getFromDefaultStatement() != null ? DefaultFormView.create(formEntity) : FormView.create(formEntity);
+            }
+            if (formView != null && (parent instanceof LSFDesignDeclaration || parent instanceof LSFExtendDesignDeclaration)) {
+                LSFDesignStatement designStatement = (LSFDesignStatement) parent.getParent();
+
+                processComponentBody(formView.getMainContainer(), designStatement.getComponentBody());
+            }
+        }
+        if (formView == null) { // если дизайн вообще не прописан
+            formView = DefaultFormView.create(formEntity);
+        }
     }
+
+    private static final Comparator<LSFElement> REQUIRES_COMPARATOR = new Comparator<LSFElement>() {
+        @Override
+        public int compare(LSFElement o1, LSFElement o2) {
+            LSFModuleDeclaration decl1 = o1.getLSFFile().getModuleDeclaration();
+            if (decl1 != null) {
+                LSFModuleDeclaration decl2 = o2.getLSFFile().getModuleDeclaration();
+                if (decl2 != null) {
+                    if (decl1.requires(decl2)) {
+                        return 1;
+                    } else if (decl2.requires(decl1)) {
+                        return -1;
+                    }
+                }
+            }
+
+            String name1;
+            String name2;
+
+            if (o1 instanceof LSFFormExtend && o2 instanceof LSFFormExtend) {
+                name1 = ((LSFFormExtend) o1).getGlobalName();
+                name2 = ((LSFFormExtend) o2).getGlobalName();
+            } else if (o1 instanceof LSFFormUsage && o2 instanceof LSFFormUsage) {
+                name1 = ((LSFFormUsage) o1).getNameRef();
+                name2 = ((LSFFormUsage) o2).getNameRef();
+            } else {
+                throw new UnsupportedOperationException("Uncomparable classes");
+            }
+
+            return StringUtil.naturalCompare(name1, name2);
+        }
+    };
 
     public String getFormCaption() {
-        return formDecl.getCaption();
+        return formView.getCaption();
     }
 
-    public String getFormSID() {
-        return formDecl.getGlobalName();
-    }
-
-    private void processComponentBody(FormView form, ComponentView parentComponent, LSFComponentBody componentBody) {
+    private void processComponentBody(ComponentView parentComponent, LSFComponentBody componentBody) {
         LSFComponentBlockStatement componentBlockStatement = componentBody.getComponentBlockStatement();
         if (componentBlockStatement == null) {
             return;
@@ -70,28 +119,32 @@ public class DesignInfo {
             if (componentStatement.getSetupComponentStatement() != null) {
                 LSFSetupComponentStatement statement = componentStatement.getSetupComponentStatement();
 
-                String componentSID = getComponentSID(statement.getComponentSelector(), form);
-                ComponentView componentView = form.getComponentBySID(componentSID);
+                String componentSID = getComponentSID(statement.getComponentSelector(), formView);
+                ComponentView componentView = formView.getComponentBySID(componentSID);
 
-                processComponentBody(form, componentView, statement.getComponentBody());
+                if (componentView != null) {
+                    processComponentBody(componentView, statement.getComponentBody());
+                }
             } else if (componentStatement.getNewComponentStatement() != null) {
                 LSFNewComponentStatement statement = componentStatement.getNewComponentStatement();
                 String name = statement.getComponentStubDecl().getComponentDecl().getName();
-                ContainerView container = form.createContainer(null, name);
+                ContainerView container = formView.createContainer(null, name);
 
                 LSFComponentInsertPositionSelector insertPositionSelector = statement.getComponentInsertPositionSelector();
-                addComponent(container, (ContainerView) parentComponent, insertPositionSelector, form);
+                addComponent(container, (ContainerView) parentComponent, insertPositionSelector, formView);
 
-                processComponentBody(form, container, statement.getComponentBody());
+                processComponentBody(container, statement.getComponentBody());
             } else if (componentStatement.getAddComponentStatement() != null) {
                 LSFAddComponentStatement statement = componentStatement.getAddComponentStatement();
-                String name = getComponentSID(statement.getComponentSelector(), form);
-                ContainerView component = form.getContainerBySID(name);
+                String name = getComponentSID(statement.getComponentSelector(), formView);
+                ComponentView component = formView.getComponentBySID(name);
 
-                LSFComponentInsertPositionSelector insertPositionSelector = statement.getComponentInsertPositionSelector();
-                addComponent(component, (ContainerView) parentComponent, insertPositionSelector, form);
+                if (component != null) {
+                    LSFComponentInsertPositionSelector insertPositionSelector = statement.getComponentInsertPositionSelector();
+                    addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
 
-                processComponentBody(form, component, statement.getComponentBody());
+                    processComponentBody(component, statement.getComponentBody());
+                }
             } else if (componentStatement.getSetObjectPropertyStatement() != null) {
                 LSFSetObjectPropertyStatement statement = componentStatement.getSetObjectPropertyStatement();
                 String propertyName = statement.getFirstChild().getText();
@@ -100,7 +153,14 @@ public class DesignInfo {
                 Object propertyValueObject = getPropertyValue(propertyValue);
 
                 if (parentComponent != null) {
-                    parentComponent.setProperty(propertyName, propertyValueObject);
+                    ViewProxyUtil.setObjectProperty(parentComponent.equals(formView.getMainContainer()) ? formView : parentComponent, propertyName, propertyValueObject);
+                }
+            } else if (componentStatement.getRemoveComponentStatement() != null) {
+                LSFRemoveComponentStatement statement = componentStatement.getRemoveComponentStatement();
+                String name = getComponentSID(statement.getComponentSelector(), formView);
+                ComponentView component = formView.getComponentBySID(name);
+                if (component != null) {
+                    formView.removeComponent(component, statement.getRemoveCascade() != null);
                 }
             }
         }
@@ -116,7 +176,7 @@ public class DesignInfo {
                 return Color.decode(colorLiteral.getFirstChild().getText());
             }
         } else if (valueStatement.getStringLiteral() != null) {
-            return valueStatement.getStringLiteral().getText();
+            return valueStatement.getStringLiteral().getValue();
         } else if (valueStatement.getIntLiteral() != null) {
             return Integer.decode(valueStatement.getIntLiteral().getText());
         } else if (valueStatement.getDoubleLiteral() != null) {
@@ -166,7 +226,25 @@ public class DesignInfo {
             ComponentView componentView = form.getComponentBySID(componentSID);
             return componentView.getParent().getSID();
         } else if (componentSelector.getPropertySelector() != null) {
-            return componentSelector.getPropertySelector().getFormPropertyDrawUsage().getSimpleName().getName();
+            LSFFormPropertyDrawUsageImpl usage = (LSFFormPropertyDrawUsageImpl) componentSelector.getPropertySelector().getFormPropertyDrawUsage();
+            if (usage.getAliasUsage() != null) {
+                return usage.getAliasUsage().getSimpleName().getName();
+            } else {
+                String name = usage.getSimpleName().getName();
+                LSFNonEmptyObjectUsageList usageList = usage.getFormPropertyObject().getObjectUsageList().getNonEmptyObjectUsageList();
+                if (usageList != null) {
+                    name += "_";
+                    List<LSFObjectUsage> objectUsages = usageList.getObjectUsageList();
+                    for (LSFObjectUsage objectUsage : objectUsages) {
+                        name += objectUsage.getName();
+                        if (objectUsages.indexOf(objectUsage) < objectUsages.size() - 1) {
+                            name += "_";
+                        }
+                    }
+                }
+
+                return name;
+            }
         } else {
             return componentSelector.getComponentUsage().getMultiCompoundID().getName();
         }

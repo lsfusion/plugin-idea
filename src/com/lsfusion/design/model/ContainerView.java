@@ -22,6 +22,7 @@ public class ContainerView extends ComponentView {
             ComponentView.PROPERTIES,
             new ReflectionProperty("childrenAlignment"),
             new ReflectionProperty("columns"),
+            new ReflectionProperty("columnLabelsWidth"),
             new ReflectionProperty("type"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("description")
@@ -35,6 +36,7 @@ public class ContainerView extends ComponentView {
     public ContainerType type = ContainerType.CONTAINERV;
     public Alignment childrenAlignment = Alignment.LEADING;
     public int columns = 4;
+    public int columnLabelsWidth = 0;
 
     public ContainerView() {
         this("");
@@ -73,12 +75,20 @@ public class ContainerView extends ComponentView {
         this.columns = columns;
     }
 
+    public void setColumnLabelsWidth(int columnLabelsWidth) {
+        this.columnLabelsWidth = columnLabelsWidth;
+    }
+
     public Alignment getChildrenAlignment() {
         return childrenAlignment;
     }
 
     public int getColumns() {
         return columns;
+    }
+
+    public int getColumnLabelsWidth() {
+        return columnLabelsWidth;
     }
 
     public ContainerType getType() {
@@ -214,6 +224,14 @@ public class ContainerView extends ComponentView {
             if (childWidget != null) {
                 hasChildren = true;
                 splitPane.setSecondComponent(childWidget);
+
+                double flex1 = children.get(0).flex;
+                double flex2 = children.get(1).flex;
+                if (flex1 == 0 && flex2 == 0) {
+                    flex1 = 1;
+                    flex2 = 1;
+                }
+                splitPane.setProportion((float) (flex1 / (flex1 + flex2)));
             }
         }
         return hasChildren ? splitPane : null;
@@ -262,6 +280,9 @@ public class ContainerView extends ComponentView {
             childrenWidgets.add(childWidget);
             if (childWidget != null) {
                 hasChildren = true;
+            }
+            if (columnLabelsWidth > 0 && childWidget instanceof HasLabel) {
+                ((HasLabel) childWidget).setLabelWidth(columnLabelsWidth);
             }
         }
 

@@ -19,11 +19,11 @@ public class BaseUtils {
     public static <G, I extends G> Collection<G> immutableCast(Collection<I> object) {
         return (Collection<G>) object;
     }
-    
+
     public static <G, I extends G> Set<G> immutableCast(Set<I> object) {
         return (Set<G>) object;
     }
-    
+
     public static <G, I extends G> Query<G> immutableCast(Query<I> object) {
         return (Query<G>) object;
     }
@@ -33,7 +33,7 @@ public class BaseUtils {
     }
 
     public static int max(int a, int b) {
-        return a > b ? a : b; 
+        return a > b ? a : b;
     }
 
     public static int min(int a, int b) {
@@ -47,14 +47,14 @@ public class BaseUtils {
     public static boolean cmp(boolean a, boolean b, boolean max) {
         return max ? a || b : a && b;
     }
-    
+
     public static <K, V> Map<K, V> filterNullable(Map<K, V> map, Set<K> set) {
-        if(set == null)
+        if (set == null)
             return map;
-        
+
         Map<K, V> result = new HashMap<K, V>();
-        for(Map.Entry<K, V> entry : map.entrySet())
-            if(set.contains(entry.getKey()))
+        for (Map.Entry<K, V> entry : map.entrySet())
+            if (set.contains(entry.getKey()))
                 result.put(entry.getKey(), entry.getValue());
         return result;
     }
@@ -64,9 +64,9 @@ public class BaseUtils {
         result.putAll(override);
         return result;
     }
-    
+
     public static <K> K nvl(K el1, K el2) {
-        return el1 != null ? el1 : el2; 
+        return el1 != null ? el1 : el2;
     }
 
     public static <K> Set<K> merge(Set<K> set1, Set<K> set2) {
@@ -98,7 +98,7 @@ public class BaseUtils {
         List<K> result = new ArrayList<K>();
         result.add(el1);
         result.add(el2);
-        return result;        
+        return result;
     }
 
     public static <K> Set<K> remove(Set<? extends K> set, K remove) {
@@ -109,12 +109,12 @@ public class BaseUtils {
 
     public static <K> Set<K> split(Set<K> set1, Set<K> set2) {
 
-        Set<K> common = new HashSet<K>(); 
-                
+        Set<K> common = new HashSet<K>();
+
         Iterator<K> it = set1.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             K next = it.next();
-            if(set2.remove(next)) {
+            if (set2.remove(next)) {
                 common.add(next);
                 it.remove();
             }
@@ -133,6 +133,32 @@ public class BaseUtils {
 
     public static boolean isRedundantString(String toolTip) {
         return toolTip == null || toolTip.trim().isEmpty();
+    }
+
+    public static String capitalize(String s) {
+        if (s.length() == 0) return s;
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+
+    public static String replicate(char character, int length) {
+
+        char[] chars = new char[length];
+        Arrays.fill(chars, character);
+        return new String(chars);
+    }
+
+    public static String nullTrim(String string) {
+        if (string == null)
+            return "";
+        else
+            return string.trim();
+    }
+
+    public static <K> String toString(String separator, K... array) {
+        String result = "";
+        for (K element : array)
+            result = (result.length() == 0 ? "" : result + separator) + element;
+        return result;
     }
 
     public static Dimension overrideSize(Dimension base, Dimension override) {
@@ -184,10 +210,28 @@ public class BaseUtils {
         reverse(fromMap, reverseMap);
         return reverseMap;
     }
-    
+
     public static <K, V> void reverse(Map<K, V> fromMap, Map<V, K> toMap) {
         for (Map.Entry<K, V> e : fromMap.entrySet()) {
             toMap.put(e.getValue(), e.getKey());
         }
+    }
+
+    public static <K> K last(List<K> list) {
+        if (list.size() > 0)
+            return list.get(list.size() - 1);
+        else
+            return null;
+    }
+
+    public static <K> int relativePosition(K element, List<K> comparatorList, List<K> insertList) {
+        int ins = 0;
+        int ind = comparatorList.indexOf(element);
+
+        Iterator<K> icp = insertList.iterator();
+        while (icp.hasNext() && comparatorList.indexOf(icp.next()) < ind) {
+            ins++;
+        }
+        return ins;
     }
 }

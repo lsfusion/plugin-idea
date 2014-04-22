@@ -2,7 +2,6 @@ package com.lsfusion.lang.psi.extend.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
-import com.intellij.openapi.util.Pair;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Query;
@@ -34,17 +33,8 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     @Nullable
     public abstract LSFExtendingFormDeclaration getExtendingFormDeclaration();
 
-    @Nullable
-    public abstract LSFFormDecl getFormDecl();
-
     @NotNull
     protected abstract List<LSFFormGroupObjectsList> getFormGroupObjectsListList();
-
-    @NotNull
-    protected abstract List<LSFFormPropertiesList> getFormPropertiesListList();
-
-    @NotNull
-    protected abstract List<LSFFormTreeGroupObjectList> getFormTreeGroupObjectListList();
 
     @Override
     public String getGlobalName() {
@@ -105,10 +95,10 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     }
 
     @Override
-    public Collection<LSFFormTreeGroupObjectDeclaration> getTreeGroupDecls() {
-        Collection<LSFFormTreeGroupObjectDeclaration> result = new ArrayList<LSFFormTreeGroupObjectDeclaration>();
-        for (LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())
-            result.addAll(formGroupObject.getFormTreeGroupObjectDeclarationList());
+    public Collection<LSFFormGroupObjectDeclaration> getFormGroupObjectDeclarations() {
+        Collection<LSFFormGroupObjectDeclaration> result = new ArrayList<LSFFormGroupObjectDeclaration>();
+        for (LSFFormGroupObjectsList formGroupObject : getFormGroupObjectsListList())
+            result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFFormGroupObjectDeclaration.class));
         return result;
     }
 
@@ -120,46 +110,6 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         }
         for (LSFFormPropertiesList formProperties : getFormPropertiesListList())
             result.addAll(PsiTreeUtil.findChildrenOfType(formProperties, LSFPropertyDrawDeclaration.class));
-        return result;
-    }
-
-    @Override
-    public Map<LSFPropertyDrawDeclaration, Pair<LSFFormPropertyOptionsList, LSFFormPropertyOptionsList>> getPropertyDrawDeclsWithOptions() {
-        Map<LSFPropertyDrawDeclaration, Pair<LSFFormPropertyOptionsList, LSFFormPropertyOptionsList>> result = new LinkedHashMap<LSFPropertyDrawDeclaration, Pair<LSFFormPropertyOptionsList, LSFFormPropertyOptionsList>>();
-        if (getFormDecl() != null) {
-            for (LSFPropertyDrawDeclaration decl : LSFElementGenerator.getBuiltInFormProps(getProject())) {
-                result.put(decl, null);
-            }
-        }
-        for (LSFFormPropertiesList formProperties : getFormPropertiesListList()) {
-            LSFFormPropertyOptionsList commonOptions = formProperties.getFormPropertyOptionsList();
-            if (commonOptions != null) {
-                LSFFormMappedPropertiesList propertyList = formProperties.getFormMappedPropertiesList();
-                if (propertyList != null) {
-                    List<LSFFormPropertyDrawMappedDecl> mappedDeclList = propertyList.getFormPropertyDrawMappedDeclList();
-                    for (LSFFormPropertyDrawMappedDecl prop : mappedDeclList) {
-                        LSFFormPropertyOptionsList options = prop.getFormPropertyOptionsList();
-
-                        result.put(prop, new Pair(commonOptions, options));
-                    }
-                }
-            } else {
-                LSFFormMappedNamePropertiesList mappedProps = formProperties.getFormMappedNamePropertiesList();
-                if (mappedProps != null) {
-                    commonOptions = mappedProps.getFormPropertyOptionsList();
-
-                    LSFFormPropertiesNamesDeclList formPropertiesNamesDeclList = mappedProps.getFormPropertiesNamesDeclList();
-
-                    List<LSFFormPropertyDrawNameDecl> formPropertyDrawNameDeclList = formPropertiesNamesDeclList.getFormPropertyDrawNameDeclList();
-                    for (LSFFormPropertyDrawNameDecl prop : formPropertyDrawNameDeclList) {
-                        LSFFormPropertyOptionsList options = prop.getFormPropertyOptionsList();
-
-                        result.put(prop, new Pair(commonOptions, options));
-                    }
-                }
-            }
-            PsiTreeUtil.findChildrenOfType(formProperties, LSFPropertyDrawDeclaration.class);
-        }
         return result;
     }
 

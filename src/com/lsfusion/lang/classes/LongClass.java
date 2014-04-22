@@ -2,6 +2,8 @@ package com.lsfusion.lang.classes;
 
 public class LongClass extends IntegralClass {
 
+    public final static LongClass instance = new LongClass();
+
     int getWhole() {
         return 10;
     }
@@ -22,5 +24,15 @@ public class LongClass extends IntegralClass {
 
     public String getName() {
         return "LONG";
+    }
+
+    @Override
+    public String getCaption() {
+        return "Длинное целое число";
+    }
+
+    @Override
+    public String getPreferredMask() {
+        return "9 999 999 999 999 999 999";
     }
 }

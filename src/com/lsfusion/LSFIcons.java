@@ -57,7 +57,8 @@ public final class LSFIcons {
         public static final Icon PROPERTY = AllIcons.Css.Property;
 
         public static final Icon FIND = AllIcons.Actions.Find;
-        
+        public static final Icon REFRESH = AllIcons.Actions.Refresh;
+
         public static final Icon VIEW_GRID = IconLoader.getIcon("/images/design/view_grid.png");
         public static final Icon VIEW_HIDE = IconLoader.getIcon("/images/design/view_hide.png");
         public static final Icon VIEW_PANEL = IconLoader.getIcon("/images/design/view_panel.png");

@@ -2,6 +2,8 @@ package com.lsfusion.lang.classes;
 
 public class IntegerClass extends IntegralClass {
 
+    public final static IntegerClass instance = new IntegerClass();
+
     int getWhole() {
         return 8;
     }
@@ -20,5 +22,10 @@ public class IntegerClass extends IntegralClass {
 
     public String getName() {
         return "INTEGER";
+    }
+
+    @Override
+    public String getCaption() {
+        return "Целое число";
     }
 }

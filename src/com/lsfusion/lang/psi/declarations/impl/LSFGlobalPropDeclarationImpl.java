@@ -52,7 +52,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     public String getCaption() {
         LSFStringLiteral stringLiteral = getPropertyDeclaration().getSimpleNameWithCaption().getStringLiteral();
-        return stringLiteral != null ? stringLiteral.getText() : null;
+        return stringLiteral != null ? stringLiteral.getValue() : null;
     }
 
     @Override
@@ -282,8 +282,8 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                 LSFId nameIdentifier = getNameIdentifier();
                 LSFId otherNameIdentifier = decl.getNameIdentifier();
                 return nameIdentifier != null && otherNameIdentifier != null &&
-                       nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
-                       resolveEquals(resolveParamClasses(), decl.resolveParamClasses());
+                        nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
+                        resolveEquals(resolveParamClasses(), decl.resolveParamClasses());
             }
         };
     }

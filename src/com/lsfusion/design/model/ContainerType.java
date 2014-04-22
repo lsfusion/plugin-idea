@@ -4,12 +4,12 @@ public enum ContainerType {
     CONTAINERH,
     CONTAINERV,
     COLUMNS,
-    TABBED_PANE,
+    TABBED,
     SPLITV,
     SPLITH;
 
     public boolean isTabbed() {
-        return this == TABBED_PANE;
+        return this == TABBED;
     }
 
     public boolean isSplit() {

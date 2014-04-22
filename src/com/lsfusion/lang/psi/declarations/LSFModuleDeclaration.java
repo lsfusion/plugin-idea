@@ -16,4 +16,5 @@ public interface LSFModuleDeclaration extends LSFNamespaceDeclaration<LSFModuleD
 
     List<LSFNamespaceReference> getPriorityRefs();
 
+    boolean requires(LSFModuleDeclaration module);
 }

@@ -36,38 +36,24 @@ public class ColumnsLayout extends CachableLayout<ColumnsConstraints> {
             return new Dimension(0, 0);
         }
 
-        int visibleColumnsCnt = 0;
-
         int width = 0;
         int height = 0;
         for (int i = 0; i < columns; ++i) {
-            int labelsWidth = 0;
-            int contentWidth = 0;
-            int contentHeight = 0;
+            int columnHeight = 0;
             int columnWidth = 0;
-            int rowsCnt = 0;
             for (int j = i; j < childCnt; j += columns) {
                 Component child = target.getComponent(j);
 
                 if (child.isVisible()) {
-                    ++rowsCnt;
-
                     Dimension childSize = sizeGetter.get(child);
 
                     columnWidth = max(columnWidth, childSize.width);
-
-                    contentHeight = limitedSum(contentHeight, childSize.height);
+                    columnHeight = limitedSum(columnHeight, childSize.height);
                 }
             }
 
-            if (rowsCnt > 0) {
-                visibleColumnsCnt++;
-
-                columnWidth = max(columnWidth, limitedSum(contentWidth, labelsWidth));
-
-                width = limitedSum(width, columnWidth);
-                height = max(height, contentHeight);
-            }
+            width = limitedSum(width, columnWidth);
+            height = max(height, columnHeight);
         }
 
         return new Dimension(width, height);
@@ -77,37 +63,27 @@ public class ColumnsLayout extends CachableLayout<ColumnsConstraints> {
     public void layoutContainer(Container parent) {
         checkParent(parent);
 
-        Insets in = target.getInsets();
-        Dimension size = target.getSize();
-
-        int parentWidth = size.width - in.left - in.right;
-        int parentHeight = size.height - in.top - in.bottom;
-
         int childCnt = target.getComponentCount();
         if (childCnt == 0) {
             return;
         }
 
+        Insets in = target.getInsets();
         int currentX = in.left;
         for (int i = 0; i < columns; ++i) {
             int currentY = in.top;
 
             //1й проход для рассчёта ширины
-            int labelsWidth = 0;
-            int contentWidth = 0;
             int columnWidth = 0;
             boolean columnVisible = false;
             for (int j = i; j < childCnt; j += columns) {
                 Component child = target.getComponent(j);
 
                 if (child.isVisible()) {
-                    int childWidth = child.getPreferredSize().width;
-                    columnWidth = max(columnWidth, childWidth);
+                    columnWidth = max(columnWidth, child.getPreferredSize().width);
                     columnVisible = true;
                 }
             }
-
-            columnWidth = max(columnWidth, limitedSum(contentWidth, labelsWidth));
 
             if (columnVisible) {
                 //2й проход проставляет размеры
@@ -116,15 +92,21 @@ public class ColumnsLayout extends CachableLayout<ColumnsConstraints> {
 
                     if (child.isVisible()) {
                         Dimension prefSize = child.getPreferredSize();
+
                         FlexAlignment align = lookupConstraints(child).getAlignment();
                         int childWidth = align == FlexAlignment.STRETCH ? columnWidth : prefSize.width;
                         int childLeft = currentX;
                         switch (align) {
-                            case CENTER: childLeft = (columnWidth - childWidth) / 2; break;
-                            case TRAILING: childLeft = columnWidth - childWidth; break;
+                            case CENTER:
+                                childLeft = (columnWidth - childWidth) / 2;
+                                break;
+                            case TRAILING:
+                                childLeft = columnWidth - childWidth;
+                                break;
                             case LEADING:
                             case STRETCH:
-                            default: break;
+                            default:
+                                break;
                         }
 
                         child.setBounds(childLeft, currentY, columnWidth, prefSize.height);

@@ -474,7 +474,7 @@ minCharWidthSetting ::= MINCHARWIDTH intLiteral
 maxCharWidthSetting ::= MAXCHARWIDTH intLiteral
 prefCharWidthSetting ::= PREFCHARWIDTH intLiteral
 imageSetting ::= IMAGE stringLiteral
-editKeySetting ::= EDITKEY stringLiteral (SHOW | HIDE)?
+editKeySetting ::= EDITKEY stringLiteral (SHOW | hideEditKey)?
 autosetSetting ::= AUTOSET
 confirmSetting ::= CONFIRM
 regexpSetting ::= REGEXP stringLiteral (stringLiteral)?
@@ -485,6 +485,8 @@ aggPropSetting ::= AGGPROP
 notNullSetting ::= NOT nullOption (DELETE)? baseEvent
 onEditEventSetting ::= ON (CHANGE | CHANGEWYS | EDIT) actionPropertyDefinitionBody
 eventIdSetting ::= EVENTID stringLiteral
+
+hideEditKey ::= HIDE
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// ACTION PROPERTIES ///////////////////////////
@@ -936,8 +938,8 @@ formPropertyOptionsList ::= (    EDITABLE
                             |    SELECTOR
                             |    HINTNOUPDATE
                             |    HINTTABLE
-                            |    TOOLBAR
                             |    OPTIMISTICASYNC
+                            |    formOptionToolbar
                             |    formOptionForce
                             |    formOptionToDraw
                             |    formOptionEventId
@@ -947,6 +949,7 @@ formPropertyOptionsList ::= (    EDITABLE
                             |    formOptionsOnEvents
                             )*
 
+formOptionToolbar ::= TOOLBAR
 formOptionColumns ::= COLUMNS (stringLiteral)? LBRAC nonEmptyGroupObjectUsageList RBRAC {pin = 1}
 formOptionForce ::= FORCE classViewType {pin = 1}
 formOptionToDraw ::= TODRAW groupObjectUsage {pin = 1}
@@ -990,12 +993,15 @@ formEventDeclaration ::= ON
     pin = 1
 }
 
-formFilterGroupDeclaration ::= FILTERGROUP ID
-                                (FILTER stringLiteral stringLiteral formFilterDeclaration filterSetDefault)+
+formFilterGroupDeclaration ::= FILTERGROUP filterGroupName regularFilterDeclaration+
 {pin(".*") = 1}
 
+filterGroupName ::= simpleName
+
+regularFilterDeclaration ::= FILTER stringLiteral stringLiteral formFilterDeclaration (filterSetDefault)?
+
 formFilterDeclaration ::= propertyExpression
-filterSetDefault ::= (DEFAULT)?
+filterSetDefault ::= DEFAULT
 
 formOrderByList ::= ORDER BY formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
 
@@ -1242,7 +1248,9 @@ designStatement ::=	(designDeclaration | extendDesignDeclaration) componentBody 
     methods = [ getIcon resolveFormDecl]
 }
 
-designDeclaration ::= DESIGN formUsage (stringLiteral)? (FROM DEFAULT)? {pin=2}
+designDeclaration ::= DESIGN formUsage (stringLiteral)? (fromDefaultStatement)? {pin=2}
+
+fromDefaultStatement ::= FROM DEFAULT
 
 extendDesignDeclaration ::= EXTEND DESIGN formUsage
 
@@ -1306,7 +1314,8 @@ componentInsertPositionSelector ::= (IN inPositionComponent)?
                                     |	FIRST
                                     )?
 
-removeComponentStatement ::= REMOVE componentSelector (CASCADE)? SEMI {pin = 1}
+removeComponentStatement ::= REMOVE componentSelector (removeCascade)? SEMI {pin = 1}
+removeCascade ::= CASCADE
 
 inPositionComponent ::= componentSelector
 
@@ -1559,6 +1568,10 @@ exclusiveOverrideOption ::= OVERRIDE | EXCLUSIVE
 
 colorLiteral ::= LEX_COLOR_LITERAL | (RGB LBRAC uintLiteral COMMA uintLiteral COMMA uintLiteral RBRAC)
 stringLiteral ::= LEX_STRING_LITERAL
+{
+    mixin="com.lsfusion.lang.psi.LSFStringValueLiteralImpl"
+    implements="com.lsfusion.lang.psi.LSFStringValueLiteral"
+}
 intLiteral ::= (MINUS)? uintLiteral
 longLiteral ::=  (MINUS)? ulongLiteral
 doubleLiteral ::= (MINUS)? unumericLiteral

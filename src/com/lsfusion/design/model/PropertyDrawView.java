@@ -2,16 +2,12 @@ package com.lsfusion.design.model;
 
 import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.table.JBTable;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.KeyStrokes;
+import com.lsfusion.design.model.entity.PropertyDrawEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
-import com.lsfusion.design.ui.CachableLayout;
-import com.lsfusion.design.ui.FlexAlignment;
-import com.lsfusion.design.ui.SingleCellTable;
-import com.lsfusion.lang.psi.*;
+import com.lsfusion.design.ui.ClassViewType;
+import com.lsfusion.lang.classes.DataClass;
 import com.lsfusion.util.BaseUtils;
 
 import javax.swing.*;
@@ -19,7 +15,8 @@ import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
-import static com.lsfusion.util.BaseUtils.*;
+import static com.lsfusion.util.BaseUtils.getKeyStrokeCaption;
+import static com.lsfusion.util.BaseUtils.isRedundantString;
 import static java.lang.Math.max;
 
 public class PropertyDrawView extends ComponentView {
@@ -46,6 +43,8 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("askConfirmMessage")
     );
 
+    public PropertyDrawEntity entity;
+
     public boolean showTableFirst;
     public boolean editOnSingleClick;
     public boolean hide;
@@ -59,64 +58,36 @@ public class PropertyDrawView extends ComponentView {
     public int preferredCharWidth;
 
     public KeyStroke editKey;
-    public boolean showEditKey = true;
+    public boolean showEditKey;
 
     public Boolean focusable;
 
     public boolean panelLabelAbove = false;
 
     public String caption;
+    public boolean showCaption = true;
     public boolean clearText;
     public String toolTip;
 
     public boolean askConfirm;
     public String askConfirmMessage;
 
-    public boolean isAction;
-    public boolean isForcedPanel;
-
-    public boolean toolbar = false;
-
     public PropertyDrawView() {
         this("");
     }
 
-    public PropertyDrawView(String sID, LSFPropertyOptions propertyOptions, Pair<LSFFormPropertyOptionsList, LSFFormPropertyOptionsList> formOptions) {
-        this(sID);
+    public PropertyDrawView(PropertyDrawEntity entity) {
+        this(entity.sID);
 
-        if (propertyOptions != null) {
-            toolbar = !propertyOptions.getToolbarSettingList().isEmpty();
+        this.entity = entity;
 
-            List<LSFFixedCharWidthSetting> fixedCharWidthSettings = propertyOptions.getFixedCharWidthSettingList();
-            if (!fixedCharWidthSettings.isEmpty()) {
-                setFixedCharWidth(Integer.parseInt(fixedCharWidthSettings.get(fixedCharWidthSettings.size() - 1).getIntLiteral().getText()));
-            }
-
-            List<LSFMinCharWidthSetting> minCharWidthSettings = propertyOptions.getMinCharWidthSettingList();
-            if (!minCharWidthSettings.isEmpty()) {
-                setMinimumCharWidth(Integer.parseInt(minCharWidthSettings.get(minCharWidthSettings.size() - 1).getIntLiteral().getText()));
-            }
-
-            List<LSFMaxCharWidthSetting> maxCharWidthSettings = propertyOptions.getMaxCharWidthSettingList();
-            if (!maxCharWidthSettings.isEmpty()) {
-                setMaximumCharWidth(Integer.parseInt(maxCharWidthSettings.get(maxCharWidthSettings.size() - 1).getIntLiteral().getText()));
-            }
-
-            List<LSFPrefCharWidthSetting> prefCharWidthSettings = propertyOptions.getPrefCharWidthSettingList();
-            if (!prefCharWidthSettings.isEmpty()) {
-                setPreferredCharWidth(Integer.parseInt(prefCharWidthSettings.get(prefCharWidthSettings.size() - 1).getIntLiteral().getText()));
-            }
-        }
-
-        LSFFormPropertyOptionsList commonFormOptions = formOptions != null ? formOptions.first : null;
-        LSFFormPropertyOptionsList propertyFormOptions = formOptions != null ? formOptions.second : null;
-
-        //todo: toDraw, force, before, after 
-        if (propertyFormOptions != null && !propertyFormOptions.getFormOptionsWithFormPropertyDrawList().isEmpty()) {
-
-        } else if (commonFormOptions != null && !commonFormOptions.getFormOptionsWithFormPropertyDrawList().isEmpty()) {
-
-        }
+        setFixedCharWidth(entity.fixedCharWidth);
+        setMinimumCharWidth(entity.minimumCharWidth);
+        setMaximumCharWidth(entity.maximumCharWidth);
+        setPreferredCharWidth(entity.preferredCharWidth);
+        setIconPath(entity.iconPath);
+        setEditKey(entity.editKey);
+        setShowEditKey(entity.showEditKey);
     }
 
     public PropertyDrawView(String sID) {
@@ -130,15 +101,25 @@ public class PropertyDrawView extends ComponentView {
     }
 
     @Override
+    public String getDisplaySID() {
+        return entity.propertyName != null ? entity.propertyName : getSID();
+    }
+
+    @Override
     public String getCaption() {
-        return caption;
+        if (caption == null) {
+            String entityCaption = this.entity.getCaption();
+            return entityCaption != null ? entityCaption : getDisplaySID();
+        } else {
+            return caption;
+        }
     }
 
     public String getEditCaption() {
-        String caption = this.caption == null ? "" : this.caption; 
+        String caption = getCaption();
         return showEditKey && editKey != null
-               ? caption + " (" + getKeyStrokeCaption(editKey) + ")"
-               : caption;
+                ? caption + " (" + getKeyStrokeCaption(editKey) + ")"
+                : caption;
     }
 
     public void setShowTableFirst(boolean showTableFirst) {
@@ -185,6 +166,129 @@ public class PropertyDrawView extends ComponentView {
         setMinimumCharWidth(charWidth);
         setMaximumCharWidth(charWidth);
         setPreferredCharWidth(charWidth);
+    }
+
+    public int getMinimumWidth(JComponent comp) {
+        if (minimumSize != null && minimumSize.width > -1) {
+            return minimumSize.width;
+        }
+        return entity.baseClass != null ?
+                entity.baseClass.getMinimumWidth(minimumCharWidth, comp.getFontMetrics(getFont(comp))) :
+                getDefaultMinimumWidth(minimumCharWidth, comp.getFontMetrics(getFont(comp)));
+    }
+
+    private int getDefaultMinimumWidth(int minCharWidth, FontMetrics fontMetrics) {
+        String minMask = minCharWidth != 0
+                ? BaseUtils.replicate('0', minCharWidth)
+                : "1234567";
+
+        return fontMetrics.stringWidth(minMask) + 8;
+    }
+
+    public int getMinimumHeight(JComponent comp) {
+        if (minimumSize != null && minimumSize.height > -1) {
+            return minimumSize.height;
+        }
+        return getPreferredHeight(comp);
+    }
+
+    public Dimension getMinimumSize(JComponent comp) {
+        return new Dimension(getMinimumWidth(comp), getMinimumHeight(comp));
+    }
+
+    public int getPreferredWidth(JComponent comp) {
+        if (preferredSize != null && preferredSize.width > -1) {
+            return preferredSize.width;
+        }
+        return entity.baseClass != null ?
+                entity.baseClass.getPreferredWidth(preferredCharWidth, comp.getFontMetrics(getFont(comp))) :
+                getDefaultPreferredWidth(preferredCharWidth, comp.getFontMetrics(getFont(comp)));
+    }
+
+    private int getDefaultPreferredWidth(int prefCharWidth, FontMetrics fontMetrics) {
+        String prefMask = prefCharWidth != 0
+                ? BaseUtils.replicate('0', prefCharWidth)
+                : "1234567";
+
+        return fontMetrics.stringWidth(prefMask) + 8;
+    }
+
+    public int getPreferredHeight(JComponent comp) {
+        if (preferredSize != null && preferredSize.height > -1) {
+            return preferredSize.height;
+        }
+        int height = entity.baseClass != null ?
+                entity.baseClass.getPreferredHeight(comp.getFontMetrics(getFont(comp))) :
+                getDefaultPreferredHeight(comp.getFontMetrics(getFont(comp)));
+        if (iconPath != null) { // предпочитаемую высоту берем исходя из размера иконки
+            Icon icon = BaseUtils.loadIcon(entity.project, "/images/" + iconPath);
+            height = Math.max(icon.getIconHeight() + 6, height);
+        }
+        return height;
+    }
+
+    private int getDefaultPreferredHeight(FontMetrics fontMetrics) {
+        return fontMetrics.getHeight() + 1;
+    }
+
+    public Dimension getPreferredSize(JComponent comp) {
+        return new Dimension(getPreferredWidth(comp), getPreferredHeight(comp));
+    }
+
+    public int getMaximumWidth(JComponent comp) {
+        int result;
+        if (maximumSize != null && maximumSize.width > -1) {
+            result = maximumSize.width;
+        } else {
+            result = entity.baseClass != null ?
+                    entity.baseClass.getMaximumWidth(maximumCharWidth, comp.getFontMetrics(getFont(comp))) :
+                    getDefaultMaximumWidth(maximumCharWidth, comp.getFontMetrics(getFont(comp)));
+        }
+        return max(result, getPreferredWidth(comp));
+    }
+
+    private int getDefaultMaximumWidth(int maxCharWidth, FontMetrics fontMetrics) {
+        if (maxCharWidth != 0)
+            return fontMetrics.stringWidth(BaseUtils.replicate('0', maxCharWidth)) + 8;
+        else
+            return Integer.MAX_VALUE;
+    }
+
+    public int getMaximumHeight(JComponent comp) {
+        int result;
+        if (maximumSize != null && maximumSize.width > -1) {
+            result = maximumSize.height;
+        } else {
+            result = entity.baseClass != null ?
+                    entity.baseClass.getMaximumHeight(comp.getFontMetrics(getFont(comp))) :
+                    getDefaultMaximumHeight(comp.getFontMetrics(getFont(comp)));
+        }
+        return max(result, getPreferredHeight(comp));
+    }
+
+    private int getDefaultMaximumHeight(FontMetrics fontMetrics) {
+        return getDefaultPreferredHeight(fontMetrics);
+    }
+
+    public Dimension getMaximumSize(JComponent comp) {
+        return new Dimension(getMaximumWidth(comp), getMaximumHeight(comp));
+    }
+
+    private Font getFont(Component component) {
+        if (font == null) {
+            return component.getFont();
+        }
+
+        Object oFont = component instanceof JComponent ? ((JComponent) component).getClientProperty(font) : null;
+        if (oFont instanceof Font) {
+            return (Font) oFont;
+        }
+
+        Font cFont = font.deriveFrom(component);
+        if (component instanceof JComponent) {
+            ((JComponent) component).putClientProperty(font, cFont);
+        }
+        return cFont;
     }
 
     public void setEditKey(KeyStroke editKey) {
@@ -302,156 +406,57 @@ public class PropertyDrawView extends ComponentView {
 
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
-        if (isAction) {
-            return new ActionPanelView(project);
+        if (entity.isAction) {
+            return new ActionPanelView(project, this);
         } else {
-            return new DataPanelView();
+            return new DataPanelView(this);
         }
     }
 
-    private class ActionPanelView extends JButton {
-        private ActionPanelView(Project project) {
-            String caption = getEditCaption();
-            if (isRedundantString(caption)) {
-                setMargin(new Insets(0, 0, 0, 0));
-            } else {
-                setMargin(new Insets(0, 14, 0, 14));
-            }
-            setText(caption);
-
-            if (iconPath != null) {
-                Icon icon = BaseUtils.loadIcon(project, "/images/" + iconPath);
-                if (icon == null) {
-                    icon = LSFIcons.ACTION;
-                }
-                setIcon(icon);
-            }
-
-            String toolTipText = !isRedundantString(toolTip) ? toolTip : getEditCaption();
-            toolTipText += " (sID: " + sID + ")";
-            if (editKey != null) {
-                toolTipText += " (" + getKeyStrokeCaption(editKey) + ")";
-            }
-            setToolTipText(toolTipText);
-        }
-
-        @Override
-        public Dimension getMinimumSize() {
-            return overrideSize(super.getMinimumSize(), minimumSize);
-        }
-
-        @Override
-        public Dimension getMaximumSize() {
-            return overrideSize(super.getMaximumSize(), maximumSize);
-        }
-
-        @Override
-        public Dimension getPreferredSize() {
-            Dimension pref = super.getPreferredSize();
-            pref.height = 24;
-            return overrideSize(pref, preferredSize);
-        }
-    }
-    
-    private class DataPanelView extends JBPanel {
-        private DataPanelView() {
-            SingleCellTable table = new SingleCellTable();
-
-            JBLabel label = new JBLabel(getEditCaption());
-            if (panelLabelAbove) {
-                label.setHorizontalAlignment(SwingConstants.CENTER);
-            }
-
-            setLayout(new DataPanelViewLayout(this, label, table));
-            add(label);
-            add(table);
-        }
+    public boolean isForcedPanel() {
+        return entity.forceViewType == ClassViewType.PANEL;
     }
 
-    private class DataPanelViewLayout extends CachableLayout {
+    public boolean isForceHide() {
+        return entity.forceViewType == ClassViewType.HIDE;
+    }
 
-        private final JBLabel label;
-        private final JBTable table;
+    public static final String TOOL_TIP_FORMAT =
+            "<html><b>%1$s</b><br>" +
+                    "%2$s";
 
-        public DataPanelViewLayout(JBPanel panel, JBLabel label, JBTable table) {
-            super(panel, false);
-            this.label = label;
-            this.table = table;
+    public static final String DETAILED_TOOL_TIP_FORMAT =
+            "<hr>" +
+                    "<b>sID:</b> %3$s<br>" +
+//                    "<b>Таблица:</b> %4$s<br>" +
+                    "<b>Объекты:</b> %4$s<br>" +
+                    "<b>Сигнатура:</b> %6$s <i>%3$s</i> (%5$s)<br>" +
+                    "<b>Скрипт:</b> %7$s<br>" +
+                    "<b>Путь:</b> %8$s" +
+                    "</html>";
+
+    public static final String EDIT_KEY_TOOL_TIP_FORMAT =
+            "<hr><b>Горячая клавиша:</b> %1$s<br>";
+
+    public String getTooltipText(String caption) {
+        String propCaption = BaseUtils.nullTrim(!isRedundantString(toolTip) ? toolTip : caption);
+        String editKeyText = editKey == null ? "" : String.format(EDIT_KEY_TOOL_TIP_FORMAT, KeyStrokes.getKeyStrokeCaption(editKey));
+
+        String sid = getDisplaySID();
+//        String tableName = this.tableName != null ? this.tableName : "&lt;none&gt;";
+        String ifaceObjects = BaseUtils.toString(", ", entity.objectClasses.toArray());
+        String ifaceClasses = BaseUtils.toString(", ", entity.interfeceClasses.toArray());
+        String returnClass = "";
+        if (entity.baseClass != null) {
+            if (entity.baseClass instanceof DataClass) {
+                returnClass = ((DataClass) entity.baseClass).getCaption();
+            } else {
+                returnClass = entity.baseClass.toString();
+            }
         }
 
-        @Override
-        protected Dimension layoutSize(Container parent, ComponentSizeGetter sizeGetter) {
-            Dimension labelSize = sizeGetter.get(label);
-            Dimension tableSize = sizeGetter.get(table);
-            int width;
-            int height;
-            if (panelLabelAbove) {
-                width = max(labelSize.width, tableSize.width);
-                height = limitedSum(labelSize.height, tableSize.height);
-            } else {
-                width = limitedSum(8, labelSize.width, tableSize.width);
-                height = max(labelSize.height, tableSize.height);
-            }
-
-            return new Dimension(width, height);
-        }
-
-        @Override
-        public void layoutContainer(Container parent) {
-            boolean vertical = panelLabelAbove;
-            boolean tableFirst = showTableFirst;
-
-            Insets in = parent.getInsets();
-
-            int width = parent.getWidth() - in.left - in.right;
-            int height = parent.getHeight() - in.top - in.bottom;
-
-            Dimension labelPref = label.getPreferredSize();
-            Dimension tablePref = table.getPreferredSize();
-
-            int tableSpace = width;
-            int tableLeft = in.left;
-            int tableTop = in.top;
-            int tableHeight = height;
-            if (vertical) {
-                tableHeight -= labelPref.height;
-                if (!tableFirst) {
-                    tableTop += labelPref.height;
-                }
-            } else {
-                //horizontal
-                tableSpace = max(0, tableSpace - 4 - labelPref.width - 4);
-                if (!tableFirst) {
-                    tableLeft += 4 + labelPref.width + 4;
-                }
-            }
-
-            int tableWidth = tableSpace;
-            if (alignment != FlexAlignment.STRETCH) {
-                tableWidth = Math.min(tableSpace, tablePref.width);
-                if (alignment == FlexAlignment.TRAILING) {
-                    tableLeft += tableSpace - tableWidth;
-                } else if (alignment == FlexAlignment.CENTER) {
-                    tableLeft += (tableSpace - tableWidth) / 2;
-                }
-            }
-
-            int labelWidth = vertical ? width : labelPref.width;
-            int labelHeight = labelPref.height;
-            int labelLeft = in.left;
-            int labelTop = in.top;
-
-            if (vertical) {
-                if (tableFirst) {
-                    labelTop += tableHeight;
-                }
-            } else {
-                labelTop += max(0, height - labelHeight) / 2;
-                labelLeft += tableFirst ? 4 + tableSpace + 4 : 4;
-            }
-
-            label.setBounds(labelLeft, labelTop, labelWidth, labelHeight);
-            table.setBounds(tableLeft, tableTop, tableWidth, tableHeight);
-        }
+        String script = entity.declText != null ? entity.declText.replace("\n", "<br>") : "";
+        String scriptPath = entity.declLocation != null ? entity.declLocation.replace("\n", "<br>") : "";
+        return String.format(TOOL_TIP_FORMAT + DETAILED_TOOL_TIP_FORMAT, propCaption, editKeyText, sid/*, tableName*/, ifaceObjects, ifaceClasses, returnClass, script, scriptPath);
     }
 }

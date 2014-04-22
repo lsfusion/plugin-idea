@@ -34,11 +34,14 @@ public class ToolbarView extends ComponentView {
     public boolean showPrint = true;
     public boolean showXls = true;
     public boolean showSettings = true;
-    
-    public boolean isTreeToolbar = false;
 
-    public ToolbarView() {
+    public boolean isTreeToolbar = false;
+    public boolean isInGridView = true;
+
+    public ToolbarView(boolean isTreeToolbar, boolean isInGridView) {
         this("");
+        this.isTreeToolbar = isTreeToolbar;
+        this.isInGridView = isInGridView;
     }
 
     public ToolbarView(String sID) {
@@ -126,24 +129,43 @@ public class ToolbarView extends ComponentView {
 
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
-        if (!visible) {
+        if (!visible || !isInGridView) {
             return null;
         }
         JBPanel panel = new JBPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
-        
+
         panel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_ADD));
         if (!isTreeToolbar) {
-            panel.add(Box.createHorizontalStrut(5));
-            panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP_CHANGE));
-            panel.add(new ToolbarGridButton(LSFIcons.Design.QUANTITY));
-            panel.add(new ToolbarGridButton(LSFIcons.Design.SUM));
-            panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP));
-            panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_GROUP));
-            panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_XLS));
-            panel.add(Box.createHorizontalStrut(5));
-            panel.add(new ToolbarGridButton(LSFIcons.Design.PREFERENCES));
+            if (isShowGroupChange() || isShowCountRows() || isShowCalculateSum() || isShowGroupChange()) {
+                panel.add(Box.createHorizontalStrut(5));
+            }
+            if (isShowGroupChange()) {
+                panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP_CHANGE));
+            }
+            if (isShowCountRows()) {
+                panel.add(new ToolbarGridButton(LSFIcons.Design.QUANTITY));
+            }
+            if (isShowCalculateSum()) {
+                panel.add(new ToolbarGridButton(LSFIcons.Design.SUM));
+            }
+            if (isShowGroupChange()) {
+                panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP));
+            }
+            if (isShowPrint() || isShowXls()) {
+                panel.add(Box.createHorizontalStrut(5));
+            }
+            if (isShowPrint()) {
+                panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_GROUP));
+            }
+            if (isShowXls()) {
+                panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_XLS));
+            }
+            if (isShowSettings()) {
+                panel.add(Box.createHorizontalStrut(5));
+                panel.add(new ToolbarGridButton(LSFIcons.Design.PREFERENCES));
+            }
         }
         return panel;
     }

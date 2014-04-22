@@ -3,13 +3,12 @@ package com.lsfusion.design.model;
 import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.table.JBTable;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.properties.ReflectionProperty;
+import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.design.ui.FlexAlignment;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import java.util.Map;
 
@@ -21,12 +20,17 @@ public class GridView extends ComponentView {
             new ReflectionProperty("quickSearch").setExpert()
     );
 
+    GridTableModel model = new GridTableModel();
+
     public boolean tabVertical = false;
     public boolean autoHide = false;
     public boolean quickSearch = false;
 
-    public GridView() {
+    private GroupObjectView groupObject;
+
+    public GridView(GroupObjectView groupObject) {
         this("");
+        this.groupObject = groupObject;
     }
 
     public GridView(String sID) {
@@ -44,7 +48,7 @@ public class GridView extends ComponentView {
     public List<Property> getProperties() {
         return PROPERTIES;
     }
-    
+
     public void setTabVertical(boolean tabVertical) {
         this.tabVertical = tabVertical;
     }
@@ -56,7 +60,7 @@ public class GridView extends ComponentView {
     public void setQuickSearch(boolean quickSearch) {
         this.quickSearch = quickSearch;
     }
-    
+
     public boolean isTabVertical() {
         return tabVertical;
     }
@@ -76,7 +80,15 @@ public class GridView extends ComponentView {
 
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
-        JBTable table = new JBTable(new DefaultTableModel(15, 7));
-        return new JBScrollPane(table);
+        if (groupObject.entity.initClassView == ClassViewType.GRID) {
+            GridTable gridTable = new GridTable(model);
+            return new JBScrollPane(gridTable);
+        } else {
+            return null;
+        }
+    }
+
+    public void addPropertyDraw(PropertyDrawView property) {
+        model.addPropertyDraw(property);
     }
 }

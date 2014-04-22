@@ -29,4 +29,10 @@ public class SingleCellTable extends JBTable {
         setRowMargin(2);
         setBorder(BorderFactory.createLineBorder(Color.gray));
     }
+
+    @Override
+    public void setBounds(int x, int y, int width, int height) {
+        setRowHeight(height);
+        super.setBounds(x, y, width, height);
+    }
 }

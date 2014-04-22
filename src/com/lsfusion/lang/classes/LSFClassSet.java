@@ -2,6 +2,8 @@ package com.lsfusion.lang.classes;
 
 import com.intellij.psi.search.GlobalSearchScope;
 
+import java.awt.*;
+
 public interface LSFClassSet {
 
     LSFValueClass getCommonClass();
@@ -12,4 +14,13 @@ public interface LSFClassSet {
 
     boolean haveCommonChilds(LSFClassSet set, GlobalSearchScope scope);
 
+    int getMinimumWidth(int minCharWidth, FontMetrics fontMetrics);
+
+    int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics);
+
+    int getMaximumWidth(int maxCharWidth, FontMetrics fontMetrics);
+
+    int getPreferredHeight(FontMetrics fontMetrics);
+
+    int getMaximumHeight(FontMetrics fontMetrics);
 }

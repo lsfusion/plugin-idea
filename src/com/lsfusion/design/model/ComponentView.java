@@ -2,7 +2,6 @@ package com.lsfusion.design.model;
 
 import com.intellij.designer.model.PropertiesContainer;
 import com.intellij.designer.model.Property;
-import com.intellij.designer.propertyTable.PropertyTable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
@@ -12,30 +11,31 @@ import com.lsfusion.design.ui.FlexAlignment;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
 public abstract class ComponentView extends PropertiesContainer {
     public static final List<Property> PROPERTIES = Arrays.<Property>asList(
-        new ReflectionProperty("minimumSize").setExpert(),
-        new ReflectionProperty("maximumSize").setExpert(),
-        new ReflectionProperty("preferredSize"),
-        new ReflectionProperty("flex"),
-        new ReflectionProperty("alignment"),
-        new ReflectionProperty("marginTop").setExpert(),
-        new ReflectionProperty("marginBottom").setExpert(),
-        new ReflectionProperty("marginLeft").setExpert(),
-        new ReflectionProperty("marginRight").setExpert(),
-        new ReflectionProperty("defaultComponent").setExpert(),
-        new ReflectionProperty("font").setExpert(),
-        new ReflectionProperty("headerFont").setExpert(),
-        new ReflectionProperty("background"),
-        new ReflectionProperty("foreground"),
-        new ReflectionProperty("iconPath").setExpert()
+            new ReflectionProperty("minimumSize").setExpert(),
+            new ReflectionProperty("maximumSize").setExpert(),
+            new ReflectionProperty("preferredSize"),
+            new ReflectionProperty("flex"),
+            new ReflectionProperty("alignment"),
+            new ReflectionProperty("marginTop").setExpert(),
+            new ReflectionProperty("marginBottom").setExpert(),
+            new ReflectionProperty("marginLeft").setExpert(),
+            new ReflectionProperty("marginRight").setExpert(),
+            new ReflectionProperty("defaultComponent").setExpert(),
+            new ReflectionProperty("font").setExpert(),
+            new ReflectionProperty("headerFont").setExpert(),
+            new ReflectionProperty("background"),
+            new ReflectionProperty("foreground"),
+            new ReflectionProperty("iconPath").setExpert()
     );
-    
-    public String sID;
+
+    private String sID;
 
     public Dimension minimumSize;
     public Dimension maximumSize;
@@ -59,9 +59,9 @@ public abstract class ComponentView extends PropertiesContainer {
     public Color foreground;
 
     public String iconPath;
-    
+
     public ContainerView parent;
-    
+
     public boolean forceHide = false;
 
     public ComponentView() {
@@ -70,6 +70,10 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public ComponentView(String sID) {
         this.sID = sID;
+    }
+
+    public String getDisplaySID() {
+        return getSID();
     }
 
     public String getSID() {
@@ -87,24 +91,13 @@ public abstract class ComponentView extends PropertiesContainer {
     public void setParent(ContainerView parent) {
         this.parent = parent;
     }
-    
+
     public boolean removeFromParent() {
         return parent != null && parent.remove(this);
     }
 
     public List<Property> getProperties() {
         return PROPERTIES;
-    }
-
-    public void setProperty(String propertyName, Object value) {
-        try {
-            Property property = PropertyTable.findProperty(getProperties(), propertyName);
-            if (property != null) {
-                // todo: set property
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void setMinimumSize(Dimension minimumSize) {
@@ -346,10 +339,10 @@ public abstract class ComponentView extends PropertiesContainer {
     public void decorateTreeRenderer(SimpleColoredComponent renderer) {
         String className = getClass().getSimpleName();
         String componentType = className.substring(0, className.length() - 4);
-        
+
         renderer.append(componentType, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
         renderer.append(" (" + sID + ")", SimpleTextAttributes.REGULAR_ATTRIBUTES);
-        
+
         renderer.setIcon(getIcon());
     }
 
@@ -370,13 +363,19 @@ public abstract class ComponentView extends PropertiesContainer {
             return null;
         }
 
-        JBPanel panel = new JBPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(marginTop, marginLeft, marginBottom, marginRight));
-        panel.add(widget);
-        
-        componentToWidget.put(this, panel);
+        JComponent result = widget;
+        Border marginBorder = BorderFactory.createEmptyBorder(marginTop, marginLeft, marginBottom, marginRight);
 
-        return panel;
+        if (widget instanceof DataPanelView) {
+            result.setBorder(BorderFactory.createCompoundBorder(marginBorder, widget.getBorder()));
+        } else {
+            result = new JBPanel(new BorderLayout());
+            result.setBorder(marginBorder);
+            result.add(widget);
+        }
+
+        componentToWidget.put(this, result);
+        return result;
     }
 
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {

@@ -122,8 +122,9 @@
         <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>
         <structureViewBuilder factoryClass="com.lsfusion.structure.LSFInterfacesStructureViewBuilderFactory"/>
 
-        <!--<fileEditorProvider implementation="com.lsfusion.design.LSFDesignEditorProvider"/>-->
-        <!--<codeInsight.lineMarkerProvider language="Lsf" implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>-->
+        <fileEditorProvider implementation="com.lsfusion.design.LSFDesignEditorProvider"/>
+        <codeInsight.lineMarkerProvider language="Lsf"
+                                        implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
 
