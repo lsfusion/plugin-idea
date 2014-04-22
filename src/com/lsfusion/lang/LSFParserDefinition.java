@@ -15,7 +15,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.lsfusion.lang.parser.LSFParser;
+import com.lsfusion.lang.parser.LSFParserImpl;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
@@ -103,7 +103,7 @@ public class LSFParserDefinition implements ParserDefinition {
 
     @NotNull
     public PsiParser createParser(final Project project) {
-        return new LSFParser();
+        return new LSFParserImpl();
     }
 
     @Override

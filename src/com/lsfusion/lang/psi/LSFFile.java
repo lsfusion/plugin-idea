@@ -77,8 +77,12 @@ public class LSFFile extends PsiFileBase implements ModifyParamContext {
     public List<PsiElement> getStatements() {
         List<PsiElement> result = new SmartList<PsiElement>();
         for (PsiElement child = getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child instanceof LSFScriptStatement) {
-                result.add(child.getFirstChild());
+            if (child instanceof LSFLazyScriptStatement) {
+                for (PsiElement ch = child.getFirstChild(); ch != null; ch = ch.getNextSibling()) {
+                    if (ch instanceof LSFScriptStatement) {
+                        result.add(ch.getFirstChild());
+                    }
+                }
             }
         }
         return result;

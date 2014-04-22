@@ -3,13 +3,13 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.ICompositeElementType;
-import com.intellij.psi.tree.IErrorCounterReparseableElementType;
+import com.intellij.psi.tree.ILazyParseableElementType;
 import com.lsfusion.lang.LSFLanguage;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class LSFReparsableElementType extends IErrorCounterReparseableElementType implements ICompositeElementType {
-    public LSFReparsableElementType(@NotNull @NonNls String debugName) {
+public abstract class LSFLazyParsableElementType extends ILazyParseableElementType implements ICompositeElementType {
+    public LSFLazyParsableElementType(@NotNull @NonNls String debugName) {
         super(debugName, LSFLanguage.INSTANCE);
     }
 

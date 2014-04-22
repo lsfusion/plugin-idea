@@ -6,12 +6,12 @@ import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class LSFReparsableElement extends LazyParseablePsiElement {
-    public LSFReparsableElement(@NotNull IElementType type, CharSequence buffer) {
+public abstract class LSFLazyParsableElement extends LazyParseablePsiElement {
+    public LSFLazyParsableElement(@NotNull IElementType type, CharSequence buffer) {
         super(type, buffer);
     }
 
-    public LSFReparsableElement(ASTNode parsed) {
+    public LSFLazyParsableElement(ASTNode parsed) {
         super(parsed.getElementType(), null);
         
         assert parsed instanceof TreeElement;

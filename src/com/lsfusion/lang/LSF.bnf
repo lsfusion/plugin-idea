@@ -27,14 +27,17 @@
   ]
 }
 
-script ::= moduleHeader (scriptStatement*)
+script ::= moduleHeader (lazyScriptStatement*)
+
+lazyScriptStatement ::= scriptStatement*
+{
+    lazy = true
+    extends = "com.lsfusion.lang.psi.LSFLazyParsableElement"
+}
 
 scriptStatement ::= statement
 {
     recoverWhile = "script_statement_recover"
-
-//    reparsable = true
-//    extends = "com.lsfusion.lang.psi.LSFReparsableElement"
 }
 
 simpleName ::= ID
@@ -1259,8 +1262,6 @@ componentBody ::= componentBlockStatement | emptyStatement
 componentBlockStatement ::= LBRACE componentStatement* RBRACE
 {
     pin = 1
-    reparsable = true
-    extends = "com.lsfusion.lang.psi.LSFReparsableElement"
 }
 
 componentStatement ::=      setObjectPropertyStatement
