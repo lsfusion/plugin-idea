@@ -15,9 +15,11 @@ import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ConcurrentHashMap;
 import com.intellij.util.containers.ConcurrentHashSet;
+import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
@@ -29,6 +31,9 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+
+import static com.intellij.psi.util.PsiTreeUtil.instanceOf;
+import static com.intellij.psi.util.PsiTreeUtil.processElements;
 
 public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent { //, EditorFactoryListener
     private static final Logger LOG = Logger.getInstance("#" + MetaChangeDetector.class.getName());
@@ -918,33 +923,48 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             return;
         }
 
-        if(element instanceof LSFMetaCodeStatement) // нужно перегенерировать тело использования
-            addUsageProcessing((LSFMetaCodeStatement)element);
 
-        if(element instanceof LSFMetaCodeDeclarationStatement) // нужно перегенерить все usage'ы этого метакода
-            addDeclProcessing((LSFMetaCodeDeclarationStatement)element);
-
-        if(element instanceof LSFFile) { // перегенерировать все внутренние использования
-            for(PsiElement child : element.getChildren()) {
-                if(child instanceof LSFMetaCodeStatement)
-                    addUsageProcessing((LSFMetaCodeStatement)child);
-                if(child instanceof LSFMetaCodeDeclarationStatement)
-                    addDeclProcessing((LSFMetaCodeDeclarationStatement)child);
+        Collection<PsiElement> children = findChildrenOfType(element, LSFMetaCodeStatement.class, LSFMetaCodeDeclarationStatement.class);
+        for (PsiElement child : children) {
+            if (child instanceof LSFMetaCodeStatement) {
+                // нужно перегенерировать тело использования
+                addUsageProcessing((LSFMetaCodeStatement) child);
+            } else if (child instanceof LSFMetaCodeDeclarationStatement) {
+                // нужно перегенерить все usage'ы этого метакода
+                addDeclProcessing((LSFMetaCodeDeclarationStatement) child);
             }
         }
+    }
+
+    private Collection<PsiElement> findChildrenOfType(final PsiElement element, final Class<? extends PsiElement>... classes) {
+        if (element == null) {
+            return ContainerUtil.emptyList();
+        }
+
+        PsiElementProcessor.CollectElements<PsiElement> processor = new PsiElementProcessor.CollectElements<PsiElement>() {
+            @Override
+            public boolean execute(@NotNull PsiElement each) {
+                if (each == element) return true;
+                if (instanceOf(each, classes)) {
+                    super.execute(each);
+                    return false;
+                }
+                return true;
+            }
+        };
+        processElements(element, processor);
+        return processor.getCollection();
     }
 
     private void fireRemoved(PsiElement element) {
         if(!enabled)
             return;
 
-        if(element instanceof LSFMetaCodeDeclarationStatement) // нужно перегенерить все usage'ы этого метакода
-            addDeclProcessing((LSFMetaCodeDeclarationStatement)element);
-
-        if(element instanceof LSFFile) { // перегенерировать все внутренние использования
-            for(PsiElement child : element.getChildren()) {
-                if(child instanceof LSFMetaCodeDeclarationStatement)
-                    addDeclProcessing((LSFMetaCodeDeclarationStatement)child);
+        Collection<PsiElement> children = findChildrenOfType(element, LSFMetaCodeDeclarationStatement.class);
+        for (PsiElement child : children) {
+            if (child instanceof LSFMetaCodeDeclarationStatement) {
+                // нужно перегенерить все usage'ы этого метакода
+                addDeclProcessing((LSFMetaCodeDeclarationStatement) child);
             }
         }
     }
