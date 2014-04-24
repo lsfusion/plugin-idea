@@ -10,6 +10,7 @@ import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageGroupingRule;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFMetaCodeBody;
+import com.lsfusion.lang.psi.LSFScriptStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +24,7 @@ public class LSFStatementGroupingRule implements UsageGroupingRule {
         PsiElement psiElement = ((PsiElementUsage)usage).getElement();
         
         while (psiElement != null) {
-            if (psiElement.getParent() instanceof LSFFile || psiElement.getParent() instanceof LSFMetaCodeBody) {
+            if (psiElement instanceof LSFFile || psiElement instanceof LSFMetaCodeBody || psiElement instanceof LSFScriptStatement) {
                 break;
             }
             psiElement = psiElement.getParent();
