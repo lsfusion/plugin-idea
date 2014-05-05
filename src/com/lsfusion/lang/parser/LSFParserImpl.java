@@ -2,13 +2,22 @@ package com.lsfusion.lang.parser;
 
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
+import com.intellij.lang.WhitespacesAndCommentsBinder;
 import com.intellij.psi.tree.IElementType;
 
-import static com.intellij.lang.java.parser.JavaParserUtil.GREEDY_RIGHT_EDGE_PROCESSOR;
-import static com.lsfusion.lang.parser.LSFParserUtil.*;
+import java.util.List;
+
+import static com.lsfusion.lang.parser.LSFParserUtil.ErrorState;
 import static com.lsfusion.lang.psi.LSFTypes.*;
 
 public class LSFParserImpl extends LSFParser {
+
+    public static final WhitespacesAndCommentsBinder GREEDY_RIGHT_EDGE_PROCESSOR = new WhitespacesAndCommentsBinder() {
+        @Override
+        public int getEdgePosition(final List<IElementType> tokens, final boolean atStreamEdge, final TokenTextGetter getter) {
+            return tokens.size();
+        }
+    };
 
     @Override
     public boolean parseImpl(IElementType root_, PsiBuilder builder_) {
