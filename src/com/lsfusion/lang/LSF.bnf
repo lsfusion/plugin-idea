@@ -1361,6 +1361,7 @@ componentPropertyValue ::=  colorLiteral
                         |	boundsDoubleLiteral
                         |   containerTypeLiteral
                         |   flexAlignmentLiteral
+                        |   formCalcPropertyObject
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// META STATEMENT //////////////////////////////
