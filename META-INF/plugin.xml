@@ -163,10 +163,16 @@
         <gotoClassContributor implementation="com.lsfusion.LSFClassContributor"/>
         <gotoSymbolContributor implementation="com.lsfusion.LSFSymbolContributor"/>
 
+        <lang.elementManipulator
+                forClass="com.lsfusion.lang.psi.references.LSFJavaClassStringReference"
+                implementationClass="com.lsfusion.lang.psi.references.impl.LSFJavaClassStringReferenceManipulator"/>
+
         <checkinHandlerFactory implementation="com.lsfusion.LSFCheckInHandlerFactory"/>
 
         <fileDocumentSynchronizationVetoer implementation="com.lsfusion.JarDocumentSavingVetoer"/>
 
         <!--<xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />-->
+        <!--<debugger.positionManagerFactory id="lsfPositionManagerFactory" implementation="com.lsfusion.debug.LSFPositionManagerFactory"/>-->
+        
     </extensions>
 </idea-plugin>

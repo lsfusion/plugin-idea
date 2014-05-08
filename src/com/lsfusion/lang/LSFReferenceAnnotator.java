@@ -5,7 +5,10 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
@@ -23,6 +26,8 @@ import java.awt.*;
 import java.util.Set;
 
 public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
+    private static final String ACTION_PROPRTY_CLASS_NAME = "lsfusion.server.logics.property.ActionProperty";
+    
     private AnnotationHolder myHolder;
     public boolean errorsSearchMode = false;
 
@@ -283,6 +288,43 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitLocalPropDeclaration(o);
 
         checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitJavaClassStringUsage(@NotNull LSFJavaClassStringUsage o) {
+        super.visitJavaClassStringUsage(o);
+
+        String elementText = o.getText();
+        TextRange elementRange = o.getTextRange();
+
+        for (PsiReference reference : o.getReferences()) {
+            PsiElement resolved = reference.resolve();
+            TextRange refRange = reference.getRangeInElement();
+            TextRange refFileRange = TextRange.from(elementRange.getStartOffset() + refRange.getStartOffset(), refRange.getLength());
+            if (resolved == null) {
+                Annotation annotation = myHolder.createErrorAnnotation(refFileRange, "Can't resolve " + refRange.substring(elementText));
+                annotation.setEnforcedTextAttributes(ERROR);
+            } else if (refRange.getEndOffset() == elementRange.getLength() - 1) {
+                //последний компонент должен быть Action
+                boolean correctClass = false;
+                if (resolved instanceof PsiClass) {
+                    PsiClass clazz = (PsiClass) resolved;
+                    while (clazz != null) {
+                        if (ACTION_PROPRTY_CLASS_NAME.equals(clazz.getQualifiedName())) {
+                            correctClass = true;
+                            break;
+                        }
+
+                        clazz = clazz.getSuperClass();
+                    }
+                }
+                
+                if (!correctClass) {
+                    Annotation annotation = myHolder.createErrorAnnotation(refFileRange, "Class " + elementText + " should extend ActionProperty");
+                    annotation.setEnforcedTextAttributes(ERROR);
+                }
+            }
+        }
     }
 
     private boolean checkReference(LSFReference reference) {

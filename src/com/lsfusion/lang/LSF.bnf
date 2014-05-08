@@ -580,11 +580,17 @@ initFilterDefinition ::= INITFILTER formPropertyDrawUsage {pin = 1}
 
 formActionObjectList ::= OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)* {pin(".*") = 1}
 
-customActionPropertyDefinitionBody ::= CUSTOM stringLiteral (LBRAC classNameList RBRAC)?
+customActionPropertyDefinitionBody ::= CUSTOM javaClassStringUsage (LBRAC classNameList RBRAC)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
+}
+
+javaClassStringUsage ::= stringLiteral
+{
+    mixin="com.lsfusion.lang.psi.references.impl.LSFJavaClassStringReferenceImpl"
+    implements="com.lsfusion.lang.psi.references.LSFJavaClassStringReference"
 }
 
 addFormActionPropertyDefinitionBody ::= ADDFORM (SESSION)? customClassUsage

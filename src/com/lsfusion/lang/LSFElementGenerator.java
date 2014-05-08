@@ -32,6 +32,12 @@ import java.util.Collection;
 import java.util.List;
 
 public class LSFElementGenerator {
+    
+    public static LSFStringLiteral createStringLiteralFromText(Project myProject, String text) {
+        //assert, что text уже обрамлён кавычками -> "some text"
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; GROUP someDumbGroup " + text + ";");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFStringLiteral.class).iterator().next();
+    }
 
     @Nullable
     public static LSFId createIdentifierFromText(Project myProject, String name) {
