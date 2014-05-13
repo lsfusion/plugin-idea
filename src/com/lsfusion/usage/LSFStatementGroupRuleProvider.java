@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.usage;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.usages.impl.FileStructureGroupRuleProvider;
@@ -9,6 +9,6 @@ public class LSFStatementGroupRuleProvider implements FileStructureGroupRuleProv
     @Nullable
     @Override
     public UsageGroupingRule getUsageGroupingRule(Project project) {
-        return new LSFStatementGroupingRule();
+        return LSFStatementGroupingRule.INSTANCE;
     }
 }

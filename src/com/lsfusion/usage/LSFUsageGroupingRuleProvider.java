@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.usage;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;

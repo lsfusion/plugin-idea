@@ -110,21 +110,19 @@
         <!-- Add your extensions here -->
         <fileTypeFactory implementation="com.lsfusion.lang.LSFFileTypeFactory"/>
         <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.lang.LSFParserDefinition"/>
-        <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.LSFFindUsagesProvider"/>
-        <lang.syntaxHighlighterFactory key="Lsf"
-                                       implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
+        <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>
+        <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
         <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
         <annotator language="Lsf" implementationClass="com.lsfusion.lang.LSFReferenceAnnotator"/>
         <readWriteAccessDetector implementation="com.lsfusion.LSFReadWriteAccessDetector"/>
-        <fileStructureGroupRuleProvider implementation="com.lsfusion.LSFStatementGroupRuleProvider"/>
+        <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupRuleProvider"/>
         <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>
         <structureViewBuilder factoryClass="com.lsfusion.structure.LSFInterfacesStructureViewBuilderFactory"/>
 
         <fileEditorProvider implementation="com.lsfusion.design.LSFDesignEditorProvider"/>
-        <codeInsight.lineMarkerProvider language="Lsf"
-                                        implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="Lsf" implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
 

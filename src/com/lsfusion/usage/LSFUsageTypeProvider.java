@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.usage;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.usages.UsageTarget;

@@ -6,8 +6,8 @@ import com.intellij.ide.impl.StructureViewWrapperImpl;
 import com.intellij.ide.structureView.StructureViewFactoryEx;
 import com.intellij.ide.structureView.StructureViewWrapper;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.event.CaretAdapter;
 import com.intellij.openapi.editor.event.CaretEvent;
-import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
@@ -15,7 +15,7 @@ import com.lsfusion.lang.psi.LSFBuiltInClassName;
 import com.lsfusion.lang.psi.LSFClassDecl;
 import com.lsfusion.lang.psi.LSFId;
 
-public class LSFFileCaretListener implements CaretListener {
+public class LSFFileCaretListener extends CaretAdapter {
     public final static Key<LSFFileCaretListener> PROJECT_COMPONENT_KEY = Key.create("lsfusion.structureview.caret.listener");
 
     private final Project project;

@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.usage;
 
 import com.intellij.find.impl.HelpID;
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import com.lsfusion.lang.LSFLexerAdapter;
 import com.lsfusion.lang.psi.LSFId;
-import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
+import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,14 +35,14 @@ public class LSFFindUsagesProvider implements FindUsagesProvider {
     @Nullable
     @Override
     public String getHelpId(@NotNull PsiElement psiElement) {
-        return HelpID.FIND_OTHER_USAGES;
+        return HelpID.FIND_IN_PROJECT;
     }
 
     @NotNull
     @Override
     public String getType(@NotNull PsiElement element) {
-        if (element instanceof LSFSimpleNameWithCaption) {
-            return "something";
+        if (element instanceof LSFSimpleName) {
+            return "lsFusion";
         } else {
             return "";
         }
@@ -51,7 +51,7 @@ public class LSFFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getDescriptiveName(@NotNull PsiElement element) {
-        if (element instanceof LSFSimpleNameWithCaption) {
+        if (element instanceof LSFSimpleName) {
             return element.getText();
         } else {
             return "";
@@ -61,7 +61,7 @@ public class LSFFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getNodeText(@NotNull PsiElement element, boolean useFullName) {
-        if (element instanceof LSFSimpleNameWithCaption) {
+        if (element instanceof LSFSimpleName) {
             return element.getText();
         } else {
             return "";

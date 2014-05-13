@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.usage;
 
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.vcs.FileStatus;

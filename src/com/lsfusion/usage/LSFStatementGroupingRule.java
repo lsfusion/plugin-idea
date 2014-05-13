@@ -1,4 +1,4 @@
-package com.lsfusion;
+package com.lsfusion.usage;
 
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.vcs.FileStatus;
@@ -9,7 +9,6 @@ import com.intellij.usages.UsageView;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageGroupingRule;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFMetaCodeBody;
 import com.lsfusion.lang.psi.LSFScriptStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class LSFStatementGroupingRule implements UsageGroupingRule {
+    public static final LSFStatementGroupingRule INSTANCE = new LSFStatementGroupingRule();
+    
     @Nullable
     @Override
     public UsageGroup groupUsage(@NotNull Usage usage) {
@@ -24,7 +25,7 @@ public class LSFStatementGroupingRule implements UsageGroupingRule {
         PsiElement psiElement = ((PsiElementUsage)usage).getElement();
         
         while (psiElement != null) {
-            if (psiElement instanceof LSFFile || psiElement instanceof LSFMetaCodeBody || psiElement instanceof LSFScriptStatement) {
+            if (psiElement instanceof LSFFile || psiElement instanceof LSFScriptStatement) {
                 break;
             }
             psiElement = psiElement.getParent();

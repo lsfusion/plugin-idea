@@ -17,6 +17,7 @@ import com.intellij.openapi.roots.ui.configuration.libraryEditor.ExistingLibrary
 import com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditor;
 import com.intellij.openapi.roots.ui.configuration.libraryEditor.NewLibraryEditor;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainer;
+import com.intellij.openapi.util.NotNullComputable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -51,7 +52,13 @@ public class LibraryOptionsPanel {
                                @NotNull final LibrariesContainer librariesContainer) {
         myLibrariesContainer = librariesContainer;
 
-        mySettings = new LibraryCompositionSettings(libraryDescription, baseDirectoryPath, versionFilter, new ArrayList<FrameworkLibraryVersion>());
+        mySettings = new LibraryCompositionSettings(libraryDescription, new NotNullComputable<String>() {
+            @NotNull
+            @Override
+            public String compute() {
+                return baseDirectoryPath;
+            }
+        }, versionFilter, new ArrayList<FrameworkLibraryVersion>());
 
         showSettingsPanel();
     }
