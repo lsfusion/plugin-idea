@@ -21,7 +21,6 @@ import com.intellij.ui.CheckboxTreeBase;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.Query;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
@@ -29,12 +28,10 @@ import com.lsfusion.design.model.*;
 import com.lsfusion.design.ui.*;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.psi.stubs.types.indexes.FormIndex;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -184,11 +181,6 @@ public class DesignView extends JPanel implements Disposable {
         this.formName = formName;
 
         layoutDesign(module, formName);
-
-        if (firstDraw) {
-            initUiHandlers();
-            firstDraw = false;
-        }
     }
 
     private void layoutDesign(LSFModuleDeclaration module, String formName) {
@@ -199,7 +191,13 @@ public class DesignView extends JPanel implements Disposable {
             rootComponent = designInfo.formView.mainContainer;
             formTitle = designInfo.getFormCaption();
             createLayout();
-            initListeners();
+
+            if (firstDraw) {
+                initUiHandlers();
+                firstDraw = false;
+            } else {
+                initListeners();
+            }
         }
     }
 
@@ -210,14 +208,7 @@ public class DesignView extends JPanel implements Disposable {
             Collection<LSFFormDeclaration> declarations = FormIndex.getInstance().get(formName, module.getProject(), module.getLSFFile().getRequireScope());
             if (!declarations.isEmpty()) {
                 LSFFormDeclaration formDeclaration = declarations.iterator().next();
-                Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, module.getLSFFile());
-
-                for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {
-                    if (formExtend.getLSFFile().getModuleDeclaration() == module) {
-                        designInfo = new DesignInfo(formDeclaration, module.getLSFFile());
-                        break;
-                    }
-                }
+                designInfo = new DesignInfo(formDeclaration, module.getLSFFile());
             }
         } catch (PsiInvalidElementAccessException ignored) {
         }
