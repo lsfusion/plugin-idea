@@ -18,6 +18,7 @@ import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormPropertyDrawUsageImpl;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 
+import javax.help.UnsupportedOperationException;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,6 +109,9 @@ public class DesignInfo {
     }
 
     private void processComponentBody(ComponentView parentComponent, LSFComponentBody componentBody) {
+        if (componentBody == null) {
+            return;
+        }
         LSFComponentBlockStatement componentBlockStatement = componentBody.getComponentBlockStatement();
         if (componentBlockStatement == null) {
             return;
@@ -136,37 +140,50 @@ public class DesignInfo {
                 processComponentBody(container, statement.getComponentBody());
             } else if (componentStatement.getAddComponentStatement() != null) {
                 LSFAddComponentStatement statement = componentStatement.getAddComponentStatement();
-                String name = getComponentSID(statement.getComponentSelector(), formView);
-                ComponentView component = formView.getComponentBySID(name);
+                LSFComponentSelector componentSelector = statement.getComponentSelector();
+                if (componentSelector != null) {
+                    String name = getComponentSID(componentSelector, formView);
+                    if (name != null) {
+                        ComponentView component = formView.getComponentBySID(name);
 
-                if (component != null) {
-                    LSFComponentInsertPositionSelector insertPositionSelector = statement.getComponentInsertPositionSelector();
-                    addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
+                        if (component != null) {
+                            LSFComponentInsertPositionSelector insertPositionSelector = statement.getComponentInsertPositionSelector();
+                            addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
 
-                    processComponentBody(component, statement.getComponentBody());
+                            processComponentBody(component, statement.getComponentBody());
+                        }
+                    }
                 }
             } else if (componentStatement.getSetObjectPropertyStatement() != null) {
                 LSFSetObjectPropertyStatement statement = componentStatement.getSetObjectPropertyStatement();
-                String propertyName = statement.getFirstChild().getText();
+                if (statement != null) {
+                    String propertyName = statement.getFirstChild().getText();
 
-                LSFComponentPropertyValue propertyValue = statement.getComponentPropertyValue();
-                Object propertyValueObject = getPropertyValue(propertyValue);
+                    LSFComponentPropertyValue propertyValue = statement.getComponentPropertyValue();
+                    Object propertyValueObject = getPropertyValue(propertyValue);
 
-                if (parentComponent != null) {
-                    ViewProxyUtil.setObjectProperty(parentComponent.equals(formView.getMainContainer()) ? formView : parentComponent, propertyName, propertyValueObject);
+                    if (parentComponent != null) {
+                        ViewProxyUtil.setObjectProperty(parentComponent.equals(formView.getMainContainer()) ? formView : parentComponent, propertyName, propertyValueObject);
+                    }
                 }
             } else if (componentStatement.getRemoveComponentStatement() != null) {
                 LSFRemoveComponentStatement statement = componentStatement.getRemoveComponentStatement();
-                String name = getComponentSID(statement.getComponentSelector(), formView);
-                ComponentView component = formView.getComponentBySID(name);
-                if (component != null) {
-                    formView.removeComponent(component, statement.getRemoveCascade() != null);
+                if (statement.getComponentSelector() != null) {
+                    String name = getComponentSID(statement.getComponentSelector(), formView);
+                    ComponentView component = formView.getComponentBySID(name);
+                    if (component != null) {
+                        formView.removeComponent(component, statement.getRemoveCascade() != null);
+                    }
                 }
             }
         }
     }
 
     private Object getPropertyValue(LSFComponentPropertyValue valueStatement) {
+        if (valueStatement == null) {
+            return null;
+        }
+        
         if (valueStatement.getColorLiteral() != null) {
             LSFColorLiteral colorLiteral = valueStatement.getColorLiteral();
             if (!colorLiteral.getUintLiteralList().isEmpty()) {
@@ -245,8 +262,9 @@ public class DesignInfo {
 
                 return name;
             }
-        } else {
+        } else if (componentSelector.getComponentUsage() != null) {
             return componentSelector.getComponentUsage().getMultiCompoundID().getName();
         }
+        return null;
     }
 }

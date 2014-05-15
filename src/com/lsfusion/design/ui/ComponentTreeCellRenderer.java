@@ -4,7 +4,7 @@ import com.intellij.ui.CheckboxTree;
 
 import javax.swing.*;
 
-class ComponentTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
+public class ComponentTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRenderer {
 
     public ComponentTreeCellRenderer() {
         super(true, false);

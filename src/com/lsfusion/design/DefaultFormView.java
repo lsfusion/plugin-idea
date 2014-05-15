@@ -288,7 +288,9 @@ public class DefaultFormView extends FormView {
         } else {
             filterContainer = getFilterContainer(mgroupObjects.get(groupObject));
         }
-        filterContainer.add(filterGroup);
+        if (filterContainer != null) {
+            filterContainer.add(filterGroup);
+        }
     }
 
     private void initFormButtons() {

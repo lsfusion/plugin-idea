@@ -4,11 +4,14 @@ import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.impl.ToolWindowImpl;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.design.vfs.LSFDesignVirtualFileImpl;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
@@ -84,8 +87,18 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
             }
 
             if (formDecl != null) {
-                LSFDesignVirtualFileImpl file = LSFDesignVirtualFileImpl.create(((LSFFile) psi.getContainingFile()).getModuleDeclaration(), formDecl.getDeclName());
-                FileEditorManager.getInstance(psi.getProject()).openFile(file, true);
+                ToolWindow toolWindow = ToolWindowManager.getInstance(formDecl.getProject()).getToolWindow("lsFusion Form Design");
+                if (toolWindow instanceof ToolWindowImpl) {
+                    ((ToolWindowImpl) toolWindow).ensureContentInitialized();
+                    toolWindow.activate(null);
+                }
+
+                FileEditorManager.getInstance(formDecl.getProject()).getSelectedEditor(psi.getContainingFile().getVirtualFile());
+                Editor editor = FileEditorManager.getInstance(formDecl.getProject()).getSelectedTextEditor();
+                // переносим курсор, чтобы обновление toolWindow перестало ориентироваться на предыдущее его положение
+                editor.getCaretModel().moveToOffset(psi.getTextOffset());
+
+                DesignViewFactory.getInstance().updateView(((LSFFile) psi.getContainingFile()).getModuleDeclaration(), formDecl.getDeclName());
             }
         }
     }

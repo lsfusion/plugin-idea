@@ -37,7 +37,12 @@
         </component>
 
         <component>
-            <implementation-class>com.lsfusion.lang.psi.LSFProjectComponent</implementation-class>
+            <implementation-class>com.lsfusion.design.FormDesignChangeDetector</implementation-class>
+            <skipForDefaultProject/>
+        </component>
+
+        <component>
+        <implementation-class>com.lsfusion.lang.psi.LSFProjectComponent</implementation-class>
         </component>
 
     </project-components>
@@ -168,6 +173,9 @@
         <checkinHandlerFactory implementation="com.lsfusion.LSFCheckInHandlerFactory"/>
 
         <fileDocumentSynchronizationVetoer implementation="com.lsfusion.JarDocumentSavingVetoer"/>
+
+        <toolWindow id="lsFusion Form Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
+                    anchor="right" icon="AllIcons.FileTypes.UiForm"/>
 
         <!--<xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />-->
         <!--<debugger.positionManagerFactory id="lsfPositionManagerFactory" implementation="com.lsfusion.debug.LSFPositionManagerFactory"/>-->

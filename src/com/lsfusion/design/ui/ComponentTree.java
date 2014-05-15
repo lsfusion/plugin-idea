@@ -3,9 +3,9 @@ package com.lsfusion.design.ui;
 import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckedTreeNode;
 
-class ComponentTree extends CheckboxTree {
+public class ComponentTree extends CheckboxTree {
     private CheckedListener listener;
-    
+
     public ComponentTree(ComponentTreeCellRenderer renderer, ComponentTreeNode rootNode, CheckPolicy policy) {
         super(renderer, rootNode, policy);
     }

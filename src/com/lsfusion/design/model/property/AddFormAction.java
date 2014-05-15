@@ -10,7 +10,7 @@ import com.lsfusion.util.BaseUtils;
 
 public class AddFormAction extends PropertyDrawEntity {
     public AddFormAction(String alias, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form, boolean oldSession) {
-        super(alias != null ? alias : "addForm" + (oldSession ? "Session" : "") + "_" + BaseUtils.capitalize(groupObject.getValueClass().getName()),
+        super(alias != null ? alias : "addForm" + (oldSession ? "Session" : "") + "_" + BaseUtils.capitalize(groupObject != null ? groupObject.getValueClass().getName() : "valueClass"),
                 null, commonFormOptions, propertyFormOptions, form);
         caption = "Добавить";
         isAction = true;

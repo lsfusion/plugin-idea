@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 
-class ComponentPropertyTable extends PropertyTable {
+public class ComponentPropertyTable extends PropertyTable {
     @Override
     protected boolean doRestoreDefault(ThrowableRunnable<Exception> runnable) {
         return false;

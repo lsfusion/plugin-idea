@@ -62,9 +62,11 @@ public class PropertyDrawEntity {
             if (!objects.isEmpty()) {
                 sID += "_";
                 for (ObjectEntity obj : objects) {
-                    sID += obj.sID;
-                    if (objects.indexOf(obj) < objects.size() - 1) {
-                        sID += "_";
+                    if (obj != null) {
+                        sID += obj.sID;
+                        if (objects.indexOf(obj) < objects.size() - 1) {
+                            sID += "_";
+                        }
                     }
                 }
             }
@@ -74,7 +76,9 @@ public class PropertyDrawEntity {
         project = form.getProject();
 
         for (ObjectEntity obj : objects) {
-            objectClasses.add(obj.getCaption());
+            if (obj != null) {
+                objectClasses.add(obj.getCaption());
+            }
         }
 
         LSFPropertyOptions propertyOptions = null;
@@ -175,14 +179,18 @@ public class PropertyDrawEntity {
         List<LSFFormOptionToDraw> formOptionToDrawList = optionList.getFormOptionToDrawList();
         if (!formOptionToDrawList.isEmpty()) {
             LSFFormOptionToDraw toDrawOption = formOptionToDrawList.get(formOptionToDrawList.size() - 1);
-            String name = toDrawOption.getGroupObjectUsage().getNameRef();
-            this.toDraw = form.getGroupObject(name);
+            if (toDrawOption.getGroupObjectUsage() != null) {
+                String name = toDrawOption.getGroupObjectUsage().getNameRef();
+                this.toDraw = form.getGroupObject(name);
+            }
         }
         List<LSFFormOptionForce> formOptionForceList = optionList.getFormOptionForceList();
         if (!formOptionForceList.isEmpty()) {
             LSFFormOptionForce forceOption = formOptionForceList.get(formOptionForceList.size() - 1);
-            String forceText = forceOption.getClassViewType().getText();
-            forceViewType = ClassViewType.valueOf(forceText);
+            if (forceOption.getClassViewType() != null) {
+                String forceText = forceOption.getClassViewType().getText();
+                forceViewType = ClassViewType.valueOf(forceText);
+            }
         }
         List<LSFFormOptionToolbar> formOptionToolbarList = optionList.getFormOptionToolbarList();
         if (!formOptionToolbarList.isEmpty()) {

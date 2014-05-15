@@ -6,6 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.design.KeyStrokes;
 import com.lsfusion.design.model.ModalityType;
 import com.lsfusion.design.model.property.*;
+import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.ObjectClass;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
@@ -82,10 +83,14 @@ public class FormEntity {
         GroupObjectEntity groupObject = new GroupObjectEntity(gobjDecl.getDeclName(), viewType, pageSize);
         Collection<LSFFormObjectDeclaration> objectDecarations = gobjDecl.findObjectDecarations();
         for (LSFFormObjectDeclaration objDecl : objectDecarations) {
-            objDecl.getClassName();
-            groupObject.add(new ObjectEntity(objDecl.getDeclName(), objDecl.resolveClass().getCommonClass()));
+            LSFClassSet objectClass = objDecl.resolveClass();
+            if (objectClass != null) {
+                groupObject.add(new ObjectEntity(objDecl.getDeclName(), objectClass.getCommonClass()));
+            }
         }
-        groups.add(groupObject);
+        if (!groupObject.objects.isEmpty()) {
+            groups.add(groupObject);
+        }
 
         return groupObject;
     }
@@ -155,10 +160,12 @@ public class FormEntity {
         LSFPropReference propUsage = formPropertyName.getPropertyUsage();
 
         List<ObjectEntity> objects = new ArrayList<ObjectEntity>();
-        LSFNonEmptyObjectUsageList nonEmptyObjectUsageList = objectUsageList.getNonEmptyObjectUsageList();
-        if (nonEmptyObjectUsageList != null) {
-            for (LSFObjectUsage objectUsage : nonEmptyObjectUsageList.getObjectUsageList()) {
-                objects.add(getObject(objectUsage.getNameRef()));
+        if (objectUsageList != null) {
+            LSFNonEmptyObjectUsageList nonEmptyObjectUsageList = objectUsageList.getNonEmptyObjectUsageList();
+            if (nonEmptyObjectUsageList != null) {
+                for (LSFObjectUsage objectUsage : nonEmptyObjectUsageList.getObjectUsageList()) {
+                    objects.add(getObject(objectUsage.getNameRef()));
+                }
             }
         }
         GroupObjectEntity groupObject = getApplyObject(objects);
@@ -244,7 +251,9 @@ public class FormEntity {
                 if (parentDeclaration.getPropertyUsage() != null) {
                     properties.add(parentDeclaration.getPropertyUsage());
                 } else {
-                    properties.addAll(parentDeclaration.getNonEmptyPropertyUsageList().getPropertyUsageList());
+                    if (parentDeclaration.getNonEmptyPropertyUsageList() != null) {
+                        properties.addAll(parentDeclaration.getNonEmptyPropertyUsageList().getPropertyUsageList());
+                    }
                 }
                 // todo setIsParents?
             }

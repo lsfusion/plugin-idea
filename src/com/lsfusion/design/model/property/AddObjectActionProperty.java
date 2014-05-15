@@ -12,9 +12,9 @@ import com.lsfusion.util.BaseUtils;
 public class AddObjectActionProperty extends PropertyDrawEntity {
     public AddObjectActionProperty(String alias, GroupObjectEntity groupObject, LSFPropDeclaration propDeclaration, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
         super(alias != null ? alias :
-                "addObject" + "_" + BaseUtils.capitalize(groupObject.getValueClass().getName()) +
+                "addObject" + "_" + BaseUtils.capitalize(groupObject != null ? groupObject.getValueClass().getName() : "valueClass") +
                         "_" + BaseUtils.capitalize(form.sID) +
-                        "_" + BaseUtils.capitalize(groupObject.objects.get(0).sID), propDeclaration, commonFormOptions, propertyFormOptions, form);
+                        "_" + BaseUtils.capitalize(groupObject != null ? groupObject.objects.get(0).sID : "class"), propDeclaration, commonFormOptions, propertyFormOptions, form);
         caption = "Добавить";
         isAction = true;
         iconPath = "add.png";

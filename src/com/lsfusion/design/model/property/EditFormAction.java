@@ -10,7 +10,7 @@ import com.lsfusion.util.BaseUtils;
 
 public class EditFormAction extends PropertyDrawEntity {
     public EditFormAction(String alias, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form, boolean oldSession) {
-        super(alias != null ? alias : "editForm" + (oldSession ? "Session" : "") + "_" + BaseUtils.capitalize(groupObject.getValueClass().getName()),
+        super(alias != null ? alias : "editForm" + (oldSession ? "Session" : "") + "_" + BaseUtils.capitalize(groupObject != null ? groupObject.getValueClass().getName() : "valueClass"),
                 null, commonFormOptions, propertyFormOptions, form);
 
         caption = "Редактировать";

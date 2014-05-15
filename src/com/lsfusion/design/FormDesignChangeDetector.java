@@ -1,0 +1,124 @@
+package com.lsfusion.design;
+
+import com.intellij.execution.actions.ConfigurationContext;
+import com.intellij.ide.impl.DataManagerImpl;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.*;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.lsfusion.lang.psi.LSFDesignStatement;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
+import org.jetbrains.annotations.NotNull;
+
+public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent {
+    private final PsiManager psiManager;
+    private Project project = null;
+
+    public FormDesignChangeDetector(final PsiManager psiManager, final Project project) {
+        this.psiManager = psiManager;
+        this.project = project;
+    }
+
+    @Override
+    public void projectOpened() {
+        psiManager.addPsiTreeChangeListener(this);
+    }
+
+    @Override
+    public void projectClosed() {
+    }
+
+    @Override
+    public void initComponent() {
+    }
+
+    @Override
+    public void disposeComponent() {
+    }
+
+    @NotNull
+    @Override
+    public String getComponentName() {
+        return "FormDesignChangeDetector";
+    }
+
+    @Override
+    public void childAdded(@NotNull PsiTreeChangeEvent event) {
+        fireChildChanged(event.getChild());
+    }
+
+    @Override
+    public void childRemoved(@NotNull PsiTreeChangeEvent event) {
+        fireChildChanged(event.getChild());
+    }
+
+    @Override
+    public void childReplaced(@NotNull PsiTreeChangeEvent event) {
+        fireChildChanged(event.getChild());
+    }
+
+    @Override
+    public void childMoved(@NotNull PsiTreeChangeEvent event) {
+        fireChildChanged(event.getChild());
+    }
+
+    @Override
+    public void childrenChanged(@NotNull PsiTreeChangeEvent event) {
+        fireChildChanged(event.getChild());
+    }
+
+    @Override
+    public void propertyChanged(@NotNull PsiTreeChangeEvent event) {
+        fireChildChanged(event.getChild());
+    }
+
+    private void fireChildChanged(PsiElement element) {
+        if (element == null) {
+            return;
+        }
+
+        try {
+            Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+            String formName = null;
+            LSFModuleDeclaration module = null;
+
+            if (editor != null) {
+                DataContext dataContext = new DataManagerImpl.MyDataContext(editor.getComponent());
+                PsiElement targetElement = ConfigurationContext.getFromContext(dataContext).getPsiLocation();
+
+                if (targetElement != null) {
+                    LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
+                    LSFFormDeclaration formDeclaration = null;
+                    if (formExtend != null) {
+                        formDeclaration = ((LSFFormStatementImpl) formExtend).resolveFormDecl();
+                    } else {
+                        LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
+                        if (designStatement != null) {
+                            formDeclaration = designStatement.resolveFormDecl();
+                        }
+                    }
+
+                    if (formDeclaration != null) {
+                        formName = formDeclaration.getDeclName();
+                    }
+
+                    if (targetElement.getContainingFile() instanceof LSFFile) {
+                        module = ((LSFFile) targetElement.getContainingFile()).getModuleDeclaration();
+                    }
+                }
+            }
+
+            if (module != null && formName != null) {
+                DesignViewFactory.getInstance().updateView(module, formName);
+            }
+        } catch (PsiInvalidElementAccessException ignored) {
+        }
+    }
+}
