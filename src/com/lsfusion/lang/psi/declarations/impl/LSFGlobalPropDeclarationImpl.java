@@ -211,10 +211,29 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return false;
     }
 
+    public boolean isDataProperty() {
+        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = getExpressionUnfriendlyPD();
+        if (expressionUnfriendlyPD != null) {
+            LSFContextIndependentPD contextIndependentPD = expressionUnfriendlyPD.getContextIndependentPD();
+            if (contextIndependentPD != null && contextIndependentPD.getDataPropertyDefinition() != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Nullable
     @Override
     public Icon getIcon(int flags) {
-        return isAction() ? LSFIcons.ACTION : isAbstract() ? LSFIcons.ABSTRACT_PROPERTY : LSFIcons.PROPERTY;
+        if (isAction()) {
+            return LSFIcons.ACTION;
+        } else if (isAbstract()) {
+            return LSFIcons.ABSTRACT_PROPERTY;
+        } else if (isDataProperty()) {
+            return LSFIcons.DATA_PROPERTY;
+        } else {
+            return LSFIcons.PROPERTY;
+        }
     }
 
     @Override

@@ -11,6 +11,7 @@ public final class LSFIcons {
     public static final Icon ACTION = IconLoader.getIcon("/images/action.png");
     public static final Icon CLASS = AllIcons.Nodes.Class;
     public static final Icon CONSTRAINT = AllIcons.Ide.Warning_notifications;
+    public static final Icon DATA_PROPERTY = IconLoader.getIcon("/images/data_property.png");
     public static final Icon EVENT = AllIcons.Actions.Execute;
     public static final Icon FILE = IconLoader.getIcon("/images/lsf_file.png");
     public static final Icon MODULE = IconLoader.getIcon("/images/lsf_module.png");
