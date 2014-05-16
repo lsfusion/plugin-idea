@@ -28,8 +28,14 @@ import java.util.Set;
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
 
 public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
-    private static final String ACTION_PROPERTY_FQN = "lsfusion.server.logics.property.ActionProperty";
-    
+    public static final String ACTION_PROPERTY_FQN = "lsfusion.server.logics.property.ActionProperty";
+
+    public static final TextAttributes META_USAGE = new TextAttributes(null, new JBColor(Gray._239, Gray._61), null, null, Font.PLAIN);
+    public static final TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(37, 49, 37)), null, null, Font.PLAIN);
+    public static final TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), null, null, null, Font.PLAIN);
+    public static final TextAttributes WAVE_UNDERSCORED_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
+    public static final TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
+
     private AnnotationHolder myHolder;
     public boolean errorsSearchMode = false;
 
@@ -48,12 +54,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         this.errorsSearchMode = errorsSearchMode;
         annotate(psiElement, holder);
     }
-
-    private final static TextAttributes META_USAGE = new TextAttributes(null, new JBColor(Gray._239, Gray._61), null, null, Font.PLAIN);
-    private final static TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(37, 49, 37)), null, null, Font.PLAIN);
-    private final static TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), null, null, null, Font.PLAIN);
-    public final static TextAttributes WAVE_UNDERSCORED_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
-    private final static TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
 
     @Override
     public void visitElement(@NotNull PsiElement o) {

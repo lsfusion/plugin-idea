@@ -41,6 +41,15 @@ import java.util.*;
 
 public class LSFPsiUtils {
     
+    public static TextRange subRange(TextRange range, TextRange inner) {
+        int start = range.getStartOffset() + inner.getStartOffset();
+        int end = start + inner.getLength();
+        if (end > range.getEndOffset()) {
+            throw new IllegalArgumentException("Incorrect inner range.");
+        }
+        return new TextRange(start, end);
+    }
+    
     public static List<PsiFile> findFilesByPath(Module module, final String path) {
         final PsiManager psiManager = PsiManager.getInstance(module.getProject());
 

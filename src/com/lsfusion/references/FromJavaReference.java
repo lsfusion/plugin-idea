@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.lsfusion.completion.CompletionUtils.getVariantsFromIndices;
+import static com.lsfusion.util.LSFPsiUtils.subRange;
 
 public abstract class FromJavaReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     protected final String referenceText;
@@ -118,6 +119,10 @@ public abstract class FromJavaReference extends PsiReferenceBase<PsiElement> imp
     @Override
     public Object[] getVariants() {
         return getVariantsFromIndices(null, myElement.getProject(), Arrays.asList(getIndex()), 5, getScope()).toArray();
+    }
+    
+    public TextRange getRangeInDocument() {
+        return subRange(myElement.getTextRange(), getRangeInElement());
     }
 
     protected abstract Collection<? extends LSFGlobalDeclaration> findDeclarations(GlobalSearchScope scope);
