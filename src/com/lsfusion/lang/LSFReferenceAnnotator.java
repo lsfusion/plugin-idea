@@ -25,8 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.Set;
 
+import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
+
 public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
-    private static final String ACTION_PROPRTY_CLASS_NAME = "lsfusion.server.logics.property.ActionProperty";
+    private static final String ACTION_PROPERTY_FQN = "lsfusion.server.logics.property.ActionProperty";
     
     private AnnotationHolder myHolder;
     public boolean errorsSearchMode = false;
@@ -305,20 +307,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 Annotation annotation = myHolder.createErrorAnnotation(refFileRange, "Can't resolve " + refRange.substring(elementText));
                 annotation.setEnforcedTextAttributes(ERROR);
             } else if (refRange.getEndOffset() == elementRange.getLength() - 1) {
-                //последний компонент должен быть Action
-                boolean correctClass = false;
-                if (resolved instanceof PsiClass) {
-                    PsiClass clazz = (PsiClass) resolved;
-                    while (clazz != null) {
-                        if (ACTION_PROPRTY_CLASS_NAME.equals(clazz.getQualifiedName())) {
-                            correctClass = true;
-                            break;
-                        }
-
-                        clazz = clazz.getSuperClass();
-                    }
-                }
-                
+                //последний компонент должен быть ActionProperty
+                boolean correctClass = resolved instanceof PsiClass && hasSuperClass((PsiClass) resolved, ACTION_PROPERTY_FQN);
                 if (!correctClass) {
                     Annotation annotation = myHolder.createErrorAnnotation(refFileRange, "Class " + elementText + " should extend ActionProperty");
                     annotation.setEnforcedTextAttributes(ERROR);
@@ -326,6 +316,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         }
     }
+    
 
     private boolean checkReference(LSFReference reference) {
         Annotation errorAnnotation = reference.resolveErrorAnnotation(myHolder);

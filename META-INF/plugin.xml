@@ -116,6 +116,7 @@
         <fileTypeFactory implementation="com.lsfusion.lang.LSFFileTypeFactory"/>
         <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.lang.LSFParserDefinition"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>
+        <psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor" />
         <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>

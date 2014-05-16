@@ -92,11 +92,14 @@ public class CompletionUtils {
     }
 
     public static <G extends LSFDeclaration> List<LookupElement> getVariantsFromIndices(String namespace, LSFFile file, Collection<? extends StringStubIndexExtension> indices, double priority, GlobalSearchScope scope) {
+        return getVariantsFromIndices(namespace, file.getProject(), indices, priority, scope);
+        
+    }
+    
+    public static <G extends LSFDeclaration> List<LookupElement> getVariantsFromIndices(String namespace, Project project, Collection<? extends StringStubIndexExtension> indices, double priority, GlobalSearchScope scope) {
         List<LookupElement> result = new ArrayList<LookupElement>();
 
         try {
-            Project project = file.getProject();
-
             for (StringStubIndexExtension index : indices) {
                 Collection<String> allKeys = index.getAllKeys(project);
                 for (String variant : allKeys) {

@@ -2,13 +2,20 @@ package com.lsfusion.util;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.OrderEnumerator;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Processor;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -33,6 +40,51 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class LSFPsiUtils {
+    
+    public static List<PsiFile> findFilesByPath(Module module, final String path) {
+        final PsiManager psiManager = PsiManager.getInstance(module.getProject());
+
+        final List<PsiFile> result = new ArrayList<PsiFile>();
+
+        final OrderEnumerator orderEnumerator = ModuleRootManager.getInstance(module).orderEntries();
+
+        orderEnumerator.forEachModule(new Processor<Module>() {
+            @Override
+            public boolean process(Module module) {
+                VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
+                if (sourceRoots.length > 0) {
+                    for (VirtualFile sourceRoot : sourceRoots) {
+                        VirtualFile file = sourceRoot.findFileByRelativePath(path);
+                        if (file != null) {
+                            result.add(psiManager.findFile(file));
+                        }
+                    }
+                }
+                return true;
+            }
+        });
+        
+        if (result.isEmpty()) {
+            //almost orderEnumerator.getAllLibrariesAndSdkClassesRoots(), but without sdk
+            VirtualFile[] classRoots = orderEnumerator.withoutModuleSourceEntries().recursively().withoutSdk().exportedOnly().classes().usingCache().getRoots();
+            for (VirtualFile classRoot : classRoots) {
+                VirtualFile file = classRoot.findFileByRelativePath(path);
+                if (file != null) {
+                    result.add(psiManager.findFile(file));
+                }
+            }
+        }
+
+
+        return result;
+    }
+
+    public static GlobalSearchScope getModuleScope(@NotNull PsiElement psi) {
+        Module module = ModuleUtil.findModuleForPsiElement(psi);
+        return module == null
+               ? GlobalSearchScope.allScope(psi.getProject())
+               : GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module);
+    }
 
     public static List<LSFExpression> collectExpressions(final PsiFile file, final Editor editor, int offset) {
         Document document = editor.getDocument();
