@@ -14,7 +14,7 @@ import java.util.*;
 public class LSFSymbolContributor extends LSFNameContributor {
     // полагаем, что состояние не меняется между вызовами getNames() и getItemsByName()
     // оба вызова осуществляются в рамках одного метода. (см. DefaultChooseByNameItemProvider.filterElements(), SearchEverywhereAction.buildSymbols())
-    private Map<String, LSFGlobalPropDeclaration> propertyDeclarationsMap = new HashMap<String, LSFGlobalPropDeclaration>();
+    private Map<String, List<NavigationItem>> propertyDeclarationsMap = new HashMap<String, List<NavigationItem>>();
 
     @Override
     protected Collection<StringStubIndexExtension> getIndices() {
@@ -36,7 +36,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
     @NotNull
     @Override
     public String[] getNames(Project project, boolean includeNonProjectItems) {
-        propertyDeclarationsMap = new HashMap<String, LSFGlobalPropDeclaration>();
+        propertyDeclarationsMap = new HashMap<String, List<NavigationItem>>();
         return super.getNames(project, includeNonProjectItems);
     }
 
@@ -59,7 +59,12 @@ public class LSFSymbolContributor extends LSFNameContributor {
                     }
 
                     String withParams = key + paramsString;
-                    propertyDeclarationsMap.put(withParams, decl);
+                    List<NavigationItem> decls = propertyDeclarationsMap.get(withParams);
+                    if (decls == null) {
+                        decls = new ArrayList<NavigationItem>();
+                        propertyDeclarationsMap.put(withParams, decls);
+                    }
+                    decls.add((NavigationItem) decl);
                     result.add(withParams);
                 }
             }
@@ -71,8 +76,11 @@ public class LSFSymbolContributor extends LSFNameContributor {
 
     @Override
     protected Collection<NavigationItem> getItemsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {
-        if (index instanceof PropIndex && propertyDeclarationsMap.containsKey(name)) {
-            return Arrays.asList((NavigationItem) propertyDeclarationsMap.get(name));
+        if (index instanceof PropIndex) {
+            List<NavigationItem> decls = propertyDeclarationsMap.get(name);
+            return decls != null
+                   ? decls
+                   : super.getItemsFromIndex(index, name, project, scope);
         } else {
             return super.getItemsFromIndex(index, name, project, scope);
         }

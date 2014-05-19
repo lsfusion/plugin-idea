@@ -61,7 +61,7 @@ public abstract class LSFGroupObjectDeclarationImpl extends LSFFormElementDeclar
         return LSFIcons.GROUP_OBJECT;
     }
 
-    public static Processor getProcessor() {
+    public static Processor<LSFGroupObjectDeclaration> getProcessor() {
         return new Processor<LSFGroupObjectDeclaration>() {
             public Collection<LSFGroupObjectDeclaration> process(LSFFormExtend formExtend) {
                 return formExtend.getGroupObjectDecls();

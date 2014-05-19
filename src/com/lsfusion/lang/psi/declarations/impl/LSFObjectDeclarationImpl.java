@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
+import static com.lsfusion.lang.psi.declarations.impl.LSFFormElementDeclarationImpl.Processor;
+
 public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationImpl implements LSFObjectDeclaration, LSFFormExtendElement {
 
     public LSFObjectDeclarationImpl(@NotNull ASTNode node) {
@@ -44,8 +46,8 @@ public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationIm
         return className.getCustomClassUsage().getSimpleName();
     }
 
-    public static LSFFormElementDeclarationImpl.Processor getProcessor() {
-        return new LSFFormElementDeclarationImpl.Processor<LSFObjectDeclaration>() {
+    public static Processor<LSFObjectDeclaration> getProcessor() {
+        return new Processor<LSFObjectDeclaration>() {
             public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
                 return formExtend.getObjectDecls();
             }
