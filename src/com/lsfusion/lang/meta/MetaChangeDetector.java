@@ -319,12 +319,12 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     private static class GenParse {
 
         public final LSFMetaCodeStatement usage;
-        public final LSFMetaCodeBody body;
+        public final ToParse toParse;
         public final long version;
 
-        private GenParse(LSFMetaCodeStatement usage, LSFMetaCodeBody body, long version) {
+        private GenParse(LSFMetaCodeStatement usage, ToParse toParse, long version) {
             this.usage = usage;
-            this.body = body;
+            this.toParse = toParse;
             this.version = version;
         }
     }
@@ -503,7 +503,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 });
 
                 if (toParse.getResult() != null)
-                    genUsages.add(new GenParse(metaUsage, toParse.getResult().parse(file), toParse.getResult().version));
+                    genUsages.add(new GenParse(metaUsage, toParse.getResult(), toParse.getResult().version));
             }
             final Document document = myPsiDocumentManager.getDocument(file);
             for (final GenParse gen : genUsages) {
@@ -558,7 +558,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                                     boolean prevEnabled = enabled;
                                                     enabled = false; // выключаем чтобы каскадно не вызывались события
 
-                                                    gen.usage.setInlinedBody(gen.body);
+                                                    gen.usage.setInlinedBody(gen.toParse.parse(file));
 
                                                     enabled = prevEnabled;
 
