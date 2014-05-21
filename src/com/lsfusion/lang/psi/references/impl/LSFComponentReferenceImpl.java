@@ -61,7 +61,6 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
             }
         }
 
-        // todo: заставить работать
         LSFResolveResult.ErrorAnnotator errorAnnotator = null;
         if (declarations.size() > 1) {
             final Collection<? extends LSFDeclaration> finalDeclarations = declarations;
