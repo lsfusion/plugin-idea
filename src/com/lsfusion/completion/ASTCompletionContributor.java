@@ -416,7 +416,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (paramDeclare != null) {
                 if (!parameterCompleted) {
                     parameterCompleted = true;
-                    PsiElement psi = getLastPsiOfType(PsiElement.class);
+                    PsiElement psi = getLastPsiOfType(ModifyParamContext.class);
                     if (psi != null) {
                         LSFExprParamDeclaration currentParamDeclaration = getPsiOfTypeForFrame(paramDeclare, LSFExprParamDeclaration.class);
                         for (LSFExprParamDeclaration paramDeclaration : LSFPsiUtils.getContextParams(psi, false)) {
@@ -695,7 +695,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         @Nullable
         private <T extends PsiElement> T getPsiOfTypeForFrame(Frame frame, Class<T> psiClass) {
             try {
-                return PsiTreeUtil.findElementOfClassAtOffset(file, originalOffsetShift + frame.offset, psiClass, true);
+                return PsiTreeUtil.findElementOfClassAtOffset(file, originalOffsetShift + frame.offset, psiClass, false);
             } catch (ProcessCanceledException pce) {
                 return null;
             }
