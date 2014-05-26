@@ -726,6 +726,7 @@ listActionPropertyDefinitionBody ::=    ((NEWSESSION | (NEWTHREAD uintLiteral? (
 private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfNeeded >>  //  !} => ;
                                 |   localDataPropertyDefinition SEMI
                                 |   emptyStatement
+                                |   stubListActionStatement
                                 )
 {
     pin(".*") = 1
@@ -735,10 +736,28 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | FORM | TRY | IF | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | REQUEST | RETURN | SEEK | WHILE
+                                            | NEWSESSION | NEWTHREAD
                                             | ID
                                             | SEMI
+                                            | LBRACE
                                             | RBRACE
                                            )
+                                           
+stubListActionStatement ::=     (
+                                    NEWSESSION
+                                    |
+                                    (
+                                        NEWTHREAD
+                                        uintLiteral?
+                                        (DELAY uintLiteral)?
+                                    )
+                                )
+                                (AUTOAPPLY)?
+                                (SINGLE)?
+                                LBRACE
+{
+    pin(".*") = 1
+}                                           
 
 localDataPropertyDefinition ::= LOCAL simpleName EQUALS className LBRAC classNameList RBRAC
 {
