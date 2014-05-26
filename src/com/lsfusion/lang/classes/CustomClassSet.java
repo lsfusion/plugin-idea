@@ -287,7 +287,7 @@ public class CustomClassSet implements LSFClassSet {
 
     public static LSFClassDeclaration getBaseClass(Project project) {
         LSFModuleDeclaration systemModule = LSFGlobalResolver.findModules("System", GlobalSearchScope.allScope(project)).findFirst();
-        Collection<LSFClassDeclaration> objects = LSFGlobalResolver.findElements("Object", systemModule.getLSFFile(), Collections.singleton(LSFStubElementTypes.CLASS), null, Condition.TRUE, Finalizer.EMPTY);
+        Collection<LSFClassDeclaration> objects = LSFGlobalResolver.findElements("Object", systemModule.getLSFFile(), Collections.singleton(LSFStubElementTypes.CLASS), Condition.TRUE, Finalizer.EMPTY);
         return objects.iterator().next();
     }
 

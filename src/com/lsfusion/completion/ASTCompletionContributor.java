@@ -26,6 +26,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.BooleanValueHolder;
 import com.intellij.util.ProcessingContext;
+import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
@@ -280,7 +281,8 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private boolean completeWindowName() {
-            return completeFullNameUsage(windowCompleted, WINDOW_USAGE, WindowIndex.getInstance());
+            Collection<? extends LSFFullNameDeclaration> builtInWindows = LSFElementGenerator.getBuiltInWindows(project);
+            return completeFullNameUsage(windowCompleted, WINDOW_USAGE, asList(WindowIndex.getInstance()), 1.5, true, true, builtInWindows);
         }
 
         private boolean completeTableName() {
@@ -315,7 +317,13 @@ public class ASTCompletionContributor extends CompletionContributor {
             return completeFullNameUsage(completed, frameType, indices, 1.5, true, true);
         }
 
-        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends StringStubIndexExtension> indices, double priority, boolean extractNamespace, boolean useRequiredScope) {
+        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends StringStubIndexExtension> indices,
+                                              double priority, boolean extractNamespace, boolean useRequiredScope) {
+            return completeFullNameUsage(completed, frameType, indices, priority, extractNamespace, useRequiredScope, null);
+        }
+        
+        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends StringStubIndexExtension> indices,
+                                              double priority, boolean extractNamespace, boolean useRequiredScope, Collection<? extends LSFFullNameDeclaration> additionalDeclarations) {
             Frame fullNameUsage = getLastFrameOfType(null, frameType);
             if (fullNameUsage != null) {
                 if (!completed.getValue()) {
@@ -324,6 +332,14 @@ public class ASTCompletionContributor extends CompletionContributor {
                     addLookupElements(
                             getVariantsFromIndices(namespaceName, file, indices, priority, useRequiredScope ? getRequireScope() : null)
                     );
+                    
+                    if (additionalDeclarations != null) {
+                        for (LSFFullNameDeclaration decl : additionalDeclarations) {
+                            if (namespaceName == null || namespaceName.equals(decl.getNamespaceName())) {
+                                addLookupElement(createLookupElement(decl, 1.5));
+                            }
+                        }
+                    }
                 }
                 return true;
             }
@@ -339,7 +355,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     String namespace = namespaceAndClassName[0];
                     String className = namespaceAndClassName[1];
 
-                    Collection<LSFClassDeclaration> classDeclarations = LSFGlobalResolver.findElements(className, namespace, file, Collections.singleton(LSFStubElementTypes.CLASS), null, Condition.TRUE);
+                    Collection<LSFClassDeclaration> classDeclarations = LSFGlobalResolver.findElements(className, namespace, file, Collections.singleton(LSFStubElementTypes.CLASS), Condition.TRUE);
                     for (LSFClassDeclaration classDecl : classDeclarations) {
                         for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(classDecl, LSFStubElementTypes.EXTENDCLASS, project, getRequireScope())) {
                             for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {
@@ -604,7 +620,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 }
                 if (priority > 0) {
                     addLookupElement(
-                            CompletionUtils.createLookupElement(
+                            createLookupElement(
                                     declaration.getName(),
                                     declaration.getSignaturePresentableText(),
                                     declaration.getLSFFile().getName(),

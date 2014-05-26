@@ -19,6 +19,7 @@ import com.intellij.util.io.StringRef;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
@@ -116,6 +117,19 @@ public class LSFElementGenerator {
             builtInFormProps = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
         }
         return builtInFormProps;
+    }
+
+    private static Collection<? extends LSFWindowDeclaration> builtInWindows = null;
+    public static Collection<? extends LSFWindowDeclaration> getBuiltInWindows(final Project project) {
+        if(builtInWindows == null) {
+            final PsiFile dummyFile = createDummyFile(project,
+                                                      "MODULE System;" +
+                                                      "WINDOW PANEL log 'log';" +
+                                                      "WINDOW PANEL status 'status';" +
+                                                      "WINDOW PANEL forms 'forms';");
+            builtInWindows = PsiTreeUtil.findChildrenOfType(dummyFile, LSFWindowDeclaration.class);
+        }
+        return builtInWindows;
     }
 
     public static void format(Project project, PsiElement element) {
