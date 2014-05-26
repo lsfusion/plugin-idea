@@ -73,7 +73,8 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
 
   "-"                                   { return MINUS; }
   "+"                                   { return PLUS; }
-  "*" | "/"                             { return MULT_OPERAND; }
+  "*"                                   { return MULT; }
+  "/"                                   { return DIV; }
   "(+)" | "(-)"                         { return ADDOR_OPERAND; }
 
   ";"                                   { return SEMI; }

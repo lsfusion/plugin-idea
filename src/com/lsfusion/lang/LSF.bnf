@@ -255,7 +255,7 @@ additiveORPE ::= additivePE (ADDOR_OPERAND additivePE)*
 additivePE ::= multiplicativePE ((PLUS | MINUS) multiplicativePE)*
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
-multiplicativePE ::= unaryMinusPE (MULT_OPERAND unaryMinusPE)*
+multiplicativePE ::= unaryMinusPE ((MULT | DIV) unaryMinusPE)*
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 unaryMinusPE ::= (MINUS unaryMinusPE) | postfixUnaryPE
@@ -712,7 +712,16 @@ requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actio
     methods = [inferActionParamClasses]
 }
 
-listActionPropertyDefinitionBody ::=    ((NEWSESSION | (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)) (AUTOAPPLY)? (SINGLE)?)?
+listActionPropertyDefinitionBody ::=    (
+                                            (
+                                                NEWSESSION
+                                                (LBRAC (nonEmptyNoContextPropertyUsageList | MULT) RBRAC)?
+                                                |
+                                                (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
+                                            )
+                                            (AUTOAPPLY)?
+                                            (SINGLE)?
+                                        )?
 		                                LBRACE
 			                            listActionStatement*
 		                                RBRACE
@@ -745,6 +754,7 @@ private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | 
                                            
 stubListActionStatement ::=     (
                                     NEWSESSION
+                                    (LBRAC (nonEmptyNoContextPropertyUsageList | MULT)? RBRAC)?
                                     |
                                     (
                                         NEWTHREAD
