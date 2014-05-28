@@ -714,8 +714,7 @@ requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actio
 
 listActionPropertyDefinitionBody ::=    (
                                             (
-                                                NEWSESSION
-                                                (LBRAC (nonEmptyNoContextPropertyUsageList | MULT) RBRAC)?
+                                                NEWSESSION migratePropertiesSelector?
                                                 |
                                                 (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
                                             )
@@ -731,6 +730,8 @@ listActionPropertyDefinitionBody ::=    (
     implements="com.lsfusion.lang.psi.LSFListAction, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
+
+private migratePropertiesSelector ::= LBRAC (nonEmptyNoContextPropertyUsageList | MULT) RBRAC
 
 private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfNeeded >>  //  !} => ;
                                 |   localDataPropertyDefinition SEMI
@@ -753,14 +754,9 @@ private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | 
                                            )
                                            
 stubListActionStatement ::=     (
-                                    NEWSESSION
-                                    (LBRAC (nonEmptyNoContextPropertyUsageList | MULT)? RBRAC)?
+                                    NEWSESSION migratePropertiesSelector?
                                     |
-                                    (
-                                        NEWTHREAD
-                                        uintLiteral?
-                                        (DELAY uintLiteral)?
-                                    )
+                                    (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
                                 )
                                 (AUTOAPPLY)?
                                 (SINGLE)?
@@ -824,7 +820,7 @@ multiActionPropertyDefinitionBody ::= MULTI (exclusiveOverrideOption)? nonEmptyA
     methods = [inferActionParamClasses]
 }
 
-applyActionPropertyDefinitionBody ::= APPLY SINGLE? actionPropertyDefinitionBody
+applyActionPropertyDefinitionBody ::= APPLY migratePropertiesSelector? SINGLE? actionPropertyDefinitionBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
