@@ -234,6 +234,7 @@ public class FormJavaReferenceContributor extends PsiReferenceContributor {
         return null;
     }
 
+    //является ли вызовом метода у поля ScriptingActionProperty.LM либо у параметра конструктора ScriptingActionProperty
     private boolean hasScriptingActionPropertyLMQualifier(PsiReferenceExpression methodExpression) {
         PsiExpression qualifierExpression = methodExpression.getQualifierExpression();
         if (qualifierExpression instanceof PsiReferenceExpression) {

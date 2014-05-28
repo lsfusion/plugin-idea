@@ -824,7 +824,7 @@ multiActionPropertyDefinitionBody ::= MULTI (exclusiveOverrideOption)? nonEmptyA
     methods = [inferActionParamClasses]
 }
 
-applyActionPropertyDefinitionBody ::= APPLY propertyExpression
+applyActionPropertyDefinitionBody ::= APPLY SINGLE? propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
