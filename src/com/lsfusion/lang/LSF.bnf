@@ -714,7 +714,7 @@ requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actio
 
 listActionPropertyDefinitionBody ::=    (
                                             (
-                                                NEWSESSION migratePropertiesSelector?
+                                                NEWSESSION (NESTED | migratePropertiesSelector)?
                                                 |
                                                 (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
                                             )
@@ -754,7 +754,7 @@ private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | 
                                            )
                                            
 stubListActionStatement ::=     (
-                                    NEWSESSION migratePropertiesSelector?
+                                    NEWSESSION (NESTED | migratePropertiesSelector)?
                                     |
                                     (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
                                 )
