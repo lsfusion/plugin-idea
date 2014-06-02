@@ -1,10 +1,7 @@
 package com.lsfusion.lang.psi.extend;
 
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFObjectDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +16,8 @@ public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubEl
     Collection<LSFObjectDeclaration> getObjectDecls();
 
     Collection<LSFGroupObjectDeclaration> getGroupObjectDecls();
+    
+    Collection<LSFFilterGroupDeclaration> getFilterGroupDecls();
 
     Collection<LSFFormGroupObjectDeclaration> getFormGroupObjectDeclarations();
 
@@ -30,6 +29,8 @@ public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubEl
     Collection<LSFPropertyDrawDeclaration> getPropertyDrawDecls();
 
     List<LSFFormFilterGroupDeclaration> getFormFilterGroupDeclarationList();
+
+    List<LSFFormExtendFilterGroupDeclaration> getFormExtendFilterGroupDeclarationList();
 
     Set<LSFDeclaration> resolveDuplicates();
 }

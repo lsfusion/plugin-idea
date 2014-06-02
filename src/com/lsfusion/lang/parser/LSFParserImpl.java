@@ -77,7 +77,10 @@ public class LSFParserImpl extends LSFParser {
                 if (tokenType == NAVIGATOR) break;
                 if (tokenType == ATSIGN) break;
                 if (tokenType == META) break;
-                if (tokenType == EXTEND) break;
+                if (tokenType == EXTEND && builder_.lookAhead(1) != FILTERGROUP) 
+                {
+                    break;
+                }
                 if (!isExtend && tokenType == DESIGN) break;
 
                 // не выделяем мелкие statement'ы в отдельные куски, т.к. это только тормозит парсинг
@@ -88,6 +91,8 @@ public class LSFParserImpl extends LSFParser {
             }
 
             builder_.advanceLexer();
+
+            isExtend = false;
         }
 
         lazyStatement.collapse(LAZY_SCRIPT_STATEMENT);

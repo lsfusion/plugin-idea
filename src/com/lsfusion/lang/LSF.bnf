@@ -874,6 +874,7 @@ formStatement ::=	(	formDecl
                     |	formHintsList
                     |	formEventsList
                     |	formFilterGroupDeclaration
+                    |	formExtendFilterGroupDeclaration
                     |	formOrderByList
                     |	dialogFormDeclaration
                     |	editFormDeclaration
@@ -1001,7 +1002,8 @@ formActionPropertyObject ::= formPropertyObject
 formPropertyDrawMappedDecl ::= (simpleName EQUALS)? formPropertyObject formPropertyOptionsList
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFPropertyDrawMappedDeclarationImpl"
-    implements="com.lsfusion.lang.psi.declarations.LSFPropertyDrawMappedDeclaration"}
+    implements="com.lsfusion.lang.psi.declarations.LSFPropertyDrawMappedDeclaration"
+}
 
 formMappedPropertiesList ::= formPropertyDrawMappedDecl (COMMA formPropertyDrawMappedDecl)* {pin = 1}
 
@@ -1027,10 +1029,23 @@ formEventDeclaration ::= ON
     pin = 1
 }
 
-formFilterGroupDeclaration ::= FILTERGROUP filterGroupName regularFilterDeclaration+
-{pin(".*") = 1}
+formFilterGroupDeclaration ::= FILTERGROUP filterGroupName regularFilterDeclaration*
+{pin = 1}
 
 filterGroupName ::= simpleName
+{
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFFilterGroupDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFFilterGroupDeclaration"
+}
+
+formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage regularFilterDeclaration+
+{pin(".*") = 1}
+
+filterGroupUsage ::= simpleName
+{
+    mixin="com.lsfusion.lang.psi.references.impl.LSFFilterGroupReferenceImpl"
+    implements="com.lsfusion.lang.psi.references.LSFFilterGroupReference"
+}
 
 regularFilterDeclaration ::= FILTER stringLiteral stringLiteral formFilterDeclaration (filterSetDefault)?
 

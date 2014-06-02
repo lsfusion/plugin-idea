@@ -180,7 +180,8 @@ public class ASTCompletionContributor extends CompletionContributor {
         boolean staticObjectCompleted = false;
         BooleanValueHolder objectCompleted = new BooleanValueHolder(false);
         BooleanValueHolder groupObjectCompleted = new BooleanValueHolder(false);
-        BooleanValueHolder propertyDrawCompleted = new BooleanValueHolder(true);
+        BooleanValueHolder propertyDrawCompleted = new BooleanValueHolder(false);
+        BooleanValueHolder filterGroupCompleted = new BooleanValueHolder(false);
         boolean parameterCompleted = false;
         boolean propertyCompleted = false;
 
@@ -264,6 +265,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (!res) res = completeStaticObjectUsage();
                 if (!res) res = completeObjectUsage();
                 if (!res) res = completeGroupObjectUsage();
+                if (!res) res = completeFilterGrouopUsage();
                 if (!res) res = completePropertyDrawUsage();
                 if (!res) res = completeParameterUsage();
                 if (!res) res = completePropertyUsage();
@@ -391,6 +393,19 @@ public class ASTCompletionContributor extends CompletionContributor {
                         @Override
                         public Collection<LSFGroupObjectDeclaration> process(LSFFormExtend formExtend) {
                             return formExtend.getGroupObjectDecls();
+                        }
+                    }
+            );
+        }
+
+        private boolean completeFilterGrouopUsage() {
+            return completeFormContextObject(
+                    filterGroupCompleted,
+                    FILTER_GROUP_USAGE,
+                    new FormExtendProcessor<LSFFilterGroupDeclaration>() {
+                        @Override
+                        public Collection<LSFFilterGroupDeclaration> process(LSFFormExtend formExtend) {
+                            return formExtend.getFilterGroupDecls();
                         }
                     }
             );

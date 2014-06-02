@@ -21,6 +21,7 @@ public final class LSFIcons {
     public static final Icon FOLLOWS = AllIcons.Duplicates.SendToTheRight;
     public static final Icon FORM = AllIcons.FileTypes.UiForm;
     public static final Icon GROUP = AllIcons.Actions.GroupByModuleGroup;
+    public static final Icon FILTER = IconLoader.getIcon("/images/design/filt.png");
     public static final Icon GROUP_BY_CLASS = IconLoader.getIcon("/images/group_by_class.png");
     public static final Icon GROUP_BY_MODULE = AllIcons.Actions.GroupByModule;
     public static final Icon GROUP_OBJECT = AllIcons.Actions.GroupByPrefix;

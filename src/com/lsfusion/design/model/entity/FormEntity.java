@@ -13,6 +13,7 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.types.indexes.PropIndex;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -77,6 +78,9 @@ public class FormEntity {
             addRegularFilterGroup(lsfFormFilterGroupDeclaration);
         }
 
+        for (LSFFormExtendFilterGroupDeclaration lsfFormExtendFilterGroupDeclaration : formExtend.getFormExtendFilterGroupDeclarationList()) {
+            extendRegularFilterGroup(lsfFormExtendFilterGroupDeclaration);
+        }
     }
 
     private GroupObjectEntity addGroupObject(LSFGroupObjectDeclaration gobjDecl, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
@@ -96,8 +100,32 @@ public class FormEntity {
     }
 
     private void addRegularFilterGroup(LSFFormFilterGroupDeclaration filterGroupDeclaration) {
-        RegularFilterGroupEntity filterGroup = new RegularFilterGroupEntity(filterGroupDeclaration.getFilterGroupName().getSimpleName().getName());
-        for (LSFRegularFilterDeclaration regularFilterDeclaration : filterGroupDeclaration.getRegularFilterDeclarationList()) {
+        LSFFilterGroupName filterGroupName = filterGroupDeclaration.getFilterGroupName();
+        if (filterGroupName == null) {
+            return;
+        }
+        RegularFilterGroupEntity filterGroup = new RegularFilterGroupEntity(filterGroupName.getSimpleName().getName());
+        
+        addFiltersToFilterGroup(filterGroup, filterGroupDeclaration.getRegularFilterDeclarationList());
+        
+        regularFilterGroups.add(filterGroup);
+    }
+    
+    private void extendRegularFilterGroup(LSFFormExtendFilterGroupDeclaration filterGroupExtend) {
+        LSFFilterGroupUsage filterGroupUsage = filterGroupExtend.getFilterGroupUsage();
+        if (filterGroupUsage != null) {
+            LSFFilterGroupDeclaration filterGroupDecl = filterGroupUsage.resolveDecl();
+            if (filterGroupDecl != null) {
+                RegularFilterGroupEntity filterGroup = getFilterGroup(filterGroupDecl.getSimpleName().getName());
+                if (filterGroup != null) {
+                    addFiltersToFilterGroup(filterGroup, filterGroupExtend.getRegularFilterDeclarationList());
+                }
+            }
+        }
+    }
+
+    private void addFiltersToFilterGroup(RegularFilterGroupEntity filterGroup, List<LSFRegularFilterDeclaration> regularFilterDeclarationList) {
+        for (LSFRegularFilterDeclaration regularFilterDeclaration : regularFilterDeclarationList) {
 
             List<ObjectEntity> params = new ArrayList<ObjectEntity>();
             for (LSFExprParamDeclaration paramDeclaration : regularFilterDeclaration.getFormFilterDeclaration().getPropertyExpression().resolveParams()) {
@@ -109,7 +137,6 @@ public class FormEntity {
             RegularFilterEntity filter = new RegularFilterEntity(stringLiterals.get(0).getValue(), KeyStroke.getKeyStroke(stringLiterals.get(1).getValue()), params, isDefault);
             filterGroup.addFilter(filter);
         }
-        regularFilterGroups.add(filterGroup);
     }
 
     private void extractPropertyDraws(LSFFormExtend formExtend) {
@@ -271,6 +298,7 @@ public class FormEntity {
         }
     }
 
+    @Nullable
     public GroupObjectEntity getGroupObject(String sID) {
         if (sID != null) {
             for (GroupObjectEntity groupObject : groups) {
@@ -282,6 +310,19 @@ public class FormEntity {
         return null;
     }
 
+    @Nullable
+    public RegularFilterGroupEntity getFilterGroup(String sID) {
+        if (sID != null) {
+            for (RegularFilterGroupEntity filterGroup : regularFilterGroups) {
+                if (sID.equals(filterGroup.sID)) {
+                    return filterGroup;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nullable
     public ObjectEntity getObject(String sID) {
         if (sID != null) {
             for (GroupObjectEntity groupObject : groups) {

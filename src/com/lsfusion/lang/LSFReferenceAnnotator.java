@@ -138,6 +138,18 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitGroupObjectUsage(@NotNull LSFGroupObjectUsage o) {
+        super.visitGroupObjectUsage(o);
+        checkReference(o);
+    }
+
+    @Override
+    public void visitFilterGroupUsage(@NotNull LSFFilterGroupUsage o) {
+        super.visitFilterGroupUsage(o);
+        checkReference(o);
+    }
+
+    @Override
     public void visitObjectUsage(@NotNull LSFObjectUsage o) {
         super.visitObjectUsage(o);
 

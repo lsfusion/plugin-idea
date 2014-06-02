@@ -94,7 +94,9 @@ public class FormView {
         }
 
         for (RegularFilterGroupEntity filterGroup : entity.regularFilterGroups) {
-            addRegularFilterGroupBase(filterGroup);
+            if (!filterGroup.filters.isEmpty()) {
+                addRegularFilterGroupBase(filterGroup);
+            }
         }
     }
 

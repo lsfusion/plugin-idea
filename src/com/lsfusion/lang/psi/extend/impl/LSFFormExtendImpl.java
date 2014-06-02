@@ -95,6 +95,18 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     }
 
     @Override
+    public Collection<LSFFilterGroupDeclaration> getFilterGroupDecls() {
+        Collection<LSFFilterGroupDeclaration> result = new ArrayList<LSFFilterGroupDeclaration>();
+        for (LSFFormFilterGroupDeclaration decl : getFormFilterGroupDeclarationList()) {
+            LSFFilterGroupName filterGroup = decl.getFilterGroupName();
+            if (filterGroup != null) {
+                result.add(filterGroup);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public Collection<LSFFormGroupObjectDeclaration> getFormGroupObjectDeclarations() {
         Collection<LSFFormGroupObjectDeclaration> result = new ArrayList<LSFFormGroupObjectDeclaration>();
         for (LSFFormGroupObjectsList formGroupObject : getFormGroupObjectsListList())
@@ -120,6 +132,7 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         duplicates.addAll(resolveDuplicates((List<LSFGroupObjectDeclaration>) getGroupObjectDecls(), LSFGroupObjectDeclarationImpl.getProcessor(), extendForms));
         duplicates.addAll(resolveDuplicates((List<LSFPropertyDrawDeclaration>) getPropertyDrawDecls(), LSFPropertyDrawDeclarationImpl.getProcessor(), extendForms));
         duplicates.addAll(resolveDuplicates((List<LSFObjectDeclaration>) getObjectDecls(), LSFObjectDeclarationImpl.getProcessor(), extendForms));
+        duplicates.addAll(resolveDuplicates((List<LSFFilterGroupDeclaration>) getFilterGroupDecls(), LSFFilterGroupDeclarationImpl.getProcessor(), extendForms));
 
         return duplicates;
     }
