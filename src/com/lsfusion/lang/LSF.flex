@@ -254,6 +254,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "NAME"                    			{ return NAME; }
   "NAMESPACE"               			{ return NAMESPACE; }
   "NAVIGATOR"               			{ return NAVIGATOR; }
+  "NESTED"                     			{ return NESTED; }
   "NEW"                     			{ return NEW; }
   "NEWSESSION"              			{ return NEWSESSION; }
   "NEWTHREAD"              			    { return NEWTHREAD; }
