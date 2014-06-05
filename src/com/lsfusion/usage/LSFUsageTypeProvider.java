@@ -5,18 +5,44 @@ import com.intellij.usages.UsageTarget;
 import com.intellij.usages.impl.rules.UsageType;
 import com.intellij.usages.impl.rules.UsageTypeProviderEx;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFGroupDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class LSFUsageTypeProvider implements UsageTypeProviderEx {
-    public static final UsageType CLASS_STATEMENT = new UsageType("CLASS statement");
+//    private statement ::=
+//      constraintStatement
+//    |	groupStatement
+//    |	overrideStatement // starts with ID
+//    |	classStatement
+//    |	followsStatement // starts with ID
+//    |	writeWhenStatement // starts with ID
+//    |	explicitInterfacePropertyStatement
+//    |	eventStatement
+//    |	showDepStatement
+//    |	globalEventStatement
+//    |	aspectStatement
+//    |	tableStatement
+//    |	loggableStatement
+//    |	indexStatement
+//    |	formStatement
+//    |	designStatement
+//    |	windowStatement
+//    |	navigatorStatement
+//    |	metaCodeStatement // ?
+//    |	metaCodeDeclarationStatement // ?
+
+    public static final UsageType CONSTRAINT_STATEMENT = new UsageType("CONSTRAINT statement");
     public static final UsageType GROUP_STATEMENT = new UsageType("GROUP statement");
     public static final UsageType OVERRIDE_STATEMENT = new UsageType("OVERRIDE statement");
-    public static final UsageType CONSTRAINT_STATEMENT = new UsageType("CONSTRAINT statement");
+    public static final UsageType CLASS_STATEMENT = new UsageType("CLASS statement");
     public static final UsageType FOLLOWS_STATEMENT = new UsageType("FOLLOWS statement");
     public static final UsageType WRITE_WHEN = new UsageType("WRITE WHEN statement");
     public static final UsageType PROPERTY_DECLARATION = new UsageType("Property declaration");
@@ -44,50 +70,60 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
     @Nullable
     @Override
     public UsageType getUsageType(PsiElement element, @NotNull UsageTarget[] targets) {
+        return getLsfUsageType(element);
+    }
+
+    @Nullable
+    public static UsageType getLsfUsageType(PsiElement element) {
+        element = LSFPsiUtils.getStatementParent(element);
+        if (element == null) {
+            return null;
+        }
+        
         if (element instanceof LSFClassExtend) {
-            return CLASS_STATEMENT;    
+            return CLASS_STATEMENT;
         } else  if (element instanceof LSFGroupDeclaration) {
             return GROUP_STATEMENT;
-        } else if (element instanceof LSFOverrideStatement) { 
-            return OVERRIDE_STATEMENT;               
-        } else if (element instanceof LSFConstraintStatement) { 
-            return CONSTRAINT_STATEMENT;                
-        } else if (element instanceof LSFFollowsStatement) { 
-            return FOLLOWS_STATEMENT;        
+        } else if (element instanceof LSFOverrideStatement) {
+            return OVERRIDE_STATEMENT;
+        } else if (element instanceof LSFConstraintStatement) {
+            return CONSTRAINT_STATEMENT;
+        } else if (element instanceof LSFFollowsStatement) {
+            return FOLLOWS_STATEMENT;
         } else if (element instanceof LSFWriteWhenStatement) {
-            return WRITE_WHEN;        
-        } else if (element instanceof LSFGlobalPropDeclaration) {
-            return PROPERTY_DECLARATION;        
-        } else if (element instanceof LSFEventStatement) {  
-            return EVENT_STATEMENT;        
-        } else if (element instanceof LSFShowDepStatement) {  
-            return SHOWDEP_STATEMENT;        
-        } else if (element instanceof LSFGlobalEventStatement) {  
-            return GLOBAL_EVENT_STATEMENT;        
-        } else if (element instanceof LSFAspectStatement) {  
-            return ASPECT_STATEMENT;        
-        } else if (element instanceof LSFTableDeclaration) {  
-            return TABLE_DECLARATION;        
-        } else if (element instanceof LSFLoggableStatement) {  
-            return LOGGABLE_STATEMENT;        
-        } else if (element instanceof LSFIndexStatement) {  
+            return WRITE_WHEN;
+        } else if (element instanceof LSFExplicitInterfacePropertyStatement) {
+            return PROPERTY_DECLARATION;
+        } else if (element instanceof LSFEventStatement) {
+            return EVENT_STATEMENT;
+        } else if (element instanceof LSFShowDepStatement) {
+            return SHOWDEP_STATEMENT;
+        } else if (element instanceof LSFGlobalEventStatement) {
+            return GLOBAL_EVENT_STATEMENT;
+        } else if (element instanceof LSFAspectStatement) {
+            return ASPECT_STATEMENT;
+        } else if (element instanceof LSFTableDeclaration) {
+            return TABLE_DECLARATION;
+        } else if (element instanceof LSFLoggableStatement) {
+            return LOGGABLE_STATEMENT;
+        } else if (element instanceof LSFIndexStatement) {
             return INDEX_STATEMENT;
         } else if (element instanceof LSFFormExtend) {
             return FORM_STATEMENT;
-        } else if (element instanceof LSFDesignStatement) { 
+        } else if (element instanceof LSFDesignStatement) {
             return DESIGN_STATEMENT;
-        } else if (element instanceof LSFWindowStatement) { 
+        } else if (element instanceof LSFWindowStatement) {
             return WINDOW_STATEMENT;
-        } else if (element instanceof LSFNavigatorStatement) { 
+        } else if (element instanceof LSFNavigatorStatement) {
             return NAVIGATOR_STATEMENT;
-        } else if (element instanceof LSFMetaReference) { 
+        } else if (element instanceof LSFMetaReference) {
             return METACODE_REFERENCE;
-        } else if (element instanceof LSFMetaDeclaration) { 
+        } else if (element instanceof LSFMetaDeclaration) {
             return METACODE_DECLARATION;
-        } else if (element instanceof LSFModuleDeclaration) { 
+        } else if (element instanceof LSFModuleDeclaration) {
             return MODULE_STATEMENT;
         }
-        
+
         return null;
     }
 }

@@ -8,8 +8,7 @@ import com.intellij.usages.UsageGroup;
 import com.intellij.usages.UsageView;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.UsageGroupingRule;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFScriptStatement;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,16 +21,10 @@ public class LSFStatementGroupingRule implements UsageGroupingRule {
     @Override
     public UsageGroup groupUsage(@NotNull Usage usage) {
         if (!(usage instanceof PsiElementUsage)) return null;
-        PsiElement psiElement = ((PsiElementUsage)usage).getElement();
-        
-        while (psiElement != null) {
-            if (psiElement instanceof LSFFile || psiElement instanceof LSFScriptStatement) {
-                break;
-            }
-            psiElement = psiElement.getParent();
-        }
-        
-        return psiElement != null ? new StatementUsageGroup(psiElement) : null;
+
+        PsiElement element = LSFPsiUtils.getStatementParent(((PsiElementUsage)usage).getElement());
+
+        return element == null ? null : new StatementUsageGroup(element);
     }
     
     private class StatementUsageGroup implements UsageGroup {

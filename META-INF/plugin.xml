@@ -42,7 +42,7 @@
         </component>
 
         <component>
-        <implementation-class>com.lsfusion.lang.psi.LSFProjectComponent</implementation-class>
+            <implementation-class>com.lsfusion.lang.psi.LSFProjectComponent</implementation-class>
         </component>
 
     </project-components>
@@ -115,7 +115,11 @@
         <!-- Add your extensions here -->
         <fileTypeFactory implementation="com.lsfusion.lang.LSFFileTypeFactory"/>
         <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.lang.LSFParserDefinition"/>
+
+        <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupingRuleProvider"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>
+        <usageTypeProvider implementation="com.lsfusion.usage.LSFUsageTypeProvider"/>
+
         <psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor" />
         <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
@@ -124,7 +128,6 @@
         <annotator language="Lsf" implementationClass="com.lsfusion.lang.LSFReferenceAnnotator"/>
         <annotator language="JAVA" implementationClass="com.lsfusion.references.FromJavaReferenceAnnotator"/>
         <readWriteAccessDetector implementation="com.lsfusion.LSFReadWriteAccessDetector"/>
-        <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupRuleProvider"/>
         <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>
         <structureViewBuilder factoryClass="com.lsfusion.structure.LSFInterfacesStructureViewBuilderFactory"/>
 

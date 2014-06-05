@@ -20,10 +20,7 @@ import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFImplicitValuePropertyStatement;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
-import com.lsfusion.lang.psi.LSFPsiImplUtil;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.ContextModifier;
 import com.lsfusion.lang.psi.context.ExtendParamContext;
 import com.lsfusion.lang.psi.context.LSFExpression;
@@ -36,10 +33,30 @@ import com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ExplicitValueIndex;
 import com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ImplicitInterfaceIndex;
 import com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ImplicitValueIndex;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class LSFPsiUtils {
+    
+    @Nullable
+    public static PsiElement getStatementParent(PsiElement element) {
+        if (element == null) {
+            return null;
+        }
+
+        while (element.getParent() != null) {
+            //parent == scriptStatement OR metaCodeBody
+            if (element.getParent() instanceof LSFFile
+                || element.getParent() instanceof LSFScriptStatement
+                || element.getParent() instanceof LSFMetaCodeBody) {
+                break;
+            }
+            element = element.getParent();
+        }
+
+        return element.getParent() == null ? null : element;
+    }
     
     public static TextRange subRange(TextRange range, TextRange inner) {
         int start = range.getStartOffset() + inner.getStartOffset();
