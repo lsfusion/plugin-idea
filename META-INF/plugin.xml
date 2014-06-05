@@ -120,8 +120,9 @@
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>
         <usageTypeProvider implementation="com.lsfusion.usage.LSFUsageTypeProvider"/>
 
-        <psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor" />
-        <lang.syntaxHighlighterFactory key="Lsf" implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
+        <psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>
+        <lang.syntaxHighlighterFactory key="Lsf"
+                                       implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
         <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
@@ -132,7 +133,8 @@
         <structureViewBuilder factoryClass="com.lsfusion.structure.LSFInterfacesStructureViewBuilderFactory"/>
 
         <fileEditorProvider implementation="com.lsfusion.design.LSFDesignEditorProvider"/>
-        <codeInsight.lineMarkerProvider language="Lsf" implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="Lsf"
+                                        implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
 
@@ -182,8 +184,11 @@
         <toolWindow id="lsFusion Form Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
                     anchor="right" icon="AllIcons.FileTypes.UiForm"/>
 
+        <toolWindow id="Module Dependencies" anchor="right"
+                    factoryClass="com.lsfusion.dependencies.ModuleDependeciesViewToolWindowFactory"/>
+
         <!--<xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />-->
         <!--<debugger.positionManagerFactory id="lsfPositionManagerFactory" implementation="com.lsfusion.debug.LSFPositionManagerFactory"/>-->
-        
+
     </extensions>
 </idea-plugin>

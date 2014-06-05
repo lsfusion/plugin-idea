@@ -1,8 +1,10 @@
 package com.lsfusion.lang.psi;
 
+import com.intellij.find.findUsages.DefaultFindUsagesHandlerFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.*;
@@ -26,7 +28,8 @@ public class LSFGlobalResolver {
 
     public static ConcurrentHashMap<LSFModuleDeclaration, Set<LSFFile>> cached = new ConcurrentHashMap<LSFModuleDeclaration, Set<LSFFile>>();
 
-    // вот эту хрень надо по хорошему кэшировать
+    public static ConcurrentHashMap<LSFModuleDeclaration, Set<PsiReference>> moduleRefsCache = new ConcurrentHashMap<LSFModuleDeclaration, Set<PsiReference>>();
+
     public static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration) {
         Set<LSFFile> cachedFiles = cached.get(declaration);
         if (cachedFiles != null)
@@ -42,6 +45,20 @@ public class LSFGlobalResolver {
         }
 //        System.out.println("CACHED "+declaration.getName()+" "+System.identityHashCode(declaration));
         cached.put(declaration, result);
+        return result;
+    }
+
+    public static Set<PsiReference> getModuleReferences(LSFModuleDeclaration declaration) {
+        Set<PsiReference> cachedRefs = moduleRefsCache.get(declaration);
+        if (cachedRefs != null)
+            return cachedRefs;
+
+        LSFId nameIdentifier = declaration.getNameIdentifier();
+        DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
+        Set<PsiReference> result = new HashSet<PsiReference>(fact.createFindUsagesHandler(nameIdentifier, false)
+                .findReferencesToHighlight(nameIdentifier, declaration.getUseScope()));
+
+        moduleRefsCache.put(declaration, result);
         return result;
     }
 

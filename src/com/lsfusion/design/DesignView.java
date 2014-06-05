@@ -9,7 +9,6 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
@@ -97,16 +96,12 @@ public class DesignView extends JPanel implements Disposable {
 
             @Override
             public void run() {
-                checkUpdate();
+                if (toolWindow.isVisible()) {
+                    checkUpdate();
+                }
             }
         };
         ActionManager.getInstance().addTimerListener(500, timerListener);
-        Disposer.register(this, new Disposable() {
-            @Override
-            public void dispose() {
-                ActionManager.getInstance().removeTimerListener(timerListener);
-            }
-        });
     }
 
     private void checkUpdate() {
@@ -125,8 +120,6 @@ public class DesignView extends JPanel implements Disposable {
 
         if (files != null && files.length == 1) {
             changeForm(files[0], dataContext);
-        } else if (files != null && files.length > 1) {
-            changeForm(null, dataContext);
         }
     }
 

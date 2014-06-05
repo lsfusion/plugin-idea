@@ -42,19 +42,19 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
 
     public LSFNamespaceReference getExplicitNamespaceRef() {
         ModuleStubElement stub = getStub();
-        if(stub != null)
+        if (stub != null)
             return stub.getExplicitNamespaceRef();
-                
+
         LSFNamespaceName namespace = getNamespaceName();
-        if(namespace==null)
+        if (namespace == null)
             return null;
         return namespace.getNamespaceUsage();
     }
-    
+
     @Override
     public String getNamespace() {
         LSFNamespaceReference explicitNamespace = getExplicitNamespaceRef();
-        if(explicitNamespace==null)
+        if (explicitNamespace == null)
             return getDeclName();
         return explicitNamespace.getNameRef();
     }
@@ -62,11 +62,11 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
     @Override
     public List<LSFNamespaceReference> getPriorityRefs() {
         ModuleStubElement stub = getStub();
-        if(stub != null)
+        if (stub != null)
             return stub.getPriorityRefs();
-        
+
         LSFPriorityList priorityList = getPriorityList();
-        if(priorityList==null)
+        if (priorityList == null)
             return new ArrayList<LSFNamespaceReference>();
         LSFNonEmptyNamespaceUsageList nonEmptyNamespaceUsageList = priorityList.getNonEmptyNamespaceUsageList();
         if (nonEmptyNamespaceUsageList == null) {
@@ -78,23 +78,16 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
     @Override
     public boolean requires(LSFModuleDeclaration module) {
         return LSFGlobalResolver.getRequireModules(this).contains(module.getLSFFile());
-//        for (LSFModuleReference ref : getRequireRefs()) {
-//            LSFModuleDeclaration decl = ref.resolveDecl();
-//            if (decl != null && (module.equals(decl) || decl.requires(module))) {
-//                return true;
-//            }
-//        }
-//        return false;
     }
 
     @Override
     public List<LSFModuleReference> getRequireRefs() {
         ModuleStubElement stub = getStub();
-        if(stub != null)
+        if (stub != null)
             return stub.getRequireRefs();
-        
+
         LSFRequireList requireList = getRequireList();
-        if(requireList==null)
+        if (requireList == null)
             return new ArrayList<LSFModuleReference>();
         LSFNonEmptyModuleUsageList nonEmptyModuleUsageList = requireList.getNonEmptyModuleUsageList();
         if (nonEmptyModuleUsageList == null) {
