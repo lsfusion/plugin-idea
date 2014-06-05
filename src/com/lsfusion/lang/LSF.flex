@@ -232,6 +232,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "INPUT"                   			{ return INPUT; }
   "IS"                      			{ return IS; }
   "JOIN"                    			{ return JOIN; }
+  "KEEPSESSIONPROPERTIES"               { return KEEPSESSIONPROPERTIES; }
   "LAST"                                { return LAST; }
   "LEFT"                    			{ return LEFT; }
   "LIMIT"                   			{ return LIMIT; }

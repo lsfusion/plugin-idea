@@ -899,6 +899,7 @@ formDecl ::= FORM simpleNameWithCaption
 		            (modalityTypeLiteral)?
 		            (IMAGE stringLiteral)?
 		            (AUTOREFRESH intLiteral)?
+		            (KEEPSESSIONPROPERTIES)?
 {
     pin = 2
     mixin ="com.lsfusion.lang.psi.declarations.impl.LSFFormDeclarationImpl"
@@ -930,7 +931,7 @@ formCommonGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjec
 
 formGroupObjectReportPath ::= REPORTFILE formPropertyObject
 
-formGroupObjectViewType ::= (INIT | FIXED ) classViewType
+formGroupObjectViewType ::= (INIT | FIXED) classViewType
 
 classViewType ::= PANEL | HIDE | GRID
 
