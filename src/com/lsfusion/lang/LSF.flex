@@ -25,7 +25,7 @@ import static com.lsfusion.lang.psi.LSFTypes.*;
 
 EOL = \r|\n|\r\n
 LINE_WS = [ \t\f]
-STR_LITERAL_CHAR = "\\'" | "\\" | [^'\n\r]
+STR_LITERAL_CHAR = ("\\" [tnr'\\]) | [^\n\r'\\]
 DIGIT = [0-9]
 DIGITS = [0-9]+
 EDIGITS	= [0-9]*
