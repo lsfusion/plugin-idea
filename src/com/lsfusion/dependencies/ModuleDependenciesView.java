@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.changes.committed.LabeledComboBoxAction;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
@@ -19,6 +20,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.tools.SimpleActionGroup;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.jgraph.layout.JGraphFacade;
 import com.jgraph.layout.JGraphLayout;
@@ -35,19 +37,21 @@ import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFModuleUsage;
 import com.lsfusion.lang.psi.LSFRequireList;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.references.LSFModuleReference;
+import com.lsfusion.lang.psi.references.LSFReference;
 import org.jgraph.JGraph;
 import org.jgraph.graph.DefaultGraphCell;
+import org.jgraph.graph.GraphConstants;
 import org.jgrapht.ext.JGraphModelAdapter;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.ListenableDirectedGraph;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 public class ModuleDependenciesView extends JPanel implements Disposable {
     private final static String HIERARCHICAL_LAYOUT = "Hierarchical Layout";
@@ -68,14 +72,19 @@ public class ModuleDependenciesView extends JPanel implements Disposable {
     private boolean showRequiring = false;
     private boolean allEdges = false;
 
+    private boolean showDeclPath = false;
+    private String latestTargetModule;
+
     private String currentLayout = COMPACT_TREE_LAYOUT;
     private JGraph jgraph;
     private ModuleGraphDataModel dataModel;
+    private ListenableDirectedGraph g;
     private JGraphModelAdapter m_jgAdapter;
     private JBScrollPane scrollPane;
 
     private CheckboxAction showRequiredAction;
     private CheckboxAction showRequiringAction;
+    private LabeledComboBoxAction layoutAction;
 
     public ModuleDependenciesView(Project project, final ToolWindowEx toolWindow) {
         this.project = project;
@@ -93,11 +102,25 @@ public class ModuleDependenciesView extends JPanel implements Disposable {
             public void run() {
                 if (toolWindow.isVisible()) {
                     checkUpdate();
+                    if (showDeclPath) {
+                        colorPath();
+                    }
                 }
             }
         };
         ActionManager.getInstance().addTimerListener(500, timerListener);
 
+        ActionToolbar toolbar = createToolbar();
+
+        toolbar.updateActionsImmediately();
+
+        add(toolbar.getComponent(), BorderLayout.NORTH);
+
+        layoutAction.setSelected(3);
+        redraw();
+    }
+
+    private ActionToolbar createToolbar() {
         SimpleActionGroup actions = new SimpleActionGroup();
 
         actions.add(new AnAction(null, "Refresh", LSFIcons.Design.REFRESH) {
@@ -157,7 +180,7 @@ public class ModuleDependenciesView extends JPanel implements Disposable {
             }
         });
 
-        final LabeledComboBoxAction layoutAction = new LabeledComboBoxAction("") {
+        layoutAction = new LabeledComboBoxAction("") {
             @Override
             protected void selectionChanged(Object selection) {
                 if (!currentLayout.equals(selection)) {
@@ -174,14 +197,25 @@ public class ModuleDependenciesView extends JPanel implements Disposable {
         };
         actions.add(layoutAction);
 
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
+        actions.add(new CheckboxAction("Show path to element") {
+            @Override
+            public boolean isSelected(AnActionEvent e) {
+                return showDeclPath;
+            }
 
-        toolbar.updateActionsImmediately();
+            @Override
+            public void setSelected(AnActionEvent e, boolean state) {
+                showDeclPath = state;
+                if (!showDeclPath) {
+                    latestTargetModule = null;
+                    recolorGraph(null);
+                } else {
+                    colorPath();
+                }
+            }
+        });
 
-        add(toolbar.getComponent(), BorderLayout.NORTH);
-
-        layoutAction.setSelected(3);
-        redraw();
+        return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);    
     }
 
     private void checkUpdate() {
@@ -240,13 +274,11 @@ public class ModuleDependenciesView extends JPanel implements Disposable {
             createRequiringNode(dataModel, currentModule, new HashSet<LSFModuleDeclaration>());
         }
 
-        ListenableDirectedGraph g = new ListenableDirectedGraph(DefaultEdge.class);
+        g = new ListenableDirectedGraph(DefaultEdge.class);
 
-        dataModel.initGraph(g);
+        fillGraph();
 
         m_jgAdapter = new JGraphModelAdapter(g);
-
-        dataModel.designGraph(g, m_jgAdapter);
 
         jgraph = new JGraph(m_jgAdapter);
 
@@ -261,6 +293,10 @@ public class ModuleDependenciesView extends JPanel implements Disposable {
 
         scrollPane = new JBScrollPane(jgraph);
         add(scrollPane);
+
+        initGraphDesign();
+
+        recolorGraph(null);
 
         revalidate();
     }
@@ -328,6 +364,120 @@ public class ModuleDependenciesView extends JPanel implements Disposable {
         }
 
         return true;
+    }
+
+    public void fillGraph() {
+        for (ModuleGraphNode node : dataModel.getNodes()) {
+            g.addVertex(node);
+        }
+
+        for (Pair<ModuleGraphNode, ModuleGraphNode> e : dataModel.getEdges()) {
+            ModuleGraphEdge edge = new ModuleGraphEdge(e.first, e.second);
+            g.addEdge(e.first, e.second, edge);
+        }
+    }
+
+    public void initGraphDesign() {
+        Map cellAttr = new HashMap();
+        for (ModuleGraphNode node : dataModel.getNodes()) {
+            DefaultGraphCell cell = m_jgAdapter.getVertexCell(node);
+            if (cell != null) {
+                Map attr = cell.getAttributes();
+                GraphConstants.setAutoSize(attr, true);
+                GraphConstants.setInset(attr, 3);
+
+                cellAttr.put(cell, attr);
+            }
+        }
+
+        for (Object gEdge : g.edgeSet()) {
+            DefaultGraphCell cell = m_jgAdapter.getEdgeCell(gEdge);
+            if (cell != null) {
+                Map attr = cell.getAttributes();
+                GraphConstants.setLabelEnabled(attr, false);
+
+                cellAttr.put(cell, attr);
+            }
+        }
+
+        m_jgAdapter.edit(cellAttr, null, null, null);
+    }
+
+    public void recolorGraph(String targetModule) {
+        List path = null;
+        if (targetModule != null) {
+            path = dataModel.getPath(g, targetModule);
+        }
+
+        Map cellAttr = new HashMap();
+        for (ModuleGraphNode node : dataModel.getNodes()) {
+            DefaultGraphCell cell = m_jgAdapter.getVertexCell(node);
+            if (cell != null) {
+                Map attr = cell.getAttributes();
+                Color background;
+
+                if (node == dataModel.rootNode) {
+                    background = new Color(255, 153, 0);
+                } else if (targetModule != null && node == dataModel.getNode(targetModule)) {
+                    background = new Color(114, 102, 255);
+                } else if (node.required) {
+                    background = new JBColor(new Color(0, 173, 57), JBColor.GREEN);
+                } else {
+                    background = new JBColor(new Color(48, 117, 255), JBColor.BLUE);
+                }
+                GraphConstants.setBackground(attr, background);
+
+                cellAttr.put(cell, attr);
+            }
+        }
+
+        for (Object gEdge : g.edgeSet()) {
+            DefaultGraphCell cell = m_jgAdapter.getEdgeCell(gEdge);
+            if (cell != null) {
+                Map attr = cell.getAttributes();
+
+                ModuleGraphEdge edge = (ModuleGraphEdge) gEdge;
+                if (path != null && path.contains(edge)) {
+                    GraphConstants.setLineColor(attr, new Color(114, 102, 255));
+                    GraphConstants.setLineWidth(attr, 2);
+                } else if ((edge.getSource()).required) {
+                    GraphConstants.setLineColor(attr, new JBColor(new Color(0, 173, 57), JBColor.GREEN));
+                    GraphConstants.setLineWidth(attr, 1);
+                } else {
+                    GraphConstants.setLineColor(attr, JBColor.BLUE);
+                    GraphConstants.setLineWidth(attr, 1);
+                }
+
+                cellAttr.put(cell, attr);
+            }
+        }
+
+        m_jgAdapter.edit(cellAttr, null, null, null);
+    }
+
+    private void colorPath() {
+        Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+
+        if (editor != null) {
+            DataContext dataContext = new DataManagerImpl.MyDataContext(editor.getComponent());
+            PsiElement targetElement = ConfigurationContext.getFromContext(dataContext).getPsiLocation();
+
+            String declModuleName;
+            if (targetElement != null && targetElement.getContainingFile() instanceof LSFFile) {
+                LSFReference ref = PsiTreeUtil.getParentOfType(targetElement, LSFReference.class);
+                if (ref != null) {
+                    LSFDeclaration decl = ref.resolveDecl();
+                    if (decl != null) {
+                        declModuleName = decl.getLSFFile().getModuleDeclaration().getName();
+
+                        if (declModuleName != null && !declModuleName.equals(latestTargetModule)) {
+                            recolorGraph(declModuleName);
+                            latestTargetModule = declModuleName;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void showUnableMessage() {
