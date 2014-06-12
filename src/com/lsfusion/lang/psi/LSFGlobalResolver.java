@@ -31,17 +31,26 @@ public class LSFGlobalResolver {
     public static ConcurrentHashMap<LSFModuleDeclaration, Set<PsiReference>> moduleRefsCache = new ConcurrentHashMap<LSFModuleDeclaration, Set<PsiReference>>();
 
     public static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration) {
+        return getRequireModules(declaration, new HashSet<LSFFile>());
+    }
+
+    private static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration, Set<LSFFile> alreadyGet) {
         Set<LSFFile> cachedFiles = cached.get(declaration);
         if (cachedFiles != null)
             return cachedFiles;
 
         Set<LSFFile> result = new HashSet<LSFFile>();
 
-        result.add(declaration.getLSFFile());
+        LSFFile declarationFile = declaration.getLSFFile();
+        result.add(declarationFile);
+        alreadyGet.add(declarationFile);
         for (LSFModuleReference ref : declaration.getRequireRefs()) {
             LSFModuleDeclaration resolve = ref.resolveDecl();
-            if (resolve != null)
-                result.addAll(getRequireModules(resolve));
+            if (resolve != null && !alreadyGet.contains(resolve.getLSFFile())) {
+                Set<LSFFile> requireModules = getRequireModules(resolve, alreadyGet);
+
+                result.addAll(requireModules);
+            }
         }
 //        System.out.println("CACHED "+declaration.getName()+" "+System.identityHashCode(declaration));
         cached.put(declaration, result);
