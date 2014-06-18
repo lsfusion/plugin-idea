@@ -1592,7 +1592,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
-        LSFStringLiteral stringLiteral = sourceStatement.getStringLiteral();
+        List<LSFStringLiteral> stringLiteralList = sourceStatement.getStringLiteralList();
+        if (stringLiteralList.isEmpty()) {
+            return null;
+        }
+        LSFStringLiteral stringLiteral = stringLiteralList.get(0);
         if (stringLiteral == null) {
             return null;
         }

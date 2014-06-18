@@ -251,6 +251,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "MINCHARWIDTH"            			{ return MINCHARWIDTH; }
   "MODAL"                   			{ return MODAL; }
   "MODULE"                  			{ return MODULE; }
+  "MS"                                  { return MS; }
   "MULTI"                   			{ return MULTI; }
   "NAME"                    			{ return NAME; }
   "NAMESPACE"               			{ return NAMESPACE; }
@@ -283,6 +284,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "PARTITION"               			{ return PARTITION; }
   "PDF"                     			{ return PDF; }
   "PERSISTENT"              			{ return PERSISTENT; }
+  "PG"                                  { return PG; }    
   "POSITION"                			{ return POSITION; }
   "PREFCHARWIDTH"           			{ return PREFCHARWIDTH; }
   "PREV"                    			{ return PREV; }

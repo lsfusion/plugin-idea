@@ -42,18 +42,20 @@ public class LSFGlobalResolver {
         Set<LSFFile> result = new HashSet<LSFFile>();
 
         LSFFile declarationFile = declaration.getLSFFile();
-        result.add(declarationFile);
-        alreadyGet.add(declarationFile);
-        for (LSFModuleReference ref : declaration.getRequireRefs()) {
-            LSFModuleDeclaration resolve = ref.resolveDecl();
-            if (resolve != null && !alreadyGet.contains(resolve.getLSFFile())) {
-                Set<LSFFile> requireModules = getRequireModules(resolve, alreadyGet);
+        if (!alreadyGet.contains(declarationFile)) {
+            result.add(declarationFile);
+            alreadyGet.add(declarationFile);
+            for (LSFModuleReference ref : declaration.getRequireRefs()) {
+                LSFModuleDeclaration resolve = ref.resolveDecl();
+                if (resolve != null) {
+                    Set<LSFFile> requireModules = getRequireModules(resolve, alreadyGet);
 
-                result.addAll(requireModules);
+                    result.addAll(requireModules);
+                }
             }
-        }
 //        System.out.println("CACHED "+declaration.getName()+" "+System.identityHashCode(declaration));
-        cached.put(declaration, result);
+            cached.put(declaration, result);
+        }
         return result;
     }
 

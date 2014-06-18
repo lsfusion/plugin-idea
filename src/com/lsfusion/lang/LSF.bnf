@@ -414,7 +414,7 @@ abstractPropertyDefinition ::= ABSTRACT (((CASE | MULTI) (OVERRIDE | EXCLUSIVE)?
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
-formulaPropertyDefinition ::= FORMULA (builtInClassName)? stringLiteral
+formulaPropertyDefinition ::= FORMULA (NULL)? (builtInClassName)? ((PG | MS)? stringLiteral)+
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"

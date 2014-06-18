@@ -2,7 +2,6 @@ package com.lsfusion.lang.meta;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.impl.ApplicationImpl;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ProjectComponent;
@@ -584,7 +583,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     }
                 };
 
-                ApplicationManager.getApplication().invokeLater(runGenUsage, ModalityState.any());
+                ApplicationManager.getApplication().invokeLater(runGenUsage);
             }
 
             if (!usages.isEmpty())
@@ -846,16 +845,11 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                         public void run() {
                             Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, GlobalSearchScope.allScope(myProject));
                             for (LSFModuleDeclaration declaration : moduleDeclarations) {
-                                final LSFFile file = declaration.getLSFFile();
-                                final List<LSFMetaCodeStatement> metaStatements = file.getMetaCodeStatementList();
+                                LSFFile file = declaration.getLSFFile();
+                                List<LSFMetaCodeStatement> metaStatements = file.getMetaCodeStatementList();
                                 indicator.setText2("Statements : " + metaStatements.size());
 
-                                ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-                                    @Override
-                                    public void run() {
                                         addForcedUsageProcessing(file, metaStatements, sync, null);
-                                    }
-                                });
                                 
                                 indicator.setText2("");
                             }
