@@ -593,14 +593,14 @@ javaClassStringUsage ::= stringLiteral
     implements="com.lsfusion.lang.psi.references.LSFJavaClassStringReference"
 }
 
-addFormActionPropertyDefinitionBody ::= ADDFORM (SESSION)? customClassUsage
+addFormActionPropertyDefinitionBody ::= ADDFORM (SESSION | NESTED)? customClassUsage
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
-editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION)? customClassUsage
+editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION | NESTED)? customClassUsage
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1061,8 +1061,10 @@ predefinedFormPropertyName ::= OBJVALUE
                            |    SELECTION
                            |    ADDOBJ
                            |    ADDFORM
+                           |    ADDNESTEDFORM
                            |    ADDSESSIONFORM
                            |    EDITFORM
+                           |    EDITNESTEDFORM
                            |    EDITSESSIONFORM
                            |    DELETE
                            |    DELETESESSION
@@ -1657,7 +1659,7 @@ modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN
 
 formPrintTypeLiteral ::= PRINT (AUTO | XLS | PDF)? {pin = 1}
 
-formSessionScopeLiteral ::= OLDSESSION | NEWSESSION | MANAGESESSION
+formSessionScopeLiteral ::= OLDSESSION | NEWSESSION | MANAGESESSION | NESTEDSESSION
 
 emailRecipientTypeLiteral ::= TO | CC | BCC
 

@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.lsfusion.design.model.entity.FormSessionScope.forAddFormActionName;
+import static com.lsfusion.design.model.entity.FormSessionScope.forEditFormActionName;
+
 public class FormEntity {
     private LSFFile file;
 
@@ -224,10 +227,10 @@ public class FormEntity {
                     regularFilterGroups.add(filterGroup);
                 } else if ("ADDOBJ".equals(name)) {
                     propertyDraw = new AddObjectActionProperty(alias, groupObject, null, commonOptions, formPropertyOptions, this);
-                } else if ("ADDFORM".equals(name) || "ADDSESSIONFORM".equals(name)) {
-                    propertyDraw = new AddFormAction(alias, groupObject, commonOptions, formPropertyOptions, this, "ADDSESSIONFORM".equals(name));
-                } else if ("EDITFORM".equals(name) || "EDITSESSIONFORM".equals(name)) {
-                    propertyDraw = new EditFormAction(alias, groupObject, commonOptions, formPropertyOptions, this, "EDITSESSIONFORM".equals(name));
+                } else if ("ADDFORM".equals(name) || "ADDSESSIONFORM".equals(name) || "ADDNESTEDFORM".equals(name)) {
+                    propertyDraw = new AddFormAction(alias, groupObject, commonOptions, formPropertyOptions, this, forAddFormActionName(name));
+                } else if ("EDITFORM".equals(name) || "EDITSESSIONFORM".equals(name) || "EDITNESTEDFORM".equals(name)) {
+                    propertyDraw = new EditFormAction(alias, groupObject, commonOptions, formPropertyOptions, this, forEditFormActionName(name));
                 } else if ("DELETE".equals(name) || "DELETESESSION".equals(name)) {
                     propertyDraw = new DeleteAction(alias, groupObject, commonOptions, formPropertyOptions, this, "DELETESESSION".equals(name));
                 }

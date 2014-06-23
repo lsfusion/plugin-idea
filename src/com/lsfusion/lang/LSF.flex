@@ -104,6 +104,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "ADD"                     			{ return ADD; }
   "ADDFORM"                 			{ return ADDFORM; }
   "ADDOBJ"                  			{ return ADDOBJ; }
+  "ADDNESTEDFORM"          			    { return ADDNESTEDFORM; }
   "ADDSESSIONFORM"          			{ return ADDSESSIONFORM; }
   "AFTER"                   			{ return AFTER; }
   "GOAFTER"                   			{ return GOAFTER; }
@@ -179,6 +180,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "EDITABLE"                			{ return EDITABLE; }
   "EDITFORM"                			{ return EDITFORM; }
   "EDITKEY"                 			{ return EDITKEY; }
+  "EDITNESTEDFORM"         			    { return EDITNESTEDFORM; }
   "EDITSESSIONFORM"         			{ return EDITSESSIONFORM; }
   "ELSE"                    			{ return ELSE; }
   "EMAIL"                   			{ return EMAIL; }
@@ -257,6 +259,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "NAMESPACE"               			{ return NAMESPACE; }
   "NAVIGATOR"               			{ return NAVIGATOR; }
   "NESTED"                     			{ return NESTED; }
+  "NESTEDSESSION"              			{ return NESTEDSESSION; }
   "NEW"                     			{ return NEW; }
   "NEWSESSION"              			{ return NEWSESSION; }
   "NEWTHREAD"              			    { return NEWTHREAD; }
