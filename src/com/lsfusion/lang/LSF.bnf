@@ -1655,7 +1655,7 @@ alignmentLiteral ::= LEADING | CENTER | TRAILING
 
 flexAlignmentLiteral ::= LEADING | CENTER | TRAILING | STRETCH
 
-modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN
+modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN | DIALOG
 
 formPrintTypeLiteral ::= PRINT (AUTO | XLS | PDF)? {pin = 1}
 
