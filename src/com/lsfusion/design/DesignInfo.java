@@ -248,7 +248,11 @@ public class DesignInfo {
                 return usage.getAliasUsage().getSimpleName().getName();
             } else {
                 String name = usage.getSimpleName().getName();
-                LSFNonEmptyObjectUsageList usageList = usage.getFormPropertyObject().getObjectUsageList().getNonEmptyObjectUsageList();
+                LSFObjectUsageList objectUsageList = usage.getObjectUsageList();
+                
+                assert objectUsageList != null;
+                
+                LSFNonEmptyObjectUsageList usageList = objectUsageList.getNonEmptyObjectUsageList();
                 if (usageList != null) {
                     name += "_";
                     List<LSFObjectUsage> objectUsages = usageList.getObjectUsageList();

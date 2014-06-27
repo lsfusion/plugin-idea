@@ -1084,7 +1084,9 @@ formPropertyObject ::= formPropertyName LBRAC objectUsageList RBRAC
 
 aliasUsage ::= simpleName
 
-formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyObject) | aliasUsage
+formPropertyDrawPropertyUsage ::= simpleName
+
+formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage LBRAC objectUsageList RBRAC) | aliasUsage
 {
     implements="com.lsfusion.lang.psi.references.LSFPropertyDrawReference"
     mixin="com.lsfusion.lang.psi.references.impl.LSFPropertyDrawReferenceImpl"

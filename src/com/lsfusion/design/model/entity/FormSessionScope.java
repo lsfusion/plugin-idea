@@ -11,7 +11,7 @@ public enum FormSessionScope {
         } else if ("ADDNESTEDFORM".equals(name)) {
             return NESTEDSESSION;
         }
-        throw new IllegalStateException("incorrect EDITFORM action name"); 
+        throw new IllegalStateException("incorrect ADDFORM action name"); 
     }
     
     public static FormSessionScope forEditFormActionName(String name) {

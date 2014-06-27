@@ -21,8 +21,7 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
     }
 
     public static boolean notSimpleIdAhead(PsiBuilder builder_, int level_) {
-        return builder_.getTokenType() == LSFTypes.ID
-               && (builder_.lookAhead(1) == LSFTypes.LBRAC || builder_.lookAhead(1) == LSFTypes.POINT);
+        return builder_.getTokenType() == LSFTypes.ID && builder_.lookAhead(1) == LSFTypes.LBRAC;
     }
 
     private static Key<Boolean> INNERID = Key.create("lsf.inner.id");
