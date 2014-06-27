@@ -1,9 +1,11 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.util.containers.ArrayListSet;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
@@ -21,6 +23,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl<LSFClassDeclaration, ClassStubElement> implements LSFClassDeclaration {
 
@@ -61,24 +64,28 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
 
     @Override
     public PsiElement[] processImplementationsSearch() {
-        Collection<LSFClassDeclaration> classes = LSFGlobalResolver.findClassExtends(LSFClassDeclarationImpl.this, getProject(), GlobalSearchScope.allScope(getProject()));
         List<PsiElement> names = new ArrayList<PsiElement>();
-        for (LSFClassDeclaration classDecl : classes) {
-            names.add(classDecl);
+
+        Collection<LSFClassExtend> extendClasses = LSFGlobalResolver.findExtendElements(this, LSFStubElementTypes.EXTENDCLASS, getProject(), GlobalSearchScope.allScope(getProject())).findAll();
+        for (LSFClassExtend classExtend : extendClasses) {
+            if (((LSFClassExtendImpl) classExtend).getClassDecl() == null) {
+                names.add(((LSFClassExtendImpl) classExtend).getExtendingClassDeclaration().getCustomClassUsage());
+            }
         }
+
+        names.addAll(processChildrenSearch(this, getProject()));
+        
         return names.toArray(new PsiElement[names.size()]);
     }
 
-    @Override
-    public PsiElement[] processExtensionsSearch() {
-        Collection<LSFClassExtend> classes = LSFGlobalResolver.findExtendElements(this, LSFStubElementTypes.EXTENDCLASS, getProject(), GlobalSearchScope.allScope(getProject())).findAll();
-        List<PsiElement> names = new ArrayList<PsiElement>();
-        for (LSFClassExtend classDecl : classes) {
-            if (((LSFClassExtendImpl) classDecl).getClassDecl() == null) {
-                names.add(((LSFClassExtendImpl) classDecl).getExtendingClassDeclaration().getCustomClassUsage());
-            }
+    public static Set<LSFClassDeclaration> processChildrenSearch(LSFClassDeclaration classDecl, Project project) {
+        Set<LSFClassDeclaration> result = new ArrayListSet<LSFClassDeclaration>();
+        Collection<LSFClassDeclaration> classExtends = LSFGlobalResolver.findClassExtends(classDecl, project, GlobalSearchScope.allScope(project));
+        for (LSFClassDeclaration lsfClassDeclaration : classExtends) {
+            result.add(lsfClassDeclaration);
+            result.addAll(processChildrenSearch(lsfClassDeclaration, project));
         }
-        return names.toArray(new PsiElement[names.size()]);
+        return result;
     }
 
     @Override

@@ -59,11 +59,11 @@ public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<
     }
 
     @Override
-    public PsiElement[] processExtensionsSearch() {
+    public PsiElement[] processImplementationsSearch() {
         Collection<LSFFormExtend> forms = LSFGlobalResolver.findExtendElements(this, LSFStubElementTypes.EXTENDFORM, getProject(), GlobalSearchScope.allScope(getProject())).findAll();
         List<PsiElement> names = new ArrayList<PsiElement>();
         for (LSFFormExtend extend : forms) {
-            if (((LSFFormExtendImpl) extend).getFormDecl() == null) {
+            if (extend.getFormDecl() == null) {
                 names.add(((LSFFormExtendImpl) extend).getExtendingFormDeclaration().getFormUsage());
             }
         }

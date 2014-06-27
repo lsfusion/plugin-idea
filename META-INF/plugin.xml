@@ -100,11 +100,6 @@
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift B" keymap="$default"/>
         </action>
-        <action id="GoToExtension" class="com.lsfusion.actions.GoToExtensionAction" text="Extension(s)"
-                description="Navigate to the extension(s) of the selected element">
-            <add-to-group group-id="GoToCodeGroup"/>
-            <keyboard-shortcut first-keystroke="control alt E" keymap="$default"/>
-        </action>
 
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
@@ -119,6 +114,12 @@
         <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupingRuleProvider"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>
         <usageTypeProvider implementation="com.lsfusion.usage.LSFUsageTypeProvider"/>
+        <usageFilteringRuleProvider implementation="com.lsfusion.usage.LSFUsageFilteringRuleProvider"/>
+
+        <callHierarchyProvider language="Lsf"
+                               implementationClass="com.lsfusion.hierarchy.usages.LSFUsageHierarchyProvider"/>
+        <typeHierarchyProvider language="Lsf"
+                               implementationClass="com.lsfusion.hierarchy.classes.LSFClassHierarchyProvider"/>
 
         <psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>
         <lang.syntaxHighlighterFactory key="Lsf"
@@ -130,6 +131,7 @@
         <annotator language="JAVA" implementationClass="com.lsfusion.references.FromJavaReferenceAnnotator"/>
         <readWriteAccessDetector implementation="com.lsfusion.LSFReadWriteAccessDetector"/>
         <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>
+        <gotoTargetRendererProvider implementation="com.lsfusion.LSFGoToTargetRendererProvider"/>
         <structureViewBuilder factoryClass="com.lsfusion.structure.LSFInterfacesStructureViewBuilderFactory"/>
 
         <fileEditorProvider implementation="com.lsfusion.design.LSFDesignEditorProvider"/>

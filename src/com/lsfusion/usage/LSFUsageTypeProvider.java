@@ -59,14 +59,14 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
     public static final UsageType NAVIGATOR_STATEMENT = new UsageType("NAVIGATOR statement");
     public static final UsageType METACODE_REFERENCE = new UsageType("META reference");
     public static final UsageType METACODE_DECLARATION = new UsageType("META declaration");
-    public static final UsageType MODULE_STATEMENT= new UsageType("Module statement");
-    
+    public static final UsageType MODULE_STATEMENT = new UsageType("Module statement");
+
     @Nullable
     @Override
     public UsageType getUsageType(PsiElement element) {
         return getUsageType(element, UsageTarget.EMPTY_ARRAY);
     }
-    
+
     @Nullable
     @Override
     public UsageType getUsageType(PsiElement element, @NotNull UsageTarget[] targets) {
@@ -79,10 +79,10 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
         if (element == null) {
             return null;
         }
-        
+
         if (element instanceof LSFClassExtend) {
             return CLASS_STATEMENT;
-        } else  if (element instanceof LSFGroupDeclaration) {
+        } else if (element instanceof LSFGroupDeclaration) {
             return GROUP_STATEMENT;
         } else if (element instanceof LSFOverrideStatement) {
             return OVERRIDE_STATEMENT;

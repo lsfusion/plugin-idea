@@ -331,7 +331,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     @Override
-    public PsiElement[] processExtensionsSearch() {
+    public PsiElement[] processImplementationsSearch() {
         DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
         LSFId nameIdentifier = getNameIdentifier();
         if (nameIdentifier == null) {

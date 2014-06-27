@@ -75,11 +75,6 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
 
     @Override
     public PsiElement[] processImplementationsSearch() {
-        return processExtensionsSearch();
-    }
-
-    @Override
-    public PsiElement[] processExtensionsSearch() {
         return PsiElement.EMPTY_ARRAY;
     }
 }

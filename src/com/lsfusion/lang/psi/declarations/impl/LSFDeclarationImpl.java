@@ -97,11 +97,6 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
 
     @Override
     public PsiElement[] processImplementationsSearch() {
-        return processExtensionsSearch();
-    }
-
-    @Override
-    public PsiElement[] processExtensionsSearch() {
         return PsiElement.EMPTY_ARRAY;
     }
 }

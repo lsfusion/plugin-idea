@@ -18,6 +18,4 @@ public interface LSFDeclaration extends LSFElement, PsiNameIdentifierOwner, Item
     boolean resolveDuplicates();
 
     PsiElement[] processImplementationsSearch();
-
-    PsiElement[] processExtensionsSearch();
 }
