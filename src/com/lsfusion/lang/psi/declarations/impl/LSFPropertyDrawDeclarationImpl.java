@@ -3,9 +3,7 @@ package com.lsfusion.lang.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.lang.psi.LSFObjectUsage;
-import com.lsfusion.lang.psi.LSFObjectUsageList;
-import com.lsfusion.lang.psi.LSFPsiImplUtil;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import org.jetbrains.annotations.NotNull;
@@ -40,14 +38,22 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
         final LSFObjectUsageList objectUsageList = getObjectUsageList();
         if (objectUsageList == null)
             return super.getDuplicateCondition();
+        
+        final LSFSimpleName alias = getSimpleName();
 
         return new Condition<LSFPropertyDrawDeclaration>() {
             public boolean value(LSFPropertyDrawDeclaration decl) {
-                if (getSimpleName() == null && decl.getSimpleName() == null) {
-                    return false;
+                LSFSimpleName otherAlias = decl.getSimpleName();
+                if (alias != null || otherAlias != null) {
+                    return alias != null && otherAlias != null && alias.getText().equals(otherAlias.getText());
                 }
-                return getNameIdentifier().getText().equals(decl.getNameIdentifier().getText()) &&
-                        resolveEquals(objectUsageList, decl.getObjectUsageList());
+                
+                LSFId nameIdentifier = getNameIdentifier();
+                LSFId otherNameIdentifier = decl.getNameIdentifier();
+                
+                return nameIdentifier != null && otherNameIdentifier != null &&
+                       nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
+                       resolveEquals(objectUsageList, decl.getObjectUsageList());
             }
         };
     }

@@ -29,6 +29,7 @@ public abstract class LSFPropertyDrawMappedDeclarationImpl extends LSFPropertyDr
         return getFormPropertyObject().getObjectUsageList();
     }
 
+    @NotNull
     public LSFFormPropertyName getFormPropertyName() {
         return getFormPropertyObject().getFormPropertyName();
     }

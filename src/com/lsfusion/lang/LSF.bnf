@@ -470,7 +470,7 @@ propertyOptions ::= (   IN groupUsage
                     )*
 
 shortcutSetting ::= SHORTCUT noContextPropertyUsage {pin = 1}
-asEditActionSetting ::= (ASONCHANGE | ASONCHANGEWYS | ASONEDIT) noContextPropertyUsage
+asEditActionSetting ::= (ASONCHANGE | ASONCHANGEWYS | ASONEDIT) noContextPropertyUsage {pin = 1}
 toolbarSetting ::= TOOLBAR
 fixedCharWidthSetting ::= FIXEDCHARWIDTH intLiteral
 minCharWidthSetting ::= MINCHARWIDTH intLiteral

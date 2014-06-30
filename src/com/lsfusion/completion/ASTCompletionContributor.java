@@ -472,10 +472,20 @@ public class ASTCompletionContributor extends CompletionContributor {
                     boolean res = completePropertyInContextOfFormPropertyObject(propUsage);
                     if (!res) res = completePropertyInContextOfMappedPropertiesList(propUsage);
                     if (!res) res = completePropertyInFormContext(propUsage);
+                    if (!res) res = completePropertyInNoContext(propUsage);
                     if (!res) res = completePropertyInModifyParamContext();
                     quickLog("Completed propertyUsage");
                 }
 
+                return true;
+            }
+            return false;
+        }
+
+        private boolean completePropertyInNoContext(Frame propUsage) {
+            Frame frame = getLastFrameOfType(propUsage, NO_CONTEXT_PROPERTY_USAGE);
+            if (frame != null) {
+                completeProperties(Collections.EMPTY_LIST, MAY_USE_ANY, true);
                 return true;
             }
             return false;
@@ -550,6 +560,10 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private void completeProperties(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy) {
+            completeProperties(contextClasses, classUsagePolicy, false);
+        }
+        
+        private void completeProperties(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy, boolean forceAll) {
             quickLog("After getContextClasses..");
 
             String namespaceName = extractNamespace();
@@ -582,7 +596,7 @@ public class ASTCompletionContributor extends CompletionContributor {
 
             quickLog("After LOCAL searching..");
 
-            if (!isBasicCompletion) {
+            if (!isBasicCompletion || forceAll) {
                 //search any other declarations
                 Collection<LSFPropertyStatement> globalDeclarations = getDeclarationsFromScope(project, getRequireScope(), PropIndex.getInstance());
                 addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, globalDeclarations);

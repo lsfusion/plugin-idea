@@ -13,6 +13,7 @@ public abstract class LSFPropertyDrawNameDeclarationImpl extends LSFPropertyDraw
         super(node);
     }
 
+    @NotNull
     public abstract LSFFormPropertyName getFormPropertyName();
 
     public static LSFId getNameIdentifier(LSFFormPropertyName name) {
