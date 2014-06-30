@@ -175,6 +175,8 @@
         <gotoClassContributor implementation="com.lsfusion.LSFClassContributor"/>
         <gotoSymbolContributor implementation="com.lsfusion.LSFSymbolContributor"/>
 
+        <renamePsiElementProcessor implementation="com.lsfusion.refactoring.RenamePropertyProcessor"/>
+
         <lang.elementManipulator
                 forClass="com.lsfusion.lang.psi.references.LSFJavaClassStringReference"
                 implementationClass="com.lsfusion.lang.psi.references.impl.LSFJavaClassStringReferenceManipulator"/>
