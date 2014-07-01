@@ -74,18 +74,11 @@ public class LSFPsiUtils {
 
         final OrderEnumerator orderEnumerator = ModuleRootManager.getInstance(module).orderEntries();
 
+        proceedModuleRoots(module, path, result, psiManager);
         orderEnumerator.forEachModule(new Processor<Module>() {
             @Override
             public boolean process(Module module) {
-                VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
-                if (sourceRoots.length > 0) {
-                    for (VirtualFile sourceRoot : sourceRoots) {
-                        VirtualFile file = sourceRoot.findFileByRelativePath(path);
-                        if (file != null) {
-                            result.add(psiManager.findFile(file));
-                        }
-                    }
-                }
+                proceedModuleRoots(module, path, result, psiManager);
                 return true;
             }
         });
@@ -103,6 +96,18 @@ public class LSFPsiUtils {
 
 
         return result;
+    }
+
+    private static void proceedModuleRoots(Module module, String path, List<PsiFile> result, PsiManager psiManager) {
+        VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
+        if (sourceRoots.length > 0) {
+            for (VirtualFile sourceRoot : sourceRoots) {
+                VirtualFile file = sourceRoot.findFileByRelativePath(path);
+                if (file != null) {
+                    result.add(psiManager.findFile(file));
+                }
+            }
+        }
     }
 
     public static GlobalSearchScope getModuleScope(@NotNull PsiElement psi) {
