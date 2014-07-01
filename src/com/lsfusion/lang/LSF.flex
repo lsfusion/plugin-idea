@@ -192,6 +192,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "EXCLUSIVE"               			{ return EXCLUSIVE; }
   "EXEC"                    			{ return EXEC; }
   "EXTEND"                  			{ return EXTEND; }
+  "EXTERNAL"                  			{ return EXTERNAL; }
   "FILTER"                  			{ return FILTER; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
   "FILTERS"                 			{ return FILTERS; }

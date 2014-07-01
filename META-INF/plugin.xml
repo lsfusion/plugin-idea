@@ -21,9 +21,7 @@
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
-    <!-- uncomment to enable plugin in all products
-    <depends>com.intellij.modules.lang</depends>
-    -->
+    <depends>com.intellij.properties</depends>
 
     <application-components>
         <!-- Add your application components here -->
@@ -121,7 +119,8 @@
         <typeHierarchyProvider language="Lsf"
                                implementationClass="com.lsfusion.hierarchy.classes.LSFClassHierarchyProvider"/>
 
-        <psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>
+        <languageInjector implementation="com.lsfusion.references.LSFLanguageInjector" />
+        <!--<psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>-->
         <lang.syntaxHighlighterFactory key="Lsf"
                                        implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>

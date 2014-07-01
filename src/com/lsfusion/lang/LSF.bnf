@@ -91,8 +91,13 @@ private statement ::=   constraintStatement
                     |	navigatorStatement
                     |	metaCodeStatement // ?
                     |	metaCodeDeclarationStatement // ?
+                    |   externalStatement
                     |	emptyStatement
                     |   stubStatement
+
+externalStatement ::= EXTERNAL (externalProperty | externalClass) SEMI {pin = 1}
+externalProperty ::= PROPERTY noContextPropertyUsage {pin = 1} 
+externalClass ::= CLASS className {pin = 1}
 
 // some statements are pinned after the first token, so we need these fake rules to pin incomplete statements
 stubStatement ::=
@@ -104,7 +109,7 @@ stubStatement ::=
 
 private script_statement_recover ::= !statement_start
 // Important ! after recover the rule should mandatory be pinned (matched)
-private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT
+private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT | EXTERNAL
                             | CLASS | ATSIGN | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
 
 

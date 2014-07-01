@@ -161,6 +161,13 @@ public class BaseUtils {
         return result;
     }
 
+    public static <K> String toString(Collection<K> array, String separator) {
+        String result = "";
+        for (K element : array)
+            result = (result.length() == 0 ? "" : result + separator) + element;
+        return result;
+    }
+
     public static Dimension overrideSize(Dimension base, Dimension override) {
         if (override != null) {
             if (override.width >= 0) {
