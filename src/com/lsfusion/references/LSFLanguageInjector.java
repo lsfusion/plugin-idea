@@ -5,6 +5,7 @@ import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.search.searches.ReferencesSearch;
@@ -19,6 +20,7 @@ import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Paths;
 import java.util.*;
 
 import static com.intellij.psi.search.GlobalSearchScope.fileScope;
@@ -119,10 +121,39 @@ public class LSFLanguageInjector implements LanguageInjector {
         }
         return "dumb";
     } 
+    
+    private String getFileBaseName(String path) {
+        int dir = path.lastIndexOf("/");
+        if(dir > 0)
+            path = path.substring(dir+1);
+        
+        int sep = path.lastIndexOf(".");
+        if(sep > 0)
+            path = path.substring(0, sep);
+        return path;
+    }
+
+    private static PsiClass findThisClass(PsiReferenceExpression refExpr, PsiMember refMember) {
+        final PsiClass refMemberClass = refMember.getContainingClass();
+        if (refMemberClass == null) return null;
+        PsiElement parent = refExpr.getContext();
+        while(parent != null){
+            if (parent instanceof PsiClass){
+                if (parent.equals(refMemberClass) || ((PsiClass)parent).isInheritor(refMemberClass, true)){
+                    return (PsiClass)parent;
+                }
+            }
+            parent = parent.getContext();
+        }
+
+        return refMemberClass;
+    }
 
     private String getModuleName(PsiReferenceExpression methodExpression) {
         //проверяем на ссылку .getModule("ModuleName")
         PsiExpression qualifierExpression = methodExpression.getQualifierExpression();
+        Set<String> modules = new HashSet<String>();
+
         if (qualifierExpression instanceof PsiMethodCallExpression) {
             return extractModuleNameFromPossibleGetModuleCall((PsiMethodCallExpression) qualifierExpression);
         } else if (qualifierExpression instanceof PsiReferenceExpression) {
@@ -198,11 +229,50 @@ public class LSFLanguageInjector implements LanguageInjector {
                         return moduleName.getResult();
                     }
                 }
+
+                if(modules.isEmpty())
+                    getModulesFromType(lmVar.getType(), modules);
             }
+        } else if (qualifierExpression instanceof PsiThisExpression) {
+            PsiType type = qualifierExpression.getType();
+            if(type!=null)
+                getModulesFromType(type, modules);
+        } else if(qualifierExpression == null) {
+            PsiElement resolve = methodExpression.resolve();
+            if(resolve instanceof PsiMethod)
+                getModulesFromConstructor(modules, findThisClass(methodExpression, (PsiMethod) resolve));
         }
         //todo: if qualifierExpression == null or refToConcreateClassModule(i.e. EmailLogicsModule) => search for file path in constructor...
 
+        if(!modules.isEmpty())
+            return BaseUtils.toString(modules, ",");
         return null;
+    }
+
+    private void getModulesFromType(PsiType varType, Set<String> modules) {
+        if(varType instanceof PsiClassType) {
+            PsiClass psiClass = ((PsiClassType) varType).resolve();
+            if(psiClass != null) {
+                getModulesFromConstructor(modules, psiClass);
+            }                        
+        }
+    }
+
+    private void getModulesFromConstructor(Set<String> modules, PsiClass psiClass) {
+        for(PsiMethod constructor : psiClass.getConstructors()) {
+            PsiCodeBlock body = constructor.getBody();
+            if(body != null) {
+                PsiStatement[] statements = body.getStatements();
+                if (statements.length > 0) {
+                    PsiStatement statement = statements[0];
+                    for(PsiLiteralExpression literalExpression : PsiTreeUtil.findChildrenOfType(statement, PsiLiteralExpression.class)) {
+                        String filename = getFileBaseName(literalExpression.getText());
+                        if(!filename.isEmpty() && !filename.equals("null"))
+                            modules.add(filename);
+                    }
+                }
+            }
+        }
     }
 
     private String extractModuleNameFromPossibleGetModuleCall(PsiMethodCallExpression getModuleCall) {
