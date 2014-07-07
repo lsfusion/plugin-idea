@@ -3,9 +3,6 @@ package com.lsfusion.references;
 import com.intellij.codeInsight.navigation.ClassImplementationsSearch;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.PropertiesFile;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -110,7 +107,7 @@ public class LSFLanguageInjector implements LanguageInjector {
     
     private String getTopModuleList(PsiElement element) {
 
-        List<PsiFile> filesByPath = LSFPsiUtils.findFilesByPath(ModuleUtilCore.findModuleForPsiElement(element), "lsfusion.properties");
+        List<PsiFile> filesByPath = LSFPsiUtils.findFilesByPath(element, "lsfusion.properties");
         for(PsiFile file : filesByPath) {
             if(file instanceof PropertiesFile) {
                 PropertiesFile propFile = (PropertiesFile)file ;
@@ -152,7 +149,7 @@ public class LSFLanguageInjector implements LanguageInjector {
                     }
                 }
                 
-                for(PsiExpression rightExpr : rightExprs) {
+                for (PsiExpression rightExpr : rightExprs) {
                     if (rightExpr instanceof PsiMethodCallExpression) {
                         PsiMethodCallExpression methodCall = (PsiMethodCallExpression) rightExpr;
                         String methodName = methodCall.getMethodExpression().getReferenceName();
@@ -165,8 +162,7 @@ public class LSFLanguageInjector implements LanguageInjector {
                                 if (expr instanceof PsiLiteralExpression) {
                                     Object argValue = ((PsiLiteralExpression) expr).getValue();
                                     if (argValue instanceof String) {
-                                        Module module = ModuleUtil.findModuleForPsiElement(methodExpression);
-                                        List<PsiFile> files = LSFPsiUtils.findFilesByPath(module, (String) argValue);
+                                        List<PsiFile> files = LSFPsiUtils.findFilesByPath(methodExpression, (String) argValue);
                                         for (PsiFile file : files) {
                                             if (file instanceof LSFFile) {
                                                 LSFFile lsfFile = (LSFFile) file;
@@ -198,7 +194,9 @@ public class LSFLanguageInjector implements LanguageInjector {
                             return true;
                         }
                     });
-                    return moduleName.getResult();
+                    if (moduleName.getResult() != null) {
+                        return moduleName.getResult();
+                    }
                 }
             }
         }

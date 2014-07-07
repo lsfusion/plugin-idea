@@ -1,7 +1,5 @@
 package com.lsfusion.references;
 
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
@@ -177,8 +175,7 @@ public class FormJavaReferenceContributor extends PsiReferenceContributor {
                                     if (expr instanceof PsiLiteralExpression) {
                                         Object argValue = ((PsiLiteralExpression) expr).getValue();
                                         if (argValue instanceof String) {
-                                            Module module = ModuleUtil.findModuleForPsiElement(refElement);
-                                            List<PsiFile> files = LSFPsiUtils.findFilesByPath(module, (String) argValue);
+                                            List<PsiFile> files = LSFPsiUtils.findFilesByPath(refElement, (String) argValue);
                                             for (PsiFile file : files) {
                                                 if (file instanceof LSFFile) {
                                                     LSFFile lsfFile = (LSFFile) file;

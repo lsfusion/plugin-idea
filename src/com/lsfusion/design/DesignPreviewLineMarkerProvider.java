@@ -29,16 +29,8 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement psi) {
-        if (psi instanceof LSFDesignStatement) {
-            if (((LSFDesignStatement) psi).resolveFormDecl() != null) {
-                return createLineMarker(psi);
-            }
-        } else if (psi instanceof LSFFormExtend) {
-            if (((LSFFormStatementImpl) psi).resolveFormDecl() != null) {
-                return createLineMarker(psi);
-            }
-        }
-        return null;
+        LSFFormDeclaration decl = resolveFormDecl(psi);
+        return decl == null ? null : createLineMarker(psi);
     }
 
     private LineMarkerInfo createLineMarker(PsiElement psi) {
@@ -47,7 +39,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
                 psi.getTextRange().getStartOffset(),
                 LSFIcons.Design.DESIGN,
                 Pass.UPDATE_ALL,
-                GetFormNameFunction.INSTANCE,
+                GetFormNameTooltipProvider.INSTANCE,
                 OpenDesignPreviewNavigationHandler.INSTANCE
         );
     }
@@ -56,17 +48,22 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
     public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
     }
 
-    private static class GetFormNameFunction implements Function<PsiElement, String> {
-        static GetFormNameFunction INSTANCE = new GetFormNameFunction();
+    public static LSFFormDeclaration resolveFormDecl(PsiElement psi) {
+        LSFFormDeclaration decl = null;
+        if (psi instanceof LSFDesignStatement) {
+            decl = ((LSFDesignStatement) psi).resolveFormDecl();
+        } else if (psi instanceof LSFFormExtend) {
+            decl = ((LSFFormStatementImpl) psi).resolveFormDecl();
+        }
+        return decl;
+    }
+
+    private static class GetFormNameTooltipProvider implements Function<PsiElement, String> {
+        static GetFormNameTooltipProvider INSTANCE = new GetFormNameTooltipProvider();
 
         @Override
         public String fun(PsiElement psi) {
-            LSFFormDeclaration formDecl = null;
-            if (psi instanceof LSFDesignStatement) {
-                formDecl = ((LSFDesignStatement) psi).resolveFormDecl();
-            } else if (psi instanceof LSFFormExtend) {
-                formDecl = ((LSFFormStatementImpl) psi).resolveFormDecl();
-            }
+            LSFFormDeclaration formDecl = resolveFormDecl(psi);
             if (formDecl != null) {
                 return formDecl.getGlobalName();
             }
@@ -79,12 +76,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public void navigate(MouseEvent e, PsiElement psi) {
-            LSFFormDeclaration formDecl = null;
-            if (psi instanceof LSFDesignStatement) {
-                formDecl = ((LSFDesignStatement) psi).resolveFormDecl();
-            } else if (psi instanceof LSFFormExtend) {
-                formDecl = ((LSFFormStatementImpl) psi).resolveFormDecl();
-            }
+            LSFFormDeclaration formDecl = resolveFormDecl(psi);
 
             if (formDecl != null) {
                 ToolWindow toolWindow = ToolWindowManager.getInstance(formDecl.getProject()).getToolWindow("lsFusion Form Design");
