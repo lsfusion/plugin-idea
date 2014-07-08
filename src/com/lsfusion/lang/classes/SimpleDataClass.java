@@ -1,5 +1,8 @@
 package com.lsfusion.lang.classes;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class SimpleDataClass extends DataClass {
 
     private String dataName;
@@ -29,6 +32,12 @@ public class SimpleDataClass extends DataClass {
 
     public String getName() {
         return dataName;
+    }
+
+    public Collection<String> getExtraNames() {
+        if(dataName.equals("DATETIME"))
+            return Collections.singletonList("DateTime");
+        return super.getExtraNames();
     }
 
     @Override

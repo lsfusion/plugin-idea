@@ -2,6 +2,8 @@ package com.lsfusion.lang.classes;
 
 import com.lsfusion.util.BaseUtils;
 
+import java.util.Collection;
+
 public abstract class IntegralClass extends DataClass {
 
     abstract int getWhole();
@@ -30,5 +32,10 @@ public abstract class IntegralClass extends DataClass {
     @Override
     public String getPreferredMask() {
         return "99 999 999";
+    }
+
+    @Override
+    public Collection<String> getExtraNames() {
+        return BaseUtils.toList("Result", "Quantity");
     }
 }

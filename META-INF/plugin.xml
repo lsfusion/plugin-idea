@@ -98,7 +98,16 @@
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift B" keymap="$default"/>
         </action>
-
+        <action id="Project.Shorten" class="com.lsfusion.lang.renaming.ProjectShortenNamesAction" text="Shorten names for project" description="Shorten names for project">
+            <add-to-group group-id="CodeMenu"/>
+            <keyboard-shortcut first-keystroke="control alt shift U" keymap="$default"/>
+        </action>
+        <action id="Project.UnqualifyRefs" class="com.lsfusion.lang.renaming.ProjectUnqualifyRefsAction" text="Unqualify refs for project" description="Unqualify refs for project">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
+        <action id="File.UnqualifyRefs" class="com.lsfusion.lang.renaming.FileUnqualifyRefsAction" text="Unqualify refs for file" description="Unqualify refs for file">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
@@ -139,6 +148,8 @@
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
 
+        <renamePsiElementProcessor implementation="com.lsfusion.lang.renaming.LSFRenameFullNameProcessor"/>
+
         <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
 
         <internalFileTemplate name="lsFusion script"/>
@@ -173,8 +184,6 @@
         <stubElementTypeHolder class="com.lsfusion.lang.psi.LSFTypes"/>
         <gotoClassContributor implementation="com.lsfusion.LSFClassContributor"/>
         <gotoSymbolContributor implementation="com.lsfusion.LSFSymbolContributor"/>
-
-        <renamePsiElementProcessor implementation="com.lsfusion.refactoring.RenamePropertyProcessor"/>
 
         <lang.elementManipulator
                 forClass="com.lsfusion.lang.psi.references.LSFJavaClassStringReference"

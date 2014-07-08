@@ -94,17 +94,51 @@ public class BaseUtils {
         return result;
     }
 
-    public static <K> List<K> toList(K el1, K el2) {
+    public static <K> List<K> toList(K... els) {
         List<K> result = new ArrayList<K>();
-        result.add(el1);
-        result.add(el2);
+        for(K el : els)
+            result.add(el);
         return result;
+    }
+
+    public static <K> List<K> reverse(List<K> col) {
+        return reverseThis(new ArrayList<K>(col));
+    }
+
+    public static <K> List<K> toList(Iterable<K> col) {
+        List<K> result = new ArrayList<K>();
+        for (K element : col)
+            result.add(element);
+        return result;
+    }
+
+    public static <K> List<K> reverse(Iterable<K> col) {
+        return reverse(toList(col));
+    }
+
+    public static <K> List<K> reverseThis(List<K> col) {
+        Collections.reverse(col);
+        return col;
     }
 
     public static <K> Set<K> remove(Set<? extends K> set, K remove) {
         Set<K> result = new HashSet<K>(set);
         result.remove(remove);
         return result;
+    }
+
+    public static <K, V> Map<K, V> filterNotKeys(Map<K, V> map, Set<K> set) {
+        Map<K, V> result = new HashMap<K, V>();
+        for(Map.Entry<K, V> entry : map.entrySet())
+            if(!set.contains(entry.getKey()))
+                result.put(entry.getKey(), entry.getValue());
+        return result;
+    }
+
+    private static final List emptyList = new ArrayList();
+
+    public static <K> List<K> emptyList() {
+        return emptyList;
     }
 
     public static <K> Set<K> split(Set<K> set1, Set<K> set2) {

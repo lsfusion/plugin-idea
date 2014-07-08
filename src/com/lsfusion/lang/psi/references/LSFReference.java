@@ -5,6 +5,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
+import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFElement;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFResolveResult;
@@ -25,4 +26,7 @@ public interface LSFReference<T extends LSFDeclaration> extends LSFElement, PsiR
     LSFResolveResult resolveNoCache();
 
     Annotation resolveErrorAnnotation(AnnotationHolder holder);
+
+    void handleElementRename(String newElementName, MetaTransaction transaction);
+
 }

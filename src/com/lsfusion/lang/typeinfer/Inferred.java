@@ -119,16 +119,26 @@ public class Inferred {
     }
 
     private static Map<LSFExprParamDeclaration, LSFClassSet> opParams(Map<LSFExprParamDeclaration, LSFClassSet> or1, Map<LSFExprParamDeclaration, LSFClassSet> or2, boolean or) {
-        Map<LSFExprParamDeclaration, LSFClassSet> result = new HashMap<LSFExprParamDeclaration, LSFClassSet>(or1);
-        for(Map.Entry<LSFExprParamDeclaration, LSFClassSet> decl : or2.entrySet()) {
-            LSFClassSet orClass;
-            if(result.containsKey(decl.getKey()))
-                orClass = LSFPsiImplUtil.op(result.get(decl.getKey()), decl.getValue(), or);
-            else
-                orClass = decl.getValue();
-            result.put(decl.getKey(), orClass);
-        }
-        return result;
+//        if(or) {
+//            Map<LSFExprParamDeclaration, LSFClassSet> result = new HashMap<LSFExprParamDeclaration, LSFClassSet>();
+//            for (Map.Entry<LSFExprParamDeclaration, LSFClassSet> decl : or2.entrySet()) {
+//                if (or1.containsKey(decl.getKey())) {
+//                    result.put(decl.getKey(), LSFPsiImplUtil.op(or1.get(decl.getKey()), decl.getValue(), true));
+//                }
+//            }
+//            return result;
+//        } else {
+            Map<LSFExprParamDeclaration, LSFClassSet> result = new HashMap<LSFExprParamDeclaration, LSFClassSet>(or1);
+            for (Map.Entry<LSFExprParamDeclaration, LSFClassSet> decl : or2.entrySet()) {
+                LSFClassSet orClass = null;
+                if (result.containsKey(decl.getKey()))
+                    orClass = LSFPsiImplUtil.op(result.get(decl.getKey()), decl.getValue(), or);
+                else
+                    orClass = decl.getValue();
+                result.put(decl.getKey(), orClass);
+            }
+            return result;
+//        }
     }
     
     private static Pair<Map<LSFExprParamDeclaration, LSFClassSet>, Set<Compared>> or(Map<LSFExprParamDeclaration, LSFClassSet> params1, Set<Compared> compared1, Map<LSFExprParamDeclaration, LSFClassSet> params2, Set<Compared> compared2) {

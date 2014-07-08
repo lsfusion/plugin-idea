@@ -11,6 +11,7 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
@@ -35,6 +36,28 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         super(propStubElement, nodeType);
     }
 
+    @Override
+    public List<String> resolveParamNames() {
+        LSFPropertyDeclaration decl = getPropertyDeclaration();
+        LSFClassParamDeclareList declList = decl.getClassParamDeclareList();
+        List<LSFExprParamDeclaration> params = null;
+        if(declList!=null)
+            params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(declList));
+        else {
+            LSFPropertyExpression pe = getPropertyExpression();
+            if(pe!=null)
+                params = LSFPsiImplUtil.resolveParams(pe);
+        }
+        if(params != null) {
+            List<String> result = new ArrayList<String>();
+            for(LSFExprParamDeclaration param : params)
+                result.add(param.getDeclName());
+            return result;
+        }
+
+        return null;
+    }
+
     protected abstract LSFPropertyDeclaration getPropertyDeclaration();
 
     @Nullable
@@ -42,6 +65,17 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
     @Nullable
     protected abstract LSFPropertyExpression getPropertyExpression();
+
+    @Override
+    public boolean isAbstract() {
+        LSFExpressionUnfriendlyPD unfriend = getExpressionUnfriendlyPD();
+        if(unfriend != null) {
+            LSFContextIndependentPD contextIndID = unfriend.getContextIndependentPD();
+            if(contextIndID!=null)
+                return contextIndID.getAbstractPropertyDefinition() != null || contextIndID.getAbstractActionPropertyDefinition() != null;
+        }
+        return false;
+    }
 
     @Override
     @Nullable
@@ -181,19 +215,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         }
 
         return resultClasses;
-    }
-
-    public boolean isAbstract() {
-        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = getExpressionUnfriendlyPD();
-        if (expressionUnfriendlyPD != null) {
-            LSFContextIndependentPD contextIndependentPD = expressionUnfriendlyPD.getContextIndependentPD();
-            if (contextIndependentPD != null) {
-                if (contextIndependentPD.getAbstractPropertyDefinition() != null) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     public boolean isAction() {

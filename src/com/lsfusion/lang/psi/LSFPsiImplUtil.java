@@ -2380,8 +2380,8 @@ public class LSFPsiImplUtil {
             ASTNode paramDeclare = sourceStatement.getParamDeclare().getNode();
 
             if (metaTrans != null) // !! важно до делать
-                metaTrans.regAddChange(BaseUtils.toList(genName.getNode(), whitespace), paramDeclare);
-
+                metaTrans.regChange(BaseUtils.toList(genName.getNode(), whitespace), paramDeclare, MetaTransaction.Type.BEFORE);
+            
             ASTNode sourceNode = sourceStatement.getNode();
             sourceNode.addChild(whitespace, paramDeclare);
             sourceNode.addChild(genName.getNode(), whitespace);

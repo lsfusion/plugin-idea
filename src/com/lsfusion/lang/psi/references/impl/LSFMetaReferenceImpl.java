@@ -71,7 +71,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     }
 
     @Override
-    protected Condition<LSFMetaDeclaration> getCondition() {
+    public Condition<LSFMetaDeclaration> getCondition() {
         final int paramCount = getMetaCodeIdList().getMetaCodeIdList().size();
         return new Condition<LSFMetaDeclaration>() {
             public boolean value(LSFMetaDeclaration decl) {

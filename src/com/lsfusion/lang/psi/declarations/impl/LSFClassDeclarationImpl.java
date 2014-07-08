@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +50,11 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
         if (ref.resolveDecl() == this)
             return globalName;
         return getNamespaceName() + "." + globalName;
+    }
+
+    @Override
+    public List<String> getSNames() {
+        return Collections.singletonList(getDeclName());
     }
 
     @Nullable

@@ -11,6 +11,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.references.LSFReference;
@@ -57,8 +58,12 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
 
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-        getSimpleName().setName(newElementName);
+        handleElementRename(newElementName, null);
         return this;
+    }
+
+    public void handleElementRename(String newElementName, MetaTransaction transaction) {
+        getSimpleName().setName(newElementName, transaction);
     }
 
     @Override

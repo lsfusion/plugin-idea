@@ -106,4 +106,9 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
 
         return !(parent == null || parent instanceof LSFFile) && resolveLocalDuplicates(parent);
     }
+
+    @Override
+    public boolean isAbstract() {
+        return false;
+    }
 }

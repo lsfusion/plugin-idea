@@ -17,15 +17,16 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.io.StringRef;
 import com.lsfusion.lang.meta.MetaChangeDetector;
+import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
-import com.lsfusion.lang.psi.references.impl.LSFClassReferenceImpl;
-import com.lsfusion.lang.psi.references.impl.LSFModuleReferenceImpl;
-import com.lsfusion.lang.psi.references.impl.LSFNamespaceReferenceImpl;
+import com.lsfusion.lang.psi.references.impl.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,16 +44,30 @@ public class LSFElementGenerator {
     @Nullable
     public static LSFId createIdentifierFromText(Project myProject, String name) {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + name + ";");
-        for(LSFId child : PsiTreeUtil.findChildrenOfType(dummyFile, LSFId.class))
-            if(!child.getText().equals("dummy"))
-                return child;
-        return null;
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFId.class).iterator().next();
+    }
+
+    public static LSFCompoundID createCompoundIDFromText(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; f()=" + name + "();");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFCompoundID.class).iterator().next();
     }
 
     @NotNull
     public static LSFClassName createClassNameFromText(Project myProject, String name) {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; f(" + name + " t)=t;");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFClassName.class).iterator().next();
+    }
+
+    @NotNull
+    public static LSFFormPropertyObject createMappedPropertyFromText(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; DESIGN x { ADD PROPERTY(" + name + ") {}; }");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertyObject.class).iterator().next();
+    }
+
+    @NotNull
+    public static LSFExplicitPropClassUsage createExplicitClassUsageFromText(Project myProject, String classes) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; f()=g[" + classes + "]();");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFExplicitPropClassUsage.class).iterator().next();
     }
 
     public static PsiFile createDummyFile(Project myProject, String text) {
@@ -211,6 +226,11 @@ public class LSFElementGenerator {
             @Override
             public String getFullNameRef() {
                 return fname;
+            }
+
+            @Override
+            public void setFullNameRef(String name, MetaTransaction transaction) {
+                throw new UnsupportedOperationException();
             }
 
             @Override

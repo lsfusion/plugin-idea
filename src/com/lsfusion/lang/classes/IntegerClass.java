@@ -1,5 +1,9 @@
 package com.lsfusion.lang.classes;
 
+import com.lsfusion.util.BaseUtils;
+
+import java.util.Collection;
+
 public class IntegerClass extends IntegralClass {
 
     public final static IntegerClass instance = new IntegerClass();
@@ -22,6 +26,11 @@ public class IntegerClass extends IntegralClass {
 
     public String getName() {
         return "INTEGER";
+    }
+
+    @Override
+    public Collection<String> getExtraNames() {
+        return BaseUtils.toList("Result", "Quantity");
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
@@ -11,8 +12,10 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.CollectionQuery;
+import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.PropertyUsageContext;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
@@ -72,18 +75,21 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
 
     @Override
     public LSFResolveResult resolveNoCache() {
-        Collection<? extends LSFDeclaration> declarations = null;
+        Collection<? extends LSFDeclaration> declarations = BaseUtils.emptyList();
 
-        if (getFullNameRef() == null) {
-            LocalResolveProcessor processor = new LocalResolveProcessor(getNameRef(), getDeclCondition());
-            PsiTreeUtil.treeWalkUp(processor, this, null, new ResolveState());
-            if (processor.found.size() > 0) {
-                Finalizer<LSFLocalPropDeclaration> finalizer = BaseUtils.immutableCast(getDeclFinalizer());
-                declarations = finalizer.finalize(processor.found);
-            }
-        }
-        if (declarations == null) {
+        if (getFullNameRef() == null)
+            declarations = resolveLocals(BaseUtils.<Condition<LSFPropDeclaration>>immutableCast(getCondition()), getFinalizer());
+
+        if (declarations.isEmpty()) {
             declarations = super.resolveNoCache().declarations;
+        }
+
+        if(canBeUsedInDirect()) {
+            if(declarations.isEmpty())
+                declarations = resolveLocals(getInDirectCondition(), Finalizer.EMPTY);
+
+            if(declarations.isEmpty())
+                declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), BaseUtils.<Condition<LSFGlobalPropDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
         }
 
         LSFResolveResult.ErrorAnnotator errorAnnotator = null;
@@ -157,48 +163,149 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         return PsiTreeUtil.getParentOfType(this, PropertyUsageContext.class);
     }
 
+    public boolean isNoContext() {
+        return getPropertyUsageContext() instanceof LSFNoContextPropertyUsage;
+    }
+
     @Nullable
     private List<LSFClassSet> getUsageContext() {
         PropertyUsageContext propertyUsageContext = getPropertyUsageContext();
         return propertyUsageContext == null ? null : propertyUsageContext.resolveParamClasses();
     }
 
-    protected abstract LSFNonEmptyExplicitPropClassList getNonEmptyExplicitPropClassList();
+    protected abstract LSFExplicitPropClassUsage getExplicitPropClassUsage();
+
+    @Override
+    public boolean hasExplicitClasses() {
+        return getExplicitPropClassUsage() != null;
+    }
 
     @Nullable
-    private List<LSFClassSet> getExplicitClasses() {
-        LSFNonEmptyExplicitPropClassList neList = getNonEmptyExplicitPropClassList();
-        if (neList == null)
+    public List<LSFClassSet> getExplicitClasses() {
+        LSFExplicitPropClassUsage explicitUsage = getExplicitPropClassUsage();
+        if(explicitUsage == null)
             return null;
+
+        LSFEmptyExplicitPropClassList eList = explicitUsage.getEmptyExplicitPropClassList();
+        LSFNonEmptyExplicitPropClassList neList = eList.getNonEmptyExplicitPropClassList();
         List<LSFClassSet> result = new ArrayList<LSFClassSet>();
-        for (LSFExplicitPropClass explPropClass : neList.getExplicitPropClassList()) {
-            LSFClassName className = explPropClass.getClassName();
-            if (className != null)
-                result.add(LSFPsiImplUtil.resolveClass(className));
-            else
-                result.add(null);
+        if(neList!=null) {
+            for (LSFExplicitPropClass explPropClass : neList.getExplicitPropClassList()) {
+                LSFClassName className = explPropClass.getClassName();
+                if (className != null)
+                    result.add(LSFPsiImplUtil.resolveClass(className));
+                else
+                    result.add(null);
+            }
         }
         return result;
     }
 
-    private Finalizer<LSFPropDeclaration> getDeclFinalizer() {
+    public void setExplicitClasses(List<LSFClassSet> classes, MetaTransaction transaction) {
+        String explicitClasses = "";
+        for(LSFClassSet declClass : classes)
+            explicitClasses = (explicitClasses.isEmpty() ? "" : explicitClasses + ",") + (declClass == null ? "?" : declClass.getCommonClass().getQName(this));
+        LSFExplicitPropClassUsage explicitNode = LSFElementGenerator.createExplicitClassUsageFromText(getProject(), explicitClasses);
+
+        if(transaction != null) // ? разрезать или нет на leafToken
+            transaction.regChange(MetaTransaction.getLeafTokens(explicitNode.getNode()), getSimpleName().getNode(), MetaTransaction.Type.AFTER);
+
+        addAfter(explicitNode, getCompoundID());
+    }
+
+    public void dropExplicitClasses(MetaTransaction transaction) {
+        ASTNode node = getExplicitPropClassUsage().getNode();
+
+        if(transaction != null)
+            transaction.regChange(new ArrayList<ASTNode>(), node, MetaTransaction.Type.REPLACE);
+
+        deleteChildInternal(node);
+    }
+
+    @Override
+    public void dropFullNameRef(MetaTransaction transaction) {
+        if(transaction!=null) {
+            assert getFullNameRef() != null;
+            ASTNode namespaceNode = getCompoundID().getNamespaceUsage().getNode();
+            transaction.regChange(new ArrayList<ASTNode>(), namespaceNode, 1, MetaTransaction.Type.REPLACE);
+        }
+        LSFCompoundID compoundIDFromText = LSFElementGenerator.createCompoundIDFromText(getProject(), getNameRef());
+        getCompoundID().replace(compoundIDFromText);
+    }
+
+
+    private Condition<LSFPropDeclaration> getDirectCondition() {
+        List<LSFClassSet> directClasses = getExplicitClasses();
+        if(directClasses == null) {
+            directClasses = getUsageContext();
+            if(directClasses==null) // невозможно определить классы, подходят все
+                return Condition.TRUE;
+        }
+
+        final List<LSFClassSet> fDirectClasses = directClasses;
+        final boolean isImplement = isImplement();
+        return new Condition<LSFPropDeclaration>() {
+            public boolean value(LSFPropDeclaration decl) {
+                if(isImplement && !decl.isAbstract())
+                    return false;
+
+                List<LSFClassSet> declClasses = decl.resolveParamClasses();
+                return declClasses == null || (declClasses.size() == fDirectClasses.size() && LSFPsiImplUtil.containsAll(declClasses, fDirectClasses, false));
+            }
+        };
+    }
+
+    private boolean canBeUsedInDirect() {
+        return getExplicitClasses() == null && getUsageContext() != null;
+    }
+
+    private Condition<LSFPropDeclaration> getInDirectCondition() {
+        final List<LSFClassSet> usageClasses = getUsageContext();
+        assert canBeUsedInDirect(); // потому как иначе direct бы подошел  
+        final boolean isImplement = isImplement();
+
+        return new Condition<LSFPropDeclaration>() {
+            public boolean value(LSFPropDeclaration decl) {
+                if(isImplement && !decl.isAbstract())
+                    return false;
+
+                List<LSFClassSet> declClasses = decl.resolveParamClasses();
+                assert declClasses != null; // потому как иначе direct бы подошел 
+                return declClasses.size() == usageClasses.size() && LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject()));
+            }
+        };
+    }
+
+    private Finalizer<LSFPropDeclaration> getDirectFinalizer() {
+        List<LSFClassSet> explicitClasses = getExplicitClasses();
+        List<LSFClassSet> directClasses = explicitClasses;
+        if(directClasses == null) {
+            directClasses = getUsageContext();
+            if(directClasses==null) // невозможно определить прямое или обратное использование, соответственно непонятно как "экранировать"
+                return Finalizer.EMPTY;
+        }
+        final boolean isNotEquals = isImplement() && explicitClasses == null;
+
+        final List<LSFClassSet> fDirectClasses = directClasses;
         return new Finalizer<LSFPropDeclaration>() {
             public Collection<LSFPropDeclaration> finalize(Collection<LSFPropDeclaration> decls) {
-                final List<LSFClassSet> usageClasses = getUsageContext();
-                if (usageClasses == null) // невозможно определить прямое или обратное использование, соответственно непонятно как "экранировать"
-                    return decls;
 
                 Map<LSFPropDeclaration, List<LSFClassSet>> mapClasses = new HashMap<LSFPropDeclaration, List<LSFClassSet>>();
+                Set<LSFPropDeclaration> equals = isNotEquals ? new HashSet<LSFPropDeclaration>() : null;
                 for (LSFPropDeclaration decl : decls) {
                     List<LSFClassSet> declClasses = decl.resolveParamClasses();
-                    if (declClasses != null) {
-                        if (LSFPsiImplUtil.containsAll(declClasses, usageClasses, true)) // подходят по классам
-                            mapClasses.put(decl, declClasses);
+                    if(declClasses != null) {
+                        if(isNotEquals && declClasses.equals(fDirectClasses))
+                            equals.add(decl);
+                        mapClasses.put(decl, declClasses);
                     }
                 }
 
                 if (!mapClasses.isEmpty()) { // есть прямые наследования
                     Collection<LSFPropDeclaration> result = new ArrayList<LSFPropDeclaration>();
+
+                    if(isNotEquals && equals.size() < mapClasses.size()) // оставим только 
+                        mapClasses = BaseUtils.filterNotKeys(mapClasses, equals);
 
                     List<LSFPropDeclaration> listMapClasses = new ArrayList<LSFPropDeclaration>(mapClasses.keySet());
                     for (int i = 0, size = listMapClasses.size(); i < size; i++) {
@@ -225,36 +332,11 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         };
     }
 
-    private Condition<LSFPropDeclaration> getDeclCondition() {
-        final List<LSFClassSet> usageClasses = getUsageContext();
-        final List<LSFClassSet> explicitClasses = getExplicitClasses();
-
-        if (usageClasses == null && explicitClasses == null)
-            return Condition.TRUE;
-
-        return new Condition<LSFPropDeclaration>() {
-            public boolean value(LSFPropDeclaration decl) {
-                List<LSFClassSet> declClasses = decl.resolveParamClasses();
-                if (declClasses == null)
-                    return true;
-
-                if (explicitClasses != null) {
-                    if (declClasses.size() != explicitClasses.size())
-                        return false;
-
-                    if (!LSFPsiImplUtil.containsAll(declClasses, explicitClasses, false)) // подходят по классам
-                        return false;
-                }
-
-                if (usageClasses == null)
-                    return true;
-
-                if (declClasses.size() != usageClasses.size())
-                    return false;
-
-                return LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject()));
-            }
-        };
+    public boolean isImplement() {
+        PropertyUsageContext usageContext = getPropertyUsageContext();
+        if(usageContext instanceof LSFMappedPropertyClassParamDeclare)
+            return usageContext.getParent() instanceof LSFOverrideStatement;
+        return false;
     }
 
     public boolean isDirect() {
@@ -276,13 +358,28 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     }
 
     @Override
-    protected Condition<LSFGlobalPropDeclaration> getCondition() {
-        return BaseUtils.immutableCast(getDeclCondition());
+    public Condition<LSFGlobalPropDeclaration> getCondition() {
+        return BaseUtils.immutableCast(getDirectCondition());
+    }
+
+    @Override
+    public Condition<LSFGlobalPropDeclaration> getFullCondition() {
+        Condition<LSFGlobalPropDeclaration> result = super.getFullCondition();
+        if(canBeUsedInDirect())
+            result = Conditions.or(result, BaseUtils.<Condition<LSFGlobalPropDeclaration>>immutableCast(getInDirectCondition()));
+        return result;
     }
 
     @Override
     protected Finalizer<LSFGlobalPropDeclaration> getFinalizer() {
-        return BaseUtils.immutableCast(getDeclFinalizer());
+        return BaseUtils.immutableCast(getDirectFinalizer());
+    }
+
+    private Collection<? extends LSFDeclaration> resolveLocals(Condition<LSFPropDeclaration> condition, Finalizer<LSFGlobalPropDeclaration> finalizer) {
+        LocalResolveProcessor processor = new LocalResolveProcessor(getNameRef(), BaseUtils.<Condition<LSFPropDeclaration>>immutableCast(condition));
+        PsiTreeUtil.treeWalkUp(processor, this, null, new ResolveState());
+        Finalizer<LSFLocalPropDeclaration> castFinalizer = BaseUtils.immutableCast(finalizer);
+        return castFinalizer.finalize(processor.found);
     }
 
     @Override

@@ -1,9 +1,8 @@
-package com.lsfusion.lang.typeinfer;
+package com.lsfusion.lang.renaming;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Progressive;
@@ -16,9 +15,10 @@ import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
-public class ProjectTypeInferAction extends AnAction {
+public class ProjectUnqualifyRefsAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -28,42 +28,32 @@ public class ProjectTypeInferAction extends AnAction {
                 ApplicationManager.getApplication().runWriteAction(new Runnable() {
                     public void run() {
                         MetaTransaction transaction = new MetaTransaction();
-                        
-                        Collection<String> allKeys = ModuleIndex.getInstance().getAllKeys(myProject);
 
-                        int i = 0;
+                        Collection<String> allKeys = ModuleIndex.getInstance().getAllKeys(myProject);
+                        Collection<LSFFile> files = new ArrayList<LSFFile>();
+
                         for (final String module : allKeys) {
-                            indicator.setText("Processing : " + module);
                             Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, GlobalSearchScope.allScope(myProject));
-                            for (LSFModuleDeclaration declaration : moduleDeclarations) {
-                                LSFFile file = declaration.getLSFFile();
-                                indicator.setText2("Statements : " + file.getChildren().length);
-                                TypeInferer.typeInfer(file, transaction);
-                                indicator.setText2("");
-                            }
-                            System.out.println(((double) i) / allKeys.size());
-                            indicator.setFraction(((double) i++) / allKeys.size());
+                            for (LSFModuleDeclaration declaration : moduleDeclarations)
+                                files.add(declaration.getLSFFile());
                         }
-                        
+
+                        LSFRenameFullNameProcessor.unqualifyRefs(files, transaction);
+
                         transaction.apply();
                     }
                 });
             }
         };
-        final Task task = new Task.Modal(myProject, "Updating metacode", true) {
+        Task task = new Task.Modal(myProject, "Shortening names", true) {
             public void run(final @NotNull ProgressIndicator indicator) {
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                     public void run() {
-                        CommandProcessor.getInstance().runUndoTransparentAction(new Runnable() {
-                            public void run() {
-                                run.run(indicator);
-                            }
-                        });                                
+                        run.run(indicator);
                     }
                 });
             }
         };
         ProgressManager.getInstance().run(task);
     }
-
 }

@@ -8,8 +8,11 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.meta.MetaTransaction;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
 
 public class LSFIdImpl extends ASTWrapperPsiElement implements LSFId {
 
@@ -23,9 +26,18 @@ public class LSFIdImpl extends ASTWrapperPsiElement implements LSFId {
     }
 
     @Override
-    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
+    public void setName(String name, MetaTransaction transaction) {
         LSFId genId = LSFElementGenerator.createIdentifierFromText(getProject(), name);
+
+        if(transaction != null)
+            transaction.regChange(Collections.singletonList(genId.getNode()), getNode(), MetaTransaction.Type.REPLACE);
+
         getNode().getTreeParent().replaceChild(getNode(), genId.getNode());
+    }
+
+    @Override
+    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
+        setName(name, null);
         return this;
     }
 

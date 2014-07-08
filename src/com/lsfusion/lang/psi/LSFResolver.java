@@ -7,8 +7,11 @@ import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.*;
 import com.intellij.util.Processor;
 import com.intellij.util.Query;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.impl.LSFMetaCodeDeclarationStatementImpl;
+import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
 import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.stubs.impl.MetaStubImpl;
@@ -73,5 +76,18 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
         return result;
     }
 
+    public static List<LSFFullNameReference> findFullNameUsages(final String name, final LSFFullNameDeclaration decl) {
+        final List<LSFFullNameReference> result = new ArrayList<LSFFullNameReference>();
+        searchWordUsages(GlobalSearchScope.allScope(decl.getProject()), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
+            public boolean process(PsiReference ref) {
+                if (ref instanceof LSFFullNameReference && ((LSFFullNameReference<LSFDeclaration, LSFFullNameDeclaration>) ref).getFullCondition().value(decl))
+                    synchronized (result) {
+                        result.add((LSFFullNameReference) ref);
+                    }
+                return true;
+            }
+        });
+        return result;
+    }
 }
 

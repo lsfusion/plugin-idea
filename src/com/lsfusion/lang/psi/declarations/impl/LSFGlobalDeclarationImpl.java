@@ -5,6 +5,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
+import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFStubBasedPsiElement;
 import com.lsfusion.lang.psi.declarations.LSFGlobalDeclaration;
 import com.lsfusion.lang.psi.stubs.GlobalStubElement;
@@ -40,7 +41,11 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
 
     @Override
     public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
-        return LSFDeclarationImpl.setName(this, name);
+        return LSFDeclarationImpl.setName(this, name, null);
+    }
+
+    public void setName(@NonNls @NotNull String name, MetaTransaction transaction) {
+        LSFDeclarationImpl.setName(this, name, transaction);
     }
 
     @Override

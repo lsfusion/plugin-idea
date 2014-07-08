@@ -94,6 +94,10 @@ private statement ::=   constraintStatement
                     |   externalStatement
                     |	emptyStatement
                     |   stubStatement
+                    
+externalStatement ::= EXTERNAL (externalProperty | externalClass) SEMI {pin = 1}
+externalProperty ::= PROPERTY noContextPropertyUsage {pin = 1} 
+externalClass ::= CLASS className {pin = 1}
 
 externalStatement ::= EXTERNAL (externalProperty | externalClass) SEMI {pin = 1}
 externalProperty ::= PROPERTY noContextPropertyUsage {pin = 1} 
@@ -1567,8 +1571,9 @@ namespaceUsage ::= simpleName
 explicitPropClass ::= className | QUESTION 
 
 nonEmptyExplicitPropClassList ::= explicitPropClass (COMMA explicitPropClass)*
-
-propertyUsage ::= compoundID (LSQBR nonEmptyExplicitPropClassList RSQBR)?
+emptyExplicitPropClassList ::= nonEmptyExplicitPropClassList?
+explicitPropClassUsage ::= LSQBR emptyExplicitPropClassList RSQBR
+propertyUsage ::= compoundID explicitPropClassUsage?
 {mixin="com.lsfusion.lang.psi.references.impl.LSFPropReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFPropReference"}
 
 tableUsage ::= compoundID

@@ -2,11 +2,14 @@ package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -23,7 +26,18 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     public static LSFId getSimpleName(LSFCompoundID compoundID) {
         return compoundID.getSimpleName();
     }
-    
+
+    @Override
+    public void setFullNameRef(String name, MetaTransaction transaction) {
+        LSFCompoundID compoundIDFromText = LSFElementGenerator.createCompoundIDFromText(getProject(), name + "." + getNameRef());
+        if(transaction!=null) {
+            assert getFullNameRef() == null;
+            ASTNode namespaceNode = compoundIDFromText.getNamespaceUsage().getNode();
+            transaction.regChange(BaseUtils.toList(namespaceNode, namespaceNode.getTreeNext()), getSimpleName().getNode(), MetaTransaction.Type.BEFORE);
+        }
+        getCompoundID().replace(compoundIDFromText);
+    }
+
     @Override
     public LSFId getSimpleName() {
         return getSimpleName(getCompoundID());
@@ -42,12 +56,16 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
         return null;
     }
 
-    protected Condition<G> getCondition() {
+    public Condition<G> getCondition() {
         return Condition.TRUE;
     }
 
     protected Finalizer<G> getFinalizer() {
         return Finalizer.EMPTY;
+    }
+
+    public Condition<G> getFullCondition() {
+        return getCondition();
     }
 
     @Override

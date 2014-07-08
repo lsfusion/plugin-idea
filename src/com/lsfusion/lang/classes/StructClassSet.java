@@ -5,6 +5,8 @@ import com.intellij.psi.search.GlobalSearchScope;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class StructClassSet implements LSFClassSet, LSFValueClass {
 
@@ -110,5 +112,10 @@ public class StructClassSet implements LSFClassSet, LSFValueClass {
 
     public int hashCode() {
         return Arrays.hashCode(sets);
+    }
+
+    @Override
+    public List<String> getSNames() {
+        return Collections.singletonList("Struct");
     }
 }

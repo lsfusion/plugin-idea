@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.Segment;
 import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
+import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFElementImpl;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
@@ -28,8 +29,8 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
         return nameID.getName();
     }
 
-    public static PsiElement setName(LSFDeclaration element, @NonNls @NotNull String name) throws IncorrectOperationException {
-        element.getNameIdentifier().setName(name);
+    public static PsiElement setName(LSFDeclaration element, @NonNls @NotNull String name, MetaTransaction transaction) throws IncorrectOperationException {
+        element.getNameIdentifier().setName(name, transaction);
         return element;
     }
 
@@ -38,7 +39,11 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
     }
 
     public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
-        return setName(this, name);
+        return setName(this, name, null);
+    }
+
+    public void setName(@NonNls @NotNull String name, MetaTransaction transaction) {
+        setName(this, name, transaction);
     }
 
     @Override

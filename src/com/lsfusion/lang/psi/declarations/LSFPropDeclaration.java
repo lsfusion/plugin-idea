@@ -18,6 +18,8 @@ public interface LSFPropDeclaration extends LSFDeclaration {
 
     List<LSFClassSet> resolveParamClassesNoCache();
 
+    boolean isAbstract();
+
     @Nullable
     List<LSFClassSet> inferParamClasses(LSFClassSet valueClass); // минимум кол-во параметров мы выведем
 }
