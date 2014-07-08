@@ -187,7 +187,7 @@
         <toolWindow id="lsFusion Form Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
                     anchor="right" icon="AllIcons.FileTypes.UiForm"/>
 
-        <toolWindow id="Module Dependencies" anchor="right"
+        <toolWindow id="Module Dependencies" anchor="right" icon="AllIcons.Nodes.Deploy"
                     factoryClass="com.lsfusion.dependencies.ModuleDependeciesViewToolWindowFactory"/>
 
         <!--<xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />-->
