@@ -98,14 +98,14 @@
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift B" keymap="$default"/>
         </action>
-        <action id="Project.Shorten" class="com.lsfusion.lang.renaming.ProjectShortenNamesAction" text="Shorten names for project" description="Shorten names for project">
+        <action id="Project.Shorten" class="com.lsfusion.actions.ProjectShortenNamesAction" text="Shorten names for project" description="Shorten names for project">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift U" keymap="$default"/>
         </action>
-        <action id="Project.UnqualifyRefs" class="com.lsfusion.lang.renaming.ProjectUnqualifyRefsAction" text="Unqualify refs for project" description="Unqualify refs for project">
+        <action id="Project.UnqualifyRefs" class="com.lsfusion.actions.ProjectUnqualifyRefsAction" text="Unqualify refs for project" description="Unqualify refs for project">
             <add-to-group group-id="CodeMenu"/>
         </action>
-        <action id="File.UnqualifyRefs" class="com.lsfusion.lang.renaming.FileUnqualifyRefsAction" text="Unqualify refs for file" description="Unqualify refs for file">
+        <action id="File.UnqualifyRefs" class="com.lsfusion.actions.FileUnqualifyRefsAction" text="Unqualify refs for file" description="Unqualify refs for file">
             <add-to-group group-id="CodeMenu"/>
         </action>
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
@@ -128,7 +128,8 @@
         <typeHierarchyProvider language="Lsf"
                                implementationClass="com.lsfusion.hierarchy.classes.LSFClassHierarchyProvider"/>
 
-        <languageInjector implementation="com.lsfusion.references.LSFLanguageInjector" />
+        <languageInjector implementation="com.lsfusion.references.LSFToJavaLanguageInjector" />
+        <!--<languageInjector implementation="com.lsfusion.references.LSFToJrxmlLanguageInjector" />-->
         <!--<psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>-->
         <lang.syntaxHighlighterFactory key="Lsf"
                                        implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
@@ -148,7 +149,7 @@
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
 
-        <renamePsiElementProcessor implementation="com.lsfusion.lang.renaming.LSFRenameFullNameProcessor"/>
+        <renamePsiElementProcessor implementation="com.lsfusion.refactoring.LSFRenameFullNameProcessor"/>
 
         <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
 
@@ -202,5 +203,8 @@
         <!--<xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />-->
         <!--<debugger.positionManagerFactory id="lsfPositionManagerFactory" implementation="com.lsfusion.debug.LSFPositionManagerFactory"/>-->
 
+        <!-- reports related stuff -->
+        <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>
+        <codeInsight.lineMarkerProvider language="Lsf" implementationClass="com.lsfusion.reports.JrxmlLinkLineMarkerProvider"/>
     </extensions>
 </idea-plugin>

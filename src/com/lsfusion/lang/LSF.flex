@@ -296,6 +296,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "PRIORITY"                			{ return PRIORITY; }
   "PROPERTIES"              			{ return PROPERTIES; }
   "PROPERTY"                			{ return PROPERTY; }
+  "PROPERTYDRAW"               			{ return PROPERTYDRAW; }
   "PROPORTION"              			{ return PROPORTION; }
   "QUERYCLOSE"              			{ return QUERYCLOSE; }
   "QUERYOK"                 			{ return QUERYOK; }

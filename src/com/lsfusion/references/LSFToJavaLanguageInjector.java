@@ -5,7 +5,6 @@ import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.search.searches.ReferencesSearch;
@@ -20,7 +19,6 @@ import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Paths;
 import java.util.*;
 
 import static com.intellij.psi.search.GlobalSearchScope.fileScope;
@@ -28,7 +26,7 @@ import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
 import static com.lsfusion.util.JavaPsiUtils.isClass;
 import static com.lsfusion.util.LSFPsiUtils.getModuleScope;
 
-public class LSFLanguageInjector implements LanguageInjector {
+public class LSFToJavaLanguageInjector implements LanguageInjector {
 
     @Override
     public void getLanguagesToInject(@NotNull PsiLanguageInjectionHost element, @NotNull InjectedLanguagePlaces injectionPlacesRegistrar) {

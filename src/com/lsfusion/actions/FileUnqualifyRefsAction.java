@@ -1,4 +1,4 @@
-package com.lsfusion.lang.renaming;
+package com.lsfusion.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -9,6 +9,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.refactoring.LSFRenameFullNameProcessor;
 
 import java.util.Collections;
 

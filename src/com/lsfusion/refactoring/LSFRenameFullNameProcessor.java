@@ -1,4 +1,4 @@
-package com.lsfusion.lang.renaming;
+package com.lsfusion.refactoring;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;

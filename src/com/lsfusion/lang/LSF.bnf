@@ -95,13 +95,22 @@ private statement ::=   constraintStatement
                     |	emptyStatement
                     |   stubStatement
                     
-externalStatement ::= EXTERNAL (externalProperty | externalClass) SEMI {pin = 1}
+externalStatement ::= EXTERNAL (externalProperty | externalClass | externalPropertyDraw | externalFormObject) SEMI {pin = 1}
 externalProperty ::= PROPERTY noContextPropertyUsage {pin = 1} 
 externalClass ::= CLASS className {pin = 1}
+externalPropertyDraw ::= PROPERTYDRAW formUsage formPropertyDrawUsage
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
 
-externalStatement ::= EXTERNAL (externalProperty | externalClass) SEMI {pin = 1}
-externalProperty ::= PROPERTY noContextPropertyUsage {pin = 1} 
-externalClass ::= CLASS className {pin = 1}
+externalFormObject ::= OBJECT formUsage objectUsage
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
 
 // some statements are pinned after the first token, so we need these fake rules to pin incomplete statements
 stubStatement ::=
