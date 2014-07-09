@@ -186,7 +186,7 @@ public class LSFPsiUtils {
 
     // c/p from com.intellij.ide.util.gotoByName.GotoFileCellRenderer.getRelativePath()
     @Nullable
-    private static String getRelativePath(final VirtualFile virtualFile, final Project project) {
+    public static String getRelativePath(final VirtualFile virtualFile, final Project project) {
         String url = virtualFile.getPresentableUrl();
         if (project == null) {
             return url;

@@ -46,7 +46,7 @@ public class ProjectUnqualifyRefsAction extends AnAction {
                 });
             }
         };
-        Task task = new Task.Modal(myProject, "Shortening names", true) {
+        Task task = new Task.Modal(myProject, "Unqualifying references in project", true) {
             public void run(final @NotNull ProgressIndicator indicator) {
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                     public void run() {

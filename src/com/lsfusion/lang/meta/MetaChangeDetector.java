@@ -849,7 +849,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                 List<LSFMetaCodeStatement> metaStatements = file.getMetaCodeStatementList();
                                 indicator.setText2("Statements : " + metaStatements.size());
 
-                                        addForcedUsageProcessing(file, metaStatements, sync, null);
+                                addForcedUsageProcessing(file, metaStatements, sync, null);
                                 
                                 indicator.setText2("");
                             }

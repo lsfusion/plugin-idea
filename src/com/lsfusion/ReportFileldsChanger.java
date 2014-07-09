@@ -87,7 +87,7 @@ public class ReportFileldsChanger {
         FileOutputStream ostream = new FileOutputStream(output);
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "UTF8"));
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(ostream, "UTF8"));
-        String fieldNameExpr = "(\\w+)(\\(caption\\)|\\(footer\\))?";
+        String fieldNameExpr = "(\\w+)(\\.header|\\.footer)?";
         String str;
 
         while ((str = reader.readLine()) != null) {
