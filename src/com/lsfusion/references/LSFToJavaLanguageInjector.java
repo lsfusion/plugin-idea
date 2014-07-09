@@ -1,6 +1,8 @@
 package com.lsfusion.references;
 
 import com.intellij.codeInsight.navigation.ClassImplementationsSearch;
+import com.intellij.lang.injection.MultiHostInjector;
+import com.intellij.lang.injection.MultiHostRegistrar;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.openapi.util.TextRange;
@@ -26,9 +28,92 @@ import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
 import static com.lsfusion.util.JavaPsiUtils.isClass;
 import static com.lsfusion.util.LSFPsiUtils.getModuleScope;
 
-public class LSFToJavaLanguageInjector implements LanguageInjector {
+public class LSFToJavaLanguageInjector implements MultiHostInjector {
+
+    public interface InjectedLanguagePlaces {
+
+        void addStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix, String suffix);
+        void addModuleUsage(TextRange rangeInsideHost);
+    }
+
+    private static class Injection {
+        public final String prefix;
+        public final String suffix;
+        public final PsiLanguageInjectionHost host;
+        public final TextRange rangeInsideHost;
+
+        private Injection(String prefix, String suffix, PsiLanguageInjectionHost host, TextRange rangeInsideHost) {
+            this.prefix = prefix;
+            this.suffix = suffix;
+            this.host = host;
+            this.rangeInsideHost = rangeInsideHost;
+        }
+    }
+
+    private ThreadLocal<Map<PsiVariable, Set<String>>> varModuleCaches = new ThreadLocal<Map<PsiVariable, Set<String>>>();
+    private ThreadLocal<Map<PsiClass, String>> classModuleCaches = new ThreadLocal<Map<PsiClass, String>>();
 
     @Override
+    public void getLanguagesToInject(final @NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
+        PsiClass psiClass = (PsiClass)context;
+        Collection<PsiLanguageInjectionHost> hosts = PsiTreeUtil.findChildrenOfType(psiClass, PsiLanguageInjectionHost.class);
+
+        final Map<String, MultiHostRegistrar> registrers = new HashMap<String, MultiHostRegistrar>();
+        final Map<String, List<Injection>> injectionsByModules = new HashMap<String, List<Injection>>();
+        if(hosts.size() > 0) {
+            varModuleCaches.set(new HashMap<PsiVariable, Set<String>>()); classModuleCaches.set(new HashMap<PsiClass, String>());
+            for (final PsiLanguageInjectionHost host : hosts) {
+                getLanguagesToInject(host, new InjectedLanguagePlaces() {
+                    public void addInnerStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix, String suffix) {
+                        List<Injection> injections = injectionsByModules.get(moduleName);
+                        if(injections == null) {
+                            injections = new ArrayList<Injection>();
+                            injectionsByModules.put(moduleName, injections);
+                        }
+                        injections.add(new Injection(prefix, suffix, host, rangeInsideHost));
+                    }
+
+                    @Override
+                    public void addStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix, String suffix) {
+                        addInnerStatementUsage(rangeInsideHost, moduleName, prefix, suffix);
+                    }
+
+                    @Override
+                    public void addModuleUsage(TextRange rangeInsideHost) {
+                        addInnerStatementUsage(rangeInsideHost, "MODULE", "EXTERNAL MODULE ", ";");
+                    }
+                });
+            }
+            varModuleCaches.set(null); classModuleCaches.set(null);
+            for(Map.Entry<String, List<Injection>> injectionByModule : injectionsByModules.entrySet()) {
+                MultiHostRegistrar transReg = registrar.startInjecting(LSFLanguage.INSTANCE);
+                String module = injectionByModule.getKey();
+
+                boolean first = true;
+                for(Injection injection : injectionByModule.getValue()) {
+                    String prefix = injection.prefix;
+                    if(first) {
+                        if (!module.equals("MODULE"))
+                            prefix = "REQUIRE " + module + "; " + prefix;
+                        prefix = "MODULE x; " + prefix;
+                        first = false;
+                    }
+
+                    transReg.addPlace(prefix, injection.suffix, injection.host, injection.rangeInsideHost);
+                }
+
+                transReg.doneInjecting();
+            }
+        }
+    }
+
+    @NotNull
+    @Override
+    public List<? extends Class<? extends PsiElement>> elementsToInjectIn() {
+        return Collections.singletonList(PsiClass.class);
+    }
+
+    //    @Override
     public void getLanguagesToInject(@NotNull PsiLanguageInjectionHost element, @NotNull InjectedLanguagePlaces injectionPlacesRegistrar) {
         if(element instanceof PsiLiteralExpression) {
             PsiLiteralExpression literalExpression = (PsiLiteralExpression) element;
@@ -53,7 +138,7 @@ public class LSFToJavaLanguageInjector implements LanguageInjector {
     private void resolveModuleRefs(PsiReferenceExpression methodExpression, PsiLiteralExpression element, InjectedLanguagePlaces injectionPlacesRegistrar) {
         String methodName = methodExpression.getReferenceName();
         if (isOneOfStrings(methodName, GET_MODULE)) {
-            injectionPlacesRegistrar.addPlace(LSFLanguage.INSTANCE, new TextRange(1, element.getTextLength() - 1), "MODULE x; REQUIRE ", ";");
+            injectionPlacesRegistrar.addModuleUsage(new TextRange(1, element.getTextLength() - 1));
         }
     }
 
@@ -104,7 +189,7 @@ public class LSFToJavaLanguageInjector implements LanguageInjector {
             moduleName = getTopModuleList(methodExpression);
         javaOrPropertyReference(element, classRef, moduleName, onlyModule, injectionPlacesRegistrar);
     }
-    
+
     private String getTopModuleList(PsiElement element) {
 
         List<PsiFile> filesByPath = LSFPsiUtils.findFilesByPath(element, "lsfusion.properties");
@@ -118,13 +203,13 @@ public class LSFToJavaLanguageInjector implements LanguageInjector {
             }
         }
         return "dumb";
-    } 
-    
+    }
+
     private String getFileBaseName(String path) {
         int dir = path.lastIndexOf("/");
         if(dir > 0)
             path = path.substring(dir+1);
-        
+
         int sep = path.lastIndexOf(".");
         if(sep > 0)
             path = path.substring(0, sep);
@@ -162,74 +247,20 @@ public class LSFToJavaLanguageInjector implements LanguageInjector {
                 //  someLM = BL.getModule("Some")
 
                 PsiVariable lmVar = (PsiVariable) lmRef;
-                //todo: check type of lmVar
-                
-                List<PsiExpression> rightExprs = new ArrayList<PsiExpression>();
-                if(lmVar.hasInitializer())
-                    rightExprs.add(lmVar.getInitializer());
+                Map<PsiVariable, Set<String>> varModuleCachesMap = varModuleCaches.get();
+                Set<String> varModules = varModuleCachesMap.get(lmVar);
+                if(varModules == null) {
+                    varModules = new HashSet<String>();
 
-                GlobalSearchScope fileScope = fileScope(lmVar.getContainingFile());
-                Collection<PsiReference> refs = ReferencesSearch.search(lmVar, fileScope, false).findAll();
-                for (PsiReference ref : refs) {
-                    PsiElement refElement = ref.getElement();
-                    PsiAssignmentExpression assignmentExpression = PsiTreeUtil.getParentOfType(refElement, PsiAssignmentExpression.class);
-                    if (assignmentExpression != null && assignmentExpression.getLExpression() == refElement) {
-                        rightExprs.add(assignmentExpression.getRExpression());
-                    }
+                    String usageName = getVarUsageModuleName(methodExpression, lmVar);
+                    if(usageName != null)
+                        varModules.add(usageName);
+                    else
+                        getModulesFromType(lmVar.getType(), varModules);
+
+                    varModuleCachesMap.put(lmVar, varModules);
                 }
-                
-                for (PsiExpression rightExpr : rightExprs) {
-                    if (rightExpr instanceof PsiMethodCallExpression) {
-                        PsiMethodCallExpression methodCall = (PsiMethodCallExpression) rightExpr;
-                        String methodName = methodCall.getMethodExpression().getReferenceName();
-
-                        if (isOneOfStrings(methodName, ADD_MODULE_FROM_RESOURCE)) {
-                            //  someLM = addModuleFromResource("scripts/path/Some.lsf")
-                            PsiExpression[] methodArgs = methodCall.getArgumentList().getExpressions();
-                            if (methodArgs.length == 1) {
-                                PsiExpression expr = methodArgs[0];
-                                if (expr instanceof PsiLiteralExpression) {
-                                    Object argValue = ((PsiLiteralExpression) expr).getValue();
-                                    if (argValue instanceof String) {
-                                        List<PsiFile> files = LSFPsiUtils.findFilesByPath(methodExpression, (String) argValue);
-                                        for (PsiFile file : files) {
-                                            if (file instanceof LSFFile) {
-                                                LSFFile lsfFile = (LSFFile) file;
-                                                LSFModuleDeclaration moduleDecl = lsfFile.getModuleDeclaration();
-                                                if (moduleDecl != null) {
-                                                    return moduleDecl.getName();
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            return "1_nonexistent_name";
-                        }
-                    }
-
-                    //  someLM = some.long().qualifiers(var).Line.getModule("Some")
-                    final Result<String> moduleName = new Result<String>();
-                    PsiTreeUtil.processElements(rightExpr, new PsiElementProcessor() {
-                        @Override
-                        public boolean execute(@NotNull PsiElement element) {
-                            if (element instanceof PsiMethodCallExpression) {
-                                String name = extractModuleNameFromPossibleGetModuleCall((PsiMethodCallExpression) element);
-                                if (name != null) {
-                                    moduleName.setResult(name);
-                                    return false;
-                                }
-                            }
-                            return true;
-                        }
-                    });
-                    if (moduleName.getResult() != null) {
-                        return moduleName.getResult();
-                    }
-                }
-
-                if(modules.isEmpty())
-                    getModulesFromType(lmVar.getType(), modules);
+                modules.addAll(varModules);
             }
         } else if (qualifierExpression instanceof PsiThisExpression) {
             PsiType type = qualifierExpression.getType();
@@ -247,12 +278,79 @@ public class LSFToJavaLanguageInjector implements LanguageInjector {
         return null;
     }
 
+    private String getVarUsageModuleName(PsiReferenceExpression methodExpression, PsiVariable lmVar) {
+        //todo: check type of lmVar
+        List<PsiExpression> rightExprs = new ArrayList<PsiExpression>();
+        if (lmVar.hasInitializer())
+            rightExprs.add(lmVar.getInitializer());
+
+        GlobalSearchScope fileScope = fileScope(lmVar.getContainingFile());
+        Collection<PsiReference> refs = ReferencesSearch.search(lmVar, fileScope, false).findAll();
+        for (PsiReference ref : refs) {
+            PsiElement refElement = ref.getElement();
+            PsiAssignmentExpression assignmentExpression = PsiTreeUtil.getParentOfType(refElement, PsiAssignmentExpression.class);
+            if (assignmentExpression != null && assignmentExpression.getLExpression() == refElement) {
+                rightExprs.add(assignmentExpression.getRExpression());
+            }
+        }
+
+        for (PsiExpression rightExpr : rightExprs) {
+            if (rightExpr instanceof PsiMethodCallExpression) {
+                PsiMethodCallExpression methodCall = (PsiMethodCallExpression) rightExpr;
+                String methodName = methodCall.getMethodExpression().getReferenceName();
+
+                if (isOneOfStrings(methodName, ADD_MODULE_FROM_RESOURCE)) {
+                    //  someLM = addModuleFromResource("scripts/path/Some.lsf")
+                    PsiExpression[] methodArgs = methodCall.getArgumentList().getExpressions();
+                    if (methodArgs.length == 1) {
+                        PsiExpression expr = methodArgs[0];
+                        if (expr instanceof PsiLiteralExpression) {
+                            Object argValue = ((PsiLiteralExpression) expr).getValue();
+                            if (argValue instanceof String) {
+                                List<PsiFile> files = LSFPsiUtils.findFilesByPath(methodExpression, (String) argValue);
+                                for (PsiFile file : files) {
+                                    if (file instanceof LSFFile) {
+                                        LSFFile lsfFile = (LSFFile) file;
+                                        LSFModuleDeclaration moduleDecl = lsfFile.getModuleDeclaration();
+                                        if (moduleDecl != null) {
+                                            return moduleDecl.getName();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return "1_nonexistent_name";
+                }
+            }
+
+            //  someLM = some.long().qualifiers(var).Line.getModule("Some")
+            final Result<String> moduleName = new Result<String>();
+            PsiTreeUtil.processElements(rightExpr, new PsiElementProcessor() {
+                @Override
+                public boolean execute(@NotNull PsiElement element) {
+                    if (element instanceof PsiMethodCallExpression) {
+                        String name = extractModuleNameFromPossibleGetModuleCall((PsiMethodCallExpression) element);
+                        if (name != null) {
+                            moduleName.setResult(name);
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            });
+            if (moduleName.getResult() != null)
+                return moduleName.getResult();
+        }
+        return null;
+    }
+
     private void getModulesFromType(PsiType varType, Set<String> modules) {
         if(varType instanceof PsiClassType) {
             PsiClass psiClass = ((PsiClassType) varType).resolve();
             if(psiClass != null) {
                 getModulesFromConstructor(modules, psiClass);
-            }                        
+            }
         }
     }
 
@@ -351,17 +449,31 @@ public class LSFToJavaLanguageInjector implements LanguageInjector {
         } else
             prefix = "PROPERTY";
 
-        injectionPlacesRegistrar.addPlace(LSFLanguage.INSTANCE, new TextRange(1, element.getTextLength() - 1), "MODULE x; REQUIRE " + moduleName + "; EXTERNAL " + prefix + " ", ";");
+        injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), moduleName, "EXTERNAL " + prefix + " ", ";");
     }
 
     private String getModuleForActionClass(final @NotNull PsiClass clazz) {
+        Map<PsiClass, String> classModuleCachesMap = classModuleCaches.get();
+        String module = classModuleCachesMap.get(clazz);
+        if(module != null) {
+//            if(!module.equals(calcModuleActionForClass(clazz)))
+//                module = module;
+            return module;
+        }
+
+        module = calcModuleActionForClass(clazz);
+        classModuleCachesMap.put(clazz, module);
+        return module;
+    }
+
+    private String calcModuleActionForClass(PsiClass clazz) {
         GlobalSearchScope scope = getModuleScope(clazz);
 
         final List<PsiClass> result = new ArrayList<PsiClass>();
         result.add(clazz);
         ClassImplementationsSearch.processImplementations(clazz, new Processor<PsiElement>() {
             public boolean process(PsiElement psiElement) {
-                if(psiElement instanceof PsiClass)
+                if (psiElement instanceof PsiClass)
                     result.add((PsiClass) psiElement);
                 return true;
             }
@@ -377,10 +489,10 @@ public class LSFToJavaLanguageInjector implements LanguageInjector {
                 }
             }
         }
-        
+
         if(moduleNames.isEmpty())
             return getTopModuleList(clazz);
-        
+
         return BaseUtils.toString(moduleNames, ",");
     }
 

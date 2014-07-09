@@ -128,7 +128,7 @@
         <typeHierarchyProvider language="Lsf"
                                implementationClass="com.lsfusion.hierarchy.classes.LSFClassHierarchyProvider"/>
 
-        <languageInjector implementation="com.lsfusion.references.LSFToJavaLanguageInjector" />
+        <multiHostInjector implementation="com.lsfusion.references.LSFToJavaLanguageInjector" />
         <!--<languageInjector implementation="com.lsfusion.references.LSFToJrxmlLanguageInjector" />-->
         <!--<psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>-->
         <lang.syntaxHighlighterFactory key="Lsf"
