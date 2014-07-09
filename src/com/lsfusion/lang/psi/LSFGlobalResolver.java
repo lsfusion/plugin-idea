@@ -176,8 +176,11 @@ public class LSFGlobalResolver {
         for(FullNameStubElementType<S, T> type : types)
             decls.addAll(type.getGlobalIndex().get(name, file.getProject(), scope));
         for (T virtDecl : virtDecls) {
-            if (virtDecl != null && name != null && name.equals(virtDecl.getDeclName()) && scope.contains(virtDecl.getLSFFile().getVirtualFile())) {
-                decls.add(virtDecl);
+            if (virtDecl != null && name != null && name.equals(virtDecl.getDeclName())) {
+                VirtualFile virtualFile = virtDecl.getLSFFile().getVirtualFile();
+                if (virtualFile != null && scope.contains(virtualFile)) {
+                    decls.add(virtDecl);
+                }
             }
         }
 

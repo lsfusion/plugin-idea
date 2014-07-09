@@ -12,7 +12,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -22,14 +21,16 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Segment;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageManagerImpl;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
-import com.lsfusion.references.FromJavaReferenceAnnotator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,18 +40,19 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class ShowErrorsAction extends AnAction {
     private final String EXCLUDED_MODULES = "EXCLUDED_MODULES_ERRORS_SEARCH";
+    private final String INCLUDE_LSF_FILES = "INCLUDE_LSF_FILES_ERRORS_SEARCH";
     private final String INCLUDE_JAVA_FILES = "INCLUDE_JAVA_FILES_ERRORS_SEARCH";
     private final String INCLUDE_JRXML_FILES = "INCLUDE_JRXML_FILES_ERRORS_SEARCH";
     private final LSFReferenceAnnotator ANNOTATOR = new LSFReferenceAnnotator();
-    private final FromJavaReferenceAnnotator JAVA_ANNOTATOR = new FromJavaReferenceAnnotator();
-//    private final FromJRXMLReferenceAnnotator JRXML_ANNOTATOR = new FromJRXMLReferenceAnnotator(); // todo
 
     private Project project;
+    private boolean includeLSFFiles = true;
     private boolean includeJavaFiles = false;
     private boolean includeJrxmlFiles = false;
 
@@ -82,13 +84,21 @@ public class ShowErrorsAction extends AnAction {
                     }
                 }
 
-                final List<VirtualFile> files = new ArrayList<VirtualFile>(FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope));
+                final List<VirtualFile> files = new ArrayList<VirtualFile>();
 
+                if (includeLSFFiles) {
+                    files.addAll(FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope));
+                }
                 if (includeJavaFiles) {
                     files.addAll(FileTypeIndex.getFiles(JavaFileType.INSTANCE, searchScope));
                 }
                 if (includeJrxmlFiles) {
-//                    files.addAll(FileTypeIndex.getFiles(XmlFileType.INSTANCE, searchScope));  // todo: jrxmlType
+                    Collection<VirtualFile> xmlFiles = FileTypeIndex.getFiles(XmlFileType.INSTANCE, searchScope);
+                    for (VirtualFile xmlFile : xmlFiles) {
+                        if (xmlFile.getName().endsWith("jrxml")) {
+                            files.add(xmlFile);
+                        }
+                    }
                 }
 
                 ApplicationManager.getApplication().runReadAction(new Runnable() {
@@ -98,7 +108,11 @@ public class ShowErrorsAction extends AnAction {
                         for (VirtualFile file : files) {
                             index++;
                             indicator.setText("Processing " + index + "/" + files.size() + ": " + file.getName());
-                            findErrors(PsiManager.getInstance(project).findFile(file), file.getFileType());
+                            if (file.getFileType() == LSFFileType.INSTANCE) {
+                                findLSFErrors(PsiManager.getInstance(project).findFile(file));
+                            } else {
+                                findInjectedErrors(PsiManager.getInstance(project).findFile(file));
+                            }
                         }
                     }
                 });
@@ -120,29 +134,28 @@ public class ShowErrorsAction extends AnAction {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = showBalloonsState;    
+                NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = showBalloonsState;
             }
         });
     }
 
-    private void findErrors(final PsiElement element, FileType fileType) {
-        boolean java = fileType == JavaFileType.INSTANCE;
-        boolean jrxml = fileType == XmlFileType.INSTANCE; // todo: jrxmlType
-
-        if (java) {
-            if (element.getContainingFile().getName().contains("ImportBIVCDOSActionProperty")) {
-                System.out.println();
-            }
-            JAVA_ANNOTATOR.annotate(element, new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile())), true);
-        } else if (jrxml) {
-            // todo
-//            JRXML_ANNOTATOR.annotate(element, new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile())), true);
-        } else {
-            ANNOTATOR.annotate(element, new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile())), true);
-        }
+    private void findLSFErrors(PsiElement element) {
+        ANNOTATOR.annotate(element, new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile())), true);
 
         for (PsiElement child : element.getChildren()) {
-            findErrors(child, fileType);
+            findLSFErrors(child);
+        }
+    }
+
+    private void findInjectedErrors(PsiElement element) {
+        List<Pair<PsiElement, TextRange>> injectedPsiFiles = InjectedLanguageManagerImpl.getInstance(project).getInjectedPsiFiles(element);
+        if (injectedPsiFiles != null) {
+            for (Pair<PsiElement, TextRange> injectedPsiFile : injectedPsiFiles) {
+                findLSFErrors(injectedPsiFile.first);
+            }
+        }
+        for (PsiElement child : element.getChildren()) {
+            findInjectedErrors(child);
         }
     }
 
@@ -206,7 +219,18 @@ public class ShowErrorsAction extends AnAction {
             JPanel boxesPanel = new JPanel();
             boxesPanel.setLayout(new BoxLayout(boxesPanel, BoxLayout.Y_AXIS));
 
-            final JCheckBox includeJavaFilesBox = new JCheckBox("Include Java files");
+            final JCheckBox includeLSFFilesBox = new JCheckBox("Search in LSF files");
+            includeLSFFilesBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    includeLSFFiles = includeLSFFilesBox.isSelected();
+                }
+            });
+            includeLSFFiles = Boolean.valueOf(PropertiesComponent.getInstance(project).getValue(INCLUDE_LSF_FILES));
+            includeLSFFilesBox.setSelected(includeLSFFiles);
+            boxesPanel.add(includeLSFFilesBox);
+
+            final JCheckBox includeJavaFilesBox = new JCheckBox("Search in Java files");
             includeJavaFilesBox.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -217,7 +241,7 @@ public class ShowErrorsAction extends AnAction {
             includeJavaFilesBox.setSelected(includeJavaFiles);
             boxesPanel.add(includeJavaFilesBox);
 
-            final JCheckBox includeJrxmlFilesBox = new JCheckBox("Include JRXML files (not supported yet)");
+            final JCheckBox includeJrxmlFilesBox = new JCheckBox("Search in JRXML files");
             includeJrxmlFilesBox.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -236,6 +260,7 @@ public class ShowErrorsAction extends AnAction {
         @Override
         protected void doOKAction() {
             PropertiesComponent.getInstance(project).setValue(EXCLUDED_MODULES, modulesToExclude.getText());
+            PropertiesComponent.getInstance(project).setValue(INCLUDE_LSF_FILES, String.valueOf(includeLSFFiles));
             PropertiesComponent.getInstance(project).setValue(INCLUDE_JAVA_FILES, String.valueOf(includeJavaFiles));
             PropertiesComponent.getInstance(project).setValue(INCLUDE_JRXML_FILES, String.valueOf(includeJrxmlFiles));
 
