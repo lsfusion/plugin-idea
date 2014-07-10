@@ -108,6 +108,9 @@
         <action id="File.UnqualifyRefs" class="com.lsfusion.actions.FileUnqualifyRefsAction" text="Unqualify refs for file" description="Unqualify refs for file">
             <add-to-group group-id="CodeMenu"/>
         </action>
+        <!--<action id="Project.RenameFields" class="com.lsfusion.actions.RenameJrxmlFieldsToNewFormat" text="Rename jrxml fields" description="Rename jrxml fields to new format">-->
+            <!--<add-to-group group-id="CodeMenu"/>-->
+        <!--</action>-->
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
@@ -129,7 +132,7 @@
                                implementationClass="com.lsfusion.hierarchy.classes.LSFClassHierarchyProvider"/>
 
         <multiHostInjector implementation="com.lsfusion.references.LSFToJavaLanguageInjector" />
-        <!--<languageInjector implementation="com.lsfusion.references.LSFToJrxmlLanguageInjector" />-->
+        <multiHostInjector implementation="com.lsfusion.references.LSFToJrxmlLanguageInjector" />
         <!--<psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>-->
         <lang.syntaxHighlighterFactory key="Lsf"
                                        implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>

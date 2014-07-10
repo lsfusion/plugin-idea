@@ -51,6 +51,8 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
     @Override
     public void getLanguagesToInject(final @NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
+        assert context instanceof PsiClass;
+        
         PsiClass psiClass = (PsiClass)context;
         Collection<PsiLanguageInjectionHost> hosts = PsiTreeUtil.findChildrenOfType(psiClass, PsiLanguageInjectionHost.class);
 
@@ -111,7 +113,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 //                transReg.doneInjecting();
 //            }
             for(Map.Entry<String, List<Injection>> injectionByModule : injectionsByModules.entrySet()) {
-                MultiHostRegistrar transReg = registrar.startInjecting(LSFLanguage.INSTANCE);
+                registrar.startInjecting(LSFLanguage.INSTANCE);
                 String module = injectionByModule.getKey();
 
                 boolean first = true;
@@ -124,10 +126,10 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                         first = false;
                     }
 
-                    transReg.addPlace(prefix, ";\n", injection.host, injection.rangeInsideHost);
+                    registrar.addPlace(prefix, ";\n", injection.host, injection.rangeInsideHost);
                 }
 
-                transReg.doneInjecting();
+                registrar.doneInjecting();
             }
         }
     }

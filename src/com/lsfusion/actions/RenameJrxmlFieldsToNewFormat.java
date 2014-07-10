@@ -35,6 +35,7 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.references.LSFToJrxmlLanguageInjector;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,12 +54,10 @@ import static org.apache.commons.lang.StringUtils.removeEnd;
  */
 public class RenameJrxmlFieldsToNewFormat extends AnAction {
 
+    private static final Pattern fieldExprPattern = Pattern.compile("(\\$F\\s*\\{\\s*)([\\w\\(\\)\\,]+)(\\s*\\})");
+
     private static final String oldHeaderPostfix = "(caption)";
     private static final String oldFooterPostfix = "(footer)";
-
-    private static final String newHeaderPostfix = ".header";
-    private static final String newFooterPostfix = ".footer";
-    private static final String newObjectPostfix = ".object";
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -246,8 +245,6 @@ public class RenameJrxmlFieldsToNewFormat extends AnAction {
         }
     }
 
-    Pattern fieldExprPattern = Pattern.compile("(\\$F\\s*\\{\\s*)([\\w\\(\\)\\,]+)(\\s*\\})");
-
     private String renameInText(String text, Set<String> objects) {
         Matcher m = fieldExprPattern.matcher(text);
 
@@ -264,11 +261,11 @@ public class RenameJrxmlFieldsToNewFormat extends AnAction {
     @NotNull
     private String getNewFieldName(@NotNull String fieldName, Set<String> objects) {
         if (fieldName.endsWith(oldHeaderPostfix)) {
-            return removeEnd(fieldName, oldHeaderPostfix) + newHeaderPostfix;
+            return removeEnd(fieldName, oldHeaderPostfix) + LSFToJrxmlLanguageInjector.headerPostfix;
         }
 
         if (fieldName.endsWith(oldFooterPostfix)) {
-            return removeEnd(fieldName, oldFooterPostfix) + newFooterPostfix;
+            return removeEnd(fieldName, oldFooterPostfix) + LSFToJrxmlLanguageInjector.footerPostfix;
         }
 
         if (fieldName.contains("(")) {
@@ -276,7 +273,7 @@ public class RenameJrxmlFieldsToNewFormat extends AnAction {
         }
 
         if (objects.contains(fieldName)) {
-            return fieldName + newObjectPostfix;
+            return fieldName + LSFToJrxmlLanguageInjector.objectPostfix;
         }
 
         return fieldName;
