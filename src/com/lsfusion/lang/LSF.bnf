@@ -96,9 +96,9 @@ private statement ::=   constraintStatement
                     |   stubStatement
                     
 externalStatement ::= EXTERNAL (externalProperty | externalClass | externalModule | externalPropertyDraw | externalFormObject) SEMI {pin = 1}
-externalProperty ::= PROPERTY noContextPropertyUsage {pin = 1} 
-externalClass ::= CLASS className {pin = 1}
-externalModule ::= MODULE moduleUsage {pin = 1}
+externalProperty ::= PROPERTY nonEmptyNoContextPropertyUsageList {pin = 1} 
+externalClass ::= CLASS nonEmptyClassNameList {pin = 1}
+externalModule ::= MODULE nonEmptyModuleUsageList {pin = 1}
 externalPropertyDraw ::= PROPERTYDRAW formUsage formPropertyDrawUsage
 {
     pin = 1

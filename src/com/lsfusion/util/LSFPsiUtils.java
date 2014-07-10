@@ -1,5 +1,6 @@
 package com.lsfusion.util;
 
+import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
@@ -435,5 +436,13 @@ public class LSFPsiUtils {
         };
         PsiTreeUtil.processElements(element, processor);
         return processor.getCollection();
+    }
+    
+    public static boolean isInjected(PsiElement element) {
+        PsiFile injectedFile = element.getContainingFile();
+        if (injectedFile == null) return false;
+        Project project = injectedFile.getProject();
+        InjectedLanguageManager languageManager = InjectedLanguageManager.getInstance(project);
+        return languageManager.isInjectedFragment(injectedFile);
     }
 }

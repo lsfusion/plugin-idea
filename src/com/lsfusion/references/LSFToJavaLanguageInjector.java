@@ -31,20 +31,16 @@ import static com.lsfusion.util.LSFPsiUtils.getModuleScope;
 public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
     public interface InjectedLanguagePlaces {
-
-        void addStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix, String suffix);
-        void addModuleUsage(TextRange rangeInsideHost);
+        void addStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix);
     }
 
     private static class Injection {
         public final String prefix;
-        public final String suffix;
         public final PsiLanguageInjectionHost host;
         public final TextRange rangeInsideHost;
 
-        private Injection(String prefix, String suffix, PsiLanguageInjectionHost host, TextRange rangeInsideHost) {
+        private Injection(String prefix, PsiLanguageInjectionHost host, TextRange rangeInsideHost) {
             this.prefix = prefix;
-            this.suffix = suffix;
             this.host = host;
             this.rangeInsideHost = rangeInsideHost;
         }
@@ -58,33 +54,62 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
         PsiClass psiClass = (PsiClass)context;
         Collection<PsiLanguageInjectionHost> hosts = PsiTreeUtil.findChildrenOfType(psiClass, PsiLanguageInjectionHost.class);
 
-        final Map<String, MultiHostRegistrar> registrers = new HashMap<String, MultiHostRegistrar>();
+        // группировка по префиксам по неизвестной причине не работает
+//        final Map<String, Map<String, List<Injection>>> injectionsByModules = new HashMap<String, Map<String, List<Injection>>>();
         final Map<String, List<Injection>> injectionsByModules = new HashMap<String, List<Injection>>();
         if(hosts.size() > 0) {
-            varModuleCaches.set(new HashMap<PsiVariable, Set<String>>()); classModuleCaches.set(new HashMap<PsiClass, String>());
+            varModuleCaches.set(new HashMap<PsiVariable, Set<String>>()); 
+            classModuleCaches.set(new HashMap<PsiClass, String>());
             for (final PsiLanguageInjectionHost host : hosts) {
                 getLanguagesToInject(host, new InjectedLanguagePlaces() {
-                    public void addInnerStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix, String suffix) {
+                    public void addStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix) {
+//                        Map<String, List<Injection>> injections = injectionsByModules.get(moduleName);
+//                        if(injections == null) {
+//                            injections = new HashMap<String, List<Injection>>();
+//                            injectionsByModules.put(moduleName, injections);
+//                        }
+//                        List<Injection> prefixInjections = injections.get(prefix);
+//                        if(prefixInjections == null) {
+//                            prefixInjections = new ArrayList<Injection>();
+//                            injections.put(prefix, prefixInjections);
+//                        }
+//                        prefixInjections.add(new Injection(host, rangeInsideHost));
+
                         List<Injection> injections = injectionsByModules.get(moduleName);
                         if(injections == null) {
                             injections = new ArrayList<Injection>();
                             injectionsByModules.put(moduleName, injections);
                         }
-                        injections.add(new Injection(prefix, suffix, host, rangeInsideHost));
-                    }
-
-                    @Override
-                    public void addStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix, String suffix) {
-                        addInnerStatementUsage(rangeInsideHost, moduleName, prefix, suffix);
-                    }
-
-                    @Override
-                    public void addModuleUsage(TextRange rangeInsideHost) {
-                        addInnerStatementUsage(rangeInsideHost, "MODULE", "EXTERNAL MODULE ", ";");
+                        injections.add(new Injection(prefix, host, rangeInsideHost));
                     }
                 });
             }
-            varModuleCaches.set(null); classModuleCaches.set(null);
+            varModuleCaches.set(null); 
+            classModuleCaches.set(null);
+//            for(Map.Entry<String, Map<String, List<Injection>>> injectionByModule : injectionsByModules.entrySet()) {
+//                MultiHostRegistrar transReg = registrar.startInjecting(LSFLanguage.INSTANCE);
+//                String module = injectionByModule.getKey();
+//
+//                boolean first = true;
+//                for(Map.Entry<String, List<Injection>> injection : injectionByModule.getValue().entrySet()) {
+//                    String prefix = injection.getKey();
+//                    if(first) {
+//                        if (!module.equals("MODULE"))
+//                            prefix = "REQUIRE " + module + "; " + prefix;
+//                        prefix = "MODULE x; " + prefix;
+//                        first = false;
+//                    }
+//
+//                    List<Injection> value = injection.getValue();
+//                    for (int i = 0, size = value.size(); i < size; i++) {
+//                        Injection inj = value.get(i);
+//                        transReg.addPlace(prefix, i == size - 1 ? "; " : "", inj.host, inj.rangeInsideHost);
+//                        prefix = ",";
+//                    }
+//                }
+//
+//                transReg.doneInjecting();
+//            }
             for(Map.Entry<String, List<Injection>> injectionByModule : injectionsByModules.entrySet()) {
                 MultiHostRegistrar transReg = registrar.startInjecting(LSFLanguage.INSTANCE);
                 String module = injectionByModule.getKey();
@@ -94,12 +119,12 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                     String prefix = injection.prefix;
                     if(first) {
                         if (!module.equals("MODULE"))
-                            prefix = "REQUIRE " + module + "; " + prefix;
-                        prefix = "MODULE x; " + prefix;
+                            prefix = "REQUIRE " + module + ";\n" + prefix;
+                        prefix = "MODULE x;\n" + prefix;
                         first = false;
                     }
 
-                    transReg.addPlace(prefix, injection.suffix, injection.host, injection.rangeInsideHost);
+                    transReg.addPlace(prefix, ";\n", injection.host, injection.rangeInsideHost);
                 }
 
                 transReg.doneInjecting();
@@ -138,7 +163,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
     private void resolveModuleRefs(PsiReferenceExpression methodExpression, PsiLiteralExpression element, InjectedLanguagePlaces injectionPlacesRegistrar) {
         String methodName = methodExpression.getReferenceName();
         if (isOneOfStrings(methodName, GET_MODULE)) {
-            injectionPlacesRegistrar.addModuleUsage(new TextRange(1, element.getTextLength() - 1));
+            injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), "MODULE", "EXTERNAL MODULE ");
         }
     }
 
@@ -449,7 +474,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
         } else
             prefix = "PROPERTY";
 
-        injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), moduleName, "EXTERNAL " + prefix + " ", ";");
+        injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), moduleName, "EXTERNAL " + prefix + " ");
     }
 
     private String getModuleForActionClass(final @NotNull PsiClass clazz) {
