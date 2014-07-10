@@ -29,6 +29,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageManagerImpl;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.containers.ArrayListSet;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import org.jetbrains.annotations.NotNull;
@@ -39,10 +40,8 @@ import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class ShowErrorsAction extends AnAction {
     private final String EXCLUDED_MODULES = "EXCLUDED_MODULES_ERRORS_SEARCH";
@@ -147,15 +146,24 @@ public class ShowErrorsAction extends AnAction {
         }
     }
 
-    private void findInjectedErrors(PsiElement element) {
+    private void collectLSFFiles(PsiElement element, Set<PsiElement> lsfFiles) {
         List<Pair<PsiElement, TextRange>> injectedPsiFiles = InjectedLanguageManagerImpl.getInstance(project).getInjectedPsiFiles(element);
         if (injectedPsiFiles != null) {
             for (Pair<PsiElement, TextRange> injectedPsiFile : injectedPsiFiles) {
-                findLSFErrors(injectedPsiFile.first);
+                lsfFiles.add(injectedPsiFile.first);
             }
         }
         for (PsiElement child : element.getChildren()) {
-            findInjectedErrors(child);
+            collectLSFFiles(child, lsfFiles);
+        }
+    }
+
+    private void findInjectedErrors(PsiElement element) {
+        Set<PsiElement> files = new ArrayListSet<PsiElement>();
+        collectLSFFiles(element, files);
+
+        for (PsiElement lsfFile : files) {
+            findLSFErrors(lsfFile);
         }
     }
 
@@ -264,10 +272,10 @@ public class ShowErrorsAction extends AnAction {
             PropertiesComponent.getInstance(project).setValue(INCLUDE_JAVA_FILES, String.valueOf(includeJavaFiles));
             PropertiesComponent.getInstance(project).setValue(INCLUDE_JRXML_FILES, String.valueOf(includeJrxmlFiles));
 
-            StringTokenizer tokenizer = new StringTokenizer(modulesToExclude.getText(), ", ");
+            StringTokenizer tokenizer = new StringTokenizer(modulesToExclude.getText(), ",;");
             final List<String> modules = new ArrayList<String>();
             while (tokenizer.hasMoreElements()) {
-                modules.add(tokenizer.nextToken());
+                modules.add(tokenizer.nextToken().trim());
             }
             super.doOKAction();
             executeSearchTask(modules);
