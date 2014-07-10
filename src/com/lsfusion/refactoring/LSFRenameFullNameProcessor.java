@@ -114,6 +114,8 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
 
             if (listener != null)
                 listener.elementRenamed(decl);
+        } else {
+            super.renameElement(element, newName, usages, listener);
         }
     }
                                             
