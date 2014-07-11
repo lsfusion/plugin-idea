@@ -1,12 +1,20 @@
 package com.lsfusion.refactoring;
 
+import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.refactoring.listeners.RefactoringElementListener;
@@ -14,6 +22,7 @@ import com.intellij.refactoring.rename.RenamePsiElementProcessor;
 import com.intellij.usageView.UsageInfo;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.MultiMap;
+import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.classes.*;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
@@ -26,6 +35,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static com.lsfusion.util.LSFPsiUtils.collectInjectedLSFFiles;
 
 public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
 
@@ -282,14 +293,14 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         return first.equals(second) || (isFirst && first.toLowerCase().equals(second.toLowerCase()));
     }
 
-    private static class ExtRef {
+    private static class ExtPropRef {
         public final LSFPropReference ref;
         public final LSFPropDeclaration decl;
         public final List<LSFClassSet> classes;
         public final boolean qualClasses;
         public final boolean qualNamespace;
 
-        private ExtRef(LSFPropReference ref, LSFPropDeclaration decl, List<LSFClassSet> classes, boolean qualClasses, boolean qualNamespace) {
+        private ExtPropRef(LSFPropReference ref, LSFPropDeclaration decl, List<LSFClassSet> classes, boolean qualClasses, boolean qualNamespace) {
             this.ref = ref;
             this.decl = decl;
             this.classes = classes;
@@ -298,66 +309,160 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         }
     }
     
-    // файлы должны быть в лексикографике
+    private static class ExtPropDrawRef {
+        public final LSFPropertyDrawReference ref;
+        public final LSFPropertyDrawDeclaration decl;
+
+        private ExtPropDrawRef(LSFPropertyDrawReference ref, LSFPropertyDrawDeclaration decl) {
+            this.ref = ref;
+            this.decl = decl;
+        }
+    }
+    
+    public static void shortenAllPropNames(Project project) {
+        GlobalSearchScope scope = ProjectScope.getProjectScope(project);
+
+        final List<LSFFile> files = new ArrayList<LSFFile>();
+
+        for (VirtualFile lsfFile : FileTypeIndex.getFiles(LSFFileType.INSTANCE, scope)) {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(lsfFile);
+            if (psiFile instanceof LSFFile) {
+                files.add((LSFFile) psiFile);
+            }
+        }
+        
+        for (VirtualFile javaFile : FileTypeIndex.getFiles(JavaFileType.INSTANCE, scope)) {
+            files.addAll(collectInjectedLSFFiles(javaFile, project));
+        }
+
+        for (VirtualFile xmlFile : FileTypeIndex.getFiles(XmlFileType.INSTANCE, scope)) {
+            if (xmlFile.getName().endsWith("jrxml")) {
+                files.addAll(collectInjectedLSFFiles(xmlFile, project));
+            }
+        }
+
+        MetaTransaction transaction = new MetaTransaction();
+
+        shortenAllPropNames(files, transaction);
+
+        transaction.apply();
+    }
+
     public static void shortenAllPropNames(Collection<LSFFile> files, MetaTransaction transaction) {
 
         MetaChangeDetector.getInstance(files.iterator().next().getProject()).setMetaEnabled(false, false);
 
-        List<ExtRef> resolvedRefs = new ArrayList<ExtRef>();
-        Map<LSFPropDeclaration, String> decls = new HashMap<LSFPropDeclaration, String>();
+        Map<LSFPropDeclaration, String> propertyDecls = new HashMap<LSFPropDeclaration, String>();
+        Map<LSFPropertyDrawDeclaration, String> propertyDrawDecls = new HashMap<LSFPropertyDrawDeclaration, String>();
         
-        System.out.println("Collecting decls...");
+        System.out.println("Collecting property decls...");
         int i = 0;
         for(LSFFile file : files) {
             i++;
             for(LSFPropDeclaration decl : PsiTreeUtil.findChildrenOfType(file, LSFPropDeclaration.class))
-                decls.put(decl, shortenName(decl));
+                propertyDecls.put(decl, shortenName(decl));
             System.out.println((double)i/((double)files.size()));
         }
 
-        System.out.println("Collecting and resolving refs...");
+        System.out.println("Collecting and resolving property refs...");
+
+        List<ExtPropRef> propRefs = new ArrayList<ExtPropRef>();
+        i = 0;
+        for (LSFFile file : files) {
+            i++;
+            for (LSFPropReference ref : PsiTreeUtil.findChildrenOfType(file, LSFPropReference.class)) {
+                LSFPropDeclaration decl = ref.resolveDecl();
+                if (decl != null) {
+                    List<LSFClassSet> paramClasses = decl.resolveParamClasses();
+                    if (paramClasses != null) {
+                        propRefs.add(new ExtPropRef(ref, decl, paramClasses, ref.hasExplicitClasses(), ref.getFullNameRef() != null));
+                    }
+                }
+            }
+            System.out.println((double) i / ((double) files.size()));
+        }
+        
+        System.out.println("Collecting property draw decls...");
+        i = 0;
+        for(ExtPropRef propRef : propRefs) {
+            i++;
+
+            LSFPropertyDrawDeclaration drawDecl = PsiTreeUtil.getParentOfType(propRef.ref.getElement(), LSFPropertyDrawDeclaration.class);
+            if (drawDecl != null) {
+                propertyDrawDecls.put(drawDecl, propertyDecls.get(propRef.decl));
+            }
+
+            System.out.println((double)i/((double)propRefs.size()));
+        }
+
+
+        System.out.println("Collecting and resolving property draw refs...");
+        List<ExtPropDrawRef> propDrawRefs = new ArrayList<ExtPropDrawRef>();
         i = 0;
         for(LSFFile file : files) {
             i++;
-            for(LSFPropReference ref : PsiTreeUtil.findChildrenOfType(file, LSFPropReference.class)) {
-                LSFPropDeclaration decl = ref.resolveDecl();
-                if(decl != null) {
-                    List<LSFClassSet> paramClasses = decl.resolveParamClasses();
-                    if(paramClasses != null)
-                        resolvedRefs.add(new ExtRef(ref, decl, paramClasses, ref.hasExplicitClasses(), ref.getFullNameRef()!=null));
+            for(LSFPropertyDrawReference ref : PsiTreeUtil.findChildrenOfType(file, LSFPropertyDrawReference.class)) {
+                if (ref.getAliasUsage() == null) {
+                    LSFPropertyDrawDeclaration decl = ref.resolveDecl();
+                    if (decl != null) {
+                        propDrawRefs.add(new ExtPropDrawRef(ref, decl));
+                    }
                 }
             }
             System.out.println((double)i/((double)files.size()));
         }
 
-        System.out.println("Renaming and qualifying refs...");
+        System.out.println("Renaming property draw refs...");
         i = 0;
-        for(ExtRef resolvedRef : resolvedRefs) {
+        for(ExtPropDrawRef propDrawRef : propDrawRefs) {
             i++;
-            resolvedRef.ref.handleElementRename(decls.get(resolvedRef.decl), transaction);
+
+            propDrawRef.ref.handleElementRename(propertyDrawDecls.get(propDrawRef.decl), transaction);
+
+            System.out.println((double)i/((double)propRefs.size()));
+        }
+
+        System.out.println("Renaming and qualifying property refs...");
+        i = 0;
+        for(ExtPropRef resolvedRef : propRefs) {
+            i++;
+
+            String newPropName = propertyDecls.get(resolvedRef.decl);
+
+            LSFPropReference propRef = resolvedRef.ref;
+            PsiElement propRefElement = propRef.getElement();
+
+            LSFPropertyDrawDeclaration drawDecl = PsiTreeUtil.getParentOfType(propRefElement, LSFPropertyDrawDeclaration.class);
+            if (drawDecl != null) {
+                propertyDrawDecls.put(drawDecl, newPropName);
+            }
+
+            propRef.handleElementRename(newPropName, transaction);
             if(!resolvedRef.qualClasses)
-                resolvedRef.ref.setExplicitClasses(resolvedRef.classes, transaction);
+                propRef.setExplicitClasses(resolvedRef.classes, transaction);
             if(!resolvedRef.qualNamespace && (resolvedRef.decl instanceof LSFFullNameDeclaration))
-                resolvedRef.ref.setFullNameRef(((LSFFullNameDeclaration)resolvedRef.decl).getNamespaceName(), transaction);
-            System.out.println((double)i/((double)resolvedRefs.size()));
+                propRef.setFullNameRef(((LSFFullNameDeclaration) resolvedRef.decl).getNamespaceName(), transaction);
+
+
+            System.out.println((double)i/((double)propRefs.size()));
         }
 
         System.out.println("Renaming decls...");
         i = 0;
-        for(Map.Entry<LSFPropDeclaration, String> decl : decls.entrySet()) {
+        for(Map.Entry<LSFPropDeclaration, String> decl : propertyDecls.entrySet()) {
             i++;
             decl.getKey().setName(decl.getValue(), transaction);
-            System.out.println((double)i/((double)decls.size()));
+            System.out.println((double)i/((double)propertyDecls.size()));
         }
 
         System.out.println("Unqualifying refs...");
         i = 0;
-        for(ExtRef possibleConflict : resolvedRefs) {
+        for(ExtPropRef possibleConflict : propRefs) {
             i++;
             if(possibleConflict.ref.resolveDecl()!=possibleConflict.decl)
                 possibleConflict = possibleConflict;
             unqualifyConflict(possibleConflict.ref, possibleConflict.decl, possibleConflict.classes, transaction);
-            System.out.println((double)i/((double)resolvedRefs.size()));
+            System.out.println((double)i/((double)propRefs.size()));
         }
     }
 

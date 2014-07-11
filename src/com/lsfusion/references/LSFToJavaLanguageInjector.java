@@ -152,8 +152,6 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
                     resolveModuleRefs(methodExpression, literalExpression, injectionPlacesRegistrar);
 
-                    resolveLogicsModuleMethodsRefs(methodExpression, literalExpression, injectionPlacesRegistrar);
-
                     resolveScriptingLogicsModuleMethodsRefs(methodExpression, literalExpression, injectionPlacesRegistrar);
 
                     resolveScriptingActionPropertyMethodsRefs(methodExpression, literalExpression, injectionPlacesRegistrar);
@@ -178,30 +176,19 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
     public static final String GET_MODULE = "getModule";
     public static final String ADD_MODULE_FROM_RESOURCE = "addModuleFromResource";
 
-    public static final String GET_LCP = "getLCP";
-    public static final String GET_LAP = "getLAP";
-    public static final String GET_CLASS = "getClass";
+    public static final String FIND_CLASS = "findClass";
+    public static final String FIND_ACTION = "findAction";
+    public static final String FIND_PROPERTY = "findProperty";
+    public static final String FIND_PROPERTIES = "findProperties";
 
-    public static final String GET_LCPBY_OLD_NAME = "getLCPByOldName";
-    public static final String GET_LAPBY_OLD_NAME = "getLAPByOldName";
-    public static final String GET_CLASS_BY_NAME = "getClassByName";
-
-    public static final String FIND_LCPBY_COMPOUND_OLD_NAME = "findLCPByCompoundOldName";
-    public static final String FIND_LAPBY_COMPOUND_OLD_NAME = "findLAPByCompoundOldName";
-    public static final String FIND_CLASS_BY_COMPOUND_NAME = "findClassByCompoundName";
-
-    private void resolveLogicsModuleMethodsRefs(PsiReferenceExpression methodExpression, PsiLiteralExpression element, InjectedLanguagePlaces injectionPlacesRegistrar) {
-        String methodName = methodExpression.getReferenceName();
-        if (isOneOfStrings(methodName, GET_LCPBY_OLD_NAME, GET_LAPBY_OLD_NAME, GET_CLASS_BY_NAME)) {
-            boolean classRef = GET_CLASS_BY_NAME.equals(methodName);
-            resolveModuleMethodsRef(methodExpression, element, classRef, true, injectionPlacesRegistrar);
-        }
-    }
+    public static final String LM_FIND_PROPERTY = "findProperty";
+    public static final String LM_FIND_ACTION = "findAction";
+    public static final String LM_FIND_CLASS = "findClass";
 
     private void resolveScriptingLogicsModuleMethodsRefs(PsiReferenceExpression methodExpression, PsiLiteralExpression element, InjectedLanguagePlaces injectionPlacesRegistrar) {
         String methodName = methodExpression.getReferenceName();
-        if (isOneOfStrings(methodName, FIND_LCPBY_COMPOUND_OLD_NAME, FIND_LAPBY_COMPOUND_OLD_NAME, FIND_CLASS_BY_COMPOUND_NAME)) {
-            boolean classRef = FIND_CLASS_BY_COMPOUND_NAME.equals(methodName);
+        if (isOneOfStrings(methodName, LM_FIND_PROPERTY, LM_FIND_ACTION, LM_FIND_CLASS)) {
+            boolean classRef = LM_FIND_CLASS.equals(methodName);
             resolveModuleMethodsRef(methodExpression, element, classRef, false, injectionPlacesRegistrar);
         }
     }
@@ -453,10 +440,10 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
     private void resolveScriptingActionPropertyMethodsRefs(PsiReferenceExpression methodExpression, PsiLiteralExpression element, InjectedLanguagePlaces injectionPlacesRegistrar) {
         String methodName = methodExpression.getReferenceName();
-        if (isOneOfStrings(methodName, GET_LAP, GET_LCP, GET_CLASS, GET_LCP + "s")) {
+        if (isOneOfStrings(methodName, FIND_ACTION, FIND_PROPERTY, FIND_CLASS, FIND_PROPERTIES)) {
             PsiElement qualifier = methodExpression.getQualifier();
             if (qualifier == null) {
-                referenceFromScriptingActionProperty(methodExpression, element, GET_CLASS.equals(methodName), false, injectionPlacesRegistrar);
+                referenceFromScriptingActionProperty(methodExpression, element, FIND_CLASS.equals(methodName), false, injectionPlacesRegistrar);
             }
         }
     }

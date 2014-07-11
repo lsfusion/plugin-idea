@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEnumerator;
 import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -16,12 +17,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageManagerImpl;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
+import com.intellij.util.containers.ArrayListSet;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -328,6 +331,38 @@ public class LSFPsiUtils {
     @NotNull
     public static List<LSFClassSet> getContextClasses(PsiElement psiElement, int offset, boolean objectRef) {
         return LSFPsiImplUtil.resolveParamDeclClasses(getContextParams(psiElement, offset, objectRef));
+    }
+
+    public static Set<LSFFile> collectInjectedLSFFiles(VirtualFile file, Project project) {
+        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+        if (psiFile == null) {
+            return Collections.EMPTY_SET;
+        }
+        
+        return collectInjectedLSFFiles(psiFile, project);
+    }
+
+    public static Set<LSFFile> collectInjectedLSFFiles(PsiElement root, Project project) {
+        Set<LSFFile> files = new ArrayListSet<LSFFile>();
+        collectInjectedLSFFiles(root, project, files);
+        return files;
+    }
+
+    public static void collectInjectedLSFFiles(PsiElement root, Project project, Set<LSFFile> lsfFiles) {
+        List<Pair<PsiElement, TextRange>> injectedPsiFiles = InjectedLanguageManagerImpl.getInstance(project).getInjectedPsiFiles(root);
+        if (injectedPsiFiles != null) {
+            for (Pair<PsiElement, TextRange> injectedPsiFile : injectedPsiFiles) {
+                PsiElement file = injectedPsiFile.first;
+                if (file instanceof LSFFile) {
+                    lsfFiles.add((LSFFile) file);
+                } else {
+                    System.out.println("Strange: " + file + " -> " + injectedPsiFile.second);
+                }
+            }
+        }
+        for (PsiElement child : root.getChildren()) {
+            collectInjectedLSFFiles(child, project, lsfFiles);
+        }
     }
 
     public abstract static class ResultHandler<T> {

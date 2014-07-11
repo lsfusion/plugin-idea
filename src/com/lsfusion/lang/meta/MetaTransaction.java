@@ -516,8 +516,8 @@ public class MetaTransaction {
         }
     }
 
-    public void regChange(List<ASTNode> add, ASTNode before, Type type) {
-        regChange(add, before, type == Type.REPLACE ? leafCount(before) - 1 : 0, type);
+    public void regChange(List<ASTNode> add, ASTNode anchor, Type type) {
+        regChange(add, anchor, type == Type.REPLACE ? leafCount(anchor) - 1 : 0, type);
     }
     public void regChange(List<ASTNode> add, ASTNode before, int cntAfterBefore, Type type) {
         PsiElement psi = before.getPsi();
