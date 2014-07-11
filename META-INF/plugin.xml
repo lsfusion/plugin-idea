@@ -85,7 +85,7 @@
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>
         </action>
-        <action id="TypeInfer.Project" class="com.lsfusion.lang.typeinfer.ProjectTypeInferAction"
+        <action id="TypeInfer.Project" class="com.lsfusion.actions.ProjectTypeInferAction"
                 text="Infer _types for project" description="Infer types for project">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>
@@ -101,6 +101,9 @@
         <action id="Project.Shorten" class="com.lsfusion.actions.ProjectShortenNamesAction" text="Shorten names for project" description="Shorten names for project">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift U" keymap="$default"/>
+        </action>
+        <action id="Project.InferShorten" class="com.lsfusion.actions.ProjectInferShortenAction" text="Infer types and shorten names for project" description="Infer types and shorten names for project">
+            <add-to-group group-id="CodeMenu"/>
         </action>
         <action id="Project.UnqualifyRefs" class="com.lsfusion.actions.ProjectUnqualifyRefsAction" text="Unqualify refs for project" description="Unqualify refs for project">
             <add-to-group group-id="CodeMenu"/>

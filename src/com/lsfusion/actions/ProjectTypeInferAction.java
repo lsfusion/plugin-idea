@@ -1,4 +1,4 @@
-package com.lsfusion.lang.typeinfer;
+package com.lsfusion.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -14,12 +14,18 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
+import com.lsfusion.lang.typeinfer.TypeInferer;
+import com.lsfusion.refactoring.LSFRenameFullNameProcessor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
 public class ProjectTypeInferAction extends AnAction {
 
+    protected boolean shortenAfter() {
+        return false;        
+    }
+    
     @Override
     public void actionPerformed(AnActionEvent e) {
         final Project myProject = e.getProject();
@@ -46,6 +52,9 @@ public class ProjectTypeInferAction extends AnAction {
                         }
                         
                         transaction.apply();
+
+                        if(shortenAfter())
+                            LSFRenameFullNameProcessor.shortenAllPropNames(myProject);                    
                     }
                 });
             }

@@ -112,24 +112,35 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 //
 //                transReg.doneInjecting();
 //            }
-            for(Map.Entry<String, List<Injection>> injectionByModule : injectionsByModules.entrySet()) {
-                registrar.startInjecting(LSFLanguage.INSTANCE);
+            boolean groupInjections = injectionsByModules.size() > 30; // из-за бага идеи с left \ right фрагментов в DocumentWindowImpl.injectHost(int)
+            for (Map.Entry<String, List<Injection>> injectionByModule : injectionsByModules.entrySet()) {
+                if(groupInjections)
+                    registrar.startInjecting(LSFLanguage.INSTANCE);
+                
                 String module = injectionByModule.getKey();
 
                 boolean first = true;
-                for(Injection injection : injectionByModule.getValue()) {
+                for (Injection injection : injectionByModule.getValue()) {
                     String prefix = injection.prefix;
-                    if(first) {
+                    if (first) {
                         if (!module.equals("MODULE"))
                             prefix = "REQUIRE " + module + ";\n" + prefix;
                         prefix = "MODULE x;\n" + prefix;
-                        first = false;
+                        
+                        if(groupInjections)
+                            first = false;
+                        else
+                            registrar.startInjecting(LSFLanguage.INSTANCE);
                     }
 
                     registrar.addPlace(prefix, ";\n", injection.host, injection.rangeInsideHost);
+                    
+                    if(!groupInjections)
+                        registrar.doneInjecting();
                 }
 
-                registrar.doneInjecting();
+                if(groupInjections)
+                    registrar.doneInjecting();
             }
         }
     }
