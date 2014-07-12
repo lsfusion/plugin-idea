@@ -10,6 +10,7 @@ import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.XmlElementVisitor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.xml.*;
+import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -111,7 +112,7 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
             for (Injection injection : injections) {
                 String prefix = "\nEXTERNAL " + (injection.isObjRef ? "OBJECT " : "PROPERTYDRAW ") + formName + " ";
                 if (first) {
-                    prefix = "MODULE x; REQUIRE " + requresList + "; " + prefix;
+                    prefix = "MODULE " + LSFElementGenerator.genName + "; REQUIRE " + requresList + "; " + prefix;
                     first = false;
                 }
                 

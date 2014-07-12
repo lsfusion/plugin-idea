@@ -35,9 +35,11 @@ import java.util.List;
 
 public class LSFElementGenerator {
     
+    public final static String genName = "mgen123";
+    
     public static LSFStringLiteral createStringLiteralFromText(Project myProject, String text) {
         //assert, что text уже обрамлён кавычками -> "some text"
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; GROUP someDumbGroup " + text + ";");
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; GROUP someDumbGroup " + text + ";");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFStringLiteral.class).iterator().next();
     }
 
@@ -48,25 +50,25 @@ public class LSFElementGenerator {
     }
 
     public static LSFCompoundID createCompoundIDFromText(Project myProject, String name) {
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; f()=" + name + "();");
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=" + name + "();");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFCompoundID.class).iterator().next();
     }
 
     @NotNull
     public static LSFClassName createClassNameFromText(Project myProject, String name) {
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; f(" + name + " t)=t;");
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f(" + name + " t)=t;");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFClassName.class).iterator().next();
     }
 
     @NotNull
     public static LSFFormPropertyObject createMappedPropertyFromText(Project myProject, String name) {
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; DESIGN x { ADD PROPERTY(" + name + ") {}; }");
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; DESIGN x { ADD PROPERTY(" + name + ") {}; }");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertyObject.class).iterator().next();
     }
 
     @NotNull
     public static LSFExplicitPropClassUsage createExplicitClassUsageFromText(Project myProject, String classes) {
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE x; f()=g[" + classes + "]();");
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=g[" + classes + "]();");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFExplicitPropClassUsage.class).iterator().next();
     }
 
@@ -85,7 +87,7 @@ public class LSFElementGenerator {
 
     public static LSFMetaCodeBody createMetaBodyFromText(final LSFFile file, final String text, String tab) {
         final StringBuilder tabbedText = new StringBuilder();
-        tabbedText.append("MODULE x; @dummy() {");
+        tabbedText.append("MODULE " + genName + "; @dummy() {");
         for (char symbol : text.toCharArray()) {
             tabbedText.append(symbol);
             if (symbol == '\n')
@@ -121,7 +123,7 @@ public class LSFElementGenerator {
     }
 
     public static LSFAnyTokens createMetaCodeFromText(final Project project, final String text) {
-        final PsiFile dummyFile = createDummyFile(project, "MODULE x; META dummy() " + text + " END");
+        final PsiFile dummyFile = createDummyFile(project, "MODULE " + genName + "; META dummy() " + text + " END");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFAnyTokens.class).iterator().next();
     }
 

@@ -9,6 +9,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.*;
 import com.intellij.util.containers.ConcurrentHashMap;
+import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
@@ -35,9 +36,12 @@ public class LSFGlobalResolver {
     }
 
     private static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration, Set<LSFFile> alreadyGet) {
-        Set<LSFFile> cachedFiles = cached.get(declaration);
-        if (cachedFiles != null)
-            return cachedFiles;
+        boolean toCache = !declaration.getName().equals(LSFElementGenerator.genName);
+        if(toCache) {
+            Set<LSFFile> cachedFiles = cached.get(declaration);
+            if (cachedFiles != null)
+                return cachedFiles;
+        }
 
         Set<LSFFile> result = new HashSet<LSFFile>();
 
@@ -54,7 +58,8 @@ public class LSFGlobalResolver {
                 }
             }
 //        System.out.println("CACHED "+declaration.getName()+" "+System.identityHashCode(declaration));
-            cached.put(declaration, result);
+            if(toCache)
+                cached.put(declaration, result);
         }
         return result;
     }
