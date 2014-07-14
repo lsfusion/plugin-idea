@@ -212,5 +212,14 @@
         <!-- reports related stuff -->
         <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>
         <codeInsight.lineMarkerProvider language="Lsf" implementationClass="com.lsfusion.reports.JrxmlLinkLineMarkerProvider"/>
+
+        <!-- migration -->
+        <fileTypeFactory implementation="com.lsfusion.migration.lang.MigrationFileTypeFactory"/>
+        <lang.parserDefinition language="LsfMigration" implementationClass="com.lsfusion.migration.lang.MigrationParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory key="LsfMigration" implementationClass="com.lsfusion.migration.lang.highlight.MigrationSyntaxHighlighterFactory"/>
+        <lang.braceMatcher language="LsfMigration" implementationClass="com.lsfusion.migration.lang.MigrationBraceMatcher"/>
+        <lang.commenter language="LsfMigration" implementationClass="com.lsfusion.migration.lang.MigrationCommenter"/>
+        <lang.foldingBuilder language="LsfMigration" implementationClass="com.lsfusion.migration.lang.folding.MigrationFoldingBuilder"/>
     </extensions>
 </idea-plugin>

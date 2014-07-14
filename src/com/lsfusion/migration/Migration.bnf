@@ -1,0 +1,67 @@
+{
+  psiImplUtilClass="com.lsfusion.migration.lang.psi.MigrationPsiImplUtil"
+
+  parserClass="com.lsfusion.migration.lang.parser.MigrationParser"
+  parserUtilClass="com.lsfusion.migration.lang.parser.MigrationParserUtil"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Migration"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.lsfusion.migration.lang.psi"
+  psiImplPackage="com.lsfusion.migration.lang.psi.impl"
+ 
+  elementTypeHolderClass="com.lsfusion.migration.lang.psi.MigrationTypes"
+  elementTypeClass="com.lsfusion.migration.lang.psi.MigrationElementType"
+  elementTypeFactory = "com.lsfusion.migration.lang.psi.MigrationElementTypeFactory.create"
+
+  tokenTypeClass="com.lsfusion.migration.lang.psi.MigrationTokenType"
+
+  extendedPin = false
+
+  // additional tokens
+  tokens = [
+    COMMENTS='COMMENTS'
+  ]
+}
+
+
+
+script ::= versionBlock*
+
+versionBlock ::= VERSION versionBlockBody
+
+versionBlockBody ::= LBRACE statement* RBRACE
+
+statement ::=   propertyRename
+            |   classRename
+            |   tableRename
+            |   objectRename
+{
+    recoverWhile = "statement_recover"
+}
+
+private statement_recover ::= !statement_start
+private statement_start ::= PROPERTY | CLASS | TABLE | OBJECT | RBRACE
+            
+propertyRename ::= PROPERTY (sidRename | propertyFullRename) {pin = 1}
+
+propertyFullRename ::= compoundID LSQBR classList RSQBR ARROW compoundID (LSQBR classList RSQBR)?
+ 
+classRename ::= CLASS sidRename {pin = 1}
+
+tableRename ::= TABLE sidRename  {pin = 1}
+
+objectRename ::= OBJECT objectSidRename  {pin = 1}
+
+objectSidRename ::= staticObjectID ARROW staticObjectID
+
+staticObjectID ::= ID POINT ID POINT ID | ID POINT ID
+
+sidRename ::= compoundID ARROW compoundID
+
+classList ::= className (COMMA className)
+
+className ::= compoundID | PRIMITIVE_TYPE
+
+compoundID ::= (ID POINT)? ID

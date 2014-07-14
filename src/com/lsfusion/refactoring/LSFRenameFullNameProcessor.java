@@ -320,6 +320,13 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     }
     
     public static void shortenAllPropNames(Project project) {
+        shortenAllPropNames(project, MigrationVersionChangePolicy.CHANGE_IF_COMMITED);
+    }
+    
+    public static void shortenAllPropNames(Project project, MigrationVersionChangePolicy migrationVersionChangePolicy) {
+        //todo: use migrationVersionChangePolicy
+        
+        
         GlobalSearchScope scope = ProjectScope.getProjectScope(project);
 
         final List<LSFFile> files = new ArrayList<LSFFile>();

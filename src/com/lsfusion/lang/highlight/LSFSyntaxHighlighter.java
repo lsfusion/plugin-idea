@@ -1,6 +1,5 @@
 package com.lsfusion.lang.highlight;
 
-import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -9,12 +8,11 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.ui.JBColor;
-import com.lsfusion.lang.LSFLexer;
+import com.lsfusion.lang.LSFLexerAdapter;
 import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +40,7 @@ public class LSFSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new FlexAdapter(new LSFLexer((Reader) null));
+        return new LSFLexerAdapter();
     }
 
     Set<IElementType> operands = new HashSet<IElementType>(Arrays.asList(new IElementType[] {LSFTypes.RBRAC, LSFTypes.EQ_OPERAND, LSFTypes.LESS, LSFTypes.GREATER, LSFTypes.LESS_EQUALS, LSFTypes.GREATER_EQUALS, LSFTypes.MINUS, 
