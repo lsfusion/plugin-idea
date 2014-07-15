@@ -12,13 +12,13 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
-import com.lsfusion.util.LSFPsiUtils;
+import com.lsfusion.util.LSFFileUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.lsfusion.util.LSFPsiUtils.findFilesWithShortName;
+import static com.lsfusion.util.LSFFileUtils.findFilesWithShortName;
 
 public class ReportUtils {
     public static boolean hasReportFiles(LSFFormDeclaration decl) {
@@ -49,7 +49,7 @@ public class ReportUtils {
     }
 
     public static boolean hasCustomReportFiles(LSFFormDeclaration decl, String reportName) {
-        return LSFPsiUtils.hasFilesWithShortNameInProject(decl, reportName + ".jrxml");
+        return LSFFileUtils.hasFilesWithShortNameInProject(decl, reportName + ".jrxml");
     }
 
     public static List<PsiFile> findReportFiles(LSFFormDeclaration decl) {

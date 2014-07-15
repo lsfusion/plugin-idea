@@ -9,7 +9,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Progressive;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.lsfusion.refactoring.LSFRenameFullNameProcessor;
+import com.lsfusion.refactoring.ShortenNamesProcessor;
 import org.jetbrains.annotations.NotNull;
 
 public class ProjectShortenNamesAction extends AnAction {
@@ -21,7 +21,7 @@ public class ProjectShortenNamesAction extends AnAction {
             public void run(final @NotNull ProgressIndicator indicator) {
                 ApplicationManager.getApplication().runWriteAction(new Runnable() {
                     public void run() {
-                        LSFRenameFullNameProcessor.shortenAllPropNames(myProject);
+                        ShortenNamesProcessor.shortenAllPropNames(myProject);
                     }
                 });
             }

@@ -11,7 +11,7 @@ import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
-import com.lsfusion.util.LSFPsiUtils;
+import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,7 +87,7 @@ public abstract class FromJavaReference extends PsiReferenceBase<PsiElement> imp
 
     @Nullable
     public GlobalSearchScope getScope() {
-        GlobalSearchScope projectScope = LSFPsiUtils.getModuleScope(myElement);
+        GlobalSearchScope projectScope = LSFFileUtils.getModuleWithDependenciesScope(myElement);
 
         if (moduleName != null) {
             Collection<LSFModuleDeclaration> modules = ModuleIndex.getInstance().get(moduleName, myElement.getProject(), projectScope);

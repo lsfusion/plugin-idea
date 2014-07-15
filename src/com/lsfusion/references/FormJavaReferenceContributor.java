@@ -12,7 +12,7 @@ import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.util.LSFPsiUtils;
+import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -21,7 +21,7 @@ import java.util.List;
 import static com.intellij.psi.search.GlobalSearchScope.fileScope;
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
 import static com.lsfusion.util.JavaPsiUtils.isClass;
-import static com.lsfusion.util.LSFPsiUtils.getModuleScope;
+import static com.lsfusion.util.LSFFileUtils.getModuleWithDependenciesScope;
 
 //Search for usages in getLP, etc..
 //    + lsfusion.server.logics.scripted.ScriptingActionProperty#getClass, getLCP, getLAP
@@ -175,7 +175,7 @@ public class FormJavaReferenceContributor extends PsiReferenceContributor {
                                     if (expr instanceof PsiLiteralExpression) {
                                         Object argValue = ((PsiLiteralExpression) expr).getValue();
                                         if (argValue instanceof String) {
-                                            List<PsiFile> files = LSFPsiUtils.findFilesByPath(refElement, (String) argValue);
+                                            List<PsiFile> files = LSFFileUtils.findFilesByPath(refElement, (String) argValue);
                                             for (PsiFile file : files) {
                                                 if (file instanceof LSFFile) {
                                                     LSFFile lsfFile = (LSFFile) file;
@@ -308,7 +308,7 @@ public class FormJavaReferenceContributor extends PsiReferenceContributor {
     }
 
     private String getModuleForActionClass(@NotNull PsiClass clazz) {
-        GlobalSearchScope searchScope = GlobalSearchScope.getScopeRestrictedByFileTypes(getModuleScope(clazz), LSFFileType.INSTANCE);
+        GlobalSearchScope searchScope = GlobalSearchScope.getScopeRestrictedByFileTypes(getModuleWithDependenciesScope(clazz), LSFFileType.INSTANCE);
         Collection<PsiReference> refs = ReferencesSearch.search(clazz, searchScope, false).findAll();
         for (PsiReference ref : refs) {
             PsiFile file = ref.getElement().getContainingFile();

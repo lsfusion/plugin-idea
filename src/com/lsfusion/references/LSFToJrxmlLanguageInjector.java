@@ -12,7 +12,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.xml.*;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFLanguage;
-import com.lsfusion.util.LSFPsiUtils;
+import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
             return;
         }
 
-        GlobalSearchScope scope = LSFPsiUtils.getModuleScope(xmlDocument);
+        GlobalSearchScope scope = LSFFileUtils.getModuleWithDependenciesScope(xmlDocument);
         Pair<String, String> formNameAndRequires = resolveFormFullNameAndRequires(virtualFile, xmlDocument.getProject(), scope);
         if (formNameAndRequires == null) {
             return;

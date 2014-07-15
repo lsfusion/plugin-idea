@@ -29,7 +29,9 @@
 
 script ::= versionBlock*
 
-versionBlock ::= VERSION versionBlockBody
+versionBlock ::= versionLiteral versionBlockBody
+
+versionLiteral ::= VERSION
 
 versionBlockBody ::= LBRACE statement* RBRACE
 
@@ -56,12 +58,14 @@ objectRename ::= OBJECT objectSidRename  {pin = 1}
 
 objectSidRename ::= staticObjectID ARROW staticObjectID
 
-staticObjectID ::= ID POINT ID POINT ID | ID POINT ID
+staticObjectID ::=  ID POINT ID POINT ID
+                |   ID POINT ID
 
 sidRename ::= compoundID ARROW compoundID
 
-classList ::= className (COMMA className)
+classList ::= className (COMMA className)*
 
 className ::= compoundID | PRIMITIVE_TYPE
 
-compoundID ::= (ID POINT)? ID
+compoundID ::=  ID POINT ID
+            |   ID 

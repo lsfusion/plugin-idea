@@ -26,7 +26,7 @@ import java.util.List;
 
 import static com.lsfusion.design.DesignPreviewLineMarkerProvider.resolveFormDecl;
 import static com.lsfusion.reports.ReportUtils.hasReportFiles;
-import static com.lsfusion.util.LSFPsiUtils.getFileRelativePath;
+import static com.lsfusion.util.LSFFileUtils.getFileRelativePath;
 
 public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
 

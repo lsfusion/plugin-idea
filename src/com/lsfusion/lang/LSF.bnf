@@ -415,12 +415,13 @@ noContextPropertyUsage ::= propertyUsage
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 
-dataPropertyDefinition ::= DATA (SESSION)? className (LBRAC classNameList RBRAC)
+dataPropertyDefinition ::= DATA (dataPropertySessionModifier)? className (LBRAC classNameList RBRAC)
 {
     pin(".*") = 1;
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getMigrationClassNames ]
 }
+dataPropertySessionModifier ::= SESSION
 
 nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
 {

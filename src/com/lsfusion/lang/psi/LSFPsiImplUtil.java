@@ -2804,4 +2804,78 @@ public class LSFPsiImplUtil {
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFExternalFormObject externalFormObject) {
         return resolveFormDecl(externalFormObject.getFormUsage());
     }
+
+    @NotNull
+    public static List<String> getMigrationClassNames(LSFDataPropertyDefinition dataPropertyDefinition) {
+        LSFClassNameList classNameList = dataPropertyDefinition.getClassNameList();
+
+        if (classNameList == null) {
+            return Collections.emptyList();
+        }
+        
+        LSFNonEmptyClassNameList ne = classNameList.getNonEmptyClassNameList();
+        if (ne == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> result = new ArrayList<String>();
+        for (LSFClassName className : ne.getClassNameList()) {
+            getMigrationClassName(className);
+            result.add(getClassName(className));
+        }
+        return result;
+    }
+
+    public static String getMigrationClassName(LSFClassName className) {
+        LSFBuiltInClassName builtIn = className.getBuiltInClassName();
+        if (builtIn != null) {
+            return getMigrationClassName(builtIn);
+        }
+        
+        LSFCustomClassUsage customClassUsage = className.getCustomClassUsage();
+        
+        assert customClassUsage != null;
+        
+        return getMigrationClassName(customClassUsage);
+    }
+
+    private static String getMigrationClassName(LSFCustomClassUsage customClassUsage) {
+        String nameRef = customClassUsage.getNameRef();
+        
+        String namespaceRef = customClassUsage.getFullNameRef();
+        if (namespaceRef != null) {
+            return namespaceRef + "." + nameRef;
+        }
+        
+        LSFClassDeclaration classDecl = customClassUsage.resolveDecl();
+        if (classDecl == null) {
+            //can't resolve -> just use the reference text
+            return nameRef;
+        }
+        
+        return classDecl.getNamespaceName() + "." + classDecl.getGlobalName();
+    }
+
+    public static String getMigrationClassName(LSFBuiltInClassName builtInClassName) {
+        String name = builtInClassName.getName();
+        if (name == null) {
+            //shouldn't happen
+            return "?";
+        }
+
+        if (name.startsWith("NUMERIC")) {
+            return "NUMERIC";
+        }
+
+        if (name.startsWith("STRING") ||
+            name.startsWith("VARSTRING") ||
+            name.startsWith("ISTRING") ||
+            name.startsWith("VARISTRING") ||
+            name.equals("TEXT") ||
+            name.equals("RICHTEXT")) {
+            return "STRING";
+        }
+
+        return name;
+    }
 }

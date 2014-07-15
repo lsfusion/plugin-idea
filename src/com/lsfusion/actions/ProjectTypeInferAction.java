@@ -15,7 +15,7 @@ import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
 import com.lsfusion.lang.typeinfer.TypeInferer;
-import com.lsfusion.refactoring.LSFRenameFullNameProcessor;
+import com.lsfusion.refactoring.ShortenNamesProcessor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -54,7 +54,7 @@ public class ProjectTypeInferAction extends AnAction {
                         transaction.apply();
 
                         if(shortenAfter())
-                            LSFRenameFullNameProcessor.shortenAllPropNames(myProject);                    
+                            ShortenNamesProcessor.shortenAllPropNames(myProject);                    
                     }
                 });
             }

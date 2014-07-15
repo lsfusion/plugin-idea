@@ -34,6 +34,13 @@ public class GeneratedParserUtilBase {
 
     private static final Logger LOG = Logger.getInstance("com.lsfusion.lang.parser.GeneratedParserUtilBase");
 
+    public static final WhitespacesAndCommentsBinder GREEDY_WHITESPACE_AND_COMMENTS_PROCESSOR = new WhitespacesAndCommentsBinder() {
+        @Override
+        public int getEdgePosition(final List<IElementType> tokens, final boolean atStreamEdge, final TokenTextGetter getter) {
+            return tokens.size();
+        }
+    };
+
     private static final int MAX_RECURSION_LEVEL = 1000;
     private static final int MAX_VARIANTS_SIZE = 10000;
     private static final int MAX_VARIANTS_TO_DISPLAY = 50;

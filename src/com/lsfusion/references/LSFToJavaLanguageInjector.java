@@ -19,16 +19,14 @@ import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.util.LSFPsiUtils;
+import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 import static com.intellij.psi.search.GlobalSearchScope.fileScope;
-import static com.lsfusion.util.JavaPsiUtils.hasOneOfSuperClasses;
-import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
-import static com.lsfusion.util.JavaPsiUtils.isClass;
-import static com.lsfusion.util.LSFPsiUtils.getModuleScope;
+import static com.lsfusion.util.JavaPsiUtils.*;
+import static com.lsfusion.util.LSFFileUtils.getModuleWithDependenciesScope;
 
 public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
@@ -315,16 +313,17 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
         public static final String FIND_PROPERTIES = "findProperties";
 
         private void resolveModuleMethodsRef(PsiExpression qualifierExpression, PsiLiteralExpression element, boolean classRef, boolean onlyModule, InjectedLanguagePlaces injectionPlacesRegistrar) {
-            assert qualifierExpression != null;
-            String moduleName = getModuleName(qualifierExpression);
-            if (moduleName == null)
-                moduleName = getTopModuleList(qualifierExpression);
-            javaOrPropertyReference(element, classRef, moduleName, onlyModule, injectionPlacesRegistrar);
+            if (qualifierExpression != null) {
+                String moduleName = getModuleName(qualifierExpression);
+                if (moduleName == null)
+                    moduleName = getTopModuleList(qualifierExpression);
+                javaOrPropertyReference(element, classRef, moduleName, onlyModule, injectionPlacesRegistrar);
+            }
         }
 
         private String getTopModuleList(PsiElement element) {
 
-            List<PsiFile> filesByPath = LSFPsiUtils.findFilesByPath(element, "lsfusion.properties");
+            List<PsiFile> filesByPath = LSFFileUtils.findFilesByPath(element, "lsfusion.properties");
             for (PsiFile file : filesByPath) {
                 if (file instanceof PropertiesFile) {
                     PropertiesFile propFile = (PropertiesFile) file;
@@ -429,7 +428,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                             if (expr instanceof PsiLiteralExpression) {
                                 Object argValue = ((PsiLiteralExpression) expr).getValue();
                                 if (argValue instanceof String) {
-                                    List<PsiFile> files = LSFPsiUtils.findFilesByPath(qualifierExpression, (String) argValue);
+                                    List<PsiFile> files = LSFFileUtils.findFilesByPath(qualifierExpression, (String) argValue);
                                     for (PsiFile file : files) {
                                         if (file instanceof LSFFile) {
                                             LSFFile lsfFile = (LSFFile) file;
@@ -536,7 +535,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
         }
 
         private String calcModuleActionForClass(PsiClass clazz) {
-            GlobalSearchScope scope = getModuleScope(clazz);
+            GlobalSearchScope scope = getModuleWithDependenciesScope(clazz);
 
             final List<PsiClass> result = new ArrayList<PsiClass>();
             result.add(clazz);

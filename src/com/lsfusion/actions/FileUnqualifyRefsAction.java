@@ -9,7 +9,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.refactoring.LSFRenameFullNameProcessor;
+import com.lsfusion.refactoring.ShortenNamesProcessor;
 
 import java.util.Collections;
 
@@ -32,7 +32,7 @@ public class FileUnqualifyRefsAction extends AnAction {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 public void run() {
                     MetaTransaction transaction = new MetaTransaction();
-                    LSFRenameFullNameProcessor.unqualifyRefs(Collections.singleton(file), transaction);
+                    ShortenNamesProcessor.unqualifyRefs(Collections.singleton(file), transaction);
                     transaction.apply();
                 }
             });

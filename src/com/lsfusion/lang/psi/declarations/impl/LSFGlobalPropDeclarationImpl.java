@@ -232,15 +232,25 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return false;
     }
 
-    public boolean isDataProperty() {
+    public LSFDataPropertyDefinition getDataPropertyDefinition() {
         LSFExpressionUnfriendlyPD expressionUnfriendlyPD = getExpressionUnfriendlyPD();
         if (expressionUnfriendlyPD != null) {
             LSFContextIndependentPD contextIndependentPD = expressionUnfriendlyPD.getContextIndependentPD();
-            if (contextIndependentPD != null && contextIndependentPD.getDataPropertyDefinition() != null) {
-                return true;
+            if (contextIndependentPD != null) {
+                return contextIndependentPD.getDataPropertyDefinition();
             }
         }
-        return false;
+        return null;
+    }
+
+    public boolean isDataProperty() {
+        LSFDataPropertyDefinition dataProp = getDataPropertyDefinition();
+        return dataProp != null;
+    }
+    
+    public boolean isDataStoredProperty() {
+        LSFDataPropertyDefinition dataProp = getDataPropertyDefinition();
+        return dataProp != null && dataProp.getDataPropertySessionModifier() == null;
     }
 
     @Nullable

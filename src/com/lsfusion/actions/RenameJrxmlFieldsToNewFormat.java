@@ -36,7 +36,7 @@ import com.lsfusion.lang.psi.declarations.LSFObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.references.LSFToJrxmlLanguageInjector;
-import com.lsfusion.util.LSFPsiUtils;
+import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -157,7 +157,7 @@ public class RenameJrxmlFieldsToNewFormat extends AnAction {
             return;
         }
         
-        final String relativePath = LSFPsiUtils.getRelativePath(file, project);
+        final String relativePath = LSFFileUtils.getRelativePath(file, project);
 
         int underscorePos = fileName.indexOf('_');
         String explicitFormName = underscorePos == -1 ? fileName : fileName.substring(0, underscorePos);
