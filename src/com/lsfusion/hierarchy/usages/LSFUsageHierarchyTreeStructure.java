@@ -42,7 +42,7 @@ public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
                     PsiElement el = LSFPsiUtils.getStatementParent(ref.getElement());
                     if (el != null) {
                         PsiElement nodeElement = ((LSFUsageHierarchyNodeDescriptor) descriptor).getNodeElement();
-                        if (!ignore(nodeElement, el)) {
+                        if (!ignore(nodeElement, el, ref.getElement())) {
                             result.add(new LSFUsageHierarchyNodeDescriptor(myProject, descriptor, el, false));
                         }
                     }
@@ -53,10 +53,10 @@ public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
         return result.toArray();
     }
 
-    private boolean ignore(PsiElement parent, PsiElement child) {
-        return (LSFUsageFilteringRuleProvider.filterOut(parent, child) ||
-                (parent instanceof LSFFormStatement || parent instanceof LSFDesignStatement) && child instanceof LSFDesignStatement) ||
-                (parent instanceof LSFDesignStatement && child instanceof LSFFormStatement) ||
-                (parent instanceof LSFClassStatement && (child instanceof LSFClassStatement && (((LSFClassStatement) child).getClassParentsList() != null)));
+    private boolean ignore(PsiElement parent, PsiElement childStatement, PsiElement child) {
+        return (LSFUsageFilteringRuleProvider.filterOut(childStatement, child) ||
+                (parent instanceof LSFFormStatement || parent instanceof LSFDesignStatement) && childStatement instanceof LSFDesignStatement) ||
+                (parent instanceof LSFDesignStatement && childStatement instanceof LSFFormStatement) ||
+                (parent instanceof LSFClassStatement && (childStatement instanceof LSFClassStatement && (((LSFClassStatement) childStatement).getClassParentsList() != null)));
     }
 }

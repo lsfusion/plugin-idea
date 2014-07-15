@@ -67,7 +67,7 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
             LSFFormDeclaration formDeclaration = ((LSFFormStatement) myElement).resolveFormDecl();
             return formDeclaration != null ? formDeclaration.getNameIdentifier() : null;
         } else if (myElement instanceof LSFOverrideStatement) {
-            return ((LSFOverrideStatement) myElement).getMappedPropertyClassParamDeclare().getPropertyUsage().getCompoundID().getSimpleName();
+            return ((LSFOverrideStatement) myElement).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage().getCompoundID().getSimpleName();
         } else if (myElement instanceof LSFDesignStatement) {
             LSFFormDeclaration formDeclaration = ((LSFDesignStatement) myElement).resolveFormDecl();
             return formDeclaration != null ? formDeclaration.getNameIdentifier() : null;

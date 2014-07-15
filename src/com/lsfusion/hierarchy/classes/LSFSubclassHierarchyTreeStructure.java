@@ -33,7 +33,7 @@ public class LSFSubclassHierarchyTreeStructure extends HierarchyTreeStructure {
             if (ext.resolveExtends().contains(classDecl)) {
                 LSFClassDeclaration decl = ((LSFClassStatement) ext).getClassDecl();
                 if (decl == null) {
-                    decl = ((LSFClassStatement) ext).getExtendingClassDeclaration().getCustomClassUsage().resolveDecl();
+                    decl = ((LSFClassStatement) ext).getExtendingClassDeclaration().getCustomClassUsageWrapper().getCustomClassUsage().resolveDecl();
                 }
                 if (decl != null && !decl.equals(classDecl)) {
                     result.add(new LSFClassHierarchyNodeDescriptor(myProject, descriptor, decl, false));

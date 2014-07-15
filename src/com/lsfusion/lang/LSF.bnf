@@ -139,7 +139,9 @@ classDecl ::= CLASS (ABSTRACT | NATIVE)? simpleNameWithCaption
      elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-extendingClassDeclaration ::= EXTEND CLASS customClassUsage
+extendingClassDeclaration ::= EXTEND CLASS customClassUsageWrapper
+
+customClassUsageWrapper ::= customClassUsage // for usages search filter
 
 classStatement ::= (classDecl | extendingClassDeclaration) classInstancesAndParents {
     pin = 1
@@ -927,7 +929,9 @@ formDecl ::= FORM simpleNameWithCaption
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-extendingFormDeclaration ::= EXTEND FORM formUsage
+extendingFormDeclaration ::= EXTEND FORM formUsageWrapper
+
+formUsageWrapper ::= formUsage // for usages search filter
 
 formGroupObjectsList ::= OBJECTS formGroupObjectDeclaration (COMMA formGroupObjectDeclaration)* {pin = 1}
 
@@ -1483,12 +1487,14 @@ metaCodeLiteral ::= LEX_STRING_LITERAL
 
 emptyStatement ::= SEMI;
 
-mappedPropertyClassParamDeclare ::= propertyUsage LBRAC classParamDeclareList RBRAC // temporary domain logic
+mappedPropertyClassParamDeclare ::= propertyUsageWrapper LBRAC classParamDeclareList RBRAC // temporary domain logic
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList ]
 }
+
+propertyUsageWrapper ::= propertyUsage // for usages search filter
 
 mappedPropertyExprParam ::= propertyUsage LBRAC exprParameterUsageList RBRAC // temporary mixed logic
 {

@@ -21,7 +21,7 @@ public class MappedPropertyContextInferrer implements ContextInferrer {
 
     @Override
     public Inferred inferClasses(Set<LSFExprParamDeclaration> params) {
-        LSFPropDeclaration decl = prop.getPropertyUsage().resolveDecl();
+        LSFPropDeclaration decl = prop.getPropertyUsageWrapper().getPropertyUsage().resolveDecl();
         if(decl != null) {
             List<LSFClassSet> inferredClasses = decl.inferParamClasses(null);
             if(inferredClasses == null)

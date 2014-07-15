@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
@@ -367,9 +367,9 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
         List<PsiElement> result = new ArrayList<PsiElement>();
         for (PsiReference ref : refs) {
-            if (((PsiElement) ref).getParent().getParent() instanceof LSFOverrideStatement) {
-                LSFOverrideStatement override = (LSFOverrideStatement) ((PsiElement) ref).getParent().getParent();
-                result.add(override.getMappedPropertyClassParamDeclare().getPropertyUsage());
+            LSFOverrideStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) ref, LSFOverrideStatement.class);
+            if (overrideStatement != null && ref.equals(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage())) {
+                result.add(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper());    
             }
         }
         return result.toArray(new PsiElement[result.size()]);

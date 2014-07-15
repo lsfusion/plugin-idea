@@ -64,7 +64,7 @@ public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<
         List<PsiElement> names = new ArrayList<PsiElement>();
         for (LSFFormExtend extend : forms) {
             if (extend.getFormDecl() == null) {
-                names.add(((LSFFormExtendImpl) extend).getExtendingFormDeclaration().getFormUsage());
+                names.add(((LSFFormExtendImpl) extend).getExtendingFormDeclaration().getFormUsageWrapper());
             }
         }
         return names.toArray(new PsiElement[names.size()]);

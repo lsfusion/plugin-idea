@@ -20,11 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl<LSFClassDeclaration, ClassStubElement> implements LSFClassDeclaration {
 
@@ -75,12 +71,12 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
         Collection<LSFClassExtend> extendClasses = LSFGlobalResolver.findExtendElements(this, LSFStubElementTypes.EXTENDCLASS, getProject(), GlobalSearchScope.allScope(getProject())).findAll();
         for (LSFClassExtend classExtend : extendClasses) {
             if (((LSFClassExtendImpl) classExtend).getClassDecl() == null) {
-                names.add(((LSFClassExtendImpl) classExtend).getExtendingClassDeclaration().getCustomClassUsage());
+                names.add(((LSFClassExtendImpl) classExtend).getExtendingClassDeclaration().getCustomClassUsageWrapper());
             }
         }
 
         names.addAll(processChildrenSearch(this, getProject()));
-        
+
         return names.toArray(new PsiElement[names.size()]);
     }
 

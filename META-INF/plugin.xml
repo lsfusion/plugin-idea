@@ -98,21 +98,26 @@
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift B" keymap="$default"/>
         </action>
-        <action id="Project.Shorten" class="com.lsfusion.actions.ProjectShortenNamesAction" text="Shorten names for project" description="Shorten names for project">
+        <action id="Project.Shorten" class="com.lsfusion.actions.ProjectShortenNamesAction"
+                text="Shorten names for project" description="Shorten names for project">
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift U" keymap="$default"/>
         </action>
-        <action id="Project.InferShorten" class="com.lsfusion.actions.ProjectInferShortenAction" text="Infer types and shorten names for project" description="Infer types and shorten names for project">
+        <action id="Project.InferShorten" class="com.lsfusion.actions.ProjectInferShortenAction"
+                text="Infer types and shorten names for project"
+                description="Infer types and shorten names for project">
             <add-to-group group-id="CodeMenu"/>
         </action>
-        <action id="Project.UnqualifyRefs" class="com.lsfusion.actions.ProjectUnqualifyRefsAction" text="Unqualify refs for project" description="Unqualify refs for project">
+        <action id="Project.UnqualifyRefs" class="com.lsfusion.actions.ProjectUnqualifyRefsAction"
+                text="Unqualify refs for project" description="Unqualify refs for project">
             <add-to-group group-id="CodeMenu"/>
         </action>
-        <action id="File.UnqualifyRefs" class="com.lsfusion.actions.FileUnqualifyRefsAction" text="Unqualify refs for file" description="Unqualify refs for file">
+        <action id="File.UnqualifyRefs" class="com.lsfusion.actions.FileUnqualifyRefsAction"
+                text="Unqualify refs for file" description="Unqualify refs for file">
             <add-to-group group-id="CodeMenu"/>
         </action>
         <!--<action id="Project.RenameFields" class="com.lsfusion.actions.RenameJrxmlFieldsToNewFormat" text="Rename jrxml fields" description="Rename jrxml fields to new format">-->
-            <!--<add-to-group group-id="CodeMenu"/>-->
+        <!--<add-to-group group-id="CodeMenu"/>-->
         <!--</action>-->
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
@@ -128,14 +133,15 @@
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>
         <usageTypeProvider implementation="com.lsfusion.usage.LSFUsageTypeProvider"/>
         <usageFilteringRuleProvider implementation="com.lsfusion.usage.LSFUsageFilteringRuleProvider"/>
+        <findUsagesHandlerFactory implementation="com.lsfusion.usage.LSFFindUsagesHandlerFactory"/>
 
         <callHierarchyProvider language="Lsf"
                                implementationClass="com.lsfusion.hierarchy.usages.LSFUsageHierarchyProvider"/>
         <typeHierarchyProvider language="Lsf"
                                implementationClass="com.lsfusion.hierarchy.classes.LSFClassHierarchyProvider"/>
 
-        <multiHostInjector implementation="com.lsfusion.references.LSFToJavaLanguageInjector" />
-        <multiHostInjector implementation="com.lsfusion.references.LSFToJrxmlLanguageInjector" />
+        <multiHostInjector implementation="com.lsfusion.references.LSFToJavaLanguageInjector"/>
+        <multiHostInjector implementation="com.lsfusion.references.LSFToJrxmlLanguageInjector"/>
         <!--<psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>-->
         <lang.syntaxHighlighterFactory key="Lsf"
                                        implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
@@ -211,15 +217,20 @@
 
         <!-- reports related stuff -->
         <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>
-        <codeInsight.lineMarkerProvider language="Lsf" implementationClass="com.lsfusion.reports.JrxmlLinkLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="Lsf"
+                                        implementationClass="com.lsfusion.reports.JrxmlLinkLineMarkerProvider"/>
 
         <!-- migration -->
         <fileTypeFactory implementation="com.lsfusion.migration.lang.MigrationFileTypeFactory"/>
-        <lang.parserDefinition language="LsfMigration" implementationClass="com.lsfusion.migration.lang.MigrationParserDefinition"/>
+        <lang.parserDefinition language="LsfMigration"
+                               implementationClass="com.lsfusion.migration.lang.MigrationParserDefinition"/>
 
-        <lang.syntaxHighlighterFactory key="LsfMigration" implementationClass="com.lsfusion.migration.lang.highlight.MigrationSyntaxHighlighterFactory"/>
-        <lang.braceMatcher language="LsfMigration" implementationClass="com.lsfusion.migration.lang.MigrationBraceMatcher"/>
+        <lang.syntaxHighlighterFactory key="LsfMigration"
+                                       implementationClass="com.lsfusion.migration.lang.highlight.MigrationSyntaxHighlighterFactory"/>
+        <lang.braceMatcher language="LsfMigration"
+                           implementationClass="com.lsfusion.migration.lang.MigrationBraceMatcher"/>
         <lang.commenter language="LsfMigration" implementationClass="com.lsfusion.migration.lang.MigrationCommenter"/>
-        <lang.foldingBuilder language="LsfMigration" implementationClass="com.lsfusion.migration.lang.folding.MigrationFoldingBuilder"/>
+        <lang.foldingBuilder language="LsfMigration"
+                             implementationClass="com.lsfusion.migration.lang.folding.MigrationFoldingBuilder"/>
     </extensions>
 </idea-plugin>
