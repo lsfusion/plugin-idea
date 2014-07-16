@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.FormView;
 import com.lsfusion.design.model.entity.RegularFilterEntity;
 import com.lsfusion.design.model.entity.RegularFilterGroupEntity;
 
@@ -14,12 +15,14 @@ import java.util.Map;
 
 public class RegularFilterGroupView extends ComponentView {
 
+    private FormView form;
     public RegularFilterGroupEntity entity;
 
     private List<RegularFilterView> filters = new ArrayList<RegularFilterView>();
 
-    public RegularFilterGroupView(RegularFilterGroupEntity entity) {
+    public RegularFilterGroupView(FormView form, RegularFilterGroupEntity entity) {
         super(entity.sID);
+        this.form = form;
         this.entity = entity;
 
         for (RegularFilterEntity filterEntity : entity.filters) {
@@ -52,6 +55,10 @@ public class RegularFilterGroupView extends ComponentView {
 
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+        GroupObjectView groupObjectView = form.get(entity.getToDraw(form.entity));
+        if (!groupObjectView.grid.isVisible()) {
+            return null;
+        }
         if (isSingle()) {
             RegularFilterEntity filterEntity = filters.get(0).entity;
             return new JBCheckBox(filterEntity.getFullCaption(), filterEntity.isDefault);

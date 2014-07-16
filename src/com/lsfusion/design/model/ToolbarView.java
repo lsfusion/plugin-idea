@@ -25,7 +25,7 @@ public class ToolbarView extends ComponentView {
             new ReflectionProperty("showSettings")
     );
 
-    public boolean visible = true;
+    public boolean visible = false;
 
     public boolean showGroupChange = true;
     public boolean showCountRows = true;
@@ -36,12 +36,10 @@ public class ToolbarView extends ComponentView {
     public boolean showSettings = true;
 
     public boolean isTreeToolbar = false;
-    public boolean isInGridView = true;
 
-    public ToolbarView(boolean isTreeToolbar, boolean isInGridView) {
+    public ToolbarView(boolean isTreeToolbar) {
         this("");
         this.isTreeToolbar = isTreeToolbar;
-        this.isInGridView = isInGridView;
     }
 
     public ToolbarView(String sID) {
@@ -129,7 +127,7 @@ public class ToolbarView extends ComponentView {
 
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
-        if (!visible || !isInGridView) {
+        if (!visible) {
             return null;
         }
         JBPanel panel = new JBPanel();

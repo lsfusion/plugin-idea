@@ -11,8 +11,8 @@ import com.lsfusion.design.TreeGroupContainerSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFComponentStubDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
-import com.lsfusion.lang.psi.declarations.impl.LSFFormDeclarationImpl;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFComponentReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -34,29 +34,23 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
     @Override
     public LSFResolveResult resolveNoCache() {
         String componentName = getSimpleName().getName();
+        LSFFormDeclaration formDeclaration = resolveForm(this);
+
         Collection<LSFComponentStubDeclaration> stubDecls = ComponentIndex.getInstance().get(componentName, getProject(), getLSFFile().getRequireScope());
         List<LSFDeclaration> declarations = new ArrayList<LSFDeclaration>();
 
         for (LSFComponentStubDeclaration stubDecl : stubDecls) {
-            declarations.add(stubDecl.getComponentDecl());
+            if (formDeclaration == resolveForm(stubDecl.getComponentDecl())) {
+                declarations.add(stubDecl.getComponentDecl());
+            }
         }
 
-        if (declarations.isEmpty()) {
-            PsiElement parent = this;
-            LSFFormDeclarationImpl formDecl = null;
-            while (parent != null) {
-                parent = parent.getParent();
-                if (parent instanceof LSFDesignStatement) {
-                    formDecl = (LSFFormDeclarationImpl) ((LSFDesignStatement) parent).resolveFormDecl();
-                }
-            }
-            if (formDecl != null) {
-                Collection<LSFFormExtend> formExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, getLSFFile()).findAll();
-                for (LSFFormExtend formExtend : formExtends) {
-                    LSFDeclaration declaration = getDefaultContainers(formExtend).get(componentName);
-                    if (declaration != null) {
-                        declarations.add(declaration);
-                    }
+        if (declarations.isEmpty() && formDeclaration != null) {
+            Collection<LSFFormExtend> formExtends = LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, getLSFFile()).findAll();
+            for (LSFFormExtend formExtend : formExtends) {
+                LSFDeclaration declaration = getDefaultContainers(formExtend).get(componentName);
+                if (declaration != null) {
+                    declarations.add(declaration);
                 }
             }
         }
@@ -73,6 +67,14 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
         }
 
         return new LSFResolveResult(declarations, errorAnnotator);
+    }
+
+    private LSFFormDeclaration resolveForm(PsiElement element) {
+        LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(element, LSFDesignStatement.class);
+        if (designStatement != null) {
+            return designStatement.resolveFormDecl();
+        }
+        return null;
     }
 
     private Map<String, LSFDeclaration> getDefaultContainers(LSFFormExtend formExtend) {

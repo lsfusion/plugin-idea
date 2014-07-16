@@ -28,6 +28,8 @@ public class GridView extends ComponentView {
 
     private GroupObjectView groupObject;
 
+    private JComponent component;
+
     public GridView(GroupObjectView groupObject) {
         this("");
         this.groupObject = groupObject;
@@ -78,11 +80,15 @@ public class GridView extends ComponentView {
         return LSFIcons.Design.GRID;
     }
 
+    public boolean isVisible() {
+        return component != null;
+    }
+
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
-        if (groupObject.entity.initClassView == ClassViewType.GRID) {
+        if (groupObject.entity.initClassView == ClassViewType.GRID && model.getColumnCount() > 0) {
             GridTable gridTable = new GridTable(model);
-            return new JBScrollPane(gridTable);
+            return component = new JBScrollPane(gridTable);
         } else {
             return null;
         }

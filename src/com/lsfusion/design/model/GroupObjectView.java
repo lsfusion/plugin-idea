@@ -25,7 +25,7 @@ public class GroupObjectView extends ArrayList<ObjectView> implements GroupView 
         }
 
         grid = new GridView(this);
-        toolbar = new ToolbarView(false, entity.initClassView == ClassViewType.GRID);
+        toolbar = new ToolbarView(false);
         showType = new ShowTypeView(this);
     }
 
@@ -40,6 +40,7 @@ public class GroupObjectView extends ArrayList<ObjectView> implements GroupView 
 
     public void addGridPropertyDraw(PropertyDrawView property) {
         grid.addPropertyDraw(property);
+        toolbar.visible = entity.initClassView == ClassViewType.GRID;
     }
 
     public boolean isLastGroupInTree() {

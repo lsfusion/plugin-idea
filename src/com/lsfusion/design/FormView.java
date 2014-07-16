@@ -150,7 +150,7 @@ public class FormView {
     }
 
     private RegularFilterGroupView addRegularFilterGroupBase(RegularFilterGroupEntity filterGroup) {
-        RegularFilterGroupView filterGroupView = new RegularFilterGroupView(filterGroup);
+        RegularFilterGroupView filterGroupView = new RegularFilterGroupView(this, filterGroup);
         regularFilters.add(filterGroupView);
         addRegularFilterGroupView(filterGroupView);
 

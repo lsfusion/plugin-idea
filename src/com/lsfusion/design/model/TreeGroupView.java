@@ -25,7 +25,7 @@ public class TreeGroupView extends ComponentView implements GroupView {
         alignment = FlexAlignment.STRETCH;
 
         this.entity = entity;
-        toolbar = new ToolbarView(true, true);
+        toolbar = new ToolbarView(true);
     }
 
     @Override
@@ -45,6 +45,7 @@ public class TreeGroupView extends ComponentView implements GroupView {
 
     public void addPropertyDraw(GroupObjectView groupObject, PropertyDrawView property, List<PropertyDrawView> formProperties) {
         model.addPropertyDraw(groupObject, property, formProperties);
+        toolbar.visible = true;
     }
 
     public int calculatePreferredSize() {
