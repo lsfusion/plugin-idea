@@ -350,6 +350,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "VALIGN"                  			{ return VALIGN; }
   "VERTICAL"                			{ return VERTICAL; }
   "VIEW"                    			{ return VIEW; }
+  "WAIT"                                { return WAIT; }
   "WHEN"                    			{ return WHEN; }
   "WHERE"                   			{ return WHERE; }
   "WHILE"                   			{ return WHILE; }
