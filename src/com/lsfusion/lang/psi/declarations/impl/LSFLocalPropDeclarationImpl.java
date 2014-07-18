@@ -53,7 +53,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
 
     @Override
     public List<LSFClassSet> resolveParamClassesNoCache() {
-        return LSFPsiImplUtil.resolveClass(getClassNameList());
+        return LSFPsiImplUtil.resolveClasses(getClassNameList());
     }
 
     @Override

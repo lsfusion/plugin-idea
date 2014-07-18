@@ -18,7 +18,7 @@ import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
-import com.lsfusion.lang.psi.stubs.extend.types.indexes.ClassExtendsClassIndex;
+import com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
@@ -183,7 +183,7 @@ public class LSFGlobalResolver {
         for (T virtDecl : virtDecls) {
             if (virtDecl != null && name != null && name.equals(virtDecl.getDeclName())) {
                 VirtualFile virtualFile = virtDecl.getLSFFile().getVirtualFile();
-                if (virtualFile != null && scope.contains(virtualFile)) {
+                if (virtualFile == null || scope.contains(virtualFile)) {
                     decls.add(virtDecl);
                 }
             }

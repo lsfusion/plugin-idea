@@ -12,7 +12,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFPropReference;
-import com.lsfusion.lang.psi.stubs.types.indexes.PropIndex;
+import com.lsfusion.lang.psi.indexes.PropIndex;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;

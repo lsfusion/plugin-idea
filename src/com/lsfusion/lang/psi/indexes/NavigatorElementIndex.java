@@ -1,14 +1,14 @@
-package com.lsfusion.lang.psi.stubs.types.indexes;
+package com.lsfusion.lang.psi.indexes;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFNavigatorElementDeclaration;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class NavigatorElementIndex extends StringStubIndexExtension<LSFNavigatorElementDeclaration> {
 
     private static final NavigatorElementIndex ourInstance = new NavigatorElementIndex();
+
     public static NavigatorElementIndex getInstance() {
         return ourInstance;
     }
@@ -16,7 +16,7 @@ public class NavigatorElementIndex extends StringStubIndexExtension<LSFNavigator
     @NotNull
     @Override
     public StubIndexKey<String, LSFNavigatorElementDeclaration> getKey() {
-        return LSFStubElementTypes.NAVIGATORELEMENT.key;
+        return LSFIndexKeys.NAVIGATORELEMENT;
     }
 }
 

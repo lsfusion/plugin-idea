@@ -16,7 +16,7 @@ import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFComponentReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
-import com.lsfusion.lang.psi.stubs.types.indexes.ComponentIndex;
+import com.lsfusion.lang.psi.indexes.ComponentIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

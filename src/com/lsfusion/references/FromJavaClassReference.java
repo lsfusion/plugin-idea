@@ -4,7 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
-import com.lsfusion.lang.psi.stubs.types.indexes.ClassIndex;
+import com.lsfusion.lang.psi.indexes.ClassIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

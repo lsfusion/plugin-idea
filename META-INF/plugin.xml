@@ -39,9 +39,9 @@
             <skipForDefaultProject/>
         </component>
 
-        <component>
-            <implementation-class>com.lsfusion.lang.psi.LSFProjectComponent</implementation-class>
-        </component>
+        <!--<component>-->
+            <!--<implementation-class>com.lsfusion.lang.psi.LSFProjectComponent</implementation-class>-->
+        <!--</component>-->
 
     </project-components>
 
@@ -172,27 +172,27 @@
         <library.presentationProvider implementation="com.lsfusion.module.LSFusionLibraryPresentationProvider"/>
         <configurationType implementation="com.lsfusion.module.run.LSFusionRunConfigurationType"/>
 
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.MetaIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.PropIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.ClassIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.ExplicitNamespaceIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.FormIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.GroupIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.TableIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.WindowIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.NavigatorElementIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.types.indexes.ComponentIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.MetaIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ModuleIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.PropIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ClassIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExplicitNamespaceIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.FormIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.GroupIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.TableIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.WindowIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.NavigatorElementIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ComponentIndex"/>
 
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.extend.types.indexes.ExtendFormIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.extend.types.indexes.ExtendClassIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendFormIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendClassIndex"/>
 
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.extend.types.indexes.ClassExtendsClassIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex"/>
 
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ExplicitInterfaceIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ExplicitValueIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ImplicitValueIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ImplicitInterfaceIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExplicitInterfaceIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExplicitValueIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ImplicitValueIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ImplicitInterfaceIndex"/>
 
         <stubElementTypeHolder class="com.lsfusion.lang.psi.LSFTypes"/>
         <gotoClassContributor implementation="com.lsfusion.LSFClassContributor"/>

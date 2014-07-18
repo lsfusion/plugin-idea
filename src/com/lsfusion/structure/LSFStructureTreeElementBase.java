@@ -36,9 +36,9 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
         if (valueClass != null && getElement() != null) {
             GlobalSearchScope scope = LSFGlobalResolver.getRequireScope((LSFFile) getElement());
 
-            for (LSFPropertyStatementTreeElement statement : LSFPsiUtils.getClassInterfaces(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ResultHandler<LSFPropertyStatementTreeElement>() {
+            for (LSFPropertyStatementTreeElement statement : LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFPropertyStatementTreeElement>() {
                 @Override
-                public LSFPropertyStatementTreeElement getResult(LSFPropertyStatement statement, LSFValueClass valueClass) {
+                public LSFPropertyStatementTreeElement map(LSFPropertyStatement statement, LSFValueClass valueClass) {
                     return new LSFPropertyStatementTreeElement(valueClass, statement, navigationHandler);
                 }
             })) {

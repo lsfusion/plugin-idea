@@ -12,7 +12,7 @@ public interface LSFClassSet {
 
     boolean containsAll(LSFClassSet set);
 
-    boolean haveCommonChilds(LSFClassSet set, GlobalSearchScope scope);
+    boolean haveCommonChildren(LSFClassSet set, GlobalSearchScope scope);
 
     int getMinimumWidth(int minCharWidth, FontMetrics fontMetrics);
 

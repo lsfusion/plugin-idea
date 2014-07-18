@@ -2,12 +2,14 @@ package com.lsfusion.lang.psi.stubs.extend.types;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
 import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
 import com.lsfusion.lang.psi.stubs.extend.impl.ExtendFormStubImpl;
-import com.lsfusion.lang.psi.stubs.extend.types.indexes.ExtendFormIndex;
+import com.lsfusion.lang.psi.indexes.ExtendFormIndex;
+import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -21,6 +23,11 @@ public class ExtendFormStubElementType extends ExtendStubElementType<LSFFormExte
     @Override
     public StringStubIndexExtension<LSFFormExtend> getGlobalIndex() {
         return ExtendFormIndex.getInstance();
+    }
+
+    @Override
+    public StubIndexKey<String, LSFFormExtend> getGlobalIndexKey() {
+        return LSFIndexKeys.EXTENDFORM;
     }
 
     @Override

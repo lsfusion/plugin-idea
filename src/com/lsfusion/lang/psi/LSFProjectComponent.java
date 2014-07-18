@@ -11,7 +11,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.PsiManagerEx;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.lang.psi.stubs.types.indexes.PropIndex;
+import com.lsfusion.lang.psi.indexes.PropIndex;
 import org.jetbrains.annotations.NotNull;
 
 public class LSFProjectComponent implements ProjectComponent {

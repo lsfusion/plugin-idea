@@ -318,7 +318,7 @@ public class LSFPsiImplUtil {
         for (int i = 0, size = classes1.size(); i < size; i++) {
             LSFClassSet class1 = classes1.get(i);
             LSFClassSet class2 = classes2.get(i);
-            if (class1 != null && class2 != null && !class1.haveCommonChilds(class2, scope)) // потом переделать haveCommonChilds
+            if (class1 != null && class2 != null && !class1.haveCommonChildren(class2, scope)) // потом переделать haveCommonChildren
                 return false;
         }
         return true;
@@ -329,7 +329,7 @@ public class LSFPsiImplUtil {
         for (int i = 0, size = Math.min(classes1.size(), classes2.size()); i < size; i++) {
             LSFClassSet class1 = classes1.get(i);
             LSFClassSet class2 = classes2.get(i);
-            if (class1 == null || class2 == null || class1.haveCommonChilds(class2, scope)) { // потом переделать haveCommonChilds
+            if (class1 == null || class2 == null || class1.haveCommonChildren(class2, scope)) { // потом переделать haveCommonChildren
                 count++;
             }
         }
@@ -423,7 +423,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static List<LSFClassSet> resolveClass(@Nullable LSFClassNameList classNameList) {
+    public static List<LSFClassSet> resolveClasses(@Nullable LSFClassNameList classNameList) {
         if (classNameList == null) {
             return Collections.emptyList();
         }
@@ -957,11 +957,7 @@ public class LSFPsiImplUtil {
             } else {
                 String typeDefClass = getClassName(typePD.getClassName());
                 if (typeDefClass != null) {
-                    if (result == null) {
-                        result = Arrays.asList(typeDefClass);
-                    } else {
-                        result.add(typeDefClass);
-                    }
+                    result = Arrays.asList(typeDefClass);
                 }
             }
         }
@@ -1526,7 +1522,7 @@ public class LSFPsiImplUtil {
         if (custom != null) {
             LSFClassNameList classNameList = custom.getClassNameList();
             if (classNameList != null)
-                return resolveClass(classNameList);
+                return resolveClasses(classNameList);
         }
         return null;
     }
@@ -1554,22 +1550,22 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement) {
-        return resolveClass(sourceStatement.getClassNameList());
+        return resolveClasses(sourceStatement.getClassNameList());
     }
 
     @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFNativePropertyDefinition sourceStatement) {
-        return resolveClass(sourceStatement.getClassNameList());
+        return resolveClasses(sourceStatement.getClassNameList());
     }
 
     @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
-        return resolveClass(sourceStatement.getClassNameList());
+        return resolveClasses(sourceStatement.getClassNameList());
     }
 
     @Nullable
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
-        return resolveClass(sourceStatement.getClassNameList());
+        return resolveClasses(sourceStatement.getClassNameList());
     }
 
     @Nullable
@@ -1582,7 +1578,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static List<LSFClassSet> inferValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+    public static List<LSFClassSet> inferGroupValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
             return new ArrayList<LSFClassSet>();
@@ -1693,7 +1689,10 @@ public class LSFPsiImplUtil {
             return builtInClassName.getName();
         }
         LSFCustomClassUsage customClassUsage = className.getCustomClassUsage();
-        return customClassUsage != null ? customClassUsage.getName() : null;
+        
+        assert customClassUsage != null;
+        
+        return customClassUsage.getName();
     }
 
     // LSFPropertyExpression.resolveValueParamClasses
@@ -2192,7 +2191,7 @@ public class LSFPsiImplUtil {
                 if (contextIndependentPD != null) { // кое где есть ACTION'ы в propertyObject
                     PsiElement element = contextIndependentPD.getChildren()[0]; // лень создавать отдельный параметр или интерфейс
                     if (element instanceof LSFGroupPropertyDefinition) {
-                        joinClasses = LSFPsiImplUtil.inferValueParamClasses((LSFGroupPropertyDefinition) element);
+                        joinClasses = inferGroupValueParamClasses((LSFGroupPropertyDefinition) element);
                     } else
                         joinClasses = unfriendlyPD.resolveValueParamClasses();
                 } else {

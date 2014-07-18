@@ -19,8 +19,9 @@ public class ExtendClassStubImpl extends ExtendStubImpl<LSFClassExtend, ExtendCl
     @Override
     public List<String> getShortExtends() {
         List<String> result = new ArrayList<String>();
-        for(StringRef shortExtend : shortExtends)
+        for (StringRef shortExtend : shortExtends) {
             result.add(StringRef.toString(shortExtend));
+        }
         return result;
     }
 
@@ -28,24 +29,27 @@ public class ExtendClassStubImpl extends ExtendStubImpl<LSFClassExtend, ExtendCl
         super(parent, psi);
 
         shortExtends = new ArrayList<StringRef>();
-        for(String shortExtend : psi.getShortExtends())
+        for (String shortExtend : psi.getShortExtends()) {
             shortExtends.add(StringRef.fromString(shortExtend));
+        }
     }
 
     public ExtendClassStubImpl(StubInputStream dataStream, StubElement parentStub, ExtendClassStubElementType type) throws IOException {
         super(dataStream, parentStub, type);
-        
+
         shortExtends = new ArrayList<StringRef>();
-        for(int i=0,size=dataStream.readInt();i<size;i++)
+        for (int i = 0, size = dataStream.readInt(); i < size; i++) {
             shortExtends.add(dataStream.readName());
+        }
     }
 
     @Override
     public void serialize(StubOutputStream dataStream) throws IOException {
         super.serialize(dataStream);
-        
+
         dataStream.writeInt(shortExtends.size());
-        for (StringRef shortExtend : shortExtends) 
+        for (StringRef shortExtend : shortExtends) {
             dataStream.writeName(StringRef.toString(shortExtend));
+        }
     }
 }

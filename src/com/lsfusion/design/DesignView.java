@@ -31,7 +31,7 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
-import com.lsfusion.lang.psi.stubs.types.indexes.FormIndex;
+import com.lsfusion.lang.psi.indexes.FormIndex;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 

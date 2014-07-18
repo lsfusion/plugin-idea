@@ -1,11 +1,11 @@
-package com.lsfusion.lang.psi.stubs.interfaces.types.indexes;
+package com.lsfusion.lang.psi.indexes;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
 import org.jetbrains.annotations.NotNull;
 
-public class ExplicitValueIndex extends StringStubIndexExtension {
+public class ExplicitValueIndex extends StringStubIndexExtension<LSFExplicitValuePropStatement> {
     private static final ExplicitValueIndex INSTANCE = new ExplicitValueIndex();
 
     public static ExplicitValueIndex getInstance() {
@@ -14,7 +14,7 @@ public class ExplicitValueIndex extends StringStubIndexExtension {
 
     @NotNull
     @Override
-    public StubIndexKey getKey() {
-        return LSFStubElementTypes.EXPLICIT_VALUE.key;
+    public StubIndexKey<String, LSFExplicitValuePropStatement> getKey() {
+        return LSFIndexKeys.EXPLICIT_VALUE;
     }
 }

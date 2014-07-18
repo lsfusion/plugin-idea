@@ -48,7 +48,7 @@ public class StructClassSet implements LSFClassSet, LSFValueClass {
         return true;
     }
 
-    public boolean haveCommonChilds(LSFClassSet set, GlobalSearchScope scope) {
+    public boolean haveCommonChildren(LSFClassSet set, GlobalSearchScope scope) {
         if (!(set instanceof StructClassSet))
             return false;
         StructClassSet structSet = (StructClassSet) set;
@@ -56,7 +56,7 @@ public class StructClassSet implements LSFClassSet, LSFValueClass {
             return false;
 
         for (int i = 0; i < sets.length; i++)
-            if (!sets[i].haveCommonChilds(structSet.sets[i], scope))
+            if (!sets[i].haveCommonChildren(structSet.sets[i], scope))
                 return false;
         return true;
     }

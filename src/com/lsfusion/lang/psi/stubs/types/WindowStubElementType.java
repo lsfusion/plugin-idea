@@ -2,12 +2,14 @@ package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import com.lsfusion.lang.psi.impl.LSFWindowCreateStatementImpl;
 import com.lsfusion.lang.psi.stubs.WindowStubElement;
 import com.lsfusion.lang.psi.stubs.impl.WindowStubImpl;
-import com.lsfusion.lang.psi.stubs.types.indexes.WindowIndex;
+import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
+import com.lsfusion.lang.psi.indexes.WindowIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -21,6 +23,11 @@ public class WindowStubElementType extends FullNameStubElementType<WindowStubEle
     @Override
     public StringStubIndexExtension<LSFWindowDeclaration> getGlobalIndex() {
         return WindowIndex.getInstance();
+    }
+
+    @Override
+    public StubIndexKey<String, LSFWindowDeclaration> getGlobalIndexKey() {
+        return LSFIndexKeys.WINDOW;
     }
 
     @Override

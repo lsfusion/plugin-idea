@@ -1,13 +1,17 @@
 package com.lsfusion.lang.psi.stubs.interfaces.types;
 
-import com.intellij.psi.stubs.*;
+import com.intellij.psi.stubs.IndexSink;
+import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFImplicitInterfacePropStatement;
 import com.lsfusion.lang.psi.impl.LSFImplicitInterfacePropertyStatementImpl;
 import com.lsfusion.lang.psi.stubs.interfaces.ImplicitInterfaceStubElement;
 import com.lsfusion.lang.psi.stubs.interfaces.impl.ImplicitInterfaceStubImpl;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
+import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -16,12 +20,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ImplicitInterfaceStubElementType extends IStubElementType<ImplicitInterfaceStubElement, LSFImplicitInterfacePropStatement> {
-    public final StubIndexKey<String, LSFImplicitInterfacePropStatement> key;
-
+public class ImplicitInterfaceStubElementType extends LSFStubElementType<ImplicitInterfaceStubElement, LSFImplicitInterfacePropStatement> {
     public ImplicitInterfaceStubElementType() {
-        super("IMPLICIT_INTERFACE_PROPERTY_STATEMENT", LSFLanguage.INSTANCE);
-        key = StubIndexKey.createIndexKey(getExternalId());
+        super("IMPLICIT_INTERFACE_PROPERTY_STATEMENT");
     }
 
     @Override
@@ -55,17 +56,12 @@ public class ImplicitInterfaceStubElementType extends IStubElementType<ImplicitI
     }
 
     @Override
-    public String getExternalId() {
-        return "lsf.ImplicitInterface";
-    }
-
-    @Override
-    public void serialize(ImplicitInterfaceStubElement stub, StubOutputStream dataStream) throws IOException {
+    public void serialize(@NotNull ImplicitInterfaceStubElement stub, @NotNull StubOutputStream dataStream) throws IOException {
         List<String> params = stub.getParamProperties();
         if (params != null) {
             dataStream.writeInt(params.size());
-            for (int i = 0; i < params.size(); i++) {
-                dataStream.writeName(params.get(i));
+            for (String param : params) {
+                dataStream.writeName(param);
             }
         } else {
             dataStream.writeInt(0);
@@ -83,19 +79,18 @@ public class ImplicitInterfaceStubElementType extends IStubElementType<ImplicitI
                 params.add(name != null ? name.getString() : null);
             }
         }
-        ImplicitInterfaceStubImpl stub = new ImplicitInterfaceStubImpl(parentStub, this, params);
 
-        return stub;
+        return new ImplicitInterfaceStubImpl(parentStub, this, params);
     }
 
     @Override
-    public void indexStub(ImplicitInterfaceStubElement stub, IndexSink sink) {
+    public void indexStub(@NotNull ImplicitInterfaceStubElement stub, @NotNull IndexSink sink) {
         List<String> paramProps = stub.getParamProperties();
         if (paramProps != null) {
             Set<String> set = new HashSet<String>(paramProps); // избегаем повторного добавления при многократном вхождении свойства
             for (String paramClass : set) {
                 if (paramClass != null) {
-                    sink.occurrence(key, paramClass);
+                    sink.occurrence(LSFIndexKeys.IMPLICIT_INTERFACE, paramClass);
                 }
             }
         }

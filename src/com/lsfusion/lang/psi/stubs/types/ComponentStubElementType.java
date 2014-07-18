@@ -1,21 +1,21 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.*;
-import com.lsfusion.lang.LSFLanguage;
+import com.intellij.psi.stubs.IndexSink;
+import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.StubOutputStream;
 import com.lsfusion.lang.psi.declarations.LSFComponentStubDeclaration;
 import com.lsfusion.lang.psi.impl.LSFComponentStubDeclImpl;
 import com.lsfusion.lang.psi.stubs.ComponentStubElement;
 import com.lsfusion.lang.psi.stubs.impl.ComponentStubImpl;
+import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class ComponentStubElementType extends IStubElementType<ComponentStubElement, LSFComponentStubDeclaration> {
-    public final StubIndexKey<String, LSFComponentStubDeclaration> key;
-
+public class ComponentStubElementType extends LSFStubElementType<ComponentStubElement, LSFComponentStubDeclaration> {
     public ComponentStubElementType() {
-        super("COMPONENT_STUB_DECLARATION", LSFLanguage.INSTANCE);
-        key = StubIndexKey.createIndexKey(getExternalId());
+        super("COMPONENT_STUB_DECLARATION");
     }
 
     @Override
@@ -27,12 +27,6 @@ public class ComponentStubElementType extends IStubElementType<ComponentStubElem
     public ComponentStubElement createStub(@NotNull LSFComponentStubDeclaration psi, StubElement parentStub) {
         String name = psi.getComponentDecl().getName();
         return new ComponentStubImpl(parentStub, this, name);
-    }
-
-    @NotNull
-    @Override
-    public String getExternalId() {
-        return "lsf.DesignComponent";
     }
 
     @Override
@@ -48,6 +42,6 @@ public class ComponentStubElementType extends IStubElementType<ComponentStubElem
 
     @Override
     public void indexStub(@NotNull ComponentStubElement stub, @NotNull IndexSink sink) {
-        sink.occurrence(key, ((ComponentStubImpl) stub).name);
+        sink.occurrence(LSFIndexKeys.COMPONENT, ((ComponentStubImpl) stub).name);
     }
 }

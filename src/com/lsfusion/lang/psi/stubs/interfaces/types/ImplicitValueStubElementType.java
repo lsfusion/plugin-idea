@@ -1,15 +1,20 @@
 package com.lsfusion.lang.psi.stubs.interfaces.types;
 
-import com.intellij.psi.stubs.*;
+import com.intellij.psi.stubs.IndexSink;
+import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.psi.LSFExpressionUnfriendlyPD;
 import com.lsfusion.lang.psi.LSFPropertyExpression;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.LSFImplicitValuePropStatement;
 import com.lsfusion.lang.psi.impl.LSFImplicitValuePropertyStatementImpl;
 import com.lsfusion.lang.psi.stubs.interfaces.ImplicitValueStubElement;
 import com.lsfusion.lang.psi.stubs.interfaces.impl.ImplicitValueStubImpl;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
+import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -18,17 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ImplicitValueStubElementType extends IStubElementType<ImplicitValueStubElement, LSFImplicitValuePropStatement> {
-    public final StubIndexKey<String, LSFImplicitValuePropStatement> key;
-
+public class ImplicitValueStubElementType extends LSFStubElementType<ImplicitValueStubElement, LSFImplicitValuePropStatement> {
     public ImplicitValueStubElementType() {
-        super("IMPLICIT_VALUE_PROPERTY_STATEMENT", LSFLanguage.INSTANCE);
-        key = StubIndexKey.createIndexKey(getExternalId());
-    }
-
-    @Override
-    public String getExternalId() {
-        return "lsf.ImplicitValue";
+        super("IMPLICIT_VALUE_PROPERTY_STATEMENT");
     }
 
     @Override
@@ -36,8 +33,8 @@ public class ImplicitValueStubElementType extends IStubElementType<ImplicitValue
         List<String> props = stub.getValueProperties();
         if (props != null) {
             dataStream.writeInt(props.size());
-            for (int i = 0; i < props.size(); i++) {
-                dataStream.writeName(props.get(i));
+            for (String prop : props) {
+                dataStream.writeName(prop);
             }
         } else {
             dataStream.writeInt(0);
@@ -55,9 +52,8 @@ public class ImplicitValueStubElementType extends IStubElementType<ImplicitValue
                 props.add(name != null ? name.getString() : null);
             }
         }
-        ImplicitValueStubImpl stub = new ImplicitValueStubImpl(parentStub, this, props);
 
-        return stub;
+        return new ImplicitValueStubImpl(parentStub, this, props);
     }
 
     @Override
@@ -67,7 +63,7 @@ public class ImplicitValueStubElementType extends IStubElementType<ImplicitValue
             Set<String> set = new HashSet<String>(valueProps); // избегаем повторного добавления при многократном вхождении свойства
             for (String valueClass : set) {
                 if (valueClass != null) {
-                    sink.occurrence(key, valueClass);
+                    sink.occurrence(LSFIndexKeys.IMPLICIT_VALUE, valueClass);
                 }
             }
         }
@@ -83,15 +79,19 @@ public class ImplicitValueStubElementType extends IStubElementType<ImplicitValue
         final ImplicitValueStubImpl stub = new ImplicitValueStubImpl(parentStub, psi.getElementType());
 
         List<String> propNames = new ArrayList<String>();
-        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = psi.getPropertyStatement().getExpressionUnfriendlyPD();
+        LSFPropertyStatement propertyStatement = psi.getPropertyStatement();
+
+        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
         if (expressionUnfriendlyPD != null) {
             propNames.addAll(LSFPsiImplUtil.getValuePropertyNames(expressionUnfriendlyPD));
         } else {
-            LSFPropertyExpression propertyExpression = psi.getPropertyStatement().getPropertyExpression();
-            if (propertyExpression != null) {
-                propNames.addAll(LSFPsiImplUtil.getValuePropertyNames(propertyExpression));
-            }
+            LSFPropertyExpression propertyExpression = propertyStatement.getPropertyExpression();
+
+            assert propertyExpression != null;
+
+            propNames.addAll(LSFPsiImplUtil.getValuePropertyNames(propertyExpression));
         }
+
         stub.setValueProperties(propNames);
 
         return stub;

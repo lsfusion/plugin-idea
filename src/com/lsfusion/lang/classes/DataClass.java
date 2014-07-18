@@ -62,7 +62,7 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     }
 
     @Override
-    public boolean haveCommonChilds(LSFClassSet set, GlobalSearchScope scope) {
+    public boolean haveCommonChildren(LSFClassSet set, GlobalSearchScope scope) {
         if (!(set instanceof DataClass))
             return false;
 

@@ -27,10 +27,10 @@ import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl;
-import com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ExplicitInterfaceIndex;
-import com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ExplicitValueIndex;
-import com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ImplicitInterfaceIndex;
-import com.lsfusion.lang.psi.stubs.interfaces.types.indexes.ImplicitValueIndex;
+import com.lsfusion.lang.psi.indexes.ExplicitInterfaceIndex;
+import com.lsfusion.lang.psi.indexes.ExplicitValueIndex;
+import com.lsfusion.lang.psi.indexes.ImplicitInterfaceIndex;
+import com.lsfusion.lang.psi.indexes.ImplicitValueIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -209,85 +209,84 @@ public class LSFPsiUtils {
         }
     }
 
-    public abstract static class ResultHandler<T> {
-        public static ResultHandler DEFAULT_INSTANCE = new ResultHandler<LSFPropertyStatement>() {
+    public abstract static class ApplicableMapper<T> {
+        public static ApplicableMapper STATEMENT = new ApplicableMapper<LSFPropertyStatement>() {
             @Override
-            public LSFPropertyStatement getResult(LSFPropertyStatement statement, LSFValueClass valueClass) {
+            public LSFPropertyStatement map(LSFPropertyStatement statement, LSFValueClass valueClass) {
                 return statement;
             }
         };
 
-        public abstract <T> T getResult(LSFPropertyStatement statement, LSFValueClass valueClass);
+        public abstract <T> T map(LSFPropertyStatement statement, LSFValueClass valueClass);
     }
 
-    public static Set<LSFPropertyStatement> getClassInterfaces(LSFValueClass valueClass, Project project, GlobalSearchScope scope) {
-        return getClassInterfaces(valueClass, project, scope, ResultHandler.DEFAULT_INSTANCE);
+    public static Set<LSFPropertyStatement> getPropertiesApplicableToClass(LSFValueClass valueClass, Project project, GlobalSearchScope scope) {
+        return mapPropertiesApplicableToClass(valueClass, project, scope, ApplicableMapper.STATEMENT);
     }
 
-    public static <T> Set<T> getClassInterfaces(LSFValueClass valueClass, Project project, GlobalSearchScope scope, ResultHandler<T> resultHandler) {
+    public static <T> Set<T> mapPropertiesApplicableToClass(LSFValueClass valueClass, Project project, GlobalSearchScope scope, ApplicableMapper<T> applicableMapper) {
+        
+        LSFClassSet valueClassSet = valueClass instanceof LSFClassDeclaration ? new CustomClassSet((LSFClassDeclaration) valueClass) : (LSFClassSet) valueClass;
+
         Set<LSFPropertyStatement> resultStatements = new HashSet<LSFPropertyStatement>();
 
-        List<LSFPropertyStatement> valueClassStatements = new ArrayList<LSFPropertyStatement>();
-        for (LSFValueClass vc : CustomClassSet.getClassParentsRecursively(valueClass)) {
-            String parentClassName = vc.getName();
-            Collection<LSFExplicitInterfacePropStatement> eiStatements = ExplicitInterfaceIndex.getInstance().get(parentClassName, project, scope);
+        List<LSFPropertyStatement> statementsWithClassAsResult = new ArrayList<LSFPropertyStatement>();
+        for (LSFValueClass clazz : CustomClassSet.getClassParentsRecursively(valueClass)) {
+            String className = clazz.getName();
+            Collection<LSFExplicitInterfacePropStatement> eiStatements = ExplicitInterfaceIndex.getInstance().get(className, project, scope);
             for (LSFExplicitInterfacePropStatement statement : eiStatements) {
                 resultStatements.add(statement.getPropertyStatement());
             }
 
-            Collection<LSFExplicitValuePropStatement> evStatements = ExplicitValueIndex.getInstance().get(parentClassName, project, scope);
+            Collection<LSFExplicitValuePropStatement> evStatements = ExplicitValueIndex.getInstance().get(className, project, scope);
             for (LSFExplicitValuePropStatement evStatement : evStatements) {
-                valueClassStatements.add(evStatement.getPropertyStatement());
+                statementsWithClassAsResult.add(evStatement.getPropertyStatement());
             }
         }
 
-        Set<String> valueClassStatementNames = new HashSet<String>();
+        Set<String> namesOfStatementsWithClassAsResult = new HashSet<String>();
         int i = 0;
-        Set<LSFPropertyStatement> notFittingStatemens = new HashSet<LSFPropertyStatement>();
-        while (i < valueClassStatements.size()) {
-            LSFPropertyStatement vcStatement = valueClassStatements.get(i);
-            String evsName = vcStatement.getName();
-            if (!valueClassStatementNames.contains(evsName) && !notFittingStatemens.contains(vcStatement)) {
-                LSFClassSet resolvedClass = vcStatement.resolveValueClass(false);
-                LSFClassSet valueClassSet = valueClass instanceof LSFClassDeclaration ? new CustomClassSet((LSFClassDeclaration) valueClass) : (LSFClassSet) valueClass;
-                if (resolvedClass != null && resolvedClass.haveCommonChilds(valueClassSet, scope)) {
-                    valueClassStatementNames.add(evsName);
+        Set<LSFPropertyStatement> skipStatemens = new HashSet<LSFPropertyStatement>();
+        while (i < statementsWithClassAsResult.size()) {
+            LSFPropertyStatement statement = statementsWithClassAsResult.get(i);
+            String statementName = statement.getName();
+            
+            if (!namesOfStatementsWithClassAsResult.contains(statementName) && !skipStatemens.contains(statement)) {
+                LSFClassSet resolvedClass = statement.resolveValueClass(false);
+                if (resolvedClass != null && resolvedClass.haveCommonChildren(valueClassSet, scope)) {
+                    namesOfStatementsWithClassAsResult.add(statementName);
 
-                    Collection<LSFImplicitValuePropertyStatement> ivStatements = ImplicitValueIndex.getInstance().get(evsName, project, scope);
-                    for (LSFImplicitValuePropertyStatement ivpStatement : ivStatements) {
-                        valueClassStatements.add(ivpStatement.getPropertyStatement());
+                    Collection<LSFImplicitValuePropStatement> ivStatements = ImplicitValueIndex.getInstance().get(statementName, project, scope);
+                    for (LSFImplicitValuePropStatement ivpStatement : ivStatements) {
+                        statementsWithClassAsResult.add(ivpStatement.getPropertyStatement());
                     }
                 } else {
-                    notFittingStatemens.add(vcStatement);
+                    skipStatemens.add(statement);
                 }
             }
             i++;
         }
 
-        for (String statementName : valueClassStatementNames) {
-            Collection<LSFImplicitInterfacePropStatement> iiStataments = ImplicitInterfaceIndex.getInstance().get(statementName, project, scope);
+        for (String name : namesOfStatementsWithClassAsResult) {
+            Collection<LSFImplicitInterfacePropStatement> iiStataments = ImplicitInterfaceIndex.getInstance().get(name, project, scope);
             for (LSFImplicitInterfacePropStatement iiStatement : iiStataments) {
                 resultStatements.add(iiStatement.getPropertyStatement());
             }
         }
 
-        return filterClassInterfaces(resultStatements, valueClass, resultHandler);
+        return mapPropertiesApplicableToClass(valueClassSet, resultStatements, applicableMapper);
     }
 
-    public static <T> Set<T> filterClassInterfaces(Collection<LSFPropertyStatement> statements, LSFValueClass valueClass) {
-        return filterClassInterfaces(statements, valueClass, ResultHandler.DEFAULT_INSTANCE);
-    }
-
-    public static <T> Set<T> filterClassInterfaces(Collection<LSFPropertyStatement> statements, LSFValueClass valueClass, ResultHandler<T> resultHandler) {
+    private static <T> Set<T> mapPropertiesApplicableToClass(LSFClassSet valueClassSet, Collection<LSFPropertyStatement> statements, ApplicableMapper<T> applicableMapper) {
+        
         Set<T> result = new HashSet<T>();
         for (LSFPropertyStatement statement : statements) {
             List<LSFClassSet> paramClasses = statement.resolveParamClasses();
             if (paramClasses != null && !paramClasses.isEmpty()) {
                 for (LSFClassSet paramClass : paramClasses) {
                     if (paramClass != null) {
-                        LSFClassSet valueClassSet = valueClass instanceof LSFClassDeclaration ? new CustomClassSet((LSFClassDeclaration) valueClass) : (LSFClassSet) valueClass;
                         if (paramClass.containsAll(valueClassSet)) {
-                            result.add((T) resultHandler.getResult(statement, paramClass.getCommonClass()));
+                            result.add((T) applicableMapper.map(statement, paramClass.getCommonClass()));
                             break;
                         }
                     }

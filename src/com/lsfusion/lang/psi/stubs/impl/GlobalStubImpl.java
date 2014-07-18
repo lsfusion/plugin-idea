@@ -36,7 +36,7 @@ public abstract class GlobalStubImpl<This extends GlobalStubElement<This, Decl>,
 
     public void serialize(StubOutputStream dataStream) throws IOException {
         dataStream.writeName(StringRef.toString(name));
-        
+
         dataStream.writeBoolean(isCorrect);
     }
 

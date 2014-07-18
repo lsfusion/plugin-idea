@@ -20,6 +20,7 @@ public abstract class LSFExplicitValuePropStatementImpl extends StubBasedPsiElem
         super(node);
     }
 
+    @NotNull
     @Override
     public LSFPropertyStatement getPropertyStatement() {
         return getImplicitValuePropertyStatement().getPropertyStatement();

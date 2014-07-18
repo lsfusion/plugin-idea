@@ -10,7 +10,7 @@ import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
+import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

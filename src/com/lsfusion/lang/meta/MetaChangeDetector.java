@@ -23,7 +23,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
-import com.lsfusion.lang.psi.stubs.types.indexes.ModuleIndex;
+import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;

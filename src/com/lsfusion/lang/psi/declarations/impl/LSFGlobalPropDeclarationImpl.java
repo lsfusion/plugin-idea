@@ -58,13 +58,16 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return null;
     }
 
-    protected abstract LSFPropertyDeclaration getPropertyDeclaration();
+    public abstract LSFPropertyDeclaration getPropertyDeclaration();
 
     @Nullable
-    protected abstract LSFExpressionUnfriendlyPD getExpressionUnfriendlyPD();
+    public abstract LSFExpressionUnfriendlyPD getExpressionUnfriendlyPD();
 
     @Nullable
-    protected abstract LSFPropertyExpression getPropertyExpression();
+    public abstract LSFPropertyExpression getPropertyExpression();
+
+    @Nullable
+    public abstract LSFPropertyOptions getPropertyOptions();
 
     @Override
     public boolean isAbstract() {
@@ -189,7 +192,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
                 PsiElement element = contextIndependentPD.getChildren()[0]; // лень создавать отдельный параметр или интерфейс
                 if (element instanceof LSFGroupPropertyDefinition) {
-                    List<LSFClassSet> inferredValueClasses = LSFPsiImplUtil.inferValueParamClasses((LSFGroupPropertyDefinition) element);
+                    List<LSFClassSet> inferredValueClasses = LSFPsiImplUtil.inferGroupValueParamClasses((LSFGroupPropertyDefinition) element);
                     for (int i = 0; i < resultClasses.size(); i++)
                         if (resultClasses.get(i) == null && i < inferredValueClasses.size()) { // не определены, возьмем выведенные
                             resultClasses.set(i, inferredValueClasses.get(i));
@@ -251,6 +254,15 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     public boolean isDataStoredProperty() {
         LSFDataPropertyDefinition dataProp = getDataPropertyDefinition();
         return dataProp != null && dataProp.getDataPropertySessionModifier() == null;
+    }
+    
+    public boolean isStoredProperty() {
+        if (isDataStoredProperty()) {
+            return true;
+        }
+        
+        LSFPropertyOptions options = getPropertyOptions();
+        return options != null && !options.getPersistentSettingList().isEmpty();
     }
 
     @Nullable
@@ -383,5 +395,14 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             }
         }
         return result.toArray(new PsiElement[result.size()]);
+    }
+
+    @Nullable
+    @Override
+    public String getColumnName() {
+        if (!isStoredProperty()) {
+            return null;
+        }
+        return getNamespaceName() + "." + getName();
     }
 }

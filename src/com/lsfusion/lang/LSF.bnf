@@ -246,7 +246,7 @@ nonEmptyClassParamDeclareList ::= classParamDeclare (COMMA classParamDeclare)*
 propertyExpression ::= ifPE
 {
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
-    methods = [ resolveValueClass resolveInferredValueClass resolveParams inferParamClasses getValueClassNames getValuePropertyNames]
+    methods = [ resolveValueClass resolveParams resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]
 }
 
 ifPE ::= orPE (IF orPE)*
@@ -467,7 +467,7 @@ typePropertyDefinition ::= typeIs className {pin = 1}
 
 
 propertyOptions ::= (   IN groupUsage
-                    |	PERSISTENT
+                    |	persistentSetting
                     |   COMPLEX
                     |	TABLE tableUsage
                     |	shortcutSetting
@@ -494,6 +494,7 @@ propertyOptions ::= (   IN groupUsage
 shortcutSetting ::= SHORTCUT noContextPropertyUsage {pin = 1}
 asEditActionSetting ::= (ASONCHANGE | ASONCHANGEWYS | ASONEDIT) noContextPropertyUsage {pin = 1}
 toolbarSetting ::= TOOLBAR
+persistentSetting ::= PERSISTENT
 fixedCharWidthSetting ::= FIXEDCHARWIDTH intLiteral
 minCharWidthSetting ::= MINCHARWIDTH intLiteral
 maxCharWidthSetting ::= MAXCHARWIDTH intLiteral

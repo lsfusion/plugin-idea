@@ -1,14 +1,14 @@
-package com.lsfusion.lang.psi.stubs.types.indexes;
+package com.lsfusion.lang.psi.indexes;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class FormIndex extends StringStubIndexExtension<LSFFormDeclaration> {
 
     private static final FormIndex ourInstance = new FormIndex();
+
     public static FormIndex getInstance() {
         return ourInstance;
     }
@@ -16,6 +16,6 @@ public class FormIndex extends StringStubIndexExtension<LSFFormDeclaration> {
     @NotNull
     @Override
     public StubIndexKey<String, LSFFormDeclaration> getKey() {
-        return LSFStubElementTypes.FORM.key;
+        return LSFIndexKeys.FORM;
     }
 }

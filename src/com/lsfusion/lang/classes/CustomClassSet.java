@@ -358,7 +358,7 @@ public class CustomClassSet implements LSFClassSet {
     }
 
     @Override
-    public boolean haveCommonChilds(LSFClassSet set, GlobalSearchScope scope) {
+    public boolean haveCommonChildren(LSFClassSet set, GlobalSearchScope scope) {
         if (!(set instanceof CustomClassSet))
             return false;
         return getCommonChild((CustomClassSet) set, scope) != null;

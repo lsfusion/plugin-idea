@@ -8,7 +8,7 @@ import com.intellij.util.containers.ArrayListSet;
 import com.lsfusion.lang.psi.LSFClassStatement;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
-import com.lsfusion.lang.psi.stubs.extend.types.indexes.ClassExtendsClassIndex;
+import com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

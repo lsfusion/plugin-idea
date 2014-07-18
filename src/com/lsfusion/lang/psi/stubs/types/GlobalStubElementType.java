@@ -1,7 +1,9 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.*;
-import com.lsfusion.lang.LSFLanguage;
+import com.intellij.psi.stubs.IndexSink;
+import com.intellij.psi.stubs.StringStubIndexExtension;
+import com.intellij.psi.stubs.StubIndexKey;
+import com.intellij.psi.stubs.StubOutputStream;
 import com.lsfusion.lang.psi.LSFGlobalElement;
 import com.lsfusion.lang.psi.stubs.GlobalStubElement;
 import org.jetbrains.annotations.NonNls;
@@ -9,30 +11,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public abstract class GlobalStubElementType<StubT extends GlobalStubElement<StubT, PsiT>, PsiT extends LSFGlobalElement<PsiT, StubT>> extends IStubElementType<StubT, PsiT> {
-                                                                                                                        
+public abstract class GlobalStubElementType<StubT extends GlobalStubElement<StubT, PsiT>, PsiT extends LSFGlobalElement<PsiT, StubT>> extends LSFStubElementType<StubT, PsiT> {
     protected GlobalStubElementType(@NotNull @NonNls String debugName) {
-        super(debugName, LSFLanguage.INSTANCE);
-
-        key = StubIndexKey.createIndexKey(getExternalId());
+        super(debugName);
     }
 
-    @NotNull
-    @Override
-    public String getExternalId() {
-        return "lsf." + toString();
-    }
-
-    public final StubIndexKey<String, PsiT> key;
     public abstract StringStubIndexExtension<PsiT> getGlobalIndex();
 
+    public abstract StubIndexKey<String, PsiT> getGlobalIndexKey();
+
     @Override
-    public void indexStub(StubT stub, IndexSink sink) {
-        sink.occurrence(key, stub.getGlobalName());
+    public void indexStub(@NotNull StubT stub, @NotNull IndexSink sink) {
+        sink.occurrence(getGlobalIndexKey(), stub.getGlobalName());
     }
 
     @Override
-    public void serialize(StubT stub, StubOutputStream dataStream) throws IOException {
+    public void serialize(@NotNull StubT stub, @NotNull StubOutputStream dataStream) throws IOException {
         stub.serialize(dataStream);
     }
 }

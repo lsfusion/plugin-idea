@@ -1,6 +1,8 @@
 package com.lsfusion.lang.psi.declarations;
 
 import com.lsfusion.lang.psi.LSFDataPropertyDefinition;
+import com.lsfusion.lang.psi.LSFExpressionUnfriendlyPD;
+import com.lsfusion.lang.psi.LSFPropertyExpression;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,4 +20,14 @@ public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlob
     boolean isDataStoredProperty();
 
     public List<String> resolveParamNames();
+
+    @Nullable
+    public String getColumnName();
+
+    @Nullable
+    LSFExpressionUnfriendlyPD getExpressionUnfriendlyPD();
+
+    @Nullable
+    LSFPropertyExpression getPropertyExpression();
+
 }

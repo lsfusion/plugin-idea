@@ -36,8 +36,8 @@ import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.indexes.*;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
-import com.lsfusion.lang.psi.stubs.types.indexes.*;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -571,7 +571,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             for (LSFClassSet classSet : contextClasses) {
                 LSFValueClass valueClass = classSet.getCommonClass();
                 if (valueClass != null) {
-                    addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getClassInterfaces(valueClass, project, requireScope));
+                    addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, requireScope));
                 }
             }
 
