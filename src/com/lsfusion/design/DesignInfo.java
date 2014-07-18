@@ -1,9 +1,9 @@
 package com.lsfusion.design;
 
-import com.intellij.find.findUsages.DefaultFindUsagesHandlerFactory;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Query;
 import com.lsfusion.design.model.ComponentView;
 import com.lsfusion.design.model.ContainerType;
@@ -20,9 +20,7 @@ import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 
 import javax.help.UnsupportedOperationException;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 
 public class DesignInfo {
@@ -44,9 +42,7 @@ public class DesignInfo {
             formEntity.extendForm(formExtend);
         }
 
-        DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
-        List<PsiReference> refs = new ArrayList<PsiReference>(fact.createFindUsagesHandler(formDecl.getNameIdentifier(), false)
-                .findReferencesToHighlight(formDecl.getNameIdentifier(), lsfFile.getRequireScope()));
+        Collection<PsiReference> refs = ReferencesSearch.search(formDecl.getNameIdentifier(), lsfFile.getRequireScope()).findAll();
 
         List<LSFFormUsage> formUsages = new ArrayList<LSFFormUsage>();
         for (PsiReference ref : refs) {

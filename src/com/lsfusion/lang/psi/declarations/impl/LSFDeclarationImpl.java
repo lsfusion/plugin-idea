@@ -2,14 +2,13 @@ package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.util.Segment;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFElementImpl;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,21 +55,6 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
         return false;
     }
 
-    public static String getLocationString(LSFDeclaration decl) {
-        final PsiFile file = decl.getLSFFile();
-        final Document document = PsiDocumentManager.getInstance(decl.getProject()).getDocument(file);
-        final SmartPsiElementPointer pointer = SmartPointerManager.getInstance(decl.getProject()).createSmartPsiElementPointer(decl);
-        final Segment range = pointer.getRange();
-        int lineNumber = -1;
-        int linePosition = -1;
-        if (document != null && range != null) {
-            lineNumber = document.getLineNumber(range.getStartOffset()) + 1;
-            linePosition = range.getStartOffset() - document.getLineStartOffset(lineNumber - 1) + 1;
-        }
-
-        return file.getName() + "(" + lineNumber + ":" + linePosition + ")";
-    }
-
     public static String getPresentableText(LSFDeclaration decl) {
         return decl.getDeclName();
     }
@@ -87,7 +71,7 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
 
     @Override
     public String getLocationString() {
-        return getLocationString(this);
+        return LSFPsiUtils.getLocationString(this);
     }
 
     @Override

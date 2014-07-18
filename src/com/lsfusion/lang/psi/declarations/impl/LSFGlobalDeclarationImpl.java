@@ -9,6 +9,7 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFStubBasedPsiElement;
 import com.lsfusion.lang.psi.declarations.LSFGlobalDeclaration;
 import com.lsfusion.lang.psi.stubs.GlobalStubElement;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,7 +61,7 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
 
     @Override
     public String getLocationString() {
-        return LSFDeclarationImpl.getLocationString(this);
+        return LSFPsiUtils.getLocationString(this);
     }
 
     @Override

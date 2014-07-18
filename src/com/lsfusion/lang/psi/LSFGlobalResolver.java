@@ -1,11 +1,11 @@
 package com.lsfusion.lang.psi;
 
-import com.intellij.find.findUsages.DefaultFindUsagesHandlerFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.*;
 import com.intellij.util.containers.ConcurrentHashMap;
@@ -13,12 +13,12 @@ import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
+import com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex;
 import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
-import com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
@@ -37,7 +37,7 @@ public class LSFGlobalResolver {
 
     private static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration, Set<LSFFile> alreadyGet) {
         boolean toCache = !declaration.getName().equals(LSFElementGenerator.genName);
-        if(toCache) {
+        if (toCache) {
             Set<LSFFile> cachedFiles = cached.get(declaration);
             if (cachedFiles != null)
                 return cachedFiles;
@@ -58,7 +58,7 @@ public class LSFGlobalResolver {
                 }
             }
 //        System.out.println("CACHED "+declaration.getName()+" "+System.identityHashCode(declaration));
-            if(toCache)
+            if (toCache)
                 cached.put(declaration, result);
         }
         return result;
@@ -70,9 +70,8 @@ public class LSFGlobalResolver {
             return cachedRefs;
 
         LSFId nameIdentifier = declaration.getNameIdentifier();
-        DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
-        Set<PsiReference> result = new HashSet<PsiReference>(fact.createFindUsagesHandler(nameIdentifier, false)
-                .findReferencesToHighlight(nameIdentifier, declaration.getUseScope()));
+
+        Set<PsiReference> result = new HashSet<PsiReference>(ReferencesSearch.search(nameIdentifier, declaration.getUseScope()).findAll());
 
         moduleRefsCache.put(declaration, result);
         return result;
@@ -86,7 +85,7 @@ public class LSFGlobalResolver {
         Project project = lsfFile.getProject();
         LSFModuleDeclaration declaration = lsfFile.getModuleDeclaration();
         VirtualFile vfile = lsfFile.getVirtualFile();
-        if(vfile == null) {
+        if (vfile == null) {
             Query<LSFModuleDeclaration> modules = findModules(declaration.getGlobalName(), GlobalSearchScope.allScope(project));
             LSFModuleDeclaration first = modules.findFirst();
             if (first != null)
@@ -94,7 +93,7 @@ public class LSFGlobalResolver {
         }
 
         Set<VirtualFile> vFiles = new HashSet<VirtualFile>();
-        for(LSFFile f : getRequireModules(declaration)) {
+        for (LSFFile f : getRequireModules(declaration)) {
             vFiles.add(f.getVirtualFile()); // null может быть только для dumb
         }
         return GlobalSearchScope.filesScope(project, vFiles);
@@ -178,7 +177,7 @@ public class LSFGlobalResolver {
         GlobalSearchScope scope = getRequireScope(file);
 
         Collection<T> decls = new ArrayList<T>();
-        for(FullNameStubElementType<S, T> type : types)
+        for (FullNameStubElementType<S, T> type : types)
             decls.addAll(type.getGlobalIndex().get(name, file.getProject(), scope));
         for (T virtDecl : virtDecls) {
             if (virtDecl != null && name != null && name.equals(virtDecl.getDeclName())) {

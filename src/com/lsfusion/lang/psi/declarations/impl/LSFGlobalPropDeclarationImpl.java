@@ -1,12 +1,11 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
-import com.intellij.find.findUsages.DefaultFindUsagesHandlerFactory;
-import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
@@ -375,17 +374,11 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
     @Override
     public PsiElement[] processImplementationsSearch() {
-        DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
         LSFId nameIdentifier = getNameIdentifier();
         if (nameIdentifier == null) {
             return PsiElement.EMPTY_ARRAY;
         }
-
-        FindUsagesHandler handler = fact.createFindUsagesHandler(nameIdentifier, false);
-        if (handler == null) {
-            return PsiElement.EMPTY_ARRAY;
-        }
-        Collection<PsiReference> refs = handler.findReferencesToHighlight(nameIdentifier, GlobalSearchScope.allScope(getProject()));
+        Collection<PsiReference> refs = ReferencesSearch.search(nameIdentifier, GlobalSearchScope.allScope(getProject())).findAll();
 
         List<PsiElement> result = new ArrayList<PsiElement>();
         for (PsiReference ref : refs) {

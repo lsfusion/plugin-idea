@@ -15,15 +15,13 @@ public class ImplementationsSearch extends QueryExecutorBase<PsiElement, PsiElem
     public void processQuery(@NotNull PsiElement sourceElement, @NotNull final Processor<PsiElement> consumer) {
         if (sourceElement instanceof LSFId) {
 
-            PsiElement nearestExtendableParent = PsiTreeUtil.getParentOfType(sourceElement, LSFDeclaration.class);
+            final LSFDeclaration declParent = PsiTreeUtil.getParentOfType(sourceElement, LSFDeclaration.class);
 
-            if (nearestExtendableParent.getParent() != null) {
-                final LSFDeclaration finalNearestExtendableParent = (LSFDeclaration) nearestExtendableParent;
-
+            if (declParent != null) {
                 ApplicationManager.getApplication().runReadAction(new Runnable() {
                     @Override
                     public void run() {
-                        for (PsiElement element : finalNearestExtendableParent.processImplementationsSearch()) {
+                        for (PsiElement element : declParent.processImplementationsSearch()) {
                             consumer.process(element);
                         }
                     }

@@ -6,6 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.LSFClassStatement;
 import com.lsfusion.lang.psi.LSFFormStatement;
 import com.lsfusion.lang.psi.LSFOverrideStatement;
+import com.lsfusion.util.LSFPsiUtils;
 
 public class LSFPsiListCellRenderer extends DefaultPsiElementCellRenderer {
     @Override
@@ -26,6 +27,11 @@ public class LSFPsiListCellRenderer extends DefaultPsiElementCellRenderer {
         }
 
         return super.getElementText(element);
+    }
+
+    @Override
+    public String getContainerText(PsiElement element, String name) {
+        return LSFPsiUtils.getLocationString(element);
     }
 
     private String getCutText(PsiElement element) {

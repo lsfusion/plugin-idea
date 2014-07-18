@@ -1,13 +1,13 @@
 package com.lsfusion.hierarchy.usages;
 
-import com.intellij.find.findUsages.DefaultFindUsagesHandlerFactory;
-import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor;
 import com.intellij.ide.hierarchy.HierarchyTreeStructure;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.searches.ReferencesSearch;
+import com.intellij.util.Processor;
 import com.intellij.util.containers.ArrayListSet;
 import com.lsfusion.lang.psi.LSFClassStatement;
 import com.lsfusion.lang.psi.LSFDesignStatement;
@@ -17,7 +17,6 @@ import com.lsfusion.usage.LSFUsageFilteringRuleProvider;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Set;
 
 public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
@@ -27,18 +26,14 @@ public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
 
     @NotNull
     @Override
-    protected Object[] buildChildren(@NotNull HierarchyNodeDescriptor descriptor) {
-        Set<LSFUsageHierarchyNodeDescriptor> result = new ArrayListSet<LSFUsageHierarchyNodeDescriptor>();
+    protected Object[] buildChildren(@NotNull final HierarchyNodeDescriptor descriptor) {
+        final Set<LSFUsageHierarchyNodeDescriptor> result = new ArrayListSet<LSFUsageHierarchyNodeDescriptor>();
         final PsiElement element = ((LSFUsageHierarchyNodeDescriptor) descriptor).getElementId();
 
         if (element != null && element instanceof LSFId) {
-            DefaultFindUsagesHandlerFactory fact = new DefaultFindUsagesHandlerFactory();
-            FindUsagesHandler findUsagesHandler = fact.createFindUsagesHandler(element, false);
-
-            if (findUsagesHandler != null) {
-                Collection<PsiReference> res = findUsagesHandler.findReferencesToHighlight(element, GlobalSearchScope.allScope(myProject));
-
-                for (PsiReference ref : res) {
+            ReferencesSearch.search(element, GlobalSearchScope.allScope(myProject)).forEach(new Processor<PsiReference>() {
+                @Override
+                public boolean process(PsiReference ref) {
                     PsiElement el = LSFPsiUtils.getStatementParent(ref.getElement());
                     if (el != null) {
                         PsiElement nodeElement = ((LSFUsageHierarchyNodeDescriptor) descriptor).getNodeElement();
@@ -46,8 +41,9 @@ public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
                             result.add(new LSFUsageHierarchyNodeDescriptor(myProject, descriptor, el, false));
                         }
                     }
+                    return true;
                 }
-            }
+            });
         }
 
         return result.toArray();

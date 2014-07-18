@@ -5,11 +5,10 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageManagerImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiElementProcessor;
@@ -26,18 +25,18 @@ import com.lsfusion.lang.psi.context.LSFExpression;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl;
 import com.lsfusion.lang.psi.indexes.ExplicitInterfaceIndex;
 import com.lsfusion.lang.psi.indexes.ExplicitValueIndex;
 import com.lsfusion.lang.psi.indexes.ImplicitInterfaceIndex;
 import com.lsfusion.lang.psi.indexes.ImplicitValueIndex;
+import com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class LSFPsiUtils {
-    
+
     @Nullable
     public static PsiElement getStatementParent(PsiElement element) {
         if (element == null) {
@@ -47,8 +46,8 @@ public class LSFPsiUtils {
         while (element.getParent() != null) {
             //parent == scriptStatement OR metaCodeBody
             if (element.getParent() instanceof LSFFile
-                || element.getParent() instanceof LSFScriptStatement
-                || element.getParent() instanceof LSFMetaCodeBody) {
+                    || element.getParent() instanceof LSFScriptStatement
+                    || element.getParent() instanceof LSFMetaCodeBody) {
                 break;
             }
             element = element.getParent();
@@ -56,7 +55,7 @@ public class LSFPsiUtils {
 
         return element.getParent() == null ? null : element;
     }
-    
+
     public static TextRange subRange(TextRange range, TextRange inner) {
         int start = range.getStartOffset() + inner.getStartOffset();
         int end = start + inner.getLength();
@@ -182,7 +181,7 @@ public class LSFPsiUtils {
         if (psiFile == null) {
             return Collections.EMPTY_SET;
         }
-        
+
         return collectInjectedLSFFiles(psiFile, project);
     }
 
@@ -225,7 +224,7 @@ public class LSFPsiUtils {
     }
 
     public static <T> Set<T> mapPropertiesApplicableToClass(LSFValueClass valueClass, Project project, GlobalSearchScope scope, ApplicableMapper<T> applicableMapper) {
-        
+
         LSFClassSet valueClassSet = valueClass instanceof LSFClassDeclaration ? new CustomClassSet((LSFClassDeclaration) valueClass) : (LSFClassSet) valueClass;
 
         Set<LSFPropertyStatement> resultStatements = new HashSet<LSFPropertyStatement>();
@@ -250,7 +249,7 @@ public class LSFPsiUtils {
         while (i < statementsWithClassAsResult.size()) {
             LSFPropertyStatement statement = statementsWithClassAsResult.get(i);
             String statementName = statement.getName();
-            
+
             if (!namesOfStatementsWithClassAsResult.contains(statementName) && !skipStatemens.contains(statement)) {
                 LSFClassSet resolvedClass = statement.resolveValueClass(false);
                 if (resolvedClass != null && resolvedClass.haveCommonChildren(valueClassSet, scope)) {
@@ -278,7 +277,7 @@ public class LSFPsiUtils {
     }
 
     private static <T> Set<T> mapPropertiesApplicableToClass(LSFClassSet valueClassSet, Collection<LSFPropertyStatement> statements, ApplicableMapper<T> applicableMapper) {
-        
+
         Set<T> result = new HashSet<T>();
         for (LSFPropertyStatement statement : statements) {
             List<LSFClassSet> paramClasses = statement.resolveParamClasses();
@@ -321,7 +320,7 @@ public class LSFPsiUtils {
         for (PsiElement child = element.getLastChild(); child != null; child = child.getPrevSibling()) {
             if (aClass.isInstance(child)) {
                 //noinspection unchecked
-                return (T)child;
+                return (T) child;
             }
         }
         return null;
@@ -333,7 +332,7 @@ public class LSFPsiUtils {
             for (Class<? extends T> aClass : classes) {
                 if (aClass.isInstance(child)) {
                     //noinspection unchecked
-                    return (T)child;
+                    return (T) child;
                 }
             }
         }
@@ -347,4 +346,20 @@ public class LSFPsiUtils {
         InjectedLanguageManager languageManager = InjectedLanguageManager.getInstance(project);
         return languageManager.isInjectedFragment(injectedFile);
     }
+
+    public static String getLocationString(PsiElement element) {
+        final PsiFile file = element.getContainingFile();
+        final Document document = PsiDocumentManager.getInstance(element.getProject()).getDocument(file);
+        final SmartPsiElementPointer pointer = SmartPointerManager.getInstance(element.getProject()).createSmartPsiElementPointer(element);
+        final Segment range = pointer.getRange();
+        int lineNumber = -1;
+        int linePosition = -1;
+        if (document != null && range != null) {
+            lineNumber = document.getLineNumber(range.getStartOffset()) + 1;
+            linePosition = range.getStartOffset() - document.getLineStartOffset(lineNumber - 1) + 1;
+        }
+
+        return file.getName() + "(" + lineNumber + ":" + linePosition + ")";
+    }
+
 }
