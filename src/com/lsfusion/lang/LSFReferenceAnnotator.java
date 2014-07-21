@@ -197,6 +197,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
         if (o.resolveDuplicates()) {
             addAlreadyDefinedError(o.getPropertyDeclaration(), o.getPresentableText());
+        } else {
+            if (o.isStoredProperty()) {
+                if (o.resolveDuplicateColumns()) {
+                    addDuplicateColumnNameError(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
+                } else {
+//                    addColumnInfo(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
+                }
+            }
         }
     }
 
@@ -343,6 +351,18 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (declaration.getName() != null && declaration.resolveDuplicates()) {
             addAlreadyDefinedError(declaration);
         }
+    }
+    
+    private void addDuplicateColumnNameError(PsiElement element, String tableName, String columnName) {
+        Annotation annotation = myHolder.createErrorAnnotation(element, "The property has duplicate column name. Table: " + tableName + ", column: " + columnName);
+        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+        addError(element, annotation);
+    }
+
+    private void addColumnInfo(PsiElement element, String tableName, String columnName) {
+        final Annotation annotation = myHolder.createInfoAnnotation(element.getTextRange(), "Table: " + tableName + "; columnName: " + columnName);
+        TextAttributes error = IMPLICIT_DECL;
+        annotation.setEnforcedTextAttributes(error);
     }
 
     private void addAlreadyDefinedError(LSFDeclaration decl) {

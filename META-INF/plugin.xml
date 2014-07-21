@@ -184,6 +184,8 @@
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.NavigatorElementIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ComponentIndex"/>
 
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.TableClassesIndex"/>
+        
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendFormIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendClassIndex"/>
 
@@ -193,6 +195,12 @@
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExplicitValueIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ImplicitValueIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ImplicitInterfaceIndex"/>
+        
+        <!-- caches -->
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ParamClassesCache" serviceImplementation="com.lsfusion.lang.psi.cache.ParamClassesCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ValueClassCache" serviceImplementation="com.lsfusion.lang.psi.cache.ValueClassCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.TableNameCache" serviceImplementation="com.lsfusion.lang.psi.cache.TableNameCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ColumnNameCache" serviceImplementation="com.lsfusion.lang.psi.cache.ColumnNameCache"/>
 
         <stubElementTypeHolder class="com.lsfusion.lang.psi.LSFTypes"/>
         <gotoClassContributor implementation="com.lsfusion.LSFClassContributor"/>

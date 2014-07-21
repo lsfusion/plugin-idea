@@ -11,10 +11,10 @@ import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
 import com.lsfusion.lang.psi.impl.LSFExplicitValuePropertyStatementImpl;
+import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import com.lsfusion.lang.psi.stubs.interfaces.ExplicitValueStubElement;
 import com.lsfusion.lang.psi.stubs.interfaces.impl.ExplicitValueStubImpl;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
-import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -86,10 +86,9 @@ public class ExplicitValueStubElementType extends LSFStubElementType<ExplicitVal
             classNames.addAll(LSFPsiImplUtil.getValueClassNames(expressionUnfriendlyPD));
         } else {
             LSFPropertyExpression propertyExpression = propertyStatement.getPropertyExpression();
-
-            assert propertyExpression != null;
-
-            classNames.addAll(LSFPsiImplUtil.getValueClassNames(propertyExpression));
+            if (propertyExpression != null) {
+                classNames.addAll(LSFPsiImplUtil.getValueClassNames(propertyExpression));
+            }
         }
 
         stub.setValueClasses(classNames);

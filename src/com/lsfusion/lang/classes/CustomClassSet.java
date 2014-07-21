@@ -28,6 +28,10 @@ public class CustomClassSet implements LSFClassSet {
         this.classes = classes;
     }
 
+    public Set<LSFClassDeclaration> getClasses() {
+        return classes;
+    }
+
     public CustomClassSet op(CustomClassSet set, boolean or) {
         if (or) {
             Set<LSFClassDeclaration> orSet = new HashSet<LSFClassDeclaration>(classes);

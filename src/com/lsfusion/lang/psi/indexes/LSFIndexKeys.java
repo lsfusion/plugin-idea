@@ -18,6 +18,8 @@ public class LSFIndexKeys {
     public static final StubIndexKey<String, LSFTableDeclaration> TABLE = StubIndexKey.createIndexKey("lsf.indices.table");
     public static final StubIndexKey<String, LSFWindowDeclaration> WINDOW = StubIndexKey.createIndexKey("lsf.indices.window");
 
+    public static final StubIndexKey<String, LSFTableDeclaration> TABLE_CLASSES = StubIndexKey.createIndexKey("lsf.indices.table.classes");
+
     public static final StubIndexKey<String, LSFFormExtend> EXTENDFORM = StubIndexKey.createIndexKey("lsf.indices.extends.form");
     public static final StubIndexKey<String, LSFClassExtend> EXTENDCLASS = StubIndexKey.createIndexKey("lsf.indices.extends.class");
     public static final StubIndexKey<String, LSFClassExtend> EXTENDCLASS_SHORT = StubIndexKey.createIndexKey("lsf.indices.extends.class.short");

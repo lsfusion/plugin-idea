@@ -16,6 +16,6 @@ public abstract class LSFStubElementType<StubT extends StubElement<PsiT>, PsiT e
     @NotNull
     @Override
     public String getExternalId() {
-        return "lsf." + toString();
+        return "lsf.stub." + toString();
     }
 }

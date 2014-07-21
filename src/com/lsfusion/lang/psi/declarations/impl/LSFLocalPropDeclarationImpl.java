@@ -3,6 +3,8 @@ package com.lsfusion.lang.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.lang.psi.cache.ParamClassesCache;
+import com.lsfusion.lang.psi.cache.ValueClassCache;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
@@ -37,7 +39,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
 
     @Override
     public LSFClassSet resolveValueClass(boolean infer) {
-        return LSFResolveCache.getValueClassInstance().resolveWithCaching(this, infer ? LSFValueClassResolver.INFER_INSTANCE : LSFValueClassResolver.NO_INFER_INSTANCE, true, false);
+        return ValueClassCache.getInstance(getProject()).resolveValueClassWithCaching(this, infer);
     }
 
     @Override
@@ -48,7 +50,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     @Override
     @Nullable
     public List<LSFClassSet> resolveParamClasses() {
-        return LSFResolveCache.getParamClassesInstance().resolveWithCaching(this, LSFParamClassesResolver.INSTANCE, true, false);
+        return ParamClassesCache.getInstance(getProject()).resolveParamClassesWithCaching(this);
     }
 
     @Override

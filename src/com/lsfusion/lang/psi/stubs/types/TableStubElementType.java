@@ -1,15 +1,12 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
-import com.intellij.psi.stubs.StubElement;
-import com.intellij.psi.stubs.StubIndexKey;
-import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.*;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.impl.LSFTableStatementImpl;
-import com.lsfusion.lang.psi.stubs.TableStubElement;
-import com.lsfusion.lang.psi.stubs.impl.TableStubImpl;
 import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import com.lsfusion.lang.psi.indexes.TableIndex;
+import com.lsfusion.lang.psi.stubs.TableStubElement;
+import com.lsfusion.lang.psi.stubs.impl.TableStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -40,8 +37,24 @@ public class TableStubElementType extends FullNameStubElementType<TableStubEleme
         return new TableStubImpl(parentStub, psi);
     }
 
+    @NotNull
     @Override
-    public TableStubElement deserialize(StubInputStream dataStream, StubElement parentStub) throws IOException {
+    public TableStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         return new TableStubImpl(dataStream, parentStub, this);
+    }
+
+    @Override
+    public void serialize(@NotNull TableStubElement stub, @NotNull StubOutputStream dataStream) throws IOException {
+        super.serialize(stub, dataStream);
+        dataStream.writeUTFFast(stub.getClassNamesString());
+    }
+
+    @Override
+    public void indexStub(@NotNull TableStubElement stub, @NotNull IndexSink sink) {
+        super.indexStub(stub, sink);
+        String classNames = stub.getClassNamesString();
+        if (!classNames.isEmpty()) {
+            sink.occurrence(LSFIndexKeys.TABLE_CLASSES, classNames);
+        }
     }
 }

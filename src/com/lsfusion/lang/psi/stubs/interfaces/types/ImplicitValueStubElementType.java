@@ -86,10 +86,9 @@ public class ImplicitValueStubElementType extends LSFStubElementType<ImplicitVal
             propNames.addAll(LSFPsiImplUtil.getValuePropertyNames(expressionUnfriendlyPD));
         } else {
             LSFPropertyExpression propertyExpression = propertyStatement.getPropertyExpression();
-
-            assert propertyExpression != null;
-
-            propNames.addAll(LSFPsiImplUtil.getValuePropertyNames(propertyExpression));
+            if (propertyExpression != null) {
+                propNames.addAll(LSFPsiImplUtil.getValuePropertyNames(propertyExpression));
+            }
         }
 
         stub.setValueProperties(propNames);

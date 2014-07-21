@@ -188,6 +188,10 @@ public class BaseUtils {
             return string.trim();
     }
 
+    public static <K> String toString(K... array) {
+        return toString(",", array);
+    }
+    
     public static <K> String toString(String separator, K... array) {
         String result = "";
         for (K element : array)

@@ -42,7 +42,7 @@ public class ExtendClassStubElementType extends ExtendStubElementType<LSFClassEx
     }
 
     @Override
-    public void indexStub(@NotNull ExtendClassStubElement stub, IndexSink sink) {
+    public void indexStub(@NotNull ExtendClassStubElement stub, @NotNull IndexSink sink) {
         super.indexStub(stub, sink);
 
         for (String shortExtend : stub.getShortExtends()) {

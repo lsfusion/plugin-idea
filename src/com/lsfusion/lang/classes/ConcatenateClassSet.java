@@ -8,37 +8,41 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class StructClassSet implements LSFClassSet, LSFValueClass {
+public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
 
-    private LSFClassSet[] sets;
+    private final LSFClassSet[] sets;
 
-    public StructClassSet(LSFClassSet[] sets) {
+    public ConcatenateClassSet(LSFClassSet[] sets) {
         this.sets = sets;
     }
 
-    public LSFClassSet get(int i) {
+    public LSFClassSet getSet(int i) {
         if (i < sets.length && i >= 0)
             return sets[i];
         return null;
     }
+    
+    public int getSetSize() {
+        return sets.length;
+    }
 
     public LSFClassSet op(LSFClassSet set, boolean or) {
-        if (!(set instanceof StructClassSet))
+        if (!(set instanceof ConcatenateClassSet))
             return null;
-        StructClassSet structSet = (StructClassSet) set;
+        ConcatenateClassSet structSet = (ConcatenateClassSet) set;
         if (structSet.sets.length != sets.length)
             return null;
 
         LSFClassSet[] result = new LSFClassSet[sets.length];
         for (int i = 0; i < sets.length; i++)
             result[i] = sets[i].op(structSet.sets[i], or);
-        return new StructClassSet(result);
+        return new ConcatenateClassSet(result);
     }
 
     public boolean containsAll(LSFClassSet set) {
-        if (!(set instanceof StructClassSet))
+        if (!(set instanceof ConcatenateClassSet))
             return false;
-        StructClassSet structSet = (StructClassSet) set;
+        ConcatenateClassSet structSet = (ConcatenateClassSet) set;
         if (structSet.sets.length != sets.length)
             return false;
 
@@ -49,9 +53,9 @@ public class StructClassSet implements LSFClassSet, LSFValueClass {
     }
 
     public boolean haveCommonChildren(LSFClassSet set, GlobalSearchScope scope) {
-        if (!(set instanceof StructClassSet))
+        if (!(set instanceof ConcatenateClassSet))
             return false;
-        StructClassSet structSet = (StructClassSet) set;
+        ConcatenateClassSet structSet = (ConcatenateClassSet) set;
         if (structSet.sets.length != sets.length)
             return false;
 
@@ -107,7 +111,7 @@ public class StructClassSet implements LSFClassSet, LSFValueClass {
     }
 
     public boolean equals(Object o) {
-        return this == o || o instanceof StructClassSet && Arrays.equals(sets, ((StructClassSet) o).sets);
+        return this == o || o instanceof ConcatenateClassSet && Arrays.equals(sets, ((ConcatenateClassSet) o).sets);
     }
 
     public int hashCode() {

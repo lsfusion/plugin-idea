@@ -8,8 +8,6 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.impl.PsiManagerEx;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.indexes.PropIndex;
@@ -24,13 +22,6 @@ public class LSFProjectComponent implements ProjectComponent {
 
     @Override
     public void projectOpened() {
-        ((PsiManagerEx) PsiManager.getInstance(project)).registerRunnableToRunOnAnyChange(new Runnable() {
-            public void run() {
-                LSFResolveCache.getParamClassesInstance().clearCache(true);
-                LSFResolveCache.getValueClassInstance().clearCache(true);
-            }
-        });
-
         StartupManager.getInstance(project).runWhenProjectIsInitialized(new Runnable() {
             @Override
             public void run() {

@@ -27,9 +27,9 @@ import com.intellij.util.Function;
 import com.lsfusion.LSFBundle;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.classes.ConcatenateClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
-import com.lsfusion.lang.classes.StructClassSet;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.context.LSFExpression;
@@ -124,7 +124,7 @@ public class InsertCompositionAction extends BaseRefactoringAction {
         protected void invokeImpl(final LSFFile file, final Project project, final Editor editor, final FileEditor fileEditor, final @NotNull LSFExpression expr) {
             InferResult inferResult = expr.inferParamClasses(null).finish();
             LSFClassSet classSet = expr.resolveInferredValueClass(inferResult);
-            if (classSet != null && !(classSet instanceof StructClassSet)) {
+            if (classSet != null && !(classSet instanceof ConcatenateClassSet)) {
                 final LSFValueClass valueClass = classSet.getCommonClass();
                 LSFStructureViewNavigationHandler navigationHandler = new LSFStructureViewNavigationHandler() {
                     @Override

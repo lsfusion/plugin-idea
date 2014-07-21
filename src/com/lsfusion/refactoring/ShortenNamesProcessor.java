@@ -574,7 +574,7 @@ public class ShortenNamesProcessor {
             if(name == null)
                 return true;
 
-            if(valueClass instanceof StructClassSet)
+            if(valueClass instanceof ConcatenateClassSet)
                 return name.equals("STRUCT");
             if(valueClass instanceof DataClass)
                 return name.equals(((DataClass) valueClass).getName());

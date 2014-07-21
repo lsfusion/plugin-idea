@@ -343,7 +343,7 @@ public class LSFPsiImplUtil {
         return true;
     }
 
-    public static LSFClassSet resolve(LSFBuiltInClassName builtIn) {
+    public static DataClass resolve(LSFBuiltInClassName builtIn) {
         String name = builtIn.getText();
         if (name.equals("DOUBLE"))
             return DoubleClass.instance;
@@ -401,14 +401,30 @@ public class LSFPsiImplUtil {
         return new SimpleDataClass(name);
     }
 
-    public static LSFClassSet resolveClass(@Nullable LSFCustomClassUsage usage) {
+    @Nullable
+    public static LSFClassDeclaration resolveClassDecl(@Nullable LSFCustomClassUsage usage) {
         if (usage == null) {
             return null;
         }
-        LSFClassDeclaration decl = usage.resolveDecl();
-        if (decl == null)
+        return usage.resolveDecl();
+    }
+
+    @Nullable
+    public static CustomClassSet resolveClass(@Nullable LSFCustomClassUsage usage) {
+        LSFClassDeclaration classDecl = resolveClassDecl(usage);
+        return classDecl == null ? null : new CustomClassSet(classDecl);
+    }
+
+    @Nullable
+    public static LSFValueClass resolveValueClass(@Nullable LSFClassName className) {
+        if (className == null) {
             return null;
-        return new CustomClassSet(decl);
+        }
+        LSFBuiltInClassName builtInClassName = className.getBuiltInClassName();
+        if (builtInClassName != null)
+            return resolve(builtInClassName);
+
+        return resolveClassDecl(className.getCustomClassUsage());
     }
 
     @Nullable
@@ -601,8 +617,8 @@ public class LSFPsiImplUtil {
 
         LSFUintLiteral uintLiteral = sourceStatement.getUintLiteral();
         if (uintLiteral != null) {
-            if (valueClass instanceof StructClassSet)
-                return ((StructClassSet) valueClass).get(Integer.valueOf(uintLiteral.getText()) - 1);
+            if (valueClass instanceof ConcatenateClassSet)
+                return ((ConcatenateClassSet) valueClass).getSet(Integer.valueOf(uintLiteral.getText()) - 1);
             return null;
         }
 
@@ -759,7 +775,7 @@ public class LSFPsiImplUtil {
         LSFClassSet[] sets = new LSFClassSet[peList.size()];
         for (int i = 0; i < sets.length; i++)
             sets[i] = resolveInferredValueClass(peList.get(i), inferred);
-        return new StructClassSet(sets);
+        return new ConcatenateClassSet(sets);
     }
 
     @Nullable
@@ -1500,7 +1516,7 @@ public class LSFPsiImplUtil {
     // UnfriendlyPE.resolveValueParamClasses
 
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFEditFormActionPropertyDefinitionBody editForm) {
-        return Collections.singletonList(resolveClass(editForm.getCustomClassUsage()));
+        return Collections.singletonList((LSFClassSet)resolveClass(editForm.getCustomClassUsage()));
     }
 
     // извращенная эмуляция unfriendly
@@ -2079,8 +2095,8 @@ public class LSFPsiImplUtil {
     public static Inferred inferParamClasses(@NotNull LSFPostfixUnaryPE sourceStatement, @Nullable LSFClassSet valueClass) {
         LSFUintLiteral uintLiteral = sourceStatement.getUintLiteral();
         if (uintLiteral != null) {
-            if (valueClass instanceof StructClassSet)
-                valueClass = ((StructClassSet) valueClass).get(Integer.valueOf(uintLiteral.getText()) - 1);
+            if (valueClass instanceof ConcatenateClassSet)
+                valueClass = ((ConcatenateClassSet) valueClass).getSet(Integer.valueOf(uintLiteral.getText()) - 1);
             else
                 valueClass = null;
         }

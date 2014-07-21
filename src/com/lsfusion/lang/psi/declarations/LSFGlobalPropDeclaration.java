@@ -10,19 +10,8 @@ import java.util.List;
 
 public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlobalPropDeclaration, PropStubElement>, LSFPropDeclaration {
 
-    String getCaption();
-
-    boolean isAction();
-    
     @Nullable
     LSFDataPropertyDefinition getDataPropertyDefinition();
-
-    boolean isDataStoredProperty();
-
-    public List<String> resolveParamNames();
-
-    @Nullable
-    public String getColumnName();
 
     @Nullable
     LSFExpressionUnfriendlyPD getExpressionUnfriendlyPD();
@@ -30,4 +19,27 @@ public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlob
     @Nullable
     LSFPropertyExpression getPropertyExpression();
 
+    String getCaption();
+
+    boolean isAction();
+    
+    boolean isStoredProperty();
+
+    boolean isDataStoredProperty();
+
+    public List<String> resolveParamNames();
+
+    boolean resolveDuplicateColumns();
+
+    @Nullable
+    String getTableName();
+
+    @Nullable
+    String getTableNameNoCache();
+
+    @Nullable
+    String getColumnName();
+
+    @Nullable
+    String getColumnNameNoCache();
 }
