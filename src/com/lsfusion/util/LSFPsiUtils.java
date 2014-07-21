@@ -198,8 +198,6 @@ public class LSFPsiUtils {
                 PsiElement file = injectedPsiFile.first;
                 if (file instanceof LSFFile) {
                     lsfFiles.add((LSFFile) file);
-                } else {
-                    System.out.println("Strange: " + file + " -> " + injectedPsiFile.second);
                 }
             }
         }
