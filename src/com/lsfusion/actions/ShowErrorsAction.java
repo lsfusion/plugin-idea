@@ -22,10 +22,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Segment;
+import com.intellij.openapi.vcs.FileStatus;
+import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.text.StringTokenizer;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.LSFFile;
@@ -33,12 +36,9 @@ import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
 import java.util.List;
 
 public class ShowErrorsAction extends AnAction {
@@ -103,6 +103,9 @@ public class ShowErrorsAction extends AnAction {
                     public void run() {
                         int index = 0;
                         for (VirtualFile file : files) {
+                            if (FileStatusManager.getInstance(project).getStatus(file) == FileStatus.IGNORED) {
+                                continue;
+                            }
                             index++;
                             indicator.setText("Processing " + index + "/" + files.size() + ": " + file.getName());
                             if (file.getFileType() == LSFFileType.INSTANCE) {

@@ -5,6 +5,7 @@ import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
 import com.intellij.psi.PsiManager;
@@ -42,8 +43,11 @@ public class LSFProjectComponent implements ProjectComponent {
                             ApplicationManager.getApplication().runReadAction(new Runnable() {
                                 @Override
                                 public void run() {
-                                    for (LSFGlobalPropDeclaration decl : propIndex.get(key, project, GlobalSearchScope.projectScope(project))) {
-                                        decl.resolveParamClasses();
+                                    try {
+                                        for (LSFGlobalPropDeclaration decl : propIndex.get(key, project, GlobalSearchScope.projectScope(project))) {
+                                            decl.resolveParamClasses();
+                                        }
+                                    } catch (IndexNotReadyException ignored) {
                                     }
                                 }
                             });
