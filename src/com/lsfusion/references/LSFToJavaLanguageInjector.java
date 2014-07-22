@@ -29,6 +29,22 @@ import static com.lsfusion.util.JavaPsiUtils.*;
 import static com.lsfusion.util.LSFFileUtils.getModuleWithDependenciesScope;
 
 public class LSFToJavaLanguageInjector implements MultiHostInjector {
+    public static final String LSF_LOGICS_PARSER_FQN = "lsfusion.server.LsfLogicsParser";
+    public static final String LSF_LOGICS_LEXER_FQN = "lsfusion.server.LsfLogicsLexer";
+    public static final String SCRIPTING_ACTION_PROPERTY_FQN = "lsfusion.server.logics.scripted.ScriptingActionProperty";
+    public static final String LOGICS_MODULE_FQN = "lsfusion.server.logics.LogicsModule";
+    public static final String SCRIPTING_LOGICS_MODULE_FQN = "lsfusion.server.logics.scripted.ScriptingLogicsModule";
+
+    public static final String SCRIPTING_ACTION_PROPERTY_LM_FIELD = "LM";
+
+    public static final String GET_MODULE = "getModule";
+    public static final String ADD_MODULE_FROM_RESOURCE = "addModuleFromResource";
+
+    public static final String FIND_CLASS = "findClass";
+    public static final String FIND_ACTION = "findAction";
+    public static final String FIND_PROPERTY = "findProperty";
+    public static final String FIND_PROPERTIES = "findProperties";
+
 
     public interface InjectedLanguagePlaces {
         void addStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix);
@@ -49,8 +65,13 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
     @Override
     public void getLanguagesToInject(final @NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
         assert context instanceof PsiClass;
-
+        
         PsiClass psiClass = (PsiClass)context;
+        if (isClass(psiClass, LSF_LOGICS_PARSER_FQN) || isClass(psiClass, LSF_LOGICS_LEXER_FQN)) {
+            //пропускаем эти классы, т.к. они очень долго разбираются, но для нас не актуальны
+            return;
+        }
+        
         Collection<PsiLanguageInjectionHost> hosts = PsiTreeUtil.findChildrenOfType(psiClass, PsiLanguageInjectionHost.class);
 
         // группировка по префиксам по неизвестной причине не работает
@@ -279,11 +300,8 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                     PsiElement declarationScope = lmParam.getDeclarationScope();
                     if (declarationScope instanceof PsiMethod) {
                         PsiMethod declarationMethod = (PsiMethod) declarationScope;
-                        if (declarationMethod.isConstructor()) {
-                            PsiType type = lmParam.getType();
-                            if (type instanceof PsiClassType && hasSuperClass(((PsiClassType) type).resolve(), SCRIPTING_LOGICS_MODULE_FQN)) {
-                                return true;
-                            }
+                        if (declarationMethod.isConstructor() && isLogicsModuleVar(lmParam)) {
+                            return true;
                         }
                     }
                 }
@@ -297,20 +315,6 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                 injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), "MODULE", "EXTERNAL MODULE ");
             }
         }
-
-        public static final String SCRIPTING_ACTION_PROPERTY_FQN = "lsfusion.server.logics.scripted.ScriptingActionProperty";
-        public static final String LOGICS_MODULE_FQN = "lsfusion.server.logics.LogicsModule";
-        public static final String SCRIPTING_LOGICS_MODULE_FQN = "lsfusion.server.logics.scripted.ScriptingLogicsModule";
-
-        public static final String SCRIPTING_ACTION_PROPERTY_LM_FIELD = "LM";
-
-        public static final String GET_MODULE = "getModule";
-        public static final String ADD_MODULE_FROM_RESOURCE = "addModuleFromResource";
-
-        public static final String FIND_CLASS = "findClass";
-        public static final String FIND_ACTION = "findAction";
-        public static final String FIND_PROPERTY = "findProperty";
-        public static final String FIND_PROPERTIES = "findProperties";
 
         private void resolveModuleMethodsRef(PsiExpression qualifierExpression, PsiLiteralExpression element, boolean classRef, boolean onlyModule, InjectedLanguagePlaces injectionPlacesRegistrar) {
             if (qualifierExpression != null) {
@@ -371,7 +375,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                 return extractModuleNameFromPossibleGetModuleCall((PsiMethodCallExpression) qualifierExpression);
             } else if (qualifierExpression instanceof PsiReferenceExpression) {
                 PsiElement lmRef = ((PsiReferenceExpression) qualifierExpression).resolve();
-                if (lmRef instanceof PsiVariable) {
+                if (lmRef instanceof PsiVariable && isLogicsModuleVar((PsiVariable) lmRef)) {
                     //ссылка на переменную, ищем инициализацию этой перменной одним их двух способобов:
                     //  someLM = addModuleFromResource("scripts/path/Some.lsf")
                     //  someLM = BL.getModule("Some")
@@ -397,6 +401,11 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
             if (!modules.isEmpty())
                 return BaseUtils.toString(modules, ",");
             return null;
+        }
+
+        private boolean isLogicsModuleVar(PsiVariable lmVar) {
+            PsiType type = lmVar.getType();
+            return type instanceof PsiClassType && hasSuperClass(((PsiClassType) type).resolve(), SCRIPTING_LOGICS_MODULE_FQN);
         }
 
         private String getVarUsageModuleName(PsiExpression qualifierExpression, PsiVariable lmVar) {
