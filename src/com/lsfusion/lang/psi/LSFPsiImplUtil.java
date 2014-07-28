@@ -2835,8 +2835,7 @@ public class LSFPsiImplUtil {
 
         List<String> result = new ArrayList<String>();
         for (LSFClassName className : ne.getClassNameList()) {
-            getMigrationClassName(className);
-            result.add(getClassName(className));
+            result.add(getMigrationClassName(className));
         }
         return result;
     }
