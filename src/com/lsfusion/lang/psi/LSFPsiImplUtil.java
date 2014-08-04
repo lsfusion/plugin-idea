@@ -2151,11 +2151,11 @@ public class LSFPsiImplUtil {
         return ((LSFExpression) sourceStatement.getChildren()[0]).inferParamClasses(valueClass);
     }
 
-    public static Inferred inferJoinParamClasses(@NotNull LSFPropertyObject propertyObject, LSFPropertyExpressionList peList, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferJoinParamClasses(@NotNull LSFPropertyObject propertyObject, @Nullable LSFPropertyExpressionList peList, @Nullable LSFClassSet valueClass) {
         List<LSFClassSet> joinClasses = inferParamClasses(valueClass, propertyObject);
 
         List<LSFPropertyExpression> list;
-        LSFNonEmptyPropertyExpressionList npeList = peList.getNonEmptyPropertyExpressionList();
+        LSFNonEmptyPropertyExpressionList npeList = peList == null ? null : peList.getNonEmptyPropertyExpressionList();
         if (npeList != null)
             list = npeList.getPropertyExpressionList();
         else

@@ -178,6 +178,8 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         if (resultClasses == null)
             return null;
 
+        resultClasses = new ArrayList<LSFClassSet>(resultClasses);
+
         //        LSFActionPropertyDefinition action = sourceStatement.getActionPropertyDefinition();
 //        return 
 

@@ -2,12 +2,15 @@ package com.lsfusion.refactoring;
 
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.highlighter.XmlFileType;
+import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageManagerImpl;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
@@ -312,8 +315,9 @@ public class ShortenNamesProcessor {
     }
 
     public static void shortenAllPropNames(Collection<LSFFile> files, List<PropertyMigration> migrations, MetaTransaction transaction) {
-        
-        MetaChangeDetector.getInstance(files.iterator().next().getProject()).setMetaEnabled(false, false);
+
+        Project project = files.iterator().next().getProject();
+        MetaChangeDetector.getInstance(project).setMetaEnabled(false, false);
 
         Map<LSFPropDeclaration, String> propertyDecls = new HashMap<LSFPropDeclaration, String>();
         Map<LSFPropertyDrawDeclaration, String> propertyDrawDecls = new HashMap<LSFPropertyDrawDeclaration, String>();
@@ -324,7 +328,9 @@ public class ShortenNamesProcessor {
             i++;
             for(LSFPropDeclaration decl : PsiTreeUtil.findChildrenOfType(file, LSFPropDeclaration.class))
                 propertyDecls.put(decl, shortenName(decl));
-            System.out.println((double)i/((double)files.size()));
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + files.size() + ": " + (double) i / ((double) files.size()));
+            }
         }
 
         System.out.println("Collecting and resolving property refs...");
@@ -342,7 +348,9 @@ public class ShortenNamesProcessor {
                     }
                 }
             }
-            System.out.println((double) i / ((double) files.size()));
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + files.size() + ": " + (double) i / ((double) files.size()));
+            }
         }
         
         System.out.println("Collecting property draw decls...");
@@ -350,14 +358,27 @@ public class ShortenNamesProcessor {
         for(ExtPropRef propRef : propRefs) {
             i++;
 
-            LSFPropertyDrawDeclaration drawDecl = PsiTreeUtil.getParentOfType(propRef.ref.getElement(), LSFPropertyDrawDeclaration.class);
-            if (drawDecl != null) {
-                propertyDrawDecls.put(drawDecl, propertyDecls.get(propRef.decl));
+            //если делать так, то находятся usages в OPTIONS_LIST, поэтому смотрим максимум на 2 уровня вверх
+//            LSFPropertyDrawDeclaration drawDecl = PsiTreeUtil.getParentOfType(propRef.ref.getElement(), LSFPropertyDrawDeclaration.class);
+
+            LSFPropertyDrawDeclaration drawDecl = null;
+            PsiElement refParent = propRef.ref.getElement().getParent().getParent();
+            if (refParent instanceof LSFPropertyDrawDeclaration) {
+                drawDecl = (LSFPropertyDrawDeclaration) refParent;
+            } else if (refParent.getParent() instanceof LSFPropertyDrawDeclaration) {
+                drawDecl = (LSFPropertyDrawDeclaration) refParent.getParent();
             }
 
-            System.out.println((double)i/((double)propRefs.size()));
-        }
+            
+            if (drawDecl != null && drawDecl.getSimpleName() == null) {
+                String newName = propertyDecls.get(propRef.decl);
+                propertyDrawDecls.put(drawDecl, newName);
+            }
 
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + propRefs.size() + ": " + (double) i / ((double) propRefs.size()));
+            }
+        }
 
         System.out.println("Collecting and resolving property draw refs...");
         List<ExtPropDrawRef> propDrawRefs = new ArrayList<ExtPropDrawRef>();
@@ -367,12 +388,14 @@ public class ShortenNamesProcessor {
             for(LSFPropertyDrawReference ref : PsiTreeUtil.findChildrenOfType(file, LSFPropertyDrawReference.class)) {
                 if (ref.getAliasUsage() == null) {
                     LSFPropertyDrawDeclaration decl = ref.resolveDecl();
-                    if (decl != null) {
+                    if (decl != null && decl.getSimpleName() == null) {
                         propDrawRefs.add(new ExtPropDrawRef(ref, decl));
                     }
                 }
             }
-            System.out.println((double)i/((double)files.size()));
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + files.size() + ": " + (double) i / ((double) files.size()));
+            }
         }
 
         System.out.println("Renaming property draw refs...");
@@ -380,11 +403,40 @@ public class ShortenNamesProcessor {
         for(ExtPropDrawRef propDrawRef : propDrawRefs) {
             i++;
 
-            propDrawRef.ref.handleElementRename(propertyDrawDecls.get(propDrawRef.decl), transaction);
+            String newPropDrawName = propertyDrawDecls.get(propDrawRef.decl);
+            if (newPropDrawName != null) {
+                propDrawRef.ref.handleElementRename(newPropDrawName, transaction);
+            }
 
-            System.out.println((double)i/((double)propRefs.size()));
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + propRefs.size() + ": " + (double) i / ((double) propRefs.size()));
+            }
         }
 
+        System.out.println("Sorting property refs...");
+        final InjectedLanguageManager injectionManager = InjectedLanguageManagerImpl.getInstance(project);
+        Collections.sort(propRefs, new Comparator<ExtPropRef>() {
+            @Override
+            public int compare(ExtPropRef o1, ExtPropRef o2) {
+                PsiLanguageInjectionHost host1 = injectionManager.getInjectionHost(o1.ref);
+                PsiLanguageInjectionHost host2 = injectionManager.getInjectionHost(o2.ref);
+                if (host1 == null && host2 != null) return 1;
+                if (host1 != null && host2 == null) return -1;
+                if (host1 == null && host2 == null) return 0;
+                
+                PsiFile f1 = host1.getContainingFile();
+                PsiFile f2 = host2.getContainingFile();
+                
+                if (f1 != f2) {
+                    //в разных файлах - не важно как сортировать
+                    return Integer.compare(System.identityHashCode(f1), System.identityHashCode(f2));
+                }
+
+                //позже должен обрабатываться тот, который выше по файлу
+                return -Integer.compare(host1.getTextOffset(), host2.getTextOffset());
+            }
+        });
+        
         System.out.println("Renaming and qualifying property refs...");
         i = 0;
         for(ExtPropRef resolvedRef : propRefs) {
@@ -393,12 +445,6 @@ public class ShortenNamesProcessor {
             String newPropName = propertyDecls.get(resolvedRef.decl);
 
             LSFPropReference propRef = resolvedRef.ref;
-            PsiElement propRefElement = propRef.getElement();
-
-            LSFPropertyDrawDeclaration drawDecl = PsiTreeUtil.getParentOfType(propRefElement, LSFPropertyDrawDeclaration.class);
-            if (drawDecl != null) {
-                propertyDrawDecls.put(drawDecl, newPropName);
-            }
 
             propRef.handleElementRename(newPropName, transaction);
             if(!resolvedRef.qualClasses)
@@ -406,8 +452,9 @@ public class ShortenNamesProcessor {
             if(!resolvedRef.qualNamespace && (resolvedRef.decl instanceof LSFFullNameDeclaration))
                 propRef.setFullNameRef(((LSFFullNameDeclaration) resolvedRef.decl).getNamespaceName(), transaction);
 
-
-            System.out.println((double)i/((double)propRefs.size()));
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + propRefs.size() + ": " + (double) i / ((double) propRefs.size()));
+            }
         }
 
         System.out.println("Renaming decls...");
@@ -428,17 +475,19 @@ public class ShortenNamesProcessor {
             
             i++;
             decl.setName(newName, transaction);
-            System.out.println((double)i/((double)propertyDecls.size()));
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + propertyDecls.size() + ": " + (double) i / ((double) propertyDecls.size()));
+            }
         }
 
         System.out.println("Unqualifying refs...");
         i = 0;
         for(ExtPropRef possibleConflict : propRefs) {
             i++;
-            if(possibleConflict.ref.resolveDecl()!=possibleConflict.decl)
-                possibleConflict = possibleConflict;
             unqualifyConflict(possibleConflict.ref, possibleConflict.decl, possibleConflict.classes, transaction);
-            System.out.println((double)i/((double)propRefs.size()));
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + propRefs.size() + ": " + (double) i / ((double) propRefs.size()));
+            }
         }
     }
 
