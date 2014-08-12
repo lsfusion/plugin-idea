@@ -79,14 +79,16 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
             GlobalSearchScope scope = GlobalSearchScope.projectScope(element.getProject());
             Collection<PsiReference> refs = ReferencesSearch.search(element, scope, false).findAll();
             for (PsiReference ref : refs) {
-                PsiElement refElement = ref.getElement();
-                LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(refElement, LSFPropertyDrawDeclaration.class);
-                //ищем propertyDraw без alias'а
-                if (propDrawDecl != null && propDrawDecl.getSimpleName() == null) {
-                    LSFPropertyUsage propertyUsage = propDrawDecl.getFormPropertyName().getPropertyUsage();
-                    if (propertyUsage != null) {
-                        LSFSimpleName propUsageId = propertyUsage.getCompoundID().getSimpleName();
-                        allRenames.put(propUsageId, newName);
+                PsiElement refParent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFPropertyDrawDeclaration.class, LSFFormPropertyOptionsList.class);
+                if (refParent instanceof LSFPropertyDrawDeclaration) {
+                    LSFPropertyDrawDeclaration propDrawDecl = (LSFPropertyDrawDeclaration)refParent;
+                    //ищем propertyDraw без alias'а
+                    if (propDrawDecl.getSimpleName() == null) {
+                        LSFPropertyUsage propertyUsage = propDrawDecl.getFormPropertyName().getPropertyUsage();
+                        if (propertyUsage != null) {
+                            LSFSimpleName propUsageId = propertyUsage.getCompoundID().getSimpleName();
+                            allRenames.put(propUsageId, newName);
+                        }
                     }
                 }
             }

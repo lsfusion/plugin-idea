@@ -20,6 +20,7 @@ import com.lsfusion.lang.classes.*;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 import com.lsfusion.lang.psi.LSFMetaCodeStatement;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.*;
@@ -358,21 +359,14 @@ public class ShortenNamesProcessor {
         for(ExtPropRef propRef : propRefs) {
             i++;
 
-            //если делать так, то находятся usages в OPTIONS_LIST, поэтому смотрим максимум на 2 уровня вверх
-//            LSFPropertyDrawDeclaration drawDecl = PsiTreeUtil.getParentOfType(propRef.ref.getElement(), LSFPropertyDrawDeclaration.class);
+            PsiElement refParent = PsiTreeUtil.getParentOfType(propRef.ref.getElement(), LSFPropertyDrawDeclaration.class, LSFFormPropertyOptionsList.class);
 
-            LSFPropertyDrawDeclaration drawDecl = null;
-            PsiElement refParent = propRef.ref.getElement().getParent().getParent();
             if (refParent instanceof LSFPropertyDrawDeclaration) {
-                drawDecl = (LSFPropertyDrawDeclaration) refParent;
-            } else if (refParent.getParent() instanceof LSFPropertyDrawDeclaration) {
-                drawDecl = (LSFPropertyDrawDeclaration) refParent.getParent();
-            }
-
-            
-            if (drawDecl != null && drawDecl.getSimpleName() == null) {
-                String newName = propertyDecls.get(propRef.decl);
-                propertyDrawDecls.put(drawDecl, newName);
+                LSFPropertyDrawDeclaration drawDecl = (LSFPropertyDrawDeclaration) refParent;
+                if (drawDecl.getSimpleName() == null) {
+                    String newName = propertyDecls.get(propRef.decl);
+                    propertyDrawDecls.put(drawDecl, newName);
+                }
             }
 
             if (i % 1000 == 0) {
