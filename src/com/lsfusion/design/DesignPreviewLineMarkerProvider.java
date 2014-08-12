@@ -85,10 +85,11 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
                     toolWindow.activate(null);
                 }
 
-                FileEditorManager.getInstance(formDecl.getProject()).getSelectedEditor(psi.getContainingFile().getVirtualFile());
                 Editor editor = FileEditorManager.getInstance(formDecl.getProject()).getSelectedTextEditor();
-                // переносим курсор, чтобы обновление toolWindow перестало ориентироваться на предыдущее его положение
-                editor.getCaretModel().moveToOffset(psi.getTextOffset());
+                if (editor != null) {
+                    // переносим курсор, чтобы обновление toolWindow перестало ориентироваться на предыдущее его положение
+                    editor.getCaretModel().moveToOffset(psi.getTextOffset());
+                }
 
                 DesignViewFactory.getInstance().updateView(((LSFFile) psi.getContainingFile()).getModuleDeclaration(), formDecl.getDeclName());
             }

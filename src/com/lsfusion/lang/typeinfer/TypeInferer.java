@@ -86,7 +86,7 @@ public class TypeInferer {
                     if (resClass == null) {
                         //                    Notifications.Bus.notify(new Notificati(on("unResolved", "Unresolved", element.getContainingFile().getName() + " " + element.getTextRange(), NotificationType.INFORMATION));
 
-                        System.out.println(element.getContainingFile().getName() + " " + (statement == null ? "NO" : statement.getMetacodeUsage().getText()) + " " + element.getText());
+                        System.out.println(element.getContainingFile().getName() + " " + (statement == null ? "NO" : statement.getMetaCodeStatementHeader().getMetacodeUsage().getText()) + " " + element.getText());
                         break;
                     }
                 }

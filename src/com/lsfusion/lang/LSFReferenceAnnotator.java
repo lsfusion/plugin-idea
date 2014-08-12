@@ -14,6 +14,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.lsfusion.actions.ShowErrorsAction;
+import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
@@ -31,6 +32,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final String ACTION_PROPERTY_FQN = "lsfusion.server.logics.property.ActionProperty";
 
     public static final TextAttributes META_USAGE = new TextAttributes(null, new JBColor(Gray._239, Gray._61), null, null, Font.PLAIN);
+    public static final TextAttributes META_NESTING_USAGE = new TextAttributes(new JBColor(Gray._180, Gray._91), null, null, null, Font.PLAIN);
     public static final TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(37, 49, 37)), null, null, Font.PLAIN);
     public static final TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), null, null, null, Font.PLAIN);
     public static final TextAttributes WAVE_UNDERSCORED_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
@@ -178,6 +180,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitMetaCodeStatement(@NotNull LSFMetaCodeStatement o) {
         super.visitMetaCodeStatement(o);
 
+        if (MetaNestingLineMarkerProvider.resolveNestingLevel(o) > 0) {
+            Annotation annotation = myHolder.createInfoAnnotation(o.getMetaCodeStatementHeader().getTextRange(), "");
+            annotation.setEnforcedTextAttributes(META_NESTING_USAGE);
+            Annotation annotation2 = myHolder.createInfoAnnotation(o.getMetaCodeStatementSemi().getTextRange(), "");
+            annotation2.setEnforcedTextAttributes(META_NESTING_USAGE);
+            LSFMetaCodeBody metaCodeBody = o.getMetaCodeBody();
+            if (metaCodeBody != null) {
+                Annotation annotation3 = myHolder.createInfoAnnotation(metaCodeBody.getMetaCodeBodyLeftBrace().getTextRange(), "");
+                annotation3.setEnforcedTextAttributes(META_NESTING_USAGE);
+                Annotation annotation4 = myHolder.createInfoAnnotation(metaCodeBody.getMetaCodeBodyRightBrace().getTextRange(), "");
+                annotation4.setEnforcedTextAttributes(META_NESTING_USAGE);
+            }
+        }
         checkReference(o);
     }
 

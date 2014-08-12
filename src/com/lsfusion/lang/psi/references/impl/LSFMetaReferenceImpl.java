@@ -54,11 +54,17 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
         return super.getLSFFile();
     }
 
-    protected abstract LSFMetacodeUsage getMetacodeUsage();
-
     public abstract LSFMetaCodeBody getMetaCodeBody();
 
-    protected abstract LSFMetaCodeIdList getMetaCodeIdList();
+    protected abstract LSFMetaCodeStatementHeader getMetaCodeStatementHeader();
+
+    protected LSFMetacodeUsage getMetacodeUsage() {
+        return getMetaCodeStatementHeader().getMetacodeUsage();
+    }
+
+    protected LSFMetaCodeIdList getMetaCodeIdList() {
+        return getMetaCodeStatementHeader().getMetaCodeIdList();
+    }
 
     @Override
     public boolean isCorrect() {

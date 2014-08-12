@@ -1455,14 +1455,20 @@ anyTokens ::= (<< readAny >>)*
 
 private metaStatement ::= statement { recoverWhile = "meta_statement_recover" }
 private meta_statement_recover ::= !(statement_start | RBRACE)
-metaCodeBody ::= LBRACE (metaStatement*) RBRACE
+metaCodeBody ::= metaCodeBodyLeftBrace (metaStatement*) metaCodeBodyRightBrace
 
-metaCodeStatement ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC metaCodeBody? SEMI
+metaCodeBodyLeftBrace ::= LBRACE
+metaCodeBodyRightBrace ::= RBRACE
+
+metaCodeStatement ::= metaCodeStatementHeader metaCodeBody? metaCodeStatementSemi
 {
     pin=2
     mixin="com.lsfusion.lang.psi.references.impl.LSFMetaReferenceImpl"
     implements="com.lsfusion.lang.psi.references.LSFMetaReference"
 }
+
+metaCodeStatementHeader ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC
+metaCodeStatementSemi ::= SEMI
 
 metaDeclId ::=  ID
 metaDeclIdList ::= (metaDeclId (COMMA metaDeclId)*)?

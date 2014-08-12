@@ -159,6 +159,9 @@
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>
 
+        <codeInsight.lineMarkerProvider language="Lsf"
+                                        implementationClass="com.lsfusion.lang.meta.MetaNestingLineMarkerProvider"/>
+
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
 
         <renamePsiElementProcessor implementation="com.lsfusion.refactoring.LSFRenameFullNameProcessor"/>
@@ -185,7 +188,7 @@
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ComponentIndex"/>
 
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.TableClassesIndex"/>
-        
+
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendFormIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendClassIndex"/>
 
@@ -195,12 +198,16 @@
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExplicitValueIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ImplicitValueIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ImplicitInterfaceIndex"/>
-        
+
         <!-- caches -->
-        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ParamClassesCache" serviceImplementation="com.lsfusion.lang.psi.cache.ParamClassesCache"/>
-        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ValueClassCache" serviceImplementation="com.lsfusion.lang.psi.cache.ValueClassCache"/>
-        <projectService serviceInterface="com.lsfusion.lang.psi.cache.TableNameCache" serviceImplementation="com.lsfusion.lang.psi.cache.TableNameCache"/>
-        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ColumnNameCache" serviceImplementation="com.lsfusion.lang.psi.cache.ColumnNameCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ParamClassesCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.ParamClassesCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ValueClassCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.ValueClassCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.TableNameCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.TableNameCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ColumnNameCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.ColumnNameCache"/>
 
         <stubElementTypeHolder class="com.lsfusion.lang.psi.LSFTypes"/>
         <gotoClassContributor implementation="com.lsfusion.LSFClassContributor"/>
@@ -214,7 +221,7 @@
 
         <fileDocumentSynchronizationVetoer implementation="com.lsfusion.JarDocumentSavingVetoer"/>
 
-        <toolWindow id="lsFusion Form Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
+        <toolWindow id="Form Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
                     anchor="right" icon="AllIcons.FileTypes.UiForm"/>
 
         <toolWindow id="Module Dependencies" anchor="right" icon="AllIcons.Nodes.Deploy"

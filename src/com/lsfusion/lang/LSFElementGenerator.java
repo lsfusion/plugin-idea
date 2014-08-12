@@ -19,14 +19,14 @@ import com.intellij.util.io.StringRef;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
-import com.lsfusion.lang.psi.references.impl.*;
+import com.lsfusion.lang.psi.references.impl.LSFClassReferenceImpl;
+import com.lsfusion.lang.psi.references.impl.LSFModuleReferenceImpl;
+import com.lsfusion.lang.psi.references.impl.LSFNamespaceReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,9 +34,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class LSFElementGenerator {
-    
+
     public final static String genName = "mgen123";
-    
+
     public static LSFStringLiteral createStringLiteralFromText(Project myProject, String text) {
         //assert, что text уже обрамлён кавычками -> "some text"
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; GROUP someDumbGroup " + text + ";");
@@ -76,48 +76,46 @@ public class LSFElementGenerator {
         final PsiFileFactory factory = PsiFileFactory.getInstance(myProject);
         final String name = "internal." + LSFFileType.INSTANCE.getDefaultExtension();
         final LightVirtualFile virtualFile = new LightVirtualFile(name, LSFFileType.INSTANCE, text);
-        final PsiFile psiFile = ((PsiFileFactoryImpl)factory).trySetupPsiForFile(virtualFile, LSFLanguage.INSTANCE, false, true);
+        final PsiFile psiFile = ((PsiFileFactoryImpl) factory).trySetupPsiForFile(virtualFile, LSFLanguage.INSTANCE, false, true);
         assert psiFile != null;
         return psiFile;
     }
 
     private static boolean isWhitespace(char it) {
-        return it==' ' || it=='\t';
+        return it == ' ' || it == '\t';
     }
 
-    public static LSFMetaCodeBody createMetaBodyFromText(final LSFFile file, final String text, String tab) {
+    public static LSFMetaCodeBody createMetaBodyFromText(final LSFFile file, final String text) {
         final StringBuilder tabbedText = new StringBuilder();
         tabbedText.append("MODULE " + genName + "; @dummy() {");
         for (char symbol : text.toCharArray()) {
             tabbedText.append(symbol);
-            if (symbol == '\n')
-                tabbedText.append(tab);
         }
         tabbedText.append("};");
 
 //        return ApplicationManager.getApplication().runReadAction(new Computable<LSFMetaCodeBody>() {
 //            @Override
 //            public LSFMetaCodeBody compute() {
-                boolean old = ApplicationImpl.setExceptionalThreadWithReadAccessFlag(true);
+        boolean old = ApplicationImpl.setExceptionalThreadWithReadAccessFlag(true);
 
-                Project project = file.getProject();
-                final PsiFile dummyFile = createDummyFile(project,  tabbedText.toString());
+        Project project = file.getProject();
+        final PsiFile dummyFile = createDummyFile(project, tabbedText.toString());
 //                format(myProject, dummyFile);
-                Collection<LSFMetaCodeBody> childrenOfType = PsiTreeUtil.findChildrenOfType(dummyFile, LSFMetaCodeBody.class);
-        
-                if(childrenOfType.isEmpty()) {
-                    ApplicationImpl.setExceptionalThreadWithReadAccessFlag(old);
-                    return null;
-                }
-                LSFMetaCodeBody body = childrenOfType.iterator().next();
+        Collection<LSFMetaCodeBody> childrenOfType = PsiTreeUtil.findChildrenOfType(dummyFile, LSFMetaCodeBody.class);
 
-                List<LSFMetaCodeStatement> recMetaStatements = ((LSFMetaCodeBody)body).getMetaCodeStatementList(); 
+        if (childrenOfType.isEmpty()) {
+            ApplicationImpl.setExceptionalThreadWithReadAccessFlag(old);
+            return null;
+        }
+        LSFMetaCodeBody body = childrenOfType.iterator().next();
 
-                ApplicationImpl.setExceptionalThreadWithReadAccessFlag(old);
+        List<LSFMetaCodeStatement> recMetaStatements = ((LSFMetaCodeBody) body).getMetaCodeStatementList();
 
-                MetaChangeDetector.syncUsageProcessing(file, recMetaStatements);
-        
-                return body;
+        ApplicationImpl.setExceptionalThreadWithReadAccessFlag(old);
+
+        MetaChangeDetector.syncUsageProcessing(file, recMetaStatements);
+
+        return body;
 //            }
 //        });
     }
@@ -128,8 +126,9 @@ public class LSFElementGenerator {
     }
 
     private static List<? extends LSFPropertyDrawDeclaration> builtInFormProps = null;
+
     public static List<? extends LSFPropertyDrawDeclaration> getBuiltInFormProps(final Project project) {
-        if(builtInFormProps == null) {
+        if (builtInFormProps == null) {
             final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
             builtInFormProps = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
         }
@@ -137,13 +136,14 @@ public class LSFElementGenerator {
     }
 
     private static Collection<? extends LSFWindowDeclaration> builtInWindows = null;
+
     public static Collection<? extends LSFWindowDeclaration> getBuiltInWindows(final Project project) {
-        if(builtInWindows == null) {
+        if (builtInWindows == null) {
             final PsiFile dummyFile = createDummyFile(project,
-                                                      "MODULE System;" +
-                                                      "WINDOW PANEL log 'log';" +
-                                                      "WINDOW PANEL status 'status';" +
-                                                      "WINDOW PANEL forms 'forms';");
+                    "MODULE System;" +
+                            "WINDOW PANEL log 'log';" +
+                            "WINDOW PANEL status 'status';" +
+                            "WINDOW PANEL forms 'forms';");
             builtInWindows = PsiTreeUtil.findChildrenOfType(dummyFile, LSFWindowDeclaration.class);
         }
         return builtInWindows;
@@ -181,7 +181,7 @@ public class LSFElementGenerator {
     public static LSFModuleReference createModuleRefFromText(final StringRef name, final LSFFile file) {
         return new LSFModuleReferenceImpl(dummy) {
             public LSFId getSimpleName() {
-                throw new UnsupportedOperationException(); 
+                throw new UnsupportedOperationException();
             }
 
             @Override

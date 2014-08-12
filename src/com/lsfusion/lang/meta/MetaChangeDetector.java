@@ -22,8 +22,8 @@ import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.references.LSFMetaReference;
 import com.lsfusion.lang.psi.indexes.ModuleIndex;
+import com.lsfusion.lang.psi.references.LSFMetaReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;
@@ -312,7 +312,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             if (tokens == null)
                 return null;
             else
-                return LSFElementGenerator.createMetaBodyFromText(file, parseText(tokens, usages, decls), whitespace);
+                return LSFElementGenerator.createMetaBodyFromText(file, parseText(tokens, usages, decls));
         }
     }
 
@@ -850,7 +850,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                 indicator.setText2("Statements : " + metaStatements.size());
 
                                 addForcedUsageProcessing(file, metaStatements, sync, null);
-                                
+
                                 indicator.setText2("");
                             }
                         }
