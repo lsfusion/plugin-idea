@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.LSFReferenceAnnotator;
@@ -68,7 +69,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public boolean isCorrect() {
-        return super.isCorrect() && getMetacodeUsage() != null && getMetaCodeIdList() != null && getNode().findChildByType(LSFTypes.SEMI) != null;
+        return super.isCorrect() && getMetacodeUsage() != null && getMetaCodeIdList() != null && PsiTreeUtil.getChildOfType(this, LSFMetaCodeStatementSemi.class) != null;
     }
 
     @Override
@@ -203,7 +204,8 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
                 if (!body.getText().equals(parsed.getText()))
                     body.replace(parsed);
             } else {
-                getNode().addChild(parsed.getNode(), getNode().findChildByType(LSFTypes.SEMI));
+                LSFMetaCodeStatementSemi semi = PsiTreeUtil.getChildOfType(this, LSFMetaCodeStatementSemi.class);
+                getNode().addChild(parsed.getNode(), semi != null ? semi.getNode() : null);
             }
         }
     }
