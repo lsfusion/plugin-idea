@@ -857,15 +857,21 @@ forAddObjClause ::= ADDOBJ (paramDeclare EQUALS)? customClassUsage
     methods = [ resolveClass ensureClass ]
 }
 
-forActionPropertyDefinitionBody ::= FOR (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
-		                            inlineStatement
-		                            (forAddObjClause)?
-		                            DO actionPropertyDefinitionBody
+forActionPropertyDefinitionBody ::= forActionPropertyMainBody
 		                            (ELSE actionPropertyDefinitionBody)?
 {
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [ inferActionParamClasses ]
+}
+
+forActionPropertyMainBody ::= FOR (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
+                              inlineStatement
+                              (forAddObjClause)?
+                              DO actionPropertyDefinitionBody
+{
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer ]
 }
                                                        
 whileActionPropertyDefinitionBody ::= WHILE (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?

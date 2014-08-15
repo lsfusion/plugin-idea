@@ -192,7 +192,7 @@ public class LSFPsiImplUtil {
         return ContextInferrer.EMPTY;
     }
 
-    public static ContextModifier getContextModifier(@NotNull LSFForActionPropertyDefinitionBody sourceStatement) {
+    public static ContextModifier getContextModifier(@NotNull LSFForActionPropertyMainBody sourceStatement) {
         ContextModifier result = null;
 
         LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
@@ -209,8 +209,8 @@ public class LSFPsiImplUtil {
         return result != null ? result : ContextModifier.EMPTY;
     }
 
-    public static ContextInferrer getContextInferrer(@NotNull LSFForActionPropertyDefinitionBody sourceStatement) {
-        return new ActionExprInferrer(sourceStatement);
+    public static ContextInferrer getContextInferrer(@NotNull LSFForActionPropertyMainBody sourceStatement) {
+        return new ActionExprInferrer(((LSFForActionPropertyDefinitionBody) sourceStatement.getParent()));
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFWhileActionPropertyDefinitionBody sourceStatement) {
@@ -2431,23 +2431,24 @@ public class LSFPsiImplUtil {
 
     public static Inferred inferActionParamClasses(LSFForActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         // берем условия for, если есть, для остальных из внутреннего action'а 
-        LSFPropertyExpression expr = body.getPropertyExpression();
+        LSFPropertyExpression expr = body.getForActionPropertyMainBody().getPropertyExpression();
         Inferred forClasses = Inferred.EMPTY;
         if (expr != null)
             forClasses = forClasses.and(inferParamClasses(expr, null).filter(params));
-        LSFNonEmptyPropertyExpressionList npeList = body.getNonEmptyPropertyExpressionList();
+        LSFNonEmptyPropertyExpressionList npeList = body.getForActionPropertyMainBody().getNonEmptyPropertyExpressionList();
         if (npeList != null) {
             for (LSFPropertyExpression pe : npeList.getPropertyExpressionList())
                 forClasses = forClasses.and(inferParamClasses(pe, null).filter(params));
         }
 
         Inferred result = Inferred.EMPTY;
-        List<LSFActionPropertyDefinitionBody> actions = body.getActionPropertyDefinitionBodyList();
-        if (actions.size() > 0) {
-            result = inferActionParamClasses(actions.get(0), params).override(forClasses);
-            if (actions.size() > 1) {
-                result = result.or(inferActionParamClasses(actions.get(1), params));
-            }
+        LSFActionPropertyDefinitionBody doAction = body.getForActionPropertyMainBody().getActionPropertyDefinitionBody();
+        if (doAction != null) {
+            result = inferActionParamClasses(doAction, params).override(forClasses);
+        }
+        LSFActionPropertyDefinitionBody elseAction = body.getActionPropertyDefinitionBody();
+        if (elseAction != null) {
+            result = result.or(inferActionParamClasses(elseAction, params));    
         }
         return result;
     }
