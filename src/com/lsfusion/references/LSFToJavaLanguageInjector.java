@@ -562,7 +562,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                 for (PsiReference ref : refs) {
                     PsiFile file = ref.getElement().getContainingFile();
                     if (file instanceof LSFFile) {
-                        return ((LSFFile) file).getModuleDeclaration().getName();
+                        moduleNames.add(((LSFFile) file).getModuleDeclaration().getName());
                     }
                 }
             }

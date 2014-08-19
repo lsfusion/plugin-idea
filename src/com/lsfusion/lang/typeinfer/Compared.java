@@ -12,8 +12,8 @@ public abstract class Compared<T> {
         this.second = second;
     }
 
-    public abstract LSFClassSet resolveInferred(T operand, InferResult inferred);
-    public abstract Inferred inferResolved(T operand, LSFClassSet classSet);
+    public abstract LSFExClassSet resolveInferred(T operand, InferExResult inferred);
+    public abstract Inferred inferResolved(T operand, LSFExClassSet classSet);
 
     @Override
     public boolean equals(Object o) {

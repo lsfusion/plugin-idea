@@ -2,7 +2,9 @@ package com.lsfusion.lang.psi.references;
 
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.InferResult;
+import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.Nullable;
 
 public interface LSFAbstractParamReference<T extends LSFExprParamDeclaration> extends LSFReference<T> {
@@ -11,6 +13,6 @@ public interface LSFAbstractParamReference<T extends LSFExprParamDeclaration> ex
     LSFClassSet resolveClass();
 
     @Nullable
-    LSFClassSet resolveInferredClass(@Nullable InferResult inferred);
+    LSFExClassSet resolveInferredClass(@Nullable InferExResult inferred);
 
 }

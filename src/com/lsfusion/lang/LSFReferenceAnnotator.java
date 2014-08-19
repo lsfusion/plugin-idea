@@ -16,11 +16,15 @@ import com.intellij.ui.JBColor;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.context.ExtendParamContext;
+import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.references.LSFReference;
+import com.lsfusion.lang.typeinfer.MetaTypeInferAction;
+import com.lsfusion.lang.typeinfer.TypeInferAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -270,6 +274,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitMetaDeclaration(o);
 
         checkAlreadyDefined(o);
+/*
+        Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Infer type");
+        annotation.registerFix(new MetaTypeInferAction(o));*/
     }
 
     @Override

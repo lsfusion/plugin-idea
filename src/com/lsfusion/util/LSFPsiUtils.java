@@ -119,7 +119,7 @@ public class LSFPsiUtils {
         }
 
         if (!property.isAction()) {
-            LSFClassSet valueClass = property.resolveValueClass(false);
+            LSFClassSet valueClass = property.resolveValueClass();
             text += ": " + (valueClass == null ? "?" : valueClass);
         }
 
@@ -249,7 +249,7 @@ public class LSFPsiUtils {
             String statementName = statement.getName();
 
             if (!namesOfStatementsWithClassAsResult.contains(statementName) && !skipStatemens.contains(statement)) {
-                LSFClassSet resolvedClass = statement.resolveValueClass(false);
+                LSFClassSet resolvedClass = statement.resolveValueClass();
                 if (resolvedClass != null && resolvedClass.haveCommonChildren(valueClassSet, scope)) {
                     namesOfStatementsWithClassAsResult.add(statementName);
 

@@ -6,15 +6,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ParamClassesCache extends PsiDependentCache<LSFPropDeclaration, List<LSFClassSet>> {
-    public static final PsiResolver<LSFPropDeclaration, List<LSFClassSet>> RESOLVER = new PsiResolver<LSFPropDeclaration, List<LSFClassSet>>() {
+public class ParamClassesCache extends PsiDependentCache<LSFPropDeclaration, List<LSFExClassSet>> {
+    public static final PsiResolver<LSFPropDeclaration, List<LSFExClassSet>> RESOLVER = new PsiResolver<LSFPropDeclaration, List<LSFExClassSet>>() {
         @Override
-        public List<LSFClassSet> resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
-            return lsfPropDeclaration.resolveParamClassesNoCache();
+        public List<LSFExClassSet> resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
+            return lsfPropDeclaration.resolveExParamClassesNoCache();
         }
     };
 
@@ -27,7 +28,7 @@ public class ParamClassesCache extends PsiDependentCache<LSFPropDeclaration, Lis
         super(messageBus);
     }
     
-    public List<LSFClassSet> resolveParamClassesWithCaching(LSFPropDeclaration element) {
+    public List<LSFExClassSet> resolveParamClassesWithCaching(LSFPropDeclaration element) {
         return resolveWithCaching(element, RESOLVER, true, false);
     }
 }

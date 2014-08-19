@@ -38,4 +38,9 @@ public class NumericClass extends IntegralClass {
     public String getCaption() {
         return "Число" + '[' + length + ',' + precision + ']';
     }
+
+    @Override
+    public boolean fixedSize() {
+        return false;
+    }
 }

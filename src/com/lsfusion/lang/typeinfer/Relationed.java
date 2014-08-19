@@ -1,7 +1,6 @@
 package com.lsfusion.lang.typeinfer;
 
 import com.lsfusion.lang.classes.DataClass;
-import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFAdditiveORPE;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 
@@ -12,12 +11,12 @@ public class Relationed extends Compared<LSFAdditiveORPE> {
     }
 
     @Override
-    public LSFClassSet resolveInferred(LSFAdditiveORPE operand, InferResult inferred) {
+    public LSFExClassSet resolveInferred(LSFAdditiveORPE operand, InferExResult inferred) {
         return LSFPsiImplUtil.resolveInferredValueClass(operand, inferred);
     }
 
     @Override
-    public Inferred inferResolved(LSFAdditiveORPE operand, LSFClassSet classSet) {
-        return LSFPsiImplUtil.inferParamClasses(operand, classSet!=null && classSet instanceof DataClass ? classSet : null);
+    public Inferred inferResolved(LSFAdditiveORPE operand, LSFExClassSet classSet) {
+        return LSFPsiImplUtil.inferParamClasses(operand, classSet!=null && classSet.classSet instanceof DataClass ? classSet : null);
     }
 }

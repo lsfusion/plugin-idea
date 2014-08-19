@@ -233,6 +233,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         getCompoundID().replace(compoundIDFromText);
     }
 
+    public static final boolean enableAbstractImpl = true;
 
     private Condition<LSFPropDeclaration> getDirectCondition() {
         List<LSFClassSet> directClasses = getExplicitClasses();
@@ -243,7 +244,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         }
 
         final List<LSFClassSet> fDirectClasses = directClasses;
-        final boolean isImplement = isImplement();
+        final boolean isImplement = enableAbstractImpl && isImplement();
         return new Condition<LSFPropDeclaration>() {
             public boolean value(LSFPropDeclaration decl) {
                 if(isImplement && !decl.isAbstract())
@@ -262,7 +263,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     private Condition<LSFPropDeclaration> getInDirectCondition() {
         final List<LSFClassSet> usageClasses = getUsageContext();
         assert canBeUsedInDirect(); // потому как иначе direct бы подошел  
-        final boolean isImplement = isImplement();
+        final boolean isImplement = enableAbstractImpl && isImplement();
 
         return new Condition<LSFPropDeclaration>() {
             public boolean value(LSFPropDeclaration decl) {
@@ -284,7 +285,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
             if(directClasses==null) // невозможно определить прямое или обратное использование, соответственно непонятно как "экранировать"
                 return Finalizer.EMPTY;
         }
-        final boolean isNotEquals = isImplement() && explicitClasses == null;
+        final boolean isNotEquals = enableAbstractImpl && isImplement() && explicitClasses == null;
 
         final List<LSFClassSet> fDirectClasses = directClasses;
         return new Finalizer<LSFPropDeclaration>() {

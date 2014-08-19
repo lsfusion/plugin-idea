@@ -8,6 +8,7 @@ import com.lsfusion.lang.psi.LSFNonEmptyClassParamDeclareList;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.typeinfer.Inferred;
+import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
 
 import java.util.*;
@@ -23,7 +24,7 @@ public class MappedPropertyContextInferrer implements ContextInferrer {
     public Inferred inferClasses(Set<LSFExprParamDeclaration> params) {
         LSFPropDeclaration decl = prop.getPropertyUsageWrapper().getPropertyUsage().resolveDecl();
         if(decl != null) {
-            List<LSFClassSet> inferredClasses = decl.inferParamClasses(null);
+            List<LSFExClassSet> inferredClasses = decl.inferParamClasses(null);
             if(inferredClasses == null)
                 return Inferred.EMPTY;
             
@@ -38,7 +39,7 @@ public class MappedPropertyContextInferrer implements ContextInferrer {
                 paramDecls = new ArrayList<LSFClassParamDeclare>();
             else
                 paramDecls = neList.getClassParamDeclareList();
-            Map<LSFExprParamDeclaration, LSFClassSet> result = new HashMap<LSFExprParamDeclaration, LSFClassSet>();
+            Map<LSFExprParamDeclaration, LSFExClassSet> result = new HashMap<LSFExprParamDeclaration, LSFExClassSet>();
             for(int i=0;i<BaseUtils.min(paramDecls.size(), inferredClasses.size());i++)
                 result.put(paramDecls.get(i).getParamDeclare(), inferredClasses.get(i));
             return new Inferred(result);                            

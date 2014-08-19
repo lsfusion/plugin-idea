@@ -24,6 +24,7 @@ import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 import com.lsfusion.lang.psi.LSFMetaCodeStatement;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.*;
+import com.lsfusion.lang.psi.references.impl.LSFPropReferenceImpl;
 import com.lsfusion.migration.MigrationElementGenerator;
 import com.lsfusion.migration.lang.MigrationFileType;
 import com.lsfusion.migration.lang.psi.MigrationFile;
@@ -97,8 +98,8 @@ public class ShortenNamesProcessor {
         boolean firstAte = false;
         List<LSFClassSet> paramClasses = decl.resolveParamClasses();
         if(paramClasses!=null || paramNames!=null) {
-            int size = (paramClasses != null ? paramClasses.size() : paramNames.size()) - 1;
-            for(int i= size;i>=0;i--) {
+            int size = (paramClasses != null ? paramClasses.size() : paramNames.size());
+            for(int i= size-1;i>=0;i--) {
                 LSFClassSet prmClass = null;
                 if(paramClasses!=null)
                     prmClass = paramClasses.get(i);
@@ -660,7 +661,7 @@ public class ShortenNamesProcessor {
 
         @Override
         public boolean equalsRef(LSFPropReference ref, LSFPropDeclaration decl) {
-            if(isImplement != null && (isImplement != ref.isImplement()))
+            if(LSFPropReferenceImpl.enableAbstractImpl && isImplement != null && (isImplement != ref.isImplement()))
                 return false;
             return super.equalsRef(ref, decl);
         }

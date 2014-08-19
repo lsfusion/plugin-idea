@@ -89,7 +89,7 @@ public class PropertyDrawEntity {
 //                caption = propDeclaration.getDeclName();
 //            }
             isAction = ((LSFGlobalPropDeclaration) propDeclaration).isAction();
-            baseClass = propDeclaration.resolveValueClass(true);
+            baseClass = propDeclaration.resolveValueClass();
 
             declText = propDeclaration.getText();
             declLocation = propDeclaration.getLocationString();

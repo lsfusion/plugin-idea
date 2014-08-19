@@ -8,6 +8,7 @@ import com.lsfusion.lang.psi.cache.ValueClassCache;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
+import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,30 +39,30 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     @Override
-    public LSFClassSet resolveValueClass(boolean infer) {
+    public LSFExClassSet resolveExValueClass(boolean infer) {
         return ValueClassCache.getInstance(getProject()).resolveValueClassWithCaching(this, infer);
     }
 
     @Override
-    public LSFClassSet resolveValueClassNoCache(boolean infer) {
-        return LSFPsiImplUtil.resolveClass(getClassName());
+    public LSFExClassSet resolveExValueClassNoCache(boolean infer) {
+        return LSFExClassSet.toEx(LSFPsiImplUtil.resolveClass(getClassName()));
     }
 
     @Override
     @Nullable
-    public List<LSFClassSet> resolveParamClasses() {
+    public List<LSFExClassSet> resolveExParamClasses() {
         return ParamClassesCache.getInstance(getProject()).resolveParamClassesWithCaching(this);
     }
 
     @Override
-    public List<LSFClassSet> resolveParamClassesNoCache() {
-        return LSFPsiImplUtil.resolveClasses(getClassNameList());
+    public List<LSFExClassSet> resolveExParamClassesNoCache() {
+        return LSFExClassSet.toEx(LSFPsiImplUtil.resolveClasses(getClassNameList()));
     }
 
     @Override
     @Nullable
-    public List<LSFClassSet> inferParamClasses(LSFClassSet valueClass) {
-        return resolveParamClasses();
+    public List<LSFExClassSet> inferParamClasses(LSFExClassSet valueClass) {
+        return resolveExParamClasses();
     }
 
     @Nullable
@@ -80,9 +81,17 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
         return "(" + StringUtils.join(classes, ", ") + ")";
     }
 
+    public List<LSFClassSet> resolveParamClasses() {
+        return LSFGlobalPropDeclarationImpl.finishParamClasses(this);
+    }
+
+    public LSFClassSet resolveValueClass() {
+        return LSFGlobalPropDeclarationImpl.finishValueClass(this);
+    }
+
     @Override
     public String getSignaturePresentableText() {
-        LSFClassSet valueClass = resolveValueClass(false);
+        LSFClassSet valueClass = resolveValueClass();
         return getParamsPresentableText() + ": " + (valueClass == null ? "?" : valueClass);
     }
 

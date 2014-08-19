@@ -10,6 +10,7 @@ import com.intellij.openapi.progress.Progressive;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
@@ -33,6 +34,8 @@ public class ProjectTypeInferAction extends AnAction {
             public void run(final @NotNull ProgressIndicator indicator) {
                 ApplicationManager.getApplication().runWriteAction(new Runnable() {
                     public void run() {
+                        MetaChangeDetector.getInstance(myProject).setMetaEnabled(false, false);
+
                         MetaTransaction transaction = new MetaTransaction();
                         
                         Collection<String> allKeys = ModuleIndex.getInstance().getAllKeys(myProject);
@@ -53,8 +56,12 @@ public class ProjectTypeInferAction extends AnAction {
                         
                         transaction.apply();
 
-                        if(shortenAfter())
+                        if(shortenAfter()) {
+                            MetaChangeDetector.getInstance(myProject).setMetaEnabled(true, true); // переобновим мета коды, потому как могли быть ошибки
+                            MetaChangeDetector.getInstance(myProject).setMetaEnabled(false, false);
+
                             ShortenNamesProcessor.shortenAllPropNames(myProject);                    
+                    }
                     }
                 });
             }

@@ -21,6 +21,10 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
 
     public abstract String getName();
 
+    public boolean fixedSize() {
+        return true;
+    }
+
     @Override
     public List<String> getSNames() {
         String name = getName();

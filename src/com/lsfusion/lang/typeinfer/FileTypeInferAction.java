@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
@@ -28,9 +29,13 @@ public class FileTypeInferAction extends AnAction {
         if(file!=null) {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 public void run() {
-                    MetaTransaction transaction = new MetaTransaction();
-                    TypeInferer.typeInfer(file, transaction);
-                    transaction.apply();
+                    CommandProcessor.getInstance().runUndoTransparentAction(new Runnable() {
+                        public void run() {
+                            MetaTransaction transaction = new MetaTransaction();
+                            TypeInferer.typeInfer(file, transaction);
+                            transaction.apply();
+                        }
+                    });
                 }
             });
         }

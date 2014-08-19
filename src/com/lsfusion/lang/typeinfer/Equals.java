@@ -1,6 +1,5 @@
 package com.lsfusion.lang.typeinfer;
 
-import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.LSFRelationalPE;
 
@@ -11,12 +10,12 @@ public class Equals extends Compared<LSFRelationalPE> {
     }
 
     @Override
-    public LSFClassSet resolveInferred(LSFRelationalPE operand, InferResult inferred) {
+    public LSFExClassSet resolveInferred(LSFRelationalPE operand, InferExResult inferred) {
         return LSFPsiImplUtil.resolveInferredValueClass(operand, inferred);
     }
 
     @Override
-    public Inferred inferResolved(LSFRelationalPE operand, LSFClassSet classSet) {
+    public Inferred inferResolved(LSFRelationalPE operand, LSFExClassSet classSet) {
         return LSFPsiImplUtil.inferParamClasses(operand, classSet);
     }
 }

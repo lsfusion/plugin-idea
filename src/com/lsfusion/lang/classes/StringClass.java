@@ -95,4 +95,9 @@ public class StringClass extends DataClass {
     public String toString() {
         return "STRING";
     }
+
+    @Override
+    public boolean fixedSize() {
+        return false;
+    }
 }

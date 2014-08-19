@@ -7,7 +7,8 @@ import com.lsfusion.lang.psi.LSFResolveResult;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.psi.references.LSFObjectReference;
-import com.lsfusion.lang.typeinfer.InferResult;
+import com.lsfusion.lang.typeinfer.InferExResult;
+import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,11 +48,11 @@ public abstract class LSFAbstractParamReferenceImpl<T extends LSFExprParamDeclar
 
     @Nullable
     @Override
-    public LSFClassSet resolveInferredClass(@Nullable InferResult inferred) {
+    public LSFExClassSet resolveInferredClass(@Nullable InferExResult inferred) {
         T decl = resolveDecl();
         if(decl == null)
             return null;
-        LSFClassSet result = decl.resolveClass();
+        LSFExClassSet result = LSFExClassSet.toEx(decl.resolveClass());
         if(result == null && inferred != null)
             result = inferred.get(decl);
         return result;

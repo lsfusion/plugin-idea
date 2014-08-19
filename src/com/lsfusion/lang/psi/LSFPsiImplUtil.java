@@ -269,28 +269,21 @@ public class LSFPsiImplUtil {
 
     // CLASSES
 
-    public static LSFClassSet op(@Nullable LSFClassSet class1, @Nullable LSFClassSet class2, boolean or) {
-        if (class1 == null || class2 == null) {
-            LSFClassSet nvlClass = BaseUtils.nvl(class1, class2);
-            if (or && !(nvlClass instanceof DataClass))
-                return null;
-            else
-                return nvlClass;
-        }
-
-        if (class1 instanceof DataClass) {
-            if (class2 instanceof DataClass)
-                return ((DataClass) class1).op((DataClass) class2, or);
+    public static LSFExClassSet op(@Nullable LSFExClassSet class1, @Nullable LSFExClassSet class2, boolean or) {
+        if(class1 == null && class2 == null)
             return null;
-        }
-        if (class2 instanceof DataClass)
-            return null;
-
-        return ((CustomClassSet) class1).op((CustomClassSet) class2, or);
+        
+        if(class1 == null)
+            return class2.opNull(or);
+        
+        if(class2 == null)
+            return class1.opNull(or);
+        
+        return class1.op(class2, or);
     }
 
     @Nullable
-    private static LSFClassSet or(@Nullable LSFClassSet class1, @Nullable LSFClassSet class2) {
+    private static LSFExClassSet or(@Nullable LSFExClassSet class1, @Nullable LSFExClassSet class2) {
         return op(class1, class2, true);
     }
 
@@ -336,8 +329,8 @@ public class LSFPsiImplUtil {
         return count;
     }
 
-    public static boolean allClassesDeclared(List<LSFClassSet> classes) {
-        for (LSFClassSet classSet : classes)
+    public static boolean allClassesDeclared(List<LSFExClassSet> classes) {
+        for (LSFExClassSet classSet : classes)
             if (classSet == null)
                 return false;
         return true;
@@ -410,24 +403,6 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static CustomClassSet resolveClass(@Nullable LSFCustomClassUsage usage) {
-        LSFClassDeclaration classDecl = resolveClassDecl(usage);
-        return classDecl == null ? null : new CustomClassSet(classDecl);
-    }
-
-    @Nullable
-    public static LSFValueClass resolveValueClass(@Nullable LSFClassName className) {
-        if (className == null) {
-            return null;
-        }
-        LSFBuiltInClassName builtInClassName = className.getBuiltInClassName();
-        if (builtInClassName != null)
-            return resolve(builtInClassName);
-
-        return resolveClassDecl(className.getCustomClassUsage());
-    }
-
-    @Nullable
     public static LSFClassSet resolveClass(@Nullable LSFClassName className) {
         if (className == null) {
             return null;
@@ -436,6 +411,12 @@ public class LSFPsiImplUtil {
         if (builtInClassName != null)
             return resolve(builtInClassName);
         return resolveClass(className.getCustomClassUsage());
+    }
+
+    @Nullable
+    public static CustomClassSet resolveClass(@Nullable LSFCustomClassUsage usage) {
+        LSFClassDeclaration classDecl = resolveClassDecl(usage);
+        return classDecl == null ? null : new CustomClassSet(classDecl);
     }
 
     @NotNull
@@ -482,79 +463,91 @@ public class LSFPsiImplUtil {
     // PROPERTYEXPRESSION.RESOLVEVALUECLASS
 
     @Nullable
-    public static LSFClassSet resolveExpressionInferredValueClass(@Nullable LSFExpression sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveExpressionInferredValueClass(@Nullable LSFExpression sourceStatement, @Nullable InferExResult inferred) {
         return sourceStatement == null ? null : sourceStatement.resolveInferredValueClass(inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveValueClass(@NotNull LSFPropertyExpression sourceStatement, boolean infer) {
-        return sourceStatement.resolveInferredValueClass(infer ? sourceStatement.inferParamClasses(null).finish() : null);
+    public static LSFExClassSet resolveValueClass(@NotNull LSFPropertyExpression sourceStatement, boolean infer) {
+        return sourceStatement.resolveInferredValueClass(infer ? sourceStatement.inferParamClasses(null).finishEx() : null);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFPropertyExpression sourceStatement, @Nullable InferResult inferred) {
+    public static LSFValueClass resolveValueClass(@Nullable LSFClassName className) {
+        if (className == null) {
+            return null;
+        }
+        LSFBuiltInClassName builtInClassName = className.getBuiltInClassName();
+        if (builtInClassName != null)
+            return resolve(builtInClassName);
+
+        return resolveClassDecl(className.getCustomClassUsage());
+    }
+
+    @Nullable
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFPropertyExpression sourceStatement, @Nullable InferExResult inferred) {
         return resolveInferredValueClass(sourceStatement.getIfPE(), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFIfPE sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFIfPE sourceStatement, @Nullable InferExResult inferred) {
         return resolveInferredValueClass(sourceStatement.getOrPEList().get(0), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFOrPE sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFOrPE sourceStatement, @Nullable InferExResult inferred) {
         List<LSFXorPE> list = sourceStatement.getXorPEList();
         if (list.size() > 1)
-            return LogicalClass.instance;
+            return LSFExClassSet.logical;
         return resolveInferredValueClass(list.get(0), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFXorPE sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFXorPE sourceStatement, @Nullable InferExResult inferred) {
         List<LSFAndPE> list = sourceStatement.getAndPEList();
         if (list.size() > 1)
-            return LogicalClass.instance;
+            return LSFExClassSet.logical;
         return resolveInferredValueClass(list.get(0), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFAndPE sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFAndPE sourceStatement, @Nullable InferExResult inferred) {
         List<LSFNotPE> list = sourceStatement.getNotPEList();
         if (list.size() > 1)
-            return LogicalClass.instance;
+            return LSFExClassSet.logical;
         return resolveInferredValueClass(list.get(0), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFNotPE sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFNotPE sourceStatement, @Nullable InferExResult inferred) {
         LSFEqualityPE eqPE = sourceStatement.getEqualityPE();
         if (eqPE != null)
             return resolveInferredValueClass(eqPE, inferred);
-        return LogicalClass.instance;
+        return LSFExClassSet.logical;
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFEqualityPE sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFEqualityPE sourceStatement, @Nullable InferExResult inferred) {
         List<LSFRelationalPE> list = sourceStatement.getRelationalPEList();
         if (list.size() == 2)
-            return LogicalClass.instance;
+            return LSFExClassSet.logical;
         return resolveInferredValueClass(list.get(0), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFRelationalPE sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFRelationalPE sourceStatement, @Nullable InferExResult inferred) {
         List<LSFAdditiveORPE> list = sourceStatement.getAdditiveORPEList();
         if (list.size() == 2)
-            return LogicalClass.instance;
+            return LSFExClassSet.logical;
 
-        LSFClassSet result = resolveInferredValueClass(list.get(0), inferred);
+        LSFExClassSet result = resolveInferredValueClass(list.get(0), inferred);
 
         LSFTypePropertyDefinition typeDef = sourceStatement.getTypePropertyDefinition();
         if (typeDef != null) {
             if (typeDef.getTypeIs().getText().equals("IS"))
-                return LogicalClass.instance;
+                return LSFExClassSet.logical;
             else {
-                LSFClassSet resolveClass = resolveClass(typeDef.getClassName());
+                LSFExClassSet resolveClass = LSFExClassSet.toEx(resolveClass(typeDef.getClassName()));
                 if (resolveClass != null) {
                     if (result == null)
                         result = resolveClass;
@@ -566,10 +559,10 @@ public class LSFPsiImplUtil {
         return result;
     }
 
-    private static LSFClassSet orClasses(List<LSFClassSet> classes) {
-        LSFClassSet result = null;
+    private static LSFExClassSet orClasses(List<LSFExClassSet> classes) {
+        LSFExClassSet result = null;
         for (int i = 0; i < classes.size(); i++) {
-            LSFClassSet classSet = classes.get(i);
+            LSFExClassSet classSet = classes.get(i);
             if (i == 0)
                 result = classSet;
             else
@@ -578,32 +571,50 @@ public class LSFPsiImplUtil {
         return result;
     }
 
+    private static LSFExClassSet orStringClasses(List<LSFExClassSet> classes) {
+        boolean hasString = false;
+        List<LSFExClassSet> fixedClasses = new ArrayList<LSFExClassSet>();
+        for (int i = 0; i < classes.size(); i++) {
+            LSFExClassSet ex = classes.get(i);
+            if(ex != null) {
+                LSFClassSet classSet = ex.classSet;
+                if(classSet instanceof StringClass)
+                    hasString = true;
+                else if (hasString) {
+                    ex = new LSFExClassSet(new StringClass(false, false, new ExtInt(1)));
+                }
+            } 
+            fixedClasses.add(ex);
+        }
+        return orClasses(fixedClasses);
+    }
+
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFAdditiveORPE sourceStatement, @Nullable InferResult inferred) {
-        List<LSFClassSet> orClasses = new ArrayList<LSFClassSet>();
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFAdditiveORPE sourceStatement, @Nullable InferExResult inferred) {
+        List<LSFExClassSet> orClasses = new ArrayList<LSFExClassSet>();
         for (LSFAdditivePE pe : sourceStatement.getAdditivePEList())
             orClasses.add(resolveInferredValueClass(pe, inferred));
         return orClasses(orClasses);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFAdditivePE sourceStatement, @Nullable InferResult inferred) {
-        List<LSFClassSet> orClasses = new ArrayList<LSFClassSet>();
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFAdditivePE sourceStatement, @Nullable InferExResult inferred) {
+        List<LSFExClassSet> orClasses = new ArrayList<LSFExClassSet>();
         for (LSFMultiplicativePE pe : sourceStatement.getMultiplicativePEList())
             orClasses.add(resolveInferredValueClass(pe, inferred));
-        return orClasses(orClasses);
+        return orStringClasses(orClasses);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFMultiplicativePE sourceStatement, @Nullable InferResult inferred) {
-        List<LSFClassSet> orClasses = new ArrayList<LSFClassSet>();
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFMultiplicativePE sourceStatement, @Nullable InferExResult inferred) {
+        List<LSFExClassSet> orClasses = new ArrayList<LSFExClassSet>();
         for (LSFUnaryMinusPE pe : sourceStatement.getUnaryMinusPEList())
             orClasses.add(resolveInferredValueClass(pe, inferred));
         return orClasses(orClasses);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFUnaryMinusPE sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFUnaryMinusPE sourceStatement, @Nullable InferExResult inferred) {
         LSFUnaryMinusPE unaryMinusPE = sourceStatement.getUnaryMinusPE();
         if (unaryMinusPE != null)
             return resolveInferredValueClass(unaryMinusPE, inferred);
@@ -612,13 +623,14 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFPostfixUnaryPE sourceStatement, @Nullable InferResult inferred) {
-        LSFClassSet valueClass = resolveInferredValueClass(sourceStatement.getSimplePE(), inferred);
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFPostfixUnaryPE sourceStatement, @Nullable InferExResult inferred) {
+        LSFExClassSet valueClass = resolveInferredValueClass(sourceStatement.getSimplePE(), inferred);
 
         LSFUintLiteral uintLiteral = sourceStatement.getUintLiteral();
         if (uintLiteral != null) {
-            if (valueClass instanceof ConcatenateClassSet)
-                return ((ConcatenateClassSet) valueClass).getSet(Integer.valueOf(uintLiteral.getText()) - 1);
+            LSFClassSet classSet = LSFExClassSet.fromEx(valueClass);
+            if (classSet instanceof ConcatenateClassSet)
+                return LSFExClassSet.checkNull(((ConcatenateClassSet) classSet).getSet(Integer.valueOf(uintLiteral.getText()) - 1), valueClass.orAny);
             return null;
         }
 
@@ -626,7 +638,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFSimplePE sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFSimplePE sourceStatement, @Nullable InferExResult inferred) {
         LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
         if (pe != null)
             return pe.resolveInferredValueClass(inferred);
@@ -635,7 +647,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFExpressionPrimitive sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFExpressionPrimitive sourceStatement, @Nullable InferExResult inferred) {
         LSFExprParameterUsage ep = sourceStatement.getExprParameterUsage();
         if (ep != null)
             return resolveInferredValueClass(ep, inferred);
@@ -644,7 +656,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFExprParameterUsage sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFExprParameterUsage sourceStatement, @Nullable InferExResult inferred) {
         LSFExprParameterNameUsage nameParam = sourceStatement.getExprParameterNameUsage();
         if (nameParam != null)
             return nameParam.resolveInferredClass(inferred);
@@ -652,23 +664,23 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFExpressionFriendlyPD sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFExpressionFriendlyPD sourceStatement, @Nullable InferExResult inferred) {
         return ((LSFExpression) sourceStatement.getChildren()[0]).resolveInferredValueClass(inferred);
     }
 
-    private static LSFClassSet resolveValueClass(LSFPropertyUsage usage, boolean infer) {
+    private static LSFExClassSet resolveValueClass(LSFPropertyUsage usage, boolean infer) {
         LSFPropDeclaration decl = usage.resolveDecl();
         if (decl != null)
-            return decl.resolveValueClass(infer);
+            return decl.resolveExValueClass(infer);
         return null;
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFJoinPropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFJoinPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         LSFPropertyObject propertyObject = sourceStatement.getPropertyObject();
         LSFPropertyUsage usage = propertyObject.getPropertyUsage();
         if (usage != null) {
-            LSFClassSet valueClass = resolveValueClass(usage, inferred != null);
+            LSFExClassSet valueClass = resolveValueClass(usage, inferred != null);
             if (valueClass != null)
                 return valueClass;
             return null;
@@ -690,13 +702,13 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    private static LSFClassSet resolveInferredValueClass(List<LSFPropertyExpression> list, @Nullable InferResult inferred) {
+    private static LSFExClassSet resolveInferredValueClass(List<LSFPropertyExpression> list, @Nullable InferExResult inferred) {
         if (list.size() == 0)
             return null;
 
-        LSFClassSet result = null;
+        LSFExClassSet result = null;
         for (int i = 0; i < list.size(); i++) {
-            LSFClassSet valueClass = list.get(i).resolveInferredValueClass(inferred);
+            LSFExClassSet valueClass = list.get(i).resolveInferredValueClass(inferred);
             if (i == 0)
                 result = valueClass;
             else
@@ -706,7 +718,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    private static LSFClassSet resolveInferredValueClass(@Nullable LSFNonEmptyPropertyExpressionList list, @Nullable InferResult inferred) {
+    private static LSFExClassSet resolveInferredValueClass(@Nullable LSFNonEmptyPropertyExpressionList list, @Nullable InferExResult inferred) {
         if (list == null) {
             return null;
         }
@@ -714,17 +726,17 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFMultiPropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFMultiPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFOverridePropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFOverridePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFIfElsePropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFIfElsePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         List<LSFPropertyExpression> list = sourceStatement.getPropertyExpressionList();
         if (list.isEmpty()) {
             return null;
@@ -733,12 +745,12 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFMaxPropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFMaxPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFCasePropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFCasePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         List<LSFPropertyExpression> list = new ArrayList<LSFPropertyExpression>();
         for (LSFCaseBranchBody caseBranch : sourceStatement.getCaseBranchBodyList()) {
             List<LSFPropertyExpression> propertyExpressionList = caseBranch.getPropertyExpressionList();
@@ -754,17 +766,17 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFPartitionPropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFPartitionPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return resolveExpressionInferredValueClass(sourceStatement.getPropertyExpression(), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFRecursivePropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFRecursivePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return resolveInferredValueClass(sourceStatement.getPropertyExpressionList(), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFStructCreationPropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFStructCreationPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         LSFNonEmptyPropertyExpressionList nonEmptyPropertyExpressionList = sourceStatement.getNonEmptyPropertyExpressionList();
         if (nonEmptyPropertyExpressionList == null) {
             return null;
@@ -774,42 +786,42 @@ public class LSFPsiImplUtil {
 
         LSFClassSet[] sets = new LSFClassSet[peList.size()];
         for (int i = 0; i < sets.length; i++)
-            sets[i] = resolveInferredValueClass(peList.get(i), inferred);
-        return new ConcatenateClassSet(sets);
+            sets[i] = LSFExClassSet.fromEx(resolveInferredValueClass(peList.get(i), inferred));
+        return LSFExClassSet.toEx(new ConcatenateClassSet(sets));
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFCastPropertyDefinition sourceStatement, @Nullable InferResult inferred) {
-        return resolve(sourceStatement.getBuiltInClassName());
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFCastPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+        return LSFExClassSet.toEx(resolve(sourceStatement.getBuiltInClassName()));
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFConcatPropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFConcatPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), inferred);
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFSessionPropertyDefinition sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFSessionPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         LSFSessionPropertyType type = sourceStatement.getSessionPropertyType();
         if (type.getText().equals("PREV"))
             return resolveInferredValueClass(sourceStatement.getPropertyExpression(), inferred);
-        return LogicalClass.instance;
+        return LSFExClassSet.logical;
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFSignaturePropertyDefinition sourceStatement, @Nullable InferResult inferred) {
-        return LogicalClass.instance;
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFSignaturePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+        return LSFExClassSet.logical;
     }
 
     @Nullable
-    public static LSFClassSet resolveInferredValueClass(@NotNull LSFLiteral sourceStatement, @Nullable InferResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFLiteral sourceStatement, @Nullable InferExResult inferred) {
         DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
         if (builtInClass != null) {
-            return builtInClass;
+            return LSFExClassSet.toEx(builtInClass);
         }
         LSFStaticObjectID staticObject = sourceStatement.getStaticObjectID();
         if (staticObject != null)
-            return resolveClass(staticObject.getCustomClassUsage());
+            return LSFExClassSet.toEx(resolveClass(staticObject.getCustomClassUsage()));
         return null;
     }
 
@@ -833,20 +845,20 @@ public class LSFPsiImplUtil {
         if (stringLiteral != null)
             return new StringClass(false, true, new ExtInt(stringLiteral.getValue().length()));
         if (sourceStatement.getDateTimeLiteral() != null)
-            return new SimpleDataClass("DATETIME");
+            return DateTimeClass.instance;
         if (sourceStatement.getDateLiteral() != null)
-            return new SimpleDataClass("DATE");
+            return DateClass.instance;
         if (sourceStatement.getTimeLiteral() != null)
-            return new SimpleDataClass("TIME");
+            return TimeClass.instance;
         if (sourceStatement.getColorLiteral() != null)
-            return new SimpleDataClass("COLOR");
+            return ColorClass.instance;
         return null;
     }
 
     // UnfriendlyPE.resolveValueClass
 
     @Nullable
-    public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFExpressionUnfriendlyPD sourceStatement, boolean infer) {
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFExpressionUnfriendlyPD sourceStatement, boolean infer) {
         LSFContextIndependentPD contextIndependentPD = sourceStatement.getContextIndependentPD();
         if (contextIndependentPD != null)
             return ((UnfriendlyPE) contextIndependentPD.getChildren()[0]).resolveUnfriendValueClass(infer);
@@ -854,48 +866,48 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFDataPropertyDefinition sourceStatement, boolean infer) {
-        return resolveClass(sourceStatement.getClassName());
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFDataPropertyDefinition sourceStatement, boolean infer) {
+        return LSFExClassSet.toEx(resolveClass(sourceStatement.getClassName()));
     }
 
     @Nullable
-    public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFNativePropertyDefinition sourceStatement, boolean infer) {
-        return resolveClass(sourceStatement.getClassName());
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFNativePropertyDefinition sourceStatement, boolean infer) {
+        return LSFExClassSet.toEx(resolveClass(sourceStatement.getClassName()));
     }
 
     @Nullable
-    public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFAbstractPropertyDefinition sourceStatement, boolean infer) {
-        return resolveClass(sourceStatement.getClassName());
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFAbstractPropertyDefinition sourceStatement, boolean infer) {
+        return LSFExClassSet.toEx(resolveClass(sourceStatement.getClassName()));
     }
 
     @Nullable
-    public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFAbstractActionPropertyDefinition sourceStatement, boolean infer) {
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFAbstractActionPropertyDefinition sourceStatement, boolean infer) {
         return null;
     }
 
-    private static InferResult inferGroupParamClasses(LSFGroupPropertyDefinition sourceStatement) {
+    private static InferExResult inferGroupParamClasses(LSFGroupPropertyDefinition sourceStatement) {
         Inferred result = Inferred.EMPTY;
         for (LSFPropertyExpression expr : getContextExprs(sourceStatement))
             result = result.and(inferParamClasses(expr, null));
-        return result.finish();
+        return result.finishEx();
     }
 
     @Nullable
-    public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFGroupPropertyDefinition sourceStatement, boolean infer) {
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFGroupPropertyDefinition sourceStatement, boolean infer) {
         return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), infer ? inferGroupParamClasses(sourceStatement) : null);
     }
 
     @Nullable
-    public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFFormulaPropertyDefinition sourceStatement, boolean infer) {
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFFormulaPropertyDefinition sourceStatement, boolean infer) {
         LSFBuiltInClassName builtIn = sourceStatement.getBuiltInClassName();
         if (builtIn != null)
-            return resolve(builtIn);
+            return LSFExClassSet.toEx(resolve(builtIn));
         return null;
     }
 
     @Nullable
-    public static LSFClassSet resolveUnfriendValueClass(@NotNull LSFFilterPropertyDefinition sourceStatement, boolean infer) {
-        return LogicalClass.instance;
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFFilterPropertyDefinition sourceStatement, boolean infer) {
+        return LSFExClassSet.logical;
     }
 
     // PropertyExpression.getValueClassNames
@@ -1515,13 +1527,13 @@ public class LSFPsiImplUtil {
 
     // UnfriendlyPE.resolveValueParamClasses
 
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFEditFormActionPropertyDefinitionBody editForm) {
-        return Collections.singletonList((LSFClassSet)resolveClass(editForm.getCustomClassUsage()));
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFEditFormActionPropertyDefinitionBody editForm) {
+        return LSFExClassSet.toEx(Collections.singletonList((LSFClassSet)resolveClass(editForm.getCustomClassUsage())));
     }
 
     // извращенная эмуляция unfriendly
     @Nullable
-    public static List<LSFClassSet> resolveActionUnfriendlyValueParamClasses(@NotNull LSFActionPropertyDefinition actionDef) {
+    public static List<LSFExClassSet> resolveActionUnfriendlyValueParamClasses(@NotNull LSFActionPropertyDefinition actionDef) {
         // извращенная эмуляция unfriendly
         LSFActionPropertyDefinitionBody body = actionDef.getActionPropertyDefinitionBody();
         if (body == null) {
@@ -1530,7 +1542,7 @@ public class LSFPsiImplUtil {
 
         LSFAddFormActionPropertyDefinitionBody addForm = body.getAddFormActionPropertyDefinitionBody();
         if (addForm != null)
-            return new ArrayList<LSFClassSet>();
+            return new ArrayList<LSFExClassSet>();
         LSFEditFormActionPropertyDefinitionBody editForm = body.getEditFormActionPropertyDefinitionBody();
         if (editForm != null)
             return resolveValueParamClasses(editForm);
@@ -1538,13 +1550,13 @@ public class LSFPsiImplUtil {
         if (custom != null) {
             LSFClassNameList classNameList = custom.getClassNameList();
             if (classNameList != null)
-                return resolveClasses(classNameList);
+                return LSFExClassSet.toEx(resolveClasses(classNameList));
         }
         return null;
     }
 
     @Nullable
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement) {
         LSFContextIndependentPD contextIndependentPD = sourceStatement.getContextIndependentPD();
         if (contextIndependentPD != null)
             return ((UnfriendlyPE) contextIndependentPD.getChildren()[0]).resolveValueParamClasses();
@@ -1558,52 +1570,52 @@ public class LSFPsiImplUtil {
             List<LSFExprParamReference> paramRefs = new ArrayList<LSFExprParamReference>();
             for (LSFExprParameterUsage actionParam : actionParams.getExprParameterUsageList())
                 paramRefs.add(actionParam.getExprParameterNameUsage());
-            return resolveParamRefClasses(paramRefs);
+            return LSFExClassSet.toEx(resolveParamRefClasses(paramRefs));
         }
 
         return resolveActionUnfriendlyValueParamClasses(actionDef);
     }
 
     @Nullable
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement) {
-        return resolveClasses(sourceStatement.getClassNameList());
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement) {
+        return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @Nullable
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFNativePropertyDefinition sourceStatement) {
-        return resolveClasses(sourceStatement.getClassNameList());
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFNativePropertyDefinition sourceStatement) {
+        return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @Nullable
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
-        return resolveClasses(sourceStatement.getClassNameList());
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
+        return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @Nullable
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
-        return resolveClasses(sourceStatement.getClassNameList());
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
+        return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @Nullable
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
-            return new ArrayList<LSFClassSet>();
+            return new ArrayList<LSFExClassSet>();
 
         return resolveParamClasses(groupBy.getNonEmptyPropertyExpressionList());
     }
 
     @NotNull
-    public static List<LSFClassSet> inferGroupValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> inferGroupValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
-            return new ArrayList<LSFClassSet>();
+            return new ArrayList<LSFExClassSet>();
 
         return resolveParamClasses(groupBy.getNonEmptyPropertyExpressionList(), inferGroupParamClasses(sourceStatement));
     }
 
     @Nullable
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
         List<LSFStringLiteral> stringLiteralList = sourceStatement.getStringLiteralList();
         if (stringLiteralList.isEmpty()) {
             return null;
@@ -1615,7 +1627,7 @@ public class LSFPsiImplUtil {
 
         String text = stringLiteral.getValue();
         int i = 0;
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        List<LSFExClassSet> result = new ArrayList<LSFExClassSet>();
         while (text.contains("$" + (i + 1))) {
             i++;
             result.add(null);
@@ -1624,10 +1636,10 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement) {
         LSFGroupObjectUsage groupObjectUsage = sourceStatement.getGroupObjectID().getGroupObjectUsage();
         if (groupObjectUsage != null) {
-            return groupObjectUsage.resolveClasses();
+            return LSFExClassSet.toEx(groupObjectUsage.resolveClasses());
         }
         return null;
     }
@@ -1789,16 +1801,16 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static List<LSFClassSet> resolveExprClasses(List<LSFPropertyExpression> exprs, @Nullable InferResult inferred) {
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+    public static List<LSFExClassSet> resolveExprClasses(List<LSFPropertyExpression> exprs, @Nullable InferExResult inferred) {
+        List<LSFExClassSet> result = new ArrayList<LSFExClassSet>();
         for (LSFPropertyExpression expr : exprs)
             result.add(expr.resolveInferredValueClass(inferred));
         return result;
     }
 
     @NotNull
-    public static List<LSFClassSet> resolveParamExprClasses(List<LSFExprParameterUsage> exprs) {
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+    public static List<LSFExClassSet> resolveParamExprClasses(List<LSFExprParameterUsage> exprs) {
+        List<LSFExClassSet> result = new ArrayList<LSFExClassSet>();
         for (LSFExprParameterUsage expr : exprs)
             result.add(resolveInferredValueClass(expr, null));
         return result;
@@ -1833,22 +1845,25 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFNonEmptyPropertyExpressionList sourceStatement, @Nullable InferResult inferred) {
+    public static List<LSFExClassSet> resolveParamClasses(@NotNull LSFNonEmptyPropertyExpressionList sourceStatement, @Nullable InferExResult inferred) {
         return resolveExprClasses(sourceStatement.getPropertyExpressionList(), inferred);
     }
 
-    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFNonEmptyPropertyExpressionList sourceStatement) {
+    public static List<LSFExClassSet> resolveParamClasses(@NotNull LSFNonEmptyPropertyExpressionList sourceStatement) {
         return resolveExprClasses(sourceStatement.getPropertyExpressionList(), null);
     }
 
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFPropertyExpressionList sourceStatement) {
-        LSFNonEmptyPropertyExpressionList nonEmpty = sourceStatement.getNonEmptyPropertyExpressionList();
+        return finishParamClasses(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    private static List<LSFClassSet> finishParamClasses(LSFNonEmptyPropertyExpressionList nonEmpty) {
         if (nonEmpty != null)
-            return resolveParamClasses(nonEmpty);
+            return LSFExClassSet.fromEx(resolveParamClasses(nonEmpty));
         return new ArrayList<LSFClassSet>();
     }
 
-    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFExprParameterUsageList sourceStatement) {
+    public static List<LSFExClassSet> resolveParamClasses(@NotNull LSFExprParameterUsageList sourceStatement) {
         return resolveParamExprClasses(sourceStatement.getExprParameterUsageList());
     }
 
@@ -1875,7 +1890,7 @@ public class LSFPsiImplUtil {
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFPartitionPropertyDefinition sourceStatement) {
         LSFPartitionPropertyBy by = sourceStatement.getPartitionPropertyBy();
         if (by != null)
-            return resolveParamClasses(by.getNonEmptyPropertyExpressionList());
+            return finishParamClasses(by.getNonEmptyPropertyExpressionList());
         return new ArrayList<LSFClassSet>();
     }
 
@@ -1959,23 +1974,23 @@ public class LSFPsiImplUtil {
     @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFMappedPropertyExprParam sourceStatement) {
         LSFExprParameterUsageList exprParameterUsageList = sourceStatement.getExprParameterUsageList();
-        return exprParameterUsageList == null ? null : resolveParamClasses(exprParameterUsageList);
+        return exprParameterUsageList == null ? null : LSFExClassSet.fromEx(resolveParamClasses(exprParameterUsageList));
     }
 
     // PROPERTYEXPRESSION.INFERPARAMCLASSES
 
     @NotNull
-    public static Inferred inferExpressionParamClasses(@Nullable LSFExpression sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferExpressionParamClasses(@Nullable LSFExpression sourceStatement, @Nullable LSFExClassSet valueClass) {
         return sourceStatement == null ? Inferred.EMPTY : sourceStatement.inferParamClasses(valueClass);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFPropertyExpression sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFPropertyExpression sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getIfPE(), valueClass);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFIfPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFIfPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFOrPE> peList = sourceStatement.getOrPEList();
 
         Inferred result = inferParamClasses(peList.get(0), valueClass);
@@ -1985,7 +2000,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFOrPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFOrPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFXorPE> peList = sourceStatement.getXorPEList();
         if (peList.size() == 1)
             return inferParamClasses(peList.get(0), valueClass);
@@ -1997,7 +2012,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFXorPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFXorPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFAndPE> peList = sourceStatement.getAndPEList();
         if (peList.size() == 1)
             return inferParamClasses(peList.get(0), valueClass);
@@ -2009,7 +2024,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFAndPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFAndPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFNotPE> peList = sourceStatement.getNotPEList();
         if (peList.size() == 1)
             return inferParamClasses(peList.get(0), valueClass);
@@ -2021,7 +2036,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFNotPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFNotPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         LSFEqualityPE eqPE = sourceStatement.getEqualityPE();
         if (eqPE != null)
             return inferParamClasses(eqPE, valueClass);
@@ -2034,28 +2049,28 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFEqualityPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFEqualityPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFRelationalPE> list = sourceStatement.getRelationalPEList();
         if (list.size() == 2)
-            return new Inferred(new Equals(list.get(0), list.get(1)));
+            return Inferred.create(new Equals(list.get(0), list.get(1)));
         return inferParamClasses(list.get(0), valueClass);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFRelationalPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFRelationalPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFAdditiveORPE> list = sourceStatement.getAdditiveORPEList();
 
         LSFTypePropertyDefinition typeDef = sourceStatement.getTypePropertyDefinition();
         if (typeDef != null)
-            return inferParamClasses(list.get(0), resolveClass(typeDef.getClassName()));
+            return inferParamClasses(list.get(0), LSFExClassSet.toEx(resolveClass(typeDef.getClassName())));
 
         if (list.size() == 2)
-            return new Inferred(new Relationed(list.get(0), list.get(1)));
+            return Inferred.create(new Relationed(list.get(0), list.get(1)));
         return inferParamClasses(list.get(0), valueClass);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFAdditiveORPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFAdditiveORPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<Inferred> maps = new ArrayList<Inferred>();
         for (LSFAdditivePE additivePE : sourceStatement.getAdditivePEList())
             maps.add(inferParamClasses(additivePE, valueClass));
@@ -2063,7 +2078,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFAdditivePE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFAdditivePE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<Inferred> maps = new ArrayList<Inferred>();
         for (LSFMultiplicativePE additivePE : sourceStatement.getMultiplicativePEList())
             maps.add(inferParamClasses(additivePE, valueClass));
@@ -2071,7 +2086,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFMultiplicativePE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFMultiplicativePE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<Inferred> maps = new ArrayList<Inferred>();
         for (LSFUnaryMinusPE additivePE : sourceStatement.getUnaryMinusPEList())
             maps.add(inferParamClasses(additivePE, valueClass));
@@ -2079,7 +2094,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFUnaryMinusPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFUnaryMinusPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         LSFUnaryMinusPE unaryMinusPE = sourceStatement.getUnaryMinusPE();
         if (unaryMinusPE != null)
             return inferParamClasses(unaryMinusPE, valueClass);
@@ -2092,11 +2107,11 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFPostfixUnaryPE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFPostfixUnaryPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         LSFUintLiteral uintLiteral = sourceStatement.getUintLiteral();
         if (uintLiteral != null) {
-            if (valueClass instanceof ConcatenateClassSet)
-                valueClass = ((ConcatenateClassSet) valueClass).getSet(Integer.valueOf(uintLiteral.getText()) - 1);
+            if (valueClass != null && valueClass.classSet instanceof ConcatenateClassSet)
+                valueClass = LSFExClassSet.checkNull(((ConcatenateClassSet) valueClass.classSet).getSet(Integer.valueOf(uintLiteral.getText()) - 1), valueClass.orAny);
             else
                 valueClass = null;
         }
@@ -2105,7 +2120,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFSimplePE sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFSimplePE sourceStatement, @Nullable LSFExClassSet valueClass) {
         LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
         if (pe != null)
             return inferParamClasses(pe, valueClass);
@@ -2118,7 +2133,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFExpressionPrimitive sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFExpressionPrimitive sourceStatement, @Nullable LSFExClassSet valueClass) {
         LSFExprParameterUsage ep = sourceStatement.getExprParameterUsage();
         if (ep != null)
             return inferParamClasses(ep, valueClass);
@@ -2131,13 +2146,13 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFExprParameterUsage sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFExprParameterUsage sourceStatement, @Nullable LSFExClassSet valueClass) {
         LSFExprParameterNameUsage nameParam = sourceStatement.getExprParameterNameUsage();
         if (nameParam != null) {
             LSFExprParamDeclaration decl = nameParam.resolveDecl();
 
             if (decl != null) {
-                LSFClassSet declClass = decl.resolveClass();
+                LSFExClassSet declClass = LSFExClassSet.toEx(decl.resolveClass());
                 if (declClass == null)
                     declClass = valueClass;
                 return new Inferred(decl, declClass);
@@ -2147,12 +2162,12 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFExpressionFriendlyPD sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFExpressionFriendlyPD sourceStatement, @Nullable LSFExClassSet valueClass) {
         return ((LSFExpression) sourceStatement.getChildren()[0]).inferParamClasses(valueClass);
     }
 
-    public static Inferred inferJoinParamClasses(@NotNull LSFPropertyObject propertyObject, @Nullable LSFPropertyExpressionList peList, @Nullable LSFClassSet valueClass) {
-        List<LSFClassSet> joinClasses = inferParamClasses(valueClass, propertyObject);
+    public static Inferred inferJoinParamClasses(@NotNull LSFPropertyObject propertyObject, LSFPropertyExpressionList peList, @Nullable LSFExClassSet valueClass) {
+        List<LSFExClassSet> joinClasses = inferParamClasses(valueClass, propertyObject);
 
         List<LSFPropertyExpression> list;
         LSFNonEmptyPropertyExpressionList npeList = peList == null ? null : peList.getNonEmptyPropertyExpressionList();
@@ -2169,21 +2184,21 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFJoinPropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFJoinPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferJoinParamClasses(sourceStatement.getPropertyObject(), sourceStatement.getPropertyExpressionList(), valueClass);
     }
 
     @Nullable
-    private static List<LSFClassSet> inferParamClasses(LSFClassSet valueClass, LSFPropertyUsage usage) {
+    private static List<LSFExClassSet> inferParamClasses(LSFExClassSet valueClass, LSFPropertyUsage usage) {
         LSFPropDeclaration decl = usage.resolveDecl();
         if (decl != null)
             return decl.inferParamClasses(valueClass);
         return null;
     }
 
-    private static List<LSFClassSet> inferParamClasses(LSFClassSet valueClass, LSFPropertyObject propertyObject) {
+    private static List<LSFExClassSet> inferParamClasses(LSFExClassSet valueClass, LSFPropertyObject propertyObject) {
         LSFPropertyUsage usage = propertyObject.getPropertyUsage();
-        List<LSFClassSet> joinClasses;
+        List<LSFExClassSet> joinClasses;
         if (usage != null) {
             joinClasses = inferParamClasses(valueClass, usage);
         } else {
@@ -2194,8 +2209,8 @@ public class LSFPsiImplUtil {
             LSFPropertyExpression pe = exprObject.getPropertyExpression();
             if (pe != null) {
                 List<LSFExprParamDeclaration> params = pe.resolveParams();
-                joinClasses = new ArrayList<LSFClassSet>();
-                InferResult inferred = inferParamClasses(pe, valueClass).finish();
+                joinClasses = new ArrayList<LSFExClassSet>();
+                InferExResult inferred = inferParamClasses(pe, valueClass).finishEx();
                 for (LSFExprParamDeclaration param : params)
                     joinClasses.add(inferred.get(param));
             } else {
@@ -2224,8 +2239,8 @@ public class LSFPsiImplUtil {
                                 paramDecls.add(exprParameterNameUsage.getClassParamDeclare().getParamDeclare());
                             }
                         }
-                        InferResult inferred = inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(paramDecls)).finish();
-                        joinClasses = new ArrayList<LSFClassSet>();
+                        InferExResult inferred = inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(paramDecls)).finishEx();
+                        joinClasses = new ArrayList<LSFExClassSet>();
                         for (LSFExprParamDeclaration param : paramDecls) {
                             joinClasses.add(inferred.get(param));
                         }
@@ -2239,7 +2254,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    private static Inferred inferParamClasses(List<LSFPropertyExpression> list, @Nullable LSFClassSet valueClass) {
+    private static Inferred inferParamClasses(List<LSFPropertyExpression> list, @Nullable LSFExClassSet valueClass) {
         if (list.size() == 0)
             return Inferred.EMPTY;
 
@@ -2249,7 +2264,7 @@ public class LSFPsiImplUtil {
         return Inferred.orClasses(classes);
     }
 
-    private static Inferred inferParamClasses(@Nullable LSFNonEmptyPropertyExpressionList list, @Nullable LSFClassSet valueClass) {
+    private static Inferred inferParamClasses(@Nullable LSFNonEmptyPropertyExpressionList list, @Nullable LSFExClassSet valueClass) {
         if (list == null) {
             return Inferred.EMPTY;
         }
@@ -2257,17 +2272,17 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFMultiPropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFMultiPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getNonEmptyPropertyExpressionList(), valueClass);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFOverridePropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFOverridePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getNonEmptyPropertyExpressionList(), valueClass);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFIfElsePropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFIfElsePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFPropertyExpression> list = sourceStatement.getPropertyExpressionList();
         if (list.isEmpty()) {
             return Inferred.EMPTY;
@@ -2283,12 +2298,12 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFMaxPropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFMaxPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getNonEmptyPropertyExpressionList(), valueClass);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFCasePropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFCasePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<Inferred> list = new ArrayList<Inferred>();
         for (LSFCaseBranchBody caseBranch : sourceStatement.getCaseBranchBodyList()) {
             List<LSFPropertyExpression> peList = caseBranch.getPropertyExpressionList();
@@ -2310,13 +2325,13 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFPartitionPropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFPartitionPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<Inferred> classes = new ArrayList<Inferred>();
         classes.add(inferExpressionParamClasses(sourceStatement.getPropertyExpression(), valueClass));
 
         LSFPartitionPropertyBy partitionBy = sourceStatement.getPartitionPropertyBy();
         if (partitionBy != null) {
-            List<LSFClassSet> joinClasses = null;
+            List<LSFExClassSet> joinClasses = null;
             LSFPropertyObject po = sourceStatement.getPropertyObject();
             if (po != null)
                 joinClasses = inferParamClasses(valueClass, po);
@@ -2335,7 +2350,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFRecursivePropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFRecursivePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFPropertyExpression> peList = sourceStatement.getPropertyExpressionList();
         if (peList.isEmpty()) {
             return Inferred.EMPTY;
@@ -2350,7 +2365,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFStructCreationPropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFStructCreationPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<Inferred> classes = new ArrayList<Inferred>();
         LSFNonEmptyPropertyExpressionList nonEmptyPropertyExpressionList = sourceStatement.getNonEmptyPropertyExpressionList();
         if (nonEmptyPropertyExpressionList == null) {
@@ -2363,27 +2378,27 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFCastPropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFCastPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getPropertyExpression(), null); // из-за cast'а
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFConcatPropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFConcatPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getNonEmptyPropertyExpressionList(), valueClass);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFSessionPropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFSessionPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getPropertyExpression(), null);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFSignaturePropertyDefinition sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFSignaturePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getPropertyExpression(), null);
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFLiteral sourceStatement, @Nullable LSFClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFLiteral sourceStatement, @Nullable LSFExClassSet valueClass) {
         return Inferred.EMPTY;
     }
 
@@ -2477,8 +2492,8 @@ public class LSFPsiImplUtil {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
     }
 
-    private static Inferred inferParamClasses(LSFMappedPropertyExprParam mappedProperty, @Nullable LSFClassSet valueClass) {
-        List<LSFClassSet> joinClasses = inferParamClasses(null, mappedProperty.getPropertyUsage());
+    private static Inferred inferParamClasses(LSFMappedPropertyExprParam mappedProperty, @Nullable LSFExClassSet valueClass) {
+        List<LSFExClassSet> joinClasses = inferParamClasses(null, mappedProperty.getPropertyUsage());
 
         LSFExprParameterUsageList exprParameterUsageList = mappedProperty.getExprParameterUsageList();
         if (exprParameterUsageList == null) {
@@ -2502,7 +2517,7 @@ public class LSFPsiImplUtil {
 
         LSFMappedPropertyExprParam to = body.getMappedPropertyExprParam();
         if (to != null)
-            result = inferParamClasses(to, resolveClass(body.getCustomClassUsage())).filter(params).override(result);
+            result = inferParamClasses(to, LSFExClassSet.toEx(resolveClass(body.getCustomClassUsage()))).filter(params).override(result);
         return result;
     }
 
@@ -2600,9 +2615,9 @@ public class LSFPsiImplUtil {
 
         for (LSFFormActionObjectUsage ou : objectMap)
             list.add(
-                    inferExpressionParamClasses(ou.getPropertyExpression(), ou.getObjectUsage().resolveClass()).filter(params)
+                    inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
             );
-        return Inferred.orClasses(list);
+        return Inferred.andClasses(list); // по идее and так как на сервере and
     }
 
     public static Inferred inferActionParamClasses(LSFAddFormActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
@@ -2638,7 +2653,7 @@ public class LSFPsiImplUtil {
                 valueClass = objectUsage.resolveClass();
             }
         }
-        return inferExpressionParamClasses(body.getPropertyExpression(), valueClass).filter(params);
+        return inferExpressionParamClasses(body.getPropertyExpression(), LSFExClassSet.toEx(valueClass)).filter(params);
     }
 
     public static Inferred inferActionParamClasses(LSFEmailActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
@@ -2649,7 +2664,7 @@ public class LSFPsiImplUtil {
             LSFFormActionObjectList actionObjList = object.getFormActionObjectList();
             if (actionObjList != null) {
                 for (LSFFormActionObjectUsage ou : actionObjList.getFormActionObjectUsageList()) {
-                    list.add(inferExpressionParamClasses(ou.getPropertyExpression(), ou.getObjectUsage().resolveClass()).filter(params));
+                    list.add(inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params));
                 }
             }
         }

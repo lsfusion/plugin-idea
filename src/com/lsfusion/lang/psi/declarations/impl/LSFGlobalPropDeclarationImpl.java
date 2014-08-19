@@ -21,12 +21,14 @@ import com.lsfusion.lang.psi.cache.TableNameCache;
 import com.lsfusion.lang.psi.cache.ValueClassCache;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.indexes.TableClassesIndex;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
-import com.lsfusion.lang.typeinfer.InferResult;
+import com.lsfusion.lang.typeinfer.InferExResult;
+import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -105,12 +107,12 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     @Override
-    public LSFClassSet resolveValueClass(boolean infer) {
+    public LSFExClassSet resolveExValueClass(boolean infer) {
         return ValueClassCache.getInstance(getProject()).resolveValueClassWithCaching(this, infer);
     }
 
     @Override
-    public LSFClassSet resolveValueClassNoCache(boolean infer) {
+    public LSFExClassSet resolveExValueClassNoCache(boolean infer) {
         LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
         if (unfr != null)
             return unfr.resolveUnfriendValueClass(infer);
@@ -122,31 +124,45 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return null;
     }
 
+    @Nullable
+    private List<LSFExClassSet> resolveValueParamClasses() {
+        LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
+        if (unfr != null)
+            return unfr.resolveValueParamClasses();
+
+        LSFPropertyExpression expr = getPropertyExpression();
+        if (expr != null)
+            return LSFExClassSet.toEx(LSFPsiImplUtil.resolveValueParamClasses(expr));
+
+        return null;
+
+    }
+
     @Override
     @Nullable
-    public List<LSFClassSet> resolveParamClasses() {
+    public List<LSFExClassSet> resolveExParamClasses() {
         return ParamClassesCache.getInstance(getProject()).resolveParamClassesWithCaching(this);
     }
 
     @Override
-    public List<LSFClassSet> resolveParamClassesNoCache() {
+    public List<LSFExClassSet> resolveExParamClassesNoCache() {
         LSFPropertyDeclaration decl = getPropertyDeclaration();
         LSFClassParamDeclareList cpd = decl.getClassParamDeclareList();
-        List<LSFClassSet> declareClasses = null;
+        List<LSFExClassSet> declareClasses = null;
         if (cpd != null) {
-            declareClasses = LSFPsiImplUtil.resolveClass(cpd);
+            declareClasses = LSFExClassSet.toEx(LSFPsiImplUtil.resolveClass(cpd));
             if (LSFPsiImplUtil.allClassesDeclared(declareClasses)) // оптимизация
                 return declareClasses;
         }
 
-        List<LSFClassSet> valueClasses = resolveValueParamClasses();
+        List<LSFExClassSet> valueClasses = resolveValueParamClasses();
         if (valueClasses == null)
             return declareClasses;
 
         if (declareClasses == null)
             return valueClasses;
 
-        List<LSFClassSet> mixed = new ArrayList<LSFClassSet>(declareClasses);
+        List<LSFExClassSet> mixed = new ArrayList<LSFExClassSet>(declareClasses);
         for (int i = 0, size = declareClasses.size(); i < size; i++) {
             if (i >= valueClasses.size())
                 break;
@@ -157,28 +173,33 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return Collections.unmodifiableList(mixed);
     }
 
-    @Nullable
-    private List<LSFClassSet> resolveValueParamClasses() {
-        LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
-        if (unfr != null)
-            return unfr.resolveValueParamClasses();
+    public static List<LSFClassSet> finishParamClasses(LSFPropDeclaration decl) {
+        return LSFExClassSet.fromEx(decl.resolveExParamClasses());
+    }
 
-        LSFPropertyExpression expr = getPropertyExpression();
-        if (expr != null)
-            return LSFPsiImplUtil.resolveValueParamClasses(expr);
+    public static LSFClassSet finishValueClass(LSFPropDeclaration decl) {
+        return LSFExClassSet.fromEx(decl.resolveExValueClass(false));
+    }
+    
+    @Override
+    public List<LSFClassSet> resolveParamClasses() {
+        return finishParamClasses(this);
+    }
 
-        return null;
+    @Override
+    public LSFClassSet resolveValueClass() {
+        return finishValueClass(this);
     }
 
     @Override
     @Nullable
-    public List<LSFClassSet> inferParamClasses(LSFClassSet valueClass) {
+    public List<LSFExClassSet> inferParamClasses(LSFExClassSet valueClass) {
 
-        List<LSFClassSet> resultClasses = resolveParamClasses();
+        List<LSFExClassSet> resultClasses = resolveExParamClasses();
         if (resultClasses == null)
             return null;
-
-        resultClasses = new ArrayList<LSFClassSet>(resultClasses);
+        
+        resultClasses = new ArrayList<LSFExClassSet>(resultClasses);
 
         //        LSFActionPropertyDefinition action = sourceStatement.getActionPropertyDefinition();
 //        return 
@@ -189,7 +210,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         if (cpd != null)
             params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(cpd));
 
-        InferResult inferredClasses = null;
+        InferExResult inferredClasses = null;
         LSFExpressionUnfriendlyPD unfriendlyPD = getExpressionUnfriendlyPD();
         if (unfriendlyPD != null) {
             LSFActionPropertyDefinition actionDef = unfriendlyPD.getActionPropertyDefinition();
@@ -197,7 +218,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                 if (params == null)
                     params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(actionDef.getExprParameterUsageList()));
                 if (params != null) // может быть action unfriendly
-                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finish();
+                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finishEx();
             } else {
                 LSFContextIndependentPD contextIndependentPD = unfriendlyPD.getContextIndependentPD();
 
@@ -205,7 +226,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
                 PsiElement element = contextIndependentPD.getChildren()[0]; // лень создавать отдельный параметр или интерфейс
                 if (element instanceof LSFGroupPropertyDefinition) {
-                    List<LSFClassSet> inferredValueClasses = LSFPsiImplUtil.inferGroupValueParamClasses((LSFGroupPropertyDefinition) element);
+                    List<LSFExClassSet> inferredValueClasses = LSFPsiImplUtil.inferGroupValueParamClasses((LSFGroupPropertyDefinition) element);
                     for (int i = 0; i < resultClasses.size(); i++)
                         if (resultClasses.get(i) == null && i < inferredValueClasses.size()) { // не определены, возьмем выведенные
                             resultClasses.set(i, inferredValueClasses.get(i));
@@ -219,7 +240,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                 if (params == null)
                     params = expr.resolveParams();
 
-                inferredClasses = LSFPsiImplUtil.inferParamClasses(expr, valueClass).finish();
+                inferredClasses = LSFPsiImplUtil.inferParamClasses(expr, valueClass).finishEx();
             }
         }
         if (inferredClasses != null) {
@@ -328,7 +349,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     public String getSignaturePresentableText() {
         String valueClassString = "";
         if (!isAction()) {
-            LSFClassSet valueClass = resolveValueClass(false);
+            LSFClassSet valueClass = resolveValueClass();
             valueClassString = ": " + (valueClass == null ? "?" : valueClass);
         }
 
