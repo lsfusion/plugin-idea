@@ -164,7 +164,13 @@
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
 
+        <lang.refactoringSupport language="Lsf" implementationClass="com.lsfusion.refactoring.LSFRefactoringSupportProvider"/>
+
         <renamePsiElementProcessor implementation="com.lsfusion.refactoring.LSFRenameFullNameProcessor"/>
+
+        <refactoring.safeDeleteProcessor implementation="com.lsfusion.refactoring.LSFSafeDeleteProcessor"/>
+        
+        <elementDescriptionProvider implementation="com.lsfusion.lang.psi.LSFElementDescriptionProvider"/>
 
         <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
 
