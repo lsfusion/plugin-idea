@@ -244,9 +244,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         if (metaDecl == null || !metaDecl.isCorrect())
             return null;
 
-        String preceedingTab = metaUsage.getPreceedingTab();
         int actualOffset = offset;
-        offset -= adjustMetaTabOffset(metaBody.getText().substring(0, offset), preceedingTab);
 
         for (PsiElement child : metaBody.getChildren()) {
             if (child instanceof LSFMetaCodeStatement) {
@@ -256,16 +254,12 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 LSFMetaCodeBody innerBody = ((LSFMetaCodeStatement) child).getMetaCodeBody();
                 if (innerBody != null) {
                     String text = innerBody.getText();
-                    offset -= text.length() - adjustMetaTabOffset(text, preceedingTab);
+                    offset -= text.length();
                 }
             }
         }
 
         return metaDecl.findOffsetInCode(mapOffset(offset, metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams()));
-    }
-
-    private static int adjustMetaTabOffset(String text, String preceedingTab) {
-        return (text.split("\n").length - 1) * preceedingTab.length() + 1;
     }
 
     private static class LongLivingMeta {
@@ -298,14 +292,12 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         private final List<MetaTransaction.InToken> usages;
         private final List<String> decls;
         public final long version;
-        public final String whitespace;
 
-        private ToParse(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, long version, String whitespace) {
+        private ToParse(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, long version) {
             this.tokens = tokens;
             this.usages = usages;
             this.decls = decls;
             this.version = version;
-            this.whitespace = whitespace;
         }
 
         public LSFMetaCodeBody parse(LSFFile file) {
@@ -347,9 +339,9 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
                             assert metaDecl == null || metaDecl.isValid();
                             if (metaDecl == null || !metaDecl.isCorrect())
-                                toParse.setResult(new ToParse(null, null, null, version, null));
+                                toParse.setResult(new ToParse(null, null, null, version));
                             else
-                                toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), version, metaUsage.getPreceedingTab()));
+                                toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), version));
                         }
                     }
                 });
@@ -484,9 +476,9 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                 assert metaDecl == null || metaDecl.isValid();
                                 if (metaDecl == null || !declPending.processing.contains(getLongLivingDecl(metaDecl))) { // не обновляем, потому как все равно обновится при обработке metaDeclChanged
                                     if (metaDecl == null || !metaDecl.isCorrect())
-                                        toParse.setResult(new ToParse(null, null, null, version, null));
+                                        toParse.setResult(new ToParse(null, null, null, version));
                                     else
-                                        toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), version, metaUsage.getPreceedingTab()));
+                                        toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), version));
                                 }
                             } else
                                 keep = true;

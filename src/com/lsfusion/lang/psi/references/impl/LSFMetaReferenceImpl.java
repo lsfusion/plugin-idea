@@ -179,21 +179,6 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     }
 
     @Override
-    public String getPreceedingTab() {
-        ASTNode treePrev = getNode().getTreePrev();
-/*        if(treePrev==null) {
-            PsiElement parent = getParent();
-            assert parent instanceof LSFStatements;
-            treePrev = parent.getNode().getTreePrev(); // предполагается что тут statements будут
-        }*/
-        if (treePrev != null && LSFParserDefinition.isWhiteSpace(treePrev.getElementType())) { // сохраним табуляцию
-            String whitespace = treePrev.getText();
-            return whitespace.substring(whitespace.lastIndexOf('\n') + 1);
-        }
-        return "";
-    }
-
-    @Override
     public void setInlinedBody(LSFMetaCodeBody parsed) {
         LSFMetaCodeBody body = getMetaCodeBody();
         if (parsed == null || !isCorrect()) {
