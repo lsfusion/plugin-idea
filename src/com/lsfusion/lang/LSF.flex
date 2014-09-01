@@ -329,6 +329,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "SINGLE"                  			{ return SINGLE; }
   "SPLITH"                  			{ return SPLITH; }
   "SPLITV"                  			{ return SPLITV; }
+  "STATIC"                    			{ return STATIC; }
   "STEP"                    			{ return STEP; }
   "STRICT"                  			{ return STRICT; }
   "STRUCT"                  			{ return STRUCT; }
