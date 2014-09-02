@@ -36,6 +36,7 @@ public final class LSFIcons {
     public static final Icon PARAMETER = AllIcons.Nodes.Parameter;
     public static final Icon LOCAL_PROPERTY = AllIcons.Nodes.Variable;
     public static final Icon STATIC_OBJECT = AllIcons.Nodes.Static;
+    public static final Icon PRINT = AllIcons.Graph.Print;
     public static final Icon PROPERTY = AllIcons.Nodes.Property;
     public static final Icon PROPERTY_DRAW = AllIcons.Nodes.PropertyRead;
     public static final Icon SHOW_DEP = AllIcons.Nodes.DataView;

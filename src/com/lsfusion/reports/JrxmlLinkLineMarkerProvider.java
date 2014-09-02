@@ -18,7 +18,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,7 +47,7 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
         return new LineMarkerInfo(
                 psi,
                 psi.getTextRange().getStartOffset(),
-                LSFIcons.Design.PRINT_GROUP,
+                LSFIcons.PRINT,
                 Pass.UPDATE_ALL,
                 TooltipProvider.INSTANCE,
                 GotoJrxmlFileNavigationHandler.INSTANCE
@@ -88,25 +90,37 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
             if (formDecl != null) {
                 List<PsiFile> files = ReportUtils.findReportFiles(formDecl);
 
-                if (files.size() < 1) {
-                    JBPopupFactory
-                            .getInstance()
-                            .createMessage("Can't find related report files")
-                            .show(new RelativePoint(e));
-                } else if (files.size() == 1) {
-                    files.get(0).navigate(true);
-                } else {
-                    Collections.sort(files, PsiFileByPathComparator.INSTANCE);
+                try {
+                    for (PsiFile file : files) {
+                        openFile(file);
+                    }
+                } catch (Exception ex) {
+                    if (files.size() < 1) {
+                        JBPopupFactory
+                                .getInstance()
+                                .createMessage("Can't find related report files")
+                                .show(new RelativePoint(e));
+                    } else if (files.size() == 1) {
+                        files.get(0).navigate(true);
+                    } else {
+                        Collections.sort(files, PsiFileByPathComparator.INSTANCE);
 
-                    JBPopupFactory
-                            .getInstance()
-                            .createListPopup(createListPopupStep(files))
-                            .show(new RelativePoint(e));
+                        JBPopupFactory
+                                .getInstance()
+                                .createListPopup(createListPopupStep(files))
+                                .show(new RelativePoint(e));
+                    }    
                 }
             }
         }
+        
+        private void openFile(PsiFile file) throws Exception {
+            String path = file.getVirtualFile().getCanonicalPath();
+            File fileInPath = new File(path);
+            Desktop.getDesktop().open(fileInPath);
+        }
 
-        private ListPopupStep createListPopupStep(List<PsiFile> files) {
+        private ListPopupStep createListPopupStep(final List<PsiFile> files) {
             return new BaseListPopupStep<PsiFile>("Choose .jrxml file to navigate to...", files) {
                 @NotNull
                 @Override
