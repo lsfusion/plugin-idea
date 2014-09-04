@@ -5,7 +5,7 @@ import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import org.jetbrains.annotations.NotNull;
 
-public class MetaIndex extends StringStubIndexExtension<LSFMetaDeclaration> {
+public class MetaIndex extends LSFStringStubIndex<LSFMetaDeclaration> {
 
     private static final MetaIndex ourInstance = new MetaIndex();
 
@@ -17,5 +17,10 @@ public class MetaIndex extends StringStubIndexExtension<LSFMetaDeclaration> {
     @Override
     public StubIndexKey<String, LSFMetaDeclaration> getKey() {
         return LSFIndexKeys.META;
+    }
+
+    @Override
+    protected Class<LSFMetaDeclaration> getPsiClass() {
+        return LSFMetaDeclaration.class;
     }
 }

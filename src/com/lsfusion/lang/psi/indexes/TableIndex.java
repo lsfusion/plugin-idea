@@ -5,7 +5,7 @@ import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import org.jetbrains.annotations.NotNull;
 
-public class TableIndex extends StringStubIndexExtension<LSFTableDeclaration> {
+public class TableIndex extends LSFStringStubIndex<LSFTableDeclaration> {
 
     private static final TableIndex ourInstance = new TableIndex();
 
@@ -17,6 +17,11 @@ public class TableIndex extends StringStubIndexExtension<LSFTableDeclaration> {
     @Override
     public StubIndexKey<String, LSFTableDeclaration> getKey() {
         return LSFIndexKeys.TABLE;
+    }
+
+    @Override
+    protected Class<LSFTableDeclaration> getPsiClass() {
+        return LSFTableDeclaration.class;
     }
 }
 

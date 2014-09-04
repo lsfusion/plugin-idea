@@ -5,7 +5,7 @@ import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFImplicitValuePropStatement;
 import org.jetbrains.annotations.NotNull;
 
-public class ImplicitValueIndex extends StringStubIndexExtension<LSFImplicitValuePropStatement> {
+public class ImplicitValueIndex extends LSFStringStubIndex<LSFImplicitValuePropStatement> {
     private static final ImplicitValueIndex INSTANCE = new ImplicitValueIndex();
 
     public static ImplicitValueIndex getInstance() {
@@ -16,5 +16,10 @@ public class ImplicitValueIndex extends StringStubIndexExtension<LSFImplicitValu
     @Override
     public StubIndexKey<String, LSFImplicitValuePropStatement> getKey() {
         return LSFIndexKeys.IMPLICIT_VALUE;
+    }
+
+    @Override
+    protected Class<LSFImplicitValuePropStatement> getPsiClass() {
+        return LSFImplicitValuePropStatement.class;
     }
 }

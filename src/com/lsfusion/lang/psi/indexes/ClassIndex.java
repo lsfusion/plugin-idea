@@ -5,7 +5,7 @@ import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import org.jetbrains.annotations.NotNull;
 
-public class ClassIndex extends StringStubIndexExtension<LSFClassDeclaration> {
+public class ClassIndex extends LSFStringStubIndex<LSFClassDeclaration> {
 
     private static final ClassIndex ourInstance = new ClassIndex();
 
@@ -17,5 +17,10 @@ public class ClassIndex extends StringStubIndexExtension<LSFClassDeclaration> {
     @Override
     public StubIndexKey<String, LSFClassDeclaration> getKey() {
         return LSFIndexKeys.CLASS;
+    }
+
+    @Override
+    protected Class<LSFClassDeclaration> getPsiClass() {
+        return LSFClassDeclaration.class;
     }
 }

@@ -5,7 +5,7 @@ import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFImplicitInterfacePropStatement;
 import org.jetbrains.annotations.NotNull;
 
-public class ImplicitInterfaceIndex extends StringStubIndexExtension<LSFImplicitInterfacePropStatement> {
+public class ImplicitInterfaceIndex extends LSFStringStubIndex<LSFImplicitInterfacePropStatement> {
     private static final ImplicitInterfaceIndex INSTANCE = new ImplicitInterfaceIndex();
 
     public static ImplicitInterfaceIndex getInstance() {
@@ -16,5 +16,10 @@ public class ImplicitInterfaceIndex extends StringStubIndexExtension<LSFImplicit
     @Override
     public StubIndexKey<String, LSFImplicitInterfacePropStatement> getKey() {
         return LSFIndexKeys.IMPLICIT_INTERFACE;
+    }
+
+    @Override
+    protected Class<LSFImplicitInterfacePropStatement> getPsiClass() {
+        return LSFImplicitInterfacePropStatement.class;
     }
 }

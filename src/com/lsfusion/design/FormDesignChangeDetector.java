@@ -88,6 +88,10 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
         }
 
         final Document document = psiDocumentManager.getDocument(element.getContainingFile());
+        if (document == null) {
+            return;
+        }
+        
         psiDocumentManager.performForCommittedDocument(document, new Runnable() {
             @Override
             public void run() {

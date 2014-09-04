@@ -5,7 +5,7 @@ import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFExplicitNamespaceDeclaration;
 import org.jetbrains.annotations.NotNull;
 
-public class ExplicitNamespaceIndex extends StringStubIndexExtension<LSFExplicitNamespaceDeclaration> {
+public class ExplicitNamespaceIndex extends LSFStringStubIndex<LSFExplicitNamespaceDeclaration> {
 
     private static final ExplicitNamespaceIndex ourInstance = new ExplicitNamespaceIndex();
 
@@ -17,5 +17,10 @@ public class ExplicitNamespaceIndex extends StringStubIndexExtension<LSFExplicit
     @Override
     public StubIndexKey<String, LSFExplicitNamespaceDeclaration> getKey() {
         return LSFIndexKeys.EXPLICIT_NAMESPACE;
+    }
+
+    @Override
+    protected Class<LSFExplicitNamespaceDeclaration> getPsiClass() {
+        return LSFExplicitNamespaceDeclaration.class;
     }
 }
