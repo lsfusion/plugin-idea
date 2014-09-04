@@ -36,19 +36,22 @@ versionLiteral ::= VERSION
 versionBlockBody ::= LBRACE statement* RBRACE
 
 statement ::=   propertyRename
+            |   storedPropertyRename
             |   classRename
             |   tableRename
             |   objectRename
+            |   propertyDrawRename
 {
     recoverWhile = "statement_recover"
 }
 
 private statement_recover ::= !statement_start
-private statement_start ::= PROPERTY | CLASS | TABLE | OBJECT | RBRACE
+private statement_start ::= STORED | FORM | PROPERTY | CLASS | TABLE | OBJECT | RBRACE
             
-propertyRename ::= PROPERTY (sidRename | propertyFullRename) {pin = 1}
+storedPropertyRename ::= STORED PROPERTY propertyFullRename {pin = 1}             
+propertyRename ::= PROPERTY propertyFullRename {pin = 1}
 
-propertyFullRename ::= compoundID LSQBR classList RSQBR ARROW compoundID (LSQBR classList RSQBR)?
+propertyFullRename ::= compoundID signature ARROW compoundID (signature)?
  
 classRename ::= CLASS sidRename {pin = 1}
 
@@ -58,14 +61,37 @@ objectRename ::= OBJECT objectSidRename  {pin = 1}
 
 objectSidRename ::= staticObjectID ARROW staticObjectID
 
-staticObjectID ::=  ID POINT ID POINT ID
-                |   ID POINT ID
+propertyDrawRename ::= FORM PROPERTY formPropertyID ARROW formPropertyID {pin = 1}
+
+formPropertyID ::= ID POINT ID POINT ID (LBRACKET idList RBRACKET)?   
+
+staticObjectID ::= ID POINT ID POINT ID
 
 sidRename ::= compoundID ARROW compoundID
 
-classList ::= className (COMMA className)*
+signature ::= LSQBR (signatureItem (COMMA signatureItem)*)? RSQBR
 
-className ::= compoundID | PRIMITIVE_TYPE
+signatureItem ::= UNKNOWNCLASS | resolveClassSet
+
+resolveClassSet ::= concatenateClassSet
+                  |	orObjectClassSet
+                  |	upClassSet
+                  |	singleClass
+                    
+concatenateClassSet ::= CONCAT RBRACKET resolveClassSetList LBRACKET
+
+resolveClassSetList ::= (resolveClassSet (COMMA resolveClassSet)*)?
+
+orObjectClassSet ::= LBRACE (upClassSet | customClass) (COMMA customClassList)? RBRACE
+
+customClassList ::= (customClass (COMMA customClass)*)?
+	
+upClassSet ::=	LBRACKET customClassList RBRACKET
+	
+singleClass ::= customClass | PRIMITIVE_TYPE
+	
+customClass ::= compoundID
+
+idList ::= (ID (COMMA ID)*)?
 
 compoundID ::=  ID POINT ID
-            |   ID 

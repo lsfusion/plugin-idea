@@ -12,7 +12,8 @@ public class MigrationBraceMatcher implements PairedBraceMatcher {
 
     private final BracePair[] pairs = new BracePair[]{
             new BracePair(MigrationTypes.LBRACE, MigrationTypes.RBRACE, true),
-            new BracePair(MigrationTypes.LSQBR, MigrationTypes.RSQBR, false)
+            new BracePair(MigrationTypes.LSQBR, MigrationTypes.RSQBR, false),
+            new BracePair(MigrationTypes.LBRACKET, MigrationTypes.RBRACKET, false)
     };
 
     public BracePair[] getPairs() {

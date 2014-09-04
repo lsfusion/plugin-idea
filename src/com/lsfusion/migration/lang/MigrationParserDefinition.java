@@ -37,6 +37,9 @@ public class MigrationParserDefinition implements ParserDefinition {
             RBRACE,
             LSQBR,
             RSQBR,
+            LBRACKET,
+            RBRACKET,
+            UNKNOWNCLASS,
             ID
     );
 

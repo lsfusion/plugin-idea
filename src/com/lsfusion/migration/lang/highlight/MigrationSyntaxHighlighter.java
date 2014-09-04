@@ -37,7 +37,8 @@ public class MigrationSyntaxHighlighter extends SyntaxHighlighterBase {
                             MigrationTypes.POINT,
                             MigrationTypes.ARROW,
                             MigrationTypes.LBRACE, MigrationTypes.RBRACE,
-                            MigrationTypes.LSQBR, MigrationTypes.RSQBR
+                            MigrationTypes.LSQBR, MigrationTypes.RSQBR,
+                            MigrationTypes.LBRACKET, MigrationTypes.RBRACKET
                     }
             )
     );

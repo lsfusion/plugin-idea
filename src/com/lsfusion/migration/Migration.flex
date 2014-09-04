@@ -54,10 +54,18 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
     "["                                   { return LSQBR; }
     "]"                                   { return RSQBR; }
     
+    "("                                   { return LBRACKET; }
+    ")"                                   { return RBRACKET; }
+        
+    "?"                                 { return UNKNOWNCLASS; }
+    
     "CLASS"                   			{ return CLASS; }
     "OBJECT"                  			{ return OBJECT; }
     "PROPERTY"                			{ return PROPERTY; }
     "TABLE"                   			{ return TABLE; }
+    "CONCAT"                            { return CONCAT; }
+    "STORED"                            { return STORED; }
+    "FORM"                              { return FORM; }
     
     {FIRST_ID_LETTER} {NEXT_ID_LETTER}*   { return ID; }
     
