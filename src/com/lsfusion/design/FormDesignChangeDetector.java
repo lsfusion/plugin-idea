@@ -54,40 +54,40 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
 
     @Override
     public void childAdded(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild());
+        fireChildChanged(event.getChild(), event.getFile());
     }
 
     @Override
     public void childRemoved(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild());
+        fireChildChanged(event.getChild(), event.getFile());
     }
 
     @Override
     public void childReplaced(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild());
+        fireChildChanged(event.getChild(), event.getFile());
     }
 
     @Override
     public void childMoved(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild());
+        fireChildChanged(event.getChild(), event.getFile());
     }
 
     @Override
     public void childrenChanged(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild());
+        fireChildChanged(event.getChild(), event.getFile());
     }
 
     @Override
     public void propertyChanged(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild());
+        fireChildChanged(event.getChild(), event.getFile());
     }
 
-    private void fireChildChanged(PsiElement element) {
-        if (element == null) {
+    private void fireChildChanged(PsiElement element, PsiFile file) {
+        if (element == null || file == null) {
             return;
         }
 
-        final Document document = psiDocumentManager.getDocument(element.getContainingFile());
+        final Document document = psiDocumentManager.getDocument(file);
         if (document == null) {
             return;
         }
