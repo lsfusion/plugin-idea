@@ -7,6 +7,7 @@ import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -88,7 +89,7 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
         }
 
         final Document document = psiDocumentManager.getDocument(file);
-        if (document == null) {
+        if (document == null || DumbService.isDumb(project)) {
             return;
         }
         
