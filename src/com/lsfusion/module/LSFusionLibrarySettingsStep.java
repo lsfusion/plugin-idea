@@ -54,7 +54,7 @@ public class LSFusionLibrarySettingsStep extends ModuleWizardStep {
             }
         });
 
-        javaSettingsStep = JavaModuleType.getModuleType().modifySettingsStep(settingsStep, moduleBuilder);
+        javaSettingsStep = JavaModuleType.getModuleType().modifyProjectTypeStep(settingsStep, moduleBuilder);
         libraryPanel = createLibraryPanel();
 
         //noinspection RedundantCast
