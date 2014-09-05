@@ -50,10 +50,14 @@ public class InsertCompositionAction extends BaseRefactoringAction {
     protected static final String REFACTORING_NAME = LSFBundle.message("insert.composition.title");
 
     public InsertCompositionAction() {
+        initPresentation();
+    }
+    
+    protected void initPresentation() {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(REFACTORING_NAME);
         presentation.setDescription("Inserts composition in the caret position");
-        presentation.setIcon(LSFIcons.FILE);
+        presentation.setIcon(LSFIcons.FILE);    
     }
 
     @Override
@@ -70,14 +74,24 @@ public class InsertCompositionAction extends BaseRefactoringAction {
     protected boolean isEnabledOnElements(@NotNull PsiElement[] elements) {
         return false;
     }
+    
+    protected boolean isFastAction() {
+        return false;
+    }
 
     @Nullable
     @Override
     protected RefactoringActionHandler getHandler(@NotNull DataContext dataContext) {
-        return new InsertCompositionActionHandler();
+        return new InsertCompositionActionHandler(isFastAction());
     }
 
     private static class InsertCompositionActionHandler implements RefactoringActionHandler {
+        private boolean chooseFirstExpression = false;
+        
+        public InsertCompositionActionHandler(boolean chooseFirstExpression) {
+            this.chooseFirstExpression = chooseFirstExpression;
+        }
+        
         @Override
         public void invoke(@NotNull final Project project, final Editor editor, final PsiFile file, DataContext dataContext) {
             if (!(file instanceof LSFFile)) {
@@ -94,7 +108,7 @@ public class InsertCompositionAction extends BaseRefactoringAction {
                 final List<LSFExpression> expressions = LSFPsiUtils.collectExpressions(file, editor, offset);
                 if (expressions.isEmpty()) {
                     selectionModel.selectLineAtCaret();
-                } else if (expressions.size() == 1) {
+                } else if (chooseFirstExpression || expressions.size() == 1) {
                     selectedExpression = expressions.get(0);
                 } else {
                     Pass<LSFExpression> selectionHandler = new Pass<LSFExpression>() {

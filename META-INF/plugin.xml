@@ -96,7 +96,11 @@
         </action>
         <action id="InsertComposition" class="com.lsfusion.actions.InsertCompositionAction">
             <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt shift B" keymap="$default"/>
+            <keyboard-shortcut first-keystroke="control alt shift W" keymap="$default"/>
+        </action>
+        <action id="FastInsertComposition" class="com.lsfusion.actions.FastInsertCompositionAction">
+            <add-to-group group-id="CodeMenu"/>
+            <keyboard-shortcut first-keystroke="control alt W" keymap="$default"/>
         </action>
         <action id="Project.Shorten" class="com.lsfusion.actions.ProjectShortenNamesAction"
                 text="Shorten names for project" description="Shorten names for project">
