@@ -19,6 +19,7 @@ import com.intellij.util.io.StringRef;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFComponentDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import com.lsfusion.lang.psi.references.LSFClassReference;
@@ -30,6 +31,8 @@ import com.lsfusion.lang.psi.references.impl.LSFNamespaceReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -133,6 +136,26 @@ public class LSFElementGenerator {
             builtInFormProps = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
         }
         return builtInFormProps;
+    }
+
+    private static List<? extends LSFComponentDeclaration> builtInFormComponents = null;
+
+    public static List<? extends LSFComponentDeclaration> getBuiltInFormComponents(Project project) {
+        if (builtInFormComponents == null) {
+            builtInFormComponents = createFormComponents(project, Arrays.asList("main", "functions.box", "leftControls", "rightControls", "nogroup.panel", "nogroup.panel.props"));
+        }
+        return builtInFormComponents;
+    }
+    
+    public static List<? extends LSFComponentDeclaration> createFormComponents(Project project, List<String> componentsNames) {
+        String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
+                "DESIGN defaultForm FROM DEFAULT {";
+        for (String name : componentsNames) {
+            text += "NEW " + name + ";";
+        }
+        text += "}";
+        final PsiFile dummyFile = createDummyFile(project, text);
+        return new ArrayList<LSFComponentDeclaration>(PsiTreeUtil.findChildrenOfType(dummyFile, LSFComponentDeclaration.class));    
     }
 
     private static Collection<? extends LSFWindowDeclaration> builtInWindows = null;

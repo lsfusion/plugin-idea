@@ -8,15 +8,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.design.FormView;
 import com.lsfusion.design.GroupObjectContainerSet;
 import com.lsfusion.design.TreeGroupContainerSet;
+import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFComponentStubDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.indexes.ComponentIndex;
+import com.lsfusion.lang.psi.indexes.GroupIndex;
 import com.lsfusion.lang.psi.references.LSFComponentReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
-import com.lsfusion.lang.psi.indexes.ComponentIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -45,13 +44,37 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
             }
         }
 
-        if (declarations.isEmpty() && formDeclaration != null) {
-            Collection<LSFFormExtend> formExtends = LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, getLSFFile()).findAll();
-            for (LSFFormExtend formExtend : formExtends) {
-                LSFDeclaration declaration = getDefaultContainers(formExtend).get(componentName);
-                if (declaration != null) {
-                    declarations.add(declaration);
+        if (declarations.isEmpty()) {
+            // список групп свойств
+            Set<String> groups = new HashSet<String>();
+            for (String key : GroupIndex.getInstance().getAllKeys(getProject())) {
+                Collection<LSFGroupDeclaration> groupDeclarations = GroupIndex.getInstance().get(key, getProject(), getLSFFile().getRequireScope());
+                for (LSFGroupDeclaration groupDeclaration : groupDeclarations) {
+                    groups.add(groupDeclaration.getNameIdentifier().getName());
                 }
+            }
+            
+            // стандартные контейнеры групп объектов
+            if (formDeclaration != null) {
+                Collection<LSFFormExtend> formExtends = LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, getLSFFile()).findAll();
+                for (LSFFormExtend formExtend : formExtends) {
+                    LSFDeclaration declaration = getDefaultContainers(formExtend, groups).get(componentName);
+                    if (declaration != null) {
+                        declarations.add(declaration);
+                    }
+                }
+            }
+            
+            // стандартные контейнеры формы
+            LSFDeclaration builtInFormComponent = getBuiltInFormComponents().get(componentName);
+            if (builtInFormComponent != null) {
+                declarations.add(builtInFormComponent);
+            }
+
+            // стандартные контейнеры свойсв без группы
+            LSFDeclaration noGroupDeclaration = getNoGroupDeclarations(groups).get(componentName);
+            if (noGroupDeclaration != null) {
+                declarations.add(noGroupDeclaration);
             }
         }
 
@@ -62,6 +85,13 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
                 @Override
                 public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
                     return resolveAmbiguousErrorAnnotation(holder, finalDeclarations);
+                }
+            };
+        } else if (declarations.isEmpty()) {
+            errorAnnotator = new LSFResolveResult.ErrorAnnotator() {
+                @Override
+                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+                    return resolveNotFoundErrorAnnotation(holder, Collections.<LSFDeclaration>emptyList());
                 }
             };
         }
@@ -77,8 +107,10 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
         return null;
     }
 
-    private Map<String, LSFDeclaration> getDefaultContainers(LSFFormExtend formExtend) {
+    private Map<String, LSFDeclaration> getDefaultContainers(LSFFormExtend formExtend, Set<String> groups) {
         Map<String, LSFDeclaration> result = new HashMap<String, LSFDeclaration>();
+        
+        // стандартные контейнеры дерева объектов
         for (LSFFormTreeGroupObjectList lsfFormTreeGroupObjectList : PsiTreeUtil.findChildrenOfType(formExtend, LSFFormTreeGroupObjectList.class)) {
             LSFTreeGroupDeclaration treeGroupDeclaration = lsfFormTreeGroupObjectList.getTreeGroupDeclaration();
             if (treeGroupDeclaration != null) {
@@ -91,6 +123,7 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
             }
         }
 
+        // стандартные контейнеры групп объектов
         for (LSFGroupObjectDeclaration lsfGroupObjectDeclaration : formExtend.getGroupObjectDecls()) {
             String goName = lsfGroupObjectDeclaration.getDeclName();
             if (goName != null) {
@@ -118,7 +151,38 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
                     }
                 }
             }
+            
+            // контейнеры групп свойств
+            for (String group : groups) {
+                result.put(goName + "." + group, lsfGroupObjectDeclaration);    
+            }
         }
+
+        // контенеры групп фильтров
+        for (LSFFilterGroupDeclaration filterGroupDeclaration : formExtend.getFilterGroupDecls()) {
+            result.put(FormView.getRegularFilterGroupSID(filterGroupDeclaration.getDeclName()), filterGroupDeclaration);    
+        }
+        
+        return result;
+    }
+    
+    private Map<String, LSFDeclaration> getBuiltInFormComponents() {
+        Map<String, LSFDeclaration> result = new HashMap<String, LSFDeclaration>();
+        for (LSFComponentDeclaration componentDeclaration : LSFElementGenerator.getBuiltInFormComponents(getProject())) {
+            result.put(componentDeclaration.getName(), componentDeclaration);
+        }    
+        return result;
+    }
+        
+    private Map<String, LSFDeclaration> getNoGroupDeclarations(Set<String> groups) {
+        List<String> nogroupGroupContainers = new ArrayList<String>();
+        for (String group : groups) {
+            nogroupGroupContainers.add("NOGROUP." + group);
+        }
+        Map<String, LSFDeclaration> result = new HashMap<String, LSFDeclaration>();
+        for (LSFComponentDeclaration componentDeclaration : LSFElementGenerator.createFormComponents(getProject(), nogroupGroupContainers)) {
+            result.put(componentDeclaration.getName(), componentDeclaration);
+        }    
         return result;
     }
 

@@ -58,7 +58,6 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
                                 break;
                             }
                         }
-                        ;
                     }
                 } else if (statement instanceof LSFClassStatement && ((LSFClassStatement) statement).getExtendingClassDeclaration() != null) {
                     targets.add(((LSFClassStatement) statement).resolveDecl().getNameIdentifier());
