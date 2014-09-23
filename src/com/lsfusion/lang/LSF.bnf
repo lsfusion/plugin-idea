@@ -1262,11 +1262,11 @@ indexStatement ::= INDEX nonEmptyNoContextPropertyUsageList SEMI {pin=1 methods 
 
 windowStatement ::= windowCreateStatement | windowHideStatement {pin=1 methods = [ getIcon ]}
 
-windowCreateStatement ::= WINDOW windowType simpleName stringLiteral windowOptions SEMI
+windowCreateStatement ::= WINDOW simpleName (stringLiteral)? windowType windowOptions SEMI
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFWindowDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFWindowDeclaration"
     stubClass = "com.lsfusion.lang.psi.stubs.WindowStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
-    pin = 3
+    pin = 2
 }
 
 windowHideStatement ::= HIDE WINDOW windowUsage SEMI {pin=2}
