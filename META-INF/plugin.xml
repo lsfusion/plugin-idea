@@ -39,10 +39,6 @@
             <skipForDefaultProject/>
         </component>
 
-        <component>
-            <implementation-class>com.lsfusion.lang.psi.LSFProjectComponent</implementation-class>
-        </component>
-
     </project-components>
 
     <actions>

@@ -41,13 +41,17 @@ public class LSFSymbolContributor extends LSFNameContributor {
     }
 
     @Override
-    protected Collection<String> getIndexKeys(StringStubIndexExtension index, Project project, boolean includeNonProjectItems) {
+    protected Collection<String> getIndexKeys(StringStubIndexExtension index, String pattern, Project project, boolean includeNonProjectItems) {
         if (index instanceof PropIndex) {
             List<String> result = new ArrayList<String>();
             Collection<String> allKeys = index.getAllKeys(project);
             final GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
             for (String key : allKeys) {
                 for (LSFGlobalPropDeclaration decl : ((PropIndex) index).get(key, project, scope)) {
+                    if (pattern != null && !matches(key, pattern)) {
+                        continue;
+                    }
+                    
                     List<LSFClassSet> paramClasses = decl.resolveParamClasses();
                     String paramsString = "";
                     if (paramClasses != null) {
@@ -70,7 +74,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
             }
             return result;
         } else {
-            return super.getIndexKeys(index, project, includeNonProjectItems);
+            return super.getIndexKeys(index, pattern, project, includeNonProjectItems);
         }
     }
 
