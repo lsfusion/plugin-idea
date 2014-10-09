@@ -951,7 +951,7 @@ treeGroupDeclaration ::= simpleName
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFTreeGroupDeclImpl"
 }
 
-formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectReportPath)? (formGroupObjectViewType)? (formGroupObjectPageSize)? (formGroupObjectUpdateList)?
+formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectReportPath)? (formGroupObjectViewType)? (formGroupObjectPageSize)? (formGroupObjectUpdateList)? (formGroupObjectRelativePosition)?
 formTreeGroupObjectDeclaration ::= formCommonGroupObject (treeGroupParentDeclaration)?
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
@@ -971,6 +971,8 @@ formGroupObjectPageSize ::= PAGESIZE intLiteral
 formGroupObjectUpdateList ::= formGroupObjectUpdate (COMMA formGroupObjectUpdate)* 
 
 formGroupObjectUpdate ::= FIRST | LAST | (STATIC literal)
+
+formGroupObjectRelativePosition ::= AFTER groupObjectUsage | BEFORE groupObjectUsage  
 
 formSingleGroupObjectDeclaration ::= formObjectDeclaration
 
