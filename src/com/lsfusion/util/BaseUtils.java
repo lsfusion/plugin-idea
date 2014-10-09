@@ -161,6 +161,15 @@ public class BaseUtils {
         return col.iterator().next();
     }
 
+    public static boolean isAllNull(Iterable<?> col) {
+        for (Object obj : col) {
+            if (obj != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static String getKeyStrokeCaption(KeyStroke editKey) {
         return editKey.toString().replaceAll("typed ", "").replaceAll("pressed ", "").replaceAll("released ", "");
     }

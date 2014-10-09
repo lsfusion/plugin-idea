@@ -26,13 +26,13 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
 
     private final LSFValueClass valueClass;
 
-    private final LSFFileCaretListener caretListener;
+    private final LSFStructureFileCaretListener caretListener;
 
     private final LSFStructureViewNavigationHandler navigationHandler;
 
     private boolean needTotalExpansion = true;
 
-    public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFFileCaretListener caretListener) {
+    public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFStructureFileCaretListener caretListener) {
         this(file, null, caretListener, null);
     }
 
@@ -40,7 +40,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
         this(file, valueClass, null, navigationHandler);
     }
 
-    public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFFileCaretListener caretListener, LSFStructureViewNavigationHandler navigationHandler) {
+    public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFStructureFileCaretListener caretListener, LSFStructureViewNavigationHandler navigationHandler) {
         this.file = file;
         this.valueClass = valueClass;
         this.navigationHandler = navigationHandler;

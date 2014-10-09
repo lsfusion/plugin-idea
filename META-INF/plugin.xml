@@ -39,6 +39,11 @@
             <skipForDefaultProject/>
         </component>
 
+        <component>
+            <implementation-class>com.lsfusion.LSFBaseProjectComponent</implementation-class>
+            <skipForDefaultProject/>
+        </component>
+
     </project-components>
 
     <actions>

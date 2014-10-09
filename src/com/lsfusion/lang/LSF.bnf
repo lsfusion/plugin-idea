@@ -212,7 +212,7 @@ implicitInterfacePropertyStatement ::= propertyStatement
     elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-propertyStatement ::= propertyDeclaration EQUALS
+propertyStatement ::= propertyDeclaration equalsSign
                       (expressionUnfriendlyPD | propertyExpression) 
                       propertyOptions
                       << semicolonIfNeeded >>
@@ -1683,6 +1683,8 @@ ulongLiteral ::= LEX_ULONG_LITERAL
 nullLiteral ::= NULL
 
 nullOption ::= NULL
+
+equalsSign ::= EQUALS
 
 dimensionLiteral ::= LBRAC intLiteral COMMA intLiteral RBRAC
 boundsIntLiteral ::= LBRAC intLiteral COMMA intLiteral COMMA intLiteral COMMA intLiteral RBRAC

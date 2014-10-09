@@ -19,12 +19,12 @@ public class LSFFoldingBuilder implements FoldingBuilder {
     @Override
     public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
         List<FoldingDescriptor> list = new ArrayList<FoldingDescriptor>();
-        buildFolding(node, list);
+        buildFolding(node, list, document);
         FoldingDescriptor[] descriptors = new FoldingDescriptor[list.size()];
         return list.toArray(descriptors);
     }
 
-    private static void buildFolding(ASTNode node, List<FoldingDescriptor> list) {
+    private static void buildFolding(ASTNode node, List<FoldingDescriptor> list, Document document) {
         IElementType elementType = node.getElementType();
         boolean fullFolding = elementType == LSFTypes.META_CODE_BODY
                               || elementType == LSFTypes.NAVIGATOR_ELEMENT_STATEMENT_BODY
@@ -46,8 +46,13 @@ public class LSFFoldingBuilder implements FoldingBuilder {
             }
         }
 
+        if (elementType == LSFTypes.PROPERTY_STATEMENT) {
+            LSFPropertyParamsFoldingManager propFildingManager = new LSFPropertyParamsFoldingManager(node, document);
+            list.addAll(propFildingManager.buildDescriptors());
+        }
+
         for (ASTNode child : node.getChildren(null)) {
-            buildFolding(child, list);
+            buildFolding(child, list, document);
         }
     }
 

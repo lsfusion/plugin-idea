@@ -11,18 +11,19 @@ import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.LSFBuiltInClassName;
 import com.lsfusion.lang.psi.LSFClassDecl;
 import com.lsfusion.lang.psi.LSFId;
 
-public class LSFFileCaretListener extends CaretAdapter {
-    public final static Key<LSFFileCaretListener> PROJECT_COMPONENT_KEY = Key.create("lsfusion.structureview.caret.listener");
+public class LSFStructureFileCaretListener extends CaretAdapter {
+    public final static Key<LSFStructureFileCaretListener> PROJECT_COMPONENT_KEY = Key.create("lsfusion.structureview.caret.listener");
 
     private final Project project;
 
     private PsiElement currentClassElement;
 
-    public LSFFileCaretListener(Project project) {
+    public LSFStructureFileCaretListener(Project project) {
         this.project = project;
     }
 
@@ -38,13 +39,7 @@ public class LSFFileCaretListener extends CaretAdapter {
         PsiElement targetElement = TargetElementUtilBase.findTargetElement(e.getEditor(), ImplementationSearcher.getFlags());
 
         if (targetElement instanceof LSFId) {
-            PsiElement parent = targetElement;
-            while (parent != null) {
-                if (parent instanceof LSFClassDecl || parent instanceof LSFBuiltInClassName) {
-                    break;
-                }
-                parent = parent.getParent();
-            }
+            PsiElement parent = PsiTreeUtil.getParentOfType(targetElement, LSFClassDecl.class, LSFBuiltInClassName.class);
 
             if (parent != null && parent != currentClassElement) {
                 currentClassElement = parent;
