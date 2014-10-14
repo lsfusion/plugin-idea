@@ -79,7 +79,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
             LSFFormDeclaration formDecl = resolveFormDecl(psi);
 
             if (formDecl != null) {
-                ToolWindow toolWindow = ToolWindowManager.getInstance(formDecl.getProject()).getToolWindow("lsFusion Form Design");
+                ToolWindow toolWindow = ToolWindowManager.getInstance(formDecl.getProject()).getToolWindow("Form Design");
                 if (toolWindow instanceof ToolWindowImpl) {
                     ((ToolWindowImpl) toolWindow).ensureContentInitialized();
                     toolWindow.activate(null);
