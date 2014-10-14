@@ -306,7 +306,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "RECURSION"               			{ return RECURSION; }
   "REGEXP"                  			{ return REGEXP; }
   "REMOVE"                  			{ return REMOVE; }
-  "REPORTFILE"              			{ return REPORTFILE; }
+  "REPORTFILES"              			{ return REPORTFILES; }
   "REQUEST"                 			{ return REQUEST; }
   "REQUIRE"                 			{ return REQUIRE; }
   "RESOLVE"                 			{ return RESOLVE; }

@@ -908,6 +908,7 @@ formStatement ::=	(	formDecl
                     |	dialogFormDeclaration
                     |	editFormDeclaration
                     |	listFormDeclaration
+                    |   reportFilesDeclaration
                     )*
                     SEMI
 {
@@ -922,6 +923,9 @@ formStatement ::=	(	formDecl
 dialogFormDeclaration ::= DIALOG customClassUsage OBJECT objectUsage {pin = 1}
 editFormDeclaration ::= EDIT customClassUsage OBJECT objectUsage {pin = 1}
 listFormDeclaration ::= LIST customClassUsage OBJECT objectUsage {pin = 1}
+
+reportFilesDeclaration ::= REPORTFILES groupObjectReportPath (COMMA groupObjectReportPath)* {pin = 1}
+groupObjectReportPath ::= (TOP | groupObjectUsage) formPropertyObject
 
 formDecl ::= FORM simpleNameWithCaption
 		            (TITLE stringLiteral)?
@@ -951,7 +955,7 @@ treeGroupDeclaration ::= simpleName
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFTreeGroupDeclImpl"
 }
 
-formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectReportPath)? (formGroupObjectViewType)? (formGroupObjectPageSize)? (formGroupObjectUpdateList)? (formGroupObjectRelativePosition)?
+formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectViewType)? (formGroupObjectPageSize)? (formGroupObjectUpdateList)? (formGroupObjectRelativePosition)?
 formTreeGroupObjectDeclaration ::= formCommonGroupObject (treeGroupParentDeclaration)?
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
@@ -959,8 +963,6 @@ treeGroupParentDeclaration ::= PARENT (propertyUsage | LBRAC nonEmptyPropertyUsa
 
 formCommonGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDeclaration
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFGroupObjectDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration"}
-
-formGroupObjectReportPath ::= REPORTFILE formPropertyObject
 
 formGroupObjectViewType ::= (INIT | FIXED) classViewType
 
