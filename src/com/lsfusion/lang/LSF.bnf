@@ -1709,11 +1709,11 @@ flexAlignmentLiteral ::= LEADING | CENTER | TRAILING | STRETCH
 
 modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN | DIALOG
 
-formPrintTypeLiteral ::= PRINT (AUTO | XLS | PDF)? {pin = 1}
+formPrintTypeLiteral ::= PRINT (AUTO | XLSX | PDF)? {pin = 1}
 
 formSessionScopeLiteral ::= OLDSESSION | NEWSESSION | MANAGESESSION | NESTEDSESSION
 
 emailRecipientTypeLiteral ::= TO | CC | BCC
 
-emailAttachFormat ::= PDF | DOCX | HTML | RTF
+emailAttachFormat ::= PDF | DOCX | HTML | RTF | XLSX
 

@@ -357,7 +357,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "WHILE"                   			{ return WHILE; }
   "WINDOW"                  			{ return WINDOW; }
   "XOR"                     			{ return XOR; }
-  "XLS"                                 { return XLS; }
+  "XLSX"                                 { return XLSX; }
   "YES"                     			{ return YES; }
   "##"                                  { return FAKETWODASHES;}
   "###"                                 { return FAKETHREEDASHES;}
