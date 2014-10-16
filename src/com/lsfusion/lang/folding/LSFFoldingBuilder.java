@@ -64,6 +64,6 @@ public class LSFFoldingBuilder implements FoldingBuilder {
 
     @Override
     public boolean isCollapsedByDefault(@NotNull ASTNode node) {
-        return node.getElementType() == LSFTypes.META_CODE_BODY;
+        return node.getElementType() == LSFTypes.META_CODE_BODY || node.getElementType() == LSFTypes.EQUALS_SIGN;
     }
 }
