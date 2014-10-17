@@ -116,6 +116,7 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
             if (treeGroupDeclaration != null) {
                 String tgoName = treeGroupDeclaration.getSimpleName().getText();
                 if (tgoName != null) {
+                    result.put(FormView.getTreeSID(tgoName), treeGroupDeclaration);
                     result.put(FormView.getTreeSID(tgoName) + TreeGroupContainerSet.TREE_GROUP_CONTAINER, treeGroupDeclaration);
                     result.put(FormView.getToolbarSID(tgoName), treeGroupDeclaration);
                     result.put(FormView.getFilterSID(tgoName), treeGroupDeclaration);
