@@ -27,7 +27,7 @@ import static com.lsfusion.migration.lang.psi.MigrationTypes.*;
 EOL = \r|\n|\r\n
 LINE_WS = [ \t\f]
 DIGITS = [0-9]+
-FIRST_ID_LETTER	= [a-zA-Z]
+FIRST_ID_LETTER	= [a-zA-Z_]
 NEXT_ID_LETTER = [a-zA-Z_0-9]
 
 %%
