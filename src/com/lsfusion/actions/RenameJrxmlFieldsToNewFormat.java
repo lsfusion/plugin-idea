@@ -65,15 +65,15 @@ public class RenameJrxmlFieldsToNewFormat extends AnAction {
         ProgressManager.getInstance().run(
                 new Task.Modal(project, "Renaming jrxml fields to new format", true) {
                     public void run(final @NotNull ProgressIndicator indicator) {
-                        final boolean showBalloonsState = NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS;
-                        NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = false;
+                        final boolean showBalloonsState = NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS;
+                        NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = false;
 
                         renameInAllFiles(indicator, project);
 
                         ApplicationManager.getApplication().invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = showBalloonsState;
+                                NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = showBalloonsState;
                             }
                         });
                     }

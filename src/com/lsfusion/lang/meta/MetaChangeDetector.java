@@ -17,6 +17,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.util.containers.ConcurrentHashMap;
+import com.intellij.util.containers.ConcurrentHashSet;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
@@ -581,7 +582,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private abstract class MetaPending<T, G> {
-        public final Set<Object> processing = ContainerUtil.newConcurrentSet();
+        public final Set<Object> processing = new ConcurrentHashSet<Object>();
         private Map<G, Set<T>> pending = new HashMap<G, Set<T>>();
 
         protected abstract G group(T element);
