@@ -29,6 +29,8 @@ import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
+import com.lsfusion.refactoring.ElementMigration;
+import com.lsfusion.refactoring.PropertyMigration;
 import com.lsfusion.util.BaseUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -62,14 +64,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             if(pe!=null)
                 params = LSFPsiImplUtil.resolveParams(pe);
         }
-        if(params != null) {
-            List<String> result = new ArrayList<String>();
-            for(LSFExprParamDeclaration param : params)
-                result.add(param.getDeclName());
-            return result;
-        }
-
-        return null;
+        return LSFPsiImplUtil.resolveParamNames(params);
     }
 
     public abstract LSFPropertyDeclaration getPropertyDeclaration();
@@ -576,5 +571,10 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             return null;
         }
         return ColumnNamingPolicy.getInstance(getProject()).getColumnName(this);
+    }
+
+    @Override
+    public ElementMigration getMigration(String newName) {
+        return PropertyMigration.create(this, getGlobalName(), newName);
     }
 }

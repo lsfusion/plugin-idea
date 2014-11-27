@@ -104,19 +104,9 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     public LSFResolveResult.ErrorAnnotator resolveDefaultErrorAnnotator(final Collection<? extends LSFDeclaration> decls) {
         LSFResolveResult.ErrorAnnotator errorAnnotator = null;
         if (decls.isEmpty()) {
-            errorAnnotator = new LSFResolveResult.ErrorAnnotator() {
-                @Override
-                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-                    return resolveNotFoundErrorAnnotation(holder, decls);
-                }
-            };
+            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, decls);
         } else if (decls.size() > 1) {
-            errorAnnotator = new LSFResolveResult.ErrorAnnotator() {
-                @Override
-                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-                    return resolveAmbiguousErrorAnnotation(holder, decls);
-                }
-            };
+            errorAnnotator = new LSFResolveResult.AmbigiousErrorAnnotator(this, decls);
         }
         return errorAnnotator;
     }

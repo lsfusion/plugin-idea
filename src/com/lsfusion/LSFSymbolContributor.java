@@ -14,7 +14,25 @@ import java.util.*;
 public class LSFSymbolContributor extends LSFNameContributor {
     // полагаем, что состояние не меняется между вызовами getNames() и getItemsByName()
     // оба вызова осуществляются в рамках одного метода. (см. DefaultChooseByNameItemProvider.filterElements(), SearchEverywhereAction.buildSymbols())
-    private Map<String, List<NavigationItem>> propertyDeclarationsMap = new HashMap<String, List<NavigationItem>>();
+    private final Map<String, List<NavigationItem>> propertyDeclarationsMap = new HashMap<String, List<NavigationItem>>();
+    
+    private void clearPropertyDeclarationsMap() {
+        synchronized (propertyDeclarationsMap) {
+            propertyDeclarationsMap.clear();
+        }
+            
+    }
+
+    private List<NavigationItem> getPropertyDeclarationsMap(String withParams, boolean putIfIsEmpty) {
+        synchronized (propertyDeclarationsMap) {
+            List<NavigationItem> decls = propertyDeclarationsMap.get(withParams);
+            if (putIfIsEmpty && decls == null) {
+                decls = Collections.synchronizedList(new ArrayList<NavigationItem>());
+                propertyDeclarationsMap.put(withParams, decls);
+            }
+            return decls;
+        }
+    }
 
     @Override
     protected Collection<StringStubIndexExtension> getIndices() {
@@ -36,7 +54,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
     @NotNull
     @Override
     public String[] getNames(Project project, boolean includeNonProjectItems) {
-        propertyDeclarationsMap = new HashMap<String, List<NavigationItem>>();
+        clearPropertyDeclarationsMap();
         return super.getNames(project, includeNonProjectItems);
     }
 
@@ -63,11 +81,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
                     }
 
                     String withParams = key + paramsString;
-                    List<NavigationItem> decls = propertyDeclarationsMap.get(withParams);
-                    if (decls == null) {
-                        decls = new ArrayList<NavigationItem>();
-                        propertyDeclarationsMap.put(withParams, decls);
-                    }
+                    List<NavigationItem> decls = getPropertyDeclarationsMap(withParams, true);
                     decls.add((NavigationItem) decl);
                     result.add(withParams);
                 }
@@ -81,7 +95,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
     @Override
     protected Collection<NavigationItem> getItemsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {
         if (index instanceof PropIndex) {
-            List<NavigationItem> decls = propertyDeclarationsMap.get(name);
+            List<NavigationItem> decls = getPropertyDeclarationsMap(name, false);
             return decls != null
                    ? decls
                    : super.getItemsFromIndex(index, name, project, scope);

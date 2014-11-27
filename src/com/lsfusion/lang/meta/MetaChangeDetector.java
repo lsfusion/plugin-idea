@@ -2,7 +2,6 @@ package com.lsfusion.lang.meta;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.impl.ApplicationImpl;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -16,8 +15,9 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.util.containers.ConcurrentHashMap;
-import com.intellij.util.containers.ConcurrentHashSet;
+import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
 import java.util.*;
 
 import static com.lsfusion.util.LSFPsiUtils.findChildrenOfType;
@@ -107,8 +109,9 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                         setMetaSyncMode(PropertiesComponent.getInstance(myProject).getBoolean(META_SYNC_MODE, true));
                         setMetaEnabled(PropertiesComponent.getInstance(myProject).getBoolean(ENABLED_META, false), false);
 
-                        timer = new Timer();
-                        timer.schedule(indexUpdater, 10, 30);
+//                        смысла особого нет так как любой highlight'инг приведет к соответствующему эффекту, а так после reprocess'а метакодов долгий лок висит 
+//                        timer = new Timer();
+//                        timer.schedule(indexUpdater, 10, 30);
                     }
                 }
         );
@@ -333,9 +336,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 ApplicationManager.getApplication().runReadAction(new Runnable() {
                     public void run() {
                         if (metaUsage.isCorrect()) {
-                            metaUsage.setAnotherFile(file);
-                            LSFMetaDeclaration metaDecl = metaUsage.resolveDecl();
-                            metaUsage.setAnotherFile(null);
+                            LSFMetaDeclaration metaDecl = LSFElementGenerator.createMetaRefFromText(metaUsage.getNameRef(), metaUsage.getFullNameRef(), file, metaUsage.getParamCount()).resolveDecl();
 
                             assert metaDecl == null || metaDecl.isValid();
                             if (metaDecl == null || !metaDecl.isCorrect())
@@ -347,11 +348,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 });
 
                 if (toParse.getResult() != null) {
-                    boolean old = ApplicationImpl.setExceptionalThreadWithReadAccessFlag(true);
-
                     metaUsage.setInlinedBody(toParse.getResult().parse(file));
-
-                    ApplicationImpl.setExceptionalThreadWithReadAccessFlag(old);
                 }
             }
     }
@@ -446,7 +443,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             inlineProceed(true, file, sync);
         return result;
     }
-
+    
     public class MetaUsageProcessing implements Runnable {
         private LSFFile file;
         private Set<LSFMetaCodeStatement> usages;
@@ -551,7 +548,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                                     enabled = false; // выключаем чтобы каскадно не вызывались события
 
                                                     gen.usage.setInlinedBody(gen.toParse.parse(file));
-
+                                                    
                                                     enabled = prevEnabled;
 
 //                                                    myPsiDocumentManager.commitDocument(document);
@@ -584,7 +581,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private abstract class MetaPending<T, G> {
-        public final ConcurrentHashSet<T> processing = new ConcurrentHashSet<T>();
+        public final Set<Object> processing = ContainerUtil.newConcurrentSet();
         private Map<G, Set<T>> pending = new HashMap<G, Set<T>>();
 
         protected abstract G group(T element);

@@ -100,4 +100,14 @@ public class StringClass extends DataClass {
     public boolean fixedSize() {
         return false;
     }
+
+    @Override
+    public String getCanonicalName() {
+        String userSID = super.getCanonicalName();
+        if (length == ExtInt.UNLIMITED) {
+            return userSID;
+        } else {
+            return userSID.replaceFirst("_", "[") + "]";
+        }        
+    }
 }

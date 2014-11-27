@@ -28,7 +28,7 @@ import java.util.Map;
 
 import static com.lsfusion.module.LSFusionModuleBuilder.BOOTSTRAP_CLASS_NAME;
 
-public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunConfigurationModule> implements CommonJavaRunConfigurationParameters {
+public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunConfigurationModule> implements CommonJavaRunConfigurationParameters {//}, RunConfigurationWithSuppressedDefaultDebugAction {
 
     public static final String MAIN_CLASS_NAME = BOOTSTRAP_CLASS_NAME;
 

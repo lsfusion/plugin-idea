@@ -94,23 +94,11 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
 
         LSFResolveResult.ErrorAnnotator errorAnnotator = null;
         if (declarations.size() > 1) {
-            final Collection<? extends LSFDeclaration> finalDeclarations = declarations;
-            errorAnnotator = new LSFResolveResult.ErrorAnnotator() {
-                @Override
-                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-                    return resolveAmbiguousErrorAnnotation(holder, finalDeclarations);
-                }
-            };
+            errorAnnotator = new LSFResolveResult.AmbigiousErrorAnnotator(this, declarations);
         } else if (declarations.isEmpty()) {
             declarations = resolveNoConditionDeclarations();
 
-            final Collection<? extends LSFDeclaration> finalDeclarations = declarations;
-            errorAnnotator = new LSFResolveResult.ErrorAnnotator() {
-                @Override
-                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-                    return resolveNotFoundErrorAnnotation(holder, finalDeclarations);
-                }
-            };
+            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, declarations);
         }
 
         return new LSFResolveResult(declarations, errorAnnotator);
@@ -168,7 +156,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     }
 
     @Nullable
-    private List<LSFClassSet> getUsageContext() {
+    protected List<LSFClassSet> getUsageContext() {
         PropertyUsageContext propertyUsageContext = getPropertyUsageContext();
         return propertyUsageContext == null ? null : propertyUsageContext.resolveParamClasses();
     }
@@ -257,7 +245,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     }
 
     private boolean canBeUsedInDirect() {
-        return getExplicitClasses() == null && getUsageContext() != null;
+        return getExplicitClasses() == null && getUsageContext() != null && !isImplement();
     }
 
     private Condition<LSFPropDeclaration> getInDirectCondition() {
@@ -285,7 +273,8 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
             if(directClasses==null) // невозможно определить прямое или обратное использование, соответственно непонятно как "экранировать"
                 return Finalizer.EMPTY;
         }
-        final boolean isNotEquals = enableAbstractImpl && isImplement() && explicitClasses == null;
+        final boolean onlyNotEquals = onlyNotEquals();
+        final boolean isNotEquals = onlyNotEquals || (enableAbstractImpl && isImplement() && explicitClasses == null);
 
         final List<LSFClassSet> fDirectClasses = directClasses;
         return new Finalizer<LSFPropDeclaration>() {
@@ -305,7 +294,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                 if (!mapClasses.isEmpty()) { // есть прямые наследования
                     Collection<LSFPropDeclaration> result = new ArrayList<LSFPropDeclaration>();
 
-                    if(isNotEquals && equals.size() < mapClasses.size()) // оставим только 
+                    if((isNotEquals && equals.size() < mapClasses.size()) || onlyNotEquals) // оставим только не равные 
                         mapClasses = BaseUtils.filterNotKeys(mapClasses, equals);
 
                     List<LSFPropDeclaration> listMapClasses = new ArrayList<LSFPropDeclaration>(mapClasses.keySet());
@@ -340,10 +329,17 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         return false;
     }
 
+    public boolean onlyNotEquals() {
+        return false;
+    }
+
     public boolean isDirect() {
-        List<LSFClassSet> usageContext = getUsageContext();
-        if (usageContext == null)
-            return true;
+        List<LSFClassSet> usageContext = getExplicitClasses();
+        if(usageContext == null) {
+            usageContext = getUsageContext();
+            if(usageContext==null) // невозможно определить классы, подходят все
+                return true;
+        }
 
         LSFPropDeclaration decl = resolveDecl();
         assert decl != null; // предполагается что ошибка resolve'а уже отработана

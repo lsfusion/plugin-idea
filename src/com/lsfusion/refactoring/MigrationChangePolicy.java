@@ -1,6 +1,6 @@
 package com.lsfusion.refactoring;
 
-enum MigrationChangePolicy {
+public enum MigrationChangePolicy {
     DO_NOT_MODIFY, USE_LAST_VERSION, INCREMENT_VERSION, INCREMENT_VERSION_IF_COMMITED;
     
     public String getDisplayText() {

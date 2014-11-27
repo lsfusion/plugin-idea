@@ -47,7 +47,9 @@ public class MetaTransaction {
             List<InToken> original = new ArrayList<InToken>();
             List<Collection<List<ExtToken>>> deconc = deconc(tokens, usageParams, declParams, original);
 
-            int adjBefore = adjustOffset(newTokens, token);
+            Integer adjBefore = adjustOffset(newTokens, token);
+            if(adjBefore == null)
+                adjBefore = adjBefore;
             if (type == Type.AFTER)
                 adjBefore++;
             int cnt = type == Type.REPLACE  ? newTokens.get(adjBefore).tokCount : 0;
@@ -146,7 +148,7 @@ public class MetaTransaction {
             if((i==0)!=upperChar)
                 recDeconcatToken(token, i + 1, usageParams, declParams, BaseUtils.add(current, new ExtToken("###", true)), currToken + Character.toLowerCase(charAt), false, usedEmptyDecls, result);
         }
-        recDeconcatToken(token, i + 1, usageParams, declParams, !first && currToken.isEmpty() ? BaseUtils.add(current, new ExtToken("##", true)) : current, currToken + charAt, false, usedEmptyDecls, result);
+        recDeconcatToken(token, i + 1, usageParams, declParams, !first && currToken.isEmpty() && charAt != '.' ? BaseUtils.add(current, new ExtToken("##", true)) : current, currToken + charAt, false, usedEmptyDecls, result);
     }
 
     private static Collection<List<ExtToken>> deconcatToken(String token, List<InToken> usageParams, List<String> declParams) {
@@ -479,7 +481,9 @@ public class MetaTransaction {
                             Result<Pair<String, String>> error = new Result<Pair<String, String>>();
                             result = merge(result, oldColTokens, error);
                             if(result==null) {
-                                Notifications.Bus.notify(new Notification("diffMeta", "Diff meta", decl.getGlobalName() + "\nFirst :" + usageParams + " " + error.getResult().first + "\nSecond :" + resultStatement.getUsageParams() + " "  + error.getResult().second, NotificationType.ERROR));
+                                String notificationText = decl.getGlobalName() + "\nFirst :" + usageParams + " " + error.getResult().first + "\nSecond :" + resultStatement.getUsageParams() + " " + error.getResult().second;
+                                Notifications.Bus.notify(new Notification("diffMeta", "Diff meta", notificationText, NotificationType.ERROR));
+                                System.out.println(notificationText);
                                 break;
                             }
                         }

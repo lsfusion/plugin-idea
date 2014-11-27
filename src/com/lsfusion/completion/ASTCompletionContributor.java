@@ -13,10 +13,7 @@ import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.ResolveState;
+import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PostprocessReformattingAspect;
 import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.psi.scope.BaseScopeProcessor;
@@ -50,7 +47,9 @@ import static com.lsfusion.completion.ASTCompletionContributor.ClassUsagePolicy.
 import static com.lsfusion.completion.CompletionUtils.createLookupElement;
 import static com.lsfusion.completion.CompletionUtils.getVariantsFromIndices;
 import static com.lsfusion.lang.LSFParserDefinition.NOT_KEYWORDS;
-import static com.lsfusion.lang.parser.GeneratedParserUtilBase.*;
+import static com.lsfusion.lang.parser.GeneratedParserUtilBase.COMPLETION_CALLBACK_KEY;
+import static com.lsfusion.lang.parser.GeneratedParserUtilBase.CompletionCallback;
+import static com.lsfusion.lang.parser.GeneratedParserUtilBase.Frame;
 import static com.lsfusion.lang.psi.LSFPsiImplUtil.resolveParamClasses;
 import static com.lsfusion.lang.psi.LSFTypes.*;
 import static com.lsfusion.lang.psi.LSFTypes.Factory.getPsiElementClassByType;
@@ -102,7 +101,14 @@ public class ASTCompletionContributor extends CompletionContributor {
     }
 
     private static void suggestByGuessingTokens(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
+        if (parameters.getPosition().getContainingFile() instanceof LSFCodeFragment) {
+            completeInFragment(parameters, result);
+        } else {
+            completeInFile(parameters, result);
+        }
+    }
 
+    private static void completeInFile(CompletionParameters parameters, CompletionResultSet result) {
         PsiElement position = parameters.getPosition();
         PsiElement prev = prevVisibleLeaf(position);
 
@@ -131,6 +137,22 @@ public class ASTCompletionContributor extends CompletionContributor {
         PsiFile tempFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText("a.lsf", LSFLanguage.INSTANCE, text, true, false);
         tempFile.putUserData(COMPLETION_CALLBACK_KEY, completionCallback);
         TreeUtil.ensureParsed(tempFile.getNode());
+    }
+
+    private static void completeInFragment(CompletionParameters parameters, CompletionResultSet result) {
+        PsiElement position = parameters.getPosition();
+
+        assert position.getContainingFile() instanceof LSFCodeFragment;
+
+        LSFCodeFragment file = (LSFCodeFragment) position.getContainingFile();
+
+        String text = file.getText().substring(0, position.getTextRange().getStartOffset());
+
+        MyCompletionCallback completionCallback = new MyCompletionCallback(text, 0, parameters, result, text.length());
+
+        LSFCodeFragment fragment = new LSFCodeFragment(file.isExpression(), position.getProject(), file.getContext(), text);
+        fragment.putUserData(COMPLETION_CALLBACK_KEY, completionCallback);
+        TreeUtil.ensureParsed(fragment.getNode());
     }
 
     public static final InsertHandler keywordInsertHandler = new InsertHandler() {
@@ -265,7 +287,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (!res) res = completeStaticObjectUsage();
                 if (!res) res = completeObjectUsage();
                 if (!res) res = completeGroupObjectUsage();
-                if (!res) res = completeFilterGrouopUsage();
+                if (!res) res = completeFilterGroupUsage();
                 if (!res) res = completePropertyDrawUsage();
                 if (!res) res = completeParameterUsage();
                 if (!res) res = completePropertyUsage();
@@ -332,7 +354,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     completed.setValue(true);
                     String namespaceName = extractNamespace ? extractNamespace() : null;
                     addLookupElements(
-                            getVariantsFromIndices(namespaceName, file, indices, priority, useRequiredScope ? getRequireScope() : null)
+                            getVariantsFromIndices(namespaceName, file, indices, priority, useRequiredScope ? getRequireScope() : GlobalSearchScope.allScope(project))
                     );
                     
                     if (additionalDeclarations != null) {
@@ -398,7 +420,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             );
         }
 
-        private boolean completeFilterGrouopUsage() {
+        private boolean completeFilterGroupUsage() {
             return completeFormContextObject(
                     filterGroupCompleted,
                     FILTER_GROUP_USAGE,
@@ -450,7 +472,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     PsiElement psi = getLastPsiOfType(ModifyParamContext.class);
                     if (psi != null) {
                         LSFExprParamDeclaration currentParamDeclaration = getPsiOfTypeForFrame(paramDeclare, LSFExprParamDeclaration.class);
-                        for (LSFExprParamDeclaration paramDeclaration : LSFPsiUtils.getContextParams(psi, false)) {
+                        for (LSFExprParamDeclaration paramDeclaration : LSFPsiUtils.getContextParams(psi, getOriginalFrameOffset(paramDeclare), false)) {
                             if (paramDeclaration != currentParamDeclaration) {
                                 addLookupElement(createLookupElement(paramDeclaration));
                             }
@@ -473,7 +495,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     if (!res) res = completePropertyInContextOfMappedPropertiesList(propUsage);
                     if (!res) res = completePropertyInFormContext(propUsage);
                     if (!res) res = completePropertyInNoContext(propUsage);
-                    if (!res) res = completePropertyInModifyParamContext();
+                    if (!res) res = completePropertyInModifyParamContext(propUsage);
                     quickLog("Completed propertyUsage");
                 }
 
@@ -491,10 +513,10 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
-        private boolean completePropertyInModifyParamContext() {
+        private boolean completePropertyInModifyParamContext(Frame propUsage) {
             ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class);
             if (psi != null) {
-                completeProperties(getContextClasses(psi, false), MAY_USE_ANY);
+                completeProperties(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
                 return true;
             }
             return false;
@@ -576,20 +598,20 @@ public class ASTCompletionContributor extends CompletionContributor {
             }
 
             quickLog("After getDeclarationsFromScope..");
-
+            
             final Collection<LSFLocalDataPropertyDefinition> localDeclarations = new ArrayList<LSFLocalDataPropertyDefinition>();
             // search local properties
-            LSFListActionPropertyDefinitionBody psiListAction = getLastPsiOfType(LSFListActionPropertyDefinitionBody.class);
-            if (psiListAction != null) {
+            PsiElement lastElement = getLastPsiOfType(PsiElement.class);
+            if (lastElement != null) {
                 PsiTreeUtil.treeWalkUp(new BaseScopeProcessor() {
                     @Override
-                    public boolean execute(@NotNull PsiElement element, ResolveState state) {
+                    public boolean execute(@NotNull PsiElement element, @NotNull ResolveState state) {
                         if (element instanceof LSFLocalDataPropertyDefinition) {
                             localDeclarations.add((LSFLocalDataPropertyDefinition) element);
                         }
-                        return false;
+                        return true;
                     }
-                }, psiListAction, null, new ResolveState());
+                }, lastElement, null, new ResolveState());
             }
 
             addDeclarationsToLookup(contextClasses, classUsagePolicy, null, localDeclarations);
@@ -625,17 +647,26 @@ public class ASTCompletionContributor extends CompletionContributor {
                                 LSFClassSet declClass = declClasses.get(i);
                                 LSFClassSet contextClass = contextClasses.get(i);
 
-                                if (declClass != null && contextClass != null && !declClass.equals(contextClass)) {
+                                if (declClass != null && contextClass != null && !declClass.containsAll(contextClass)) {
                                     priority = -1;
                                     break;
                                 }
                             }
-                            priority += declClasses.size();
+                            if(priority != -1)
+                                priority += declClasses.size();
                         }
                     } else {
                         for (LSFClassSet declClass : declClasses) {
                             if (declClass != null) {
-                                if (contextClasses.contains(declClass)) {
+                                boolean foundInContext = false;
+                                for(LSFClassSet contextClass : contextClasses) {
+                                    if(declClass.containsAll(contextClass)) {
+                                        foundInContext = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (foundInContext) {
                                     priority++;
                                 } else {
                                     if (classUsagePolicy == MUST_USE_ANY) {
@@ -650,7 +681,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (priority > 0) {
                     addLookupElement(
                             createLookupElement(
-                                    declaration.getName(),
+                                    declaration.getName(), declaration,
                                     declaration.getSignaturePresentableText(),
                                     declaration.getLSFFile().getName(),
                                     declaration.getIcon(0),
@@ -740,10 +771,14 @@ public class ASTCompletionContributor extends CompletionContributor {
         @Nullable
         private <T extends PsiElement> T getPsiOfTypeForFrame(Frame frame, Class<T> psiClass) {
             try {
-                return PsiTreeUtil.findElementOfClassAtOffset(file, originalOffsetShift + frame.offset, psiClass, false);
+                return PsiTreeUtil.findElementOfClassAtOffset(file, getOriginalFrameOffset(frame), psiClass, false);
             } catch (ProcessCanceledException pce) {
                 return null;
             }
+        }
+        
+        private int getOriginalFrameOffset(Frame frame) {
+            return originalOffsetShift + frame.offset;
         }
     }
 }

@@ -885,6 +885,11 @@ public class LSFPsiImplUtil {
         return null;
     }
 
+    @Nullable
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFNativeActionPropertyDefinition sourceStatement, boolean infer) {
+        return null;
+    }
+
     private static InferExResult inferGroupParamClasses(LSFGroupPropertyDefinition sourceStatement) {
         Inferred result = Inferred.EMPTY;
         for (LSFPropertyExpression expr : getContextExprs(sourceStatement))
@@ -1087,6 +1092,10 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -1392,6 +1401,10 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
+    public static List<String> getValuePropertyNames(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
     public static List<String> getValuePropertyNames(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
@@ -1597,6 +1610,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
+        return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
+    }
+
+    @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
@@ -1662,6 +1680,10 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueParamClassNames(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
+        return getClassNames(sourceStatement.getClassNameList());
+    }
+
+    public static List<String> getValueParamClassNames(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
         return getClassNames(sourceStatement.getClassNameList());
     }
 
@@ -1747,6 +1769,16 @@ public class LSFPsiImplUtil {
             return result;
         for (LSFClassParamDeclare classParamDeclare : ne.getClassParamDeclareList())
             result.add(classParamDeclare.getParamDeclare());
+        return result;
+    }
+
+    public static List<String> resolveParamNames(List<LSFExprParamDeclaration> params) {
+        if(params == null)
+            return null;
+        
+        List<String> result = new ArrayList<String>();
+        for(LSFExprParamDeclaration param : params)
+            result.add(param.getDeclName());
         return result;
     }
 
@@ -1843,6 +1875,17 @@ public class LSFPsiImplUtil {
     public static List<LSFClassSet> resolveParamClasses(@Nullable LSFObjectUsageList sourceStatement) {
         return sourceStatement == null ? null : resolveParamRefClasses(getObjectUsageList(sourceStatement));
     }
+    
+    public static String getObjectUsageString(@Nullable LSFObjectUsageList sourceStatement) {
+        if(sourceStatement == null)
+            return "";
+
+        String result = "";
+        for(LSFObjectUsage objectUsage : getObjectUsageList(sourceStatement)) {
+            result = (result.isEmpty() ? "" : result + ",") + objectUsage.getSimpleName().getName();
+        }
+        return "(" + result + ")";
+    }
 
     @NotNull
     public static List<LSFExClassSet> resolveParamClasses(@NotNull LSFNonEmptyPropertyExpressionList sourceStatement, @Nullable InferExResult inferred) {
@@ -1870,6 +1913,14 @@ public class LSFPsiImplUtil {
     @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFJoinPropertyDefinition sourceStatement) {
         return resolveParamClasses(sourceStatement.getPropertyExpressionList());
+    }
+    
+    public static List<LSFPropertyExpression> getList(LSFPropertyExpressionList peList) {
+        LSFNonEmptyPropertyExpressionList nepeList = peList.getNonEmptyPropertyExpressionList();
+        if(nepeList == null)
+            return new ArrayList<LSFPropertyExpression>();
+        else
+            return nepeList.getPropertyExpressionList();
     }
 
     @Nullable
@@ -2169,12 +2220,7 @@ public class LSFPsiImplUtil {
     public static Inferred inferJoinParamClasses(@NotNull LSFPropertyObject propertyObject, LSFPropertyExpressionList peList, @Nullable LSFExClassSet valueClass) {
         List<LSFExClassSet> joinClasses = inferParamClasses(valueClass, propertyObject);
 
-        List<LSFPropertyExpression> list;
-        LSFNonEmptyPropertyExpressionList npeList = peList == null ? null : peList.getNonEmptyPropertyExpressionList();
-        if (npeList != null)
-            list = npeList.getPropertyExpressionList();
-        else
-            list = new ArrayList<LSFPropertyExpression>();
+        List<LSFPropertyExpression> list = getList(peList);
 
         List<Inferred> classes = new ArrayList<Inferred>();
         for (int i = 0; i < list.size(); i++)

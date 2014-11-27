@@ -23,4 +23,6 @@ public interface LSFClassSet {
     int getPreferredHeight(FontMetrics fontMetrics);
 
     int getMaximumHeight(FontMetrics fontMetrics);
+
+    String getCanonicalName();
 }

@@ -13,6 +13,8 @@ public class MetaCodeEnableAction extends AnAction {
 
     @Override
     public void update(AnActionEvent e) {
-        e.getPresentation().setText(MetaChangeDetector.getInstance(e.getProject()).getMetaEnabled()? "Disable _meta" : "Enable _meta");
+        if (e.getProject() != null) {
+            e.getPresentation().setText(MetaChangeDetector.getInstance(e.getProject()).getMetaEnabled() ? "Disable _meta" : "Enable _meta");
+        }
     }
 }

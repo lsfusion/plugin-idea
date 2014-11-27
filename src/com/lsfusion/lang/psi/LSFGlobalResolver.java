@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
@@ -22,6 +23,7 @@ import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
+import com.lsfusion.util.LSFPsiUtils;
 
 import java.util.*;
 
@@ -36,7 +38,8 @@ public class LSFGlobalResolver {
     }
 
     private static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration, Set<LSFFile> alreadyGet) {
-        boolean toCache = !declaration.getName().equals(LSFElementGenerator.genName);
+        String name = declaration.getName();
+        boolean toCache = name != null && !name.equals(LSFElementGenerator.genName) && !LSFPsiUtils.isInjected(declaration);
         if (toCache) {
             Set<LSFFile> cachedFiles = cached.get(declaration);
             if (cachedFiles != null)
@@ -82,6 +85,13 @@ public class LSFGlobalResolver {
     }
 
     public static GlobalSearchScope getRequireScope(LSFFile lsfFile) {
+        if (lsfFile instanceof LSFCodeFragment && lsfFile.getContext() != null) {
+            PsiFile containingFile = lsfFile.getContext().getContainingFile();
+            if (containingFile instanceof LSFFile && containingFile != lsfFile) {
+                return getRequireScope((LSFFile)containingFile);
+            }
+        }
+
         Project project = lsfFile.getProject();
         LSFModuleDeclaration declaration = lsfFile.getModuleDeclaration();
         VirtualFile vfile = lsfFile.getVirtualFile();
@@ -125,8 +135,11 @@ public class LSFGlobalResolver {
                     return namespace.equals(fqName) && fCondition.value(t);
                 }
             };
-        } else
-            finalizer = new NamespaceFinalizer<T>(file.getModuleDeclaration(), finalizer);
+        } else {
+            LSFModuleDeclaration moduleDeclaration = file.getModuleDeclaration();
+            if(moduleDeclaration != null)
+                finalizer = new NamespaceFinalizer<T>(moduleDeclaration, finalizer);
+        }
         return findElements(name, file, types, condition, finalizer, virtDecls);
     }
 
@@ -174,7 +187,7 @@ public class LSFGlobalResolver {
 
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, T... virtDecls) {
 
-        GlobalSearchScope scope = getRequireScope(file);
+        GlobalSearchScope scope = file.getRequireScope();
 
         Collection<T> decls = new ArrayList<T>();
         for (FullNameStubElementType<S, T> type : types)

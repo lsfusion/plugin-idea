@@ -56,4 +56,8 @@ public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclara
         CollectionQuery<This> declarations = new CollectionQuery<This>(LSFGlobalResolver.findElements(getDeclName(), null, getLSFFile(), getTypes(), getFindDuplicatesCondition(), Finalizer.EMPTY));
         return declarations.findAll().size() > 1;
     }
+
+    public String getCanonicalName() {
+        return getNamespaceName() + "." + getGlobalName();
+    }
 }

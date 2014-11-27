@@ -6,6 +6,8 @@ import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.refactoring.ElementMigration;
+import com.lsfusion.refactoring.PropertyDrawMigration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,5 +74,10 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
                 return false;
         return true;
 
+    }
+
+    @Override
+    public ElementMigration getMigration(String newName) {
+        return PropertyDrawMigration.create(this, newName);
     }
 }

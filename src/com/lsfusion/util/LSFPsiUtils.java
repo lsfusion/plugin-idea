@@ -139,7 +139,19 @@ public class LSFPsiUtils {
             Set<LSFExprParamDeclaration> upParams;
             Set<LSFExprParamDeclaration> result = new HashSet<LSFExprParamDeclaration>();
             if (current instanceof ExtendParamContext) {
-                upParams = getContextParams(current.getParent(), offset, objectRef);
+                int upOffset = offset;
+                PsiElement context = current.getContext();
+                if (context != null && current instanceof LSFCodeFragment) {
+                    upOffset = context.getTextOffset();
+                    context = PsiTreeUtil.getParentOfType(context, LSFActionPropertyDefinitionBody.class);
+                    if (context != null) {
+                        context = context.getContext();
+                    }
+                }                
+                if(context == null)
+                    upParams = new HashSet<LSFExprParamDeclaration>();
+                else
+                    upParams = getContextParams(context, upOffset, objectRef);
                 result.addAll(upParams);
             } else { // не extend - останавливаемся
                 upParams = new HashSet<LSFExprParamDeclaration>();
@@ -159,7 +171,7 @@ public class LSFPsiUtils {
         }
 
         PsiElement parent = current.getParent();
-        if (!(parent == null || parent instanceof LSFFile)) {
+        if (parent != null) {
             return getContextParams(parent, offset, objectRef); // бежим выше
         }
 

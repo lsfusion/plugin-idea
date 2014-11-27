@@ -96,4 +96,26 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
 
         return steps == 0 ? curr : null;
     }
+
+    private static Key<Integer> PARSING_MODE_KEY = Key.create("lsf.parsing.mode");
+    private static final int MODE_EXPRESSION = 1;
+    private static final int MODE_ACTION = 2;
+    public static void setExpressionParsing(PsiBuilder builder_) {
+        builder_.putUserData(PARSING_MODE_KEY, MODE_EXPRESSION);
+    }
+    
+    public static void setActionParsing(PsiBuilder builder_) {
+        builder_.putUserData(PARSING_MODE_KEY, MODE_ACTION);
+    }
+    
+    public static boolean isExpressionParsing(PsiBuilder builder_, int level) {
+        Integer value = builder_.getUserData(PARSING_MODE_KEY);
+        return value != null && value == MODE_EXPRESSION;
+    }
+    
+    public static boolean isActionParsing(PsiBuilder builder_, int level) {
+        Integer value = builder_.getUserData(PARSING_MODE_KEY);
+        return value != null && value == MODE_ACTION;
+    }
+    
 }

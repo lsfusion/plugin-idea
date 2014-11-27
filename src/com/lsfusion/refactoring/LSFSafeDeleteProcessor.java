@@ -9,6 +9,7 @@ import com.intellij.refactoring.safeDelete.SafeDeleteProcessorDelegateBase;
 import com.intellij.usageView.UsageInfo;
 import com.intellij.util.CommonProcessors;
 import com.intellij.util.IncorrectOperationException;
+import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.usage.LSFFindUsagesHandler;
@@ -29,7 +30,7 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
 
     @Override
     public boolean handlesElement(PsiElement element) {
-        return true;
+        return element.getLanguage().is(LSFLanguage.INSTANCE);
     }
 
     @Nullable

@@ -21,6 +21,8 @@ public class MetaSyncModeAction extends AnAction {
 
     @Override
     public void update(AnActionEvent e) {
-        e.getPresentation().setIcon(MetaChangeDetector.getInstance(e.getProject()).getMetaSyncMode() ? CHECKED_ICON : EMPTY_ICON);
+        if (e.getProject() != null) {
+            e.getPresentation().setIcon(MetaChangeDetector.getInstance(e.getProject()).getMetaSyncMode() ? CHECKED_ICON : EMPTY_ICON);
+        }
     }
 }

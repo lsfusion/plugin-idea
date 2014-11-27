@@ -43,4 +43,10 @@ public class NumericClass extends IntegralClass {
     public boolean fixedSize() {
         return false;
     }
+
+    @Override
+    public String getCanonicalName() {
+        String userSID = super.getCanonicalName();
+        return userSID.replaceFirst("_", "[").replaceFirst("_", ",") + "]";
+    }
 }

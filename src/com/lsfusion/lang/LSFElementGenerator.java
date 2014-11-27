@@ -3,7 +3,6 @@ package com.lsfusion.lang;
 import com.intellij.formatting.FormatTextRanges;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
-import com.intellij.openapi.application.impl.ApplicationImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -13,21 +12,23 @@ import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.impl.source.codeStyle.CodeFormatterFacade;
 import com.intellij.psi.impl.source.tree.CompositePsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.io.StringRef;
+import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFComponentDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
-import com.lsfusion.lang.psi.references.impl.LSFClassReferenceImpl;
-import com.lsfusion.lang.psi.references.impl.LSFModuleReferenceImpl;
-import com.lsfusion.lang.psi.references.impl.LSFNamespaceReferenceImpl;
+import com.lsfusion.lang.psi.references.LSFPropReference;
+import com.lsfusion.lang.psi.references.impl.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,9 +38,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class LSFElementGenerator {
-
+    
     public final static String genName = "mgen123";
-
+    
     public static LSFStringLiteral createStringLiteralFromText(Project myProject, String text) {
         //assert, что text уже обрамлён кавычками -> "some text"
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; GROUP someDumbGroup " + text + ";");
@@ -96,31 +97,20 @@ public class LSFElementGenerator {
         }
         tabbedText.append("};");
 
-//        return ApplicationManager.getApplication().runReadAction(new Computable<LSFMetaCodeBody>() {
-//            @Override
-//            public LSFMetaCodeBody compute() {
-        boolean old = ApplicationImpl.setExceptionalThreadWithReadAccessFlag(true);
-
         Project project = file.getProject();
         final PsiFile dummyFile = createDummyFile(project, tabbedText.toString());
-//                format(myProject, dummyFile);
         Collection<LSFMetaCodeBody> childrenOfType = PsiTreeUtil.findChildrenOfType(dummyFile, LSFMetaCodeBody.class);
 
         if (childrenOfType.isEmpty()) {
-            ApplicationImpl.setExceptionalThreadWithReadAccessFlag(old);
             return null;
         }
         LSFMetaCodeBody body = childrenOfType.iterator().next();
 
-        List<LSFMetaCodeStatement> recMetaStatements = ((LSFMetaCodeBody) body).getMetaCodeStatementList();
-
-        ApplicationImpl.setExceptionalThreadWithReadAccessFlag(old);
+        List<LSFMetaCodeStatement> recMetaStatements = body.getMetaCodeStatementList();
 
         MetaChangeDetector.syncUsageProcessing(file, recMetaStatements);
 
         return body;
-//            }
-//        });
     }
 
     public static LSFAnyTokens createMetaCodeFromText(final Project project, final String text) {
@@ -146,7 +136,7 @@ public class LSFElementGenerator {
         }
         return builtInFormComponents;
     }
-    
+
     public static List<? extends LSFComponentDeclaration> createFormComponents(Project project, List<String> componentsNames) {
         String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
                 "DESIGN defaultForm FROM DEFAULT {";
@@ -173,7 +163,7 @@ public class LSFElementGenerator {
     }
 
     public static void format(Project project, PsiElement element) {
-        final CodeFormatterFacade codeFormatter = new CodeFormatterFacade(CodeStyleSettingsManager.getSettings(project));
+        final CodeFormatterFacade codeFormatter = new CodeFormatterFacade(CodeStyleSettingsManager.getSettings(project), LSFLanguage.INSTANCE);
         codeFormatter.processText(element.getContainingFile(), new FormatTextRanges(element.getTextRange(), true), false);
     }
 
@@ -239,6 +229,130 @@ public class LSFElementGenerator {
 
     public static LSFClassReference createClassRefFromText(final String name, final String fname, final LSFFile file) {
         return new LSFClassReferenceImpl(dummy) {
+            public LSFCompoundID getCompoundID() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String getNameRef() {
+                return name;
+            }
+
+            @Override
+            public String getFullNameRef() {
+                return fname;
+            }
+
+            @Override
+            public void setFullNameRef(String name, MetaTransaction transaction) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public LSFFile getLSFFile() {
+                return file;
+            }
+        };
+    }
+
+    public static LSFFile createProjectLSFFile(LSFFile file) {
+        final Project project = file.getProject();
+        return new LSFFile(file.getViewProvider()) {
+            @Override
+            public LSFModuleDeclaration getModuleDeclaration() {
+                return null;
+            }
+
+            @Override
+            public GlobalSearchScope getRequireScope() {
+                return GlobalSearchScope.allScope(project);
+            }
+
+            @NotNull
+            @Override
+            public Project getProject() {
+                return project;
+            }
+        };
+    }
+
+    public static LSFPropReferenceImpl createImplementPropRefFromText(String name, LSFFile file, List<LSFClassSet> classes) {
+        return createPropRefFromText(name, null, file, null, classes, true, true);
+    }
+    
+    public static LSFPropReferenceImpl createPropRefFromText(final String name, final String fname, final LSFFile file, final List<LSFClassSet> explicitClasses, final List<LSFClassSet> usageContext, final boolean isImplement, final boolean onlyNotEquals) {
+        return new LSFPropReferenceImpl(dummy) {
+            @Override
+            protected LSFExplicitPropClassUsage getExplicitPropClassUsage() {
+                throw new UnsupportedOperationException();
+            }
+
+            public LSFCompoundID getCompoundID() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String getNameRef() {
+                return name;
+            }
+
+            @Override
+            public String getFullNameRef() {
+                return fname;
+            }
+
+            @Override
+            public void setFullNameRef(String name, MetaTransaction transaction) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Nullable
+            @Override
+            public List<LSFClassSet> getExplicitClasses() {
+                return explicitClasses;
+            }
+
+            @Nullable
+            @Override
+            protected List<LSFClassSet> getUsageContext() {
+                return usageContext;
+            }
+
+            @Override
+            public boolean isImplement() {
+                return isImplement;
+            }
+
+            @Override
+            public boolean onlyNotEquals() {
+                return onlyNotEquals;
+            }
+
+            @Override
+            public LSFFile getLSFFile() {
+                return file;
+            }
+        };
+    }
+
+    public static LSFMetaReferenceImpl createMetaRefFromText(final String name, final String fname, final LSFFile file, final int paramCount) {
+        return new LSFMetaReferenceImpl(dummy) {
+
+            @Override
+            public LSFMetaCodeBody getMetaCodeBody() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            protected LSFMetaCodeStatementHeader getMetaCodeStatementHeader() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int getParamCount() {
+                return paramCount;
+            }
+
             public LSFCompoundID getCompoundID() {
                 throw new UnsupportedOperationException();
             }

@@ -1,4 +1,4 @@
-package com.lsfusion.migration.lang;
+package com.lsfusion.migration;
 
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;

@@ -17,11 +17,12 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="135.690"/>
+    <idea-version since-build="139.560"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
     <depends>com.intellij.properties</depends>
+    <depends>AntSupport</depends>
 
     <application-components>
         <!-- Add your application components here -->
@@ -91,6 +92,10 @@
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>
         </action>
+        <action id="Check.Abstract" class="com.lsfusion.actions.ProjectCheckAbstractAction"
+                text="Check abstract for project" description="Check abstract for project">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
         <action id="TypeInfer.Check" class="com.lsfusion.lang.typeinfer.FindNotInferredAction" text="Find not inferred"
                 description="Find not inferred elements for project">
             <add-to-group group-id="CodeMenu"/>
@@ -127,6 +132,13 @@
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
+        
+        <action id="PreFindUsagesAction" class="com.lsfusion.actions.PreShowPropertyUsagesAction">
+            <keyboard-shortcut first-keystroke="ctrl alt F7" keymap="$default"/>
+        </action>
+        <action id="PreFastFindUsagesAction" class="com.lsfusion.actions.PreFindPropertyUsagesAction">
+            <keyboard-shortcut first-keystroke="alt F7" keymap="$default"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -139,6 +151,7 @@
         <usageTypeProvider implementation="com.lsfusion.usage.LSFUsageTypeProvider"/>
         <usageFilteringRuleProvider implementation="com.lsfusion.usage.LSFUsageFilteringRuleProvider"/>
         <findUsagesHandlerFactory implementation="com.lsfusion.usage.LSFFindUsagesHandlerFactory"/>
+        <actionPromoter implementation="com.lsfusion.actions.LSFActionPromoter"/>
 
         <callHierarchyProvider language="Lsf"
                                implementationClass="com.lsfusion.hierarchy.usages.LSFUsageHierarchyProvider"/>
@@ -238,8 +251,13 @@
         <toolWindow id="Module Dependencies" anchor="right" icon="AllIcons.Nodes.Deploy"
                     factoryClass="com.lsfusion.dependencies.ModuleDependeciesViewToolWindowFactory"/>
 
-        <!--<xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />-->
-        <!--<debugger.positionManagerFactory id="lsfPositionManagerFactory" implementation="com.lsfusion.debug.LSFPositionManagerFactory"/>-->
+        <!-- debugger -->
+        <xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />
+        <!-- приоритет обратен порядку, поэтому ставим последним -->
+        <debugger.positionManagerFactory id="lsfPositionManagerFactory" order="last" implementation="com.lsfusion.debug.LSFPositionManagerFactory"/>
+        
+        <programRunner implementation="com.lsfusion.debug.LSFDebuggerRunner" />
+        <debugger.codeFragmentFactory implementation="com.lsfusion.debug.evaluation.LSFCodeFragmentFactory"/>
 
         <!-- reports related stuff -->
         <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>
@@ -258,5 +276,8 @@
         <lang.commenter language="LsfMigration" implementationClass="com.lsfusion.migration.lang.MigrationCommenter"/>
         <lang.foldingBuilder language="LsfMigration"
                              implementationClass="com.lsfusion.migration.lang.folding.MigrationFoldingBuilder"/>
+        <fileDocumentManagerListener implementation="com.lsfusion.lang.meta.StripLinesDisabler"/>
+
+        <xdebugger.debuggerSupport implementation="com.lsfusion.debug.LSFDumbDebuggerSupport" order="first"/>
     </extensions>
 </idea-plugin>

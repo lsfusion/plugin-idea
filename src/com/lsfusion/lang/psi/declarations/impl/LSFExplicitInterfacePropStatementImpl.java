@@ -20,6 +20,7 @@ public abstract class LSFExplicitInterfacePropStatementImpl extends StubBasedPsi
         super(node);
     }
 
+    @NotNull
     @Override
     public LSFPropertyStatement getPropertyStatement() {
         return getExplicitValuePropertyStatement().getPropertyStatement();

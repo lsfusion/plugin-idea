@@ -1,42 +1,42 @@
 package com.lsfusion.refactoring;
 
-import com.intellij.openapi.vfs.VirtualFile;
-import com.lsfusion.lang.psi.LSFDataPropertyDefinition;
+import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 
-public class PropertyMigration {
-    private final VirtualFile declarationFile;
-    private final String migrationString;
+import java.util.List;
 
-    PropertyMigration(LSFGlobalPropDeclaration decl, String oldName, String newName) {
-        String signatureQualifier = computeSignatureQualifier(decl);
-        String oldFullName = decl.getNamespaceName() + "." + oldName + signatureQualifier;
-        String newFullName = decl.getNamespaceName() + "." + newName + signatureQualifier;
-        this.migrationString = oldFullName + " -> " + newFullName;
-        this.declarationFile = decl.getContainingFile().getVirtualFile();
-    }
+public class PropertyMigration extends ElementMigration {
 
-    private String computeSignatureQualifier(LSFGlobalPropDeclaration decl) {
-        LSFDataPropertyDefinition dataProp = decl.getDataPropertyDefinition();
+    private final boolean isStored;
+    
+    public static PropertyMigration create(LSFGlobalPropDeclaration decl, String oldName, String newName) {
+        String namespace = decl.getNamespaceName();
         
-        assert dataProp != null;
-
-        String signature = "";
-        for (String className : dataProp.getMigrationClassNames()) {
-            if (!signature.isEmpty()) {
-                signature += ",";
-            }
-            signature += className;
-        }
+        List<LSFClassSet> paramsClasses = decl.resolveParamClasses();
+        String oldFullName = PropertyCanonicalNameUtils.createName(namespace, oldName, paramsClasses);
+        String newFullName = PropertyCanonicalNameUtils.createName(namespace, newName, paramsClasses);
         
-        return "[" + signature + "]";
+        return new PropertyMigration(decl, oldFullName, newFullName, decl.isStoredProperty());
     }
 
-    public VirtualFile getDeclarationFile() {
-        return declarationFile;
+    public static PropertyMigration create(LSFGlobalPropDeclaration decl, List<LSFClassSet> oldClasses, List<LSFClassSet> newClasses) {
+        String namespace = decl.getNamespaceName();
+        
+        String name = decl.getDeclName();
+        String oldFullName = PropertyCanonicalNameUtils.createName(namespace, name, oldClasses);
+        String newFullName = PropertyCanonicalNameUtils.createName(namespace, name, newClasses);
+
+        return new PropertyMigration(decl, oldFullName, newFullName, decl.isStoredProperty());
     }
 
-    public String getMigrationString() {
-        return migrationString;
+    public PropertyMigration(LSFGlobalPropDeclaration decl, String oldName, String newName, boolean isStored) {
+        super(decl, oldName, newName);
+        
+        this.isStored = isStored;
+    }
+
+    @Override
+    public String getPrefix() {
+        return (isStored ? "STORED " : "") + "PROPERTY";
     }
 }

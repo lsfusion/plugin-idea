@@ -11,6 +11,7 @@ public interface LSFPropertyDrawDeclaration extends LSFFormElementDeclaration {
     @NotNull
     LSFFormPropertyName getFormPropertyName();
     
+    @Nullable
     LSFObjectUsageList getObjectUsageList();
 
     @Nullable

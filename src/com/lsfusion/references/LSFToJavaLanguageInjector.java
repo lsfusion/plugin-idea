@@ -3,8 +3,6 @@ package com.lsfusion.references;
 import com.intellij.codeInsight.navigation.ClassImplementationsSearch;
 import com.intellij.lang.injection.MultiHostInjector;
 import com.intellij.lang.injection.MultiHostRegistrar;
-import com.intellij.lang.properties.IProperty;
-import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -61,6 +59,10 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
             this.rangeInsideHost = rangeInsideHost;
         }
     }
+    
+    public static boolean disableGroupInjections = false;
+    
+    private static ThreadLocal<Stack<PsiClass>> stackParsing = new ThreadLocal<Stack<PsiClass>>();
 
     @Override
     public void getLanguagesToInject(final @NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
@@ -71,7 +73,17 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
             //пропускаем эти классы, т.к. они очень долго разбираются, но для нас не актуальны
             return;
         }
-        
+
+        Stack<PsiClass> stack = stackParsing.get();
+        if(stack == null) {
+            stack = new Stack<PsiClass>();
+            stackParsing.set(stack);
+        }
+            
+        if(stack.contains(psiClass))
+            return;
+        stack.push(psiClass);
+
         Collection<PsiLanguageInjectionHost> hosts = PsiTreeUtil.findChildrenOfType(psiClass, PsiLanguageInjectionHost.class);
 
         // группировка по префиксам по неизвестной причине не работает
@@ -129,7 +141,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 //
 //                transReg.doneInjecting();
 //            }
-            boolean groupInjections = count.getResult() > 30; // из-за бага идеи с left \ right фрагментов в DocumentWindowImpl.injectHost(int)
+            boolean groupInjections = !disableGroupInjections && count.getResult() > 30; // из-за бага идеи с left \ right фрагментов в DocumentWindowImpl.injectHost(int)
             for (Map.Entry<String, List<Injection>> injectionByModule : injectionsByModules.entrySet()) {
                 if(groupInjections)
                     registrar.startInjecting(LSFLanguage.INSTANCE);
@@ -160,6 +172,8 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                     registrar.doneInjecting();
             }
         }
+        
+        stack.pop();
     }
 
     @NotNull
@@ -320,24 +334,9 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
             if (qualifierExpression != null) {
                 String moduleName = getModuleName(qualifierExpression);
                 if (moduleName == null)
-                    moduleName = getTopModuleList(qualifierExpression);
+                    moduleName = LSFFileUtils.getTopModule(qualifierExpression);
                 javaOrPropertyReference(element, classRef, moduleName, onlyModule, injectionPlacesRegistrar);
             }
-        }
-
-        private String getTopModuleList(PsiElement element) {
-
-            List<PsiFile> filesByPath = LSFFileUtils.findFilesByPath(element, "lsfusion.properties");
-            for (PsiFile file : filesByPath) {
-                if (file instanceof PropertiesFile) {
-                    PropertiesFile propFile = (PropertiesFile) file;
-                    IProperty property = propFile.findPropertyByKey("logics.topModulesList");
-                    if (property != null) {
-                        return property.getValue();
-                    }
-                }
-            }
-            return "dumb";
         }
 
         private String getFileBaseName(String path) {
@@ -568,7 +567,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
             }
 
             if (moduleNames.isEmpty())
-                return getTopModuleList(clazz);
+                return LSFFileUtils.getTopModule(clazz);
 
             return BaseUtils.toString(moduleNames, ",");
         }

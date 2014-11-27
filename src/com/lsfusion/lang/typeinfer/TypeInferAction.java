@@ -38,7 +38,7 @@ public class TypeInferAction implements IntentionAction {
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         TypeInferer.typeInfer(modify, null);
     }
-
+    
     @Override
     public boolean startInWriteAction() {
         return true;

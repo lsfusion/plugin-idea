@@ -12,6 +12,7 @@ import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class CompletionUtils {
     }
 
     public static LookupElement createLookupElement(LSFDeclaration declaration, double priority) {
-        return createLookupElement(declaration.getName(), declaration.getLSFFile().getName(), declaration.getIcon(0), priority);
+        return createLookupElement(declaration.getName(), declaration, "", declaration.getLSFFile().getName(), declaration.getIcon(0), priority);
     }
 
     public static LookupElement createLookupElement(String lookupString, String typeText, Icon icon) {
@@ -47,11 +48,19 @@ public class CompletionUtils {
     }
 
     public static LookupElement createLookupElement(String lookupString, String typeText, Icon icon, double priority) {
-        return createLookupElement(lookupString, "", typeText, icon, priority);
+        return createLookupElement(lookupString, null, "", typeText, icon, priority);
+    }
+
+    public static LookupElement createLookupElement(String lookupString, LSFDeclaration lookupObject, String typeText, Icon icon, double priority) {
+        return createLookupElement(lookupString, lookupObject, "", typeText, icon, priority);
     }
 
     public static LookupElement createLookupElement(String lookupString, String additionalInfo, String typeText, Icon icon, double priority) {
-        return createLookupElement(lookupString, additionalInfo, typeText, icon, priority, null, false, null);
+        return createLookupElement(lookupString, null, additionalInfo, typeText, icon, priority);
+    }
+
+    public static LookupElement createLookupElement(String lookupString, LSFDeclaration lookupObject, String additionalInfo, String typeText, Icon icon, double priority) {
+        return createLookupElement(lookupString, lookupObject, additionalInfo, typeText, icon, priority, null, false, null);
     }
 
     public static LookupElement createLookupElement(String lookupString, double priority, boolean bold, InsertHandler insertHandler) {
@@ -59,7 +68,18 @@ public class CompletionUtils {
     }
 
     public static LookupElement createLookupElement(String lookupString, String additionalInfo, String typeText, Icon icon, double priority, TailType tailType, boolean bold, InsertHandler insertHandler) {
-        LookupElementBuilder elementBuilder = LookupElementBuilder.create(lookupString);
+        return createLookupElement(lookupString, null, additionalInfo, typeText, icon, priority, tailType, bold, insertHandler);    
+    }
+
+    public static LookupElement createLookupElement(String lookupString, LSFDeclaration lookupObject, String additionalInfo, String typeText, Icon icon, double priority, TailType tailType, boolean bold, InsertHandler insertHandler) {
+//        lookupObject = null;
+        LookupElementBuilder elementBuilder;
+        if (lookupObject != null) {
+            String idObject = lookupString + (typeText != null ? "_" + typeText : "") + (additionalInfo != null ? "_" + additionalInfo : "");
+            elementBuilder = LookupElementBuilder.create(idObject, lookupString);
+        } else {
+            elementBuilder = LookupElementBuilder.create(lookupString);
+        }
         if (bold) {
             elementBuilder = elementBuilder.withBoldness(true);
         }
@@ -91,12 +111,12 @@ public class CompletionUtils {
         return element;
     }
 
-    public static <G extends LSFDeclaration> List<LookupElement> getVariantsFromIndices(String namespace, LSFFile file, Collection<? extends StringStubIndexExtension> indices, double priority, GlobalSearchScope scope) {
+    public static <G extends LSFDeclaration> List<LookupElement> getVariantsFromIndices(String namespace, LSFFile file, Collection<? extends StringStubIndexExtension> indices, double priority, @NotNull GlobalSearchScope scope) {
         return getVariantsFromIndices(namespace, file.getProject(), indices, priority, scope);
         
     }
     
-    public static <G extends LSFDeclaration> List<LookupElement> getVariantsFromIndices(String namespace, Project project, Collection<? extends StringStubIndexExtension> indices, double priority, GlobalSearchScope scope) {
+    public static <G extends LSFDeclaration> List<LookupElement> getVariantsFromIndices(String namespace, Project project, Collection<? extends StringStubIndexExtension> indices, double priority, @NotNull GlobalSearchScope scope) {
         List<LookupElement> result = new ArrayList<LookupElement>();
 
         try {

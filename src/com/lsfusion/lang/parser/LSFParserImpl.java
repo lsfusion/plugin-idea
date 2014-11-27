@@ -37,9 +37,13 @@ public class LSFParserImpl extends LSFParser {
 
         Marker lazyStatement = builder_.mark();
         builder_.advanceLexer();
-        
+
+        boolean isMetaDecl = tokenType == META;
+        boolean isMetaUsage = tokenType == ATSIGN;
+        boolean isMetaEnd = false;
+
         boolean isExtend = tokenType == EXTEND;
-        int metaCount = tokenType == META ? 1 : 0;
+        int metaCount = isMetaDecl ? 1 : 0;
         int braceCount = 0;
         boolean greedyBlock = false;
         while (true) {
@@ -74,6 +78,13 @@ public class LSFParserImpl extends LSFParser {
                 }
                 if (!isExtend && tokenType == DESIGN) break;
 
+                if(isMetaUsage && builder_.lookAhead(1) == SEMI) {
+                    builder_.advanceLexer(); // съедаем SEMI 
+                    isMetaEnd = true;
+                }
+                if(isMetaDecl)
+                    isMetaEnd = true;
+//
                 // не выделяем мелкие statement'ы в отдельные куски, т.к. это только тормозит парсинг
 //              if (tokenType == INDEX) break;
 //              if (tokenType == CONSTRAINT) break;
@@ -84,6 +95,9 @@ public class LSFParserImpl extends LSFParser {
             builder_.advanceLexer();
 
             isExtend = false;
+            
+            if(isMetaEnd) // нужно чтобы meta code'ы попали в один lazyScript, чтобы корректно работал meta change detector
+                break;
         }
 
         lazyStatement.collapse(LAZY_SCRIPT_STATEMENT);

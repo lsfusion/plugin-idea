@@ -114,4 +114,9 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     }
 
     public abstract String getPreferredMask();
+
+    @Override
+    public String getCanonicalName() {
+        return getName();
+    }
 }

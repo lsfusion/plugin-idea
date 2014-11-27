@@ -1,7 +1,6 @@
 package com.lsfusion.references;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -9,8 +8,6 @@ import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -85,34 +82,9 @@ public abstract class FromJavaReference extends PsiReferenceBase<PsiElement> imp
         return results.toArray(new ResolveResult[results.size()]);
     }
 
-    @Nullable
+    @NotNull
     public GlobalSearchScope getScope() {
-        GlobalSearchScope projectScope = LSFFileUtils.getModuleWithDependenciesScope(myElement);
-
-        if (moduleName != null) {
-            Collection<LSFModuleDeclaration> modules = ModuleIndex.getInstance().get(moduleName, myElement.getProject(), projectScope);
-            if (modules.isEmpty()) {
-                return null;
-            }
-
-            GlobalSearchScope scope = GlobalSearchScope.EMPTY_SCOPE;
-
-            List<VirtualFile> files = new ArrayList<VirtualFile>();
-
-            for (LSFModuleDeclaration lsfModule : modules) {
-                if (searchInRequiredModules) {
-                    scope = scope.uniteWith(lsfModule.getLSFFile().getRequireScope());
-                } else {
-                    files.add(lsfModule.getLSFFile().getVirtualFile());
-                }
-            }
-
-            return searchInRequiredModules
-                   ? scope
-                   : GlobalSearchScope.filesScope(myElement.getProject(), files);
-        }
-        
-        return projectScope;
+        return LSFFileUtils.getElementRequireScope(myElement, moduleName, searchInRequiredModules);
     }
 
     @NotNull

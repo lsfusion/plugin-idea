@@ -8,6 +8,7 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFElementImpl;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.refactoring.ElementMigration;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -87,5 +88,14 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
     @Override
     public PsiElement[] processImplementationsSearch() {
         return PsiElement.EMPTY_ARRAY;
+    }
+
+    public static ElementMigration getMigration(LSFDeclaration decl, String newName) {
+        return null;
+    }
+    
+    @Override
+    public ElementMigration getMigration(String newName) {
+        return getMigration(this, newName);
     }
 }

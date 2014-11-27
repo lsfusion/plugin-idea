@@ -111,7 +111,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "AGGPROP"                 			{ return AGGPROP; }
   "AGGR"                    			{ return AGGR; }
   "NAGGR"                    			{ return NAGGR; }
-  "ALL"                     			{ return ALL; }
   "AND"                     			{ return AND; }
   "APPLY"                   			{ return APPLY; }
   "AS"                      			{ return AS; }
@@ -268,7 +267,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "NO"                      			{ return NO; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOT"                     			{ return NOT; }
-  "NOTHING"                 			{ return NOTHING; }
   "NULL"                    			{ return NULL; }
   "OBJECT"                  			{ return OBJECT; }
   "OBJECTS"                 			{ return OBJECTS; }

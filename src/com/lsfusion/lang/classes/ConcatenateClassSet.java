@@ -2,6 +2,7 @@ package com.lsfusion.lang.classes;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.lsfusion.refactoring.ClassCanonicalNameUtils;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -21,7 +22,11 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
             return sets[i];
         return null;
     }
-    
+
+    public LSFClassSet[] getSets() {
+        return sets;
+    }
+
     public int getSetSize() {
         return sets.length;
     }
@@ -121,5 +126,10 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
     @Override
     public List<String> getSNames() {
         return Collections.singletonList("Struct");
+    }
+
+    @Override
+    public String getCanonicalName() {
+        return ClassCanonicalNameUtils.createName(this);
     }
 }

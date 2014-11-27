@@ -1,4 +1,3 @@
-
 package com.lsfusion.lang;
 
 import com.intellij.lang.ASTNode;
@@ -23,64 +22,65 @@ import org.jetbrains.annotations.NotNull;
 import static com.lsfusion.lang.psi.LSFTypes.*;
 
 public class LSFParserDefinition implements ParserDefinition {
-    public static final IStubFileElementType FILE = new IStubFileElementType(Language.findInstance(LSFLanguage.class));
+    public static final IStubFileElementType LSF_FILE = new IStubFileElementType(Language.findInstance(LSFLanguage.class));
 
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(LSFTypes.COMMENTS);
     public static final TokenSet STRINGS = TokenSet.create(LSFTypes.STRING_LITERAL);
 
     public static final TokenSet NOT_KEYWORDS = TokenSet.create(
-            LSFTypes.COMMENTS,
-            LEX_LOGICAL_LITERAL,
-            PRIMITIVE_TYPE,
-            LEX_STRING_LITERAL,
-            LEX_UINT_LITERAL,
-            LEX_ULONG_LITERAL,
-            LEX_UDOUBLE_LITERAL,
-            LEX_UNUMERIC_LITERAL,
-            LEX_DATE_LITERAL,
-            LEX_DATETIME_LITERAL,
-            LEX_TIME_LITERAL,
-            LEX_COLOR_LITERAL,
-            DOLLAR,
-            EQ_OPERAND,
-            LESS_EQUALS,
-            LESS,
-            GREATER_EQUALS,
-            GREATER,
-            QUESTION,
-            MINUS,
-            PLUS,
-            MULT,
-            DIV,
-            ADDOR_OPERAND,
-            SEMI,
-            COLON,
-            COMMA,
-            POINT,
-            EQUALS,
-            PLUSEQ,
-            ARROW,
-            FOLLOWS,
-            LBRAC,
-            RBRAC,
-            LBRACE,
-            RBRACE,
-            LSQBR,
-            RSQBR,
-            ATSIGN,
-            FAKETWODASHES,
-            FAKETHREEDASHES,
-            ID
+        LSFTypes.COMMENTS,
+        LEX_LOGICAL_LITERAL,
+        PRIMITIVE_TYPE,
+        LEX_STRING_LITERAL,
+        LEX_UINT_LITERAL,
+        LEX_ULONG_LITERAL,
+        LEX_UDOUBLE_LITERAL,
+        LEX_UNUMERIC_LITERAL,
+        LEX_DATE_LITERAL,
+        LEX_DATETIME_LITERAL,
+        LEX_TIME_LITERAL,
+        LEX_COLOR_LITERAL,
+        DOLLAR,
+        EQ_OPERAND,
+        LESS_EQUALS,
+        LESS,
+        GREATER_EQUALS,
+        GREATER,
+        QUESTION,
+        MINUS,
+        PLUS,
+        MULT,
+        DIV,
+        ADDOR_OPERAND,
+        SEMI,
+        COLON,
+        COMMA,
+        POINT,
+        EQUALS,
+        PLUSEQ,
+        ARROW,
+        FOLLOWS,
+        LBRAC,
+        RBRAC,
+        LBRACE,
+        RBRACE,
+        LSQBR,
+        RSQBR,
+        ATSIGN,
+        FAKETWODASHES,
+        FAKETHREEDASHES,
+        ID
     );
 
     public static boolean isWhiteSpace(IElementType type) {
         return WHITE_SPACES.contains(type);
     }
+
     public static boolean isWhiteSpaceOrComment(IElementType type) {
         return WHITE_SPACES.contains(type) || COMMENTS.contains(type);
     }
-    
+
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
@@ -109,7 +109,7 @@ public class LSFParserDefinition implements ParserDefinition {
 
     @Override
     public IFileElementType getFileNodeType() {
-        return FILE;
+        return LSF_FILE;
     }
 
     public PsiFile createFile(FileViewProvider viewProvider) {

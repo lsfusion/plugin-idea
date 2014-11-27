@@ -54,7 +54,7 @@ class LSFRenameDialog extends RenameDialog {
     }
 
     private boolean isMigrationNeeded() {
-        return LSFRenameFullNameProcessor.isStoredPropertyElement(getPsiElement());
+        return LSFRenameFullNameProcessor.isMigrationNeeded(getPsiElement());
     }
 
     public MigrationChangePolicy getMigrationPolicy() {

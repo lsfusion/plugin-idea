@@ -5,6 +5,7 @@ import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -15,14 +16,14 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.classes.*;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
-import com.lsfusion.lang.psi.LSFMetaCodeStatement;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.psi.references.impl.LSFPropReferenceImpl;
 import com.lsfusion.migration.MigrationElementGenerator;
@@ -45,6 +46,7 @@ public class ShortenNamesProcessor {
     private static PropInMetaRef[] exceptions = new PropInMetaRef[] {
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementConsignmentHeader", "Consignment", 1), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Label", 1), false, true),
+            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Machinery", 1), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementSaleLedgerCustom", "SaleLedger", 3), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementStockDocumentLedger", "StockDocument", 2), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementSkuLedger", "Stock", 3), false, true),
@@ -52,20 +54,22 @@ public class ShortenNamesProcessor {
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementBatchCustom", "Stock", 4), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPurchaseLedgerCustom", "PurchaseLedger", 3), false, true),
             new PropInMetaRef(new PropRef("batch", "Stock", Collections.singletonList(new ClassRef("DocumentDetail", "Stock")), true), new MetacodeRef("implementDocumentBatch", "Stock", 1), false, true),
+            new PropInMetaRef(new PropRef("batch", "Stock", Collections.singletonList(new ClassRef("DocumentDetail", "Stock")), true), new MetacodeRef("implementDocumentBatch", "Stock", 2), false, true),
             new PropInMetaRef(new PropRef("name", "Box", Collections.singletonList(new ClassRef("Box", "Box")), false), new MetacodeRef("defineDocumentDetailBoxCustom", "Box", 3), true, false),
             new PropInMetaRef(new PropRef("name", "Box", Collections.singletonList(new ClassRef("Box", "Box")), false), new MetacodeRef("defineDocumentAbstractDetailBoxCustom", "Box", 3), true, false),
-            new PropInMetaRef(new PropRef("skip", "Machinery", Collections.singletonList(new ClassRef("PriceTransactionDocument", "Machinery")), false), new MetacodeRef("defineDocumentMachineryPriceTransaction", "Machinery", 3), true, false),
+            new PropInMetaRef(new PropRef("skip", "Machinery", Collections.singletonList(new ClassRef("PriceTransactionDocument", "Machinery")), false), new MetacodeRef("defineDocumentMachineryPriceTransaction", "Machinery", 4), true, false),
+            new PropInMetaRef(new PropRef("skip", "Label", Collections.singletonList(new ClassRef("PriceTransactionDocument", "Label")), false), new MetacodeRef("defineDocumentLabelTransaction", "Label", 5), true, false),
             new PropInMetaRef(new PropRef("stock", "Invoice", Collections.singletonList(new ClassRef("InvoiceDetail", "Invoice")), true), new MetacodeRef("defineInvoice", "Invoice", 4), false, true)
     };
 
-    private static List<String> getWords(String string) {
+    public static List<String> getWords(String string) {
         if(string.isEmpty())
             return new ArrayList<String>();
             
         List<String> result = new ArrayList<String>();
         int prevStart = 0;
         for(int i=1;i<string.length();i++) {
-            if(Character.isUpperCase(string.charAt(i))) {
+            if(Character.isUpperCase(string.charAt(i)) && !(Character.isUpperCase(string.charAt(i-1)) && (i+1>=string.length() || Character.isUpperCase(string.charAt(i + 1))) && !string.substring(prevStart, i).equals("VAT"))) {
                 if(prevStart >= 0)
                     result.add(string.substring(prevStart, i));
                 prevStart = i;
@@ -107,7 +111,7 @@ public class ShortenNamesProcessor {
                 if(paramNames!=null)
                     prmName = paramNames.get(i);
 
-                if(i==0 && size == 1 && (declName.equals("toDate") || declName.equals("toTime") || declName.equals("toDateTime"))) {
+                if(i==0 && size == 1 && (declName.equals("toDate") || declName.equals("toTime") || declName.equals("toDateTime") || decl.equals("objectClass"))) {
                     String prmCheck = null;
                     if(prmName!=null)
                         prmCheck = prmName.toUpperCase();
@@ -116,7 +120,8 @@ public class ShortenNamesProcessor {
                     if(prmCheck != null) {
                         if((declName.equals("toDate") && prmCheck.equals(DateTimeClass.instance.getName())) ||
                             (declName.equals("toTime") && prmCheck.equals(DateTimeClass.instance.getName())) ||
-                            (declName.equals("toDateTime") && prmCheck.equals(DateClass.instance.getName())))
+                            (declName.equals("toDateTime") && prmCheck.equals(DateClass.instance.getName())) ||
+                            (declName.equals("objectClass") && prmCheck.equals("Object")))
                             return declName;                            
                     }
                 }
@@ -146,8 +151,11 @@ public class ShortenNamesProcessor {
                             keep = keep;
                         skip++;
                     }
+
+                    if((keep - skip) < 0)
+                        break;
                     
-                    if(skipFull > 3 || (keep - skip) < 0) // пропускаем не больше 3 слов
+                    if(skipFull > 3 && !(k==0 && skipFull == 4 && equalWord(declWords.get(keep - skip + 1), "length", true) && equalWord(declWords.get(keep - skip + 2), "leg", true))) // пропускаем не больше 3 слов или lengthLegInsideSurface
                         break;
                 }
                 
@@ -217,7 +225,7 @@ public class ShortenNamesProcessor {
             }
         }
         
-        List<PropertyMigration> migrations = new ArrayList<PropertyMigration>();
+        List<ElementMigration> migrations = new ArrayList<ElementMigration>();
 
         MetaTransaction transaction = new MetaTransaction();
 
@@ -230,7 +238,7 @@ public class ShortenNamesProcessor {
         }
     }
 
-    public static void modifyMigrationScripts(List<PropertyMigration> migrations, MigrationChangePolicy migrationChangePolicy, Project project, GlobalSearchScope scope) {
+    public static void modifyMigrationScripts(List<ElementMigration> migrations, MigrationChangePolicy migrationChangePolicy, Project project, GlobalSearchScope scope) {
         Collection<VirtualFile> migrationFiles = FileTypeIndex.getFiles(MigrationFileType.INSTANCE, scope);
         for (VirtualFile file : migrationFiles) {
             PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
@@ -239,9 +247,10 @@ public class ShortenNamesProcessor {
                 if (migrationChangePolicy == MigrationChangePolicy.INCREMENT_VERSION_IF_COMMITED) {
                     createNewVersionBlock = LSFFileUtils.isFileCommited(project, file);
                 }
-                
-                GlobalSearchScope moduleScope = LSFFileUtils.getModuleWithDependenciesScope(psiFile);
-                
+
+                String topModule = LSFFileUtils.getTopModule(psiFile);
+                GlobalSearchScope moduleScope = LSFFileUtils.getElementRequireScope(psiFile, topModule, true);
+
                 MigrationFile migrationFile = (MigrationFile)psiFile;
                 
                 String statements = filterMigrationsToString(migrations, moduleScope);
@@ -301,22 +310,25 @@ public class ShortenNamesProcessor {
         return prefix + lastPartInt;
     }
 
-    private static String filterMigrationsToString(List<PropertyMigration> migrations, GlobalSearchScope moduleScope) {
-        String result = "";
-        for (PropertyMigration migration : migrations) {
+    private static String filterMigrationsToString(List<ElementMigration> migrations, GlobalSearchScope moduleScope) {
+        StringBuilder result = new StringBuilder();
+        for (ElementMigration migration : migrations) {
             VirtualFile declarationFile = migration.getDeclarationFile();
             if (declarationFile != null && moduleScope.accept(declarationFile)) {
-                if (!result.isEmpty()) {
-                    result += "\n";
+                if (result.length() != 0) {
+                    result.append("\n");
                 }
 
-                result += "    PROPERTY " + migration.getMigrationString();
+                result.append("    ");
+                result.append(migration.getPrefix());
+                result.append(" ");
+                result.append( migration.getMigrationString());
             }
         }
-        return result;
+        return result.toString();
     }
 
-    public static void shortenAllPropNames(Collection<LSFFile> files, List<PropertyMigration> migrations, MetaTransaction transaction) {
+    public static void shortenAllPropNames(Collection<LSFFile> files, List<ElementMigration> migrations, MetaTransaction transaction) {
 
         Project project = files.iterator().next().getProject();
         MetaChangeDetector.getInstance(project).setMetaEnabled(false, false);
@@ -393,6 +405,46 @@ public class ShortenNamesProcessor {
             }
         }
 
+        System.out.println("Migrating property draws..."); // отдельно для кэширования, так как resolve вызывается
+        i = 0;
+        for(Map.Entry<LSFPropertyDrawDeclaration, String> e : propertyDrawDecls.entrySet()) {
+            LSFPropertyDrawDeclaration decl = e.getKey();
+            String newName = e.getValue();
+
+            String oldName = decl.getDeclName();
+            if (!oldName.equals(newName)) {
+                assert decl.getSimpleName() == null;
+                PropertyDrawMigration migration = PropertyDrawMigration.create(decl, newName);
+                assert migration != null;
+                migrations.add(migration);
+            }
+
+            i++;
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + propertyDecls.size() + ": " + (double) i / ((double) propertyDecls.size()));
+            }
+        }
+
+        System.out.println("Migrating decls..."); // отдельно так как resolve вызывается, но нужно вызывать до изменения psi так как используется resolveClasses
+        i = 0;
+        for(Map.Entry<LSFPropDeclaration, String> e : propertyDecls.entrySet()) {
+            LSFPropDeclaration decl = e.getKey();
+            String newName = e.getValue();
+
+            if (decl instanceof LSFGlobalPropDeclaration) {
+                LSFGlobalPropDeclaration globalDecl = (LSFGlobalPropDeclaration) decl;
+                String oldName = decl.getDeclName();
+                if (!oldName.equals(newName)) {
+                    migrations.add(PropertyMigration.create(globalDecl, oldName, newName));
+                }
+            }
+
+            i++;
+            if (i % 1000 == 0) {
+                System.out.println(i + " of " + propertyDecls.size() + ": " + (double) i / ((double) propertyDecls.size()));
+            }
+        }
+
         System.out.println("Renaming property draw refs...");
         i = 0;
         for(ExtPropDrawRef propDrawRef : propDrawRefs) {
@@ -431,7 +483,7 @@ public class ShortenNamesProcessor {
                 return -Integer.compare(host1.getTextOffset(), host2.getTextOffset());
             }
         });
-        
+
         System.out.println("Renaming and qualifying property refs...");
         i = 0;
         for(ExtPropRef resolvedRef : propRefs) {
@@ -457,17 +509,6 @@ public class ShortenNamesProcessor {
         for(Map.Entry<LSFPropDeclaration, String> e : propertyDecls.entrySet()) {
             LSFPropDeclaration decl = e.getKey();
             String newName = e.getValue();
-
-            if (decl instanceof LSFGlobalPropDeclaration) {
-                LSFGlobalPropDeclaration globalDecl = (LSFGlobalPropDeclaration) decl;
-                if (globalDecl.isDataStoredProperty()) {
-                    String oldName = decl.getDeclName();
-                    if (!oldName.equals(newName)) {
-                        migrations.add(new PropertyMigration(globalDecl, oldName, newName));
-                    }
-                }
-            }
-            
             i++;
             decl.setName(newName, transaction);
             if (i % 1000 == 0) {
@@ -724,4 +765,261 @@ public class ShortenNamesProcessor {
             this.qualClasses = qualClasses;
         }
     }
+    
+    private static interface CalcGraph {
+        void proceedFile(Map<PropId, Set<PropId>> result, LSFFile file);        
+    }
+    
+    private static class PropId {
+        private final String file;
+        private final TextRange range;
+        
+        private final String canonicalName;
+
+        private PropId(LSFGlobalPropDeclaration decl) {
+            this.file = decl.getLSFFile().getName();
+            this.range = decl.getTextRange();
+
+            canonicalName = PropertyCanonicalNameUtils.createName(decl.getNamespaceName(), decl.getDeclName(), decl.resolveParamClasses());
+        }
+
+        @Override
+        public String toString() {
+            return canonicalName + " " + file + " " + range;            
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            PropId propId = (PropId) o;
+
+            if (!file.equals(propId.file)) return false;
+            if (!range.equals(propId.range)) return false;
+
+            assert canonicalName.equals(propId.canonicalName);
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = file.hashCode();
+            result = 31 * result + range.hashCode();
+            return result;
+        }
+    }
+
+    private static Set<PropId> recCalcGraph(PropId decl, Map<PropId, Set<PropId>> graph) {
+        Set<PropId> result = new HashSet<PropId>();
+        
+        Set<PropId> setGraph = graph.get(decl);        
+        if(setGraph != null) {
+            for(PropId prop : setGraph) {
+                result.addAll(recCalcGraph(prop, graph));
+                result.add(prop);
+            }
+        }
+        return result;
+    }
+
+    public static Map<PropId, Set<PropId>> calcGraph(Project myProject, CalcGraph calcGraph) {
+        Collection<String> allKeys = ModuleIndex.getInstance().getAllKeys(myProject);
+
+        Map<PropId, Set<PropId>> result = new HashMap<PropId, Set<PropId>>();
+                
+        for (final String module : allKeys) {
+            Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, GlobalSearchScope.allScope(myProject));
+            for (LSFModuleDeclaration declaration : moduleDeclarations) {
+                calcGraph.proceedFile(result, declaration.getLSFFile());
+            }
+        }
+     
+        Map<PropId, Set<PropId>> fullGraph = new HashMap<PropId, Set<PropId>>();
+        for(Map.Entry<PropId, Set<PropId>> entry : result.entrySet()) {
+            fullGraph.put(entry.getKey(), recCalcGraph(entry.getKey(), result));
+        }
+        return fullGraph;
+    }
+
+    public static Map<PropId, Set<PropId>> calcAbstractGraph(Project myProject, final Set<PropId> props) {
+        return calcGraph(myProject, new CalcGraph() {
+            public void proceedFile(Map<PropId, Set<PropId>> result, LSFFile file) {
+                LSFFile projectFile = LSFElementGenerator.createProjectLSFFile(file);
+                for (PsiElement statement : PsiTreeUtil.findChildrenOfType(file, LSFPropertyStatement.class)) {
+                    LSFPropertyStatement propStatement = (LSFPropertyStatement) statement;
+                    
+                    PropId propId = new PropId(propStatement);
+                    props.add(propId);
+                    
+                    List<LSFClassSet> paramClasses = propStatement.resolveParamClasses();
+
+                    if (paramClasses != null) { // эмулируем +=
+                        LSFPropReferenceImpl ref = LSFElementGenerator.createImplementPropRefFromText(propStatement.getDeclName(), projectFile, paramClasses);
+                        LSFResolveResult resResult = ref.multiResolveDecl(false);
+                        if (!(resResult.errorAnnotator instanceof LSFResolveResult.NotFoundErrorAnnotator)) {
+                            if(!resResult.declarations.contains(propStatement)) {
+                                for (LSFDeclaration decl : resResult.declarations) {
+                                    PropId abstId = new PropId((LSFGlobalPropDeclaration) decl);
+                                    Set<PropId> impls = result.get(abstId);
+                                    if (impls == null) {
+                                        impls = new HashSet<PropId>();
+                                        result.put(abstId, impls);
+                                    }
+                                    impls.add(propId);
+                                }
+                            } else {
+                                LSFPropReferenceImpl ref2 = LSFElementGenerator.createImplementPropRefFromText(propStatement.getDeclName(), projectFile, paramClasses);
+                                LSFResolveResult resResult2 = ref2.multiResolveDecl(false);
+                                assert resResult.declarations.size() == 1 && propStatement.isAbstract();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    private static boolean isCompleteElement(PsiElement outer, PsiElement inner) {
+        return outer.getTextRange().equals(inner.getTextRange());
+    }
+
+    public static Map<PropId, Set<PropId>> calcImplementGraph(Project myProject) {
+        return calcGraph(myProject, new CalcGraph() {
+            public void proceedFile(Map<PropId, Set<PropId>> result, LSFFile file) {
+                for (PsiElement statement : PsiTreeUtil.findChildrenOfType(file, LSFOverrideStatement.class)) {
+                    
+                    LSFOverrideStatement ovStatement = (LSFOverrideStatement) statement;
+                    LSFMappedPropertyClassParamDeclare mappedDeclare = ovStatement.getMappedPropertyClassParamDeclare();
+                    LSFPropertyUsage usage = mappedDeclare.getPropertyUsageWrapper().getPropertyUsage();
+                    LSFGlobalPropDeclaration decl = (LSFGlobalPropDeclaration) usage.resolveDecl();
+                    if(decl != null) {
+                        List<LSFParamDeclaration> params = LSFPsiImplUtil.resolveParams(mappedDeclare.getClassParamDeclareList());
+                        if (params != null) {
+                            List<LSFPropertyExpression> peList = ovStatement.getPropertyExpressionList();
+                            LSFActionPropertyDefinition actionDef = ovStatement.getActionPropertyDefinition();
+                            if (actionDef != null) {
+                                if (peList.size() > 0)
+                                    break;
+                                proceedImpl(actionDef.getActionPropertyDefinitionBody(), decl, params, result);
+                            } else {
+                                if (peList.size() == 1) {
+                                    LSFPropertyExpression pe = peList.get(0);
+                                    proceedImpl(pe, decl, params, result);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private static interface Getter<T> {
+        Pair<LSFPropertyObject, LSFPropertyExpressionList> get(T element);
+    }
+    private static void proceedImpl(LSFPropertyExpression pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Map<PropId, Set<PropId>> result) {
+        proceedImpl(pe, abst, params, LSFJoinPropertyDefinition.class, new Getter<LSFJoinPropertyDefinition>() {
+            public Pair<LSFPropertyObject, LSFPropertyExpressionList> get(LSFJoinPropertyDefinition element) {
+                return new Pair<LSFPropertyObject, LSFPropertyExpressionList>(element.getPropertyObject(), element.getPropertyExpressionList());
+            }
+        }, result);
+    }
+    
+    private static void proceedImpl(LSFActionPropertyDefinitionBody pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Map<PropId, Set<PropId>> result) {
+        proceedImpl(pe, abst, params, LSFExecActionPropertyDefinitionBody.class, new Getter<LSFExecActionPropertyDefinitionBody>() {
+            public Pair<LSFPropertyObject, LSFPropertyExpressionList> get(LSFExecActionPropertyDefinitionBody element) {
+                return new Pair<LSFPropertyObject, LSFPropertyExpressionList>(element.getPropertyObject(), element.getPropertyExpressionList());
+            }
+        }, result);
+    }
+    
+    private static <T extends PsiElement> void proceedImpl(PsiElement pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Class<T> aClass, Getter<T> getter, Map<PropId, Set<PropId>> result) {
+        assert pe instanceof LSFPropertyExpression || pe instanceof LSFActionPropertyDefinitionBody;
+        String declName = abst.getDeclName();
+        for (PsiElement element : PsiTreeUtil.findChildrenOfType(pe, aClass)) {
+            // проверяем что целиком элемент
+            if (!isCompleteElement(pe, element))
+                break;
+
+            Pair<LSFPropertyObject, LSFPropertyExpressionList> usageWithExprs = getter.get((T) element);
+
+            LSFPropertyUsage propUsage = usageWithExprs.first.getPropertyUsage();
+            if (propUsage != null) {
+                String nameRef = propUsage.getNameRef();
+                if (!nameRef.equals(declName)) // проверяем имя
+                    break;
+
+                // проверяем что подставляются только параметры в нужном порядке (просто по имени)                                        
+                List<LSFPropertyExpression> joinList = LSFPsiImplUtil.getList(usageWithExprs.second);
+                boolean parameterMatch = true;
+                for (int i = 0; i < joinList.size(); i++) {
+                    LSFPropertyExpression param = joinList.get(i);
+                    for (PsiElement child : PsiTreeUtil.findChildrenOfType(param, LSFAbstractParamReference.class)) {
+                        if (!isCompleteElement(param, child)) {
+                            parameterMatch = false;
+                            break;
+                        }
+
+                        LSFAbstractParamReference paramRef = (LSFAbstractParamReference) child;
+                        LSFDeclaration paramDecl = paramRef.resolveDecl();
+                        if (!params.get(i).equals(paramDecl)) {
+                            parameterMatch = false;
+                            break;
+                        }
+
+                        break;
+                    }
+                    if (!parameterMatch)
+                        break;
+                }
+
+                if (parameterMatch) { // параметры тоже подходят
+                    PropId abstId = new PropId(abst);
+                    LSFGlobalPropDeclaration impl = (LSFGlobalPropDeclaration) propUsage.resolveDecl();
+                    if (impl != null) {
+                        Set<PropId> impls = result.get(abstId);
+                        if (impls == null) {
+                            impls = new HashSet<PropId>();
+                            result.put(abstId, impls);
+                        }
+                        impls.add(new PropId(impl));
+                    }
+                }
+            }
+            break;
+        }
+    }    
+    
+    public static void checkGraphs(Project myProject) {
+        System.out.println("start");
+        Set<PropId> props = new HashSet<PropId>();
+        Map<PropId, Set<PropId>> absGraph = calcAbstractGraph(myProject, props);
+        Map<PropId, Set<PropId>> impGraph = calcImplementGraph(myProject);
+        System.out.println("stop");
+        
+        for(PropId prop : props) {
+            Set<PropId> absEdges = absGraph.get(prop);
+            if(absEdges == null)
+                absEdges = new HashSet<PropId>();
+            else
+                absEdges = new HashSet<PropId>(absEdges);
+            Set<PropId> impEdges = impGraph.get(prop);
+            if(impEdges == null)
+                impEdges = new HashSet<PropId>();
+            else
+                impEdges = new HashSet<PropId>(impEdges);
+            
+            BaseUtils.split(absEdges, impEdges);
+            
+            for(PropId edge : absEdges) {
+                System.out.println("ABS : " + prop + ", BUT NOT IMPL : " + edge);
+            }
+
+            for(PropId edge : impEdges) {
+                System.out.println("IMPL : " + prop + ", BUT NOT ABS : " + edge);
+            }
+        }
+    }
+
 }

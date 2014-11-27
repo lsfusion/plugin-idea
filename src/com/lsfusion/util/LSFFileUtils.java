@@ -1,5 +1,7 @@
 package com.lsfusion.util;
 
+import com.intellij.lang.properties.IProperty;
+import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -19,11 +21,14 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.util.Processor;
 import com.lsfusion.lang.psi.Result;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class LSFFileUtils {
@@ -182,5 +187,47 @@ public class LSFFileUtils {
         return module == null
                ? GlobalSearchScope.allScope(psi.getProject())
                : GlobalSearchScope.moduleWithDependentsScope(module);
+    }
+
+    public static String getTopModule(PsiElement element) {
+        List<PsiFile> filesByPath = findFilesByPath(element, "lsfusion.properties");
+        for (PsiFile file : filesByPath) {
+            if (file instanceof PropertiesFile) {
+                PropertiesFile propFile = (PropertiesFile) file;
+                IProperty property = propFile.findPropertyByKey("logics.topModule");
+                if (property != null) {
+                    return BaseUtils.nullTrim(property.getValue());
+                }
+            }
+        }
+        return "dumb";
+    }
+
+    public static GlobalSearchScope getElementRequireScope(PsiElement myElement, String moduleName, boolean searchInRequiredModules) {
+        GlobalSearchScope projectScope = getModuleWithDependenciesScope(myElement);
+
+        if (moduleName != null) {
+            Collection<LSFModuleDeclaration> modules = ModuleIndex.getInstance().get(moduleName, myElement.getProject(), projectScope);
+            if (modules.isEmpty()) {
+                return GlobalSearchScope.EMPTY_SCOPE;
+            }
+
+            GlobalSearchScope scope = GlobalSearchScope.EMPTY_SCOPE;
+            List<VirtualFile> files = new ArrayList<VirtualFile>();
+
+            for (LSFModuleDeclaration lsfModule : modules) {
+                if (searchInRequiredModules) {
+                    scope = scope.uniteWith(lsfModule.getLSFFile().getRequireScope());
+                } else {
+                    files.add(lsfModule.getLSFFile().getVirtualFile());
+                }
+            }
+
+            return searchInRequiredModules
+                   ? scope
+                   : GlobalSearchScope.filesScope(myElement.getProject(), files);
+        }
+
+        return projectScope;
     }
 }

@@ -3,6 +3,7 @@ package com.lsfusion.design;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.impl.DataManagerImpl;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -82,6 +83,8 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
     public void propertyChanged(@NotNull PsiTreeChangeEvent event) {
         fireChildChanged(event.getChild(), event.getFile());
     }
+    
+    private boolean alreadyPending; // не синхронизируем, так как все в edt
 
     private void fireChildChanged(PsiElement element, PsiFile file) {
         if (element == null || file == null) {
@@ -93,46 +96,51 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
             return;
         }
         
-        psiDocumentManager.performForCommittedDocument(document, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-                    String formName = null;
-                    LSFModuleDeclaration module = null;
+        if(!alreadyPending) {
+            alreadyPending = true;
+            ApplicationManager.getApplication().invokeLater(new Runnable() { // так как это событие вызывается до commitTransaction, modificationStamp'ы и unsavedDocument'ы не обновились, а значит к индексам обращаться нельзя
+                @Override
+                public void run() {
+                    try {
+                        Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+                        String formName = null;
+                        LSFModuleDeclaration module = null;
 
-                    if (editor != null) {
-                        DataContext dataContext = new DataManagerImpl.MyDataContext(editor.getComponent());
-                        PsiElement targetElement = ConfigurationContext.getFromContext(dataContext).getPsiLocation();
+                        if (editor != null) {
+                            DataContext dataContext = new DataManagerImpl.MyDataContext(editor.getComponent());
+                            PsiElement targetElement = ConfigurationContext.getFromContext(dataContext).getPsiLocation();
 
-                        if (targetElement != null) {
-                            LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
-                            LSFFormDeclaration formDeclaration = null;
-                            if (formExtend != null) {
-                                formDeclaration = ((LSFFormStatementImpl) formExtend).resolveFormDecl();
-                            } else {
-                                LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
-                                if (designStatement != null) {
-                                    formDeclaration = designStatement.resolveFormDecl();
+                            if (targetElement != null) {
+                                LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
+                                LSFFormDeclaration formDeclaration = null;
+                                if (formExtend != null) {
+                                    formDeclaration = ((LSFFormStatementImpl) formExtend).resolveFormDecl();
+                                } else {
+                                    LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
+                                    if (designStatement != null) {
+                                        formDeclaration = designStatement.resolveFormDecl();
+                                    }
+                                }
+
+                                if (formDeclaration != null) {
+                                    formName = formDeclaration.getDeclName();
+                                }
+
+                                if (targetElement.getContainingFile() instanceof LSFFile) {
+                                    module = ((LSFFile) targetElement.getContainingFile()).getModuleDeclaration();
                                 }
                             }
-
-                            if (formDeclaration != null) {
-                                formName = formDeclaration.getDeclName();
-                            }
-
-                            if (targetElement.getContainingFile() instanceof LSFFile) {
-                                module = ((LSFFile) targetElement.getContainingFile()).getModuleDeclaration();
-                            }
                         }
-                    }
 
-                    if (module != null && formName != null) {
-                        DesignViewFactory.getInstance().updateView(module, formName);
+                        if (module != null && formName != null) {
+                            DesignViewFactory.getInstance().updateView(module, formName);
+                        }
+                    } catch (PsiInvalidElementAccessException ignored) {
                     }
-                } catch (PsiInvalidElementAccessException ignored) {
-                }   
-            }
-        });
+                    
+                    alreadyPending = false;
+                }
+            });
+        }
     }
 }

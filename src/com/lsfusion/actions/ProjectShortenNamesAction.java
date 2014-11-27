@@ -10,6 +10,7 @@ import com.intellij.openapi.progress.Progressive;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.refactoring.ShortenNamesProcessor;
+import com.lsfusion.references.LSFToJavaLanguageInjector;
 import org.jetbrains.annotations.NotNull;
 
 public class ProjectShortenNamesAction extends AnAction {
@@ -26,6 +27,9 @@ public class ProjectShortenNamesAction extends AnAction {
                 });
             }
         };
+        
+        LSFToJavaLanguageInjector.disableGroupInjections = true;
+
         Task task = new Task.Modal(myProject, "Shortening names", true) {
             public void run(final @NotNull ProgressIndicator indicator) {
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
@@ -33,6 +37,8 @@ public class ProjectShortenNamesAction extends AnAction {
                         CommandProcessor.getInstance().runUndoTransparentAction(new Runnable() {
                             public void run() {
                                 run.run(indicator);
+
+                                LSFToJavaLanguageInjector.disableGroupInjections = false;
                             }
                         });}
                 });

@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
+import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFParserDefinition;
@@ -77,9 +78,13 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
         return getMetacodeUsage().getCompoundID();
     }
 
+    public int getParamCount() {
+        return getMetaCodeIdList().getMetaCodeIdList().size();
+    }
+    
     @Override
     public Condition<LSFMetaDeclaration> getCondition() {
-        final int paramCount = getMetaCodeIdList().getMetaCodeIdList().size();
+        final int paramCount = getParamCount();
         return new Condition<LSFMetaDeclaration>() {
             public boolean value(LSFMetaDeclaration decl) {
                 return decl.getParamCount() == paramCount;
@@ -93,23 +98,10 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
         LSFResolveResult.ErrorAnnotator errorAnnotator = null;
         if (declarations.size() > 1) {
-            final Collection<LSFMetaCodeDeclarationStatement> finalDeclarations = declarations;
-            errorAnnotator = new LSFResolveResult.ErrorAnnotator() {
-                @Override
-                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-                    return resolveAmbiguousErrorAnnotation(holder, finalDeclarations);
-                }
-            };
+            errorAnnotator = new LSFResolveResult.AmbigiousErrorAnnotator(this, declarations);
         } else if (declarations.isEmpty()) {
             declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), Condition.TRUE, Finalizer.EMPTY);
-
-            final Collection<LSFMetaCodeDeclarationStatement> finalDeclarations = declarations;
-            errorAnnotator = new LSFResolveResult.ErrorAnnotator() {
-                @Override
-                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-                    return resolveNotFoundErrorAnnotation(holder, finalDeclarations);
-                }
-            };
+            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, declarations);
         }
 
         return new LSFResolveResult(declarations, errorAnnotator);

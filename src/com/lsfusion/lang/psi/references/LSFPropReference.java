@@ -15,6 +15,8 @@ public interface LSFPropReference extends LSFFullNameReference<LSFPropDeclaratio
 
     boolean isImplement();
 
+    boolean onlyNotEquals();
+
     List<LSFClassSet> getExplicitClasses();
 
     boolean hasExplicitClasses();

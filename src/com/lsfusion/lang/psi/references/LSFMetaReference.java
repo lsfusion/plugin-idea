@@ -15,6 +15,8 @@ public interface LSFMetaReference extends LSFFullNameReference<LSFMetaDeclaratio
     void setVersion(long version);
     void setAnotherFile(LSFFile file);
     
+    int getParamCount();
+    
     void setInlinedBody(LSFMetaCodeBody parsed);
     void dropInlinedBody();
 

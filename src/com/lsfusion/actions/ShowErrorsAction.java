@@ -67,8 +67,8 @@ public class ShowErrorsAction extends AnAction {
     }
 
     private void executeSearchTask(final List<String> excludedModules) {
-        final boolean showBalloonsState = NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS;
-        NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = false;
+        final boolean showBalloonsState = NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS;
+        NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = false;
 
         final Progressive progress = new Progressive() {
             @Override
@@ -139,7 +139,7 @@ public class ShowErrorsAction extends AnAction {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = showBalloonsState;
+                NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = showBalloonsState;
             }
         });
     }

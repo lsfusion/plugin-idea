@@ -80,20 +80,9 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
 
         LSFResolveResult.ErrorAnnotator errorAnnotator = null;
         if (declarations.size() > 1) {
-            final Collection<? extends LSFDeclaration> finalDeclarations = declarations;
-            errorAnnotator = new LSFResolveResult.ErrorAnnotator() {
-                @Override
-                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-                    return resolveAmbiguousErrorAnnotation(holder, finalDeclarations);
-                }
-            };
+            errorAnnotator = new LSFResolveResult.AmbigiousErrorAnnotator(this, declarations);
         } else if (declarations.isEmpty()) {
-            errorAnnotator = new LSFResolveResult.ErrorAnnotator() {
-                @Override
-                public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-                    return resolveNotFoundErrorAnnotation(holder, Collections.<LSFDeclaration>emptyList());
-                }
-            };
+            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, declarations);
         }
 
         return new LSFResolveResult(declarations, errorAnnotator);

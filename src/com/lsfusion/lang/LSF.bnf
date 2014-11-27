@@ -27,7 +27,9 @@
   ]
 }
 
-script ::= moduleHeader (lazyScriptStatement*)
+script ::= << isExpressionParsing >> propertyExpression
+        | << isActionParsing >> listActionStatement*
+        | moduleHeader (lazyScriptStatement*)
 
 lazyScriptStatement ::= scriptStatement*
 {
@@ -316,6 +318,7 @@ expressionUnfriendlyPD ::= contextIndependentPD | actionPropertyDefinition
 contextIndependentPD ::= dataPropertyDefinition
                     |   nativePropertyDefinition
 	                |   abstractActionPropertyDefinition
+	                |   nativeActionPropertyDefinition
                     |   abstractPropertyDefinition
 	                |   formulaPropertyDefinition
 	                |   groupPropertyDefinition
@@ -536,6 +539,13 @@ abstractActionPropertyDefinition ::= ABSTRACT ACTION
                                     )?
                                     (CHECKED)?
                                     LBRAC classNameList RBRAC
+{
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+}
+
+
+nativeActionPropertyDefinition ::= ACTION NATIVE LBRAC classNameList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
@@ -1175,7 +1185,7 @@ followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
-followsResolveType ::= LEX_LOGICAL_LITERAL | ALL | NOTHING
+followsResolveType ::= (LEX_LOGICAL_LITERAL) +
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// WRITE STATEMENT /////////////////////////////

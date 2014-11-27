@@ -10,6 +10,7 @@ import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.refactoring.ClassCanonicalNameUtils;
 import com.lsfusion.util.BaseUtils;
 
 import java.awt.*;
@@ -400,5 +401,10 @@ public class CustomClassSet implements LSFClassSet {
     @Override
     public int getMaximumHeight(FontMetrics fontMetrics) {
         return getPreferredHeight(fontMetrics);
+    }
+
+    @Override
+    public String getCanonicalName() {
+        return ClassCanonicalNameUtils.createName(this);
     }
 }

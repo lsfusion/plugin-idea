@@ -1,21 +1,26 @@
 
 package com.lsfusion.lang.psi;
 
-import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.Language;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.tree.IFileElementType;
 import com.intellij.util.SmartList;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.psi.context.ContextInferrer;
 import com.lsfusion.lang.psi.context.ContextModifier;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
@@ -27,9 +32,25 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.List;
 
-public class LSFFile extends PsiFileBase implements ModifyParamContext {
+public class LSFFile extends PsiFileImpl implements ModifyParamContext {
     public LSFFile(@NotNull FileViewProvider viewProvider) {
-        super(viewProvider, LSFLanguage.INSTANCE);
+        this(viewProvider, LSFParserDefinition.LSF_FILE, LSFParserDefinition.LSF_FILE);
+    }
+
+    protected LSFFile(@NotNull FileViewProvider viewProvider, IFileElementType fileElementType, IFileElementType fileContentType) {
+        super(viewProvider);
+        init(fileElementType, fileContentType);
+    }
+
+    @Override
+    public void accept(@NotNull PsiElementVisitor visitor) {
+        visitor.visitFile(this);
+    }
+
+    @NotNull
+    @Override
+    public Language getLanguage() {
+        return LSFLanguage.INSTANCE;
     }
 
     @NotNull
@@ -39,15 +60,25 @@ public class LSFFile extends PsiFileBase implements ModifyParamContext {
     }
 
     public GlobalSearchScope getScope() {
+        if (this instanceof LSFCodeFragment && getContext() != null) {
+            PsiFile containingFile = getContext().getContainingFile();
+            if (containingFile instanceof LSFFile && containingFile != this) {
+                return ((LSFFile) containingFile).getScope();
+            }
+        }
         Project project = getProject();
-        if(getVirtualFile()==null) // в fillVariants не узнаешь какой конкретно сейчас файл
-            return GlobalSearchScope.allScope(project);  
+        
+        if (getVirtualFile() == null) {
+            // в fillVariants не узнаешь какой конкретно сейчас файл
+            return GlobalSearchScope.allScope(project);
+        }
         Module moduleForFile = ModuleUtilCore.findModuleForFile(getVirtualFile(), project);
-        if(moduleForFile==null) // library
+        if (moduleForFile == null) {
+            // library
             return ProjectScope.getLibrariesScope(project);
+        }
         return GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(moduleForFile);
     }
-
     public GlobalSearchScope getRequireScope() {
         return LSFGlobalResolver.getRequireScope(this);
     }
