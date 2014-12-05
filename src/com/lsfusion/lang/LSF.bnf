@@ -938,11 +938,12 @@ reportFilesDeclaration ::= REPORTFILES groupObjectReportPath (COMMA groupObjectR
 groupObjectReportPath ::= (TOP | groupObjectUsage) formPropertyObject
 
 formDecl ::= FORM simpleNameWithCaption
-		            (TITLE stringLiteral)?
-		            (modalityTypeLiteral)?
-		            (IMAGE stringLiteral)?
-		            (AUTOREFRESH intLiteral)?
-		            (KEEPSESSIONPROPERTIES)?
+		            (   TITLE stringLiteral
+		            |   modalityTypeLiteral
+		            |   IMAGE stringLiteral
+		            |   AUTOREFRESH intLiteral
+		            |   KEEPSESSIONPROPERTIES
+		            )*
 {
     pin = 2
     mixin ="com.lsfusion.lang.psi.declarations.impl.LSFFormDeclarationImpl"
@@ -965,7 +966,13 @@ treeGroupDeclaration ::= simpleName
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFTreeGroupDeclImpl"
 }
 
-formGroupObjectDeclaration ::= formCommonGroupObject (formGroupObjectViewType)? (formGroupObjectPageSize)? (formGroupObjectUpdateList)? (formGroupObjectRelativePosition)?
+formGroupObjectDeclaration ::= formCommonGroupObject formGroupObjectOptions
+formGroupObjectOptions ::= (    formGroupObjectViewType 
+                           |    formGroupObjectPageSize
+                           |    formGroupObjectUpdateList
+                           |    formGroupObjectRelativePosition
+                           )*
+                           
 formTreeGroupObjectDeclaration ::= formCommonGroupObject (treeGroupParentDeclaration)?
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 

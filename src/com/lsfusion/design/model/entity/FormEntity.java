@@ -11,8 +11,9 @@ import com.lsfusion.lang.classes.ObjectClass;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.indexes.PropIndex;
+import com.lsfusion.lang.psi.references.LSFPropReference;
+import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -61,14 +62,16 @@ public class FormEntity {
             title = formDecl.getCaption();
             sID = formDecl.getDeclName();
 
-            LSFModalityTypeLiteral modalityLiteral = formDecl.getModalityTypeLiteral();
-            if (modalityLiteral != null) {
-                modalityType = ModalityType.valueOf(modalityLiteral.getText());
+            List<LSFModalityTypeLiteral> modalityLiterals = formDecl.getModalityTypeLiteralList();
+            if (modalityLiterals.size() > 0) {
+                modalityType = ModalityType.valueOf(modalityLiterals.get(modalityLiterals.size() - 1).getText());
             }
         }
 
         for (LSFFormGroupObjectDeclaration formGroupObjectDeclaration : formExtend.getFormGroupObjectDeclarations()) {
-            addGroupObject(formGroupObjectDeclaration.getFormCommonGroupObject(), formGroupObjectDeclaration.getFormGroupObjectViewType(), formGroupObjectDeclaration.getFormGroupObjectPageSize());
+            LSFFormGroupObjectViewType viewType = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectViewTypeList());
+            LSFFormGroupObjectPageSize pageSize = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectPageSizeList());
+            addGroupObject(formGroupObjectDeclaration.getFormCommonGroupObject(), viewType, pageSize);
         }
 
         for (LSFFormTreeGroupObjectList tgobjDecl : formExtend.getFormTreeGroupObjectListList()) {
