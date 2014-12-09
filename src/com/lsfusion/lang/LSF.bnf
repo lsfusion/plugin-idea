@@ -1183,16 +1183,13 @@ constraintStatement ::= CONSTRAINT baseEvent propertyExpression
 ////////////////////////////////////////////////////////////////////////////////
 
 followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS
-                     propertyExpression (RESOLVE followsResolveType baseEvent)?
-		             (COMMA propertyExpression (RESOLVE followsResolveType baseEvent)?)*
+                     propertyExpression (RESOLVE LEFT? RIGHT? baseEvent)?		             
 		             SEMI
 {
     pin = 2
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
-
-followsResolveType ::= (LEX_LOGICAL_LITERAL) +
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// WRITE STATEMENT /////////////////////////////
