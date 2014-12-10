@@ -983,7 +983,7 @@ formCommonGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjec
 
 formGroupObjectViewType ::= (INIT | FIXED) classViewType
 
-classViewType ::= PANEL | HIDE | GRID
+classViewType ::= PANEL | GRID
 
 formGroupObjectPageSize ::= PAGESIZE intLiteral
 
