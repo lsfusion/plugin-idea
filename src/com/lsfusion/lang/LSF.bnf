@@ -917,7 +917,6 @@ formStatement ::=	(	formDecl
                     |	formOrderByList
                     |	dialogFormDeclaration
                     |	editFormDeclaration
-                    |	listFormDeclaration
                     |   reportFilesDeclaration
                     )*
                     SEMI
@@ -932,7 +931,6 @@ formStatement ::=	(	formDecl
 
 dialogFormDeclaration ::= DIALOG customClassUsage OBJECT objectUsage {pin = 1}
 editFormDeclaration ::= EDIT customClassUsage OBJECT objectUsage {pin = 1}
-listFormDeclaration ::= LIST customClassUsage OBJECT objectUsage {pin = 1}
 
 reportFilesDeclaration ::= REPORTFILES groupObjectReportPath (COMMA groupObjectReportPath)* {pin = 1}
 groupObjectReportPath ::= (TOP | groupObjectUsage) formPropertyObject
