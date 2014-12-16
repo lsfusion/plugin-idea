@@ -72,7 +72,7 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
     }
 
     public String getVMParameters() {
-        return VM_PARAMETERS;
+        return VM_PARAMETERS != null ? VM_PARAMETERS : "-Xmx1843m -ea";
     }
 
     public void setProgramParameters(String value) {

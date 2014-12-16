@@ -1,5 +1,8 @@
 package com.lsfusion.debug;
 
+import com.intellij.debugger.ui.breakpoints.Breakpoint;
+import com.intellij.debugger.ui.breakpoints.JavaBreakpointType;
+import com.intellij.debugger.ui.breakpoints.LineBreakpoint;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
@@ -11,6 +14,7 @@ import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
 import com.intellij.xdebugger.XDebuggerUtil;
+import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.breakpoints.XLineBreakpointTypeBase;
@@ -19,10 +23,13 @@ import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.psi.LSFActionPropertyDefinitionBody;
 import com.lsfusion.lang.psi.LSFListActionPropertyDefinitionBody;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.java.debugger.breakpoints.properties.JavaBreakpointProperties;
+import org.jetbrains.java.debugger.breakpoints.properties.JavaLineBreakpointProperties;
 
 import java.util.List;
 
-public class LSFBreakpointType extends XLineBreakpointTypeBase {
+public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBreakpointType {
     
     private static final String ID = "lsf-line";
     
@@ -36,6 +43,10 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase {
         }
     };
 
+    @Override
+    public int getPriority() {
+        return 200;
+    }
 
     public LSFBreakpointType() {
 //        super(ID, NAME, new LSFDebuggerEditorsProvider());
@@ -75,5 +86,23 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase {
         }
 
         return false;
+    }
+
+    @NotNull
+    @Override
+    public Breakpoint createJavaBreakpoint(Project project, XBreakpoint breakpoint) {
+        return LineBreakpoint.create(project, breakpoint);
+    }
+
+    @Nullable
+    @Override
+    public JavaBreakpointProperties createProperties() {
+        return new JavaLineBreakpointProperties();
+    }
+
+    @Nullable
+    @Override
+    public JavaBreakpointProperties createBreakpointProperties(@NotNull VirtualFile file, int line) {
+        return new JavaLineBreakpointProperties();
     }
 }

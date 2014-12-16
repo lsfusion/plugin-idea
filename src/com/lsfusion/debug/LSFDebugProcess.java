@@ -2,9 +2,11 @@ package com.lsfusion.debug;
 
 import com.intellij.debugger.DebuggerBundle;
 import com.intellij.debugger.DebuggerManagerEx;
-import com.intellij.debugger.SourcePosition;
 import com.intellij.debugger.engine.*;
 import com.intellij.debugger.engine.evaluation.EvaluateException;
+import com.intellij.debugger.engine.evaluation.EvaluationContextImpl;
+import com.intellij.debugger.engine.evaluation.expression.EvaluatorBuilderImpl;
+import com.intellij.debugger.engine.evaluation.expression.ExpressionEvaluator;
 import com.intellij.debugger.engine.events.SuspendContextCommandImpl;
 import com.intellij.debugger.engine.jdi.ThreadReferenceProxy;
 import com.intellij.debugger.engine.requests.RequestManagerImpl;
@@ -18,12 +20,11 @@ import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.JavaCodeFragment;
+import com.intellij.psi.JavaCodeFragmentFactory;
 import com.intellij.util.EventDispatcher;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
-import com.lsfusion.lang.psi.LSFCustomActionPropertyDefinitionBody;
 import com.lsfusion.util.ReflectionUtils;
 import com.sun.jdi.*;
 import com.sun.jdi.event.LocatableEvent;
@@ -81,15 +82,49 @@ public class LSFDebugProcess extends JavaDebugProcess {
     
     private final List<StepIntoAfterHitBreakpoint> commonDelegateBreakpoints = new ArrayList<StepIntoAfterHitBreakpoint>();
     
-    private void enableCommonDelegateBreakPoints() {
+    private ExpressionEvaluator registerSteppingEvaluator;
+    private ExpressionEvaluator unregisterSteppingEvaluator;
+    
+    private void enableCommonDelegateBreakPoints(SuspendContextImpl suspendContext) {
+        invokeRemoteMethod(true, suspendContext);
         for(StepIntoAfterHitBreakpoint commonDelegate : commonDelegateBreakpoints) {
             commonDelegate.enable();
         }
     }
 
-    private void disableCommonDelegateBreakPoints() {
+    private void disableCommonDelegateBreakPoints(final SuspendContextImpl suspendContext, boolean scheduleRemoteMethod) {
         for(StepIntoAfterHitBreakpoint commonDelegate : commonDelegateBreakpoints) {
             commonDelegate.disable();
+        }
+        if (scheduleRemoteMethod) {
+            getJavaDebugProcess().getManagerThread().schedule(new SuspendContextCommandImpl(suspendContext) {
+                @Override
+                public void contextAction() throws Exception {
+                    invokeRemoteMethod(false, suspendContext);
+                }
+            });
+        } else {
+            invokeRemoteMethod(false, suspendContext);   
+        }
+    }     
+
+    private void invokeRemoteMethod(boolean register, SuspendContextImpl context, Object... args) {
+        try {
+            final StackFrameProxyImpl frameProxy = context.getThread().frame(0);
+            if (frameProxy == null) {
+                // might be if the thread has been collected
+                return;
+            }
+    
+            final EvaluationContextImpl evaluationContext = new EvaluationContextImpl(context, frameProxy, null);
+    
+            if (register) {
+                registerSteppingEvaluator.evaluate(evaluationContext);
+            } else {
+                unregisterSteppingEvaluator.evaluate(evaluationContext);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -98,7 +133,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
             //при высоте стэка меньше ~7 перестают генериться ивенты для STEP_OUT
             //и JVM просто резумается, поэтому удаляем BP чуть раньше
             if (context.getThread().frameCount() < 10) {
-                disableCommonDelegateBreakPoints();
+                disableCommonDelegateBreakPoints(context, false);
                 return true;
             }
         } catch (EvaluateException ignore) {
@@ -126,10 +161,29 @@ public class LSFDebugProcess extends JavaDebugProcess {
             public void paused(SuspendContext suspendContext) {
                 ThreadReferenceProxy thread = suspendContext.getThread();
                 deleteStepRequests(thread == null ? null : thread.getThreadReference());
-                disableCommonDelegateBreakPoints();
+                disableCommonDelegateBreakPoints((SuspendContextImpl) suspendContext, true);
             }
         });
 
+        ApplicationManager.getApplication().runReadAction(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JavaCodeFragmentFactory codeFragmentFactory = JavaCodeFragmentFactory.getInstance(getProject());
+                    
+                    String evalString = "lsfusion.server.logics.debug.ActionPropertyDebugger.getInstance().registerStepping()";
+                    final JavaCodeFragment codeFragment = codeFragmentFactory.createCodeBlockCodeFragment(evalString, null, true);
+                    registerSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(codeFragment, null);
+
+                    String unEvalString = "lsfusion.server.logics.debug.ActionPropertyDebugger.getInstance().unregisterStepping()";
+                    final JavaCodeFragment unregisterCodeFragment = codeFragmentFactory.createCodeBlockCodeFragment(unEvalString, null, true);
+                    unregisterSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(unregisterCodeFragment, null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        
         javaSession.getProcess().setXDebugProcess(this);
     }
 
@@ -473,7 +527,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
         @Override
         public void contextAction() {
-            enableCommonDelegateBreakPoints();
+            enableCommonDelegateBreakPoints(getSuspendContext());
             super.contextAction();
         }
     }
@@ -508,7 +562,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
             boolean disableBreakpoint = disableIfSmallStackCommonDelegateBreakPoints(context);
             if (setupCommonDelegateBP && !disableBreakpoint) {
-                enableCommonDelegateBreakPoints();
+                enableCommonDelegateBreakPoints(context);
             }
 
             return STEP_OUT;

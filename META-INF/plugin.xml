@@ -258,6 +258,7 @@
         
         <programRunner implementation="com.lsfusion.debug.LSFDebuggerRunner" />
         <debugger.codeFragmentFactory implementation="com.lsfusion.debug.evaluation.LSFCodeFragmentFactory"/>
+        <debugger.javaBreakpointHandlerFactory implementation="com.lsfusion.debug.LSFBreakpointHandlerFactory"/>
 
         <!-- reports related stuff -->
         <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>
