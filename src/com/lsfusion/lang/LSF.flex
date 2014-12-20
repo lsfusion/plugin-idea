@@ -316,6 +316,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "SEEK"                    			{ return SEEK; }
   "SELECTION"               			{ return SELECTION; }
   "SELECTOR"                			{ return SELECTOR; }
+  "SERIALIZE"                           { return SERIALIZE; }
   "SESSION"                 			{ return SESSION; }
   "SET"                     			{ return SET; }
   "SETCHANGED"              			{ return SETCHANGED; }
