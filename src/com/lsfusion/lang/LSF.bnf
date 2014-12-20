@@ -853,7 +853,7 @@ multiActionPropertyDefinitionBody ::= MULTI (exclusiveOverrideOption)? nonEmptyA
     methods = [inferActionParamClasses]
 }
 
-applyActionPropertyDefinitionBody ::= APPLY migratePropertiesSelector? SINGLE? SERIALIZE? actionPropertyDefinitionBody
+applyActionPropertyDefinitionBody ::= APPLY migratePropertiesSelector? SINGLE? SERIALIZABLE? actionPropertyDefinitionBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
