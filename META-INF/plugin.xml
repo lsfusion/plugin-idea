@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -11,8 +11,6 @@
     <change-notes><![CDATA[
       <b>Version 1.0</b><br>
       <p>Initial version</p>
-      <b>Version 1.0.1</b><br>
-      <p>New module type support</p>
       ]]>
     </change-notes>
 
