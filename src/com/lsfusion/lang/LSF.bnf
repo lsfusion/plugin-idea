@@ -1497,7 +1497,7 @@ metaCodeStatementHeader ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC
 metaCodeStatementSemi ::= SEMI
 
 metaDeclId ::=  ID
-metaDeclIdList ::= (metaDeclId (COMMA metaDeclId)*)?
+metaDeclIdList ::= metaDeclId (COMMA metaDeclId)*
 
 metaCodeIdList ::= (metaCodeId (COMMA metaCodeId)*)?
 
