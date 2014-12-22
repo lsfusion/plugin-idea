@@ -21,6 +21,7 @@ import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.references.LSFReference;
+import com.lsfusion.lang.psi.references.LSFStaticObjectReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -255,6 +256,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitClassDeclaration(o);
 
         checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitStaticObjectReference(@NotNull LSFStaticObjectReference o) {
+        super.visitStaticObjectReference(o);
+        
+        checkReference(o);
     }
 
     @Override
