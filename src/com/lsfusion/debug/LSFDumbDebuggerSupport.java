@@ -3,17 +3,18 @@ package com.lsfusion.debug;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
-import com.intellij.xdebugger.AbstractDebuggerSession;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
-import com.intellij.xdebugger.impl.DebuggerSupport;
 import com.intellij.xdebugger.impl.XDebuggerSupport;
-import com.intellij.xdebugger.impl.actions.*;
+import com.intellij.xdebugger.impl.actions.DebuggerActionHandler;
+import com.intellij.xdebugger.impl.actions.XDebuggerSuspendedActionHandler;
 import com.intellij.xdebugger.impl.actions.handlers.XDebuggerActionHandler;
+import com.intellij.xdebugger.impl.breakpoints.XBreakpointPanelProvider;
+import com.intellij.xdebugger.impl.breakpoints.ui.BreakpointItem;
 import com.intellij.xdebugger.impl.breakpoints.ui.BreakpointPanelProvider;
-import com.intellij.xdebugger.impl.evaluate.quick.common.QuickEvaluateHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 // the problem is that java debugger works even if session is not suspended, which is not good, when we "override" java debugger
 public class LSFDumbDebuggerSupport extends XDebuggerSupport {
@@ -29,6 +30,7 @@ public class LSFDumbDebuggerSupport extends XDebuggerSupport {
 
     private final DebuggerActionHandler mySmartStepIntoHandler;
 
+    private final XBreakpointPanelProvider myBreakpointPanelProvider;
 
     private static class DebuggerActionHandlerFacade extends XDebuggerActionHandler {
         
@@ -75,6 +77,13 @@ public class LSFDumbDebuggerSupport extends XDebuggerSupport {
         myForceRunToCursor = new DebuggerActionHandlerFacade(super.getForceRunToCursorHandler());
 
         mySmartStepIntoHandler = new DebuggerActionHandlerFacade(super.getStepIntoHandler());
+        
+        myBreakpointPanelProvider = new XBreakpointPanelProvider() {
+            // panelProvider в XDebuggerSupport уже предоставляет breakpoint'ы всех XBreakpoint типов
+            @Override
+            public void provideBreakpointItems(Project project, Collection<BreakpointItem> items) {
+            }
+        };
     }
 
     @NotNull
@@ -123,5 +132,11 @@ public class LSFDumbDebuggerSupport extends XDebuggerSupport {
     @Override
     public DebuggerActionHandler getForceRunToCursorHandler() {
         return myForceRunToCursor;
+    }
+
+    @NotNull
+    @Override
+    public BreakpointPanelProvider<?> getBreakpointPanelProvider() {
+        return myBreakpointPanelProvider;
     }
 }
