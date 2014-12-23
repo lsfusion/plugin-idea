@@ -1102,7 +1102,7 @@ filterGroupUsage ::= simpleName
     implements="com.lsfusion.lang.psi.references.LSFFilterGroupReference"
 }
 
-regularFilterDeclaration ::= FILTER stringLiteral stringLiteral formFilterDeclaration (filterSetDefault)?
+regularFilterDeclaration ::= FILTER stringLiteral formFilterDeclaration (stringLiteral)? (filterSetDefault)?
 
 formFilterDeclaration ::= propertyExpression
 filterSetDefault ::= DEFAULT
