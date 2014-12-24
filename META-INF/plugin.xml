@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -47,6 +47,9 @@
 
     <actions>
         <!-- Add your actions here -->
+        <action id="ChangeGroupFilters" class="com.lsfusion.actions.ChangeFilterGroups" text="Change group filters">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
         <action id="MetaCode.Enable" class="com.lsfusion.actions.MetaCodeEnableAction" text="Toggle _meta"
                 description="Toggle meta code mode">
             <add-to-group group-id="CodeMenu"/>
