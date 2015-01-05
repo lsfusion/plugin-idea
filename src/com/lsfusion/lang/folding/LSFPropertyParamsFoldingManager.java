@@ -37,7 +37,7 @@ public class LSFPropertyParamsFoldingManager {
         List<FoldingDescriptor> result = new ArrayList<FoldingDescriptor>();
         
         // в случае, если курсор находится в той же строке, что и знак '=', не добавляем фолдинг или не обновляем (если уже есть), чтобы избежать прыжков 
-        boolean currentLine = rebuildIfInCurrentLine(result);
+        boolean currentLine = rebuildIfNotInCurrentLine(result);
 
         if (!currentLine) {
             LSFEqualsSign equalsSign = propertyStatement.getEqualsSign();
@@ -66,7 +66,7 @@ public class LSFPropertyParamsFoldingManager {
         return result;
     }
     
-    private boolean rebuildIfInCurrentLine(List<FoldingDescriptor> descriptors) {
+    private boolean rebuildIfNotInCurrentLine(List<FoldingDescriptor> descriptors) {
         EditorFactory editorFactory = EditorFactory.getInstance();
         if (editorFactory != null) {
             Editor[] editors = editorFactory.getEditors(document, propertyStatement.getProject());
@@ -128,9 +128,12 @@ public class LSFPropertyParamsFoldingManager {
     public static boolean rebuildFoldings(Document document, int newPosition) {
         Integer oldPosition = lineUnderChange.get(document);
         if (oldPosition != null && oldPosition != newPosition) {
-            lineUnderChange.remove(document);
             return true;
         }
         return false;
     } 
+    
+    public static void foldingsRebuilt(Document document) {
+        lineUnderChange.remove(document);
+    }
 }
