@@ -1109,7 +1109,7 @@ filterSetDefault ::= DEFAULT
 
 formOrderByList ::= ORDER BY formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
 
-formPropertyDrawWithOrder ::= formPropertyDrawUsage (ASC | DESC)?
+formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 
 predefinedFormPropertyName ::= OBJVALUE
                            |    SELECTION

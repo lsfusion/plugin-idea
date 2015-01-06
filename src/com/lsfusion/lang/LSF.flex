@@ -114,7 +114,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "AND"                     			{ return AND; }
   "APPLY"                   			{ return APPLY; }
   "AS"                      			{ return AS; }
-  "ASC"                     			{ return ASC; }
   "ASONCHANGE"              			{ return ASONCHANGE; }
   "ASONCHANGEWYS"           			{ return ASONCHANGEWYS; }
   "ASONEDIT"                			{ return ASONEDIT; }
