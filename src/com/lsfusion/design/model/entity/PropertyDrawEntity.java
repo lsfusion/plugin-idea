@@ -50,25 +50,22 @@ public class PropertyDrawEntity {
     public KeyStroke editKey;
     public boolean showEditKey = true;
 
-    public PropertyDrawEntity(String sID, LSFPropDeclaration propDeclaration, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        this(sID, null, new ArrayList<ObjectEntity>(), propDeclaration, commonFormOptions, propertyFormOptions, form);
-    }
-
     public PropertyDrawEntity(String alias, String propertyName, List<ObjectEntity> objects, LSFPropDeclaration propDeclaration, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
         if (alias != null) {
             sID = alias;
         } else {
             sID = propertyName;
             if (!objects.isEmpty()) {
-                sID += "_";
+                sID += "(";
                 for (ObjectEntity obj : objects) {
                     if (obj != null) {
                         sID += obj.sID;
                         if (objects.indexOf(obj) < objects.size() - 1) {
-                            sID += "_";
+                            sID += ",";
                         }
                     }
                 }
+                sID += ")";
             }
         }
         this.propertyName = propertyName;

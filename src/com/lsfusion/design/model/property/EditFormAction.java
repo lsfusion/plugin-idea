@@ -10,7 +10,7 @@ import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 
 public class EditFormAction extends PropertyDrawEntity {
     public EditFormAction(String alias, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form, FormSessionScope scope) {
-        super(AddFormAction.alias(alias, "editForm", scope, groupObject), null, commonFormOptions, propertyFormOptions, form);
+        super(alias, "EDITFORM", groupObject.objects, null, commonFormOptions, propertyFormOptions, form);
 
         caption = "Редактировать";
         isAction = true;

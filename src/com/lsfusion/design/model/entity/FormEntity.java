@@ -223,7 +223,7 @@ public class FormEntity {
                         }
                     }
 
-                    propertyDraw = new SelectionProperty(alias, sIDPostfix, commonOptions, formPropertyOptions, this);
+                    propertyDraw = new SelectionProperty(alias, groupObject, sIDPostfix, commonOptions, formPropertyOptions, this);
                     RegularFilterGroupEntity filterGroup = new RegularFilterGroupEntity(null);
                     RegularFilterEntity filter = new RegularFilterEntity("Отмеченные", KeyStrokes.getSelectionFilterKeyStroke(), objects);
                     filterGroup.addFilter(filter);
@@ -384,7 +384,7 @@ public class FormEntity {
         if (!propDeclarations.isEmpty()) {
             declaration = propDeclarations.iterator().next();
         }
-        return new PropertyDrawEntity(sID, declaration, null, null, this);
+        return new PropertyDrawEntity(null, sID, new ArrayList<ObjectEntity>(), declaration, null, null, this);
     }
 
     public boolean isModal() {
