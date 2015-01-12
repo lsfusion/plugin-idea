@@ -967,7 +967,7 @@ treeGroupDeclaration ::= simpleName
 formGroupObjectDeclaration ::= formCommonGroupObject formGroupObjectOptions
 formGroupObjectOptions ::= (    formGroupObjectViewType 
                            |    formGroupObjectPageSize
-                           |    formGroupObjectUpdateList
+                           |    formGroupObjectUpdate
                            |    formGroupObjectRelativePosition
                            )*
                            
@@ -985,9 +985,7 @@ classViewType ::= PANEL | GRID
 
 formGroupObjectPageSize ::= PAGESIZE intLiteral
 
-formGroupObjectUpdateList ::= formGroupObjectUpdate (COMMA formGroupObjectUpdate)* 
-
-formGroupObjectUpdate ::= FIRST | LAST | (STATIC literal)
+formGroupObjectUpdate ::= FIRST | LAST
 
 formGroupObjectRelativePosition ::= AFTER groupObjectUsage | BEFORE groupObjectUsage  
 
