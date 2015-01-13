@@ -25,9 +25,11 @@ import java.util.TimerTask;
 public class LSFBreakpointHandler extends JavaBreakpointHandler {
     private List<Runnable> remoteEvents = new ArrayList<Runnable>();
     private DebuggerService debuggerService;
+    private Integer debuggerPort;
     
     public LSFBreakpointHandler(Class<? extends XBreakpointType<?, ?>> breakpointTypeClass, DebugProcessImpl process) {
         super(breakpointTypeClass, process);
+        debuggerPort = process.getUserData(LSFDebuggerRunner.DEBUGGER_PROPERTY_KEY);
     }
     
     private void reattachToService() {
@@ -36,7 +38,7 @@ public class LSFBreakpointHandler extends JavaBreakpointHandler {
             @Override
             public void run() {
                 try {
-                    Registry registry = LocateRegistry.getRegistry(1299);
+                    Registry registry = LocateRegistry.getRegistry(debuggerPort);
                     debuggerService = (DebuggerService) registry.lookup("lsfDebuggerService");
                     if (debuggerService != null) {
                         executePendingMethods();

@@ -32,6 +32,8 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
 
     public static final String MAIN_CLASS_NAME = BOOTSTRAP_CLASS_NAME;
 
+    private static final int DEFAULT_DEBUGGER_PORT = 1299;
+
     public String VM_PARAMETERS;
     public String PROGRAM_PARAMETERS;
     public String WORKING_DIRECTORY;
@@ -160,6 +162,20 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
     @Override
     protected ModuleBasedConfiguration createInstance() {
         return new LSFusionRunConfiguration(getName(), getProject(), LSFusionRunConfigurationType.getInstance().getConfigurationFactory());
+    }
+    
+    public int getDebuggerPort() {
+        String vmParams = getVMParameters();
+        String[] strings = vmParams.split(" ");
+        for (String s : strings) {
+            if (s.startsWith("-Dlsfusion.debugger.port")) {
+                Integer result = Integer.valueOf(s.substring(s.lastIndexOf("=") + 1));
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return DEFAULT_DEBUGGER_PORT;
     }
 
     public static class LSFServerCommandLineState extends JavaCommandLineState {
