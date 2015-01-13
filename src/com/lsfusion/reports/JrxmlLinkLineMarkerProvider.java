@@ -35,11 +35,6 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement psi) {
-//        LSFFormDeclaration decl = resolveFormDecl(psi);
-//
-//        if (decl != null && hasReportFiles(decl)) {
-//            return createLineMarker(psi);
-//        }
         return null;
     }
 

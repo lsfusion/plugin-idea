@@ -21,17 +21,6 @@ public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
-//        if (element instanceof LSFMetaReference) {
-//            int level = resolveNestingLevel(element);
-//            if (level > 0) {
-//                return new LineMarkerInfo(element,
-//                        element.getTextRange().getStartOffset(),
-//                        createIcon(level),
-//                        Pass.UPDATE_OVERRIDEN_MARKERS,
-//                        MetaNestingLevelTooltipProvider.INSTANCE,
-//                        null);
-//            }
-//        }
         return null;
     }
 
