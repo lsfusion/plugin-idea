@@ -29,8 +29,9 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement psi) {
-        LSFFormDeclaration decl = resolveFormDecl(psi);
-        return decl == null ? null : createLineMarker(psi);
+//        LSFFormDeclaration decl = resolveFormDecl(psi);
+//        return decl == null ? null : createLineMarker(psi);
+        return null;
     }
 
     private LineMarkerInfo createLineMarker(PsiElement psi) {
@@ -38,7 +39,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
                 psi,
                 psi.getTextRange().getStartOffset(),
                 LSFIcons.Design.DESIGN,
-                Pass.UPDATE_ALL,
+                Pass.UPDATE_OVERRIDEN_MARKERS,
                 GetFormNameTooltipProvider.INSTANCE,
                 OpenDesignPreviewNavigationHandler.INSTANCE
         );
@@ -46,6 +47,12 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
+        for (PsiElement element : elements) {
+            LSFFormDeclaration decl = resolveFormDecl(element);
+            if (decl != null) {
+                result.add(createLineMarker(element));
+            }
+        }
     }
 
     public static LSFFormDeclaration resolveFormDecl(PsiElement psi) {

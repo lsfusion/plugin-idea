@@ -21,17 +21,17 @@ public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
-        if (element instanceof LSFMetaReference) {
-            int level = resolveNestingLevel(element);
-            if (level > 0) {
-                return new LineMarkerInfo(element,
-                        element.getTextRange().getStartOffset(),
-                        createIcon(level),
-                        Pass.UPDATE_ALL,
-                        MetaNestingLevelTooltipProvider.INSTANCE,
-                        null);
-            }
-        }
+//        if (element instanceof LSFMetaReference) {
+//            int level = resolveNestingLevel(element);
+//            if (level > 0) {
+//                return new LineMarkerInfo(element,
+//                        element.getTextRange().getStartOffset(),
+//                        createIcon(level),
+//                        Pass.UPDATE_OVERRIDEN_MARKERS,
+//                        MetaNestingLevelTooltipProvider.INSTANCE,
+//                        null);
+//            }
+//        }
         return null;
     }
 
@@ -64,6 +64,18 @@ public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
+        for (PsiElement element : psiElements) {
+            if (element instanceof LSFMetaReference) {
+                int level = resolveNestingLevel(element);
+                if (level > 0) {
+                    lineMarkerInfos.add(new LineMarkerInfo(element,
+                            element.getTextRange().getStartOffset(),
+                            createIcon(level),
+                            Pass.UPDATE_OVERRIDEN_MARKERS,
+                            MetaNestingLevelTooltipProvider.INSTANCE,
+                            null));                      }
+            }
+        }
     }
 
     public static int resolveNestingLevel(PsiElement element) {
