@@ -424,7 +424,7 @@ dataPropertyDefinition ::= DATA (dataPropertySessionModifier)? className (LBRAC 
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getMigrationClassNames ]
 }
-dataPropertySessionModifier ::= SESSION
+dataPropertySessionModifier ::= LOCAL
 
 nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
 {
