@@ -114,7 +114,7 @@ public class LSFElementGenerator {
     }
 
     public static LSFAnyTokens createMetaCodeFromText(final Project project, final String text) {
-        final PsiFile dummyFile = createDummyFile(project, "MODULE " + genName + "; META dummy() " + text + " END");
+        final PsiFile dummyFile = createDummyFile(project, "MODULE " + genName + "; META dummy(dummy) " + text + " END");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFAnyTokens.class).iterator().next();
     }
 

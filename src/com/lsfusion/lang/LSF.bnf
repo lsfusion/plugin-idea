@@ -424,7 +424,7 @@ dataPropertyDefinition ::= DATA (dataPropertySessionModifier)? className (LBRAC 
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getMigrationClassNames ]
 }
-dataPropertySessionModifier ::= LOCAL
+dataPropertySessionModifier ::= LOCAL nestedLocalModifier
 
 nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
 {
@@ -747,7 +747,7 @@ requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actio
 
 listActionPropertyDefinitionBody ::=    (
                                             (
-                                                NEWSESSION (NESTED | migratePropertiesSelector)?
+                                                ((NEWSESSION nestedPropertiesSelector?) | NESTEDSESSION)
                                                 |
                                                 (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
                                             )
@@ -764,7 +764,7 @@ listActionPropertyDefinitionBody ::=    (
     methods = [inferActionParamClasses]
 }
 
-private migratePropertiesSelector ::= LBRAC (nonEmptyNoContextPropertyUsageList | MULT) RBRAC
+private nestedPropertiesSelector ::= NESTED (LOCAL | nonEmptyNoContextPropertyUsageList)
 
 private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfNeeded >>  //  !} => ;
                                 |   localDataPropertyDefinition SEMI
@@ -779,7 +779,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | FORM | TRY | IF | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | REQUEST | RETURN | SEEK | WHILE
-                                            | NEWSESSION | NEWTHREAD
+                                            | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID
                                             | SEMI
                                             | LBRACE
@@ -787,7 +787,7 @@ private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | 
                                            )
                                            
 stubListActionStatement ::=     (
-                                    NEWSESSION (NESTED | migratePropertiesSelector)?
+                                    ((NEWSESSION nestedPropertiesSelector?) | NESTEDSESSION)
                                     |
                                     (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
                                 )
@@ -798,12 +798,14 @@ stubListActionStatement ::=     (
     pin(".*") = 1
 }                                           
 
-localDataPropertyDefinition ::= LOCAL simpleName EQUALS className LBRAC classNameList RBRAC
+localDataPropertyDefinition ::= LOCAL nestedLocalModifier simpleName EQUALS className LBRAC classNameList RBRAC
 {
     pin = 1
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFLocalPropDeclarationImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration"
 }
+
+nestedLocalModifier ::= NESTED?
 
 //Разбиваем правило, чтобы была возможность запинить по EXEC
 execActionPropertyDefinitionBody ::= execActionPropertyDefinitionBody1 | execActionPropertyDefinitionBody2
@@ -853,7 +855,7 @@ multiActionPropertyDefinitionBody ::= MULTI (exclusiveOverrideOption)? nonEmptyA
     methods = [inferActionParamClasses]
 }
 
-applyActionPropertyDefinitionBody ::= APPLY migratePropertiesSelector? SINGLE? SERIALIZABLE? actionPropertyDefinitionBody
+applyActionPropertyDefinitionBody ::= APPLY nestedPropertiesSelector? SINGLE? SERIALIZABLE? actionPropertyDefinitionBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"

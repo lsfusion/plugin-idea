@@ -106,6 +106,8 @@ public class MetaTransaction {
                 if(token.startsWith(usageParam, i)) { // парсим, будем считать что usageParam больше одного раза вставлять не будем
                     String declParam = declParams.get(j);
                     if(usageParam.isEmpty()) {
+                        if(usedEmptyDecls.size() >= 2)
+                            continue;
                         if(i > 0 && i < token.length()) // оптимизация
                             if(!(!Character.isUpperCase(token.charAt(i-1)) && Character.isUpperCase(token.charAt(i))))
                                 continue;

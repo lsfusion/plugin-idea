@@ -2,9 +2,17 @@ package com.lsfusion.lang.classes;
 
 import com.lsfusion.util.DateUtils;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class DateTimeClass extends DataClass {
 
     public final static DateTimeClass instance = new DateTimeClass();
+
+    @Override
+    public Collection<String> getExtraNames() {
+        return Collections.singletonList("DateTime");
+    }
 
     @Override
     public String getName() {

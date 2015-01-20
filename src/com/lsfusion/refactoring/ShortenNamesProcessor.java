@@ -111,7 +111,7 @@ public class ShortenNamesProcessor {
                 if(paramNames!=null)
                     prmName = paramNames.get(i);
 
-                if(i==0 && size == 1 && (declName.equals("toDate") || declName.equals("toTime") || declName.equals("toDateTime") || decl.equals("objectClass"))) {
+                if(i==0 && size == 1 && (declName.equals("toDate") || declName.equals("toTime") || declName.equals("toDateTime") || declName.equals("objectClass"))) {
                     String prmCheck = null;
                     if(prmName!=null)
                         prmCheck = prmName.toUpperCase();
