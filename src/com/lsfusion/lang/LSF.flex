@@ -121,7 +121,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "ASYNCUPDATE"             			{ return ASYNCUPDATE; }
   "ATTACH"                  			{ return ATTACH; }
   "AUTO"                                { return AUTO; }
-  "AUTOAPPLY"               			{ return AUTOAPPLY; }
   "AUTOREFRESH"                         { return AUTOREFRESH; }
   "AUTOSET"                 			{ return AUTOSET; }
   "BACKGROUND"              			{ return BACKGROUND; }
@@ -233,7 +232,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "INPUT"                   			{ return INPUT; }
   "IS"                      			{ return IS; }
   "JOIN"                    			{ return JOIN; }
-  "KEEPSESSIONPROPERTIES"               { return KEEPSESSIONPROPERTIES; }
   "LAST"                                { return LAST; }
   "LEFT"                    			{ return LEFT; }
   "LIMIT"                   			{ return LIMIT; }

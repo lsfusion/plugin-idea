@@ -751,7 +751,6 @@ listActionPropertyDefinitionBody ::=    (
                                                 |
                                                 (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
                                             )
-                                            (AUTOAPPLY)?
                                             (SINGLE)?
                                         )?
 		                                LBRACE
@@ -942,7 +941,6 @@ formDecl ::= FORM simpleNameWithCaption
 		            |   modalityTypeLiteral
 		            |   IMAGE stringLiteral
 		            |   AUTOREFRESH intLiteral
-		            |   KEEPSESSIONPROPERTIES
 		            )*
 {
     pin = 2
