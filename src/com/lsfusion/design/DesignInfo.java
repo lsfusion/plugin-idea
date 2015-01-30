@@ -130,7 +130,7 @@ public class DesignInfo {
                 String name = statement.getComponentStubDecl().getComponentDecl().getName();
                 ContainerView container = formView.createContainer(null, name);
 
-                LSFComponentInsertPositionSelector insertPositionSelector = statement.getComponentInsertPositionSelector();
+                LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
                 addComponent(container, (ContainerView) parentComponent, insertPositionSelector, formView);
 
                 processComponentBody(container, statement.getComponentBody());
@@ -143,7 +143,7 @@ public class DesignInfo {
                         ComponentView component = formView.getComponentBySID(name);
 
                         if (component != null) {
-                            LSFComponentInsertPositionSelector insertPositionSelector = statement.getComponentInsertPositionSelector();
+                            LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
                             addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
 
                             processComponentBody(component, statement.getComponentBody());
@@ -211,11 +211,7 @@ public class DesignInfo {
         return null;
     }
 
-    private void addComponent(ComponentView component, ContainerView container, LSFComponentInsertPositionSelector insertPositionSelector, FormView form) {
-        LSFInPositionComponent inPositionComponent = insertPositionSelector.getInPositionComponent();
-        if (inPositionComponent != null) {
-            container = form.getContainerBySID(getComponentSID(inPositionComponent.getComponentSelector(), form));
-        }
+    private void addComponent(ComponentView component, ContainerView container, LSFComponentInsertPosition insertPositionSelector, FormView form) {
         LSFComponentSelector neighbour = insertPositionSelector.getComponentSelector();
         if (neighbour != null) {
             LSFInsertRelativePositionLiteral insertRelativePositionLiteral = insertPositionSelector.getInsertRelativePositionLiteral();

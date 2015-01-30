@@ -1318,12 +1318,12 @@ navigatorElementStatementBody ::=   (   LBRACE
                                         RBRACE
                                     ) | emptyStatement
 
-addNavigatorElementStatement ::= ADD navigatorElementSelector (stringLiteral)? navigatorElementInsertPositionSelector (TO windowUsage)? navigatorElementStatementBody
+addNavigatorElementStatement ::= ADD navigatorElementSelector (stringLiteral)? navigatorElementInsertPosition (TO windowUsage)? navigatorElementStatementBody
 {
     pin = 1
 }
 
-newNavigatorElementStatement ::= NEW simpleName (ACTION noContextPropertyUsage)? stringLiteral navigatorElementInsertPositionSelector (TO windowUsage)? (IMAGE stringLiteral)? navigatorElementStatementBody
+newNavigatorElementStatement ::= NEW simpleName (ACTION noContextPropertyUsage)? stringLiteral navigatorElementInsertPosition (TO windowUsage)? (IMAGE stringLiteral)? navigatorElementStatementBody
 {
     pin = 2
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFNavigatorElementDeclarationImpl"
@@ -1332,10 +1332,9 @@ newNavigatorElementStatement ::= NEW simpleName (ACTION noContextPropertyUsage)?
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-navigatorElementInsertPositionSelector ::=	(IN navigatorElementSelector)?
-                                            (   insertRelativePositionLiteral navigatorElementSelector
-                                            |	FIRST
-                                            )?
+navigatorElementInsertPosition ::=	(   insertRelativePositionLiteral navigatorElementSelector
+                                    |	FIRST
+                                    )?
 
 setupNavigatorElementStatement ::= navigatorElementSelector (stringLiteral)? (TO windowUsage)? navigatorElementStatementBody
 
@@ -1407,18 +1406,15 @@ private setup_group_object_statement_recover ::= !(ID | SEMI | RBRACE)
 
 setGroupObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 1}
                               
-newComponentStatement ::= NEW componentStubDecl componentInsertPositionSelector componentBody {pin = 2}
-addComponentStatement ::= ADD componentSelector componentInsertPositionSelector componentBody {pin = 1}
+newComponentStatement ::= NEW componentStubDecl componentInsertPosition componentBody {pin = 2}
+addComponentStatement ::= ADD componentSelector componentInsertPosition componentBody {pin = 1}
 
-componentInsertPositionSelector ::= (IN inPositionComponent)?
-                                    (   insertRelativePositionLiteral componentSelector
-                                    |	FIRST
-                                    )?
-
+componentInsertPosition ::= (   insertRelativePositionLiteral componentSelector
+                            |	FIRST
+                            )?
+                            
 removeComponentStatement ::= REMOVE componentSelector (removeCascade)? SEMI {pin = 1}
 removeCascade ::= CASCADE
-
-inPositionComponent ::= componentSelector
 
 componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                 	|	PROPERTY LBRAC propertySelector RBRAC
