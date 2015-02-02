@@ -146,7 +146,6 @@ public class FormView {
 
     private void addRegularFilterGroupView(RegularFilterGroupView filterGroupView) {
         mfilters.put(filterGroupView.entity, filterGroupView);
-        setComponentSID(filterGroupView, getRegularFilterGroupSID(filterGroupView));
     }
 
     private RegularFilterGroupView addRegularFilterGroupBase(RegularFilterGroupEntity filterGroup) {
