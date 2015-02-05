@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -230,6 +230,12 @@
                         serviceImplementation="com.lsfusion.lang.psi.cache.TableNameCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.ColumnNameCache"
                         serviceImplementation="com.lsfusion.lang.psi.cache.ColumnNameCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyDependenciesCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.PropertyDependenciesCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyDependentsCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.PropertyDependentsCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyComplexityCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.PropertyComplexityCache"/>
 
         <stubElementTypeHolder class="com.lsfusion.lang.psi.LSFTypes"/>
         <gotoClassContributor implementation="com.lsfusion.LSFClassContributor"/>
@@ -247,7 +253,12 @@
                     anchor="right" icon="AllIcons.FileTypes.UiForm"/>
 
         <toolWindow id="Module Dependencies" anchor="right" icon="AllIcons.Nodes.Deploy"
-                    factoryClass="com.lsfusion.dependencies.ModuleDependeciesViewToolWindowFactory"/>
+                    factoryClass="com.lsfusion.dependencies.module.ModuleDependenciesViewToolWindowFactory"/>
+
+        <toolWindow id="Property Dependencies" anchor="right" icon="AllIcons.Nodes.Deploy"
+                    factoryClass="com.lsfusion.dependencies.property.PropertyDependenciesViewToolWindowFactory"/>
+        <codeInsight.lineMarkerProvider language="Lsf"
+                                        implementationClass="com.lsfusion.dependencies.property.PropertyComplexityLineMarkerProvider"/>
 
         <!-- debugger -->
         <xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />

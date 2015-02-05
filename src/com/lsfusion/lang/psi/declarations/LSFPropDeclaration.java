@@ -5,6 +5,7 @@ import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface LSFPropDeclaration extends LSFDeclaration {
 
@@ -29,4 +30,9 @@ public interface LSFPropDeclaration extends LSFDeclaration {
 
     List<LSFExClassSet> resolveExParamClassesNoCache();
 
+    Set<LSFPropDeclaration> getDependencies();
+
+    Set<LSFPropDeclaration> getDependents();
+    
+    Integer getComplexity();
 }

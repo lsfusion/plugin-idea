@@ -25,6 +25,10 @@ public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlob
     
     boolean isStoredProperty();
 
+    boolean isPersistentProperty();
+
+    boolean isDataProperty();
+
     boolean isDataStoredProperty();
 
     public List<String> resolveParamNames();

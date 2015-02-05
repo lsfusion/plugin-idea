@@ -15,15 +15,13 @@ import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.cache.ColumnNameCache;
-import com.lsfusion.lang.psi.cache.ParamClassesCache;
-import com.lsfusion.lang.psi.cache.TableNameCache;
-import com.lsfusion.lang.psi.cache.ValueClassCache;
+import com.lsfusion.lang.psi.cache.*;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.indexes.TableClassesIndex;
+import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -284,14 +282,14 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         LSFDataPropertyDefinition dataProp = getDataPropertyDefinition();
         return dataProp != null && dataProp.getDataPropertySessionModifier() == null;
     }
-    
-    public boolean isStoredProperty() {
-        if (isDataStoredProperty()) {
-            return true;
-        }
-        
+
+    public boolean isPersistentProperty() {
         LSFPropertyOptions options = getPropertyOptions();
         return options != null && !options.getPersistentSettingList().isEmpty();
+    }
+    
+    public boolean isStoredProperty() {
+        return isDataStoredProperty() || isPersistentProperty();
     }
 
     @Nullable
@@ -576,5 +574,77 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     public ElementMigration getMigration(String newName) {
         return PropertyMigration.create(this, getGlobalName(), newName);
+    }
+    
+    @Override
+    public Set<LSFPropDeclaration> getDependencies() {
+        return getPropDependencies(this);
+    }
+    
+    public static Set<LSFPropDeclaration> getPropDependencies(LSFPropDeclaration prop) {
+        Set<LSFPropDeclaration> result = new HashSet<LSFPropDeclaration>();
+
+        Collection<LSFPropReference> propReferences;
+
+        if (prop instanceof LSFGlobalPropDeclaration && prop.isAbstract()) {
+            Collection<PsiReference> references = ReferencesSearch.search(prop.getNameIdentifier()).findAll();
+            propReferences = new ArrayList<LSFPropReference>();
+            for (PsiReference reference : references) {
+                LSFOverrideStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) reference, LSFOverrideStatement.class);
+                if (overrideStatement != null && reference.equals(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage())) {
+                    for (LSFPropertyExpression propertyExpression : overrideStatement.getPropertyExpressionList()) {
+                        propReferences.addAll(PsiTreeUtil.findChildrenOfType(propertyExpression, LSFPropReference.class));    
+                    }
+                }    
+            }
+        } else {
+            propReferences = PsiTreeUtil.findChildrenOfType(prop, LSFPropReference.class);
+        }
+
+        for (LSFPropReference propReference : propReferences) {
+            LSFPropDeclaration propDeclaration = propReference.resolveDecl();
+            if (propDeclaration != null) {
+                result.add(propDeclaration);
+            }
+        }
+
+        return result;    
+    }
+
+    @Override
+    public Set<LSFPropDeclaration> getDependents() {
+        return getPropDependents(this);
+    }
+    
+    public static Set<LSFPropDeclaration> getPropDependents(LSFPropDeclaration prop) {
+        Set<LSFPropDeclaration> result = new HashSet<LSFPropDeclaration>();
+
+        Set<PsiReference> refs = new HashSet<PsiReference>(ReferencesSearch.search(prop.getNameIdentifier(), prop.getUseScope()).findAll());
+
+        for (PsiReference ref : refs) {
+            LSFPropDeclaration dependent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFPropDeclaration.class);
+            if (dependent != null) {
+                result.add(dependent);
+            }
+        }
+
+        return result;     
+    }
+
+    @Override
+    public Integer getComplexity() {
+        return getPropComplexity(this);
+    }
+
+    public static Integer getPropComplexity(LSFPropDeclaration prop) {
+        Integer complexity = 1;
+        if (!(prop instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration) prop).isPersistentProperty())) {
+            Set<LSFPropDeclaration> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching(prop);
+            for (LSFPropDeclaration dependency : dependencies) {
+                complexity += getPropComplexity(dependency);
+            }
+        }
+        
+        return complexity;
     }
 }

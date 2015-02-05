@@ -43,6 +43,10 @@ public final class LSFIcons {
     public static final Icon TABLE = AllIcons.Nodes.DataTables;
     public static final Icon WINDOW = AllIcons.RunConfigurations.Applet;
     public static final Icon WRITE_WHEN = AllIcons.Nodes.PropertyWrite;
+    
+    public static final Icon DEPENDENCY_ZOOM_IN = AllIcons.Graph.ZoomIn;
+    public static final Icon DEPENDENCY_ZOOM_OUT = AllIcons.Graph.ZoomOut;
+    public static final Icon DEPENDENCY_ACTUAL_ZOOM = AllIcons.Graph.ActualZoom;
 
     public static final class Design {
         public static final Icon DESIGN = AllIcons.FileTypes.UiForm;
