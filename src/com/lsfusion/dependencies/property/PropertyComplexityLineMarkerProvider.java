@@ -35,7 +35,7 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
             if (document == null) {
                 document = PsiDocumentManager.getInstance(element.getProject()).getDocument(element.getContainingFile());
             }
-            if (element instanceof LSFPropertyStatement && !((LSFPropertyStatement) element).isAction() && !((LSFPropertyStatement) element).isStoredProperty()) {
+            if (element instanceof LSFPropertyStatement && ((LSFPropertyStatement) element).isCorrect() && !((LSFPropertyStatement) element).isAction() && !((LSFPropertyStatement) element).isStoredProperty()) {
                 int lineNumber = document.getLineNumber(element.getTextOffset());
                 if (!usedLines.contains(lineNumber)) {
                     result.add(createLineMarker((LSFPropertyStatement) element));
