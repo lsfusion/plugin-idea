@@ -3,30 +3,44 @@ package com.lsfusion.dependencies.property;
 import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
+import com.intellij.openapi.editor.Document;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.cache.PropertyComplexityCache;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
-    public LineMarkerInfo getLineMarkerInfo(PsiElement element) {
+    public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
         return null;
     }
 
     @Override
-    public void collectSlowLineMarkers(List<PsiElement> elements, Collection<LineMarkerInfo> result) {
+    public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
+        Document document = null;
+        Set<Integer> usedLines = new HashSet<Integer>();
         for (PsiElement element : elements) {
+            if (document == null) {
+                document = PsiDocumentManager.getInstance(element.getProject()).getDocument(element.getContainingFile());
+            }
             if (element instanceof LSFPropertyStatement && !((LSFPropertyStatement) element).isAction() && !((LSFPropertyStatement) element).isStoredProperty()) {
-                result.add(createLineMarker((LSFPropertyStatement) element));
+                int lineNumber = document.getLineNumber(element.getTextOffset());
+                if (!usedLines.contains(lineNumber)) {
+                    result.add(createLineMarker((LSFPropertyStatement) element));
+                    usedLines.add(lineNumber);
+                }
             }
         }
     }
