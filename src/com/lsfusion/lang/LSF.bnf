@@ -1318,12 +1318,12 @@ navigatorElementStatementBody ::=   (   LBRACE
                                         RBRACE
                                     ) | emptyStatement
 
-addNavigatorElementStatement ::= ADD navigatorElementSelector (stringLiteral)? navigatorElementInsertPosition (TO windowUsage)? navigatorElementStatementBody
+addNavigatorElementStatement ::= ADD navigatorElementSelector (stringLiteral)? navigatorElementOptions navigatorElementStatementBody
 {
     pin = 1
 }
 
-newNavigatorElementStatement ::= NEW simpleName (ACTION noContextPropertyUsage)? stringLiteral navigatorElementInsertPosition (TO windowUsage)? (IMAGE stringLiteral)? navigatorElementStatementBody
+newNavigatorElementStatement ::= NEW simpleName (stringLiteral)? (ACTION noContextPropertyUsage)? navigatorElementOptions navigatorElementStatementBody
 {
     pin = 2
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFNavigatorElementDeclarationImpl"
@@ -1332,11 +1332,17 @@ newNavigatorElementStatement ::= NEW simpleName (ACTION noContextPropertyUsage)?
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
+setupNavigatorElementStatement ::= navigatorElementSelector (stringLiteral)? navigatorElementOptions navigatorElementStatementBody
+
+navigatorElementOptions ::= (	WINDOW windowUsage
+                            |	navigatorElementInsertPosition 
+                            |	IMAGE stringLiteral
+                            )*
+
+
 navigatorElementInsertPosition ::=	(   insertRelativePositionLiteral navigatorElementSelector
                                     |	FIRST
-                                    )?
-
-setupNavigatorElementStatement ::= navigatorElementSelector (stringLiteral)? (TO windowUsage)? navigatorElementStatementBody
+                                    )
 
 navigatorElementSelector ::= navigatorElementUsage
 
