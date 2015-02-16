@@ -222,6 +222,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "HTML"                    			{ return HTML; }
   "IF"                      			{ return IF; }
   "IMAGE"                   			{ return IMAGE; }
+  "IMPORT"                   			{ return IMPORT; }
   "IMPOSSIBLE"              			{ return IMPOSSIBLE; }
   "IN"                      			{ return IN; }
   "INDEX"                   			{ return INDEX; }
@@ -352,7 +353,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "WHILE"                   			{ return WHILE; }
   "WINDOW"                  			{ return WINDOW; }
   "XLS"                                 { return XLS; }
-  "XLSX"                                 { return XLSX; }
+  "XLSX"                                { return XLSX; }
   "XOR"                     			{ return XOR; }
   "YES"                     			{ return YES; }
   "##"                                  { return FAKETWODASHES;}

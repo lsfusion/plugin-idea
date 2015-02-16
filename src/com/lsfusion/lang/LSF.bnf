@@ -590,6 +590,7 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |	evalActionPropertyDefinitionBody
                 |	drillDownActionPropertyDefinitionBody
                 |	focusActionPropertyDefinitionBody
+                |   importActionPropertyDefinitionBody
 
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
@@ -731,6 +732,13 @@ focusActionPropertyDefinitionBody ::= FOCUS formPropertyDrawID
     methods = [inferActionParamClasses]
 }
 
+importActionPropertyDefinitionBody ::= IMPORT XLS TO nonEmptyNoContextPropertyUsageList FROM propertyExpression
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
 drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
 {
     pin = 1
@@ -776,7 +784,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 }
 
 private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
-                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | FORM | TRY | IF | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
+                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | REQUEST | RETURN | SEEK | WHILE
                                             | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID
