@@ -74,6 +74,7 @@ public class DesignView extends JPanel implements Disposable {
     private final Map<ComponentView, Boolean> selection = new HashMap<ComponentView, Boolean>();
 
     private final MergingUpdateQueue myUpdateQueue;
+    private final MergingUpdateQueue redrawQueue;
 
     private boolean firstDraw = true;
 
@@ -84,8 +85,11 @@ public class DesignView extends JPanel implements Disposable {
         myUpdateQueue = new MergingUpdateQueue("DesignView", 150, false, toolWindow.getComponent(), this, toolWindow.getComponent(), true);
         myUpdateQueue.setRestartTimerOnAdd(true);
 
+        redrawQueue = new MergingUpdateQueue("DesignView", 150, false, toolWindow.getComponent(), this, toolWindow.getComponent(), true);
+        redrawQueue.setRestartTimerOnAdd(true);
+
         if (initialFormName != null && initialModule != null) {
-            redraw(initialModule, initialFormName);
+            update(initialModule, initialFormName);
         }
 
         final TimerListener timerListener = new TimerListener() {
@@ -163,13 +167,24 @@ public class DesignView extends JPanel implements Disposable {
             @Override
             public void run() {
                 if (!project.isDisposed()) {
-                    redraw(module, formName);
+                    update(module, formName);
+                }
+            }
+        });
+    }         
+    
+    public void scheduleRedraw() {
+        redrawQueue.queue(new Update("redraw") {
+            @Override
+            public void run() {
+                if (!project.isDisposed()) {
+                    redrawForm();
                 }
             }
         });
     }
 
-    public void redraw(LSFModuleDeclaration module, String formName) {
+    public void update(LSFModuleDeclaration module, String formName) {
         this.module = module;
         this.formName = formName;
 
@@ -262,11 +277,12 @@ public class DesignView extends JPanel implements Disposable {
             @Override
             public void onNodeStateChanged(ComponentTreeNode node) {
                 selection.put(node.getComponent(), node.isChecked());
+                scheduleRedraw();
             }
 
             @Override
             public void nodeChecked(ComponentTreeNode node, boolean checked) {
-                rebuildForm();
+                redrawForm();
             }
         });
     }
@@ -290,7 +306,7 @@ public class DesignView extends JPanel implements Disposable {
         formSplitter.setFirstComponent(leftPanel);
         formSplitter.setSecondComponent(formLayer);
 
-        rebuildForm();
+        redrawForm();
 
         setLayout(new BorderLayout());
         add(formSplitter);
@@ -341,7 +357,7 @@ public class DesignView extends JPanel implements Disposable {
         return true;
     }
 
-    private void rebuildForm() {
+    private void redrawForm() {
         formPanel.removeAll();
 
         JComponent rootWidget = rootComponent.createWidget(project, selection, componentToWidget);

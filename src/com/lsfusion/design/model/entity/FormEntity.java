@@ -140,7 +140,11 @@ public class FormEntity {
 
             List<LSFStringLiteral> stringLiterals = regularFilterDeclaration.getStringLiteralList();
             boolean isDefault = regularFilterDeclaration.getFilterSetDefault() != null;
-            RegularFilterEntity filter = new RegularFilterEntity(stringLiterals.get(0).getValue(), KeyStroke.getKeyStroke(stringLiterals.get(1).getValue()), params, isDefault);
+            KeyStroke keyStroke = null;
+            if (stringLiterals.size() > 1) {
+                keyStroke = KeyStroke.getKeyStroke(stringLiterals.get(1).getValue());
+            }
+            RegularFilterEntity filter = new RegularFilterEntity(stringLiterals.get(0).getValue(), keyStroke, params, isDefault);
             filterGroup.addFilter(filter);
         }
     }
