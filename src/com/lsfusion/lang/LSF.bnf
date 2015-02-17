@@ -1358,17 +1358,15 @@ navigatorElementSelector ::= navigatorElementUsage
 ////////////////////////////////// DESIGN STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-designStatement ::=	(designDeclaration | extendDesignDeclaration) componentBody {
+designStatement ::=	designHeader componentBody {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.FormContext"
     methods = [ getIcon resolveFormDecl]
 }
 
-designDeclaration ::= DESIGN formUsage (stringLiteral)? (fromDefaultStatement)? {pin=2}
+designHeader ::= DESIGN formUsage customFormDesignOption? {pin=2}
 
-fromDefaultStatement ::= FROM DEFAULT
-
-extendDesignDeclaration ::= EXTEND DESIGN formUsage
+customFormDesignOption ::= CUSTOM
 
 componentBody ::= componentBlockStatement | emptyStatement
 

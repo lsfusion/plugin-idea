@@ -52,19 +52,17 @@ public class DesignInfo {
         }
         Collections.sort(formUsages, REQUIRES_COMPARATOR);
 
+        formView = DefaultFormView.create(formEntity);
+        
         for (LSFFormUsage ref : formUsages) {
             PsiElement parent = ref.getParent();
-            if (parent instanceof LSFDesignDeclaration) {
-                formView = ((LSFDesignDeclaration) parent).getFromDefaultStatement() != null ? DefaultFormView.create(formEntity) : FormView.create(formEntity);
-            }
-            if (formView != null && (parent instanceof LSFDesignDeclaration || parent instanceof LSFExtendDesignDeclaration)) {
+            if (parent instanceof LSFDesignHeader) {
+                if (((LSFDesignHeader) parent).getCustomFormDesignOption() != null) {
+                    formView = FormView.create(formEntity);
+                }
                 LSFDesignStatement designStatement = (LSFDesignStatement) parent.getParent();
-
                 processComponentBody(formView.getMainContainer(), designStatement.getComponentBody());
             }
-        }
-        if (formView == null) { // если дизайн вообще не прописан
-            formView = DefaultFormView.create(formEntity);
         }
     }
 

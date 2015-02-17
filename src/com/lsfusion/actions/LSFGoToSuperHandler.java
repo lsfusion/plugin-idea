@@ -8,13 +8,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.meta.MetaChangeDetector;
-import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFClassStatement;
+import com.lsfusion.lang.psi.LSFFormStatement;
+import com.lsfusion.lang.psi.LSFMetaCodeDeclarationStatement;
+import com.lsfusion.lang.psi.LSFOverrideStatement;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -47,17 +48,6 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
                     LSFFormDeclaration formDecl = ((LSFFormStatement) statement).resolveFormDecl();
                     if (formDecl != null) {
                         targets.add(formDecl.getNameIdentifier());
-                    }
-                } else if (statement instanceof LSFDesignStatement && ((LSFDesignStatement) statement).getExtendDesignDeclaration() != null) {
-                    LSFFormDeclaration formDecl = ((LSFDesignStatement) statement).resolveFormDecl();
-                    if (formDecl != null) {
-                        for (PsiReference reference : ReferencesSearch.search(formDecl.getNameIdentifier()).findAll()) {
-                            PsiElement st = LSFPsiUtils.getStatementParent(reference.getElement());
-                            if (st instanceof LSFDesignStatement && ((LSFDesignStatement) st).getExtendDesignDeclaration() == null) {
-                                targets.add(((LSFDesignStatement) st).getDesignDeclaration().getFormUsage());
-                                break;
-                            }
-                        }
                     }
                 } else if (statement instanceof LSFClassStatement && ((LSFClassStatement) statement).getExtendingClassDeclaration() != null) {
                     targets.add(((LSFClassStatement) statement).resolveDecl().getNameIdentifier());

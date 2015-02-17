@@ -2844,16 +2844,8 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFDesignStatement designStatement) {
-        LSFDesignDeclaration designDecl = designStatement.getDesignDeclaration();
-        if (designDecl != null) {
-            return resolveFormDecl(designDecl.getFormUsage());
-        }
-
-        LSFExtendDesignDeclaration extendDesignDeclaration = designStatement.getExtendDesignDeclaration();
-
-        assert extendDesignDeclaration != null;
-
-        return resolveFormDecl(extendDesignDeclaration.getFormUsage());
+        LSFDesignHeader designHeader = designStatement.getDesignHeader();
+        return resolveFormDecl(designHeader.getFormUsage());
     }
 
     @Nullable
