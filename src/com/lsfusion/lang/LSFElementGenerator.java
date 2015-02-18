@@ -20,14 +20,13 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFComponentDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
-import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.references.impl.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -139,7 +138,7 @@ public class LSFElementGenerator {
 
     public static List<? extends LSFComponentDeclaration> createFormComponents(Project project, List<String> componentsNames) {
         String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
-                "DESIGN defaultForm FROM DEFAULT {";
+                "DESIGN defaultForm {";
         for (String name : componentsNames) {
             text += "NEW " + name + ";";
         }

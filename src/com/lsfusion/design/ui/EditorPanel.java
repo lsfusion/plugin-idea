@@ -39,7 +39,7 @@ import static javax.swing.BorderFactory.*;
         - RegularFilterGroupView.isSingle
         - forceHide
             - гриды, тулбары, фильтры, showtype для групп дерева
-    - учесть отсутствие FROM DEFAULT
+    - учесть CUSTOM (раньше: отсутствие FROM DEFAULT)
  */
 public class EditorPanel extends JPanel {
 
