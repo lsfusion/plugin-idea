@@ -336,7 +336,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "TEXTHALIGN"              			{ return TEXTHALIGN; }
   "TEXTVALIGN"              			{ return TEXTVALIGN; }
   "THEN"                    			{ return THEN; }
-  "TITLE"                   			{ return TITLE; }
   "TO"                      			{ return TO; }
   "TODRAW"                  			{ return TODRAW; }
   "TOOLBAR"                 			{ return TOOLBAR; }
