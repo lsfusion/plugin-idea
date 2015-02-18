@@ -945,8 +945,7 @@ reportFilesDeclaration ::= REPORTFILES groupObjectReportPath (COMMA groupObjectR
 groupObjectReportPath ::= (TOP | groupObjectUsage) formPropertyObject
 
 formDecl ::= FORM simpleNameWithCaption
-		            (   TITLE stringLiteral
-		            |   modalityTypeLiteral
+		            (   modalityTypeLiteral
 		            |   IMAGE stringLiteral
 		            |   AUTOREFRESH intLiteral
 		            )*
