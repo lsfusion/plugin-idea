@@ -153,9 +153,11 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "LEADING"             			    { return LEADING; }
   "TRAILING"             			    { return TRAILING; }
   "STRETCH"             			    { return STRETCH; }
+  "CSV"                  			    { return CSV; }
   "CUSTOM"                  			{ return CUSTOM; }
   "CYCLES"                  			{ return CYCLES; }
   "DATA"                    			{ return DATA; }
+  "DBF"                    			    { return DBF; }
   "DEFAULT"                 			{ return DEFAULT; }
   "DELETE"                  			{ return DELETE; }
   "DELETESESSION"           			{ return DELETESESSION; }

@@ -732,7 +732,7 @@ focusActionPropertyDefinitionBody ::= FOCUS formPropertyDrawID
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT XLS TO nonEmptyNoContextPropertyUsageList FROM propertyExpression
+importActionPropertyDefinitionBody ::= IMPORT (XLS | XLSX | DBF | CSV) TO nonEmptyNoContextPropertyUsageList FROM propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
