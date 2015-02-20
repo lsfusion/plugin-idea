@@ -192,6 +192,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "EXEC"                    			{ return EXEC; }
   "EXTEND"                  			{ return EXTEND; }
   "EXTERNAL"                  			{ return EXTERNAL; }
+  "FILE"                                { return FILE; }
   "FILTER"                  			{ return FILTER; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
   "FILTERS"                 			{ return FILTERS; }
@@ -299,6 +300,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "QUERYCLOSE"              			{ return QUERYCLOSE; }
   "QUERYOK"                 			{ return QUERYOK; }
   "QUICKFILTER"                         { return QUICKFILTER; }
+  "READ"                			    { return READ; }
   "READONLY"                			{ return READONLY; }
   "READONLYIF"              			{ return READONLYIF; }
   "RECURSION"               			{ return RECURSION; }
