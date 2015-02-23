@@ -740,7 +740,7 @@ readActionPropertyDefinitionBody ::= READ FILE propertyExpression TO propertyUsa
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT (XLS | XLSX | DBF | CSV) TO nonEmptyNoContextPropertyUsageList FROM propertyExpression
+importActionPropertyDefinitionBody ::= IMPORT (XLS | XLSX | DBF | CSV | XML) TO nonEmptyNoContextPropertyUsageList FROM propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"

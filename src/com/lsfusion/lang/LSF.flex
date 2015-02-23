@@ -357,6 +357,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "WINDOW"                  			{ return WINDOW; }
   "XLS"                                 { return XLS; }
   "XLSX"                                { return XLSX; }
+  "XML"                                 { return XML; }
   "XOR"                     			{ return XOR; }
   "YES"                     			{ return YES; }
   "##"                                  { return FAKETWODASHES;}
