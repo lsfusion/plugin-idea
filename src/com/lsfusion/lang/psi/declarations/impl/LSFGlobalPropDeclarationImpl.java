@@ -143,7 +143,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         LSFClassParamDeclareList cpd = decl.getClassParamDeclareList();
         List<LSFExClassSet> declareClasses = null;
         if (cpd != null) {
-            declareClasses = LSFExClassSet.toEx(LSFPsiImplUtil.resolveClass(cpd));
+            declareClasses = LSFExClassSet.toEx(LSFPsiImplUtil.resolveExplicitClass(cpd));
             if (LSFPsiImplUtil.allClassesDeclared(declareClasses)) // оптимизация
                 return declareClasses;
         }

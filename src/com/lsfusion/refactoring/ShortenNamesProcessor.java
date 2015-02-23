@@ -62,6 +62,10 @@ public class ShortenNamesProcessor {
             new PropInMetaRef(new PropRef("stock", "Invoice", Collections.singletonList(new ClassRef("InvoiceDetail", "Invoice")), true), new MetacodeRef("defineInvoice", "Invoice", 4), false, true)
     };
 
+    private static boolean isPredefinedWord(String s) {
+        return s.equals("VAT") || s.equals("UOM");
+    }
+
     public static List<String> getWords(String string) {
         if(string.isEmpty())
             return new ArrayList<String>();
@@ -69,7 +73,7 @@ public class ShortenNamesProcessor {
         List<String> result = new ArrayList<String>();
         int prevStart = 0;
         for(int i=1;i<string.length();i++) {
-            if(Character.isUpperCase(string.charAt(i)) && !(Character.isUpperCase(string.charAt(i-1)) && (i+1>=string.length() || Character.isUpperCase(string.charAt(i + 1))) && !string.substring(prevStart, i).equals("VAT"))) {
+            if(Character.isUpperCase(string.charAt(i)) && !(Character.isUpperCase(string.charAt(i-1)) && (i+1>=string.length() || Character.isUpperCase(string.charAt(i + 1))) && !isPredefinedWord(string.substring(prevStart, i)))) {
                 if(prevStart >= 0)
                     result.add(string.substring(prevStart, i));
                 prevStart = i;

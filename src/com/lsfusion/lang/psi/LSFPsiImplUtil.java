@@ -5,6 +5,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafElement;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.classes.*;
@@ -438,20 +439,40 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFClassSet resolveClass(@NotNull LSFClassParamDeclare sourceStatement) {
+        LSFClassSet explicitClass = resolveExplicitClass(sourceStatement);
+        if(explicitClass != null)
+            return explicitClass;
+
+        LSFPropertyDeclaration propDecl = PsiTreeUtil.getParentOfType(sourceStatement, LSFPropertyDeclaration.class);
+        if(propDecl != null) {
+            LSFGlobalPropDeclaration statement = PsiTreeUtil.getParentOfType(sourceStatement, LSFGlobalPropDeclaration.class);
+            if(statement.getExpressionUnfriendlyPD() != null) { // оптимизация, хотя в некоторых случаях все же меняет поведение
+                int paramNum = PsiTreeUtil.getParentOfType(sourceStatement, LSFNonEmptyClassParamDeclareList.class).getClassParamDeclareList().indexOf(sourceStatement);
+                assert paramNum >= 0;
+                List<LSFExClassSet> paramClasses = statement.resolveExParamClasses();// для кэширования, так можно было бы resolveValueParamClasses вызвать
+                if (paramClasses != null && paramNum < paramClasses.size())
+                    return LSFExClassSet.fromEx(paramClasses.get(paramNum));
+            }
+        }
+        return resolveExplicitClass(sourceStatement);
+    }
+
+    @Nullable
+    public static LSFClassSet resolveExplicitClass(@NotNull LSFClassParamDeclare sourceStatement) {
         LSFClassName className = sourceStatement.getClassName();
         if (className == null)
             return null;
         return resolveClass(className);
     }
 
-    public static List<LSFClassSet> resolveClass(LSFClassParamDeclareList classNameList) {
+    public static List<LSFClassSet> resolveExplicitClass(LSFClassParamDeclareList classNameList) {
         List<LSFClassSet> result = new ArrayList<LSFClassSet>();
 
         LSFNonEmptyClassParamDeclareList ne = classNameList.getNonEmptyClassParamDeclareList();
         if (ne == null)
             return result;
         for (LSFClassParamDeclare classParamDeclare : ne.getClassParamDeclareList())
-            result.add(resolveClass(classParamDeclare));
+            result.add(resolveExplicitClass(classParamDeclare));
         return result;
     }
 

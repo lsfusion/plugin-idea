@@ -16,7 +16,6 @@ public interface LSFPropDeclaration extends LSFDeclaration {
     List<LSFClassSet> resolveParamClasses();
     
     LSFClassSet resolveValueClass();
-    
 
     LSFExClassSet resolveExValueClass(boolean infer);
 
