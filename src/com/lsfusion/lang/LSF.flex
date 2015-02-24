@@ -192,7 +192,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "EXEC"                    			{ return EXEC; }
   "EXTEND"                  			{ return EXTEND; }
   "EXTERNAL"                  			{ return EXTERNAL; }
-  "FILE"                                { return FILE; }
   "FILTER"                  			{ return FILTER; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
   "FILTERS"                 			{ return FILTERS; }
@@ -347,6 +346,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "TREE"                    			{ return TREE; }
   "TRY"                                 { return TRY; }
   "UNGROUP"                 			{ return UNGROUP; }
+  "URL"                 			    { return URL; }
   "VALIGN"                  			{ return VALIGN; }
   "VERTICAL"                			{ return VERTICAL; }
   "VIEW"                    			{ return VIEW; }

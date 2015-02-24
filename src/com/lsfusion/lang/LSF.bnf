@@ -733,7 +733,7 @@ focusActionPropertyDefinitionBody ::= FOCUS formPropertyDrawID
     methods = [inferActionParamClasses]
 }
 
-readActionPropertyDefinitionBody ::= READ FILE propertyExpression TO propertyUsage
+readActionPropertyDefinitionBody ::= READ URL propertyExpression TO propertyUsage
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
