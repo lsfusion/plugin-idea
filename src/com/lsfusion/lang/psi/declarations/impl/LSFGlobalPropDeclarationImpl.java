@@ -642,11 +642,13 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     
     private static Integer getPropComplexity(LSFPropDeclaration prop, Set<LSFPropDeclaration> processed) {
         Integer complexity = 1;
-        processed.add(prop);
-        if (!processed.contains(prop) && !(prop instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration) prop).isPersistentProperty())) {
-            Set<LSFPropDeclaration> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching(prop);
-            for (LSFPropDeclaration dependency : dependencies) {
-                complexity += getPropComplexity(dependency, processed);
+        if (!processed.contains(prop)) {
+            processed.add(prop);
+            if (!(prop instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration) prop).isPersistentProperty())) {
+                Set<LSFPropDeclaration> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching(prop);
+                for (LSFPropDeclaration dependency : dependencies) {
+                    complexity += getPropComplexity(dependency, processed);
+                }
             }
         }
 
