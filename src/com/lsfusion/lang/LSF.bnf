@@ -1371,7 +1371,7 @@ designStatement ::=	designHeader componentBody {
     methods = [ getIcon resolveFormDecl]
 }
 
-designHeader ::= DESIGN formUsage customFormDesignOption? {pin=2}
+designHeader ::= DESIGN formUsage (stringLiteral)? customFormDesignOption? {pin=2}
 
 customFormDesignOption ::= CUSTOM
 
