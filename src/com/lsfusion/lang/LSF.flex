@@ -354,6 +354,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "WHEN"                    			{ return WHEN; }
   "WHERE"                   			{ return WHERE; }
   "WHILE"                   			{ return WHILE; }
+  "WRITE"                   			{ return WRITE; }
   "WINDOW"                  			{ return WINDOW; }
   "XLS"                                 { return XLS; }
   "XLSX"                                { return XLSX; }

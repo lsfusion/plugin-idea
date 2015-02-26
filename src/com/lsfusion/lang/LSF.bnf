@@ -591,6 +591,7 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |	drillDownActionPropertyDefinitionBody
                 |	focusActionPropertyDefinitionBody
                 |   readActionPropertyDefinitionBody
+                |   writeActionPropertyDefinitionBody
                 |   importActionPropertyDefinitionBody
 
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
@@ -740,6 +741,13 @@ readActionPropertyDefinitionBody ::= READ URL propertyExpression TO propertyUsag
     methods = [inferActionParamClasses]
 }
 
+writeActionPropertyDefinitionBody ::= WRITE propertyExpression FROM propertyUsage
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
 importActionPropertyDefinitionBody ::= IMPORT (XLS | XLSX | DBF | CSV | XML) TO nonEmptyPropertyUsageListWithIds FROM propertyExpression
 {
     pin = 1
@@ -797,7 +805,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 
 private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
-                                            | READ | REQUEST | RETURN | SEEK | WHILE
+                                            | READ | REQUEST | RETURN | SEEK | WHILE| WRITE
                                             | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID
                                             | SEMI
