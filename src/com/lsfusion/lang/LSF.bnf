@@ -740,12 +740,16 @@ readActionPropertyDefinitionBody ::= READ URL propertyExpression TO propertyUsag
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT (XLS | XLSX | DBF | CSV | XML) TO nonEmptyNoContextPropertyUsageList FROM propertyExpression
+importActionPropertyDefinitionBody ::= IMPORT (XLS | XLSX | DBF | CSV | XML) TO nonEmptyPropertyUsageListWithIds FROM propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
+
+nonEmptyPropertyUsageListWithIds ::= propertyUsageWithId (COMMA propertyUsageWithId)*
+
+propertyUsageWithId ::= (ID EQUALS)? propertyUsage
 
 drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
 {
