@@ -818,7 +818,6 @@ stubListActionStatement ::=     (
                                     |
                                     (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
                                 )
-                                (AUTOAPPLY)?
                                 (SINGLE)?
                                 LBRACE
 {
