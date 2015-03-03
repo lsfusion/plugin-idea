@@ -114,14 +114,13 @@ public class DesignInfo {
         List<LSFComponentStatement> componentStatements = componentBlockStatement.getComponentStatementList();
 
         for (LSFComponentStatement componentStatement : componentStatements) {
-            if (componentStatement.getSetupComponentStatement() != null) {
-                LSFSetupComponentStatement statement = componentStatement.getSetupComponentStatement();
-
-                String componentSID = getComponentSID(statement.getComponentSelector(), formView);
+            LSFSetupComponentStatement setupComponentStatement = componentStatement.getSetupComponentStatement();
+            if (setupComponentStatement != null) {
+                String componentSID = getComponentSID(setupComponentStatement.getComponentSelector(), formView);
                 ComponentView componentView = formView.getComponentBySID(componentSID);
 
                 if (componentView != null) {
-                    processComponentBody(componentView, statement.getComponentBody());
+                    processComponentBody(componentView, setupComponentStatement.getComponentBody());
                 }
             } else if (componentStatement.getNewComponentStatement() != null) {
                 LSFNewComponentStatement statement = componentStatement.getNewComponentStatement();
@@ -150,15 +149,13 @@ public class DesignInfo {
                 }
             } else if (componentStatement.getSetObjectPropertyStatement() != null) {
                 LSFSetObjectPropertyStatement statement = componentStatement.getSetObjectPropertyStatement();
-                if (statement != null) {
-                    String propertyName = statement.getFirstChild().getText();
+                String propertyName = statement.getFirstChild().getText();
 
-                    LSFComponentPropertyValue propertyValue = statement.getComponentPropertyValue();
-                    Object propertyValueObject = getPropertyValue(propertyValue);
+                LSFComponentPropertyValue propertyValue = statement.getComponentPropertyValue();
+                Object propertyValueObject = getPropertyValue(propertyValue);
 
-                    if (parentComponent != null) {
-                        ViewProxyUtil.setObjectProperty(parentComponent.equals(formView.getMainContainer()) ? formView : parentComponent, propertyName, propertyValueObject);
-                    }
+                if (parentComponent != null) {
+                    ViewProxyUtil.setObjectProperty(parentComponent.equals(formView.getMainContainer()) ? formView : parentComponent, propertyName, propertyValueObject);
                 }
             } else if (componentStatement.getRemoveComponentStatement() != null) {
                 LSFRemoveComponentStatement statement = componentStatement.getRemoveComponentStatement();
@@ -244,14 +241,15 @@ public class DesignInfo {
                 
                 LSFNonEmptyObjectUsageList usageList = objectUsageList.getNonEmptyObjectUsageList();
                 if (usageList != null) {
-                    name += "_";
+                    name += "(";
                     List<LSFObjectUsage> objectUsages = usageList.getObjectUsageList();
                     for (LSFObjectUsage objectUsage : objectUsages) {
                         name += objectUsage.getName();
                         if (objectUsages.indexOf(objectUsage) < objectUsages.size() - 1) {
-                            name += "_";
+                            name += ",";
                         }
                     }
+                    name += ")";
                 }
 
                 return name;
