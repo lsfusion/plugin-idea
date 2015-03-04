@@ -2,7 +2,6 @@ package com.lsfusion.design;
 
 import com.intellij.designer.propertyTable.PropertyTable;
 import com.intellij.execution.actions.ConfigurationContext;
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
@@ -68,6 +67,9 @@ public class DesignView extends JPanel implements Disposable {
     private ComponentTree componentTree;
     private PropertyTable propertyTable;
     private boolean selecting = false;
+    
+    private boolean highlighting = false;
+    private List<Component> selectedComponents = new ArrayList<Component>();
 
     private final Map<ComponentView, JComponent> componentToWidget = new HashMap<ComponentView, JComponent>();
     private final Map<JComponent, ComponentView> widgetToComponent = new HashMap<JComponent, ComponentView>();
@@ -225,7 +227,7 @@ public class DesignView extends JPanel implements Disposable {
     }
 
     private void initUiHandlers() {
-        actions.add(new ToggleAction(null, "Show expert properties", AllIcons.General.Filter) {
+        actions.add(new ToggleAction(null, "Show expert properties", LSFIcons.Design.EXPERT_PROPS) {
             @Override
             public boolean isSelected(AnActionEvent e) {
                 return propertyTable.isShowExpertProperties();
@@ -248,6 +250,19 @@ public class DesignView extends JPanel implements Disposable {
                 selecting = state;
             }
         });
+        
+        actions.add(new ToggleAction(null, "Highlight selected components", LSFIcons.Design.HIGHLIGHT) {
+            @Override
+            public boolean isSelected(AnActionEvent e) {
+                return highlighting;
+            }
+
+            @Override
+            public void setSelected(AnActionEvent e, boolean state) {
+                highlighting = state;
+                repaint();
+            }
+        });
 
         actions.add(new AnAction(null, "Refresh", LSFIcons.Design.REFRESH) {
             @Override
@@ -265,11 +280,23 @@ public class DesignView extends JPanel implements Disposable {
         componentTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
-                List<ComponentView> selectedComponents = new ArrayList<ComponentView>();
+                List<ComponentView> selectedComps = new ArrayList<ComponentView>();
+                selectedComponents.clear();
+                
                 for (ComponentTreeNode node : componentTree.getSelectedNodes(ComponentTreeNode.class, null)) {
-                    selectedComponents.add(node.getComponent());
+                    ComponentView component = node.getComponent();
+                    selectedComps.add(component);
+                    
+                    JComponent comp = componentToWidget.get(component);
+                    if (node.isChecked() && comp != null && comp.isShowing()) {
+                        selectedComponents.add(comp);
+                    }
                 }
-                propertyTable.update(selectedComponents, propertyTable.getSelectionProperty());
+                
+                propertyTable.update(selectedComps, propertyTable.getSelectionProperty());
+                if (highlighting) {
+                    repaint();
+                }
             }
         });
 
@@ -431,13 +458,23 @@ public class DesignView extends JPanel implements Disposable {
         @Override
         public void paint(Graphics g, JComponent c) {
             super.paint(g, c);
-            if (selecting && currentWidget != null && currentWidget.getParent() != null) {
-                Rectangle rect = currentWidget.getBounds();
-                rect = SwingUtilities.convertRectangle(currentWidget.getParent(), rect, formLayer);
+            if (selecting) {
+                drawRectangle(g, currentWidget, JBColor.BLUE);
+            } else if (highlighting) {
+                for (Component component : selectedComponents) {
+                    drawRectangle(g, component, JBColor.ORANGE);
+                }
+            }
+        }
+        
+        private void drawRectangle(Graphics g, Component component, Color color) {
+            if (component != null && component.getParent() != null) {
+                Rectangle rect = component.getBounds();
+                rect = SwingUtilities.convertRectangle(component.getParent(), rect, formLayer);
 
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setStroke(new BasicStroke(2));
-                g2.setColor(JBColor.BLUE);
+                g2.setColor(color);
                 g2.drawRect(rect.x, rect.y, rect.width, rect.height);
             }
         }

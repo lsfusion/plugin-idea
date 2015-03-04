@@ -63,7 +63,9 @@ public final class LSFIcons {
         public static final Icon GRID = AllIcons.Nodes.DataTables;
         public static final Icon PROPERTY = AllIcons.Css.Property;
 
+        public static final Icon EXPERT_PROPS = AllIcons.General.Filter;
         public static final Icon FIND = AllIcons.Actions.Find;
+        public static final Icon HIGHLIGHT = AllIcons.General.Locate;
         public static final Icon REFRESH = AllIcons.Actions.Refresh;
 
         public static final Icon VIEW_GRID = IconLoader.getIcon("/images/design/view_grid.png");
