@@ -30,7 +30,7 @@ public class DesignViewFactory {
         this.toolWindow = toolWindow;
 
         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-        String formName = null;
+        LSFFormDeclaration formDeclaration = null;
         LSFModuleDeclaration moduleDeclaration = null;
 
         if (editor != null) {
@@ -38,7 +38,6 @@ public class DesignViewFactory {
             PsiElement targetElement = ConfigurationContext.getFromContext(dataContext).getPsiLocation();
 
             if (targetElement != null) {
-                LSFFormDeclaration formDeclaration = null;
                 LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
                 if (formExtend != null) {
                     formDeclaration = ((LSFFormStatementImpl) formExtend).resolveFormDecl();
@@ -48,9 +47,6 @@ public class DesignViewFactory {
                         formDeclaration = designStatement.resolveFormDecl();
                     }
                 }
-                if (formDeclaration != null) {
-                    formName = formDeclaration.getDeclName();
-                }
 
                 if (targetElement.getContainingFile() instanceof LSFFile) {
                     moduleDeclaration = ((LSFFile) targetElement.getContainingFile()).getModuleDeclaration();
@@ -58,16 +54,18 @@ public class DesignViewFactory {
             }
         }
 
-        designView = new DesignView(project, moduleDeclaration, formName, toolWindow);
+        if (moduleDeclaration != null && formDeclaration != null) {
+            designView = new DesignView(project, moduleDeclaration, formDeclaration, toolWindow);
 
-        toolWindow.getComponent().removeAll();
-        toolWindow.getComponent().add(designView);
-        toolWindow.getComponent().repaint();
+            toolWindow.getComponent().removeAll();
+            toolWindow.getComponent().add(designView);
+            toolWindow.getComponent().repaint();
+        }
     }
 
-    public void updateView(LSFModuleDeclaration module, String formName) {
+    public void updateView(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration) {
         if (toolWindow != null && toolWindow.isVisible()) {
-            designView.scheduleRebuild(module, formName);
+            designView.scheduleRebuild(module, formDeclaration);
         }
     }
 }

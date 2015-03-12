@@ -12,7 +12,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.CheckboxTreeBase;
@@ -30,7 +29,6 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
-import com.lsfusion.lang.psi.indexes.FormIndex;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,7 +53,7 @@ public class DesignView extends JPanel implements Disposable {
     private ComponentTreeNode rootNode;
 
     private LSFModuleDeclaration module;
-    private String formName;
+    private LSFFormDeclaration formDeclaration;
 
     public String formTitle;
 
@@ -80,7 +78,7 @@ public class DesignView extends JPanel implements Disposable {
 
     private boolean firstDraw = true;
 
-    public DesignView(@NotNull Project project, LSFModuleDeclaration initialModule, String initialFormName, final ToolWindowEx toolWindow) {
+    public DesignView(@NotNull Project project, LSFModuleDeclaration initialModule, LSFFormDeclaration formDeclaration, final ToolWindowEx toolWindow) {
         this.project = project;
         this.toolWindow = toolWindow;
 
@@ -90,9 +88,7 @@ public class DesignView extends JPanel implements Disposable {
         redrawQueue = new MergingUpdateQueue("DesignView", 150, false, toolWindow.getComponent(), this, toolWindow.getComponent(), true);
         redrawQueue.setRestartTimerOnAdd(true);
 
-        if (initialFormName != null && initialModule != null) {
-            update(initialModule, initialFormName);
-        }
+        update(initialModule, formDeclaration);
 
         final TimerListener timerListener = new TimerListener() {
             @Override
@@ -157,19 +153,19 @@ public class DesignView extends JPanel implements Disposable {
             }
 
             if (formName != null && module != null) {
-                if (!formName.equals(this.formName) || module != this.module) {
-                    scheduleRebuild(module, formName);
+                if (formDeclaration != this.formDeclaration || module != this.module) {
+                    scheduleRebuild(module, formDeclaration);
                 }
             }
         }
     }
 
-    public void scheduleRebuild(final LSFModuleDeclaration module, final String formName) {
+    public void scheduleRebuild(final LSFModuleDeclaration module, final LSFFormDeclaration formDeclaration) {
         myUpdateQueue.queue(new Update("rebuild") {
             @Override
             public void run() {
                 if (!project.isDisposed()) {
-                    update(module, formName);
+                    update(module, formDeclaration);
                 }
             }
         });
@@ -186,44 +182,27 @@ public class DesignView extends JPanel implements Disposable {
         });
     }
 
-    public void update(LSFModuleDeclaration module, String formName) {
+    public void update(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration) {
         this.module = module;
-        this.formName = formName;
+        this.formDeclaration = formDeclaration;
 
-        layoutDesign(module, formName);
+        layoutDesign(module, formDeclaration);
     }
 
-    private void layoutDesign(LSFModuleDeclaration module, String formName) {
-        DesignInfo designInfo = getDesignInfo(module, formName);
+    private void layoutDesign(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration) {
+        DesignInfo designInfo = new DesignInfo(formDeclaration, module.getLSFFile());
 
-        if (designInfo != null) {
-            removeAll();
-            rootComponent = designInfo.formView.mainContainer;
-            formTitle = designInfo.getFormCaption();
-            createLayout();
+        removeAll();
+        rootComponent = designInfo.formView.mainContainer;
+        formTitle = designInfo.getFormCaption();
+        createLayout();
 
-            if (firstDraw) {
-                initUiHandlers();
-                firstDraw = false;
-            } else {
-                initListeners();
-            }
+        if (firstDraw) {
+            initUiHandlers();
+            firstDraw = false;
+        } else {
+            initListeners();
         }
-    }
-
-    private DesignInfo getDesignInfo(LSFModuleDeclaration module, String formName) {
-        DesignInfo designInfo = null;
-
-        try {
-            Collection<LSFFormDeclaration> declarations = FormIndex.getInstance().get(formName, module.getProject(), module.getLSFFile().getRequireScope());
-            if (!declarations.isEmpty()) {
-                LSFFormDeclaration formDeclaration = declarations.iterator().next();
-                designInfo = new DesignInfo(formDeclaration, module.getLSFFile());
-            }
-        } catch (PsiInvalidElementAccessException ignored) {
-        }
-
-        return designInfo;
     }
 
     private void initUiHandlers() {
@@ -267,7 +246,7 @@ public class DesignView extends JPanel implements Disposable {
         actions.add(new AnAction(null, "Refresh", LSFIcons.Design.REFRESH) {
             @Override
             public void actionPerformed(AnActionEvent e) {
-                layoutDesign(module, formName);
+                layoutDesign(module, formDeclaration);
             }
         });
 

@@ -103,7 +103,7 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
                 public void run() {
                     try {
                         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-                        String formName = null;
+                        LSFFormDeclaration formDeclaration = null;
                         LSFModuleDeclaration module = null;
 
                         if (editor != null) {
@@ -112,7 +112,6 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
 
                             if (targetElement != null) {
                                 LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
-                                LSFFormDeclaration formDeclaration = null;
                                 if (formExtend != null) {
                                     formDeclaration = ((LSFFormStatementImpl) formExtend).resolveFormDecl();
                                 } else {
@@ -122,18 +121,14 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
                                     }
                                 }
 
-                                if (formDeclaration != null) {
-                                    formName = formDeclaration.getDeclName();
-                                }
-
                                 if (targetElement.getContainingFile() instanceof LSFFile) {
                                     module = ((LSFFile) targetElement.getContainingFile()).getModuleDeclaration();
                                 }
                             }
                         }
 
-                        if (module != null && formName != null) {
-                            DesignViewFactory.getInstance().updateView(module, formName);
+                        if (module != null && formDeclaration != null) {
+                            DesignViewFactory.getInstance().updateView(module, formDeclaration);
                         }
                     } catch (PsiInvalidElementAccessException ignored) {
                     }

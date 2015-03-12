@@ -96,7 +96,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
                     editor.getCaretModel().moveToOffset(psi.getTextOffset());
                 }
 
-                DesignViewFactory.getInstance().updateView(((LSFFile) psi.getContainingFile()).getModuleDeclaration(), formDecl.getDeclName());
+                DesignViewFactory.getInstance().updateView(((LSFFile) psi.getContainingFile()).getModuleDeclaration(), formDecl);
             }
         }
     }
