@@ -31,6 +31,7 @@ import com.jgraph.layout.tree.JGraphCompactTreeLayout;
 import com.jgraph.layout.tree.JGraphRadialTreeLayout;
 import com.jgraph.layout.tree.JGraphTreeLayout;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.dependencies.module.DependencySpeedSearch;
 import org.jgraph.JGraph;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.GraphConstants;
@@ -43,10 +44,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class DependenciesView extends JPanel implements Disposable {
     protected final static String HIERARCHICAL_LAYOUT = "Hierarchical Layout";
@@ -79,6 +77,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     protected ListenableDirectedGraph g;
     protected JGraphModelAdapter m_jgAdapter;
     protected JBScrollPane scrollPane;
+    
+    protected GraphNode selectedInSearch;
 
     protected CheckboxAction showRequiredAction;
     protected CheckboxAction showRequiringAction;
@@ -210,7 +210,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                     showDeclPath = state;
                     if (!showDeclPath) {
                         latestTargetElementInPath = null;
-                        recolorGraph(null);
+                        recolorGraph(false);
                         
                     } else {
                         findAndColorPath();
@@ -241,6 +241,10 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         });
 
         return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
+    }
+    
+    public Collection<GraphNode> getAllNodes() {
+        return dataModel.getNodes();
     }
     
     private void checkUpdate() {
@@ -296,6 +300,18 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         initJGraph();
 
+        new DependencySpeedSearch(jgraph) {
+            @Override
+            protected Object[] getAllElements() {
+                return getAllNodes().toArray();
+            }
+
+            @Override
+            protected void selectElement(Object element, String selectedText) {
+                selectNode(isPopupActive() ? (GraphNode) element : null);
+            }
+        };
+
         if (!changeLayout(false)) {
             return;
         }
@@ -305,7 +321,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         initGraphDesign();
 
-        recolorGraph(null);
+        recolorGraph(true);
 
         jgraph.refresh();
         
@@ -433,16 +449,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             ApplicationManager.getApplication().invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        DefaultGraphCell vertexCell = m_jgAdapter.getVertexCell(dataModel.rootNode);
-                        if (vertexCell != null) {
-                            Rectangle bounds = jgraph.getCellBounds(vertexCell).getBounds();
-                            scrollPane.getHorizontalScrollBar().setValue(Math.min(bounds.x - 50, scrollPane.getHorizontalScrollBar().getMaximum()));
-                            scrollPane.getVerticalScrollBar().setValue(Math.min(bounds.y - 50, scrollPane.getVerticalScrollBar().getMaximum()));
-                        }
-                    } catch (IllegalArgumentException e) {
-                        showUnableMessage();
-                    }
+                    scrollToNode(dataModel.rootNode);
                 }
             });
 
@@ -452,6 +459,27 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         }
 
         return true;
+    }
+
+    public void selectNode(GraphNode node) {
+        selectedInSearch = node;
+        recolorGraph(false);
+        if (selectedInSearch != null) {
+            scrollToNode(selectedInSearch);
+        }
+    }
+
+    public void scrollToNode(final GraphNode node) {
+        try {
+            DefaultGraphCell vertexCell = m_jgAdapter.getVertexCell(node);
+            if (vertexCell != null) {
+                Rectangle bounds = jgraph.getCellBounds(vertexCell).getBounds();
+                scrollPane.getHorizontalScrollBar().setValue(Math.min(bounds.x - 50, scrollPane.getHorizontalScrollBar().getMaximum()));
+                scrollPane.getVerticalScrollBar().setValue(Math.min(bounds.y - 50, scrollPane.getVerticalScrollBar().getMaximum()));
+            }
+        } catch (IllegalArgumentException e) {
+            showUnableMessage();
+        }
     }
 
     public void fillGraph() {
@@ -493,8 +521,12 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         m_jgAdapter.edit(cellAttr, null, null, null);
     }
+    
+    public void recolorGraph(boolean redraw) {
+        recolorGraph(null, redraw);
+    }
 
-    public void recolorGraph(String targetElement) {
+    public void recolorGraph(String targetElement, boolean redraw) {
         java.util.List path = null;
         if (targetElement != null) {
             path = dataModel.getPath(g, targetElement);
@@ -507,7 +539,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 Map attr = cell.getAttributes();
                 Color background;
 
-                if (node == dataModel.rootNode) {
+                if (node == selectedInSearch) {
+                    background = JBColor.RED;
+                } else if (node == dataModel.rootNode) {
                     background = getRootNodeColor();
                 } else if (targetElement != null && node == dataModel.getNode(targetElement)) {
                     background = getPathTargetNodeColor();
@@ -518,9 +552,11 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 }
                 GraphConstants.setBackground(attr, background);
                 
-                Border nodeBorder = getNodeBorder(node);
-                if (nodeBorder != null) {
-                    GraphConstants.setBorder(attr, new CompoundBorder(nodeBorder, GraphConstants.getBorder(attr)));
+                if (redraw) {
+                    Border nodeBorder = getNodeBorder(node);
+                    if (nodeBorder != null) {
+                        GraphConstants.setBorder(attr, new CompoundBorder(nodeBorder, GraphConstants.getBorder(attr)));
+                    }
                 }
 
                 cellAttr.put(cell, attr);
@@ -586,7 +622,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     private void findAndColorPath() {
         String pathTarget = getPathTarget();
         if (pathTarget != null && !pathTarget.equals(latestTargetElementInPath)) {
-            recolorGraph(pathTarget);
+            recolorGraph(pathTarget, false);
             latestTargetElementInPath = pathTarget;
         }
     }
