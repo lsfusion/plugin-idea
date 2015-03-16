@@ -266,6 +266,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "DELAY"              			        { return DELAY; }
   "NO"                      			{ return NO; }
   "NOINLINE"                			{ return NOINLINE; }
+  "NOHEADER"                			{ return NOHEADER; }
   "NOT"                     			{ return NOT; }
   "NULL"                    			{ return NULL; }
   "OBJECT"                  			{ return OBJECT; }
