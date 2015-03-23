@@ -8,6 +8,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
+import com.lsfusion.actions.ToggleComplexityAction;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.cache.PropertyComplexityCache;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,10 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
+        if (!elements.isEmpty() && !ToggleComplexityAction.isComplexityEnabled(elements.iterator().next().getProject())) {
+            return;
+        }
+        
         Document document = null;
         Set<Integer> usedLines = new HashSet<Integer>();
         for (PsiElement element : elements) {

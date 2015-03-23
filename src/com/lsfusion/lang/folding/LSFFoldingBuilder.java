@@ -4,8 +4,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.folding.FoldingBuilder;
 import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.tree.IElementType;
+import com.lsfusion.actions.folding.PropertyFoldingManager;
 import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,12 +21,16 @@ public class LSFFoldingBuilder implements FoldingBuilder {
     @Override
     public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
         List<FoldingDescriptor> list = new ArrayList<FoldingDescriptor>();
-        buildFolding(node, list, document);
+        Project project = node.getPsi().getProject();
+        boolean propFoldNone = PropertyFoldingManager.isNone(project);
+        boolean propFoldImplicit = PropertyFoldingManager.isImplicit(project); 
+        
+        buildFolding(node, list, document, propFoldNone, propFoldImplicit);
         FoldingDescriptor[] descriptors = new FoldingDescriptor[list.size()];
         return list.toArray(descriptors);
     }
 
-    private static void buildFolding(ASTNode node, List<FoldingDescriptor> list, Document document) {
+    private static void buildFolding(ASTNode node, List<FoldingDescriptor> list, Document document, boolean propFoldNone, boolean propFoldImplicit) {
         IElementType elementType = node.getElementType();
         boolean fullFolding = elementType == LSFTypes.META_CODE_BODY
                               || elementType == LSFTypes.NAVIGATOR_ELEMENT_STATEMENT_BODY
@@ -46,13 +52,13 @@ public class LSFFoldingBuilder implements FoldingBuilder {
             }
         }
 
-        if (elementType == LSFTypes.PROPERTY_STATEMENT) {
-            LSFPropertyParamsFoldingManager propFildingManager = new LSFPropertyParamsFoldingManager(node, document);
-            list.addAll(propFildingManager.buildDescriptors());
+        if (!propFoldNone && elementType == LSFTypes.PROPERTY_STATEMENT) {
+            LSFPropertyParamsFoldingManager propFoldingManager = new LSFPropertyParamsFoldingManager(node, document);
+            list.addAll(propFoldingManager.buildDescriptors(propFoldImplicit));
         }
 
         for (ASTNode child : node.getChildren(null)) {
-            buildFolding(child, list, document);
+            buildFolding(child, list, document, propFoldNone, propFoldImplicit);
         }
     }
 

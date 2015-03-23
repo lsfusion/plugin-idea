@@ -75,6 +75,24 @@
                 description="Toggle lsFusion completion support">
             <add-to-group group-id="CodeMenu"/>
         </action>
+        <action id="ToggleLSFComplexity" class="com.lsfusion.actions.ToggleComplexityAction"
+                text="Show property complexity" description="Toggle property complexity">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
+        
+        <group id="propertyFolding" popup="true" text="Property classes">
+            <add-to-group group-id="CodeMenu"/>
+            <action id="AllPropertyFolding" class="com.lsfusion.actions.folding.ShowAllPropertyFoldingAction"
+                    text="All" description="Show classes for all properties">
+            </action>
+            <action id="NonePropertyFolding" class="com.lsfusion.actions.folding.ShowNonePropertyFoldingAction"
+                    text="None" description="Don't show classes for properties">
+            </action>
+            <action id="ImplicitPropertyFolding" class="com.lsfusion.actions.folding.ShowImplicitPropertyFoldingAction"
+                    text="Implicit" description="Show implicit classes only">
+            </action>
+        </group>
+        
         <action id="Errors" class="com.lsfusion.actions.ShowErrorsAction" text="Show errors"
                 description="Show all current errors in all files">
             <add-to-group group-id="CodeMenu"/>

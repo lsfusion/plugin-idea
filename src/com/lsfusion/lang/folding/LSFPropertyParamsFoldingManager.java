@@ -10,9 +10,7 @@ import com.intellij.util.containers.ConcurrentWeakHashMap;
 import com.lsfusion.lang.classes.ConcatenateClassSet;
 import com.lsfusion.lang.classes.DataClass;
 import com.lsfusion.lang.classes.LSFClassSet;
-import com.lsfusion.lang.psi.LSFEqualsSign;
-import com.lsfusion.lang.psi.LSFPropertyDeclaration;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -33,8 +31,24 @@ public class LSFPropertyParamsFoldingManager {
     }
 
     @NotNull
-    public List<FoldingDescriptor> buildDescriptors() {
+    public List<FoldingDescriptor> buildDescriptors(boolean implicit) {
         List<FoldingDescriptor> result = new ArrayList<FoldingDescriptor>();
+
+        boolean printValueClass = true;
+        boolean printParamClasses = true;
+        
+        if (implicit) {
+            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
+            if (expressionUnfriendlyPD != null) {
+                LSFContextIndependentPD cipd = expressionUnfriendlyPD.getContextIndependentPD();
+                if (cipd != null && cipd.getFilterPropertyDefinition() == null && cipd.getGroupPropertyDefinition() == null) {
+                    printParamClasses = false;
+                    printValueClass = false;
+                }
+            } else {
+                printParamClasses = false;
+            }
+        }
         
         // в случае, если курсор находится в той же строке, что и знак '=', не добавляем фолдинг или не обновляем (если уже есть), чтобы избежать прыжков 
         boolean currentLine = rebuildIfNotInCurrentLine(result);
@@ -44,16 +58,18 @@ public class LSFPropertyParamsFoldingManager {
 
             if (equalsSign != null) {
                 String text = "";
-                if (!allClassesDefined(propertyStatement.getPropertyDeclaration())) {
+                if (printParamClasses && !allClassesDefined(propertyStatement.getPropertyDeclaration())) {
                     List<LSFClassSet> paramClasses = propertyStatement.resolveParamClasses();
                     if (paramClasses != null && !paramClasses.isEmpty() && !BaseUtils.isAllNull(paramClasses)) {
                         text = "(" + BaseUtils.toString(getClassNames(paramClasses), ", ") + ") ";
                     }
                 }
 
-                String className = getClassName(propertyStatement.resolveValueClass());
-                if (className != null) {
-                    text += "-> " + className + " ";
+                if (printValueClass) {
+                    String className = getClassName(propertyStatement.resolveValueClass());
+                    if (className != null) {
+                        text += "-> " + className + " ";
+                    }
                 }
 
                 if (!text.isEmpty()) {
