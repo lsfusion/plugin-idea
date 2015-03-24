@@ -208,6 +208,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "FORMS"                   			{ return FORMS; }
   "FORMULA"                 			{ return FORMULA; }
   "FROM"                    			{ return FROM; }
+  "FULL"              			        { return FULL; }
   "FULLSCREEN"              			{ return FULLSCREEN; }
   "GLOBAL"                              { return GLOBAL; }
   "GRID"                    			{ return GRID; }

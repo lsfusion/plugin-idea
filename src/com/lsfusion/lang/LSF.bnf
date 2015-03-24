@@ -1274,7 +1274,7 @@ aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPr
 ////////////////////////////////// TABLE STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-tableStatement ::= TABLE simpleName LBRAC nonEmptyClassNameList RBRAC SEMI 
+tableStatement ::= TABLE simpleName LBRAC nonEmptyClassNameList RBRAC (FULL)? SEMI 
 {
     pin = 2
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFTableDeclarationImpl"
