@@ -10,7 +10,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
@@ -73,12 +72,6 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
 
         needTotalExpansion = true;
         return new LSFClassInterfacesTreeModel(file, currentClass, navigationHandler);
-    }
-
-    @NotNull
-    @Override
-    public StructureViewModel createStructureViewModel() {
-        return createStructureViewModel(PsiUtilBase.findEditor(file));
     }
 
     @NotNull

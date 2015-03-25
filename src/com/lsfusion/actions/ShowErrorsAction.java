@@ -67,45 +67,45 @@ public class ShowErrorsAction extends AnAction {
     }
 
     private void executeSearchTask(final List<String> excludedModules) {
-        final boolean showBalloonsState = NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS;
-        NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = false;
+        final boolean showBalloonsState = NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS;
+        NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = false;
 
         final Progressive progress = new Progressive() {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
-                Notifications.Bus.notify(new Notification("", "", "Searching for errors started", NotificationType.INFORMATION));
-
-                // Почему-то, если использовать просто GlobalSearchScope.projectScope(project), при исключении модулей подключает ещё и все библиотеки
-                GlobalSearchScope searchScope = GlobalSearchScope.notScope(GlobalSearchScope.notScope(GlobalSearchScope.projectScope(project)));
-
-                ModulesConfigurator modulesConfigurator = new ModulesConfigurator(project);
-                for (String moduleName : excludedModules) {
-                    Module module = modulesConfigurator.getModule(moduleName);
-                    if (module != null) {
-                        searchScope = searchScope.intersectWith(GlobalSearchScope.notScope(module.getModuleScope()));
-                    }
-                }
-
-                final List<VirtualFile> files = new ArrayList<VirtualFile>();
-
-                if (includeLSFFiles) {
-                    files.addAll(FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope));
-                }
-                if (includeJavaFiles) {
-                    files.addAll(FileTypeIndex.getFiles(JavaFileType.INSTANCE, searchScope));
-                }
-                if (includeJrxmlFiles) {
-                    Collection<VirtualFile> xmlFiles = FileTypeIndex.getFiles(XmlFileType.INSTANCE, searchScope);
-                    for (VirtualFile xmlFile : xmlFiles) {
-                        if (xmlFile.getName().endsWith("jrxml")) {
-                            files.add(xmlFile);
-                        }
-                    }
-                }
-
                 ApplicationManager.getApplication().runReadAction(new Runnable() {
                     @Override
                     public void run() {
+                        Notifications.Bus.notify(new Notification("", "", "Searching for errors started", NotificationType.INFORMATION));
+
+                        // Почему-то, если использовать просто GlobalSearchScope.projectScope(project), при исключении модулей подключает ещё и все библиотеки
+                        GlobalSearchScope searchScope = GlobalSearchScope.notScope(GlobalSearchScope.notScope(GlobalSearchScope.projectScope(project)));
+
+                        ModulesConfigurator modulesConfigurator = new ModulesConfigurator(project);
+                        for (String moduleName : excludedModules) {
+                            Module module = modulesConfigurator.getModule(moduleName);
+                            if (module != null) {
+                                searchScope = searchScope.intersectWith(GlobalSearchScope.notScope(module.getModuleScope()));
+                            }
+                        }
+
+                        final List<VirtualFile> files = new ArrayList<VirtualFile>();
+
+                        if (includeLSFFiles) {
+                            files.addAll(FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope));
+                        }
+                        if (includeJavaFiles) {
+                            files.addAll(FileTypeIndex.getFiles(JavaFileType.INSTANCE, searchScope));
+                        }
+                        if (includeJrxmlFiles) {
+                            Collection<VirtualFile> xmlFiles = FileTypeIndex.getFiles(XmlFileType.INSTANCE, searchScope);
+                            for (VirtualFile xmlFile : xmlFiles) {
+                                if (xmlFile.getName().endsWith("jrxml")) {
+                                    files.add(xmlFile);
+                                }
+                            }
+                        }
+
                         int index = 0;
                         for (VirtualFile file : files) {
                             if (FileStatusManager.getInstance(project).getStatus(file) == FileStatus.IGNORED) {
@@ -119,10 +119,10 @@ public class ShowErrorsAction extends AnAction {
                                 findInjectedErrors(PsiManager.getInstance(project).findFile(file));
                             }
                         }
+
+                        Notifications.Bus.notify(new Notification("", "", "Searching for errors finished", NotificationType.INFORMATION));
                     }
                 });
-
-                Notifications.Bus.notify(new Notification("", "", "Searching for errors finished", NotificationType.INFORMATION));
             }
         };
 
@@ -139,7 +139,7 @@ public class ShowErrorsAction extends AnAction {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                NotificationsConfigurationImpl.getNotificationsConfigurationImpl().SHOW_BALLOONS = showBalloonsState;
+                NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = showBalloonsState;
             }
         });
     }

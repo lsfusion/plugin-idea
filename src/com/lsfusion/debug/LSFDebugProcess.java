@@ -153,7 +153,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         doStepMethod = ReflectionUtils.getPrivateMethod(
             DebugProcessImpl.class,
             "doStep",
-            SuspendContextImpl.class, ThreadReferenceProxyImpl.class, Integer.TYPE, RequestHint.class
+            SuspendContextImpl.class, ThreadReferenceProxyImpl.class, Integer.TYPE, Integer.TYPE, RequestHint.class
         );
 
         getJavaDebugProcess().addDebugProcessListener(new DebugProcessAdapter() {
@@ -434,7 +434,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
     }
 
     private void doStep(final SuspendContextImpl suspendContext, final ThreadReferenceProxyImpl stepThread, int depth, RequestHint hint) {
-        ReflectionUtils.invokeMethod(doStepMethod, getJavaDebugProcess(), suspendContext, stepThread, depth, hint);
+        ReflectionUtils.invokeMethod(doStepMethod, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint);
     }
 
     public abstract class StepCommand extends SuspendContextCommandImpl {
