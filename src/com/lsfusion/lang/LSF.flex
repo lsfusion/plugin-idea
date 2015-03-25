@@ -235,6 +235,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "INLINE"                  			{ return INLINE; }
   "INPUT"                   			{ return INPUT; }
   "IS"                      			{ return IS; }
+  "JDBC"                  			    { return JDBC; }
   "JOIN"                    			{ return JOIN; }
   "LAST"                                { return LAST; }
   "LEFT"                    			{ return LEFT; }
@@ -332,7 +333,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "SINGLE"                  			{ return SINGLE; }
   "SPLITH"                  			{ return SPLITH; }
   "SPLITV"                  			{ return SPLITV; }
-  "SQL"                  			    { return SQL; }
   "STEP"                    			{ return STEP; }
   "STRICT"                  			{ return STRICT; }
   "STRUCT"                  			{ return STRUCT; }

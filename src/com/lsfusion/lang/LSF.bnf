@@ -748,7 +748,7 @@ writeActionPropertyDefinitionBody ::= WRITE propertyExpression FROM propertyUsag
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT (XLS | XLSX | DBF | CSV | XML | SQL | MDB) (stringLiteral)? (NOHEADER)? TO nonEmptyPropertyUsageListWithIds FROM propertyExpression
+importActionPropertyDefinitionBody ::= IMPORT (XLS | XLSX | DBF | CSV | XML | JDBC | MDB) (stringLiteral)? (NOHEADER)? TO nonEmptyPropertyUsageListWithIds FROM propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
