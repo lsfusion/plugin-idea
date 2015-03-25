@@ -245,6 +245,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "LOGGABLE"                			{ return LOGGABLE; }
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "MAX"                     			{ return MAX; }
+  "MDB"                     			{ return MDB; }
   "LAST"                     			{ return LAST; }
   "MAXCHARWIDTH"            			{ return MAXCHARWIDTH; }
   "MENU"                    			{ return MENU; }
