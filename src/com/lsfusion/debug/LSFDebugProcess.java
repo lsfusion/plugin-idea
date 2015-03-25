@@ -148,7 +148,13 @@ public class LSFDebugProcess extends JavaDebugProcess {
         commonDelegateBreakpoints.add(new CommonCustomDelegateBreakpoint());
         
         eEditorsProvider = new LSFDebuggerEditorsProvider();
-        SESSION_EMPTY_CONTEXT = (DebuggerContextImpl) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "SESSION_EMPTY_CONTEXT");
+        DebuggerContextImpl sessionEmptyContext;
+        try {
+            sessionEmptyContext = (DebuggerContextImpl) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "SESSION_EMPTY_CONTEXT");
+        } catch(Exception e) {
+            sessionEmptyContext = (DebuggerContextImpl) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "i");
+        }
+        SESSION_EMPTY_CONTEXT = sessionEmptyContext;
 
         doStepMethod = ReflectionUtils.getPrivateMethod(
             DebugProcessImpl.class,
