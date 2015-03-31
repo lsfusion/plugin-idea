@@ -30,7 +30,7 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
 
     @Override
     public boolean handlesElement(PsiElement element) {
-        return element.getLanguage().is(LSFLanguage.INSTANCE);
+        return element.getLanguage().is(LSFLanguage.INSTANCE) && (!(element instanceof LSFFile) || ((LSFFile) element).getModuleDeclaration() != null);
     }
 
     @Nullable
@@ -76,12 +76,18 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
             return ((LSFExplicitInterfacePropertyStatement) element).getPropertyStatement().getNameIdentifier();
         } else if (element instanceof LSFNewComponentStatement) {
             return ((LSFNewComponentStatement) element).getComponentStubDecl().getComponentDecl().getNameIdentifier();
+        } else if (element instanceof LSFFile) {
+            LSFModuleDeclaration moduleDeclaration = ((LSFFile) element).getModuleDeclaration();
+            return moduleDeclaration.getNameIdentifier();
         } else {
             return ((LSFDeclaration) element).getNameIdentifier();
         }
     }
     
     public static PsiElement getElementToDelete(PsiElement element) {
+        if (element instanceof LSFFile) {
+            return element;
+        }
         PsiElement parentOfType = PsiTreeUtil.getParentOfType(element, LSFExplicitInterfacePropertyStatement.class, LSFClassStatement.class, LSFTableStatement.class,
                 LSFFormStatement.class, LSFGroupStatement.class, LSFWindowStatement.class, LSFMetaCodeDeclarationStatement.class,
                 
