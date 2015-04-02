@@ -1443,8 +1443,7 @@ componentInsertPosition ::= (   insertRelativePositionLiteral componentSelector
                             |	FIRST
                             )?
                             
-removeComponentStatement ::= REMOVE componentSelector (removeCascade)? SEMI {pin = 1}
-removeCascade ::= CASCADE
+removeComponentStatement ::= REMOVE componentSelector SEMI {pin = 1}
 
 componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                 	|	PROPERTY LBRAC propertySelector RBRAC

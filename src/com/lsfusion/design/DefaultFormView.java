@@ -346,11 +346,11 @@ public class DefaultFormView extends FormView {
         formButtonContainer.add(rightControlsContainer);
 
         if (!entity.isModal()) {
-            removeComponent(okFunction, false);
-            removeComponent(closeFunction, false);
+            removeComponent(okFunction);
+            removeComponent(closeFunction);
         }
         if (!entity.isDialog()) {
-            removeComponent(dropFunction, false);
+            removeComponent(dropFunction);
         }
     }
 

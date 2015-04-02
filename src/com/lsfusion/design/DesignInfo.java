@@ -163,7 +163,7 @@ public class DesignInfo {
                     String name = getComponentSID(statement.getComponentSelector(), formView);
                     ComponentView component = formView.getComponentBySID(name);
                     if (component != null) {
-                        formView.removeComponent(component, statement.getRemoveCascade() != null);
+                        formView.removeComponent(component);
                     }
                 }
             }

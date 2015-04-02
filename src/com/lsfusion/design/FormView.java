@@ -248,19 +248,13 @@ public class FormView {
         return (ContainerView) component;
     }
 
-    public void removeComponent(ComponentView component, boolean cascade) {
+    public void removeComponent(ComponentView component) {
 
         component.parent.remove(component);
 
         //не удаляем компоненты (не-контейнеры) из пула, чтобы можно было опять их использовать в настройке
         if (component instanceof ContainerView) {
             removeContainerFromMapping((ContainerView) component);
-            if (cascade) {
-                List<ComponentView> children = new ArrayList<ComponentView>(((ContainerView) component).getChildren());
-                for (ComponentView child : children) {
-                    removeComponent(child, true);
-                }
-            }
         }
     }
 

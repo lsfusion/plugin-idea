@@ -130,7 +130,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "BREAK"                   			{ return BREAK; }
   "BY"                      			{ return BY; }
   "CANCEL"                  			{ return CANCEL; }
-  "CASCADE"                 			{ return CASCADE; }
   "CASE"                    			{ return CASE; }
   "CC"                      			{ return CC; }
   "CENTER"                  			{ return CENTER; }
