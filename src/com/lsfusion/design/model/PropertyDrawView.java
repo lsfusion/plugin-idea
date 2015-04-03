@@ -22,7 +22,7 @@ import static java.lang.Math.max;
 public class PropertyDrawView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
-            new ReflectionProperty("showTableFirst").setExpert(),
+            new ReflectionProperty("panelCaptionAfter").setExpert(),
             new ReflectionProperty("editOnSingleClick").setExpert(),
             new ReflectionProperty("hide").setExpert(),
             new ReflectionProperty("regexp"),
@@ -35,7 +35,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("editKey"),
             new ReflectionProperty("showEditKey").setExpert(),
             new ReflectionProperty("focusable"),
-            new ReflectionProperty("panelLabelAbove"),
+            new ReflectionProperty("panelCaptionAbove"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("clearText").setExpert(),
             new ReflectionProperty("toolTip"),
@@ -45,7 +45,7 @@ public class PropertyDrawView extends ComponentView {
 
     public PropertyDrawEntity entity;
 
-    public boolean showTableFirst;
+    public boolean panelCaptionAfter;
     public boolean editOnSingleClick;
     public boolean hide;
     public String regexp;
@@ -62,7 +62,7 @@ public class PropertyDrawView extends ComponentView {
 
     public Boolean focusable;
 
-    public boolean panelLabelAbove = false;
+    public boolean panelCaptionAbove = false;
 
     public String caption;
     public boolean showCaption = true;
@@ -85,7 +85,7 @@ public class PropertyDrawView extends ComponentView {
         setMinimumCharWidth(entity.minimumCharWidth);
         setMaximumCharWidth(entity.maximumCharWidth);
         setPreferredCharWidth(entity.preferredCharWidth);
-        setIconPath(entity.iconPath);
+        setImagePath(entity.iconPath);
         setEditKey(entity.editKey);
         setShowEditKey(entity.showEditKey);
     }
@@ -122,8 +122,8 @@ public class PropertyDrawView extends ComponentView {
                 : caption;
     }
 
-    public void setShowTableFirst(boolean showTableFirst) {
-        this.showTableFirst = showTableFirst;
+    public void setPanelCaptionAfter(boolean panelCaptionAfter) {
+        this.panelCaptionAfter = panelCaptionAfter;
     }
 
     public void setEditOnSingleClick(boolean editOnSingleClick) {
@@ -220,8 +220,8 @@ public class PropertyDrawView extends ComponentView {
         int height = entity.baseClass != null ?
                 entity.baseClass.getPreferredHeight(comp.getFontMetrics(getFont(comp))) :
                 getDefaultPreferredHeight(comp.getFontMetrics(getFont(comp)));
-        if (iconPath != null) { // предпочитаемую высоту берем исходя из размера иконки
-            Icon icon = BaseUtils.loadIcon(entity.project, "/images/" + iconPath);
+        if (imagePath != null) { // предпочитаемую высоту берем исходя из размера иконки
+            Icon icon = BaseUtils.loadIcon(entity.project, "/images/" + imagePath);
             height = Math.max(icon.getIconHeight() + 6, height);
         }
         return height;
@@ -303,8 +303,8 @@ public class PropertyDrawView extends ComponentView {
         this.focusable = focusable;
     }
 
-    public void setPanelLabelAbove(boolean panelLabelAbove) {
-        this.panelLabelAbove = panelLabelAbove;
+    public void setPanelCaptionAbove(boolean panelCaptionAbove) {
+        this.panelCaptionAbove = panelCaptionAbove;
     }
 
     public void setCaption(String caption) {
@@ -327,8 +327,8 @@ public class PropertyDrawView extends ComponentView {
         this.toolTip = toolTip;
     }
 
-    public boolean isShowTableFirst() {
-        return showTableFirst;
+    public boolean isPanelCaptionAfter() {
+        return panelCaptionAfter;
     }
 
     public boolean isEditOnSingleClick() {
@@ -379,8 +379,8 @@ public class PropertyDrawView extends ComponentView {
         return focusable;
     }
 
-    public boolean isPanelLabelAbove() {
-        return panelLabelAbove;
+    public boolean isPanelCaptionAbove() {
+        return panelCaptionAbove;
     }
 
     public boolean isClearText() {

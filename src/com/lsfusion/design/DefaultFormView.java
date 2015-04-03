@@ -358,7 +358,7 @@ public class DefaultFormView extends FormView {
         action.editKey = editKey;
         action.focusable = false;
         action.alignment = FlexAlignment.STRETCH;
-        action.iconPath = iconPath;
+        action.imagePath = iconPath;
         action.showCaption = showCaption;
 
         if (iconPath != null) {

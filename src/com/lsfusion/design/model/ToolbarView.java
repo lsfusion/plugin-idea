@@ -76,16 +76,16 @@ public class ToolbarView extends ComponentView {
         this.showGroupReport = showGroup;
     }
 
-    public void setShowPrintGroupButton(boolean showPrintGroupButton) {
+    public void setShowPrintGroup(boolean showPrintGroupButton) {
         this.showPrint = showPrintGroupButton;
     }
 
-    public void setShowPrintGroupXlsButton(boolean showPrintGroupXlsButton) {
-        this.showXls = showPrintGroupXlsButton;
+    public void setShowPrintGroupXls(boolean showPrintGroupXls) {
+        this.showXls = showPrintGroupXls;
     }
 
-    public void setShowHideSettings(boolean showHideSettings) {
-        this.showSettings = showHideSettings;
+    public void setShowSettings(boolean showSettings) {
+        this.showSettings = showSettings;
     }
 
     public boolean isVisible() {

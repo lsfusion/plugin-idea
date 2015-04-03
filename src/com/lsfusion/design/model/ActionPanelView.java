@@ -27,8 +27,8 @@ public class ActionPanelView extends JButton {
             setText(caption);
         }
 
-        if (property.iconPath != null) {
-            Icon icon = BaseUtils.loadIcon(project, "/images/" + property.iconPath);
+        if (property.imagePath != null) {
+            Icon icon = BaseUtils.loadIcon(project, "/images/" + property.imagePath);
             if (icon == null) {
                 icon = LSFIcons.ACTION;
             }

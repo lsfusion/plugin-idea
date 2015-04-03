@@ -29,10 +29,10 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("marginRight").setExpert(),
             new ReflectionProperty("defaultComponent").setExpert(),
             new ReflectionProperty("font").setExpert(),
-            new ReflectionProperty("headerFont").setExpert(),
+            new ReflectionProperty("captionFont").setExpert(),
             new ReflectionProperty("background"),
             new ReflectionProperty("foreground"),
-            new ReflectionProperty("iconPath").setExpert()
+            new ReflectionProperty("imagePath").setExpert()
     );
 
     private String sID;
@@ -53,12 +53,12 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public FontInfo font;
 
-    public FontInfo headerFont;
+    public FontInfo captionFont;
 
     public Color background;
     public Color foreground;
 
-    public String iconPath;
+    public String imagePath;
 
     public ContainerView parent;
 
@@ -226,8 +226,8 @@ public abstract class ComponentView extends PropertiesContainer {
 
     /* ========= design properties ========= */
 
-    public void setHeaderFont(FontInfo headerFont) {
-        this.headerFont = headerFont;
+    public void setCaptionFont(FontInfo captionFont) {
+        this.captionFont = captionFont;
     }
 
     public void setFont(FontInfo font) {
@@ -271,8 +271,8 @@ public abstract class ComponentView extends PropertiesContainer {
         this.foreground = foreground;
     }
 
-    public void setIconPath(String iconPath) {
-        this.iconPath = iconPath;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
 
@@ -320,8 +320,8 @@ public abstract class ComponentView extends PropertiesContainer {
         return font;
     }
 
-    public FontInfo getHeaderFont() {
-        return headerFont;
+    public FontInfo getCaptionFont() {
+        return captionFont;
     }
 
     public Color getBackground() {
@@ -332,8 +332,8 @@ public abstract class ComponentView extends PropertiesContainer {
         return foreground;
     }
 
-    public String getIconPath() {
-        return iconPath;
+    public String getImagePath() {
+        return imagePath;
     }
 
     public void decorateTreeRenderer(SimpleColoredComponent renderer) {
