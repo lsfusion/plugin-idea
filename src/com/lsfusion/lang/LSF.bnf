@@ -1397,7 +1397,7 @@ componentStatement ::=      setObjectPropertyStatement
                         |	setupComponentStatement
                         |	setupGroupObject
                         |	newComponentStatement
-                        |	addComponentStatement
+                        |   moveComponentStatement
                         |	removeComponentStatement
                         |	emptyStatement
                         |   componentStubStatement
@@ -1437,7 +1437,7 @@ private setup_group_object_statement_recover ::= !(ID | SEMI | RBRACE)
 setGroupObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 1}
                               
 newComponentStatement ::= NEW componentStubDecl componentInsertPosition componentBody {pin = 2}
-addComponentStatement ::= ADD componentSelector componentInsertPosition componentBody {pin = 1}
+moveComponentStatement ::= MOVE componentSelector componentInsertPosition componentBody {pin = 1}
 
 componentInsertPosition ::= (   insertRelativePositionLiteral componentSelector
                             |	FIRST

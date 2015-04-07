@@ -255,6 +255,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "MINCHARWIDTH"            			{ return MINCHARWIDTH; }
   "MODAL"                   			{ return MODAL; }
   "MODULE"                  			{ return MODULE; }
+  "MOVE"                                { return MOVE; }
   "MS"                                  { return MS; }
   "MULTI"                   			{ return MULTI; }
   "NAME"                    			{ return NAME; }

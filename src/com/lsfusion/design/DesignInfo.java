@@ -131,8 +131,8 @@ public class DesignInfo {
                 addComponent(container, (ContainerView) parentComponent, insertPositionSelector, formView);
 
                 processComponentBody(container, statement.getComponentBody());
-            } else if (componentStatement.getAddComponentStatement() != null) {
-                LSFAddComponentStatement statement = componentStatement.getAddComponentStatement();
+            } else if (componentStatement.getMoveComponentStatement() != null) {
+                LSFMoveComponentStatement statement = componentStatement.getMoveComponentStatement();
                 LSFComponentSelector componentSelector = statement.getComponentSelector();
                 if (componentSelector != null) {
                     String name = getComponentSID(componentSelector, formView);
