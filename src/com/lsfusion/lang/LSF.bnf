@@ -1406,7 +1406,7 @@ componentStatement ::=      setObjectPropertyStatement
 }
 
 private component_statement_recover ::= !component_statement_recover_start 
-private component_statement_recover_start ::= ID | GROUP | PARENT | PROPERTY | NEW | ADD | REMOVE | SEMI | RBRACE 
+private component_statement_recover_start ::= ID | GROUP | PARENT | PROPERTY | NEW | MOVE | REMOVE | SEMI | RBRACE 
 
 componentStubStatement ::=      GROUP LBRAC ID RBRAC LBRACE
                             |   NEW ID
