@@ -65,7 +65,7 @@ public class LSFElementGenerator {
 
     @NotNull
     public static LSFFormPropertyObject createMappedPropertyFromText(Project myProject, String name) {
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; DESIGN x { ADD PROPERTY(" + name + ") {}; }");
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; DESIGN x { MOVE PROPERTY(" + name + ") {}; }");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertyObject.class).iterator().next();
     }
 
