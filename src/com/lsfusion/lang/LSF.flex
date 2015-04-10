@@ -137,6 +137,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "CHANGECLASS"             			{ return CHANGECLASS; }
   "CHANGED"                 			{ return CHANGED; }
   "CHANGEWYS"               			{ return CHANGEWYS; }
+  "CHARSET"               			    { return CHARSET; }
   "CHECK"                   			{ return CHECK; }
   "CHECKED"                 			{ return CHECKED; }
   "CLASS"                   			{ return CLASS; }
