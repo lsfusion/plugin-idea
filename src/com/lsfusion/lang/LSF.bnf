@@ -748,13 +748,20 @@ writeActionPropertyDefinitionBody ::= WRITE propertyExpression FROM propertyUsag
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT (((XLS | XLSX | DBF | XML | JDBC | MDB) TO nonEmptyPropertyUsageListWithIds FROM propertyExpression) |
-    (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)? TO nonEmptyPropertyUsageListWithIds FROM propertyExpression))
+importActionPropertyDefinitionBody ::= IMPORT importActionSourceType TO nonEmptyPropertyUsageListWithIds FROM propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
+
+importActionSourceType ::=  XLS
+                        |   XLSX
+                        |   DBF
+                        |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
+                        |   XML
+                        |   JDBC
+                        |   MDB
 
 nonEmptyPropertyUsageListWithIds ::= propertyUsageWithId (COMMA propertyUsageWithId)*
 
