@@ -18,6 +18,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
 import com.intellij.tools.SimpleActionGroup;
+import com.intellij.ui.DarculaColors;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.jgraph.layout.JGraphFacade;
@@ -540,7 +541,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 Color background;
 
                 if (node == selectedInSearch) {
-                    background = JBColor.RED;
+                    background = new JBColor(new Color(247, 91, 107), DarculaColors.RED);
                 } else if (node == dataModel.rootNode) {
                     background = getRootNodeColor();
                 } else if (targetElement != null && node == dataModel.getNode(targetElement)) {
