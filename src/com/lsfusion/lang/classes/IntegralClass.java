@@ -38,4 +38,9 @@ public abstract class IntegralClass extends DataClass {
     public Collection<String> getExtraNames() {
         return BaseUtils.toList("Result", "Quantity");
     }
+
+    @Override
+    public boolean fixedSize() {
+        return false;
+    }
 }
