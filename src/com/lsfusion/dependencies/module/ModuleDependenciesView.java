@@ -13,7 +13,6 @@ import com.lsfusion.lang.psi.LSFModuleUsage;
 import com.lsfusion.lang.psi.LSFRequireList;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFReference;
 
 import java.util.Set;
@@ -72,8 +71,7 @@ public class ModuleDependenciesView extends DependenciesView {
     public void createDependencyNode(PsiElement element, Set<PsiElement> proceeded) {
         LSFModuleDeclaration module = (LSFModuleDeclaration) element;
         
-        for (LSFModuleReference reference : module.getRequireRefs()) {
-            LSFModuleDeclaration moduleDeclaration = reference.resolveDecl();
+        for (LSFModuleDeclaration moduleDeclaration : module.getRequireModules()) {
             if (moduleDeclaration != null && moduleDeclaration != module) {
                 String sourceDeclName = module.getDeclName();
                 String targetDeclName = moduleDeclaration.getDeclName();

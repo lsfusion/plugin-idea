@@ -15,7 +15,6 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex;
-import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
@@ -52,13 +51,10 @@ public class LSFGlobalResolver {
         if (!alreadyGet.contains(declarationFile)) {
             result.add(declarationFile);
             alreadyGet.add(declarationFile);
-            for (LSFModuleReference ref : declaration.getRequireRefs()) {
-                LSFModuleDeclaration resolve = ref.resolveDecl();
-                if (resolve != null) {
-                    Set<LSFFile> requireModules = getRequireModules(resolve, alreadyGet);
+            for (LSFModuleDeclaration decl : declaration.getRequireModules()) {
+                Set<LSFFile> requireModules = getRequireModules(decl, alreadyGet);
 
-                    result.addAll(requireModules);
-                }
+                result.addAll(requireModules);
             }
 //        System.out.println("CACHED "+declaration.getName()+" "+System.identityHashCode(declaration));
             if (toCache)

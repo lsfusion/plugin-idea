@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.*;
@@ -96,6 +97,25 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
         return BaseUtils.<LSFModuleReference, LSFModuleUsage>immutableCast(nonEmptyModuleUsageList.getModuleUsageList());
     }
 
+    @Override
+    public List<LSFModuleDeclaration> getRequireModules() {
+        List<LSFModuleDeclaration> result = new ArrayList<LSFModuleDeclaration>();
+        List<LSFModuleReference> requireRefs = getRequireRefs();
+        for (LSFModuleReference ref : requireRefs) {
+            LSFModuleDeclaration moduleDecl = ref.resolveDecl();
+            if (moduleDecl != null) {
+                result.add(moduleDecl);
+            }
+        }
+        
+        // Если REQUIRE вообще не указан, то по умолчанию поведение должно быть эквивалентно REQUIRE System;
+        if (result.isEmpty()) {
+            LSFModuleDeclaration systemModule = LSFGlobalResolver.findModules("System", GlobalSearchScope.allScope(getProject())).findFirst();
+            result = Collections.singletonList(systemModule);
+        }
+        return result;
+    }
+    
     @Override
     public LSFSimpleName getNameIdentifier() {
         return getModuleName().getSimpleName();
