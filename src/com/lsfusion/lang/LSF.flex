@@ -332,6 +332,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "SHOWDROP"                			{ return SHOWDROP; }
   "SHOWIF"                  			{ return SHOWIF; }
   "SINGLE"                  			{ return SINGLE; }
+  "SHEET"                  			    { return SHEET; }
   "SPLITH"                  			{ return SPLITH; }
   "SPLITV"                  			{ return SPLITV; }
   "STEP"                    			{ return STEP; }

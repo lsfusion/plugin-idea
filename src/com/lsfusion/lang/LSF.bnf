@@ -755,8 +755,8 @@ importActionPropertyDefinitionBody ::= IMPORT importActionSourceType TO nonEmpty
     methods = [inferActionParamClasses]
 }
 
-importActionSourceType ::=  XLS
-                        |   XLSX
+importActionSourceType ::=  XLS (SHEET propertyExpression)?
+                        |   XLSX (SHEET propertyExpression)?
                         |   DBF
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
                         |   XML
