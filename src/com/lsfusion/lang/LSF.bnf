@@ -734,7 +734,7 @@ focusActionPropertyDefinitionBody ::= FOCUS formPropertyDrawID
     methods = [inferActionParamClasses]
 }
 
-readActionPropertyDefinitionBody ::= READ propertyExpression TO propertyUsage (MOVE propertyExpression)? (DELETE)?
+readActionPropertyDefinitionBody ::= READ propertyExpression TO propertyUsage ((MOVE propertyExpression) | (DELETE))?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
