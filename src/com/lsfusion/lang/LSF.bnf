@@ -439,12 +439,18 @@ abstractPropertyDefinition ::= ABSTRACT (((CASE | MULTI) (OVERRIDE | EXCLUSIVE)?
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
-formulaPropertyDefinition ::= FORMULA (NULL)? (builtInClassName)? ((PG | MS)? stringLiteral)+
+formulaPropertyDefinition ::= FORMULA (NULL)? (builtInClassName)? formulaPropertySyntaxList
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
+
+formulaPropertySyntaxList ::= formulaPropertySyntax (COMMA formulaPropertySyntax)*
+
+formulaPropertySyntax ::= formulaPropertySyntaxType stringLiteral 
+
+formulaPropertySyntaxType ::= (PG | MS)?
 
 groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | EQUAL | LAST | NAGGR
 groupPropertyBy ::= BY nonEmptyPropertyExpressionList;
