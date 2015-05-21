@@ -190,6 +190,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "EXCEPTLAST"              			{ return EXCEPTLAST; }
   "EXCLUSIVE"               			{ return EXCLUSIVE; }
   "EXEC"                    			{ return EXEC; }
+  "EXPORT"                    			{ return EXPORT; }
   "EXTEND"                  			{ return EXTEND; }
   "EXTERNAL"                  			{ return EXTERNAL; }
   "FILTER"                  			{ return FILTER; }
