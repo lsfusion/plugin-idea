@@ -165,6 +165,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "DESIGN"                  			{ return DESIGN; }
   "DIALOG"                  			{ return DIALOG; }
   "DO"                      			{ return DO; }
+  "DOC"                      			{ return DOC; }
   "DOCKED"                  			{ return DOCKED; }
   "DOCKEDMODAL"             			{ return DOCKEDMODAL; }
   "DOCX"                    			{ return DOCX; }

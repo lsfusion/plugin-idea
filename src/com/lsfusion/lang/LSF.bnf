@@ -1760,7 +1760,7 @@ modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN | DIALOG
 
 formPrintTypeLiteral ::= PRINT (AUTO | XLSX | XLS | PDF)? {pin = 1}
 
-formExportLiteral ::= EXPORT (XLSX | XLS | PDF) {pin = 1}
+formExportLiteral ::= EXPORT (DOC | DOCX | PDF | XLS | XLSX) {pin = 1}
 
 formSessionScopeLiteral ::= OLDSESSION | NEWSESSION | MANAGESESSION | NESTEDSESSION
 
