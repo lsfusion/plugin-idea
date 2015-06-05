@@ -78,7 +78,7 @@ public class DesignView extends JPanel implements Disposable {
 
     private boolean firstDraw = true;
 
-    public DesignView(@NotNull Project project, LSFModuleDeclaration initialModule, LSFFormDeclaration formDeclaration, final ToolWindowEx toolWindow) {
+    public DesignView(@NotNull Project project, final ToolWindowEx toolWindow) {
         this.project = project;
         this.toolWindow = toolWindow;
 
@@ -87,8 +87,6 @@ public class DesignView extends JPanel implements Disposable {
 
         redrawQueue = new MergingUpdateQueue("DesignView", 150, false, toolWindow.getComponent(), this, toolWindow.getComponent(), true);
         redrawQueue.setRestartTimerOnAdd(true);
-
-        update(initialModule, formDeclaration);
 
         final TimerListener timerListener = new TimerListener() {
             @Override

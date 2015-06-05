@@ -54,12 +54,14 @@ public class DesignViewFactory {
             }
         }
 
-        if (moduleDeclaration != null && formDeclaration != null) {
-            designView = new DesignView(project, moduleDeclaration, formDeclaration, toolWindow);
+        designView = new DesignView(project, toolWindow);
 
-            toolWindow.getComponent().removeAll();
-            toolWindow.getComponent().add(designView);
-            toolWindow.getComponent().repaint();
+        toolWindow.getComponent().removeAll();
+        toolWindow.getComponent().add(designView);
+        toolWindow.getComponent().repaint();
+
+        if (moduleDeclaration != null && formDeclaration != null) {
+            designView.scheduleRebuild(moduleDeclaration, formDeclaration);
         }
     }
 
