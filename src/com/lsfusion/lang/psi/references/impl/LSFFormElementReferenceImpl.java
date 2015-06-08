@@ -48,7 +48,11 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
         final String nameRef = getNameRef();
         return new Condition<T>() {
             public boolean value(T decl) {
-                return decl.getDeclName().equals(nameRef);
+                String name = decl.getDeclName();
+                if (name != null) {
+                    return decl.getDeclName().equals(nameRef);
+                } 
+                return false;
             }
         };
     }
