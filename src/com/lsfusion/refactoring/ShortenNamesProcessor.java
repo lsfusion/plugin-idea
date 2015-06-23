@@ -59,8 +59,12 @@ public class ShortenNamesProcessor {
             new PropInMetaRef(new PropRef("name", "Box", Collections.singletonList(new ClassRef("Box", "Box")), false), new MetacodeRef("defineDocumentAbstractDetailBoxCustom", "Box", 3), true, false),
             new PropInMetaRef(new PropRef("skip", "Machinery", Collections.singletonList(new ClassRef("PriceTransactionDocument", "Machinery")), false), new MetacodeRef("defineDocumentMachineryPriceTransaction", "Machinery", 4), true, false),
             new PropInMetaRef(new PropRef("skip", "Label", Collections.singletonList(new ClassRef("PriceTransactionDocument", "Label")), false), new MetacodeRef("defineDocumentLabelTransaction", "Label", 5), true, false),
-            new PropInMetaRef(new PropRef("stock", "Invoice", Collections.singletonList(new ClassRef("InvoiceDetail", "Invoice")), true), new MetacodeRef("defineInvoice", "Invoice", 4), false, true)
-    };
+            new PropInMetaRef(new PropRef("stock", "Invoice", Collections.singletonList(new ClassRef("InvoiceDetail", "Invoice")), true), new MetacodeRef("defineInvoice", "Invoice", 4), false, true),
+            new PropInMetaRef(new PropRef(null, null, null, false), new MetacodeRef("implementZoneLedgerCustom", "Zone", 3), true, true),
+            new PropInMetaRef(new PropRef("invoiceDetail", "Pricing", Collections.singletonList(new ClassRef("PricingDetail", "Pricing")), true), new MetacodeRef("defineInvoicePricingAggregation", "Pricing", 7), true, false),
+            new PropInMetaRef(new PropRef("countUsers", null, null, false), new MetacodeRef("extendFormFilterRoleAccessNSPrefix", "Operation", 5), true, false),
+            new PropInMetaRef(new PropRef("description", null, null, false), new MetacodeRef("defineDocumentDetailBatchCustomPrefixInner", "Stock", 4), true, false)
+    };                                                                                          
 
     private static boolean isPredefinedWord(String s) {
         return s.equals("VAT") || s.equals("UOM");
@@ -190,8 +194,9 @@ public class ShortenNamesProcessor {
         int k = 0;
         int skipPrm = 0;
         while(true) {
-            while(j - skipPrm - k >= 0 && keep - k >= 0 && equalWord(declWords.get(keep - k), prmWords.get(j - skipPrm - k), keep==k))
+            while(j - skipPrm - k >= 0 && keep - k >= 0 && equalWord(declWords.get(keep - k), prmWords.get(j - skipPrm - k), false)) {
                 k++;
+            }
             skipPrm++;
             if(k>0 || skipPrm > j)
                 break;                                                         
