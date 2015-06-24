@@ -118,7 +118,7 @@ externalFormObject ::= OBJECT formUsage objectUsage
 // some statements are pinned after the first token, so we need these fake rules to pin incomplete statements
 stubStatement ::=
     EXTEND (CLASS | FORM | DESIGN) ID
-    | CLASS (ABSTRACT | NATIVE)? ID
+    | CLASS (ABSTRACT | NATIVE)? COMPLEX? ID
     | (ATSIGN | FORM | GROUP | META | DESIGN | TABLE) ID
     | WINDOW windowType ID
     {pin(".*") = 1}
@@ -133,7 +133,7 @@ private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVI
 ////////////////////////////////// CLASS STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-classDecl ::= CLASS (ABSTRACT | NATIVE)? simpleNameWithCaption
+classDecl ::= CLASS (ABSTRACT | NATIVE)? COMPLEX? simpleNameWithCaption
 {
      mixin = "com.lsfusion.lang.psi.declarations.impl.LSFClassDeclarationImpl"
      implements = "com.lsfusion.lang.psi.declarations.LSFClassDeclaration"
