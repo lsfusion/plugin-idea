@@ -766,7 +766,7 @@ importActionSourceType ::=  XLS (SHEET propertyExpression)?
                         |   XLSX (SHEET propertyExpression)?
                         |   DBF
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
-                        |   XML
+                        |   XML (ATTR)?
                         |   JDBC
                         |   MDB
 

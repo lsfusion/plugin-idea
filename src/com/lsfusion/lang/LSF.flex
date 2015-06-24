@@ -99,6 +99,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "@"                                   { return ATSIGN; }
 
   "ABSTRACT"                			{ return ABSTRACT; }
+  "ATTR"                			    { return ATTR; }
   "NATIVE"                			    { return NATIVE; }
   "ACTION"                  			{ return ACTION; }
   "ADD"                     			{ return ADD; }
