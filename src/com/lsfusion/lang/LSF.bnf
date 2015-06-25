@@ -433,7 +433,7 @@ nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
-abstractPropertyDefinition ::= ABSTRACT (((CASE | MULTI) (OVERRIDE | EXCLUSIVE)?) | OVERRIDE | EXCLUSIVE)? (CHECKED)? className LBRAC classNameList RBRAC
+abstractPropertyDefinition ::= ABSTRACT ((((CASE | MULTI) abstractExclusiveOverrideOption?) | (OVERRIDE abstractCaseAddOption?) | EXCLUSIVE)? (CHECKED)? className LBRAC classNameList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
@@ -539,9 +539,8 @@ actionPropertyDefinition ::= ACTION
 
 
 abstractActionPropertyDefinition ::= ABSTRACT ACTION
-                                    (   CASE (exclusiveOverrideOption)?
-                                    |	MULTI (exclusiveOverrideOption )?
-                                    |	LIST
+                                    (   ((CASE | MULTI) abstractExclusiveOverrideOption?)
+                                    |	(LIST abstractCaseAddOption?)
                                     )?
                                     (CHECKED)?
                                     LBRAC classNameList RBRAC
@@ -1716,6 +1715,10 @@ multiCompoundID ::= ID (POINT ID)*
 }
 
 exclusiveOverrideOption ::= OVERRIDE | EXCLUSIVE
+
+abstractExclusiveOverrideOption ::= (OVERRIDE abstractCaseAddOption? ) | EXCLUSIVE
+
+abstractCaseAddOption ::= FIRST | LAST
 
 colorLiteral ::= LEX_COLOR_LITERAL | (RGB LBRAC uintLiteral COMMA uintLiteral COMMA uintLiteral RBRAC)
 stringLiteral ::= LEX_STRING_LITERAL
