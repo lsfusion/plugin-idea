@@ -664,6 +664,7 @@ emailActionPropertyDefinitionBody ::=
 		(emailRecipientTypeLiteral propertyExpression)*
 		(	INLINE formEmailToObjects
 		|	ATTACH emailAttachFormat (NAME propertyExpression)? formEmailToObjects
+		|   ATTACH FILE propertyExpression (NAME propertyExpression)?
 		)*
 {
     pin = 1

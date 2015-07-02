@@ -196,6 +196,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "EXPORT"                    			{ return EXPORT; }
   "EXTEND"                  			{ return EXTEND; }
   "EXTERNAL"                  			{ return EXTERNAL; }
+  "FILE"                  			    { return FILE; }
   "FILTER"                  			{ return FILTER; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
   "FILTERS"                 			{ return FILTERS; }
