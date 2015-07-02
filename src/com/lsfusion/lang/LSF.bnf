@@ -478,6 +478,7 @@ typePropertyDefinition ::= typeIs className {pin = 1}
 propertyOptions ::= (   IN groupUsage
                     |	persistentSetting
                     |   COMPLEX
+                    |   NOHINT
                     |	TABLE tableUsage
                     |	shortcutSetting
                     |	asEditActionSetting

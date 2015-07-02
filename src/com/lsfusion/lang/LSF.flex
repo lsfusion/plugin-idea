@@ -145,6 +145,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "CLOSE"                   			{ return CLOSE; }
   "COLUMNS"                 			{ return COLUMNS; }
   "COMPLEX"                 			{ return COMPLEX; }
+  "NOHINT"                 			    { return NOHINT; }
   "CONCAT"                  			{ return CONCAT; }
   "CONFIRM"                 			{ return CONFIRM; }
   "CONSTRAINT"              			{ return CONSTRAINT; }

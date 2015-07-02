@@ -38,13 +38,14 @@ public class LSFBreakpointHandler extends JavaBreakpointHandler {
             @Override
             public void run() {
                 try {
-                    Registry registry = LocateRegistry.getRegistry(debuggerPort);
+                    Registry registry = LocateRegistry.getRegistry("localhost", debuggerPort);
                     debuggerService = (DebuggerService) registry.lookup("lsfDebuggerService");
                     if (debuggerService != null) {
                         executePendingMethods();
                         timerTask.cancel();
                     }
                 } catch (Throwable ignored) {
+                    ignored = ignored;
                 }
             }
         }, 0, 1000);
@@ -129,6 +130,7 @@ public class LSFBreakpointHandler extends JavaBreakpointHandler {
                         debuggerService.unregisterBreakpoint(module, line);
                     }
                 } catch (Throwable ignored) {
+                    ignored = ignored;
                 }
             }
         });
