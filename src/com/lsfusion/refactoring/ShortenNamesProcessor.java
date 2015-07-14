@@ -47,8 +47,11 @@ public class ShortenNamesProcessor {
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementConsignmentHeader", "Consignment", 1), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Label", 1), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Machinery", 1), false, true),
+            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Machinery", 2), false, true),
+            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocumentStock", "Machinery", 3), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementSaleLedgerCustom", "SaleLedger", 3), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementStockDocumentLedger", "StockDocument", 2), false, true),
+            new PropInMetaRef(new PropRef("stock", "StockDocument", Collections.singletonList(new ClassRef("StockDocumentLedger", "StockDocument")), true), new MetacodeRef("implementStockDocumentLedger", "StockDocument", 3), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementSkuLedger", "Stock", 3), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementDocument", "Stock", 1), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementBatchCustom", "Stock", 4), false, true),
@@ -60,10 +63,12 @@ public class ShortenNamesProcessor {
             new PropInMetaRef(new PropRef("skip", "Machinery", Collections.singletonList(new ClassRef("PriceTransactionDocument", "Machinery")), false), new MetacodeRef("defineDocumentMachineryPriceTransaction", "Machinery", 4), true, false),
             new PropInMetaRef(new PropRef("skip", "Label", Collections.singletonList(new ClassRef("PriceTransactionDocument", "Label")), false), new MetacodeRef("defineDocumentLabelTransaction", "Label", 5), true, false),
             new PropInMetaRef(new PropRef("stock", "Invoice", Collections.singletonList(new ClassRef("InvoiceDetail", "Invoice")), true), new MetacodeRef("defineInvoice", "Invoice", 4), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, false), new MetacodeRef("implementZoneLedgerCustom", "Zone", 3), true, true),
+            new PropInMetaRef(new PropRef(null, null, null, false), new MetacodeRef("implementZoneLedgerCustom", "Zone", 4), true, false),
             new PropInMetaRef(new PropRef("invoiceDetail", "Pricing", Collections.singletonList(new ClassRef("PricingDetail", "Pricing")), true), new MetacodeRef("defineInvoicePricingAggregation", "Pricing", 7), true, false),
             new PropInMetaRef(new PropRef("countUsers", null, null, false), new MetacodeRef("extendFormFilterRoleAccessNSPrefix", "Operation", 5), true, false),
-            new PropInMetaRef(new PropRef("description", null, null, false), new MetacodeRef("defineDocumentDetailBatchCustomPrefixInner", "Stock", 4), true, false)
+            new PropInMetaRef(new PropRef("description", null, null, false), new MetacodeRef("defineDocumentDetailBatchCustomPrefixInner", "Stock", 4), true, false),
+            new PropInMetaRef(new PropRef("sku", null, null, false), new MetacodeRef("defineDocumentWare", "Ware", 2), true, true),
+            new PropInMetaRef(new PropRef("quantity", null, null, false), new MetacodeRef("defineDocumentWare", "Ware", 2), true, true),
     };                                                                                          
 
     private static boolean isPredefinedWord(String s) {
