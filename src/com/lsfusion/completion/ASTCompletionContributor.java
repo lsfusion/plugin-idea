@@ -13,7 +13,10 @@ import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.ResolveState;
 import com.intellij.psi.impl.source.PostprocessReformattingAspect;
 import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.psi.scope.BaseScopeProcessor;
@@ -47,9 +50,7 @@ import static com.lsfusion.completion.ASTCompletionContributor.ClassUsagePolicy.
 import static com.lsfusion.completion.CompletionUtils.createLookupElement;
 import static com.lsfusion.completion.CompletionUtils.getVariantsFromIndices;
 import static com.lsfusion.lang.LSFParserDefinition.NOT_KEYWORDS;
-import static com.lsfusion.lang.parser.GeneratedParserUtilBase.COMPLETION_CALLBACK_KEY;
-import static com.lsfusion.lang.parser.GeneratedParserUtilBase.CompletionCallback;
-import static com.lsfusion.lang.parser.GeneratedParserUtilBase.Frame;
+import static com.lsfusion.lang.parser.GeneratedParserUtilBase.*;
 import static com.lsfusion.lang.psi.LSFPsiImplUtil.resolveParamClasses;
 import static com.lsfusion.lang.psi.LSFTypes.*;
 import static com.lsfusion.lang.psi.LSFTypes.Factory.getPsiElementClassByType;
@@ -591,9 +592,11 @@ public class ASTCompletionContributor extends CompletionContributor {
             String namespaceName = extractNamespace();
 
             for (LSFClassSet classSet : contextClasses) {
-                LSFValueClass valueClass = classSet.getCommonClass();
-                if (valueClass != null) {
-                    addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, requireScope));
+                if (classSet != null) {
+                    LSFValueClass valueClass = classSet.getCommonClass();
+                    if (valueClass != null) {
+                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, requireScope));
+                    }
                 }
             }
 
