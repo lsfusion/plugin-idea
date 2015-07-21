@@ -45,6 +45,7 @@ public class ShortenNamesProcessor {
     private static final String INITIAL_MIGRATION_VERSION = "1.0.0";
     private static PropInMetaRef[] exceptions = new PropInMetaRef[] {
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementConsignmentHeader", "Consignment", 1), false, true),
+            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementConsignmentHeaderData", "Consignment", 1), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Label", 1), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Machinery", 1), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Machinery", 2), false, true),
