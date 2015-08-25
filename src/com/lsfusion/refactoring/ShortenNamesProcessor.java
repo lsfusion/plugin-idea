@@ -57,6 +57,8 @@ public class ShortenNamesProcessor {
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementDocument", "Stock", 1), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementBatchCustom", "Stock", 4), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPurchaseLedgerCustom", "PurchaseLedger", 3), false, true),
+            new PropInMetaRef(new PropRef(null, null, null, false), new MetacodeRef("extendFormFilterAccessLegalEntity", "EmployeeLegalEntity", 5), false, true),
+            new PropInMetaRef(new PropRef(null, null, null, false), new MetacodeRef("extendFormFilterAccessStock", "EmployeeStock", 5), false, true),
             new PropInMetaRef(new PropRef("batch", "Stock", Collections.singletonList(new ClassRef("DocumentDetail", "Stock")), true), new MetacodeRef("implementDocumentBatch", "Stock", 1), false, true),
             new PropInMetaRef(new PropRef("batch", "Stock", Collections.singletonList(new ClassRef("DocumentDetail", "Stock")), true), new MetacodeRef("implementDocumentBatch", "Stock", 2), false, true),
             new PropInMetaRef(new PropRef("name", "Box", Collections.singletonList(new ClassRef("Box", "Box")), false), new MetacodeRef("defineDocumentDetailBoxCustom", "Box", 3), true, false),
@@ -70,6 +72,7 @@ public class ShortenNamesProcessor {
             new PropInMetaRef(new PropRef("description", null, null, false), new MetacodeRef("defineDocumentDetailBatchCustomPrefixInner", "Stock", 4), true, false),
             new PropInMetaRef(new PropRef("sku", null, null, false), new MetacodeRef("defineDocumentWare", "Ware", 2), true, true),
             new PropInMetaRef(new PropRef("quantity", null, null, false), new MetacodeRef("defineDocumentWare", "Ware", 2), true, true),
+            new PropInMetaRef(new PropRef("skipCreateWare", null, null, false), new MetacodeRef("defineDocumentWare", "Ware", 2), false, true),
     };                                                                                          
 
     private static boolean isPredefinedWord(String s) {
