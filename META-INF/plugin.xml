@@ -277,6 +277,8 @@
                     factoryClass="com.lsfusion.dependencies.property.PropertyDependenciesViewToolWindowFactory"/>
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.dependencies.property.PropertyComplexityLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="Lsf"
+                                        implementationClass="com.lsfusion.dependencies.property.PropertyTableLineMarkerProvider"/>
 
         <!-- debugger -->
         <xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />
