@@ -8,7 +8,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
-import com.lsfusion.actions.ToggleComplexityAction;
+import com.lsfusion.actions.ToggleShowTableAction;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
-        if (!elements.isEmpty() && !ToggleComplexityAction.isComplexityEnabled(elements.iterator().next().getProject())) {
+        if (!elements.isEmpty() && !ToggleShowTableAction.isShowTableEnabled(elements.iterator().next().getProject())) {
             return;
         }
         
@@ -39,7 +39,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
             if (document == null) {
                 document = PsiDocumentManager.getInstance(element.getProject()).getDocument(element.getContainingFile());
             }
-            if (element instanceof LSFPropertyStatement && ((LSFPropertyStatement) element).isCorrect() && (((LSFPropertyStatement) element).isDataProperty() || ((LSFPropertyStatement) element).isPersistentProperty())) {
+            if (element instanceof LSFPropertyStatement && ((LSFPropertyStatement) element).isCorrect() && (((LSFPropertyStatement) element).isDataStoredProperty() || ((LSFPropertyStatement) element).isPersistentProperty())) {
                 int lineNumber = document.getLineNumber(element.getTextOffset());
                 if (!usedLines.contains(lineNumber)) {
                     result.add(createLineMarker((LSFPropertyStatement) element));
@@ -55,7 +55,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
                 psi.getTextRange().getStartOffset(),
                 createIcon(),
                 Pass.UPDATE_OVERRIDEN_MARKERS,
-                PropertyComplexityTooltipProvider.INSTANCE,
+                PropertyShowTableTooltipProvider.INSTANCE,
                 null
         );
     }
@@ -65,7 +65,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
                 String text = "T";
-                g.setColor(new JBColor(new Color(114, 174, 108), new Color(99, 146, 97)));
+                g.setColor(new JBColor(new Color(255, 153, 0), new Color(255, 153, 0)));
 
                 g.drawRoundRect(x, y, 12, 12, 2, 2);
                 Font textFont = new Font("Dialog", Font.BOLD, 11);
@@ -87,12 +87,13 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
         };
     }
 
-    private static class PropertyComplexityTooltipProvider implements Function<PsiElement, String> {
-        static PropertyComplexityTooltipProvider INSTANCE = new PropertyComplexityTooltipProvider();
+    private static class PropertyShowTableTooltipProvider implements Function<PsiElement, String> {
+        static PropertyShowTableTooltipProvider INSTANCE = new PropertyShowTableTooltipProvider();
 
         @Override
         public String fun(PsiElement psi) {
-            return psi instanceof LSFPropertyStatement ? "Table: " + ((LSFPropertyStatement) psi).getTableName() : "Unknown table";
+            String name = psi instanceof LSFPropertyStatement ? ((LSFPropertyStatement) psi).getTableName() : null;
+            return name == null ? "Unknown table" : ("Table: " + name);
         }
     }
 }

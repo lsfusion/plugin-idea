@@ -79,6 +79,10 @@
                 text="Show property complexity" description="Toggle property complexity">
             <add-to-group group-id="CodeMenu"/>
         </action>
+        <action id="ToggleLSFShowTable" class="com.lsfusion.actions.ToggleShowTableAction"
+                text="Show property table" description="Toggle showing property table">
+            <add-to-group group-id="CodeMenu"/>
+        </action>
         
         <group id="propertyFolding" popup="true" text="Property classes">
             <add-to-group group-id="CodeMenu"/>
