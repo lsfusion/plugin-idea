@@ -707,7 +707,7 @@ seekObjectActionPropertyDefinitionBody ::= SEEK objectID propertyExpression
     methods = [inferActionParamClasses]
 }
 
-fileActionPropertyDefinitionBody ::= (LOADFILE | OPENFILE) propertyExpression
+fileActionPropertyDefinitionBody ::= (LOADFILE | OPENFILE | SAVEFILE) propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"

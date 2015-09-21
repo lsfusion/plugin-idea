@@ -324,6 +324,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "RIGHT"                   			{ return RIGHT; }
   "ROUND"                   			{ return ROUND; }
   "RTF"                     			{ return RTF; }
+  "SAVEFILE"                            { return SAVEFILE; }
   "SEEK"                    			{ return SEEK; }
   "SELECTION"               			{ return SELECTION; }
   "SELECTOR"                			{ return SELECTOR; }
