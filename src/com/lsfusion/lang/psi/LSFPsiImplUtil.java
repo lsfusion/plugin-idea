@@ -2749,7 +2749,7 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFFileActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+        return inferExpressionParamClasses(body.getPropertyExpressionList().get(0), null).filter(params);
     }
 
     public static Inferred inferActionParamClasses(LSFEvalActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
