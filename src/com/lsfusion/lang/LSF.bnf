@@ -823,7 +823,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 
 private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
-                                            | READ | REQUEST | RETURN | SEEK | WHILE| WRITE
+                                            | READ | REQUEST | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID
                                             | SEMI

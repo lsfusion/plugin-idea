@@ -1,8 +1,6 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.annotation.Annotation;
-import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.design.FormView;
@@ -105,10 +103,15 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
             if (treeGroupDeclaration != null) {
                 String tgoName = treeGroupDeclaration.getSimpleName().getText();
                 if (tgoName != null) {
-                    result.put(FormView.getTreeSID(tgoName), treeGroupDeclaration);
-                    result.put(FormView.getTreeSID(tgoName) + TreeGroupContainerSet.TREE_GROUP_CONTAINER, treeGroupDeclaration);
-                    result.put(FormView.getToolbarSID(tgoName), treeGroupDeclaration);
-                    result.put(FormView.getFilterSID(tgoName), treeGroupDeclaration);
+                    String treeSID = FormView.getTreeSID(tgoName);
+                    result.put(treeSID, treeGroupDeclaration);
+                    result.put(treeSID + TreeGroupContainerSet.TREE_GROUP_CONTAINER, treeGroupDeclaration);
+                    result.put(treeSID + GroupObjectContainerSet.CONTROLS_CONTAINER, treeGroupDeclaration);
+                    result.put(treeSID + GroupObjectContainerSet.CONTROLS_RIGHT_CONTAINER, treeGroupDeclaration);
+                    result.put(treeSID + GroupObjectContainerSet.FILTERS_CONTAINER, treeGroupDeclaration);
+                    result.put(treeSID + GroupObjectContainerSet.TOOLBAR_PROPS_CONTAINER, treeGroupDeclaration);
+                    result.put(FormView.getToolbarSID(treeSID), treeGroupDeclaration);
+                    result.put(FormView.getFilterSID(treeSID), treeGroupDeclaration);
                 }
             }
         }
