@@ -87,7 +87,7 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
     private boolean alreadyPending; // не синхронизируем, так как все в edt
 
     private void fireChildChanged(PsiElement element, PsiFile file) {
-        if (element == null || file == null) {
+        if (element == null || file == null || !DesignViewFactory.getInstance().windowIsVisible()) {
             return;
         }
 

@@ -64,9 +64,13 @@ public class DesignViewFactory {
             designView.scheduleRebuild(moduleDeclaration, formDeclaration);
         }
     }
+    
+    public boolean windowIsVisible() {
+        return toolWindow != null && toolWindow.isVisible();
+    }
 
     public void updateView(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration) {
-        if (toolWindow != null && toolWindow.isVisible()) {
+        if (windowIsVisible()) {
             designView.scheduleRebuild(module, formDeclaration);
         }
     }
