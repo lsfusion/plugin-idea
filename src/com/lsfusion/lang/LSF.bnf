@@ -1210,7 +1210,7 @@ overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 
 constraintStatement ::= CONSTRAINT baseEvent propertyExpression
 		                (CHECKED (BY nonEmptyNoContextPropertyUsageList)? )?
-		                MESSAGE stringLiteral
+		                MESSAGE propertyExpression
 		                SEMI
 {
     pin = 1
