@@ -87,14 +87,14 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFConstraintStatement sourceStatement) {
-        LSFPropertyExpression decl = sourceStatement.getPropertyExpression();
+        LSFPropertyExpression decl = sourceStatement.getPropertyExpressionList().get(0);
         if (decl == null)
             return ContextModifier.EMPTY;
         return new ExprsContextModifier(decl);
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFConstraintStatement sourceStatement) {
-        LSFPropertyExpression decl = sourceStatement.getPropertyExpression();
+        LSFPropertyExpression decl = sourceStatement.getPropertyExpressionList().get(0);
         if (decl == null)
             return ContextInferrer.EMPTY;
         return new ExprsContextInferrer(decl);
