@@ -14,7 +14,7 @@ public class PropertyFoldingManager {
     private static final String LSF_PROPERTY_FOLDING_STATE = "lsfusion.property.folding";
 
     public static FoldingMode getFoldingMode(Project project) {
-        return FoldingMode.valueOf(PropertiesComponent.getInstance(project).getOrInit(LSF_PROPERTY_FOLDING_STATE, FoldingMode.IMPLICIT.name()));
+        return FoldingMode.valueOf(PropertiesComponent.getInstance(project).getValue(LSF_PROPERTY_FOLDING_STATE, FoldingMode.IMPLICIT.name()));
     }
 
     public static void setFoldingMode(Project project, FoldingMode foldingMode) {

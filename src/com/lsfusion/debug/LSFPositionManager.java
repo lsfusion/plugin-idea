@@ -29,13 +29,10 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ThreeState;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
-import com.lsfusion.lang.psi.LSFActionPropertyDefinitionBody;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.indexes.ModuleIndex;
@@ -110,7 +107,7 @@ public class LSFPositionManager extends PositionManagerEx {
                 return fromOffset;
             }
         }
-        throw new NoDataException();
+        throw NoDataException.INSTANCE;
     }
 
     @NotNull
@@ -118,7 +115,7 @@ public class LSFPositionManager extends PositionManagerEx {
     public List<Location> locationsOfLine(@NotNull final ReferenceType type, @NotNull final SourcePosition position) throws NoDataException {
 
         if(!(position.getFile() instanceof LSFFile))
-            throw new NoDataException();
+            throw NoDataException.INSTANCE;
             
         try {
             return Collections.singletonList(type.methodsByName("action_" + position.getLine()).get(0).allLineLocations().iterator().next());
@@ -141,7 +138,7 @@ public class LSFPositionManager extends PositionManagerEx {
                 }
             });
         }
-        throw new NoDataException();
+        throw NoDataException.INSTANCE;
     }
 
     @Nullable
@@ -158,7 +155,7 @@ public class LSFPositionManager extends PositionManagerEx {
                 }
             });
         }
-        throw new NoDataException();
+        throw NoDataException.INSTANCE;
     }
 
     @Nullable

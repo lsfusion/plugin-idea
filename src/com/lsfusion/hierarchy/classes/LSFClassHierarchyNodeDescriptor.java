@@ -25,30 +25,30 @@ public class LSFClassHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
 
     @Override
     public boolean isValid() {
-        return myElement.isValid();
+        return getPsiElement().isValid();
     }
 
     @Override
     public void navigate(boolean requestFocus) {
-        ((NavigationItem) myElement).navigate(true);
+        ((NavigationItem) getPsiElement()).navigate(true);
     }
 
     @Override
     public boolean canNavigate() {
-        return ((NavigationItem) myElement).canNavigate();
+        return ((NavigationItem) getPsiElement()).canNavigate();
     }
 
     @Override
     public boolean canNavigateToSource() {
-        return ((NavigationItem) myElement).canNavigateToSource();
+        return ((NavigationItem) getPsiElement()).canNavigateToSource();
     }
 
     public LSFClassDeclaration getClassDecl() {
-        return (LSFClassDeclaration) myElement;
+        return (LSFClassDeclaration) getPsiElement();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof LSFClassHierarchyNodeDescriptor && myElement.equals(((LSFClassHierarchyNodeDescriptor) obj).myElement);
+        return obj instanceof LSFClassHierarchyNodeDescriptor && getPsiElement().equals(((LSFClassHierarchyNodeDescriptor) obj).getPsiElement());
     }
 }

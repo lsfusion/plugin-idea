@@ -1,6 +1,6 @@
 package com.lsfusion.structure;
 
-import com.intellij.codeInsight.TargetElementUtilBase;
+import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.codeInsight.navigation.ImplementationSearcher;
 import com.intellij.ide.impl.StructureViewWrapperImpl;
 import com.intellij.ide.structureView.StructureViewFactoryEx;
@@ -36,7 +36,7 @@ public class LSFStructureFileCaretListener extends CaretAdapter {
 
     @Override
     public void caretPositionChanged(CaretEvent e) {
-        PsiElement targetElement = TargetElementUtilBase.findTargetElement(e.getEditor(), ImplementationSearcher.getFlags());
+        PsiElement targetElement = TargetElementUtil.findTargetElement(e.getEditor(), ImplementationSearcher.getFlags());
 
         if (targetElement instanceof LSFId) {
             PsiElement parent = PsiTreeUtil.getParentOfType(targetElement, LSFClassDecl.class, LSFBuiltInClassName.class);

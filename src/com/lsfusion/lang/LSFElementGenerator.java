@@ -266,12 +266,6 @@ public class LSFElementGenerator {
             public GlobalSearchScope getRequireScope() {
                 return GlobalSearchScope.allScope(project);
             }
-
-            @NotNull
-            @Override
-            public Project getProject() {
-                return project;
-            }
         };
     }
 

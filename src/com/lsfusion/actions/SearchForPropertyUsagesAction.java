@@ -1,7 +1,7 @@
 package com.lsfusion.actions;
 
 import com.intellij.codeInsight.CodeInsightActionHandler;
-import com.intellij.codeInsight.TargetElementUtilBase;
+import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.codeInsight.actions.BaseCodeInsightAction;
 import com.intellij.ide.impl.DataManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -87,7 +87,7 @@ public abstract class SearchForPropertyUsagesAction extends BaseCodeInsightActio
     }
 
     public PsiElement findSourceElement(Project project, Editor editor, int offset) {
-        if (TargetElementUtilBase.inVirtualSpace(editor, offset)) {
+        if (TargetElementUtil.inVirtualSpace(editor, offset)) {
             return null;
         }
 
@@ -100,7 +100,7 @@ public abstract class SearchForPropertyUsagesAction extends BaseCodeInsightActio
             if (mirror instanceof PsiFile) file = (PsiFile) mirror;
         }
 
-        return file.findElementAt(TargetElementUtilBase.adjustOffset(file, document, offset));
+        return file.findElementAt(TargetElementUtil.adjustOffset(file, document, offset));
     }
 
     private List<String> propertyUsagesAlternatives = Arrays.asList(PROPERTY_DRAW_USAGES, PROPERTY_USAGES);

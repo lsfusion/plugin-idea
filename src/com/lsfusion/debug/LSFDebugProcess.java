@@ -38,7 +38,7 @@ import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.lsfusion.debug.DebugUtils.*;
 import static com.lsfusion.references.LSFToJavaLanguageInjector.SCRIPTING_ACTION_PROPERTY_FQN;
@@ -80,7 +80,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
     private final DebuggerContextImpl SESSION_EMPTY_CONTEXT;
     
-    private final List<StepIntoAfterHitBreakpoint> commonDelegateBreakpoints = new ArrayList<StepIntoAfterHitBreakpoint>();
+    private final List<StepIntoAfterHitBreakpoint> commonDelegateBreakpoints = new ArrayList<>();
     
     private ExpressionEvaluator registerSteppingEvaluator;
     private ExpressionEvaluator unregisterSteppingEvaluator;
@@ -236,9 +236,9 @@ public class LSFDebugProcess extends JavaDebugProcess {
         return DebuggerManagerEx.getInstanceEx(getProject()).getBreakpointManager();
     }
 
-    private Set<ThreadReferenceProxyImpl> getSteppingThroughThreads() {
+    private AtomicReference<ThreadReferenceProxyImpl> getSteppingThroughThreads() {
         //приходится делать так жёстко, чтобы встроится во внутреннюю логику jaav-debuggera
-        return (Set<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "mySteppingThroughThreads");
+        return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "mySteppingThroughThread");
     }
 
     private EventDispatcher<DebugProcessListener> getDebugProcessDispatcher() {
@@ -251,8 +251,8 @@ public class LSFDebugProcess extends JavaDebugProcess {
     }
 
     // com.intellij.debugger.impl.DebuggerSession.resumeAction()
-    private void resumeAction(final StepCommand command, int event) {
-        getContextManager().setState(SESSION_EMPTY_CONTEXT, DebuggerSession.STATE_WAIT_EVALUATION, event, null);
+    private void resumeAction(final StepCommand command, DebuggerSession.Event event) {
+        getContextManager().setState(SESSION_EMPTY_CONTEXT, DebuggerSession.State.WAIT_EVALUATION, event, null);
         getJavaDebugProcess().getManagerThread().schedule(command);
     }
 
@@ -270,8 +270,8 @@ public class LSFDebugProcess extends JavaDebugProcess {
         }
         
         if (stepIntoCommand != null) {
-            getSteppingThroughThreads().add(stepIntoCommand.getContextThread());
-            resumeAction(stepIntoCommand, DebuggerSession.EVENT_STEP);
+            getSteppingThroughThreads().set(stepIntoCommand.getContextThread());
+            resumeAction(stepIntoCommand, DebuggerSession.Event.STEP);
         } else {
             super.startStepInto();
         }
@@ -281,8 +281,8 @@ public class LSFDebugProcess extends JavaDebugProcess {
     public void startStepOver() {
         if (isCurrentPositionInLsf() || inExecuteCustom(true)) {
             StepOverCommand stepOverCommand = new StepOverCommand(getSuspendContext());
-            getSteppingThroughThreads().add(stepOverCommand.getContextThread());
-            resumeAction(stepOverCommand, DebuggerSession.EVENT_STEP);
+            getSteppingThroughThreads().set(stepOverCommand.getContextThread());
+            resumeAction(stepOverCommand, DebuggerSession.Event.STEP);
         } else {
             super.startStepOver();
         }
@@ -292,8 +292,8 @@ public class LSFDebugProcess extends JavaDebugProcess {
     public void startStepOut() {
         if (isCurrentPositionInLsf() || inExecuteCustom()) {
             StepOutCommand stepOutCommand = new StepOutCommand(getSuspendContext());
-            getSteppingThroughThreads().add(stepOutCommand.getContextThread());
-            resumeAction(stepOutCommand, DebuggerSession.EVENT_STEP);
+            getSteppingThroughThreads().set(stepOutCommand.getContextThread());
+            resumeAction(stepOutCommand, DebuggerSession.Event.STEP);
         } else {
             super.startStepOut();
         }
@@ -306,7 +306,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
     private boolean inExecuteCustom(final boolean shouldBeLastStatement) {
         ApplicationManager.getApplication().assertIsDispatchThread();
 
-        final Ref<Boolean> inExecute = new Ref<Boolean>();
+        final Ref<Boolean> inExecute = new Ref<>();
         getJavaDebugProcess().getManagerThread().invokeAndWait(new SuspendContextCommandImpl(getSuspendContext()) {
             @Override
             public void contextAction() {
@@ -385,7 +385,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
     private boolean isCurrentPositionInLsf() {
         ApplicationManager.getApplication().assertIsDispatchThread();
 
-        final Ref<Boolean> inLSF = new Ref<Boolean>();
+        final Ref<Boolean> inLSF = new Ref<>();
         getJavaDebugProcess().getManagerThread().invokeAndWait(new SuspendContextCommandImpl(getSuspendContext()) {
             @Override
             public void contextAction() {
@@ -424,7 +424,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         EventRequestManager requestManager = getVirtualMachineProxy().eventRequestManager();
         List<StepRequest> stepRequests = requestManager.stepRequests();
         if (!stepRequests.isEmpty()) {
-            final List<StepRequest> toDelete = new ArrayList<StepRequest>(stepRequests.size());
+            final List<StepRequest> toDelete = new ArrayList<>(stepRequests.size());
             for (final StepRequest request : stepRequests) {
                 ThreadReference threadReference = request.thread();
                 try {

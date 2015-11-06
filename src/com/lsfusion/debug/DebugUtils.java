@@ -1,24 +1,10 @@
 package com.lsfusion.debug;
 
-import com.intellij.debugger.SourcePosition;
 import com.intellij.debugger.jdi.VirtualMachineProxyImpl;
-import com.intellij.openapi.editor.Document;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.xdebugger.XSourcePosition;
-import com.intellij.xdebugger.impl.XSourcePositionImpl;
-import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.sun.jdi.Location;
 import com.sun.jdi.Method;
 import com.sun.jdi.ReferenceType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DebugUtils {

@@ -155,8 +155,8 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
                 ((LSFusionRunConfiguration)runConfiguration.getConfiguration()).setModule(rootModel.getModule());
                 ((LSFusionRunConfiguration)runConfiguration.getConfiguration()).setWorkingDirectory(contentEntryPath);
                 if (runManager instanceof RunManagerEx) {
-                    ((RunManagerEx) runManager).addConfiguration(runConfiguration, false);
-                    ((RunManagerEx) runManager).setSelectedConfiguration(runConfiguration);
+                    runManager.addConfiguration(runConfiguration, false);
+                    runManager.setSelectedConfiguration(runConfiguration);
                 }
             }
 
@@ -173,7 +173,7 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
 
     private void createFromTemplateAndOpen(final Project project, String templateName, final File templateFile, Properties properties) {
         try {
-            String content = FileTemplateManager.getInstance().getInternalTemplate(templateName).getText(properties);
+            String content = FileTemplateManager.getInstance(project).getInternalTemplate(templateName).getText(properties);
 
 
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(templateFile), "UTF-8"));

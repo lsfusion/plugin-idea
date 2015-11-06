@@ -37,7 +37,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
     protected PsiElement getElementFromDescriptor(@NotNull HierarchyNodeDescriptor descriptor) {
         if (descriptor instanceof LSFUsageHierarchyNodeDescriptor) {
             LSFUsageHierarchyNodeDescriptor nodeDescriptor = (LSFUsageHierarchyNodeDescriptor) descriptor;
-            return nodeDescriptor.getNodeElement();
+            return nodeDescriptor.getPsiElement();
         }
         return null;
     }
@@ -68,7 +68,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
     protected PsiElement getOpenFileElementFromDescriptor(@NotNull HierarchyNodeDescriptor descriptor) {
         if (descriptor instanceof LSFUsageHierarchyNodeDescriptor) {
             LSFUsageHierarchyNodeDescriptor nodeDescriptor = (LSFUsageHierarchyNodeDescriptor) descriptor;
-            return nodeDescriptor.getNodeElement();
+            return nodeDescriptor.getPsiElement();
         }
         return null;
     }
@@ -159,8 +159,8 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
         }
 
         private int compareEqual(LSFUsageHierarchyNodeDescriptor d1, LSFUsageHierarchyNodeDescriptor d2) {
-            PsiElement nodeElement1 = d1.getNodeElement();
-            PsiElement nodeElement2 = d2.getNodeElement();
+            PsiElement nodeElement1 = d1.getPsiElement();
+            PsiElement nodeElement2 = d2.getPsiElement();
             if (nodeElement1 instanceof LSFExplicitInterfacePropertyStatement && nodeElement2 instanceof LSFExplicitInterfacePropertyStatement) {
                 boolean isAction1 = ((LSFExplicitInterfacePropertyStatement) nodeElement1).getExplicitValuePropertyStatement().getPropertyStatement().isAction();
                 boolean isAction2 = ((LSFExplicitInterfacePropertyStatement) nodeElement2).getExplicitValuePropertyStatement().getPropertyStatement().isAction();
@@ -180,7 +180,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
 
         private int getIndex(LSFUsageHierarchyNodeDescriptor node) {
             for (Class ord : classOrder) {
-                if (ord.isInstance(node.getNodeElement())) {
+                if (ord.isInstance(node.getPsiElement())) {
                     return classOrder.indexOf(ord);
                 }
             }

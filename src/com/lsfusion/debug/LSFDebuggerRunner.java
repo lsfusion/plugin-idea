@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class LSFDebuggerRunner extends GenericDebuggerRunner {
     public static final String DEBUG_ACTIONS_PROPERTY = "lsfusion.server.debug.actions";
-    public static final Key<Integer> DEBUGGER_PROPERTY_KEY = new Key<Integer>("lsfusin.debuggerPort");
+    public static final Key<Integer> DEBUGGER_PROPERTY_KEY = new Key<>("lsfusin.debuggerPort");
     
     @Override
     public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile) {
@@ -77,7 +77,7 @@ public class LSFDebuggerRunner extends GenericDebuggerRunner {
         debugProcess.putUserData(DEBUGGER_PROPERTY_KEY, debuggerPort);
 
         XDebugSession debugSession =
-            XDebuggerManager.getInstance(env.getProject()).startSession(this, env, env.getContentToReuse(), new XDebugProcessStarter() {
+            XDebuggerManager.getInstance(env.getProject()).startSession(env, new XDebugProcessStarter() {
                 @Override
                 @NotNull
                 public XDebugProcess start(final @NotNull XDebugSession session) {

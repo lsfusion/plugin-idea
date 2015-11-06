@@ -36,12 +36,12 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
 
     @Override
     public boolean isValid() {
-        return myElement.isValid();
+        return getPsiElement().isValid();
     }
 
     @Override
     public void navigate(boolean requestFocus) {
-        ((NavigationItem) myElement).navigate(true);
+        ((NavigationItem) getPsiElement()).navigate(true);
     }
 
     @Override
@@ -54,15 +54,12 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
         return true;
     }
 
-    public PsiElement getNodeElement() {
-        return myElement;
-    }
-
     public PsiElement getElementId() {
         return nameIdentifier;
     }
 
     private LSFId getId() {
+        PsiElement myElement = getPsiElement();
         if (myElement instanceof LSFFormStatement) {
             LSFFormDeclaration formDeclaration = ((LSFFormStatement) myElement).resolveFormDecl();
             return formDeclaration != null ? formDeclaration.getNameIdentifier() : null;
@@ -82,6 +79,6 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof LSFUsageHierarchyNodeDescriptor && myElement.equals(((LSFUsageHierarchyNodeDescriptor) obj).myElement);
+        return obj instanceof LSFUsageHierarchyNodeDescriptor && getPsiElement().equals(((LSFUsageHierarchyNodeDescriptor) obj).getPsiElement());
     }
 }

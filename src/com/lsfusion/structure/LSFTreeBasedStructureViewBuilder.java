@@ -1,6 +1,6 @@
 package com.lsfusion.structure;
 
-import com.intellij.codeInsight.TargetElementUtilBase;
+import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.codeInsight.navigation.ImplementationSearcher;
 import com.intellij.ide.structureView.StructureView;
 import com.intellij.ide.structureView.StructureViewModel;
@@ -54,7 +54,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
 
         LSFValueClass currentClass = valueClass;
         if (currentClass == null) {
-            PsiElement targetElement = TargetElementUtilBase.findTargetElement(editor, ImplementationSearcher.getFlags());
+            PsiElement targetElement = TargetElementUtil.findTargetElement(editor, ImplementationSearcher.getFlags());
             if (targetElement instanceof LSFId) {
                 PsiElement parent = targetElement;
                 while (parent != null) {
@@ -76,7 +76,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
 
     @NotNull
     @Override
-    public StructureView createStructureView(FileEditor fileEditor, Project project) {
+    public StructureView createStructureView(FileEditor fileEditor, @NotNull Project project) {
         StructureView structureView = super.createStructureView(fileEditor, project);
 
         final JTree tree = ((StructureViewComponent) structureView).getTree();

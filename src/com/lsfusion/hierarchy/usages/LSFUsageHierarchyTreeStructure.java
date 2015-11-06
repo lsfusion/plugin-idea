@@ -27,7 +27,7 @@ public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
     @NotNull
     @Override
     protected Object[] buildChildren(@NotNull final HierarchyNodeDescriptor descriptor) {
-        final Set<LSFUsageHierarchyNodeDescriptor> result = new ArrayListSet<LSFUsageHierarchyNodeDescriptor>();
+        final Set<LSFUsageHierarchyNodeDescriptor> result = new ArrayListSet<>();
         final PsiElement element = ((LSFUsageHierarchyNodeDescriptor) descriptor).getElementId();
 
         if (element != null && element instanceof LSFId) {
@@ -36,7 +36,7 @@ public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
                 public boolean process(PsiReference ref) {
                     PsiElement el = LSFPsiUtils.getStatementParent(ref.getElement());
                     if (el != null) {
-                        PsiElement nodeElement = ((LSFUsageHierarchyNodeDescriptor) descriptor).getNodeElement();
+                        PsiElement nodeElement = descriptor.getPsiElement();
                         if (!ignore(nodeElement, el, ref.getElement())) {
                             result.add(new LSFUsageHierarchyNodeDescriptor(myProject, descriptor, el, false));
                         }
