@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.30</version>
+    <version>1.0.32</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -15,7 +15,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="141.177"/>
+    <idea-version since-build="143.381"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -286,12 +286,12 @@
 
         <!-- debugger -->
         <xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />
+        <xdebugger.breakpointType implementation="com.lsfusion.debug.property.LSFPropertyBreakpointType" />
         <!-- приоритет обратен порядку, поэтому ставим последним -->
         <debugger.positionManagerFactory id="lsfPositionManagerFactory" order="last" implementation="com.lsfusion.debug.LSFPositionManagerFactory"/>
         
         <programRunner implementation="com.lsfusion.debug.LSFDebuggerRunner" />
         <debugger.codeFragmentFactory implementation="com.lsfusion.debug.evaluation.LSFCodeFragmentFactory"/>
-        <debugger.javaBreakpointHandlerFactory implementation="com.lsfusion.debug.LSFBreakpointHandlerFactory"/>
 
         <!-- reports related stuff -->
         <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>

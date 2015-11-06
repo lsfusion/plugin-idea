@@ -24,7 +24,9 @@ import com.intellij.psi.JavaCodeFragment;
 import com.intellij.psi.JavaCodeFragmentFactory;
 import com.intellij.util.EventDispatcher;
 import com.intellij.xdebugger.XDebugSession;
+import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.lsfusion.debug.property.LSFPropertyBreakpointHandler;
 import com.lsfusion.util.ReflectionUtils;
 import com.sun.jdi.*;
 import com.sun.jdi.event.LocatableEvent;
@@ -37,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.JavaDebuggerEditorsProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -85,6 +88,9 @@ public class LSFDebugProcess extends JavaDebugProcess {
     private ExpressionEvaluator registerSteppingEvaluator;
     private ExpressionEvaluator unregisterSteppingEvaluator;
     
+    private LSFBreakpointHandler breakpointHandler;
+    private LSFPropertyBreakpointHandler propertyBreakpointHandler;
+
     private void enableCommonDelegateBreakPoints(SuspendContextImpl suspendContext) {
         invokeRemoteMethod(true, suspendContext);
         for(StepIntoAfterHitBreakpoint commonDelegate : commonDelegateBreakpoints) {
@@ -143,6 +149,11 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
     public LSFDebugProcess(@NotNull XDebugSession session, DebuggerSession javaSession) {
         super(session, javaSession);
+
+        LSFDebugVMNotifier vmNotifier = new LSFDebugVMNotifier(getJavaDebugProcess());
+        
+        breakpointHandler = new LSFActionBreakpointHandler(getJavaDebugProcess(), vmNotifier);
+        propertyBreakpointHandler = new LSFPropertyBreakpointHandler(getJavaDebugProcess(), vmNotifier);
         
         commonDelegateBreakpoints.add(new CommonDelegateBreakpoint());
         commonDelegateBreakpoints.add(new CommonCustomDelegateBreakpoint());
@@ -237,12 +248,12 @@ public class LSFDebugProcess extends JavaDebugProcess {
     }
 
     private AtomicReference<ThreadReferenceProxyImpl> getSteppingThroughThreads() {
-        //приходится делать так жёстко, чтобы встроится во внутреннюю логику jaav-debuggera
+        //приходится делать так жёстко, чтобы встроится во внутреннюю логику java-debuggera
         return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "mySteppingThroughThread");
     }
 
     private EventDispatcher<DebugProcessListener> getDebugProcessDispatcher() {
-        //приходится делать так жёстко, чтобы встроится во внутреннюю логику jaav-debuggera
+        //приходится делать так жёстко, чтобы встроится во внутреннюю логику java-debuggera
         return (EventDispatcher<DebugProcessListener>) ReflectionUtils.getPrivateFieldValue(DebugProcessImpl.class, getJavaDebugProcess(), "myDebugProcessDispatcher");
     }
 
@@ -413,11 +424,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         }
         
         ReferenceType refType = location.declaringType();
-        if (!refType.name().startsWith(DELEGATES_HOLDER_CLASS_FQN_PREFIX)) {
-            return false;
-        }
-
-        return location.method().name().contains("action");
+        return refType.name().startsWith(DELEGATES_HOLDER_CLASS_FQN_PREFIX) && location.method().name().contains("action");
     }
 
     private void deleteStepRequests(@Nullable final ThreadReference stepThread) {
@@ -441,6 +448,16 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
     private void doStep(final SuspendContextImpl suspendContext, final ThreadReferenceProxyImpl stepThread, int depth, RequestHint hint) {
         ReflectionUtils.invokeMethod(doStepMethod, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint);
+    }
+    
+    @NotNull
+    @Override
+    public XBreakpointHandler<?>[] getBreakpointHandlers() {
+        XBreakpointHandler<?>[] breakpointHandlers = super.getBreakpointHandlers();
+        XBreakpointHandler<?>[] result = Arrays.copyOf(breakpointHandlers, breakpointHandlers.length + 2);
+        result[breakpointHandlers.length] = breakpointHandler;
+        result[breakpointHandlers.length + 1] = propertyBreakpointHandler;
+        return result;
     }
 
     public abstract class StepCommand extends SuspendContextCommandImpl {
