@@ -118,6 +118,7 @@ public class ShowErrorsAction extends AnAction {
                             } else {
                                 findInjectedErrors(PsiManager.getInstance(project).findFile(file));
                             }
+                            indicator.setFraction((double) index/files.size());
                         }
 
                         Notifications.Bus.notify(new Notification("", "", "Searching for errors finished", NotificationType.INFORMATION));
