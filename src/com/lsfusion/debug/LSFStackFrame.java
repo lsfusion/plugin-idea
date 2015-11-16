@@ -3,7 +3,10 @@ package com.lsfusion.debug;
 import com.intellij.debugger.SourcePosition;
 import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.debugger.engine.JavaDebuggerEvaluator;
+import com.intellij.debugger.engine.JavaStackFrame;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
+import com.intellij.debugger.ui.impl.watch.MethodsTracker;
+import com.intellij.debugger.ui.impl.watch.StackFrameDescriptorImpl;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
@@ -14,6 +17,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.ColoredTextContainer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.XSourcePosition;
+import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.LSFPropertyDeclaration;
@@ -36,6 +40,15 @@ public class LSFStackFrame extends XStackFrame {
         this.frame = frame;
         this.debugProcess = debugProcess;
         this.position = position;
+    }
+
+    @Nullable
+    @Override
+    public XDebuggerEvaluator getEvaluator() {
+        if (evaluator == null) {
+            evaluator = new JavaDebuggerEvaluator(debugProcess, new JavaStackFrame(new StackFrameDescriptorImpl(frame, new MethodsTracker()), false));
+        } 
+        return evaluator;
     }
 
     @Nullable
