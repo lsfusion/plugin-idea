@@ -60,7 +60,6 @@ public class ShortenNamesProcessor {
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementDocumentPrefix", "Stock", 3), false, true),
             new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementOutContractLedger", "ContractLedger", 2), false, true),
             new PropInMetaRef(new PropRef(null, null, null, false), new MetacodeRef("extendFormFilterAccessLegalEntity", "EmployeeLegalEntity", 5), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, false), new MetacodeRef("extendFormFilterAccessStock", "EmployeeStock", 5), false, true),
             new PropInMetaRef(new PropRef("batch", "Stock", Collections.singletonList(new ClassRef("DocumentDetail", "Stock")), true), new MetacodeRef("implementDocumentBatch", "Stock", 1), false, true),
             new PropInMetaRef(new PropRef("batch", "Stock", Collections.singletonList(new ClassRef("DocumentDetail", "Stock")), true), new MetacodeRef("implementDocumentBatch", "Stock", 2), false, true),
             new PropInMetaRef(new PropRef("name", "Box", Collections.singletonList(new ClassRef("Box", "Box")), false), new MetacodeRef("defineDocumentDetailBoxCustom", "Box", 3), true, false),
