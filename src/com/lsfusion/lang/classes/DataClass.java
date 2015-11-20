@@ -39,7 +39,8 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
         return new ArrayList<String>();
     }
 
-    public DataClass op(DataClass compClass, boolean or) {
+    public DataClass op(DataClass compClass, boolean or, boolean string) {
+        assert or || !string;
         if (compClass.equals(this))
             return this;
         return null;
@@ -51,18 +52,21 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     }
 
     @Override
-    public LSFClassSet op(LSFClassSet set, boolean or) {
+    public LSFClassSet op(LSFClassSet set, boolean or, boolean string) {
         if (!(set instanceof DataClass))
             return null;
 
-        return op((DataClass) set, or);
+        return op((DataClass) set, or, string);
     }
 
     @Override
-    public boolean containsAll(LSFClassSet set) {
+    public boolean containsAll(LSFClassSet set, boolean implicitCast) {
         if (!(set instanceof DataClass))
             return false;
-        return op((DataClass) set, false) != null;
+        DataClass compatible = op((DataClass) set, true, false);
+        if(implicitCast)
+            return compatible != null;
+        return compatible !=null && compatible.equals(this);
     }
 
     @Override
@@ -70,7 +74,7 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
         if (!(set instanceof DataClass))
             return false;
 
-        return op((DataClass) set, false) != null;
+        return op((DataClass) set, false, false) != null;
     }
 
     @Override

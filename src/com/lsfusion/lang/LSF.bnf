@@ -278,7 +278,8 @@ additiveORPE ::= additivePE (ADDOR_OPERAND additivePE)*
 additivePE ::= multiplicativePE ((PLUS | MINUS) multiplicativePE)*
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
-multiplicativePE ::= unaryMinusPE ((MULT | DIV) unaryMinusPE)*
+typeMult ::= MULT | DIV
+multiplicativePE ::= unaryMinusPE (typeMult unaryMinusPE)*
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 unaryMinusPE ::= (MINUS unaryMinusPE) | postfixUnaryPE

@@ -11,7 +11,7 @@ public class SimpleDataClass extends DataClass {
         this.dataName = dataName;
     }
 
-    public DataClass op(DataClass compClass, boolean or) {
+    public DataClass op(DataClass compClass, boolean or, boolean string) {
         if (compClass.equals(this))
             return this;
         return null;

@@ -271,6 +271,12 @@ public class LSFPsiImplUtil {
     // CLASSES
 
     public static LSFExClassSet op(@Nullable LSFExClassSet class1, @Nullable LSFExClassSet class2, boolean or) {
+        return op(class1, class2, or, false);
+    }
+
+    public static LSFExClassSet op(@Nullable LSFExClassSet class1, @Nullable LSFExClassSet class2, boolean or, boolean string) {
+        assert or || !string;
+
         if(class1 == null && class2 == null)
             return null;
         
@@ -280,12 +286,26 @@ public class LSFPsiImplUtil {
         if(class2 == null)
             return class1.opNull(or);
         
-        return class1.op(class2, or);
+        return class1.op(class2, or, string);
     }
 
     @Nullable
-    private static LSFExClassSet or(@Nullable LSFExClassSet class1, @Nullable LSFExClassSet class2) {
-        return op(class1, class2, true);
+    private static LSFExClassSet or(@Nullable LSFExClassSet class1, @Nullable LSFExClassSet class2, boolean string) {
+        return op(class1, class2, true, string);
+    }
+
+    @Nullable
+    private static LSFExClassSet scale(@Nullable LSFExClassSet class1, @Nullable LSFExClassSet class2, boolean mult) {
+        if(class1 == null)
+            return class2;
+
+        if(class2 == null)
+            return class1;
+
+        if(!(class1.classSet instanceof IntegralClass && class2.classSet instanceof IntegralClass))
+            return null;
+
+        return LSFExClassSet.checkNull(((IntegralClass)class1.classSet).scale((IntegralClass)class2.classSet, mult), class1.orAny || class2.orAny);
     }
 
     public static boolean containsAll(@NotNull List<LSFClassSet> who, @NotNull List<LSFClassSet> what, boolean falseImplicitClass) {
@@ -295,7 +315,7 @@ public class LSFPsiImplUtil {
             if (whoClass == null && whatClass == null)
                 continue;
 
-            if (whoClass != null && whatClass != null && !whoClass.containsAll(whatClass))
+            if (whoClass != null && whatClass != null && !whoClass.containsAll(whatClass, true))
                 return false;
 
             if (whatClass != null)
@@ -580,14 +600,26 @@ public class LSFPsiImplUtil {
         return result;
     }
 
-    private static LSFExClassSet orClasses(List<LSFExClassSet> classes) {
+    private static LSFExClassSet orClasses(List<LSFExClassSet> classes, boolean string) {
         LSFExClassSet result = null;
         for (int i = 0; i < classes.size(); i++) {
             LSFExClassSet classSet = classes.get(i);
             if (i == 0)
                 result = classSet;
             else
-                result = or(result, classSet);
+                result = or(result, classSet, string);
+        }
+        return result;
+    }
+
+    private static LSFExClassSet scaleClasses(List<LSFExClassSet> classes, List<Boolean> mults) {
+        LSFExClassSet result = null;
+        for (int i = 0; i < classes.size(); i++) {
+            LSFExClassSet classSet = classes.get(i);
+            if (i == 0)
+                result = classSet;
+            else
+                result = scale(result, classSet, mults.get(i-1));
         }
         return result;
     }
@@ -607,7 +639,7 @@ public class LSFPsiImplUtil {
             } 
             fixedClasses.add(ex);
         }
-        return orClasses(fixedClasses);
+        return orClasses(fixedClasses, true);
     }
 
     @Nullable
@@ -615,7 +647,7 @@ public class LSFPsiImplUtil {
         List<LSFExClassSet> orClasses = new ArrayList<LSFExClassSet>();
         for (LSFAdditivePE pe : sourceStatement.getAdditivePEList())
             orClasses.add(resolveInferredValueClass(pe, inferred));
-        return orClasses(orClasses);
+        return orClasses(orClasses, false);
     }
 
     @Nullable
@@ -631,7 +663,10 @@ public class LSFPsiImplUtil {
         List<LSFExClassSet> orClasses = new ArrayList<LSFExClassSet>();
         for (LSFUnaryMinusPE pe : sourceStatement.getUnaryMinusPEList())
             orClasses.add(resolveInferredValueClass(pe, inferred));
-        return orClasses(orClasses);
+        List<Boolean> mults = new ArrayList<Boolean>();
+        for (LSFTypeMult type : sourceStatement.getTypeMultList())
+            mults.add(type.getText().equals("*"));
+        return scaleClasses(orClasses, mults);
     }
 
     @Nullable
@@ -724,6 +759,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     private static LSFExClassSet resolveInferredValueClass(List<LSFPropertyExpression> list, @Nullable InferExResult inferred) {
+        return resolveInferredValueClass(list, inferred, false);
+    }
+
+    @Nullable
+    private static LSFExClassSet resolveInferredValueClass(List<LSFPropertyExpression> list, @Nullable InferExResult inferred, boolean string) {
         if (list.size() == 0)
             return null;
 
@@ -733,17 +773,22 @@ public class LSFPsiImplUtil {
             if (i == 0)
                 result = valueClass;
             else
-                result = or(result, valueClass);
+                result = or(result, valueClass, string);
         }
         return result;
     }
 
     @Nullable
-    private static LSFExClassSet resolveInferredValueClass(@Nullable LSFNonEmptyPropertyExpressionList list, @Nullable InferExResult inferred) {
+    private static LSFExClassSet resolveInferredValueClass(@Nullable LSFNonEmptyPropertyExpressionList list, @Nullable InferExResult inferred, boolean string) {
         if (list == null) {
             return null;
         }
-        return resolveInferredValueClass(list.getPropertyExpressionList(), inferred);
+        return resolveInferredValueClass(list.getPropertyExpressionList(), inferred, string);
+    }
+
+    @Nullable
+    private static LSFExClassSet resolveInferredValueClass(@Nullable LSFNonEmptyPropertyExpressionList list, @Nullable InferExResult inferred) {
+        return resolveInferredValueClass(list, inferred, false);
     }
 
     @Nullable
@@ -818,7 +863,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFConcatPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
-        return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), inferred);
+        return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), inferred, true);
     }
 
     @Nullable
@@ -864,7 +909,7 @@ public class LSFPsiImplUtil {
         }
         LSFStringLiteral stringLiteral = sourceStatement.getStringLiteral();
         if (stringLiteral != null)
-            return new StringClass(false, true, new ExtInt(stringLiteral.getValue().length()));
+            return new StringClass(false, false, new ExtInt(stringLiteral.getValue().length()));
         if (sourceStatement.getDateTimeLiteral() != null)
             return DateTimeClass.instance;
         if (sourceStatement.getDateLiteral() != null)
@@ -2983,5 +3028,29 @@ public class LSFPsiImplUtil {
         }
 
         return name;
+    }
+
+    public static boolean checkOverrideValue(@NotNull LSFOverrideStatement o, Result<LSFClassSet> required, Result<LSFClassSet> found) {
+        List<LSFPropertyExpression> peList = o.getPropertyExpressionList();
+        if(peList.size() >= 1) {
+            LSFMappedPropertyClassParamDeclare mappedDeclare = o.getMappedPropertyClassParamDeclare();
+
+            boolean infer = true;
+
+            LSFExClassSet abstractClass = resolveValueClass(mappedDeclare.getPropertyUsageWrapper().getPropertyUsage(), infer);
+            if (abstractClass != null) {
+                LSFPropertyExpression pe = peList.get(peList.size() - 1);
+                LSFExClassSet peClass = resolveValueClass(pe, infer);
+                if(peClass != null) {
+                    if(!abstractClass.classSet.containsAll(peClass.classSet, false)) {
+                        required.setResult(abstractClass.classSet);
+                        found.setResult(peClass.classSet);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

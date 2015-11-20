@@ -350,13 +350,13 @@ public class CustomClassSet implements LSFClassSet {
         return sortFirstFulls.iterator().next();
     }
 
-    public LSFClassSet op(LSFClassSet set, boolean or) {
+    public LSFClassSet op(LSFClassSet set, boolean or, boolean string) {
         if (!(set instanceof CustomClassSet))
             return null;
         return op((CustomClassSet) set, or);
     }
 
-    public boolean containsAll(LSFClassSet set) {
+    public boolean containsAll(LSFClassSet set, boolean implicitCast) {
         if (!(set instanceof CustomClassSet))
             return false;
         return containsAll((CustomClassSet) set);

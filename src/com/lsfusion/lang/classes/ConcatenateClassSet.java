@@ -31,7 +31,7 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
         return sets.length;
     }
 
-    public LSFClassSet op(LSFClassSet set, boolean or) {
+    public LSFClassSet op(LSFClassSet set, boolean or, boolean string) {
         if (!(set instanceof ConcatenateClassSet))
             return null;
         ConcatenateClassSet structSet = (ConcatenateClassSet) set;
@@ -40,11 +40,11 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
 
         LSFClassSet[] result = new LSFClassSet[sets.length];
         for (int i = 0; i < sets.length; i++)
-            result[i] = sets[i].op(structSet.sets[i], or);
+            result[i] = sets[i].op(structSet.sets[i], or, string);
         return new ConcatenateClassSet(result);
     }
 
-    public boolean containsAll(LSFClassSet set) {
+    public boolean containsAll(LSFClassSet set, boolean implicitCast) {
         if (!(set instanceof ConcatenateClassSet))
             return false;
         ConcatenateClassSet structSet = (ConcatenateClassSet) set;
@@ -52,7 +52,7 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
             return false;
 
         for (int i = 0; i < sets.length; i++)
-            if (!sets[i].containsAll(structSet.sets[i]))
+            if (!sets[i].containsAll(structSet.sets[i], true))
                 return false;
         return true;
     }

@@ -2,6 +2,7 @@ package com.lsfusion.lang.typeinfer;
 
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LogicalClass;
+import com.sun.istack.internal.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,18 +88,24 @@ public class LSFExClassSet {
     }
     
     // может быть null
+    @Nullable
     public LSFExClassSet op(LSFExClassSet exClassSet, boolean or) {
+        return op(exClassSet, or, false);
+    }
+    @Nullable
+    public LSFExClassSet op(LSFExClassSet exClassSet, boolean or, boolean string) {
         if(or) {
-            return LSFExClassSet.checkNull(classSet.op(exClassSet.classSet, true), orAny || exClassSet.orAny);
+            return LSFExClassSet.checkNull(classSet.op(exClassSet.classSet, true, string), orAny || exClassSet.orAny);
         } else {
+            assert !string;
             if(orAny) {
                 if(exClassSet.orAny) // если оба orAny, то не and'м, а or'м
-                    return LSFExClassSet.checkNull(classSet.op(exClassSet.classSet, true), true);
+                    return LSFExClassSet.checkNull(classSet.op(exClassSet.classSet, true, string), true);
                 return exClassSet;
             }
             if(exClassSet.orAny)
                 return this;
-            return LSFExClassSet.checkNull(classSet.op(exClassSet.classSet, false), false);
+            return LSFExClassSet.checkNull(classSet.op(exClassSet.classSet, false, string), false);
         }
     }
     

@@ -8,9 +8,9 @@ public interface LSFClassSet {
 
     LSFValueClass getCommonClass();
 
-    LSFClassSet op(LSFClassSet set, boolean or);
+    LSFClassSet op(LSFClassSet set, boolean or, boolean string);
 
-    boolean containsAll(LSFClassSet set);
+    boolean containsAll(LSFClassSet set, boolean implicitCast);
 
     boolean haveCommonChildren(LSFClassSet set, GlobalSearchScope scope);
 

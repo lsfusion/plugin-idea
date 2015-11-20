@@ -294,7 +294,7 @@ public class LSFPsiUtils {
             if (paramClasses != null && !paramClasses.isEmpty()) {
                 for (LSFClassSet paramClass : paramClasses) {
                     if (paramClass != null) {
-                        if (paramClass.containsAll(valueClassSet)) {
+                        if (paramClass.containsAll(valueClassSet, true)) {
                             result.add((T) applicableMapper.map(statement, paramClass.getCommonClass()));
                             break;
                         }

@@ -14,6 +14,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.lsfusion.actions.ShowErrorsAction;
+import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
@@ -25,7 +26,7 @@ import com.lsfusion.lang.psi.references.LSFStaticObjectReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.Set;
+import java.util.*;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
 
@@ -432,5 +433,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);
     }
+
+    @Override
+    public void visitOverrideStatement(@NotNull LSFOverrideStatement element) {
+        Result<LSFClassSet> required = new Result<LSFClassSet>(); Result<LSFClassSet> found = new Result<LSFClassSet>();
+        if(!LSFPsiImplUtil.checkOverrideValue(element, required, found)) {
+            Annotation annotation = myHolder.createErrorAnnotation(element, "Wrong value class. Required : " + required.getResult().getCanonicalName() + ", found : " + found.getResult().getCanonicalName());
+            annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+            addError(element, annotation);
+        }
+    }
+
 }
 

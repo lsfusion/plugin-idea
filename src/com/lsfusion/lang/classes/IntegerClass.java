@@ -4,7 +4,7 @@ import com.lsfusion.util.BaseUtils;
 
 import java.util.Collection;
 
-public class IntegerClass extends IntegralClass {
+public class IntegerClass extends IntClass {
 
     public final static IntegerClass instance = new IntegerClass();
 

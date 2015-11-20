@@ -650,7 +650,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                                 LSFClassSet declClass = declClasses.get(i);
                                 LSFClassSet contextClass = contextClasses.get(i);
 
-                                if (declClass != null && contextClass != null && !declClass.containsAll(contextClass)) {
+                                if (declClass != null && contextClass != null && !declClass.containsAll(contextClass, true)) {
                                     priority = -1;
                                     break;
                                 }
@@ -663,7 +663,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                             if (declClass != null) {
                                 boolean foundInContext = false;
                                 for(LSFClassSet contextClass : contextClasses) {
-                                    if(declClass.containsAll(contextClass)) {
+                                    if(declClass.containsAll(contextClass, true)) {
                                         foundInContext = true;
                                         break;
                                     }

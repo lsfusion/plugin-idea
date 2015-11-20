@@ -1,6 +1,6 @@
 package com.lsfusion.lang.classes;
 
-public class LongClass extends IntegralClass {
+public class LongClass extends IntClass {
 
     public final static LongClass instance = new LongClass();
 

@@ -11,7 +11,7 @@ public abstract class IntegralClass extends DataClass {
     abstract int getPrecision();
 
     @Override
-    public DataClass op(DataClass compClass, boolean or) {
+    public IntegralClass op(DataClass compClass, boolean or, boolean string) {
         if (!(compClass instanceof IntegralClass)) return null;
 
         IntegralClass integralClass = (IntegralClass) compClass;
@@ -21,6 +21,23 @@ public abstract class IntegralClass extends DataClass {
             return or ? integralClass : this;
         int whole = BaseUtils.cmp(getWhole(), integralClass.getWhole(), or);
         int precision = BaseUtils.cmp(getPrecision(), integralClass.getPrecision(), or);
+        return new NumericClass(whole + precision, precision);
+    }
+
+    public DataClass scale(IntegralClass compClass, boolean mult) {
+
+        if(!(this instanceof NumericClass) || !(compClass instanceof NumericClass))
+            return op(compClass, true, false);
+
+        int whole;
+        int precision;
+        if(mult) {
+            whole = getWhole() + compClass.getWhole();
+            precision = getPrecision() + compClass.getPrecision();
+        } else {
+            whole = getWhole() + compClass.getPrecision();
+            precision = getPrecision() + compClass.getWhole();
+        }
         return new NumericClass(whole + precision, precision);
     }
 

@@ -34,11 +34,12 @@ public class StringClass extends DataClass {
         }
     }
 
-    public DataClass op(DataClass compClass, boolean or) {
+    public DataClass op(DataClass compClass, boolean or, boolean string) {
         if (!(compClass instanceof StringClass)) return null;
 
+        assert or || !string;
         StringClass stringClass = (StringClass) compClass;
-        return new StringClass(BaseUtils.cmp(blankPadded, stringClass.blankPadded, or), BaseUtils.cmp(caseInsensitive, stringClass.caseInsensitive, or),
+        return new StringClass(BaseUtils.cmp(blankPadded, stringClass.blankPadded, or && !string), BaseUtils.cmp(caseInsensitive, stringClass.caseInsensitive, or),
                 BaseUtils.cmp(rich, stringClass.rich, or), length.cmp(stringClass.length, or));
     }
 
