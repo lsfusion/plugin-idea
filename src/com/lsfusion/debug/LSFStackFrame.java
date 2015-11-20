@@ -4,6 +4,7 @@ import com.intellij.debugger.SourcePosition;
 import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.debugger.engine.JavaDebuggerEvaluator;
 import com.intellij.debugger.engine.JavaStackFrame;
+import com.intellij.debugger.engine.events.DebuggerContextCommandImpl;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.debugger.ui.impl.watch.MethodsTracker;
 import com.intellij.debugger.ui.impl.watch.StackFrameDescriptorImpl;
@@ -35,19 +36,24 @@ public class LSFStackFrame extends XStackFrame {
     private final XSourcePosition position;
     private JavaDebuggerEvaluator evaluator;
 
-    public LSFStackFrame(Project project, @NotNull StackFrameProxyImpl frame, @NotNull DebugProcessImpl debugProcess, @NotNull XSourcePosition position) {
+    public LSFStackFrame(Project project, @NotNull final StackFrameProxyImpl frame, @NotNull final DebugProcessImpl debugProcess, @NotNull XSourcePosition position) {
         this.project = project;
         this.frame = frame;
         this.debugProcess = debugProcess;
         this.position = position;
+
+        debugProcess.getManagerThread().invoke(new DebuggerContextCommandImpl(debugProcess.getDebuggerContext()) {
+            @Override
+            public void threadAction() {
+                StackFrameDescriptorImpl stackFrameDescriptor = new StackFrameDescriptorImpl(frame, new MethodsTracker());
+                evaluator = new JavaDebuggerEvaluator(debugProcess, new JavaStackFrame(stackFrameDescriptor, false));
+            }
+        });
     }
 
     @Nullable
     @Override
     public XDebuggerEvaluator getEvaluator() {
-        if (evaluator == null) {
-            evaluator = new JavaDebuggerEvaluator(debugProcess, new JavaStackFrame(new StackFrameDescriptorImpl(frame, new MethodsTracker()), false));
-        } 
         return evaluator;
     }
 
