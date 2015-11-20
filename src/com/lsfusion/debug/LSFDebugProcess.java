@@ -249,7 +249,12 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
     private AtomicReference<ThreadReferenceProxyImpl> getSteppingThroughThreads() {
         //приходится делать так жёстко, чтобы встроится во внутреннюю логику java-debuggera
-        return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "mySteppingThroughThread");
+        try {
+            return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "mySteppingThroughThread");
+        } catch (Exception e) {
+            //такой же косяк, что и с SESSION_EMPTY_CONTEXT. ultimate версия
+            return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "j");
+        }
     }
 
     private EventDispatcher<DebugProcessListener> getDebugProcessDispatcher() {

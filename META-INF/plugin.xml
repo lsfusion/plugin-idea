@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.33</version>
+    <version>1.0.34</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -181,7 +181,7 @@
         <multiHostInjector implementation="com.lsfusion.references.LSFToJavaLanguageInjector"/>
         <multiHostInjector implementation="com.lsfusion.references.LSFToJrxmlLanguageInjector"/>
         <!--<psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>-->
-        <lang.syntaxHighlighterFactory key="Lsf"
+        <lang.syntaxHighlighterFactory language="Lsf"
                                        implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
@@ -303,7 +303,7 @@
         <lang.parserDefinition language="LsfMigration"
                                implementationClass="com.lsfusion.migration.lang.MigrationParserDefinition"/>
 
-        <lang.syntaxHighlighterFactory key="LsfMigration"
+        <lang.syntaxHighlighterFactory language="LsfMigration"
                                        implementationClass="com.lsfusion.migration.lang.highlight.MigrationSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="LsfMigration"
                            implementationClass="com.lsfusion.migration.lang.MigrationBraceMatcher"/>
@@ -312,6 +312,7 @@
                              implementationClass="com.lsfusion.migration.lang.folding.MigrationFoldingBuilder"/>
         <fileDocumentManagerListener implementation="com.lsfusion.lang.meta.StripLinesDisabler"/>
 
-        <xdebugger.debuggerSupport implementation="com.lsfusion.debug.LSFDumbDebuggerSupport" order="first"/>
+        <!--пробуем убрать этот хак, т.к. в данный момент визуально из-за него больше проблем (stepping в ultimate, ...), но надо понаблюдать-->
+        <!--<xdebugger.debuggerSupport implementation="com.lsfusion.debug.LSFDumbDebuggerSupport" order="first"/>-->
     </extensions>
 </idea-plugin>
