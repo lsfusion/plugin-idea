@@ -66,7 +66,7 @@ public class LibraryOptionsPanel {
     private void showSettingsPanel() {
         List<Library> libraries = calculateSuitableLibraries();
 
-        myLibraryComboBoxModel = new SortedComboBoxModel<LibraryEditor>(new Comparator<LibraryEditor>() {
+        myLibraryComboBoxModel = new SortedComboBoxModel<>(new Comparator<LibraryEditor>() {
             @Override
             public int compare(LibraryEditor o1, LibraryEditor o2) {
                 final String name1 = o1.getName();
@@ -114,7 +114,7 @@ public class LibraryOptionsPanel {
 
     private List<Library> calculateSuitableLibraries() {
         final CustomLibraryDescription description = mySettings.getLibraryDescription();
-        List<Library> suitableLibraries = new ArrayList<Library>();
+        List<Library> suitableLibraries = new ArrayList<>();
         for (Library library : myLibrariesContainer.getAllLibraries()) {
             if (description instanceof OldCustomLibraryDescription &&
                 ((OldCustomLibraryDescription) description).isSuitableLibrary(library, myLibrariesContainer)
