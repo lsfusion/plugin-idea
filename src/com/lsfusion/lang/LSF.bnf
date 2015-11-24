@@ -776,7 +776,7 @@ importActionSourceType ::=  XLS (SHEET propertyExpression)?
 
 nonEmptyPropertyUsageListWithIds ::= propertyUsageWithId (COMMA propertyUsageWithId)*
 
-propertyUsageWithId ::= (ID EQUALS)? propertyUsage
+propertyUsageWithId ::= ((ID | stringLiteral) EQUALS)? propertyUsage
 
 drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
 {
