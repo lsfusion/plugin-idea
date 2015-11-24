@@ -15,12 +15,11 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.JavaDummyHolder;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFLanguage;
-import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.LSFCodeFragment;
+import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
-import com.lsfusion.util.BaseUtils;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.List;
 

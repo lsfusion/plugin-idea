@@ -14,6 +14,6 @@
     <orderEntry type="library" name="jgraph-5.13.0.0" level="project" />
     <orderEntry type="library" name="jgrapht-ext-0.9.0" level="project" />
     <orderEntry type="library" name="jgrapht-core-0.9.0" level="project" />
+    <orderEntry type="library" name="commons-lang3-3.4" level="project" />
   </component>
 </module>
-
