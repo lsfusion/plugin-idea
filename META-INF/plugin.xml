@@ -274,10 +274,10 @@
         <toolWindow id="Form Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
                     anchor="right" icon="AllIcons.FileTypes.UiForm"/>
 
-        <toolWindow id="Module Dependencies" anchor="right" icon="AllIcons.Nodes.Deploy"
+        <toolWindow id="LSF Module DEPs" anchor="right" icon="AllIcons.Nodes.Deploy"
                     factoryClass="com.lsfusion.dependencies.module.ModuleDependenciesViewToolWindowFactory"/>
 
-        <toolWindow id="Property Dependencies" anchor="right" icon="AllIcons.Nodes.Deploy"
+        <toolWindow id="LSF Property DEPs" anchor="right" icon="AllIcons.Nodes.Deploy"
                     factoryClass="com.lsfusion.dependencies.property.PropertyDependenciesViewToolWindowFactory"/>
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.dependencies.property.PropertyComplexityLineMarkerProvider"/>
