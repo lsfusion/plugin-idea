@@ -163,7 +163,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         try {
             sessionEmptyContext = (DebuggerContextImpl) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "SESSION_EMPTY_CONTEXT");
         } catch(Exception e) {
-            sessionEmptyContext = (DebuggerContextImpl) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "i");
+            sessionEmptyContext = (DebuggerContextImpl) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "g");
         }
         SESSION_EMPTY_CONTEXT = sessionEmptyContext;
 
@@ -253,7 +253,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
             return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "mySteppingThroughThread");
         } catch (Exception e) {
             //такой же косяк, что и с SESSION_EMPTY_CONTEXT. ultimate версия
-            return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "j");
+            return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "c");
         }
     }
 
