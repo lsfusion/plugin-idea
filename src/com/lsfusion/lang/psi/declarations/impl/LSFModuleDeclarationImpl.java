@@ -111,7 +111,8 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
         // Если REQUIRE вообще не указан, то по умолчанию поведение должно быть эквивалентно REQUIRE System;
         if (result.isEmpty()) {
             LSFModuleDeclaration systemModule = LSFGlobalResolver.findModules("System", GlobalSearchScope.allScope(getProject())).findFirst();
-            result = Collections.singletonList(systemModule);
+            if(systemModule != null) // теоретически его может не быть
+                result = Collections.singletonList(systemModule);
         }
         return result;
     }

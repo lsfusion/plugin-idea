@@ -1313,7 +1313,14 @@ loggableStatement ::= LOGGABLE nonEmptyNoContextPropertyUsageList SEMI {pin=1 me
 ////////////////////////////////// INDEX STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-indexStatement ::= INDEX nonEmptyNoContextPropertyUsageList SEMI {pin=1 methods = [ getIcon ]}
+mappedPropertyOrSimpleExprParam ::= mappedPropertyExprParam | exprParameterUsage; // exprParam
+nonEmptyMappedPropertyOrSimpleExprParamList ::= mappedPropertyOrSimpleExprParam (COMMA mappedPropertyOrSimpleExprParam)*  { pin(".*") = 1}
+
+indexStatement ::= INDEX nonEmptyMappedPropertyOrSimpleExprParamList SEMI {
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer ]
+    pin=1 methods = [ getIcon ]
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////// WINDOW STATEMENT ////////////////////////////

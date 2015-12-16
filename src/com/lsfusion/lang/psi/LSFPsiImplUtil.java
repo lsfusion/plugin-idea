@@ -268,6 +268,20 @@ public class LSFPsiImplUtil {
         return ContextInferrer.EMPTY;
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFIndexStatement sourceStatement) {
+        LSFNonEmptyMappedPropertyOrSimpleExprParamList list = sourceStatement.getNonEmptyMappedPropertyOrSimpleExprParamList();
+        if (list == null)
+            return ContextModifier.EMPTY;
+        return new MappedPropertyOrSimpleExprParamContextModifier(list.getMappedPropertyOrSimpleExprParamList());
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFIndexStatement sourceStatement) {
+        LSFNonEmptyMappedPropertyOrSimpleExprParamList list = sourceStatement.getNonEmptyMappedPropertyOrSimpleExprParamList();
+        if (list != null)
+            return new MappedPropertyOrSimpleExprParamContextInferrer(list.getMappedPropertyOrSimpleExprParamList());
+        return ContextInferrer.EMPTY;
+    }
+
     // CLASSES
 
     public static LSFExClassSet op(@Nullable LSFExClassSet class1, @Nullable LSFExClassSet class2, boolean or) {
@@ -2609,7 +2623,7 @@ public class LSFPsiImplUtil {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
     }
 
-    private static Inferred inferParamClasses(LSFMappedPropertyExprParam mappedProperty, @Nullable LSFExClassSet valueClass) {
+    public static Inferred inferParamClasses(LSFMappedPropertyExprParam mappedProperty, @Nullable LSFExClassSet valueClass) {
         List<LSFExClassSet> joinClasses = inferParamClasses(null, mappedProperty.getPropertyUsage());
 
         LSFExprParameterUsageList exprParameterUsageList = mappedProperty.getExprParameterUsageList();

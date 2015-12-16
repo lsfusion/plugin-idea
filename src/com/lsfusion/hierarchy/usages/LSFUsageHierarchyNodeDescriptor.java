@@ -36,7 +36,11 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
 
     @Override
     public boolean isValid() {
-        return getPsiElement().isValid();
+        PsiElement psiElement = getPsiElement();
+        if(psiElement == null)
+            return false;
+
+        return psiElement.isValid();
     }
 
     @Override
