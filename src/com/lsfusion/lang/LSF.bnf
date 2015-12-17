@@ -1030,7 +1030,7 @@ classViewType ::= PANEL | GRID
 
 formGroupObjectPageSize ::= PAGESIZE intLiteral
 
-formGroupObjectUpdate ::= FIRST | LAST
+formGroupObjectUpdate ::= FIRST | LAST | PREV
 
 formGroupObjectRelativePosition ::= AFTER groupObjectUsage | BEFORE groupObjectUsage  
 
