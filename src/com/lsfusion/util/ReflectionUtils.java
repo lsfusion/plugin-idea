@@ -54,6 +54,24 @@ public class ReflectionUtils {
             throw Throwables.propagate(e);
         }
     }
+    
+    // Делалось, чтобы избежать необходимости подстраиваться под каждую версию Idea. В Ultimate версии некоторые классы,
+    // в частности com.intellij.debugger.impl.DebuggerSession, компилируются без debug info, поэтому каждый раз приходилось
+    // заново искать буквы, которые присваивались именам полей. Вместо этого ищем поля по классам.
+    // Естесственно, работает только до тех пор, пока в классе не больше одного поля заданного класса.
+    public static Object getPrivateFieldValueByClass(Class clazz, Object target, Class fieldClass) {
+        try {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.getType() == fieldClass) {
+                    field.setAccessible(true);
+                    return field.get(target);
+                }
+            }
+        } catch (Exception e) {
+            Throwables.propagate(e);
+        }
+        return null;
+    }
 
     public static void setPrivateFieldValue(Object target, String fieldName, Object value) {
         setPrivateFieldValue(target.getClass(), target, fieldName, value);

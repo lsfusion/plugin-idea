@@ -45,6 +45,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static com.lsfusion.debug.DebugUtils.*;
 import static com.lsfusion.references.LSFToJavaLanguageInjector.SCRIPTING_ACTION_PROPERTY_FQN;
+import static com.lsfusion.util.ReflectionUtils.getPrivateFieldValueByClass;
 import static com.sun.jdi.request.StepRequest.STEP_INTO;
 import static com.sun.jdi.request.StepRequest.STEP_OUT;
 
@@ -159,13 +160,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         commonDelegateBreakpoints.add(new CommonCustomDelegateBreakpoint());
         
         eEditorsProvider = new LSFDebuggerEditorsProvider();
-        DebuggerContextImpl sessionEmptyContext;
-        try {
-            sessionEmptyContext = (DebuggerContextImpl) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "SESSION_EMPTY_CONTEXT");
-        } catch(Exception e) {
-            sessionEmptyContext = (DebuggerContextImpl) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "g");
-        }
-        SESSION_EMPTY_CONTEXT = sessionEmptyContext;
+        SESSION_EMPTY_CONTEXT = (DebuggerContextImpl) getPrivateFieldValueByClass(DebuggerSession.class, getDebuggerSession(), DebuggerContextImpl.class); // SESSION_EMPTY_CONTEXT field
 
         doStepMethod = ReflectionUtils.getPrivateMethod(
             DebugProcessImpl.class,
@@ -247,14 +242,9 @@ public class LSFDebugProcess extends JavaDebugProcess {
         return DebuggerManagerEx.getInstanceEx(getProject()).getBreakpointManager();
     }
 
-    private AtomicReference<ThreadReferenceProxyImpl> getSteppingThroughThreads() {
+    private AtomicReference<ThreadReferenceProxyImpl> getSteppingThroughThread() {
         //приходится делать так жёстко, чтобы встроится во внутреннюю логику java-debuggera
-        try {
-            return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "mySteppingThroughThread");
-        } catch (Exception e) {
-            //такой же косяк, что и с SESSION_EMPTY_CONTEXT. ultimate версия
-            return (AtomicReference<ThreadReferenceProxyImpl>) ReflectionUtils.getPrivateFieldValue(DebuggerSession.class, getDebuggerSession(), "c");
-        }
+        return (AtomicReference<ThreadReferenceProxyImpl>) getPrivateFieldValueByClass(DebuggerSession.class, getDebuggerSession(), AtomicReference.class); // mySteppingThroughThread field
     }
 
     private EventDispatcher<DebugProcessListener> getDebugProcessDispatcher() {
@@ -286,7 +276,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         }
         
         if (stepIntoCommand != null) {
-            getSteppingThroughThreads().set(stepIntoCommand.getContextThread());
+            getSteppingThroughThread().set(stepIntoCommand.getContextThread());
             resumeAction(stepIntoCommand, DebuggerSession.Event.STEP);
         } else {
             super.startStepInto();
@@ -297,7 +287,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
     public void startStepOver() {
         if (isCurrentPositionInLsf() || inExecuteCustom(true)) {
             StepOverCommand stepOverCommand = new StepOverCommand(getSuspendContext());
-            getSteppingThroughThreads().set(stepOverCommand.getContextThread());
+            getSteppingThroughThread().set(stepOverCommand.getContextThread());
             resumeAction(stepOverCommand, DebuggerSession.Event.STEP);
         } else {
             super.startStepOver();
@@ -308,7 +298,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
     public void startStepOut() {
         if (isCurrentPositionInLsf() || inExecuteCustom()) {
             StepOutCommand stepOutCommand = new StepOutCommand(getSuspendContext());
-            getSteppingThroughThreads().set(stepOutCommand.getContextThread());
+            getSteppingThroughThread().set(stepOutCommand.getContextThread());
             resumeAction(stepOutCommand, DebuggerSession.Event.STEP);
         } else {
             super.startStepOut();
