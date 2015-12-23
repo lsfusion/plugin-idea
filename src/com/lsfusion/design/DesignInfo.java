@@ -8,6 +8,7 @@ import com.intellij.util.Query;
 import com.lsfusion.design.model.ComponentView;
 import com.lsfusion.design.model.ContainerType;
 import com.lsfusion.design.model.ContainerView;
+import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.model.proxy.ViewProxyUtil;
 import com.lsfusion.design.ui.FlexAlignment;
@@ -140,8 +141,10 @@ public class DesignInfo {
                         ComponentView component = formView.getComponentBySID(name);
 
                         if (component != null) {
-                            LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
-                            addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
+                            if (!(component instanceof PropertyDrawView) || component.getParent() != null) { // не добавляем свойства, которые уже добавлены в грид
+                                LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
+                                addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
+                            }
 
                             processComponentBody(component, statement.getComponentBody());
                         }
