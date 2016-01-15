@@ -143,6 +143,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "CHECKED"                 			{ return CHECKED; }
   "CLASS"                   			{ return CLASS; }
   "CLOSE"                   			{ return CLOSE; }
+  "CODE"              			        { return CODE; }
   "COLUMNS"                 			{ return COLUMNS; }
   "COMPLEX"                 			{ return COMPLEX; }
   "NOHINT"                 			    { return NOHINT; }
