@@ -322,9 +322,13 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                 LSFClassSet classSet = iterator.next();
                 if (classSet != null) {
                     paramsString += classSet;
-                }
-                if (params != null && params.get(i) != null) {
-                    paramsString += (classSet != null ? " " : "") + params.get(i).getDeclName();
+                } else {
+                    if (params != null) {
+                        LSFExprParamDeclaration paramDecl = params.get(i);
+                        if (paramDecl != null) {
+                            paramsString += paramDecl.getDeclName();
+                        }
+                    }
                 }
                 if (iterator.hasNext()) {
                     paramsString += ", ";
