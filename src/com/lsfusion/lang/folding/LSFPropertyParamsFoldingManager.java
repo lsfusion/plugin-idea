@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.util.containers.ConcurrentWeakHashMap;
 import com.lsfusion.lang.classes.ConcatenateClassSet;
+import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.DataClass;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
@@ -123,6 +124,9 @@ public class LSFPropertyParamsFoldingManager {
             return null;
         } else if (classSet instanceof DataClass) {
             return ((DataClass) classSet).getName();
+        } else if (classSet instanceof CustomClassSet) {
+            String classString = classSet.toString();
+            return classString.contains(", ") ? "[" + classString + "]" : classString;
         } else {
             return classSet.toString();
         }  
