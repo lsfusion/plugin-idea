@@ -34,7 +34,7 @@ public class DesignInfo {
 
         Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile);
 
-        List<LSFFormExtend> formExtends = new ArrayList<LSFFormExtend>(lsfFormExtends.findAll());
+        List<LSFFormExtend> formExtends = new ArrayList<>(lsfFormExtends.findAll());
         Collections.sort(formExtends, REQUIRES_COMPARATOR);
 
         FormEntity formEntity = new FormEntity(lsfFile);
@@ -45,25 +45,26 @@ public class DesignInfo {
 
         Collection<PsiReference> refs = ReferencesSearch.search(formDecl.getNameIdentifier(), lsfFile.getRequireScope()).findAll();
 
-        List<LSFFormUsage> formUsages = new ArrayList<LSFFormUsage>();
+        List<LSFFormUsage> formDesignUsages = new ArrayList<>();
         for (PsiReference ref : refs) {
             if (ref instanceof LSFFormUsage) {
-                formUsages.add((LSFFormUsage) ref);
+                PsiElement parent = ((LSFFormUsage) ref).getParent();
+                if (parent instanceof LSFDesignHeader) {
+                    formDesignUsages.add((LSFFormUsage) ref);
+                }
             }
         }
-        Collections.sort(formUsages, REQUIRES_COMPARATOR);
+        Collections.sort(formDesignUsages, REQUIRES_COMPARATOR);
 
         formView = DefaultFormView.create(formEntity);
         
-        for (LSFFormUsage ref : formUsages) {
-            PsiElement parent = ref.getParent();
-            if (parent instanceof LSFDesignHeader) {
-                if (((LSFDesignHeader) parent).getCustomFormDesignOption() != null) {
-                    formView = FormView.create(formEntity);
-                }
-                LSFDesignStatement designStatement = (LSFDesignStatement) parent.getParent();
-                processComponentBody(formView.getMainContainer(), designStatement.getComponentBody());
+        for (LSFFormUsage ref : formDesignUsages) {
+            LSFDesignHeader designHeader = (LSFDesignHeader) ref.getParent();
+            if (designHeader.getCustomFormDesignOption() != null) {
+                formView = FormView.create(formEntity);
             }
+            LSFDesignStatement designStatement = (LSFDesignStatement) designHeader.getParent();
+            processComponentBody(formView.getMainContainer(), designStatement.getComponentBody());
         }
     }
 
