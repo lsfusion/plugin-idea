@@ -32,6 +32,7 @@ EDIGITS	= [0-9]*
 HEX_DIGIT =	[0-9a-fA-F]
 FIRST_ID_LETTER	= [a-zA-Z]
 NEXT_ID_LETTER = [a-zA-Z_0-9]
+CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
 
 %%
 <YYINITIAL> {
@@ -60,6 +61,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   {DIGIT}{4} _ {DIGIT}{2} _ {DIGIT}{2} _ {DIGIT}{2} : {DIGIT}{2}  { return LEX_DATETIME_LITERAL; }
   {DIGIT}{2} : {DIGIT}{2}               { return LEX_TIME_LITERAL; }
   "#" {HEX_DIGIT}{6}                    { return LEX_COLOR_LITERAL; }
+  {CODE_LITERAL}                        { return LEX_CODE_LITERAL; }
 
   "$"                                   { return DOLLAR; }
 
@@ -143,7 +145,6 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
   "CHECKED"                 			{ return CHECKED; }
   "CLASS"                   			{ return CLASS; }
   "CLOSE"                   			{ return CLOSE; }
-  "CODE"              			        { return CODE; }
   "COLUMNS"                 			{ return COLUMNS; }
   "COMPLEX"                 			{ return COMPLEX; }
   "NOHINT"                 			    { return NOHINT; }

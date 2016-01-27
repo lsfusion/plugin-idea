@@ -624,8 +624,7 @@ initFilterDefinition ::= INITFILTER formPropertyDrawUsage {pin = 1}
 
 formActionObjectList ::= OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)* {pin(".*") = 1}
 
-customActionPropertyDefinitionBody ::= CUSTOM ((javaClassStringUsage (LBRAC classNameList RBRAC)? (NULL)?) |
-                                       (CODE anyTokens END))
+customActionPropertyDefinitionBody ::= CUSTOM ((javaClassStringUsage (LBRAC classNameList RBRAC)?)  | codeLiteral) (NULL)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1751,6 +1750,7 @@ unumericLiteral ::= LEX_UNUMERIC_LITERAL
 uintLiteral ::= LEX_UINT_LITERAL
 ulongLiteral ::= LEX_ULONG_LITERAL
 nullLiteral ::= NULL
+codeLiteral ::= LEX_CODE_LITERAL
 
 nullOption ::= NULL
 
