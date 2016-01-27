@@ -1,17 +1,28 @@
 package com.lsfusion.lang.classes;
 
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.Query;
+import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.psi.Finalizer;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.cache.ChildrenCache;
+import com.lsfusion.lang.psi.cache.ParentsCache;
+import com.lsfusion.lang.psi.cache.PsiDependentCache;
+import com.lsfusion.lang.psi.cache.TableNameCache;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.refactoring.ClassCanonicalNameUtils;
 import com.lsfusion.util.BaseUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.*;
@@ -71,6 +82,10 @@ public class CustomClassSet implements LSFClassSet {
     }
 
     public static Collection<LSFClassDeclaration> getParents(LSFClassDeclaration decl) {
+        return ParentsCache.getInstance(decl.getProject()).getParentsWithCaching(decl);
+    }
+
+    public static Collection<LSFClassDeclaration> getParentsNoCache(LSFClassDeclaration decl) {
         Set<LSFClassDeclaration> result = new HashSet<LSFClassDeclaration>();
         for (LSFClassExtend extDecl : resolveExtendElements(decl))
             result.addAll(extDecl.resolveExtends());
@@ -79,7 +94,18 @@ public class CustomClassSet implements LSFClassSet {
 
     public static Collection<LSFClassDeclaration> getChildren(LSFClassDeclaration decl, GlobalSearchScope scope) {
         Project project = decl.getProject();
+        if(scope.equals(GlobalSearchScope.allScope(project)))
+            return getChildrenAll(decl);
         return LSFGlobalResolver.findClassExtends(decl, project, scope);
+    }
+
+    public static Collection<LSFClassDeclaration> getChildrenAll(LSFClassDeclaration decl) {
+        return ChildrenCache.getInstance(decl.getProject()).getChildrenWithCaching(decl);
+    }
+
+    public static Collection<LSFClassDeclaration> getChildrenAllNoCache(LSFClassDeclaration decl) {
+        Project project = decl.getProject();
+        return LSFGlobalResolver.findClassExtends(decl, project, GlobalSearchScope.allScope(project));
     }
 
     public LSFClassDeclaration getCommonChild(CustomClassSet set, GlobalSearchScope scope) {

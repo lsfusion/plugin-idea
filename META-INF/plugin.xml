@@ -258,6 +258,10 @@
                         serviceImplementation="com.lsfusion.lang.psi.cache.PropertyDependentsCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyComplexityCache"
                         serviceImplementation="com.lsfusion.lang.psi.cache.PropertyComplexityCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ParentsCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.ParentsCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ChildrenCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.ChildrenCache"/>
 
         <stubElementTypeHolder class="com.lsfusion.lang.psi.LSFTypes"/>
         <gotoClassContributor implementation="com.lsfusion.LSFClassContributor"/>
