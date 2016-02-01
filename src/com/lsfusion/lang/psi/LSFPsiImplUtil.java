@@ -80,9 +80,6 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFActionStatement sourceStatement) {
-        LSFActionListParams decl = sourceStatement.getActionListParams();
-        if (decl != null)
-            return new ExprParamUsageContextModifier(decl.getExprParameterUsageList().getExprParameterUsageList());
         return ContextModifier.EMPTY;
     }
 
@@ -1679,14 +1676,6 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFActionStatement actionStatement) {
-        LSFActionListParams actionParams = actionStatement.getActionListParams();
-        if (actionParams != null) {
-            List<LSFExprParamReference> paramRefs = new ArrayList<LSFExprParamReference>();
-            for (LSFExprParameterUsage actionParam : actionParams.getExprParameterUsageList().getExprParameterUsageList())
-                paramRefs.add(actionParam.getExprParameterNameUsage());
-            return LSFExClassSet.toEx(LSFPsiImplUtil.resolveParamRefClasses(paramRefs));
-        }
-
         LSFActionUnfriendlyPD unfriend = actionStatement.getActionUnfriendlyPD();
         if(unfriend != null)
             return LSFPsiImplUtil.resolveValueParamClasses(unfriend);
@@ -2459,22 +2448,7 @@ public class LSFPsiImplUtil {
 
                 LSFActionPropertyDefinitionBody body = actionStatement.getActionPropertyDefinitionBody();
                 if(body != null) {
-                    LSFExprParameterUsageList params = actionStatement.getActionListParams().getExprParameterUsageList();
-                    if (params != null) { // и есть declaration'ы
-                        List<LSFExprParamDeclaration> paramDecls = new ArrayList<LSFExprParamDeclaration>();
-                        for (LSFExprParameterUsage param : params.getExprParameterUsageList()) {
-                            LSFExprParameterNameUsage exprParameterNameUsage = param.getExprParameterNameUsage();
-                            if (exprParameterNameUsage != null) {
-                                paramDecls.add(exprParameterNameUsage.getClassParamDeclare().getParamDeclare());
-                            }
-                        }
-                        InferExResult inferred = inferActionParamClasses(body, new HashSet<LSFExprParamDeclaration>(paramDecls)).finishEx();
-                        joinClasses = new ArrayList<LSFExClassSet>();
-                        for (LSFExprParamDeclaration param : paramDecls) {
-                            joinClasses.add(inferred.get(param));
-                        }
-                    } else
-                        joinClasses = null;
+                    joinClasses = null;
                 } else { // contextUnfriendly
                     joinClasses = LSFPsiImplUtil.resolveValueParamClasses(actionStatement);
                 }

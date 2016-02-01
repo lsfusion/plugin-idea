@@ -231,9 +231,7 @@ private propertyImplementation ::= actionStatement | propertyCalcStatement
 
 propertyCalcStatement ::= (expressionUnfriendlyPD | propertyExpression)
 
-actionListParams ::= (LBRAC exprParameterUsageList RBRAC)
-
-actionStatement ::= ACTION actionListParams? (actionUnfriendlyPD | topActionPropertyDefinitionBody) {
+actionStatement ::= ACTION (actionUnfriendlyPD | topActionPropertyDefinitionBody) {
     pin = 1
     // actually declare context, but it's pretty difficult to implement using only classes
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
@@ -1202,7 +1200,7 @@ formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage 
 overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 		                (WHEN propertyExpression THEN)?
 		                (	propertyExpression
-		                |	ACTION actionListParams? topActionPropertyDefinitionBody
+		                |	ACTION topActionPropertyDefinitionBody
 		                )
 		                << semicolonIfNeeded >>
 {

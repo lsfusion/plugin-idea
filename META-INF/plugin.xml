@@ -133,10 +133,6 @@
             <add-to-group group-id="CodeMenu"/>
             <keyboard-shortcut first-keystroke="control alt shift U" keymap="$default"/>
         </action>
-        <action id="Move.Decls" class="com.lsfusion.actions.MoveDeclParamsAction"
-                text="Move action params to the left" description="Move action params to the left">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
         <action id="Project.InferShorten" class="com.lsfusion.actions.ProjectInferShortenAction"
                 text="Infer types and shorten names for project"
                 description="Infer types and shorten names for project">
