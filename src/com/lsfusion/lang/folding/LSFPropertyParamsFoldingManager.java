@@ -39,15 +39,31 @@ public class LSFPropertyParamsFoldingManager {
         boolean printParamClasses = true;
         
         if (implicit) {
-            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
-            if (expressionUnfriendlyPD != null) {
-                LSFContextIndependentPD cipd = expressionUnfriendlyPD.getContextIndependentPD();
-                if (cipd != null && cipd.getFilterPropertyDefinition() == null && cipd.getGroupPropertyDefinition() == null) {
+            LSFPropertyCalcStatement pCalcStatement = propertyStatement.getPropertyCalcStatement();
+            if(pCalcStatement != null) {
+                LSFExpressionUnfriendlyPD expressionUnfriendlyPD = pCalcStatement.getExpressionUnfriendlyPD();
+                if (expressionUnfriendlyPD != null) {
+                    if (expressionUnfriendlyPD.getFilterPropertyDefinition() == null && expressionUnfriendlyPD.getGroupPropertyDefinition() == null) {
+                        printParamClasses = false;
+                        printValueClass = false;
+                    }
+                } else {
                     printParamClasses = false;
-                    printValueClass = false;
                 }
             } else {
-                printParamClasses = false;
+                LSFActionStatement actionStatement = propertyStatement.getActionStatement();
+                if(actionStatement != null) {
+                    printValueClass = false;
+
+                    LSFActionUnfriendlyPD actionUFD = actionStatement.getActionUnfriendlyPD();
+                    if (actionUFD != null) {
+                        if (actionUFD.getEditFormActionPropertyDefinitionBody() == null) {
+                            printParamClasses = false;
+                        }
+                    } else {
+                        printParamClasses = false;
+                    }
+                }
             }
         }
         

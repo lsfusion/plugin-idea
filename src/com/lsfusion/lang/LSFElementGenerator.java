@@ -75,6 +75,12 @@ public class LSFElementGenerator {
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFExplicitPropClassUsage.class).iterator().next();
     }
 
+    @NotNull
+    public static LSFPropertyDeclParams createPropertyDeclParams(Project myProject, String params) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f"+params + "=1;");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFPropertyDeclParams.class).iterator().next();
+    }
+
     public static PsiFile createDummyFile(Project myProject, String text) {
         final PsiFileFactory factory = PsiFileFactory.getInstance(myProject);
         final String name = "internal." + LSFFileType.INSTANCE.getDefaultExtension();

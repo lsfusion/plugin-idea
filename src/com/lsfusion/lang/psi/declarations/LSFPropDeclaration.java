@@ -1,15 +1,14 @@
 package com.lsfusion.lang.psi.declarations;
 
 import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFInterfacePropStatement;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
 
-public interface LSFPropDeclaration extends LSFDeclaration {
-
-    String getSignaturePresentableText();
+public interface LSFPropDeclaration extends LSFDeclaration, LSFInterfacePropStatement {
 
     boolean isAbstract();
     

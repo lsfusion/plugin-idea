@@ -7,6 +7,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.lsfusion.lang.psi.LSFFile;
@@ -35,32 +36,12 @@ public class CompletionUtils {
         PropertiesComponent.getInstance(project).setValue(CompletionUtils.LSF_COMPLETION_ENABLED, Boolean.toString(enabled));
     }
 
-    public static LookupElement createLookupElement(LSFDeclaration declaration) {
-        return createLookupElement(declaration, 5);
-    }
-
     public static LookupElement createLookupElement(LSFDeclaration declaration, double priority) {
-        return createLookupElement(declaration.getName(), declaration, "", declaration.getLSFFile().getName(), declaration.getIcon(0), priority);
+        return createLookupElement(declaration.getDeclName(), declaration, "", "", declaration.getLSFFile().getName(), declaration.getIcon(0), priority);
     }
 
-    public static LookupElement createLookupElement(String lookupString, String typeText, Icon icon) {
-        return createLookupElement(lookupString, typeText, icon, 5);
-    }
-
-    public static LookupElement createLookupElement(String lookupString, String typeText, Icon icon, double priority) {
-        return createLookupElement(lookupString, null, "", typeText, icon, priority);
-    }
-
-    public static LookupElement createLookupElement(String lookupString, LSFDeclaration lookupObject, String typeText, Icon icon, double priority) {
-        return createLookupElement(lookupString, lookupObject, "", typeText, icon, priority);
-    }
-
-    public static LookupElement createLookupElement(String lookupString, String additionalInfo, String typeText, Icon icon, double priority) {
-        return createLookupElement(lookupString, null, additionalInfo, typeText, icon, priority);
-    }
-
-    public static LookupElement createLookupElement(String lookupString, LSFDeclaration lookupObject, String additionalInfo, String typeText, Icon icon, double priority) {
-        return createLookupElement(lookupString, lookupObject, additionalInfo, typeText, icon, priority, null, false, null);
+    public static LookupElement createLookupElement(String lookupString, PsiElement lookupObject, String additionalIdInfo, String additionalInfo, String typeText, Icon icon, double priority) {
+        return createLookupElement(lookupString, lookupObject, additionalIdInfo, additionalInfo, typeText, icon, priority, null, false, null);
     }
 
     public static LookupElement createLookupElement(String lookupString, double priority, boolean bold, InsertHandler insertHandler) {
@@ -68,14 +49,14 @@ public class CompletionUtils {
     }
 
     public static LookupElement createLookupElement(String lookupString, String additionalInfo, String typeText, Icon icon, double priority, TailType tailType, boolean bold, InsertHandler insertHandler) {
-        return createLookupElement(lookupString, null, additionalInfo, typeText, icon, priority, tailType, bold, insertHandler);    
+        return createLookupElement(lookupString, null, additionalInfo, "", typeText, icon, priority, tailType, bold, insertHandler);
     }
 
-    public static LookupElement createLookupElement(String lookupString, LSFDeclaration lookupObject, String additionalInfo, String typeText, Icon icon, double priority, TailType tailType, boolean bold, InsertHandler insertHandler) {
+    public static LookupElement createLookupElement(String lookupString, PsiElement lookupObject, String additionalIdInfo, String additionalInfo, String typeText, Icon icon, double priority, TailType tailType, boolean bold, InsertHandler insertHandler) {
 //        lookupObject = null;
         LookupElementBuilder elementBuilder;
         if (lookupObject != null) {
-            String idObject = lookupString + (typeText != null ? "_" + typeText : "") + (additionalInfo != null ? "_" + additionalInfo : "");
+            String idObject = lookupString + (typeText != null ? "_" + typeText : "") + (additionalIdInfo != null ? "_" + additionalIdInfo : "");
             elementBuilder = LookupElementBuilder.create(idObject, lookupString);
         } else {
             elementBuilder = LookupElementBuilder.create(lookupString);
@@ -93,8 +74,8 @@ public class CompletionUtils {
 
 //        additionalInfo = "[prio=" + priority + "]" + (additionalInfo == null ? "" : additionalInfo);
 
-        if (additionalInfo != null) {
-            elementBuilder = elementBuilder.withTailText(additionalInfo, true);
+        if (additionalIdInfo != null) {
+            elementBuilder = elementBuilder.withTailText(additionalIdInfo + (additionalInfo != null ? additionalInfo : ""), true);
         }
 
         LookupElement element = elementBuilder;

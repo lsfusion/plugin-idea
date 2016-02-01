@@ -37,7 +37,7 @@ public class LSFGlobalResolver {
     }
 
     private static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration, Set<LSFFile> alreadyGet) {
-        String name = declaration.getName();
+        String name = declaration.getGlobalName();
         boolean toCache = name != null && !name.equals(LSFElementGenerator.genName) && !LSFPsiUtils.isInjected(declaration);
         if (toCache) {
             Set<LSFFile> cachedFiles = cached.get(declaration);

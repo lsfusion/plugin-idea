@@ -34,9 +34,10 @@ public class ImplicitInterfaceStubElementType extends LSFStubElementType<Implici
     public ImplicitInterfaceStubElement createStub(@NotNull final LSFImplicitInterfacePropStatement psi, StubElement parentStub) {
         final ImplicitInterfaceStubImpl stub = new ImplicitInterfaceStubImpl(parentStub, psi.getElementType());
 
-        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = psi.getPropertyStatement().getExpressionUnfriendlyPD();
-        if (expressionUnfriendlyPD != null) {
-            LSFContextIndependentPD contextIndependentPD = expressionUnfriendlyPD.getContextIndependentPD();
+        LSFPropertyStatement propertyStatement = psi.getPropertyStatement();
+        LSFPropertyCalcStatement pCalcStatement = propertyStatement.getPropertyCalcStatement();
+        if (pCalcStatement != null) {
+            LSFExpressionUnfriendlyPD contextIndependentPD = pCalcStatement.getExpressionUnfriendlyPD();
             if (contextIndependentPD != null) {
                 LSFGroupPropertyDefinition groupPropertyDefinition = contextIndependentPD.getGroupPropertyDefinition();
                 if (groupPropertyDefinition != null) {

@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.context;
 
 import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFStringClassRef;
 import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.InferResult;
 import com.lsfusion.lang.typeinfer.Inferred;

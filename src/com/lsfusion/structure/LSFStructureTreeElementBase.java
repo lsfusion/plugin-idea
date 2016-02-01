@@ -8,6 +8,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFInterfacePropStatement;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -38,10 +39,10 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
 
             for (LSFPropertyStatementTreeElement statement : LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFPropertyStatementTreeElement>() {
                 @Override
-                public LSFPropertyStatementTreeElement map(LSFPropertyStatement statement, LSFValueClass valueClass) {
-                    return new LSFPropertyStatementTreeElement(valueClass, statement, navigationHandler);
+                public LSFPropertyStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
+                    return new LSFPropertyStatementTreeElement(valueClass, ((LSFPropertyStatement) statement), navigationHandler);
                 }
-            })) {
+            }, true, true)) {
                 children.add(statement);
             }
         }

@@ -38,6 +38,10 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
 
     @Override
     public String getName() {
+        Stub stub = getStub();
+        if (stub != null) // оптимизация
+            return stub.getGlobalName();
+
         return LSFDeclarationImpl.getName(this);
     }
 
@@ -88,5 +92,9 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
     @Override
     public ElementMigration getMigration(String newName) {
         return LSFDeclarationImpl.getMigration(this, newName);
+    }
+
+    public PsiElement getLookupObject() { // пока не совсем понятно зачем
+        return this;
     }
 }

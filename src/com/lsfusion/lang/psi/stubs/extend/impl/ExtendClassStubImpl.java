@@ -3,10 +3,11 @@ package com.lsfusion.lang.psi.stubs.extend.impl;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
-import com.intellij.util.io.StringRef;
+import com.lsfusion.lang.psi.LSFStringClassRef;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendClassStubElementType;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,32 +15,34 @@ import java.util.List;
 
 public class ExtendClassStubImpl extends ExtendStubImpl<LSFClassExtend, ExtendClassStubElement> implements ExtendClassStubElement {
 
-    private List<StringRef> shortExtends;
+    private LSFStringClassRef thisElement;
+    private List<LSFStringClassRef> myExtends;
 
     @Override
-    public List<String> getShortExtends() {
-        List<String> result = new ArrayList<String>();
-        for (StringRef shortExtend : shortExtends) {
-            result.add(StringRef.toString(shortExtend));
-        }
-        return result;
+    @NotNull
+    public LSFStringClassRef getThis() {
+        return thisElement;
+    }
+
+    @Override
+    public List<LSFStringClassRef> getExtends() {
+        return myExtends;
     }
 
     public ExtendClassStubImpl(StubElement parent, LSFClassExtend psi) {
         super(parent, psi);
 
-        shortExtends = new ArrayList<StringRef>();
-        for (String shortExtend : psi.getShortExtends()) {
-            shortExtends.add(StringRef.fromString(shortExtend));
-        }
+        thisElement = psi.getThis();
+        myExtends = psi.getExtends();
     }
 
     public ExtendClassStubImpl(StubInputStream dataStream, StubElement parentStub, ExtendClassStubElementType type) throws IOException {
         super(dataStream, parentStub, type);
 
-        shortExtends = new ArrayList<StringRef>();
+        thisElement = LSFStringClassRef.deserialize(dataStream);
+        myExtends = new ArrayList<LSFStringClassRef>();
         for (int i = 0, size = dataStream.readInt(); i < size; i++) {
-            shortExtends.add(dataStream.readName());
+            myExtends.add(LSFStringClassRef.deserialize(dataStream));
         }
     }
 
@@ -47,9 +50,10 @@ public class ExtendClassStubImpl extends ExtendStubImpl<LSFClassExtend, ExtendCl
     public void serialize(StubOutputStream dataStream) throws IOException {
         super.serialize(dataStream);
 
-        dataStream.writeInt(shortExtends.size());
-        for (StringRef shortExtend : shortExtends) {
-            dataStream.writeName(StringRef.toString(shortExtend));
+        thisElement.serialize(dataStream);
+        dataStream.writeInt(myExtends.size());
+        for (LSFStringClassRef shortExtend : myExtends) {
+            shortExtend.serialize(dataStream);
         }
     }
 }

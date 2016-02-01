@@ -94,7 +94,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     @Override
     public void projectOpened() {
-        myPsiManager.addPsiTreeChangeListener(this);
+//        myPsiManager.addPsiTreeChangeListener(this);
  /*       EditorFactory.getInstance().addEditorFactoryListener(this, myProject);
         Disposer.register(myProject, new Disposable() {
             @Override

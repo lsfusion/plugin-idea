@@ -16,10 +16,7 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.*;
-import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.indexes.TableClassesIndex;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
@@ -53,14 +50,17 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     public List<String> resolveParamNames() {
         LSFPropertyDeclaration decl = getPropertyDeclaration();
-        LSFClassParamDeclareList declList = decl.getClassParamDeclareList();
+        LSFPropertyDeclParams declList = decl.getPropertyDeclParams();
         List<LSFExprParamDeclaration> params = null;
         if(declList!=null)
-            params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(declList));
+            params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(declList.getClassParamDeclareList()));
         else {
-            LSFPropertyExpression pe = getPropertyExpression();
-            if(pe!=null)
-                params = LSFPsiImplUtil.resolveParams(pe);
+            LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+            if(pCalcStatement != null) {
+                LSFPropertyExpression pe = pCalcStatement.getPropertyExpression();
+                if (pe != null)
+                    params = LSFPsiImplUtil.resolveParams(pe);
+            }
         }
         return LSFPsiImplUtil.resolveParamNames(params);
     }
@@ -68,21 +68,43 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     public abstract LSFPropertyDeclaration getPropertyDeclaration();
 
     @Nullable
-    public abstract LSFExpressionUnfriendlyPD getExpressionUnfriendlyPD();
+    public abstract LSFActionStatement getActionStatement();
 
     @Nullable
-    public abstract LSFPropertyExpression getPropertyExpression();
+    public abstract LSFPropertyCalcStatement getPropertyCalcStatement();
 
     @Nullable
     public abstract LSFPropertyOptions getPropertyOptions();
 
     @Override
     public boolean isAbstract() {
-        LSFExpressionUnfriendlyPD unfriend = getExpressionUnfriendlyPD();
-        if(unfriend != null) {
-            LSFContextIndependentPD contextIndID = unfriend.getContextIndependentPD();
-            if(contextIndID!=null)
-                return contextIndID.getAbstractPropertyDefinition() != null || contextIndID.getAbstractActionPropertyDefinition() != null;
+        LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+        if(pCalcStatement != null) {
+            LSFExpressionUnfriendlyPD unfriend = pCalcStatement.getExpressionUnfriendlyPD();
+            if (unfriend != null) {
+                return unfriend.getAbstractPropertyDefinition() != null;
+            }
+        } else {
+            LSFActionStatement pActionStatement = getActionStatement();
+            if(pActionStatement != null) {
+                LSFActionUnfriendlyPD unfriend = pActionStatement.getActionUnfriendlyPD();
+                if (unfriend != null) {
+                    return unfriend.getAbstractActionPropertyDefinition() != null;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isUnfriendly() {
+        LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+        if(pCalcStatement != null) {
+            return pCalcStatement.getExpressionUnfriendlyPD() != null;
+        } else {
+            LSFActionStatement pActionStatement = getActionStatement();
+            if(pActionStatement != null)
+                return pActionStatement.getActionUnfriendlyPD() != null;
         }
         return false;
     }
@@ -106,26 +128,36 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
     @Override
     public LSFExClassSet resolveExValueClassNoCache(boolean infer) {
-        LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
-        if (unfr != null)
-            return unfr.resolveUnfriendValueClass(infer);
+        LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+        if(pCalcStatement != null) {
+            LSFExpressionUnfriendlyPD unfr = pCalcStatement.getExpressionUnfriendlyPD();
+            if (unfr != null)
+                return unfr.resolveUnfriendValueClass(infer);
 
-        LSFPropertyExpression expr = getPropertyExpression();
-        if (expr != null)
-            return expr.resolveValueClass(infer);
+            LSFPropertyExpression expr = pCalcStatement.getPropertyExpression();
+            if (expr != null)
+                return expr.resolveValueClass(infer);
+        }
 
         return null;
     }
 
     @Nullable
     private List<LSFExClassSet> resolveValueParamClasses() {
-        LSFExpressionUnfriendlyPD unfr = getExpressionUnfriendlyPD();
-        if (unfr != null)
-            return unfr.resolveValueParamClasses();
+        LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+        if(pCalcStatement != null) {
+            LSFExpressionUnfriendlyPD unfr = pCalcStatement.getExpressionUnfriendlyPD();
+            if (unfr != null)
+                return unfr.resolveValueParamClasses();
 
-        LSFPropertyExpression expr = getPropertyExpression();
-        if (expr != null)
-            return LSFExClassSet.toEx(LSFPsiImplUtil.resolveValueParamClasses(expr));
+            LSFPropertyExpression expr = pCalcStatement.getPropertyExpression();
+            if (expr != null)
+                return LSFExClassSet.toEx(LSFPsiImplUtil.resolveValueParamClasses(expr));
+        } else {
+            LSFActionStatement actionStatement = getActionStatement();
+            if(actionStatement != null)
+                return LSFPsiImplUtil.resolveValueParamClasses(actionStatement);
+        }
 
         return null;
 
@@ -140,10 +172,10 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     public List<LSFExClassSet> resolveExParamClassesNoCache() {
         LSFPropertyDeclaration decl = getPropertyDeclaration();
-        LSFClassParamDeclareList cpd = decl.getClassParamDeclareList();
+        LSFPropertyDeclParams cpd = decl.getPropertyDeclParams();
         List<LSFExClassSet> declareClasses = null;
         if (cpd != null) {
-            declareClasses = LSFExClassSet.toEx(LSFPsiImplUtil.resolveExplicitClass(cpd));
+            declareClasses = LSFExClassSet.toEx(LSFPsiImplUtil.resolveExplicitClass(cpd.getClassParamDeclareList()));
             if (LSFPsiImplUtil.allClassesDeclared(declareClasses)) // оптимизация
                 return declareClasses;
         }
@@ -194,30 +226,21 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         
         resultClasses = new ArrayList<LSFExClassSet>(resultClasses);
 
-        //        LSFActionPropertyDefinition action = sourceStatement.getActionPropertyDefinition();
+        //        LSFActionStatement action = sourceStatement.getActionPropertyDefinition();
 //        return 
 
         List<LSFExprParamDeclaration> params = null;
         LSFPropertyDeclaration decl = getPropertyDeclaration();
-        LSFClassParamDeclareList cpd = decl.getClassParamDeclareList();
+        LSFPropertyDeclParams cpd = decl.getPropertyDeclParams();
         if (cpd != null)
-            params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(cpd));
+            params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(cpd.getClassParamDeclareList()));
 
         InferExResult inferredClasses = null;
-        LSFExpressionUnfriendlyPD unfriendlyPD = getExpressionUnfriendlyPD();
-        if (unfriendlyPD != null) {
-            LSFActionPropertyDefinition actionDef = unfriendlyPD.getActionPropertyDefinition();
-            if (actionDef != null) {
-                if (params == null)
-                    params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(actionDef.getExprParameterUsageList()));
-                if (params != null) // может быть action unfriendly
-                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finishEx();
-            } else {
-                LSFContextIndependentPD contextIndependentPD = unfriendlyPD.getContextIndependentPD();
-
-                assert contextIndependentPD != null;
-
-                PsiElement element = contextIndependentPD.getChildren()[0]; // лень создавать отдельный параметр или интерфейс
+        LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+        if(pCalcStatement != null) {
+            LSFExpressionUnfriendlyPD unfriendlyPD = pCalcStatement.getExpressionUnfriendlyPD();
+            if (unfriendlyPD != null) {
+                PsiElement element = unfriendlyPD.getChildren()[0]; // лень создавать отдельный параметр или интерфейс
                 if (element instanceof LSFGroupPropertyDefinition) {
                     List<LSFExClassSet> inferredValueClasses = LSFPsiImplUtil.inferGroupValueParamClasses((LSFGroupPropertyDefinition) element);
                     for (int i = 0; i < resultClasses.size(); i++)
@@ -226,16 +249,24 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                         }
                     return resultClasses;
                 }
-            }
-        } else {
-            LSFPropertyExpression expr = getPropertyExpression();
-            if (expr != null) {
+            } else {
+                LSFPropertyExpression expr = pCalcStatement.getPropertyExpression();
+                assert expr != null;
                 if (params == null)
                     params = expr.resolveParams();
 
                 inferredClasses = LSFPsiImplUtil.inferParamClasses(expr, valueClass).finishEx();
             }
+        } else {
+            LSFActionStatement actionDef = getActionStatement();
+            if(actionDef != null) {
+                if (params == null)
+                    params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(actionDef.getActionListParams().getExprParameterUsageList()));
+                if (params != null) // может быть action unfriendly
+                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finishEx();
+            }
         }
+
         if (inferredClasses != null) {
             assert resultClasses.size() == params.size();
             for (int i = 0; i < resultClasses.size(); i++)
@@ -248,26 +279,15 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     public boolean isAction() {
-        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = getExpressionUnfriendlyPD();
-        if (expressionUnfriendlyPD != null) {
-            LSFContextIndependentPD contextIndependentPD = expressionUnfriendlyPD.getContextIndependentPD();
-            if (contextIndependentPD != null) {
-                if (contextIndependentPD.getAbstractActionPropertyDefinition() != null) {
-                    return true;
-                }
-            } else {
-                return true;
-            }
-        }
-        return false;
+        return getActionStatement() != null;
     }
 
     public LSFDataPropertyDefinition getDataPropertyDefinition() {
-        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = getExpressionUnfriendlyPD();
-        if (expressionUnfriendlyPD != null) {
-            LSFContextIndependentPD contextIndependentPD = expressionUnfriendlyPD.getContextIndependentPD();
-            if (contextIndependentPD != null) {
-                return contextIndependentPD.getDataPropertyDefinition();
+        LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+        if(pCalcStatement != null) {
+            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = pCalcStatement.getExpressionUnfriendlyPD();
+            if (expressionUnfriendlyPD != null) {
+                return expressionUnfriendlyPD.getDataPropertyDefinition();
             }
         }
         return null;
@@ -295,71 +315,97 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Nullable
     @Override
     public Icon getIcon(int flags) {
+        return getIcon(getPropType());
+    }
+
+    public static Icon getIcon(byte propType) {
+        switch (propType) {
+            case 3:
+                return LSFIcons.ACTION;
+            case 2:
+                return LSFIcons.ABSTRACT_PROPERTY;
+            case 1:
+                return LSFIcons.DATA_PROPERTY;
+            default:
+                return LSFIcons.PROPERTY;
+        }
+    }
+
+    public byte getPropType() {
         if (isAction()) {
-            return LSFIcons.ACTION;
+            return 3;
         } else if (isAbstract()) {
-            return LSFIcons.ABSTRACT_PROPERTY;
+            return 2;
         } else if (isDataProperty()) {
-            return LSFIcons.DATA_PROPERTY;
+            return 1;
         } else {
-            return LSFIcons.PROPERTY;
+            return 0;
         }
     }
 
     @Override
     public String getPresentableText() {
-        return getDeclName() + getParamsPresentableText();
+        return getDeclName() + getParamPresentableText();
     }
 
-    private String getParamsPresentableText() {
-        List<? extends LSFExprParamDeclaration> params = getExplicitParams();
-
-        List<LSFClassSet> paramClasses = resolveParamClasses();
-        String paramsString = "";
-        if (paramClasses != null) {
-            int i = 0;
-            for (Iterator<LSFClassSet> iterator = paramClasses.iterator(); iterator.hasNext(); ) {
-                LSFClassSet classSet = iterator.next();
-                if (classSet != null) {
-                    paramsString += classSet;
-                } else {
-                    if (params != null) {
-                        LSFExprParamDeclaration paramDecl = params.get(i);
-                        if (paramDecl != null) {
-                            paramsString += paramDecl.getDeclName();
-                        }
-                    }
-                }
-                if (iterator.hasNext()) {
-                    paramsString += ", ";
-                }
-                i++;
-            }
-        } else if (params != null) {
-            paramsString += StringUtils.join(params, ", ");
-        }
-
-        return "(" + paramsString + ")";
+    public String getParamPresentableText() {
+//        List<LSFStringClassRef> params = getExplicitParams();
+        return getParamPresentableText(resolveParamClasses());
     }
 
-    @Override
-    public String getSignaturePresentableText() {
+    public static String getParamPresentableText(List<?> paramClasses) {
+        return "(" + StringUtils.join(paramClasses, ", ") + ")";
+    }
+
+    @NotNull
+    public String getValuePresentableText() {
         String valueClassString = "";
         if (!isAction()) {
             LSFClassSet valueClass = resolveValueClass();
             valueClassString = ": " + (valueClass == null ? "?" : valueClass);
         }
-
-        return getParamsPresentableText() + valueClassString;
+        return valueClassString;
     }
 
-    public List<? extends LSFExprParamDeclaration> getExplicitParams() {
-        List<? extends LSFExprParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
-        LSFPropertyExpression pExpression = getPropertyExpression();
-        if (params == null && pExpression != null) {
-            params = pExpression.resolveParams();
+    public LSFExplicitClasses getExplicitParams() {
+        List<LSFParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
+        if(params != null)
+            return LSFPsiImplUtil.getClassNameRefs(params);
+
+        LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+        if(pCalcStatement != null) {
+            LSFPropertyExpression pExpression = pCalcStatement.getPropertyExpression();
+            if (pExpression != null)
+                return LSFPsiImplUtil.getClassNameRefs(BaseUtils.<List<LSFParamDeclaration>>immutableCast(pExpression.resolveParams()));
+
+            LSFExpressionUnfriendlyPD unfriend = pCalcStatement.getExpressionUnfriendlyPD();
+            if(unfriend != null)
+                return LSFPsiImplUtil.getValueParamClassNames(unfriend);
+        } else {
+            LSFActionStatement actionStatement = getActionStatement();
+            if(actionStatement != null) {
+                LSFActionUnfriendlyPD unfriend = actionStatement.getActionUnfriendlyPD();
+                if (unfriend != null)
+                    return LSFPsiImplUtil.getValueParamClassNames(unfriend);
+            }
         }
-        return params;
+
+        return null;
+    }
+
+    public Set<String> getExplicitValues() {
+        LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+        if(pCalcStatement != null) {
+            LSFPropertyExpression pExpression = pCalcStatement.getPropertyExpression();
+            if (pExpression != null)
+                return new HashSet<>(pExpression.getValueClassNames());
+
+            LSFExpressionUnfriendlyPD unfriend = pCalcStatement.getExpressionUnfriendlyPD();
+            if(unfriend != null)
+                return new HashSet<>(LSFPsiImplUtil.getValueClassNames(unfriend));
+        }
+
+        return null;
     }
 
     @Override
@@ -657,5 +703,10 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         }
 
         return complexity;    
+    }
+
+    @Override
+    public Icon getIcon() {
+        return getIcon(0);
     }
 }

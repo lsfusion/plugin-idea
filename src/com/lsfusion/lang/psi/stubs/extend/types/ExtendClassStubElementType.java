@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.stubs.extend.types;
 
 import com.intellij.psi.stubs.*;
+import com.lsfusion.lang.psi.LSFStringClassRef;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.impl.LSFClassStatementImpl;
 import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
@@ -10,6 +11,8 @@ import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ExtendClassStubElementType extends ExtendStubElementType<LSFClassExtend, ExtendClassStubElement> {
 
@@ -45,8 +48,12 @@ public class ExtendClassStubElementType extends ExtendStubElementType<LSFClassEx
     public void indexStub(@NotNull ExtendClassStubElement stub, @NotNull IndexSink sink) {
         super.indexStub(stub, sink);
 
-        for (String shortExtend : stub.getShortExtends()) {
-            sink.occurrence(LSFIndexKeys.EXTENDCLASS_SHORT, shortExtend);
+        Set<String> added = new HashSet<>();
+        for (LSFStringClassRef shortExtend : stub.getExtends()) {
+            String name = shortExtend.name;
+            if(added.add(name)) {
+                sink.occurrence(LSFIndexKeys.EXTENDCLASS_SHORT, name);
+            }
         }
     }
 }

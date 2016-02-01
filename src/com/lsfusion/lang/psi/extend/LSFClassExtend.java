@@ -1,5 +1,6 @@
 package com.lsfusion.lang.psi.extend;
 
+import com.lsfusion.lang.psi.LSFStringClassRef;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration;
 import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
@@ -11,7 +12,9 @@ public interface LSFClassExtend extends LSFExtend<LSFClassExtend, ExtendClassStu
     
     List<LSFClassDeclaration> resolveExtends();
 
-    List<String> getShortExtends();
+    LSFStringClassRef getThis();
+
+    List<LSFStringClassRef> getExtends();
     
     List<LSFStaticObjectDeclaration> getStaticObjects();
 

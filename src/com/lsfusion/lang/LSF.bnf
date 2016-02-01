@@ -215,19 +215,41 @@ implicitInterfacePropertyStatement ::= propertyStatement
 }
 
 propertyStatement ::= propertyDeclaration equalsSign
-                      (expressionUnfriendlyPD | propertyExpression) 
+                      propertyImplementation
                       propertyOptions
                       << semicolonIfNeeded >>
 {
     pin = 1
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFGlobalPropDeclarationImpl"
-    implements="com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.LSFInterfacePropStatement"
     stubClass = "com.lsfusion.lang.psi.stubs.PropStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
     methods = [ getContextModifier getContextInferrer ]
 }
 
-propertyDeclaration ::= simpleNameWithCaption (LBRAC classParamDeclareList RBRAC)?
+private propertyImplementation ::= actionStatement | propertyCalcStatement
+
+propertyCalcStatement ::= (expressionUnfriendlyPD | propertyExpression)
+
+actionListParams ::= (LBRAC exprParameterUsageList RBRAC)
+
+actionStatement ::= ACTION actionListParams? (actionUnfriendlyPD | topActionPropertyDefinitionBody) {
+    pin = 1
+    // actually declare context, but it's pretty difficult to implement using only classes
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer ]
+}
+
+actionUnfriendlyPD ::= abstractActionPropertyDefinition
+                        |	addFormActionPropertyDefinitionBody
+                        |	editFormActionPropertyDefinitionBody
+                        |	customActionPropertyDefinitionBody
+    	                |   nativeActionPropertyDefinition
+{methods = [ resolveValueParamClasses]}
+
+propertyDeclParams ::= LBRAC classParamDeclareList RBRAC
+
+propertyDeclaration ::= simpleNameWithCaption propertyDeclParams?
 {methods = [ resolveParamDecls ]}
 
 paramDeclare ::= simpleName
@@ -313,17 +335,13 @@ expressionFriendlyPD ::= joinPropertyDefinition
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
 }
 
-expressionUnfriendlyPD ::= contextIndependentPD | actionPropertyDefinition
+expressionUnfriendlyPD ::= dataPropertyDefinition
+                           |   nativePropertyDefinition
+                           |   abstractPropertyDefinition
+                           |   formulaPropertyDefinition
+                           |   groupPropertyDefinition
+                           |   filterPropertyDefinition
 {methods = [ resolveUnfriendValueClass resolveValueParamClasses]}
-
-contextIndependentPD ::= dataPropertyDefinition
-                    |   nativePropertyDefinition
-	                |   abstractActionPropertyDefinition
-	                |   nativeActionPropertyDefinition
-                    |   abstractPropertyDefinition
-	                |   formulaPropertyDefinition
-	                |   groupPropertyDefinition
-                    |   filterPropertyDefinition
 
 joinPropertyDefinition ::= JOIN? propertyObject LBRAC propertyExpressionList RBRAC
 {
@@ -411,7 +429,7 @@ sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
-propertyExprObject ::= LSQBR EQUALS (propertyExpression | expressionUnfriendlyPD) RSQBR
+propertyExprObject ::= LSQBR EQUALS propertyImplementation RSQBR
 {implements="com.lsfusion.lang.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
 
 propertyObject ::=  propertyUsage | propertyExprObject
@@ -529,18 +547,7 @@ hideEditKey ::= HIDE
 ////////////////////////////////// ACTION PROPERTIES ///////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-actionPropertyDefinition ::= ACTION
-		                    (LBRAC exprParameterUsageList RBRAC)?
-		                    actionPropertyDefinitionBody
-{
-    pin = 1
-    // actually declare context, but it's pretty difficult to implement using only classes
-    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
-    methods = [ getContextModifier getContextInferrer ]
-}
-
-
-abstractActionPropertyDefinition ::= ABSTRACT ACTION
+abstractActionPropertyDefinition ::= ABSTRACT
                                     (   ((CASE | MULTI) abstractExclusiveOverrideOption?)
                                     |	(LIST abstractCaseAddOption?)
                                     )?
@@ -552,11 +559,13 @@ abstractActionPropertyDefinition ::= ABSTRACT ACTION
 }
 
 
-nativeActionPropertyDefinition ::= ACTION NATIVE LBRAC classNameList RBRAC
+nativeActionPropertyDefinition ::= NATIVE LBRAC classNameList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
+
+private topActionPropertyDefinitionBody ::= actionPropertyDefinitionBody
 
 // extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
 actionPropertyDefinitionBody ::=    customActionPDB
@@ -585,9 +594,6 @@ private keepContextActionPDB ::=    listActionPropertyDefinitionBody
                         |   applyActionPropertyDefinitionBody
 
 private customActionPDB ::= formActionPropertyDefinitionBody
-                |	addFormActionPropertyDefinitionBody
-                |	editFormActionPropertyDefinitionBody
-                |	customActionPropertyDefinitionBody
                 |   messageActionPropertyDefinitionBody
                 |   asyncUpdateActionPropertyDefinitionBody
                 |   seekObjectActionPropertyDefinitionBody
@@ -627,8 +633,8 @@ formActionObjectList ::= OBJECTS formActionObjectUsage (COMMA formActionObjectUs
 customActionPropertyDefinitionBody ::= CUSTOM ((javaClassStringUsage (LBRAC classNameList RBRAC)?)  | codeLiteral) (NULL)?
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
+    implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
+    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
 javaClassStringUsage ::= stringLiteral
@@ -640,15 +646,15 @@ javaClassStringUsage ::= stringLiteral
 addFormActionPropertyDefinitionBody ::= ADDFORM (SESSION | NESTED)? customClassUsage
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
+    implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
+    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
 editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION | NESTED)? customClassUsage
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
+    implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
+    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
 addObjectActionPropertyDefinitionBody ::= ADDOBJ customClassUsage (WHERE propertyExpression)? (TO mappedPropertyExprParam)?
@@ -1196,7 +1202,7 @@ formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage 
 overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 		                (WHEN propertyExpression THEN)?
 		                (	propertyExpression
-		                |	actionPropertyDefinition
+		                |	ACTION actionListParams? topActionPropertyDefinitionBody
 		                )
 		                << semicolonIfNeeded >>
 {

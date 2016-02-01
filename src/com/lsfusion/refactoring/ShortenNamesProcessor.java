@@ -916,11 +916,11 @@ public class ShortenNamesProcessor {
                         List<LSFParamDeclaration> params = LSFPsiImplUtil.resolveParams(mappedDeclare.getClassParamDeclareList());
                         if (params != null) {
                             List<LSFPropertyExpression> peList = ovStatement.getPropertyExpressionList();
-                            LSFActionPropertyDefinition actionDef = ovStatement.getActionPropertyDefinition();
-                            if (actionDef != null) {
+                            LSFActionPropertyDefinitionBody body = ovStatement.getActionPropertyDefinitionBody();
+                            if (body != null) {
                                 if (peList.size() > 0)
                                     break;
-                                proceedImpl(actionDef.getActionPropertyDefinitionBody(), decl, params, result);
+                                proceedImpl(body, decl, params, result);
                             } else {
                                 if (peList.size() == 1) {
                                     LSFPropertyExpression pe = peList.get(0);

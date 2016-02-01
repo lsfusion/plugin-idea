@@ -8,7 +8,6 @@ import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
-import com.lsfusion.lang.psi.references.impl.LSFFullNameReferenceImpl;
 import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -56,6 +55,11 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
 
     @Override
     public LSFFullNameDeclaration resolveDecl() {
+        ExtendClassStubElement stub = getStub();
+        if(stub != null) {
+            return stub.getThis().resolveDecl(getLSFFile());
+        }
+
         LSFClassDecl classDecl = getClassDecl();
         if (classDecl != null)
             return classDecl;
@@ -86,6 +90,11 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
 
     @Override
     public List<LSFClassDeclaration> resolveExtends() {
+        ExtendClassStubElement stub = getStub();
+        if(stub != null) {
+            return LSFStringClassRef.resolveDecls(stub.getExtends(), getLSFFile());
+        }
+
         LSFClassParentsList parents = getClassParentsList();
         if (parents == null)
             return new ArrayList<LSFClassDeclaration>();
@@ -101,20 +110,33 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         return result;
     }
 
-    public List<String> getShortExtends() {
+    @Override
+    public LSFStringClassRef getThis() {
         ExtendClassStubElement stub = getStub();
         if (stub != null)
-            return stub.getShortExtends();
+            return stub.getThis();
+
+        LSFClassDecl classDecl = getClassDecl();
+        if (classDecl != null)
+            return new LSFStringClassRef(null, false, classDecl.getSimpleNameWithCaption().getSimpleName().getText());
+
+        return LSFPsiImplUtil.getClassNameRef(getExtendingClassDeclaration().getCustomClassUsageWrapper().getCustomClassUsage());
+    }
+
+    public List<LSFStringClassRef> getExtends() {
+        ExtendClassStubElement stub = getStub();
+        if (stub != null)
+            return stub.getExtends();
 
         LSFClassParentsList parents = getClassParentsList();
         if (parents == null)
-            return new ArrayList<String>();
+            return new ArrayList<LSFStringClassRef>();
 
-        List<String> result = new ArrayList<String>();
+        List<LSFStringClassRef> result = new ArrayList<>();
         LSFNonEmptyCustomClassUsageList nonEmptyCustomClassUsageList = parents.getNonEmptyCustomClassUsageList();
         if (nonEmptyCustomClassUsageList != null) {
             for (LSFCustomClassUsage usage : nonEmptyCustomClassUsageList.getCustomClassUsageList()) {
-                result.add(LSFFullNameReferenceImpl.getSimpleName(usage.getCompoundID()).getText());
+                result.add(LSFPsiImplUtil.getClassNameRef(usage));
             }
         }
         return result;

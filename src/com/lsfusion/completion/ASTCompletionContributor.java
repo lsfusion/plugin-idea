@@ -133,11 +133,11 @@ public class ASTCompletionContributor extends CompletionContributor {
         int completionOffset = StringUtil.isEmptyOrSpaces(prefixText) ? 0 : prefixText.length();
         String text = completionOffset == 0 ? "" : prefixText;
 
-        MyCompletionCallback completionCallback = new MyCompletionCallback(text, originalOffsetShift, parameters, result, completionOffset);
-
-        PsiFile tempFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText("a.lsf", LSFLanguage.INSTANCE, text, true, false);
-        tempFile.putUserData(COMPLETION_CALLBACK_KEY, completionCallback);
-        TreeUtil.ensureParsed(tempFile.getNode());
+        completeScript(new ScriptCreator() {
+            public PsiFile create(String text, Project project) {
+                return PsiFileFactory.getInstance(project).createFileFromText("a.lsf", LSFLanguage.INSTANCE, text, true, false);
+            }
+        }, parameters, result, originalOffsetShift, file.getProject(), completionOffset, text);
     }
 
     private static void completeInFragment(CompletionParameters parameters, CompletionResultSet result) {
@@ -145,15 +145,54 @@ public class ASTCompletionContributor extends CompletionContributor {
 
         assert position.getContainingFile() instanceof LSFCodeFragment;
 
-        LSFCodeFragment file = (LSFCodeFragment) position.getContainingFile();
+        final LSFCodeFragment file = (LSFCodeFragment) position.getContainingFile();
 
         String text = file.getText().substring(0, position.getTextRange().getStartOffset());
 
-        MyCompletionCallback completionCallback = new MyCompletionCallback(text, 0, parameters, result, text.length());
+        completeScript(new ScriptCreator() {
+            public PsiFile create(String text, Project project) {
+                return new LSFCodeFragment(file.isExpression(), project, file.getContext(), text);
+            }
+        }, parameters, result, 0, position.getProject(), text.length(), text);
+    }
 
-        LSFCodeFragment fragment = new LSFCodeFragment(file.isExpression(), position.getProject(), file.getContext(), text);
-        fragment.putUserData(COMPLETION_CALLBACK_KEY, completionCallback);
-        TreeUtil.ensureParsed(fragment.getNode());
+    private interface ScriptCreator {
+        PsiFile create(String text, Project project);
+    }
+
+    private enum ExecType {
+        BASE, LIGHT, HEAVY, ALL;
+
+        public boolean isProps() {
+            return this != ExecType.BASE || this == ExecType.ALL;
+        }
+
+        public boolean isLight() {
+            assert isProps();
+            return this == ExecType.LIGHT || this == ExecType.ALL;
+        }
+
+        public boolean isHeavy() {
+            assert isProps();
+            return this == ExecType.HEAVY || this == ExecType.ALL;
+        }
+
+        public boolean isBase() {
+            return this == ExecType.BASE || this == ExecType.ALL;
+        }
+    }
+
+    private static void completeScript(ScriptCreator creator, CompletionParameters parameters, CompletionResultSet result, int originalOffsetShift, Project project, int completionOffset, String text) {
+        completeScript(creator, parameters, result, originalOffsetShift, project, completionOffset, text, ExecType.BASE);
+        completeScript(creator, parameters, result, originalOffsetShift, project, completionOffset, text, ExecType.LIGHT);
+        completeScript(creator, parameters, result, originalOffsetShift, project, completionOffset, text, ExecType.HEAVY);
+    }
+
+    private static void completeScript(ScriptCreator creator, CompletionParameters parameters, CompletionResultSet result, int originalOffsetShift, Project project, int completionOffset, String text, ExecType type) {
+        PsiFile tempFile = creator.create(text, project);
+        MyCompletionCallback completionCallback = new MyCompletionCallback(text, originalOffsetShift, parameters, result, completionOffset, type);
+        tempFile.putUserData(COMPLETION_CALLBACK_KEY, completionCallback);
+        TreeUtil.ensureParsed(tempFile.getNode());
     }
 
     public static final InsertHandler keywordInsertHandler = new InsertHandler() {
@@ -207,10 +246,29 @@ public class ASTCompletionContributor extends CompletionContributor {
         BooleanValueHolder filterGroupCompleted = new BooleanValueHolder(false);
         boolean parameterCompleted = false;
         boolean propertyCompleted = false;
+        final ExecType type;
+
+        private static final double NAMESPACE_PRIORITY = 1.5;
+        private static final double MODULE_PRIORITY = 1.5;
+        private static final double WINDOW_PRIORITY = 1.5;
+        private static final double NAVIGATOR_PRIORITY = 1.5;
+        private static final double TABLE_PRIORITY = 1.5;
+        private static final double METACODE_PRIORITY = 1.5;
+        private static final double CUSTOM_CLASS_PRIORITY = 1.5;
+        private static final double GROUP_PRIORITY = 1.5;
+        private static final double FORM_PRIORITY = 1.5;
+
+        private static final double STATIC_PRIORITY = 5;
+        private static final double FORM_OBJECT_PRIORITY = 5;
+        private static final double PARAM_PRIORITY = 5;
+
+        private static final double PROPERTY_PRIORITY = 2; // при USE_ANY еще добавляются количество подходящих классов
+
+        private static final double KEYWORD_PRIORITY = 2;
 
         long startTime = 0;
 
-        public MyCompletionCallback(String text, int originalOffsetShift, CompletionParameters parameters, CompletionResultSet result, int completionOffset) {
+        public MyCompletionCallback(String text, int originalOffsetShift, CompletionParameters parameters, CompletionResultSet result, int completionOffset, ExecType type) {
             super(completionOffset);
             this.text = text;
             this.originalOffsetShift = originalOffsetShift;
@@ -218,6 +276,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             file = (LSFFile) parameters.getOriginalFile();
             project = file.getProject();
             isBasicCompletion = parameters.getCompletionType() == CompletionType.BASIC;
+            this.type = type;
 
             startTime = System.nanoTime();
         }
@@ -258,10 +317,12 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         public void addKeywordVariants(String... keywords) {
-            for (String keyword : keywords) {
-                addLookupElement(
-                        createLookupElement(keyword, 0, true, keywordInsertHandler)
-                );
+            if(type.isBase()) {
+                for (String keyword : keywords) {
+                    addLookupElement(
+                            createLookupElement(keyword, KEYWORD_PRIORITY, true, keywordInsertHandler)
+                    );
+                }
             }
         }
 
@@ -298,48 +359,48 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private boolean completeNamespaceName() {
-            return completeFullNameUsage(namespaceCompleted, NAMESPACE_USAGE, asList(ModuleIndex.getInstance(), ExplicitNamespaceIndex.getInstance()), 1, false, true);
+            return completeFullNameUsage(namespaceCompleted, NAMESPACE_USAGE, asList(ModuleIndex.getInstance(), ExplicitNamespaceIndex.getInstance()), NAMESPACE_PRIORITY, false, true);
         }
 
         private boolean completeModuleName() {
-            return completeFullNameUsage(moduleCompleted, MODULE_USAGE, asList(ModuleIndex.getInstance()), 1, false, false);
+            return completeFullNameUsage(moduleCompleted, MODULE_USAGE, asList(ModuleIndex.getInstance()), MODULE_PRIORITY, false, false);
         }
 
         private boolean completeWindowName() {
             Collection<? extends LSFFullNameDeclaration> builtInWindows = LSFElementGenerator.getBuiltInWindows(project);
-            return completeFullNameUsage(windowCompleted, WINDOW_USAGE, asList(WindowIndex.getInstance()), 1.5, true, true, builtInWindows);
+            return completeFullNameUsage(windowCompleted, WINDOW_USAGE, asList(WindowIndex.getInstance()), WINDOW_PRIORITY, true, true, builtInWindows);
         }
 
         private boolean completeTableName() {
-            return completeFullNameUsage(tableCompleted, TABLE_USAGE, WindowIndex.getInstance());
+            return completeFullNameUsage(tableCompleted, TABLE_USAGE, WindowIndex.getInstance(), TABLE_PRIORITY);
         }
 
         private boolean completeMetaName() {
-            return completeFullNameUsage(metaCompleted, METACODE_USAGE, MetaIndex.getInstance());
+            return completeFullNameUsage(metaCompleted, METACODE_USAGE, MetaIndex.getInstance(), METACODE_PRIORITY);
         }
 
         private boolean completeClassName() {
-            return completeFullNameUsage(classCompleted, CUSTOM_CLASS_USAGE, ClassIndex.getInstance());
+            return completeFullNameUsage(classCompleted, CUSTOM_CLASS_USAGE, ClassIndex.getInstance(), CUSTOM_CLASS_PRIORITY);
         }
 
         private boolean completeGroupName() {
-            return completeFullNameUsage(groupCompleted, GROUP_USAGE, GroupIndex.getInstance());
+            return completeFullNameUsage(groupCompleted, GROUP_USAGE, GroupIndex.getInstance(), GROUP_PRIORITY);
         }
 
         private boolean completeFormName() {
-            return completeFullNameUsage(formCompleted, FORM_USAGE, FormIndex.getInstance());
+            return completeFullNameUsage(formCompleted, FORM_USAGE, FormIndex.getInstance(), FORM_PRIORITY);
         }
 
         private boolean completeNavigatorName() {
-            return completeFullNameUsage(navigatorCompleted, NAVIGATOR_ELEMENT_USAGE, asList(FormIndex.getInstance(), NavigatorElementIndex.getInstance()));
+            return completeFullNameUsage(navigatorCompleted, NAVIGATOR_ELEMENT_USAGE, asList(FormIndex.getInstance(), NavigatorElementIndex.getInstance()), NAVIGATOR_PRIORITY);
         }
 
-        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, StringStubIndexExtension index) {
-            return completeFullNameUsage(completed, frameType, asList(index));
+        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, StringStubIndexExtension index, double priority) {
+            return completeFullNameUsage(completed, frameType, asList(index), priority);
         }
 
-        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends StringStubIndexExtension> indices) {
-            return completeFullNameUsage(completed, frameType, indices, 1.5, true, true);
+        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends StringStubIndexExtension> indices, double priority) {
+            return completeFullNameUsage(completed, frameType, indices, priority, true, true);
         }
 
         private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends StringStubIndexExtension> indices,
@@ -351,7 +412,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                                               double priority, boolean extractNamespace, boolean useRequiredScope, Collection<? extends LSFFullNameDeclaration> additionalDeclarations) {
             Frame fullNameUsage = getLastFrameOfType(null, frameType);
             if (fullNameUsage != null) {
-                if (!completed.getValue()) {
+                if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
                     String namespaceName = extractNamespace ? extractNamespace() : null;
                     addLookupElements(
@@ -361,7 +422,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     if (additionalDeclarations != null) {
                         for (LSFFullNameDeclaration decl : additionalDeclarations) {
                             if (namespaceName == null || namespaceName.equals(decl.getNamespaceName())) {
-                                addLookupElement(createLookupElement(decl, 1.5));
+                                addLookupElement(createLookupElement(decl, priority));
                             }
                         }
                     }
@@ -374,7 +435,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         private boolean completeStaticObjectUsage() {
             Frame staticObjectId = getLastFrameOfType(null, STATIC_OBJECT_ID);
             if (staticObjectId != null) {
-                if (!staticObjectCompleted) {
+                if (type.isBase() && !staticObjectCompleted) {
                     staticObjectCompleted = true;
                     String namespaceAndClassName[] = extractClassNameAndNamespaceForStaticObjectId();
                     String namespace = namespaceAndClassName[0];
@@ -384,7 +445,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     for (LSFClassDeclaration classDecl : classDeclarations) {
                         for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(classDecl, LSFStubElementTypes.EXTENDCLASS, project, getRequireScope())) {
                             for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {
-                                addLookupElement(createLookupElement(staticDecl));
+                                addLookupElement(createLookupElement(staticDecl, STATIC_PRIORITY));
                             }
                         }
                     }
@@ -450,13 +511,13 @@ public class ASTCompletionContributor extends CompletionContributor {
         private <T extends LSFDeclaration> boolean completeFormContextObject(BooleanValueHolder completed, IElementType frameType, FormExtendProcessor<T> formExtendProcessor) {
             Frame elementUsage = getLastFrameOfType(null, frameType);
             if (elementUsage != null) {
-                if (!completed.getValue()) {
+                if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
                     FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
                         Set<T> declaration = processFormContext(psi, elementUsage.offset, formExtendProcessor);
                         for (T elementDecl : declaration) {
-                            addLookupElement(createLookupElement(elementDecl));
+                            addLookupElement(createLookupElement(elementDecl, FORM_OBJECT_PRIORITY));
                         }
                     }
                 }
@@ -468,14 +529,14 @@ public class ASTCompletionContributor extends CompletionContributor {
         private boolean completeParameterUsage() {
             Frame paramDeclare = getLastFrameOfType(null, PARAM_DECLARE);
             if (paramDeclare != null) {
-                if (!parameterCompleted) {
+                if (type.isBase() && !parameterCompleted) {
                     parameterCompleted = true;
                     PsiElement psi = getLastPsiOfType(ModifyParamContext.class);
                     if (psi != null) {
                         LSFExprParamDeclaration currentParamDeclaration = getPsiOfTypeForFrame(paramDeclare, LSFExprParamDeclaration.class);
                         for (LSFExprParamDeclaration paramDeclaration : LSFPsiUtils.getContextParams(psi, getOriginalFrameOffset(paramDeclare), false)) {
                             if (paramDeclaration != currentParamDeclaration) {
-                                addLookupElement(createLookupElement(paramDeclaration));
+                                addLookupElement(createLookupElement(paramDeclaration, PARAM_PRIORITY));
                             }
                         }
                     }
@@ -488,7 +549,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         private boolean completePropertyUsage() {
             Frame propUsage = getLastFrameOfType(null, PROPERTY_USAGE);
             if (propUsage != null) {
-                if (!propertyCompleted) {
+                if (type.isProps() && !propertyCompleted) {
                     quickLog("Completing propertyUsage");
                     propertyCompleted = true;
 
@@ -591,11 +652,14 @@ public class ASTCompletionContributor extends CompletionContributor {
 
             String namespaceName = extractNamespace();
 
+            boolean isLight = type.isLight();
+            boolean isHeavy = type.isHeavy();
+
             for (LSFClassSet classSet : contextClasses) {
                 if (classSet != null) {
                     LSFValueClass valueClass = classSet.getCommonClass();
                     if (valueClass != null) {
-                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, requireScope));
+                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, getRequireScope(), isLight, isHeavy));
                     }
                 }
             }
@@ -621,14 +685,14 @@ public class ASTCompletionContributor extends CompletionContributor {
 
             quickLog("After LOCAL searching..");
 
-            if (!isBasicCompletion || forceAll) {
+            if ((!isBasicCompletion || forceAll) && !isLight) {
                 //search any other declarations
                 Collection<LSFPropertyStatement> globalDeclarations = getDeclarationsFromScope(project, getRequireScope(), PropIndex.getInstance());
                 addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, globalDeclarations);
             }
         }
 
-        private <G extends LSFPropDeclaration> void addDeclarationsToLookup(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy, String namespace, Collection<G> declarations) {
+        private <G extends LSFInterfacePropStatement> void addDeclarationsToLookup(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy, String namespace, Collection<G> declarations) {
             boolean useAll = classUsagePolicy == MUST_USE_ALL;
 
             for (G declaration : declarations) {
@@ -638,7 +702,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     continue;
                 }
 
-                int priority = 2;
+                double priority = PROPERTY_PRIORITY;
 
                 List<LSFClassSet> declClasses = declaration.resolveParamClasses();
                 if (declClasses != null) {
@@ -684,10 +748,10 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (priority > 0) {
                     addLookupElement(
                             createLookupElement(
-                                    declaration.getName(), declaration,
-                                    declaration.getSignaturePresentableText(),
-                                    declaration.getLSFFile().getName(),
-                                    declaration.getIcon(0),
+                                    declaration.getName(), declaration.getLookupObject(),
+                                    declaration.getParamPresentableText(),
+                                    declaration.getValuePresentableText(), declaration.getLSFFile().getName(),
+                                    declaration.getIcon(),
                                     priority
                             ));
                 }

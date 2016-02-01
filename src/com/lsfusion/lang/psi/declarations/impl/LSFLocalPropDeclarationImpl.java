@@ -75,10 +75,10 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
 
     @Override
     public String getPresentableText() {
-        return getDeclName() + getParamsPresentableText();
+        return getDeclName() + getParamPresentableText();
     }
 
-    private String getParamsPresentableText() {
+    public String getParamPresentableText() {
         List<LSFClassSet> classes = resolveParamClasses();
         return "(" + StringUtils.join(classes, ", ") + ")";
     }
@@ -91,10 +91,10 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
         return LSFGlobalPropDeclarationImpl.finishValueClass(this);
     }
 
-    @Override
-    public String getSignaturePresentableText() {
+    @NotNull
+    public String getValuePresentableText() {
         LSFClassSet valueClass = resolveValueClass();
-        return getParamsPresentableText() + ": " + (valueClass == null ? "?" : valueClass);
+        return ": " + (valueClass == null ? "?" : valueClass);
     }
 
     @Override
@@ -138,5 +138,14 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     @Override
     public Integer getComplexity() {
         return LSFGlobalPropDeclarationImpl.getPropComplexity(this);
+    }
+
+    @Override
+    public Icon getIcon() {
+        return getIcon(0);
+    }
+
+    public PsiElement getLookupObject() { // пока не совсем понятно зачем
+        return this;
     }
 }

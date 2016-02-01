@@ -5,10 +5,7 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.lang.psi.LSFExpressionUnfriendlyPD;
-import com.lsfusion.lang.psi.LSFPropertyExpression;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
-import com.lsfusion.lang.psi.LSFPsiImplUtil;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFImplicitValuePropStatement;
 import com.lsfusion.lang.psi.impl.LSFImplicitValuePropertyStatementImpl;
 import com.lsfusion.lang.psi.stubs.interfaces.ImplicitValueStubElement;
@@ -78,19 +75,8 @@ public class ImplicitValueStubElementType extends LSFStubElementType<ImplicitVal
     public ImplicitValueStubElement createStub(@NotNull LSFImplicitValuePropStatement psi, StubElement parentStub) {
         final ImplicitValueStubImpl stub = new ImplicitValueStubImpl(parentStub, psi.getElementType());
 
-        List<String> propNames = new ArrayList<String>();
         LSFPropertyStatement propertyStatement = psi.getPropertyStatement();
-
-        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
-        if (expressionUnfriendlyPD != null) {
-            propNames.addAll(LSFPsiImplUtil.getValuePropertyNames(expressionUnfriendlyPD));
-        } else {
-            LSFPropertyExpression propertyExpression = propertyStatement.getPropertyExpression();
-            if (propertyExpression != null) {
-                propNames.addAll(LSFPsiImplUtil.getValuePropertyNames(propertyExpression));
-            }
-        }
-
+        List<String> propNames = LSFPsiImplUtil.getValueAPPropertyNames(propertyStatement.getPropertyCalcStatement(), propertyStatement.getActionStatement());
         stub.setValueProperties(propNames);
 
         return stub;

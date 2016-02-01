@@ -313,7 +313,7 @@ public class MetaTransaction {
         while(true) {
             if(et.ift < first.size() && first.get(et.ift).size() == 1 && et.isd < second.size() && second.get(et.isd).size() == 1) { // оптимизация
                 List<K> sf = BaseUtils.single(first.get(et.ift));
-                List<K> ss = BaseUtils.single(second.get(et.ift));
+                List<K> ss = BaseUtils.single(second.get(et.isd));
                 if(sf.equals(ss))
                     opts.add(new Option(BaseUtils.add(et.tokens, sf), et.ift + 1, et.isd + 1));
                 else {
@@ -522,6 +522,7 @@ public class MetaTransaction {
         }
     }
 
+    // важно чтобы не было "сливания токенов", например Whitespace Node Whitespace, так как Whitespace'ы сольются и уйдет нумерация
     public void regChange(List<ASTNode> add, ASTNode anchor, Type type) {
         regChange(add, anchor, type == Type.REPLACE ? leafCount(anchor) - 1 : 0, type);
     }

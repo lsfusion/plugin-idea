@@ -1,8 +1,6 @@
 package com.lsfusion.lang.psi.declarations;
 
-import com.lsfusion.lang.psi.LSFDataPropertyDefinition;
-import com.lsfusion.lang.psi.LSFExpressionUnfriendlyPD;
-import com.lsfusion.lang.psi.LSFPropertyExpression;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,10 +12,10 @@ public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlob
     LSFDataPropertyDefinition getDataPropertyDefinition();
 
     @Nullable
-    LSFExpressionUnfriendlyPD getExpressionUnfriendlyPD();
+    public abstract LSFActionStatement getActionStatement();
 
     @Nullable
-    LSFPropertyExpression getPropertyExpression();
+    public abstract LSFPropertyCalcStatement getPropertyCalcStatement();
 
     String getCaption();
 
@@ -30,6 +28,8 @@ public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlob
     boolean isDataProperty();
 
     boolean isDataStoredProperty();
+
+    boolean isUnfriendly();
 
     public List<String> resolveParamNames();
 
