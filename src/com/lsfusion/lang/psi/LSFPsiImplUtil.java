@@ -3049,7 +3049,7 @@ public class LSFPsiImplUtil {
         if(peList.size() >= 1) {
             LSFMappedPropertyClassParamDeclare mappedDeclare = o.getMappedPropertyClassParamDeclare();
 
-            boolean infer = true;
+            boolean infer = false; // пока не работает, т.к. нет RecursionGuard'а
 
             LSFExClassSet abstractClass = resolveValueClass(mappedDeclare.getPropertyUsageWrapper().getPropertyUsage(), infer);
             if (abstractClass != null) {
