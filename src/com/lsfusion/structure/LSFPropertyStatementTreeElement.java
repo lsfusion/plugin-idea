@@ -32,7 +32,7 @@ public class LSFPropertyStatementTreeElement extends PsiTreeElementBase<LSFPrope
     @NotNull
     @Override
     public Collection<StructureViewTreeElement> getChildrenBase() {
-        return new ArrayList<StructureViewTreeElement>();
+        return new ArrayList<>();
     }
 
     @Nullable
@@ -53,11 +53,6 @@ public class LSFPropertyStatementTreeElement extends PsiTreeElementBase<LSFPrope
         } else {
             super.navigate(false);
         }
-    }
-
-    @Override
-    public boolean canNavigateToSource() { // автоматом при навигации по дереву
-        return navigationHandler != null;
     }
 
     @Override
