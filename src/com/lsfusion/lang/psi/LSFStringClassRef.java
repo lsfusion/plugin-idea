@@ -67,11 +67,8 @@ public class LSFStringClassRef {
 
     public static List<LSFClassSet> resolve(List<LSFStringClassRef> classes, LSFFile file) {
         List<LSFClassSet> result = new ArrayList<>();
-        for(LSFStringClassRef classRef : classes) {
-            LSFClassSet decl = classRef.resolve(file);
-            if(decl != null)
-                result.add(decl);
-        }
+        for(LSFStringClassRef classRef : classes)
+            result.add(classRef != null ? classRef.resolve(file) : null);
         return result;
     }
 
@@ -88,7 +85,7 @@ public class LSFStringClassRef {
     public static String getParamPresentableText(List<LSFStringClassRef> classes) {
         List<String> result = new ArrayList<>();
         for(LSFStringClassRef classRef : classes) {
-            result.add(classRef.name);
+            result.add(classRef != null ? classRef.name : null);
         }
         return LSFGlobalPropDeclarationImpl.getParamPresentableText(result);
     }

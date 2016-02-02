@@ -1,13 +1,10 @@
 package com.lsfusion.lang.psi;
 
-import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
-import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceStubElement;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 public abstract class LSFExplicitClasses {
@@ -21,7 +18,7 @@ public abstract class LSFExplicitClasses {
         if(dataStream.readBoolean()) {
             return LSFExplicitSignature.deserialize(dataStream);
         } else {
-            return LSFGroupExplicitClasses.deserialize(dataStream);
+            return LSFImplicitExplicitClasses.deserialize(dataStream);
         }
     }
 

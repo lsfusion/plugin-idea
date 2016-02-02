@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class LSFExplicitSignature extends LSFExplicitClasses {
 
-    public List<LSFStringClassRef> signature;
+    public List<LSFStringClassRef> signature; // значения nullable
 
     public LSFExplicitSignature(List<LSFStringClassRef> signature) {
         this.signature = signature;
@@ -23,7 +23,8 @@ public class LSFExplicitSignature extends LSFExplicitClasses {
     public Set<String> getIndexedClasses() {
         Set<String> names = new HashSet<>();
         for (LSFStringClassRef param : signature) {
-            names.add(param.name);
+            if(param != null)
+                names.add(param.name);
         }
         return names;
     }
@@ -33,7 +34,9 @@ public class LSFExplicitSignature extends LSFExplicitClasses {
         dataStream.writeBoolean(true);
         dataStream.writeInt(signature.size());
         for (LSFStringClassRef param : signature) {
-            param.serialize(dataStream);
+            dataStream.writeBoolean(param != null);
+            if(param != null)
+                param.serialize(dataStream);
         }
     }
 
@@ -41,8 +44,22 @@ public class LSFExplicitSignature extends LSFExplicitClasses {
         List<LSFStringClassRef> params = new ArrayList<LSFStringClassRef>();
         int paramsCount = dataStream.readInt();
         for (int i = 0; i < paramsCount; i++) {
-            params.add(LSFStringClassRef.deserialize(dataStream));//);
+            params.add(dataStream.readBoolean() ? LSFStringClassRef.deserialize(dataStream) : null);//);
         }
         return new LSFExplicitSignature(params);
+    }
+
+    public boolean allClassesDeclared() {
+        return LSFPsiImplUtil.allClassesDeclared(signature);
+    }
+
+    public LSFExplicitSignature merge(LSFExplicitSignature ex) {
+        List<LSFStringClassRef> newSign = new ArrayList<>(signature);
+        for(int i=0,size=newSign.size();i<size;i++) {
+            LSFStringClassRef sclass = newSign.get(i);
+            if (sclass == null && i < ex.signature.size())
+                newSign.set(i, ex.signature.get(i));
+        }
+        return new LSFExplicitSignature(newSign);
     }
 }

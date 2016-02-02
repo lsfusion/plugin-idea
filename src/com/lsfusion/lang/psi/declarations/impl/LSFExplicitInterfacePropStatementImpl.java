@@ -107,7 +107,7 @@ public abstract class LSFExplicitInterfacePropStatementImpl extends StubBasedPsi
         if(paramExplicitValues != null) {
             valueText = StringUtils.join(paramExplicitValues,",");
         }
-        return valueText + "?";
+        return ": " + valueText + "?";
 //        return ((LSFGlobalPropDeclarationImpl)getPropertyStatement()).getValuePresentableText();
     }
 

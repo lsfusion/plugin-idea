@@ -6,7 +6,7 @@ import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
 import com.lsfusion.lang.psi.LSFExplicitClasses;
-import com.lsfusion.lang.psi.LSFGroupExplicitClasses;
+import com.lsfusion.lang.psi.LSFImplicitExplicitClasses;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
 import com.lsfusion.lang.psi.impl.LSFExplicitInterfacePropertyStatementImpl;
 import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceStubElement;
@@ -46,7 +46,7 @@ public class ExplicitInterfaceStubElementType extends LSFStubElementType<Explici
         Set<String> values = stub.getParamExplicitValues();
         dataStream.writeBoolean(values != null);
         if (values != null) {
-            LSFGroupExplicitClasses.serializeSet(dataStream, values);
+            LSFImplicitExplicitClasses.serializeSet(dataStream, values);
         }
 
         dataStream.writeByte(stub.getPropType());
@@ -56,7 +56,7 @@ public class ExplicitInterfaceStubElementType extends LSFStubElementType<Explici
     @Override
     public ExplicitInterfaceStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         StringRef name = dataStream.readName();
-        return new ExplicitInterfaceStubImpl(parentStub, this, name != null ? name.getString() : null, dataStream.readBoolean() ? LSFExplicitClasses.deserialize(dataStream) : null, dataStream.readBoolean() ? LSFGroupExplicitClasses.deserializeSet(dataStream) : null, dataStream.readByte());
+        return new ExplicitInterfaceStubImpl(parentStub, this, name != null ? name.getString() : null, dataStream.readBoolean() ? LSFExplicitClasses.deserialize(dataStream) : null, dataStream.readBoolean() ? LSFImplicitExplicitClasses.deserializeSet(dataStream) : null, dataStream.readByte());
     }
 
     @Override

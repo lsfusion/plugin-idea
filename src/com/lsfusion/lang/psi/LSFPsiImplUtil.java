@@ -13,7 +13,6 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
-import com.lsfusion.lang.psi.references.LSFExprParamReference;
 import com.lsfusion.lang.typeinfer.*;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -360,8 +359,8 @@ public class LSFPsiImplUtil {
         return count;
     }
 
-    public static boolean allClassesDeclared(List<LSFExClassSet> classes) {
-        for (LSFExClassSet classSet : classes)
+    public static <T> boolean allClassesDeclared(List<T> classes) {
+        for (T classSet : classes)
             if (classSet == null)
                 return false;
         return true;
@@ -1840,7 +1839,7 @@ public class LSFPsiImplUtil {
             for (LSFPropertyExpression pe : groupPropertyBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList()) {
                 valueClasses.addAll(getValueClassNames(pe));
             }
-            return new LSFGroupExplicitClasses(valueClasses);
+            return LSFImplicitExplicitClasses.create(valueClasses);
         }
         return new LSFExplicitSignature(Collections.EMPTY_LIST);
     }
@@ -1870,10 +1869,7 @@ public class LSFPsiImplUtil {
     public static LSFExplicitSignature getClassNameRefs(List<LSFParamDeclaration> params) {
         List<LSFStringClassRef> classNames = new ArrayList<>();
         for (LSFParamDeclaration param : params) {
-            LSFStringClassRef className = param.getClassName();
-            if (className != null) {
-                classNames.add(className);
-            }
+            classNames.add(param.getClassName());
         }
         return new LSFExplicitSignature(classNames);
     }

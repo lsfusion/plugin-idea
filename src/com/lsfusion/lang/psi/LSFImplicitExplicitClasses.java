@@ -5,18 +5,28 @@ import com.intellij.psi.stubs.StubOutputStream;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 // группировочное свойство, но с explicit классами внутри
-public class LSFGroupExplicitClasses extends LSFExplicitClasses {
+public class LSFImplicitExplicitClasses extends LSFExplicitClasses {
 
     private Set<String> valueClasses;
 
-    public LSFGroupExplicitClasses(Set<String> valueClasses) {
-        this.valueClasses = valueClasses;
+    public static Set<String> getNotNullSet(Collection<String> valueClasses) {
+        Set<String> result = new HashSet<>();
+        for(String valueClass : valueClasses)
+            result.add(valueClass);
+        return result;
+    }
+
+    public static LSFImplicitExplicitClasses create(Set<String> valueClasses) {
+        return new LSFImplicitExplicitClasses(valueClasses);
+    }
+
+    private LSFImplicitExplicitClasses(Set<String> valueClasses) {
+        this.valueClasses = getNotNullSet(valueClasses);
     }
 
     @NotNull
@@ -38,8 +48,8 @@ public class LSFGroupExplicitClasses extends LSFExplicitClasses {
         }
     }
 
-    public static LSFGroupExplicitClasses deserialize(@NotNull StubInputStream dataStream) throws IOException {
-        return new LSFGroupExplicitClasses(deserializeSet(dataStream));
+    public static LSFImplicitExplicitClasses deserialize(@NotNull StubInputStream dataStream) throws IOException {
+        return new LSFImplicitExplicitClasses(deserializeSet(dataStream));
     }
 
     public static Set<String> deserializeSet(@NotNull StubInputStream dataStream) throws IOException {

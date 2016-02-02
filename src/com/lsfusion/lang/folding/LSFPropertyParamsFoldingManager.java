@@ -153,12 +153,7 @@ public class LSFPropertyParamsFoldingManager {
         if (paramDeclarations == null) {
             return false;
         }
-        for (LSFParamDeclaration declaration : paramDeclarations) {
-            if (declaration.getClassName() == null) {
-                return false;
-            }
-        }
-        return true;
+        return LSFPsiImplUtil.getClassNameRefs(paramDeclarations).allClassesDeclared();
     }
     
     public static boolean rebuildFoldings(Document document, int newPosition) {

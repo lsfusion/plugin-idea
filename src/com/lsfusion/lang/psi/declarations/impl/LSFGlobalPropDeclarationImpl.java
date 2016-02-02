@@ -352,7 +352,13 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     public static String getParamPresentableText(List<?> paramClasses) {
-        return "(" + StringUtils.join(paramClasses, ", ") + ")";
+        String result = "";
+        if(paramClasses != null) {
+            for (Object paramClass : paramClasses)
+                result = (result.isEmpty() ? "" : result + ",") + (paramClass != null ? paramClass.toString() : "?");
+        } else
+            result = "?";
+        return "(" + result + ")";
     }
 
     @NotNull
@@ -366,10 +372,27 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     public LSFExplicitClasses getExplicitParams() {
+        LSFExplicitSignature declParams = getDeclExplicitParams();
+        if (declParams != null && declParams.allClassesDeclared()) // оптимизация
+            return declParams;
+
+        LSFExplicitClasses implicitParams = getImplicitExplicitParams();
+        if(implicitParams == null)
+            return declParams;
+        if(declParams == null || !(implicitParams instanceof LSFExplicitSignature)) // если группировка забиваем на explicit
+            return implicitParams;
+
+        return declParams.merge((LSFExplicitSignature) implicitParams);
+    }
+
+    private LSFExplicitSignature getDeclExplicitParams() {
         List<LSFParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
         if(params != null)
             return LSFPsiImplUtil.getClassNameRefs(params);
+        return null;
+    }
 
+    private LSFExplicitClasses getImplicitExplicitParams() {
         LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
         if(pCalcStatement != null) {
             LSFPropertyExpression pExpression = pCalcStatement.getPropertyExpression();
@@ -387,7 +410,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                     return LSFPsiImplUtil.getValueParamClassNames(unfriend);
             }
         }
-
         return null;
     }
 
@@ -396,11 +418,11 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         if(pCalcStatement != null) {
             LSFPropertyExpression pExpression = pCalcStatement.getPropertyExpression();
             if (pExpression != null)
-                return new HashSet<>(pExpression.getValueClassNames());
+                return LSFImplicitExplicitClasses.getNotNullSet(pExpression.getValueClassNames());
 
             LSFExpressionUnfriendlyPD unfriend = pCalcStatement.getExpressionUnfriendlyPD();
             if(unfriend != null)
-                return new HashSet<>(LSFPsiImplUtil.getValueClassNames(unfriend));
+                return LSFImplicitExplicitClasses.getNotNullSet(LSFPsiImplUtil.getValueClassNames(unfriend));
         }
 
         return null;
