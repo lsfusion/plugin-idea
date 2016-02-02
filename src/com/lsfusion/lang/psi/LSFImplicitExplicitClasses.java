@@ -17,7 +17,8 @@ public class LSFImplicitExplicitClasses extends LSFExplicitClasses {
     public static Set<String> getNotNullSet(Collection<String> valueClasses) {
         Set<String> result = new HashSet<>();
         for(String valueClass : valueClasses)
-            result.add(valueClass);
+            if(valueClass != null)
+                result.add(valueClass);
         return result;
     }
 
