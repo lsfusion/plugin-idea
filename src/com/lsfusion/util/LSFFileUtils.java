@@ -203,6 +203,20 @@ public class LSFFileUtils {
         return "dumb";
     }
 
+    public static String getDBNamingPolicy(PsiElement element) {
+        List<PsiFile> filesByPath = findFilesByPath(element, "lsfusion.properties");
+        for (PsiFile file : filesByPath) {
+            if (file instanceof PropertiesFile) {
+                PropertiesFile propFile = (PropertiesFile) file;
+                IProperty property = propFile.findPropertyByKey("db.namingPolicy");
+                if (property != null) {
+                    return BaseUtils.nullTrim(property.getValue());
+                }
+            }
+        }
+        return null;
+    }
+
     public static GlobalSearchScope getElementRequireScope(PsiElement myElement, String moduleName, boolean searchInRequiredModules) {
         GlobalSearchScope projectScope = getModuleWithDependenciesScope(myElement);
 

@@ -252,6 +252,8 @@
                         serviceImplementation="com.lsfusion.lang.psi.cache.TableNameCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.ColumnNameCache"
                         serviceImplementation="com.lsfusion.lang.psi.cache.ColumnNameCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ColumnNamingPolicyCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.ColumnNamingPolicyCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyDependenciesCache"
                         serviceImplementation="com.lsfusion.lang.psi.cache.PropertyDependenciesCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyDependentsCache"

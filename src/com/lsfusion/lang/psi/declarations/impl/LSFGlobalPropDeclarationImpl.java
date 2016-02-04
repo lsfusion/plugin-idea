@@ -638,7 +638,10 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         if (!isStoredProperty()) {
             return null;
         }
-        return ColumnNamingPolicy.getInstance(getProject()).getColumnName(this);
+
+        LSFFile lsfFile = getLSFFile();
+        ColumnNamingPolicy columnNamingPolicy = ColumnNamingPolicyCache.getInstance(lsfFile).getColumnNamingPolicyWithCaching(lsfFile);
+        return columnNamingPolicy == null ? null : columnNamingPolicy.getColumnName(this);
     }
 
     @Override
