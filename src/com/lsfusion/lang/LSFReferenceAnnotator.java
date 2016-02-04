@@ -26,7 +26,7 @@ import com.lsfusion.lang.psi.references.LSFStaticObjectReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Set;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
 
@@ -189,16 +189,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitMetaCodeStatement(o);
 
         if (MetaNestingLineMarkerProvider.resolveNestingLevel(o) > 0) {
-            Annotation annotation = myHolder.createInfoAnnotation(o.getMetaCodeStatementHeader().getTextRange(), "");
-            annotation.setEnforcedTextAttributes(META_NESTING_USAGE);
-            Annotation annotation2 = myHolder.createInfoAnnotation(o.getMetaCodeStatementSemi().getTextRange(), "");
-            annotation2.setEnforcedTextAttributes(META_NESTING_USAGE);
+            Annotation metaHeaderAnnotation = myHolder.createInfoAnnotation(o.getMetaCodeStatementHeader().getTextRange(), "");
+            metaHeaderAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
+            LSFMetaCodeStatementSemi metaCodeStatementSemi = o.getMetaCodeStatementSemi();
+            if (metaCodeStatementSemi != null) {
+                Annotation metaSemiAnnotation = myHolder.createInfoAnnotation(metaCodeStatementSemi.getTextRange(), "");
+                metaSemiAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
+            }
             LSFMetaCodeBody metaCodeBody = o.getMetaCodeBody();
             if (metaCodeBody != null) {
-                Annotation annotation3 = myHolder.createInfoAnnotation(metaCodeBody.getMetaCodeBodyLeftBrace().getTextRange(), "");
-                annotation3.setEnforcedTextAttributes(META_NESTING_USAGE);
-                Annotation annotation4 = myHolder.createInfoAnnotation(metaCodeBody.getMetaCodeBodyRightBrace().getTextRange(), "");
-                annotation4.setEnforcedTextAttributes(META_NESTING_USAGE);
+                Annotation metaLeftBraceAnnotation = myHolder.createInfoAnnotation(metaCodeBody.getMetaCodeBodyLeftBrace().getTextRange(), "");
+                metaLeftBraceAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
+                Annotation metaRightBraceAnnotation = myHolder.createInfoAnnotation(metaCodeBody.getMetaCodeBodyRightBrace().getTextRange(), "");
+                metaRightBraceAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
             }
         }
         checkReference(o);
@@ -436,7 +439,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitOverrideStatement(@NotNull LSFOverrideStatement element) {
-        Result<LSFClassSet> required = new Result<LSFClassSet>(); Result<LSFClassSet> found = new Result<LSFClassSet>();
+        Result<LSFClassSet> required = new Result<>(); Result<LSFClassSet> found = new Result<>();
         if(!LSFPsiImplUtil.checkOverrideValue(element, required, found)) {
             Annotation annotation = myHolder.createErrorAnnotation(element, "Wrong value class. Required : " + required.getResult().getCanonicalName() + ", found : " + found.getResult().getCanonicalName());
             annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
