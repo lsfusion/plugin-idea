@@ -613,7 +613,7 @@ formActionPropertyDefinitionBody ::=
 		(initFilterDefinition)?
 		(formSessionScopeLiteral)?
 		(modalityTypeLiteral)?
-		(CHECK)? (SHOWDROP)?
+		(CHECK)? (SHOWDROP)? (NOCANCEL)?
 		(formPrintTypeLiteral)?
 		(formExportLiteral)?
 {

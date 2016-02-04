@@ -276,6 +276,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "NEWTHREAD"              			    { return NEWTHREAD; }
   "DELAY"              			        { return DELAY; }
   "NO"                      			{ return NO; }
+  "NOCANCEL"                			{ return NOCANCEL; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOHEADER"                			{ return NOHEADER; }
   "NOT"                     			{ return NOT; }
