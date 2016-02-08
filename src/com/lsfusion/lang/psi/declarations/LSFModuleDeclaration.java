@@ -10,7 +10,7 @@ public interface LSFModuleDeclaration extends LSFNamespaceDeclaration<LSFModuleD
 
     List<LSFModuleReference> getRequireRefs();
 
-    // В отличие от getRequireRefs учитывает, что для модуля без блока REQUIRE делается REQUIRE System; 
+    // Р”РѕР»Р¶РµРЅ РІРѕР·РІСЂР°С‰Р°С‚СЊ РјРѕРґСѓР»СЊ System, РµСЃР»Рё Р±Р»РѕРє REQUIRE РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ 
     List<LSFModuleDeclaration> getRequireModules();
     
     LSFNamespaceReference getExplicitNamespaceRef();
