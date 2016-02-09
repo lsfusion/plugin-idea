@@ -23,9 +23,11 @@ import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.references.LSFStaticObjectReference;
+import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Set;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
@@ -270,6 +272,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitRelationalPE(@NotNull LSFRelationalPE o) {
+        super.visitRelationalPE(o);
+
+        checkRelationalPE(o);
+    }
+
+    @Override
     public void visitFormDeclaration(@NotNull LSFFormDeclaration o) {
         super.visitFormDeclaration(o);
 
@@ -381,6 +390,32 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             return false;
         }
         return true;
+    }
+
+    private void checkRelationalPE(LSFRelationalPE relationalPE) {
+        List<LSFAdditiveORPE> children = relationalPE.getAdditiveORPEList();
+        if (children.size() == 2) {
+            LSFClassSet class1 = getLSFClassSet(children.get(0));
+            LSFClassSet class2 = getLSFClassSet(children.get(1));
+            if (class1 != null && class2 != null && !class1.isCompatible(class2)) {
+                Annotation annotation = myHolder.createErrorAnnotation(relationalPE, String.format("Type mismatch: can't compare %s and %s", class1, class2));
+                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                addError(relationalPE, annotation);
+            }
+        } else {
+            LSFTypePropertyDefinition type = relationalPE.getTypePropertyDefinition();
+            if(type != null && relationalPE.getChildren().length == 2) {
+                LSFClassSet class1 = getLSFClassSet(children.get(0));
+                LSFClassSet class2 = LSFPsiImplUtil.resolveClass(type.getClassName());
+                if(class1 != null && class2 != null && !class1.haveCommonChildren(class2, null)) {
+                    myHolder.createWarningAnnotation(relationalPE, String.format("Type mismatch: can't cast %s to %s", class1, class2));
+                }
+            }
+        }
+    }
+
+    private LSFClassSet getLSFClassSet(LSFAdditiveORPE element) {
+        return LSFExClassSet.fromEx(element.resolveInferredValueClass(null));
     }
 
     private void checkAlreadyDefined(LSFDeclaration declaration) {

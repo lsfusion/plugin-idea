@@ -14,6 +14,8 @@ public interface LSFClassSet {
 
     boolean haveCommonChildren(LSFClassSet set, GlobalSearchScope scope);
 
+    boolean isCompatible(LSFClassSet set);
+
     int getMinimumWidth(int minCharWidth, FontMetrics fontMetrics);
 
     int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics);

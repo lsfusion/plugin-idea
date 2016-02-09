@@ -71,6 +71,11 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
     }
 
     @Override
+    public boolean isCompatible(LSFClassSet set) {
+        return set instanceof ConcatenateClassSet;
+    }
+
+    @Override
     public int getMinimumWidth(int minCharWidth, FontMetrics fontMetrics) {
         return fontMetrics.stringWidth("999 999") + 8;
     }

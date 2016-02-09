@@ -78,6 +78,11 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     }
 
     @Override
+    public boolean isCompatible(LSFClassSet set) {
+        return haveCommonChildren(set, null);
+    }
+
+    @Override
     public String toString() {
         return getName();
     }
