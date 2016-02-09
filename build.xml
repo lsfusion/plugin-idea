@@ -133,7 +133,7 @@
 
             <arg value="-sliceandcharat"/>
             <arg value="--skel"/>
-            <arg value="${basedir}/buildLlib/idea-flex.skeleton"/>
+            <arg value="${basedir}/buildLib/idea-flex.skeleton"/>
             <arg value="--nobak"/>
             <arg value="${basedir}/src/com/lsfusion/migration/Migration.flex"/>
             <arg value="-d"/>
