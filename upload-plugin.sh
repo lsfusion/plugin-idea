@@ -13,7 +13,7 @@ curl --request POST \
 	--data j_username=lsfusion \
 	--data j_password=ud47khe8ub \
 	--data _spring_security_remember_me=on \
-	https://plugins.jetbarins.com/j_spring_security_check | grep -v 'Location: .*/login/authfail'
+	https://plugins.jetbrains.com/j_spring_security_check | grep -v 'Location: .*/login/authfail'
 
 [ $? -ne 0 ] && echo "Could not log-in to JetBrains website" && exit 1
 
