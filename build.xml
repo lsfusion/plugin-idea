@@ -206,8 +206,8 @@
             description="Build plugin archive for module &#39;lsfusion-idea-plugin&#39;">
         <property name="tmp.dir" value="${basedir}/temp"/>
         <mkdir dir="${tmp.dir}"/>
-        <mkdir dir="${tmp.dir}/lib"/>
-        <jar destfile="${tmp.dir}/lib/lsfusion-idea-plugin.jar" duplicate="preserve">
+        <mkdir dir="${tmp.dir}/lsfusion-idea-plugin/lib"/>
+        <jar destfile="${tmp.dir}/lsfusion-idea-plugin/lib/lsfusion-idea-plugin.jar" duplicate="preserve">
             <zipfileset dir="${output.dir}"/>
             <zipfileset file="${basedir}/META-INF/plugin.xml" prefix="META-INF"/>
             <manifest>
@@ -215,7 +215,7 @@
                 <attribute name="Manifest-Version" value="1.0"/>
             </manifest>
         </jar>
-        <copy todir="${tmp.dir}/lib">
+        <copy todir="${tmp.dir}/lsfusion-idea-plugin/lib">
             <file name="${basedir}/lib/jgrapht-ext-0.9.0.jar"/>
             <file name="${basedir}/lib/commons-beanutils-1.8.0.jar"/>
             <file name="${basedir}/lib/commons-lang3-3.4.jar"/>
