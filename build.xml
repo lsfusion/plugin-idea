@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="lsfusion-idea-plugin" default="all">
+    
+    <property name="idea.home" value="/usr/share/idea"/>
+
+    <!-- Compiler options -->
+
+    <property name="compiler.debug" value="on"/>
+    <property name="compiler.generate.no.warnings" value="off"/>
+    <property name="compiler.max.memory" value="700m"/>
+    <patternset id="ignored.files">
+        <exclude name="**/*.hprof/**"/>
+        <exclude name="**/*.pyc/**"/>
+        <exclude name="**/*.pyo/**"/>
+        <exclude name="**/*.rbc/**"/>
+        <exclude name="**/*~/**"/>
+        <exclude name="**/.DS_Store/**"/>
+        <exclude name="**/.git/**"/>
+        <exclude name="**/.hg/**"/>
+        <exclude name="**/.svn/**"/>
+        <exclude name="**/CVS/**"/>
+        <exclude name="**/RCS/**"/>
+        <exclude name="**/SCCS/**"/>
+        <exclude name="**/__pycache__/**"/>
+        <exclude name="**/_svn/**"/>
+        <exclude name="**/rcs/**"/>
+        <exclude name="**/vssver.scc/**"/>
+        <exclude name="**/vssver2.scc/**"/>
+    </patternset>
+    <patternset id="compiler.resources">
+        <include name="**/?*.properties"/>
+        <include name="**/?*.xml"/>
+        <include name="**/?*.gif"/>
+        <include name="**/?*.png"/>
+        <include name="**/?*.jpeg"/>
+        <include name="**/?*.jpg"/>
+        <include name="**/?*.html"/>
+        <include name="**/?*.dtd"/>
+        <include name="**/?*.tld"/>
+        <include name="**/?*.ftl"/>
+        <include name="**/?*.ft"/>
+    </patternset>
+
+    <!-- JDK definitions -->
+
+    <property name="jdk.home" value="/usr/java/latest"/>
+    
+    <path id="jdk.classpath">
+        <fileset dir="${jdk.home}">
+            <include name="jre/lib/*.jar"/>
+            <include name="jre/lib/ext/*.jar"/>
+            <include name="lib/tools.jar"/>
+        </fileset>
+        <fileset dir="${idea.home}">
+            <include name="lib/*.jar"/>
+            <include name="plugins/properties/lib/properties.jar"/>
+        </fileset>
+    </path>
+
+    <!-- Register Custom Compiler Taskdefs -->
+    <property name="javac2.home" value="${idea.home}/lib"/>
+    <path id="javac2.classpath">
+        <pathelement location="${javac2.home}/javac2.jar"/>
+        <pathelement location="${javac2.home}/jdom.jar"/>
+        <pathelement location="${javac2.home}/asm-all.jar"/>
+        <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+    </path>
+    <target name="register.custom.compilers">
+        <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+        <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions"
+                 classpathref="javac2.classpath"/>
+    </target>
+
+    <!-- Module lsfusion-idea-plugin -->
+
+    <property name="compiler.args"
+              value="-encoding UTF-8 -source 1.7 -target 1.7"/>
+
+    <property name="output.dir"
+              value="${basedir}/out/production/lsfusion-idea-plugin"/>
+
+    <path id="lsfusion-idea-plugin.classpath">
+        <path refid="jdk.classpath"/>
+        <pathelement location="${basedir}/lib/commons-beanutils-1.8.0.jar"/>
+        <pathelement location="${basedir}/lib/jgraph-5.13.0.0.jar"/>
+        <pathelement location="${basedir}/lib/jgrapht-ext-0.9.0.jar"/>
+        <pathelement location="${basedir}/lib/jgrapht-core-0.9.0.jar"/>
+        <pathelement location="${basedir}/lib/commons-lang3-3.4.jar"/>
+    </path>
+
+    <patternset id="excluded.from.compilation">
+        <patternset refid="ignored.files"/>
+    </patternset>
+
+    <path id="lsfusion-idea-plugin.sourcepath">
+        <dirset dir="${basedir}">
+            <include name="src"/>
+            <include name="gen"/>
+            <include name="resources"/>
+        </dirset>
+    </path>
+    
+    <property name="buildLib" value="${basedir}/buildLib"/>
+
+    <path id="lexer.classpath">
+        <pathelement location="${buildLib}/jflex.jar"/>
+    </path>
+
+    <path id="parser.classpath">
+        <pathelement location="${buildLib}/grammar-kit.jar"/>
+        <file name="${basedir}/lib/psiImplUtils.jar"/>
+        <fileset dir="${idea.home}/lib">
+            <include name="jdom.jar"/>
+            <include name="openapi.jar"/>
+            <include name="util.jar"/>
+            <include name="idea.jar"/>
+            <include name="picocontainer.jar"/>
+            <include name="extensions.jar"/>
+            <include name="trove4j.jar"/>
+            <include name="resources.jar"/>
+            <include name="jsr166e.jar"/>
+            <include name="asm.jar"/>
+            <include name="guava-17.0.jar"/>
+            <include name="cglib-2.2.2.jar"/>
+            <include name="automaton.jar"/>
+            <include name="asm-commons.jar"/>
+        </fileset>
+    </path>
+
+    <target name="generate.lexer" description="Generate lexer">
+        <java classname="JFlex.Main" fork="true" failonerror="true">
+            <classpath refid="lexer.classpath"/>
+
+            <arg value="-sliceandcharat"/>
+            <arg value="--skel"/>
+            <arg value="${basedir}/buildLlib/idea-flex.skeleton"/>
+            <arg value="--nobak"/>
+            <arg value="${basedir}/src/com/lsfusion/migration/Migration.flex"/>
+            <arg value="-d"/>
+            <arg value="${basedir}/src/com/lsfusion/migration"/>
+        </java>
+
+        <java classname="JFlex.Main" fork="true" failonerror="true">
+            <classpath refid="lexer.classpath"/>
+
+            <arg value="-sliceandcharat"/>
+            <arg value="--skel"/>
+            <arg value="${buildLib}/idea-flex.skeleton"/>
+            <arg value="--nobak"/>
+            <arg value="${basedir}/src/com/lsfusion/lang/LSF.flex"/>
+            <arg value="-d"/>
+            <arg value="${basedir}/src/com/lsfusion/lang"/>
+        </java>
+    </target>
+
+    <target name="generate.parser" description="Generate java classes, parser">
+        <delete dir="${basedir}/gen"/>
+        
+        <java classname="org.intellij.grammar.Main" failonerror="true">
+            <classpath refid="parser.classpath"/>
+            <arg value="${basedir}/gen"/>
+            <arg file="${basedir}/src/com/lsfusion/migration/Migration.bnf"/>
+        </java>
+
+        <java classname="org.intellij.grammar.Main" failonerror="true">
+            <classpath refid="parser.classpath"/>
+            <arg value="${basedir}/gen" />
+            <arg file="${basedir}/src/com/lsfusion/lang/LSF.bnf" />
+        </java>
+    </target>
+
+    <target name="compile" depends="generate.lexer, generate.parser, register.custom.compilers"
+            description="Compile module lsfusion-idea-plugin; production classes">
+
+        <mkdir dir="${output.dir}"/>
+        <javac2 destdir="${output.dir}" debug="${compiler.debug}"
+                nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true"
+                executable="${jdk.home}/bin/javac" includeantruntime="true">
+            <compilerarg line="${compiler.args}"/>
+            <classpath refid="lsfusion-idea-plugin.classpath"/>
+            <src refid="lsfusion-idea-plugin.sourcepath"/>
+            <patternset refid="excluded.from.compilation"/>
+        </javac2>
+
+        <copy todir="${output.dir}">
+            <fileset dir="${basedir}/src">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+            <fileset dir="${basedir}/gen">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+            <fileset dir="${basedir}/resources">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean" description="cleanup module">
+        <delete dir="${output.dir}"/>
+    </target>
+
+    <target name="build.plugin.jar" depends="compile"
+            description="Build plugin archive for module &#39;lsfusion-idea-plugin&#39;">
+        <property name="tmp.dir" value="${basedir}/temp"/>
+        <mkdir dir="${tmp.dir}"/>
+        <mkdir dir="${tmp.dir}/lib"/>
+        <jar destfile="${tmp.dir}/lib/lsfusion-idea-plugin.jar" duplicate="preserve">
+            <zipfileset dir="${output.dir}"/>
+            <zipfileset file="${basedir}/META-INF/plugin.xml" prefix="META-INF"/>
+            <manifest>
+                <attribute name="Created-By" value="IntelliJ IDEA"/>
+                <attribute name="Manifest-Version" value="1.0"/>
+            </manifest>
+        </jar>
+        <copy todir="${tmp.dir}/lib">
+            <file name="${basedir}/lib/jgrapht-ext-0.9.0.jar"/>
+            <file name="${basedir}/lib/commons-beanutils-1.8.0.jar"/>
+            <file name="${basedir}/lib/commons-lang3-3.4.jar"/>
+            <file name="${basedir}/lib/jgraph-5.13.0.0.jar"/>
+            <file name="${basedir}/lib/jgrapht-core-0.9.0.jar"/>
+        </copy>
+        <zip destfile="${basedir}/lsfusion-idea-plugin.zip">
+            <fileset dir="${tmp.dir}"/>
+        </zip>
+        <delete dir="${tmp.dir}"/>
+    </target>
+
+    <target name="all" depends="clean, build.plugin.jar" description="build all"/>
+
+
+    <target name="pack.psi.impl.utils" description="Pack psiImplUtils jar">
+        <jar destfile="${basedir}/lib/psiImplUtils.jar"
+             basedir="${output.dir}"
+             includes="com/lsfusion/migration/lang/psi/MigrationPsiImplUtil.class com/lsfusion/lang/psi/LSFPsiImplUtil.class"
+        />
+    </target>
+</project>

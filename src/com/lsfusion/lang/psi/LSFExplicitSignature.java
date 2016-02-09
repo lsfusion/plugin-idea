@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class LSFExplicitSignature extends LSFExplicitClasses {
     }
 
     public boolean allClassesDeclared() {
-        return LSFPsiImplUtil.allClassesDeclared(signature);
+        return LSFPsiUtils.allClassesDeclared(signature);
     }
 
     public LSFExplicitSignature merge(LSFExplicitSignature ex) {

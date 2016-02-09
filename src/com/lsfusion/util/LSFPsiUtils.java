@@ -80,8 +80,8 @@ public class LSFPsiUtils {
 
         CharSequence documentText = document.getCharsSequence();
 
-        final List<TextRange> ranges = new ArrayList<TextRange>();
-        final List<LSFExpression> expressions = new ArrayList<LSFExpression>();
+        final List<TextRange> ranges = new ArrayList<>();
+        final List<LSFExpression> expressions = new ArrayList<>();
 
         fillLsfExpressions(file, offset, ranges, expressions);
         if (!isLsfIdentifierPart(documentText.charAt(offset)) && offset > 0) {
@@ -137,7 +137,7 @@ public class LSFPsiUtils {
             ContextModifier contextModifier = ((ModifyParamContext) current).getContextModifier();
 
             Set<LSFExprParamDeclaration> upParams;
-            Set<LSFExprParamDeclaration> result = new HashSet<LSFExprParamDeclaration>();
+            Set<LSFExprParamDeclaration> result = new HashSet<>();
             if (current instanceof ExtendParamContext) {
                 int upOffset = offset;
                 PsiElement context = current.getContext();
@@ -149,12 +149,12 @@ public class LSFPsiUtils {
                     }
                 }                
                 if(context == null)
-                    upParams = new HashSet<LSFExprParamDeclaration>();
+                    upParams = new HashSet<>();
                 else
                     upParams = getContextParams(context, upOffset, objectRef);
                 result.addAll(upParams);
             } else { // не extend - останавливаемся
-                upParams = new HashSet<LSFExprParamDeclaration>();
+                upParams = new HashSet<>();
             }
             result.addAll(contextModifier.resolveParams(offset, upParams));
             return result;
@@ -166,7 +166,7 @@ public class LSFPsiUtils {
                 }
             }, objectRef);
             if (objects != null) {
-                return BaseUtils.<LSFExprParamDeclaration, LSFObjectDeclaration>immutableCast(objects);
+                return BaseUtils.immutableCast(objects);
             }
         }
 
@@ -175,7 +175,7 @@ public class LSFPsiUtils {
             return getContextParams(parent, offset, objectRef); // бежим выше
         }
 
-        return new HashSet<LSFExprParamDeclaration>();
+        return new HashSet<>();
     }
 
     @NotNull
@@ -198,7 +198,7 @@ public class LSFPsiUtils {
     }
 
     public static Set<LSFFile> collectInjectedLSFFiles(PsiElement root, Project project) {
-        Set<LSFFile> files = new ArrayListSet<LSFFile>();
+        Set<LSFFile> files = new ArrayListSet<>();
         collectInjectedLSFFiles(root, project, files);
         return files;
     }
@@ -216,6 +216,13 @@ public class LSFPsiUtils {
         for (PsiElement child : root.getChildren()) {
             collectInjectedLSFFiles(child, project, lsfFiles);
         }
+    }
+
+    public static <T> boolean allClassesDeclared(List<T> classes) {
+        for (T classSet : classes)
+            if (classSet == null)
+                return false;
+        return true;
     }
 
     public abstract static class ApplicableMapper<T> {
@@ -238,9 +245,9 @@ public class LSFPsiUtils {
 
         LSFClassSet valueClassSet = valueClass instanceof LSFClassDeclaration ? new CustomClassSet((LSFClassDeclaration) valueClass) : (LSFClassSet) valueClass;
 
-        Set<LSFInterfacePropStatement> resultStatements = new HashSet<LSFInterfacePropStatement>();
+        Set<LSFInterfacePropStatement> resultStatements = new HashSet<>();
 
-        List<LSFPropertyStatement> statementsWithClassAsResult = new ArrayList<LSFPropertyStatement>();
+        List<LSFPropertyStatement> statementsWithClassAsResult = new ArrayList<>();
         for (LSFValueClass clazz : CustomClassSet.getClassParentsRecursively(valueClass)) {
             String className = clazz.getName();
             Collection<LSFExplicitInterfacePropStatement> eiStatements = ExplicitInterfaceIndex.getInstance().get(className, project, scope);
@@ -275,9 +282,9 @@ public class LSFPsiUtils {
         }
 
         if(isHeavy) {
-            Set<String> namesOfStatementsWithClassAsResult = new HashSet<String>();
+            Set<String> namesOfStatementsWithClassAsResult = new HashSet<>();
             int i = 0;
-            Set<LSFPropertyStatement> skipStatemens = new HashSet<LSFPropertyStatement>();
+            Set<LSFPropertyStatement> skipStatemens = new HashSet<>();
             while (i < statementsWithClassAsResult.size()) {
                 LSFPropertyStatement statement = statementsWithClassAsResult.get(i);
                 String statementName = statement.getName();
@@ -311,7 +318,7 @@ public class LSFPsiUtils {
 
     private static <T> Set<T> mapPropertiesApplicableToClass(LSFClassSet valueClassSet, Collection<LSFInterfacePropStatement> statements, ApplicableMapper<T> applicableMapper) {
 
-        Set<T> result = new HashSet<T>();
+        Set<T> result = new HashSet<>();
         for (LSFInterfacePropStatement statement : statements) {
             List<LSFClassSet> paramClasses = statement.resolveParamClasses();
             if (paramClasses != null && !paramClasses.isEmpty()) {

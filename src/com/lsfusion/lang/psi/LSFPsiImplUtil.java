@@ -21,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.*;
 
+import static java.util.Collections.singletonList;
+
 @SuppressWarnings("UnusedParameters")
 public class LSFPsiImplUtil {
 
@@ -158,7 +160,7 @@ public class LSFPsiImplUtil {
     }
 
     private static List<LSFPropertyExpression> getContextExprs(@NotNull LSFGroupPropertyDefinition sourceStatement) {
-        List<LSFPropertyExpression> result = new ArrayList<LSFPropertyExpression>();
+        List<LSFPropertyExpression> result = new ArrayList<>();
         result.addAll(sourceStatement.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
         LSFGroupPropertyBy by = sourceStatement.getGroupPropertyBy();
         if (by != null)
@@ -237,7 +239,7 @@ public class LSFPsiImplUtil {
     }
 
     private static ContextModifier getContextModifier(LSFExprParameterUsage exprParameterUsage) {
-        return new ExprParamUsageContextModifier(exprParameterUsage == null ? Collections.<LSFExprParameterUsage>emptyList() : Collections.singletonList(exprParameterUsage));
+        return new ExprParamUsageContextModifier(exprParameterUsage == null ? Collections.<LSFExprParameterUsage>emptyList() : singletonList(exprParameterUsage));
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFChangeClassActionPropertyDefinitionBody sourceStatement) {
@@ -359,13 +361,6 @@ public class LSFPsiImplUtil {
         return count;
     }
 
-    public static <T> boolean allClassesDeclared(List<T> classes) {
-        for (T classSet : classes)
-            if (classSet == null)
-                return false;
-        return true;
-    }
-
     public static DataClass resolve(LSFBuiltInClassName builtIn) {
         String name = builtIn.getText();
         return resolveDataClass(name);
@@ -403,26 +398,27 @@ public class LSFPsiImplUtil {
             return new StringClass(false, false, true, ExtInt.UNLIMITED);
         }
 
-        if (name.equals("WORDFILE")) {
-            return WordClass.instance;
-        } else if (name.equals("IMAGEFILE")) {
-            return ImageClass.instance;
-        } else if (name.equals("PDFFILE")) {
-            return PDFClass.instance;
-        } else if (name.equals("CUSTOMFILE")) {
-            return DynamicFormatFileClass.instance;
-        } else if (name.equals("EXCELFILE")) {
-            return ExcelClass.instance;
-        } else if (name.equals("BOOLEAN")) {
-            return LogicalClass.instance;
-        } else if (name.equals("DATE")) {
-            return DateClass.instance;
-        } else if (name.equals("TIME")) {
-            return TimeClass.instance;
-        } else if (name.equals("DATETIME")) {
-            return DateTimeClass.instance;
-        } else if (name.equals("COLOR")) {
-            return ColorClass.instance;
+        switch (name) {
+            case "WORDFILE":
+                return WordClass.instance;
+            case "IMAGEFILE":
+                return ImageClass.instance;
+            case "PDFFILE":
+                return PDFClass.instance;
+            case "CUSTOMFILE":
+                return DynamicFormatFileClass.instance;
+            case "EXCELFILE":
+                return ExcelClass.instance;
+            case "BOOLEAN":
+                return LogicalClass.instance;
+            case "DATE":
+                return DateClass.instance;
+            case "TIME":
+                return TimeClass.instance;
+            case "DATETIME":
+                return DateTimeClass.instance;
+            case "COLOR":
+                return ColorClass.instance;
         }
 
         return new SimpleDataClass(name);
@@ -464,7 +460,7 @@ public class LSFPsiImplUtil {
             return Collections.emptyList();
         }
 
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        List<LSFClassSet> result = new ArrayList<>();
         for (LSFClassName className : ne.getClassNameList())
             result.add(resolveClass(className));
         return result;
@@ -499,7 +495,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<LSFClassSet> resolveExplicitClass(LSFClassParamDeclareList classNameList) {
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        List<LSFClassSet> result = new ArrayList<>();
 
         LSFNonEmptyClassParamDeclareList ne = classNameList.getNonEmptyClassParamDeclareList();
         if (ne == null)
@@ -639,17 +635,16 @@ public class LSFPsiImplUtil {
 
     private static LSFExClassSet orStringClasses(List<LSFExClassSet> classes) {
         boolean hasString = false;
-        List<LSFExClassSet> fixedClasses = new ArrayList<LSFExClassSet>();
-        for (int i = 0; i < classes.size(); i++) {
-            LSFExClassSet ex = classes.get(i);
-            if(ex != null) {
+        List<LSFExClassSet> fixedClasses = new ArrayList<>();
+        for (LSFExClassSet ex : classes) {
+            if (ex != null) {
                 LSFClassSet classSet = ex.classSet;
-                if(classSet instanceof StringClass)
+                if (classSet instanceof StringClass)
                     hasString = true;
                 else if (hasString) {
                     ex = new LSFExClassSet(new StringClass(false, false, new ExtInt(1)));
                 }
-            } 
+            }
             fixedClasses.add(ex);
         }
         return orClasses(fixedClasses, true);
@@ -657,7 +652,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFAdditiveORPE sourceStatement, @Nullable InferExResult inferred) {
-        List<LSFExClassSet> orClasses = new ArrayList<LSFExClassSet>();
+        List<LSFExClassSet> orClasses = new ArrayList<>();
         for (LSFAdditivePE pe : sourceStatement.getAdditivePEList())
             orClasses.add(resolveInferredValueClass(pe, inferred));
         return orClasses(orClasses, false);
@@ -665,7 +660,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFAdditivePE sourceStatement, @Nullable InferExResult inferred) {
-        List<LSFExClassSet> orClasses = new ArrayList<LSFExClassSet>();
+        List<LSFExClassSet> orClasses = new ArrayList<>();
         for (LSFMultiplicativePE pe : sourceStatement.getMultiplicativePEList())
             orClasses.add(resolveInferredValueClass(pe, inferred));
         return orStringClasses(orClasses);
@@ -673,10 +668,10 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFMultiplicativePE sourceStatement, @Nullable InferExResult inferred) {
-        List<LSFExClassSet> orClasses = new ArrayList<LSFExClassSet>();
+        List<LSFExClassSet> orClasses = new ArrayList<>();
         for (LSFUnaryMinusPE pe : sourceStatement.getUnaryMinusPEList())
             orClasses.add(resolveInferredValueClass(pe, inferred));
-        List<Boolean> mults = new ArrayList<Boolean>();
+        List<Boolean> mults = new ArrayList<>();
         for (LSFTypeMult type : sourceStatement.getTypeMultList())
             mults.add(type.getText().equals("*"));
         return scaleClasses(orClasses, mults);
@@ -834,7 +829,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFCasePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
-        List<LSFPropertyExpression> list = new ArrayList<LSFPropertyExpression>();
+        List<LSFPropertyExpression> list = new ArrayList<>();
         for (LSFCaseBranchBody caseBranch : sourceStatement.getCaseBranchBodyList()) {
             List<LSFPropertyExpression> propertyExpressionList = caseBranch.getPropertyExpressionList();
             if (propertyExpressionList.size() > 1) {
@@ -1027,31 +1022,31 @@ public class LSFPsiImplUtil {
     public static List<String> getValueClassNames(@NotNull LSFOrPE sourceStatement) {
         List<LSFXorPE> xorPEList = sourceStatement.getXorPEList();
         if (xorPEList.size() == 1) {
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             result.addAll(getValueClassNames(xorPEList.get(0)));
             return result;
         }
-        return Arrays.asList(LogicalClass.instance.getName());
+        return singletonList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFXorPE sourceStatement) {
         List<LSFAndPE> andPEList = sourceStatement.getAndPEList();
         if (andPEList.size() == 1) {
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             result.addAll(getValueClassNames(andPEList.get(0)));
             return result;
         }
-        return Arrays.asList(LogicalClass.instance.getName());
+        return singletonList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFAndPE sourceStatement) {
         List<LSFNotPE> notPEList = sourceStatement.getNotPEList();
         if (notPEList.size() == 1) {
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             result.addAll(getValueClassNames(notPEList.get(0)));
             return result;
         }
-        return Arrays.asList(LogicalClass.instance.getName());
+        return singletonList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFNotPE sourceStatement) {
@@ -1059,13 +1054,13 @@ public class LSFPsiImplUtil {
         if (equalityPE != null) {
             return getValueClassNames(equalityPE);
         }
-        return Arrays.asList(LogicalClass.instance.getName());
+        return singletonList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFEqualityPE sourceStatement) {
         List<LSFRelationalPE> relationalPEList = sourceStatement.getRelationalPEList();
         if (relationalPEList.size() == 2) {
-            return Arrays.asList(LogicalClass.instance.getName());
+            return singletonList(LogicalClass.instance.getName());
         }
         return getValueClassNames(relationalPEList.get(0));
     }
@@ -1073,7 +1068,7 @@ public class LSFPsiImplUtil {
     public static List<String> getValueClassNames(@NotNull LSFRelationalPE sourceStatement) {
         List<LSFAdditiveORPE> additiveORPEs = sourceStatement.getAdditiveORPEList();
         if (additiveORPEs.size() == 2) {
-            return Arrays.asList(LogicalClass.instance.getName());
+            return singletonList(LogicalClass.instance.getName());
         }
 
         List<String> result = getValueClassNames(additiveORPEs.get(0));
@@ -1081,11 +1076,11 @@ public class LSFPsiImplUtil {
         LSFTypePropertyDefinition typePD = sourceStatement.getTypePropertyDefinition();
         if (typePD != null) {
             if (typePD.getTypeIs().getText().equals("IS")) {
-                return Arrays.asList(LogicalClass.instance.getName());
+                return singletonList(LogicalClass.instance.getName());
             } else {
                 String typeDefClass = getClassName(typePD.getClassName());
                 if (typeDefClass != null) {
-                    result = Arrays.asList(typeDefClass);
+                    result = singletonList(typeDefClass);
                 }
             }
         }
@@ -1093,7 +1088,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFAdditiveORPE sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (LSFAdditivePE addPE : sourceStatement.getAdditivePEList()) {
             result.addAll(getValueClassNames(addPE));
         }
@@ -1101,7 +1096,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFAdditivePE sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (LSFMultiplicativePE multPE : sourceStatement.getMultiplicativePEList()) {
             result.addAll(getValueClassNames(multPE));
         }
@@ -1109,7 +1104,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFMultiplicativePE sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (LSFUnaryMinusPE umPE : sourceStatement.getUnaryMinusPEList()) {
             result.addAll(getValueClassNames(umPE));
         }
@@ -1152,7 +1147,7 @@ public class LSFPsiImplUtil {
             return Collections.emptyList();
         }
         LSFResolveResult lsfResolveResult = exprParameterNameUsage.resolveNoCache();
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (LSFDeclaration decl : lsfResolveResult.declarations) {
             LSFStringClassRef className = ((LSFParamDeclare) decl).getClassName();
             if (className != null) {
@@ -1170,14 +1165,14 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFDataPropertyDefinition sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         LSFClassName className = sourceStatement.getClassName();
         result.add(getClassName(className));
         return result;
     }
 
     public static List<String> getValueClassNames(@NotNull LSFNativePropertyDefinition sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         LSFClassName className = sourceStatement.getClassName();
         result.add(getClassName(className));
         return result;
@@ -1204,7 +1199,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         LSFClassName className = sourceStatement.getClassName();
         result.add(getClassName(className));
         return result;
@@ -1213,7 +1208,7 @@ public class LSFPsiImplUtil {
     public static List<String> getValueClassNames(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
         LSFBuiltInClassName builtIn = sourceStatement.getBuiltInClassName();
         if (builtIn != null) {
-            return Arrays.asList(builtIn.getName());
+            return singletonList(builtIn.getName());
         }
         return Collections.EMPTY_LIST;
     }
@@ -1223,7 +1218,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {
-        return Arrays.asList(LogicalClass.instance.getName());
+        return singletonList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFExpressionFriendlyPD sourceStatement) {
@@ -1304,7 +1299,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFCasePropertyDefinition sourceStatement) {
-        List<LSFPropertyExpression> list = new ArrayList<LSFPropertyExpression>();
+        List<LSFPropertyExpression> list = new ArrayList<>();
         for (LSFCaseBranchBody caseBranch : sourceStatement.getCaseBranchBodyList()) {
             List<LSFPropertyExpression> propertyExpressionList = caseBranch.getPropertyExpressionList();
             if (propertyExpressionList.size() > 1) {
@@ -1335,7 +1330,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFCastPropertyDefinition sourceStatement) {
-        return Arrays.asList(sourceStatement.getBuiltInClassName().getName());
+        return singletonList(sourceStatement.getBuiltInClassName().getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFSessionPropertyDefinition sourceStatement) {
@@ -1343,21 +1338,21 @@ public class LSFPsiImplUtil {
         if (type.getText().equals("PREV")) {
             return getValueClassNames(sourceStatement.getPropertyExpression());
         }
-        return Arrays.asList(LogicalClass.instance.getName());
+        return singletonList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFSignaturePropertyDefinition sourceStatement) {
-        return Arrays.asList(LogicalClass.instance.getName());
+        return singletonList(LogicalClass.instance.getName());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFLiteral sourceStatement) {
         DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
         if (builtInClass != null) {
-            return Arrays.asList(builtInClass.getName());
+            return singletonList(builtInClass.getName());
         }
         LSFStaticObjectID staticObjectID = sourceStatement.getStaticObjectID();
         if (staticObjectID != null) {
-            return Arrays.asList(staticObjectID.getCustomClassUsage().getName());
+            return singletonList(staticObjectID.getCustomClassUsage().getName());
         }
         return Collections.EMPTY_LIST;
     }
@@ -1378,7 +1373,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFOrPE sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         List<LSFXorPE> xorPEList = sourceStatement.getXorPEList();
         if (xorPEList.size() == 1) {
             result.addAll(getValuePropertyNames(xorPEList.get(0)));
@@ -1387,7 +1382,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFXorPE sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         List<LSFAndPE> andPEList = sourceStatement.getAndPEList();
         if (andPEList.size() == 1) {
             result.addAll(getValuePropertyNames(andPEList.get(0)));
@@ -1396,7 +1391,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFAndPE sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         List<LSFNotPE> notPEList = sourceStatement.getNotPEList();
         if (notPEList.size() == 1) {
             result.addAll(getValuePropertyNames(notPEList.get(0)));
@@ -1435,7 +1430,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFAdditiveORPE sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (LSFAdditivePE addPE : sourceStatement.getAdditivePEList()) {
             result.addAll(getValuePropertyNames(addPE));
         }
@@ -1443,7 +1438,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFAdditivePE sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (LSFMultiplicativePE multPE : sourceStatement.getMultiplicativePEList()) {
             result.addAll(getValuePropertyNames(multPE));
         }
@@ -1451,7 +1446,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFMultiplicativePE sourceStatement) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (LSFUnaryMinusPE umPE : sourceStatement.getUnaryMinusPEList()) {
             result.addAll(getValuePropertyNames(umPE));
         }
@@ -1552,7 +1547,7 @@ public class LSFPsiImplUtil {
         LSFPropertyObject propertyObject = sourceStatement.getPropertyObject();
         LSFPropertyUsage usage = propertyObject.getPropertyUsage();
         if (usage != null) {
-            return Arrays.asList(usage.getName());
+            return singletonList(usage.getName());
         }
 
         LSFPropertyExprObject exprObject = propertyObject.getPropertyExprObject();
@@ -1617,7 +1612,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFCasePropertyDefinition sourceStatement) {
-        List<LSFPropertyExpression> list = new ArrayList<LSFPropertyExpression>();
+        List<LSFPropertyExpression> list = new ArrayList<>();
         for (LSFCaseBranchBody caseBranch : sourceStatement.getCaseBranchBodyList()) {
             List<LSFPropertyExpression> propertyExpressionList = caseBranch.getPropertyExpressionList();
             if (propertyExpressionList.size() > 1) {
@@ -1716,12 +1711,12 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAddFormActionPropertyDefinitionBody sourceStatement) {
-        return new ArrayList<LSFExClassSet>();
+        return new ArrayList<>();
     }
 
     @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFEditFormActionPropertyDefinitionBody editForm) {
-        return LSFExClassSet.toEx(Collections.singletonList((LSFClassSet)resolveClass(editForm.getCustomClassUsage())));
+        return LSFExClassSet.toEx(singletonList((LSFClassSet)resolveClass(editForm.getCustomClassUsage())));
     }
 
     @Nullable
@@ -1733,7 +1728,7 @@ public class LSFPsiImplUtil {
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
-            return new ArrayList<LSFExClassSet>();
+            return new ArrayList<>();
 
         return resolveParamClasses(groupBy.getNonEmptyPropertyExpressionList());
     }
@@ -1742,7 +1737,7 @@ public class LSFPsiImplUtil {
     public static List<LSFExClassSet> inferGroupValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
-            return new ArrayList<LSFExClassSet>();
+            return new ArrayList<>();
 
         return resolveParamClasses(groupBy.getNonEmptyPropertyExpressionList(), inferGroupParamClasses(sourceStatement));
     }
@@ -1765,7 +1760,7 @@ public class LSFPsiImplUtil {
 
         String text = stringLiteral.getValue();
         int i = 0;
-        List<LSFExClassSet> result = new ArrayList<LSFExClassSet>();
+        List<LSFExClassSet> result = new ArrayList<>();
         while (text.contains("$" + (i + 1))) {
             i++;
             result.add(null);
@@ -1858,7 +1853,7 @@ public class LSFPsiImplUtil {
             return new LSFExplicitSignature(Collections.EMPTY_LIST);
         }
 
-        List<LSFStringClassRef> result = new ArrayList<LSFStringClassRef>();
+        List<LSFStringClassRef> result = new ArrayList<>();
         for (LSFClassName className : ne.getClassNameList()) {
             result.add(getClassNameRef(className));
         }
@@ -1913,7 +1908,7 @@ public class LSFPsiImplUtil {
 
     // LSFPropertyExpression.resolveValueParamClasses
     public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFPropertyExpression sourceStatement) {
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        List<LSFClassSet> result = new ArrayList<>();
         for (LSFExprParamDeclaration param : sourceStatement.resolveParams())
             result.add(param.resolveClass());
         return result;
@@ -1928,7 +1923,7 @@ public class LSFPsiImplUtil {
         if (classNameList == null)
             return null;
 
-        List<LSFParamDeclaration> result = new ArrayList<LSFParamDeclaration>();
+        List<LSFParamDeclaration> result = new ArrayList<>();
 
         LSFNonEmptyClassParamDeclareList ne = classNameList.getNonEmptyClassParamDeclareList();
         if (ne == null)
@@ -1942,7 +1937,7 @@ public class LSFPsiImplUtil {
         if(params == null)
             return null;
         
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for(LSFExprParamDeclaration param : params)
             result.add(param.getDeclName());
         return result;
@@ -1952,7 +1947,7 @@ public class LSFPsiImplUtil {
         if (classNameList == null)
             return null;
 
-        List<LSFParamDeclaration> result = new ArrayList<LSFParamDeclaration>();
+        List<LSFParamDeclaration> result = new ArrayList<>();
 
         for (LSFExprParameterUsage usage : classNameList.getExprParameterUsageList()) {
             LSFExprParameterNameUsage nameUsage = usage.getExprParameterNameUsage();
@@ -1968,7 +1963,7 @@ public class LSFPsiImplUtil {
         if (propertyDeclaration.getPropertyDeclParams() != null) {
             LSFNonEmptyClassParamDeclareList paramDeclareList = propertyDeclaration.getPropertyDeclParams().getClassParamDeclareList().getNonEmptyClassParamDeclareList();
             if (paramDeclareList != null) {
-                result = new ArrayList<LSFParamDeclaration>();
+                result = new ArrayList<>();
                 for (LSFClassParamDeclare paramDeclare : paramDeclareList.getClassParamDeclareList())
                     result.add(paramDeclare.getParamDeclare());
             }
@@ -1980,7 +1975,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static List<LSFClassSet> resolveParamDeclClasses(Collection<? extends LSFExprParamDeclaration> decls) {
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        List<LSFClassSet> result = new ArrayList<>();
         for (LSFExprParamDeclaration decl : decls) {
             LSFClassSet classSet = decl.resolveClass();
             if (classSet != null) {
@@ -1992,7 +1987,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static List<LSFClassSet> resolveParamRefClasses(List<? extends LSFAbstractParamReference> refs) {
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        List<LSFClassSet> result = new ArrayList<>();
         for (LSFAbstractParamReference ref : refs)
             result.add(ref.resolveClass());
         return result;
@@ -2000,7 +1995,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static List<LSFExClassSet> resolveExprClasses(List<LSFPropertyExpression> exprs, @Nullable InferExResult inferred) {
-        List<LSFExClassSet> result = new ArrayList<LSFExClassSet>();
+        List<LSFExClassSet> result = new ArrayList<>();
         for (LSFPropertyExpression expr : exprs)
             result.add(expr.resolveInferredValueClass(inferred));
         return result;
@@ -2008,7 +2003,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static List<LSFExClassSet> resolveParamExprClasses(List<LSFExprParameterUsage> exprs) {
-        List<LSFExClassSet> result = new ArrayList<LSFExClassSet>();
+        List<LSFExClassSet> result = new ArrayList<>();
         for (LSFExprParameterUsage expr : exprs)
             result.add(resolveInferredValueClass(expr, null));
         return result;
@@ -2021,20 +2016,20 @@ public class LSFPsiImplUtil {
         }
         LSFNonEmptyClassParamDeclareList ne = sourceStatement.getNonEmptyClassParamDeclareList();
         if (ne != null) {
-            List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+            List<LSFClassSet> result = new ArrayList<>();
             for (LSFClassParamDeclare decl : ne.getClassParamDeclareList())
                 result.add(decl.resolveClass());
             return result;
         }
 
-        return new ArrayList<LSFClassSet>();
+        return new ArrayList<>();
     }
 
     public static List<LSFObjectUsage> getObjectUsageList(LSFObjectUsageList objectUsageList) {
         LSFNonEmptyObjectUsageList neList = objectUsageList.getNonEmptyObjectUsageList();
         if (neList != null)
             return neList.getObjectUsageList();
-        return new ArrayList<LSFObjectUsage>();
+        return new ArrayList<>();
     }
 
     @Nullable
@@ -2069,7 +2064,7 @@ public class LSFPsiImplUtil {
     private static List<LSFClassSet> finishParamClasses(LSFNonEmptyPropertyExpressionList nonEmpty) {
         if (nonEmpty != null)
             return LSFExClassSet.fromEx(resolveParamClasses(nonEmpty));
-        return new ArrayList<LSFClassSet>();
+        return new ArrayList<>();
     }
 
     public static List<LSFExClassSet> resolveParamClasses(@NotNull LSFExprParameterUsageList sourceStatement) {
@@ -2084,7 +2079,7 @@ public class LSFPsiImplUtil {
     public static List<LSFPropertyExpression> getList(LSFPropertyExpressionList peList) {
         LSFNonEmptyPropertyExpressionList nepeList = peList.getNonEmptyPropertyExpressionList();
         if(nepeList == null)
-            return new ArrayList<LSFPropertyExpression>();
+            return new ArrayList<>();
         else
             return nepeList.getPropertyExpressionList();
     }
@@ -2108,7 +2103,7 @@ public class LSFPsiImplUtil {
         LSFPartitionPropertyBy by = sourceStatement.getPartitionPropertyBy();
         if (by != null)
             return finishParamClasses(by.getNonEmptyPropertyExpressionList());
-        return new ArrayList<LSFClassSet>();
+        return new ArrayList<>();
     }
 
     @Nullable
@@ -2159,7 +2154,7 @@ public class LSFPsiImplUtil {
     private static List<LSFFormObjectDeclaration> getObjectDecls(LSFFormCommonGroupObject commonGroup) {
         LSFFormSingleGroupObjectDeclaration singleGroup = commonGroup.getFormSingleGroupObjectDeclaration();
         if (singleGroup != null)
-            return Collections.singletonList(singleGroup.getFormObjectDeclaration());
+            return singletonList(singleGroup.getFormObjectDeclaration());
 
         LSFFormMultiGroupObjectDeclaration formMultiGroupObjectDeclaration = commonGroup.getFormMultiGroupObjectDeclaration();
 
@@ -2222,7 +2217,7 @@ public class LSFPsiImplUtil {
         if (peList.size() == 1)
             return inferParamClasses(peList.get(0), valueClass);
 
-        List<Inferred> maps = new ArrayList<Inferred>();
+        List<Inferred> maps = new ArrayList<>();
         for (LSFXorPE xorPe : peList)
             maps.add(inferParamClasses(xorPe, null)); // подойдут все классы, так как boolean
         return Inferred.orClasses(maps);
@@ -2234,7 +2229,7 @@ public class LSFPsiImplUtil {
         if (peList.size() == 1)
             return inferParamClasses(peList.get(0), valueClass);
 
-        List<Inferred> maps = new ArrayList<Inferred>();
+        List<Inferred> maps = new ArrayList<>();
         for (LSFAndPE andPe : peList)
             maps.add(inferParamClasses(andPe, null)); // подойдут все классы, так как boolean
         return Inferred.orClasses(maps);
@@ -2246,7 +2241,7 @@ public class LSFPsiImplUtil {
         if (peList.size() == 1)
             return inferParamClasses(peList.get(0), valueClass);
 
-        List<Inferred> maps = new ArrayList<Inferred>();
+        List<Inferred> maps = new ArrayList<>();
         for (LSFNotPE notPE : peList)
             maps.add(inferParamClasses(notPE, null)); // подойдут все классы, так как boolean
         return Inferred.andClasses(maps);
@@ -2288,7 +2283,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFAdditiveORPE sourceStatement, @Nullable LSFExClassSet valueClass) {
-        List<Inferred> maps = new ArrayList<Inferred>();
+        List<Inferred> maps = new ArrayList<>();
         for (LSFAdditivePE additivePE : sourceStatement.getAdditivePEList())
             maps.add(inferParamClasses(additivePE, valueClass));
         return Inferred.orClasses(maps);
@@ -2296,7 +2291,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFAdditivePE sourceStatement, @Nullable LSFExClassSet valueClass) {
-        List<Inferred> maps = new ArrayList<Inferred>();
+        List<Inferred> maps = new ArrayList<>();
         for (LSFMultiplicativePE additivePE : sourceStatement.getMultiplicativePEList())
             maps.add(inferParamClasses(additivePE, valueClass));
         return Inferred.andClasses(maps);
@@ -2304,7 +2299,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFMultiplicativePE sourceStatement, @Nullable LSFExClassSet valueClass) {
-        List<Inferred> maps = new ArrayList<Inferred>();
+        List<Inferred> maps = new ArrayList<>();
         for (LSFUnaryMinusPE additivePE : sourceStatement.getUnaryMinusPEList())
             maps.add(inferParamClasses(additivePE, valueClass));
         return Inferred.andClasses(maps);
@@ -2388,7 +2383,7 @@ public class LSFPsiImplUtil {
 
         List<LSFPropertyExpression> list = getList(peList);
 
-        List<Inferred> classes = new ArrayList<Inferred>();
+        List<Inferred> classes = new ArrayList<>();
         for (int i = 0; i < list.size(); i++)
             classes.add(inferParamClasses(list.get(i), joinClasses != null && i < joinClasses.size() ? joinClasses.get(i) : null));
         return Inferred.andClasses(classes);
@@ -2423,7 +2418,7 @@ public class LSFPsiImplUtil {
                 LSFPropertyExpression pe = pCalcStatement.getPropertyExpression();
                 if (pe != null) {
                     List<LSFExprParamDeclaration> params = pe.resolveParams();
-                    joinClasses = new ArrayList<LSFExClassSet>();
+                    joinClasses = new ArrayList<>();
                     InferExResult inferred = inferParamClasses(pe, valueClass).finishEx();
                     for (LSFExprParamDeclaration param : params)
                         joinClasses.add(inferred.get(param));
@@ -2459,7 +2454,7 @@ public class LSFPsiImplUtil {
         if (list.size() == 0)
             return Inferred.EMPTY;
 
-        List<Inferred> classes = new ArrayList<Inferred>();
+        List<Inferred> classes = new ArrayList<>();
         for (LSFPropertyExpression expr : list)
             classes.add(inferParamClasses(expr, valueClass));
         return Inferred.orClasses(classes);
@@ -2505,7 +2500,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFCasePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
-        List<Inferred> list = new ArrayList<Inferred>();
+        List<Inferred> list = new ArrayList<>();
         for (LSFCaseBranchBody caseBranch : sourceStatement.getCaseBranchBodyList()) {
             List<LSFPropertyExpression> peList = caseBranch.getPropertyExpressionList();
 
@@ -2527,7 +2522,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFPartitionPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
-        List<Inferred> classes = new ArrayList<Inferred>();
+        List<Inferred> classes = new ArrayList<>();
         classes.add(inferExpressionParamClasses(sourceStatement.getPropertyExpression(), valueClass));
 
         LSFPartitionPropertyBy partitionBy = sourceStatement.getPartitionPropertyBy();
@@ -2567,7 +2562,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFStructCreationPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
-        List<Inferred> classes = new ArrayList<Inferred>();
+        List<Inferred> classes = new ArrayList<>();
         LSFNonEmptyPropertyExpressionList nonEmptyPropertyExpressionList = sourceStatement.getNonEmptyPropertyExpressionList();
         if (nonEmptyPropertyExpressionList == null) {
             return Inferred.EMPTY;
@@ -2702,7 +2697,7 @@ public class LSFPsiImplUtil {
         }
 
         List<LSFExprParameterUsage> list = exprParameterUsageList.getExprParameterUsageList();
-        List<Inferred> classes = new ArrayList<Inferred>();
+        List<Inferred> classes = new ArrayList<>();
         for (int i = 0; i < list.size(); i++)
             classes.add(inferParamClasses(list.get(i), joinClasses != null && i < joinClasses.size() ? joinClasses.get(i) : null));
         return Inferred.andClasses(classes);
@@ -2761,7 +2756,7 @@ public class LSFPsiImplUtil {
 
     public static Inferred inferActionParamClasses(LSFCaseActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         // берем условия for, если есть, для остальных из внутреннего action'а 
-        List<Inferred> list = new ArrayList<Inferred>();
+        List<Inferred> list = new ArrayList<>();
         for (LSFActionCaseBranchBody caseBranch : body.getActionCaseBranchBodyList()) {
             LSFPropertyExpression whenExpression = caseBranch.getPropertyExpression();
             Inferred inferred = Inferred.EMPTY;
@@ -2787,7 +2782,7 @@ public class LSFPsiImplUtil {
             return Inferred.EMPTY;
         }
 
-        List<Inferred> list = new ArrayList<Inferred>();
+        List<Inferred> list = new ArrayList<>();
         for (LSFActionPropertyDefinitionBody action : nonEmptyActionPDBList.getActionPropertyDefinitionBodyList()) {
             list.add(inferActionParamClasses(action, params));
         }
@@ -2799,9 +2794,9 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFFormActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        List<Inferred> list = new ArrayList<Inferred>();
+        List<Inferred> list = new ArrayList<>();
 
-        List<LSFFormActionObjectUsage> objectMap = new ArrayList<LSFFormActionObjectUsage>();
+        List<LSFFormActionObjectUsage> objectMap = new ArrayList<>();
         LSFFormActionObjectList objects = body.getFormActionObjectList();
         if (objects != null)
             objectMap.addAll(objects.getFormActionObjectUsageList());
@@ -2846,7 +2841,7 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFEmailActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        List<Inferred> list = new ArrayList<Inferred>();
+        List<Inferred> list = new ArrayList<>();
 
         List<LSFFormEmailToObjects> objects = body.getFormEmailToObjectsList();
         for (LSFFormEmailToObjects object : objects) {
@@ -3042,7 +3037,7 @@ public class LSFPsiImplUtil {
             return Collections.emptyList();
         }
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (LSFClassName className : ne.getClassNameList()) {
             result.add(getMigrationClassName(className));
         }

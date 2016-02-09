@@ -2,7 +2,7 @@ package com.lsfusion.lang.typeinfer;
 
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LogicalClass;
-import com.sun.istack.internal.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ public class LSFExClassSet {
     }
 
     public static <T> Map<T, LSFExClassSet> toEx(Map<T, LSFClassSet> classes) {
-        Map<T, LSFExClassSet> result = new HashMap<T, LSFExClassSet>();
+        Map<T, LSFExClassSet> result = new HashMap<>();
         for(Map.Entry<T, LSFClassSet> paramClass : classes.entrySet()) {
             result.put(paramClass.getKey(), new LSFExClassSet(paramClass.getValue(), false));
         }
@@ -44,7 +44,7 @@ public class LSFExClassSet {
     }
 
     public static <T> Map<T, LSFClassSet> fromEx(Map<T, LSFExClassSet> classes) {
-        Map<T, LSFClassSet> result = new HashMap<T, LSFClassSet>();
+        Map<T, LSFClassSet> result = new HashMap<>();
         for(Map.Entry<T, LSFExClassSet> paramClass : classes.entrySet()) {
             result.put(paramClass.getKey(), fromEx(paramClass.getValue()));
         }
@@ -55,7 +55,7 @@ public class LSFExClassSet {
         if(classes == null)
             return null;
         
-        List<LSFExClassSet> result = new ArrayList<LSFExClassSet>();
+        List<LSFExClassSet> result = new ArrayList<>();
         for(LSFClassSet paramClass : classes) {
             result.add(toEx(paramClass));
         }
@@ -66,7 +66,7 @@ public class LSFExClassSet {
         if(classes == null)
             return null;
         
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        List<LSFClassSet> result = new ArrayList<>();
         for(LSFExClassSet paramClass : classes) {
             result.add(fromEx(paramClass));
         }

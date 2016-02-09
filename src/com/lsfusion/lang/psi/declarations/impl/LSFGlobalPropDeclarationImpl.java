@@ -27,7 +27,7 @@ import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.refactoring.ElementMigration;
 import com.lsfusion.refactoring.PropertyMigration;
 import com.lsfusion.util.BaseUtils;
-import org.apache.commons.lang.StringUtils;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -176,7 +176,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         List<LSFExClassSet> declareClasses = null;
         if (cpd != null) {
             declareClasses = LSFExClassSet.toEx(LSFPsiImplUtil.resolveExplicitClass(cpd.getClassParamDeclareList()));
-            if (LSFPsiImplUtil.allClassesDeclared(declareClasses)) // оптимизация
+            if (LSFPsiUtils.allClassesDeclared(declareClasses)) // оптимизация
                 return declareClasses;
         }
 
@@ -187,7 +187,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         if (declareClasses == null)
             return valueClasses;
 
-        List<LSFExClassSet> mixed = new ArrayList<LSFExClassSet>(declareClasses);
+        List<LSFExClassSet> mixed = new ArrayList<>(declareClasses);
         for (int i = 0, size = declareClasses.size(); i < size; i++) {
             if (i >= valueClasses.size())
                 break;
@@ -224,7 +224,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         if (resultClasses == null)
             return null;
         
-        resultClasses = new ArrayList<LSFExClassSet>(resultClasses);
+        resultClasses = new ArrayList<>(resultClasses);
 
         //        LSFActionStatement action = sourceStatement.getActionPropertyDefinition();
 //        return 
@@ -261,7 +261,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             LSFActionStatement actionDef = getActionStatement();
             if(actionDef != null) {
                 if (params != null) // может быть action unfriendly
-                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<LSFExprParamDeclaration>(params)).finishEx();
+                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getActionPropertyDefinitionBody(), new HashSet<>(params)).finishEx();
             }
         }
 
@@ -464,7 +464,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         }
         Collection<PsiReference> refs = ReferencesSearch.search(nameIdentifier, GlobalSearchScope.allScope(getProject())).findAll();
 
-        List<PsiElement> result = new ArrayList<PsiElement>();
+        List<PsiElement> result = new ArrayList<>();
         for (PsiReference ref : refs) {
             LSFOverrideStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) ref, LSFOverrideStatement.class);
             if (overrideStatement != null && ref.equals(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage())) {
@@ -508,7 +508,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
     
     public boolean resolveDuplicateColumns() {
-        CollectionQuery<LSFGlobalPropDeclaration> declarations = new CollectionQuery<LSFGlobalPropDeclaration>(
+        CollectionQuery<LSFGlobalPropDeclaration> declarations = new CollectionQuery<>(
                 LSFGlobalResolver.findElements(
                         getDeclName(), null, getLSFFile(), getTypes(), getFindDuplicateColumnsCondition(), Finalizer.EMPTY
                 )
@@ -655,13 +655,13 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
     
     public static Set<LSFPropDeclaration> getPropDependencies(LSFPropDeclaration prop) {
-        Set<LSFPropDeclaration> result = new HashSet<LSFPropDeclaration>();
+        Set<LSFPropDeclaration> result = new HashSet<>();
 
         Collection<LSFPropReference> propReferences;
 
         if (prop instanceof LSFGlobalPropDeclaration && prop.isAbstract()) {
             Collection<PsiReference> references = ReferencesSearch.search(prop.getNameIdentifier()).findAll();
-            propReferences = new ArrayList<LSFPropReference>();
+            propReferences = new ArrayList<>();
             for (PsiReference reference : references) {
                 LSFOverrideStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) reference, LSFOverrideStatement.class);
                 if (overrideStatement != null && reference.equals(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage())) {
@@ -690,9 +690,9 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
     
     public static Set<LSFPropDeclaration> getPropDependents(LSFPropDeclaration prop) {
-        Set<LSFPropDeclaration> result = new HashSet<LSFPropDeclaration>();
+        Set<LSFPropDeclaration> result = new HashSet<>();
 
-        Set<PsiReference> refs = new HashSet<PsiReference>(ReferencesSearch.search(prop.getNameIdentifier(), prop.getUseScope()).findAll());
+        Set<PsiReference> refs = new HashSet<>(ReferencesSearch.search(prop.getNameIdentifier(), prop.getUseScope()).findAll());
 
         for (PsiReference ref : refs) {
             LSFPropDeclaration dependent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFPropDeclaration.class);
