@@ -6,15 +6,28 @@ import com.intellij.openapi.project.Project;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 
 public class MetaCodeEnableAction extends AnAction {
              
     @Override
     public void actionPerformed(AnActionEvent e) {
         final Project project = getEventProject(e); // not to share context
-        int result = JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(), 
-                "Are you sure you want to toggle meta code mode?", "Confirm Meta Action", JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.OK_OPTION) {
+        
+        boolean doToggle = true;
+        if (e.getInputEvent() instanceof KeyEvent) {
+            boolean enabled = MetaChangeDetector.getInstance(project).getMetaEnabled();
+            int result = JOptionPane.showConfirmDialog(
+                    JOptionPane.getRootFrame(),
+                    "Are you sure you want to " + (enabled ? "disable" : "enable") + " meta code?", 
+                    (enabled ? "Disable" : "Enable") + " Meta Action", 
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (result != JOptionPane.OK_OPTION) {
+                doToggle = false;
+            }
+        }
+        if (doToggle) {
             MetaChangeDetector.getInstance(project).toggleMetaEnabled();
         }
     }
