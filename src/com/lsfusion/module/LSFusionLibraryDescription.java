@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class LSFusionLibraryDescription extends CustomLibraryDescription {
 
-    private static final String LSFUSION_SERVER_LIBRARY_PATTERN = "lsfusion-server-(.*)\\.jar";
+    private static final String LSFUSION_SERVER_LIBRARY_PATTERN = "lsfusion.*server.*\\.jar";
 
 
     @NotNull
@@ -53,15 +53,12 @@ public class LSFusionLibraryDescription extends CustomLibraryDescription {
             return null;
         }
 
-        final String[] jarNameAndVersion = getLSFusionServerFileAndVersion(dir);
-        if (jarNameAndVersion == null) {
+        final String jarName = getLSFusionServerFileName(dir);
+        if (jarName == null) {
             return null;
         }
 
-        final String jarName = jarNameAndVersion[0];
-        final String version = jarNameAndVersion[1];
-
-        return new NewLibraryConfiguration("lsFusion-server" + "-" + version) {
+        return new NewLibraryConfiguration(jarName) {
             @Override
             public void addRoots(@NotNull LibraryEditor libraryEditor) {
                 libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(new File(jarName)), OrderRootType.CLASSES);
@@ -70,10 +67,10 @@ public class LSFusionLibraryDescription extends CustomLibraryDescription {
     }
 
     public static boolean isLSFusionServerDirectory(VirtualFile file) {
-        return getLSFusionServerFileAndVersion(file) != null;
+        return getLSFusionServerFileName(file) != null;
     }
 
-    public static String[] getLSFusionServerFileAndVersion(VirtualFile directory) {
+    public static String getLSFusionServerFileName(VirtualFile directory) {
         if (directory != null && directory.isDirectory()) {
             final String path = directory.getPath();
             final Pattern pattern = Pattern.compile(LSFUSION_SERVER_LIBRARY_PATTERN);
@@ -88,8 +85,8 @@ public class LSFusionLibraryDescription extends CustomLibraryDescription {
                 File jarFile = serverFiles[0];
                 String jarName = jarFile.getName();
                 Matcher matcher = pattern.matcher(jarName);
-                if (matcher.matches() && matcher.groupCount() == 1) {
-                    return new String[]{ jarFile.getPath(), matcher.group(1) };
+                if (matcher.matches()) {
+                    return jarFile.getPath();
                 }
             }
         }

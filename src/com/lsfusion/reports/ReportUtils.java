@@ -53,7 +53,7 @@ public class ReportUtils {
     }
 
     public static List<PsiFile> findReportFiles(LSFFormDeclaration decl) {
-        List<PsiFile> files = new ArrayList<PsiFile>();
+        List<PsiFile> files = new ArrayList<>();
         
         String namespace = decl.getNamespaceName();
         String name = decl.getDeclName();
