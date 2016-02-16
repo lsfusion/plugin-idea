@@ -213,7 +213,7 @@ public class FormEntity {
             propertyDraw = new PropertyDrawEntity(alias, propUsage.getNameRef(), objects, propDeclaration, commonOptions, formPropertyOptions, this);
         } else {
             LSFPredefinedFormPropertyName predef = formPropertyName.getPredefinedFormPropertyName();
-            if (predef != null) {
+            if (predef != null && groupObject != null) {
                 String name = predef.getName();
                 if ("OBJVALUE".equals(name)) {
                     propertyDraw = new ObjectValueProperty(alias, groupObject, commonOptions, formPropertyOptions, this);
