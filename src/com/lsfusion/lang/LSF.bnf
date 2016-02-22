@@ -1117,7 +1117,7 @@ formEventsList ::= EVENTS formEventDeclaration (COMMA formEventDeclaration)* {pi
 
 formEventDeclaration ::= ON
                         (    OK
-                        |    APPLY
+                        |    APPLY (BEFORE | AFTER)
                         |    CLOSE
                         |    INIT
                         |    CANCEL
