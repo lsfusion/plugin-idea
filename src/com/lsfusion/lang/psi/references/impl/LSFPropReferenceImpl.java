@@ -56,8 +56,10 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         public boolean execute(@NotNull PsiElement element, ResolveState state) {
             if(element instanceof LSFLocalPropDeclaration) {
                 LSFLocalPropDeclaration decl = (LSFLocalPropDeclaration) element;
-                if (decl.getName().equals(name) && condition.value(decl))
+                String declName = decl.getName();
+                if (declName != null && declName.equals(this.name) && condition.value(decl)) {
                     found.add(decl);
+                }
             }
             return true;
         }
