@@ -34,6 +34,7 @@ import com.jgraph.layout.tree.JGraphTreeLayout;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.dependencies.module.DependencySpeedSearch;
 import org.jgraph.JGraph;
+import org.jgraph.graph.AttributeMap;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.GraphConstants;
 import org.jgrapht.ext.JGraphModelAdapter;
@@ -466,10 +467,12 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     public void selectNode(GraphNode node) {
-        selectedInSearch = node;
-        recolorGraph(false);
-        if (selectedInSearch != null) {
-            scrollToNode(selectedInSearch);
+        if (selectedInSearch == null || !selectedInSearch.equals(node)) {
+            selectedInSearch = node;
+            recolorGraph(false);
+            if (selectedInSearch != null) {
+                scrollToNode(selectedInSearch);
+            }
         }
     }
 
@@ -503,10 +506,13 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             DefaultGraphCell cell = m_jgAdapter.getVertexCell(node);
             if (cell != null) {
                 Map attr = cell.getAttributes();
-                GraphConstants.setAutoSize(attr, true);
-                GraphConstants.setInset(attr, 3);
+                Map newAttr = new AttributeMap(attr);
+                GraphConstants.setAutoSize(newAttr, true);
+                GraphConstants.setInset(newAttr, 3);
 
-                cellAttr.put(cell, attr);
+                if (!newAttr.equals(attr)) {
+                    cellAttr.put(cell, newAttr);
+                }
             }
         }
 
@@ -514,12 +520,15 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             DefaultGraphCell cell = m_jgAdapter.getEdgeCell(gEdge);
             if (cell != null) {
                 Map attr = cell.getAttributes();
-                GraphConstants.setLabelEnabled(attr, false);
-                GraphConstants.setLineEnd(attr, GraphConstants.ARROW_CLASSIC);
-                GraphConstants.setDisconnectable(attr, false);
-                GraphConstants.setSelectable(attr, false);
+                Map newAttr = new AttributeMap(attr);
+                GraphConstants.setLabelEnabled(newAttr, false);
+                GraphConstants.setLineEnd(newAttr, GraphConstants.ARROW_CLASSIC);
+                GraphConstants.setDisconnectable(newAttr, false);
+                GraphConstants.setSelectable(newAttr, false);
 
-                cellAttr.put(cell, attr);
+                if (!newAttr.equals(attr)) {
+                    cellAttr.put(cell, newAttr);
+                }
             }
         }
 
@@ -541,6 +550,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             DefaultGraphCell cell = m_jgAdapter.getVertexCell(node);
             if (cell != null) {
                 Map attr = cell.getAttributes();
+
+                Map newAttr = new AttributeMap(attr);
                 Color background;
 
                 if (node == selectedInSearch) {
@@ -554,16 +565,18 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 } else {
                     background = getDependencyNodeColor(node);
                 }
-                GraphConstants.setBackground(attr, background);
+                GraphConstants.setBackground(newAttr, background);
                 
                 if (redraw) {
                     Border nodeBorder = getNodeBorder(node);
                     if (nodeBorder != null) {
-                        GraphConstants.setBorder(attr, new CompoundBorder(nodeBorder, GraphConstants.getBorder(attr)));
+                        GraphConstants.setBorder(newAttr, new CompoundBorder(nodeBorder, GraphConstants.getBorder(attr)));
                     }
                 }
 
-                cellAttr.put(cell, attr);
+                if (!newAttr.equals(attr)) {
+                    cellAttr.put(cell, newAttr);
+                }
             }
         }
 
@@ -572,19 +585,22 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             if (cell != null) {
                 Map attr = cell.getAttributes();
 
+                Map newAttr = new AttributeMap(attr);
                 GraphEdge edge = (GraphEdge) gEdge;
                 if (path != null && path.contains(edge)) {
-                    GraphConstants.setLineColor(attr, getPathEdgeColor());
-                    GraphConstants.setLineWidth(attr, 2);
+                    GraphConstants.setLineColor(newAttr, getPathEdgeColor());
+                    GraphConstants.setLineWidth(newAttr, 2);
                 } else if ((edge.getSource()).isDependent()) {
-                    GraphConstants.setLineColor(attr, getDependentEdgeColor());
-                    GraphConstants.setLineWidth(attr, 1);
+                    GraphConstants.setLineColor(newAttr, getDependentEdgeColor());
+                    GraphConstants.setLineWidth(newAttr, 1);
                 } else {
-                    GraphConstants.setLineColor(attr, getDependencyEdgeColor());
-                    GraphConstants.setLineWidth(attr, 1);
+                    GraphConstants.setLineColor(newAttr, getDependencyEdgeColor());
+                    GraphConstants.setLineWidth(newAttr, 1);
                 }
 
-                cellAttr.put(cell, attr);
+                if (!newAttr.equals(attr)) {
+                    cellAttr.put(cell, newAttr);
+                }
             }
         }
 
