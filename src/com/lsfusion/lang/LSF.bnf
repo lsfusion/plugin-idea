@@ -616,6 +616,7 @@ formActionPropertyDefinitionBody ::=
 		(CHECK)? (SHOWDROP)? (NOCANCEL)?
 		(formPrintTypeLiteral)?
 		(formExportLiteral)?
+		(READONLY)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
