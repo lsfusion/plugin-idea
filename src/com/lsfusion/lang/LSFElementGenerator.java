@@ -150,7 +150,7 @@ public class LSFElementGenerator {
         }
         text += "}";
         final PsiFile dummyFile = createDummyFile(project, text);
-        return new ArrayList<LSFComponentDeclaration>(PsiTreeUtil.findChildrenOfType(dummyFile, LSFComponentDeclaration.class));    
+        return new ArrayList<>(PsiTreeUtil.findChildrenOfType(dummyFile, LSFComponentDeclaration.class));    
     }
 
     private static Collection<? extends LSFWindowDeclaration> builtInWindows = null;

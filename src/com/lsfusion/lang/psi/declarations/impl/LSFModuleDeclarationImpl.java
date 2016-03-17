@@ -68,12 +68,12 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
 
         LSFPriorityList priorityList = getPriorityList();
         if (priorityList == null)
-            return new ArrayList<LSFNamespaceReference>();
+            return new ArrayList<>();
         LSFNonEmptyNamespaceUsageList nonEmptyNamespaceUsageList = priorityList.getNonEmptyNamespaceUsageList();
         if (nonEmptyNamespaceUsageList == null) {
             return Collections.emptyList();
         }
-        return BaseUtils.<LSFNamespaceReference, LSFNamespaceUsage>immutableCast(nonEmptyNamespaceUsageList.getNamespaceUsageList());
+        return BaseUtils.immutableCast(nonEmptyNamespaceUsageList.getNamespaceUsageList());
     }
 
     @Override
@@ -89,17 +89,17 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
 
         LSFRequireList requireList = getRequireList();
         if (requireList == null)
-            return new ArrayList<LSFModuleReference>();
+            return new ArrayList<>();
         LSFNonEmptyModuleUsageList nonEmptyModuleUsageList = requireList.getNonEmptyModuleUsageList();
         if (nonEmptyModuleUsageList == null) {
             return Collections.emptyList();
         }
-        return BaseUtils.<LSFModuleReference, LSFModuleUsage>immutableCast(nonEmptyModuleUsageList.getModuleUsageList());
+        return BaseUtils.immutableCast(nonEmptyModuleUsageList.getModuleUsageList());
     }
 
     @Override
     public List<LSFModuleDeclaration> getRequireModules() {
-        List<LSFModuleDeclaration> result = new ArrayList<LSFModuleDeclaration>();
+        List<LSFModuleDeclaration> result = new ArrayList<>();
         List<LSFModuleReference> requireRefs = getRequireRefs();
         for (LSFModuleReference ref : requireRefs) {
             LSFModuleDeclaration moduleDecl = ref.resolveDecl();

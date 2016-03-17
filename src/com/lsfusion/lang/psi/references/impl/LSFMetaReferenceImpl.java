@@ -4,10 +4,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
-import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
@@ -94,7 +92,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public LSFResolveResult resolveNoCache() {
-        Collection<LSFMetaCodeDeclarationStatement> declarations = new ArrayList<LSFMetaCodeDeclarationStatement>((Collection<? extends LSFMetaCodeDeclarationStatement>) super.resolveNoCache().declarations);
+        Collection<LSFMetaCodeDeclarationStatement> declarations = new ArrayList<>((Collection<? extends LSFMetaCodeDeclarationStatement>) super.resolveNoCache().declarations);
 
         LSFResolveResult.ErrorAnnotator errorAnnotator = null;
         if (declarations.size() > 1) {
@@ -113,7 +111,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
         String description = "";
         int i = 1;
-        List<LSFMetaCodeDeclarationStatement> decls = new ArrayList<LSFMetaCodeDeclarationStatement>((Collection<? extends LSFMetaCodeDeclarationStatement>) declarations);
+        List<LSFMetaCodeDeclarationStatement> decls = new ArrayList<>((Collection<? extends LSFMetaCodeDeclarationStatement>) declarations);
         for (LSFMetaCodeDeclarationStatement decl : decls) {
             description += decl.getPresentableText();
 
@@ -159,7 +157,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public List<MetaTransaction.InToken> getUsageParams() {
-        List<MetaTransaction.InToken> result = new ArrayList<MetaTransaction.InToken>();
+        List<MetaTransaction.InToken> result = new ArrayList<>();
         for (LSFMetaCodeId id : getMetaCodeIdList().getMetaCodeIdList())
             result.add(MetaTransaction.parseToken(id));
         return result;

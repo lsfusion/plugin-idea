@@ -18,7 +18,7 @@ public class RegularFilterGroupView extends ComponentView {
     private FormView form;
     public RegularFilterGroupEntity entity;
 
-    private List<RegularFilterView> filters = new ArrayList<RegularFilterView>();
+    private List<RegularFilterView> filters = new ArrayList<>();
 
     public RegularFilterGroupView(FormView form, RegularFilterGroupEntity entity) {
         super(entity.sID);
@@ -63,7 +63,7 @@ public class RegularFilterGroupView extends ComponentView {
             RegularFilterEntity filterEntity = filters.get(0).entity;
             return new JBCheckBox(filterEntity.getFullCaption(), filterEntity.isDefault);
         } else {
-            List<Object> items = new ArrayList<Object>();
+            List<Object> items = new ArrayList<>();
             Object defaultItem = "(Все)";
             items.add(defaultItem);
             for (RegularFilterView regFilter : filters) {

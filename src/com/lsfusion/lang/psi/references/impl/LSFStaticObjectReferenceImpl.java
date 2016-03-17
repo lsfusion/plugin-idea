@@ -22,7 +22,7 @@ public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFS
 
     @Override
     public LSFResolveResult resolveNoCache() {
-        List<LSFStaticObjectDeclaration> decls = new ArrayList<LSFStaticObjectDeclaration>();
+        List<LSFStaticObjectDeclaration> decls = new ArrayList<>();
         for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(getCustomClassUsage().resolveDecl(), LSFStubElementTypes.EXTENDCLASS, getLSFFile())) {
             for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {
                 if (getSimpleName().getName() != null && staticDecl != null && getSimpleName().getName().equals(staticDecl.getName())) {

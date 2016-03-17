@@ -3,6 +3,7 @@ package com.lsfusion.design.model;
 import com.intellij.designer.model.PropertiesContainer;
 import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBPanel;
@@ -380,12 +381,12 @@ public abstract class ComponentView extends PropertiesContainer {
 
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
         JLabel jLabel = new JLabel(getClass().getSimpleName());
-        jLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        jLabel.setBorder(BorderFactory.createLineBorder(JBColor.BLACK, 1));
         return jLabel;
     }
 
     public static <T> List<T> addToList(@NotNull List<T> list, T... rest) {
-        List<T> merged = new ArrayList<T>(list);
+        List<T> merged = new ArrayList<>(list);
         Collections.addAll(merged, rest);
         return merged;
     }

@@ -4,7 +4,6 @@ import com.lsfusion.lang.psi.LSFClassParamDeclareList;
 import com.lsfusion.lang.psi.LSFMappedPropertyClassParamDeclare;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
 import com.lsfusion.util.BaseUtils;
 
 import java.util.List;
@@ -23,6 +22,6 @@ public class ExplicitContextModifier implements ContextModifier {
 
     @Override
     public List<LSFExprParamDeclaration> resolveParams(int offset, Set<LSFExprParamDeclaration> currentParams) {
-        return BaseUtils.<LSFExprParamDeclaration, LSFParamDeclaration>immutableCast(LSFPsiImplUtil.resolveParams(explicit));
+        return BaseUtils.immutableCast(LSFPsiImplUtil.resolveParams(explicit));
     }
 }

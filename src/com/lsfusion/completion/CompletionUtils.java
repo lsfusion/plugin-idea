@@ -98,7 +98,7 @@ public class CompletionUtils {
     }
     
     public static <G extends LSFDeclaration> List<LookupElement> getVariantsFromIndices(String namespace, Project project, Collection<? extends StringStubIndexExtension> indices, double priority, @NotNull GlobalSearchScope scope) {
-        List<LookupElement> result = new ArrayList<LookupElement>();
+        List<LookupElement> result = new ArrayList<>();
 
         try {
             for (StringStubIndexExtension index : indices) {
@@ -129,7 +129,7 @@ public class CompletionUtils {
     }
 
     public static <G extends LSFFullNameDeclaration> List<G> getDeclarationsFromScope(Project project, GlobalSearchScope scope, StringStubIndexExtension index) {
-        List<G> result = new ArrayList<G>();
+        List<G> result = new ArrayList<>();
 
         Collection<String> propKeys = index.getAllKeys(project);
 //        quickLog("After getAllKeys: " + propKeys.size());

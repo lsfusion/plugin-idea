@@ -28,11 +28,11 @@ public abstract class ElementsContextModifier implements ContextModifier {
     }
     
     public List<LSFExprParamDeclaration> resolveParams(int offset, Set<LSFExprParamDeclaration> currentParams) {
-        Set<String> paramNames = new HashSet<String>();
+        Set<String> paramNames = new HashSet<>();
         for(LSFExprParamDeclaration currentParam : currentParams)
             paramNames.add(currentParam.getDeclName());
 
-        List<LSFExprParamDeclaration> extParams = new ArrayList<LSFExprParamDeclaration>();
+        List<LSFExprParamDeclaration> extParams = new ArrayList<>();
         for(PsiElement element : getElements())
             recResolveParams(element, offset, paramNames, extParams);
         return extParams;

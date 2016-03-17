@@ -415,32 +415,41 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         }
 
         JGraphLayout hir = null;
-        if (currentLayout.equals(HIERARCHICAL_LAYOUT)) {
-            hir = new JGraphHierarchicalLayout();
-            ((JGraphHierarchicalLayout) hir).setOrientation(SwingConstants.WEST);
-            ((JGraphHierarchicalLayout) hir).setInterRankCellSpacing(getAverageNodeWidth());
-        } else if (currentLayout.equals(COMPACT_TREE_LAYOUT)) {
-            hir = new JGraphCompactTreeLayout();
-            ((JGraphCompactTreeLayout) hir).setPositionMultipleTrees(true);
-            ((JGraphCompactTreeLayout) hir).setLevelDistance(getAverageNodeWidth());
-            ((JGraphCompactTreeLayout) hir).setOrientation(SwingConstants.WEST);
-        } else if (currentLayout.equals(TREE_LAYOUT)) {
-            hir = new JGraphTreeLayout();
-            ((JGraphTreeLayout) hir).setPositionMultipleTrees(true);
-            ((JGraphTreeLayout) hir).setOrientation(SwingConstants.WEST);
-            ((JGraphTreeLayout) hir).setLevelDistance(getAverageNodeWidth());
-        } else if (currentLayout.equals(SIMPLE_LAYOUT)) {
-            hir = new JGraphSimpleLayout(JGraphSimpleLayout.TYPE_CIRCLE);
-        } else if (currentLayout.equals(ORGANIC_LAYOUT)) {
-            hir = new JGraphOrganicLayout();
-        } else if (currentLayout.equals(FAST_ORGANIC_LAYOUT)) {
-            hir = new JGraphFastOrganicLayout();
-            ((JGraphFastOrganicLayout) hir).setForceConstant(150);
-        } else if (currentLayout.equals(RADIAL_TREE_LAYOUT)) {
-            hir = new JGraphRadialTreeLayout();
-            ((JGraphRadialTreeLayout) hir).setRadiusx(getAverageNodeWidth());
-        } else if (currentLayout.equals(SELF_ORGANIZING_ORGANIC_LAYOUT)) {
-            hir = new JGraphSelfOrganizingOrganicLayout();
+        switch (currentLayout) {
+            case HIERARCHICAL_LAYOUT:
+                hir = new JGraphHierarchicalLayout();
+                ((JGraphHierarchicalLayout) hir).setOrientation(SwingConstants.WEST);
+                ((JGraphHierarchicalLayout) hir).setInterRankCellSpacing(getAverageNodeWidth());
+                break;
+            case COMPACT_TREE_LAYOUT:
+                hir = new JGraphCompactTreeLayout();
+                ((JGraphCompactTreeLayout) hir).setPositionMultipleTrees(true);
+                ((JGraphCompactTreeLayout) hir).setLevelDistance(getAverageNodeWidth());
+                ((JGraphCompactTreeLayout) hir).setOrientation(SwingConstants.WEST);
+                break;
+            case TREE_LAYOUT:
+                hir = new JGraphTreeLayout();
+                ((JGraphTreeLayout) hir).setPositionMultipleTrees(true);
+                ((JGraphTreeLayout) hir).setOrientation(SwingConstants.WEST);
+                ((JGraphTreeLayout) hir).setLevelDistance(getAverageNodeWidth());
+                break;
+            case SIMPLE_LAYOUT:
+                hir = new JGraphSimpleLayout(JGraphSimpleLayout.TYPE_CIRCLE);
+                break;
+            case ORGANIC_LAYOUT:
+                hir = new JGraphOrganicLayout();
+                break;
+            case FAST_ORGANIC_LAYOUT:
+                hir = new JGraphFastOrganicLayout();
+                ((JGraphFastOrganicLayout) hir).setForceConstant(150);
+                break;
+            case RADIAL_TREE_LAYOUT:
+                hir = new JGraphRadialTreeLayout();
+                ((JGraphRadialTreeLayout) hir).setRadiusx(getAverageNodeWidth());
+                break;
+            case SELF_ORGANIZING_ORGANIC_LAYOUT:
+                hir = new JGraphSelfOrganizingOrganicLayout();
+                break;
         }
 
         try {

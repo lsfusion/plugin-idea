@@ -57,9 +57,9 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
         if (LSFParserDefinition.isWhiteSpaceOrComment(node.getElementType())) {
             if (prev) {
                 recReadMetaWhiteSpaceOrComments(node.getTreePrev(), prev, tokens);
-                tokens.add(new Pair<String, IElementType>(node.getText(), node.getElementType()));
+                tokens.add(Pair.create(node.getText(), node.getElementType()));
             } else {
-                tokens.add(new Pair<String, IElementType>(node.getText(), node.getElementType()));
+                tokens.add(Pair.create(node.getText(), node.getElementType()));
                 recReadMetaWhiteSpaceOrComments(node.getTreeNext(), prev, tokens);
             }
         }
@@ -88,20 +88,20 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
             return Collections.emptyList();
         }
 
-        List<Pair<String, IElementType>> tokens = new ArrayList<Pair<String, IElementType>>();
+        List<Pair<String, IElementType>> tokens = new ArrayList<>();
 
         ASTNode node = anyTokens.getNode();
 
         readMetaWhiteSpaceOrComments(node, true, tokens);
         for (ASTNode anyToken : node.getChildren(null))
-            tokens.add(new Pair<String, IElementType>(anyToken.getText(), anyToken.getElementType()));
+            tokens.add(Pair.create(anyToken.getText(), anyToken.getElementType()));
         readMetaWhiteSpaceOrComments(node, false, tokens);
         return tokens;
     }
 
     @Override
     public List<String> getDeclParams() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         LSFMetaDeclIdList metaDeclIdList = getMetaDeclIdList();
         if (metaDeclIdList != null) {
             for (LSFMetaDeclId decl : metaDeclIdList.getMetaDeclIdList())

@@ -1,5 +1,6 @@
 package com.lsfusion.design.ui;
 
+import com.intellij.ui.JBColor;
 import com.intellij.ui.table.JBTable;
 
 import javax.swing.*;
@@ -20,14 +21,14 @@ public class SingleCellTable extends JBTable {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (!hasFocus) {
-                    setBackground(Color.white);
+                    setBackground(JBColor.WHITE);
                 }
                 return comp;
             }
         });
         getColumnModel().setColumnMargin(2);
         setRowMargin(2);
-        setBorder(BorderFactory.createLineBorder(Color.gray));
+        setBorder(BorderFactory.createLineBorder(JBColor.GRAY));
     }
 
     @Override

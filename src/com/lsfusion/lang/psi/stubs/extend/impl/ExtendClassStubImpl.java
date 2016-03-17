@@ -40,7 +40,7 @@ public class ExtendClassStubImpl extends ExtendStubImpl<LSFClassExtend, ExtendCl
         super(dataStream, parentStub, type);
 
         thisElement = LSFStringClassRef.deserialize(dataStream);
-        myExtends = new ArrayList<LSFStringClassRef>();
+        myExtends = new ArrayList<>();
         for (int i = 0, size = dataStream.readInt(); i < size; i++) {
             myExtends.add(LSFStringClassRef.deserialize(dataStream));
         }

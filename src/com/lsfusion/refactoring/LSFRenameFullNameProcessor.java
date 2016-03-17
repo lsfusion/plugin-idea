@@ -20,7 +20,10 @@ import com.intellij.util.containers.MultiMap;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.util.LSFFileUtils;
@@ -74,7 +77,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
 
     @Override
     public void prepareRenaming(PsiElement element, String newName, Map<PsiElement, String> allRenames) {
-        cascadePostRenames = new ArrayList<Runnable>(); // just in case
+        cascadePostRenames = new ArrayList<>(); // just in case
 
         LSFPropertyDeclaration propDecl = PsiTreeUtil.getParentOfType(element, LSFPropertyDeclaration.class);
         if (propDecl != null) {
@@ -125,9 +128,9 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     public void renameElement(PsiElement element, String newName, UsageInfo[] usages, @Nullable RefactoringElementListener listener) throws IncorrectOperationException {
         LSFFullNameDeclaration decl = getFullNameDecl(element);
         if(decl != null) {
-            List<Pair<LSFFullNameReference, LSFDeclaration>> possibleConflicts = new ArrayList<Pair<LSFFullNameReference, LSFDeclaration>>();
+            List<Pair<LSFFullNameReference, LSFDeclaration>> possibleConflicts = new ArrayList<>();
             for (LSFFullNameReference possibleConflict : LSFResolver.findFullNameUsages(newName, decl)) {
-                possibleConflicts.add(new Pair<LSFFullNameReference, LSFDeclaration>(possibleConflict, possibleConflict.resolveDecl()));
+                possibleConflicts.add(Pair.create(possibleConflict, possibleConflict.resolveDecl()));
             }
 
             for (UsageInfo usage : usages) {
@@ -161,7 +164,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     }
     
     // нужно заранее делать, потому как в getPostRenameCallback element'ы уже без контекста попадают
-    private List<Runnable> cascadePostRenames = new ArrayList<Runnable>();  
+    private List<Runnable> cascadePostRenames = new ArrayList<>();  
 
     @Nullable
     @Override
@@ -170,7 +173,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
             final Runnable migrationRunnable = getMigrationRunnable(element, newName);
             if(!cascadePostRenames.isEmpty()) {
                 final List<Runnable> fCascadePostRenames = cascadePostRenames;
-                cascadePostRenames = new ArrayList<Runnable>();
+                cascadePostRenames = new ArrayList<>();
                 return new Runnable() {
                     public void run() {
                         if(migrationRunnable != null)

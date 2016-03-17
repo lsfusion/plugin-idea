@@ -1,33 +1,20 @@
 package com.lsfusion.lang.typeinfer;
 
-import com.intellij.extapi.psi.ASTDelegatePsiElement;
-import com.intellij.lang.ASTNode;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.impl.source.codeStyle.CodeEditUtil;
-import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.ProjectScope;
-import com.intellij.psi.tree.IElementType;
-import com.lsfusion.lang.LSFElementGenerator;
-import com.lsfusion.lang.LSFFileType;
-import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
-import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFMetaCodeStatement;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.LSFResolver;
 import com.lsfusion.lang.psi.context.ContextModifier;
 import com.lsfusion.lang.psi.context.ExtendParamContext;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
-import com.lsfusion.lang.psi.impl.LSFActionStatementImpl;
 import com.lsfusion.util.BaseUtils;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,11 +27,11 @@ public class TypeInferer {
 
         if (element instanceof ModifyParamContext) {
             if (!(element instanceof ExtendParamContext))
-                currentParams = new HashSet<LSFExprParamDeclaration>();
+                currentParams = new HashSet<>();
 
             ModifyParamContext modifyContext = (ModifyParamContext) element;
             ContextModifier contextModifier = modifyContext.getContextModifier();
-            Set<LSFExprParamDeclaration> params = new HashSet<LSFExprParamDeclaration>(contextModifier.resolveParams(Integer.MAX_VALUE, currentParams));
+            Set<LSFExprParamDeclaration> params = new HashSet<>(contextModifier.resolveParams(Integer.MAX_VALUE, currentParams));
             InferResult inferred = modifyContext.getContextInferrer().inferClasses(params).finish();
             for (LSFExprParamDeclaration param : params) {
                 LSFClassSet inferredClass = inferred.get(param);
@@ -81,7 +68,7 @@ public class TypeInferer {
     private static void recFindNotInferred(PsiElement element, Set<LSFExprParamDeclaration> currentParams, LSFMetaCodeStatement statement) {
         if (element instanceof ModifyParamContext) {
             if (!(element instanceof ExtendParamContext))
-                currentParams = new HashSet<LSFExprParamDeclaration>();
+                currentParams = new HashSet<>();
 
             boolean unfr = false;
             ModifyParamContext modifyContext = (ModifyParamContext) element;
@@ -92,7 +79,7 @@ public class TypeInferer {
             }
 
             ContextModifier contextModifier = modifyContext.getContextModifier();
-            Set<LSFExprParamDeclaration> params = new HashSet<LSFExprParamDeclaration>(contextModifier.resolveParams(Integer.MAX_VALUE, currentParams));
+            Set<LSFExprParamDeclaration> params = new HashSet<>(contextModifier.resolveParams(Integer.MAX_VALUE, currentParams));
             if (!unfr) {
                 for (LSFExprParamDeclaration param : params) {
                     LSFClassSet resClass = param.resolveClass();

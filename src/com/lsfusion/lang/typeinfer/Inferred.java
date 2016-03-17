@@ -25,7 +25,7 @@ public class Inferred {
     public final Set<Compared> notCompared;
 
     private static Map<LSFExprParamDeclaration, LSFExClassSet> orAny(Map<LSFExprParamDeclaration, LSFExClassSet> params) {
-        Map<LSFExprParamDeclaration, LSFExClassSet> anyParams = new HashMap<LSFExprParamDeclaration, LSFExClassSet>();
+        Map<LSFExprParamDeclaration, LSFExClassSet> anyParams = new HashMap<>();
         for(Map.Entry<LSFExprParamDeclaration, LSFExClassSet> param : params.entrySet()) {
             anyParams.put(param.getKey(), LSFExClassSet.orAny(param.getValue()));
         }
@@ -33,8 +33,8 @@ public class Inferred {
     } 
     
     private static <T> Map<LSFExprParamDeclaration, LSFExClassSet> applyCompared(Map<LSFExprParamDeclaration, LSFExClassSet> params, Set<Compared> compared) {
-        Map<LSFExprParamDeclaration, LSFExClassSet> result = new HashMap<LSFExprParamDeclaration, LSFExClassSet>(params);
-        Set<Compared> rest = new HashSet<Compared>(compared);
+        Map<LSFExprParamDeclaration, LSFExClassSet> result = new HashMap<>(params);
+        Set<Compared> rest = new HashSet<>(compared);
         for(Compared<T> compare : compared) {
             rest.remove(compare);
             InferExResult recInferred = new Inferred(result, rest).finishEx();
@@ -56,7 +56,7 @@ public class Inferred {
     }
 
     private static Map<LSFExprParamDeclaration, LSFExClassSet> overrideClasses(Map<LSFExprParamDeclaration, LSFExClassSet> oldClasses, Map<LSFExprParamDeclaration, LSFExClassSet> newClasses) {
-        Map<LSFExprParamDeclaration, LSFExClassSet> result = new HashMap<LSFExprParamDeclaration, LSFExClassSet>(oldClasses);
+        Map<LSFExprParamDeclaration, LSFExClassSet> result = new HashMap<>(oldClasses);
         for(Map.Entry<LSFExprParamDeclaration, LSFExClassSet> paramClass : newClasses.entrySet()) {
             LSFExprParamDeclaration param = paramClass.getKey();
             LSFExClassSet newClass = paramClass.getValue();
@@ -161,7 +161,7 @@ public class Inferred {
     }
 
     private static Map<LSFExprParamDeclaration, LSFExClassSet> opParams(Map<LSFExprParamDeclaration, LSFExClassSet> or1, Map<LSFExprParamDeclaration, LSFExClassSet> or2, boolean or) {
-        Map<LSFExprParamDeclaration, LSFExClassSet> result = new HashMap<LSFExprParamDeclaration, LSFExClassSet>();
+        Map<LSFExprParamDeclaration, LSFExClassSet> result = new HashMap<>();
         for(Map.Entry<LSFExprParamDeclaration, LSFExClassSet> decl1 : or1.entrySet()) {
             LSFExprParamDeclaration key1 = decl1.getKey();
             result.put(key1, LSFPsiImplUtil.op(decl1.getValue(), or2.get(key1), or));            
@@ -175,10 +175,10 @@ public class Inferred {
     }
     
     private static Pair<Map<LSFExprParamDeclaration, LSFExClassSet>, Set<Compared>> or(Map<LSFExprParamDeclaration, LSFExClassSet> params1, Set<Compared> compared1, Map<LSFExprParamDeclaration, LSFExClassSet> params2, Set<Compared> compared2) {
-        Set<Compared> rest1 = new HashSet<Compared>(compared1);
-        Set<Compared> rest2 = new HashSet<Compared>(compared2);
+        Set<Compared> rest1 = new HashSet<>(compared1);
+        Set<Compared> rest2 = new HashSet<>(compared2);
         Set<Compared> common = BaseUtils.split(rest1, rest2);
-        return new Pair<Map<LSFExprParamDeclaration, LSFExClassSet>, Set<Compared>>(opParams(applyCompared(params1, rest1), applyCompared(params2, rest2), true), common); 
+        return Pair.create(opParams(applyCompared(params1, rest1), applyCompared(params2, rest2), true), common); 
     }
 
     public Inferred or(Inferred or2) {

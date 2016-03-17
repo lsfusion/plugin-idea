@@ -1,6 +1,8 @@
 package com.lsfusion.lang.psi.declarations;
 
-import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFActionStatement;
+import com.lsfusion.lang.psi.LSFDataPropertyDefinition;
+import com.lsfusion.lang.psi.LSFPropertyCalcStatement;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,10 +14,10 @@ public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlob
     LSFDataPropertyDefinition getDataPropertyDefinition();
 
     @Nullable
-    public abstract LSFActionStatement getActionStatement();
+    LSFActionStatement getActionStatement();
 
     @Nullable
-    public abstract LSFPropertyCalcStatement getPropertyCalcStatement();
+    LSFPropertyCalcStatement getPropertyCalcStatement();
 
     String getCaption();
 
@@ -31,7 +33,7 @@ public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlob
 
     boolean isUnfriendly();
 
-    public List<String> resolveParamNames();
+    List<String> resolveParamNames();
 
     boolean resolveDuplicateColumns();
 

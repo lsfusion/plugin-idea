@@ -31,7 +31,7 @@ public class ProjectUnqualifyRefsAction extends AnAction {
                         MetaTransaction transaction = new MetaTransaction();
 
                         Collection<String> allKeys = ModuleIndex.getInstance().getAllKeys(myProject);
-                        Collection<LSFFile> files = new ArrayList<LSFFile>();
+                        Collection<LSFFile> files = new ArrayList<>();
 
                         for (final String module : allKeys) {
                             Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, GlobalSearchScope.allScope(myProject));

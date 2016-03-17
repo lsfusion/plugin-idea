@@ -12,8 +12,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.LSFResolver;
-import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.util.BaseUtils;
 import org.apache.commons.lang.StringUtils;
@@ -21,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.*;
 
 public class MetaTransaction {
-    public static enum Type {
+    public enum Type {
         REPLACE, BEFORE, AFTER
     }
 
@@ -44,7 +42,7 @@ public class MetaTransaction {
         }
 
         void apply(List<InToken> newTokens, List<Collection<List<ExtToken>>> oldTokens, List<InToken> usageParams, List<String> declParams) {
-            List<InToken> original = new ArrayList<InToken>();
+            List<InToken> original = new ArrayList<>();
             List<Collection<List<ExtToken>>> deconc = deconc(tokens, usageParams, declParams, original);
 
             Integer adjBefore = adjustOffset(newTokens, token);
@@ -78,7 +76,7 @@ public class MetaTransaction {
         }
 
         protected static List<Collection<List<ExtToken>>> deconc(List<Pair<InToken, IElementType>> tokens, List<InToken> usageParams, List<String> declParams, List<InToken> original) {
-            List<Collection<List<ExtToken>>> deconc = new ArrayList<Collection<List<ExtToken>>>();
+            List<Collection<List<ExtToken>>> deconc = new ArrayList<>();
             for(Pair<InToken, IElementType> token : tokens) { // нужно попытаться "разрезать", преобразовать назад
                 original.add(token.first);
                 if(isSpecSymbol(token.second)) // оптимизация
@@ -118,7 +116,7 @@ public class MetaTransaction {
                             if(capitalized) // непонятно что делать
                                 continue;
                             else { // немного поговнокодим, потому как ряд частных случаев, и обобщение будет громоздким
-                                List<ExtToken> addTokens = new ArrayList<ExtToken>();
+                                List<ExtToken> addTokens = new ArrayList<>();
                                 addTokens.add(new ExtToken("###", true));
                                 addTokens.add(new ExtToken(declParam, true));
                                 recDeconcatToken(token, i + usageParam.length(), usageParams, declParams, BaseUtils.add(finishToken(current, currToken), addTokens), "", false, usedEmptyDecls, result);
@@ -126,7 +124,7 @@ public class MetaTransaction {
                         }
                     }
 
-                    List<ExtToken> addTokens = new ArrayList<ExtToken>();
+                    List<ExtToken> addTokens = new ArrayList<>();
                     if(capitalized || !first)
                         addTokens.add(new ExtToken(capitalized ? "###" : "##", true));
                     addTokens.add(new ExtToken(declParam, true));
@@ -154,7 +152,7 @@ public class MetaTransaction {
     }
 
     private static Collection<List<ExtToken>> deconcatToken(String token, List<InToken> usageParams, List<String> declParams) {
-        Collection<List<ExtToken>> result = new ArrayList<List<ExtToken>>();
+        Collection<List<ExtToken>> result = new ArrayList<>();
         recDeconcatToken(token, 0, usageParams, declParams, new ArrayList<ExtToken>(), "", true, new HashSet<String>(), result);
         return result;
     }
@@ -165,12 +163,12 @@ public class MetaTransaction {
 //    }
 
     private static class SingleTransaction {
-        public List<Change> changes = new ArrayList<Change>();
+        public List<Change> changes = new ArrayList<>();
     }
 
 
 
-    private final Map<LSFMetaCodeStatement, SingleTransaction> transactions = new HashMap<LSFMetaCodeStatement, SingleTransaction>();
+    private final Map<LSFMetaCodeStatement, SingleTransaction> transactions = new HashMap<>();
 
     private static int leafCount(ASTNode node) {
         if(node instanceof LeafElement) {
@@ -201,9 +199,9 @@ public class MetaTransaction {
         }
     }
     public static List<ASTNode> getLeafTokens(ASTNode node) {
-        List<LeafElement> leafElements = new ArrayList<LeafElement>();
+        List<LeafElement> leafElements = new ArrayList<>();
         recLeafTokens(node, leafElements);
-        return BaseUtils.<ASTNode, LeafElement>immutableCast(leafElements);
+        return BaseUtils.immutableCast(leafElements);
     }
 
     private static void recMetaTokens(ASTNode node, List<LeafElement> result, boolean first) {
@@ -292,7 +290,7 @@ public class MetaTransaction {
                 continue;
 
             if(nextOpt.size() == needed.size()) { // подошел
-                opts.add(new Option<K>(BaseUtils.add(commonTokens, needed), needSd ? ift : ift + 1, needSd ? isd + 1 : isd));
+                opts.add(new Option<>(BaseUtils.add(commonTokens, needed), needSd ? ift : ift + 1, needSd ? isd + 1 : isd));
                 if(opts.size() > 100000)
                     opts = opts;
             } else {
@@ -305,11 +303,11 @@ public class MetaTransaction {
     }
 
     private static <K extends Comparable<K>> List<Collection<List<K>>> merge(List<Collection<List<K>>> first, List<Collection<List<K>>> second, Result<Pair<String, String>> error) {
-        List<Collection<List<K>>> result = new ArrayList<Collection<List<K>>>();
+        List<Collection<List<K>>> result = new ArrayList<>();
 
-        Option<K> et = new Option<K>(new ArrayList<K>(), 0, 0);
+        Option<K> et = new Option<>(new ArrayList<K>(), 0, 0);
 
-        TreeSet<Option<K>> opts = new TreeSet<Option<K>>();
+        TreeSet<Option<K>> opts = new TreeSet<>();
         while(true) {
             if(et.ift < first.size() && first.get(et.ift).size() == 1 && et.isd < second.size() && second.get(et.isd).size() == 1) { // оптимизация
                 List<K> sf = BaseUtils.single(first.get(et.ift));
@@ -317,7 +315,7 @@ public class MetaTransaction {
                 if(sf.equals(ss))
                     opts.add(new Option(BaseUtils.add(et.tokens, sf), et.ift + 1, et.isd + 1));
                 else {
-                    error.setResult(new Pair<String, String>("", ""));
+                    error.setResult(Pair.create("", ""));
                     return null; // diff
                 }
             } else
@@ -327,7 +325,7 @@ public class MetaTransaction {
                 if(et.ift == first.size() && et.isd == second.size()) // все совпало
                     return result;
                 // 10 токенов влево, 10 токенов вправо
-                error.setResult(new Pair<String, String>("", ""));
+                error.setResult(Pair.create("", ""));
                 return null; // diff
             }
 
@@ -337,7 +335,7 @@ public class MetaTransaction {
             ito.remove();
 
             boolean hasDiff = false;
-            Collection<List<K>> optTokens = new ArrayList<List<K>>();
+            Collection<List<K>> optTokens = new ArrayList<>();
             while(ito.hasNext()) {
                 Option<K> next = ito.next();
                 if(et.compareI(next) == 0)
@@ -351,14 +349,14 @@ public class MetaTransaction {
             if(!hasDiff) {
                 optTokens.add(et.tokens);
                 result.add(optTokens);
-                et = new Option<K>(new ArrayList<K>(), et.ift, et.isd);
-                opts = new TreeSet<Option<K>>(); // обнуляем варианты
+                et = new Option<>(new ArrayList<K>(), et.ift, et.isd);
+                opts = new TreeSet<>(); // обнуляем варианты
             }
         }
     }
 
     private static List<LeafElement> getMetaTokens(LSFMetaCodeBody body) {
-        List<LeafElement> result = new ArrayList<LeafElement>();
+        List<LeafElement> result = new ArrayList<>();
         recMetaTokens(body.getNode(), result, true);
         return result;
     }
@@ -431,7 +429,7 @@ public class MetaTransaction {
         return result + " (" + extTokens.size() + ")";
     }
     public static List<String> toString(List<Collection<List<ExtToken>>> tokens) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for(Collection<List<ExtToken>> token : tokens) {
             String concOpt = "";
             for(List<ExtToken> opt : token)
@@ -442,7 +440,7 @@ public class MetaTransaction {
     }
 
     public void apply() { // группируем metaCodeStatement'ы по decl'ам
-        Set<LSFMetaDeclaration> declChanged = new HashSet<LSFMetaDeclaration>();
+        Set<LSFMetaDeclaration> declChanged = new HashSet<>();
         for(LSFMetaCodeStatement usageChanged : transactions.keySet()) {
             LSFMetaDeclaration metaDecl = usageChanged.resolveDecl();
             if(metaDecl != null) {
@@ -465,11 +463,11 @@ public class MetaTransaction {
                 if(statement != null) {
                     SingleTransaction transaction = transactions.get(statement);
                     if(transaction != null) {
-                        List<List<ExtToken>> oldTokens = new ArrayList<List<ExtToken>>();
+                        List<List<ExtToken>> oldTokens = new ArrayList<>();
                         List<InToken> usageParams = statement.getUsageParams();
                         List<InToken> newTokens = MetaChangeDetector.getNewTokens(texts, usageParams, declParams, oldTokens);
 
-                        List<Collection<List<ExtToken>>> oldColTokens = new ArrayList<Collection<List<ExtToken>>>();
+                        List<Collection<List<ExtToken>>> oldColTokens = new ArrayList<>();
                         for(List<ExtToken> oldToken : oldTokens)
                             oldColTokens.add(Collections.singleton(oldToken));
 
@@ -480,7 +478,7 @@ public class MetaTransaction {
                             result = oldColTokens;
                             resultStatement = statement;
                         } else {
-                            Result<Pair<String, String>> error = new Result<Pair<String, String>>();
+                            Result<Pair<String, String>> error = new Result<>();
                             result = merge(result, oldColTokens, error);
                             if(result==null) {
                                 String notificationText = decl.getGlobalName() + "\nFirst :" + usageParams + " " + error.getResult().first + "\nSecond :" + resultStatement.getUsageParams() + " " + error.getResult().second;
@@ -539,9 +537,9 @@ public class MetaTransaction {
             }
             List<LeafElement> tokens = getMetaTokens(metaCodeStatement.getMetaCodeBody());
 
-            List<Pair<InToken, IElementType>> addPairs = new ArrayList<Pair<InToken, IElementType>>();
+            List<Pair<InToken, IElementType>> addPairs = new ArrayList<>();
             for(ASTNode addNode : add)
-                addPairs.add(new Pair<InToken, IElementType>(parseToken(addNode), addNode.getElementType()));
+                addPairs.add(Pair.create(parseToken(addNode), addNode.getElementType()));
 
             int indexBefore = tokens.indexOf(leafBefore);
             metaTransaction.changes.add(new Change(indexBefore, addPairs, type));

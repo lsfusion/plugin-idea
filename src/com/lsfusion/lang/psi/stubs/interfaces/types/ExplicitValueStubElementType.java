@@ -5,8 +5,6 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.lang.psi.LSFExpressionUnfriendlyPD;
-import com.lsfusion.lang.psi.LSFPropertyExpression;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
@@ -45,7 +43,7 @@ public class ExplicitValueStubElementType extends LSFStubElementType<ExplicitVal
     @Override
     public ExplicitValueStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         int classCount = dataStream.readInt();
-        List<String> classes = new ArrayList<String>();
+        List<String> classes = new ArrayList<>();
         if (classCount != 0) {
             for (int i = 0; i < classCount; i++) {
                 StringRef name = dataStream.readName();
@@ -60,7 +58,7 @@ public class ExplicitValueStubElementType extends LSFStubElementType<ExplicitVal
     public void indexStub(@NotNull ExplicitValueStubElement stub, @NotNull IndexSink sink) {
         List<String> valueClasses = stub.getValueClasses();
         if (valueClasses != null) {
-            Set<String> set = new HashSet<String>(valueClasses); // избегаем повторного добавления при многократном вхождении класса
+            Set<String> set = new HashSet<>(valueClasses); // избегаем повторного добавления при многократном вхождении класса
             for (String valueClass : set) {
                 if (valueClass != null) {
                     sink.occurrence(LSFIndexKeys.EXPLICIT_VALUE, valueClass);

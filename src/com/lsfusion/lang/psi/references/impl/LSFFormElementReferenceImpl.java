@@ -32,7 +32,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
 
     @Override
     public LSFResolveResult resolveNoCache() {
-        final List<T> objects = new ArrayList<T>();
+        final List<T> objects = new ArrayList<>();
         if (getSimpleName() != null) {
             Condition<T> filter = getResolvedDeclarationsFilter();
             for (T decl : collectElementsFromContext()) {
@@ -63,7 +63,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
 
     protected abstract FormExtendProcessor<T> getElementsCollector();
 
-    public static interface FormExtendProcessor<T> {
+    public interface FormExtendProcessor<T> {
         Collection<T> process(LSFFormExtend formExtend);
     }
 
@@ -78,7 +78,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
             return processFormContext(parent, offset, processor); // бежим выше
         }
 
-        return new HashSet<T>();
+        return new HashSet<>();
     }
 
     public static <T> Set<T> processFormContext(PsiElement current, final FormExtendProcessor<T> processor, boolean objectRef) {
@@ -91,7 +91,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
         }
 
         if (extendForms != null) {
-            final Set<T> finalResult = new HashSet<T>();
+            final Set<T> finalResult = new HashSet<>();
             extendForms.forEach(new com.intellij.util.Processor<LSFFormExtend>() {
                 public boolean process(LSFFormExtend formExtend) {
                     finalResult.addAll(processor.process(formExtend));

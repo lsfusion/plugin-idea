@@ -38,8 +38,8 @@ public class PropertyDrawEntity {
 
     public String declText;
     public String declLocation;
-    public List<String> interfeceClasses = new ArrayList<String>();
-    public List<String> objectClasses = new ArrayList<String>();
+    public List<String> interfeceClasses = new ArrayList<>();
+    public List<String> objectClasses = new ArrayList<>();
 
     // следующие параметры берутся из объявления свойства и используются в качестве значений по умолчанию в дизайне 
     public int fixedCharWidth;

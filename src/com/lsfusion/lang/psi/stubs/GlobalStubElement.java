@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public interface GlobalStubElement<This extends GlobalStubElement<This, Decl>, Decl extends LSFGlobalElement<Decl, This>> extends LSFStubElement<Decl> {
 
-    public void serialize(StubOutputStream dataStream) throws IOException;
+    void serialize(StubOutputStream dataStream) throws IOException;
 
-    public String getGlobalName();
+    String getGlobalName();
 }

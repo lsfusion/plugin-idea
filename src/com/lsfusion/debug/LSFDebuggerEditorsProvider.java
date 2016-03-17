@@ -37,7 +37,7 @@ public class LSFDebuggerEditorsProvider extends JavaDebuggerEditorsProvider {
     @NotNull
     @Override
     public Collection<Language> getSupportedLanguages(@NotNull Project project, @Nullable XSourcePosition sourcePosition) {
-        Set<Language> langs = new HashSet<Language>(super.getSupportedLanguages(project, sourcePosition));
+        Set<Language> langs = new HashSet<>(super.getSupportedLanguages(project, sourcePosition));
         langs.add(LSFLanguage.INSTANCE);
         langs.add(JavaLanguage.INSTANCE);
         return langs;

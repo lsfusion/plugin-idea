@@ -66,7 +66,7 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
 
     @Override
     public PsiElement[] processImplementationsSearch() {
-        List<PsiElement> names = new ArrayList<PsiElement>();
+        List<PsiElement> names = new ArrayList<>();
 
         Collection<LSFClassExtend> extendClasses = LSFGlobalResolver.findExtendElements(this, LSFStubElementTypes.EXTENDCLASS, getProject(), GlobalSearchScope.allScope(getProject())).findAll();
         for (LSFClassExtend classExtend : extendClasses) {
@@ -81,7 +81,7 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
     }
 
     public static Set<LSFClassDeclaration> processChildrenSearch(LSFClassDeclaration classDecl, Project project) {
-        Set<LSFClassDeclaration> result = new ArrayListSet<LSFClassDeclaration>();
+        Set<LSFClassDeclaration> result = new ArrayListSet<>();
         Collection<LSFClassDeclaration> classExtends = LSFGlobalResolver.findClassExtends(classDecl, project, GlobalSearchScope.allScope(project));
         for (LSFClassDeclaration lsfClassDeclaration : classExtends) {
             result.add(lsfClassDeclaration);

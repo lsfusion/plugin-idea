@@ -27,10 +27,10 @@ import static com.lsfusion.design.model.entity.FormSessionScope.forEditFormActio
 public class FormEntity {
     private LSFFile file;
 
-    public List<GroupObjectEntity> groups = new ArrayList<GroupObjectEntity>();
-    public List<TreeGroupEntity> treeGroups = new ArrayList<TreeGroupEntity>();
-    public List<PropertyDrawEntity> propertyDraws = new ArrayList<PropertyDrawEntity>();
-    public List<RegularFilterGroupEntity> regularFilterGroups = new ArrayList<RegularFilterGroupEntity>();
+    public List<GroupObjectEntity> groups = new ArrayList<>();
+    public List<TreeGroupEntity> treeGroups = new ArrayList<>();
+    public List<PropertyDrawEntity> propertyDraws = new ArrayList<>();
+    public List<RegularFilterGroupEntity> regularFilterGroups = new ArrayList<>();
 
     public PropertyDrawEntity printActionPropertyDraw;
     public PropertyDrawEntity editActionPropertyDraw;
@@ -133,7 +133,7 @@ public class FormEntity {
     private void addFiltersToFilterGroup(RegularFilterGroupEntity filterGroup, List<LSFRegularFilterDeclaration> regularFilterDeclarationList) {
         for (LSFRegularFilterDeclaration regularFilterDeclaration : regularFilterDeclarationList) {
 
-            List<ObjectEntity> params = new ArrayList<ObjectEntity>();
+            List<ObjectEntity> params = new ArrayList<>();
             for (LSFExprParamDeclaration paramDeclaration : regularFilterDeclaration.getFormFilterDeclaration().getPropertyExpression().resolveParams()) {
                 params.add(getObject(paramDeclaration.getDeclName()));
             }
@@ -196,7 +196,7 @@ public class FormEntity {
                                         LSFFormPropertyOptionsList formPropertyOptions, Pair<Boolean, PropertyDrawEntity> relativeProsition, LSFObjectUsageList objectUsageList) {
         LSFPropReference propUsage = formPropertyName.getPropertyUsage();
 
-        List<ObjectEntity> objects = new ArrayList<ObjectEntity>();
+        List<ObjectEntity> objects = new ArrayList<>();
         if (objectUsageList != null) {
             LSFNonEmptyObjectUsageList nonEmptyObjectUsageList = objectUsageList.getNonEmptyObjectUsageList();
             if (nonEmptyObjectUsageList != null) {
@@ -260,9 +260,9 @@ public class FormEntity {
                 LSFFormOptionsWithFormPropertyDraw beforeAfterOption = formOptionsWithFormPropertyDrawList.get(formOptionsWithFormPropertyDrawList.size() - 1);
                 String formPropertyName = beforeAfterOption.getFormPropertyDrawUsage().getNameRef();
                 if (beforeAfterOption.getText().startsWith("BEFORE")) {
-                    return new Pair<Boolean, PropertyDrawEntity>(true, getPropertyDraw(formPropertyName));
+                    return new Pair<>(true, getPropertyDraw(formPropertyName));
                 } else if (beforeAfterOption.getText().startsWith("AFTER")) {
-                    return new Pair<Boolean, PropertyDrawEntity>(false, getPropertyDraw(formPropertyName));
+                    return new Pair<>(false, getPropertyDraw(formPropertyName));
                 }
             }
         }
@@ -284,7 +284,7 @@ public class FormEntity {
 
             LSFTreeGroupParentDeclaration parentDeclaration = treeGroupObjectDeclaration.getTreeGroupParentDeclaration();
             if (parentDeclaration != null) {
-                List<LSFPropertyUsage> properties = new ArrayList<LSFPropertyUsage>();
+                List<LSFPropertyUsage> properties = new ArrayList<>();
                 if (parentDeclaration.getPropertyUsage() != null) {
                     properties.add(parentDeclaration.getPropertyUsage());
                 } else {

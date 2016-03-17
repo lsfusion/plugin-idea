@@ -62,7 +62,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
     
     public static boolean disableGroupInjections = false;
     
-    private static ThreadLocal<Stack<PsiClass>> stackParsing = new ThreadLocal<Stack<PsiClass>>();
+    private static ThreadLocal<Stack<PsiClass>> stackParsing = new ThreadLocal<>();
 
     @Override
     public void getLanguagesToInject(final @NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
@@ -76,7 +76,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
         Stack<PsiClass> stack = stackParsing.get();
         if(stack == null) {
-            stack = new Stack<PsiClass>();
+            stack = new Stack<>();
             stackParsing.set(stack);
         }
             
@@ -88,8 +88,8 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
         // группировка по префиксам по неизвестной причине не работает
 //        final Map<String, Map<String, List<Injection>>> injectionsByModules = new HashMap<String, Map<String, List<Injection>>>();
-        final Map<String, List<Injection>> injectionsByModules = new HashMap<String, List<Injection>>();
-        final Result<Integer> count = new Result<Integer>(0);
+        final Map<String, List<Injection>> injectionsByModules = new HashMap<>();
+        final Result<Integer> count = new Result<>(0);
         if(hosts.size() > 0) {
             InjectProcessor processor = new InjectProcessor();
             for (final PsiLanguageInjectionHost host : hosts) {
@@ -109,7 +109,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
                         List<Injection> injections = injectionsByModules.get(moduleName);
                         if (injections == null) {
-                            injections = new ArrayList<Injection>();
+                            injections = new ArrayList<>();
                             injectionsByModules.put(moduleName, injections);
                         }
                         injections.add(new Injection(prefix, host, rangeInsideHost));
@@ -184,9 +184,9 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
     private class InjectProcessor { // для кэшей
 
-        private Map<PsiVariable, Set<String>> varModuleCaches = new HashMap<PsiVariable, Set<String>>();
-        private Map<PsiClass, String> classModuleCaches = new HashMap<PsiClass, String>();
-        private Map<PsiClass, Integer> superClassesCaches = new HashMap<PsiClass, Integer>();
+        private Map<PsiVariable, Set<String>> varModuleCaches = new HashMap<>();
+        private Map<PsiClass, String> classModuleCaches = new HashMap<>();
+        private Map<PsiClass, Integer> superClassesCaches = new HashMap<>();
 
         //    @Override
         public void getLanguagesToInject(@NotNull PsiLanguageInjectionHost element, @NotNull InjectedLanguagePlaces injectionPlacesRegistrar) {
@@ -215,7 +215,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                                 if (hasSuperClasses.equals(0)) { // если наследуется от ScriptingActionProperty
                                     referenceFromScriptingActionProperty(thisClass, literalExpression, classRef, false, injectionPlacesRegistrar);
                                 } else if (hasSuperClasses.equals(1)) { // если наследуется от ScriptingLogicsModule
-                                    Set<String> modules = new HashSet<String>();
+                                    Set<String> modules = new HashSet<>();
                                     getModulesFromConstructor(modules, thisClass);
                                     javaOrPropertyReference(literalExpression, classRef, BaseUtils.toString(modules, ","), false, injectionPlacesRegistrar);
                                 }
@@ -368,7 +368,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
         private String getModuleName(PsiExpression qualifierExpression) {
             //проверяем на ссылку .getModule("ModuleName")
-            Set<String> modules = new HashSet<String>();
+            Set<String> modules = new HashSet<>();
 
             if (qualifierExpression instanceof PsiMethodCallExpression) {
                 return extractModuleNameFromPossibleGetModuleCall((PsiMethodCallExpression) qualifierExpression);
@@ -382,7 +382,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                     PsiVariable lmVar = (PsiVariable) lmRef;
                     Set<String> varModules = varModuleCaches.get(lmVar);
                     if (varModules == null) {
-                        varModules = new HashSet<String>();
+                        varModules = new HashSet<>();
 
                         String usageName = getVarUsageModuleName(qualifierExpression, lmVar);
                         if (usageName != null)
@@ -409,7 +409,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
         private String getVarUsageModuleName(PsiExpression qualifierExpression, PsiVariable lmVar) {
             //todo: check type of lmVar
-            List<PsiExpression> rightExprs = new ArrayList<PsiExpression>();
+            List<PsiExpression> rightExprs = new ArrayList<>();
             if (lmVar.hasInitializer())
                 rightExprs.add(lmVar.getInitializer());
 
@@ -454,7 +454,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                 }
 
                 //  someLM = some.long().qualifiers(var).Line.getModule("Some")
-                final Result<String> moduleName = new Result<String>();
+                final Result<String> moduleName = new Result<>();
                 PsiTreeUtil.processElements(rightExpr, new PsiElementProcessor() {
                     @Override
                     public boolean execute(@NotNull PsiElement element) {
@@ -545,7 +545,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
         private String calcModuleActionForClass(PsiClass clazz) {
             GlobalSearchScope scope = getModuleWithDependenciesScope(clazz);
 
-            final List<PsiClass> result = new ArrayList<PsiClass>();
+            final List<PsiClass> result = new ArrayList<>();
             result.add(clazz);
             ClassImplementationsSearch.processImplementations(clazz, new Processor<PsiElement>() {
                 public boolean process(PsiElement psiElement) {
@@ -554,7 +554,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                     return true;
                 }
             }, scope);
-            Set<String> moduleNames = new HashSet<String>();
+            Set<String> moduleNames = new HashSet<>();
             for (PsiClass iclazz : result) {
                 GlobalSearchScope searchScope = GlobalSearchScope.getScopeRestrictedByFileTypes(scope, LSFFileType.INSTANCE);
                 Collection<PsiReference> refs = ReferencesSearch.search(iclazz, searchScope, false).findAll();

@@ -31,7 +31,7 @@ public class LSFCodeFragment extends LSFFile implements JavaCodeFragment, Extend
     private ExceptionHandler exceptionHandler;
     private GlobalSearchScope resolveScope;
 
-    private Set<String> imports = new HashSet<String>();
+    private Set<String> imports = new HashSet<>();
 
     private PsiElement context;
 

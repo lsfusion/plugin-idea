@@ -16,7 +16,7 @@ public class AndContextInferrer implements ContextInferrer {
     }
 
     public AndContextInferrer(ContextInferrer modifier1, ContextInferrer modifier2) {
-        List<ContextInferrer> modifiers = new ArrayList<ContextInferrer>();
+        List<ContextInferrer> modifiers = new ArrayList<>();
         modifiers.add(modifier1);
         modifiers.add(modifier2);
 

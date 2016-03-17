@@ -35,7 +35,7 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
         }
         
         Document document = null;
-        Set<Integer> usedLines = new HashSet<Integer>();
+        Set<Integer> usedLines = new HashSet<>();
         for (PsiElement element : elements) {
             if (document == null) {
                 document = PsiDocumentManager.getInstance(element.getProject()).getDocument(element.getContainingFile());

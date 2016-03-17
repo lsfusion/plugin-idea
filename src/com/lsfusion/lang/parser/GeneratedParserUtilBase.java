@@ -535,7 +535,7 @@ public class GeneratedParserUtilBase {
         int predicateCount;
         boolean predicateSign = true;
         boolean suppressErrors;
-        public final ArrayList<Frame> frameStack = new ArrayList<Frame>(30);
+        public final ArrayList<Frame> frameStack = new ArrayList<>(30);
         public CompletionCallback completionCallback;
         public boolean completionTriggered = false;
 
@@ -544,10 +544,10 @@ public class GeneratedParserUtilBase {
         public boolean altMode;
 
         private int lastExpectedVariantOffset = -1;
-        public MyList<Variant> variants = new MyList<Variant>(INITIAL_VARIANTS_SIZE);
-        public MyList<Variant> unexpected = new MyList<Variant>(INITIAL_VARIANTS_SIZE / 10);
+        public MyList<Variant> variants = new MyList<>(INITIAL_VARIANTS_SIZE);
+        public MyList<Variant> unexpected = new MyList<>(INITIAL_VARIANTS_SIZE / 10);
 
-        final LimitedPool<Variant> VARIANTS = new LimitedPool<Variant>(VARIANTS_POOL_SIZE, new LimitedPool.ObjectFactory<Variant>() {
+        final LimitedPool<Variant> VARIANTS = new LimitedPool<>(VARIANTS_POOL_SIZE, new LimitedPool.ObjectFactory<Variant>() {
             @Override
             public Variant create() {
                 return new Variant();
@@ -557,7 +557,7 @@ public class GeneratedParserUtilBase {
             public void cleanup(final Variant o) {
             }
         });
-        final LimitedPool<Frame> FRAMES = new LimitedPool<Frame>(FRAMES_POOL_SIZE, new LimitedPool.ObjectFactory<Frame>() {
+        final LimitedPool<Frame> FRAMES = new LimitedPool<>(FRAMES_POOL_SIZE, new LimitedPool.ObjectFactory<Frame>() {
             @Override
             public Frame create() {
                 return new Frame();
@@ -754,8 +754,8 @@ public class GeneratedParserUtilBase {
     private static final int MAX_CHILDREN_IN_TREE = 10;
     public static boolean parseAsTree(ErrorState state, final PsiBuilder builder_, int level, final IElementType chunkType,
                                       boolean checkBraces, final Parser parser, final Parser eatMoreCondition) {
-        final LinkedList<Pair<PsiBuilder.Marker, PsiBuilder.Marker>> parenList = new LinkedList<Pair<PsiBuilder.Marker, PsiBuilder.Marker>>();
-        final LinkedList<Pair<PsiBuilder.Marker, Integer>> siblingList = new LinkedList<Pair<PsiBuilder.Marker, Integer>>();
+        final LinkedList<Pair<PsiBuilder.Marker, PsiBuilder.Marker>> parenList = new LinkedList<>();
+        final LinkedList<Pair<PsiBuilder.Marker, Integer>> siblingList = new LinkedList<>();
         PsiBuilder.Marker marker = null;
 
         final Runnable checkSiblingsRunnable = new Runnable() {

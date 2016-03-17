@@ -60,7 +60,7 @@ public abstract class LSFAbstractParamReferenceImpl<T extends LSFExprParamDeclar
 
     @Override
     public LSFResolveResult resolveNoCache() {
-        final List<T> objects = new ArrayList<T>();
+        final List<T> objects = new ArrayList<>();
         if (getSimpleName() != null) {
             final String nameRef = getNameRef();
             for (LSFExprParamDeclaration decl : getContextParams()) {

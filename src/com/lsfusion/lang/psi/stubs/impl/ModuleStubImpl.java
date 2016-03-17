@@ -28,12 +28,12 @@ public class ModuleStubImpl extends NamespaceStubImpl<ModuleStubElement, LSFModu
         LSFNamespaceReference explicit = psi.getExplicitNamespaceRef();
         namespace = explicit == null ? null : StringRef.fromString(explicit.getNameRef());
 
-        requires = new ArrayList<StringRef>();
+        requires = new ArrayList<>();
         for (LSFModuleReference ref : psi.getRequireRefs()) {
             requires.add(StringRef.fromString(ref.getNameRef()));
         }
 
-        priorities = new ArrayList<StringRef>();
+        priorities = new ArrayList<>();
         for (LSFNamespaceReference ref : psi.getPriorityRefs()) {
             priorities.add(StringRef.fromString(ref.getNameRef()));
         }
@@ -46,7 +46,7 @@ public class ModuleStubImpl extends NamespaceStubImpl<ModuleStubElement, LSFModu
     public List<LSFModuleReference> getRequireRefs() {
         LSFFile file = getFile();
 
-        List<LSFModuleReference> result = new ArrayList<LSFModuleReference>();
+        List<LSFModuleReference> result = new ArrayList<>();
         for (StringRef req : requires) {
             result.add(LSFElementGenerator.createModuleRefFromText(req, file));
         }
@@ -56,7 +56,7 @@ public class ModuleStubImpl extends NamespaceStubImpl<ModuleStubElement, LSFModu
     public List<LSFNamespaceReference> getPriorityRefs() {
         LSFFile file = getFile();
 
-        List<LSFNamespaceReference> result = new ArrayList<LSFNamespaceReference>();
+        List<LSFNamespaceReference> result = new ArrayList<>();
         for (StringRef req : requires) {
             result.add(LSFElementGenerator.createNamespaceRefFromText(req, file));
         }
@@ -93,12 +93,12 @@ public class ModuleStubImpl extends NamespaceStubImpl<ModuleStubElement, LSFModu
 
         namespace = dataStream.readName();
 
-        requires = new ArrayList<StringRef>();
+        requires = new ArrayList<>();
         for (int i = 0, size = dataStream.readInt(); i < size; i++) {
             requires.add(dataStream.readName());
         }
 
-        priorities = new ArrayList<StringRef>();
+        priorities = new ArrayList<>();
         for (int i = 0, size = dataStream.readInt(); i < size; i++) {
             priorities.add(dataStream.readName());
         }

@@ -193,7 +193,7 @@ public class FormJavaReferenceContributor extends PsiReferenceContributor {
                         }
 
                         //  someLM = some.long().qualifiers(var).Line.getModule("Some")
-                        final Result<String> moduleName = new Result<String>();
+                        final Result<String> moduleName = new Result<>();
                         PsiTreeUtil.processElements(rExpression, new PsiElementProcessor() {
                             @Override
                             public boolean execute(@NotNull PsiElement element) {

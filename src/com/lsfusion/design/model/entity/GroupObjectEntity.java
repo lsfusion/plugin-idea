@@ -15,10 +15,10 @@ public class GroupObjectEntity {
 
     public TreeGroupEntity treeGroup;
 
-    public List<ObjectEntity> objects = new ArrayList<ObjectEntity>();
+    public List<ObjectEntity> objects = new ArrayList<>();
 
     public ClassViewType initClassView = GRID;
-    public List<ClassViewType> banClassView = new ArrayList<ClassViewType>();
+    public List<ClassViewType> banClassView = new ArrayList<>();
 
     public int pageSize = 0;
 

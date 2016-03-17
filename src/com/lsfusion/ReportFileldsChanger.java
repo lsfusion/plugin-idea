@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class ReportFileldsChanger {
     private String extractFormNameFromPath(String reportPath) {
-        Map<String, String> explicitLink = new HashMap<String, String>();
+        Map<String, String> explicitLink = new HashMap<>();
         explicitLink.put("D:/lsfusion/custom-logics/mothercare-logics/src/main/resources/reports/custom/machinery/label/LabelMothercare_printLabelTransactionA_l.jrxml", "Label_printLabelTransaction");
         explicitLink.put("D:/lsfusion/custom-logics/mothercare-logics/src/main/resources/reports/custom/machinery/label/LabelMothercare_printLabelTransactionB_l.jrxml", "Label_printLabelTransaction");
         explicitLink.put("D:/lsfusion/custom-logics/sot-logics/src/main/resources/reports/custom/machinery/label/LabelSOT_printLabelTransactionA_l.jrxml", "Label_printLabelTransaction");
@@ -114,7 +114,7 @@ public class ReportFileldsChanger {
     }
 
     private ArrayList<String> findAllReportPathes(VirtualFile baseDir) {
-        ArrayList<String> reportPathes = new ArrayList<String>();
+        ArrayList<String> reportPathes = new ArrayList<>();
         findFiles(baseDir, reportPathes, "jrxml");
         return reportPathes;
     }

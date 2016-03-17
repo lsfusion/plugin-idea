@@ -28,7 +28,7 @@ public class LSFSuperclassHierarchyTreeStructure extends HierarchyTreeStructure 
     @Override
     protected Object[] buildChildren(@NotNull HierarchyNodeDescriptor descriptor) {
         LSFClassHierarchyNodeDescriptor nodeDescriptor = (LSFClassHierarchyNodeDescriptor) descriptor;
-        Set<LSFClassHierarchyNodeDescriptor> result = new ArrayListSet<LSFClassHierarchyNodeDescriptor>();
+        Set<LSFClassHierarchyNodeDescriptor> result = new ArrayListSet<>();
 
         Collection<LSFClassExtend> classExtends = LSFGlobalResolver.findExtendElements(nodeDescriptor.getClassDecl(), LSFStubElementTypes.EXTENDCLASS, myProject, GlobalSearchScope.allScope(myProject)).findAll();
         for (LSFClassExtend classExtend : classExtends) {
@@ -39,7 +39,7 @@ public class LSFSuperclassHierarchyTreeStructure extends HierarchyTreeStructure 
     }
 
     private List<LSFClassHierarchyNodeDescriptor> createNode(LSFClassExtend classExtend, HierarchyNodeDescriptor parent) {
-        List<LSFClassHierarchyNodeDescriptor> result = new ArrayList<LSFClassHierarchyNodeDescriptor>();
+        List<LSFClassHierarchyNodeDescriptor> result = new ArrayList<>();
 
         LSFClassParentsList classParentsList = ((LSFClassStatement) classExtend).getClassParentsList();
         if (classParentsList != null) {

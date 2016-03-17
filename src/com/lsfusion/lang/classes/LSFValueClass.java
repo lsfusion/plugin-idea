@@ -5,9 +5,9 @@ import com.intellij.psi.PsiElement;
 import java.util.List;
 
 public interface LSFValueClass {
-    public String getName();
+    String getName();
 
-    public String getQName(PsiElement context);
+    String getQName(PsiElement context);
 
     String getCaption();
 

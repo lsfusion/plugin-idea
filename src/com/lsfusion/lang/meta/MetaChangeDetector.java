@@ -370,7 +370,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                     while (true) {
                                         try {
                                             Thread.sleep(200);
-                                        } catch (InterruptedException e) {
+                                        } catch (InterruptedException ignored) {
                                         }
                                         synchronized (displaySync) {
                                             if (inlinePending == inlineProceeded && idleTimes > 4) {
@@ -855,7 +855,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     while (!finishedReprocessing) {
                         try {
                             Thread.sleep(200);
-                        } catch (InterruptedException e) {
+                        } catch (InterruptedException ignored) {
                         }
 
                         indicator.setFraction((inlinePending == 0 ? 1.0d : (double) inlineProceeded / (double) inlinePending) * coeff + coeff);

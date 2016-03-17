@@ -8,7 +8,7 @@ import java.util.Set;
 public class RegularFilterGroupEntity {
     public String sID;
 
-    public List<RegularFilterEntity> filters = new ArrayList<RegularFilterEntity>();
+    public List<RegularFilterEntity> filters = new ArrayList<>();
 
     public RegularFilterGroupEntity(String sID) {
         this.sID = sID;
@@ -19,7 +19,7 @@ public class RegularFilterGroupEntity {
     }
 
     public GroupObjectEntity getToDraw(FormEntity form) {
-        Set<ObjectEntity> groupObjects = new HashSet<ObjectEntity>();
+        Set<ObjectEntity> groupObjects = new HashSet<>();
 
         for (RegularFilterEntity regFilter : filters) {
             groupObjects.addAll(regFilter.objects);

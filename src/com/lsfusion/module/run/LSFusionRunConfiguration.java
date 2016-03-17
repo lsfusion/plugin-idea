@@ -41,7 +41,7 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
     public String ALTERNATIVE_JRE_PATH;
 
     public boolean PASS_PARENT_ENVS = true;
-    private Map<String, String> myEnvs = new LinkedHashMap<String, String>();
+    private Map<String, String> myEnvs = new LinkedHashMap<>();
 
     protected LSFusionRunConfiguration(final String name, final Project project, final ConfigurationFactory factory) {
         super(name, new JavaRunConfigurationModule(project, true), factory);
@@ -56,7 +56,7 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
 
     @NotNull
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
-        SettingsEditorGroup<LSFusionRunConfiguration> group = new SettingsEditorGroup<LSFusionRunConfiguration>();
+        SettingsEditorGroup<LSFusionRunConfiguration> group = new SettingsEditorGroup<>();
         group.addEditor(ExecutionBundle.message("run.configuration.configuration.tab.title"), new LSFusionRunConfigurationEditor(getProject()));
         JavaRunConfigurationExtensionManager.getInstance().appendEditors(this, group);
         group.addEditor(ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel<LSFusionRunConfiguration>());

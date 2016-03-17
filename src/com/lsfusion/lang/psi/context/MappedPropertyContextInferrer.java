@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.context;
 
-import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFClassParamDeclare;
 import com.lsfusion.lang.psi.LSFClassParamDeclareList;
 import com.lsfusion.lang.psi.LSFMappedPropertyClassParamDeclare;
@@ -36,10 +35,10 @@ public class MappedPropertyContextInferrer implements ContextInferrer {
             List<LSFClassParamDeclare> paramDecls;
             LSFNonEmptyClassParamDeclareList neList = declList.getNonEmptyClassParamDeclareList();
             if(neList == null)
-                paramDecls = new ArrayList<LSFClassParamDeclare>();
+                paramDecls = new ArrayList<>();
             else
                 paramDecls = neList.getClassParamDeclareList();
-            Map<LSFExprParamDeclaration, LSFExClassSet> result = new HashMap<LSFExprParamDeclaration, LSFExClassSet>();
+            Map<LSFExprParamDeclaration, LSFExClassSet> result = new HashMap<>();
             for(int i=0;i<BaseUtils.min(paramDecls.size(), inferredClasses.size());i++)
                 result.put(paramDecls.get(i).getParamDeclare(), inferredClasses.get(i));
             return new Inferred(result);                            

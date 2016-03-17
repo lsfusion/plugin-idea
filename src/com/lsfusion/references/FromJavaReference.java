@@ -63,7 +63,7 @@ public abstract class FromJavaReference extends PsiReferenceBase<PsiElement> imp
             return new ResolveResult[0];
         }
 
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
+        List<ResolveResult> results = new ArrayList<>();
         for (LSFGlobalDeclaration decl : findDeclarations(scope)) {
             boolean add = true;
             if (namespaceName != null && decl instanceof LSFFullNameDeclaration) {

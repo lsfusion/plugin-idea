@@ -9,8 +9,8 @@ import com.intellij.util.Query;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.psi.indexes.FormIndex;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -22,7 +22,7 @@ public class FormDeclByReportNameResolver {
 
         if (formDeclaration != null) {
             Query<LSFFormExtend> formExtends = LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, project, scope);
-            final Set<String> requiredModules = new HashSet<String>();
+            final Set<String> requiredModules = new HashSet<>();
             formExtends.forEach(new Processor<LSFFormExtend>() {
                 @Override
                 public boolean process(LSFFormExtend extend) {
@@ -37,7 +37,7 @@ public class FormDeclByReportNameResolver {
                 }
                 requires += moduleName;
             }
-            return new Pair<String, String>(formDeclaration.getNamespaceName() + "." + formDeclaration.getGlobalName(), requires);
+            return Pair.create(formDeclaration.getNamespaceName() + "." + formDeclaration.getGlobalName(), requires);
         }
 
         return null;

@@ -8,7 +8,7 @@ import java.util.Map;
 public class MetaSubstitutor {
     public final static MetaSubstitutor EMPTY = new MetaSubstitutor(new ArrayList<String>(), new ArrayList<String>());
 
-    private final Map<String, String> map = new HashMap<String, String>();
+    private final Map<String, String> map = new HashMap<>();
     public MetaSubstitutor(List<String> from, List<String> to) {
         for(int i=0;i<from.size();i++) {
             if(i<to.size())
@@ -23,7 +23,7 @@ public class MetaSubstitutor {
     }
 
     public List<String> substitute(List<String> text) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for(String element: text)
             result.add(substitute(element));
         return result;

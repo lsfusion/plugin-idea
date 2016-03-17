@@ -4,7 +4,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.lsfusion.design.ui.Alignment.*;
+import static com.lsfusion.design.ui.Alignment.CENTER;
+import static com.lsfusion.design.ui.Alignment.LEADING;
 
 public class FlexLayout extends CachableLayout<FlexConstraints> {
 
@@ -22,7 +23,7 @@ public class FlexLayout extends CachableLayout<FlexConstraints> {
         this.vertical = vertical;
         this.alignment = alignment;
 
-        this.constraintsMap = new HashMap<Component, FlexConstraints>();
+        this.constraintsMap = new HashMap<>();
     }
 
     @Override

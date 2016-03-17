@@ -54,7 +54,7 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
         String formName = formNameAndRequires.first;
         String requresList = formNameAndRequires.second;
 
-        final List<Injection> injections = new ArrayList<Injection>();
+        final List<Injection> injections = new ArrayList<>();
         
         rootTag.acceptChildren(new XmlElementVisitor() {
             @Override

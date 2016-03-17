@@ -89,7 +89,7 @@ public class ShowErrorsAction extends AnAction {
                             }
                         }
 
-                        final List<VirtualFile> files = new ArrayList<VirtualFile>();
+                        final List<VirtualFile> files = new ArrayList<>();
 
                         if (includeLSFFiles) {
                             files.addAll(FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope));
@@ -267,7 +267,7 @@ public class ShowErrorsAction extends AnAction {
             PropertiesComponent.getInstance(project).setValue(INCLUDE_JRXML_FILES, String.valueOf(includeJrxmlFiles));
 
             StringTokenizer tokenizer = new StringTokenizer(modulesToExclude.getText(), ",;");
-            final List<String> modules = new ArrayList<String>();
+            final List<String> modules = new ArrayList<>();
             while (tokenizer.hasMoreElements()) {
                 modules.add(tokenizer.nextToken().trim());
             }

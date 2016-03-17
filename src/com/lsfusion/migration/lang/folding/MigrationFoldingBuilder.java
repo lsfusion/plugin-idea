@@ -18,7 +18,7 @@ public class MigrationFoldingBuilder implements FoldingBuilder {
     @NotNull
     @Override
     public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
-        List<FoldingDescriptor> list = new ArrayList<FoldingDescriptor>();
+        List<FoldingDescriptor> list = new ArrayList<>();
         buildFolding(node, list);
         FoldingDescriptor[] descriptors = new FoldingDescriptor[list.size()];
         return list.toArray(descriptors);

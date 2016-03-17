@@ -32,7 +32,7 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
     @NotNull
     @Override
     public Collection<StructureViewTreeElement> getChildrenBase() {
-        final ArrayList<StructureViewTreeElement> children = new ArrayList<StructureViewTreeElement>();
+        final ArrayList<StructureViewTreeElement> children = new ArrayList<>();
 
         if (valueClass != null && getElement() != null) {
             GlobalSearchScope scope = LSFGlobalResolver.getRequireScope((LSFFile) getElement());

@@ -7,8 +7,8 @@ import org.jgrapht.alg.DijkstraShortestPath;
 import java.util.*;
 
 public class GraphDataModel {
-    private Map<String, GraphNode> nodes = new LinkedHashMap<String, GraphNode>();
-    private List<Pair<GraphNode, GraphNode>> edges = new ArrayList<Pair<GraphNode, GraphNode>>();
+    private Map<String, GraphNode> nodes = new LinkedHashMap<>();
+    private List<Pair<GraphNode, GraphNode>> edges = new ArrayList<>();
 
     public GraphNode rootNode;
 

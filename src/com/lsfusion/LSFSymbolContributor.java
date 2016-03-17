@@ -14,7 +14,7 @@ import java.util.*;
 public class LSFSymbolContributor extends LSFNameContributor {
     // полагаем, что состояние не меняется между вызовами getNames() и getItemsByName()
     // оба вызова осуществляются в рамках одного метода. (см. DefaultChooseByNameItemProvider.filterElements(), SearchEverywhereAction.buildSymbols())
-    private final Map<String, List<NavigationItem>> propertyDeclarationsMap = new HashMap<String, List<NavigationItem>>();
+    private final Map<String, List<NavigationItem>> propertyDeclarationsMap = new HashMap<>();
     
     private void clearPropertyDeclarationsMap() {
         synchronized (propertyDeclarationsMap) {
@@ -36,7 +36,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
 
     @Override
     protected Collection<StringStubIndexExtension> getIndices() {
-        List<StringStubIndexExtension> indices = new ArrayList<StringStubIndexExtension>();
+        List<StringStubIndexExtension> indices = new ArrayList<>();
         indices.add(ClassIndex.getInstance());
         indices.add(ModuleIndex.getInstance());
         indices.add(ExplicitNamespaceIndex.getInstance());
@@ -61,7 +61,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
     @Override
     protected Collection<String> getIndexKeys(StringStubIndexExtension index, String pattern, Project project, boolean includeNonProjectItems) {
         if (index instanceof PropIndex) {
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             Collection<String> allKeys = index.getAllKeys(project);
             final GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
             for (String key : allKeys) {

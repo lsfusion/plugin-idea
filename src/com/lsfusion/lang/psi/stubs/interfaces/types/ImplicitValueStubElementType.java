@@ -5,13 +5,14 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.LSFImplicitValuePropStatement;
 import com.lsfusion.lang.psi.impl.LSFImplicitValuePropertyStatementImpl;
+import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import com.lsfusion.lang.psi.stubs.interfaces.ImplicitValueStubElement;
 import com.lsfusion.lang.psi.stubs.interfaces.impl.ImplicitValueStubImpl;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
-import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class ImplicitValueStubElementType extends LSFStubElementType<ImplicitVal
     @Override
     public ImplicitValueStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         int propsCount = dataStream.readInt();
-        List<String> props = new ArrayList<String>();
+        List<String> props = new ArrayList<>();
         if (propsCount != 0) {
             for (int i = 0; i < propsCount; i++) {
                 StringRef name = dataStream.readName();
@@ -57,7 +58,7 @@ public class ImplicitValueStubElementType extends LSFStubElementType<ImplicitVal
     public void indexStub(@NotNull ImplicitValueStubElement stub, @NotNull IndexSink sink) {
         List<String> valueProps = stub.getValueProperties();
         if (valueProps != null) {
-            Set<String> set = new HashSet<String>(valueProps); // избегаем повторного добавления при многократном вхождении свойства
+            Set<String> set = new HashSet<>(valueProps); // избегаем повторного добавления при многократном вхождении свойства
             for (String valueClass : set) {
                 if (valueClass != null) {
                     sink.occurrence(LSFIndexKeys.IMPLICIT_VALUE, valueClass);

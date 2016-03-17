@@ -9,7 +9,6 @@ import com.intellij.psi.ResolveResult;
 import com.intellij.psi.impl.AnyPsiChangeListener;
 import com.intellij.psi.impl.PsiManagerImpl;
 import com.intellij.reference.SoftReference;
-import com.intellij.util.containers.ConcurrentWeakHashMap;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +28,7 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
 
     public PsiDependentCache(@NotNull MessageBus messageBus) {
         for (int i = 0; i < myMaps.length; i++) {
-            myMaps[i] = new ConcurrentWeakHashMap(100, 0.75f, Runtime.getRuntime().availableProcessors(), ContainerUtil.canonicalStrategy());
+            myMaps[i] = ContainerUtil.createConcurrentWeakMap(100, 0.75f, Runtime.getRuntime().availableProcessors(), ContainerUtil.<Psi>canonicalStrategy());
         }
         messageBus.connect().subscribe(PsiManagerImpl.ANY_PSI_CHANGE_TOPIC, new AnyPsiChangeListener() {
             @Override
@@ -103,7 +102,7 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         }
     }
 
-    private static final Getter<Object> NULL_RESULT = new StaticGetter<Object>(null);
+    private static final Getter<Object> NULL_RESULT = new StaticGetter<>(null);
 
     private static <Psi extends PsiElement, TResult> void cache(@NotNull Psi psi, @NotNull ConcurrentMap<Psi, Getter<TResult>> map, TResult result) {
         // optimization: less contention
@@ -116,7 +115,7 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
             //noinspection unchecked
             cached = (Getter<TResult>) NULL_RESULT;
         } else {
-            cached = new SoftGetter<TResult>(result);
+            cached = new SoftGetter<>(result);
         }
         map.put(psi, cached);
     }

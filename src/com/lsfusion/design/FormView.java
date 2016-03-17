@@ -28,40 +28,40 @@ public class FormView {
     protected PropertyDrawView okButton;
     protected PropertyDrawView closeButton;
 
-    private final Map<String, ComponentView> sidToComponent = new HashMap<String, ComponentView>();
+    private final Map<String, ComponentView> sidToComponent = new HashMap<>();
 
     protected ContainerFactory containerFactory;
 
-    public List<TreeGroupView> treeGroups = new ArrayList<TreeGroupView>();
-    public List<GroupObjectView> groupObjects = new ArrayList<GroupObjectView>();
-    public List<PropertyDrawView> properties = new ArrayList<PropertyDrawView>();
-    public List<RegularFilterGroupView> regularFilters = new ArrayList<RegularFilterGroupView>();
+    public List<TreeGroupView> treeGroups = new ArrayList<>();
+    public List<GroupObjectView> groupObjects = new ArrayList<>();
+    public List<PropertyDrawView> properties = new ArrayList<>();
+    public List<RegularFilterGroupView> regularFilters = new ArrayList<>();
 
-    protected Map<TreeGroupEntity, TreeGroupView> mtreeGroups = new HashMap<TreeGroupEntity, TreeGroupView>();
+    protected Map<TreeGroupEntity, TreeGroupView> mtreeGroups = new HashMap<>();
 
     public TreeGroupView get(TreeGroupEntity treeGroup) {
         return mtreeGroups.get(treeGroup);
     }
 
-    protected Map<GroupObjectEntity, GroupObjectView> mgroupObjects = new HashMap<GroupObjectEntity, GroupObjectView>();
+    protected Map<GroupObjectEntity, GroupObjectView> mgroupObjects = new HashMap<>();
 
     public GroupObjectView get(GroupObjectEntity groupObject) {
         return mgroupObjects.get(groupObject);
     }
 
-    protected Map<ObjectEntity, ObjectView> mobjects = new HashMap<ObjectEntity, ObjectView>();
+    protected Map<ObjectEntity, ObjectView> mobjects = new HashMap<>();
 
     public ObjectView get(ObjectEntity object) {
         return mobjects.get(object);
     }
 
-    protected Map<PropertyDrawEntity, PropertyDrawView> mproperties = new HashMap<PropertyDrawEntity, PropertyDrawView>();
+    protected Map<PropertyDrawEntity, PropertyDrawView> mproperties = new HashMap<>();
 
     public PropertyDrawView get(PropertyDrawEntity property) {
         return mproperties.get(property);
     }
 
-    protected Map<RegularFilterGroupEntity, RegularFilterGroupView> mfilters = new HashMap<RegularFilterGroupEntity, RegularFilterGroupView>();
+    protected Map<RegularFilterGroupEntity, RegularFilterGroupView> mfilters = new HashMap<>();
 
     public RegularFilterGroupView get(RegularFilterGroupEntity filterGroup) {
         return mfilters.get(filterGroup);

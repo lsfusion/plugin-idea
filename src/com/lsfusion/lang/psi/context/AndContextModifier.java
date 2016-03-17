@@ -22,9 +22,9 @@ public class AndContextModifier implements ContextModifier {
 
     @Override
     public List<LSFExprParamDeclaration> resolveParams(int offset, Set<LSFExprParamDeclaration> currentParams) {
-        LinkedHashSet<LSFExprParamDeclaration> extParams = new LinkedHashSet<LSFExprParamDeclaration>();
+        LinkedHashSet<LSFExprParamDeclaration> extParams = new LinkedHashSet<>();
         for(ContextModifier modifier : modifiers)
             extParams.addAll(modifier.resolveParams(offset, BaseUtils.merge(currentParams, extParams)));
-        return new ArrayList<LSFExprParamDeclaration>(extParams);
+        return new ArrayList<>(extParams);
     }
 }

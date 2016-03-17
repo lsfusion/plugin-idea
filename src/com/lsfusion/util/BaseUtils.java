@@ -52,7 +52,7 @@ public class BaseUtils {
         if (set == null)
             return map;
 
-        Map<K, V> result = new HashMap<K, V>();
+        Map<K, V> result = new HashMap<>();
         for (Map.Entry<K, V> entry : map.entrySet())
             if (set.contains(entry.getKey()))
                 result.put(entry.getKey(), entry.getValue());
@@ -60,7 +60,7 @@ public class BaseUtils {
     }
 
     public static <K, V> Map<K, V> override(Map<K, V> map, Map<K, V> override) {
-        Map<K, V> result = new HashMap<K, V>(map);
+        Map<K, V> result = new HashMap<>(map);
         result.putAll(override);
         return result;
     }
@@ -70,43 +70,43 @@ public class BaseUtils {
     }
 
     public static <K> Set<K> merge(Set<K> set1, Set<K> set2) {
-        Set<K> result = new HashSet<K>(set1);
+        Set<K> result = new HashSet<>(set1);
         result.addAll(set2);
         return result;
     }
 
     public static <K> List<K> add(List<K> set1, List<K> set2) {
-        List<K> result = new ArrayList<K>(set1);
+        List<K> result = new ArrayList<>(set1);
         result.addAll(set2);
         return result;
     }
 
     public static <K> List<K> add(List<K> set, K element) {
-        List<K> result = new ArrayList<K>(set);
+        List<K> result = new ArrayList<>(set);
         result.add(element);
         return result;
     }
 
     public static <K> List<K> add(K element, List<K> set) {
-        List<K> result = new ArrayList<K>();
+        List<K> result = new ArrayList<>();
         result.add(element);
         result.addAll(set);
         return result;
     }
 
     public static <K> List<K> toList(K... els) {
-        List<K> result = new ArrayList<K>();
+        List<K> result = new ArrayList<>();
         for(K el : els)
             result.add(el);
         return result;
     }
 
     public static <K> List<K> reverse(List<K> col) {
-        return reverseThis(new ArrayList<K>(col));
+        return reverseThis(new ArrayList<>(col));
     }
 
     public static <K> List<K> toList(Iterable<K> col) {
-        List<K> result = new ArrayList<K>();
+        List<K> result = new ArrayList<>();
         for (K element : col)
             result.add(element);
         return result;
@@ -122,13 +122,13 @@ public class BaseUtils {
     }
 
     public static <K> Set<K> remove(Set<? extends K> set, K remove) {
-        Set<K> result = new HashSet<K>(set);
+        Set<K> result = new HashSet<>(set);
         result.remove(remove);
         return result;
     }
 
     public static <K, V> Map<K, V> filterNotKeys(Map<K, V> map, Set<K> set) {
-        Map<K, V> result = new HashMap<K, V>();
+        Map<K, V> result = new HashMap<>();
         for(Map.Entry<K, V> entry : map.entrySet())
             if(!set.contains(entry.getKey()))
                 result.put(entry.getKey(), entry.getValue());
@@ -143,7 +143,7 @@ public class BaseUtils {
 
     public static <K> Set<K> split(Set<K> set1, Set<K> set2) {
 
-        Set<K> common = new HashSet<K>();
+        Set<K> common = new HashSet<>();
 
         Iterator<K> it = set1.iterator();
         while (it.hasNext()) {
@@ -260,7 +260,7 @@ public class BaseUtils {
     }
 
     public static <K, V> Map<V, K> reverse(Map<K, V> fromMap) {
-        HashMap<V, K> reverseMap = new HashMap<V, K>();
+        HashMap<V, K> reverseMap = new HashMap<>();
         reverse(fromMap, reverseMap);
         return reverseMap;
     }

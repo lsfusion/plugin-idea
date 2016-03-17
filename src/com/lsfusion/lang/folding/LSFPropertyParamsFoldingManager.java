@@ -6,7 +6,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.FoldRegion;
-import com.intellij.util.containers.ConcurrentWeakHashMap;
+import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.ConcatenateClassSet;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.DataClass;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public class LSFPropertyParamsFoldingManager {
-    public static Map<Document, Integer> lineUnderChange = new ConcurrentWeakHashMap<Document, Integer>();
+    public static Map<Document, Integer> lineUnderChange = ContainerUtil.createConcurrentWeakMap();
     
     private final Document document;
     private LSFPropertyStatement propertyStatement;
@@ -33,7 +33,7 @@ public class LSFPropertyParamsFoldingManager {
 
     @NotNull
     public List<FoldingDescriptor> buildDescriptors(boolean implicit) {
-        List<FoldingDescriptor> result = new ArrayList<FoldingDescriptor>();
+        List<FoldingDescriptor> result = new ArrayList<>();
 
         boolean printValueClass = true;
         boolean printParamClasses = true;
@@ -128,7 +128,7 @@ public class LSFPropertyParamsFoldingManager {
     }
     
     private List<String> getClassNames(List<LSFClassSet> classSets) {
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         for (LSFClassSet classSet : classSets) {
             names.add(getClassName(classSet));
         }

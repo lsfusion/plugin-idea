@@ -19,7 +19,7 @@ public class ModuleGrouper implements Grouper {
             return Collections.emptyList();
         }
 
-        LinkedHashMap<String, Group> map = new LinkedHashMap<String, Group>();
+        LinkedHashMap<String, Group> map = new LinkedHashMap<>();
 
         for (TreeElement child : children) {
             if (child instanceof LSFPropertyStatementTreeElement) {

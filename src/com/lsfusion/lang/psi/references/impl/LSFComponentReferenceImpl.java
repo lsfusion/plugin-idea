@@ -34,7 +34,7 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
         LSFFormDeclaration formDeclaration = resolveForm(this);
 
         Collection<LSFComponentStubDeclaration> stubDecls = ComponentIndex.getInstance().get(componentName, getProject(), getLSFFile().getRequireScope());
-        List<LSFDeclaration> declarations = new ArrayList<LSFDeclaration>();
+        List<LSFDeclaration> declarations = new ArrayList<>();
 
         for (LSFComponentStubDeclaration stubDecl : stubDecls) {
             if (formDeclaration == resolveForm(stubDecl.getComponentDecl())) {
@@ -44,7 +44,7 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
 
         if (declarations.isEmpty()) {
             // список групп свойств
-            Set<String> groups = new HashSet<String>();
+            Set<String> groups = new HashSet<>();
             for (String key : GroupIndex.getInstance().getAllKeys(getProject())) {
                 Collection<LSFGroupDeclaration> groupDeclarations = GroupIndex.getInstance().get(key, getProject(), getLSFFile().getRequireScope());
                 for (LSFGroupDeclaration groupDeclaration : groupDeclarations) {
@@ -95,7 +95,7 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
     }
 
     private Map<String, LSFDeclaration> getDefaultContainers(LSFFormExtend formExtend, Set<String> groups) {
-        Map<String, LSFDeclaration> result = new HashMap<String, LSFDeclaration>();
+        Map<String, LSFDeclaration> result = new HashMap<>();
         
         // стандартные контейнеры дерева объектов
         for (LSFFormTreeGroupObjectList lsfFormTreeGroupObjectList : PsiTreeUtil.findChildrenOfType(formExtend, LSFFormTreeGroupObjectList.class)) {
@@ -160,7 +160,7 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
     }
     
     private Map<String, LSFDeclaration> getBuiltInFormComponents() {
-        Map<String, LSFDeclaration> result = new HashMap<String, LSFDeclaration>();
+        Map<String, LSFDeclaration> result = new HashMap<>();
         for (LSFComponentDeclaration componentDeclaration : LSFElementGenerator.getBuiltInFormComponents(getProject())) {
             result.put(componentDeclaration.getName(), componentDeclaration);
         }    
@@ -168,11 +168,11 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
     }
         
     private Map<String, LSFDeclaration> getNoGroupDeclarations(Set<String> groups) {
-        List<String> nogroupGroupContainers = new ArrayList<String>();
+        List<String> nogroupGroupContainers = new ArrayList<>();
         for (String group : groups) {
             nogroupGroupContainers.add("NOGROUP." + group);
         }
-        Map<String, LSFDeclaration> result = new HashMap<String, LSFDeclaration>();
+        Map<String, LSFDeclaration> result = new HashMap<>();
         for (LSFComponentDeclaration componentDeclaration : LSFElementGenerator.createFormComponents(getProject(), nogroupGroupContainers)) {
             result.put(componentDeclaration.getName(), componentDeclaration);
         }    

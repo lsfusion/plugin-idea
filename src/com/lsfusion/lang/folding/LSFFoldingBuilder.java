@@ -20,7 +20,7 @@ public class LSFFoldingBuilder implements FoldingBuilder {
     @NotNull
     @Override
     public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
-        List<FoldingDescriptor> list = new ArrayList<FoldingDescriptor>();
+        List<FoldingDescriptor> list = new ArrayList<>();
         Project project = node.getPsi().getProject();
         boolean propFoldNone = PropertyFoldingManager.isNone(project);
         boolean propFoldImplicit = PropertyFoldingManager.isImplicit(project); 

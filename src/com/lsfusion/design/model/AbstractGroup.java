@@ -10,7 +10,7 @@ public class AbstractGroup {
 
 
     public AbstractGroup parent;
-    public Set<AbstractGroup> children = new LinkedHashSet<AbstractGroup>();
+    public Set<AbstractGroup> children = new LinkedHashSet<>();
 
     public AbstractGroup(String sID, String caption) {
         this.sID = sID;

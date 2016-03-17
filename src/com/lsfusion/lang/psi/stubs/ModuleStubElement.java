@@ -12,5 +12,5 @@ public interface ModuleStubElement extends NamespaceStubElement<ModuleStubElemen
 
     List<LSFModuleReference> getRequireRefs();
 
-    public LSFNamespaceReference getExplicitNamespaceRef();
+    LSFNamespaceReference getExplicitNamespaceRef();
 }

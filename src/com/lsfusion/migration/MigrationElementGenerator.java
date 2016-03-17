@@ -18,7 +18,7 @@ public class MigrationElementGenerator {
     @NotNull
     public static Pair<PsiElement, PsiElement> createVersionBlock(Project myProject, String prefix, String version, String innerText) {
         final PsiFile dummyFile = createDummyFile(myProject, prefix + "V" + version + " {\n" + innerText + "\n}");
-        return new Pair<PsiElement, PsiElement>(dummyFile.getFirstChild(), dummyFile.getLastChild());
+        return Pair.create(dummyFile.getFirstChild(), dummyFile.getLastChild());
     }
 
     @NotNull
@@ -33,7 +33,7 @@ public class MigrationElementGenerator {
         PsiElement firstChild = versionBlockBody.getFirstChild().getNextSibling();
         PsiElement lastChild = versionBlockBody.getLastChild().getPrevSibling();
         
-        return new Pair<PsiElement, PsiElement>(firstChild, lastChild);
+        return Pair.create(firstChild, lastChild);
     }
 
     public static PsiFile createDummyFile(Project myProject, String text) {

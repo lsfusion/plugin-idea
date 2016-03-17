@@ -22,6 +22,6 @@ public class AddObjectContextModifier implements ContextModifier {
         LSFParamDeclare paramDeclare = clause.getParamDeclare();
         if(paramDeclare!=null)
             return Collections.<LSFExprParamDeclaration>singletonList(paramDeclare);
-        return new ArrayList<LSFExprParamDeclaration>();
+        return new ArrayList<>();
     }
 }

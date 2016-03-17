@@ -19,7 +19,7 @@ public class ExtendedClassGrouper implements Grouper {
             return Collections.emptyList();
         }
 
-        LinkedHashMap<LSFValueClass, Group> groupMap = new LinkedHashMap<LSFValueClass, Group>();
+        LinkedHashMap<LSFValueClass, Group> groupMap = new LinkedHashMap<>();
         for (TreeElement child : children) {
             if (child instanceof LSFPropertyStatementTreeElement) {
                 LSFPropertyStatementTreeElement psChild = (LSFPropertyStatementTreeElement) child;

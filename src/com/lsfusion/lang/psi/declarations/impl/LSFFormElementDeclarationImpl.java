@@ -14,7 +14,7 @@ import java.util.Collection;
 
 public abstract class LSFFormElementDeclarationImpl<T extends LSFDeclaration> extends LSFDeclarationImpl implements LSFFormElementDeclaration, LSFFormExtendElement {
 
-    public static interface Processor<T> {
+    public interface Processor<T> {
         Collection<T> process(LSFFormExtend formExtend);
     }
 

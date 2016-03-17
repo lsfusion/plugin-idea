@@ -167,7 +167,7 @@ public class RenameJrxmlFieldsToNewFormat extends AnAction {
             System.out.println("Using explicit objects for: " + relativePath);
             objects = explicitObjects.get(explicitFormName);
         } else {
-            objects = new HashSet<String>();
+            objects = new HashSet<>();
 
             final LSFFormDeclaration formDecl = explicitLink.containsKey(fileName)
                                                 ? resolveByFullFileName(explicitLink.get(fileName), project, scope)

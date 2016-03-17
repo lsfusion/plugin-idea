@@ -42,7 +42,7 @@ public class LSFExplicitSignature extends LSFExplicitClasses {
     }
 
     public static LSFExplicitSignature deserialize(@NotNull StubInputStream dataStream) throws IOException {
-        List<LSFStringClassRef> params = new ArrayList<LSFStringClassRef>();
+        List<LSFStringClassRef> params = new ArrayList<>();
         int paramsCount = dataStream.readInt();
         for (int i = 0; i < paramsCount; i++) {
             params.add(dataStream.readBoolean() ? LSFStringClassRef.deserialize(dataStream) : null);//);

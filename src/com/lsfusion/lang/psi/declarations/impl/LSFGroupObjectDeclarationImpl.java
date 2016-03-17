@@ -27,14 +27,14 @@ public abstract class LSFGroupObjectDeclarationImpl extends LSFFormElementDeclar
 
     @Override
     public List<LSFClassSet> resolveClasses() {
-        List<LSFFormObjectDeclaration> objectDecls = new ArrayList<LSFFormObjectDeclaration>();
+        List<LSFFormObjectDeclaration> objectDecls = new ArrayList<>();
         LSFFormSingleGroupObjectDeclaration single = getFormSingleGroupObjectDeclaration();
         if (single != null)
             objectDecls.add(single.getFormObjectDeclaration());
         else
             objectDecls.addAll(getFormMultiGroupObjectDeclaration().getFormObjectDeclarationList());
 
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        List<LSFClassSet> result = new ArrayList<>();
         for (LSFFormObjectDeclaration objectDecl : objectDecls)
             result.add(objectDecl.resolveClass());
         return result;

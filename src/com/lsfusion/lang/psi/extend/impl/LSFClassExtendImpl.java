@@ -97,8 +97,8 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
 
         LSFClassParentsList parents = getClassParentsList();
         if (parents == null)
-            return new ArrayList<LSFClassDeclaration>();
-        List<LSFClassDeclaration> result = new ArrayList<LSFClassDeclaration>();
+            return new ArrayList<>();
+        List<LSFClassDeclaration> result = new ArrayList<>();
         LSFNonEmptyCustomClassUsageList nonEmptyCustomClassUsageList = parents.getNonEmptyCustomClassUsageList();
         if (nonEmptyCustomClassUsageList != null) {
             for (LSFCustomClassUsage usage : nonEmptyCustomClassUsageList.getCustomClassUsageList()) {
@@ -130,7 +130,7 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
 
         LSFClassParentsList parents = getClassParentsList();
         if (parents == null)
-            return new ArrayList<LSFStringClassRef>();
+            return new ArrayList<>();
 
         List<LSFStringClassRef> result = new ArrayList<>();
         LSFNonEmptyCustomClassUsageList nonEmptyCustomClassUsageList = parents.getNonEmptyCustomClassUsageList();
@@ -145,7 +145,7 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
     @Override
     public List<LSFStaticObjectDeclaration> getStaticObjects() {
         LSFStaticObjectDeclList listDecl = getStaticObjectDeclList();
-        List<LSFStaticObjectDeclaration> result = new ArrayList<LSFStaticObjectDeclaration>();
+        List<LSFStaticObjectDeclaration> result = new ArrayList<>();
         if (listDecl != null && listDecl.getNonEmptyStaticObjectDeclList() != null) {
             for (LSFStaticObjectDecl decl : listDecl.getNonEmptyStaticObjectDeclList().getStaticObjectDeclList()) {
                 result.add(decl);
@@ -155,7 +155,7 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
     }
 
     public Set<LSFStaticObjectDeclaration> resolveStaticObjectDuplicates() {
-        Set<LSFStaticObjectDeclaration> result = new HashSet<LSFStaticObjectDeclaration>();
+        Set<LSFStaticObjectDeclaration> result = new HashSet<>();
 
         List<LSFStaticObjectDeclaration> localDecls = getStaticObjects();
         for (int i = 0; i < localDecls.size(); i++) {
@@ -170,7 +170,7 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
             }
         }
 
-        List<LSFStaticObjectDeclaration> parentObjects = new ArrayList<LSFStaticObjectDeclaration>();
+        List<LSFStaticObjectDeclaration> parentObjects = new ArrayList<>();
         for (LSFClassExtend extend : LSFGlobalResolver.findExtendElements(resolveDecl(), LSFStubElementTypes.EXTENDCLASS, getLSFFile()).findAll()) {
             if (!this.equals(extend)) {
                 parentObjects.addAll(extend.getStaticObjects());

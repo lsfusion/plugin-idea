@@ -22,7 +22,7 @@ public class LSFUsageFilteringRuleProvider implements UsageFilteringRuleProvider
     @NotNull
     @Override
     public UsageFilteringRule[] getActiveRules(@NotNull Project project) {
-        List<UsageFilteringRule> rules = new ArrayList<UsageFilteringRule>();
+        List<UsageFilteringRule> rules = new ArrayList<>();
         rules.add(new TypeUsageFilteringRule());
 
         return rules.toArray(new UsageFilteringRule[rules.size()]);

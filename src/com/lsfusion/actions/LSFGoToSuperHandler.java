@@ -33,7 +33,7 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
     public void invoke(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
         final PsiElement at = file.findElementAt(editor.getCaretModel().getOffset());
         if (at != null) {
-            List<PsiElement> targets = new ArrayList<PsiElement>();
+            List<PsiElement> targets = new ArrayList<>();
 
             // metacode
             LeafPsiElement mapped = (LeafPsiElement) MetaChangeDetector.mapOffset(at);

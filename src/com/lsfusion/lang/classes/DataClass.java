@@ -2,14 +2,13 @@ package com.lsfusion.lang.classes;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.apache.commons.lang.StringUtils;
 import com.lsfusion.util.BaseUtils;
+import org.apache.commons.lang.StringUtils;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import java.awt.*;
 
 public abstract class DataClass implements LSFClassSet, LSFValueClass {
 
@@ -28,7 +27,7 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     @Override
     public List<String> getSNames() {
         String name = getName();
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         result.add(name);
         result.add(StringUtils.capitalize(name.toLowerCase()));
         result.addAll(getExtraNames());
@@ -36,7 +35,7 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     }
 
     public Collection<String> getExtraNames() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     public DataClass op(DataClass compClass, boolean or, boolean string) {

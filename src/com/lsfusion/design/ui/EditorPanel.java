@@ -58,9 +58,9 @@ public class EditorPanel extends JPanel {
     private PropertyTable propertyTable;
     private boolean selecting = false;
 
-    private final Map<ComponentView, JComponent> componentToWidget = new HashMap<ComponentView, JComponent>();
-    private final Map<JComponent, ComponentView> widgetToComponent = new HashMap<JComponent, ComponentView>();
-    private final Map<ComponentView, Boolean> selection = new HashMap<ComponentView, Boolean>();
+    private final Map<ComponentView, JComponent> componentToWidget = new HashMap<>();
+    private final Map<JComponent, ComponentView> widgetToComponent = new HashMap<>();
+    private final Map<ComponentView, Boolean> selection = new HashMap<>();
 
     public EditorPanel(@NotNull Project project, @NotNull LSFDesignVirtualFileImpl file) {
         super(null);
@@ -121,7 +121,7 @@ public class EditorPanel extends JPanel {
         componentTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
-                List<ComponentView> selectedComponents = new ArrayList<ComponentView>();
+                List<ComponentView> selectedComponents = new ArrayList<>();
                 for (ComponentTreeNode node : componentTree.getSelectedNodes(ComponentTreeNode.class, null)) {
                     selectedComponents.add(node.getComponent());
                 }

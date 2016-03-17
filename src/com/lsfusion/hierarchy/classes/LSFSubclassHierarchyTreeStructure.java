@@ -22,7 +22,7 @@ public class LSFSubclassHierarchyTreeStructure extends HierarchyTreeStructure {
     @NotNull
     @Override
     protected Object[] buildChildren(@NotNull HierarchyNodeDescriptor descriptor) {
-        Set<LSFClassHierarchyNodeDescriptor> result = new ArrayListSet<LSFClassHierarchyNodeDescriptor>();
+        Set<LSFClassHierarchyNodeDescriptor> result = new ArrayListSet<>();
 
         LSFClassDeclaration classDecl = ((LSFClassHierarchyNodeDescriptor) descriptor).getClassDecl();
         ClassExtendsClassIndex index = ClassExtendsClassIndex.getInstance();

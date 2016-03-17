@@ -53,7 +53,7 @@ public class LSFFileUtils {
     }
 
     private static boolean hasFilesWithShortName(String fileName, Project project, GlobalSearchScope scope) {
-        final Result<Boolean> hasFiles = new Result<Boolean>(false);
+        final Result<Boolean> hasFiles = new Result<>(false);
         FilenameIndex.processFilesByName(
                 fileName, false, new Processor<PsiFileSystemItem>() {
                     @Override
@@ -97,7 +97,7 @@ public class LSFFileUtils {
     public static List<PsiFile> findFilesByPath(Module module, final String path) {
         final PsiManager psiManager = PsiManager.getInstance(module.getProject());
 
-        final List<PsiFile> result = new ArrayList<PsiFile>();
+        final List<PsiFile> result = new ArrayList<>();
 
         final OrderEnumerator orderEnumerator = ModuleRootManager.getInstance(module).orderEntries();
 
@@ -227,7 +227,7 @@ public class LSFFileUtils {
             }
 
             GlobalSearchScope scope = GlobalSearchScope.EMPTY_SCOPE;
-            List<VirtualFile> files = new ArrayList<VirtualFile>();
+            List<VirtualFile> files = new ArrayList<>();
 
             for (LSFModuleDeclaration lsfModule : modules) {
                 if (searchInRequiredModules) {

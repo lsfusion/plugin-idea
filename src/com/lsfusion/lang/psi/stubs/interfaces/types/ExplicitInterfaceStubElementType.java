@@ -9,14 +9,15 @@ import com.lsfusion.lang.psi.LSFExplicitClasses;
 import com.lsfusion.lang.psi.LSFImplicitExplicitClasses;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
 import com.lsfusion.lang.psi.impl.LSFExplicitInterfacePropertyStatementImpl;
+import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceStubElement;
 import com.lsfusion.lang.psi.stubs.interfaces.impl.ExplicitInterfaceStubImpl;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
-import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ExplicitInterfaceStubElementType extends LSFStubElementType<ExplicitInterfaceStubElement, LSFExplicitInterfacePropStatement> {
     public ExplicitInterfaceStubElementType() {
@@ -63,7 +64,7 @@ public class ExplicitInterfaceStubElementType extends LSFStubElementType<Explici
     public void indexStub(@NotNull ExplicitInterfaceStubElement stub, @NotNull IndexSink sink) {
         LSFExplicitClasses paramExplicitClasses = stub.getParamExplicitClasses();
         if(paramExplicitClasses != null) {
-            Set<String> set = new HashSet<String>(); // избегаем повторного добавления при многократном вхождении класса
+            Set<String> set = new HashSet<>(); // избегаем повторного добавления при многократном вхождении класса
             for (String paramClass : paramExplicitClasses.getIndexedClasses()) {
                 if (paramClass != null && set.add(paramClass))
                     sink.occurrence(LSFIndexKeys.EXPLICIT_INTERFACE, paramClass);

@@ -68,37 +68,37 @@ public class DefaultFormView extends FormView {
         initFormButtons();
     }
 
-    protected Map<GroupObjectView, ContainerView> groupContainers = new HashMap<GroupObjectView, ContainerView>();
+    protected Map<GroupObjectView, ContainerView> groupContainers = new HashMap<>();
 
     public ContainerView getGroupObjectContainer(GroupObjectView groupObject) {
         return groupContainers.get(groupObject);
     }
 
-    protected Map<GroupObjectView, ContainerView> gridContainers = new HashMap<GroupObjectView, ContainerView>();
+    protected Map<GroupObjectView, ContainerView> gridContainers = new HashMap<>();
 
     public ContainerView getGridContainer(GroupObjectView treeGroup) {
         return gridContainers.get(treeGroup);
     }
 
-    protected Map<GroupObjectView, ContainerView> panelContainers = new HashMap<GroupObjectView, ContainerView>();
+    protected Map<GroupObjectView, ContainerView> panelContainers = new HashMap<>();
 
     public ContainerView getPanelContainer(GroupObjectView groupObject) {
         return panelContainers.get(groupObject);
     }
 
-    protected transient Map<TreeGroupView, ContainerView> treeContainers = new HashMap<TreeGroupView, ContainerView>();
+    protected transient Map<TreeGroupView, ContainerView> treeContainers = new HashMap<>();
 
     public ContainerView getTreeContainer(TreeGroupView treeGroup) {
         return treeContainers.get(treeGroup);
     }
 
-    protected final Map<GroupView, ContainerView> panelPropsContainers = new HashMap<GroupView, ContainerView>();
+    protected final Map<GroupView, ContainerView> panelPropsContainers = new HashMap<>();
 
     public ContainerView getPanelPropsContainer(GroupObjectView groupObject) {
         return panelPropsContainers.get(groupObject);
     }
 
-    protected transient Map<GroupView, ContainerView> controlsContainers = new HashMap<GroupView, ContainerView>();
+    protected transient Map<GroupView, ContainerView> controlsContainers = new HashMap<>();
 
     public ContainerView getControlsContainer(GroupObjectView groupObject) {
         return controlsContainers.get(groupObject);
@@ -108,7 +108,7 @@ public class DefaultFormView extends FormView {
         return controlsContainers.get(treeGroup);
     }
 
-    protected final Map<GroupView, ContainerView> toolbarPropsContainers = new HashMap<GroupView, ContainerView>();
+    protected final Map<GroupView, ContainerView> toolbarPropsContainers = new HashMap<>();
 
     public ContainerView getToolbarPropsContainer(GroupObjectView groupObject) {
         return toolbarPropsContainers.get(groupObject);
@@ -118,7 +118,7 @@ public class DefaultFormView extends FormView {
         return toolbarPropsContainers.get(treeGroup);
     }
 
-    protected transient Map<GroupView, ContainerView> rightControlsContainers = new HashMap<GroupView, ContainerView>();
+    protected transient Map<GroupView, ContainerView> rightControlsContainers = new HashMap<>();
 
     public ContainerView getRightControlsContainer(GroupObjectView groupObject) {
         return rightControlsContainers.get(groupObject);
@@ -128,7 +128,7 @@ public class DefaultFormView extends FormView {
         return rightControlsContainers.get(treeGroup);
     }
 
-    protected final Map<GroupView, ContainerView> filtersContainers = new HashMap<GroupView, ContainerView>();
+    protected final Map<GroupView, ContainerView> filtersContainers = new HashMap<>();
 
     public ContainerView getFilterContainer(GroupObjectView groupObject) {
         return filtersContainers.get(groupObject);

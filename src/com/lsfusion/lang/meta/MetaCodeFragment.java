@@ -18,8 +18,8 @@ public class MetaCodeFragment {
 
     public MetaCodeFragment(List<String> params, List<Pair<String, IElementType>> tokenTypes) {
         this.parameters = params;
-        tokens = new ArrayList<String>();
-        types = new ArrayList<IElementType>();
+        tokens = new ArrayList<>();
+        types = new ArrayList<>();
         for(Pair<String, IElementType> tokenType : tokenTypes) {
             tokens.add(tokenType.first);
             types.add(tokenType.second);
@@ -32,7 +32,7 @@ public class MetaCodeFragment {
     }
     
     public int mapOffset(int offset, List<MetaTransaction.InToken> params) {
-        List<List<MetaTransaction.ExtToken>> oldTokens = new ArrayList<List<MetaTransaction.ExtToken>>();
+        List<List<MetaTransaction.ExtToken>> oldTokens = new ArrayList<>();
         List<MetaTransaction.InToken> newTokens = getNewTokens(params, oldTokens);
         int mapOffset = 0;
         int j=0;
@@ -56,11 +56,11 @@ public class MetaCodeFragment {
     }
 
     public List<MetaTransaction.InToken> getNewTokens(List<MetaTransaction.InToken> params, List<List<MetaTransaction.ExtToken>> oldTokens) {
-        ArrayList<MetaTransaction.InToken> newTokens = new ArrayList<MetaTransaction.InToken>();
-        List<IElementType> newTokTypes = new ArrayList<IElementType>();
+        ArrayList<MetaTransaction.InToken> newTokens = new ArrayList<>();
+        List<IElementType> newTokTypes = new ArrayList<>();
 
         for (int i = 0; i < tokens.size(); i++) {
-            Result<Boolean> transformed = new Result<Boolean>();
+            Result<Boolean> transformed = new Result<>();
             MetaTransaction.InToken tokenStr = transformedToken(params, tokens.get(i), transformed);
             if (tokenStr.text.equals("##") || tokenStr.text.equals("###")) {
                 if (!newTokens.isEmpty() && i+1 < tokens.size()) { // если не первый и не последний
@@ -80,7 +80,7 @@ public class MetaCodeFragment {
                         newTokens.add(nextToken);
                         newTokTypes.add(types.get(i+1)); 
                         if(oldTokens!=null) {
-                            List<MetaTransaction.ExtToken> prev = new ArrayList<MetaTransaction.ExtToken>();
+                            List<MetaTransaction.ExtToken> prev = new ArrayList<>();
                             prev.add(new MetaTransaction.ExtToken(tokens.get(i), true));
                             prev.add(new MetaTransaction.ExtToken(tokens.get(i+1), transformed.getResult()));
                             oldTokens.add(prev);
@@ -92,7 +92,7 @@ public class MetaCodeFragment {
                 newTokens.add(tokenStr);
                 newTokTypes.add(types.get(i));
                 if(oldTokens!=null) {
-                    List<MetaTransaction.ExtToken> prev = new ArrayList<MetaTransaction.ExtToken>();
+                    List<MetaTransaction.ExtToken> prev = new ArrayList<>();
                     prev.add(new MetaTransaction.ExtToken(tokens.get(i), transformed.getResult()));
                     oldTokens.add(prev);
                 }

@@ -67,11 +67,11 @@ public class DesignView extends JPanel implements Disposable {
     private boolean selecting = false;
     
     private boolean highlighting = false;
-    private List<Component> selectedComponents = new ArrayList<Component>();
+    private List<Component> selectedComponents = new ArrayList<>();
 
-    private final Map<ComponentView, JComponent> componentToWidget = new HashMap<ComponentView, JComponent>();
-    private final Map<JComponent, ComponentView> widgetToComponent = new HashMap<JComponent, ComponentView>();
-    private final Map<ComponentView, Boolean> selection = new HashMap<ComponentView, Boolean>();
+    private final Map<ComponentView, JComponent> componentToWidget = new HashMap<>();
+    private final Map<JComponent, ComponentView> widgetToComponent = new HashMap<>();
+    private final Map<ComponentView, Boolean> selection = new HashMap<>();
 
     private final MergingUpdateQueue myUpdateQueue;
     private final MergingUpdateQueue redrawQueue;
@@ -257,7 +257,7 @@ public class DesignView extends JPanel implements Disposable {
         componentTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
-                List<ComponentView> selectedComps = new ArrayList<ComponentView>();
+                List<ComponentView> selectedComps = new ArrayList<>();
                 selectedComponents.clear();
                 
                 for (ComponentTreeNode node : componentTree.getSelectedNodes(ComponentTreeNode.class, null)) {

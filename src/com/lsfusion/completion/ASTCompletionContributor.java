@@ -629,7 +629,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         public <G extends LSFFullNameDeclaration> List<G> getDeclarationsFromScope(Project project, GlobalSearchScope scope, StringStubIndexExtension index) {
-            List<G> result = new ArrayList<G>();
+            List<G> result = new ArrayList<>();
 
             Collection<String> propKeys = index.getAllKeys(project);
             quickLog("After getAllKeys: " + propKeys.size());
@@ -666,7 +666,7 @@ public class ASTCompletionContributor extends CompletionContributor {
 
             quickLog("After getDeclarationsFromScope..");
             
-            final Collection<LSFLocalDataPropertyDefinition> localDeclarations = new ArrayList<LSFLocalDataPropertyDefinition>();
+            final Collection<LSFLocalDataPropertyDefinition> localDeclarations = new ArrayList<>();
             // search local properties
             PsiElement lastElement = getLastPsiOfType(PsiElement.class);
             if (lastElement != null) {

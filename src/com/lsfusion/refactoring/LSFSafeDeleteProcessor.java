@@ -38,7 +38,7 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
     public NonCodeUsageSearchInfo findUsages(PsiElement element, PsiElement[] allElementsToDelete, List<UsageInfo> result) {
             Project project = element.getProject();
             element = getNameIdentifier(element);
-        new LSFFindUsagesHandler(element).processElementUsages(element, new CommonProcessors.CollectProcessor<UsageInfo>(result), new LSFFindUsagesOptions(project));
+        new LSFFindUsagesHandler(element).processElementUsages(element, new CommonProcessors.CollectProcessor<>(result), new LSFFindUsagesOptions(project));
         return null;
     }
 
@@ -51,7 +51,7 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
     @Nullable
     @Override
     public Collection<String> findConflicts(PsiElement element, PsiElement[] allElementsToDelete) {
-            List<UsageInfo> usages = new ArrayList<UsageInfo>();
+            List<UsageInfo> usages = new ArrayList<>();
             findUsages(element, allElementsToDelete, usages);
             if (!usages.isEmpty()) {
                 return Arrays.asList("Element '" + getNameIdentifier(element).getText() +  "' has some usages.");

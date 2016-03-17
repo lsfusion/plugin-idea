@@ -82,9 +82,9 @@ public class ShortenNamesProcessor {
 
     public static List<String> getWords(String string) {
         if(string.isEmpty())
-            return new ArrayList<String>();
+            return new ArrayList<>();
             
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         int prevStart = 0;
         for(int i=1;i<string.length();i++) {
             if(Character.isUpperCase(string.charAt(i)) && !(Character.isUpperCase(string.charAt(i-1)) && (i+1>=string.length() || Character.isUpperCase(string.charAt(i + 1))) && !isPredefinedWord(string.substring(prevStart, i)))) {
@@ -111,7 +111,7 @@ public class ShortenNamesProcessor {
         List<String> declWords = getWords(declName);
         int keep = declWords.size() - 1;
         
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         List<String> paramNames = null;
         if(decl instanceof LSFGlobalPropDeclaration)
@@ -148,7 +148,7 @@ public class ShortenNamesProcessor {
                 int skip = 0; // сколько слов пропустили
                 int skipFull = 0; // сколько полных слов пропустили
                 while(k == 0) {
-                    List<String> sNames = new ArrayList<String>();
+                    List<String> sNames = new ArrayList<>();
                     if(prmClass!=null)
                         sNames = prmClass.getCommonClass().getSNames();
                     if(paramNames!=null)
@@ -225,7 +225,7 @@ public class ShortenNamesProcessor {
     public static void shortenAllPropNames(Project project, MigrationChangePolicy migrationChangePolicy) {
         GlobalSearchScope scope = ProjectScope.getProjectScope(project);
 
-        final List<LSFFile> files = new ArrayList<LSFFile>();
+        final List<LSFFile> files = new ArrayList<>();
 
         for (VirtualFile lsfFile : FileTypeIndex.getFiles(LSFFileType.INSTANCE, scope)) {
             PsiFile psiFile = PsiManager.getInstance(project).findFile(lsfFile);
@@ -244,7 +244,7 @@ public class ShortenNamesProcessor {
             }
         }
         
-        List<ElementMigration> migrations = new ArrayList<ElementMigration>();
+        List<ElementMigration> migrations = new ArrayList<>();
 
         MetaTransaction transaction = new MetaTransaction();
 
@@ -352,8 +352,8 @@ public class ShortenNamesProcessor {
         Project project = files.iterator().next().getProject();
         MetaChangeDetector.getInstance(project).setMetaEnabled(false, false);
 
-        Map<LSFPropDeclaration, String> propertyDecls = new HashMap<LSFPropDeclaration, String>();
-        Map<LSFPropertyDrawDeclaration, String> propertyDrawDecls = new HashMap<LSFPropertyDrawDeclaration, String>();
+        Map<LSFPropDeclaration, String> propertyDecls = new HashMap<>();
+        Map<LSFPropertyDrawDeclaration, String> propertyDrawDecls = new HashMap<>();
         
         System.out.println("Collecting property decls...");
         int i = 0;
@@ -368,7 +368,7 @@ public class ShortenNamesProcessor {
 
         System.out.println("Collecting and resolving property refs...");
 
-        List<ExtPropRef> propRefs = new ArrayList<ExtPropRef>();
+        List<ExtPropRef> propRefs = new ArrayList<>();
         i = 0;
         for (LSFFile file : files) {
             i++;
@@ -407,7 +407,7 @@ public class ShortenNamesProcessor {
         }
 
         System.out.println("Collecting and resolving property draw refs...");
-        List<ExtPropDrawRef> propDrawRefs = new ArrayList<ExtPropDrawRef>();
+        List<ExtPropDrawRef> propDrawRefs = new ArrayList<>();
         i = 0;
         for(LSFFile file : files) {
             i++;
@@ -785,7 +785,7 @@ public class ShortenNamesProcessor {
         }
     }
     
-    private static interface CalcGraph {
+    private interface CalcGraph {
         void proceedFile(Map<PropId, Set<PropId>> result, LSFFile file);        
     }
     
@@ -830,7 +830,7 @@ public class ShortenNamesProcessor {
     }
 
     private static Set<PropId> recCalcGraph(PropId decl, Map<PropId, Set<PropId>> graph) {
-        Set<PropId> result = new HashSet<PropId>();
+        Set<PropId> result = new HashSet<>();
         
         Set<PropId> setGraph = graph.get(decl);        
         if(setGraph != null) {
@@ -845,7 +845,7 @@ public class ShortenNamesProcessor {
     public static Map<PropId, Set<PropId>> calcGraph(Project myProject, CalcGraph calcGraph) {
         Collection<String> allKeys = ModuleIndex.getInstance().getAllKeys(myProject);
 
-        Map<PropId, Set<PropId>> result = new HashMap<PropId, Set<PropId>>();
+        Map<PropId, Set<PropId>> result = new HashMap<>();
                 
         for (final String module : allKeys) {
             Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, GlobalSearchScope.allScope(myProject));
@@ -854,7 +854,7 @@ public class ShortenNamesProcessor {
             }
         }
      
-        Map<PropId, Set<PropId>> fullGraph = new HashMap<PropId, Set<PropId>>();
+        Map<PropId, Set<PropId>> fullGraph = new HashMap<>();
         for(Map.Entry<PropId, Set<PropId>> entry : result.entrySet()) {
             fullGraph.put(entry.getKey(), recCalcGraph(entry.getKey(), result));
         }
@@ -882,7 +882,7 @@ public class ShortenNamesProcessor {
                                     PropId abstId = new PropId((LSFGlobalPropDeclaration) decl);
                                     Set<PropId> impls = result.get(abstId);
                                     if (impls == null) {
-                                        impls = new HashSet<PropId>();
+                                        impls = new HashSet<>();
                                         result.put(abstId, impls);
                                     }
                                     impls.add(propId);
@@ -934,13 +934,13 @@ public class ShortenNamesProcessor {
         });
     }
 
-    private static interface Getter<T> {
+    private interface Getter<T> {
         Pair<LSFPropertyObject, LSFPropertyExpressionList> get(T element);
     }
     private static void proceedImpl(LSFPropertyExpression pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Map<PropId, Set<PropId>> result) {
         proceedImpl(pe, abst, params, LSFJoinPropertyDefinition.class, new Getter<LSFJoinPropertyDefinition>() {
             public Pair<LSFPropertyObject, LSFPropertyExpressionList> get(LSFJoinPropertyDefinition element) {
-                return new Pair<LSFPropertyObject, LSFPropertyExpressionList>(element.getPropertyObject(), element.getPropertyExpressionList());
+                return Pair.create(element.getPropertyObject(), element.getPropertyExpressionList());
             }
         }, result);
     }
@@ -948,7 +948,7 @@ public class ShortenNamesProcessor {
     private static void proceedImpl(LSFActionPropertyDefinitionBody pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Map<PropId, Set<PropId>> result) {
         proceedImpl(pe, abst, params, LSFExecActionPropertyDefinitionBody.class, new Getter<LSFExecActionPropertyDefinitionBody>() {
             public Pair<LSFPropertyObject, LSFPropertyExpressionList> get(LSFExecActionPropertyDefinitionBody element) {
-                return new Pair<LSFPropertyObject, LSFPropertyExpressionList>(element.getPropertyObject(), element.getPropertyExpressionList());
+                return Pair.create(element.getPropertyObject(), element.getPropertyExpressionList());
             }
         }, result);
     }
@@ -999,7 +999,7 @@ public class ShortenNamesProcessor {
                     if (impl != null) {
                         Set<PropId> impls = result.get(abstId);
                         if (impls == null) {
-                            impls = new HashSet<PropId>();
+                            impls = new HashSet<>();
                             result.put(abstId, impls);
                         }
                         impls.add(new PropId(impl));
@@ -1012,7 +1012,7 @@ public class ShortenNamesProcessor {
     
     public static void checkGraphs(Project myProject) {
         System.out.println("start");
-        Set<PropId> props = new HashSet<PropId>();
+        Set<PropId> props = new HashSet<>();
         Map<PropId, Set<PropId>> absGraph = calcAbstractGraph(myProject, props);
         Map<PropId, Set<PropId>> impGraph = calcImplementGraph(myProject);
         System.out.println("stop");
@@ -1020,14 +1020,14 @@ public class ShortenNamesProcessor {
         for(PropId prop : props) {
             Set<PropId> absEdges = absGraph.get(prop);
             if(absEdges == null)
-                absEdges = new HashSet<PropId>();
+                absEdges = new HashSet<>();
             else
-                absEdges = new HashSet<PropId>(absEdges);
+                absEdges = new HashSet<>(absEdges);
             Set<PropId> impEdges = impGraph.get(prop);
             if(impEdges == null)
-                impEdges = new HashSet<PropId>();
+                impEdges = new HashSet<>();
             else
-                impEdges = new HashSet<PropId>(impEdges);
+                impEdges = new HashSet<>(impEdges);
             
             BaseUtils.split(absEdges, impEdges);
             

@@ -29,7 +29,7 @@ public abstract class LSFNameContributor implements ChooseByNameContributor {
             pattern = ((JTextField) focusedComponent).getText();
         }
         
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (StringStubIndexExtension index : getIndices()) {
             result.addAll(getIndexKeys(index, pattern, project, includeNonProjectItems));
         }
@@ -45,7 +45,7 @@ public abstract class LSFNameContributor implements ChooseByNameContributor {
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
         final GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
 
-        final List<NavigationItem> result = new ArrayList<NavigationItem>();
+        final List<NavigationItem> result = new ArrayList<>();
         for (StringStubIndexExtension index : getIndices()) {
             result.addAll(getItemsFromIndex(index, name, project, scope));
         }

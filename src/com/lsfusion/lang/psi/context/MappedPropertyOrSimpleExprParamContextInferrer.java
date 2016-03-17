@@ -42,7 +42,7 @@ public class MappedPropertyOrSimpleExprParamContextInferrer implements ContextIn
     private final ContextInferrer andInferrer;
 
     public MappedPropertyOrSimpleExprParamContextInferrer(List<LSFMappedPropertyOrSimpleExprParam> params) {
-        List<ContextInferrer> inferrers = new ArrayList<ContextInferrer>();
+        List<ContextInferrer> inferrers = new ArrayList<>();
         for(LSFMappedPropertyOrSimpleExprParam param : params) {
             LSFExprParameterUsage exprParameterUsage = param.getExprParameterUsage();
             ContextInferrer inferrer;

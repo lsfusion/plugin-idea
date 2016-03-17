@@ -5,7 +5,7 @@ import java.util.List;
 
 public class TreeGroupEntity {
     public String sID;
-    public List<GroupObjectEntity> groups = new ArrayList<GroupObjectEntity>();
+    public List<GroupObjectEntity> groups = new ArrayList<>();
 
     public TreeGroupEntity(String sID) {
         this.sID = sID;

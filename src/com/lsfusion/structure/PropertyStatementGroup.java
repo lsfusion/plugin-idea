@@ -13,7 +13,7 @@ public abstract class PropertyStatementGroup implements Group, ItemPresentation 
     private List<TreeElement> children;
 
     public PropertyStatementGroup() {
-        children = new ArrayList<TreeElement>();
+        children = new ArrayList<>();
     }
 
     public void addChild(TreeElement child) {

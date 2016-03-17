@@ -44,7 +44,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     private static class LocalResolveProcessor implements PsiScopeProcessor {
 
         private final String name;
-        private Collection<LSFLocalPropDeclaration> found = new ArrayList<LSFLocalPropDeclaration>();
+        private Collection<LSFLocalPropDeclaration> found = new ArrayList<>();
         private final Condition<LSFPropDeclaration> condition;
 
         private LocalResolveProcessor(String name, Condition<LSFPropDeclaration> condition) {
@@ -109,15 +109,14 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
     private Collection<LSFPropDeclaration> resolveNoConditionDeclarations() {
         final List<LSFClassSet> usageClasses = getUsageContext();
         if (usageClasses != null) {
-            CollectionQuery<LSFPropDeclaration> declarations = new CollectionQuery<LSFPropDeclaration>(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), Condition.TRUE, new Finalizer() {
+            CollectionQuery<LSFPropDeclaration> declarations = new CollectionQuery<>(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), Condition.TRUE, new Finalizer() {
                 @Override
                 public Collection finalize(Collection decls) {
-                    Map<LSFPropDeclaration, Integer> declMap = new HashMap<LSFPropDeclaration, Integer>();
+                    Map<LSFPropDeclaration, Integer> declMap = new HashMap<>();
 
                     GlobalSearchScope scope = GlobalSearchScope.allScope(getProject());
 
-                    for (Iterator<LSFPropDeclaration> iterator = decls.iterator(); iterator.hasNext(); ) {
-                        LSFPropDeclaration decl = iterator.next();
+                    for (LSFPropDeclaration decl : (Iterable<LSFPropDeclaration>) decls) {
                         List<LSFClassSet> declClasses = decl.resolveParamClasses();
                         if (declClasses == null) {
                             declMap.put(decl, 0);
@@ -128,11 +127,11 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                     }
 
                     int commonClasses = 0;
-                    List<LSFDeclaration> result = new ArrayList<LSFDeclaration>();
+                    List<LSFDeclaration> result = new ArrayList<>();
                     for (Map.Entry<LSFPropDeclaration, Integer> entry : declMap.entrySet()) {
                         if (entry.getValue() > commonClasses) {
                             commonClasses = entry.getValue();
-                            result = new ArrayList<LSFDeclaration>();
+                            result = new ArrayList<>();
                             result.add(entry.getKey());
                         } else if (entry.getValue() == commonClasses) {
                             result.add(entry.getKey());
@@ -145,7 +144,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
             return declarations.findAll();
 
         }
-        return new ArrayList<LSFPropDeclaration>();
+        return new ArrayList<>();
     }
 
     @Nullable
@@ -178,7 +177,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
 
         LSFEmptyExplicitPropClassList eList = explicitUsage.getEmptyExplicitPropClassList();
         LSFNonEmptyExplicitPropClassList neList = eList.getNonEmptyExplicitPropClassList();
-        List<LSFClassSet> result = new ArrayList<LSFClassSet>();
+        List<LSFClassSet> result = new ArrayList<>();
         if(neList!=null) {
             for (LSFExplicitPropClass explPropClass : neList.getExplicitPropClassList()) {
                 LSFClassName className = explPropClass.getClassName();
@@ -282,7 +281,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         return new Finalizer<LSFPropDeclaration>() {
             public Collection<LSFPropDeclaration> finalize(Collection<LSFPropDeclaration> decls) {
 
-                Map<LSFPropDeclaration, List<LSFClassSet>> mapClasses = new HashMap<LSFPropDeclaration, List<LSFClassSet>>();
+                Map<LSFPropDeclaration, List<LSFClassSet>> mapClasses = new HashMap<>();
                 Set<LSFPropDeclaration> equals = isNotEquals ? new HashSet<LSFPropDeclaration>() : null;
                 for (LSFPropDeclaration decl : decls) {
                     List<LSFClassSet> declClasses = decl.resolveParamClasses();
@@ -294,12 +293,12 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                 }
 
                 if (!mapClasses.isEmpty()) { // есть прямые наследования
-                    Collection<LSFPropDeclaration> result = new ArrayList<LSFPropDeclaration>();
+                    Collection<LSFPropDeclaration> result = new ArrayList<>();
 
                     if((isNotEquals && equals.size() < mapClasses.size()) || onlyNotEquals) // оставим только не равные 
                         mapClasses = BaseUtils.filterNotKeys(mapClasses, equals);
 
-                    List<LSFPropDeclaration> listMapClasses = new ArrayList<LSFPropDeclaration>(mapClasses.keySet());
+                    List<LSFPropDeclaration> listMapClasses = new ArrayList<>(mapClasses.keySet());
                     for (int i = 0, size = listMapClasses.size(); i < size; i++) {
                         LSFPropDeclaration decl = listMapClasses.get(i);
                         List<LSFClassSet> classesI = mapClasses.get(decl);
@@ -387,7 +386,7 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
 
         String description = "";
         int i = 1;
-        List<LSFPropDeclaration> decls = new ArrayList<LSFPropDeclaration>((Collection<? extends LSFPropDeclaration>) declarations);
+        List<LSFPropDeclaration> decls = new ArrayList<>((Collection<? extends LSFPropDeclaration>) declarations);
         for (LSFPropDeclaration decl : decls) {
             description += decl.getPresentableText();
 

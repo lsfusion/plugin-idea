@@ -18,7 +18,6 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.lsfusion.lang.typeinfer.TypeInferer;
 import com.lsfusion.refactoring.ElementMigration;
@@ -49,7 +48,7 @@ public class ProjectTypeInferAction extends AnAction {
                         
                         Collection<String> allKeys = ModuleIndex.getInstance().getAllKeys(myProject);
                         
-                        Map<LSFGlobalPropDeclaration, List<LSFClassSet>> propertyDecls = new HashMap<LSFGlobalPropDeclaration, List<LSFClassSet>>();
+                        Map<LSFGlobalPropDeclaration, List<LSFClassSet>> propertyDecls = new HashMap<>();
                         
                         int i = 0;
                         System.out.println("Processing param classes...");
@@ -84,7 +83,7 @@ public class ProjectTypeInferAction extends AnAction {
                             indicator.setFraction(((double) i++) / allKeys.size());
                         }
                         
-                        List<ElementMigration> migrations = new ArrayList<ElementMigration>();
+                        List<ElementMigration> migrations = new ArrayList<>();
                         for(Map.Entry<LSFGlobalPropDeclaration, List<LSFClassSet>> propertyDeclEntry : propertyDecls.entrySet()) {
                             LSFGlobalPropDeclaration decl = propertyDeclEntry.getKey();
                             List<LSFClassSet> oldClasses = propertyDeclEntry.getValue();

@@ -12,14 +12,14 @@ public interface InferResult {
 
     Map<LSFExprParamDeclaration, LSFClassSet> getMap();
 
-    public final static InferResult EMPTY = new InferResult() {
+    InferResult EMPTY = new InferResult() {
         public LSFClassSet get(LSFExprParamDeclaration decl) {
             return null;
         }
 
         @Override
         public Map<LSFExprParamDeclaration, LSFClassSet> getMap() {
-            return new HashMap<LSFExprParamDeclaration, LSFClassSet>();
+            return new HashMap<>();
         }
     };
 }

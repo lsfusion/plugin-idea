@@ -28,7 +28,7 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("description")
     );
 
-    private final List<ComponentView> children = new ArrayList<ComponentView>();
+    private final List<ComponentView> children = new ArrayList<>();
 
     public String caption;
     public String description;
@@ -273,7 +273,7 @@ public class ContainerView extends ComponentView {
     }
 
     private JComponent createColumnsPanel(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget) {
-        List<Component> childrenWidgets = new ArrayList<Component>();
+        List<Component> childrenWidgets = new ArrayList<>();
         boolean hasChildren = false;
         for (ComponentView child : children) {
             Component childWidget = child.createWidget(project, selection, componentToWidget);

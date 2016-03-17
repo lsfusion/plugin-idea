@@ -6,7 +6,7 @@ public interface Finalizer<T> {
     Collection<T> finalize(Collection<T> decls);
     
     
-    public final static Finalizer EMPTY = new Finalizer() {
+    Finalizer EMPTY = new Finalizer() {
         public Collection finalize(Collection decls) {
             return decls;
         }

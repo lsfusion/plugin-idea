@@ -7,7 +7,7 @@ import java.util.Set;
 
 public interface ContextInferrer {
     
-    public final static ContextInferrer EMPTY = new ContextInferrer() {
+    ContextInferrer EMPTY = new ContextInferrer() {
         public Inferred inferClasses(Set<LSFExprParamDeclaration> params) {
             return Inferred.EMPTY;
         }

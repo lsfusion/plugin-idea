@@ -63,7 +63,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
                 return file;
             }
         };
-        final List<LSFMetaCodeStatement> result = new ArrayList<LSFMetaCodeStatement>();
+        final List<LSFMetaCodeStatement> result = new ArrayList<>();
         searchWordUsages(GlobalSearchScope.allScope(file.getProject()), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
             public boolean process(PsiReference ref) {
                 if (ref instanceof LSFMetaReference && ((LSFMetaReference) ref).isResolveToVirt(virtDecl))
@@ -77,7 +77,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
     }
 
     public static List<LSFFullNameReference> findFullNameUsages(final String name, final LSFFullNameDeclaration decl) {
-        final List<LSFFullNameReference> result = new ArrayList<LSFFullNameReference>();
+        final List<LSFFullNameReference> result = new ArrayList<>();
         searchWordUsages(GlobalSearchScope.allScope(decl.getProject()), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
             public boolean process(PsiReference ref) {
                 if (ref instanceof LSFFullNameReference && ((LSFFullNameReference<LSFDeclaration, LSFFullNameDeclaration>) ref).getFullCondition().value(decl))

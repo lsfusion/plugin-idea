@@ -31,7 +31,7 @@ public class MigrationSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
-    static Set<IElementType> OPERAND_TYPES = new HashSet<IElementType>(
+    static Set<IElementType> OPERAND_TYPES = new HashSet<>(
             Arrays.asList(
                     new IElementType[]{
                             MigrationTypes.POINT,

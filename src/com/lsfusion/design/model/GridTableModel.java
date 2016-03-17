@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GridTableModel extends AbstractTableModel {
-    private List<PropertyDrawView> properties = new ArrayList<PropertyDrawView>();
+    private List<PropertyDrawView> properties = new ArrayList<>();
 
     @Override
     public int getColumnCount() {

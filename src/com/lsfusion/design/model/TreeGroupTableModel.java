@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 public class TreeGroupTableModel extends DefaultTreeModel implements TreeTableModel {
-    public final List<PropertyDrawView> properties = new ArrayList<PropertyDrawView>();
-    public final List<PropertyDrawView> columnProperties = new ArrayList<PropertyDrawView>();
-    public final Map<GroupObjectView, List<PropertyDrawView>> groupPropsMap = new HashMap<GroupObjectView, List<PropertyDrawView>>();
+    public final List<PropertyDrawView> properties = new ArrayList<>();
+    public final List<PropertyDrawView> columnProperties = new ArrayList<>();
+    public final Map<GroupObjectView, List<PropertyDrawView>> groupPropsMap = new HashMap<>();
 
     public TreeGroupTableModel() {
         super(null);
@@ -42,7 +42,7 @@ public class TreeGroupTableModel extends DefaultTreeModel implements TreeTableMo
 
             List<PropertyDrawView> groupProperties = groupPropsMap.get(groupObject);
             if (groupProperties == null) {
-                groupProperties = new ArrayList<PropertyDrawView>();
+                groupProperties = new ArrayList<>();
                 groupPropsMap.put(groupObject, groupProperties);
             }
             int gins = BaseUtils.relativePosition(property, properties, groupProperties);
