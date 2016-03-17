@@ -15,9 +15,6 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.util.containers.ConcurrentHashMap;
-import com.intellij.util.containers.ConcurrentHashSet;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
@@ -29,9 +26,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.SoftReference;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 
 import static com.lsfusion.util.LSFPsiUtils.findChildrenOfType;
 
@@ -333,7 +329,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     public static void syncUsageProcessing(final LSFFile file, List<LSFMetaCodeStatement> usages) {
         for (final LSFMetaCodeStatement metaUsage : usages)
             if (metaUsage.isCorrect()) {
-                final Result<ToParse> toParse = new Result<ToParse>();
+                final Result<ToParse> toParse = new Result<>();
                 ApplicationManager.getApplication().runReadAction(new Runnable() {
                     public void run() {
                         if (metaUsage.isCorrect()) {
@@ -354,7 +350,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             }
     }
 
-    private LinkedHashMap<Document, Long> changedDocs = new LinkedHashMap<Document, Long>(16, 0.75f, true);
+    private LinkedHashMap<Document, Long> changedDocs = new LinkedHashMap<>(16, 0.75f, true);
     private int inlinePending = 0;
 
     private void inlinePend(LSFFile file, boolean sync) {
@@ -459,11 +455,11 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         }
 
         public void run() {
-            final List<GenParse> genUsages = new ArrayList<GenParse>();
+            final List<GenParse> genUsages = new ArrayList<>();
             final Iterator<LSFMetaCodeStatement> iterator = usages.iterator();
             while (iterator.hasNext()) {
                 final LSFMetaCodeStatement metaUsage = iterator.next();
-                final Result<ToParse> toParse = new Result<ToParse>();
+                final Result<ToParse> toParse = new Result<>();
                 ApplicationManager.getApplication().runReadAction(new Runnable() {
                     public void run() {
                         version++; // синхронизация не волнует может быть и одна версия (если в рамках нескольких read'ов но не write'ов)
@@ -497,7 +493,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             }
             final Document document = myPsiDocumentManager.getDocument(file);
             for (final GenParse gen : genUsages) {
-                final Result<Runnable> runMetaText = new Result<Runnable>();
+                final Result<Runnable> runMetaText = new Result<>();
                 runMetaText.setResult(new Runnable() {
                     public void run() {
                         if (!actualize(gen, file, sync)) // оптимизация
@@ -582,8 +578,8 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private abstract class MetaPending<T, G> {
-        public final Set<Object> processing = new ConcurrentHashSet<Object>();
-        private Map<G, Set<T>> pending = new HashMap<G, Set<T>>();
+        public final Set<Object> processing = ContainerUtil.newConcurrentSet();
+        private Map<G, Set<T>> pending = new HashMap<>();
 
         protected abstract G group(T element);
 
@@ -597,7 +593,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 processing.addAll(group.getValue());
                 ApplicationManager.getApplication().executeOnPooledThread(createAction(group.getKey(), group.getValue()));
             }
-            pending = new HashMap<G, Set<T>>();
+            pending = new HashMap<>();
         }
 
         private void flushGroup(G group) {
@@ -634,7 +630,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                         G group = group(statement);
                         Set<T> pendEls = pending.get(group);
                         if (pendEls == null) {
-                            pendEls = new HashSet<T>();
+                            pendEls = new HashSet<>();
                             pending.put(group, pendEls);
                         }
                         pendEls.add(statement);
@@ -685,14 +681,15 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         usagesPending.processing.addAll(used);
         if (used.size() > 0)
             finishedReprocessing = false;
-        new MetaUsageProcessing(file, new HashSet<LSFMetaCodeStatement>(used), sync, forcedEnabled).run();
+        new MetaUsageProcessing(file, new HashSet<>(used), sync, forcedEnabled).run();
     }
 
     private void addUsageProcessing(LSFMetaCodeStatement statement) { // в синхронном режиме может вызываться должен быть достаточно быстрым
         addUsageProcessing(Collections.singleton(statement));
     }
 
-    private ConcurrentHashMap<LongLivingMeta, List<LSFMetaCodeStatement>> cacheUsages = new ConcurrentHashMap<LongLivingMeta, List<LSFMetaCodeStatement>>();
+    private ConcurrentMap<LongLivingMeta, List<LSFMetaCodeStatement>> cacheUsages = ContainerUtil.newConcurrentMap();
+
 
     void fireChangedNotMetaBody() {
         cacheUsages.clear();
@@ -784,7 +781,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         }*/
 
         if (reprocess)
-            reprocessAllDocuments(syncMode);
+            reprocessAllDocuments(syncMode, false);
     }
 
     public boolean getMetaEnabled() {
@@ -811,10 +808,14 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     public void reprocessAllDocuments() {
-        reprocessAllDocuments(getMetaSyncMode());
+        reprocessAllDocuments(getMetaSyncMode(), false);
+    }
+    
+    public void reenableAllMetaCodes() {
+        reprocessAllDocuments(getMetaSyncMode(), true);    
     }
 
-    public void reprocessAllDocuments(final boolean sync) {
+    public void reprocessAllDocuments(final boolean sync, final boolean reenable) {
         final Progressive run = new Progressive() {
             public void run(final @NotNull ProgressIndicator indicator) {
                 reprocessing = true;
@@ -836,7 +837,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                             Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, GlobalSearchScope.allScope(myProject));
                             for (LSFModuleDeclaration declaration : moduleDeclarations) {
                                 LSFFile file = declaration.getLSFFile();
-                                List<LSFMetaCodeStatement> metaStatements = file.getMetaCodeStatementList();
+                                List<LSFMetaCodeStatement> metaStatements = reenable ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
                                 indicator.setText2("Statements : " + metaStatements.size());
 
                                 addForcedUsageProcessing(file, metaStatements, sync, null);
