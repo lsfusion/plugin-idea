@@ -914,10 +914,14 @@ public class LSFPsiImplUtil {
         if (sourceStatement.getUdoubleLiteral() != null)
             return DoubleClass.instance;
         if (sourceStatement.getUnumericLiteral() != null) {
-            String name = sourceStatement.getText();
-            String whole = name.substring(0, name.indexOf("."));
-            String precision = name.substring(name.indexOf(".") + 1, name.length() - 1);
-            return new NumericClass(whole.length() + precision.length(), precision.length());
+            try {
+                String name = sourceStatement.getText();
+                String whole = name.substring(0, name.indexOf("."));
+                String precision = name.substring(name.indexOf(".") + 1, name.length() - 1);
+                return new NumericClass(whole.length() + precision.length(), precision.length());
+            } catch (IndexOutOfBoundsException e) {
+                return null;
+            }
         }
         LSFStringLiteral stringLiteral = sourceStatement.getStringLiteral();
         if (stringLiteral != null)
