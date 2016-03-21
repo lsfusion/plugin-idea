@@ -12,11 +12,9 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.meta.MetaChangeDetector;
-import com.lsfusion.lang.psi.LSFClassStatement;
-import com.lsfusion.lang.psi.LSFFormStatement;
-import com.lsfusion.lang.psi.LSFMetaCodeDeclarationStatement;
-import com.lsfusion.lang.psi.LSFOverrideStatement;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,9 +48,15 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
                         targets.add(formDecl.getNameIdentifier());
                     }
                 } else if (statement instanceof LSFClassStatement && ((LSFClassStatement) statement).getExtendingClassDeclaration() != null) {
-                    targets.add(((LSFClassStatement) statement).resolveDecl().getNameIdentifier());
+                    LSFId statementId = ((LSFClassStatement) statement).resolveDecl().getNameIdentifier();
+                    if (statementId != null) {
+                        targets.add(statementId);
+                    }
                 } else if (statement instanceof LSFOverrideStatement) {
-                    targets.add(((LSFOverrideStatement) statement).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage().resolveDecl());
+                    LSFPropDeclaration propertyDecl = ((LSFOverrideStatement) statement).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage().resolveDecl();
+                    if (propertyDecl != null) {
+                        targets.add(propertyDecl);
+                    }
                 }
             }
 
