@@ -85,7 +85,7 @@ public class CustomClassSet implements LSFClassSet {
 
     public static Collection<LSFClassDeclaration> getChildren(LSFClassDeclaration decl, GlobalSearchScope scope) {
         Project project = decl.getProject();
-        if(scope.equals(GlobalSearchScope.allScope(project)))
+        if (scope != null && scope.equals(GlobalSearchScope.allScope(project)))
             return getChildrenAll(decl);
         return LSFGlobalResolver.findClassExtends(decl, project, scope);
     }
