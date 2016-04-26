@@ -20,6 +20,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.references.LSFExprParamReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.references.LSFStaticObjectReference;
@@ -147,6 +148,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
         if (o.resolveDecl() == o.getClassParamDeclare().getParamDeclare())
             addImplicitDecl(o);
+
+        LSFClassName className = o.getClassParamDeclare().getClassName();
+        if(className != null) {
+            LSFExprParamReference parentRef = PsiTreeUtil.getParentOfType(o.resolveDecl(), LSFExprParamReference.class);
+            if(parentRef == null) {
+                Annotation annotation = myHolder.createErrorAnnotation(o, "Redefinition of reference '" + o.getNameRef() + "'");
+                annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+                addError(o, annotation);
+            }
+        }
     }
 
     @Override
