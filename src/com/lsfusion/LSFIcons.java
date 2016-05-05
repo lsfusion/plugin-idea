@@ -48,6 +48,8 @@ public final class LSFIcons {
     public static final Icon DEPENDENCY_ZOOM_OUT = AllIcons.Graph.ZoomOut;
     public static final Icon DEPENDENCY_ACTUAL_ZOOM = AllIcons.Graph.ActualZoom;
 
+    public static final Icon GRAPH_EXPORT = AllIcons.Graph.Export;
+
     public static final class Design {
         public static final Icon DESIGN = AllIcons.FileTypes.UiForm;
         public static final Icon COMPONENT = AllIcons.RunConfigurations.Application; //todo:

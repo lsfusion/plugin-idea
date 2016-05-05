@@ -242,6 +242,13 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
         });
 
+        actions.add(new AnAction(LSFIcons.GRAPH_EXPORT) {
+            @Override
+            public void actionPerformed(AnActionEvent e) {
+                new SVGExporter().exportSVG(jgraph);
+            }
+        });
+
         return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
     }
     

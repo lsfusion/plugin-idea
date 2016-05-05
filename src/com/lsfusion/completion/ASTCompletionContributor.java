@@ -696,7 +696,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             boolean useAll = classUsagePolicy == MUST_USE_ALL;
 
             for (G declaration : declarations) {
-                assert namespace == null || declaration instanceof LSFGlobalPropDeclaration;
+                assert namespace == null || declaration instanceof LSFGlobalPropDeclaration; // неправильный
 
                 if (namespace != null && !namespace.equals(((LSFGlobalPropDeclaration)declaration).getNamespaceName())) {
                     continue;

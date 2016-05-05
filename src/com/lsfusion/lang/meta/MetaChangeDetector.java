@@ -188,7 +188,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     @Override
     public void childMoved(@NotNull PsiTreeChangeEvent event) {
-        System.out.print("CHILD MOVED FROM PARENT : " + event.getOldParent().getText() + " TO " + event.getNewParent().getText() + " CHILD " + event.getChild().getText());
+//        System.out.print("CHILD MOVED FROM PARENT : " + event.getOldParent().getText() + " TO " + event.getNewParent().getText() + " CHILD " + event.getChild().getText());
     }
 
     private static <K> K pop(Set<K> set) {
