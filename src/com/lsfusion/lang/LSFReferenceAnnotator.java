@@ -152,7 +152,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         LSFClassName className = o.getClassParamDeclare().getClassName();
         if(className != null) {
             LSFExprParamReference parentRef = PsiTreeUtil.getParentOfType(o.resolveDecl(), LSFExprParamReference.class);
-            if(parentRef == null) {
+            if(parentRef == null || o != parentRef) {
                 Annotation annotation = myHolder.createErrorAnnotation(o, "Redefinition of reference '" + o.getNameRef() + "'");
                 annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
                 addError(o, annotation);
