@@ -8,6 +8,7 @@ import com.lsfusion.design.GroupObjectContainerSet;
 import com.lsfusion.design.TreeGroupContainerSet;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.indexes.ComponentIndex;
@@ -31,13 +32,13 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
     @Override
     public LSFResolveResult resolveNoCache() {
         String componentName = getSimpleName().getName();
-        LSFFormDeclaration formDeclaration = resolveForm(this);
+        LSFFormDeclaration formDeclaration = resolveForm(this, true);
 
         Collection<LSFComponentStubDeclaration> stubDecls = ComponentIndex.getInstance().get(componentName, getProject(), getLSFFile().getRequireScope());
         List<LSFDeclaration> declarations = new ArrayList<>();
 
         for (LSFComponentStubDeclaration stubDecl : stubDecls) {
-            if (formDeclaration == resolveForm(stubDecl.getComponentDecl())) {
+            if (formDeclaration == resolveForm(stubDecl.getComponentDecl(), false)) {
                 declarations.add(stubDecl.getComponentDecl());
             }
         }
@@ -86,10 +87,16 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
         return new LSFResolveResult(declarations, errorAnnotator);
     }
 
-    private LSFFormDeclaration resolveForm(PsiElement element) {
+    private LSFFormDeclaration resolveForm(PsiElement element, boolean exRef) {
         LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(element, LSFDesignStatement.class);
         if (designStatement != null) {
             return designStatement.resolveFormDecl();
+        }
+        if(exRef) {
+            FormContext formContext = PsiTreeUtil.getParentOfType(element, FormContext.class);
+            if (formContext != null) {
+                return formContext.resolveFormDecl();
+            }
         }
         return null;
     }

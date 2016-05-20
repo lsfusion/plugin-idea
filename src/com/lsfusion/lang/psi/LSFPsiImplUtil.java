@@ -892,6 +892,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFTabVisiblePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+        return LSFExClassSet.logical;
+    }
+
+    @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFLiteral sourceStatement, @Nullable InferExResult inferred) {
         DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
         if (builtInClass != null) {
@@ -1349,6 +1354,10 @@ public class LSFPsiImplUtil {
         return singletonList(LogicalClass.instance.getName());
     }
 
+    public static List<String> getValueClassNames(@NotNull LSFTabVisiblePropertyDefinition sourceStatement) {
+        return singletonList(LogicalClass.instance.getName());
+    }
+
     public static List<String> getValueClassNames(@NotNull LSFLiteral sourceStatement) {
         DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
         if (builtInClass != null) {
@@ -1659,6 +1668,10 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFSignaturePropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFTabVisiblePropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -2598,6 +2611,11 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
+    public static Inferred inferParamClasses(@NotNull LSFTabVisiblePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+        return Inferred.EMPTY;
+    }
+
+    @NotNull
     public static Inferred inferParamClasses(@NotNull LSFLiteral sourceStatement, @Nullable LSFExClassSet valueClass) {
         return Inferred.EMPTY;
     }
@@ -3011,6 +3029,11 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormPropertyDrawID formPropertyDrawID) {
         return resolveFormDecl(formPropertyDrawID.getFormUsage());
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFComponentID componentID) {
+        return resolveFormDecl(componentID.getFormUsage());
     }
 
     @Nullable

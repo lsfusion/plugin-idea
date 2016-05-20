@@ -351,6 +351,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "SUM"                     			{ return SUM; }
   "TABBED"                  			{ return TABBED; }
   "TABLE"                   			{ return TABLE; }
+  "TABVISIBLE"                   		{ return TABVISIBLE; }
   "TEXTHALIGN"              			{ return TEXTHALIGN; }
   "TEXTVALIGN"              			{ return TEXTVALIGN; }
   "THEN"                    			{ return THEN; }

@@ -327,6 +327,7 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	castPropertyDefinition
 	    |	sessionPropertyDefinition
 	    |	signaturePropertyDefinition
+	    |   tabVisiblePropertyDefinition
 	    |	literal
 {
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
@@ -425,6 +426,9 @@ sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+
+tabVisiblePropertyDefinition ::= TABVISIBLE componentID
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 propertyExprObject ::= LSQBR EQUALS propertyImplementation RSQBR
@@ -1719,6 +1723,13 @@ objectID ::= <<innerIDCheck>> formUsage POINT objectUsage
 }
 
 formPropertyDrawID ::= <<innerIDCheck>> formUsage POINT formPropertyDrawUsage
+{
+    pin = 3
+    implements="com.lsfusion.lang.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
+
+componentID ::= <<innerIDCheck>> formUsage POINT componentUsage
 {
     pin = 3
     implements="com.lsfusion.lang.psi.context.FormContext"
