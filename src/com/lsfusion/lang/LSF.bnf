@@ -608,6 +608,7 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |   readActionPropertyDefinitionBody
                 |   writeActionPropertyDefinitionBody
                 |   importActionPropertyDefinitionBody
+                |   newThreadActionPropertyDefinitionBody
 
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
@@ -783,6 +784,18 @@ importActionSourceType ::=  XLS (SHEET propertyExpression)?
                         |   JDBC
                         |   MDB
 
+newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
+                                        (
+                                            CONNECTION propertyExpression
+                                            |
+                                            (SCHEDULE uintLiteral? (DELAY uintLiteral)?)?
+                                        )
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
 nonEmptyPropertyUsageListWithIds ::= propertyUsageWithId (COMMA propertyUsageWithId)*
 
 propertyUsageWithId ::= ((ID | stringLiteral) EQUALS)? propertyUsage
@@ -803,9 +816,7 @@ requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actio
 
 listActionPropertyDefinitionBody ::=    (
                                             (
-                                                ((NEWSESSION nestedPropertiesSelector?) | NESTEDSESSION)
-                                                |
-                                                (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
+                                                (NEWSESSION nestedPropertiesSelector?) | NESTEDSESSION
                                             )
                                             (SINGLE)?
                                         )?
