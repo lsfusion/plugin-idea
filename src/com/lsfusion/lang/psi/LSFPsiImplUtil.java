@@ -892,7 +892,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFTabVisiblePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFTabActivePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return LSFExClassSet.logical;
     }
 
@@ -1354,7 +1354,7 @@ public class LSFPsiImplUtil {
         return singletonList(LogicalClass.instance.getName());
     }
 
-    public static List<String> getValueClassNames(@NotNull LSFTabVisiblePropertyDefinition sourceStatement) {
+    public static List<String> getValueClassNames(@NotNull LSFTabActivePropertyDefinition sourceStatement) {
         return singletonList(LogicalClass.instance.getName());
     }
 
@@ -1671,7 +1671,7 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
-    public static List<String> getValuePropertyNames(@NotNull LSFTabVisiblePropertyDefinition sourceStatement) {
+    public static List<String> getValuePropertyNames(@NotNull LSFTabActivePropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -2611,7 +2611,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFTabVisiblePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFTabActivePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return Inferred.EMPTY;
     }
 

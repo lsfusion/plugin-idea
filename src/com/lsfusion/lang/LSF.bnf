@@ -327,7 +327,7 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	castPropertyDefinition
 	    |	sessionPropertyDefinition
 	    |	signaturePropertyDefinition
-	    |   tabVisiblePropertyDefinition
+	    |   tabActivePropertyDefinition
 	    |	literal
 {
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
@@ -428,7 +428,7 @@ sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
-tabVisiblePropertyDefinition ::= TABVISIBLE componentID
+tabActivePropertyDefinition ::= TABACTIVE componentID
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 propertyExprObject ::= LSQBR EQUALS propertyImplementation RSQBR
