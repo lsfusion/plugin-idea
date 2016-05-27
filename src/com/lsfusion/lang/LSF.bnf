@@ -587,6 +587,7 @@ private extendContextActionPDB ::=  assignActionPropertyDefinitionBody
 
 private keepContextActionPDB ::=    listActionPropertyDefinitionBody
                         |	requestInputActionPropertyDefinitionBody
+                        |	formActiveActionPropertyDefinitionBody
                         |	execActionPropertyDefinitionBody
                         |   tryActionPropertyDefinitionBody
                         |	ifActionPropertyDefinitionBody
@@ -808,6 +809,13 @@ drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
 }
 
 requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+formActiveActionPropertyDefinitionBody ::= FORMACTIVE formUsage
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"

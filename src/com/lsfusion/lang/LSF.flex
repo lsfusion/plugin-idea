@@ -213,6 +213,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "FORCE"                   			{ return FORCE; }
   "FOREGROUND"              			{ return FOREGROUND; }
   "FORM"                    			{ return FORM; }
+  "FORMACTIVE"                    		{ return FORMACTIVE; }
   "FORMS"                   			{ return FORMS; }
   "FORMULA"                 			{ return FORMULA; }
   "FROM"                    			{ return FROM; }
