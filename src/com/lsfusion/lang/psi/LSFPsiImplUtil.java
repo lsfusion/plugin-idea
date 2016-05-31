@@ -892,7 +892,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFTabActivePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFActiveTabPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return LSFExClassSet.logical;
     }
 
@@ -1354,7 +1354,7 @@ public class LSFPsiImplUtil {
         return singletonList(LogicalClass.instance.getName());
     }
 
-    public static List<String> getValueClassNames(@NotNull LSFTabActivePropertyDefinition sourceStatement) {
+    public static List<String> getValueClassNames(@NotNull LSFActiveTabPropertyDefinition sourceStatement) {
         return singletonList(LogicalClass.instance.getName());
     }
 
@@ -1671,7 +1671,7 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
-    public static List<String> getValuePropertyNames(@NotNull LSFTabActivePropertyDefinition sourceStatement) {
+    public static List<String> getValuePropertyNames(@NotNull LSFActiveTabPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -2611,7 +2611,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFTabActivePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFActiveTabPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return Inferred.EMPTY;
     }
 
@@ -2754,7 +2754,7 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
-    public static Inferred inferActionParamClasses(LSFFormActiveActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+    public static Inferred inferActionParamClasses(LSFActiveFormActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return Inferred.EMPTY;
     }
 

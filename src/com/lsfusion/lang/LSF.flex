@@ -101,6 +101,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "@"                                   { return ATSIGN; }
 
   "ABSTRACT"                			{ return ABSTRACT; }
+  "ACTIVE"                			    { return ACTIVE; }
   "ATTR"                			    { return ATTR; }
   "NATIVE"                			    { return NATIVE; }
   "ACTION"                  			{ return ACTION; }
@@ -213,7 +214,6 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "FORCE"                   			{ return FORCE; }
   "FOREGROUND"              			{ return FOREGROUND; }
   "FORM"                    			{ return FORM; }
-  "FORMACTIVE"                    		{ return FORMACTIVE; }
   "FORMS"                   			{ return FORMS; }
   "FORMULA"                 			{ return FORMULA; }
   "FROM"                    			{ return FROM; }
@@ -352,9 +352,9 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "STRUCT"                  			{ return STRUCT; }
   "SUBJECT"                 			{ return SUBJECT; }
   "SUM"                     			{ return SUM; }
+  "TAB"                   		        { return TAB; }
   "TABBED"                  			{ return TABBED; }
   "TABLE"                   			{ return TABLE; }
-  "TABACTIVE"                   		{ return TABACTIVE; }
   "TEXTHALIGN"              			{ return TEXTHALIGN; }
   "TEXTVALIGN"              			{ return TEXTVALIGN; }
   "THEN"                    			{ return THEN; }

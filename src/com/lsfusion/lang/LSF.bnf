@@ -327,7 +327,7 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	castPropertyDefinition
 	    |	sessionPropertyDefinition
 	    |	signaturePropertyDefinition
-	    |   tabActivePropertyDefinition
+	    |   activeTabPropertyDefinition
 	    |	literal
 {
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
@@ -428,7 +428,7 @@ sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
-tabActivePropertyDefinition ::= TABACTIVE componentID
+activeTabPropertyDefinition ::= ACTIVE TAB componentID
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 propertyExprObject ::= LSQBR EQUALS propertyImplementation RSQBR
@@ -587,7 +587,7 @@ private extendContextActionPDB ::=  assignActionPropertyDefinitionBody
 
 private keepContextActionPDB ::=    listActionPropertyDefinitionBody
                         |	requestInputActionPropertyDefinitionBody
-                        |	formActiveActionPropertyDefinitionBody
+                        |	activeFormActionPropertyDefinitionBody
                         |	execActionPropertyDefinitionBody
                         |   tryActionPropertyDefinitionBody
                         |	ifActionPropertyDefinitionBody
@@ -815,7 +815,7 @@ requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actio
     methods = [inferActionParamClasses]
 }
 
-formActiveActionPropertyDefinitionBody ::= FORMACTIVE formUsage
+activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
