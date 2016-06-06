@@ -713,7 +713,7 @@ asyncUpdateActionPropertyDefinitionBody ::= ASYNCUPDATE propertyExpression
     methods = [inferActionParamClasses]
 }
 
-seekObjectActionPropertyDefinitionBody ::= SEEK objectID propertyExpression
+seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)? objectID propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
