@@ -165,6 +165,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "DATA"                    			{ return DATA; }
   "DBF"                    			    { return DBF; }
   "DEFAULT"                 			{ return DEFAULT; }
+  "DELAY"              			        { return DELAY; }
   "DELETE"                  			{ return DELETE; }
   "DELETESESSION"           			{ return DELETESESSION; }
   "DESC"                    			{ return DESC; }
@@ -276,7 +277,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "NEW"                     			{ return NEW; }
   "NEWSESSION"              			{ return NEWSESSION; }
   "NEWTHREAD"              			    { return NEWTHREAD; }
-  "DELAY"              			        { return DELAY; }
+  "NOCLOSE"              			    { return NOCLOSE; }
   "NO"                      			{ return NO; }
   "NOCANCEL"                			{ return NOCANCEL; }
   "NOINLINE"                			{ return NOINLINE; }

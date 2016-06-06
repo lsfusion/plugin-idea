@@ -824,7 +824,7 @@ activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
 
 listActionPropertyDefinitionBody ::=    (
                                             (
-                                                (NEWSESSION nestedPropertiesSelector?) | NESTEDSESSION
+                                                (NEWSESSION (NOCLOSE)? nestedPropertiesSelector?) | NESTEDSESSION
                                             )
                                             (SINGLE)?
                                         )?
