@@ -101,6 +101,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "@"                                   { return ATSIGN; }
 
   "ABSTRACT"                			{ return ABSTRACT; }
+  "ACTIVATE"                			{ return ACTIVATE; }
   "ACTIVE"                			    { return ACTIVE; }
   "ATTR"                			    { return ATTR; }
   "NATIVE"                			    { return NATIVE; }

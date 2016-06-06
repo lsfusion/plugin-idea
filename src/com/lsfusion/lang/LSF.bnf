@@ -588,6 +588,7 @@ private extendContextActionPDB ::=  assignActionPropertyDefinitionBody
 private keepContextActionPDB ::=    listActionPropertyDefinitionBody
                         |	requestInputActionPropertyDefinitionBody
                         |	activeFormActionPropertyDefinitionBody
+                        |	activateActionPropertyDefinitionBody
                         |	execActionPropertyDefinitionBody
                         |   tryActionPropertyDefinitionBody
                         |	ifActionPropertyDefinitionBody
@@ -816,6 +817,13 @@ requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actio
 }
 
 activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+activateActionPropertyDefinitionBody ::= ACTIVATE ((FORM formUsage) | (TAB componentID))
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
