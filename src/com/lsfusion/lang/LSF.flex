@@ -99,6 +99,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "]"                                   { return RSQBR; }
 
   "@"                                   { return ATSIGN; }
+  "@@"                                  { return ATSIGN2; }
 
   "ABSTRACT"                			{ return ABSTRACT; }
   "ACTIVATE"                			{ return ACTIVATE; }

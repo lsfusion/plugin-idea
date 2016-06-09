@@ -520,6 +520,7 @@ propertyOptions ::= (   IN groupUsage
                     |	notNullSetting
                     |	onEditEventSetting
                     |	eventIdSetting
+                    |   ATSIGN2 simpleName
                     )*
 
 shortcutSetting ::= SHORTCUT noContextPropertyUsage {pin = 1}
