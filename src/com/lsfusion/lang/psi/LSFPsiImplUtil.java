@@ -2918,7 +2918,7 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
-    public static Inferred inferActionParamClasses(LSFExecutorActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+    public static Inferred inferActionParamClasses(LSFNewExecutorActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return Inferred.EMPTY;
     }
 

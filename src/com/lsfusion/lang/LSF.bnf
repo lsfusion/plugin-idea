@@ -612,7 +612,7 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |   writeActionPropertyDefinitionBody
                 |   importActionPropertyDefinitionBody
                 |   newThreadActionPropertyDefinitionBody
-                |   executorActionPropertyDefinitionBody
+                |   newExecutorActionPropertyDefinitionBody
 
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
@@ -800,7 +800,7 @@ newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
     methods = [inferActionParamClasses]
 }
 
-executorActionPropertyDefinitionBody ::= EXECUTOR actionPropertyDefinitionBody THREADS propertyExpression
+newExecutorActionPropertyDefinitionBody ::= NEWEXECUTOR actionPropertyDefinitionBody THREADS propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -868,9 +868,9 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 }
 
 private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
-                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | EXECUTOR | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
+                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | READ | REQUEST | RETURN | SAVEFILE | SEEK | WHILE| WRITE
-                                            | NEWSESSION | NEWTHREAD | NESTEDSESSION
+                                            | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID
                                             | SEMI
                                             | LBRACE

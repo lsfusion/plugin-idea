@@ -200,7 +200,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "EXCEPTLAST"              			{ return EXCEPTLAST; }
   "EXCLUSIVE"               			{ return EXCLUSIVE; }
   "EXEC"                    			{ return EXEC; }
-  "EXECUTOR"                    		{ return EXECUTOR; }
+  "NEWEXECUTOR"                    		{ return NEWEXECUTOR; }
   "EXPORT"                    			{ return EXPORT; }
   "EXTEND"                  			{ return EXTEND; }
   "EXTERNAL"                  			{ return EXTERNAL; }
