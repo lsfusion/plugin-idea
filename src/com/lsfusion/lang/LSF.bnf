@@ -612,6 +612,7 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |   writeActionPropertyDefinitionBody
                 |   importActionPropertyDefinitionBody
                 |   newThreadActionPropertyDefinitionBody
+                |   executorActionPropertyDefinitionBody
 
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
@@ -799,6 +800,13 @@ newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
     methods = [inferActionParamClasses]
 }
 
+executorActionPropertyDefinitionBody ::= EXECUTOR actionPropertyDefinitionBody THREADS propertyExpression
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
 nonEmptyPropertyUsageListWithIds ::= propertyUsageWithId (COMMA propertyUsageWithId)*
 
 propertyUsageWithId ::= ((ID | stringLiteral) EQUALS)? propertyUsage
@@ -859,8 +867,8 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
     recoverWhile = "list_action_statement_recover"
 }
 
-private list_action_statement_recover ::= !(ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
-                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
+private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
+                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | EXECUTOR | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | READ | REQUEST | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID

@@ -200,6 +200,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "EXCEPTLAST"              			{ return EXCEPTLAST; }
   "EXCLUSIVE"               			{ return EXCLUSIVE; }
   "EXEC"                    			{ return EXEC; }
+  "EXECUTOR"                    		{ return EXECUTOR; }
   "EXPORT"                    			{ return EXPORT; }
   "EXTEND"                  			{ return EXTEND; }
   "EXTERNAL"                  			{ return EXTERNAL; }
@@ -361,6 +362,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "TEXTHALIGN"              			{ return TEXTHALIGN; }
   "TEXTVALIGN"              			{ return TEXTVALIGN; }
   "THEN"                    			{ return THEN; }
+  "THREADS"                    			{ return THREADS; }
   "TO"                      			{ return TO; }
   "TODRAW"                  			{ return TODRAW; }
   "TOOLBAR"                 			{ return TOOLBAR; }
