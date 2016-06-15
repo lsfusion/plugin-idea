@@ -31,6 +31,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.text.StringTokenizer;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -62,8 +63,12 @@ public class ShowErrorsAction extends AnAction {
     public void actionPerformed(final AnActionEvent e) {
         project = getEventProject(e);
 
-        ExcludeModulesDialog dialog = new ExcludeModulesDialog();
-        dialog.show();
+        if (!MetaChangeDetector.getInstance(project).getMetaEnabled()) {
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Meta code is disabled. The action won't be performed", "Errors search", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            ExcludeModulesDialog dialog = new ExcludeModulesDialog();
+            dialog.show();
+        }
     }
 
     private void executeSearchTask(final List<String> excludedModules) {
