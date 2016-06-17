@@ -428,7 +428,7 @@ sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
-activeTabPropertyDefinition ::= ACTIVE TAB componentID
+activeTabPropertyDefinition ::= ACTIVE TAB componentUsage FORM formUsage
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 propertyExprObject ::= LSQBR EQUALS propertyImplementation RSQBR
@@ -832,7 +832,7 @@ activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
     methods = [inferActionParamClasses]
 }
 
-activateActionPropertyDefinitionBody ::= ACTIVATE ((FORM formUsage) | (TAB componentID))
+activateActionPropertyDefinitionBody ::= ACTIVATE ((FORM formUsage) | (TAB componentUsage FORM formUsage))
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1765,13 +1765,6 @@ formPropertyDrawID ::= <<innerIDCheck>> formUsage POINT formPropertyDrawUsage
     methods = [resolveFormDecl]
 }
 
-componentID ::= <<innerIDCheck>> formUsage POINT componentUsage
-{
-    pin = 3
-    implements="com.lsfusion.lang.psi.context.FormContext"
-    methods = [resolveFormDecl]
-}
-
 multiCompoundID ::= ID (POINT ID)*
 {
     mixin="com.lsfusion.lang.psi.LSFIdImpl"
@@ -1792,7 +1785,6 @@ stringLiteral ::= LEX_STRING_LITERAL
     implements="com.lsfusion.lang.psi.LSFStringValueLiteral"
 }
 intLiteral ::= (MINUS)? uintLiteral
-longLiteral ::=  (MINUS)? ulongLiteral
 doubleLiteral ::= (MINUS)? unumericLiteral
 dateLiteral ::= LEX_DATE_LITERAL
 dateTimeLiteral ::= LEX_DATETIME_LITERAL
