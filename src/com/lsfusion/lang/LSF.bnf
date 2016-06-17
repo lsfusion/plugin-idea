@@ -1776,6 +1776,7 @@ multiCompoundID ::= ID (POINT ID)*
 {
     mixin="com.lsfusion.lang.psi.LSFIdImpl"
     implements="com.lsfusion.lang.psi.LSFId"
+    methods = [ setName ]
 }
 
 exclusiveOverrideOption ::= OVERRIDE | EXCLUSIVE
