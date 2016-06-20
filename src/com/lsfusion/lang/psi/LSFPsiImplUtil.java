@@ -3048,11 +3048,6 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFComponentID componentID) {
-        return resolveFormDecl(componentID.getFormUsage());
-    }
-
-    @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormStatement formStatement) {
         return (LSFFormDeclaration) formStatement.resolveDecl();
     }
