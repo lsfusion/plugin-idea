@@ -2922,6 +2922,10 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
+    public static Inferred inferActionParamClasses(LSFNewSessionActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return inferActionParamClasses(body.getActionPropertyDefinitionBody(), params);
+    }
+    
     public static Inferred inferActionParamClasses(LSFDrillDownActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
     }
@@ -3060,6 +3064,14 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFExternalFormObject externalFormObject) {
         return resolveFormDecl(externalFormObject.getFormUsage());
+    }
+    
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFActivateActionPropertyDefinitionBody activateActionPDB) {
+        return resolveFormDecl(activateActionPDB.getFormUsage());
+    }
+
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFActiveTabPropertyDefinition activeTabPD) {
+        return resolveFormDecl(activeTabPD.getFormUsage());
     }
     
     public static void setName(@NotNull LSFMultiCompoundID mcId, String name, MetaTransaction transaction) {

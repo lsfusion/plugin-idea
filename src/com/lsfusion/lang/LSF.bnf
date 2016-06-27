@@ -429,7 +429,10 @@ signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 activeTabPropertyDefinition ::= ACTIVE TAB componentUsage FORM formUsage
-{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{
+    implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.FormContext" 
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames resolveFormDecl]
+}
 
 propertyExprObject ::= LSQBR EQUALS propertyImplementation RSQBR
 {implements="com.lsfusion.lang.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
@@ -613,6 +616,7 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |   importActionPropertyDefinitionBody
                 |   newThreadActionPropertyDefinitionBody
                 |   newExecutorActionPropertyDefinitionBody
+                |   newSessionActionPropertyDefinitionBody
 
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
@@ -807,6 +811,17 @@ newExecutorActionPropertyDefinitionBody ::= NEWEXECUTOR actionPropertyDefinition
     methods = [inferActionParamClasses]
 }
 
+newSessionActionPropertyDefinitionBody ::= (    NEWSESSION (NOCLOSE)? nestedPropertiesSelector? 
+                                           |    NESTEDSESSION
+                                           )
+                                           (SINGLE)?
+                                           actionPropertyDefinitionBody
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
 nonEmptyPropertyUsageListWithIds ::= propertyUsageWithId (COMMA propertyUsageWithId)*
 
 propertyUsageWithId ::= ((ID | stringLiteral) EQUALS)? propertyUsage
@@ -835,21 +850,15 @@ activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
 activateActionPropertyDefinitionBody ::= ACTIVATE ((FORM formUsage) | (TAB componentUsage FORM formUsage))
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
 }
 
-listActionPropertyDefinitionBody ::=    (
-                                            (
-                                                (NEWSESSION (NOCLOSE)? nestedPropertiesSelector?) | NESTEDSESSION
-                                            )
-                                            (SINGLE)?
-                                        )?
-		                                LBRACE
+listActionPropertyDefinitionBody ::=    LBRACE
 			                            listActionStatement*
 		                                RBRACE
 {
-    pin = 2
+    pin = 1
     mixin="com.lsfusion.lang.psi.LSFListActionImpl"
     implements="com.lsfusion.lang.psi.LSFListAction, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
@@ -860,7 +869,6 @@ private nestedPropertiesSelector ::= NESTED (LOCAL | nonEmptyNoContextPropertyUs
 private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfNeeded >>  //  !} => ;
                                 |   localDataPropertyDefinition SEMI
                                 |   emptyStatement
-                                |   stubListActionStatement
                                 )
 {
     pin(".*") = 1
@@ -876,17 +884,6 @@ private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY 
                                             | LBRACE
                                             | RBRACE
                                            )
-                                           
-stubListActionStatement ::=     (
-                                    ((NEWSESSION nestedPropertiesSelector?) | NESTEDSESSION)
-                                    |
-                                    (NEWTHREAD uintLiteral? (DELAY uintLiteral)?)
-                                )
-                                (SINGLE)?
-                                LBRACE
-{
-    pin(".*") = 1
-}                                           
 
 localDataPropertyDefinition ::= LOCAL nestedLocalModifier simpleName EQUALS className LBRAC classNameList RBRAC
 {
