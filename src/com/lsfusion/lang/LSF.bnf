@@ -811,7 +811,7 @@ newExecutorActionPropertyDefinitionBody ::= NEWEXECUTOR actionPropertyDefinition
     methods = [inferActionParamClasses]
 }
 
-newSessionActionPropertyDefinitionBody ::= (    NEWSESSION (NOCLOSE)? nestedPropertiesSelector? 
+newSessionActionPropertyDefinitionBody ::= (    NEWSESSION (NEWSQL)? nestedPropertiesSelector? 
                                            |    NESTEDSESSION
                                            )
                                            (SINGLE)?

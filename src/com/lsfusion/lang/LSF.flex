@@ -279,8 +279,8 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "NESTEDSESSION"              			{ return NESTEDSESSION; }
   "NEW"                     			{ return NEW; }
   "NEWSESSION"              			{ return NEWSESSION; }
+  "NEWSQL"              			    { return NEWSQL; }
   "NEWTHREAD"              			    { return NEWTHREAD; }
-  "NOCLOSE"              			    { return NOCLOSE; }
   "NO"                      			{ return NO; }
   "NOCANCEL"                			{ return NOCANCEL; }
   "NOINLINE"                			{ return NOINLINE; }
