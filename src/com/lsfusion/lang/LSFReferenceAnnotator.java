@@ -42,6 +42,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), null, null, null, Font.PLAIN);
     public static final TextAttributes WAVE_UNDERSCORED_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
     public static final TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
+    public static final TextAttributes UNTYPED_IMPLICIT_DECL = new TextAttributes(new JBColor(new Color(56, 96, 255), new Color(100, 100, 255)), null, null, null, Font.PLAIN);
 
     private AnnotationHolder myHolder;
     public boolean errorsSearchMode = false;
@@ -146,10 +147,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
         checkReference(o);
 
-        if (o.resolveDecl() == o.getClassParamDeclare().getParamDeclare())
-            addImplicitDecl(o);
-
         LSFClassName className = o.getClassParamDeclare().getClassName();
+        if (o.resolveDecl() == o.getClassParamDeclare().getParamDeclare()) {
+            if(className != null)
+                addImplicitDecl(o);
+            else
+                addUntypedImplicitDecl(o);
+        }
+
         if(className != null) {
             LSFExprParamReference parentRef = PsiTreeUtil.getParentOfType(o.resolveDecl(), LSFExprParamReference.class);
             if(parentRef == null || o != parentRef) {
@@ -478,6 +483,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void addImplicitDecl(LSFReference reference) {
         final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Implicit declaration");
         TextAttributes error = IMPLICIT_DECL;
+        if (isInMetaUsage(reference))
+            error = TextAttributes.merge(error, META_USAGE);
+        annotation.setEnforcedTextAttributes(error);
+    }
+
+    private void addUntypedImplicitDecl(LSFReference reference) {
+        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Untyped implicit declaration");
+        TextAttributes error = UNTYPED_IMPLICIT_DECL;
         if (isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);
