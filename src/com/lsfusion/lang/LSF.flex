@@ -305,6 +305,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "PARTITION"               			{ return PARTITION; }
   "PDF"                     			{ return PDF; }
   "PERSISTENT"              			{ return PERSISTENT; }
+  "PERIOD"                              { return PERIOD; }    
   "PG"                                  { return PG; }    
   "POSITION"                			{ return POSITION; }
   "PREFCHARWIDTH"           			{ return PREFCHARWIDTH; }

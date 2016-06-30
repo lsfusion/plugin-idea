@@ -793,11 +793,9 @@ importActionSourceType ::=  XLS (SHEET propertyExpression)?
                         |   MDB
 
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
-                                        (
-                                            CONNECTION propertyExpression
-                                            |
-                                            (SCHEDULE uintLiteral? (DELAY uintLiteral)?)?
-                                        )
+                                        (   CONNECTION propertyExpression
+                                        |   (SCHEDULE (PERIOD propertyExpression)? (DELAY propertyExpression)?)
+                                        )?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
