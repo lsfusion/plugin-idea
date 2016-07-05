@@ -28,6 +28,8 @@ public class LSFStubElementTypeFactory {
                 return LSFStubElementTypes.NAVIGATORELEMENT;
             case "FORM_STATEMENT":
                 return LSFStubElementTypes.EXTENDFORM;
+            case "DESIGN_STATEMENT":
+                return LSFStubElementTypes.DESIGN;
             case "CLASS_STATEMENT":
                 return LSFStubElementTypes.EXTENDCLASS;
             case "EXPLICIT_INTERFACE_PROPERTY_STATEMENT":

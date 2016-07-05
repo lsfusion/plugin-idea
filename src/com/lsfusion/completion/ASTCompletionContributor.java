@@ -35,6 +35,7 @@ import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.indexes.*;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -54,7 +55,9 @@ import static com.lsfusion.lang.parser.GeneratedParserUtilBase.*;
 import static com.lsfusion.lang.psi.LSFPsiImplUtil.resolveParamClasses;
 import static com.lsfusion.lang.psi.LSFTypes.*;
 import static com.lsfusion.lang.psi.LSFTypes.Factory.getPsiElementClassByType;
+import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.DesignProcessor;
 import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.FormExtendProcessor;
+import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.processDesignContext;
 import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.processFormContext;
 import static com.lsfusion.util.LSFPsiUtils.getContextClasses;
 import static java.util.Arrays.asList;
@@ -244,6 +247,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         BooleanValueHolder groupObjectCompleted = new BooleanValueHolder(false);
         BooleanValueHolder propertyDrawCompleted = new BooleanValueHolder(false);
         BooleanValueHolder filterGroupCompleted = new BooleanValueHolder(false);
+        BooleanValueHolder componentCompleted = new BooleanValueHolder(false);
         boolean parameterCompleted = false;
         boolean propertyCompleted = false;
         final ExecType type;
@@ -260,6 +264,7 @@ public class ASTCompletionContributor extends CompletionContributor {
 
         private static final double STATIC_PRIORITY = 5;
         private static final double FORM_OBJECT_PRIORITY = 5;
+        private static final double DESIGN_PRIORITY = 5;
         private static final double PARAM_PRIORITY = 5;
 
         private static final double PROPERTY_PRIORITY = 2; // при USE_ANY еще добавляются количество подходящих классов
@@ -350,6 +355,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (!res) res = completeObjectUsage();
                 if (!res) res = completeGroupObjectUsage();
                 if (!res) res = completeFilterGroupUsage();
+                if (!res) res = completeComponentUsage();
                 if (!res) res = completePropertyDrawUsage();
                 if (!res) res = completeParameterUsage();
                 if (!res) res = completePropertyUsage();
@@ -495,6 +501,19 @@ public class ASTCompletionContributor extends CompletionContributor {
             );
         }
 
+        private boolean completeComponentUsage() {
+            return completeDesignContextObject(
+                    componentCompleted,
+                    COMPONENT_USAGE,
+                    new DesignProcessor<LSFComponentDeclaration>() {
+                        @Override
+                        public Collection<LSFComponentDeclaration> process(LSFDesign design) {
+                            return design.getComponentDecls();
+                        }
+                    }
+            );
+        }
+
         private boolean completePropertyDrawUsage() {
             return completeFormContextObject(
                     propertyDrawCompleted,
@@ -518,6 +537,24 @@ public class ASTCompletionContributor extends CompletionContributor {
                         Set<T> declaration = processFormContext(psi, elementUsage.offset, formExtendProcessor);
                         for (T elementDecl : declaration) {
                             addLookupElement(createLookupElement(elementDecl, FORM_OBJECT_PRIORITY));
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private <T extends LSFDeclaration> boolean completeDesignContextObject(BooleanValueHolder completed, IElementType frameType, DesignProcessor<T> designProcessor) {
+            Frame elementUsage = getLastFrameOfType(null, frameType);
+            if (elementUsage != null) {
+                if (type.isBase() && !completed.getValue()) {
+                    completed.setValue(true);
+                    FormContext psi = getLastPsiOfType(FormContext.class);
+                    if (psi != null) {
+                        Set<T> declaration = processDesignContext(psi, elementUsage.offset, designProcessor);
+                        for (T elementDecl : declaration) {
+                            addLookupElement(createLookupElement(elementDecl, DESIGN_PRIORITY));
                         }
                     }
                 }

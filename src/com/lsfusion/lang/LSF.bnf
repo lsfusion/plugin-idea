@@ -1444,7 +1444,10 @@ navigatorElementSelector ::= navigatorElementUsage
 
 designStatement ::=	designHeader componentBody {
     pin = 1
-    implements = "com.lsfusion.lang.psi.context.FormContext"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
+    stubClass = "com.lsfusion.lang.psi.stubs.extend.DesignStubElement"
+    implements="com.lsfusion.lang.psi.extend.LSFDesign, com.lsfusion.lang.psi.context.FormContext"
+    mixin="com.lsfusion.lang.psi.extend.impl.LSFDesignImpl"
     methods = [ getIcon resolveFormDecl]
 }
 

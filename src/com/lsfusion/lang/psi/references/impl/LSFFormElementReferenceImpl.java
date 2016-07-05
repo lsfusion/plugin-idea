@@ -5,13 +5,11 @@ import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.EmptyQuery;
 import com.intellij.util.Query;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFFormStatement;
-import com.lsfusion.lang.psi.LSFGlobalResolver;
-import com.lsfusion.lang.psi.LSFResolveResult;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFFormElementReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -95,6 +93,46 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
             extendForms.forEach(new com.intellij.util.Processor<LSFFormExtend>() {
                 public boolean process(LSFFormExtend formExtend) {
                     finalResult.addAll(processor.process(formExtend));
+                    return true;
+                }
+            });
+            return finalResult;
+        }
+        return null;
+    }
+
+    public interface DesignProcessor<T> {
+        Collection<T> process(LSFDesign design);
+    }
+
+    public static <T> Set<T> processDesignContext(PsiElement current, int offset, final DesignProcessor<T> processor) {
+        Set<T> processedContext = processDesignContext(current, processor, true);
+        if (processedContext != null) {
+            return processedContext;
+        }
+
+        PsiElement parent = current.getParent();
+        if (!(parent == null || parent instanceof LSFFile)) {
+            return processDesignContext(parent, offset, processor); // бежим выше
+        }
+
+        return new HashSet<>();
+    }
+
+    public static <T> Set<T> processDesignContext(PsiElement current, final DesignProcessor<T> processor, boolean objectRef) {
+        Query<LSFDesign> designs = null;
+        if (current instanceof FormContext && (objectRef || current instanceof LSFDesignStatement)) {
+            LSFFormDeclaration designDecl = ((FormContext) current).resolveFormDecl();
+            designs = designDecl == null
+                    ? new EmptyQuery<LSFDesign>()
+                    : LSFGlobalResolver.findExtendElements(designDecl, LSFStubElementTypes.DESIGN, (LSFFile) current.getContainingFile());
+        }
+
+        if (designs != null) {
+            final Set<T> finalResult = new HashSet<>();
+            designs.forEach(new com.intellij.util.Processor<LSFDesign>() {
+                public boolean process(LSFDesign design) {
+                    finalResult.addAll(processor.process(design));
                     return true;
                 }
             });

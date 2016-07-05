@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.stubs.types;
 
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendClassStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.DesignStubElementType;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendFormStubElementType;
 import com.lsfusion.lang.psi.stubs.interfaces.types.ExplicitInterfaceStubElementType;
 import com.lsfusion.lang.psi.stubs.interfaces.types.ExplicitValueStubElementType;
@@ -23,6 +24,7 @@ public interface LSFStubElementTypes {
 
     ExtendFormStubElementType EXTENDFORM = new ExtendFormStubElementType();
     ExtendClassStubElementType EXTENDCLASS = new ExtendClassStubElementType();
+    DesignStubElementType DESIGN = new DesignStubElementType();
 
     ExplicitInterfaceStubElementType EXPLICIT_INTERFACE = new ExplicitInterfaceStubElementType();
     ExplicitValueStubElementType EXPLICIT_VALUE = new ExplicitValueStubElementType();

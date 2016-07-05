@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi.indexes;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 
 public class LSFIndexKeys {
@@ -23,6 +24,7 @@ public class LSFIndexKeys {
     public static final StubIndexKey<String, LSFFormExtend> EXTENDFORM = StubIndexKey.createIndexKey("lsf.indices.extends.form");
     public static final StubIndexKey<String, LSFClassExtend> EXTENDCLASS = StubIndexKey.createIndexKey("lsf.indices.extends.class");
     public static final StubIndexKey<String, LSFClassExtend> EXTENDCLASS_SHORT = StubIndexKey.createIndexKey("lsf.indices.extends.class.short");
+    public static final StubIndexKey<String, LSFDesign> DESIGN = StubIndexKey.createIndexKey("lsf.indices.design");
 
     public static final StubIndexKey<String, LSFExplicitInterfacePropStatement> EXPLICIT_INTERFACE = StubIndexKey.createIndexKey("lsf.indices.explicit.interface");
     public static final StubIndexKey<String, LSFExplicitValuePropStatement> EXPLICIT_VALUE = StubIndexKey.createIndexKey("lsf.indices.explicit.value");

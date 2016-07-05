@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.53</version>
+    <version>1.0.54</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -239,6 +239,7 @@
 
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendFormIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendClassIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.DesignIndex"/>
 
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex"/>
 
