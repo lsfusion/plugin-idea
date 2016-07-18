@@ -295,6 +295,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitEqualityPE(@NotNull LSFEqualityPE o) {
+        super.visitEqualityPE(o);
+
+        checkEqualityPE(o);
+    }
+
+    @Override
     public void visitFormDeclaration(@NotNull LSFFormDeclaration o) {
         super.visitFormDeclaration(o);
 
@@ -431,6 +438,23 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private LSFClassSet getLSFClassSet(LSFAdditiveORPE element) {
+        return LSFExClassSet.fromEx(element.resolveInferredValueClass(null));
+    }
+
+    private void checkEqualityPE(LSFEqualityPE equalityPE) {
+        List<LSFRelationalPE> children = equalityPE.getRelationalPEList();
+        if (children.size() == 2) {
+            LSFClassSet class1 = getLSFClassSet(children.get(0));
+            LSFClassSet class2 = getLSFClassSet(children.get(1));
+            if (class1 != null && class2 != null && !class1.isCompatible(class2)) {
+                Annotation annotation = myHolder.createErrorAnnotation(equalityPE, String.format("Type mismatch: can't compare %s and %s", class1, class2));
+                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                addError(equalityPE, annotation);
+            }
+        }
+    }
+
+    private LSFClassSet getLSFClassSet(LSFRelationalPE element) {
         return LSFExClassSet.fromEx(element.resolveInferredValueClass(null));
     }
 
