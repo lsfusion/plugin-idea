@@ -1464,7 +1464,6 @@ componentBlockStatement ::= LBRACE componentStatement* RBRACE
 
 componentStatement ::=      setObjectPropertyStatement
                         |	setupComponentStatement
-                        |	setupGroupObject
                         |	newComponentStatement
                         |   moveComponentStatement
                         |	removeComponentStatement
@@ -1475,11 +1474,9 @@ componentStatement ::=      setObjectPropertyStatement
 }
 
 private component_statement_recover ::= !component_statement_recover_start 
-private component_statement_recover_start ::= ID | GROUP | PARENT | PROPERTY | NEW | MOVE | REMOVE | SEMI | RBRACE 
+private component_statement_recover_start ::= ID | PARENT | PROPERTY | NEW | MOVE | REMOVE | SEMI | RBRACE 
 
-componentStubStatement ::=      GROUP LBRAC ID RBRAC LBRACE
-                            |   NEW ID
-  
+componentStubStatement ::= NEW ID
 {
     pin(".*") = 1
 }
@@ -1489,22 +1486,6 @@ setupComponentStatement ::= componentSelector componentBody
     pin = 1
 }
 
-setupGroupObject ::= GROUP LBRAC groupObjectUsage RBRAC
-                           LBRACE setupGroupObjectStatement* RBRACE
-{
-    pin = 5
-}
-
-setupGroupObjectStatement ::=   setGroupObjectPropertyStatement
-                            |   emptyStatement
-{
-    recoverWhile = "setup_group_object_statement_recover"
-}
-                                
-private setup_group_object_statement_recover ::= !(ID | SEMI | RBRACE)
-
-setGroupObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 1}
-                              
 newComponentStatement ::= NEW componentStubDecl componentInsertPosition componentBody {pin = 2}
 moveComponentStatement ::= MOVE componentSelector componentInsertPosition componentBody {pin = 1}
 
