@@ -372,6 +372,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "TRY"                                 { return TRY; }
   "UNGROUP"                 			{ return UNGROUP; }
   "VALIGN"                  			{ return VALIGN; }
+  "VALUE"                               { return VALUE; }
   "VERTICAL"                			{ return VERTICAL; }
   "VIEW"                    			{ return VIEW; }
   "WAIT"                                { return WAIT; }
