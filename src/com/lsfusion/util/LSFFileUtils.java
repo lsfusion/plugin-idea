@@ -95,32 +95,33 @@ public class LSFFileUtils {
     }
 
     public static List<PsiFile> findFilesByPath(Module module, final String path) {
-        final PsiManager psiManager = PsiManager.getInstance(module.getProject());
-
         final List<PsiFile> result = new ArrayList<>();
 
-        final OrderEnumerator orderEnumerator = ModuleRootManager.getInstance(module).orderEntries();
+        if (module != null) {
+            final PsiManager psiManager = PsiManager.getInstance(module.getProject());
 
-        proceedModuleRoots(module, path, result, psiManager);
-        orderEnumerator.forEachModule(new Processor<Module>() {
-            @Override
-            public boolean process(Module module) {
-                proceedModuleRoots(module, path, result, psiManager);
-                return true;
-            }
-        });
-        
-        if (result.isEmpty()) {
-            //almost orderEnumerator.getAllLibrariesAndSdkClassesRoots(), but without sdk
-            VirtualFile[] classRoots = orderEnumerator.withoutModuleSourceEntries().recursively().withoutSdk().exportedOnly().classes().usingCache().getRoots();
-            for (VirtualFile classRoot : classRoots) {
-                VirtualFile file = classRoot.findFileByRelativePath(path);
-                if (file != null) {
-                    result.add(psiManager.findFile(file));
+            final OrderEnumerator orderEnumerator = ModuleRootManager.getInstance(module).orderEntries();
+
+            proceedModuleRoots(module, path, result, psiManager);
+            orderEnumerator.forEachModule(new Processor<Module>() {
+                @Override
+                public boolean process(Module module) {
+                    proceedModuleRoots(module, path, result, psiManager);
+                    return true;
+                }
+            });
+
+            if (result.isEmpty()) {
+                //almost orderEnumerator.getAllLibrariesAndSdkClassesRoots(), but without sdk
+                VirtualFile[] classRoots = orderEnumerator.withoutModuleSourceEntries().recursively().withoutSdk().exportedOnly().classes().usingCache().getRoots();
+                for (VirtualFile classRoot : classRoots) {
+                    VirtualFile file = classRoot.findFileByRelativePath(path);
+                    if (file != null) {
+                        result.add(psiManager.findFile(file));
+                    }
                 }
             }
         }
-
 
         return result;
     }
