@@ -626,14 +626,17 @@ formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
 	    FORM formUsage
 		(formActionObjectList)?
-        (contextFilterDefinition)?
-		(initFilterDefinition)?
-		(formSessionScopeLiteral)?
-		(modalityTypeLiteral)?
-		(CHECK)? (SHOWDROP)? (NOCANCEL)?
-		(formPrintTypeLiteral)?
-		(formExportLiteral)?
-		(READONLY)?
+		(   contextFilterDefinition
+		|   initFilterDefinition
+		|   formSessionScopeLiteral
+		|   modalityTypeLiteral
+		|   CHECK
+		|   SHOWDROP 
+		|   NOCANCEL
+		|   formPrintTypeLiteral
+		|   formExportLiteral  
+		|   READONLY
+		)*
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
