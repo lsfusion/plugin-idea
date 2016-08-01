@@ -68,6 +68,7 @@ public class LSFParserDefinition implements ParserDefinition {
         LSQBR,
         RSQBR,
         ATSIGN,
+        ATSIGN2,
         FAKETWODASHES,
         FAKETHREEDASHES,
         ID
