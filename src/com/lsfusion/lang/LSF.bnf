@@ -712,7 +712,7 @@ confirmActionPropertyDefinitionBody ::= CONFIRM propertyExpression
     methods = [inferActionParamClasses]
 }
 
-messageActionPropertyDefinitionBody ::= MESSAGE (NO WAIT)? propertyExpression
+messageActionPropertyDefinitionBody ::= MESSAGE ((NO WAIT) | NOWAIT)? propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
