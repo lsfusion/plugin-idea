@@ -387,7 +387,7 @@ multiPropertyDefinition ::= MULTI nonEmptyPropertyExpressionList (exclusiveOverr
 partitionPropertyBy ::= BY nonEmptyPropertyExpressionList
 partitionPropertyDefinition ::= PARTITION
                                 (   (SUM | PREV)
-                                |   UNGROUP propertyObject
+                                |   UNGROUP propertyUsage
                                     (   PROPORTION (STRICT)? ROUND LBRAC LEX_UINT_LITERAL RBRAC
                                     |   LIMIT (STRICT)?
                                     )

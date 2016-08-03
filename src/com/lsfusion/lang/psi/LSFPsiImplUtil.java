@@ -2545,9 +2545,9 @@ public class LSFPsiImplUtil {
         LSFPartitionPropertyBy partitionBy = sourceStatement.getPartitionPropertyBy();
         if (partitionBy != null) {
             List<LSFExClassSet> joinClasses = null;
-            LSFPropertyObject po = sourceStatement.getPropertyObject();
-            if (po != null)
-                joinClasses = inferParamClasses(valueClass, po);
+            LSFPropertyUsage pu = sourceStatement.getPropertyUsage();
+            if (pu != null)
+                joinClasses = inferParamClasses(valueClass, pu);
 
             List<LSFPropertyExpression> list = partitionBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList();
             for (int i = 0; i < list.size(); i++)
