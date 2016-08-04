@@ -726,10 +726,13 @@ asyncUpdateActionPropertyDefinitionBody ::= ASYNCUPDATE propertyExpression
     methods = [inferActionParamClasses]
 }
 
-seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)? objectID propertyExpression
-{
+seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)? 
+                                            (   (objectID EQUALS propertyExpression) 
+                                            |   (groupObjectID (OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)*)?) 
+                                            )
+{                        
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses]
 }
 

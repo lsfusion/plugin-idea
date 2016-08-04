@@ -12,6 +12,7 @@ import com.lsfusion.lang.classes.*;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.typeinfer.*;
 import com.lsfusion.util.BaseUtils;
@@ -3073,7 +3074,18 @@ public class LSFPsiImplUtil {
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFActiveTabPropertyDefinition activeTabPD) {
         return resolveFormDecl(activeTabPD.getFormUsage());
     }
-    
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFSeekObjectActionPropertyDefinitionBodyImpl seekObjectActionBody) {
+        LSFFormUsage formUsage = null;
+        if (seekObjectActionBody.getGroupObjectID() != null) {
+            formUsage = seekObjectActionBody.getGroupObjectID().getFormUsage();
+        } else if (seekObjectActionBody.getObjectID() != null) {
+            formUsage = seekObjectActionBody.getObjectID().getFormUsage();
+        }
+        return resolveFormDecl(formUsage);
+    }
+
     public static void setName(@NotNull LSFMultiCompoundID mcId, String name, MetaTransaction transaction) {
         LSFMultiCompoundID genId = LSFElementGenerator.createMultiCompoundIdFromText(mcId.getProject(), name);
 
