@@ -377,7 +377,6 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "VALUE"                               { return VALUE; }
   "VERTICAL"                			{ return VERTICAL; }
   "VIEW"                    			{ return VIEW; }
-  "WAIT"                                { return WAIT; }
   "WHEN"                    			{ return WHEN; }
   "WHERE"                   			{ return WHERE; }
   "WHILE"                   			{ return WHILE; }
