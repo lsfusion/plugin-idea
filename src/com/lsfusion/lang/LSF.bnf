@@ -457,10 +457,7 @@ nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
-abstractPropertyDefinition ::= ABSTRACT ( ((CASE | MULTI) abstractExclusiveOverrideOption?) 
-                                        | (VALUE? OVERRIDE abstractCaseAddOption?) 
-                                        | (VALUE? EXCLUSIVE)
-                                        )? 
+abstractPropertyDefinition ::= ABSTRACT ((CASE | MULTI | VALUE) abstractExclusiveOverrideOption?)? 
                                (CHECKED)? className LBRAC classNameList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
@@ -733,7 +730,7 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)?
 {                        
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
-    methods = [inferActionParamClasses]
+    methods = [inferActionParamClasses resolveFormDecl] 
 }
 
 fileActionPropertyDefinitionBody ::= LOADFILE propertyExpression 
