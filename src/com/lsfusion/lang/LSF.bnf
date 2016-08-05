@@ -777,7 +777,7 @@ readActionPropertyDefinitionBody ::= READ propertyExpression TO propertyUsage ((
     methods = [inferActionParamClasses]
 }
 
-writeActionPropertyDefinitionBody ::= WRITE propertyExpression FROM propertyUsage
+writeActionPropertyDefinitionBody ::= WRITE propertyExpression FROM propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
