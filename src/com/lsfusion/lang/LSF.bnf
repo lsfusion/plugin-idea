@@ -829,7 +829,7 @@ newSessionActionPropertyDefinitionBody ::= (    NEWSESSION (NEWSQL)? nestedPrope
 
 nonEmptyPropertyUsageListWithIds ::= propertyUsageWithId (COMMA propertyUsageWithId)*
 
-propertyUsageWithId ::= ((ID | stringLiteral) EQUALS)? propertyUsage
+propertyUsageWithId ::= propertyUsage (EQUALS (ID | stringLiteral))? 
 
 drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
 {
