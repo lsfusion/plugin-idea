@@ -545,7 +545,7 @@ echoSymbolsSetting ::= ECHO
 indexSetting ::= INDEXED
 aggPropSetting ::= AGGPROP
 notNullSetting ::= NOT nullOption (DELETE)? baseEvent
-onEditEventSetting ::= ON (CHANGE | CHANGEWYS | EDIT) actionPropertyDefinitionBody
+onEditEventSetting ::= ON (CHANGE | GROUPCHANGE | CHANGEWYS | EDIT) actionPropertyDefinitionBody
 eventIdSetting ::= EVENTID stringLiteral
 
 hideEditKey ::= HIDE

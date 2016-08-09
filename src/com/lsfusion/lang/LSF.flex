@@ -227,6 +227,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "GLOBAL"                              { return GLOBAL; }
   "GRID"                    			{ return GRID; }
   "GROUP"                   			{ return GROUP; }
+  "GROUPCHANGE"                         { return GROUPCHANGE; }
   "EQUAL"                               { return EQUAL; }
   "HALIGN"                  			{ return HALIGN; }
   "HEADER"                  			{ return HEADER; }
