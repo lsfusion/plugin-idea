@@ -120,9 +120,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "AND"                     			{ return AND; }
   "APPLY"                   			{ return APPLY; }
   "AS"                      			{ return AS; }
-  "ASONCHANGE"              			{ return ASONCHANGE; }
-  "ASONCHANGEWYS"           			{ return ASONCHANGEWYS; }
-  "ASONEDIT"                			{ return ASONEDIT; }
+  "ASON"                      			{ return ASON; }
   "ASSIGN"                  			{ return ASSIGN; }
   "ASYNCUPDATE"             			{ return ASYNCUPDATE; }
   "ATTACH"                  			{ return ATTACH; }
