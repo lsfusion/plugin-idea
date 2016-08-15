@@ -285,7 +285,8 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
                 Set<LSFPropDeclaration> equals = isNotEquals ? new HashSet<LSFPropDeclaration>() : null;
                 for (LSFPropDeclaration decl : decls) {
                     List<LSFClassSet> declClasses = decl.resolveParamClasses();
-                    if(declClasses != null) {
+                    if(declClasses != null && declClasses.size() == fDirectClasses.size()) { // double check, так как из-за recursion guard'а decl.resolvePC может внутри проверки condition возвращать null и соотвественно подходить, а в finalizer'е классы resolve'ся и уже не подходит (можно было бы и containsAll проверять но это серьезный overhead будет)
+                        assert declClasses.size() == fDirectClasses.size();
                         if(isNotEquals && declClasses.equals(fDirectClasses))
                             equals.add(decl);
                         mapClasses.put(decl, declClasses);
