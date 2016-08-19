@@ -971,7 +971,7 @@ forActionPropertyDefinitionBody ::= forActionPropertyMainBody
 }
 
 forActionPropertyMainBody ::= FOR (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
-                              inlineStatement
+                              inlineOption
                               (forAddObjClause)?
                               DO actionPropertyDefinitionBody
 {
@@ -981,7 +981,7 @@ forActionPropertyMainBody ::= FOR (propertyExpression (ORDER (DESC)? nonEmptyPro
 }
                                                        
 whileActionPropertyDefinitionBody ::= WHILE (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
-		                              inlineStatement
+		                              inlineOption
 		                              (forAddObjClause)?
 		                              DO actionPropertyDefinitionBody
 {
@@ -1296,7 +1296,7 @@ writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression 
 ////////////////////////////////// EVENT STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-eventStatement ::= WHEN baseEvent propertyExpression inlineStatement
+eventStatement ::= WHEN baseEvent propertyExpression inlineOption
 		                DO actionPropertyDefinitionBody (ORDER (DESC)? nonEmptyPropertyExpressionList)?
 		           << semicolonIfNeeded >>
 {
@@ -1318,7 +1318,7 @@ globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefi
 
 baseEvent ::= (GLOBAL | SESSION)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmptyNoContextPropertyUsageList)?
 
-inlineStatement ::=   (NOINLINE (LBRAC exprParameterUsageList RBRAC)? )? (INLINE)?
+inlineOption ::=   (NOINLINE (LBRAC exprParameterUsageList RBRAC)? )? (INLINE)?
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SHOWDEP STATEMENT //////////////////////////////
@@ -1687,7 +1687,7 @@ exprParameterNameUsage ::= classParamDeclare
 {mixin="com.lsfusion.lang.psi.references.impl.LSFExprParamReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFExprParamReference"}
 
 // can be used for param and object simultaneously, for use in exprs
-exprParameterUsage ::= ((DOLLAR)? exprParameterNameUsage) | (DOLLAR LEX_UINT_LITERAL)
+exprParameterUsage ::= (DOLLAR)? exprParameterNameUsage
 
 // global
 
