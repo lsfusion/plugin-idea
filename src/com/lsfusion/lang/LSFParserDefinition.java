@@ -40,6 +40,7 @@ public class LSFParserDefinition implements ParserDefinition {
         LEX_DATE_LITERAL,
         LEX_DATETIME_LITERAL,
         LEX_TIME_LITERAL,
+        LEX_CODE_LITERAL,
         LEX_COLOR_LITERAL,
         DOLLAR,
         EQ_OPERAND,
