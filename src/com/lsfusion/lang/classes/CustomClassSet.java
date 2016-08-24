@@ -388,7 +388,7 @@ public class CustomClassSet implements LSFClassSet {
 
     @Override
     public boolean isCompatible(LSFClassSet set) {
-        return set instanceof CustomClassSet;
+        return set instanceof CustomClassSet && haveCommonChildren(set, null);
     }
 
     @Override
