@@ -161,7 +161,7 @@ public class LSFPositionManager extends PositionManagerEx {
     @Nullable
     @Override
     public XStackFrame createStackFrame(@NotNull StackFrameProxyImpl frame, @NotNull DebugProcessImpl debugProcess, @NotNull final Location location) {
-        SourcePosition position = ApplicationManager.getApplication().runReadAction(new Computable<SourcePosition>() {
+        final SourcePosition position = ApplicationManager.getApplication().runReadAction(new Computable<SourcePosition>() {
             @Override
             public SourcePosition compute() {
                 try {
@@ -173,7 +173,12 @@ public class LSFPositionManager extends PositionManagerEx {
         });
         
         if (position != null) {
-            XSourcePositionImpl xpos = XSourcePositionImpl.createByOffset(position.getFile().getVirtualFile(), position.getOffset());
+            XSourcePositionImpl xpos = ApplicationManager.getApplication().runReadAction(new Computable<XSourcePositionImpl>() {
+                @Override
+                public XSourcePositionImpl compute() {
+                    return XSourcePositionImpl.createByOffset(position.getFile().getVirtualFile(), position.getOffset());
+                }
+            });
             if (xpos != null) {
                 return new LSFStackFrame(debugProcess.getProject(), frame, debugProcess, xpos);
             }
