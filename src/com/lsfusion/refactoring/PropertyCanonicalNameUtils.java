@@ -39,19 +39,21 @@ public final class PropertyCanonicalNameUtils {
         StringBuilder snBuilder = new StringBuilder();
         snBuilder.append(signatureLBracket);
         boolean isFirst = true;
-        for (LSFClassSet cs : signature) {
-            if (!isFirst) {
-                snBuilder.append(",");
-            }
-            isFirst = false;
-            if (cs instanceof StringClass) {
-                snBuilder.append(commonStringClassName);
-            } else if (cs instanceof NumericClass) {
-                snBuilder.append(commonNumericClassName);
-            } else if (cs != null) {
-                snBuilder.append(cs.getCanonicalName());
-            } else {
-                snBuilder.append(UNKNOWNCLASS);
+        if (signature != null) {
+            for (LSFClassSet cs : signature) {
+                if (!isFirst) {
+                    snBuilder.append(",");
+                }
+                isFirst = false;
+                if (cs instanceof StringClass) {
+                    snBuilder.append(commonStringClassName);
+                } else if (cs instanceof NumericClass) {
+                    snBuilder.append(commonNumericClassName);
+                } else if (cs != null) {
+                    snBuilder.append(cs.getCanonicalName());
+                } else {
+                    snBuilder.append(UNKNOWNCLASS);
+                }
             }
         }
         snBuilder.append(signatureRBracket);
