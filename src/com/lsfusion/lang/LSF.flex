@@ -47,6 +47,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]" | "VARSTRING[" {DIGITS} "]" | "VARISTRING[" {DIGITS} "]"
   | "TEXT" | "RICHTEXT"
   | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "CUSTOMFILE" | "EXCELFILE"
+  | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "CUSTOMLINK" | "EXCELLINK"
   | "BOOLEAN"
   | "COLOR"                             { return PRIMITIVE_TYPE; }
 

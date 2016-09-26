@@ -70,6 +70,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "DATE", "DATETIME", "TIME", "YEAR",
                                                                  "STRING[]", "ISTRING[]", "VARSTRING[]", "VARISTRING[]", "TEXT",
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "CUSTOMFILE", "EXCELFILE",
+                                                                 "WORDLINK", "IMAGELINK", "PDFLINK", "CUSTOMLINK", "EXCELLINK",
                                                                  "BOOLEAN", "COLOR"};
 
     enum ClassUsagePolicy {

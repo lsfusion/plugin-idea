@@ -38,6 +38,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
     "INTEGER" | "DOUBLE" | "LONG" | "BOOLEAN"
     | "DATETIME" | "DATE" | "YEAR" | "TIME"
     | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "CUSTOMFILE" | "EXCELFILE"
+    | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "CUSTOMLINK" | "EXCELLINK"
     | "STRING" | "NUMERIC" | "COLOR"      { return PRIMITIVE_TYPE; }
                       
     "V" {DIGITS} ("." {DIGITS})*          { return VERSION; }

@@ -9,6 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.classes.*;
+import com.lsfusion.lang.classes.link.*;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
@@ -410,6 +411,16 @@ public class LSFPsiImplUtil {
                 return DynamicFormatFileClass.instance;
             case "EXCELFILE":
                 return ExcelClass.instance;
+            case "WORDLINK":
+                return WordLinkClass.instance;
+            case "IMAGELINK":
+                return ImageLinkClass.instance;
+            case "PDFLINK":
+                return PDFLinkClass.instance;
+            case "CUSTOMLINK":
+                return DynamicFormatLinkClass.instance;
+            case "EXCELLINK":
+                return ExcelLinkClass.instance;
             case "BOOLEAN":
                 return LogicalClass.instance;
             case "DATE":
