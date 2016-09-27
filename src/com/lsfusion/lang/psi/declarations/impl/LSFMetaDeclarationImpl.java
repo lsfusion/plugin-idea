@@ -54,7 +54,7 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     }
 
     private void recReadMetaWhiteSpaceOrComments(ASTNode node, boolean prev, List<Pair<String, IElementType>> tokens) {
-        if (LSFParserDefinition.isWhiteSpaceOrComment(node.getElementType())) {
+        if (node != null && LSFParserDefinition.isWhiteSpaceOrComment(node.getElementType())) {
             if (prev) {
                 recReadMetaWhiteSpaceOrComments(node.getTreePrev(), prev, tokens);
                 tokens.add(Pair.create(node.getText(), node.getElementType()));
