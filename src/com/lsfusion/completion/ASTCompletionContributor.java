@@ -55,10 +55,7 @@ import static com.lsfusion.lang.parser.GeneratedParserUtilBase.*;
 import static com.lsfusion.lang.psi.LSFPsiImplUtil.resolveParamClasses;
 import static com.lsfusion.lang.psi.LSFTypes.*;
 import static com.lsfusion.lang.psi.LSFTypes.Factory.getPsiElementClassByType;
-import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.DesignProcessor;
-import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.FormExtendProcessor;
-import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.processDesignContext;
-import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.processFormContext;
+import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.*;
 import static com.lsfusion.util.LSFPsiUtils.getContextClasses;
 import static java.util.Arrays.asList;
 
@@ -97,7 +94,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         extend(completionType, psiElement().inFile(PlatformPatterns.instanceOf(LSFFile.class)), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-                if (CompletionUtils.isCompletionEnabled(parameters.getOriginalFile().getProject())) {
+                if (CompletionUtils.isCompletionEnabled(parameters.getOriginalFile().getProject()) && parameters.getPosition().getContainingFile() instanceof LSFFile) {
                     result = result.withPrefixMatcher(new CamelHumpMatcher(result.getPrefixMatcher().getPrefix(), false));
                     suggestByGuessingTokens(parameters, result);
                 }
