@@ -3,7 +3,6 @@ package com.lsfusion.design;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.impl.DataManagerImpl;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -98,7 +97,7 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
         
         if(!alreadyPending) {
             alreadyPending = true;
-            ApplicationManager.getApplication().invokeLater(new Runnable() { // так как это событие вызывается до commitTransaction, modificationStamp'ы и unsavedDocument'ы не обновились, а значит к индексам обращаться нельзя
+            DumbService.getInstance(project).smartInvokeLater(new Runnable() { // так как это событие вызывается до commitTransaction, modificationStamp'ы и unsavedDocument'ы не обновились, а значит к индексам обращаться нельзя
                 @Override
                 public void run() {
                     try {

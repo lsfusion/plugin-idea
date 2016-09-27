@@ -710,7 +710,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         public void run() {
             if (!DumbService.isDumb(myProject)) {
                 for (final LongLivingMeta metaDecl : decls) {
-                    ApplicationManager.getApplication().runReadAction(new Runnable() {
+                    DumbService.getInstance(myProject).smartInvokeLater(new Runnable() {
                         public void run() {
                             List<LSFMetaCodeStatement> usages = null;
                             if (metaDecl.file.isValid()) {
