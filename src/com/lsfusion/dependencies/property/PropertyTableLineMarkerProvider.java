@@ -1,6 +1,7 @@
 package com.lsfusion.dependencies.property;
 
 import com.intellij.codeHighlighting.Pass;
+import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.Document;
@@ -10,11 +11,16 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
 import com.lsfusion.actions.ToggleShowTableAction;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
+import com.lsfusion.lang.psi.declarations.impl.LSFTableDeclarationImpl;
+import com.lsfusion.lang.psi.indexes.TableIndex;
+import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +62,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
                 createIcon(),
                 Pass.UPDATE_OVERRIDEN_MARKERS,
                 PropertyShowTableTooltipProvider.INSTANCE,
-                null
+                ShowTableNavigationProvider.INSTANCE
         );
     }
 
@@ -94,6 +100,28 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
         public String fun(PsiElement psi) {
             String name = psi instanceof LSFPropertyStatement ? ((LSFPropertyStatement) psi).getTableName() : null;
             return name == null ? "Unknown table" : ("Table: " + name);
+        }
+    }
+    
+    private static class ShowTableNavigationProvider implements GutterIconNavigationHandler {
+        static ShowTableNavigationProvider INSTANCE = new ShowTableNavigationProvider();
+
+        @Override
+        public void navigate(MouseEvent e, PsiElement psi) {
+            if (e.getID() == MouseEvent.MOUSE_RELEASED) {
+                String name = psi instanceof LSFPropertyStatement ? ((LSFPropertyStatement) psi).getTableName() : null;
+                if (name != null) {
+                    String namespace = name.substring(0, name.indexOf("_"));
+                    String tableName = name.substring(name.indexOf("_") + 1);
+                    Collection<LSFTableDeclaration> tableDeclarations = TableIndex.getInstance().get(tableName, psi.getProject(), LSFFileUtils.getModuleWithDependenciesScope(psi));
+                    for (LSFTableDeclaration declaration : tableDeclarations) {
+                        if (declaration.getNamespaceName().equals(namespace)) {
+                            ((LSFTableDeclarationImpl) declaration).navigate(true);
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 }
