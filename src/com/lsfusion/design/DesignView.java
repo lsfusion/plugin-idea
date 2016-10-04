@@ -370,7 +370,7 @@ public class DesignView extends JPanel implements Disposable {
 
         if (rootWidget != null) {
             rootWidget.setBorder(
-                    createCompoundBorder(createEmptyBorder(5, 5, 5, 5), createLineBorder(new Color(69, 160, 255), 1))
+                    createCompoundBorder(createEmptyBorder(5, 5, 5, 5), createLineBorder(new JBColor(new Color(69, 160, 255), new Color(95, 123, 141)), 1))
             );
             formPanel.add(rootWidget);
         }
