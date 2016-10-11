@@ -535,17 +535,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitAssignActionPropertyDefinitionBody(@NotNull LSFAssignActionPropertyDefinitionBody o) {
-        LSFPropDeclaration declaration = ((LSFPropertyUsageImpl) o.getFirstChild().getFirstChild()).resolveDecl();
-        if (declaration != null) {
-            LSFPropertyCalcStatement statement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
-            if (declaration.resolveValueClass() == null || //action or not data/multi/case
-                    (statement != null && statement.getPropertyExpression() != null)) {
-                Annotation annotation = myHolder.createErrorAnnotation(o, "ASSIGN is allowed only to DATA/MULTI/CASE property");
-                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                addError(o, annotation);
+        LSFPropertyUsageImpl propertyUsage = (LSFPropertyUsageImpl) o.getFirstChild().getFirstChild();
+        if(propertyUsage != null) {
+            LSFPropDeclaration declaration = propertyUsage.resolveDecl();
+            if (declaration != null && declaration instanceof LSFPropertyStatementImpl) {
+                LSFPropertyCalcStatement statement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
+                if (declaration.resolveValueClass() == null || //action or not data/multi/case
+                        (statement != null && statement.getPropertyExpression() != null)) {
+                    Annotation annotation = myHolder.createErrorAnnotation(o, "ASSIGN is allowed only to DATA/MULTI/CASE property");
+                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                    addError(o, annotation);
+                }
             }
         }
-
     }
 }
 
