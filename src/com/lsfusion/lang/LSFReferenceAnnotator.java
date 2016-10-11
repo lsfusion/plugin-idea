@@ -20,6 +20,8 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
+import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.LSFExprParamReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.references.LSFReference;
@@ -530,5 +532,20 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
+
+    @Override
+    public void visitAssignActionPropertyDefinitionBody(@NotNull LSFAssignActionPropertyDefinitionBody o) {
+        LSFPropDeclaration declaration = ((LSFPropertyUsageImpl) o.getFirstChild().getFirstChild()).resolveDecl();
+        if (declaration != null) {
+            LSFPropertyCalcStatement statement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
+            if (declaration.resolveValueClass() == null || //action or not data/multi/case
+                    (statement != null && statement.getPropertyExpression() != null)) {
+                Annotation annotation = myHolder.createErrorAnnotation(o, "ASSIGN is allowed only to DATA/MULTI/CASE property");
+                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                addError(o, annotation);
+            }
+        }
+
+    }
 }
 
