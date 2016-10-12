@@ -536,18 +536,39 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitAssignActionPropertyDefinitionBody(@NotNull LSFAssignActionPropertyDefinitionBody o) {
         LSFPropertyUsageImpl propertyUsage = (LSFPropertyUsageImpl) o.getFirstChild().getFirstChild();
-        if(propertyUsage != null) {
+        if (propertyUsage != null) {
             LSFPropDeclaration declaration = propertyUsage.resolveDecl();
             if (declaration != null && declaration instanceof LSFPropertyStatementImpl) {
-                LSFPropertyCalcStatement statement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
-                if (declaration.resolveValueClass() == null || //action or not data/multi/case
-                        (statement != null && statement.getPropertyExpression() != null)) {
-                    Annotation annotation = myHolder.createErrorAnnotation(o, "ASSIGN is allowed only to DATA/MULTI/CASE property");
-                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                    addError(o, annotation);
+                LSFActionStatement actionStatement = ((LSFPropertyStatementImpl) declaration).getActionStatement();
+                if (actionStatement != null) {
+                    addAssignError(o);
+                } else {
+                    LSFPropertyCalcStatement propertyStatement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
+                    if (propertyStatement != null) {
+                        LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
+                        if (expression != null && !assignAllowed(expression)) {
+                            addAssignError(o);
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private boolean assignAllowed(PsiElement element) {
+        if (element instanceof LSFOverridePropertyDefinition || element instanceof LSFMultiPropertyDefinition || element instanceof LSFCasePropertyDefinition)
+            return true;
+        for (PsiElement child : element.getChildren()) {
+            if (assignAllowed(child))
+                return true;
+        }
+        return false;
+    }
+
+    private void addAssignError(LSFAssignActionPropertyDefinitionBody o) {
+        Annotation annotation = myHolder.createErrorAnnotation(o, "ASSIGN is allowed only to DATA/MULTI/CASE property");
+        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+        addError(o, annotation);
     }
 }
 
