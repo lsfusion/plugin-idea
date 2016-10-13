@@ -69,6 +69,9 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "CUSTOMFILE", "EXCELFILE",
                                                                  "WORDLINK", "IMAGELINK", "PDFLINK", "CUSTOMLINK", "EXCELLINK",
                                                                  "BOOLEAN", "COLOR"};
+    private static final String[] DESIGN_PROPERTIES = new String[] {"askConfirm", "askConfirmMessage", "caption",
+            "echoSymbols", "editKey", "focusable", "hide", "maxValue", "maximumCharWidth", "minimumCharWidth", "noSort",
+            "notNull", "panelCaptionAbove", "panelCaptionAfter", "pattern", "preferredCharWidth", "regexp", "regexpMessage"};
 
     enum ClassUsagePolicy {
         /**
@@ -357,6 +360,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (!res) res = completePropertyDrawUsage();
                 if (!res) res = completeParameterUsage();
                 if (!res) res = completePropertyUsage();
+                if (!res) res = completeDesignProperties();
             } catch (ProcessCanceledException pce) {
                 LOGGER.debug("ProcessCanceledException while filling ID completion variants ", pce);
             }
@@ -596,6 +600,17 @@ public class ASTCompletionContributor extends CompletionContributor {
                     quickLog("Completed propertyUsage");
                 }
 
+                return true;
+            }
+            return false;
+        }
+
+        private boolean completeDesignProperties() {
+            Frame frame = getLastFrameOfType(null, DESIGN_STATEMENT);
+            if (frame != null) {
+                for (String designProperty : DESIGN_PROPERTIES) {
+                    addLookupElement(createLookupElement(designProperty, DESIGN_PRIORITY, true, null));
+                }
                 return true;
             }
             return false;
