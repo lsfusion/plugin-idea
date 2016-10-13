@@ -264,7 +264,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     LSFGroupPropertyBy groupPropertyBy = groupPropertyDefinition.getGroupPropertyBy();
                     if (groupPropertyBy != null) {
                         for (LSFPropertyExpression expr : groupPropertyBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList()) {
-                            LSFExClassSet valueClass = expr.resolveValueClass(true);
+                            LSFExClassSet valueClass = expr.resolveValueClass(false);
                             if(valueClass != null) {
                                 groupByParams.add(valueClass.classSet);
                             }
