@@ -30,6 +30,7 @@ import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -252,6 +253,62 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 }
             }
         }
+
+        List<LSFClassSet> groupByParams = new ArrayList<>();
+        LSFPropertyCalcStatement propertyCalcStatement = o.getPropertyCalcStatement();
+        if(propertyCalcStatement != null) {
+            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
+            if(expressionUnfriendlyPD != null) {
+                LSFGroupPropertyDefinition groupPropertyDefinition = expressionUnfriendlyPD.getGroupPropertyDefinition();
+                if (groupPropertyDefinition != null) {
+                    LSFGroupPropertyBy groupPropertyBy = groupPropertyDefinition.getGroupPropertyBy();
+                    if (groupPropertyBy != null) {
+                        for (LSFPropertyExpression expr : groupPropertyBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList()) {
+                            LSFExClassSet valueClass = expr.resolveValueClass(true);
+                            if(valueClass != null) {
+                                groupByParams.add(valueClass.classSet);
+                            }
+                        }
+
+                        List<LSFClassSet> exprParams = new ArrayList<>();
+                        LSFPropertyDeclParams propertyDeclParams = o.getPropertyDeclaration().getPropertyDeclParams();
+                        if (propertyDeclParams != null) {
+                            LSFNonEmptyClassParamDeclareList classParamDeclareList = propertyDeclParams.getClassParamDeclareList().getNonEmptyClassParamDeclareList();
+                            if (classParamDeclareList != null) {
+                                for (LSFClassParamDeclare classParamDeclare : classParamDeclareList.getClassParamDeclareList()) {
+                                    exprParams.add(classParamDeclare.resolveClass());
+                                }
+                            }
+                        }
+
+                        if (exprParams.size() == groupByParams.size()) {
+                            boolean error = false;
+                            for (int i = 0; i < exprParams.size(); i++) {
+                                LSFClassSet exprParam = exprParams.get(i);
+                                LSFClassSet groupByParam = groupByParams.get(i);
+                                if (exprParam != null && groupByParam != null && !exprParam.isCompatible(groupByParam)) {
+                                    error = true;
+                                }
+                            }
+                            if(error) {
+                                Annotation annotation = myHolder.createErrorAnnotation(o,
+                                        String.format("Incorrect GROUP BY params: required %s; found %s", listToString(exprParams), listToString(groupByParams)));
+                                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                                addError(o, annotation);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private String listToString(List<LSFClassSet> list) {
+        String result = "";
+        for(LSFClassSet value : list) {
+            result += (result.isEmpty() ? "" : ", ") + value;
+        }
+        return result;
     }
 
     @Override
