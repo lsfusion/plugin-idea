@@ -376,7 +376,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private boolean completeTableName() {
-            return completeFullNameUsage(tableCompleted, TABLE_USAGE, WindowIndex.getInstance(), TABLE_PRIORITY);
+            return completeFullNameUsage(tableCompleted, TABLE_USAGE, TableIndex.getInstance(), TABLE_PRIORITY);
         }
 
         private boolean completeMetaName() {
