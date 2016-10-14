@@ -14,6 +14,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.lsfusion.actions.ShowErrorsAction;
+import com.lsfusion.completion.ASTCompletionContributor;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
 import com.lsfusion.lang.psi.*;
@@ -626,6 +627,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         Annotation annotation = myHolder.createErrorAnnotation(o, "ASSIGN is allowed only to DATA/MULTI/CASE property");
         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
         addError(o, annotation);
+    }
+
+    @Override
+    public void visitSetObjectPropertyStatement(@NotNull LSFSetObjectPropertyStatement o) {
+        String text = o.getText();
+        if (text != null && text.contains("=")) {
+            String property = text.substring(0, text.indexOf("=")).trim();
+            if (!ASTCompletionContributor.validDesignProperty(property)) {
+                Annotation annotation = myHolder.createErrorAnnotation(o, "Can't resolve property " + property);
+                annotation.setEnforcedTextAttributes(ERROR);
+                addError(o, annotation);
+            }
+        }
     }
 }
 

@@ -69,9 +69,19 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "CUSTOMFILE", "EXCELFILE",
                                                                  "WORDLINK", "IMAGELINK", "PDFLINK", "CUSTOMLINK", "EXCELLINK",
                                                                  "BOOLEAN", "COLOR"};
-    private static final String[] DESIGN_PROPERTIES = new String[] {"askConfirm", "askConfirmMessage", "caption",
-            "echoSymbols", "editKey", "focusable", "hide", "maxValue", "maximumCharWidth", "minimumCharWidth", "noSort",
-            "notNull", "panelCaptionAbove", "panelCaptionAfter", "pattern", "preferredCharWidth", "regexp", "regexpMessage"};
+    private static final List<String> DESIGN_PROPERTIES = Arrays.asList("align", "alignment", "askConfirm", "askConfirmMessage",
+            "background", "caption", "captionFont", "childrenAlignment", "columnLabelsWidth", "columnLabelsWidth", "columns",
+            "defaultComponent", "echoSymbols", "editKey", "fill", "fixedHeight", "fixedWidth", "flex", "focusable", "font",
+            "fontSize", "fontStyle", "foreground", "headerHeight", "hide", "imagePath", "margin", "maximumSize", "maxValue",
+            "minimumSize", "minimumWidth", "maximumCharWidth", "maximumHeight", "maximumWidth", "minimumCharWidth", "minimumHeight",
+            "noSort", "notNull", "panelCaptionAbove", "panelCaptionAfter", "pattern", "preferredCharWidth", "preferredHeight",
+            "preferredSize", "preferredWidth", "quickSearch", "regexp", "regexpMessage", "showCalculateSum", "showCountQuantity",
+            "showIf", "showGroup", "showGroupChange", "showPrintGroup", "showPrintGroupXls", "showSettings", "tabVertical",
+            "toolTip", "type", "visible");
+
+    public static boolean validDesignProperty(String designProperty) {
+        return DESIGN_PROPERTIES.contains(designProperty);
+    }
 
     enum ClassUsagePolicy {
         /**
