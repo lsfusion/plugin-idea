@@ -940,9 +940,14 @@ public class LSFPsiImplUtil {
                 return null;
             }
         }
-        LSFStringLiteral stringLiteral = sourceStatement.getStringLiteral();
-        if (stringLiteral != null)
-            return new StringClass(false, false, new ExtInt(stringLiteral.getValue().length()));
+        LSFLocalizedStringValueLiteral stringLiteral = sourceStatement.getLocalizedStringLiteral();
+        if (stringLiteral != null) {
+            if (stringLiteral.needToBeLocalized()) {
+                return new StringClass(false, false, false, ExtInt.UNLIMITED);
+            } else {
+                return new StringClass(false, false, new ExtInt(stringLiteral.getValue().length()));
+            }
+        }
         if (sourceStatement.getDateTimeLiteral() != null)
             return DateTimeClass.instance;
         if (sourceStatement.getDateLiteral() != null)

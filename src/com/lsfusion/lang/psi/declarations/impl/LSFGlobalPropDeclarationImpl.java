@@ -117,7 +117,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
     @Override
     public String getCaption() {
-        LSFStringLiteral stringLiteral = getPropertyDeclaration().getSimpleNameWithCaption().getStringLiteral();
+        LSFLocalizedStringLiteral stringLiteral = getPropertyDeclaration().getSimpleNameWithCaption().getLocalizedStringLiteral();
         return stringLiteral != null ? stringLiteral.getValue() : null;
     }
 

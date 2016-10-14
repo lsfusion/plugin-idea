@@ -5,10 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.lang.psi.LSFGlobalResolver;
-import com.lsfusion.lang.psi.LSFId;
-import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
-import com.lsfusion.lang.psi.LSFStringLiteral;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
@@ -43,7 +40,7 @@ public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<
     @Override
     @NotNull
     public String getCaption() {
-        LSFStringLiteral stringLiteral = getSimpleNameWithCaption().getStringLiteral();
+        LSFLocalizedStringLiteral stringLiteral = getSimpleNameWithCaption().getLocalizedStringLiteral();
         return stringLiteral == null ? "" : stringLiteral.getValue();
     }
 

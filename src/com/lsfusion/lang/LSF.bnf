@@ -1091,7 +1091,7 @@ formMultiGroupObjectDeclaration ::= (simpleName EQUALS)?
 		                            RBRAC
 
 formObjectDeclaration ::= (simpleName EQUALS)?
-		                  className (stringLiteral)?
+		                  className (localizedStringLiteral)?
 		                  (ON CHANGE formActionPropertyObject)?
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFObjectDeclarationImpl"
@@ -1138,7 +1138,7 @@ formOptionToDraw ::= TODRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
 formOptionsWithFormPropertyDraw ::= (BEFORE | AFTER | QUICKFILTER) formPropertyDrawUsage {pin = 1}
-formOptionsOnEvents ::= ON (formEventType | (SHORTCUT (stringLiteral)?) ) formActionPropertyObject
+formOptionsOnEvents ::= ON (formEventType | (SHORTCUT (localizedStringLiteral)?) ) formActionPropertyObject
 {
     pin = 1
 }
@@ -1194,7 +1194,7 @@ filterGroupUsage ::= simpleName
     implements="com.lsfusion.lang.psi.references.LSFFilterGroupReference"
 }
 
-regularFilterDeclaration ::= FILTER stringLiteral formFilterDeclaration (stringLiteral)? (filterSetDefault)?
+regularFilterDeclaration ::= FILTER localizedStringLiteral formFilterDeclaration (stringLiteral)? (filterSetDefault)?
 
 formFilterDeclaration ::= propertyExpression
 filterSetDefault ::= DEFAULT
@@ -1377,7 +1377,7 @@ indexStatement ::= INDEX nonEmptyMappedPropertyOrSimpleExprParamList SEMI {
 
 windowStatement ::= windowCreateStatement | windowHideStatement {pin=1 methods = [ getIcon ]}
 
-windowCreateStatement ::= WINDOW simpleName (stringLiteral)? windowType windowOptions SEMI
+windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType windowOptions SEMI
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFWindowDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFWindowDeclaration"
     stubClass = "com.lsfusion.lang.psi.stubs.WindowStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
@@ -1419,12 +1419,12 @@ navigatorElementStatementBody ::=   (   LBRACE
                                         RBRACE
                                     ) | emptyStatement
 
-addNavigatorElementStatement ::= ADD navigatorElementSelector (stringLiteral)? navigatorElementOptions navigatorElementStatementBody
+addNavigatorElementStatement ::= ADD navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
 {
     pin = 1
 }
 
-newNavigatorElementStatement ::= NEW simpleName (stringLiteral)? (ACTION noContextPropertyUsage)? navigatorElementOptions navigatorElementStatementBody
+newNavigatorElementStatement ::= NEW simpleName (localizedStringLiteral)? (ACTION noContextPropertyUsage)? navigatorElementOptions navigatorElementStatementBody
 {
     pin = 2
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFNavigatorElementDeclarationImpl"
@@ -1433,7 +1433,7 @@ newNavigatorElementStatement ::= NEW simpleName (stringLiteral)? (ACTION noConte
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-setupNavigatorElementStatement ::= navigatorElementSelector (stringLiteral)? navigatorElementOptions navigatorElementStatementBody
+setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
 
 navigatorElementOptions ::= (	WINDOW windowUsage
                             |	navigatorElementInsertPosition 
@@ -1460,7 +1460,7 @@ designStatement ::=	designHeader componentBody {
     methods = [ getIcon resolveFormDecl]
 }
 
-designHeader ::= DESIGN formUsage (stringLiteral)? customFormDesignOption? {pin=2}
+designHeader ::= DESIGN formUsage (localizedStringLiteral)? customFormDesignOption? {pin=2}
 
 customFormDesignOption ::= CUSTOM
 
@@ -1618,7 +1618,7 @@ mappedPropertyExprParam ::= propertyUsage LBRAC exprParameterUsageList RBRAC // 
     methods = [ resolveParamClasses getParamList]
 }
 
-simpleNameWithCaption ::= simpleName (stringLiteral)?
+simpleNameWithCaption ::= simpleName (localizedStringLiteral)?
 
 // local
 
@@ -1655,7 +1655,7 @@ literal ::=
 	|	uintLiteral
 	|	udoubleLiteral
 	|	unumericLiteral
-	|	stringLiteral
+	|	localizedStringLiteral
 	|	booleanLiteral
 	|	dateTimeLiteral
 	|	dateLiteral
@@ -1771,6 +1771,12 @@ stringLiteral ::= LEX_STRING_LITERAL
 {
     mixin="com.lsfusion.lang.psi.LSFStringValueLiteralImpl"
     implements="com.lsfusion.lang.psi.LSFStringValueLiteral"
+}
+
+localizedStringLiteral ::= LEX_STRING_LITERAL 
+{
+    mixin="com.lsfusion.lang.psi.LSFLocalizedStringValueLiteralImpl"
+    implements="com.lsfusion.lang.psi.LSFLocalizedStringValueLiteral"
 }
 intLiteral ::= (MINUS)? uintLiteral
 doubleLiteral ::= (MINUS)? unumericLiteral

@@ -4,8 +4,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFLocalizedStringLiteral;
 import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
-import com.lsfusion.lang.psi.LSFStringLiteral;
 import com.lsfusion.lang.psi.declarations.LSFGroupDeclaration;
 import com.lsfusion.lang.psi.stubs.GroupStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -51,7 +51,7 @@ public abstract class LSFGroupDeclarationImpl extends LSFFullNameDeclarationImpl
 
     @Override
     public String getCaption() {
-        LSFStringLiteral literal = getSimpleNameWithCaption().getStringLiteral();
+        LSFLocalizedStringLiteral literal = getSimpleNameWithCaption().getLocalizedStringLiteral();
         return literal != null ? literal.getValue() : null;
     }
 }

@@ -39,10 +39,15 @@ public class LSFElementGenerator {
     
     public static LSFStringLiteral createStringLiteralFromText(Project myProject, String text) {
         //assert, что text уже обрамлён кавычками -> "some text"
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; GROUP someDumbGroup " + text + ";");
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; FORM someForm FILTERGROUP id FILTER '' func() " + text + ";");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFStringLiteral.class).iterator().next();
     }
 
+    public static LSFLocalizedStringValueLiteral createLocalizedStringValueLiteral(Project myProject, String text) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; GROUP someDumbGroup " + text + ";");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFLocalizedStringValueLiteral.class).iterator().next();
+    } 
+    
     @Nullable
     public static LSFId createIdentifierFromText(Project myProject, String name) {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + name + ";");

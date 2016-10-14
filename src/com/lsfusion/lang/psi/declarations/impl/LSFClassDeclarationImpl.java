@@ -92,7 +92,7 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
 
     @Override
     public String getCaption() {
-        LSFStringLiteral stringLiteral = getSimpleNameWithCaption().getStringLiteral();
+        LSFLocalizedStringLiteral stringLiteral = getSimpleNameWithCaption().getLocalizedStringLiteral();
         if (stringLiteral != null) {
             return stringLiteral.getValue();
         }
