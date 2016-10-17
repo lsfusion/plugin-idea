@@ -27,8 +27,11 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("hide").setExpert(),
             new ReflectionProperty("regexp"),
             new ReflectionProperty("regexpMessage"),
+            new ReflectionProperty("pattern"),
             new ReflectionProperty("maxValue"),
             new ReflectionProperty("echoSymbols"),
+            new ReflectionProperty("noSort").setExpert(),
+            new ReflectionProperty("notNull"),
             new ReflectionProperty("minimumCharWidth").setExpert(),
             new ReflectionProperty("maximumCharWidth").setExpert(),
             new ReflectionProperty("preferredCharWidth"),
@@ -50,6 +53,7 @@ public class PropertyDrawView extends ComponentView {
     public boolean hide;
     public String regexp;
     public String regexpMessage;
+    public String pattern;
     public Long maxValue;
     public boolean echoSymbols;
 
@@ -71,6 +75,9 @@ public class PropertyDrawView extends ComponentView {
 
     public boolean askConfirm;
     public String askConfirmMessage;
+    
+    public boolean noSort;
+    public boolean notNull;
 
     public PropertyDrawView() {
         this("");
@@ -140,6 +147,10 @@ public class PropertyDrawView extends ComponentView {
 
     public void setRegexpMessage(String regexpMessage) {
         this.regexpMessage = regexpMessage;
+    }
+    
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
     }
 
     public void setMaxValue(long maxValue) {
@@ -322,6 +333,14 @@ public class PropertyDrawView extends ComponentView {
     public void setAskConfirmMessage(String askConfirmMessage) {
         this.askConfirmMessage = askConfirmMessage;
     }
+    
+    public void setNoSort(boolean noSort) {
+        this.noSort = noSort;
+    }
+    
+    public void setNotNull(boolean notNull) {
+        this.notNull = notNull;
+    }
 
     public void setToolTip(String toolTip) {
         this.toolTip = toolTip;
@@ -345,6 +364,10 @@ public class PropertyDrawView extends ComponentView {
 
     public String getRegexpMessage() {
         return regexpMessage;
+    }
+    
+    public String getPattern() {
+        return pattern;
     }
 
     public Long getMaxValue() {
@@ -397,6 +420,14 @@ public class PropertyDrawView extends ComponentView {
 
     public String getAskConfirmMessage() {
         return askConfirmMessage;
+    }
+    
+    public boolean getNoSort() {
+        return noSort;
+    }
+    
+    public boolean getNotNull() {
+        return notNull;
     }
 
     @Override

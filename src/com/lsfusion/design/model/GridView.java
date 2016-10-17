@@ -17,7 +17,8 @@ public class GridView extends ComponentView {
             ComponentView.PROPERTIES,
             new ReflectionProperty("tabVertical").setExpert(),
             new ReflectionProperty("autoHide").setExpert(),
-            new ReflectionProperty("quickSearch").setExpert()
+            new ReflectionProperty("quickSearch").setExpert(),
+            new ReflectionProperty("headerHeight").setExpert()
     );
 
     GridTableModel model = new GridTableModel();
@@ -25,6 +26,8 @@ public class GridView extends ComponentView {
     public boolean tabVertical = false;
     public boolean autoHide = false;
     public boolean quickSearch = false;
+
+    public int headerHeight = 0;
 
     private GroupObjectView groupObject;
 
@@ -62,6 +65,10 @@ public class GridView extends ComponentView {
     public void setQuickSearch(boolean quickSearch) {
         this.quickSearch = quickSearch;
     }
+    
+    public void setHeaderHeight(int headerHeight) {
+        this.headerHeight = headerHeight;
+    }
 
     public boolean isTabVertical() {
         return tabVertical;
@@ -73,6 +80,10 @@ public class GridView extends ComponentView {
 
     public boolean isQuickSearch() {
         return quickSearch;
+    }
+    
+    public int getHeaderHeight() {
+        return headerHeight;
     }
 
     @Override

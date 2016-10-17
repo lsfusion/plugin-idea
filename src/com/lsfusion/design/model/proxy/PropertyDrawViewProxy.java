@@ -30,12 +30,20 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.regexpMessage = regexpMessage;
     }
 
+    public void setPattern(String pattern) {
+        target.pattern = pattern;
+    }
+
     public void setMaxValue(long maxValue) {
         target.maxValue = maxValue;
     }
 
     public void setEchoSymbols(boolean echoSymbols) {
         target.echoSymbols = echoSymbols;
+    }
+
+    public void setNoSort(boolean noSort) {
+        target.noSort = noSort;
     }
 
     public void setMinimumCharWidth(int minimumCharWidth) {
@@ -84,5 +92,9 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
 
     public void setToolTip(String toolTip) {
         target.toolTip = toolTip;
+    }
+
+    public void setNotNull(boolean notNull) {
+        target.notNull = notNull;
     }
 }

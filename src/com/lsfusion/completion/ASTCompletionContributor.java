@@ -26,6 +26,8 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.BooleanValueHolder;
 import com.intellij.util.ProcessingContext;
+import com.lsfusion.design.model.proxy.ViewProxy;
+import com.lsfusion.design.model.proxy.ViewProxyFactory;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -43,6 +45,7 @@ import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
@@ -69,15 +72,18 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "CUSTOMFILE", "EXCELFILE",
                                                                  "WORDLINK", "IMAGELINK", "PDFLINK", "CUSTOMLINK", "EXCELLINK",
                                                                  "BOOLEAN", "COLOR"};
-    private static final List<String> DESIGN_PROPERTIES = Arrays.asList("align", "alignment", "askConfirm", "askConfirmMessage",
-            "background", "caption", "captionFont", "childrenAlignment", "columnLabelsWidth", "columnLabelsWidth", "columns",
-            "defaultComponent", "echoSymbols", "editKey", "fill", "fixedHeight", "fixedWidth", "flex", "focusable", "font",
-            "fontSize", "fontStyle", "foreground", "headerHeight", "hide", "imagePath", "margin", "maximumSize", "maxValue",
-            "minimumSize", "minimumWidth", "maximumCharWidth", "maximumHeight", "maximumWidth", "minimumCharWidth", "minimumHeight",
-            "noSort", "notNull", "panelCaptionAbove", "panelCaptionAfter", "pattern", "preferredCharWidth", "preferredHeight",
-            "preferredSize", "preferredWidth", "quickSearch", "regexp", "regexpMessage", "showCalculateSum", "showCountQuantity",
-            "showIf", "showGroup", "showGroupChange", "showPrintGroup", "showPrintGroupXls", "showSettings", "tabVertical",
-            "toolTip", "type", "visible");
+    
+    private static final Set<String> DESIGN_PROPERTIES = new LinkedHashSet<String>() {
+    {
+        for (Class<? extends ViewProxy> aClass : ViewProxyFactory.PROXY_CLASSES.values()) {
+            for (Method method : aClass.getDeclaredMethods()) {
+                if (method.getName().startsWith("set")) {
+                    add(Character.toLowerCase(method.getName().charAt(3)) + method.getName().substring(4));
+                }
+            }
+        }   
+    }
+};
 
     public static boolean validDesignProperty(String designProperty) {
         return DESIGN_PROPERTIES.contains(designProperty);

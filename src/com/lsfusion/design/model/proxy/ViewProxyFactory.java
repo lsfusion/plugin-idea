@@ -3,7 +3,7 @@ package com.lsfusion.design.model.proxy;
 import com.lsfusion.design.FormView;
 import com.lsfusion.design.model.*;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ViewProxyFactory {
@@ -15,19 +15,19 @@ public class ViewProxyFactory {
         return InstanceHolder.instance;
     }
 
-    private final Map<Class<?>, Class<? extends ViewProxy>> proxyClasses = new HashMap();
-
-    private ViewProxyFactory() {
-        proxyClasses.put(ComponentView.class, ComponentViewProxy.class);
-        proxyClasses.put(ClassChooserView.class, ClassChooserViewProxy.class);
-        proxyClasses.put(ContainerView.class, ContainerViewProxy.class);
-        proxyClasses.put(FormView.class, FormViewProxy.class);
-        proxyClasses.put(GridView.class, GridViewProxy.class);
-        proxyClasses.put(GroupObjectView.class, GroupObjectViewProxy.class);
-        proxyClasses.put(PropertyDrawView.class, PropertyDrawViewProxy.class);
-        proxyClasses.put(ToolbarView.class, ToolbarViewProxy.class);
-        proxyClasses.put(FilterView.class, FilterViewProxy.class);
-    }
+    public static final Map<Class<?>, Class<? extends ViewProxy>> PROXY_CLASSES = new LinkedHashMap(){
+        {
+            put(ComponentView.class, ComponentViewProxy.class);
+            put(ClassChooserView.class, ClassChooserViewProxy.class);
+            put(ContainerView.class, ContainerViewProxy.class);
+            put(FormView.class, FormViewProxy.class);
+            put(GridView.class, GridViewProxy.class);
+            put(PropertyDrawView.class, PropertyDrawViewProxy.class);
+            put(ToolbarView.class, ToolbarViewProxy.class);
+            put(FilterView.class, FilterViewProxy.class);
+            put(TreeGroupView.class, TreeGroupProxy.class);
+        }
+    };
 
     public ViewProxy createViewProxy(Object target) {
         if (target == null) {
@@ -35,7 +35,7 @@ public class ViewProxyFactory {
         }
 
         Class cz = target.getClass();
-        while (cz != null && !proxyClasses.containsKey(cz)) {
+        while (cz != null && !PROXY_CLASSES.containsKey(cz)) {
             cz = cz.getSuperclass();
         }
 
@@ -43,9 +43,9 @@ public class ViewProxyFactory {
             throw new RuntimeException("View proxy isn't supported for the object!");
         }
 
-        Class<? extends ViewProxy> proxyClass = proxyClasses.get(cz);
+        Class<? extends ViewProxy> proxyClass = PROXY_CLASSES.get(cz);
         try {
-            return proxyClass.getConstructor(cz).newInstance(target);
+            return (ViewProxy) proxyClass.getConstructor(cz).newInstance(target);
         } catch (Exception e) {
             throw new RuntimeException("Can't create object: ", e);
         }

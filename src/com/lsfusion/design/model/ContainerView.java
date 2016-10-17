@@ -25,7 +25,8 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("columnLabelsWidth"),
             new ReflectionProperty("type"),
             new ReflectionProperty("caption"),
-            new ReflectionProperty("description")
+            new ReflectionProperty("description"),
+            new ReflectionProperty("showIf").setExpert()
     );
 
     private final List<ComponentView> children = new ArrayList<>();
@@ -37,6 +38,7 @@ public class ContainerView extends ComponentView {
     public Alignment childrenAlignment = Alignment.LEADING;
     public int columns = 4;
     public int columnLabelsWidth = 0;
+    public String showIf;
 
     public ContainerView() {
         this("");
@@ -78,6 +80,10 @@ public class ContainerView extends ComponentView {
     public void setColumnLabelsWidth(int columnLabelsWidth) {
         this.columnLabelsWidth = columnLabelsWidth;
     }
+    
+    public void setShowIf(String showIf) {
+        this.showIf = showIf;
+    }
 
     public Alignment getChildrenAlignment() {
         return childrenAlignment;
@@ -107,6 +113,10 @@ public class ContainerView extends ComponentView {
     @Override
     public Icon getIcon() {
         return LSFIcons.Design.CONTAINER;
+    }
+    
+    public String getShowIf() {
+        return showIf;
     }
 
     public void add(ComponentView comp) {
