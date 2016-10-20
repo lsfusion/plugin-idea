@@ -288,4 +288,10 @@ public class BaseUtils {
         }
         return ins;
     }
+
+    public static boolean nullEquals(Object obj1, Object obj2) {
+        if (obj1 == null)
+            return obj2 == null;
+        return obj2 != null && obj1.equals(obj2);
+    }
 }
