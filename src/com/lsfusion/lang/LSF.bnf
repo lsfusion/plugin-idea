@@ -603,6 +603,7 @@ private keepContextActionPDB ::=    listActionPropertyDefinitionBody
                         |	multiActionPropertyDefinitionBody
                         |	terminalFlowActionPropertyDefinitionBody
                         |   applyActionPropertyDefinitionBody
+                        |   cancelActionPropertyDefinitionBody
 
 private customActionPDB ::= formActionPropertyDefinitionBody
                 |   messageActionPropertyDefinitionBody
@@ -871,7 +872,7 @@ listActionPropertyDefinitionBody ::=    LBRACE
     methods = [inferActionParamClasses]
 }
 
-private nestedPropertiesSelector ::= NESTED (LOCAL | (LBRACE nonEmptyNoContextPropertyUsageList RBRACE))
+private nestedPropertiesSelector ::= NESTED (LOCAL | (LBRAC nonEmptyNoContextPropertyUsageList RBRAC))
 
 private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfNeeded >>  //  !} => ;
                                 |   localDataPropertyDefinition SEMI
@@ -882,7 +883,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
     recoverWhile = "list_action_statement_recover"
 }
 
-private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
+private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | CANCEL | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | READ | REQUEST | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
@@ -950,6 +951,13 @@ multiActionPropertyDefinitionBody ::= MULTI (exclusiveOverrideOption)? nonEmptyA
 }
 
 applyActionPropertyDefinitionBody ::= APPLY nestedPropertiesSelector? SINGLE? SERIALIZABLE? actionPropertyDefinitionBody
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+cancelActionPropertyDefinitionBody ::= CANCEL nestedPropertiesSelector?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
