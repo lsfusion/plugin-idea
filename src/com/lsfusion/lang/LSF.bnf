@@ -871,7 +871,7 @@ listActionPropertyDefinitionBody ::=    LBRACE
     methods = [inferActionParamClasses]
 }
 
-private nestedPropertiesSelector ::= NESTED (LOCAL | nonEmptyNoContextPropertyUsageList)
+private nestedPropertiesSelector ::= NESTED (LOCAL | (LBRACE nonEmptyNoContextPropertyUsageList RBRACE))
 
 private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfNeeded >>  //  !} => ;
                                 |   localDataPropertyDefinition SEMI
