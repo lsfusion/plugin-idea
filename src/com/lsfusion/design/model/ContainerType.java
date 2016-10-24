@@ -5,6 +5,7 @@ public enum ContainerType {
     CONTAINERV,
     COLUMNS,
     TABBED,
+    SCROLL,
     SPLITV,
     SPLITH;
 
@@ -35,4 +36,6 @@ public enum ContainerType {
     public boolean isColumns() {
         return this == COLUMNS;
     }
+
+    public boolean isScroll() { return this == SCROLL; }
 }

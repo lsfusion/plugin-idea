@@ -1813,6 +1813,7 @@ containerTypeLiteral ::=    CONTAINERV
 	                    |	CONTAINERH
 	                    |	COLUMNS
 	                    |	TABBED
+	                    |   SCROLL
 	                    |	SPLITH
 	                    |	SPLITV
 	                    

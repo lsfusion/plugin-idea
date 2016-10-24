@@ -337,6 +337,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "ROUND"                   			{ return ROUND; }
   "RTF"                     			{ return RTF; }
   "SAVEFILE"                            { return SAVEFILE; }
+  "SCROLL"                              { return SCROLL; }
   "SEEK"                    			{ return SEEK; }
   "SELECTION"               			{ return SELECTION; }
   "SELECTOR"                			{ return SELECTOR; }

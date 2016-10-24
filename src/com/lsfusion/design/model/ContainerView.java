@@ -186,7 +186,7 @@ public class ContainerView extends ComponentView {
                 widget = createSplitPanel(project, selection, componentToWidget, oldWidget);
             }
         } else {
-            if (type.isLinear()) {
+            if (type.isLinear() || type.isScroll()) {
                 widget = createLinearPanel(project, selection, componentToWidget);
             } else if (type.isColumns()) {
                 widget = createColumnsPanel(project, selection, componentToWidget);
