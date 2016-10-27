@@ -294,7 +294,6 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "CONTEXTFILTER"              			{ return CONTEXTFILTER; }
   "OBJVALUE"                			{ return OBJVALUE; }
   "OK"                      			{ return OK; }
-  "OLDSESSION"              			{ return OLDSESSION; }
   "ON"                      			{ return ON; }
   "OPENFILE"                			{ return OPENFILE; }
   "OPTIMISTICASYNC"                     { return OPTIMISTICASYNC; }
