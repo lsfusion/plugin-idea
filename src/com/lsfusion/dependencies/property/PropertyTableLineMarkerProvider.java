@@ -111,13 +111,16 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
             if (e.getID() == MouseEvent.MOUSE_RELEASED) {
                 String name = psi instanceof LSFPropertyStatement ? ((LSFPropertyStatement) psi).getTableName() : null;
                 if (name != null) {
-                    String namespace = name.substring(0, name.indexOf("_"));
-                    String tableName = name.substring(name.indexOf("_") + 1);
-                    Collection<LSFTableDeclaration> tableDeclarations = TableIndex.getInstance().get(tableName, psi.getProject(), LSFFileUtils.getModuleWithDependenciesScope(psi));
-                    for (LSFTableDeclaration declaration : tableDeclarations) {
-                        if (declaration.getNamespaceName().equals(namespace)) {
-                            ((LSFTableDeclarationImpl) declaration).navigate(true);
-                            return;
+                    int underscoreIndex = name.indexOf("_");
+                    if (underscoreIndex != -1) {
+                        String namespace = name.substring(0, underscoreIndex);
+                        String tableName = name.substring(underscoreIndex + 1);
+                        Collection<LSFTableDeclaration> tableDeclarations = TableIndex.getInstance().get(tableName, psi.getProject(), LSFFileUtils.getModuleWithDependenciesScope(psi));
+                        for (LSFTableDeclaration declaration : tableDeclarations) {
+                            if (declaration.getNamespaceName().equals(namespace)) {
+                                ((LSFTableDeclarationImpl) declaration).navigate(true);
+                                return;
+                            }
                         }
                     }
                 }
