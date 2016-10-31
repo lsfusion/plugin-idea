@@ -900,7 +900,7 @@ localDataPropertyDefinition ::= LOCAL nestedLocalModifier simpleName EQUALS clas
     implements="com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration"
 }
 
-nestedLocalModifier ::= NESTED?
+nestedLocalModifier ::= (NESTED (MANAGESESSION | NOMANAGESESSION)?)?
 
 //Разбиваем правило, чтобы была возможность запинить по EXEC
 execActionPropertyDefinitionBody ::= execActionPropertyDefinitionBody1 | execActionPropertyDefinitionBody2
