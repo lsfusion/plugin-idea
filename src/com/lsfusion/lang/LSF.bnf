@@ -841,7 +841,7 @@ drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
     methods = [inferActionParamClasses]
 }
 
-requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)
+requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody) SEMI
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -998,7 +998,7 @@ whileActionPropertyDefinitionBody ::= WHILE (propertyExpression (ORDER (DESC)? n
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-terminalFlowActionPropertyDefinitionBody ::= BREAK | RETURN
+terminalFlowActionPropertyDefinitionBody ::= (BREAK | RETURN) SEMI
 {
     implements="com.lsfusion.lang.psi.context.ActionExpression" methods = [inferActionParamClasses]
 }
