@@ -298,6 +298,7 @@
         <!-- debugger -->
         <xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />
         <xdebugger.breakpointType implementation="com.lsfusion.debug.property.LSFPropertyBreakpointType" />
+        <xdebugger.breakpointType implementation="com.lsfusion.debug.classchange.LSFClassChangeBreakpointType"/>
         <!-- приоритет обратен порядку, поэтому ставим последним -->
         <debugger.positionManagerFactory id="lsfPositionManagerFactory" order="last" implementation="com.lsfusion.debug.LSFPositionManagerFactory"/>
         

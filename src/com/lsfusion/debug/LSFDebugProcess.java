@@ -26,6 +26,7 @@ import com.intellij.util.EventDispatcher;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.lsfusion.debug.classchange.LSFClassChangeBreakpointHandler;
 import com.lsfusion.debug.property.LSFPropertyBreakpointHandler;
 import com.lsfusion.util.ReflectionUtils;
 import com.sun.jdi.*;
@@ -91,6 +92,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
     
     private LSFBreakpointHandler breakpointHandler;
     private LSFPropertyBreakpointHandler propertyBreakpointHandler;
+    private LSFClassChangeBreakpointHandler classChangeBreakpointHandler;
 
     private void enableCommonDelegateBreakPoints(SuspendContextImpl suspendContext) {
         invokeRemoteMethod(true, suspendContext);
@@ -155,6 +157,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         
         breakpointHandler = new LSFActionBreakpointHandler(getJavaDebugProcess(), vmNotifier);
         propertyBreakpointHandler = new LSFPropertyBreakpointHandler(getJavaDebugProcess(), vmNotifier);
+        classChangeBreakpointHandler = new LSFClassChangeBreakpointHandler(getJavaDebugProcess(), vmNotifier);
         
         commonDelegateBreakpoints.add(new CommonDelegateBreakpoint());
         commonDelegateBreakpoints.add(new CommonCustomDelegateBreakpoint());
@@ -449,9 +452,11 @@ public class LSFDebugProcess extends JavaDebugProcess {
     @Override
     public XBreakpointHandler<?>[] getBreakpointHandlers() {
         XBreakpointHandler<?>[] breakpointHandlers = super.getBreakpointHandlers();
-        XBreakpointHandler<?>[] result = Arrays.copyOf(breakpointHandlers, breakpointHandlers.length + 2);
-        result[breakpointHandlers.length] = breakpointHandler;
-        result[breakpointHandlers.length + 1] = propertyBreakpointHandler;
+        int handlersCount = breakpointHandlers.length;
+        XBreakpointHandler<?>[] result = Arrays.copyOf(breakpointHandlers, handlersCount + 3);
+        result[handlersCount] = breakpointHandler;
+        result[handlersCount + 1] = propertyBreakpointHandler;
+        result[handlersCount + 2] = classChangeBreakpointHandler;
         return result;
     }
 
