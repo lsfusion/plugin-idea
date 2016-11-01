@@ -92,7 +92,7 @@ public class LSFGlobalResolver {
         Project project = lsfFile.getProject();
         LSFModuleDeclaration declaration = lsfFile.getModuleDeclaration();
         VirtualFile vfile = lsfFile.getVirtualFile();
-        if (vfile == null) {
+        if (vfile == null && declaration != null) {
             Query<LSFModuleDeclaration> modules = findModules(declaration.getGlobalName(), GlobalSearchScope.allScope(project));
             LSFModuleDeclaration first = modules.findFirst();
             if (first != null)
@@ -100,8 +100,10 @@ public class LSFGlobalResolver {
         }
 
         Set<VirtualFile> vFiles = new HashSet<>();
-        for (LSFFile f : getRequireModules(declaration)) {
-            vFiles.add(f.getVirtualFile()); // null может быть только для dumb
+        if (declaration != null) {
+            for (LSFFile f : getRequireModules(declaration)) {
+                vFiles.add(f.getVirtualFile()); // null может быть только для dumb
+            }
         }
         return GlobalSearchScope.filesScope(project, vFiles);
     }
