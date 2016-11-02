@@ -5,6 +5,7 @@ import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -35,11 +36,12 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
     private LineMarkerInfo createLineMarker(PsiElement psi) {
         return new LineMarkerInfo(
                 psi,
-                psi.getTextRange().getStartOffset(),
+                psi.getTextRange(),
                 LSFIcons.Design.DESIGN,
-                Pass.UPDATE_OVERRIDEN_MARKERS,
+                Pass.UPDATE_OVERRIDDEN_MARKERS,
                 GetFormNameTooltipProvider.INSTANCE,
-                OpenDesignPreviewNavigationHandler.INSTANCE
+                OpenDesignPreviewNavigationHandler.INSTANCE,
+                GutterIconRenderer.Alignment.RIGHT
         );
     }
 

@@ -4,6 +4,7 @@ import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
@@ -54,11 +55,12 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
         int complexity = PropertyComplexityCache.getInstance(psi.getProject()).resolveWithCaching(psi); 
         return new LineMarkerInfo(
                 psi,
-                psi.getTextRange().getStartOffset(),
+                psi.getTextRange(),
                 createIcon(complexity),
-                Pass.UPDATE_OVERRIDEN_MARKERS,
+                Pass.UPDATE_OVERRIDDEN_MARKERS,
                 PropertyComplexityTooltipProvider.INSTANCE,
-                null
+                null,
+                GutterIconRenderer.Alignment.RIGHT
         );
     }
 

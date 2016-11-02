@@ -5,6 +5,7 @@ import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
@@ -58,11 +59,12 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
     private LineMarkerInfo createLineMarker(LSFPropertyStatement psi) {
         return new LineMarkerInfo(
                 psi,
-                psi.getTextRange().getStartOffset(),
+                psi.getTextRange(),
                 createIcon(),
-                Pass.UPDATE_OVERRIDEN_MARKERS,
+                Pass.UPDATE_OVERRIDDEN_MARKERS,
                 PropertyShowTableTooltipProvider.INSTANCE,
-                ShowTableNavigationProvider.INSTANCE
+                ShowTableNavigationProvider.INSTANCE,
+                GutterIconRenderer.Alignment.RIGHT
         );
     }
 

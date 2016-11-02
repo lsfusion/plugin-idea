@@ -1,13 +1,11 @@
 package com.lsfusion.module;
 
 import com.intellij.framework.library.LibraryVersionProperties;
-import com.intellij.openapi.roots.libraries.JarVersionDetectionUtil;
-import com.intellij.openapi.roots.libraries.LibraryKind;
-import com.intellij.openapi.roots.libraries.LibraryPresentationProvider;
-import com.intellij.openapi.roots.libraries.LibraryUtil;
+import com.intellij.openapi.roots.libraries.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.lsfusion.LSFIcons;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;
@@ -37,7 +35,7 @@ public class LSFusionLibraryPresentationProvider extends LibraryPresentationProv
     }
 
     @NotNull
-    public Icon getIcon() {
+    public Icon getIcon(@Nullable LibraryProperties properties) {
         return LSFIcons.LIBRARY;
     }
 }

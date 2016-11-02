@@ -26,6 +26,7 @@ import com.intellij.util.EventDispatcher;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.intellij.xdebugger.frame.XSuspendContext;
 import com.lsfusion.debug.classchange.LSFClassChangeBreakpointHandler;
 import com.lsfusion.debug.property.LSFPropertyBreakpointHandler;
 import com.lsfusion.util.ReflectionUtils;
@@ -108,7 +109,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         if (scheduleRemoteMethod) {
             getJavaDebugProcess().getManagerThread().schedule(new SuspendContextCommandImpl(suspendContext) {
                 @Override
-                public void contextAction() throws Exception {
+                public void contextAction(@NotNull SuspendContextImpl suspendContext) throws Exception {
                     invokeRemoteMethod(false, suspendContext);
                 }
             });
@@ -171,7 +172,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
             SuspendContextImpl.class, ThreadReferenceProxyImpl.class, Integer.TYPE, Integer.TYPE, RequestHint.class
         );
 
-        getJavaDebugProcess().addDebugProcessListener(new DebugProcessAdapter() {
+        getJavaDebugProcess().addDebugProcessListener(new DebugProcessListener() {
             @Override
             public void paused(SuspendContext suspendContext) {
                 ThreadReferenceProxy thread = suspendContext.getThread();
@@ -266,12 +267,12 @@ public class LSFDebugProcess extends JavaDebugProcess {
     }
 
     @Override
-    public void startForceStepInto() {
-        startStepInto();
+    public void startForceStepInto(@Nullable XSuspendContext context) {
+        startStepInto(context);
     }
 
     @Override
-    public void startStepInto() {
+    public void startStepInto(@Nullable XSuspendContext context) {
         StepCommand stepIntoCommand = null;
 
         if (isCurrentPositionInLsf() || inExecuteCustom(true)) {
@@ -282,29 +283,29 @@ public class LSFDebugProcess extends JavaDebugProcess {
             getSteppingThroughThread().set(stepIntoCommand.getContextThread());
             resumeAction(stepIntoCommand, DebuggerSession.Event.STEP);
         } else {
-            super.startStepInto();
+            super.startStepInto(context);
         }
     }
 
     @Override
-    public void startStepOver() {
+    public void startStepOver(@Nullable XSuspendContext context) {
         if (isCurrentPositionInLsf() || inExecuteCustom(true)) {
             StepOverCommand stepOverCommand = new StepOverCommand(getSuspendContext());
             getSteppingThroughThread().set(stepOverCommand.getContextThread());
             resumeAction(stepOverCommand, DebuggerSession.Event.STEP);
         } else {
-            super.startStepOver();
+            super.startStepOver(context);
         }
     }
 
     @Override
-    public void startStepOut() {
+    public void startStepOut(@Nullable XSuspendContext context) {
         if (isCurrentPositionInLsf() || inExecuteCustom()) {
             StepOutCommand stepOutCommand = new StepOutCommand(getSuspendContext());
             getSteppingThroughThread().set(stepOutCommand.getContextThread());
             resumeAction(stepOutCommand, DebuggerSession.Event.STEP);
         } else {
-            super.startStepOut();
+            super.startStepOut(context);
         }
     }
 
@@ -318,7 +319,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         final Ref<Boolean> inExecute = new Ref<>();
         getJavaDebugProcess().getManagerThread().invokeAndWait(new SuspendContextCommandImpl(getSuspendContext()) {
             @Override
-            public void contextAction() {
+            public void contextAction(@NotNull SuspendContextImpl suspendContext) {
                 inExecute.set(inExecuteCustom(getSuspendContext(), shouldBeLastStatement));
             }
         });
@@ -397,7 +398,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         final Ref<Boolean> inLSF = new Ref<>();
         getJavaDebugProcess().getManagerThread().invokeAndWait(new SuspendContextCommandImpl(getSuspendContext()) {
             @Override
-            public void contextAction() {
+            public void contextAction(@NotNull SuspendContextImpl suspendContext) {
                 inLSF.set(isTopFrameInLsf(getSuspendContext()));
             }
         });
@@ -480,10 +481,10 @@ public class LSFDebugProcess extends JavaDebugProcess {
         }
         
         @Override
-        public void contextAction() {
+        public void contextAction(@NotNull SuspendContextImpl suspendContext) {
             showStatusText(DebuggerBundle.message("status.process.resumed"));
             
-            SuspendContextImpl suspendContext = getSuspendContext();
+            SuspendContextImpl suspendContextImpl = getSuspendContext();
             ThreadReferenceProxyImpl thread = getContextThread();
 
             RequestHint hint = createRequestHint(thread, suspendContext);
@@ -491,10 +492,10 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
             applyThreadFilter(thread);
 
-            doStep(suspendContext, thread, getInitialStepping(), hint);
+            doStep(suspendContextImpl, thread, getInitialStepping(), hint);
 
-            getSuspendManager().resume(getSuspendContext());
-            getDebugProcessDispatcher().getMulticaster().resumed(getSuspendContext());
+            getSuspendManager().resume(suspendContextImpl);
+            getDebugProcessDispatcher().getMulticaster().resumed(suspendContextImpl);
         }
 
         public abstract RequestHint createRequestHint(ThreadReferenceProxyImpl thread, SuspendContextImpl suspendContext);
@@ -549,9 +550,9 @@ public class LSFDebugProcess extends JavaDebugProcess {
         }
 
         @Override
-        public void contextAction() {
+        public void contextAction(@NotNull SuspendContextImpl suspendContext) {
             enableCommonDelegateBreakPoints(getSuspendContext());
-            super.contextAction();
+            super.contextAction(suspendContext);
         }
     }
 

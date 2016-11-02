@@ -4,6 +4,7 @@ import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
+import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopupStep;
 import com.intellij.openapi.ui.popup.PopupStep;
@@ -41,11 +42,12 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
     private LineMarkerInfo createLineMarker(PsiElement psi) {
         return new LineMarkerInfo(
                 psi,
-                psi.getTextRange().getStartOffset(),
+                psi.getTextRange(),
                 LSFIcons.PRINT,
-                Pass.UPDATE_OVERRIDEN_MARKERS,
+                Pass.UPDATE_OVERRIDDEN_MARKERS,
                 TooltipProvider.INSTANCE,
-                GotoJrxmlFileNavigationHandler.INSTANCE
+                GotoJrxmlFileNavigationHandler.INSTANCE,
+                GutterIconRenderer.Alignment.RIGHT
         );
     }
 

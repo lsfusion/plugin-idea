@@ -13,7 +13,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.vcs.changes.committed.LabeledComboBoxAction;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
@@ -48,16 +47,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+import static com.lsfusion.dependencies.GraphLayoutComboAction.*;
+
 public abstract class DependenciesView extends JPanel implements Disposable {
-    protected final static String HIERARCHICAL_LAYOUT = "Hierarchical Layout";
-    protected final static String COMPACT_TREE_LAYOUT = "Compact Tree Layout";
-    protected final static String TREE_LAYOUT = "Tree Layout";
-    protected final static String SIMPLE_LAYOUT = "Simple Layout";
-    protected final static String ORGANIC_LAYOUT = "Organic Layout";
-    protected final static String FAST_ORGANIC_LAYOUT = "Fast Organic Layout";
-    protected final static String SELF_ORGANIZING_ORGANIC_LAYOUT = "Self Organizing Organic Layout";
-    protected final static String RADIAL_TREE_LAYOUT = "Radial Tree Layout";
-    
     protected String title;
 
     protected final Project project;
@@ -74,7 +66,6 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     protected GraphDataModel dataModel;
     
-    protected String currentLayout = COMPACT_TREE_LAYOUT;
     protected JGraph jgraph;
     protected ListenableDirectedGraph g;
     protected JGraphModelAdapter m_jgAdapter;
@@ -84,7 +75,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     protected CheckboxAction showRequiredAction;
     protected CheckboxAction showRequiringAction;
-    protected LabeledComboBoxAction layoutAction;
+    protected GraphLayoutComboAction layoutAction;
     
     protected double latestScale = 1;
 
@@ -119,7 +110,6 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         add(toolbar.getComponent(), BorderLayout.NORTH);
 
-        layoutAction.setSelected(3);
         redraw();
     }
 
@@ -183,19 +173,10 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
         });
 
-        layoutAction = new LabeledComboBoxAction("") {
+        layoutAction = new GraphLayoutComboAction("Layout:") {
             @Override
-            protected void selectionChanged(Object selection) {
-                if (!currentLayout.equals(selection)) {
-                    currentLayout = (String) selection;
-                    changeLayout(true);
-                }
-            }
-
-            @Override
-            protected ComboBoxModel createModel() {
-                return new DefaultComboBoxModel(new Object[]{HIERARCHICAL_LAYOUT, SIMPLE_LAYOUT, TREE_LAYOUT, COMPACT_TREE_LAYOUT,
-                        RADIAL_TREE_LAYOUT, ORGANIC_LAYOUT, FAST_ORGANIC_LAYOUT, SELF_ORGANIZING_ORGANIC_LAYOUT});
+            protected void changeLayout(boolean update) {
+                DependenciesView.this.changeLayout(update);
             }
         };
         actions.add(layoutAction);
@@ -422,7 +403,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         }
 
         JGraphLayout hir = null;
-        switch (currentLayout) {
+        switch (layoutAction.getCurrentLayout()) {
             case HIERARCHICAL_LAYOUT:
                 hir = new JGraphHierarchicalLayout();
                 ((JGraphHierarchicalLayout) hir).setOrientation(SwingConstants.WEST);

@@ -4,6 +4,7 @@ import com.intellij.debugger.SourcePosition;
 import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.debugger.engine.JavaDebuggerEvaluator;
 import com.intellij.debugger.engine.JavaStackFrame;
+import com.intellij.debugger.engine.SuspendContextImpl;
 import com.intellij.debugger.engine.events.DebuggerContextCommandImpl;
 import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.debugger.ui.impl.watch.MethodsTracker;
@@ -44,7 +45,7 @@ public class LSFStackFrame extends XStackFrame {
 
         debugProcess.getManagerThread().invoke(new DebuggerContextCommandImpl(debugProcess.getDebuggerContext()) {
             @Override
-            public void threadAction() {
+            public void threadAction(@NotNull SuspendContextImpl suspendContext) {
                 StackFrameDescriptorImpl stackFrameDescriptor = new StackFrameDescriptorImpl(frame, new MethodsTracker());
                 evaluator = new JavaDebuggerEvaluator(debugProcess, new JavaStackFrame(stackFrameDescriptor, false));
             }

@@ -11,8 +11,8 @@ public class ComponentTree extends CheckboxTree {
     }
 
     @Override
-    protected void checkNode(CheckedTreeNode node, boolean checked) {
-        super.checkNode(node, checked);
+    public void setNodeState(CheckedTreeNode node, boolean checked) {
+        super.setNodeState(node, checked);
         if (listener != null) {
             listener.nodeChecked((ComponentTreeNode) node, checked);
         }
