@@ -841,7 +841,7 @@ drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
     methods = [inferActionParamClasses]
 }
 
-requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody) SEMI
+requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
