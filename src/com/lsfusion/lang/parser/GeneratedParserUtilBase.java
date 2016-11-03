@@ -232,6 +232,10 @@ public class GeneratedParserUtilBase {
         return marker;
     }
 
+    public static PsiBuilder.Marker enter_section_(PsiBuilder builder, int level, int modifiers) {
+        return enter_section_(builder, level, modifiers, null, null);
+    }
+
     public static void exit_section_(PsiBuilder builder_, PsiBuilder.Marker marker, @Nullable IElementType elementType, boolean result) {
         ErrorState state = ErrorState.get(builder_);
         Frame frame = elementType != null
