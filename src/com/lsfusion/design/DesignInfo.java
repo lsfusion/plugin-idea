@@ -130,7 +130,9 @@ public class DesignInfo {
                 ContainerView container = formView.createContainer(null, name);
 
                 LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
-                addComponent(container, (ContainerView) parentComponent, insertPositionSelector, formView);
+                if (parentComponent instanceof ContainerView) {
+                    addComponent(container, (ContainerView) parentComponent, insertPositionSelector, formView);
+                }
 
                 processComponentBody(container, statement.getComponentBody());
             } else if (componentStatement.getMoveComponentStatement() != null) {
@@ -144,7 +146,9 @@ public class DesignInfo {
                         if (component != null) {
                             if (!(component instanceof PropertyDrawView) || component.getParent() != null) { // не добавляем свойства, которые уже добавлены в грид
                                 LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
-                                addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
+                                if (parentComponent instanceof ContainerView) {
+                                    addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
+                                }
                             }
 
                             processComponentBody(component, statement.getComponentBody());
