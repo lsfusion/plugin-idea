@@ -21,11 +21,13 @@ public class ColumnsPanel extends FlexPanel {
             columns[i] = column;
         }
         
-        for (int i = 0; i < children.size(); ++i) {
-            Component child = children.get(i);
-            if (child != null) {
-                int colIndex = i % columnCount;
-                columns[colIndex].add(child, new ColumnsConstraints(FlexAlignment.STRETCH));
+        if (columnCount > 0) {
+            for (int i = 0; i < children.size(); ++i) {
+                Component child = children.get(i);
+                if (child != null) {
+                    int colIndex = i % columnCount;
+                    columns[colIndex].add(child, new ColumnsConstraints(FlexAlignment.STRETCH));
+                }
             }
         }
     }
