@@ -3,6 +3,7 @@ package com.lsfusion.design.model;
 import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBSplitter;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.properties.ReflectionProperty;
@@ -186,8 +187,10 @@ public class ContainerView extends ComponentView {
                 widget = createSplitPanel(project, selection, componentToWidget, oldWidget);
             }
         } else {
-            if (type.isLinear() || type.isScroll()) {
+            if (type.isLinear()) {
                 widget = createLinearPanel(project, selection, componentToWidget);
+            } else if (type.isScroll()) {
+                widget = createScrollPanel(project, selection, componentToWidget);
             } else if (type.isColumns()) {
                 widget = createColumnsPanel(project, selection, componentToWidget);
             }
@@ -217,6 +220,20 @@ public class ContainerView extends ComponentView {
             }
         }
         return hasChildren ? flexPanel : null;
+    }
+
+    private JBScrollPane createScrollPanel(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget) {
+        JBScrollPane scrollPane = new JBScrollPane();
+        boolean hasChildren = false;
+        for (ComponentView child : children) {
+            JComponent childWidget = child.createWidget(project, selection, componentToWidget);
+            if (childWidget != null) {
+                hasChildren = true;
+                scrollPane.setPreferredSize(childWidget.getPreferredSize());
+                scrollPane.setViewportView(childWidget);
+            }
+        }
+        return hasChildren ? scrollPane : null;
     }
 
     private JBSplitter createSplitPanel(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
