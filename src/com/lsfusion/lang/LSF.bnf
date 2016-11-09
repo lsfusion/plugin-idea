@@ -1213,10 +1213,10 @@ formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 
 predefinedFormPropertyName ::= OBJVALUE
                            |    SELECTION
-                           |    ADDOBJ
-                           |    ADDFORM
-                           |    ADDNESTEDFORM
-                           |    ADDSESSIONFORM
+                           |   ((    ADDOBJ
+                               |    ADDFORM
+                               |    ADDNESTEDFORM
+                               |    ADDSESSIONFORM) (LSQBR explicitPropClass RSQBR)?)
                            |    EDITFORM
                            |    EDITNESTEDFORM
                            |    EDITSESSIONFORM
