@@ -1126,6 +1126,7 @@ formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptions
 formPropertyOptionsList ::= (    EDITABLE
                             |    READONLY
                             |    SELECTOR
+                            |    (NEWSESSION | NESTEDSESSION)
                             |    HINTNOUPDATE
                             |    HINTTABLE
                             |    OPTIMISTICASYNC
