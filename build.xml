@@ -120,6 +120,7 @@
             <include name="resources.jar"/>
             <include name="jsr166e.jar"/>
             <include name="asm.jar"/>
+            <include name="asm-all.jar"/>
             <include name="guava-17.0.jar"/>
             <include name="cglib-2.2.2.jar"/>
             <include name="automaton.jar"/>
@@ -128,10 +129,9 @@
     </path>
 
     <target name="generate.lexer" description="Generate lexer">
-        <java classname="JFlex.Main" fork="true" failonerror="true">
+        <java classname="jflex.Main" fork="true" failonerror="true">
             <classpath refid="lexer.classpath"/>
 
-            <arg value="-sliceandcharat"/>
             <arg value="--skel"/>
             <arg value="${basedir}/buildLib/idea-flex.skeleton"/>
             <arg value="--nobak"/>
@@ -140,10 +140,9 @@
             <arg value="${basedir}/src/com/lsfusion/migration"/>
         </java>
 
-        <java classname="JFlex.Main" fork="true" failonerror="true">
+        <java classname="jflex.Main" fork="true" failonerror="true">
             <classpath refid="lexer.classpath"/>
 
-            <arg value="-sliceandcharat"/>
             <arg value="--skel"/>
             <arg value="${buildLib}/idea-flex.skeleton"/>
             <arg value="--nobak"/>
