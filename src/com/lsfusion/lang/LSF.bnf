@@ -1550,7 +1550,7 @@ propertySelector ::= formPropertyDrawUsage
 setObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 2}
 
 componentPropertyValue ::=  colorLiteral
-                        |	stringLiteral
+                        |	localizedStringLiteral
                         |	intLiteral
                         |	doubleLiteral
                         |	dimensionLiteral

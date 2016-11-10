@@ -91,15 +91,44 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
     @Override
     public String getValue() {
         String text = getText();
-        return text.substring(1, text.length() - 1);
+        if (needToBeLocalized()) {
+            return text.substring(1, text.length() - 1);
+        } else {
+            return removeEscapeSymbols(text.substring(1, text.length() - 1));
+        }
     }
 
     @Override
     public boolean needToBeLocalized() {
-        return getValue().indexOf('{') != -1;
+        String text = getText();
+        for (int i = 1; i + 1 < text.length(); ++i) {
+            char ch = text.charAt(i);
+            if (ch == '{' || ch == '}') {
+                return true;
+            } else if (ch == '\\') {
+                ++i;
+            }
+        }
+        return false;
     }
-
-
+    
+    private static String removeEscapeSymbols(String s) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < s.length(); ++i) {
+            char cur = s.charAt(i);
+            if (cur == '\\' && i+1 < s.length()) {
+                char next = s.charAt(i+1);
+                if (next == '\\' || next == '{' || next == '}') {
+                    builder.append(next);
+                    ++i;
+                    continue;
+                }
+            }
+            builder.append(cur);
+        }
+        return builder.toString();
+    }
+    
     @NotNull
     @Override 
     public PsiReference[] getReferences() {
