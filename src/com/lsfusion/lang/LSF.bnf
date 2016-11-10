@@ -787,7 +787,7 @@ writeActionPropertyDefinitionBody ::= WRITE propertyExpression FROM propertyExpr
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT importActionSourceType TO nonEmptyPropertyUsageListWithIds FROM propertyExpression
+importActionPropertyDefinitionBody ::= IMPORT importActionSourceType TO nonEmptyPropertyUsageListWithIds FROM propertyExpression (WHERE propertyExpression)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
