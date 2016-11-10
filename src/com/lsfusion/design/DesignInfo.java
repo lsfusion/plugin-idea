@@ -191,8 +191,8 @@ public class DesignInfo {
             } else {
                 return Color.decode(colorLiteral.getFirstChild().getText());
             }
-        } else if (valueStatement.getStringLiteral() != null) {
-            return valueStatement.getStringLiteral().getValue();
+        } else if (valueStatement.getLocalizedStringLiteral() != null) {
+            return valueStatement.getLocalizedStringLiteral().getValue();
         } else if (valueStatement.getIntLiteral() != null) {
             return Integer.decode(valueStatement.getIntLiteral().getText());
         } else if (valueStatement.getDoubleLiteral() != null) {
