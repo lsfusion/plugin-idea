@@ -622,10 +622,15 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |   newExecutorActionPropertyDefinitionBody
                 |   newSessionActionPropertyDefinitionBody
 
+private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage
+                    OBJECT propertyExpression)
+                |   
+                (formUsage
+               		(formActionObjectList)?) ) {pin =1}
+
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
-	    FORM formUsage
-		(formActionObjectList)?
+	    FORM mappedForm
 		(   contextFilterDefinition
 		|   initFilterDefinition
 		|   MANAGESESSION
