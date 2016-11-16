@@ -2771,6 +2771,17 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
+    public static Inferred inferActionParamClasses(LSFRequestActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        LSFActionPropertyDefinitionBody actionBody = body.getActionPropertyDefinitionBody();
+        if (actionBody != null)
+            return inferActionParamClasses(actionBody, params);
+        return Inferred.EMPTY;
+    }
+
+    public static Inferred inferActionParamClasses(LSFInputActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+    }
+
     public static Inferred inferActionParamClasses(LSFActiveFormActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return Inferred.EMPTY;
     }

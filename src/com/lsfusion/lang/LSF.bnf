@@ -594,6 +594,8 @@ private extendContextActionPDB ::=  assignActionPropertyDefinitionBody
 
 private keepContextActionPDB ::=    listActionPropertyDefinitionBody
                         |	requestInputActionPropertyDefinitionBody
+                        |   requestActionPropertyDefinitionBody
+                        |   inputActionPropertyDefinitionBody
                         |	activeFormActionPropertyDefinitionBody
                         |	activateActionPropertyDefinitionBody
                         |	execActionPropertyDefinitionBody
@@ -623,9 +625,9 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |   newSessionActionPropertyDefinitionBody
 
 private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage
-                    OBJECT propertyExpression)
+                    INPUT? OBJECT propertyExpression)
                 |   
-                (formUsage
+                (formUsage (INPUT objectUsage?)?
                		(formActionObjectList)?) ) {pin =1}
 
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
@@ -848,6 +850,20 @@ drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
 
 requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)
 {
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+inputActionPropertyDefinitionBody ::= INPUT ((PRIMITIVE_TYPE DEFAULT propertyExpression) | PRIMITIVE_TYPE | (DEFAULT propertyExpression))
+{
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
@@ -890,7 +906,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 
 private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | CANCEL | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
-                                            | READ | REQUEST | RETURN | SAVEFILE | SEEK | WHILE| WRITE
+                                            | READ | REQUEST | INPUT | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID
                                             | SEMI
