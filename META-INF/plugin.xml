@@ -46,113 +46,86 @@
     </project-components>
 
     <actions>
-        <!-- Add your actions here -->
-        <action id="MetaCode.Enable" class="com.lsfusion.actions.MetaCodeEnableAction" text="Toggle _meta"
-                description="Toggle meta code mode">
-            <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
-        </action>
-        <action id="MetaCode.Refresh" class="com.lsfusion.actions.MetaRefreshAction" text="Refresh _meta"
-                description="Refresh meta code">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <action id="MetaCode.Reenable" class="com.lsfusion.actions.MetaReenableAction" text="Reenable _meta"
-                description="Enable disabled meta code blocks">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <action id="MetaCode.ShowFile" class="com.lsfusion.actions.MetaShowFileAction" text="Show _meta for file"
-                description="Show meta code for current file">
-            <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt K" keymap="$default"/>
-        </action>
-        <action id="MetaCode.HideFile" class="com.lsfusion.actions.MetaHideFileAction" text="Hide _meta for file"
-                description="Hide meta code for current file">
-            <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt shift K" keymap="$default"/>
-        </action>
-        <action id="MetaCode.SyncMode" class="com.lsfusion.actions.MetaSyncModeAction" text="Meta sync mode"
-                description="Toggle meta code sync mode">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <action id="ToggleLSFCompletion" class="com.lsfusion.actions.ToggleCompletionAction"
-                text="lsFusion completion support"
-                description="Toggle lsFusion completion support">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <action id="ToggleLSFComplexity" class="com.lsfusion.actions.ToggleComplexityAction"
-                text="Show property complexity" description="Toggle property complexity">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <action id="ToggleLSFShowTable" class="com.lsfusion.actions.ToggleShowTableAction"
-                text="Show property table" description="Toggle showing property table">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
+        <group id="LSFGroup" popup="true" text="LSF">
+            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="CodeMenu"/>
         
-        <group id="propertyFolding" popup="true" text="Property classes">
-            <add-to-group group-id="CodeMenu"/>
-            <action id="AllPropertyFolding" class="com.lsfusion.actions.folding.ShowAllPropertyFoldingAction"
-                    text="All" description="Show classes for all properties">
+            <action id="MetaCode.Enable" class="com.lsfusion.actions.MetaCodeEnableAction" text="Toggle _meta"
+                    description="Toggle meta code mode">
+                <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
             </action>
-            <action id="NonePropertyFolding" class="com.lsfusion.actions.folding.ShowNonePropertyFoldingAction"
-                    text="None" description="Don't show classes for properties">
+            <action id="MetaCode.Refresh" class="com.lsfusion.actions.MetaRefreshAction" text="Refresh _meta"
+                    description="Refresh meta code"/>
+            <action id="MetaCode.Reenable" class="com.lsfusion.actions.MetaReenableAction" text="Reenable _meta"
+                    description="Enable disabled meta code blocks"/>
+            <action id="MetaCode.ShowFile" class="com.lsfusion.actions.MetaShowFileAction" text="Show _meta for file"
+                    description="Show meta code for current file">
+                <keyboard-shortcut first-keystroke="control alt K" keymap="$default"/>
             </action>
-            <action id="ImplicitPropertyFolding" class="com.lsfusion.actions.folding.ShowImplicitPropertyFoldingAction"
-                    text="Implicit" description="Show implicit classes only">
+            <action id="MetaCode.HideFile" class="com.lsfusion.actions.MetaHideFileAction" text="Hide _meta for file"
+                    description="Hide meta code for current file">
+                <keyboard-shortcut first-keystroke="control alt shift K" keymap="$default"/>
             </action>
+            <action id="MetaCode.SyncMode" class="com.lsfusion.actions.MetaSyncModeAction" text="Meta sync mode"
+                    description="Toggle meta code sync mode"/>
+            
+            <separator/>
+            
+            <action id="ToggleLSFCompletion" class="com.lsfusion.actions.ToggleCompletionAction"
+                    text="lsFusion completion support"
+                    description="Toggle lsFusion completion support"/>
+            <action id="ToggleLSFComplexity" class="com.lsfusion.actions.ToggleComplexityAction"
+                    text="Show property complexity" description="Toggle property complexity"/>
+            <action id="ToggleLSFShowTable" class="com.lsfusion.actions.ToggleShowTableAction"
+                    text="Show property table" description="Toggle showing property table"/>
+            
+            <group id="propertyFolding" popup="true" text="Property classes">
+                <action id="AllPropertyFolding" class="com.lsfusion.actions.folding.ShowAllPropertyFoldingAction"
+                        text="All" description="Show classes for all properties"/>
+                <action id="NonePropertyFolding" class="com.lsfusion.actions.folding.ShowNonePropertyFoldingAction"
+                        text="None" description="Don't show classes for properties"/>
+                <action id="ImplicitPropertyFolding" class="com.lsfusion.actions.folding.ShowImplicitPropertyFoldingAction"
+                        text="Implicit" description="Show implicit classes only"/>
+            </group>
+            
+            <action id="Errors" class="com.lsfusion.actions.ShowErrorsAction" text="Show errors"
+                    description="Show all current errors in all files">
+                <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
+            </action>
+
+            <separator/>
+            
+            <action id="TypeInfer.File" class="com.lsfusion.lang.typeinfer.FileTypeInferAction" text="Infer _types for file"
+                    description="Infer types for file">
+                <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>
+            </action>
+            <action id="TypeInfer.Project" class="com.lsfusion.actions.ProjectTypeInferAction"
+                    text="Infer _types for project" description="Infer types for project">
+                <keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>
+            </action>
+            <action id="Check.Abstract" class="com.lsfusion.actions.ProjectCheckAbstractAction"
+                    text="Check abstract for project" description="Check abstract for project"/>
+            <action id="TypeInfer.Check" class="com.lsfusion.lang.typeinfer.FindNotInferredAction" text="Find not inferred"
+                    description="Find not inferred elements for project"/>
+            <action id="InsertComposition" class="com.lsfusion.actions.InsertCompositionAction">
+                <keyboard-shortcut first-keystroke="control alt shift W" keymap="$default"/>
+            </action>
+            <action id="FastInsertComposition" class="com.lsfusion.actions.FastInsertCompositionAction">
+                <keyboard-shortcut first-keystroke="control alt W" keymap="$default"/>
+            </action>
+            <action id="Project.Shorten" class="com.lsfusion.actions.ProjectShortenNamesAction"
+                    text="Shorten names for project" description="Shorten names for project">
+                <keyboard-shortcut first-keystroke="control alt shift U" keymap="$default"/>
+            </action>
+            <action id="Project.InferShorten" class="com.lsfusion.actions.ProjectInferShortenAction"
+                    text="Infer types and shorten names for project"
+                    description="Infer types and shorten names for project"/>
+            <action id="Project.UnqualifyRefs" class="com.lsfusion.actions.ProjectUnqualifyRefsAction"
+                    text="Unqualify refs for project" description="Unqualify refs for project"/>
+            <action id="File.UnqualifyRefs" class="com.lsfusion.actions.FileUnqualifyRefsAction"
+                    text="Unqualify refs for file" description="Unqualify refs for file"/>
+            <!--<action id="Project.RenameFields" class="com.lsfusion.actions.RenameJrxmlFieldsToNewFormat" text="Rename jrxml fields" description="Rename jrxml fields to new format"/>-->
         </group>
         
-        <action id="Errors" class="com.lsfusion.actions.ShowErrorsAction" text="Show errors"
-                description="Show all current errors in all files">
-            <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
-        </action>
-        <action id="TypeInfer.File" class="com.lsfusion.lang.typeinfer.FileTypeInferAction" text="Infer _types for file"
-                description="Infer types for file">
-            <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>
-        </action>
-        <action id="TypeInfer.Project" class="com.lsfusion.actions.ProjectTypeInferAction"
-                text="Infer _types for project" description="Infer types for project">
-            <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>
-        </action>
-        <action id="Check.Abstract" class="com.lsfusion.actions.ProjectCheckAbstractAction"
-                text="Check abstract for project" description="Check abstract for project">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <action id="TypeInfer.Check" class="com.lsfusion.lang.typeinfer.FindNotInferredAction" text="Find not inferred"
-                description="Find not inferred elements for project">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <action id="InsertComposition" class="com.lsfusion.actions.InsertCompositionAction">
-            <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt shift W" keymap="$default"/>
-        </action>
-        <action id="FastInsertComposition" class="com.lsfusion.actions.FastInsertCompositionAction">
-            <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt W" keymap="$default"/>
-        </action>
-        <action id="Project.Shorten" class="com.lsfusion.actions.ProjectShortenNamesAction"
-                text="Shorten names for project" description="Shorten names for project">
-            <add-to-group group-id="CodeMenu"/>
-            <keyboard-shortcut first-keystroke="control alt shift U" keymap="$default"/>
-        </action>
-        <action id="Project.InferShorten" class="com.lsfusion.actions.ProjectInferShortenAction"
-                text="Infer types and shorten names for project"
-                description="Infer types and shorten names for project">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <action id="Project.UnqualifyRefs" class="com.lsfusion.actions.ProjectUnqualifyRefsAction"
-                text="Unqualify refs for project" description="Unqualify refs for project">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <action id="File.UnqualifyRefs" class="com.lsfusion.actions.FileUnqualifyRefsAction"
-                text="Unqualify refs for file" description="Unqualify refs for file">
-            <add-to-group group-id="CodeMenu"/>
-        </action>
-        <!--<action id="Project.RenameFields" class="com.lsfusion.actions.RenameJrxmlFieldsToNewFormat" text="Rename jrxml fields" description="Rename jrxml fields to new format">-->
-        <!--<add-to-group group-id="CodeMenu"/>-->
-        <!--</action>-->
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
