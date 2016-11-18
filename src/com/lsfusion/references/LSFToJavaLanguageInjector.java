@@ -3,6 +3,7 @@ package com.lsfusion.references;
 import com.intellij.codeInsight.navigation.ClassImplementationsSearch;
 import com.intellij.lang.injection.MultiHostInjector;
 import com.intellij.lang.injection.MultiHostRegistrar;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -213,7 +214,13 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                                 }
                                 
                                 if (hasSuperClasses.equals(0)) { // если наследуется от ScriptingActionProperty
-                                    referenceFromScriptingActionProperty(thisClass, literalExpression, classRef, false, injectionPlacesRegistrar);
+                                    //падает на ReferencesSearch.search(): You must not run search from within updating PSI activity. Please consider invokeLatering it instead.
+                                    ApplicationManager.getApplication().invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            referenceFromScriptingActionProperty(thisClass, literalExpression, classRef, false, injectionPlacesRegistrar);
+                                        }
+                                    });
                                 } else if (hasSuperClasses.equals(1)) { // если наследуется от ScriptingLogicsModule
                                     Set<String> modules = new HashSet<>();
                                     getModulesFromConstructor(modules, thisClass);
