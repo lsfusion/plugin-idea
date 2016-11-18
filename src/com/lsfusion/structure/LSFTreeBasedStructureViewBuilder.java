@@ -8,7 +8,9 @@ import com.intellij.ide.structureView.TreeBasedStructureViewBuilder;
 import com.intellij.ide.structureView.newStructureView.StructureViewComponent;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.lsfusion.lang.classes.LSFValueClass;
@@ -54,7 +56,13 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
 
         LSFValueClass currentClass = valueClass;
         if (currentClass == null) {
-            PsiElement targetElement = TargetElementUtil.findTargetElement(editor, ImplementationSearcher.getFlags());
+            PsiElement targetElement = DumbService.getInstance(editor.getProject()).runReadActionInSmartMode(new Computable<PsiElement>() {
+                @Override
+                public PsiElement compute() {
+                    return TargetElementUtil.findTargetElement(editor, ImplementationSearcher.getFlags());
+                }
+            });
+            
             if (targetElement instanceof LSFId) {
                 PsiElement parent = targetElement;
                 while (parent != null) {
