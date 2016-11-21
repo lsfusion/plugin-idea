@@ -190,9 +190,9 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
         private Map<PsiClass, Integer> superClassesCaches = new HashMap<>();
 
         //    @Override
-        public void getLanguagesToInject(@NotNull PsiLanguageInjectionHost element, @NotNull InjectedLanguagePlaces injectionPlacesRegistrar) {
+        public void getLanguagesToInject(@NotNull PsiLanguageInjectionHost element, @NotNull final InjectedLanguagePlaces injectionPlacesRegistrar) {
             if (element instanceof PsiLiteralExpression) {
-                PsiLiteralExpression literalExpression = (PsiLiteralExpression) element;
+                final PsiLiteralExpression literalExpression = (PsiLiteralExpression) element;
                 Object value = literalExpression.getValue();
                 if (value instanceof String) {
                     PsiMethodCallExpression methodCall = PsiTreeUtil.getParentOfType(literalExpression, PsiMethodCallExpression.class);
@@ -203,9 +203,9 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
                         String methodName = methodExpression.getReferenceName();
                         if (isOneOfStrings(methodName, FIND_ACTION, FIND_PROPERTY, FIND_CLASS, FIND_PROPERTIES)) {
-                            boolean classRef = FIND_CLASS.equals(methodName);
+                            final boolean classRef = FIND_CLASS.equals(methodName);
 
-                            PsiClass thisClass = resolveThisClass(methodExpression);
+                            final PsiClass thisClass = resolveThisClass(methodExpression);
                             if (thisClass != null) {
                                 Integer hasSuperClasses = superClassesCaches.get(thisClass);
                                 if(hasSuperClasses == null) {

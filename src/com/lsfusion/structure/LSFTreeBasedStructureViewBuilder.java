@@ -49,7 +49,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
     }
 
     @NotNull
-    public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
+    public StructureViewModel createStructureViewModel(@Nullable final Editor editor) {
         if (caretListener != null) {
             caretListener.install(editor);
         }

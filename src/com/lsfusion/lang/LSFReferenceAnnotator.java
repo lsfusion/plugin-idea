@@ -464,8 +464,33 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         }
     }
-    
 
+    public void visitStringValueLiteral(@NotNull LSFStringValueLiteral o) {
+        super.visitStringValueLiteral(o);
+        checkEscapeSequences(o, "nrt'\\");
+    }
+
+    public void visitLocalizedStringValueLiteral(@NotNull LSFLocalizedStringValueLiteral o) {
+        super.visitLocalizedStringValueLiteral(o);
+        checkEscapeSequences(o, "nrt'\\{}");
+    }
+    
+    private void checkEscapeSequences(PsiElement element, final String escapedSymbols) {
+        String text = element.getText();
+        for (int i = 0; i < text.length(); ++i) {
+            char curCh = text.charAt(i);
+            if (curCh == '\\') {
+                if (i + 1 < text.length() && !escapedSymbols.contains(text.substring(i+1, i+2))) {
+                    TextRange textRange = TextRange.create(element.getTextRange().getStartOffset() + i, element.getTextRange().getStartOffset() + i + 2);
+                    Annotation annotation = myHolder.createErrorAnnotation(textRange, "Wrong escape sequence " + text.substring(i, i+2));
+                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                } else {
+                    ++i;
+                }
+            }
+        }
+    }
+    
     private boolean checkReference(LSFReference reference) {
         Annotation errorAnnotation = reference.resolveErrorAnnotation(myHolder);
         if (!isInMetaDecl(reference) && errorAnnotation != null) {

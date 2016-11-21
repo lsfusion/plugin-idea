@@ -7,10 +7,7 @@ import com.intellij.lang.properties.psi.impl.PropertyImpl;
 import com.intellij.lang.properties.references.PropertyReference;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiPolyVariantReference;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.ResolveResult;
+import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
@@ -28,7 +25,17 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         super(node);
         initPropertyFiles();
     }
-    
+
+    public void accept(@NotNull LSFVisitor visitor) {
+        visitor.visitLocalizedStringValueLiteral(this);
+    }
+
+    @Override
+    public void accept(@NotNull PsiElementVisitor visitor) {
+        if (visitor instanceof LSFVisitor) accept((LSFVisitor)visitor);
+        else super.accept(visitor);
+    }
+
     private synchronized void initPropertyFiles() {
         if (propertyFiles == null) {
             propertyFiles = new HashSet<>();
