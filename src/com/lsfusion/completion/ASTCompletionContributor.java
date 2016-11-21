@@ -113,7 +113,9 @@ public class ASTCompletionContributor extends CompletionContributor {
         extend(completionType, psiElement().inFile(PlatformPatterns.instanceOf(LSFFile.class)), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-                if (CompletionUtils.isCompletionEnabled(parameters.getOriginalFile().getProject()) && parameters.getPosition().getContainingFile() instanceof LSFFile) {
+                if (CompletionUtils.isCompletionEnabled(parameters.getOriginalFile().getProject()) && 
+                        parameters.getPosition().getContainingFile() instanceof LSFFile &&
+                        parameters.getOriginalFile() instanceof LSFFile) {
                     result = result.withPrefixMatcher(new CamelHumpMatcher(result.getPrefixMatcher().getPrefix(), false));
                     suggestByGuessingTokens(parameters, result);
                 }
