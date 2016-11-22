@@ -169,13 +169,15 @@ public class LSFGlobalResolver {
             }
 
             // смотрим на priority
-            Collection<T> result = findInNamespace(mapDecls.get(moduleDeclaration.getNamespace()), finalizer);
+            //noinspection RedundantTypeArguments - отказывается компилироваться с language level 8
+            Collection<T> result = LSFGlobalResolver.<FullNameStubElement, T>findInNamespace(mapDecls.get(moduleDeclaration.getNamespace()), finalizer);
             if (result != null)
                 return result;
 
             for (LSFNamespaceReference priority : moduleDeclaration.getPriorityRefs()) {
                 String resolve = priority.getNameRef();
-                result = findInNamespace(mapDecls.get(resolve), finalizer);
+                //noinspection RedundantTypeArguments - отказывается компилироваться с language level 8
+                result = LSFGlobalResolver.<FullNameStubElement, T>findInNamespace(mapDecls.get(resolve), finalizer);
                 if (result != null)
                     return result;
             }

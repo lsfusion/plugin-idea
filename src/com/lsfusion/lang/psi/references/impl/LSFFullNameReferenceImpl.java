@@ -8,6 +8,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
+import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -70,7 +71,8 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
 
     @Override
     public LSFResolveResult resolveNoCache() {
-        Collection<G> decls = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), getCondition(), getFinalizer());
+        //noinspection RedundantTypeArguments - отказывается компилироваться с language level 8
+        Collection<G> decls = LSFGlobalResolver.<FullNameStubElement, G>findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), getCondition(), getFinalizer());
         return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls));
     }
 }
