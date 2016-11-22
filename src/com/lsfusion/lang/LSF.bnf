@@ -803,7 +803,7 @@ importActionPropertyDefinitionBody ::= IMPORT importActionSourceType TO nonEmpty
 
 importActionSourceType ::=  XLS (SHEET propertyExpression)?
                         |   XLSX (SHEET propertyExpression)?
-                        |   DBF
+                        |   DBF (MEMO propertyExpression)?
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
                         |   XML (ATTR)?
                         |   JDBC

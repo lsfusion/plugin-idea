@@ -265,6 +265,7 @@ CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
   "LAST"                     			{ return LAST; }
   "MAXCHARWIDTH"            			{ return MAXCHARWIDTH; }
   "MENU"                    			{ return MENU; }
+  "MEMO"                    			{ return MEMO; }
   "MESSAGE"                 			{ return MESSAGE; }
   "META"                    			{ return META; }
   "MIN"                     			{ return MIN; }
