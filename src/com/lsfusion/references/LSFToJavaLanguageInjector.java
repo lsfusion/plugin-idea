@@ -68,7 +68,17 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
     @Override
     public void getLanguagesToInject(final @NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
         assert context instanceof PsiClass;
-        
+
+        //падает на ReferencesSearch.search(): You must not run search from within updating PSI activity. Please consider invokeLatering it instead.
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                getLanguagesToInjectLater(registrar, context);
+            }
+        });
+    }
+    
+    private void getLanguagesToInjectLater(final @NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
         PsiClass psiClass = (PsiClass)context;
         if (isClass(psiClass, LSF_LOGICS_PARSER_FQN) || isClass(psiClass, LSF_LOGICS_LEXER_FQN)) {
             //пропускаем эти классы, т.к. они очень долго разбираются, но для нас не актуальны
@@ -190,9 +200,9 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
         private Map<PsiClass, Integer> superClassesCaches = new HashMap<>();
 
         //    @Override
-        public void getLanguagesToInject(@NotNull PsiLanguageInjectionHost element, @NotNull final InjectedLanguagePlaces injectionPlacesRegistrar) {
+        public void getLanguagesToInject(@NotNull PsiLanguageInjectionHost element, @NotNull InjectedLanguagePlaces injectionPlacesRegistrar) {
             if (element instanceof PsiLiteralExpression) {
-                final PsiLiteralExpression literalExpression = (PsiLiteralExpression) element;
+                PsiLiteralExpression literalExpression = (PsiLiteralExpression) element;
                 Object value = literalExpression.getValue();
                 if (value instanceof String) {
                     PsiMethodCallExpression methodCall = PsiTreeUtil.getParentOfType(literalExpression, PsiMethodCallExpression.class);
@@ -203,9 +213,9 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
                         String methodName = methodExpression.getReferenceName();
                         if (isOneOfStrings(methodName, FIND_ACTION, FIND_PROPERTY, FIND_CLASS, FIND_PROPERTIES)) {
-                            final boolean classRef = FIND_CLASS.equals(methodName);
+                            boolean classRef = FIND_CLASS.equals(methodName);
 
-                            final PsiClass thisClass = resolveThisClass(methodExpression);
+                            PsiClass thisClass = resolveThisClass(methodExpression);
                             if (thisClass != null) {
                                 Integer hasSuperClasses = superClassesCaches.get(thisClass);
                                 if(hasSuperClasses == null) {
@@ -214,13 +224,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                                 }
                                 
                                 if (hasSuperClasses.equals(0)) { // если наследуется от ScriptingActionProperty
-                                    //падает на ReferencesSearch.search(): You must not run search from within updating PSI activity. Please consider invokeLatering it instead.
-                                    ApplicationManager.getApplication().invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            referenceFromScriptingActionProperty(thisClass, literalExpression, classRef, false, injectionPlacesRegistrar);
-                                        }
-                                    });
+                                    referenceFromScriptingActionProperty(thisClass, literalExpression, classRef, false, injectionPlacesRegistrar);
                                 } else if (hasSuperClasses.equals(1)) { // если наследуется от ScriptingLogicsModule
                                     Set<String> modules = new HashSet<>();
                                     getModulesFromConstructor(modules, thisClass);
