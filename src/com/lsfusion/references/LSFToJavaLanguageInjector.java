@@ -3,7 +3,6 @@ package com.lsfusion.references;
 import com.intellij.codeInsight.navigation.ClassImplementationsSearch;
 import com.intellij.lang.injection.MultiHostInjector;
 import com.intellij.lang.injection.MultiHostRegistrar;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -69,16 +68,6 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
     public void getLanguagesToInject(final @NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
         assert context instanceof PsiClass;
 
-        //падает на ReferencesSearch.search(): You must not run search from within updating PSI activity. Please consider invokeLatering it instead.
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                getLanguagesToInjectLater(registrar, context);
-            }
-        });
-    }
-    
-    private void getLanguagesToInjectLater(final @NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
         PsiClass psiClass = (PsiClass)context;
         if (isClass(psiClass, LSF_LOGICS_PARSER_FQN) || isClass(psiClass, LSF_LOGICS_LEXER_FQN)) {
             //пропускаем эти классы, т.к. они очень долго разбираются, но для нас не актуальны
