@@ -46,7 +46,7 @@
     </project-components>
 
     <actions>
-        <group id="LSFGroup" popup="true" text="LSF">
+        <group id="LSFGroup" popup="true" text="_LSF">
             <add-to-group group-id="MainMenu" anchor="after" relative-to-action="CodeMenu"/>
         
             <action id="MetaCode.Enable" class="com.lsfusion.actions.MetaCodeEnableAction" text="Toggle _meta"
