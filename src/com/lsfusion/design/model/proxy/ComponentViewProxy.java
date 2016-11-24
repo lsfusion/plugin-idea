@@ -6,6 +6,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 
 import java.awt.*;
 
+@SuppressWarnings("unused")
 public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
     public ComponentViewProxy(T target) {
         super(target);

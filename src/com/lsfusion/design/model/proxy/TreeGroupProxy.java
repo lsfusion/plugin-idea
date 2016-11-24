@@ -2,6 +2,7 @@ package com.lsfusion.design.model.proxy;
 
 import com.lsfusion.design.model.TreeGroupView;
 
+@SuppressWarnings("unused")
 public class TreeGroupProxy extends ViewProxy<TreeGroupView> {
     public TreeGroupProxy(TreeGroupView target) {
         super(target);

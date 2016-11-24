@@ -2,6 +2,7 @@ package com.lsfusion.design.model.proxy;
 
 import com.lsfusion.design.model.ClassChooserView;
 
+@SuppressWarnings("unused")
 public class ClassChooserViewProxy extends ComponentViewProxy<ClassChooserView> {
     public ClassChooserViewProxy(ClassChooserView target) {
         super(target);

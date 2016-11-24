@@ -6,6 +6,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 
 import java.awt.*;
 
+@SuppressWarnings("unused")
 public class FormViewProxy extends ViewProxy<FormView> {
     private final ContainerViewProxy mainContainerProxy;
 

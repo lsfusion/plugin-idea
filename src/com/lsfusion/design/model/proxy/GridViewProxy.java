@@ -2,6 +2,7 @@ package com.lsfusion.design.model.proxy;
 
 import com.lsfusion.design.model.GridView;
 
+@SuppressWarnings("unused")
 public class GridViewProxy extends ComponentViewProxy<GridView> {
     public GridViewProxy(GridView target) {
         super(target);

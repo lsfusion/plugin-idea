@@ -5,6 +5,7 @@ import com.lsfusion.design.model.ContainerView;
 import com.lsfusion.design.ui.Alignment;
 import com.lsfusion.design.ui.FlexAlignment;
 
+@SuppressWarnings("unused")
 public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
 
     public ContainerViewProxy(ContainerView target) {

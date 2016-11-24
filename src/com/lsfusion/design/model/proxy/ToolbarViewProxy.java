@@ -2,6 +2,7 @@ package com.lsfusion.design.model.proxy;
 
 import com.lsfusion.design.model.ToolbarView;
 
+@SuppressWarnings("unused")
 public class ToolbarViewProxy extends ComponentViewProxy<ToolbarView> {
     public ToolbarViewProxy(ToolbarView target) {
         super(target);

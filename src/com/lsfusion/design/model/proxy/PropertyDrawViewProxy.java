@@ -4,6 +4,7 @@ import com.lsfusion.design.model.PropertyDrawView;
 
 import javax.swing.*;
 
+@SuppressWarnings("unused")
 public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> {
 
     public PropertyDrawViewProxy(PropertyDrawView target) {

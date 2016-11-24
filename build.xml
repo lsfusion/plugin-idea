@@ -66,7 +66,9 @@
         <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
     </path>
     <target name="register.custom.compilers">
+        <!--suppress AntResolveInspection : used in Linux -->
         <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+        <!--suppress AntResolveInspection : used in Linux -->
         <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions"
                  classpathref="javac2.classpath"/>
     </target>
@@ -172,6 +174,7 @@
             description="Compile module lsfusion-idea-plugin; production classes">
 
         <mkdir dir="${output.dir}"/>
+        <!--suppress AntResolveInspection : used in Linux --> 
         <javac2 destdir="${output.dir}" debug="${compiler.debug}"
                 nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true"
                 executable="${jdk.home}/bin/javac" includeantruntime="true">
