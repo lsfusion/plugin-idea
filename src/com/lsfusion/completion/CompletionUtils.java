@@ -29,7 +29,7 @@ public class CompletionUtils {
     public static final String LSF_COMPLETION_ENABLED = "lsfusion.completion.enabled";
     
     public static boolean isCompletionEnabled(Project project) {
-        return PropertiesComponent.getInstance(project).getBoolean(CompletionUtils.LSF_COMPLETION_ENABLED, true);
+        return project != null && PropertiesComponent.getInstance(project).getBoolean(CompletionUtils.LSF_COMPLETION_ENABLED, true);
     }
 
     public static void setCompletionEnabled(Project project, boolean enabled) {

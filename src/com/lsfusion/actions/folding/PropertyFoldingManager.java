@@ -14,11 +14,13 @@ public class PropertyFoldingManager {
     private static final String LSF_PROPERTY_FOLDING_STATE = "lsfusion.property.folding";
 
     public static FoldingMode getFoldingMode(Project project) {
-        return FoldingMode.valueOf(PropertiesComponent.getInstance(project).getValue(LSF_PROPERTY_FOLDING_STATE, FoldingMode.IMPLICIT.name()));
+        return project == null ? null :  FoldingMode.valueOf(PropertiesComponent.getInstance(project).getValue(LSF_PROPERTY_FOLDING_STATE, FoldingMode.IMPLICIT.name()));
     }
 
     public static void setFoldingMode(Project project, FoldingMode foldingMode) {
-        PropertiesComponent.getInstance(project).setValue(LSF_PROPERTY_FOLDING_STATE, foldingMode.name());
+        if (project != null) {
+            PropertiesComponent.getInstance(project).setValue(LSF_PROPERTY_FOLDING_STATE, foldingMode.name());
+        }
     }
 
     public static boolean isAll(Project project) {

@@ -103,8 +103,9 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         DumbService.getInstance(myProject).smartInvokeLater(
                 new Runnable() {
                     public void run() {
-                        setMetaSyncMode(PropertiesComponent.getInstance(myProject).getBoolean(META_SYNC_MODE, true));
-                        setMetaEnabled(PropertiesComponent.getInstance(myProject).getBoolean(ENABLED_META, false), false);
+                        PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(myProject);
+                        setMetaSyncMode(propertiesComponent.getBoolean(META_SYNC_MODE, true));
+                        setMetaEnabled(propertiesComponent.getBoolean(ENABLED_META, false), false);
 
 //                        смысла особого нет так как любой highlight'инг приведет к соответствующему эффекту, а так после reprocess'а метакодов долгий лок висит 
 //                        timer = new Timer();

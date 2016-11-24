@@ -210,12 +210,14 @@ public class ShowErrorsAction extends AnAction {
         @Override
         protected JComponent createCenterPanel() {
             JPanel container = new JPanel(new BorderLayout());
+            
+            PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(project);
 
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
             JLabel label = new JLabel("Modules to be excluded from scanning: ");
 
-            modulesToExclude = new JTextField(PropertiesComponent.getInstance(project).getValue(EXCLUDED_MODULES));
+            modulesToExclude = new JTextField(propertiesComponent.getValue(EXCLUDED_MODULES));
             modulesToExclude.setColumns(30);
             panel.add(label);
             panel.add(modulesToExclude);
@@ -233,7 +235,7 @@ public class ShowErrorsAction extends AnAction {
                     includeLSFFiles = includeLSFFilesBox.isSelected();
                 }
             });
-            includeLSFFiles = Boolean.valueOf(PropertiesComponent.getInstance(project).getValue(INCLUDE_LSF_FILES));
+            includeLSFFiles = Boolean.valueOf(propertiesComponent.getValue(INCLUDE_LSF_FILES));
             includeLSFFilesBox.setSelected(includeLSFFiles);
             boxesPanel.add(includeLSFFilesBox);
 
@@ -244,7 +246,7 @@ public class ShowErrorsAction extends AnAction {
                     includeJavaFiles = includeJavaFilesBox.isSelected();
                 }
             });
-            includeJavaFiles = Boolean.valueOf(PropertiesComponent.getInstance(project).getValue(INCLUDE_JAVA_FILES));
+            includeJavaFiles = Boolean.valueOf(propertiesComponent.getValue(INCLUDE_JAVA_FILES));
             includeJavaFilesBox.setSelected(includeJavaFiles);
             boxesPanel.add(includeJavaFilesBox);
 
@@ -255,7 +257,7 @@ public class ShowErrorsAction extends AnAction {
                     includeJrxmlFiles = includeJrxmlFilesBox.isSelected();
                 }
             });
-            includeJrxmlFiles = Boolean.valueOf(PropertiesComponent.getInstance(project).getValue(INCLUDE_JRXML_FILES));
+            includeJrxmlFiles = Boolean.valueOf(propertiesComponent.getValue(INCLUDE_JRXML_FILES));
             includeJrxmlFilesBox.setSelected(includeJrxmlFiles);
             boxesPanel.add(includeJrxmlFilesBox);
 
@@ -266,10 +268,11 @@ public class ShowErrorsAction extends AnAction {
 
         @Override
         protected void doOKAction() {
-            PropertiesComponent.getInstance(project).setValue(EXCLUDED_MODULES, modulesToExclude.getText());
-            PropertiesComponent.getInstance(project).setValue(INCLUDE_LSF_FILES, String.valueOf(includeLSFFiles));
-            PropertiesComponent.getInstance(project).setValue(INCLUDE_JAVA_FILES, String.valueOf(includeJavaFiles));
-            PropertiesComponent.getInstance(project).setValue(INCLUDE_JRXML_FILES, String.valueOf(includeJrxmlFiles));
+            PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(project);
+            propertiesComponent.setValue(EXCLUDED_MODULES, modulesToExclude.getText());
+            propertiesComponent.setValue(INCLUDE_LSF_FILES, String.valueOf(includeLSFFiles));
+            propertiesComponent.setValue(INCLUDE_JAVA_FILES, String.valueOf(includeJavaFiles));
+            propertiesComponent.setValue(INCLUDE_JRXML_FILES, String.valueOf(includeJrxmlFiles));
 
             StringTokenizer tokenizer = new StringTokenizer(modulesToExclude.getText(), ",;");
             final List<String> modules = new ArrayList<>();

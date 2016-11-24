@@ -23,7 +23,7 @@ public class ToggleShowTableAction extends ToggleAction {
 
     @Override
     public void setSelected(AnActionEvent e, boolean state) {
-        final Project project = e.getProject();
+        final Project project = getEventProject(e);
         if (project != null) {
             setShowTableEnabled(project, !isShowTableEnabled(project));
 
@@ -36,7 +36,7 @@ public class ToggleShowTableAction extends ToggleAction {
     }
     
     public static boolean isShowTableEnabled(Project project) {
-        return PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_SHOW_TABLE_ON, true);
+        return project != null && PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_SHOW_TABLE_ON, true);
     }
 
     public static void setShowTableEnabled(Project project, boolean enabled) {

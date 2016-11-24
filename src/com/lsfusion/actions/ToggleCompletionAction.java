@@ -15,7 +15,7 @@ public class ToggleCompletionAction extends ToggleAction {
 
     @Override
     public void setSelected(AnActionEvent e, boolean state) {
-        Project project = e.getProject();
+        Project project = getEventProject(e);
         if (project != null) {
             setCompletionEnabled(project, !isCompletionEnabled(project));
         }

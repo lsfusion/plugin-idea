@@ -23,7 +23,7 @@ public class ToggleComplexityAction extends ToggleAction {
 
     @Override
     public void setSelected(AnActionEvent e, boolean state) {
-        final Project project = e.getProject();
+        final Project project = getEventProject(e);
         if (project != null) {
             setComplexityEnabled(project, !isComplexityEnabled(project));
 
@@ -36,7 +36,7 @@ public class ToggleComplexityAction extends ToggleAction {
     }
     
     public static boolean isComplexityEnabled(Project project) {
-        return PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_COMPLEXITY_ON, true);
+        return project != null && PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_COMPLEXITY_ON, true);
     }
 
     public static void setComplexityEnabled(Project project, boolean enabled) {
