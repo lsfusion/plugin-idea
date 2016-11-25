@@ -634,6 +634,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                         }
                     }
                 }
+                LSFClassSet leftClass = declaration.resolveValueClass();
+                LSFClassSet rightClass = LSFExClassSet.fromEx(o.getPropertyExpressionList().get(0).resolveValueClass(true));
+                if (leftClass != null && rightClass != null && !leftClass.isCompatible(rightClass))
+                    addTypeMismatchError(o, rightClass, leftClass);
             }
         }
     }
@@ -650,6 +654,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void addAssignError(LSFAssignActionPropertyDefinitionBody o) {
         Annotation annotation = myHolder.createErrorAnnotation(o, "ASSIGN is allowed only to DATA/MULTI/CASE property");
+        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+        addError(o, annotation);
+    }
+
+    private void addTypeMismatchError(LSFAssignActionPropertyDefinitionBody o, LSFClassSet class1,  LSFClassSet class2) {
+        Annotation annotation = myHolder.createErrorAnnotation(o, String.format("Type mismatch: can't cast %s to %s", class1, class2));
         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
         addError(o, annotation);
     }
