@@ -3222,4 +3222,33 @@ public class LSFPsiImplUtil {
 
         return true;
     }
+    
+    private static boolean equalReferences(@NotNull LSFPropertyUsage left, LSFPropertyUsage right) {
+        return right != null && Objects.equals(left.resolve(), right.resolve());
+    }
+    
+    public static boolean checkNonRecursiveOverride(@NotNull LSFOverrideStatement override) {
+        LSFPropertyUsage leftUsage = override.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage();
+
+        Collection<LSFJoinPropertyDefinition> joinProps = PsiTreeUtil.findChildrenOfType(override, LSFJoinPropertyDefinition.class);
+        for (LSFJoinPropertyDefinition joinProp : joinProps) {
+            LSFPropertyUsage rightUsage = joinProp.getPropertyObject().getPropertyUsage();
+            if (equalReferences(leftUsage, rightUsage)) {
+                return false;
+            }
+        }
+
+        Collection<LSFExecActionPropertyDefinitionBody> execActions = PsiTreeUtil.findChildrenOfType(override, LSFExecActionPropertyDefinitionBody.class);
+        for (LSFExecActionPropertyDefinitionBody execAction : execActions) {
+            LSFPropertyObject propertyObject = execAction.getPropertyObject();
+            if (propertyObject != null) {
+                LSFPropertyUsage rightUsage = propertyObject.getPropertyUsage();
+                if (equalReferences(leftUsage, rightUsage)) {
+                    return false;
+                }
+
+            }
+        }
+        return true;
+    }
 }

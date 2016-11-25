@@ -613,6 +613,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
             addError(element, annotation);
         }
+
+        if (!LSFPsiImplUtil.checkNonRecursiveOverride(element)) {
+            Annotation annotation = myHolder.createErrorAnnotation(element, "Recursive implement");
+            annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+            addError(element, annotation);
+        }
     }
 
 

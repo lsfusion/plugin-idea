@@ -32,7 +32,7 @@ EDIGITS	= [0-9]*
 HEX_DIGIT =	[0-9a-fA-F]
 FIRST_ID_LETTER	= [a-zA-Z]
 NEXT_ID_LETTER = [a-zA-Z_0-9]
-CODE_LITERAL = \<\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}\>
+CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
 
 %%
 <YYINITIAL> {
