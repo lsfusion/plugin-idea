@@ -11,6 +11,7 @@
     <change-notes><![CDATA[
       <b>Version 1.0.71</b><br>
       <p>Enable metacode for specific modules</p>
+      <p>Inline html in EMAIL</p>
       ]]>
     </change-notes>
 
