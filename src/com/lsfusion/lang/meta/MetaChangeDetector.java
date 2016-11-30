@@ -6,10 +6,12 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.*;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
@@ -760,11 +762,15 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     private boolean enabled = false;
 
-    public void toggleMetaEnabled() {
-        setMetaEnabled(!enabled, true);
+    public void toggleMetaEnabled(List<String> modulesToInclude) {
+        setMetaEnabled(modulesToInclude, !enabled, true);
     }
 
     public void setMetaEnabled(boolean enabled, boolean reprocess) {
+        setMetaEnabled(null, enabled, reprocess);
+    }
+
+    public void setMetaEnabled(List<String> modulesToInclude, boolean enabled, boolean reprocess) {
         this.enabled = enabled;
         PropertiesComponent.getInstance(myProject).setValue(ENABLED_META, Boolean.toString(enabled));
 
@@ -782,7 +788,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         }*/
 
         if (reprocess)
-            reprocessAllDocuments(syncMode, false);
+            reprocessAllDocuments(modulesToInclude, syncMode, false);
     }
 
     public boolean getMetaEnabled() {
@@ -809,14 +815,14 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     public void reprocessAllDocuments() {
-        reprocessAllDocuments(getMetaSyncMode(), false);
+        reprocessAllDocuments(null, getMetaSyncMode(), false);
     }
     
     public void reenableAllMetaCodes() {
-        reprocessAllDocuments(getMetaSyncMode(), true);    
+        reprocessAllDocuments(null, getMetaSyncMode(), true);
     }
 
-    public void reprocessAllDocuments(final boolean sync, final boolean reenable) {
+    public void reprocessAllDocuments(List<String> modulesToInclude, final boolean sync, final boolean reenable) {
         final Progressive run = new Progressive() {
             public void run(final @NotNull ProgressIndicator indicator) {
                 reprocessing = true;
@@ -835,7 +841,21 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     ApplicationManager.getApplication().runReadAction(new Runnable() {
                         @Override
                         public void run() {
-                            Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, GlobalSearchScope.allScope(myProject));
+
+                            GlobalSearchScope modulesScope = null;
+                            if (modulesToInclude != null && !modulesToInclude.isEmpty()) {
+                                ModulesConfigurator modulesConfigurator = new ModulesConfigurator(myProject);
+                                for (String moduleToInclude : modulesToInclude) {
+                                    Module logics = modulesConfigurator.getModule(moduleToInclude);
+                                    if (logics != null) {
+                                        GlobalSearchScope moduleScope = logics.getModuleWithDependenciesScope();
+                                        modulesScope = modulesScope == null ? moduleScope : moduleScope.uniteWith(moduleScope);
+                                    }
+                                }
+                            } else
+                                modulesScope = GlobalSearchScope.allScope(myProject);
+
+                            Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, modulesScope);
                             for (LSFModuleDeclaration declaration : moduleDeclarations) {
                                 LSFFile file = declaration.getLSFFile();
                                 List<LSFMetaCodeStatement> metaStatements = reenable ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
