@@ -10,6 +10,10 @@ import java.util.Collections;
 public class LSFNamedFoldingDescriptor extends FoldingDescriptor {
     private final String placeholderText;
 
+    public LSFNamedFoldingDescriptor(@NotNull PsiElement e, @NotNull String placeholderText) {
+        this(e, placeholderText, true);
+    }
+
     public LSFNamedFoldingDescriptor(@NotNull PsiElement e, @NotNull String placeholderText, boolean neverExpands) {
         this(e, e.getTextRange(), placeholderText, neverExpands);
     }

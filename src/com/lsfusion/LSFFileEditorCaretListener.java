@@ -1,6 +1,5 @@
 package com.lsfusion;
 
-import com.intellij.codeInsight.folding.CodeFoldingManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.CaretAdapter;
@@ -17,15 +16,14 @@ public class LSFFileEditorCaretListener extends CaretAdapter {
 
     @Override
     public void caretPositionChanged(final CaretEvent e) {
-        if (latestTask != null) {
-            latestTask.expired = true;
-        }
-
         int newLine = e.getNewPosition().line;
 
         if (e.getOldPosition().line != newLine) {
             if (LSFPropertyParamsFoldingManager.rebuildFoldings(e.getEditor().getDocument(), newLine)) {
-
+                if (latestTask != null) {
+                    latestTask.expired = true;
+                }
+                
                 latestTask = new CaretListenerTimerTask(e);
                 new Timer().schedule(
                         latestTask,
@@ -50,9 +48,7 @@ public class LSFFileEditorCaretListener extends CaretAdapter {
                 public void run() {
                     Editor editor = e.getEditor();
                     editor.putUserData(Key.findKeyByName("code folding"), null); // reset cache
-                    CodeFoldingManager.getInstance(editor.getProject()).updateFoldRegions(editor);
-
-                    LSFPropertyParamsFoldingManager.foldingsRebuilt(editor.getDocument());
+                    LSFPropertyParamsFoldingManager.updateFoldRegions(editor);
                 }
             }, new Condition() {
                 @Override

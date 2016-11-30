@@ -9,10 +9,13 @@
       ]]></description>
 
     <change-notes><![CDATA[
-      <b>Version 1.0.71</b><br>
-      <p>Enable metacode for specific modules</p>
-      <p>Inline html in EMAIL</p>
-      ]]>
+        <b>Version 1.0.71</b><br>
+        <ul>
+            <li>Enable metacode for specific modules</li>
+            <li>Inline html in EMAIL</li>
+            <li>Property classes folding fix</li>
+        </ul>
+    ]]>
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->

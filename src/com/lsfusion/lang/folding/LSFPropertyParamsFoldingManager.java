@@ -1,11 +1,12 @@
 package com.lsfusion.lang.folding;
 
-import com.intellij.lang.ASTNode;
+import com.intellij.codeInsight.folding.CodeFoldingManager;
 import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.FoldRegion;
+import com.intellij.openapi.project.Project;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.ConcatenateClassSet;
 import com.lsfusion.lang.classes.CustomClassSet;
@@ -26,9 +27,9 @@ public class LSFPropertyParamsFoldingManager {
     private final Document document;
     private LSFPropertyStatement propertyStatement;
     
-    public LSFPropertyParamsFoldingManager(ASTNode node, Document document) {
+    public LSFPropertyParamsFoldingManager(LSFPropertyStatement psi, Document document) {
         this.document = document;
-        propertyStatement = (LSFPropertyStatement) node.getPsi();
+        propertyStatement = psi;
     }
 
     @NotNull
@@ -91,7 +92,7 @@ public class LSFPropertyParamsFoldingManager {
 
                 if (!text.isEmpty()) {
                     text += "=";
-                    result.add(new LSFNamedFoldingDescriptor(equalsSign, text, true));
+                    result.add(new LSFNamedFoldingDescriptor(equalsSign, text));
                 }
             }
         }
@@ -116,7 +117,7 @@ public class LSFPropertyParamsFoldingManager {
                             lineUnderChange.put(document, equalsLine);
                             FoldRegion foldRegion = selectedTextEditor.getFoldingModel().getCollapsedRegionAtOffset(equalsOffset);
                             if (foldRegion != null) {
-                                descriptors.add(new LSFNamedFoldingDescriptor(equalsSign, foldRegion.getPlaceholderText(), true));
+                                descriptors.add(new LSFNamedFoldingDescriptor(equalsSign, foldRegion.getPlaceholderText()));
                             }
                             return true;
                         }
@@ -150,21 +151,30 @@ public class LSFPropertyParamsFoldingManager {
     
     private boolean allClassesDefined(LSFPropertyDeclaration propertyDeclaration) {
         List<LSFParamDeclaration> paramDeclarations = propertyDeclaration.resolveParamDecls();
-        if (paramDeclarations == null) {
-            return false;
-        }
-        return LSFPsiImplUtil.getClassNameRefs(paramDeclarations).allClassesDeclared();
+        return paramDeclarations != null && LSFPsiImplUtil.getClassNameRefs(paramDeclarations).allClassesDeclared();
     }
     
     public static boolean rebuildFoldings(Document document, int newPosition) {
         Integer oldPosition = lineUnderChange.get(document);
-        if (oldPosition != null && oldPosition != newPosition) {
-            return true;
-        }
-        return false;
+        return oldPosition != null && oldPosition != newPosition;
     } 
     
-    public static void foldingsRebuilt(Document document) {
-        lineUnderChange.remove(document);
+    public static void foldingsRebuilt(Editor editor) {
+        Document document = editor.getDocument();
+        int lineNumber = document.getLineNumber(editor.getCaretModel().getOffset());
+        if (rebuildFoldings(document, lineNumber)) {
+            lineUnderChange.remove(document);
+        }
+    }
+    
+    public static void updateFoldRegions(Editor editor) {
+        Project project = editor.getProject();
+        if (project != null) {
+            Runnable runnable = CodeFoldingManager.getInstance(project).updateFoldRegionsAsync(editor, true);
+            if (runnable != null) {
+                runnable.run();
+                foldingsRebuilt(editor);
+            }
+        }
     }
 }

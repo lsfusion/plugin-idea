@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.tree.IElementType;
 import com.lsfusion.actions.folding.PropertyFoldingManager;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +24,7 @@ public class LSFFoldingBuilder implements FoldingBuilder {
         List<FoldingDescriptor> list = new ArrayList<>();
         Project project = node.getPsi().getProject();
         boolean propFoldNone = PropertyFoldingManager.isNone(project);
-        boolean propFoldImplicit = PropertyFoldingManager.isImplicit(project); 
+        boolean propFoldImplicit = PropertyFoldingManager.isImplicit(project);
         
         buildFolding(node, list, document, propFoldNone, propFoldImplicit);
         FoldingDescriptor[] descriptors = new FoldingDescriptor[list.size()];
@@ -53,7 +54,7 @@ public class LSFFoldingBuilder implements FoldingBuilder {
         }
 
         if (!propFoldNone && elementType == LSFTypes.PROPERTY_STATEMENT) {
-            LSFPropertyParamsFoldingManager propFoldingManager = new LSFPropertyParamsFoldingManager(node, document);
+            LSFPropertyParamsFoldingManager propFoldingManager = new LSFPropertyParamsFoldingManager((LSFPropertyStatement) node.getPsi(), document);
             list.addAll(propFoldingManager.buildDescriptors(propFoldImplicit));
         }
 
@@ -70,6 +71,6 @@ public class LSFFoldingBuilder implements FoldingBuilder {
 
     @Override
     public boolean isCollapsedByDefault(@NotNull ASTNode node) {
-        return node.getElementType() == LSFTypes.META_CODE_BODY || node.getElementType() == LSFTypes.EQUALS_SIGN;
+        return node.getElementType() == LSFTypes.EQUALS_SIGN;
     }
 }
