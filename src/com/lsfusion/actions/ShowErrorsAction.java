@@ -215,7 +215,7 @@ public class ShowErrorsAction extends AnAction {
 
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-            JLabel label = new JLabel("Modules to be excluded from scanning: ");
+            JLabel label = new JLabel("Excluded modules: ");
 
             modulesToExclude = new JTextField(propertiesComponent.getValue(EXCLUDED_MODULES));
             modulesToExclude.setColumns(30);

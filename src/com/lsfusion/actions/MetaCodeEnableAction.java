@@ -10,9 +10,10 @@ import com.lsfusion.lang.meta.MetaChangeDetector;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
 
 public class MetaCodeEnableAction extends AnAction {
     private final String INCLUDED_MODULES = "INCLUDED_MODULES_META_CODE";
@@ -63,7 +64,8 @@ public class MetaCodeEnableAction extends AnAction {
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
             JLabel confirmLabel = new JLabel(String.format("Are you sure you want to %s meta code?", enabled ? "disable" : "enable"));
-            JLabel label = new JLabel(String.format("Modules to be included in %s metacode: ", enabled ? "disabling" : "enabling"));
+            confirmLabel.setBorder(new EmptyBorder(0, 0, 10,0));
+            JLabel label = new JLabel(String.format("%s in modules: ", enabled ? "Disable" : "Enable"));
 
             modulesToInclude = new JTextField(propertiesComponent.getValue(INCLUDED_MODULES));
             modulesToInclude.setColumns(30);
