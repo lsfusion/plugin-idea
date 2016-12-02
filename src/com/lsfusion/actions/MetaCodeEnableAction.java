@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class MetaCodeEnableAction extends AnAction {
@@ -22,11 +21,9 @@ public class MetaCodeEnableAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         project = getEventProject(e);
-        if (e.getInputEvent() instanceof KeyEvent) {
-            boolean enabled = MetaChangeDetector.getInstance(project).getMetaEnabled();
-            IncludeModulesDialog dialog = new IncludeModulesDialog(enabled);
-            dialog.show();
-        }
+        boolean enabled = MetaChangeDetector.getInstance(project).getMetaEnabled();
+        IncludeModulesDialog dialog = new IncludeModulesDialog(enabled);
+        dialog.show();
     }
 
     @Override
