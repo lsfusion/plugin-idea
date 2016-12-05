@@ -11,8 +11,11 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class GridTable extends JBTable {
-    public GridTable(TableModel model) {
+    private final int headerHeight;
+
+    public GridTable(TableModel model, int headerHeight) {
         super(model);
+        this.headerHeight = headerHeight;
         setColumnSelectionAllowed(false);
 
         getTableHeader().setReorderingAllowed(false);
@@ -120,6 +123,10 @@ public class GridTable extends JBTable {
     private PropertyDrawView getColumnProperty(int column) {
         return getModel().getColumnProperty(column);
     }
+    
+    private int getHeaderHeight() {
+        return headerHeight <= 0 ? 34 : headerHeight;
+    }
 
     private class GridTableHeader extends JTableHeader {
         public GridTableHeader(TableColumnModel columnModel) {
@@ -139,7 +146,7 @@ public class GridTable extends JBTable {
 
         @Override
         public Dimension getPreferredSize() {
-            return new Dimension(columnModel.getTotalColumnWidth(), 34);
+            return new Dimension(columnModel.getTotalColumnWidth(), getHeaderHeight());
         }
     }
 }

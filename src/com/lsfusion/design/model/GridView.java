@@ -98,7 +98,7 @@ public class GridView extends ComponentView {
     @Override
     protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
         if (groupObject.entity.initClassView == ClassViewType.GRID && model.getColumnCount() > 0) {
-            GridTable gridTable = new GridTable(model);
+            GridTable gridTable = new GridTable(model, headerHeight);
             return component = new JBScrollPane(gridTable);
         } else {
             return null;
