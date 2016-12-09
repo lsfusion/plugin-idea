@@ -9,11 +9,10 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.71</b><br>
+        <b>Version 1.0.72</b><br>
         <ul>
-            <li>Enable metacode for specific modules</li>
-            <li>Inline html in EMAIL</li>
-            <li>Property classes folding fix</li>
+            <li>Enable metacode fix</li>
+            <li>IMPORT DBF CHARSET</li>
         </ul>
     ]]>
     </change-notes>
