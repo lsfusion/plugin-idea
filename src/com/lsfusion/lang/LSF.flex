@@ -251,6 +251,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "IS"                      			{ return IS; }
   "JDBC"                  			    { return JDBC; }
   "JOIN"                    			{ return JOIN; }
+  "JSON"                    			{ return JSON; }
   "LAST"                                { return LAST; }
   "LEFT"                    			{ return LEFT; }
   "LIMIT"                   			{ return LIMIT; }
