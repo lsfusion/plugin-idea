@@ -249,8 +249,7 @@ public class FormView {
     }
 
     public void removeComponent(ComponentView component) {
-
-        component.parent.remove(component);
+        component.removeFromParent();
 
         //не удаляем компоненты (не-контейнеры) из пула, чтобы можно было опять их использовать в настройке
         if (component instanceof ContainerView) {

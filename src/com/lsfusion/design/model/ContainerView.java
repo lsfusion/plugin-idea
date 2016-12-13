@@ -126,9 +126,7 @@ public class ContainerView extends ComponentView {
     }
 
     private void changeContainer(ComponentView comp) {
-        if (comp.getParent() != null)
-            comp.getParent().remove(comp);
-
+        comp.removeFromParent();
         comp.setParent(this);
     }
 

@@ -21,7 +21,9 @@ import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 
 import javax.help.UnsupportedOperationException;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public class DesignInfo {
@@ -35,7 +37,7 @@ public class DesignInfo {
         Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile);
 
         List<LSFFormExtend> formExtends = new ArrayList<>(lsfFormExtends.findAll());
-        Collections.sort(formExtends, REQUIRES_COMPARATOR);
+        formExtends.sort(REQUIRES_COMPARATOR);
 
         FormEntity formEntity = new FormEntity(lsfFile);
 
@@ -54,7 +56,7 @@ public class DesignInfo {
                 }
             }
         }
-        Collections.sort(formDesignUsages, REQUIRES_COMPARATOR);
+        formDesignUsages.sort(REQUIRES_COMPARATOR);
 
         formView = DefaultFormView.create(formEntity);
         
@@ -167,8 +169,9 @@ public class DesignInfo {
                 }
             } else if (componentStatement.getRemoveComponentStatement() != null) {
                 LSFRemoveComponentStatement statement = componentStatement.getRemoveComponentStatement();
-                if (statement.getComponentSelector() != null) {
-                    String name = getComponentSID(statement.getComponentSelector(), formView);
+                LSFComponentSelector componentSelector = statement.getComponentSelector();
+                if (componentSelector != null) {
+                    String name = getComponentSID(componentSelector, formView);
                     ComponentView component = formView.getComponentBySID(name);
                     if (component != null) {
                         formView.removeComponent(component);
@@ -185,8 +188,9 @@ public class DesignInfo {
         
         if (valueStatement.getColorLiteral() != null) {
             LSFColorLiteral colorLiteral = valueStatement.getColorLiteral();
-            if (!colorLiteral.getUintLiteralList().isEmpty()) {
-                List<LSFUintLiteral> literalList = colorLiteral.getUintLiteralList();
+            List<LSFUintLiteral> literalList = colorLiteral.getUintLiteralList();
+            if (!literalList.isEmpty()) {
+                //noinspection UseJBColor
                 return new Color(Integer.decode(literalList.get(0).getText()), Integer.decode(literalList.get(1).getText()), Integer.decode(literalList.get(2).getText()));
             } else {
                 return Color.decode(colorLiteral.getFirstChild().getText());
@@ -235,14 +239,16 @@ public class DesignInfo {
     }
 
     private String getComponentSID(LSFComponentSelector componentSelector, FormView form) {
-        if (componentSelector.getComponentSelector() != null) {
-            String componentSID = getComponentSID(componentSelector.getComponentSelector(), form);
+        LSFComponentSelector lsfComponentSelector = componentSelector.getComponentSelector();
+        if (lsfComponentSelector != null) {
+            String componentSID = getComponentSID(lsfComponentSelector, form);
             ComponentView componentView = form.getComponentBySID(componentSID);
             return componentView.getParent().getSID();
         } else if (componentSelector.getPropertySelector() != null) {
             LSFFormPropertyDrawUsageImpl usage = (LSFFormPropertyDrawUsageImpl) componentSelector.getPropertySelector().getFormPropertyDrawUsage();
-            if (usage.getAliasUsage() != null) {
-                return usage.getAliasUsage().getSimpleName().getName();
+            LSFAliasUsage aliasUsage = usage.getAliasUsage();
+            if (aliasUsage != null) {
+                return aliasUsage.getSimpleName().getName();
             } else {
                 String name = usage.getSimpleName().getName();
                 LSFObjectUsageList objectUsageList = usage.getObjectUsageList();
