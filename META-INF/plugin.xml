@@ -13,6 +13,7 @@
         <ul>
             <li>Enable metacode fix</li>
             <li>IMPORT DBF CHARSET</li>
+            <li> EXPORT XML | JSON | CSV | DBF</li>
         </ul>
     ]]>
     </change-notes>
