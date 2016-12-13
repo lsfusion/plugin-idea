@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.71</version>
+    <version>1.0.72</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -13,7 +13,7 @@
         <ul>
             <li>Enable metacode fix</li>
             <li>IMPORT DBF CHARSET</li>
-            <li> EXPORT XML | JSON | CSV | DBF</li>
+            <li>EXPORT XML | JSON | CSV | DBF</li>
         </ul>
     ]]>
     </change-notes>
