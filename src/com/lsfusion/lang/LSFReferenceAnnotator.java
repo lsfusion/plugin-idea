@@ -641,9 +641,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     }
                 }
                 LSFClassSet leftClass = declaration.resolveValueClass();
-                LSFClassSet rightClass = LSFExClassSet.fromEx(o.getPropertyExpressionList().get(0).resolveValueClass(false));
-                if (leftClass != null && rightClass != null && !leftClass.isCompatible(rightClass))
-                    addTypeMismatchError(o, rightClass, leftClass);
+                List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
+                if (!rightPropertyExpressionList.isEmpty()) {
+                    LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
+                    if (leftClass != null && rightClass != null && !leftClass.isCompatible(rightClass))
+                        addTypeMismatchError(o, rightClass, leftClass);
+                }
             }
         }
     }
