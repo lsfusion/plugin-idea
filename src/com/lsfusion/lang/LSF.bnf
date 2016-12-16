@@ -1020,7 +1020,7 @@ whileActionPropertyDefinitionBody ::= WHILE (propertyExpression (ORDER (DESC)? n
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-terminalFlowActionPropertyDefinitionBody ::= (BREAK SEMI) | RETURN
+terminalFlowActionPropertyDefinitionBody ::= BREAK | RETURN
 {
     implements="com.lsfusion.lang.psi.context.ActionExpression" methods = [inferActionParamClasses]
 }
