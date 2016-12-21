@@ -75,6 +75,7 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
                 builder_.advanceLexer();
                 return true;
             }
+            builder_.error("semicolon expected");
             return false;
         }
         return true;

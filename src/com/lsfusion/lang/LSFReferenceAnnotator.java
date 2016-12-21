@@ -484,6 +484,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     TextRange textRange = TextRange.create(element.getTextRange().getStartOffset() + i, element.getTextRange().getStartOffset() + i + 2);
                     Annotation annotation = myHolder.createErrorAnnotation(textRange, "Wrong escape sequence " + text.substring(i, i+2));
                     annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                    addError(element, annotation);
                 } else {
                     ++i;
                 }
