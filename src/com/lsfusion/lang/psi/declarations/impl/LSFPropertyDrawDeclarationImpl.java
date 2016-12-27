@@ -50,15 +50,12 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
                     return alias != null && otherAlias != null && alias.getText().equals(otherAlias.getText());
                 }
                 
-                //теперь считаются дубликатами только если одинаковые алиасы
-                return false;
-                
-//                LSFId nameIdentifier = getNameIdentifier();
-//                LSFId otherNameIdentifier = decl.getNameIdentifier();
-//                
-//                return nameIdentifier != null && otherNameIdentifier != null &&
-//                       nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
-//                       resolveEquals(objectUsageList, decl.getObjectUsageList());
+                LSFId nameIdentifier = getNameIdentifier();
+                LSFId otherNameIdentifier = decl.getNameIdentifier();
+
+                return nameIdentifier != null && otherNameIdentifier != null &&
+                       nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
+                       resolveEquals(objectUsageList, decl.getObjectUsageList());
             }
         };
     }
