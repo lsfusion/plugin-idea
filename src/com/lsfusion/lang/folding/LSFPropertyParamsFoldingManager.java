@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.ConcatenateClassSet;
 import com.lsfusion.lang.classes.CustomClassSet;
@@ -170,6 +171,7 @@ public class LSFPropertyParamsFoldingManager {
     public static void updateFoldRegions(Editor editor) {
         Project project = editor.getProject();
         if (project != null) {
+            PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
             Runnable runnable = CodeFoldingManager.getInstance(project).updateFoldRegionsAsync(editor, true);
             if (runnable != null) {
                 runnable.run();
