@@ -9,11 +9,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.72</b><br>
+        <b>Version 1.0.73</b><br>
         <ul>
-            <li>Enable metacode fix</li>
-            <li>IMPORT DBF CHARSET</li>
-            <li>EXPORT XML | JSON | CSV | DBF</li>
+            <li>REFLECTION CANONICALNAME property</li>
+            <li>non-unique property name in form error</li>
+            <li>bug fixes</li>
         </ul>
     ]]>
     </change-notes>

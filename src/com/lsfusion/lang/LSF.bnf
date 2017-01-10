@@ -328,6 +328,7 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	sessionPropertyDefinition
 	    |	signaturePropertyDefinition
 	    |   activeTabPropertyDefinition
+	    |   reflectionPropertyDefinition
 	    |	literal
 {
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
@@ -433,6 +434,11 @@ activeTabPropertyDefinition ::= ACTIVE TAB componentUsage FORM formUsage
     implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.FormContext" 
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames resolveFormDecl]
 }
+
+reflectionPropertyDefinition ::= REFLECTION reflectionPropertyType propertyUsage
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+
+reflectionPropertyType ::= CANONICALNAME
 
 propertyExprObject ::= LSQBR EQUALS propertyImplementation RSQBR
 {implements="com.lsfusion.lang.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }

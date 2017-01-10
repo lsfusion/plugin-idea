@@ -161,6 +161,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "LEADING"             			    { return LEADING; }
   "TRAILING"             			    { return TRAILING; }
   "STRETCH"             			    { return STRETCH; }
+  "CANONICALNAME"                  		{ return CANONICALNAME; }
   "CSV"                  			    { return CSV; }
   "CUSTOM"                  			{ return CUSTOM; }
   "CYCLES"                  			{ return CYCLES; }
@@ -327,6 +328,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "READONLY"                			{ return READONLY; }
   "READONLYIF"              			{ return READONLYIF; }
   "RECURSION"               			{ return RECURSION; }
+  "REFLECTION"                  		{ return REFLECTION; }
   "REGEXP"                  			{ return REGEXP; }
   "REMOVE"                  			{ return REMOVE; }
   "REPORTFILES"              			{ return REPORTFILES; }
