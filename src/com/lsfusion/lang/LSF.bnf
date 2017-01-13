@@ -1854,7 +1854,15 @@ modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN | DIALOG
 
 formPrintTypeLiteral ::= PRINT (AUTO | XLSX | XLS | PDF)? {pin = 1}
 
-formExportLiteral ::= EXPORT (DOC | DOCX | PDF | XLS | XLSX | XML | JSON | CSV | DBF) {pin = 1}
+formExportLiteral ::= EXPORT (DOC
+                            | DOCX
+                            | PDF
+                            | XLS
+                            | XLSX
+                            | XML
+                            | JSON
+                            | CSV (stringLiteral)? (CHARSET stringLiteral)?
+                            | (DBF (CHARSET stringLiteral)?)) {pin = 1}
 
 emailRecipientTypeLiteral ::= TO | CC | BCC
 
