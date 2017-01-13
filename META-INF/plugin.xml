@@ -13,6 +13,7 @@
         <ul>
             <li>REFLECTION CANONICALNAME property</li>
             <li>non-unique property name in form error</li>
+            <li>FORM EXPORT params</li>
             <li>bug fixes</li>
         </ul>
     ]]>
