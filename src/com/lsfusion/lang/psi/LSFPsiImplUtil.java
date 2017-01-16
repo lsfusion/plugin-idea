@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.*;
 
+import static com.lsfusion.lang.psi.LSFReflectionType.CANONICAL_NAME_VALUE_CLASS;
 import static java.util.Collections.singletonList;
 
 @SuppressWarnings("UnusedParameters")
@@ -909,11 +910,6 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFReflectionPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
-        return LSFExClassSet.logical;
-    }
-
-    @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFLiteral sourceStatement, @Nullable InferExResult inferred) {
         DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
         if (builtInClass != null) {
@@ -1034,6 +1030,16 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFFilterPropertyDefinition sourceStatement, boolean infer) {
         return LSFExClassSet.logical;
+    }
+
+    @Nullable
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFReflectionPropertyDefinition sourceStatement, boolean infer) {
+        switch (LSFReflectionType.valueOf(sourceStatement.getReflectionPropertyType().getText())) {
+            case CANONICALNAME:
+                return new LSFExClassSet(CANONICAL_NAME_VALUE_CLASS);
+            default:
+                return null;
+        }
     }
 
     // PropertyExpression.getValueClassNames
@@ -1252,6 +1258,15 @@ public class LSFPsiImplUtil {
         return singletonList(LogicalClass.instance.getName());
     }
 
+    public static List<String> getValueClassNames(@NotNull LSFReflectionPropertyDefinition sourceStatement) {
+        switch (LSFReflectionType.valueOf(sourceStatement.getReflectionPropertyType().getText())) {
+            case CANONICALNAME:
+                return Collections.singletonList(CANONICAL_NAME_VALUE_CLASS.getName());
+            default:
+                return Collections.EMPTY_LIST;
+        }
+    }
+
     public static List<String> getValueClassNames(@NotNull LSFExpressionFriendlyPD sourceStatement) {
         return ((LSFExpression) sourceStatement.getFirstChild()).getValueClassNames();
     }
@@ -1377,10 +1392,6 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFActiveTabPropertyDefinition sourceStatement) {
-        return singletonList(LogicalClass.instance.getName());
-    }
-
-    public static List<String> getValueClassNames(@NotNull LSFReflectionPropertyDefinition sourceStatement) {
         return singletonList(LogicalClass.instance.getName());
     }
 
@@ -1578,6 +1589,10 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
+    public static List<String> getValuePropertyNames(@NotNull LSFReflectionPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
     public static List<String> getValuePropertyNames(@NotNull LSFExpressionFriendlyPD sourceStatement) {
         return ((LSFExpression) sourceStatement.getFirstChild()).getValuePropertyNames();
     }
@@ -1701,10 +1716,6 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
-    public static List<String> getValuePropertyNames(@NotNull LSFReflectionPropertyDefinition sourceStatement) {
-        return Collections.EMPTY_LIST;
-    }
-
     public static List<String> getValuePropertyNames(@NotNull LSFLiteral sourceStatement) {
         return Collections.EMPTY_LIST;
     }
@@ -1824,6 +1835,11 @@ public class LSFPsiImplUtil {
         return null;
     }
 
+    @Nullable
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFReflectionPropertyDefinition sourceStatement) {
+        return null;
+    }
+
     // UnfriendlyPE.getValueParamClasses
 
     public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFExpressionUnfriendlyPD sourceStatement) {
@@ -1887,6 +1903,10 @@ public class LSFPsiImplUtil {
     }
 
     public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {
+        return null;
+    }
+
+    public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFReflectionPropertyDefinition sourceStatement) {
         return null;
     }
 
@@ -2640,12 +2660,8 @@ public class LSFPsiImplUtil {
         return inferParamClasses(sourceStatement.getPropertyExpression(), null);
     }
 
-    @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFActiveTabPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
-        return Inferred.EMPTY;
-    }
-
-    public static Inferred inferParamClasses(@NotNull LSFReflectionPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+    public
+    @NotNull static Inferred inferParamClasses(@NotNull LSFActiveTabPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return Inferred.EMPTY;
     }
 

@@ -328,7 +328,6 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	sessionPropertyDefinition
 	    |	signaturePropertyDefinition
 	    |   activeTabPropertyDefinition
-	    |   reflectionPropertyDefinition
 	    |	literal
 {
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
@@ -341,6 +340,7 @@ expressionUnfriendlyPD ::= dataPropertyDefinition
                            |   formulaPropertyDefinition
                            |   groupPropertyDefinition
                            |   filterPropertyDefinition
+                           |   reflectionPropertyDefinition
 {methods = [ resolveUnfriendValueClass resolveValueParamClasses]}
 
 joinPropertyDefinition ::= JOIN? propertyObject LBRAC propertyExpressionList RBRAC
@@ -435,11 +435,6 @@ activeTabPropertyDefinition ::= ACTIVE TAB componentUsage FORM formUsage
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames resolveFormDecl]
 }
 
-reflectionPropertyDefinition ::= REFLECTION reflectionPropertyType propertyUsage
-{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
-
-reflectionPropertyType ::= CANONICALNAME
-
 propertyExprObject ::= LSQBR EQUALS propertyImplementation RSQBR
 {implements="com.lsfusion.lang.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
 
@@ -501,6 +496,14 @@ filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
+
+reflectionPropertyDefinition ::= REFLECTION reflectionPropertyType propertyUsage
+{
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE" 
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+}
+
+reflectionPropertyType ::= CANONICALNAME
 
 typeIs ::= IS | AS
 typePropertyDefinition ::= typeIs className {pin = 1}
