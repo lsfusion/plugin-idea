@@ -701,5 +701,20 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         }
     }
+
+    @Override
+    public void visitAdditiveORPE(@NotNull LSFAdditiveORPE o) {
+        List<LSFAdditivePE> additivePEList = o.getAdditivePEList();
+        if(additivePEList.size() > 1) {
+            for (LSFAdditivePE child : additivePEList) {
+                LSFClassSet classSet = LSFExClassSet.fromEx(child.resolveInferredValueClass(null));
+                if (classSet != null && !(classSet instanceof IntegralClass)) {
+                    Annotation annotation = myHolder.createErrorAnnotation(child, "Can't add / subtract " + classSet + " value");
+                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                    addError(child, annotation);
+                }
+            }
+        }
+    }
 }
 
