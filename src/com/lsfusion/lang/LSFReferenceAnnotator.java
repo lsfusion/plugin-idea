@@ -17,6 +17,7 @@ import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
 import com.lsfusion.lang.classes.IntegralClass;
 import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
@@ -611,7 +612,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitOverrideStatement(@NotNull LSFOverrideStatement element) {
         Result<LSFClassSet> required = new Result<>(); Result<LSFClassSet> found = new Result<>();
         if(!LSFPsiImplUtil.checkOverrideValue(element, required, found)) {
-            Annotation annotation = myHolder.createErrorAnnotation(element, "Wrong value class. Required : " + required.getResult().getCanonicalName() + ", found : " + found.getResult().getCanonicalName());
+            String requiredClass = required.getResult() instanceof LSFValueClass ? ((LSFValueClass) required.getResult()).getCaption() : required.getResult().getCanonicalName();
+            String foundClass = found.getResult() instanceof LSFValueClass ? ((LSFValueClass) found.getResult()).getCaption() : found.getResult().getCanonicalName();
+            Annotation annotation = myHolder.createErrorAnnotation(element, "Wrong value class. Required : " + requiredClass + ", found : " + foundClass);
             annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
             addError(element, annotation);
         }
