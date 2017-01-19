@@ -103,11 +103,11 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
     // пока не поддерживаем
 
     public LSFValueClass getCommonClass() {
-        throw new UnsupportedOperationException("getCommonClass() isn't supproted for StructClassSet");
+        throw new UnsupportedOperationException("getCommonClass() isn't supported for StructClassSet");
     }
 
     public String getQName(PsiElement context) {
-        throw new UnsupportedOperationException("getQName(PsiElement context) isn't supproted for StructClassSet");
+        throw new UnsupportedOperationException("getQName(PsiElement context) isn't supported for StructClassSet");
     }
 
     @Override
@@ -117,7 +117,7 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("getName() isn't supproted for StructClassSet");
+        throw new UnsupportedOperationException("getName() isn't supported for StructClassSet");
     }
 
     public boolean equals(Object o) {
