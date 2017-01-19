@@ -15,6 +15,7 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
+import com.lsfusion.lang.classes.IntegralClass;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
 import com.lsfusion.lang.psi.*;
@@ -683,6 +684,20 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 Annotation annotation = myHolder.createErrorAnnotation(o, "Can't resolve property " + property);
                 annotation.setEnforcedTextAttributes(ERROR);
                 addError(o, annotation);
+            }
+        }
+    }
+
+    @Override
+    public void visitTypeMult(@NotNull LSFTypeMult o) {
+        for(PsiElement child : o.getParent().getChildren()) {
+            if(child instanceof LSFUnaryMinusPE) {
+                LSFClassSet classSet = LSFExClassSet.fromEx(((LSFUnaryMinusPE) child).resolveInferredValueClass(null));
+                if(classSet != null && !(classSet instanceof IntegralClass)) {
+                    Annotation annotation = myHolder.createErrorAnnotation(child, "Can't multiply / divide " + classSet + " value");
+                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                    addError(child, annotation);
+                }
             }
         }
     }

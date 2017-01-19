@@ -9,12 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.73</b><br>
+        <b>Version 1.0.74</b><br>
         <ul>
-            <li>REFLECTION CANONICALNAME property</li>
-            <li>non-unique property name in form error</li>
-            <li>FORM EXPORT params</li>
-            <li>bug fixes</li>
+            <li>check classes for divide / multiply</li>
         </ul>
     ]]>
     </change-notes>
