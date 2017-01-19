@@ -11,7 +11,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.74</b><br>
         <ul>
-            <li>check classes for divide / multiply</li>
+            <li>check classes for divide / multiply / (+) / (-)</li>
         </ul>
     ]]>
     </change-notes>
