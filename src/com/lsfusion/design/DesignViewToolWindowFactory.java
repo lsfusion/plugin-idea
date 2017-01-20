@@ -11,4 +11,9 @@ public class DesignViewToolWindowFactory implements ToolWindowFactory {
         DesignViewFactory factory = DesignViewFactory.getInstance();
         factory.initToolWindow(project, (ToolWindowEx) toolWindow);
     }
+
+    @Override
+    public boolean isDoNotActivateOnStart() {
+        return true;
+    }
 }

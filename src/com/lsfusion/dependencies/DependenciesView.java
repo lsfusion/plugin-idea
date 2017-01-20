@@ -10,6 +10,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Pair;
@@ -262,7 +263,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         if (newCurrentElement != null && newCurrentElement != currentElement) {
             currentElement = newCurrentElement;
 
-            redrawCurrent();
+            DumbService.getInstance(project).smartInvokeLater(this::redrawCurrent);
         }
     }
 

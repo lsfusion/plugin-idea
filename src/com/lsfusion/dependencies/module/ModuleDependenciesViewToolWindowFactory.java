@@ -11,4 +11,9 @@ public class ModuleDependenciesViewToolWindowFactory implements ToolWindowFactor
         ModuleDependenciesViewFactory factory = ModuleDependenciesViewFactory.getInstance();
         factory.initToolWindow(project, (ToolWindowEx) toolWindow);
     }
+
+    @Override
+    public boolean isDoNotActivateOnStart() {
+        return true;
+    }
 }

@@ -11,4 +11,9 @@ public class PropertyDependenciesViewToolWindowFactory implements ToolWindowFact
         PropertyDependenciesViewFactory factory = PropertyDependenciesViewFactory.getInstance();
         factory.initToolWindow(project, (ToolWindowEx) toolWindow);    
     }
+
+    @Override
+    public boolean isDoNotActivateOnStart() {
+        return true;
+    }
 }
