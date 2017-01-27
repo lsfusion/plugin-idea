@@ -12,6 +12,7 @@
         <b>Version 1.0.74</b><br>
         <ul>
             <li>check classes for divide / multiply / (+) / (-)</li>
+            <li>Print report to custom printer</li>
         </ul>
     ]]>
     </change-notes>

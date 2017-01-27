@@ -1855,7 +1855,7 @@ flexAlignmentLiteral ::= LEADING | CENTER | TRAILING | STRETCH
 
 modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN | DIALOG
 
-formPrintTypeLiteral ::= PRINT (AUTO | XLSX | XLS | PDF)? {pin = 1}
+formPrintTypeLiteral ::= PRINT ( XLSX | XLS | PDF | ((AUTO)? (TO propertyExpression)?)) {pin = 1}
 
 formExportLiteral ::= EXPORT (DOC
                             | DOCX
