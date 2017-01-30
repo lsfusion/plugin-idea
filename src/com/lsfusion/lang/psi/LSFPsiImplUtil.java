@@ -2093,9 +2093,11 @@ public class LSFPsiImplUtil {
     }
 
     public static List<LSFObjectUsage> getObjectUsageList(LSFObjectUsageList objectUsageList) {
-        LSFNonEmptyObjectUsageList neList = objectUsageList.getNonEmptyObjectUsageList();
-        if (neList != null)
-            return neList.getObjectUsageList();
+        if (objectUsageList != null) {
+            LSFNonEmptyObjectUsageList neList = objectUsageList.getNonEmptyObjectUsageList();
+            if (neList != null)
+                return neList.getObjectUsageList();
+        }
         return new ArrayList<>();
     }
 
