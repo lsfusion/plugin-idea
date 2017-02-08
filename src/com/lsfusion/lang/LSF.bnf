@@ -629,6 +629,7 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |   readActionPropertyDefinitionBody
                 |   writeActionPropertyDefinitionBody
                 |   importActionPropertyDefinitionBody
+                |   importFormActionPropertyDefinitionBody
                 |   newThreadActionPropertyDefinitionBody
                 |   newExecutorActionPropertyDefinitionBody
                 |   newSessionActionPropertyDefinitionBody
@@ -806,6 +807,13 @@ writeActionPropertyDefinitionBody ::= WRITE propertyExpression FROM propertyExpr
 
 importActionPropertyDefinitionBody ::= IMPORT importActionSourceType TO nonEmptyPropertyUsageListWithIds FROM propertyExpression (WHERE propertyExpression)?
 {
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+importFormActionPropertyDefinitionBody ::= IMPORT formUsage importActionSourceType
+{
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
@@ -816,6 +824,7 @@ importActionSourceType ::=  XLS (SHEET propertyExpression)?
                         |   DBF (MEMO propertyExpression)? (CHARSET stringLiteral)?
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
                         |   XML (ATTR)?
+                        |   JSON
                         |   JDBC
                         |   MDB
 
@@ -1864,7 +1873,7 @@ formExportLiteral ::= EXPORT (DOC
                             | XLSX
                             | XML
                             | JSON
-                            | CSV (stringLiteral)? (CHARSET stringLiteral)?
+                            | CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
                             | (DBF (CHARSET stringLiteral)?)) {pin = 1}
 
 emailRecipientTypeLiteral ::= TO | CC | BCC
