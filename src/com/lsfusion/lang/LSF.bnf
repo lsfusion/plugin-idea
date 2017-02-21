@@ -1873,7 +1873,7 @@ formExportLiteral ::= EXPORT (DOC
                             | XLSX
                             | XML
                             | JSON
-                            | CSV (NOHEADER)? (stringLiteral)? (CHARSET stringLiteral)?
+                            | CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
                             | (DBF (CHARSET stringLiteral)?)) {pin = 1}
 
 emailRecipientTypeLiteral ::= TO | CC | BCC
