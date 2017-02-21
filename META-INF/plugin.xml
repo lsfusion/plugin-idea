@@ -28,6 +28,9 @@
 
     <application-components>
         <!-- Add your application components here -->
+        <component>
+            <implementation-class>com.lsfusion.LSFApplicationComponent</implementation-class>
+        </component>
     </application-components>
 
     <project-components>
