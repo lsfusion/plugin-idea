@@ -645,17 +645,10 @@ private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
 	    FORM
-//        (FORM | PRINT | EXPORT) // TEMP FOR REFACTORING
 	     mappedForm
 		(   
-		// NEW
 		    syncTypeLiteral
 		|   windowTypeLiteral
-
-		// PREV
-//		|   modalityTypeLiteral
-//		|   formPrintTypeLiteral
-//		|   formExportLiteral
 
 		|   MANAGESESSION
 		|   SHOWDROP 
@@ -665,11 +658,6 @@ formActionPropertyDefinitionBody ::=
 		|   initFilterDefinition
 		|   CHECK
 		|   READONLY
-
-        // TEMP FOR REFACTORING
-//		|   exportActionPropertyEnd
-//		|   printActionPropertyEnd
-//		|   staticDestination
 		)*
 {
     pin = 1
@@ -680,26 +668,26 @@ formActionPropertyDefinitionBody ::=
 syncTypeLiteral ::= WAIT | NOWAIT
 windowTypeLiteral ::= FLOAT | DOCKED | DIALOG
 
-// TEMP FOR REFACTORING
-//printActionPropertyEnd ::=
-//		( XLSX | XLS | PDF |
-//		 DOC | DOCX |
-//		 ((AUTO) (TO propertyExpression)?))
-//exportActionPropertyEnd ::=
-//        (   XML
-//        |   JSON
-//        |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
-//        |   (DBF (CHARSET stringLiteral)?)
-//        )
-//        
 staticDestination ::= TO propertyUsage
 
-// NEW
 printActionPropertyDefinitionBody ::=
 	    PRINT mappedForm
-		( ((XLSX | XLS | PDF |
-		 DOC | DOCX) staticDestination?) |
-		 ((AUTO)? (TO propertyExpression)?))		 
+		(   (
+		    (   XLSX 
+		    |   XLS 
+		    |   PDF 
+		    |   DOC 
+		    |   DOCX
+		    ) 
+		    staticDestination?
+		    ) 
+		|
+		    (
+		    syncTypeLiteral?
+		    (AUTO)? 
+		    (TO propertyExpression)?
+		    )
+        )		 
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"

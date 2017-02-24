@@ -384,23 +384,4 @@ public class LSFElementGenerator {
             }
         };
     }
-
-    // TEMP FOR REFACTORING
-    @NotNull
-    public static ASTNode createFormTypeFromText(Project myProject, String name) {
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=ACTION { " + name + " xxx;};");
-        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormActionPropertyDefinitionBody.class).iterator().next().getNode().getFirstChildNode();
-    }
-    @NotNull
-    public static LSFStaticDestination createStaticDestination(Project myProject) {
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=ACTION { FORM xxx TO formExportFile();};");
-        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFStaticDestination.class).iterator().next();
-    }
-
-    @NotNull
-    public static LSFWindowTypeLiteral createWindowType(Project myProject, String name) {
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=ACTION { FORM xxx " + name + ";};");
-        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFWindowTypeLiteral.class).iterator().next();
-    }
-
 }
