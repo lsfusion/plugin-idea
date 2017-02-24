@@ -617,6 +617,8 @@ private keepContextActionPDB ::=    listActionPropertyDefinitionBody
                         |   cancelActionPropertyDefinitionBody
 
 private customActionPDB ::= formActionPropertyDefinitionBody
+                |   exportActionPropertyDefinitionBody
+                |   printActionPropertyDefinitionBody
                 |   messageActionPropertyDefinitionBody
                 |   asyncUpdateActionPropertyDefinitionBody
                 |   seekObjectActionPropertyDefinitionBody
@@ -642,19 +644,76 @@ private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage
 
 formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
 formActionPropertyDefinitionBody ::=
-	    FORM mappedForm
-		(   contextFilterDefinition
-		|   initFilterDefinition
+	    FORM
+//        (FORM | PRINT | EXPORT) // TEMP FOR REFACTORING
+	     mappedForm
+		(   
+		// NEW
+		    syncTypeLiteral
+		|   windowTypeLiteral
+
+		// PREV
+//		|   modalityTypeLiteral
+//		|   formPrintTypeLiteral
+//		|   formExportLiteral
+
 		|   MANAGESESSION
-		|   modalityTypeLiteral
-		|   CHECK
 		|   SHOWDROP 
 		|   NOCANCEL
-		|   formPrintTypeLiteral
-		|   formExportLiteral  
+
+		|   contextFilterDefinition
+		|   initFilterDefinition
+		|   CHECK
 		|   READONLY
+
+        // TEMP FOR REFACTORING
+//		|   exportActionPropertyEnd
+//		|   printActionPropertyEnd
+//		|   staticDestination
 		)*
 {
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
+syncTypeLiteral ::= WAIT | NOWAIT
+windowTypeLiteral ::= FLOAT | DOCKED | DIALOG
+
+// TEMP FOR REFACTORING
+//printActionPropertyEnd ::=
+//		( XLSX | XLS | PDF |
+//		 DOC | DOCX |
+//		 ((AUTO) (TO propertyExpression)?))
+//exportActionPropertyEnd ::=
+//        (   XML
+//        |   JSON
+//        |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
+//        |   (DBF (CHARSET stringLiteral)?)
+//        )
+//        
+staticDestination ::= TO propertyUsage
+
+// NEW
+printActionPropertyDefinitionBody ::=
+	    PRINT mappedForm
+		( ((XLSX | XLS | PDF |
+		 DOC | DOCX) staticDestination?) |
+		 ((AUTO)? (TO propertyExpression)?))		 
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+exportActionPropertyDefinitionBody ::=
+	    EXPORT mappedForm
+        (   XML
+        |   JSON
+        |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
+        |   (DBF (CHARSET stringLiteral)?)
+        )
+        staticDestination?
+        {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl]
@@ -924,7 +983,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 }
 
 private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | CANCEL | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
-                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
+                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | READ | REQUEST | INPUT | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID

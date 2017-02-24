@@ -14,6 +14,8 @@
             <li>check classes for divide / multiply / (+) / (-)</li>
             <li>Print report to custom printer</li>
             <li>IMPORT FORM</li>
+            <li>FORM PRINT / EXPORT is splitted into two different operators PRINT / EXPORT</li>
+            <li>Minor FORM operator changes</li>
         </ul>
     ]]>
     </change-notes>
@@ -100,6 +102,10 @@
             </action>
 
             <separator/>
+            
+            <!--<action id="Form.Refactoring" class="com.lsfusion.actions.FormRefactoring"-->
+                    <!--text="Form Refactoring" description="Form Refactoring">-->
+            <!--</action>-->
             
             <action id="TypeInfer.File" class="com.lsfusion.lang.typeinfer.FileTypeInferAction" text="Infer _types for file"
                     description="Infer types for file">

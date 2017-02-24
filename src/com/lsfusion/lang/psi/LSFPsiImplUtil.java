@@ -2909,6 +2909,36 @@ public class LSFPsiImplUtil {
         return Inferred.andClasses(list); // по идее and так как на сервере and
     }
 
+    public static Inferred inferActionParamClasses(LSFPrintActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        List<Inferred> list = new ArrayList<>();
+
+        List<LSFFormActionObjectUsage> objectMap = new ArrayList<>();
+        LSFFormActionObjectList objects = body.getFormActionObjectList();
+        if (objects != null)
+            objectMap.addAll(objects.getFormActionObjectUsageList());
+
+        for (LSFFormActionObjectUsage ou : objectMap)
+            list.add(
+                    inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
+            );
+        return Inferred.andClasses(list); // по идее and так как на сервере and
+    }
+
+    public static Inferred inferActionParamClasses(LSFExportActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        List<Inferred> list = new ArrayList<>();
+
+        List<LSFFormActionObjectUsage> objectMap = new ArrayList<>();
+        LSFFormActionObjectList objects = body.getFormActionObjectList();
+        if (objects != null)
+            objectMap.addAll(objects.getFormActionObjectUsageList());
+
+        for (LSFFormActionObjectUsage ou : objectMap)
+            list.add(
+                    inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
+            );
+        return Inferred.andClasses(list); // по идее and так как на сервере and
+    }
+
     public static Inferred inferActionParamClasses(LSFMessageActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
     }
@@ -3093,6 +3123,16 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormActionPropertyDefinitionBody formActionBody) {
+        return resolveFormDecl(formActionBody.getFormUsage());
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFPrintActionPropertyDefinitionBody formActionBody) {
+        return resolveFormDecl(formActionBody.getFormUsage());
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFExportActionPropertyDefinitionBody formActionBody) {
         return resolveFormDecl(formActionBody.getFormUsage());
     }
 
