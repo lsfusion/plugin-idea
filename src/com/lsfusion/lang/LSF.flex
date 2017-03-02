@@ -297,6 +297,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "OBJECT"                  			{ return OBJECT; }
   "OBJECTS"                 			{ return OBJECTS; }
   "CONTEXTFILTER"              			{ return CONTEXTFILTER; }
+  "CONSTRAINTFILTER"              		{ return CONSTRAINTFILTER; }
   "OBJVALUE"                			{ return OBJVALUE; }
   "OK"                      			{ return OK; }
   "ON"                      			{ return ON; }

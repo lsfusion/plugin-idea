@@ -640,7 +640,8 @@ private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage formSingleActionObj
                         |   (formUsage formActionObjectList?) ) {pin = 1 }
 
 formSingleActionObject ::= OBJECT formActionObjectProps {pin = 1}
-private formActionObjectProps ::= (EQUALS propertyExpression NULL?)? (INPUT NULL? inputDestination?)? 
+constraintFilter ::= (CONSTRAINTFILTER (EQUALS propertyExpression)?)
+private formActionObjectProps ::= (EQUALS propertyExpression NULL?)? (INPUT NULL? inputDestination?)? constraintFilter? 
 formActionObjectUsage ::= objectUsage formActionObjectProps {pin = 1}
 formActionPropertyDefinitionBody ::=
 	    FORM
