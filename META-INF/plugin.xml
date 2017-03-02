@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.76</version>
+    <version>1.0.77</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,7 +9,7 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.76</b><br>
+        <b>Version 1.0.77</b><br>
         <ul>
             <li>check classes for divide / multiply / (+) / (-)</li>
             <li>Print report to custom printer</li>

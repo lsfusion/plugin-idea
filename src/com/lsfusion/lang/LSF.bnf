@@ -636,18 +636,17 @@ private customActionPDB ::= formActionPropertyDefinitionBody
                 |   newExecutorActionPropertyDefinitionBody
                 |   newSessionActionPropertyDefinitionBody
 
-private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage
-                    INPUT? OBJECT propertyExpression)
-                |   
-                (formUsage (INPUT objectUsage?)?
-               		(formActionObjectList)?) ) {pin =1}
+private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage formSingleActionObject?)
+                        |   (formUsage formActionObjectList?) ) {pin = 1 }
 
-formActionObjectUsage ::= objectUsage EQUALS propertyExpression {pin = 1}
+formSingleActionObject ::= OBJECT formActionObjectProps {pin = 1}
+private formActionObjectProps ::= (EQUALS propertyExpression NULL?)? (INPUT NULL? inputDestination?)? 
+formActionObjectUsage ::= objectUsage formActionObjectProps {pin = 1}
 formActionPropertyDefinitionBody ::=
 	    FORM
 	     mappedForm
 		(   
-		    syncTypeLiteral
+            syncTypeLiteral
 		|   windowTypeLiteral
 
 		|   MANAGESESSION
@@ -664,6 +663,8 @@ formActionPropertyDefinitionBody ::=
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl]
 }
+
+inputDestination ::= TO propertyUsage
 
 syncTypeLiteral ::= WAIT | NOWAIT
 windowTypeLiteral ::= FLOAT | DOCKED | DIALOG
@@ -928,7 +929,7 @@ requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody
     methods = [inferActionParamClasses]
 }
 
-inputActionPropertyDefinitionBody ::= INPUT ((PRIMITIVE_TYPE DEFAULT propertyExpression) | PRIMITIVE_TYPE | (DEFAULT propertyExpression))
+inputActionPropertyDefinitionBody ::= INPUT ((PRIMITIVE_TYPE EQUALS propertyExpression) | PRIMITIVE_TYPE | (EQUALS propertyExpression))
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
