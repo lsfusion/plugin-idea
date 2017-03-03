@@ -642,6 +642,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                         LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
                         if (expression != null && !assignAllowed(expression)) {
                             addAssignError(o);
+                        } else {
+                            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
+                            if (expressionUnfriendlyPD != null) {
+                                LSFGroupPropertyDefinition groupPD = expressionUnfriendlyPD.getGroupPropertyDefinition();
+                                if (groupPD != null)
+                                    addAssignError(o);
+                            }
                         }
                     }
                 }
