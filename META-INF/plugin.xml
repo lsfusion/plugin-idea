@@ -11,11 +11,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.77</b><br>
         <ul>
-            <li>check classes for divide / multiply / (+) / (-)</li>
-            <li>Print report to custom printer</li>
-            <li>IMPORT FORM</li>
-            <li>FORM PRINT / EXPORT is splitted into two different operators PRINT / EXPORT</li>
-            <li>Minor FORM operator changes</li>
+            <li>Check assign to GROUP</li>
         </ul>
     ]]>
     </change-notes>
