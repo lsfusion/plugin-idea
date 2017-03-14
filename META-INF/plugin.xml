@@ -9,9 +9,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.77</b><br>
+        <b>Version 1.0.78</b><br>
         <ul>
             <li>Check assign to GROUP</li>
+            <li>Major FORM operator changes</li>
+            <li>Extended operator REQUEST</li>
         </ul>
     ]]>
     </change-notes>

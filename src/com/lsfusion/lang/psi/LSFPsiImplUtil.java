@@ -2807,10 +2807,15 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFRequestActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        LSFActionPropertyDefinitionBody actionBody = body.getActionPropertyDefinitionBody();
-        if (actionBody != null)
-            return inferActionParamClasses(actionBody, params);
-        return Inferred.EMPTY;
+        List<LSFActionPropertyDefinitionBody> actions = body.getActionPropertyDefinitionBodyList();
+        if (actions.isEmpty()) {
+            return Inferred.EMPTY;
+        }
+
+        Inferred result = inferActionParamClasses(actions.get(0), params);
+        if (actions.size() == 2)
+            result = result.or(inferActionParamClasses(actions.get(1), params));
+        return result;
     }
 
     public static Inferred inferActionParamClasses(LSFInputActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {

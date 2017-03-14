@@ -923,7 +923,7 @@ requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actio
     methods = [inferActionParamClasses]
 }
 
-requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody
+requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO actionPropertyDefinitionBody 
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
