@@ -23,6 +23,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.impl.LSFLocalDataPropertyDefinitionImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.LSFExprParamReference;
@@ -47,11 +48,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(37, 49, 37)), null, null, Font.PLAIN);
     public static final TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), null, null, null, Font.PLAIN);
     public static final TextAttributes WAVE_UNDERSCORED_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
+    public static final TextAttributes WARNING = new TextAttributes(new JBColor(Gray._211, new Color(100, 100, 255)), null, null, null, Font.PLAIN);
+    public static final TextAttributes WAVE_UNDERSCORED_WARNING = new TextAttributes(null, null, new JBColor(Gray._211, new Color(100, 100, 255)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
     public static final TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
     public static final TextAttributes UNTYPED_IMPLICIT_DECL = new TextAttributes(new JBColor(new Color(56, 96, 255), new Color(100, 100, 255)), null, null, null, Font.PLAIN);
 
     private AnnotationHolder myHolder;
     public boolean errorsSearchMode = false;
+    public boolean warningsSearchMode = false;
 
     @Override
     public synchronized void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder holder) {
@@ -575,10 +579,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addError(PsiElement element, Annotation annotation) {
-        if (errorsSearchMode) {
-            ShowErrorsAction.showErrorMessage(element, annotation.getMessage());
+        addError(element, annotation, LSFErrorLevel.ERROR);
+    }
+
+    private void addError(PsiElement element, Annotation annotation, LSFErrorLevel errorLevel) {
+        if ((errorLevel == LSFErrorLevel.WARNING && warningsSearchMode) || (errorLevel == LSFErrorLevel.ERROR && errorsSearchMode)) {
+            ShowErrorsAction.showErrorMessage(element, annotation.getMessage(), errorLevel);
         }
-        TextAttributes error = annotation.getEnforcedTextAttributes() == null ? ERROR : annotation.getEnforcedTextAttributes();
+        TextAttributes error = annotation.getEnforcedTextAttributes() == null ? (errorLevel == LSFErrorLevel.ERROR ? ERROR : WARNING) : annotation.getEnforcedTextAttributes();
         if (isInMetaUsage(element))
             error = TextAttributes.merge(error, META_USAGE);
         annotation.setEnforcedTextAttributes(error);
@@ -632,32 +640,49 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         LSFPropertyUsageImpl propertyUsage = (LSFPropertyUsageImpl) o.getFirstChild().getFirstChild();
         if (propertyUsage != null) {
             LSFPropDeclaration declaration = propertyUsage.resolveDecl();
-            if (declaration != null && declaration instanceof LSFPropertyStatementImpl) {
-                LSFActionStatement actionStatement = ((LSFPropertyStatementImpl) declaration).getActionStatement();
-                if (actionStatement != null) {
-                    addAssignError(o);
-                } else {
-                    LSFPropertyCalcStatement propertyStatement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
-                    if (propertyStatement != null) {
-                        LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
-                        if (expression != null && !assignAllowed(expression)) {
-                            addAssignError(o);
-                        } else {
-                            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
-                            if (expressionUnfriendlyPD != null) {
-                                LSFGroupPropertyDefinition groupPD = expressionUnfriendlyPD.getGroupPropertyDefinition();
-                                if (groupPD != null)
-                                    addAssignError(o);
+            if (declaration != null) {
+                if (declaration instanceof LSFPropertyStatementImpl) {
+                    LSFActionStatement actionStatement = ((LSFPropertyStatementImpl) declaration).getActionStatement();
+                    if (actionStatement != null) {
+                        addAssignError(o);
+                    } else {
+                        LSFPropertyCalcStatement propertyStatement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
+                        if (propertyStatement != null) {
+                            LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
+                            if (expression != null && !assignAllowed(expression)) {
+                                addAssignError(o);
+                            } else {
+                                LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
+                                if (expressionUnfriendlyPD != null) {
+                                    LSFGroupPropertyDefinition groupPD = expressionUnfriendlyPD.getGroupPropertyDefinition();
+                                    if (groupPD != null)
+                                        addAssignError(o);
+                                }
                             }
                         }
                     }
-                }
-                LSFClassSet leftClass = declaration.resolveValueClass();
-                List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
-                if (!rightPropertyExpressionList.isEmpty()) {
-                    LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
-                    if (leftClass != null && rightClass != null && !leftClass.isCompatible(rightClass))
-                        addTypeMismatchError(o, rightClass, leftClass);
+                    LSFClassSet leftClass = declaration.resolveValueClass();
+                    List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
+                    if (!rightPropertyExpressionList.isEmpty()) {
+                        LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
+                        if(leftClass != null && rightClass != null) {
+                            if (!leftClass.isCompatible(rightClass))
+                                addTypeMismatchError(o, rightClass, leftClass);
+                            else if (!leftClass.isAssignable(rightClass))
+                                addTypeMismatchWarning(o, rightClass, leftClass);
+                        }
+                    }
+                } else if (declaration instanceof LSFLocalDataPropertyDefinitionImpl) {
+                    LSFClassName className = ((LSFLocalDataPropertyDefinitionImpl) declaration).getClassName();
+                    if (className != null) {
+                        LSFClassSet leftClass = LSFPsiImplUtil.resolveClass(className);
+                        List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
+                        if (!rightPropertyExpressionList.isEmpty()) {
+                            LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
+                            if (leftClass != null && rightClass != null && !leftClass.isAssignable(rightClass))
+                                addTypeMismatchWarning(o, rightClass, leftClass);
+                        }
+                    }
                 }
             }
         }
@@ -680,9 +705,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addTypeMismatchError(LSFAssignActionPropertyDefinitionBody o, LSFClassSet class1,  LSFClassSet class2) {
-        Annotation annotation = myHolder.createErrorAnnotation(o, String.format("Type mismatch: can't cast %s to %s", class1, class2));
+        Annotation annotation = myHolder.createErrorAnnotation(o, String.format("Type mismatch: can't cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName()));
         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-        addError(o, annotation);
+        addError(o, annotation, LSFErrorLevel.ERROR);
+    }
+
+    private void addTypeMismatchWarning(LSFAssignActionPropertyDefinitionBody o, LSFClassSet class1,  LSFClassSet class2) {
+        Annotation annotation = myHolder.createErrorAnnotation(o, String.format("Type mismatch: unsafe cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName()));
+        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_WARNING);
+        addError(o, annotation, LSFErrorLevel.WARNING);
     }
 
     @Override

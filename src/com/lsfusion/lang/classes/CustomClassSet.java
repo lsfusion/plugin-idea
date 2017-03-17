@@ -392,6 +392,11 @@ public class CustomClassSet implements LSFClassSet {
     }
 
     @Override
+    public boolean isAssignable(LSFClassSet set) {
+        return isCompatible(set);
+    }
+
+    @Override
     public String toString() {
         String result = "";
         for (Iterator<LSFClassDeclaration> iterator = classes.iterator(); iterator.hasNext(); ) {

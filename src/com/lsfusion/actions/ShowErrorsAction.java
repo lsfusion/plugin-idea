@@ -29,6 +29,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.text.StringTokenizer;
+import com.lsfusion.lang.LSFErrorLevel;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.meta.MetaChangeDetector;
@@ -52,12 +53,14 @@ public class ShowErrorsAction extends AnAction {
     private final String INCLUDE_LSF_FILES = "INCLUDE_LSF_FILES_ERRORS_SEARCH";
     private final String INCLUDE_JAVA_FILES = "INCLUDE_JAVA_FILES_ERRORS_SEARCH";
     private final String INCLUDE_JRXML_FILES = "INCLUDE_JRXML_FILES_ERRORS_SEARCH";
+    private final String WARNINGS_SEARCH_MODE = "WARNINGS_SEARCH_MODE";
     private final LSFReferenceAnnotator ANNOTATOR = new LSFReferenceAnnotator();
 
     private Project project;
     private boolean includeLSFFiles = true;
     private boolean includeJavaFiles = false;
     private boolean includeJrxmlFiles = false;
+    private boolean warningsSearchMode = false;
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
@@ -110,6 +113,7 @@ public class ShowErrorsAction extends AnAction {
                                 }
                             }
                         }
+                        ANNOTATOR.warningsSearchMode = warningsSearchMode;
 
                         int index = 0;
                         for (VirtualFile file : files) {
@@ -166,7 +170,11 @@ public class ShowErrorsAction extends AnAction {
         }
     }
 
-    public static void showErrorMessage(final PsiElement element, final String errorMessage) {
+    public static void showErrorMessage(final PsiElement element, final String errorMessage){
+        showErrorMessage(element, errorMessage, LSFErrorLevel.ERROR);
+    }
+
+    public static void showErrorMessage(final PsiElement element, final String errorMessage, LSFErrorLevel errorLevel) {
         final PsiFile file = element.getContainingFile();
         final Document document = PsiDocumentManager.getInstance(element.getProject()).getDocument(file);
         final SmartPsiElementPointer pointer = SmartPointerManager.getInstance(element.getProject()).createSmartPsiElementPointer(element);
@@ -182,7 +190,8 @@ public class ShowErrorsAction extends AnAction {
         if (module != null) {
             String moduleName = module.getName();
             String linkToTheElement = "<a href=\"\">(" + moduleName + ") " + file.getName() + "(" + lineNumber + ":" + linePosition + ")</a>";
-            Notifications.Bus.notify(new Notification("LSF errors", linkToTheElement, errorMessage, NotificationType.ERROR, new NotificationListener.Adapter() {
+            Notifications.Bus.notify(new Notification(errorLevel == LSFErrorLevel.ERROR ? "LSF errors" : "LSF warnings", linkToTheElement, errorMessage,
+                    errorLevel == LSFErrorLevel.ERROR ? NotificationType.ERROR : NotificationType.WARNING, new NotificationListener.Adapter() {
                 @Override
                 protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
                     ((NavigationItem) element).navigate(true);
@@ -261,6 +270,17 @@ public class ShowErrorsAction extends AnAction {
             includeJrxmlFilesBox.setSelected(includeJrxmlFiles);
             boxesPanel.add(includeJrxmlFilesBox);
 
+            final JCheckBox warningsSearchModeBox = new JCheckBox("Show warnings");
+            warningsSearchModeBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    warningsSearchMode = warningsSearchModeBox.isSelected();
+                }
+            });
+            warningsSearchMode = Boolean.valueOf(propertiesComponent.getValue(WARNINGS_SEARCH_MODE));
+            warningsSearchModeBox.setSelected(warningsSearchMode);
+            boxesPanel.add(warningsSearchModeBox);
+
             container.add(boxesPanel, BorderLayout.SOUTH);
 
             return container;
@@ -273,6 +293,7 @@ public class ShowErrorsAction extends AnAction {
             propertiesComponent.setValue(INCLUDE_LSF_FILES, String.valueOf(includeLSFFiles));
             propertiesComponent.setValue(INCLUDE_JAVA_FILES, String.valueOf(includeJavaFiles));
             propertiesComponent.setValue(INCLUDE_JRXML_FILES, String.valueOf(includeJrxmlFiles));
+            propertiesComponent.setValue(WARNINGS_SEARCH_MODE, String.valueOf(warningsSearchMode));
 
             StringTokenizer tokenizer = new StringTokenizer(modulesToExclude.getText(), ",;");
             final List<String> modules = new ArrayList<>();

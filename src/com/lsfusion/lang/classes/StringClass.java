@@ -105,10 +105,15 @@ public class StringClass extends DataClass {
     @Override
     public String getCanonicalName() {
         String userSID = super.getCanonicalName();
-        if (length == ExtInt.UNLIMITED) {
+        if (length == ExtInt.UNLIMITED || !userSID.contains("_")) {
             return userSID;
         } else {
             return userSID.replaceFirst("_", "[") + "]";
         }        
+    }
+
+    @Override
+    public boolean isAssignable(LSFClassSet set) {
+        return !(set instanceof StringClass && length.less(((StringClass) set).length)) && super.isAssignable(set);
     }
 }

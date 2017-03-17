@@ -42,6 +42,11 @@ public class NumericClass extends IntegralClass {
     @Override
     public String getCanonicalName() {
         String userSID = super.getCanonicalName();
-        return userSID.replaceFirst("_", "[").replaceFirst("_", ",") + "]";
+        return userSID.contains("_") ? (userSID.replaceFirst("_", "[").replaceFirst("_", ",") + "]") : userSID;
+    }
+
+    @Override
+    public boolean isAssignable(LSFClassSet set) {
+        return !(set instanceof NumericClass && (length < ((NumericClass) set).length || precision < ((NumericClass) set).precision)) && super.isAssignable(set);
     }
 }

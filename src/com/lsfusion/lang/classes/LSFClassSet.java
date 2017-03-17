@@ -16,6 +16,8 @@ public interface LSFClassSet {
 
     boolean isCompatible(LSFClassSet set);
 
+    boolean isAssignable(LSFClassSet set);
+
     int getMinimumWidth(int minCharWidth, FontMetrics fontMetrics);
 
     int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics);

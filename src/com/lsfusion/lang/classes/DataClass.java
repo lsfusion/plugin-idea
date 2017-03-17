@@ -82,6 +82,11 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     }
 
     @Override
+    public boolean isAssignable(LSFClassSet set) {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return getName();
     }
