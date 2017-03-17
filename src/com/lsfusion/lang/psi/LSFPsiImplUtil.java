@@ -935,7 +935,7 @@ public class LSFPsiImplUtil {
             try {
                 String name = sourceStatement.getText();
                 String whole = name.substring(0, name.indexOf("."));
-                String precision = name.substring(name.indexOf(".") + 1, name.length() - 1);
+                String precision = name.substring(name.indexOf(".") + 1, name.length());
                 return new NumericClass(whole.length() + precision.length(), precision.length());
             } catch (IndexOutOfBoundsException e) {
                 return null;
