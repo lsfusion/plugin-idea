@@ -222,6 +222,42 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(sourceStatement);
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
+        ContextModifier result = null;
+
+        LSFFormActionObjectList formList = sourceStatement.getFormActionObjectList();
+        if(formList != null) {
+            for(LSFFormActionObjectUsage object : formList.getFormActionObjectUsageList()) {
+                ContextModifier inputModifier = new InputContextModifier(object.getParamDeclare());
+                if (result == null)
+                    result = inputModifier;
+                else
+                    result = new AndContextModifier(result, inputModifier);
+            }
+        }
+        LSFFormSingleActionObject singleObject = sourceStatement.getFormSingleActionObject();
+        if(singleObject != null) {
+            ContextModifier inputModifier = new InputContextModifier(singleObject.getParamDeclare());
+            if (result == null)
+                result = inputModifier;
+            else
+                result = new AndContextModifier(result, inputModifier);
+        }
+        return result != null ? result : ContextModifier.EMPTY;
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
+        return new ActionExprInferrer(sourceStatement);
+    }
+
+    public static ContextModifier getContextModifier(@NotNull LSFInputxActionPropertyDefinitionBody sourceStatement) {
+        return new InputContextModifier(sourceStatement.getParamDeclare());
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFInputxActionPropertyDefinitionBody sourceStatement) {
+        return new ActionExprInferrer(sourceStatement);
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFAssignActionPropertyDefinitionBody sourceStatement) {
         LSFMappedPropertyExprParam mappedPropertyExprParam = sourceStatement.getMappedPropertyExprParam();
         if (mappedPropertyExprParam != null) {
@@ -523,6 +559,24 @@ public class LSFPsiImplUtil {
         return resolveClass(sourceStatement.getCustomClassUsage());
     }
 
+    @Nullable
+    public static LSFClassSet resolveClass(@NotNull LSFFormActionObjectUsage sourceStatement) {
+        return sourceStatement.getObjectUsage().resolveClass();
+    }
+
+    @Nullable
+    public static LSFClassSet resolveClass(@NotNull LSFInputxActionPropertyDefinitionBody sourceStatement) {
+        LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
+        if(pe != null)
+            return LSFExClassSet.fromEx(pe.resolveValueClass(false));
+
+        LSFBuiltInClassName builtInClassName = sourceStatement.getBuiltInClassName();
+        if(builtInClassName != null)
+            return resolve(builtInClassName);
+        
+        return null;
+    }    
+    
     // PROPERTYEXPRESSION.RESOLVEVALUECLASS
 
     @Nullable
@@ -2692,6 +2746,11 @@ public class LSFPsiImplUtil {
     public static void ensureClass(@NotNull LSFForAddObjClause sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
     }
 
+    public static void ensureClass(@NotNull LSFFormActionObjectUsage sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
+    }
+
+    public static void ensureClass(@NotNull LSFInputxActionPropertyDefinitionBody sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
+    }
 
     public static Inferred inferActionParamClasses(@Nullable LSFActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return body == null ? Inferred.EMPTY : ((ActionExpression) body.getChildren()[0]).inferActionParamClasses(params);
@@ -2822,6 +2881,11 @@ public class LSFPsiImplUtil {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
     }
 
+    public static Inferred inferActionParamClasses(LSFInputxActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        Inferred inputInferred = inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+        return inferDoInputBody(body.getDoInputBody(), inputInferred, params);
+    }
+
     public static Inferred inferActionParamClasses(LSFActiveFormActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return Inferred.EMPTY;
     }
@@ -2914,6 +2978,32 @@ public class LSFPsiImplUtil {
         return Inferred.andClasses(list); // по идее and так как на сервере and
     }
 
+    public static Inferred inferActionParamClasses(LSFDialogActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        List<Inferred> list = new ArrayList<>();
+
+        List<LSFFormActionObjectUsage> objectMap = new ArrayList<>();
+        LSFFormActionObjectList objects = body.getFormActionObjectList();
+        if (objects != null)
+            objectMap.addAll(objects.getFormActionObjectUsageList());
+
+        for (LSFFormActionObjectUsage ou : objectMap)
+            list.add(
+                    inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
+            );
+        Inferred forClasses = Inferred.andClasses(list); // по идее and так как на сервере and
+
+        return inferDoInputBody(body.getDoInputBody(), forClasses, params);
+    }
+    
+    public static Inferred inferDoInputBody(LSFDoInputBody body, Inferred inferred, @Nullable Set<LSFExprParamDeclaration> params) {
+        if(body != null) {
+            LSFActionPropertyDefinitionBody doAction = body.getActionPropertyDefinitionBody();
+            if(doAction != null)
+                inferred = inferActionParamClasses(doAction, params).override(inferred);
+        }
+        return inferred;
+    }
+
     public static Inferred inferActionParamClasses(LSFPrintActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         List<Inferred> list = new ArrayList<>();
 
@@ -2950,6 +3040,10 @@ public class LSFPsiImplUtil {
 
     public static Inferred inferActionParamClasses(LSFConfirmActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+    }
+    public static Inferred inferActionParamClasses(LSFConfirmxActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        Inferred inputInferred = inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+        return inferDoInputBody(body.getDoInputBody(), inputInferred, params);
     }
 
     public static Inferred inferActionParamClasses(LSFAsyncUpdateActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
@@ -3128,6 +3222,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormActionPropertyDefinitionBody formActionBody) {
+        return resolveFormDecl(formActionBody.getFormUsage());
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFDialogActionPropertyDefinitionBody formActionBody) {
         return resolveFormDecl(formActionBody.getFormUsage());
     }
 

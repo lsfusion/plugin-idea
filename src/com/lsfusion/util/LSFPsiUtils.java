@@ -133,6 +133,16 @@ public class LSFPsiUtils {
 
     @NotNull
     public static Set<LSFExprParamDeclaration> getContextParams(PsiElement current, int offset, boolean objectRef) {
+        // current instanceof FormContext || current instancof LSFFormStatement
+        Set<LSFObjectDeclaration> objects = LSFFormElementReferenceImpl.processFormContext(current, new LSFFormElementReferenceImpl.FormExtendProcessor<LSFObjectDeclaration>() {
+            public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
+                return formExtend.getObjectDecls();
+            }
+        }, objectRef);
+        if (objects != null) {
+            return BaseUtils.immutableCast(objects);
+        }
+
         if (current instanceof ModifyParamContext) {
             ContextModifier contextModifier = ((ModifyParamContext) current).getContextModifier();
 
@@ -158,16 +168,6 @@ public class LSFPsiUtils {
             }
             result.addAll(contextModifier.resolveParams(offset, upParams));
             return result;
-        } else {
-            // current instanceof FormContext || current instancof LSFFormStatement
-            Set<LSFObjectDeclaration> objects = LSFFormElementReferenceImpl.processFormContext(current, new LSFFormElementReferenceImpl.FormExtendProcessor<LSFObjectDeclaration>() {
-                public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
-                    return formExtend.getObjectDecls();
-                }
-            }, objectRef);
-            if (objects != null) {
-                return BaseUtils.immutableCast(objects);
-            }
         }
 
         PsiElement parent = current.getParent();

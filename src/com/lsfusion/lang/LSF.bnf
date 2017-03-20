@@ -600,6 +600,9 @@ private extendContextActionPDB ::=  assignActionPropertyDefinitionBody
                         |	changeClassActionPropertyDefinitionBody
                         |	deleteActionPropertyDefinitionBody
                         |	addObjectActionPropertyDefinitionBody
+                        |   dialogActionPropertyDefinitionBody
+                        |   inputxActionPropertyDefinitionBody
+                        |   confirmxActionPropertyDefinitionBody
 
 private keepContextActionPDB ::=    listActionPropertyDefinitionBody
                         |	requestInputActionPropertyDefinitionBody
@@ -641,10 +644,14 @@ private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage formSingleActionObj
 
 formSingleActionObject ::= OBJECT formActionObjectProps {pin = 1}
 constraintFilter ::= (CONSTRAINTFILTER (EQUALS propertyExpression)?)
-private formActionObjectProps ::= (EQUALS propertyExpression NULL?)? (INPUT NULL? inputDestination?)? constraintFilter? 
-formActionObjectUsage ::= objectUsage formActionObjectProps {pin = 1}
+private formActionObjectProps ::= (EQUALS propertyExpression NULL?)? (INPUT paramDeclare? NULL? inputDestination?)? constraintFilter? 
+formActionObjectUsage ::= objectUsage formActionObjectProps {
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext"
+    methods = [ resolveClass ensureClass ]
+}
 formActionPropertyDefinitionBody ::=
-	    FORM
+	    (SHOW | FORM)
 	     mappedForm
 		(   
             syncTypeLiteral
@@ -664,6 +671,27 @@ formActionPropertyDefinitionBody ::=
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl]
 }
+
+dialogActionPropertyDefinitionBody ::=
+	    DIALOG
+	    mappedForm
+		(   
+            windowTypeLiteral
+
+		|   MANAGESESSION
+		|   NOCANCEL
+
+		|   CHECK
+		|   READONLY
+		)*
+		doInputBody
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext, com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [inferActionParamClasses resolveFormDecl getContextModifier getContextInferrer]
+}
+
+doInputBody ::= INREQUEST | (DO actionPropertyDefinitionBody)
 
 inputDestination ::= TO propertyUsage
 
@@ -773,6 +801,13 @@ formEmailToObjects ::= formUsage formActionObjectList?
 }
 
 confirmActionPropertyDefinitionBody ::= CONFIRM propertyExpression
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
+confirmxActionPropertyDefinitionBody ::= CONFIRMX propertyExpression doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -937,6 +972,13 @@ inputActionPropertyDefinitionBody ::= INPUT ((PRIMITIVE_TYPE EQUALS propertyExpr
     methods = [inferActionParamClasses]
 }
 
+inputxActionPropertyDefinitionBody ::= INPUTX (paramDeclare EQUALS)? (builtInClassName | propertyExpression) doInputBody
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [inferActionParamClasses resolveClass ensureClass getContextModifier getContextInferrer]
+}
+
 activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
 {
     pin = 1
@@ -972,9 +1014,9 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
     recoverWhile = "list_action_statement_recover"
 }
 
-private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | CANCEL | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
-                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
-                                            | READ | REQUEST | INPUT | RETURN | SAVEFILE | SEEK | WHILE| WRITE
+private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | CANCEL | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CONFIRMX | CUSTOM | DELETE
+                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
+                                            | READ | REQUEST | INPUT | INPUTX | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID
                                             | SEMI

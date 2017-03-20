@@ -154,6 +154,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NOHINT"                 			    { return NOHINT; }
   "CONCAT"                  			{ return CONCAT; }
   "CONFIRM"                 			{ return CONFIRM; }
+  "CONFIRMX"                 			{ return CONFIRMX; }
   "CONSTRAINT"              			{ return CONSTRAINT; }
   "CONTAINERH"              			{ return CONTAINERH; }
   "CONTAINERV"              			{ return CONTAINERV; }
@@ -249,6 +250,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "INITFILTER"                 			{ return INITFILTER; }
   "INLINE"                  			{ return INLINE; }
   "INPUT"                   			{ return INPUT; }
+  "INPUTX"                   			{ return INPUTX; }
   "IS"                      			{ return IS; }
   "JDBC"                  			    { return JDBC; }
   "JOIN"                    			{ return JOIN; }
@@ -335,6 +337,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "REMOVE"                  			{ return REMOVE; }
   "REPORTFILES"              			{ return REPORTFILES; }
   "REQUEST"                 			{ return REQUEST; }
+  "INREQUEST"                 			{ return INREQUEST; }
   "REQUIRE"                 			{ return REQUIRE; }
   "RESOLVE"                 			{ return RESOLVE; }
   "RETURN"                  			{ return RETURN; }
