@@ -9,10 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.79</b><br>
+        <b>Version 1.0.80</b><br>
         <ul>
-            <li>Unsafe class cast warnings</li>
-            <li>Inputs can introduce parameters</li>
+            <li>defaultCompare option for property</li>
         </ul>
     ]]>
     </change-notes>
