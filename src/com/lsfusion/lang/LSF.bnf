@@ -644,10 +644,13 @@ private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage formSingleActionObj
 
 formSingleActionObject ::= OBJECT formActionObjectProps {pin = 1}
 constraintFilter ::= (CONSTRAINTFILTER (EQUALS propertyExpression)?)
-private formActionObjectProps ::= (EQUALS propertyExpression NULL?)? (INPUT paramDeclare? NULL? inputDestination?)? constraintFilter? 
+objectInProps ::= EQUALS propertyExpression NULL? { pin = 1 }
+objectInputProps ::= INPUT simpleName? NULL? inputDestination? constraintFilter? { pin = 1 } 
+private formActionObjectProps ::= objectInProps? objectInputProps? 
 formActionObjectUsage ::= objectUsage formActionObjectProps {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext"
+    implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext,com.lsfusion.lang.psi.declarations.LSFObjectInputParamDeclaration"
+    extends="com.lsfusion.lang.psi.declarations.impl.LSFObjectInputParamDeclarationImpl"
     methods = [ resolveClass ensureClass ]
 }
 formActionPropertyDefinitionBody ::=

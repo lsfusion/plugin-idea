@@ -18,6 +18,7 @@ public abstract class LSFParamDeclarationImpl extends LSFExprParamDeclarationImp
         super(node);
     }
 
+    @Nullable
     protected abstract LSFSimpleName getSimpleName();
 
     @Nullable
@@ -28,12 +29,12 @@ public abstract class LSFParamDeclarationImpl extends LSFExprParamDeclarationImp
 
     @Nullable
     public LSFClassSet resolveClass() {
-        return PsiTreeUtil.getParentOfType(this, ClassParamDeclareContext.class).resolveClass();
+        return PsiTreeUtil.getParentOfType(this, ClassParamDeclareContext.class, false).resolveClass();
     }
 
     @Override
     public void ensureClass(LSFValueClass decl, MetaTransaction metaTrans) {
-        PsiTreeUtil.getParentOfType(this, ClassParamDeclareContext.class).ensureClass(decl, metaTrans);
+        PsiTreeUtil.getParentOfType(this, ClassParamDeclareContext.class, false).ensureClass(decl, metaTrans);
     }
 
     @Override

@@ -10,9 +10,9 @@ import java.util.Set;
 
 public class InputContextModifier implements ContextModifier {
 
-    private final LSFParamDeclare paramDeclare;
+    private final LSFExprParamDeclaration paramDeclare;
 
-    public InputContextModifier(LSFParamDeclare paramDeclare) {
+    public InputContextModifier(LSFExprParamDeclaration paramDeclare) {
         this.paramDeclare = paramDeclare;
     }
 

@@ -228,21 +228,25 @@ public class LSFPsiImplUtil {
         LSFFormActionObjectList formList = sourceStatement.getFormActionObjectList();
         if(formList != null) {
             for(LSFFormActionObjectUsage object : formList.getFormActionObjectUsageList()) {
-                ContextModifier inputModifier = new InputContextModifier(object.getParamDeclare());
-                if (result == null)
-                    result = inputModifier;
-                else
-                    result = new AndContextModifier(result, inputModifier);
+                if(object.getObjectInputProps() != null) {
+                    ContextModifier inputModifier = new InputContextModifier(object);
+                    if (result == null)
+                        result = inputModifier;
+                    else
+                        result = new AndContextModifier(result, inputModifier);
+                }
             }
         }
-        LSFFormSingleActionObject singleObject = sourceStatement.getFormSingleActionObject();
-        if(singleObject != null) {
-            ContextModifier inputModifier = new InputContextModifier(singleObject.getParamDeclare());
-            if (result == null)
-                result = inputModifier;
-            else
-                result = new AndContextModifier(result, inputModifier);
-        }
+//        LSFFormSingleActionObject singleObject = sourceStatement.getFormSingleActionObject();
+//        if(singleObject != null) {
+//            if(singleObject.getObjectInputProps() != null) {
+//                ContextModifier inputModifier = new InputContextModifier(singleObject);
+//                if (result == null)
+//                    result = inputModifier;
+//                else
+//                    result = new AndContextModifier(result, inputModifier);
+//            }
+//        }
         return result != null ? result : ContextModifier.EMPTY;
     }
 
@@ -2971,10 +2975,14 @@ public class LSFPsiImplUtil {
             }
         }
 
-        for (LSFFormActionObjectUsage ou : objectMap)
-            list.add(
-                    inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
-            );
+        for (LSFFormActionObjectUsage ou : objectMap) {
+            LSFObjectInProps objectInProps = ou.getObjectInProps();
+            if(objectInProps != null) {
+                list.add(
+                        inferExpressionParamClasses(objectInProps.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
+                );
+            }
+        }
         return Inferred.andClasses(list); // по идее and так как на сервере and
     }
 
@@ -2986,10 +2994,14 @@ public class LSFPsiImplUtil {
         if (objects != null)
             objectMap.addAll(objects.getFormActionObjectUsageList());
 
-        for (LSFFormActionObjectUsage ou : objectMap)
-            list.add(
-                    inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
-            );
+        for (LSFFormActionObjectUsage ou : objectMap) {
+            LSFObjectInProps objectInProps = ou.getObjectInProps();
+            if(objectInProps != null) {
+                list.add(
+                        inferExpressionParamClasses(objectInProps.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
+                );
+            }
+        }
         Inferred forClasses = Inferred.andClasses(list); // по идее and так как на сервере and
 
         return inferDoInputBody(body.getDoInputBody(), forClasses, params);
@@ -3012,10 +3024,14 @@ public class LSFPsiImplUtil {
         if (objects != null)
             objectMap.addAll(objects.getFormActionObjectUsageList());
 
-        for (LSFFormActionObjectUsage ou : objectMap)
-            list.add(
-                    inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
-            );
+        for (LSFFormActionObjectUsage ou : objectMap) {
+            LSFObjectInProps objectInProps = ou.getObjectInProps();
+            if(objectInProps != null) {
+                list.add(
+                        inferExpressionParamClasses(objectInProps.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
+                );
+            }
+        }
         return Inferred.andClasses(list); // по идее and так как на сервере and
     }
 
@@ -3027,10 +3043,14 @@ public class LSFPsiImplUtil {
         if (objects != null)
             objectMap.addAll(objects.getFormActionObjectUsageList());
 
-        for (LSFFormActionObjectUsage ou : objectMap)
-            list.add(
-                    inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
-            );
+        for (LSFFormActionObjectUsage ou : objectMap) {
+            LSFObjectInProps objectInProps = ou.getObjectInProps();
+            if (objectInProps != null) {
+                list.add(
+                        inferExpressionParamClasses(objectInProps.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params)
+                );
+            }
+        }
         return Inferred.andClasses(list); // по идее and так как на сервере and
     }
 
@@ -3070,7 +3090,10 @@ public class LSFPsiImplUtil {
             LSFFormActionObjectList actionObjList = object.getFormActionObjectList();
             if (actionObjList != null) {
                 for (LSFFormActionObjectUsage ou : actionObjList.getFormActionObjectUsageList()) {
-                    list.add(inferExpressionParamClasses(ou.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params));
+                    LSFObjectInProps objectInProps = ou.getObjectInProps();
+                    if(objectInProps != null) {
+                        list.add(inferExpressionParamClasses(objectInProps.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params));
+                    }
                 }
             }
         }
