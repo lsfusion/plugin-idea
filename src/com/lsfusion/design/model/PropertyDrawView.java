@@ -44,7 +44,8 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("clearText").setExpert(),
             new ReflectionProperty("toolTip"),
             new ReflectionProperty("askConfirm"),
-            new ReflectionProperty("askConfirmMessage")
+            new ReflectionProperty("askConfirmMessage"),
+            new ReflectionProperty("defaultCompare")
     );
 
     public PropertyDrawEntity entity;
@@ -80,6 +81,7 @@ public class PropertyDrawView extends ComponentView {
     
     public boolean noSort;
     public boolean notNull;
+    public String defaultCompare;
 
     public PropertyDrawView() {
         this("");
@@ -343,6 +345,10 @@ public class PropertyDrawView extends ComponentView {
     public void setNoSort(boolean noSort) {
         this.noSort = noSort;
     }
+
+    public void setDefaultCompare(String defaultCompare) {
+        this.defaultCompare = defaultCompare;
+    }
     
     public void setNotNull(boolean notNull) {
         this.notNull = notNull;
@@ -435,7 +441,11 @@ public class PropertyDrawView extends ComponentView {
     public boolean getNoSort() {
         return noSort;
     }
-    
+
+    public String getDefaultCompare() {
+        return defaultCompare;
+    }
+
     public boolean getNotNull() {
         return notNull;
     }

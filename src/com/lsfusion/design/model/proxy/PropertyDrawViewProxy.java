@@ -47,6 +47,10 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.noSort = noSort;
     }
 
+    public void setDefaultCompare(String defaultCompare) {
+        target.defaultCompare = defaultCompare;
+    }
+
     public void setMinimumCharWidth(int minimumCharWidth) {
         target.setMinimumCharWidth(minimumCharWidth);
     }
