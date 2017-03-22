@@ -22,6 +22,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.awt.RelativePoint;
+import com.lsfusion.lang.psi.declarations.LSFObjectInputParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +33,9 @@ import java.util.List;
 public abstract class SearchForPropertyUsagesAction extends BaseCodeInsightAction implements CodeInsightActionHandler {
     public static final String PROPERTY_USAGES = "Property";
     public static final String PROPERTY_DRAW_USAGES = "Property Draw";
-    
+    public static final String OBJECT_USAGES = "Object";
+    public static final String PARAMETER_USAGES = "Parameter";
+
     public static String propertyUsagesSearchMode;
     public static PsiElement sourceElement;
 
@@ -66,8 +69,18 @@ public abstract class SearchForPropertyUsagesAction extends BaseCodeInsightActio
 
             LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(element, LSFPropertyDrawDeclaration.class);
             if (propDrawDecl == null) {
-                AnAction a = getPlatformAction();
-                a.actionPerformed(event);
+                LSFObjectInputParamDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFObjectInputParamDeclaration.class);
+                if(objectDecl == null) {
+                    AnAction a = getPlatformAction();
+                    a.actionPerformed(event);
+                } else {
+                    RelativePoint rp = JBPopupFactory.getInstance().guessBestPopupLocation(event.getDataContext());
+                    Component component = event.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+                    JBPopupFactory
+                            .getInstance()
+                            .createListPopup(createParameterListPopupStep(element, event, component))
+                            .show(rp);
+                }
             } else {
                 RelativePoint rp = JBPopupFactory.getInstance().guessBestPopupLocation(event.getDataContext());
                 Component component = event.getData(PlatformDataKeys.CONTEXT_COMPONENT);
@@ -104,9 +117,30 @@ public abstract class SearchForPropertyUsagesAction extends BaseCodeInsightActio
     }
 
     private List<String> propertyUsagesAlternatives = Arrays.asList(PROPERTY_DRAW_USAGES, PROPERTY_USAGES);
+    private List<String> parameterUsagesAlternatives = Arrays.asList(OBJECT_USAGES, PARAMETER_USAGES);
 
     private ListPopupStep createListPopupStep(final PsiElement source, final AnActionEvent e, final Component component) {
         return new BaseListPopupStep<String>("Choose element type", propertyUsagesAlternatives.toArray(new String[2])) {
+            @NotNull
+            @Override
+            public String getTextFor(String item) {
+                return item;
+            }
+
+            @Override
+            public PopupStep onChosen(String item, boolean finalChoice) {
+                propertyUsagesSearchMode = item;
+                sourceElement = source;
+
+                AnAction a = getPlatformAction();
+                a.actionPerformed(new AnActionEvent(e.getInputEvent(), new DataManagerImpl.MyDataContext(component), e.getPlace(), e.getPresentation(), e.getActionManager(), e.getModifiers()));
+                return FINAL_CHOICE;
+            }
+        };
+    }
+
+    private ListPopupStep createParameterListPopupStep(final PsiElement source, final AnActionEvent e, final Component component) {
+        return new BaseListPopupStep<String>("Choose element type", parameterUsagesAlternatives.toArray(new String[2])) {
             @NotNull
             @Override
             public String getTextFor(String item) {

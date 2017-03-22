@@ -13,9 +13,9 @@ import com.intellij.util.Processor;
 import com.lsfusion.ImplementationsSearch;
 import com.lsfusion.actions.SearchForPropertyUsagesAction;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.LSFFormActionObjectUsage;
+import com.lsfusion.lang.psi.LSFFormObjectDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,7 +57,26 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
                     }
                 });
             } else {
-                super.processElementUsages(element, processor, options);
+                if (SearchForPropertyUsagesAction.PARAMETER_USAGES.equals(SearchForPropertyUsagesAction.propertyUsagesSearchMode)) {
+                    LSFParamDeclaration paramDecl = PsiTreeUtil.getParentOfType(SearchForPropertyUsagesAction.sourceElement, LSFParamDeclaration.class);
+                    if (paramDecl != null && paramDecl.getNameIdentifier() != null) {
+                        ReferencesSearch.search(paramDecl.getNameIdentifier()).forEach(new Processor<PsiReference>() {
+                            @Override
+                            public boolean process(PsiReference psiReference) {
+                                processor.process(new UsageInfo(psiReference));
+                                return true;
+                            }
+                        });
+                    }
+                } else {
+                    if (SearchForPropertyUsagesAction.OBJECT_USAGES.equals(SearchForPropertyUsagesAction.propertyUsagesSearchMode)) {
+                        LSFFormObjectDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFFormObjectDeclaration.class);
+                        if (objectDecl != null && objectDecl.getNameIdentifier() != null) {
+                            super.processElementUsages(element, processor, options);
+                        }
+                    } else
+                        super.processElementUsages(element, processor, options);
+                }
             }
         }
         if (((LSFFindUsagesOptions) options).isImplementingMethods) {

@@ -9,10 +9,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.80</b><br>
+        <b>Version 1.0.81</b><br>
         <ul>
             <li>defaultCompare option for property</li>
             <li>INPUT can introduce default implicit parameters with objects names </li>
+            <li>Object/Parameter option in alt + f7</li>
         </ul>
     ]]>
     </change-notes>
