@@ -711,7 +711,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addTypeMismatchWarning(LSFAssignActionPropertyDefinitionBody o, LSFClassSet class1,  LSFClassSet class2) {
-        Annotation annotation = myHolder.createErrorAnnotation(o, String.format("Type mismatch: unsafe cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName()));
+        Annotation annotation = myHolder.createWarningAnnotation(o, String.format("Type mismatch: unsafe cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName()));
         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_WARNING);
         addError(o, annotation, LSFErrorLevel.WARNING);
     }
