@@ -3,15 +3,13 @@ package com.lsfusion;
 import com.intellij.codeInsight.highlighting.ReadWriteAccessDetector;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.lsfusion.lang.psi.LSFAssignActionPropertyDefinitionBody;
-import com.lsfusion.lang.psi.LSFMappedPropertyClassParamDeclare;
-import com.lsfusion.lang.psi.LSFMappedPropertyExprParam;
-import com.lsfusion.lang.psi.LSFWriteWhenStatement;
+import com.lsfusion.lang.LSFFileType;
+import com.lsfusion.lang.psi.*;
 
 public class LSFReadWriteAccessDetector extends ReadWriteAccessDetector {
     @Override
     public boolean isReadWriteAccessible(PsiElement element) {
-        return true;
+        return element.getContainingFile().getFileType() == LSFFileType.INSTANCE;
     }
 
     @Override
