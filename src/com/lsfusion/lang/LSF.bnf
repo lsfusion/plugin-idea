@@ -773,7 +773,7 @@ editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION | NESTED)? customClas
     methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
-addObjectActionPropertyDefinitionBody ::= ADDOBJ customClassUsage (WHERE propertyExpression)? (TO mappedPropertyExprParam)?
+addObjectActionPropertyDefinitionBody ::= NEW customClassUsage (WHERE propertyExpression)? (TO mappedPropertyExprParam)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
@@ -1017,7 +1017,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
     recoverWhile = "list_action_statement_recover"
 }
 
-private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | CANCEL | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CONFIRMX | CUSTOM | DELETE
+private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CONFIRMX | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | READ | REQUEST | INPUT | INPUTX | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
@@ -1098,7 +1098,7 @@ cancelActionPropertyDefinitionBody ::= CANCEL nestedPropertiesSelector?
     methods = [inferActionParamClasses]
 }
 
-forAddObjClause ::= ADDOBJ (paramDeclare EQUALS)? customClassUsage
+forAddObjClause ::= NEW (paramDeclare EQUALS)? customClassUsage
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext"

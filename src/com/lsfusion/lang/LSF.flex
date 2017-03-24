@@ -110,7 +110,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "ACTION"                  			{ return ACTION; }
   "ADD"                     			{ return ADD; }
   "ADDFORM"                     	    { return ADDFORM; }
-  "ADDOBJ"                  			{ return ADDOBJ; }
   "AFTER"                   			{ return AFTER; }
   "GOAFTER"                   			{ return GOAFTER; }
   "AGGPROP"                 			{ return AGGPROP; }

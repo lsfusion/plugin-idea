@@ -232,7 +232,7 @@ public class FormEntity {
                     RegularFilterEntity filter = new RegularFilterEntity("Отмеченные", KeyStrokes.getSelectionFilterKeyStroke(), objects);
                     filterGroup.addFilter(filter);
                     regularFilterGroups.add(filterGroup);
-                } else if ("ADDOBJ".equals(name)) {
+                } else if ("NEW".equals(name)) {
                     propertyDraw = new AddObjectActionProperty(alias, groupObject, null, commonOptions, formPropertyOptions, this);
                 } else if ("ADDFORM".equals(name) || "ADDSESSIONFORM".equals(name) || "ADDNESTEDFORM".equals(name)) {
                     propertyDraw = new AddFormAction(alias, groupObject, commonOptions, formPropertyOptions, this, forAddFormActionName(name));
