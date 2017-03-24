@@ -21,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.lsfusion.design.model.entity.FormSessionScope.forAddFormActionName;
-import static com.lsfusion.design.model.entity.FormSessionScope.forEditFormActionName;
-
 public class FormEntity {
     private LSFFile file;
 
@@ -235,11 +232,11 @@ public class FormEntity {
                 } else if ("NEW".equals(name)) {
                     propertyDraw = new AddObjectActionProperty(alias, groupObject, null, commonOptions, formPropertyOptions, this);
                 } else if ("NEWEDIT".equals(name)) {
-                    propertyDraw = new AddFormAction(alias, groupObject, commonOptions, formPropertyOptions, this, forAddFormActionName(name));
+                    propertyDraw = new AddFormAction(alias, groupObject, commonOptions, formPropertyOptions, this);
                 } else if ("EDIT".equals(name)) {
-                    propertyDraw = new EditFormAction(alias, groupObject, commonOptions, formPropertyOptions, this, forEditFormActionName(name));
+                    propertyDraw = new EditFormAction(alias, groupObject, commonOptions, formPropertyOptions, this);
                 } else if ("DELETE".equals(name)) {
-                    propertyDraw = new DeleteAction(alias, groupObject, commonOptions, formPropertyOptions, this, "DELETESESSION".equals(name));
+                    propertyDraw = new DeleteAction(alias, groupObject, commonOptions, formPropertyOptions, this);
                 }
             }
         }

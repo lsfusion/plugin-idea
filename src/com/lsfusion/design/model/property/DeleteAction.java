@@ -7,7 +7,7 @@ import com.lsfusion.design.model.entity.PropertyDrawEntity;
 import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 
 public class DeleteAction extends PropertyDrawEntity {
-    public DeleteAction(String alias, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form, boolean oldSession) {
+    public DeleteAction(String alias, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
         super(alias, "DELETE", groupObject.objects,
                 null, commonFormOptions, propertyFormOptions, form);
 
