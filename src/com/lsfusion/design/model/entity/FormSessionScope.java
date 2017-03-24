@@ -4,7 +4,7 @@ public enum FormSessionScope {
     NEWSESSION, OLDSESSION, NESTEDSESSION;
     
     public static FormSessionScope forAddFormActionName(String name) {
-        if ("ADDFORM".equals(name)) {
+        if ("NEWEDIT".equals(name)) {
             return NEWSESSION;
         } else if ("ADDSESSIONFORM".equals(name)) {
             return OLDSESSION;

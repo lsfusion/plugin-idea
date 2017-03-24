@@ -234,11 +234,11 @@ public class FormEntity {
                     regularFilterGroups.add(filterGroup);
                 } else if ("NEW".equals(name)) {
                     propertyDraw = new AddObjectActionProperty(alias, groupObject, null, commonOptions, formPropertyOptions, this);
-                } else if ("ADDFORM".equals(name) || "ADDSESSIONFORM".equals(name) || "ADDNESTEDFORM".equals(name)) {
+                } else if ("NEWEDIT".equals(name)) {
                     propertyDraw = new AddFormAction(alias, groupObject, commonOptions, formPropertyOptions, this, forAddFormActionName(name));
-                } else if ("EDITFORM".equals(name) || "EDITSESSIONFORM".equals(name) || "EDITNESTEDFORM".equals(name)) {
+                } else if ("EDIT".equals(name)) {
                     propertyDraw = new EditFormAction(alias, groupObject, commonOptions, formPropertyOptions, this, forEditFormActionName(name));
-                } else if ("DELETE".equals(name) || "DELETESESSION".equals(name)) {
+                } else if ("DELETE".equals(name)) {
                     propertyDraw = new DeleteAction(alias, groupObject, commonOptions, formPropertyOptions, this, "DELETESESSION".equals(name));
                 }
             }
