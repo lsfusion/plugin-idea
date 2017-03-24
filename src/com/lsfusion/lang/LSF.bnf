@@ -1018,7 +1018,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
 }
 
 private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | ADDOBJ | APPLY | CANCEL | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CONFIRMX | CUSTOM | DELETE
-                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | FORM | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
+                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | READ | REQUEST | INPUT | INPUTX | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID
@@ -1153,7 +1153,7 @@ formStatement ::=	(	formDecl
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
                     |	formOrderByList
-                    |	dialogFormDeclaration
+                    |	listFormDeclaration
                     |	editFormDeclaration
                     |   reportFilesDeclaration
                     )*
@@ -1167,7 +1167,7 @@ formStatement ::=	(	formDecl
     methods = [resolveFormDecl]
 }
 
-dialogFormDeclaration ::= DIALOG customClassUsage OBJECT objectUsage {pin = 1}
+listFormDeclaration ::= LIST customClassUsage OBJECT objectUsage {pin = 1}
 editFormDeclaration ::= EDIT customClassUsage OBJECT objectUsage {pin = 1}
 
 reportFilesDeclaration ::= REPORTFILES groupObjectReportPath (COMMA groupObjectReportPath)* {pin = 1}
@@ -1260,7 +1260,7 @@ formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptions
 formPropertyOptionsList ::= (    EDITABLE
                             |    READONLY
                             |    SELECTOR
-                            |    (NEWSESSION | NESTEDSESSION)
+                            |    formOptionSession
                             |    HINTNOUPDATE
                             |    HINTTABLE
                             |    OPTIMISTICASYNC
@@ -1274,6 +1274,7 @@ formPropertyOptionsList ::= (    EDITABLE
                             |    formOptionsOnEvents
                             )*
 
+formOptionSession ::= NEWSESSION | NESTEDSESSION;
 formOptionToolbar ::= TOOLBAR
 formOptionColumns ::= COLUMNS (stringLiteral)? LBRAC nonEmptyGroupObjectUsageList RBRAC {pin = 1}
 formOptionForce ::= FORCE classViewType {pin = 1}
@@ -1346,17 +1347,13 @@ formOrderByList ::= ORDER BY formPropertyDrawWithOrder (COMMA formPropertyDrawWi
 
 formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 
+predefinedAddPropertyName ::=  NEW | NEWEDIT
+
 predefinedFormPropertyName ::= OBJVALUE
                            |    SELECTION
-                           |   ((    ADDOBJ
-                               |    ADDFORM
-                               |    ADDNESTEDFORM
-                               |    ADDSESSIONFORM) (LSQBR explicitPropClass RSQBR)?)
-                           |    EDITFORM
-                           |    EDITNESTEDFORM
-                           |    EDITSESSIONFORM
+                           |    predefinedAddPropertyName (LSQBR explicitPropClass RSQBR)?
                            |    DELETE
-                           |    DELETESESSION
+                           |    EDIT
 {
     mixin="com.lsfusion.lang.psi.LSFIdImpl"
     implements="com.lsfusion.lang.psi.LSFId"
