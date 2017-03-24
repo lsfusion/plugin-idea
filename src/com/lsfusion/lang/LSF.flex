@@ -109,10 +109,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NATIVE"                			    { return NATIVE; }
   "ACTION"                  			{ return ACTION; }
   "ADD"                     			{ return ADD; }
-  "ADDFORM"                 			{ return ADDFORM; }
   "ADDOBJ"                  			{ return ADDOBJ; }
-  "ADDNESTEDFORM"          			    { return ADDNESTEDFORM; }
-  "ADDSESSIONFORM"          			{ return ADDSESSIONFORM; }
   "AFTER"                   			{ return AFTER; }
   "GOAFTER"                   			{ return GOAFTER; }
   "AGGPROP"                 			{ return AGGPROP; }
@@ -171,7 +168,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "DEFAULT"                 			{ return DEFAULT; }
   "DELAY"              			        { return DELAY; }
   "DELETE"                  			{ return DELETE; }
-  "DELETESESSION"           			{ return DELETESESSION; }
   "DESC"                    			{ return DESC; }
   "DESIGN"                  			{ return DESIGN; }
   "DIALOG"                  			{ return DIALOG; }
@@ -189,10 +185,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "ECHO"                    			{ return ECHO; }
   "EDIT"                    			{ return EDIT; }
   "EDITABLE"                			{ return EDITABLE; }
-  "EDITFORM"                			{ return EDITFORM; }
   "EDITKEY"                 			{ return EDITKEY; }
-  "EDITNESTEDFORM"         			    { return EDITNESTEDFORM; }
-  "EDITSESSIONFORM"         			{ return EDITSESSIONFORM; }
   "ELSE"                    			{ return ELSE; }
   "EMAIL"                   			{ return EMAIL; }
   "END"                     			{ return END; }
