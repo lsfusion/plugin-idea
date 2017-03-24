@@ -1,7 +1,7 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.82</version>
+    <version>1.0.83</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,20 +9,15 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.82</b><br>
+        <b>Version 1.0.83</b><br>
         <ul>
-            <li>defaultCompare option for property</li>
-            <li>INPUT can introduce default implicit parameters with objects names </li>
-            <li>Object/Parameter option in alt + f7</li>
-            <li>Major changes in form predefined operators (ADDFORM, EDITFORM, etc.) </li>
-            <li>DIALOG -> LIST, FORM -> SHOW</li>
-            <li>ADDOBJ -> NEW</li>
+            <li>Idea 2017.1+ support</li>
         </ul>
     ]]>
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="163.7743.44"/>
+    <idea-version since-build="171.3780.107"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->

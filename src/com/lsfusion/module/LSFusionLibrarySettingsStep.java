@@ -2,8 +2,8 @@ package com.lsfusion.module;
 
 import com.intellij.facet.impl.ui.libraries.LibraryCompositionSettings;
 import com.intellij.framework.library.FrameworkLibraryVersionFilter;
+import com.intellij.ide.projectWizard.ProjectSettingsStep;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.ide.util.newProjectWizard.SelectTemplateStep;
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.SettingsStep;
@@ -58,7 +58,7 @@ public class LSFusionLibrarySettingsStep extends ModuleWizardStep {
         libraryPanel = createLibraryPanel();
 
         //noinspection RedundantCast
-        JTextField moduleNameField = settingsStep instanceof SelectTemplateStep ? ((SelectTemplateStep) settingsStep).getModuleNameField() : null;
+        JTextField moduleNameField = settingsStep instanceof ProjectSettingsStep ? ((ProjectSettingsStep) settingsStep).getModuleNameField() : null;
         settingsPanel = createSettingsPanel(moduleNameField);
 
         settingsStep.addSettingsField(LSFBundle.message("module.wizard.lsfusion.library"), libraryPanel.getSimplePanel());
