@@ -109,6 +109,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NATIVE"                			    { return NATIVE; }
   "ACTION"                  			{ return ACTION; }
   "ADD"                     			{ return ADD; }
+  "ADDFORM"                     	    { return ADDFORM; }
   "ADDOBJ"                  			{ return ADDOBJ; }
   "AFTER"                   			{ return AFTER; }
   "GOAFTER"                   			{ return GOAFTER; }
@@ -184,6 +185,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "DROPSET"                 			{ return DROPSET; }
   "ECHO"                    			{ return ECHO; }
   "EDIT"                    			{ return EDIT; }
+  "EDITFORM"                    		{ return EDITFORM; }
   "EDITABLE"                			{ return EDITABLE; }
   "EDITKEY"                 			{ return EDITKEY; }
   "ELSE"                    			{ return ELSE; }
