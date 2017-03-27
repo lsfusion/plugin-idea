@@ -83,7 +83,7 @@ public class ReportUtils {
         FileBasedIndex.getInstance().processAllKeys(FilenameIndex.NAME, new Processor<String>() {
             @Override
             public boolean process(String fileName) {
-                if (fileName.startsWith(reportName) && fileName.endsWith(".jrxml")) {
+                if (fileName.endsWith(".jrxml") && (fileName.startsWith(reportName + '.') || fileName.startsWith(reportName + '_'))) {
                     findFilesWithShortName(fileName, files, project, scope);
                 }
                 return true;
