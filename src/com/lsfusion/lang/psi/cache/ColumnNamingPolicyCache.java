@@ -13,6 +13,11 @@ public class ColumnNamingPolicyCache extends PsiDependentCache<LSFFile, ColumnNa
         public ColumnNamingPolicy resolve(@NotNull LSFFile declaration, boolean incompleteCode) {
             return ColumnNamingPolicy.getInstance(declaration);
         }
+
+        @Override
+        public boolean checkResultClass(Object result) {
+            return result instanceof ColumnNamingPolicy;
+        }
     };
 
     public static ColumnNamingPolicyCache getInstance(LSFFile lsfFile) {

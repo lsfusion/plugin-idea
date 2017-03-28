@@ -16,6 +16,17 @@ public class PropertyDependentsCache extends PsiDependentCache<LSFPropDeclaratio
         public Set<LSFPropDeclaration> resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.getDependents();
         }
+
+        @Override
+        public boolean checkResultClass(Object result) {
+            if(!(result instanceof Set))
+                return false;
+            
+            for(Object element : (Set)result)
+                if(!(element instanceof LSFPropDeclaration))
+                    return false;
+            return true;
+        }
     };
 
     public static PropertyDependentsCache getInstance(Project project) {

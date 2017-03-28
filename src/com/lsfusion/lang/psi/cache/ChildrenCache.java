@@ -7,15 +7,28 @@ import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Set;
 
 public class ChildrenCache extends PsiDependentCache<LSFClassDeclaration, Collection<LSFClassDeclaration>> {
     public static final PsiResolver<LSFClassDeclaration, Collection<LSFClassDeclaration>> RESOLVER = new PsiResolver<LSFClassDeclaration, Collection<LSFClassDeclaration>>() {
         @Override
         public Collection<LSFClassDeclaration> resolve(@NotNull LSFClassDeclaration lsfClassDeclaration, boolean incompleteCode) {
             return CustomClassSet.getChildrenAllNoCache(lsfClassDeclaration);
+        }
+
+        @Override
+        public boolean checkResultClass(Object result) {
+            if(!(result instanceof Collection))
+                return false;
+
+            for(Object element : (Collection)result)
+                if(!(element instanceof LSFClassDeclaration))
+                    return false;
+            return true;
         }
     };
 

@@ -14,6 +14,11 @@ public class PropertyComplexityCache extends PsiDependentCache<LSFPropDeclaratio
         public Integer resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.getComplexity();
         }
+
+        @Override
+        public boolean checkResultClass(Object result) {
+            return result instanceof Integer;
+        }
     };
 
     public static PropertyComplexityCache getInstance(Project project) {

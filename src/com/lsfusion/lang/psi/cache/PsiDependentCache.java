@@ -11,9 +11,11 @@ import com.intellij.psi.impl.PsiManagerImpl;
 import com.intellij.reference.SoftReference;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.messages.MessageBus;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
@@ -24,6 +26,8 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
 
     public interface PsiResolver<Psi extends PsiElement, TResult> {
         TResult resolve(@NotNull Psi psi, boolean incompleteCode);
+        
+        boolean checkResultClass(Object result); // например при memoize в RecursionGuard возвращается List чего-то
     }
 
     public PsiDependentCache(@NotNull MessageBus messageBus) {
@@ -88,6 +92,8 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         if (stamp.mayCacheNow()) {
             cache(psi, map, result);
         }
+        if(result != null && !resolver.checkResultClass(result))
+            return null;
         return result;
     }
 

@@ -15,12 +15,22 @@ public class ValueClassCache extends PsiDependentCache<LSFPropDeclaration, LSFEx
         public LSFExClassSet resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.resolveExValueClassNoCache(true);
         }
+
+        @Override
+        public boolean checkResultClass(Object result) {
+            return result instanceof LSFExClassSet;
+        }
     };
     
     public static final PsiResolver<LSFPropDeclaration, LSFExClassSet> NO_INFER_RESOLVER = new PsiResolver<LSFPropDeclaration, LSFExClassSet>() {
         @Override
         public LSFExClassSet resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.resolveExValueClassNoCache(false);
+        }
+
+        @Override
+        public boolean checkResultClass(Object result) {
+            return result instanceof LSFExClassSet;
         }
     };
 

@@ -11,8 +11,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.84</b><br>
         <ul>
-            <li>Idea 2017.1+ support</li>
-            <li>ASK YESNO support</li>
+            <li>Minor recursion guard bugfix</li>
         </ul>
     ]]>
     </change-notes>

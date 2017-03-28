@@ -13,6 +13,11 @@ public class ColumnNameCache extends PsiDependentCache<LSFGlobalPropDeclaration,
         public String resolve(@NotNull LSFGlobalPropDeclaration globalProp, boolean incompleteCode) {
             return globalProp.getColumnNameNoCache();
         }
+
+        @Override
+        public boolean checkResultClass(Object result) {
+            return result instanceof String;
+        }
     };
     
     public static ColumnNameCache getInstance(Project project) {
