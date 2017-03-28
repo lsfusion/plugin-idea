@@ -9,7 +9,7 @@ import com.lsfusion.lang.psi.*;
 public class LSFReadWriteAccessDetector extends ReadWriteAccessDetector {
     @Override
     public boolean isReadWriteAccessible(PsiElement element) {
-        return element.getContainingFile().getFileType() == LSFFileType.INSTANCE;
+        return element.getContainingFile() != null && element.getContainingFile().getFileType() == LSFFileType.INSTANCE;
     }
 
     @Override
