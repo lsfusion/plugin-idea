@@ -262,6 +262,14 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(sourceStatement);
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFConfirmxActionPropertyDefinitionBody sourceStatement) {
+        return new InputContextModifier(sourceStatement.getParamDeclare());
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFConfirmxActionPropertyDefinitionBody sourceStatement) {
+        return new ActionExprInferrer(sourceStatement);
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFAssignActionPropertyDefinitionBody sourceStatement) {
         LSFMappedPropertyExprParam mappedPropertyExprParam = sourceStatement.getMappedPropertyExprParam();
         if (mappedPropertyExprParam != null) {
@@ -579,6 +587,11 @@ public class LSFPsiImplUtil {
             return resolve(builtInClassName);
         
         return null;
+    }    
+    
+    @Nullable
+    public static LSFClassSet resolveClass(@NotNull LSFConfirmxActionPropertyDefinitionBody sourceStatement) {
+        return resolveDataClass("BOOLEAN");
     }    
     
     // PROPERTYEXPRESSION.RESOLVEVALUECLASS
@@ -2754,6 +2767,9 @@ public class LSFPsiImplUtil {
     }
 
     public static void ensureClass(@NotNull LSFInputxActionPropertyDefinitionBody sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
+    }
+
+    public static void ensureClass(@NotNull LSFConfirmxActionPropertyDefinitionBody sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
     }
 
     public static Inferred inferActionParamClasses(@Nullable LSFActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {

@@ -106,6 +106,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "ACTIVATE"                			{ return ACTIVATE; }
   "ACTIVE"                			    { return ACTIVE; }
   "ATTR"                			    { return ATTR; }
+  "ASK"                			        { return ASK; }
   "NATIVE"                			    { return NATIVE; }
   "ACTION"                  			{ return ACTION; }
   "ADD"                     			{ return ADD; }
@@ -392,6 +393,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "XML"                                 { return XML; }
   "XOR"                     			{ return XOR; }
   "YES"                     			{ return YES; }
+  "YESNO"                     			{ return YESNO; }
   "##"                                  { return FAKETWODASHES;}
   "###"                                 { return FAKETHREEDASHES;}
 

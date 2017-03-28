@@ -810,11 +810,11 @@ confirmActionPropertyDefinitionBody ::= CONFIRM propertyExpression
     methods = [inferActionParamClasses]
 }
 
-confirmxActionPropertyDefinitionBody ::= CONFIRMX propertyExpression doInputBody
+confirmxActionPropertyDefinitionBody ::= (CONFIRMX | ASK) propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
+    implements="com.lsfusion.lang.psi.context.ActionExpression,com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [inferActionParamClasses resolveClass ensureClass getContextModifier getContextInferrer]
 }
 
 messageActionPropertyDefinitionBody ::= MESSAGE (NOWAIT)? propertyExpression
