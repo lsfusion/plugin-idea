@@ -34,6 +34,7 @@ import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.references.LSFHighlightVisitorImpl;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -114,6 +115,7 @@ public class ShowErrorsAction extends AnAction {
                             }
                         }
                         ANNOTATOR.warningsSearchMode = warningsSearchMode;
+                        LSFHighlightVisitorImpl highlightVisitor = new LSFHighlightVisitorImpl(warningsSearchMode);
 
                         int index = 0;
                         for (VirtualFile file : files) {
@@ -123,7 +125,11 @@ public class ShowErrorsAction extends AnAction {
                             index++;
                             indicator.setText("Processing " + index + "/" + files.size() + ": " + file.getName());
                             if (file.getFileType() == LSFFileType.INSTANCE) {
-                                findLSFErrors(PsiManager.getInstance(project).findFile(file));
+                                PsiFile lsfFile = PsiManager.getInstance(project).findFile(file);
+                                findLSFErrors(lsfFile);
+                                if(warningsSearchMode && lsfFile != null)
+                                    highlightVisitor.analyze(lsfFile);
+
                             } else {
                                 findInjectedErrors(PsiManager.getInstance(project).findFile(file));
                             }

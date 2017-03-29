@@ -668,19 +668,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                         if(leftClass != null && rightClass != null) {
                             if (!leftClass.isCompatible(rightClass))
                                 addTypeMismatchError(o, rightClass, leftClass);
-                            else if (!leftClass.isAssignable(rightClass))
-                                addTypeMismatchWarning(o, rightClass, leftClass);
-                        }
-                    }
-                } else if (declaration instanceof LSFLocalDataPropertyDefinitionImpl) {
-                    LSFClassName className = ((LSFLocalDataPropertyDefinitionImpl) declaration).getClassName();
-                    if (className != null) {
-                        LSFClassSet leftClass = LSFPsiImplUtil.resolveClass(className);
-                        List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
-                        if (!rightPropertyExpressionList.isEmpty()) {
-                            LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
-                            if (leftClass != null && rightClass != null && !leftClass.isAssignable(rightClass))
-                                addTypeMismatchWarning(o, rightClass, leftClass);
                         }
                     }
                 }
@@ -708,12 +695,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         Annotation annotation = myHolder.createErrorAnnotation(o, String.format("Type mismatch: can't cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName()));
         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
         addError(o, annotation, LSFErrorLevel.ERROR);
-    }
-
-    private void addTypeMismatchWarning(LSFAssignActionPropertyDefinitionBody o, LSFClassSet class1,  LSFClassSet class2) {
-        Annotation annotation = myHolder.createWarningAnnotation(o, String.format("Type mismatch: unsafe cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName()));
-        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_WARNING);
-        addError(o, annotation, LSFErrorLevel.WARNING);
     }
 
     @Override
