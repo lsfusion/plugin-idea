@@ -516,7 +516,7 @@ propertyOptions ::= (   IN groupUsage
                     |	TABLE tableUsage
                     |	shortcutSetting
                     |	asEditActionSetting
-                    |	toolbarSetting
+                    |	viewTypeSetting
                     |	fixedCharWidthSetting
                     |	minCharWidthSetting
                     |	maxCharWidthSetting
@@ -537,7 +537,7 @@ propertyOptions ::= (   IN groupUsage
                     )*
 
 shortcutSetting ::= SHORTCUT noContextPropertyUsage {pin = 1}
-toolbarSetting ::= TOOLBAR
+viewTypeSetting ::= classViewType
 persistentSetting ::= PERSISTENT
 fixedCharWidthSetting ::= FIXEDCHARWIDTH intLiteral
 minCharWidthSetting ::= MINCHARWIDTH intLiteral
@@ -1217,7 +1217,7 @@ formCommonGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjec
 
 formGroupObjectViewType ::= (INIT | FIXED) classViewType
 
-classViewType ::= PANEL | GRID
+classViewType ::= PANEL | GRID | TOOLBAR
 
 formGroupObjectPageSize ::= PAGESIZE intLiteral
 
@@ -1264,7 +1264,6 @@ formPropertyOptionsList ::= (    EDITABLE
                             |    HINTNOUPDATE
                             |    HINTTABLE
                             |    OPTIMISTICASYNC
-                            |    formOptionToolbar
                             |    formOptionForce
                             |    formOptionToDraw
                             |    formOptionEventId
@@ -1275,9 +1274,8 @@ formPropertyOptionsList ::= (    EDITABLE
                             )*
 
 formOptionSession ::= NEWSESSION | NESTEDSESSION;
-formOptionToolbar ::= TOOLBAR
 formOptionColumns ::= COLUMNS (stringLiteral)? LBRAC nonEmptyGroupObjectUsageList RBRAC {pin = 1}
-formOptionForce ::= FORCE classViewType {pin = 1}
+formOptionForce ::= FORCE? classViewType
 formOptionToDraw ::= TODRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
