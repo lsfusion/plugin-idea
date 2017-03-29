@@ -103,7 +103,7 @@ public class PropertyDrawEntity {
         }
 
         if (propertyOptions != null) {
-            toolbar = !propertyOptions.getToolbarSettingList().isEmpty();
+            toolbar = false; //!propertyOptions.getToolbarSettingList().isEmpty();
 
             List<LSFFixedCharWidthSetting> fixedCharWidthSettings = propertyOptions.getFixedCharWidthSettingList();
             if (!fixedCharWidthSettings.isEmpty()) {
@@ -189,10 +189,10 @@ public class PropertyDrawEntity {
                 forceViewType = ClassViewType.valueOf(forceText);
             }
         }
-        List<LSFFormOptionToolbar> formOptionToolbarList = optionList.getFormOptionToolbarList();
-        if (!formOptionToolbarList.isEmpty()) {
-            toolbar = true;
-        }
+//        List<LSFFormOptionToolbar> formOptionToolbarList = optionList.getFormOptionToolbarList();
+//        if (!formOptionToolbarList.isEmpty()) {
+//            toolbar = true;
+//        }
     }
 
     public GroupObjectEntity getToDraw(FormEntity form) {
