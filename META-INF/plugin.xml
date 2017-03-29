@@ -9,11 +9,12 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.85</b><br>
+        <b>Version 1.0.86</b><br>
         <ul>
             <li>Minor recursion guard bugfix</li>
             <li>Removed FORCE word when forcing viewType</li>
             <li>Made TOOLBAR separate viewType</li>
+            <li>Unused properties, classes, groups inspection</li>
         </ul>
     ]]>
     </change-notes>
