@@ -11,9 +11,8 @@
     <change-notes><![CDATA[
         <b>Version 1.0.86</b><br>
         <ul>
-            <li>Minor recursion guard bugfix</li>
-            <li>Removed FORCE word when forcing viewType</li>
-            <li>Made TOOLBAR separate viewType</li>
+            <li>Minor bug fixes</li>
+            <li>Form design changed according to new view types policy</li>
             <li>Unused properties, classes, groups inspection</li>
         </ul>
     ]]>
@@ -103,6 +102,11 @@
             </action>
 
             <separator/>
+            
+            <!--<action id="Form.Refactoring" class="com.lsfusion.actions.FormRefactoring"-->
+                    <!--text="Form Refactoring" description="Form Refactoring">-->
+            <!--</action>-->
+            
             <action id="TypeInfer.File" class="com.lsfusion.lang.typeinfer.FileTypeInferAction" text="Infer _types for file"
                     description="Infer types for file">
                 <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>

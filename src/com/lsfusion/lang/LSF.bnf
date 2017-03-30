@@ -1017,7 +1017,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfN
     recoverWhile = "list_action_statement_recover"
 }
 
-private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | ASSIGN | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CONFIRMX | CUSTOM | DELETE
+private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | ASSIGN | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CONFIRMX | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | READ | REQUEST | INPUT | INPUTX | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION

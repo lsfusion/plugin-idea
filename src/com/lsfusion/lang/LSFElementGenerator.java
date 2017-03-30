@@ -404,6 +404,12 @@ public class LSFElementGenerator {
     }
 
     @NotNull
+    public static LSFFormOptionForce createFormOptionForce(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; FORM f PROPERTIES " + name + " x(a);");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormOptionForce.class).iterator().next();
+    }
+
+    @NotNull
     public static LSFFormOptionSession createFormOptionSession(Project myProject, String name) {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; FORM f PROPERTIES " + name + " x(a);");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormOptionSession.class).iterator().next();

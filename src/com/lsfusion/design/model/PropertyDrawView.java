@@ -236,8 +236,9 @@ public class PropertyDrawView extends ComponentView {
                 entity.baseClass.getPreferredHeight(comp.getFontMetrics(getFont(comp))) :
                 getDefaultPreferredHeight(comp.getFontMetrics(getFont(comp)));
         if (imagePath != null) { // предпочитаемую высоту берем исходя из размера иконки
-            Icon icon = BaseUtils.loadIcon(entity.project, "/images/" + imagePath);
-            height = Math.max(icon.getIconHeight() + 6, height);
+            Icon icon = BaseUtils.loadIcon(entity.project, "/images/design/" + imagePath);
+            if(icon != null)
+                height = Math.max(icon.getIconHeight() + 6, height);
         }
         return height;
     }

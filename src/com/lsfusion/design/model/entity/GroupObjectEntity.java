@@ -30,16 +30,14 @@ public class GroupObjectEntity {
         if (viewType != null) {
             ClassViewType type = valueOf(viewType.getClassViewType().getText());
             String mode = viewType.getFirstChild().getText();
-            if ("INIT".equals(mode)) {
-                initClassView = type;
-            } else {
+            if (!"INIT".equals(mode)) {
                 for (ClassViewType t : values()) {
                     if (type != t) {
                         banClassView.add(t);
                     }
                 }
-                initClassView = type;
             }
+            initClassView = type;
         }
 
         if (pageSize != null) {

@@ -14,8 +14,13 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PropertyDrawEntity {
+import static com.lsfusion.design.ui.ClassViewType.valueOf;
 
+public class PropertyDrawEntity {
+    
+    protected void initDefaultView() {        
+    }
+    
     public AbstractGroup parent;
 
     public String caption;
@@ -23,7 +28,15 @@ public class PropertyDrawEntity {
     public String propertyName;
 
     public String sID;
-    public boolean toolbar = false;
+
+    public boolean isToolbar(FormEntity entity) {
+        if(forceViewType != null)
+            return forceViewType.isToolbar();
+        
+        GroupObjectEntity toDraw = getToDraw(entity);
+        return toDraw != null && toDraw.initClassView.isToolbar();
+    }
+    
     public ClassViewType forceViewType = null;
     public GroupObjectEntity toDraw;
 
@@ -69,6 +82,8 @@ public class PropertyDrawEntity {
             }
         }
         this.propertyName = propertyName;
+        
+        initDefaultView();
 
         project = form.getProject();
 
@@ -80,6 +95,11 @@ public class PropertyDrawEntity {
 
         LSFPropertyOptions propertyOptions = null;
         if (propDeclaration != null) {
+            if(((LSFPropertyStatement) propDeclaration).getActionStatement() != null)
+                forceViewType = ClassViewType.PANEL;
+            else
+                forceViewType = ClassViewType.GRID;
+                
             propertyOptions = ((LSFPropertyStatement) propDeclaration).getPropertyOptions();
             caption = ((LSFGlobalPropDeclaration) propDeclaration).getCaption();
 //            if (caption == null) {
@@ -103,7 +123,8 @@ public class PropertyDrawEntity {
         }
 
         if (propertyOptions != null) {
-            toolbar = false; //!propertyOptions.getToolbarSettingList().isEmpty();
+            for(LSFViewTypeSetting viewType : propertyOptions.getViewTypeSettingList())
+                forceViewType = valueOf(viewType.getClassViewType().getText());
 
             List<LSFFixedCharWidthSetting> fixedCharWidthSettings = propertyOptions.getFixedCharWidthSettingList();
             if (!fixedCharWidthSettings.isEmpty()) {
@@ -189,10 +210,6 @@ public class PropertyDrawEntity {
                 forceViewType = ClassViewType.valueOf(forceText);
             }
         }
-//        List<LSFFormOptionToolbar> formOptionToolbarList = optionList.getFormOptionToolbarList();
-//        if (!formOptionToolbarList.isEmpty()) {
-//            toolbar = true;
-//        }
     }
 
     public GroupObjectEntity getToDraw(FormEntity form) {

@@ -10,13 +10,17 @@ import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 public class EditFormAction extends PropertyDrawEntity {
     public EditFormAction(String alias, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
         super(alias, "EDITFORM", groupObject.objects, null, commonFormOptions, propertyFormOptions, form);
+    }
+
+    @Override
+    protected void initDefaultView() {
+        super.initDefaultView();
 
         caption = "Редактировать";
         isAction = true;
         iconPath = "edit.png";
         editKey = KeyStrokes.getEditActionPropertyKeyStroke();
         showEditKey = false;
-        toolbar = true;
-        forceViewType = ClassViewType.PANEL;
+        forceViewType = ClassViewType.TOOLBAR;
     }
 }
