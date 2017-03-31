@@ -9,11 +9,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.87</b><br>
+        <b>Version 1.0.88</b><br>
         <ul>
             <li>Minor bug fixes</li>
             <li>Form design changed according to new view types policy</li>
-            <li>Unused properties, classes, groups inspection (disabled)</li>
+            <li>Unused properties, classes, groups inspection (enabled)</li>
         </ul>
     ]]>
     </change-notes>
@@ -198,7 +198,7 @@
 
         <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
 
-        <!--<highlightVisitor implementation="com.lsfusion.references.LSFHighlightVisitorImpl"/>-->
+        <highlightVisitor implementation="com.lsfusion.references.LSFHighlightVisitorImpl"/>
 
         <internalFileTemplate name="lsFusion script"/>
         <internalFileTemplate name="lsFusion settings"/>

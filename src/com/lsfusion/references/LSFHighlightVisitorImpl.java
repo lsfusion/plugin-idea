@@ -17,10 +17,12 @@ package com.lsfusion.references;
 
 import com.intellij.codeInsight.daemon.impl.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightInfoHolder;
+import com.intellij.codeInsight.daemon.impl.analysis.HighlightVisitorImpl;
 import com.intellij.lang.Language;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiResolveHelper;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.actions.ShowErrorsAction;
@@ -40,53 +42,49 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class LSFHighlightVisitorImpl implements HighlightVisitor {
-    private boolean warningsSearchMode;
+public class LSFHighlightVisitorImpl extends HighlightVisitorImpl {
 
     @SuppressWarnings("unused")
-    public LSFHighlightVisitorImpl() {
-    }
-
-    public LSFHighlightVisitorImpl(boolean warningsSearchMode) {
-        this.warningsSearchMode = warningsSearchMode;
+    public LSFHighlightVisitorImpl(@NotNull PsiResolveHelper resolveHelper) {
+        super(resolveHelper);
     }
 
     @Override
     public boolean suitableForFile(@NotNull PsiFile file) {
-        return file instanceof LSFFile;
+        return file instanceof LSFFile || super.suitableForFile(file);
+    }
+
+    public static void analyze(@NotNull PsiFile file) {
+        analyzeLSF(file, null, true);
     }
 
     @Override
-    public void visit(@NotNull PsiElement element) {
-    }
-
-    public void analyze(@NotNull PsiFile file) {
-        analyze(file, false, null, null);
-    }
-
-    @Override
-    public boolean analyze(@NotNull PsiFile file, boolean updateWholeFile, @Nullable HighlightInfoHolder holder, @Nullable Runnable action) {
-        if (ToggleHighlightWarningsAction.isHighlightWarningsEnabled(file.getProject()) || warningsSearchMode) {
-
-            try {
-
-                final FileViewProvider viewProvider = file.getViewProvider();
-                for (Language language : viewProvider.getLanguages()) {
-                    for (PsiElement element : CollectHighlightsUtil.getElementsInRange(viewProvider.getPsi(language), 0, file.getTextLength())) {
-                        if (element instanceof LSFSimpleNameWithCaption && !LSFReferenceAnnotator.isInMetaUsage(element)) {
-                            visitLSFSimpleNameWithCaption(holder, element);
-                        } else if(element instanceof LSFAssignActionPropertyDefinitionBody) {
-                            visitLSFAssignActionPropertyDefinitionBody(holder, (LSFAssignActionPropertyDefinitionBody) element);
-                        }
-                    }
-                }
-            } catch (Exception ignored) {
-            }
+    public boolean analyze(@NotNull PsiFile file, boolean updateWholeFile, @NotNull HighlightInfoHolder holder, @NotNull Runnable action) {
+        super.analyze(file, updateWholeFile, holder, action);
+        if (ToggleHighlightWarningsAction.isHighlightWarningsEnabled(file.getProject())) {
+            analyzeLSF(file, holder, false);
         }
         return true;
     }
 
-    private void visitLSFSimpleNameWithCaption(HighlightInfoHolder holder, PsiElement element) {
+    private static void analyzeLSF(PsiFile file, HighlightInfoHolder holder, boolean warningsSearchMode) {
+        try {
+
+            final FileViewProvider viewProvider = file.getViewProvider();
+            for (Language language : viewProvider.getLanguages()) {
+                for (PsiElement element : CollectHighlightsUtil.getElementsInRange(viewProvider.getPsi(language), 0, file.getTextLength())) {
+                    if (element instanceof LSFSimpleNameWithCaption && !LSFReferenceAnnotator.isInMetaUsage(element)) {
+                        visitLSFSimpleNameWithCaption(holder, element, warningsSearchMode);
+                    } else if(element instanceof LSFAssignActionPropertyDefinitionBody) {
+                        visitLSFAssignActionPropertyDefinitionBody(holder, (LSFAssignActionPropertyDefinitionBody) element, warningsSearchMode);
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static void visitLSFSimpleNameWithCaption(HighlightInfoHolder holder, PsiElement element, boolean warningsSearchMode) {
         PsiElement parent = element.getParent();
         if(parent instanceof LSFPropertyDeclaration || parent instanceof LSFGroupStatement || parent instanceof LSFClassDecl) {
             LSFDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
@@ -104,7 +102,7 @@ public class LSFHighlightVisitorImpl implements HighlightVisitor {
         }
     }
 
-    private String getWarningText(PsiElement element) {
+    private static String getWarningText(PsiElement element) {
         String warningText;
         if (element instanceof LSFPropertyDeclaration) {
             warningText = "Unused Property";
@@ -116,7 +114,7 @@ public class LSFHighlightVisitorImpl implements HighlightVisitor {
         return warningText;
     }
 
-    private void visitLSFAssignActionPropertyDefinitionBody(HighlightInfoHolder holder, LSFAssignActionPropertyDefinitionBody element) {
+    private static void visitLSFAssignActionPropertyDefinitionBody(HighlightInfoHolder holder, LSFAssignActionPropertyDefinitionBody element, boolean warningsSearchMode) {
         LSFPropertyUsageImpl propertyUsage = (LSFPropertyUsageImpl) element.getFirstChild().getFirstChild();
         if (propertyUsage != null) {
             LSFPropDeclaration declaration = propertyUsage.resolveDecl();
@@ -128,7 +126,7 @@ public class LSFHighlightVisitorImpl implements HighlightVisitor {
                         LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
                         if(leftClass != null && rightClass != null) {
                             if (!leftClass.isAssignable(rightClass))
-                                showTypeMismatchHighlight(holder, element, rightClass, leftClass);
+                                showTypeMismatchHighlight(holder, element, rightClass, leftClass, warningsSearchMode);
                         }
                     }
                 } else if (declaration instanceof LSFLocalDataPropertyDefinitionImpl) {
@@ -139,7 +137,7 @@ public class LSFHighlightVisitorImpl implements HighlightVisitor {
                         if (!rightPropertyExpressionList.isEmpty()) {
                             LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
                             if (leftClass != null && rightClass != null && !leftClass.isAssignable(rightClass))
-                                showTypeMismatchHighlight(holder, element, rightClass, leftClass);
+                                showTypeMismatchHighlight(holder, element, rightClass, leftClass, warningsSearchMode);
                         }
                     }
                 }
@@ -147,7 +145,7 @@ public class LSFHighlightVisitorImpl implements HighlightVisitor {
         }
     }
 
-    private void showTypeMismatchHighlight(HighlightInfoHolder holder, LSFAssignActionPropertyDefinitionBody element, LSFClassSet class1, LSFClassSet class2) {
+    private static void showTypeMismatchHighlight(HighlightInfoHolder holder, LSFAssignActionPropertyDefinitionBody element, LSFClassSet class1, LSFClassSet class2, boolean warningsSearchMode) {
         String message = String.format("Type mismatch: unsafe cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName());
         if (warningsSearchMode) {
             ShowErrorsAction.showErrorMessage(element, message, LSFErrorLevel.WARNING);
@@ -156,16 +154,5 @@ public class LSFHighlightVisitorImpl implements HighlightVisitor {
                     String.format("Type mismatch: unsafe cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName())).create();
             holder.add(highlightInfo);
         }
-    }
-
-    @NotNull
-    @Override
-    public HighlightVisitor clone() {
-        return new LSFHighlightVisitorImpl(warningsSearchMode);
-    }
-
-    @Override
-    public int order() {
-        return 0;
     }
 }

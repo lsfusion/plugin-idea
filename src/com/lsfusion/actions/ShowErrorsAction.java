@@ -115,7 +115,6 @@ public class ShowErrorsAction extends AnAction {
                             }
                         }
                         ANNOTATOR.warningsSearchMode = warningsSearchMode;
-                        LSFHighlightVisitorImpl highlightVisitor = new LSFHighlightVisitorImpl(warningsSearchMode);
 
                         int index = 0;
                         for (VirtualFile file : files) {
@@ -128,7 +127,7 @@ public class ShowErrorsAction extends AnAction {
                                 PsiFile lsfFile = PsiManager.getInstance(project).findFile(file);
                                 findLSFErrors(lsfFile);
                                 if(warningsSearchMode && lsfFile != null)
-                                    highlightVisitor.analyze(lsfFile);
+                                    LSFHighlightVisitorImpl.analyze(lsfFile);
 
                             } else {
                                 findInjectedErrors(PsiManager.getInstance(project).findFile(file));
