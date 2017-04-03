@@ -349,6 +349,9 @@ public abstract class LSFPropReferenceImpl extends LSFFullNameReferenceImpl<LSFP
         List<LSFClassSet> declClasses = decl.resolveParamClasses();
         if (declClasses == null)
             return true;
+        
+        if(declClasses.size() != usageContext.size())
+            return false;
 
         if (LSFPsiImplUtil.containsAll(declClasses, usageContext, false)) // подходят по классам
             return true;
