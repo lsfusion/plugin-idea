@@ -1202,6 +1202,7 @@ treeGroupDeclaration ::= simpleName
 
 formGroupObjectDeclaration ::= formCommonGroupObject formGroupObjectOptions
 formGroupObjectOptions ::= (    formGroupObjectViewType 
+                           |    formGroupObjectInitViewType 
                            |    formGroupObjectPageSize
                            |    formGroupObjectUpdate
                            |    formGroupObjectRelativePosition
@@ -1215,7 +1216,8 @@ treeGroupParentDeclaration ::= PARENT (propertyUsage | LBRAC nonEmptyPropertyUsa
 formCommonGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDeclaration
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFGroupObjectDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration"}
 
-formGroupObjectViewType ::= (INIT | FIXED) classViewType
+formGroupObjectViewType ::= classViewType
+formGroupObjectInitViewType ::= INIT | FIXED
 
 classViewType ::= PANEL | GRID | TOOLBAR
 

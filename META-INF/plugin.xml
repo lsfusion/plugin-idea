@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.87</version>
+    <version>1.0.88</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,7 @@
             <li>Minor bug fixes</li>
             <li>Form design changed according to new view types policy</li>
             <li>Unused properties, classes, groups inspection (enabled)</li>
+            <li>INIT and FIXED view types became optional</li>
             <li>ITEXT - case insensitive text</li>
         </ul>
     ]]>
