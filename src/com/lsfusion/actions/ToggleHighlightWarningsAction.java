@@ -36,7 +36,7 @@ public class ToggleHighlightWarningsAction extends ToggleAction {
     }
     
     public static boolean isHighlightWarningsEnabled(Project project) {
-        return project != null && PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_HIGHLIGHT_WARNINGS_ON, true);
+        return project != null && PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_HIGHLIGHT_WARNINGS_ON, false);
     }
 
     public static void setHighlightWarningsEnabled(Project project, boolean enabled) {
