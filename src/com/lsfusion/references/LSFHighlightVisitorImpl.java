@@ -51,7 +51,7 @@ public class LSFHighlightVisitorImpl extends HighlightVisitorImpl {
 
     @Override
     public boolean suitableForFile(@NotNull PsiFile file) {
-        return file instanceof LSFFile || super.suitableForFile(file);
+        return (file instanceof LSFFile && ToggleHighlightWarningsAction.isHighlightWarningsEnabled(file.getProject())) || super.suitableForFile(file);
     }
 
     public static void analyze(@NotNull PsiFile file) {
@@ -61,9 +61,8 @@ public class LSFHighlightVisitorImpl extends HighlightVisitorImpl {
     @Override
     public boolean analyze(@NotNull PsiFile file, boolean updateWholeFile, @NotNull HighlightInfoHolder holder, @NotNull Runnable action) {
         super.analyze(file, updateWholeFile, holder, action);
-        if (ToggleHighlightWarningsAction.isHighlightWarningsEnabled(file.getProject())) {
+        if(file instanceof LSFFile)
             analyzeLSF(file, holder, false);
-        }
         return true;
     }
 
