@@ -1,28 +1,12 @@
-/*
- * Copyright 2000-2017 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.lsfusion.references;
 
 import com.intellij.codeInsight.daemon.impl.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightInfoHolder;
-import com.intellij.codeInsight.daemon.impl.analysis.HighlightVisitorImpl;
 import com.intellij.lang.Language;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiResolveHelper;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.actions.ShowErrorsAction;
@@ -38,20 +22,19 @@ import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class LSFHighlightVisitorImpl extends HighlightVisitorImpl {
+public class LSFHighlightVisitorImpl extends DefaultHighlightVisitor {
 
-    @SuppressWarnings("unused")
-    public LSFHighlightVisitorImpl(@NotNull PsiResolveHelper resolveHelper) {
-        super(resolveHelper);
+
+    LSFHighlightVisitorImpl(@NotNull Project project, @NotNull CachedAnnotators cachedAnnotators) {
+        super(project, cachedAnnotators);
     }
 
     @Override
     public boolean suitableForFile(@NotNull PsiFile file) {
-        return (file instanceof LSFFile && ToggleHighlightWarningsAction.isHighlightWarningsEnabled(file.getProject())) || super.suitableForFile(file);
+        return (file instanceof LSFFile && ToggleHighlightWarningsAction.isHighlightWarningsEnabled(file.getProject()))/* || super.suitableForFile(file)*/;
     }
 
     public static void analyze(@NotNull PsiFile file) {
@@ -60,10 +43,9 @@ public class LSFHighlightVisitorImpl extends HighlightVisitorImpl {
 
     @Override
     public boolean analyze(@NotNull PsiFile file, boolean updateWholeFile, @NotNull HighlightInfoHolder holder, @NotNull Runnable action) {
-        super.analyze(file, updateWholeFile, holder, action);
-        if(file instanceof LSFFile)
-            analyzeLSF(file, holder, false);
-        return true;
+        boolean result = super.analyze(file, updateWholeFile, holder, action);
+        analyzeLSF(file, holder, false);
+        return result;
     }
 
     private static void analyzeLSF(PsiFile file, HighlightInfoHolder holder, boolean warningsSearchMode) {
