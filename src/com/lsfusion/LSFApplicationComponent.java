@@ -1,7 +1,7 @@
 package com.lsfusion;
 
 import com.intellij.openapi.components.ApplicationComponent;
-import io.netty.util.internal.PlatformDependent;
+import org.apache.commons.lang.SystemUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class LSFApplicationComponent implements ApplicationComponent {
@@ -9,7 +9,7 @@ public class LSFApplicationComponent implements ApplicationComponent {
     public void initComponent() {
         // попытка исправить падающий иногда IllegalArgumentException, связанный с TimSort. исправлено в Java9
         // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=7075600
-        if (PlatformDependent.javaVersion() < 9) {
+        if (SystemUtils.JAVA_VERSION_FLOAT < 1.9) {
             System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
         }
     }
