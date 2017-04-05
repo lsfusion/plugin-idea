@@ -11,10 +11,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.91</b><br>
         <ul>
-            <li>CHANGE clause in input operators</li>
-            <li>OBJVALUE -> VALUE</li>
-            <li>PRINT form SHOW WAIT/NOWAIT</li>
-            <li>warnings for PRINT</>
+            <li>NEW operator</li>
         </ul>
     ]]>
     </change-notes>

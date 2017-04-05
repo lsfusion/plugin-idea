@@ -24,6 +24,10 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         return builder_.getTokenType() == LSFTypes.ID && builder_.lookAhead(1) == LSFTypes.LBRAC;
     }
 
+    public static boolean semi(PsiBuilder builder_, int level_) {
+        return builder_.getTokenType() == LSFTypes.SEMI;
+    }
+
     private static Key<Boolean> INNERID = Key.create("lsf.inner.id");
 
     public static boolean innerIDStop(PsiBuilder builder_, int level_) {

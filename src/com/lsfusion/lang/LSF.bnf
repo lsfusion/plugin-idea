@@ -600,6 +600,7 @@ private extendContextActionPDB ::=  assignActionPropertyDefinitionBody
                         |	changeClassActionPropertyDefinitionBody
                         |	deleteActionPropertyDefinitionBody
                         |	addObjectActionPropertyDefinitionBody
+                        |	newActionPropertyDefinitionBody // should be after addObject 
                         |   dialogActionPropertyDefinitionBody
                         |   inputxActionPropertyDefinitionBody
                         |   confirmxActionPropertyDefinitionBody
@@ -779,9 +780,12 @@ editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION | NESTED)? customClas
     methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
-addObjectActionPropertyDefinitionBody ::= NEW customClassUsage (WHERE propertyExpression)? (TO mappedPropertyExprParam)?
+private addObjToClause ::= (TO mappedPropertyExprParam) { pin = 1 }
+private addObjWhereClause ::= (WHERE propertyExpression addObjToClause?) { pin = 1 }
+
+addObjectActionPropertyDefinitionBody ::= NEW customClassUsage (addObjWhereClause | addObjToClause | << semi >>)                                                                 
 {
-    pin = 1
+    pin = 3
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
@@ -1118,7 +1122,15 @@ forActionPropertyDefinitionBody ::= forActionPropertyMainBody
     methods = [ inferActionParamClasses ]
 }
 
-forActionPropertyMainBody ::= FOR (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
+newActionPropertyDefinitionBody ::= forAddObjClause
+                              actionPropertyDefinitionBody
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+}
+
+forActionPropertyMainBody ::= FOR propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)?
                               inlineOption
                               (forAddObjClause)?
                               DO actionPropertyDefinitionBody
@@ -1128,7 +1140,7 @@ forActionPropertyMainBody ::= FOR (propertyExpression (ORDER (DESC)? nonEmptyPro
     methods = [ getContextModifier getContextInferrer ]
 }
                                                        
-whileActionPropertyDefinitionBody ::= WHILE (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
+whileActionPropertyDefinitionBody ::= WHILE propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)?
 		                              inlineOption
 		                              (forAddObjClause)?
 		                              DO actionPropertyDefinitionBody
