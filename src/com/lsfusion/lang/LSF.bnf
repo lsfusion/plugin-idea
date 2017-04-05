@@ -717,6 +717,11 @@ printActionPropertyDefinitionBody ::=
 		    ) 
 		|
 		    (
+		        SHOW
+		        syncTypeLiteral?
+		    )
+		|
+		    (
 		    syncTypeLiteral?
 		    (AUTO)? 
 		    (TO propertyExpression)?

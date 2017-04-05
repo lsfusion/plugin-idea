@@ -9,10 +9,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.90</b><br>
+        <b>Version 1.0.91</b><br>
         <ul>
             <li>CHANGE clause in input operators</li>
             <li>OBJVALUE -> VALUE</li>
+            <li>PRINT form SHOW WAIT/NOWAIT</li>
         </ul>
     ]]>
     </change-notes>
