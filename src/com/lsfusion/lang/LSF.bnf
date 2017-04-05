@@ -645,7 +645,8 @@ private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage formSingleActionObj
 formSingleActionObject ::= OBJECT formActionObjectProps {pin = 1}
 constraintFilter ::= (CONSTRAINTFILTER (EQUALS propertyExpression)?)
 objectInProps ::= EQUALS propertyExpression NULL? { pin = 1 }
-objectInputProps ::= INPUT simpleName? NULL? inputDestination? constraintFilter? { pin = 1 } 
+changeInput ::= (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOASSIGN?) { pin = 1 }
+objectInputProps ::= (INPUT | changeInput) simpleName? NULL? inputDestination? constraintFilter? { pin = 1 } 
 private formActionObjectProps ::= objectInProps? objectInputProps? 
 formActionObjectUsage ::= objectUsage formActionObjectProps {
     pin = 1
@@ -975,7 +976,7 @@ inputActionPropertyDefinitionBody ::= INPUT ((PRIMITIVE_TYPE EQUALS propertyExpr
     methods = [inferActionParamClasses]
 }
 
-inputxActionPropertyDefinitionBody ::= INPUTX (paramDeclare EQUALS)? (builtInClassName | propertyExpression) doInputBody
+inputxActionPropertyDefinitionBody ::= INPUTX (paramDeclare EQUALS)? (builtInClassName | propertyExpression) CHANGE? inputDestination? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendParamContext"
@@ -1349,7 +1350,7 @@ formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 
 predefinedAddPropertyName ::=  NEW | NEWEDIT
 
-predefinedFormPropertyName ::= OBJVALUE
+predefinedFormPropertyName ::= VALUE
                            |    SELECTION
                            |    predefinedAddPropertyName (LSQBR explicitPropClass RSQBR)?
                            |    DELETE

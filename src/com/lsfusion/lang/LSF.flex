@@ -286,6 +286,8 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NEWTHREAD"              			    { return NEWTHREAD; }
   "NO"                      			{ return NO; }
   "NOCANCEL"                			{ return NOCANCEL; }
+  "NOASSIGN"                			{ return NOASSIGN; }
+  "NOCONSTRAINTFILTER"                  { return NOCONSTRAINTFILTER; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOHEADER"                			{ return NOHEADER; }
   "NOT"                     			{ return NOT; }
@@ -296,7 +298,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "OBJECTS"                 			{ return OBJECTS; }
   "CONTEXTFILTER"              			{ return CONTEXTFILTER; }
   "CONSTRAINTFILTER"              		{ return CONSTRAINTFILTER; }
-  "OBJVALUE"                			{ return OBJVALUE; }
   "OK"                      			{ return OK; }
   "ON"                      			{ return ON; }
   "OPENFILE"                			{ return OPENFILE; }
