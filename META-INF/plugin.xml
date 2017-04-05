@@ -14,6 +14,7 @@
             <li>CHANGE clause in input operators</li>
             <li>OBJVALUE -> VALUE</li>
             <li>PRINT form SHOW WAIT/NOWAIT</li>
+            <li>warnings for PRINT</>
         </ul>
     ]]>
     </change-notes>
@@ -198,7 +199,7 @@
 
         <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
 
-        <!--<highlightVisitor implementation="com.lsfusion.references.LSFHighlightVisitorImpl"/>-->
+        <highlightVisitor implementation="com.lsfusion.references.LSFHighlightVisitor"/>
 
         <internalFileTemplate name="lsFusion script"/>
         <internalFileTemplate name="lsFusion settings"/>
