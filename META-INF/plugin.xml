@@ -12,6 +12,8 @@
         <b>Version 1.0.91</b><br>
         <ul>
             <li>NEW operator</li>
+            <li>PRINT form SHOW WAIT/NOWAIT</li>
+            <li>warnings for PRINT</>
         </ul>
     ]]>
     </change-notes>
