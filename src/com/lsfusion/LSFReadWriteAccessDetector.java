@@ -33,6 +33,9 @@ public class LSFReadWriteAccessDetector extends ReadWriteAccessDetector {
                 if (element.getParent() instanceof LSFWriteWhenStatement && element instanceof LSFMappedPropertyClassParamDeclare) {
                     return Access.Write;
                 }
+                if(element.getParent() instanceof LSFObjectInProps && element instanceof LSFPropertyExpression) {
+                    return Access.Write;
+                }
             }
 
             element = element.getParent();
