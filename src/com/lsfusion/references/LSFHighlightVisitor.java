@@ -61,7 +61,7 @@ public class LSFHighlightVisitor implements HighlightVisitor, DumbAware {
 
     @Override
     public boolean suitableForFile(@NotNull final PsiFile file) {
-        return (file instanceof LSFFile && ToggleHighlightWarningsAction.isHighlightWarningsEnabled(file.getProject()));
+        return (file instanceof LSFFile && file.isWritable() && ToggleHighlightWarningsAction.isHighlightWarningsEnabled(file.getProject()));
     }
 
     @Override
