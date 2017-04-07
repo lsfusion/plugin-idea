@@ -214,14 +214,6 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(((LSFForActionPropertyDefinitionBody) sourceStatement.getParent()));
     }
 
-    public static ContextModifier getContextModifier(@NotNull LSFNewActionPropertyDefinitionBody sourceStatement) {
-        return new AddObjectContextModifier(sourceStatement.getForAddObjClause());
-    }
-
-    public static ContextInferrer getContextInferrer(@NotNull LSFNewActionPropertyDefinitionBody sourceStatement) {
-        return new ActionExprInferrer(sourceStatement);
-    }
-
     public static ContextModifier getContextModifier(@NotNull LSFWhileActionPropertyDefinitionBody sourceStatement) {
         return new ExprsContextModifier(sourceStatement.getPropertyExpression());
     }
@@ -2821,15 +2813,6 @@ public class LSFPsiImplUtil {
         LSFActionPropertyDefinitionBody elseAction = body.getActionPropertyDefinitionBody();
         if (elseAction != null) {
             result = result.or(inferActionParamClasses(elseAction, params));    
-        }
-        return result;
-    }
-
-    public static Inferred inferActionParamClasses(LSFNewActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        Inferred result = Inferred.EMPTY;
-        LSFActionPropertyDefinitionBody doAction = body.getActionPropertyDefinitionBody();
-        if (doAction != null) {
-            result = inferActionParamClasses(doAction, params);
         }
         return result;
     }
