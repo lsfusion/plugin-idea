@@ -13,7 +13,7 @@
         <ul>
             <li>NEW operator</li>
             <li>PRINT form SHOW WAIT/NOWAIT</li>
-            <li>warnings for PRINT</>
+            <li>Inspections for LSF files</>
         </ul>
     ]]>
     </change-notes>
@@ -84,8 +84,6 @@
                     text="Show property complexity" description="Toggle property complexity"/>
             <action id="ToggleLSFShowTable" class="com.lsfusion.actions.ToggleShowTableAction"
                     text="Show property table" description="Toggle showing property table"/>
-            <action id="ToggleLSFHighlightWarnings" class="com.lsfusion.actions.ToggleHighlightWarningsAction"
-                    text="Highlight warnings" description="Toggle highlighting warnings"/>
             
             <group id="propertyFolding" popup="true" text="Property classes">
                 <action id="AllPropertyFolding" class="com.lsfusion.actions.folding.ShowAllPropertyFoldingAction"
@@ -198,7 +196,17 @@
 
         <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
 
-        <highlightVisitor implementation="com.lsfusion.references.LSFHighlightVisitor"/>
+        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFUnused" displayName="LSF Unused element"
+                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="false" level="WARNING"
+                         implementationClass="com.lsfusion.inspections.LSFUnusedInspectionTool" hasStaticDescription="true"/>
+
+        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFTypeMismatch" displayName="LSF Type mismatch"
+                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
+                         implementationClass="com.lsfusion.inspections.LSFTypeMismatchInspectionTool" hasStaticDescription="true"/>
+
+        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFClassViewTypeInPrint" displayName="LSF ClassViewType in PRINT"
+                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
+                         implementationClass="com.lsfusion.inspections.LSFClassViewTypeInPrintInspectionTool" hasStaticDescription="true"/>
 
         <internalFileTemplate name="lsFusion script"/>
         <internalFileTemplate name="lsFusion settings"/>

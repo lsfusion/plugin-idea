@@ -34,7 +34,7 @@ import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.references.LSFHighlightVisitor;
+import com.lsfusion.inspections.LSFProblemsVisitor;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -127,7 +127,7 @@ public class ShowErrorsAction extends AnAction {
                                 PsiFile lsfFile = PsiManager.getInstance(project).findFile(file);
                                 findLSFErrors(lsfFile);
                                 if(warningsSearchMode && lsfFile != null)
-                                    LSFHighlightVisitor.analyze(lsfFile);
+                                    LSFProblemsVisitor.analyze(lsfFile);
 
                             } else {
                                 findInjectedErrors(PsiManager.getInstance(project).findFile(file));

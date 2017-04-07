@@ -1,0 +1,32 @@
+package com.lsfusion.inspections;
+
+import com.intellij.codeInspection.LocalInspectionToolSession;
+import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.lsfusion.lang.psi.LSFAssignActionPropertyDefinitionBody;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+public class LSFTypeMismatchInspectionTool extends LSFLocalInspectionTool {
+
+    @NotNull
+    @Override
+    public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly, @NotNull LocalInspectionToolSession session) {
+        return new PsiElementVisitor() {
+
+            @Override
+            public void visitElement(PsiElement element) {
+                if (element instanceof LSFAssignActionPropertyDefinitionBody) {
+                    LSFProblemsVisitor.visitLSFAssignActionPropertyDefinitionBody(holder, (LSFAssignActionPropertyDefinitionBody) element, false);
+                }
+            }
+        };
+    }
+
+    @Nullable
+    @Override
+    public String getStaticDescription() {
+        return "Reports unsafe class cast in assign.";
+    }
+}
