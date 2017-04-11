@@ -102,16 +102,6 @@
 
             <separator/>
             
-            <action id="Form.Refactoring" class="com.lsfusion.actions.FormRefactoring"
-                    text="Form Refactoring" description="Form Refactoring">
-            </action>
-            <action id="Form.Refactoring2" class="com.lsfusion.actions.FormRefactoring2"
-                    text="Form Refactoring2" description="Form Refactoring 2">
-            </action>
-            <action id="Form.Refactoring3" class="com.lsfusion.actions.FormRefactoring3"
-                    text="Form Refactoring3" description="Form Refactoring 3">
-            </action>
-            
             <action id="TypeInfer.File" class="com.lsfusion.lang.typeinfer.FileTypeInferAction" text="Infer _types for file"
                     description="Infer types for file">
                 <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>
