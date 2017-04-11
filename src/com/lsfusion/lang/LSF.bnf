@@ -231,19 +231,21 @@ private propertyImplementation ::= actionStatement | propertyCalcStatement
 
 propertyCalcStatement ::= (expressionUnfriendlyPD | propertyExpression)
 
-actionStatement ::= ACTION (actionUnfriendlyPD | topActionPropertyDefinitionBody) {
+actionStatement ::= (ACTION actionUnfriendlyPD | topActionPropertyDefinitionBody) {
     pin = 1
     // actually declare context, but it's pretty difficult to implement using only classes
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer ]
 }
 
-actionUnfriendlyPD ::= abstractActionPropertyDefinition
+actionUnfriendlyPD ::= (abstractActionPropertyDefinition
                         |	addFormActionPropertyDefinitionBody
                         |	editFormActionPropertyDefinitionBody
                         |	customActionPropertyDefinitionBody
-    	                |   nativeActionPropertyDefinition
-{methods = [ resolveValueParamClasses]}
+    	                |   nativeActionPropertyDefinition)    	               
+{
+    methods = [ resolveValueParamClasses]
+}
 
 propertyDeclParams ::= LBRAC classParamDeclareList RBRAC
 
@@ -583,12 +585,13 @@ nativeActionPropertyDefinition ::= NATIVE LBRAC classNameList RBRAC
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
-private topActionPropertyDefinitionBody ::= actionPropertyDefinitionBody
+private topActionPropertyDefinitionBody ::= listActionPropertyDefinitionBody
 
 // extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
-actionPropertyDefinitionBody ::=    customActionPDB
-                                |   extendContextActionPDB
-                                |	keepContextActionPDB
+actionPropertyDefinitionBody ::=    (   customActionPDB
+                                    |   extendContextActionPDB
+                                    |	keepContextActionPDB)
+                                    << semicolonIfNeeded >>
 {
     implements = "com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ inferActionParamClasses ]
@@ -1014,7 +1017,7 @@ listActionPropertyDefinitionBody ::=    LBRACE
 
 private nestedPropertiesSelector ::= NESTED (LOCAL | (LBRAC nonEmptyNoContextPropertyUsageList RBRAC))
 
-private listActionStatement ::= (   actionPropertyDefinitionBody << semicolonIfNeeded >>  //  !} => ;
+private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
                                 |   localDataPropertyDefinition SEMI
                                 |   emptyStatement
                                 )
@@ -1391,7 +1394,7 @@ formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage 
 overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 		                (WHEN propertyExpression THEN)?
 		                (	propertyExpression
-		                |	ACTION topActionPropertyDefinitionBody
+		                |	topActionPropertyDefinitionBody
 		                )
 		                << semicolonIfNeeded >>
 {
@@ -1442,8 +1445,8 @@ writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression 
 ////////////////////////////////// EVENT STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-eventStatement ::= WHEN baseEvent propertyExpression inlineOption
-		                DO actionPropertyDefinitionBody (ORDER (DESC)? nonEmptyPropertyExpressionList)?
+eventStatement ::= WHEN baseEvent propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)?
+		                inlineOption DO actionPropertyDefinitionBody
 		           << semicolonIfNeeded >>
 {
     pin = 1

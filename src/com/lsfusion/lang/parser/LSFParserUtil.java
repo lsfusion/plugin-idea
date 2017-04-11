@@ -70,7 +70,8 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
     }
 
     public static boolean semicolonIfNeeded(PsiBuilder builder_, int level) {
-        if (lookBehind(builder_, 1) != LSFTypes.RBRACE) {
+        IElementType prevToken = lookBehind(builder_, 1);
+        if (prevToken != LSFTypes.RBRACE && prevToken != LSFTypes.SEMI) {
             if (builder_.getTokenType() == LSFTypes.SEMI) {
                 builder_.advanceLexer();
                 return true;
@@ -80,6 +81,19 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         }
         return true;
     }
+//
+//    public static boolean tempSemicolonIfNeeded(PsiBuilder builder_, int level) {
+//        IElementType prevToken = lookBehind(builder_, 1);
+//        if (prevToken != LSFTypes.RBRACE && prevToken != LSFTypes.SEMI) {
+//            if (builder_.getTokenType() == LSFTypes.SEMI) {
+//                builder_.advanceLexer();
+//                return true;
+//            }
+////            builder_.error("semicolon expected");
+//            return true;
+//        }
+//        return true;
+//    }
 
     @Nullable
     public static IElementType lookBehind(PsiBuilder builder_, int steps) {

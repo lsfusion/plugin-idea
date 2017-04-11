@@ -204,9 +204,16 @@ public class MetaTransaction {
         return BaseUtils.immutableCast(leafElements);
     }
 
-    public static ASTNode findLeafToken(ASTNode node) {
+    public static ASTNode findRightLeafToken(ASTNode node) {
         List<ASTNode> leafTokens = getLeafTokens(node);
         return leafTokens.get(leafTokens.size() - 1);
+    }
+
+    public static ASTNode findLeftLeafToken(ASTNode node) {
+        List<ASTNode> leafTokens = getLeafTokens(node);
+        if(leafTokens.isEmpty())
+            return null;
+        return leafTokens.get(0);
     }
 
     private static void recMetaTokens(ASTNode node, List<LeafElement> result, boolean first) {

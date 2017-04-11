@@ -916,7 +916,7 @@ public class ShortenNamesProcessor {
                         List<LSFParamDeclaration> params = LSFPsiImplUtil.resolveParams(mappedDeclare.getClassParamDeclareList());
                         if (params != null) {
                             List<LSFPropertyExpression> peList = ovStatement.getPropertyExpressionList();
-                            LSFActionPropertyDefinitionBody body = ovStatement.getActionPropertyDefinitionBody();
+                            LSFListActionPropertyDefinitionBody body = ovStatement.getListActionPropertyDefinitionBody();
                             if (body != null) {
                                 if (peList.size() > 0)
                                     break;
@@ -945,7 +945,7 @@ public class ShortenNamesProcessor {
         }, result);
     }
     
-    private static void proceedImpl(LSFActionPropertyDefinitionBody pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Map<PropId, Set<PropId>> result) {
+    private static void proceedImpl(LSFListActionPropertyDefinitionBody pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Map<PropId, Set<PropId>> result) {
         proceedImpl(pe, abst, params, LSFExecActionPropertyDefinitionBody.class, new Getter<LSFExecActionPropertyDefinitionBody>() {
             public Pair<LSFPropertyObject, LSFPropertyExpressionList> get(LSFExecActionPropertyDefinitionBody element) {
                 return Pair.create(element.getPropertyObject(), element.getPropertyExpressionList());

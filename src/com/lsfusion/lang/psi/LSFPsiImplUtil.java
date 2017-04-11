@@ -45,7 +45,7 @@ public class LSFPsiImplUtil {
             if (expression != null)
                 return new ExprsContextInferrer(expression);
         } else {
-            LSFActionPropertyDefinitionBody body = actionStatement.getActionPropertyDefinitionBody();
+            LSFListActionPropertyDefinitionBody body = actionStatement.getListActionPropertyDefinitionBody();
             if(body != null)
                 return new ActionInferrer(body);
         }
@@ -74,7 +74,7 @@ public class LSFPsiImplUtil {
         List<LSFPropertyExpression> peList = sourceStatement.getPropertyExpressionList();
         ContextInferrer result = peList.isEmpty() ? ContextInferrer.EMPTY : new ExprsContextInferrer(peList);
 
-        LSFActionPropertyDefinitionBody body = sourceStatement.getActionPropertyDefinitionBody();
+        LSFListActionPropertyDefinitionBody body = sourceStatement.getListActionPropertyDefinitionBody();
         if (body != null) {
             ActionExprInferrer actionInfer = new ActionExprInferrer(body);
 
@@ -88,7 +88,7 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFActionStatement sourceStatement) {
-        LSFActionPropertyDefinitionBody body = sourceStatement.getActionPropertyDefinitionBody();
+        LSFListActionPropertyDefinitionBody body = sourceStatement.getListActionPropertyDefinitionBody();
         return body == null ? ContextInferrer.EMPTY : new ActionExprInferrer(body);
     }
 
@@ -2577,7 +2577,7 @@ public class LSFPsiImplUtil {
                 LSFActionStatement actionStatement = exprObject.getActionStatement();
                 assert actionStatement != null;
 
-                LSFActionPropertyDefinitionBody body = actionStatement.getActionPropertyDefinitionBody();
+                LSFListActionPropertyDefinitionBody body = actionStatement.getListActionPropertyDefinitionBody();
                 if(body != null) {
                     joinClasses = null;
                 } else { // contextUnfriendly
