@@ -1045,7 +1045,7 @@ assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | ass
 private assignActionPropertyDefinitionBody1 ::= ASSIGN mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 1}
 private assignActionPropertyDefinitionBody2 ::= mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 2}
 
-tryActionPropertyDefinitionBody ::= TRY actionPropertyDefinitionBody ((FINALLY actionPropertyDefinitionBody) | ((CATCH SEMI)?))
+tryActionPropertyDefinitionBody ::= TRY actionPropertyDefinitionBody (FINALLY actionPropertyDefinitionBody)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression" methods = [inferActionParamClasses]
