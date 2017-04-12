@@ -588,61 +588,60 @@ nativeActionPropertyDefinition ::= NATIVE LBRAC classNameList RBRAC
 private topActionPropertyDefinitionBody ::= listActionPropertyDefinitionBody
 
 // extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
-actionPropertyDefinitionBody ::=    (   customActionPDB
-                                    |   extendContextActionPDB
-                                    |	keepContextActionPDB)
-                                    << semicolonIfNeeded >>
+actionPropertyDefinitionBody ::=    (   recursiveActionPDB
+                                    |   leafActionPDB
+                                    )                                    
 {
     implements = "com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ inferActionParamClasses ]
 }
 
-private extendContextActionPDB ::=  assignActionPropertyDefinitionBody
-                        |	forActionPropertyDefinitionBody
-                        |   whileActionPropertyDefinitionBody
-                        |	changeClassActionPropertyDefinitionBody
-                        |	deleteActionPropertyDefinitionBody
-                        |	addObjectActionPropertyDefinitionBody
-                        |   dialogActionPropertyDefinitionBody
-                        |   inputxActionPropertyDefinitionBody
-                        |   confirmxActionPropertyDefinitionBody
+private recursiveActionPDB ::=  recursiveExtendContextActionPDB | recursiveKeepContextActionPDB
+private recursiveExtendContextActionPDB ::=  	forActionPropertyDefinitionBody
+                                            |   whileActionPropertyDefinitionBody
+                                            |	dialogActionPropertyDefinitionBody // mixed, input
+                                            |	inputActionPropertyDefinitionBody // mixed, input
 
-private keepContextActionPDB ::=    listActionPropertyDefinitionBody
-                        |	requestInputActionPropertyDefinitionBody
-                        |   requestActionPropertyDefinitionBody
-                        |   inputActionPropertyDefinitionBody
-                        |	activeFormActionPropertyDefinitionBody
-                        |	activateActionPropertyDefinitionBody
-                        |	execActionPropertyDefinitionBody
-                        |   tryActionPropertyDefinitionBody
-                        |	ifActionPropertyDefinitionBody
-                        |	caseActionPropertyDefinitionBody
-                        |	multiActionPropertyDefinitionBody
-                        |	terminalFlowActionPropertyDefinitionBody
-                        |   applyActionPropertyDefinitionBody
-                        |   cancelActionPropertyDefinitionBody
+private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
+                                        |	    confirmActionPropertyDefinitionBody// mixed, input
+                                        |	    newSessionActionPropertyDefinitionBody
+                                        |	    requestActionPropertyDefinitionBody
+                                        |	    tryActionPropertyDefinitionBody // mixed
+                                        |	    ifActionPropertyDefinitionBody
+                                        |	    caseActionPropertyDefinitionBody
+                                        |	    multiActionPropertyDefinitionBody	
+                                        |	    applyActionPropertyDefinitionBody
+                                        |       newThreadActionPropertyDefinitionBody // mixed
+                                        |	    newExecutorActionPropertyDefinitionBody // mixed, recursive but allways semi
 
-private customActionPDB ::= formActionPropertyDefinitionBody
-                |   exportActionPropertyDefinitionBody
-                |   printActionPropertyDefinitionBody
-                |   messageActionPropertyDefinitionBody
-                |   asyncUpdateActionPropertyDefinitionBody
-                |   seekObjectActionPropertyDefinitionBody
-                |   confirmActionPropertyDefinitionBody
-                |   emailActionPropertyDefinitionBody
-                |	fileActionPropertyDefinitionBody
-                |	evalActionPropertyDefinitionBody
-                |	drillDownActionPropertyDefinitionBody
-                |	focusActionPropertyDefinitionBody
-                |   readActionPropertyDefinitionBody
-                |   writeActionPropertyDefinitionBody
-                |   importActionPropertyDefinitionBody
-                |   importFormActionPropertyDefinitionBody
-                |   newThreadActionPropertyDefinitionBody
-                |   newExecutorActionPropertyDefinitionBody
-                |   newSessionActionPropertyDefinitionBody
+private leafActionPDB ::=  (leafExtendContextActionPDB | leafKeepContextActionPDB) SEMI
+private leafExtendContextActionPDB ::=          assignActionPropertyDefinitionBody
+                                        |	    changeClassActionPropertyDefinitionBody
+                                        |	    deleteActionPropertyDefinitionBody
+                                        |	    addObjectActionPropertyDefinitionBody
 
-private mappedForm ::= ((   (DIALOG | EDIT) customClassUsage formSingleActionObject?)
+private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody	
+                                        |	    terminalFlowActionPropertyDefinitionBody
+                                      	|  	    cancelActionPropertyDefinitionBody
+                                      	|	    formActionPropertyDefinitionBody
+                                      	|	    printActionPropertyDefinitionBody
+                                      	|	    exportActionPropertyDefinitionBody
+                                      	|	    messageActionPropertyDefinitionBody
+                                      	|	    asyncUpdateActionPropertyDefinitionBody
+                                      	|	    seekObjectActionPropertyDefinitionBody
+                                      	|	    emailActionPropertyDefinitionBody
+                                      	|	    fileActionPropertyDefinitionBody
+                                      	|	    evalActionPropertyDefinitionBody
+                                      	|	    drillDownActionPropertyDefinitionBody
+                                      	|	    focusActionPropertyDefinitionBody
+                                      	|	    readActionPropertyDefinitionBody
+                                      	|	    writeActionPropertyDefinitionBody
+                                      	|	    importActionPropertyDefinitionBody
+                                      	|	    importFormActionPropertyDefinitionBody
+                                      	|	    activeFormActionPropertyDefinitionBody
+                                      	|	    activateActionPropertyDefinitionBody
+
+private mappedForm ::= ((   (LIST | EDIT) customClassUsage formSingleActionObject?)
                         |   (formUsage formActionObjectList?) ) {pin = 1 }
 
 formSingleActionObject ::= OBJECT formActionObjectProps {pin = 1}
@@ -698,12 +697,12 @@ dialogActionPropertyDefinitionBody ::=
     methods = [inferActionParamClasses resolveFormDecl getContextModifier getContextInferrer]
 }
 
-doInputBody ::= INREQUEST | (DO actionPropertyDefinitionBody)
+doInputBody ::= SEMI | (DO actionPropertyDefinitionBody)
 
 inputDestination ::= TO propertyUsage
 
 syncTypeLiteral ::= WAIT | NOWAIT
-windowTypeLiteral ::= FLOAT | DOCKED | DIALOG
+windowTypeLiteral ::= FLOAT | DOCKED
 
 staticDestination ::= TO propertyUsage
 
@@ -812,14 +811,7 @@ formEmailToObjects ::= formUsage formActionObjectList?
     methods = [resolveFormDecl]
 }
 
-confirmActionPropertyDefinitionBody ::= CONFIRM propertyExpression
-{
-    pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
-}
-
-confirmxActionPropertyDefinitionBody ::= (CONFIRMX | ASK) propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody
+confirmActionPropertyDefinitionBody ::= (CONFIRM | ASK) propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression,com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendParamContext"
@@ -925,8 +917,10 @@ importActionSourceType ::=  XLS (SHEET propertyExpression)?
                         |   MDB
 
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
-                                        (   CONNECTION propertyExpression
-                                        |   (SCHEDULE (PERIOD propertyExpression)? (DELAY propertyExpression)?)
+                                        (   (   CONNECTION propertyExpression
+                                            |   (SCHEDULE (PERIOD propertyExpression)? (DELAY propertyExpression)?)
+                                            )
+                                            SEMI
                                         )?
 {
     pin = 1
@@ -934,7 +928,7 @@ newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
     methods = [inferActionParamClasses]
 }
 
-newExecutorActionPropertyDefinitionBody ::= NEWEXECUTOR actionPropertyDefinitionBody THREADS propertyExpression
+newExecutorActionPropertyDefinitionBody ::= NEWEXECUTOR actionPropertyDefinitionBody THREADS propertyExpression SEMI
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -963,13 +957,6 @@ drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
     methods = [inferActionParamClasses]
 }
 
-requestInputActionPropertyDefinitionBody ::= REQUEST typeId (INPUT | (ID)? actionPropertyDefinitionBody)
-{
-    pin = 2
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
-}
-
 requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO actionPropertyDefinitionBody 
 {
     pin = 1
@@ -977,14 +964,7 @@ requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO 
     methods = [inferActionParamClasses]
 }
 
-inputActionPropertyDefinitionBody ::= INPUT ((PRIMITIVE_TYPE EQUALS propertyExpression) | PRIMITIVE_TYPE | (EQUALS propertyExpression))
-{
-    pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
-}
-
-inputxActionPropertyDefinitionBody ::= INPUTX (paramDeclare EQUALS)? (builtInClassName | propertyExpression) CHANGE? inputDestination? doInputBody
+inputActionPropertyDefinitionBody ::= INPUT (paramDeclare EQUALS)? (builtInClassName | propertyExpression) CHANGE? inputDestination? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendParamContext"
@@ -1026,9 +1006,9 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
     recoverWhile = "list_action_statement_recover"
 }
 
-private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | ASSIGN | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CONFIRMX | CUSTOM | DELETE
+private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | ASSIGN | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
-                                            | READ | REQUEST | INPUT | INPUTX | RETURN | SAVEFILE | SEEK | WHILE| WRITE
+                                            | READ | REQUEST | INPUT | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID
                                             | SEMI
@@ -1065,7 +1045,7 @@ assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | ass
 private assignActionPropertyDefinitionBody1 ::= ASSIGN mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 1}
 private assignActionPropertyDefinitionBody2 ::= mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 2}
 
-tryActionPropertyDefinitionBody ::= TRY actionPropertyDefinitionBody ((FINALLY actionPropertyDefinitionBody) | CATCH)
+tryActionPropertyDefinitionBody ::= TRY actionPropertyDefinitionBody ((FINALLY actionPropertyDefinitionBody) | ((CATCH SEMI)?))
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression" methods = [inferActionParamClasses]
@@ -1183,8 +1163,7 @@ reportFilesDeclaration ::= REPORTFILES groupObjectReportPath (COMMA groupObjectR
 groupObjectReportPath ::= (TOP | groupObjectUsage) formPropertyObject
 
 formDecl ::= FORM simpleNameWithCaption
-		            (   modalityTypeLiteral
-		            |   IMAGE stringLiteral
+		            (   IMAGE stringLiteral
 		            |   AUTOREFRESH intLiteral
 		            )*
 {
@@ -1447,7 +1426,6 @@ writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression 
 
 eventStatement ::= WHEN baseEvent propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)?
 		                inlineOption DO actionPropertyDefinitionBody
-		           << semicolonIfNeeded >>
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
@@ -1458,7 +1436,7 @@ eventStatement ::= WHEN baseEvent propertyExpression (ORDER (DESC)? nonEmptyProp
 //////////////////////////// GLOBAL EVENT STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody << semicolonIfNeeded >>
+globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody
 {
     pin=1
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
@@ -1479,7 +1457,7 @@ showDepStatement ::= SHOWDEP noContextPropertyUsage FROM noContextPropertyUsage 
 //////////////////////////////// ASPECT STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPropertyDefinitionBody << semicolonIfNeeded >>
+aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPropertyDefinitionBody
 {
     pin=1
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
@@ -1961,8 +1939,6 @@ containerTypeLiteral ::=    CONTAINERV
 alignmentLiteral ::= LEADING | CENTER | TRAILING
 
 flexAlignmentLiteral ::= LEADING | CENTER | TRAILING | STRETCH
-
-modalityTypeLiteral ::= DOCKED | MODAL | DOCKEDMODAL | FULLSCREEN | DIALOG
 
 formPrintTypeLiteral ::= PRINT ( XLSX | XLS | PDF | ((AUTO)? (TO propertyExpression)?)) {pin = 1}
 

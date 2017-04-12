@@ -152,7 +152,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NOHINT"                 			    { return NOHINT; }
   "CONCAT"                  			{ return CONCAT; }
   "CONFIRM"                 			{ return CONFIRM; }
-  "CONFIRMX"                 			{ return CONFIRMX; }
   "CONSTRAINT"              			{ return CONSTRAINT; }
   "CONTAINERH"              			{ return CONTAINERH; }
   "CONTAINERV"              			{ return CONTAINERV; }
@@ -175,7 +174,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "DO"                      			{ return DO; }
   "DOC"                      			{ return DOC; }
   "DOCKED"                  			{ return DOCKED; }
-  "DOCKEDMODAL"             			{ return DOCKEDMODAL; }
   "DOCX"                    			{ return DOCX; }
   "DRAWROOT"                			{ return DRAWROOT; }
   "DRILLDOWN"                    	    { return DRILLDOWN; }
@@ -219,7 +217,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "FORMULA"                 			{ return FORMULA; }
   "FROM"                    			{ return FROM; }
   "FULL"              			        { return FULL; }
-  "FULLSCREEN"              			{ return FULLSCREEN; }
   "GLOBAL"                              { return GLOBAL; }
   "GRID"                    			{ return GRID; }
   "GROUP"                   			{ return GROUP; }
@@ -245,7 +242,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "INITFILTER"                 			{ return INITFILTER; }
   "INLINE"                  			{ return INLINE; }
   "INPUT"                   			{ return INPUT; }
-  "INPUTX"                   			{ return INPUTX; }
   "IS"                      			{ return IS; }
   "JDBC"                  			    { return JDBC; }
   "JOIN"                    			{ return JOIN; }
@@ -269,7 +265,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "META"                    			{ return META; }
   "MIN"                     			{ return MIN; }
   "MINCHARWIDTH"            			{ return MINCHARWIDTH; }
-  "MODAL"                   			{ return MODAL; }
   "MODULE"                  			{ return MODULE; }
   "MOVE"                                { return MOVE; }
   "MS"                                  { return MS; }
@@ -334,7 +329,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "REMOVE"                  			{ return REMOVE; }
   "REPORTFILES"              			{ return REPORTFILES; }
   "REQUEST"                 			{ return REQUEST; }
-  "INREQUEST"                 			{ return INREQUEST; }
   "REQUIRE"                 			{ return REQUIRE; }
   "RESOLVE"                 			{ return RESOLVE; }
   "RETURN"                  			{ return RETURN; }

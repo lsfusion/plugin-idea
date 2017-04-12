@@ -58,11 +58,6 @@ public class FormEntity {
         if (formDecl != null) {
             title = formDecl.getCaption();
             sID = formDecl.getDeclName();
-
-            List<LSFModalityTypeLiteral> modalityLiterals = formDecl.getModalityTypeLiteralList();
-            if (modalityLiterals.size() > 0) {
-                modalityType = ModalityType.valueOf(modalityLiterals.get(modalityLiterals.size() - 1).getText());
-            }
         }
 
         for (LSFFormGroupObjectDeclaration formGroupObjectDeclaration : formExtend.getFormGroupObjectDeclarations()) {

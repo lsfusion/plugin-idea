@@ -254,19 +254,19 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(sourceStatement);
     }
 
-    public static ContextModifier getContextModifier(@NotNull LSFInputxActionPropertyDefinitionBody sourceStatement) {
+    public static ContextModifier getContextModifier(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
         return new InputContextModifier(sourceStatement.getParamDeclare());
     }
 
-    public static ContextInferrer getContextInferrer(@NotNull LSFInputxActionPropertyDefinitionBody sourceStatement) {
+    public static ContextInferrer getContextInferrer(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
         return new ActionExprInferrer(sourceStatement);
     }
 
-    public static ContextModifier getContextModifier(@NotNull LSFConfirmxActionPropertyDefinitionBody sourceStatement) {
+    public static ContextModifier getContextModifier(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
         return new InputContextModifier(sourceStatement.getParamDeclare());
     }
 
-    public static ContextInferrer getContextInferrer(@NotNull LSFConfirmxActionPropertyDefinitionBody sourceStatement) {
+    public static ContextInferrer getContextInferrer(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
         return new ActionExprInferrer(sourceStatement);
     }
 
@@ -577,7 +577,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFClassSet resolveClass(@NotNull LSFInputxActionPropertyDefinitionBody sourceStatement) {
+    public static LSFClassSet resolveClass(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
         LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
         if(pe != null)
             return LSFExClassSet.fromEx(pe.resolveValueClass(false));
@@ -590,7 +590,7 @@ public class LSFPsiImplUtil {
     }    
     
     @Nullable
-    public static LSFClassSet resolveClass(@NotNull LSFConfirmxActionPropertyDefinitionBody sourceStatement) {
+    public static LSFClassSet resolveClass(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
         return resolveDataClass("BOOLEAN");
     }    
     
@@ -2766,10 +2766,10 @@ public class LSFPsiImplUtil {
     public static void ensureClass(@NotNull LSFFormActionObjectUsage sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
     }
 
-    public static void ensureClass(@NotNull LSFInputxActionPropertyDefinitionBody sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
+    public static void ensureClass(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
     }
 
-    public static void ensureClass(@NotNull LSFConfirmxActionPropertyDefinitionBody sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
+    public static void ensureClass(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
     }
 
     public static Inferred inferActionParamClasses(@Nullable LSFActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
@@ -2878,13 +2878,6 @@ public class LSFPsiImplUtil {
         return result;
     }
 
-    public static Inferred inferActionParamClasses(LSFRequestInputActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        LSFActionPropertyDefinitionBody actionBody = body.getActionPropertyDefinitionBody();
-        if (actionBody != null)
-            return inferActionParamClasses(actionBody, params);
-        return Inferred.EMPTY;
-    }
-
     public static Inferred inferActionParamClasses(LSFRequestActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         List<LSFActionPropertyDefinitionBody> actions = body.getActionPropertyDefinitionBodyList();
         if (actions.isEmpty()) {
@@ -2898,10 +2891,6 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFInputActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
-    }
-
-    public static Inferred inferActionParamClasses(LSFInputxActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         Inferred inputInferred = inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
         return inferDoInputBody(body.getDoInputBody(), inputInferred, params);
     }
@@ -3075,9 +3064,6 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFConfirmActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
-    }
-    public static Inferred inferActionParamClasses(LSFConfirmxActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         Inferred inputInferred = inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
         return inferDoInputBody(body.getDoInputBody(), inputInferred, params);
     }
