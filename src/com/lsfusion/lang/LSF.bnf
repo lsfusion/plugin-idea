@@ -640,6 +640,7 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody
                                       	|	    importFormActionPropertyDefinitionBody
                                       	|	    activeFormActionPropertyDefinitionBody
                                       	|	    activateActionPropertyDefinitionBody
+                                        |       emptyActionPropertyDefinitionBody                                      
 
 private mappedForm ::= ((   (LIST | EDIT) customClassUsage formSingleActionObject?)
                         |   (formUsage formActionObjectList?) ) {pin = 1 }
@@ -978,6 +979,8 @@ activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
     methods = [inferActionParamClasses]
 }
 
+emptyActionPropertyDefinitionBody ::= 
+
 activateActionPropertyDefinitionBody ::= ACTIVATE ((FORM formUsage) | (TAB componentUsage FORM formUsage))
 {
     pin = 1
@@ -999,7 +1002,6 @@ private nestedPropertiesSelector ::= NESTED (LOCAL | (LBRAC nonEmptyNoContextPro
 
 private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
                                 |   localDataPropertyDefinition SEMI
-                                |   emptyStatement
                                 )
 {
     pin(".*") = 1

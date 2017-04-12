@@ -134,7 +134,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "BY"                      			{ return BY; }
   "CANCEL"                  			{ return CANCEL; }
   "CASE"                    			{ return CASE; }
-  "CATCH"                               { return CATCH; }
   "CC"                      			{ return CC; }
   "CENTER"                  			{ return CENTER; }
   "CHANGE"                  			{ return CHANGE; }
