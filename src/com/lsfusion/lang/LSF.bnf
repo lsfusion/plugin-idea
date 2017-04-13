@@ -115,7 +115,7 @@ externalFormObject ::= OBJECT formUsage objectUsage
     methods = [resolveFormDecl]
 }
 
-// some statements are pinned after the first token, so we need these fake rules to pin incomplete statements
+// some statements are not pinned after the first token, so we need these fake rules to pin incomplete statements (to support recovery assertion) 
 stubStatement ::=
     EXTEND (CLASS | FORM | DESIGN) ID
     | CLASS (ABSTRACT | NATIVE)? COMPLEX? ID
@@ -219,7 +219,7 @@ propertyStatement ::= propertyDeclaration equalsSign
                         |   topActionPropertyDefinitionBody nonEmptyPropertyOptions?
                         )                      
 {
-    pin = 1
+    pin(".*") = 1
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFGlobalPropDeclarationImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.LSFInterfacePropStatement"
     stubClass = "com.lsfusion.lang.psi.stubs.PropStubElement"
@@ -608,7 +608,7 @@ private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
                                         |       newThreadActionPropertyDefinitionBody // mixed
                                         |	    newExecutorActionPropertyDefinitionBody // mixed, recursive but allways semi
 
-private leafActionPDB ::=  (leafExtendContextActionPDB | leafKeepContextActionPDB) SEMI
+private leafActionPDB ::=  (leafExtendContextActionPDB | leafKeepContextActionPDB) SEMI | SEMI { pin(".*") = 1 } // | EMPTY and not emptyActionPropertyDefinitionBody because it would be pinned and expect seni after it everywhere
 private leafExtendContextActionPDB ::=          assignActionPropertyDefinitionBody
                                         |	    changeClassActionPropertyDefinitionBody
                                         |	    deleteActionPropertyDefinitionBody
@@ -634,10 +634,9 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody
                                       	|	    importFormActionPropertyDefinitionBody
                                       	|	    activeFormActionPropertyDefinitionBody
                                       	|	    activateActionPropertyDefinitionBody
-                                        |       emptyActionPropertyDefinitionBody                                      
 
 private mappedForm ::= ((   (LIST | EDIT) customClassUsage formSingleActionObject?)
-                        |   (formUsage formActionObjectList?) ) {pin = 1 }
+                        |   (formUsage formActionObjectList?) ) {pin(".*") = 1 }
 
 formSingleActionObject ::= OBJECT formActionObjectProps {pin = 1}
 constraintFilter ::= (CONSTRAINTFILTER (EQUALS propertyExpression)?)
@@ -714,7 +713,7 @@ printActionPropertyDefinitionBody ::=
 		    ) 
 		|
 		    (
-		        SHOW
+		        MESSAGE
 		        syncTypeLiteral?
 		        (TOP intLiteral)?
 		    )
@@ -842,7 +841,7 @@ fileActionPropertyDefinitionBody ::= LOADFILE propertyExpression
                                    | OPENFILE propertyExpression 
                                    | SAVEFILE propertyExpression (NAME propertyExpression)?
 {
-    pin = 1
+    pin(".*") = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
@@ -937,7 +936,7 @@ newSessionActionPropertyDefinitionBody ::= (    NEWSESSION (NEWSQL)? nestedPrope
                                            (SINGLE)?
                                            actionPropertyDefinitionBody
 {
-    pin = 1
+    pin(".*") = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
@@ -1003,14 +1002,16 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
     recoverWhile = "list_action_statement_recover"
 }
 
+// some statements are not pinned after the first token, so we need these fake rules to pin incomplete statements (to support recovery assertion) 
+// Important ! after recover the rule should mandatory be pinned (matched)
 private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | ASSIGN | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
                                             | READ | REQUEST | INPUT | RETURN | SAVEFILE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
-                                            | ID
+                                            | ID // pinned with execActionPropertyDefinitionBody
                                             | SEMI
                                             | LBRACE
-                                            | RBRACE
+                                            | RBRACE // would not be pinned (matched) but we will consider it the end of list statement
                                            )
 
 localDataPropertyDefinition ::= LOCAL nestedLocalModifier simpleName EQUALS className LBRAC classNameList RBRAC
@@ -1498,7 +1499,7 @@ indexStatement ::= INDEX nonEmptyMappedPropertyOrSimpleExprParamList SEMI {
 /////////////////////////////// WINDOW STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-windowStatement ::= windowCreateStatement | windowHideStatement {pin=1 methods = [ getIcon ]}
+windowStatement ::= windowCreateStatement | windowHideStatement {methods = [ getIcon ]}
 
 windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType windowOptions SEMI
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFWindowDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFWindowDeclaration"
