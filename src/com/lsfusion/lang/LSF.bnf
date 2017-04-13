@@ -716,6 +716,7 @@ printActionPropertyDefinitionBody ::=
 		    (
 		        SHOW
 		        syncTypeLiteral?
+		        (TOP intLiteral)?
 		    )
 		|
 		    (
