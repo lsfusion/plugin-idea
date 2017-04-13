@@ -29,7 +29,7 @@ import static java.util.Collections.singletonList;
 @SuppressWarnings("UnusedParameters")
 public class LSFPsiImplUtil {
 
-    public static ContextModifier getContextAPModifier(@Nullable LSFPropertyCalcStatement calcStatement, @Nullable LSFActionStatement actionStatement) {
+    public static ContextModifier getContextAPModifier(@Nullable LSFPropertyCalcStatement calcStatement, @Nullable LSFActionUnfriendlyPD actionUnfriendlyPD, LSFListActionPropertyDefinitionBody listAction) {
         if(calcStatement != null) {
             LSFPropertyExpression expression = calcStatement.getPropertyExpression();
             if (expression != null)
@@ -38,14 +38,13 @@ public class LSFPsiImplUtil {
 
         return ContextModifier.EMPTY;
     }
-
-    public static ContextInferrer getContextAPInferrer(@Nullable LSFPropertyCalcStatement calcStatement, @Nullable LSFActionStatement actionStatement) {
+    
+    public static ContextInferrer getContextAPInferrer(@Nullable LSFPropertyCalcStatement calcStatement, @Nullable LSFActionUnfriendlyPD actionStatement, LSFListActionPropertyDefinitionBody body) {
         if(calcStatement != null) {
             LSFPropertyExpression expression = calcStatement.getPropertyExpression();
             if (expression != null)
                 return new ExprsContextInferrer(expression);
         } else {
-            LSFListActionPropertyDefinitionBody body = actionStatement.getListActionPropertyDefinitionBody();
             if(body != null)
                 return new ActionInferrer(body);
         }
@@ -58,11 +57,11 @@ public class LSFPsiImplUtil {
         if (decl != null)
             return new ExplicitContextModifier(decl.getClassParamDeclareList());
 
-        return getContextAPModifier(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionStatement());
+        return getContextAPModifier(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFPropertyStatement sourceStatement) {
-        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionStatement());
+        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFOverrideStatement sourceStatement) {
@@ -81,15 +80,6 @@ public class LSFPsiImplUtil {
             result = peList.isEmpty() ? actionInfer : new OverrideContextInferrer(actionInfer, result);
         }
         return result;
-    }
-
-    public static ContextModifier getContextModifier(@NotNull LSFActionStatement sourceStatement) {
-        return ContextModifier.EMPTY;
-    }
-
-    public static ContextInferrer getContextInferrer(@NotNull LSFActionStatement sourceStatement) {
-        LSFListActionPropertyDefinitionBody body = sourceStatement.getListActionPropertyDefinitionBody();
-        return body == null ? ContextInferrer.EMPTY : new ActionExprInferrer(body);
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFConstraintStatement sourceStatement) {
@@ -186,11 +176,11 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFPropertyExprObject sourceStatement) {
-        return getContextAPModifier(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionStatement());
+        return getContextAPModifier(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFPropertyExprObject sourceStatement) {
-        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionStatement());
+        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFForActionPropertyMainBody sourceStatement) {
@@ -1354,12 +1344,10 @@ public class LSFPsiImplUtil {
         assert exprObject != null;
 
         LSFPropertyCalcStatement pCalcStatement = exprObject.getPropertyCalcStatement();
-        LSFActionStatement actionStatement = exprObject.getActionStatement();
-
-        return getValueAPClassNames(pCalcStatement, actionStatement);
+        return getValueAPClassNames(pCalcStatement, exprObject.getActionUnfriendlyPD(), exprObject.getListActionPropertyDefinitionBody());
     }
 
-    public static List<String> getValueAPClassNames(LSFPropertyCalcStatement pCalcStatement, LSFActionStatement actionStatement) {
+    public static List<String> getValueAPClassNames(LSFPropertyCalcStatement pCalcStatement, LSFActionUnfriendlyPD unfriendlyPD, LSFListActionPropertyDefinitionBody listPD) {
         if(pCalcStatement == null)
             return Collections.EMPTY_LIST;
 
@@ -1679,10 +1667,10 @@ public class LSFPsiImplUtil {
 
         assert exprObject != null;
 
-        return getValueAPPropertyNames(exprObject.getPropertyCalcStatement(), exprObject.getActionStatement());
+        return getValueAPPropertyNames(exprObject.getPropertyCalcStatement(), exprObject.getActionUnfriendlyPD(), exprObject.getListActionPropertyDefinitionBody());
     }
 
-    public static List<String> getValueAPPropertyNames(LSFPropertyCalcStatement pCalcStatement, LSFActionStatement actionStatement) {
+    public static List<String> getValueAPPropertyNames(LSFPropertyCalcStatement pCalcStatement, LSFActionUnfriendlyPD unfriendlyPD, LSFListActionPropertyDefinitionBody listActionBody) {
         if(pCalcStatement == null)
             return Collections.EMPTY_LIST;
 
@@ -1798,10 +1786,9 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFActionStatement actionStatement) {
-        LSFActionUnfriendlyPD unfriend = actionStatement.getActionUnfriendlyPD();
-        if(unfriend != null)
-            return LSFPsiImplUtil.resolveValueParamClasses(unfriend);
+    public static List<LSFExClassSet> resolveValueParamClasses(LSFActionUnfriendlyPD unfriendlyPD, LSFListActionPropertyDefinitionBody listBody) {
+        if(unfriendlyPD != null)
+            return LSFPsiImplUtil.resolveValueParamClasses(unfriendlyPD);
         return null;
     }
 
@@ -2574,14 +2561,11 @@ public class LSFPsiImplUtil {
                         joinClasses = unfriendlyPD.resolveValueParamClasses();
                 }
             } else {
-                LSFActionStatement actionStatement = exprObject.getActionStatement();
-                assert actionStatement != null;
-
-                LSFListActionPropertyDefinitionBody body = actionStatement.getListActionPropertyDefinitionBody();
+                LSFListActionPropertyDefinitionBody body = exprObject.getListActionPropertyDefinitionBody();
                 if(body != null) {
                     joinClasses = null;
                 } else { // contextUnfriendly
-                    joinClasses = LSFPsiImplUtil.resolveValueParamClasses(actionStatement);
+                    joinClasses = LSFPsiImplUtil.resolveValueParamClasses(exprObject.getActionUnfriendlyPD());
                 }
 
             }

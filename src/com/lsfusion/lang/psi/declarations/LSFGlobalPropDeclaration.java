@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.declarations;
 
-import com.lsfusion.lang.psi.LSFActionStatement;
 import com.lsfusion.lang.psi.LSFDataPropertyDefinition;
 import com.lsfusion.lang.psi.LSFPropertyCalcStatement;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
@@ -12,9 +11,6 @@ public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlob
 
     @Nullable
     LSFDataPropertyDefinition getDataPropertyDefinition();
-
-    @Nullable
-    LSFActionStatement getActionStatement();
 
     @Nullable
     LSFPropertyCalcStatement getPropertyCalcStatement();

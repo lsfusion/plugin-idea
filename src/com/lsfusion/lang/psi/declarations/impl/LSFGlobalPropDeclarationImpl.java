@@ -68,13 +68,15 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     public abstract LSFPropertyDeclaration getPropertyDeclaration();
 
     @Nullable
-    public abstract LSFActionStatement getActionStatement();
+    public abstract LSFActionUnfriendlyPD getActionUnfriendlyPD();
+
+    public abstract LSFListActionPropertyDefinitionBody getListActionPropertyDefinitionBody();
 
     @Nullable
     public abstract LSFPropertyCalcStatement getPropertyCalcStatement();
 
     @Nullable
-    public abstract LSFPropertyOptions getPropertyOptions();
+    public abstract LSFNonEmptyPropertyOptions getNonEmptyPropertyOptions();
 
     @Override
     public boolean isAbstract() {
@@ -85,12 +87,9 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                 return unfriend.getAbstractPropertyDefinition() != null;
             }
         } else {
-            LSFActionStatement pActionStatement = getActionStatement();
-            if(pActionStatement != null) {
-                LSFActionUnfriendlyPD unfriend = pActionStatement.getActionUnfriendlyPD();
-                if (unfriend != null) {
-                    return unfriend.getAbstractActionPropertyDefinition() != null;
-                }
+            LSFActionUnfriendlyPD unfriend = getActionUnfriendlyPD();
+            if (unfriend != null) {
+                return unfriend.getAbstractActionPropertyDefinition() != null;
             }
         }
         return false;
@@ -102,11 +101,8 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         if(pCalcStatement != null) {
             return pCalcStatement.getExpressionUnfriendlyPD() != null;
         } else {
-            LSFActionStatement pActionStatement = getActionStatement();
-            if(pActionStatement != null)
-                return pActionStatement.getActionUnfriendlyPD() != null;
+            return getActionUnfriendlyPD() != null;
         }
-        return false;
     }
 
     @Override
@@ -154,9 +150,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             if (expr != null)
                 return LSFExClassSet.toEx(LSFPsiImplUtil.resolveValueParamClasses(expr));
         } else {
-            LSFActionStatement actionStatement = getActionStatement();
-            if(actionStatement != null)
-                return LSFPsiImplUtil.resolveValueParamClasses(actionStatement);
+            return LSFPsiImplUtil.resolveValueParamClasses(getActionUnfriendlyPD(), getListActionPropertyDefinitionBody());
         }
 
         return null;
@@ -258,10 +252,9 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                 inferredClasses = LSFPsiImplUtil.inferParamClasses(expr, valueClass).finishEx();
             }
         } else {
-            LSFActionStatement actionDef = getActionStatement();
-            if(actionDef != null) {
+            if(getListActionPropertyDefinitionBody() != null) {
                 if (params != null) // может быть action unfriendly
-                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(actionDef.getListActionPropertyDefinitionBody(), new HashSet<>(params)).finishEx();
+                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(getListActionPropertyDefinitionBody(), new HashSet<>(params)).finishEx();
             }
         }
 
@@ -277,7 +270,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     public boolean isAction() {
-        return getActionStatement() != null;
+        return getActionUnfriendlyPD() != null || getListActionPropertyDefinitionBody() != null;
     }
 
     public LSFDataPropertyDefinition getDataPropertyDefinition() {
@@ -302,7 +295,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     public boolean isPersistentProperty() {
-        LSFPropertyOptions options = getPropertyOptions();
+        LSFNonEmptyPropertyOptions options = getNonEmptyPropertyOptions();
         return options != null && !options.getPersistentSettingList().isEmpty();
     }
     
@@ -403,12 +396,9 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             if(unfriend != null)
                 return LSFPsiImplUtil.getValueParamClassNames(unfriend);
         } else {
-            LSFActionStatement actionStatement = getActionStatement();
-            if(actionStatement != null) {
-                LSFActionUnfriendlyPD unfriend = actionStatement.getActionUnfriendlyPD();
-                if (unfriend != null)
-                    return LSFPsiImplUtil.getValueParamClassNames(unfriend);
-            }
+            LSFActionUnfriendlyPD unfriend = getActionUnfriendlyPD();
+            if (unfriend != null)
+                return LSFPsiImplUtil.getValueParamClassNames(unfriend);
         }
         return null;
     }

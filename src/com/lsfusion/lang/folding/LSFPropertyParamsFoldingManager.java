@@ -53,18 +53,15 @@ public class LSFPropertyParamsFoldingManager {
                     printParamClasses = false;
                 }
             } else {
-                LSFActionStatement actionStatement = propertyStatement.getActionStatement();
-                if(actionStatement != null) {
-                    printValueClass = false;
+                printValueClass = false;
 
-                    LSFActionUnfriendlyPD actionUFD = actionStatement.getActionUnfriendlyPD();
-                    if (actionUFD != null) {
-                        if (actionUFD.getEditFormActionPropertyDefinitionBody() == null) {
-                            printParamClasses = false;
-                        }
-                    } else {
+                LSFActionUnfriendlyPD actionUFD = propertyStatement.getActionUnfriendlyPD();
+                if (actionUFD != null) {
+                    if (actionUFD.getEditFormActionPropertyDefinitionBody() == null) {
                         printParamClasses = false;
                     }
+                } else {
+                    printParamClasses = false;
                 }
             }
         }

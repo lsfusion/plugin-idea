@@ -93,14 +93,14 @@ public class PropertyDrawEntity {
             }
         }
 
-        LSFPropertyOptions propertyOptions = null;
+        LSFNonEmptyPropertyOptions propertyOptions = null;
         if (propDeclaration != null) {
-            if(((LSFPropertyStatement) propDeclaration).getActionStatement() != null)
-                forceViewType = ClassViewType.PANEL;
-            else
+            if(((LSFPropertyStatement) propDeclaration).getPropertyCalcStatement() != null)
                 forceViewType = ClassViewType.GRID;
+            else
+                forceViewType = ClassViewType.PANEL;
                 
-            propertyOptions = ((LSFPropertyStatement) propDeclaration).getPropertyOptions();
+            propertyOptions = ((LSFPropertyStatement) propDeclaration).getNonEmptyPropertyOptions();
             caption = ((LSFGlobalPropDeclaration) propDeclaration).getCaption();
 //            if (caption == null) {
 //                caption = propDeclaration.getDeclName();
@@ -167,7 +167,7 @@ public class PropertyDrawEntity {
         applyFormOptions(propertyFormOptions, form);
     }
 
-    private void getAbstractGroup(LSFPropertyOptions propertyOptions) {
+    private void getAbstractGroup(LSFNonEmptyPropertyOptions propertyOptions) {
         List<LSFGroupUsage> groupUsageList = propertyOptions.getGroupUsageList();
         if (!groupUsageList.isEmpty()) {
             LSFGroupUsage groupUsage = groupUsageList.get(groupUsageList.size() - 1);

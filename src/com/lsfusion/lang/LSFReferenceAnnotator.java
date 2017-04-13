@@ -642,22 +642,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             LSFPropDeclaration declaration = propertyUsage.resolveDecl();
             if (declaration != null) {
                 if (declaration instanceof LSFPropertyStatementImpl) {
-                    LSFActionStatement actionStatement = ((LSFPropertyStatementImpl) declaration).getActionStatement();
-                    if (actionStatement != null) {
+                    LSFPropertyCalcStatement propertyStatement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
+                    if (propertyStatement == null) {
                         addAssignError(o);
                     } else {
-                        LSFPropertyCalcStatement propertyStatement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
-                        if (propertyStatement != null) {
-                            LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
-                            if (expression != null && !assignAllowed(expression)) {
-                                addAssignError(o);
-                            } else {
-                                LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
-                                if (expressionUnfriendlyPD != null) {
-                                    LSFGroupPropertyDefinition groupPD = expressionUnfriendlyPD.getGroupPropertyDefinition();
-                                    if (groupPD != null)
-                                        addAssignError(o);
-                                }
+                        LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
+                        if (expression != null && !assignAllowed(expression)) {
+                            addAssignError(o);
+                        } else {
+                            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
+                            if (expressionUnfriendlyPD != null) {
+                                LSFGroupPropertyDefinition groupPD = expressionUnfriendlyPD.getGroupPropertyDefinition();
+                                if (groupPD != null)
+                                    addAssignError(o);
                             }
                         }
                     }

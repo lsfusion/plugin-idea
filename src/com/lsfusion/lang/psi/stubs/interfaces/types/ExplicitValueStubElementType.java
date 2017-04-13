@@ -77,7 +77,7 @@ public class ExplicitValueStubElementType extends LSFStubElementType<ExplicitVal
         final ExplicitValueStubImpl stub = new ExplicitValueStubImpl(parentStub, psi.getElementType());
 
         LSFPropertyStatement propertyStatement = psi.getPropertyStatement();
-        List<String> classNames = LSFPsiImplUtil.getValueAPClassNames(propertyStatement.getPropertyCalcStatement(), propertyStatement.getActionStatement());
+        List<String> classNames = LSFPsiImplUtil.getValueAPClassNames(propertyStatement.getPropertyCalcStatement(), propertyStatement.getActionUnfriendlyPD(), propertyStatement.getListActionPropertyDefinitionBody());
         stub.setValueClasses(classNames);
 
         return stub;

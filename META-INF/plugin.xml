@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.92</version>
+    <version>1.0.93</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,10 +9,10 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.92</b><br>
+        <b>Version 1.0.93</b><br>
         <ul>
-            <li>Removed obsolete syntax</li>
             <li>Semicolon parser refactoring</li>
+            <li>Added empty statement</li>
         </ul>
     ]]>
     </change-notes>

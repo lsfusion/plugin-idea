@@ -215,9 +215,9 @@ implicitInterfacePropertyStatement ::= propertyStatement
 }
 
 propertyStatement ::= propertyDeclaration equalsSign
-                      propertyImplementation
-                      propertyOptions
-                      << semicolonIfNeeded >>
+                        (   (ACTION actionUnfriendlyPD | propertyCalcStatement) (nonEmptyPropertyOptions | SEMI)
+                        |   topActionPropertyDefinitionBody nonEmptyPropertyOptions?
+                        )                      
 {
     pin = 1
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFGlobalPropDeclarationImpl"
@@ -227,16 +227,7 @@ propertyStatement ::= propertyDeclaration equalsSign
     methods = [ getContextModifier getContextInferrer ]
 }
 
-private propertyImplementation ::= actionStatement | propertyCalcStatement
-
 propertyCalcStatement ::= (expressionUnfriendlyPD | propertyExpression)
-
-actionStatement ::= (ACTION actionUnfriendlyPD | topActionPropertyDefinitionBody) {
-    pin = 1
-    // actually declare context, but it's pretty difficult to implement using only classes
-    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
-    methods = [ getContextModifier getContextInferrer ]
-}
 
 actionUnfriendlyPD ::= (abstractActionPropertyDefinition
                         |	addFormActionPropertyDefinitionBody
@@ -437,7 +428,7 @@ activeTabPropertyDefinition ::= ACTIVE TAB componentUsage FORM formUsage
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames resolveFormDecl]
 }
 
-propertyExprObject ::= LSQBR EQUALS propertyImplementation RSQBR
+propertyExprObject ::= LSQBR EQUALS (ACTION actionUnfriendlyPD | propertyCalcStatement | topActionPropertyDefinitionBody) RSQBR
 {implements="com.lsfusion.lang.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
 
 propertyObject ::=  propertyUsage | propertyExprObject
@@ -510,33 +501,36 @@ reflectionPropertyType ::= CANONICALNAME
 typeIs ::= IS | AS
 typePropertyDefinition ::= typeIs className {pin = 1}
 
+private semiPropertyOption ::= IN groupUsage
+                           |	persistentSetting
+                           |   COMPLEX
+                           |   NOHINT
+                           |	TABLE tableUsage
+                           |	shortcutSetting
+                           |	asEditActionSetting
+                           |	viewTypeSetting
+                           |	fixedCharWidthSetting
+                           |	minCharWidthSetting
+                           |	maxCharWidthSetting
+                           |	prefCharWidthSetting
+                           |	imageSetting
+                           |	editKeySetting
+                           |	autosetSetting
+                           |	confirmSetting
+                           |	regexpSetting
+                           |	loggableSetting
+                           |	echoSymbolsSetting
+                           |	indexSetting
+                           |	aggPropSetting
+                           |	notNullSetting
+                           |	eventIdSetting
+                           |   ATSIGN2 simpleName
+private nonSemiPropertyOption ::= onEditEventSetting
 
-propertyOptions ::= (   IN groupUsage
-                    |	persistentSetting
-                    |   COMPLEX
-                    |   NOHINT
-                    |	TABLE tableUsage
-                    |	shortcutSetting
-                    |	asEditActionSetting
-                    |	viewTypeSetting
-                    |	fixedCharWidthSetting
-                    |	minCharWidthSetting
-                    |	maxCharWidthSetting
-                    |	prefCharWidthSetting
-                    |	imageSetting
-                    |	editKeySetting
-                    |	autosetSetting
-                    |	confirmSetting
-                    |	regexpSetting
-                    |	loggableSetting
-                    |	echoSymbolsSetting
-                    |	indexSetting
-                    |	aggPropSetting
-                    |	notNullSetting
-                    |	onEditEventSetting
-                    |	eventIdSetting
-                    |   ATSIGN2 simpleName
-                    )*
+//((semiPropertyOption | nonSemiPropertyOption)* (semiPropertyOption SEMI | nonSemiPropertyOption)
+// recursive-LL might be better because of pins (? naybe it would not be possible to pin 1 rule because of for example } TABLE X (A)), but needs some refactoring
+//semiPropertyOption (SEMI | nonEmptyPropertyOptions) | nonSemiPropertyOption nonEmptyPropertyOptions?
+nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI | (semiPropertyOption* nonSemiPropertyOption)+)
 
 shortcutSetting ::= SHORTCUT noContextPropertyUsage {pin = 1}
 viewTypeSetting ::= classViewType
@@ -555,7 +549,7 @@ echoSymbolsSetting ::= ECHO
 indexSetting ::= INDEXED
 aggPropSetting ::= AGGPROP
 notNullSetting ::= NOT nullOption (DELETE)? baseEvent
-onEditEventSetting ::= ON formEventType actionPropertyDefinitionBody
+onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody
 asEditActionSetting ::= ASON formEventType noContextPropertyUsage {pin = 1}
 eventIdSetting ::= EVENTID stringLiteral
 
@@ -1374,10 +1368,9 @@ formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage 
 
 overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 		                (WHEN propertyExpression THEN)?
-		                (	propertyExpression
+		                (	(propertyExpression SEMI)
 		                |	topActionPropertyDefinitionBody
 		                )
-		                << semicolonIfNeeded >>
 {
     pin = 2;
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
