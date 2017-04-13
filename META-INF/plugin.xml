@@ -9,10 +9,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.93</b><br>
+        <b>Version 1.0.94</b><br>
         <ul>
             <li>Semicolon parser refactoring</li>
             <li>Added empty statement</li>
+            <li>PRINT form SHOW TOP</li>
         </ul>
     ]]>
     </change-notes>
