@@ -581,9 +581,9 @@ nativeActionPropertyDefinition ::= NATIVE LBRAC classNameList RBRAC
 
 private topActionPropertyDefinitionBody ::= listActionPropertyDefinitionBody
 
-// extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
-actionPropertyDefinitionBody ::=    (   recursiveActionPDB
-                                    |   leafActionPDB
+// leaf before recursive to match newWhere before new (because first one is deeper)
+actionPropertyDefinitionBody ::=    (   leafActionPDB
+                                    |   recursiveActionPDB
                                     )                                    
 {
     implements = "com.lsfusion.lang.psi.context.ActionExpression"
@@ -595,6 +595,7 @@ private recursiveExtendContextActionPDB ::=  	forActionPropertyDefinitionBody
                                             |   whileActionPropertyDefinitionBody
                                             |	dialogActionPropertyDefinitionBody // mixed, input
                                             |	inputActionPropertyDefinitionBody // mixed, input
+                                            |	newActionPropertyDefinitionBody // should be after newWhere
 
 private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
                                         |	    confirmActionPropertyDefinitionBody// mixed, input
@@ -608,13 +609,14 @@ private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
                                         |       newThreadActionPropertyDefinitionBody // mixed
                                         |	    newExecutorActionPropertyDefinitionBody // mixed, recursive but allways semi
 
+// extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
 private leafActionPDB ::=  (leafExtendContextActionPDB | leafKeepContextActionPDB) SEMI | SEMI { pin(".*") = 1 } // | EMPTY and not emptyActionPropertyDefinitionBody because it would be pinned and expect seni after it everywhere
-private leafExtendContextActionPDB ::=          assignActionPropertyDefinitionBody
+private leafExtendContextActionPDB ::=          assignActionPropertyDefinitionBody // should be before exec
                                         |	    changeClassActionPropertyDefinitionBody
                                         |	    deleteActionPropertyDefinitionBody
-                                        |	    addObjectActionPropertyDefinitionBody
+                                        |	    newWhereActionPropertyDefinitionBody // should be before new
 
-private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody	
+private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody // should be after assign	
                                         |	    terminalFlowActionPropertyDefinitionBody
                                       	|  	    cancelActionPropertyDefinitionBody
                                       	|	    formActionPropertyDefinitionBody
@@ -776,9 +778,12 @@ editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION | NESTED)? customClas
     methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
-addObjectActionPropertyDefinitionBody ::= NEW customClassUsage (WHERE propertyExpression)? (TO mappedPropertyExprParam)?
+private newWhereToClause ::= (TO mappedPropertyExprParam) { pin = 1 }
+private newWhereClause ::= (WHERE propertyExpression newWhereToClause?) { pin = 1 }
+
+newWhereActionPropertyDefinitionBody ::= NEW customClassUsage newWhereClause newWhereToClause?                                                                 
 {
-    pin = 1
+    pin = 3
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
@@ -1099,7 +1104,15 @@ forActionPropertyDefinitionBody ::= forActionPropertyMainBody
     methods = [ inferActionParamClasses ]
 }
 
-forActionPropertyMainBody ::= FOR (propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)? )?
+newActionPropertyDefinitionBody ::= forAddObjClause
+                              actionPropertyDefinitionBody
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+}
+
+forActionPropertyMainBody ::= FOR propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)?
                               inlineOption
                               (forAddObjClause)?
                               DO actionPropertyDefinitionBody
