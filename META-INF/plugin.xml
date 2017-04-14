@@ -9,9 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.95</b><br>
+        <b>Version 1.0.96</b><br>
         <ul>
-            <li>NEW operator form, which can extend context</li>
+            <li>EDIT in FORM supports explicit class</li>
         </ul>
     ]]>
     </change-notes>

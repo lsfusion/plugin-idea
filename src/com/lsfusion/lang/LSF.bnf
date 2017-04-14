@@ -1346,13 +1346,12 @@ formOrderByList ::= ORDER BY formPropertyDrawWithOrder (COMMA formPropertyDrawWi
 
 formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 
-predefinedAddPropertyName ::=  NEW | NEWEDIT
+predefinedAddPropertyName ::=  NEW | NEWEDIT | EDIT
 
 predefinedFormPropertyName ::= VALUE
                            |    SELECTION
                            |    predefinedAddPropertyName (LSQBR explicitPropClass RSQBR)?
                            |    DELETE
-                           |    EDIT
 {
     mixin="com.lsfusion.lang.psi.LSFIdImpl"
     implements="com.lsfusion.lang.psi.LSFId"
