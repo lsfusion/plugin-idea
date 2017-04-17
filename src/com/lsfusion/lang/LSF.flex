@@ -238,7 +238,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "INDEX"                   			{ return INDEX; }
   "INDEXED"                 			{ return INDEXED; }
   "INIT"                    			{ return INIT; }
-  "INITFILTER"                 			{ return INITFILTER; }
   "INLINE"                  			{ return INLINE; }
   "INPUT"                   			{ return INPUT; }
   "IS"                      			{ return IS; }
@@ -292,7 +291,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NULL"                    			{ return NULL; }
   "OBJECT"                  			{ return OBJECT; }
   "OBJECTS"                 			{ return OBJECTS; }
-  "CONTEXTFILTER"              			{ return CONTEXTFILTER; }
   "CONSTRAINTFILTER"              		{ return CONSTRAINTFILTER; }
   "OK"                      			{ return OK; }
   "ON"                      			{ return ON; }
@@ -350,7 +348,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "SHORTCUT"                			{ return SHORTCUT; }
   "SHOW"                    			{ return SHOW; }
   "SHOWDEP"                 			{ return SHOWDEP; }
-  "SHOWDROP"                			{ return SHOWDROP; }
   "SHOWIF"                  			{ return SHOWIF; }
   "SINGLE"                  			{ return SINGLE; }
   "SHEET"                  			    { return SHEET; }

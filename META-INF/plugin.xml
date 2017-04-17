@@ -12,6 +12,7 @@
         <b>Version 1.0.96</b><br>
         <ul>
             <li>EDIT in FORM supports explicit class</li>
+            <li>Removed some deprecated syntax</li>
         </ul>
     ]]>
     </change-notes>

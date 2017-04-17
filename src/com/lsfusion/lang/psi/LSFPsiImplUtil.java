@@ -2977,14 +2977,6 @@ public class LSFPsiImplUtil {
         if (objects != null)
             objectMap.addAll(objects.getFormActionObjectUsageList());
 
-        List<LSFContextFilterDefinition> contextFilterList = body.getContextFilterDefinitionList();
-        for (LSFContextFilterDefinition contextFilter : contextFilterList) {
-            LSFFormActionObjectUsage contextFiltertUsage = contextFilter.getFormActionObjectUsage();
-            if (contextFiltertUsage != null) {
-                objectMap.add(contextFiltertUsage);
-            }
-        }
-
         for (LSFFormActionObjectUsage ou : objectMap) {
             LSFObjectInProps objectInProps = ou.getObjectInProps();
             if(objectInProps != null) {
