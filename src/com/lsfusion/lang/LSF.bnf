@@ -659,12 +659,9 @@ formActionPropertyDefinitionBody ::=
             syncTypeLiteral
 		|   windowTypeLiteral
 
-		|   MANAGESESSION
-		|   SHOWDROP 
-		|   NOCANCEL
+		|   manageSessionClause
+		|   noCancelClause
 
-		|   contextFilterDefinition
-		|   initFilterDefinition
 		|   CHECK
 		|   READONLY
 		)*
@@ -674,14 +671,17 @@ formActionPropertyDefinitionBody ::=
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
+manageSessionClause ::= MANAGESESSION | NOMANAGESESSION | MANAGESESSIONX | NOMANAGESESSIONX 
+noCancelClause ::= CANCEL | NOCANCEL 
+
 dialogActionPropertyDefinitionBody ::=
 	    DIALOG
 	    mappedForm
 		(   
             windowTypeLiteral
 
-		|   MANAGESESSION
-		|   NOCANCEL
+		|   manageSessionClause
+		|   noCancelClause
 
 		|   CHECK
 		|   READONLY
@@ -744,10 +744,6 @@ exportActionPropertyDefinitionBody ::=
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl]
 }
-
-contextFilterDefinition ::= CONTEXTFILTER formActionObjectUsage {pin = 1}
-
-initFilterDefinition ::= INITFILTER formPropertyDrawUsage {pin = 1}
 
 formActionObjectList ::= OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)* {pin(".*") = 1}
 
@@ -1026,7 +1022,7 @@ localDataPropertyDefinition ::= LOCAL nestedLocalModifier simpleName EQUALS clas
     implements="com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration"
 }
 
-nestedLocalModifier ::= (NESTED (MANAGESESSION | NOMANAGESESSION)?)?
+nestedLocalModifier ::= (NESTED manageSessionClause?)?
 
 //Разбиваем правило, чтобы была возможность запинить по EXEC
 execActionPropertyDefinitionBody ::= execActionPropertyDefinitionBody1 | execActionPropertyDefinitionBody2

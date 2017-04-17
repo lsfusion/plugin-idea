@@ -254,6 +254,8 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "LOGGABLE"                			{ return LOGGABLE; }
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "NOMANAGESESSION"                     { return NOMANAGESESSION; }
+  "MANAGESESSIONX"           			{ return MANAGESESSIONX; }
+  "NOMANAGESESSIONX"                    { return NOMANAGESESSIONX; }
   "MAX"                     			{ return MAX; }
   "MDB"                     			{ return MDB; }
   "LAST"                     			{ return LAST; }
