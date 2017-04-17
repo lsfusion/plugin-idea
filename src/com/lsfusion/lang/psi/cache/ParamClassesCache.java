@@ -25,7 +25,7 @@ public class ParamClassesCache extends PsiDependentCache<LSFPropDeclaration, Lis
                 return false;
 
             for(Object element : (List)result)
-                if(!(element instanceof LSFExClassSet))
+                if(element != null && !(element instanceof LSFExClassSet))
                     return false;
             return true;
         }
