@@ -671,7 +671,7 @@ formActionPropertyDefinitionBody ::=
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
-manageSessionClause ::= MANAGESESSION | NOMANAGESESSION | MANAGESESSIONX | NOMANAGESESSIONX 
+manageSessionClause ::= MANAGESESSION | NOMANAGESESSION | MANAGESESSIONX | NOMANAGESESSIONX | AUTO 
 noCancelClause ::= CANCEL | NOCANCEL 
 
 dialogActionPropertyDefinitionBody ::=
