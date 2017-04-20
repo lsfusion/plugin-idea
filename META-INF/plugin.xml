@@ -13,6 +13,7 @@
         <ul>
             <li>EDIT in FORM supports explicit class</li>
             <li>Removed some deprecated syntax</li>
+            <li>REQUEST/INPUT/CONFIRM DO ... ELSE ...</li>
         </ul>
     ]]>
     </change-notes>

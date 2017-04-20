@@ -693,7 +693,7 @@ dialogActionPropertyDefinitionBody ::=
     methods = [inferActionParamClasses resolveFormDecl getContextModifier getContextInferrer]
 }
 
-doInputBody ::= SEMI | (DO actionPropertyDefinitionBody)
+doInputBody ::= SEMI | (DO actionPropertyDefinitionBody (ELSE actionPropertyDefinitionBody)?)
 
 inputDestination ::= TO propertyUsage
 

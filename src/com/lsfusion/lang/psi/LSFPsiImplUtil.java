@@ -3011,9 +3011,9 @@ public class LSFPsiImplUtil {
     
     public static Inferred inferDoInputBody(LSFDoInputBody body, Inferred inferred, @Nullable Set<LSFExprParamDeclaration> params) {
         if(body != null) {
-            LSFActionPropertyDefinitionBody doAction = body.getActionPropertyDefinitionBody();
-            if(doAction != null)
-                inferred = inferActionParamClasses(doAction, params).override(inferred);
+            List<LSFActionPropertyDefinitionBody> actionList = body.getActionPropertyDefinitionBodyList();
+            if(!actionList.isEmpty())
+                inferred = inferActionParamClasses(actionList.get(0), params).override(inferred);
         }
         return inferred;
     }
