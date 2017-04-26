@@ -50,7 +50,10 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
                 assert propertyDrawName != null;
                 
                 String refName = propertyDrawName.getSimpleName().getText();
-                String declName = getNameIdentifier(decl.getFormPropertyName()).getText();
+                LSFFormPropertyName formPropertyName = decl.getFormPropertyName();
+                if(formPropertyName == null)
+                    return false;                
+                String declName = getNameIdentifier(formPropertyName).getText();
 
                 LSFObjectUsageList objectUsageList = decl.getObjectUsageList();
                 if(objectUsageList == null)

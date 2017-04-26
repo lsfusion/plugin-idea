@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 public interface LSFPropertyDrawDeclaration extends LSFFormElementDeclaration {
     
-    @NotNull
+    @Nullable
     LSFFormPropertyName getFormPropertyName();
     
     @Nullable

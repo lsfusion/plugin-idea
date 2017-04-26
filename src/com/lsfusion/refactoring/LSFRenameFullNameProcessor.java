@@ -103,12 +103,15 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
             LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(element, LSFPropertyDrawDeclaration.class);
             if (propDrawDecl != null && propDrawDecl.getSimpleName() == null) {
                 //переименование propertyDraw без alias => нужно переименовать и соответствующее свойство
-                LSFPropertyUsage propertyUsage = propDrawDecl.getFormPropertyName().getPropertyUsage();
-                if (propertyUsage != null) {
-                    LSFPropDeclaration decl = propertyUsage.resolveDecl();
-                    if (decl != null) {
-                        allRenames.put(decl.getNameIdentifier(), newName);
-                        cascadePostRenames.add(getMigrationRunnable(decl.getNameIdentifier(), newName));
+                LSFFormPropertyName formPropertyName = propDrawDecl.getFormPropertyName();
+                if(formPropertyName != null) {
+                    LSFPropertyUsage propertyUsage = formPropertyName.getPropertyUsage();
+                    if (propertyUsage != null) {
+                        LSFPropDeclaration decl = propertyUsage.resolveDecl();
+                        if (decl != null) {
+                            allRenames.put(decl.getNameIdentifier(), newName);
+                            cascadePostRenames.add(getMigrationRunnable(decl.getNameIdentifier(), newName));
+                        }
                     }
                 }
             }
@@ -116,7 +119,11 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     }
 
     public static LSFSimpleName getDeclPropName(LSFPropertyDrawDeclaration propDrawDecl) {
-        LSFPropertyUsage propertyUsage = propDrawDecl.getFormPropertyName().getPropertyUsage();
+        LSFFormPropertyName formPropertyName = propDrawDecl.getFormPropertyName();
+        if(formPropertyName == null)
+            return null;
+        
+        LSFPropertyUsage propertyUsage = formPropertyName.getPropertyUsage();
         LSFSimpleName propUsageId = null;
         if (propertyUsage != null) {
             propUsageId = propertyUsage.getCompoundID().getSimpleName();

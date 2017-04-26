@@ -14,6 +14,7 @@
             <li>EDIT in FORM supports explicit class</li>
             <li>Removed some deprecated syntax</li>
             <li>REQUEST/INPUT/CONFIRM DO ... ELSE ...</li>
+            <li>Expressions and action bodies at place in the FORM operator</li>
         </ul>
     ]]>
     </change-notes>

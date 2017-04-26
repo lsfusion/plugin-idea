@@ -29,7 +29,10 @@ public abstract class LSFPropertyDrawNameDeclarationImpl extends LSFPropertyDraw
         if(simpleName != null)
             return simpleName;
 
-        return getNameIdentifier(getFormPropertyName());
+        LSFFormPropertyName formPropertyName = getFormPropertyName();
+        if(formPropertyName == null)
+            return null;
+        return getNameIdentifier(formPropertyName);
     }
 
     @Override

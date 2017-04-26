@@ -1282,18 +1282,22 @@ formOptionsOnEvents ::= ON (formEventType | (SHORTCUT (localizedStringLiteral)?)
     pin = 1
 }
 
-formCalcPropertyObject ::= formPropertyObject
-formActionPropertyObject ::= formPropertyObject
+designCalcPropertyObject ::= formPropertyObject
+formCalcPropertyObject ::= formPropertyObject | formExprDeclaration
+formActionPropertyObject ::= formPropertyObject | formActionDeclaration
 
-formPropertyDrawMappedDecl ::= (simpleName EQUALS)? formPropertyObject formPropertyOptionsList
+formPropertyDrawMappedDecl ::= (((simpleName EQUALS)? formPropertyObject)  
+                               | (simpleName? EQUALS (formExprDeclaration | formActionDeclaration)))
+                                formPropertyOptionsList
 {
+    pin = 1
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFPropertyDrawMappedDeclarationImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFPropertyDrawMappedDeclaration"
 }
 
 formMappedPropertiesList ::= formPropertyDrawMappedDecl (COMMA formPropertyDrawMappedDecl)* {pin = 1}
 
-formFiltersList ::= FILTERS formFilterDeclaration (COMMA formFilterDeclaration)* {pin(".*") = 1}
+formFiltersList ::= FILTERS formExprDeclaration (COMMA formExprDeclaration)* {pin(".*") = 1}
 
 formHintsList ::= (HINTNOUPDATE | HINTTABLE) LIST nonEmptyNoContextPropertyUsageList {pin = 1}
 
@@ -1333,9 +1337,10 @@ filterGroupUsage ::= simpleName
     implements="com.lsfusion.lang.psi.references.LSFFilterGroupReference"
 }
 
-regularFilterDeclaration ::= FILTER localizedStringLiteral formFilterDeclaration (stringLiteral)? (filterSetDefault)?
+regularFilterDeclaration ::= FILTER localizedStringLiteral formExprDeclaration (stringLiteral)? (filterSetDefault)?
 
-formFilterDeclaration ::= propertyExpression
+formExprDeclaration ::= propertyExpression
+formActionDeclaration ::= topActionPropertyDefinitionBody
 filterSetDefault ::= DEFAULT
 
 formOrderByList ::= ORDER BY formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
@@ -1357,7 +1362,7 @@ formPropertyName ::= propertyUsage | predefinedFormPropertyName
 
 formPropertyObject ::= formPropertyName LBRAC objectUsageList RBRAC
 {
-    pin = 1
+//    pin = 1 // formPropertyObject before propertyExpression
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList ]
 }
@@ -1677,7 +1682,7 @@ componentPropertyValue ::=  colorLiteral
                         |	boundsDoubleLiteral
                         |   containerTypeLiteral
                         |   flexAlignmentLiteral
-                        |   formCalcPropertyObject
+                        |   designCalcPropertyObject
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// META STATEMENT //////////////////////////////

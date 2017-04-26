@@ -126,7 +126,7 @@ public class FormEntity {
         for (LSFRegularFilterDeclaration regularFilterDeclaration : regularFilterDeclarationList) {
 
             List<ObjectEntity> params = new ArrayList<>();
-            for (LSFExprParamDeclaration paramDeclaration : regularFilterDeclaration.getFormFilterDeclaration().getPropertyExpression().resolveParams()) {
+            for (LSFExprParamDeclaration paramDeclaration : regularFilterDeclaration.getFormExprDeclaration().getPropertyExpression().resolveParams()) {
                 params.add(getObject(paramDeclaration.getDeclName()));
             }
 

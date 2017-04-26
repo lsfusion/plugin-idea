@@ -214,8 +214,8 @@ public class DesignInfo {
             return ContainerType.valueOf(valueStatement.getContainerTypeLiteral().getText());
         } else if (valueStatement.getFlexAlignmentLiteral() != null) {
             return FlexAlignment.valueOf(valueStatement.getFlexAlignmentLiteral().getText());
-        } else if (valueStatement.getFormCalcPropertyObject() != null) {
-            return valueStatement.getFormCalcPropertyObject().getFormPropertyObject().getText();
+        } else if (valueStatement.getDesignCalcPropertyObject() != null) {
+            return valueStatement.getDesignCalcPropertyObject().getFormPropertyObject().getText();
         }
         return null;
     }

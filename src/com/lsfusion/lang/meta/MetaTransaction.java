@@ -557,7 +557,7 @@ public class MetaTransaction {
             metaTransaction.changes.add(new Change(indexBefore, addPairs, type));
             for(int i=0;i<cntAfterBefore;i++) {
                 assert type.equals(Type.REPLACE);
-                metaTransaction.changes.add(new Change(indexBefore, new ArrayList<Pair<InToken, IElementType>>(), Type.REPLACE));
+                metaTransaction.changes.add(new Change(indexBefore + addPairs.size(), new ArrayList<Pair<InToken, IElementType>>(), Type.REPLACE));
             }
         }
     }
