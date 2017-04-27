@@ -814,14 +814,16 @@ public class ASTCompletionContributor extends CompletionContributor {
                     }
                 }
                 if (priority > 0) {
-                    addLookupElement(
-                            createLookupElement(
-                                    declaration.getName(), declaration.getLookupObject(),
-                                    declaration.getParamPresentableText(),
-                                    declaration.getValuePresentableText(), declaration.getLSFFile().getName(),
-                                    declaration.getIcon(),
-                                    priority
-                            ));
+                    String name = declaration.getName();
+                    if (name != null)
+                        addLookupElement(
+                                createLookupElement(
+                                        name, declaration.getLookupObject(),
+                                        declaration.getParamPresentableText(),
+                                        declaration.getValuePresentableText(), declaration.getLSFFile().getName(),
+                                        declaration.getIcon(),
+                                        priority
+                                ));
                 }
             }
         }
