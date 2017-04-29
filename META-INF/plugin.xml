@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.95</version>
+    <version>1.0.96</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -15,6 +15,7 @@
             <li>Removed some deprecated syntax</li>
             <li>REQUEST/INPUT/CONFIRM DO ... ELSE ...</li>
             <li>Expressions and action bodies at place in the FORM operator</li>
+            <li>Comparison operator is now also = (not only ==)</li>
         </ul>
     ]]>
     </change-notes>

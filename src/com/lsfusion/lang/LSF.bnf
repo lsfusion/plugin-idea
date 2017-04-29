@@ -279,7 +279,7 @@ andPE ::= notPE (AND notPE)*
 notPE ::= (NOT notPE) | equalityPE
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
-equalityPE ::= relationalPE (EQ_OPERAND relationalPE)?
+equalityPE ::= relationalPE ((EQ_OPERAND | EQUALS) relationalPE)?
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 relationalPE ::= additiveORPE (((LESS | GREATER | LESS_EQUALS | GREATER_EQUALS) additiveORPE) | typePropertyDefinition)?
@@ -960,7 +960,7 @@ requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO 
     methods = [inferActionParamClasses]
 }
 
-inputActionPropertyDefinitionBody ::= INPUT (paramDeclare EQUALS)? (builtInClassName | propertyExpression) CHANGE? inputDestination? doInputBody
+inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS propertyExpression)) CHANGE? inputDestination? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendParamContext"
