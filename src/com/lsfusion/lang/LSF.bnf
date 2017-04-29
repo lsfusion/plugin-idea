@@ -637,10 +637,10 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    activeFormActionPropertyDefinitionBody
                                       	|	    activateActionPropertyDefinitionBody
 
-private mappedForm ::= ((   (LIST | EDIT) customClassUsage formSingleActionObject?)
+private mappedForm ::= ((   (LIST | EDIT) customClassUsage formSingleActionObject)
                         |   (formUsage formActionObjectList?) ) {pin(".*") = 1 }
 
-formSingleActionObject ::= OBJECT formActionObjectProps {pin = 1}
+formSingleActionObject ::= formActionObjectProps
 constraintFilter ::= (CONSTRAINTFILTER (EQUALS propertyExpression)?)
 objectInProps ::= EQUALS propertyExpression NULL? { pin = 1 }
 changeInput ::= (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOASSIGN?) { pin = 1 }
@@ -671,7 +671,7 @@ formActionPropertyDefinitionBody ::=
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
-manageSessionClause ::= MANAGESESSION | NOMANAGESESSION | MANAGESESSIONX | NOMANAGESESSIONX | AUTO 
+manageSessionClause ::= MANAGESESSION | NOMANAGESESSION | MANAGESESSIONX | NOMANAGESESSIONX | AUTOX
 noCancelClause ::= CANCEL | NOCANCEL 
 
 dialogActionPropertyDefinitionBody ::=

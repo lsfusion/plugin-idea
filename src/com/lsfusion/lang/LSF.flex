@@ -124,6 +124,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "ASYNCUPDATE"             			{ return ASYNCUPDATE; }
   "ATTACH"                  			{ return ATTACH; }
   "AUTO"                                { return AUTO; }
+  "AUTOX"                               { return AUTOX; }
   "AUTOREFRESH"                         { return AUTOREFRESH; }
   "AUTOSET"                 			{ return AUTOSET; }
   "BACKGROUND"              			{ return BACKGROUND; }
