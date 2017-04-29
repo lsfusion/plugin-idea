@@ -9,13 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.96</b><br>
+        <b>Version 1.0.97</b><br>
         <ul>
-            <li>EDIT in FORM supports explicit class</li>
-            <li>Removed some deprecated syntax</li>
-            <li>REQUEST/INPUT/CONFIRM DO ... ELSE ...</li>
-            <li>Expressions and action bodies at place in the FORM operator</li>
-            <li>Comparison operator is now also = (not only ==)</li>
+            <li>Captions in property draw declarations</li>
         </ul>
     ]]>
     </change-notes>

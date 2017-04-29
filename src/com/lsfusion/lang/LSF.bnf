@@ -1237,7 +1237,7 @@ formObjectDeclaration ::= (simpleName EQUALS)?
     implements="com.lsfusion.lang.psi.declarations.LSFObjectDeclaration"
 }
 
-formPropertyDrawNameDecl ::= (simpleName EQUALS)? formPropertyName formPropertyOptionsList
+formPropertyDrawNameDecl ::= (simpleNameOrWithCaption EQUALS)? formPropertyName formPropertyOptionsList
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFPropertyDrawNameDeclaration"
@@ -1286,8 +1286,8 @@ designCalcPropertyObject ::= formPropertyObject
 formCalcPropertyObject ::= formPropertyObject | formExprDeclaration
 formActionPropertyObject ::= formPropertyObject | formActionDeclaration
 
-formPropertyDrawMappedDecl ::= (((simpleName EQUALS)? formPropertyObject)  
-                               | (simpleName? EQUALS (formExprDeclaration | formActionDeclaration)))
+formPropertyDrawMappedDecl ::= (((simpleNameOrWithCaption EQUALS)? formPropertyObject)  
+                               | (simpleNameOrWithCaption? EQUALS (formExprDeclaration | formActionDeclaration)))
                                 formPropertyOptionsList
 {
     pin = 1
@@ -1756,6 +1756,7 @@ mappedPropertyExprParam ::= propertyUsage LBRAC exprParameterUsageList RBRAC // 
 }
 
 simpleNameWithCaption ::= simpleName (localizedStringLiteral)?
+private simpleNameOrWithCaption ::= localizedStringLiteral | (simpleName (localizedStringLiteral)?)
 
 // local
 
