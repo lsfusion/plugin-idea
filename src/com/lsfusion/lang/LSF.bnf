@@ -534,7 +534,7 @@ nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI |
 
 shortcutSetting ::= SHORTCUT noContextPropertyUsage {pin = 1}
 viewTypeSetting ::= classViewType
-persistentSetting ::= PERSISTENT
+persistentSetting ::= MATERIALIZED
 fixedCharWidthSetting ::= FIXEDCHARWIDTH intLiteral
 minCharWidthSetting ::= MINCHARWIDTH intLiteral
 maxCharWidthSetting ::= MAXCHARWIDTH intLiteral
@@ -839,8 +839,8 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)?
 }
 
 fileActionPropertyDefinitionBody ::= LOADFILE propertyExpression 
-                                   | OPENFILE propertyExpression 
-                                   | SAVEFILE propertyExpression (NAME propertyExpression)?
+                                   | OPEN propertyExpression 
+                                   | SAVE propertyExpression (NAME propertyExpression)?
 {
     pin(".*") = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1006,8 +1006,8 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
 // some statements are not pinned after the first token, so we need these fake rules to pin incomplete statements (to support recovery assertion) 
 // Important ! after recover the rule should mandatory be pinned (matched)
 private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | ASSIGN | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
-                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPENFILE
-                                            | READ | REQUEST | INPUT | RETURN | SAVEFILE | SEEK | WHILE| WRITE
+                                            | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPEN
+                                            | READ | REQUEST | INPUT | RETURN | SAVE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | ID // pinned with execActionPropertyDefinitionBody
                                             | SEMI
@@ -1453,7 +1453,7 @@ globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefi
     methods = [ getContextModifier getContextInferrer getIcon ]
 }
 
-baseEvent ::= (GLOBAL | SESSION)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmptyNoContextPropertyUsageList)?
+baseEvent ::= (GLOBAL | LOCAL)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmptyNoContextPropertyUsageList)?
 
 inlineOption ::=   (NOINLINE (LBRAC exprParameterUsageList RBRAC)? )? (INLINE)?
 

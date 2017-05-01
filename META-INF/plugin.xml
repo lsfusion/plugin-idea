@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.96</version>
+    <version>1.0.97</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -12,6 +12,7 @@
         <b>Version 1.0.97</b><br>
         <ul>
             <li>Captions in property draw declarations</li>
+            <li>Renaming : PERSISTENT->MATERIALIZED, SESSION->LOCAL, OPENFILE->OPEN, SAVEFILE->SAVE</li>
         </ul>
     ]]>
     </change-notes>

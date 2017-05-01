@@ -259,6 +259,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "MAX"                     			{ return MAX; }
   "MDB"                     			{ return MDB; }
   "LAST"                     			{ return LAST; }
+  "MATERIALIZED"            			{ return MATERIALIZED; }
   "MAXCHARWIDTH"            			{ return MAXCHARWIDTH; }
   "MENU"                    			{ return MENU; }
   "MEMO"                    			{ return MEMO; }
@@ -295,7 +296,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "CONSTRAINTFILTER"              		{ return CONSTRAINTFILTER; }
   "OK"                      			{ return OK; }
   "ON"                      			{ return ON; }
-  "OPENFILE"                			{ return OPENFILE; }
+  "OPEN"                			    { return OPEN; }
   "OPTIMISTICASYNC"                     { return OPTIMISTICASYNC; }
   "OR"                      			{ return OR; }
   "ORDER"                   			{ return ORDER; }
@@ -305,7 +306,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "PARENT"                  			{ return PARENT; }
   "PARTITION"               			{ return PARTITION; }
   "PDF"                     			{ return PDF; }
-  "PERSISTENT"              			{ return PERSISTENT; }
   "PERIOD"                              { return PERIOD; }    
   "PG"                                  { return PG; }    
   "POSITION"                			{ return POSITION; }
@@ -336,7 +336,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "RIGHT"                   			{ return RIGHT; }
   "ROUND"                   			{ return ROUND; }
   "RTF"                     			{ return RTF; }
-  "SAVEFILE"                            { return SAVEFILE; }
+  "SAVE"                                { return SAVE; }
   "SCROLL"                              { return SCROLL; }
   "SEEK"                    			{ return SEEK; }
   "SELECTION"               			{ return SELECTION; }
