@@ -9,10 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.97</b><br>
+        <b>Version 1.0.98</b><br>
         <ul>
-            <li>Captions in property draw declarations</li>
-            <li>Renaming : PERSISTENT->MATERIALIZED, SESSION->LOCAL, OPENFILE->OPEN, SAVEFILE->SAVE</li>
+            <li>AUTOSET clause in operator NEW</li>
         </ul>
     ]]>
     </change-notes>

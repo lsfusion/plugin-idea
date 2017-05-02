@@ -1086,7 +1086,7 @@ cancelActionPropertyDefinitionBody ::= CANCEL nestedPropertiesSelector?
     methods = [inferActionParamClasses]
 }
 
-forAddObjClause ::= NEW (paramDeclare EQUALS)? customClassUsage
+forAddObjClause ::= NEW (paramDeclare EQUALS)? customClassUsage AUTOSET?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext"
