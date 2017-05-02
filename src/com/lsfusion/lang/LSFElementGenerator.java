@@ -150,7 +150,7 @@ public class LSFElementGenerator {
     }
 
     public static List<? extends LSFComponentDeclaration> createFormComponents(Project project, List<String> componentsNames) {
-        String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
+        String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEditReport,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
                 "DESIGN defaultForm {";
         for (String name : componentsNames) {
             text += "NEW " + name + ";";
@@ -384,4 +384,72 @@ public class LSFElementGenerator {
             }
         };
     }
+
+    // TEMP FOR REFACTORING
+    @NotNull
+    public static ASTNode createFormTypeFromText(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=ACTION { " + name + " xxx;};");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormActionPropertyDefinitionBody.class).iterator().next().getNode().getFirstChildNode();
+    }
+    @NotNull
+    public static LSFStaticDestination createStaticDestination(Project myProject) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=ACTION { FORM xxx TO formExportFile();};");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFStaticDestination.class).iterator().next();
+    }
+
+    @NotNull
+    public static LSFFormPropertyOptionsList createFormPropertyOptionsList(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; FORM f PROPERTIES " + name + " x(a);");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertyOptionsList.class).iterator().next();
+    }
+
+    @NotNull
+    public static LSFFormOptionForce createFormOptionForce(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; FORM f PROPERTIES " + name + " x(a);");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormOptionForce.class).iterator().next();
+    }
+
+    @NotNull
+    public static LSFFormOptionSession createFormOptionSession(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; FORM f PROPERTIES " + name + " x(a);");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormOptionSession.class).iterator().next();
+    }
+
+    @NotNull
+    public static LSFPredefinedAddPropertyName createPredefinedAddPropertyName(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; FORM f PROPERTIES " + name + "(a);");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFPredefinedAddPropertyName.class).iterator().next();
+    }
+
+    @NotNull
+    public static LSFPredefinedFormPropertyName createPredefinedFormPropertyName(Project myProject, String name) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; FORM f PROPERTIES " + name + "(a);");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFPredefinedFormPropertyName.class).iterator().next();
+    }
+
+    @NotNull
+    public static ASTNode createListToken(Project myProject) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; FORM f LIST A OBJECT b;");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFListFormDeclaration.class).iterator().next().getNode().getFirstChildNode();
+    }
+    
+    @NotNull
+    public static ASTNode createShowToken(Project myProject) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=ACTION { SHOW xxx; };");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormActionPropertyDefinitionBody.class).iterator().next().getNode().getFirstChildNode();
+    }
+
+    @NotNull
+    public static LSFOverridePropertyDefinition createOverridePropertyDefinition(Project myProject, String text) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()= OVERRIDE " + text + ";");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFOverridePropertyDefinition.class).iterator().next();
+    }
+
+
+//    @NotNull
+//    public static LSFPredefinedFormPropertyName createWindowType(Project myProject, String name) {
+//        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=ACTION { FORM xxx " + name + ";};");
+//        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFWindowTypeLiteral.class).iterator().next();
+//    }
+//
 }
