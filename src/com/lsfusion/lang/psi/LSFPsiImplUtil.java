@@ -220,7 +220,7 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(sourceStatement);
     }
 
-    public static ContextModifier getContextModifier(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
+    public static ContextModifier getInputContextModifier(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
         ContextModifier result = null;
 
         LSFFormActionObjectList formList = sourceStatement.getFormActionObjectList();
@@ -248,23 +248,33 @@ public class LSFPsiImplUtil {
         return result != null ? result : ContextModifier.EMPTY;
     }
 
-    public static ContextInferrer getContextInferrer(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
+    public static ContextInferrer getInputContextInferrer(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
         return new ActionExprInferrer(sourceStatement);
     }
 
-    public static ContextModifier getContextModifier(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
+    public static ContextModifier getInputContextModifier(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
         return new InputContextModifier(sourceStatement.getParamDeclare());
     }
 
-    public static ContextInferrer getContextInferrer(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
+    public static ContextModifier getContextModifier(@NotNull LSFDoMainBody sourceStatement) {
+        ExtendInputParamContext context = PsiTreeUtil.getParentOfType(sourceStatement, ExtendInputParamContext.class);
+        return context == null ? null : context.getInputContextModifier();
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFDoMainBody sourceStatement) {
+        ExtendInputParamContext context = PsiTreeUtil.getParentOfType(sourceStatement, ExtendInputParamContext.class);
+        return context == null ? null : context.getInputContextInferrer();
+    }
+
+    public static ContextInferrer getInputContextInferrer(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
         return new ActionExprInferrer(sourceStatement);
     }
 
-    public static ContextModifier getContextModifier(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
+    public static ContextModifier getInputContextModifier(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
         return new InputContextModifier(sourceStatement.getParamDeclare());
     }
 
-    public static ContextInferrer getContextInferrer(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
+    public static ContextInferrer getInputContextInferrer(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
         return new ActionExprInferrer(sourceStatement);
     }
 
@@ -3008,12 +3018,14 @@ public class LSFPsiImplUtil {
 
         return inferDoInputBody(body.getDoInputBody(), forClasses, params);
     }
-    
+
     public static Inferred inferDoInputBody(LSFDoInputBody body, Inferred inferred, @Nullable Set<LSFExprParamDeclaration> params) {
-        if(body != null) {
-            List<LSFActionPropertyDefinitionBody> actionList = body.getActionPropertyDefinitionBodyList();
-            if(!actionList.isEmpty())
-                inferred = inferActionParamClasses(actionList.get(0), params).override(inferred);
+        if (body != null) {
+            LSFDoMainBody doMainBody = body.getDoMainBody();
+            if (doMainBody != null) {
+                LSFActionPropertyDefinitionBody action = doMainBody.getActionPropertyDefinitionBody();
+                inferred = inferActionParamClasses(action, params).override(inferred);
+            }
         }
         return inferred;
     }

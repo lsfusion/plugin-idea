@@ -688,12 +688,18 @@ dialogActionPropertyDefinitionBody ::=
 		)*
 		doInputBody
 {
-    pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext, com.lsfusion.lang.psi.context.ExtendParamContext"
-    methods = [inferActionParamClasses resolveFormDecl getContextModifier getContextInferrer]
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext, com.lsfusion.lang.psi.context.ExtendInputParamContext"
+    methods = [inferActionParamClasses resolveFormDecl getInputContextModifier getInputContextInferrer]
 }
 
-doInputBody ::= SEMI | (DO actionPropertyDefinitionBody (ELSE actionPropertyDefinitionBody)?)
+doInputBody ::= SEMI | (doMainBody (ELSE actionPropertyDefinitionBody)?)
+
+doMainBody ::= DO actionPropertyDefinitionBody
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer ]
+}
 
 inputDestination ::= TO propertyUsage
 
@@ -810,8 +816,8 @@ formEmailToObjects ::= formUsage formActionObjectList?
 confirmActionPropertyDefinitionBody ::= (CONFIRM | ASK) propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression,com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendParamContext"
-    methods = [inferActionParamClasses resolveClass ensureClass getContextModifier getContextInferrer]
+    implements="com.lsfusion.lang.psi.context.ActionExpression,com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendInputParamContext"
+    methods = [inferActionParamClasses resolveClass ensureClass getInputContextModifier getInputContextInferrer]
 }
 
 messageActionPropertyDefinitionBody ::= MESSAGE (NOWAIT)? propertyExpression
@@ -963,8 +969,8 @@ requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO 
 inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS propertyExpression)) CHANGE? inputDestination? doInputBody
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendParamContext"
-    methods = [inferActionParamClasses resolveClass ensureClass getContextModifier getContextInferrer]
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendInputParamContext"
+    methods = [inferActionParamClasses resolveClass ensureClass getInputContextModifier getInputContextInferrer]
 }
 
 activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
