@@ -845,7 +845,7 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)?
 }
 
 fileActionPropertyDefinitionBody ::= LOADFILE propertyExpression 
-                                   | OPEN propertyExpression 
+                                   | OPEN propertyExpression (NAME propertyExpression)?
                                    | SAVE propertyExpression (NAME propertyExpression)?
 {
     pin(".*") = 1
