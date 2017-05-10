@@ -69,7 +69,7 @@ public class LSFStatementGroupingRule implements UsageGroupingRule {
 
         @Override
         public int compareTo(UsageGroup o) {
-            return 0;
+            return getText(null).compareToIgnoreCase(o.getText(null));
         }
 
         @Override
