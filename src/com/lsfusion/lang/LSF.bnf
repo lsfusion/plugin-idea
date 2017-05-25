@@ -1310,8 +1310,8 @@ formHintsList ::= (HINTNOUPDATE | HINTTABLE) LIST nonEmptyNoContextPropertyUsage
 formEventsList ::= EVENTS formEventDeclaration (COMMA formEventDeclaration)* {pin = 1}
 
 formEventDeclaration ::= ON
-                        (    OK
-                        |    APPLY (BEFORE | AFTER)
+                        (    OK (BEFORE | AFTER)?
+                        |    APPLY (BEFORE | AFTER)?
                         |    CLOSE
                         |    INIT
                         |    CANCEL

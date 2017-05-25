@@ -9,10 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.98</b><br>
+        <b>Version 1.0.99</b><br>
         <ul>
-            <li>AUTOSET clause in operator NEW</li>
-            <li>OPEN file NAME</li>
+            <li>Added BEFORE / AFTER options in ON OK event</li>
         </ul>
     ]]>
     </change-notes>
