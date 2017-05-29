@@ -13,6 +13,7 @@ import com.lsfusion.lang.classes.link.*;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
 import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.typeinfer.*;
@@ -3440,18 +3441,22 @@ public class LSFPsiImplUtil {
         return true;
     }
     
-    private static boolean equalReferences(@NotNull LSFPropertyUsage left, LSFPropertyUsage right) {
-        return right != null && Objects.equals(left.resolve(), right.resolve());
-    }
-    
     public static boolean checkNonRecursiveOverride(@NotNull LSFOverrideStatement override) {
         LSFPropertyUsage leftUsage = override.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage();
+
+        int leftParams = 0;
+        LSFClassParamDeclareList classParamDeclareList = override.getMappedPropertyClassParamDeclare().getClassParamDeclareList();
+        if(classParamDeclareList != null) {
+            LSFNonEmptyClassParamDeclareList nonEmptyClassParamDeclareList = classParamDeclareList.getNonEmptyClassParamDeclareList();
+            leftParams = nonEmptyClassParamDeclareList == null ? 0 : nonEmptyClassParamDeclareList.getClassParamDeclareList().size();
+        }
 
         Collection<LSFJoinPropertyDefinition> joinProps = PsiTreeUtil.findChildrenOfType(override, LSFJoinPropertyDefinition.class);
         for (LSFJoinPropertyDefinition joinProp : joinProps) {
             LSFPropertyUsage rightUsage = joinProp.getPropertyObject().getPropertyUsage();
             if (equalReferences(leftUsage, rightUsage)) {
-                return false;
+                if (equalParams(leftParams, joinProp.getParamList()))
+                    return false;
             }
         }
 
@@ -3461,11 +3466,45 @@ public class LSFPsiImplUtil {
             if (propertyObject != null) {
                 LSFPropertyUsage rightUsage = propertyObject.getPropertyUsage();
                 if (equalReferences(leftUsage, rightUsage)) {
-                    return false;
+                    LSFListActionPropertyDefinitionBody rightListAction = override.getListActionPropertyDefinitionBody();
+                    if (rightListAction != null) {
+                        List<LSFActionPropertyDefinitionBody> actions = rightListAction.getActionPropertyDefinitionBodyList();
+                        if(actions.size() == 1) {
+                            LSFExecActionPropertyDefinitionBody action = actions.get(0).getExecActionPropertyDefinitionBody();
+                            if (action != null) {
+                                if (equalParams(leftParams, action.getParamList())) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
                 }
-
             }
         }
         return true;
+    }
+
+    private static boolean equalReferences(@NotNull LSFPropertyUsage left, LSFPropertyUsage right) {
+        return right != null && Objects.equals(left.resolve(), right.resolve());
+    }
+
+    private static boolean equalParams(int leftParams, PsiElement paramList) {
+        if (paramList != null && paramList instanceof LSFPropertyExpressionListImpl) {
+            LSFNonEmptyPropertyExpressionList nonEmptyPropertyExpressionList = ((LSFPropertyExpressionListImpl) paramList).getNonEmptyPropertyExpressionList();
+            if (nonEmptyPropertyExpressionList != null) {
+                List<LSFPropertyExpression> rightParams = nonEmptyPropertyExpressionList.getPropertyExpressionList();
+                if(leftParams == rightParams.size()) {
+                    boolean equalParams = true;
+                    for (LSFPropertyExpression propertyExpression : rightParams) {
+                        if (!PsiTreeUtil.findChildrenOfType(propertyExpression, LSFExpressionFriendlyPD.class).isEmpty()) {
+                            equalParams = false;
+                            break;
+                        }
+                    }
+                    return equalParams;
+                }
+            }
+        }
+        return false;
     }
 }
