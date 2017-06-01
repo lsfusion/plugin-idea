@@ -130,15 +130,24 @@ public class LSFProblemsVisitor {
                                 if(!isPanel)
                                     isPanel = formGroupObjectViewType.getClassViewType().getText().equals("PANEL");
                             }
+
+                            List<LSFFormObjectDeclaration> formObjectDecls = new ArrayList<>();
+                            LSFFormMultiGroupObjectDeclaration formMultiGroupObjectDecl = formGroupObjectDecl.getFormCommonGroupObject().getFormMultiGroupObjectDeclaration();
+                            if(formMultiGroupObjectDecl != null) {
+                                formObjectDecls.addAll(formMultiGroupObjectDecl.getFormObjectDeclarationList());
+                            }
                             LSFFormSingleGroupObjectDeclaration formSingleGroupObjectDecl = formGroupObjectDecl.getFormCommonGroupObject().getFormSingleGroupObjectDeclaration();
-                            if (formSingleGroupObjectDecl != null) {
-                                LSFSimpleName formObject = formSingleGroupObjectDecl.getFormObjectDeclaration().getSimpleName();
+                            if(formSingleGroupObjectDecl != null) {
+                                formObjectDecls.add(formSingleGroupObjectDecl.getFormObjectDeclaration());
+                            }
+                            for (LSFFormObjectDeclaration formObjectDecl : formObjectDecls) {
+                                LSFSimpleName formObject = formObjectDecl.getSimpleName();
                                 if (formObject != null) {
                                     if (formObjects.contains(formObject.getText())) {
                                         if (!isPanel)
                                             createObjectShouldBeInPanelWarning(holder, element, formObject, warningsSearchMode);
                                     } else {
-                                        if(isPanel)
+                                        if (isPanel)
                                             createNoRequiredObjectWarning(holder, element, formObject, warningsSearchMode);
                                     }
                                 }
