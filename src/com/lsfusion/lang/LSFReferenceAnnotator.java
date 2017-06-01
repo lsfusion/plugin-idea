@@ -593,7 +593,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addIndirectProp(LSFPropReference reference) {
-        final Annotation annotation = myHolder.createWarningAnnotation(reference.getTextRange(), "Indirect usage");
+        final Annotation annotation = myHolder.createWeakWarningAnnotation(reference.getTextRange(), "Indirect usage");
         TextAttributes error = IMPLICIT_DECL;
         if (isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
