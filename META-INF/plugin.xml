@@ -12,6 +12,7 @@
         <b>Version 1.0.100</b><br>
         <ul>
             <li>PRINT warnings fixed</li>
+            <li>Actions with SHORTCUT are not unused</li>
         </ul>
     ]]>
     </change-notes>

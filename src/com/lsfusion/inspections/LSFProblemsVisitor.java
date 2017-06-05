@@ -17,9 +17,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
-import com.lsfusion.lang.psi.impl.LSFLocalDataPropertyDefinitionImpl;
-import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
-import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
+import com.lsfusion.lang.psi.impl.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,8 +45,8 @@ public class LSFProblemsVisitor {
         PsiElement parent = element.getParent();
         if (parent instanceof LSFPropertyDeclaration || parent instanceof LSFGroupStatement || parent instanceof LSFClassDecl) {
             LSFDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
-
-            if (objectDecl != null && objectDecl.getNameIdentifier() != null && ReferencesSearch.search(objectDecl.getNameIdentifier(), element.getUseScope(), true).findFirst() == null) {
+            if (objectDecl != null && objectDecl.getNameIdentifier() != null && !hasShortCut(objectDecl) &&
+                    ReferencesSearch.search(objectDecl.getNameIdentifier(), element.getUseScope(), true).findFirst() == null) {
 
                 String warningText = getWarningText(parent);
                 if (warningsSearchMode) {
@@ -58,6 +56,17 @@ public class LSFProblemsVisitor {
                 }
             }
         }
+    }
+
+    private static boolean hasShortCut(LSFDeclaration objectDecl) {
+        boolean hasShortCut = false;
+        if(objectDecl != null && objectDecl instanceof LSFPropertyStatementImpl) {
+            LSFNonEmptyPropertyOptions propertyOptions = ((LSFPropertyStatementImpl) objectDecl).getNonEmptyPropertyOptions();
+            if(propertyOptions != null) {
+                hasShortCut = !propertyOptions.getShortcutSettingList().isEmpty();
+            }
+        }
+        return hasShortCut;
     }
 
 
