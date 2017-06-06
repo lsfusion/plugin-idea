@@ -8,7 +8,8 @@ public abstract class LSFElementVisitor extends PsiElementVisitor {
 
     @Override
     public void visitElement(PsiElement element) {
-        if(element.getContainingFile().isWritable() && (!disabledInMeta() || !LSFReferenceAnnotator.isInMetaUsage(element)))
+        boolean isInMetaUsage = LSFReferenceAnnotator.isInMetaUsage(element);
+        if(element.getContainingFile().isWritable() && (onlyInMeta() ? isInMetaUsage : (!disabledInMeta() || !isInMetaUsage)))
             visit(element);
         super.visitElement(element);
     }
@@ -16,6 +17,10 @@ public abstract class LSFElementVisitor extends PsiElementVisitor {
     public abstract void visit(PsiElement element);
 
     protected boolean disabledInMeta() {
+        return false;
+    }
+
+    protected boolean onlyInMeta() {
         return false;
     }
 }

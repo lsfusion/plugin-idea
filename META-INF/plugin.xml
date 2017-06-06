@@ -13,6 +13,7 @@
         <ul>
             <li>PRINT warnings fixed</li>
             <li>Actions with SHORTCUT are not unused</li>
+            <li>Unused in meta inspection</li>
         </ul>
     ]]>
     </change-notes>
@@ -198,6 +199,10 @@
         <localInspection groupPath="Lsf" language="Lsf" shortName="LSFUnused" displayName="LSF Unused element"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="false" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFUnusedInspectionTool" hasStaticDescription="true"/>
+
+        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFUnusedInMeta" displayName="LSF Unused element in metacode"
+                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="false" level="WARNING"
+                         implementationClass="com.lsfusion.inspections.LSFUnusedInMetaInspectionTool" hasStaticDescription="true"/>
 
         <localInspection groupPath="Lsf" language="Lsf" shortName="LSFTypeMismatch" displayName="LSF Type mismatch"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
