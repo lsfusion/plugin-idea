@@ -219,6 +219,8 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
 
         if(ref instanceof LSFPropReference && ((LSFPropReference)ref).getExplicitClasses()==null) {
             LSFPropDeclaration propDecl = (LSFPropDeclaration) decl;
+            if(propDecl == null)
+                return;
             List<LSFClassSet> declClasses = propDecl.resolveParamClasses();
             if(declClasses != null)
                 ((LSFPropReference)ref).setExplicitClasses(declClasses, transaction);
