@@ -30,7 +30,7 @@ public class LSFProblemsVisitor {
         try {
             for (PsiElement element : CollectHighlightsUtil.getElementsInRange(file.getViewProvider().getPsi(LSFLanguage.INSTANCE), 0, file.getTextLength())) {
                 if (element instanceof LSFSimpleNameWithCaption && !LSFReferenceAnnotator.isInMetaUsage(element)) {
-                    visitLSFSimpleNameWithCaption(null, element, true);
+                    visitLSFSimpleNameWithCaption(null, (LSFSimpleNameWithCaption) element, true);
                 } else if (element instanceof LSFAssignActionPropertyDefinitionBody) {
                     visitLSFAssignActionPropertyDefinitionBody(null, (LSFAssignActionPropertyDefinitionBody) element, true);
                 } else if (element instanceof LSFPrintActionPropertyDefinitionBody) {
@@ -41,18 +41,19 @@ public class LSFProblemsVisitor {
         }
     }
 
-    static void visitLSFSimpleNameWithCaption(ProblemsHolder holder, PsiElement element, boolean warningsSearchMode) {
+    static void visitLSFSimpleNameWithCaption(ProblemsHolder holder, LSFSimpleNameWithCaption element, boolean warningsSearchMode) {
         PsiElement parent = element.getParent();
         if (parent instanceof LSFPropertyDeclaration || parent instanceof LSFGroupStatement || parent instanceof LSFClassDecl) {
             LSFDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
             if (objectDecl != null && objectDecl.getNameIdentifier() != null && !hasShortCut(objectDecl) &&
                     ReferencesSearch.search(objectDecl.getNameIdentifier(), element.getUseScope(), true).findFirst() == null) {
 
+                LSFSimpleName simpleName = element.getSimpleName();
                 String warningText = getWarningText(parent);
                 if (warningsSearchMode) {
-                    ShowErrorsAction.showErrorMessage(element, warningText, LSFErrorLevel.WARNING);
+                    ShowErrorsAction.showErrorMessage(simpleName, warningText, LSFErrorLevel.WARNING);
                 } else if (holder != null) {
-                    holder.registerProblem(new ProblemDescriptorImpl(element, element, warningText, null, ProblemHighlightType.LIKE_UNUSED_SYMBOL, false, null, true));
+                    holder.registerProblem(new ProblemDescriptorImpl(simpleName, simpleName, warningText, null, ProblemHighlightType.LIKE_UNUSED_SYMBOL, false, null, true));
                 }
             }
         }

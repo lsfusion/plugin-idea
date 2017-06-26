@@ -21,7 +21,7 @@ public class LSFUnusedInspectionTool extends LocalInspectionTool {
             @Override
             public void visit(PsiElement element) {
                 if (element instanceof LSFSimpleNameWithCaption) {
-                    LSFProblemsVisitor.visitLSFSimpleNameWithCaption(holder, element, false);
+                    LSFProblemsVisitor.visitLSFSimpleNameWithCaption(holder, (LSFSimpleNameWithCaption) element, false);
                 }
             }
 
