@@ -75,10 +75,6 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.focusable = focusable;
     }
 
-    public void setAutoSize(boolean autoSize) {
-        target.autoSize = autoSize;
-    }
-
     public void setPanelCaptionAbove(boolean panelCaptionAbove) {
         target.panelCaptionAbove = panelCaptionAbove;
     }

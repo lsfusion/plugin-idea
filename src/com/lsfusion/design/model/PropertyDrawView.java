@@ -38,7 +38,6 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("editKey"),
             new ReflectionProperty("showEditKey").setExpert(),
             new ReflectionProperty("focusable"),
-            new ReflectionProperty("autoSize"),
             new ReflectionProperty("panelCaptionAbove"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("clearText").setExpert(),
@@ -68,7 +67,6 @@ public class PropertyDrawView extends ComponentView {
 
     public Boolean focusable;
 
-    public boolean autoSize = false;
     public boolean panelCaptionAbove = false;
 
     public String caption;
@@ -319,10 +317,6 @@ public class PropertyDrawView extends ComponentView {
         this.focusable = focusable;
     }
 
-    public void setAutoSize(boolean autoSize) {
-        this.autoSize = autoSize;
-    }
-
     public void setPanelCaptionAbove(boolean panelCaptionAbove) {
         this.panelCaptionAbove = panelCaptionAbove;
     }
@@ -413,10 +407,6 @@ public class PropertyDrawView extends ComponentView {
 
     public Boolean getFocusable() {
         return focusable;
-    }
-
-    public boolean isAutoSize() {
-        return autoSize;
     }
 
     public boolean isPanelCaptionAbove() {

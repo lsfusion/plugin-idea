@@ -22,6 +22,7 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("minimumSize").setExpert(),
             new ReflectionProperty("maximumSize").setExpert(),
             new ReflectionProperty("preferredSize"),
+            new ReflectionProperty("autoSize"),
             new ReflectionProperty("flex"),
             new ReflectionProperty("alignment"),
             new ReflectionProperty("marginTop").setExpert(),
@@ -41,6 +42,8 @@ public abstract class ComponentView extends PropertiesContainer {
     public Dimension minimumSize;
     public Dimension maximumSize;
     public Dimension preferredSize;
+
+    public boolean autoSize = false;
 
     public double flex = 0;
     public FlexAlignment alignment = FlexAlignment.LEADING;
@@ -179,6 +182,10 @@ public abstract class ComponentView extends PropertiesContainer {
         setPreferredWidth(width);
     }
 
+    public void setAutoSize(boolean autoSize) {
+        this.autoSize = autoSize;
+    }
+
     public void setDefaultComponent(boolean defaultComponent) {
         this.defaultComponent = defaultComponent;
     }
@@ -287,6 +294,10 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public Dimension getPreferredSize() {
         return preferredSize;
+    }
+
+    public boolean isAutoSize() {
+        return autoSize;
     }
 
     public double getFlex() {

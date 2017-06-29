@@ -90,6 +90,10 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         setPreferredWidth(width);
     }
 
+    public void setAutoSize(boolean autoSize) {
+        target.autoSize = autoSize;
+    }
+
     public void setDefaultComponent(boolean defaultComponent) {
         target.defaultComponent = defaultComponent;
     }
