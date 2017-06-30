@@ -13,63 +13,39 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
     }
 
     public void setMinimumSize(Dimension minimumSize) {
-        target.minimumSize = minimumSize;
+        target.setMinimumSize(minimumSize);
     }
 
     public void setMinimumHeight(int minHeight) {
-        if (target.minimumSize == null) {
-            target.minimumSize = new Dimension(-1, minHeight);
-        } else {
-            target.minimumSize.height = minHeight;
-        }
+        target.setMinimumHeight(minHeight);
     }
 
     public void setMinimumWidth(int minWidth) {
-        if (target.minimumSize == null) {
-            target.minimumSize = new Dimension(minWidth, -1);
-        } else {
-            target.minimumSize.width = minWidth;
-        }
+        target.setMinimumWidth(minWidth);
     }
 
     public void setMaximumSize(Dimension maximumSize) {
-        target.maximumSize = maximumSize;
+        target.setMaximumSize(maximumSize);
     }
 
     public void setMaximumHeight(int maxHeight) {
-        if (target.maximumSize == null) {
-            target.maximumSize = new Dimension(-1, maxHeight);
-        } else {
-            target.maximumSize.height = maxHeight;
-        }
+        target.setMaximumHeight(maxHeight);
     }
 
     public void setMaximumWidth(int maxWidth) {
-        if (target.maximumSize == null) {
-            target.maximumSize = new Dimension(maxWidth, -1);
-        } else {
-            target.maximumSize.width = maxWidth;
-        }
+        target.setMaximumWidth(maxWidth);
     }
 
     public void setPreferredSize(Dimension preferredSize) {
-        target.preferredSize = preferredSize;
+        target.setPreferredSize(preferredSize);
     }
 
     public void setPreferredHeight(int prefHeight) {
-        if (target.preferredSize == null) {
-            target.preferredSize = new Dimension(-1, prefHeight);
-        } else {
-            target.preferredSize.height = prefHeight;
-        }
+        target.setPreferredHeight(prefHeight);
     }
 
     public void setPreferredWidth(int prefWidth) {
-        if (target.preferredSize == null) {
-            target.preferredSize = new Dimension(prefWidth, -1);
-        } else {
-            target.preferredSize.width = prefWidth;
-        }
+        target.setPreferredWidth(prefWidth);
     }
 
     public void setFixedSize(Dimension size) {

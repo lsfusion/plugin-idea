@@ -3,6 +3,7 @@ package com.lsfusion.design.model.proxy;
 import com.lsfusion.design.model.PropertyDrawView;
 
 import javax.swing.*;
+import java.awt.*;
 
 @SuppressWarnings("unused")
 public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> {
@@ -63,6 +64,60 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.setPreferredCharWidth(preferredCharWidth);
     }
 
+    public void setMinimumValueSize(Dimension minimumSize) {
+        target.setMinimumValueSize(minimumSize);
+    }
+
+    public void setMinimumValueHeight(int minHeight) {
+        target.setMinimumValueHeight(minHeight);
+    }
+
+    public void setMinimumValueWidth(int minWidth) {
+        target.setMinimumValueWidth(minWidth);
+    }
+
+    public void setMaximumValueSize(Dimension maximumSize) {
+        target.setMaximumValueSize(maximumSize);
+    }
+
+    public void setMaximumValueHeight(int maxHeight) {
+        target.setMaximumValueHeight(maxHeight);
+    }
+
+    public void setMaximumValueWidth(int maxWidth) {
+        target.setMaximumValueWidth(maxWidth);
+    }
+
+    public void setPreferredValueSize(Dimension preferredSize) {
+        target.setPreferredValueSize(preferredSize);
+    }
+
+    public void setPreferredValueHeight(int prefHeight) {
+        target.setPreferredValueHeight(prefHeight);
+    }
+
+    public void setPreferredValueWidth(int prefWidth) {
+        target.setPreferredValueWidth(prefWidth);
+    }
+
+    public void setFixedValueSize(Dimension size) {
+        setMinimumValueSize(size);
+        setMaximumValueSize(size);
+        setPreferredValueSize(size);
+    }
+
+    public void setFixedValueHeight(int height) {
+        setMinimumValueHeight(height);
+        setMaximumValueHeight(height);
+        setPreferredValueHeight(height);
+    }
+
+    public void setFixedValueWidth(int width) {
+        setMinimumValueWidth(width);
+        setMaximumValueWidth(width);
+        setPreferredValueWidth(width);
+    }
+    
     public void setEditKey(KeyStroke editKey) {
         target.editKey = editKey;
     }

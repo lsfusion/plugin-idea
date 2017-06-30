@@ -43,13 +43,13 @@ public class GridTable extends JBTable {
 
             TableColumn column = getColumnModel().getColumn(i);
 
-            column.setMinWidth(cell.getMinimumWidth(this));
-            column.setPreferredWidth(((getAutoResizeMode() == JTable.AUTO_RESIZE_OFF) ? cell.getMinimumWidth(this) : cell.getPreferredWidth(this)));
-            column.setMaxWidth(cell.getMaximumWidth(this));
+            column.setMinWidth(cell.getMinimumValueWidth(this));
+            column.setPreferredWidth(((getAutoResizeMode() == JTable.AUTO_RESIZE_OFF) ? cell.getMinimumValueWidth(this) : cell.getPreferredValueWidth(this)));
+            column.setMaxWidth(cell.getMaximumValueWidth(this));
 
             column.setHeaderValue(getModel().getColumnName(i));
 
-            rowHeight = Math.max(rowHeight, cell.getPreferredHeight(this));
+            rowHeight = Math.max(rowHeight, cell.getPreferredValueHeight(this));
         }
 
         if (getModel().getColumnCount() != 0) {
@@ -116,7 +116,7 @@ public class GridTable extends JBTable {
     private void resetPreferredColumnWidths() {
         for (int i = 0; i < getModel().getColumnCount(); ++i) {
             PropertyDrawView cell = getColumnProperty(i);
-            getColumnModel().getColumn(i).setPreferredWidth(cell.getPreferredWidth(this));
+            getColumnModel().getColumn(i).setPreferredWidth(cell.getPreferredValueWidth(this));
         }
     }
 

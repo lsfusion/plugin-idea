@@ -111,7 +111,7 @@ public class TreeGroupTable extends TreeTable {
         getColumnModel().getColumn(0).setPreferredWidth(treeGroup.calculatePreferredSize());
         for (int i = 1; i < getModel().getColumnCount(); ++i) {
             PropertyDrawView cell = getColumnProperty(i);
-            getColumnModel().getColumn(i).setPreferredWidth(cell.getPreferredWidth(this));
+            getColumnModel().getColumn(i).setPreferredWidth(cell.getPreferredValueWidth(this));
         }
     }
 }

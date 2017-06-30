@@ -27,9 +27,9 @@ public class DataPanelView extends JBPanel implements HasLabel {
             label.setHorizontalAlignment(SwingConstants.CENTER);
         }
 
-        table.setMinimumSize(overrideSize(table.getMinimumSize(), property.getMinimumSize(this)));
-        table.setMaximumSize(overrideSize(table.getMaximumSize(), property.getMaximumSize(this)));
-        table.setPreferredSize(overrideSize(table.getPreferredSize(), property.getPreferredSize(this)));
+        table.setMinimumSize(overrideSize(table.getMinimumSize(), property.getMinimumValueSize(this)));
+        table.setMaximumSize(overrideSize(table.getMaximumSize(), property.getMaximumValueSize(this)));
+        table.setPreferredSize(overrideSize(table.getPreferredSize(), property.getPreferredValueSize(this)));
         if (property.font != null) {
             table.setFont(property.font.deriveFrom(table));
         }
