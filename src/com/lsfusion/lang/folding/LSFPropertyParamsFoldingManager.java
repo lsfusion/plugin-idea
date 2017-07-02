@@ -54,15 +54,7 @@ public class LSFPropertyParamsFoldingManager {
                 }
             } else {
                 printValueClass = false;
-
-                LSFActionUnfriendlyPD actionUFD = propertyStatement.getActionUnfriendlyPD();
-                if (actionUFD != null) {
-                    if (actionUFD.getEditFormActionPropertyDefinitionBody() == null) {
-                        printParamClasses = false;
-                    }
-                } else {
-                    printParamClasses = false;
-                }
+                printParamClasses = false;
             }
         }
         

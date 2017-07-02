@@ -230,8 +230,6 @@ propertyStatement ::= propertyDeclaration equalsSign
 propertyCalcStatement ::= (expressionUnfriendlyPD | propertyExpression)
 
 actionUnfriendlyPD ::= (abstractActionPropertyDefinition
-                        |	addFormActionPropertyDefinitionBody
-                        |	editFormActionPropertyDefinitionBody
                         |	customActionPropertyDefinitionBody
     	                |   nativeActionPropertyDefinition)    	               
 {
@@ -428,7 +426,7 @@ activeTabPropertyDefinition ::= ACTIVE TAB componentUsage FORM formUsage
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames resolveFormDecl]
 }
 
-propertyExprObject ::= LSQBR EQUALS (ACTION actionUnfriendlyPD | propertyCalcStatement | topActionPropertyDefinitionBody) RSQBR
+propertyExprObject ::= LSQBR EQUALS (propertyCalcStatement) RSQBR
 {implements="com.lsfusion.lang.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
 
 propertyObject ::=  propertyUsage | propertyExprObject
@@ -766,20 +764,6 @@ javaClassStringUsage ::= stringLiteral
     implements="com.lsfusion.lang.psi.references.LSFJavaClassStringReference"
 }
 
-addFormActionPropertyDefinitionBody ::= ADDFORM (SESSION | NESTED)? customClassUsage
-{
-    pin = 1
-    implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
-}
-
-editFormActionPropertyDefinitionBody ::= EDITFORM (SESSION | NESTED)? customClassUsage
-{
-    pin = 1
-    implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
-}
-
 private newWhereToClause ::= (TO mappedPropertyExprParam) { pin = 1 }
 private newWhereClause ::= (WHERE propertyExpression newWhereToClause?) { pin = 1 }
 
@@ -844,8 +828,7 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)?
     methods = [inferActionParamClasses resolveFormDecl] 
 }
 
-fileActionPropertyDefinitionBody ::= LOADFILE propertyExpression 
-                                   | OPEN propertyExpression (NAME propertyExpression)?
+fileActionPropertyDefinitionBody ::= OPEN propertyExpression (NAME propertyExpression)?
                                    | SAVE propertyExpression (NAME propertyExpression)?
 {
     pin(".*") = 1

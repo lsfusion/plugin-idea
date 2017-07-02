@@ -177,11 +177,11 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFPropertyExprObject sourceStatement) {
-        return getContextAPModifier(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
+        return getContextAPModifier(sourceStatement.getPropertyCalcStatement(), null, null); // sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFPropertyExprObject sourceStatement) {
-        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement(), sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
+        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement(), null, null); //sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFForActionPropertyMainBody sourceStatement) {
@@ -1073,16 +1073,6 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFAddFormActionPropertyDefinitionBody sourceStatement, boolean infer) {
-        return null;
-    }
-
-    @Nullable
-    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFEditFormActionPropertyDefinitionBody sourceStatement, boolean infer) {
-        return null;
-    }
-
-    @Nullable
     public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFNativeActionPropertyDefinition sourceStatement, boolean infer) {
         return null;
     }
@@ -1303,14 +1293,6 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
-    public static List<String> getValueClassNames(@NotNull LSFAddFormActionPropertyDefinitionBody sourceStatement) {
-        return Collections.EMPTY_LIST;
-    }
-
-    public static List<String> getValueClassNames(@NotNull LSFEditFormActionPropertyDefinitionBody sourceStatement) {
-        return Collections.EMPTY_LIST;
-    }
-
     public static List<String> getValueClassNames(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
@@ -1363,7 +1345,7 @@ public class LSFPsiImplUtil {
         assert exprObject != null;
 
         LSFPropertyCalcStatement pCalcStatement = exprObject.getPropertyCalcStatement();
-        return getValueAPClassNames(pCalcStatement, exprObject.getActionUnfriendlyPD(), exprObject.getListActionPropertyDefinitionBody());
+        return getValueAPClassNames(pCalcStatement, null, null); //exprObject.getActionUnfriendlyPD(), exprObject.getListActionPropertyDefinitionBody());
     }
 
     public static List<String> getValueAPClassNames(LSFPropertyCalcStatement pCalcStatement, LSFActionUnfriendlyPD unfriendlyPD, LSFListActionPropertyDefinitionBody listPD) {
@@ -1639,14 +1621,6 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
-    public static List<String> getValuePropertyNames(@NotNull LSFAddFormActionPropertyDefinitionBody sourceStatement) {
-        return Collections.EMPTY_LIST;
-    }
-
-    public static List<String> getValuePropertyNames(@NotNull LSFEditFormActionPropertyDefinitionBody sourceStatement) {
-        return Collections.EMPTY_LIST;
-    }
-
     public static List<String> getValuePropertyNames(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
@@ -1686,7 +1660,7 @@ public class LSFPsiImplUtil {
 
         assert exprObject != null;
 
-        return getValueAPPropertyNames(exprObject.getPropertyCalcStatement(), exprObject.getActionUnfriendlyPD(), exprObject.getListActionPropertyDefinitionBody());
+        return getValueAPPropertyNames(exprObject.getPropertyCalcStatement(), null, null); //exprObject.getActionUnfriendlyPD(), exprObject.getListActionPropertyDefinitionBody());
     }
 
     public static List<String> getValueAPPropertyNames(LSFPropertyCalcStatement pCalcStatement, LSFActionUnfriendlyPD unfriendlyPD, LSFListActionPropertyDefinitionBody listActionBody) {
@@ -1845,16 +1819,6 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAddFormActionPropertyDefinitionBody sourceStatement) {
-        return new ArrayList<>();
-    }
-
-    @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFEditFormActionPropertyDefinitionBody editForm) {
-        return LSFExClassSet.toEx(singletonList((LSFClassSet)resolveClass(editForm.getCustomClassUsage())));
-    }
-
-    @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
         return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
@@ -1945,14 +1909,6 @@ public class LSFPsiImplUtil {
         if(classNameList != null)
             return getClassNameRefs(classNameList);
         return null;
-    }
-
-    public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFAddFormActionPropertyDefinitionBody sourceStatement) {
-        return new LSFExplicitSignature(Collections.EMPTY_LIST);
-    }
-
-    public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFEditFormActionPropertyDefinitionBody sourceStatement) {
-        return null; // нельзя обращаться к контексту (используется в stub'ах)
     }
 
     public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
@@ -2560,34 +2516,33 @@ public class LSFPsiImplUtil {
             assert exprObject != null;
 
             LSFPropertyCalcStatement pCalcStatement = exprObject.getPropertyCalcStatement();
-            if(pCalcStatement != null) {
-                LSFPropertyExpression pe = pCalcStatement.getPropertyExpression();
-                if (pe != null) {
-                    List<LSFExprParamDeclaration> params = pe.resolveParams();
-                    joinClasses = new ArrayList<>();
-                    InferExResult inferred = inferParamClasses(pe, valueClass).finishEx();
-                    for (LSFExprParamDeclaration param : params)
-                        joinClasses.add(inferred.get(param));
-                } else {
-                    LSFExpressionUnfriendlyPD unfriendlyPD = pCalcStatement.getExpressionUnfriendlyPD();
-
-                    assert unfriendlyPD != null;
-
-                    PsiElement element = unfriendlyPD.getChildren()[0]; // лень создавать отдельный параметр или интерфейс
-                    if (element instanceof LSFGroupPropertyDefinition) {
-                        joinClasses = inferGroupValueParamClasses((LSFGroupPropertyDefinition) element);
-                    } else
-                        joinClasses = unfriendlyPD.resolveValueParamClasses();
-                }
+            LSFPropertyExpression pe = pCalcStatement.getPropertyExpression();
+            if (pe != null) {
+                List<LSFExprParamDeclaration> params = pe.resolveParams();
+                joinClasses = new ArrayList<>();
+                InferExResult inferred = inferParamClasses(pe, valueClass).finishEx();
+                for (LSFExprParamDeclaration param : params)
+                    joinClasses.add(inferred.get(param));
             } else {
-                LSFListActionPropertyDefinitionBody body = exprObject.getListActionPropertyDefinitionBody();
-                if(body != null) {
-                    joinClasses = null;
-                } else { // contextUnfriendly
-                    joinClasses = LSFPsiImplUtil.resolveValueParamClasses(exprObject.getActionUnfriendlyPD());
-                }
+                LSFExpressionUnfriendlyPD unfriendlyPD = pCalcStatement.getExpressionUnfriendlyPD();
 
+                assert unfriendlyPD != null;
+
+                PsiElement element = unfriendlyPD.getChildren()[0]; // лень создавать отдельный параметр или интерфейс
+                if (element instanceof LSFGroupPropertyDefinition) {
+                    joinClasses = inferGroupValueParamClasses((LSFGroupPropertyDefinition) element);
+                } else
+                    joinClasses = unfriendlyPD.resolveValueParamClasses();
             }
+//                else {
+//                LSFListActionPropertyDefinitionBody body = exprObject.getListActionPropertyDefinitionBody();
+//                if(body != null) {
+//                    joinClasses = null;
+//                } else { // contextUnfriendly
+//                    joinClasses = LSFPsiImplUtil.resolveValueParamClasses(exprObject.getActionUnfriendlyPD());
+//                }
+//
+//            }
         }
         return joinClasses;
     }
