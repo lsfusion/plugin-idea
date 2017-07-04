@@ -231,7 +231,6 @@ propertyCalcStatement ::= (expressionUnfriendlyPD | propertyExpression)
 
 actionUnfriendlyPD ::= (abstractActionPropertyDefinition
                         |	customActionPropertyDefinitionBody
-    	                |   nativeActionPropertyDefinition)    	               
 {
     methods = [ resolveValueParamClasses]
 }
@@ -565,13 +564,6 @@ abstractActionPropertyDefinition ::= ABSTRACT
                                     )?
                                     (CHECKED)?
                                     LBRAC classNameList RBRAC
-{
-    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
-}
-
-
-nativeActionPropertyDefinition ::= NATIVE LBRAC classNameList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]

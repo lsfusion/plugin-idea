@@ -1072,11 +1072,6 @@ public class LSFPsiImplUtil {
         return null;
     }
 
-    @Nullable
-    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFNativeActionPropertyDefinition sourceStatement, boolean infer) {
-        return null;
-    }
-
     private static InferExResult inferGroupParamClasses(LSFGroupPropertyDefinition sourceStatement) {
         Inferred result = Inferred.EMPTY;
         for (LSFPropertyExpression expr : getContextExprs(sourceStatement))
@@ -1290,10 +1285,6 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement) {
-        return Collections.EMPTY_LIST;
-    }
-
-    public static List<String> getValueClassNames(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -1621,10 +1612,6 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
-    public static List<String> getValuePropertyNames(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
-        return Collections.EMPTY_LIST;
-    }
-
     public static List<String> getValuePropertyNames(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
@@ -1819,11 +1806,6 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
-        return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
-    }
-
-    @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
@@ -1909,10 +1891,6 @@ public class LSFPsiImplUtil {
         if(classNameList != null)
             return getClassNameRefs(classNameList);
         return null;
-    }
-
-    public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFNativeActionPropertyDefinition sourceStatement) {
-        return getClassNameRefs(sourceStatement.getClassNameList());
     }
 
     public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
