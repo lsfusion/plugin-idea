@@ -291,6 +291,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "WAIT"                                { return WAIT; }
   "NOWAIT"                              { return NOWAIT; }
   "NULL"                    			{ return NULL; }
+  "NONULL"                    			{ return NONULL; }
   "OBJECT"                  			{ return OBJECT; }
   "OBJECTS"                 			{ return OBJECTS; }
   "CONSTRAINTFILTER"              		{ return CONSTRAINTFILTER; }

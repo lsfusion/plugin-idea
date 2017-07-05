@@ -215,7 +215,7 @@ implicitInterfacePropertyStatement ::= propertyStatement
 }
 
 propertyStatement ::= propertyDeclaration equalsSign
-                        (   (ACTION actionUnfriendlyPD | propertyCalcStatement) (nonEmptyPropertyOptions | SEMI)
+                        (   (actionUnfriendlyPD | propertyCalcStatement) (nonEmptyPropertyOptions | SEMI)
                         |   topActionPropertyDefinitionBody nonEmptyPropertyOptions?
                         )                      
 {
@@ -230,7 +230,7 @@ propertyStatement ::= propertyDeclaration equalsSign
 propertyCalcStatement ::= (expressionUnfriendlyPD | propertyExpression)
 
 actionUnfriendlyPD ::= (abstractActionPropertyDefinition
-                        |	customActionPropertyDefinitionBody
+                        |	customActionPropertyDefinitionBody)
 {
     methods = [ resolveValueParamClasses]
 }
@@ -545,7 +545,7 @@ loggableSetting ::= LOGGABLE
 echoSymbolsSetting ::= ECHO
 indexSetting ::= INDEXED
 aggPropSetting ::= AGGPROP
-notNullSetting ::= NOT nullOption (DELETE)? baseEvent
+notNullSetting ::= nullOption (DELETE)? baseEvent
 onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody
 asEditActionSetting ::= ASON formEventType noContextPropertyUsage {pin = 1}
 eventIdSetting ::= EVENTID stringLiteral
@@ -1910,7 +1910,7 @@ ulongLiteral ::= LEX_ULONG_LITERAL
 nullLiteral ::= NULL
 codeLiteral ::= LEX_CODE_LITERAL
 
-nullOption ::= NULL
+nullOption ::= NONULL
 
 equalsSign ::= EQUALS
 
