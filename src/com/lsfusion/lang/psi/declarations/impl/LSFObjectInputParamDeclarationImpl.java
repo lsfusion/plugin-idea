@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.lsfusion.lang.psi.LSFObjectInProps;
 import com.lsfusion.lang.psi.LSFObjectInputProps;
 import com.lsfusion.lang.psi.LSFObjectUsage;
 import com.lsfusion.lang.psi.LSFSimpleName;
@@ -20,6 +21,9 @@ public abstract class LSFObjectInputParamDeclarationImpl extends LSFParamDeclara
     @Nullable
     public abstract LSFObjectInputProps getObjectInputProps();
 
+    @Nullable
+    public abstract LSFObjectInProps getObjectInProps();
+
     @Override
     protected LSFSimpleName getSimpleName() {
         LSFObjectInputProps objectInputProps = getObjectInputProps();
@@ -29,7 +33,6 @@ public abstract class LSFObjectInputParamDeclarationImpl extends LSFParamDeclara
                 return explicitName;
             return getObjectUsage().getSimpleName();
         }
-        assert false;
         return null;
     }
 }
