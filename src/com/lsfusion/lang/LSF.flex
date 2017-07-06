@@ -166,6 +166,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "DATA"                    			{ return DATA; }
   "DBF"                    			    { return DBF; }
   "DEFAULT"                 			{ return DEFAULT; }
+  "DEFAULTCOMPARE"                 	    { return DEFAULTCOMPARE; }
   "DELAY"              			        { return DELAY; }
   "DELETE"                  			{ return DELETE; }
   "DESC"                    			{ return DESC; }
