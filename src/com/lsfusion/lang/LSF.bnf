@@ -1630,7 +1630,7 @@ groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTE
 globalSingleSelectorType ::= componentSingleSelectorType 
 
 private groupObjectTreeSelector ::= TREE treeGroupSelector | groupObjectSelector { pin(".*") = 1 }
-private groupComponentSelector ::= (groupObjectSelector COMMA groupSelector? | groupSelector?) { pin(".*") = 2 }
+private groupComponentSelector ::= (groupObjectTreeSelector COMMA groupSelector? | groupSelector?) { pin(".*") = 2 }
 
 private pinnedGroupObjectTreeSelector ::= groupObjectTreeSingleSelectorType LBRAC groupObjectTreeSelector RBRAC {pin = 2}
 
