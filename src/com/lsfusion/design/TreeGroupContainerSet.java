@@ -8,6 +8,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 
 public class TreeGroupContainerSet {
     public static final String TREE_GROUP_CONTAINER = ".box";
+    public static final String TREE_CONTAINER = ".tree";
 
     private ContainerView treeContainer;
     private ContainerView controlsContainer;

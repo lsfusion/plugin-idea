@@ -1,12 +1,14 @@
 package com.lsfusion.design.ui;
 
+import com.lsfusion.design.FormContainerSet;
+import com.lsfusion.design.TreeGroupContainerSet;
 import com.lsfusion.design.model.*;
 
 import javax.swing.*;
 
 public class TestData {
     public static ContainerView create() {
-        ContainerView main = new ContainerView("main");
+        ContainerView main = new ContainerView(FormContainerSet.MAIN_CONTAINER);
         main.minimumSize = null;
         main.maximumSize = null;
         main.preferredSize = null;
@@ -3549,7 +3551,7 @@ public class TestData {
         row2.add(i_box);
         rootContainer.add(row2);
         main.add(rootContainer);
-        ContainerView functions_box = new ContainerView("functions.box");
+        ContainerView functions_box = new ContainerView(FormContainerSet.FUNCTIONS_CONTAINER);
         functions_box.minimumSize = null;
         functions_box.maximumSize = null;
         functions_box.preferredSize = null;
@@ -3570,7 +3572,7 @@ public class TestData {
         functions_box.type = ContainerType.CONTAINERH;
         functions_box.caption = null;
         functions_box.description = "Служебные кнопки";
-        ContainerView leftControls = new ContainerView("leftControls");
+        ContainerView leftControls = new ContainerView(FormContainerSet.LEFTCONTROLS_CONTAINER);
         leftControls.minimumSize = null;
         leftControls.maximumSize = null;
         leftControls.preferredSize = null;
@@ -3777,7 +3779,7 @@ public class TestData {
         isEditable__.askConfirm = false;
         isEditable__.askConfirmMessage = null;
         functions_box.add(isEditable__);
-        ContainerView rightControls = new ContainerView("rightControls");
+        ContainerView rightControls = new ContainerView(FormContainerSet.RIGHTCONTROLS_CONTAINER);
         rightControls.minimumSize = null;
         rightControls.maximumSize = null;
         rightControls.preferredSize = null;
@@ -3990,7 +3992,7 @@ public class TestData {
     }
 
     public static ContainerView create0() {
-        ContainerView main = new ContainerView("main");
+        ContainerView main = new ContainerView(FormContainerSet.MAIN_CONTAINER);
 
         ContainerView splitter = new ContainerView("splitter");
         splitter.setType(ContainerType.SPLITH);

@@ -16,6 +16,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.io.StringRef;
+import com.lsfusion.design.FormContainerSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
@@ -144,7 +145,7 @@ public class LSFElementGenerator {
 
     public static List<? extends LSFComponentDeclaration> getBuiltInFormComponents(Project project) {
         if (builtInFormComponents == null) {
-            builtInFormComponents = createFormComponents(project, Arrays.asList("main", "functions.box", "leftControls", "rightControls", "nogroup.panel", "nogroup.panel.props"));
+            builtInFormComponents = createFormComponents(project, Arrays.asList(FormContainerSet.MAIN_CONTAINER, FormContainerSet.FUNCTIONS_CONTAINER, FormContainerSet.LEFTCONTROLS_CONTAINER, FormContainerSet.RIGHTCONTROLS_CONTAINER, FormContainerSet.NOGROUP_PANEL_CONTAINER, FormContainerSet.NOGROUP_PANEL_PROPS_CONTAINER));
         }
         return builtInFormComponents;
     }

@@ -14,8 +14,10 @@ public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubEl
     LSFFormDecl getFormDecl();
 
     Collection<LSFObjectDeclaration> getObjectDecls();
-
+    
     Collection<LSFGroupObjectDeclaration> getGroupObjectDecls();
+    
+    Collection<LSFTreeGroupDeclaration> getTreeGroupDecls();
     
     Collection<LSFFilterGroupDeclaration> getFilterGroupDecls();
 

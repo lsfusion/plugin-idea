@@ -130,7 +130,7 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
                 result.put(goName + GroupObjectContainerSet.CONTROLS_CONTAINER, lsfGroupObjectDeclaration);
                 result.put(goName + GroupObjectContainerSet.CONTROLS_RIGHT_CONTAINER, lsfGroupObjectDeclaration);
                 result.put(goName + GroupObjectContainerSet.FILTERS_CONTAINER, lsfGroupObjectDeclaration);
-                result.put(goName + GroupObjectContainerSet.GRID_CONTAINER, lsfGroupObjectDeclaration);
+                result.put(goName + GroupObjectContainerSet.GRID_BOX_CONTAINER, lsfGroupObjectDeclaration);
                 result.put(goName + GroupObjectContainerSet.GROUP_CONTAINER, lsfGroupObjectDeclaration);
                 result.put(goName + GroupObjectContainerSet.PANEL_CONTAINER, lsfGroupObjectDeclaration);
                 result.put(goName + GroupObjectContainerSet.PANEL_PROPS_CONTAINER, lsfGroupObjectDeclaration);
@@ -180,9 +180,9 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
             nogroupGroupContainers.add("NOGROUP." + group);
         }
         Map<String, LSFDeclaration> result = new HashMap<>();
-        for (LSFComponentDeclaration componentDeclaration : LSFElementGenerator.createFormComponents(getProject(), nogroupGroupContainers)) {
-            result.put(componentDeclaration.getName(), componentDeclaration);
-        }    
+//        for (LSFComponentDeclaration componentDeclaration : LSFElementGenerator.createFormComponents(getProject(), nogroupGroupContainers)) {
+//            result.put(componentDeclaration.getName(), componentDeclaration);
+//        }    
         return result;
     }
 

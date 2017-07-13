@@ -6,9 +6,14 @@ import com.lsfusion.design.ui.Alignment;
 import com.lsfusion.design.ui.FlexAlignment;
 
 public class FormContainerSet {
+    public static final String MAIN_CONTAINER = "main";
     public static final String FUNCTIONS_CONTAINER = "functions.box";
+    public static final String LEFTCONTROLS_CONTAINER = "leftControls";
+    public static final String RIGHTCONTROLS_CONTAINER = "rightControls";
     public static final String NOGROUP_PANEL_CONTAINER = "nogroup.panel";
     public static final String NOGROUP_PANEL_PROPS_CONTAINER = "nogroup.panel.props";
+
+    public static final String FUNCTIONSIN_CONTAINER = "functions.";
 
     private ContainerView mainContainer;
     private ContainerView formButtonContainer;

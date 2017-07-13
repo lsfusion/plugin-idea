@@ -76,7 +76,7 @@ public class FormView {
     protected FormView(FormEntity entity) {
         this.entity = entity;
 
-        mainContainer = new ContainerView("main");
+        mainContainer = new ContainerView(FormContainerSet.MAIN_CONTAINER);
         setComponentSID(mainContainer, getMainContainerSID());
 
         containerFactory = new ContainerFactory();
@@ -262,7 +262,7 @@ public class FormView {
     }
 
     public static String getMainContainerSID() {
-        return "main";
+        return FormContainerSet.MAIN_CONTAINER;
     }
 
     private static String getTreeSID(TreeGroupView component) {
@@ -270,7 +270,7 @@ public class FormView {
     }
 
     public static String getTreeSID(String sID) {
-        return sID + ".tree";
+        return sID + TreeGroupContainerSet.TREE_CONTAINER;
     }
 
     private static String getRegularFilterGroupSID(RegularFilterGroupView component) {
@@ -278,7 +278,7 @@ public class FormView {
     }
 
     public static String getRegularFilterGroupSID(String sID) {
-        return "filters." + sID;
+        return GroupObjectContainerSet.FILTERSPREF_COMPONENT + sID;
     }
 
     private static String getGridSID(GroupObjectView component) {
@@ -286,7 +286,7 @@ public class FormView {
     }
 
     public static String getGridSID(String sID) {
-        return sID + ".grid";
+        return sID + GroupObjectContainerSet.GRID_COMPONENT;
     }
 
     private static String getToolbarSID(GroupView component) {
@@ -294,7 +294,7 @@ public class FormView {
     }
 
     public static String getToolbarSID(String sID) {
-        return sID + ".toolbar";
+        return sID + GroupObjectContainerSet.TOOLBAR_COMPONENT;
     }
 
     private static String getFilterSID(GroupView component) {
@@ -302,7 +302,7 @@ public class FormView {
     }
 
     public static String getFilterSID(String sID) {
-        return sID + ".filter";
+        return sID + GroupObjectContainerSet.FILTER_COMPONENT;
     }
 
     private static String getShowTypeSID(GroupObjectView component) {
@@ -310,7 +310,7 @@ public class FormView {
     }
 
     public static String getShowTypeSID(String sID) {
-        return sID + ".showType";
+        return sID + GroupObjectContainerSet.SHOWTYPE_COMPONENT;
     }
 
     private static String getClassChooserSID(ObjectView component) {
@@ -318,11 +318,11 @@ public class FormView {
     }
 
     public static String getClassChooserSID(String sID) {
-        return sID + ".classChooser";
+        return sID + GroupObjectContainerSet.CLASSCHOOSER_COMPONENT;
     }
 
     public static String getClientFunctionSID(String type) {
-        return "functions." + type;
+        return FormContainerSet.FUNCTIONSIN_CONTAINER + type;
     }
 
     public class ContainerFactory {

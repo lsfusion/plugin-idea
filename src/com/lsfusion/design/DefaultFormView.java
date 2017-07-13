@@ -277,7 +277,7 @@ public class DefaultFormView extends FormView {
             String[] sids = propertyGroupSID.split("_", 2);
             propertyGroupSID = sids[1];
         }
-        return (group == null ? "NOGROUP" : group.entity.sID) + "." + propertyGroupSID;
+        return (group == null ? "ABC" : group.entity.sID) + "." + propertyGroupSID;
     }
 
     private void addRegularFilterGroupView(RegularFilterGroupView filterGroup) {
@@ -321,12 +321,12 @@ public class DefaultFormView extends FormView {
         PropertyDrawView closeFunction = get(entity.closeActionPropertyDraw);
         setupFormButton(closeFunction, KeyStrokes.getCloseKeyStroke(), null, true);
 
-        ContainerView leftControlsContainer = createContainer(null, "leftControls");
+        ContainerView leftControlsContainer = createContainer(null, FormContainerSet.LEFTCONTROLS_CONTAINER);
         leftControlsContainer.setType(ContainerType.CONTAINERH);
         leftControlsContainer.childrenAlignment = Alignment.LEADING;
         leftControlsContainer.flex = 0;
 
-        ContainerView rightControlsContainer = createContainer(null, "rightControls");
+        ContainerView rightControlsContainer = createContainer(null, FormContainerSet.RIGHTCONTROLS_CONTAINER);
         rightControlsContainer.setType(ContainerType.CONTAINERH);
         rightControlsContainer.childrenAlignment = Alignment.TRAILING;
         rightControlsContainer.flex = 1;

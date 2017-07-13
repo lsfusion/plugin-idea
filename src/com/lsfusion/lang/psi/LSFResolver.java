@@ -28,7 +28,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
     @Nullable
     @Override
     public LSFResolveResult resolve(@NotNull LSFReference reference, boolean incompleteCode) {
-        return reference.resolveNoCache();
+         return reference.resolveNoCache();
     }
 
     public static List<String> getIDs(LSFMetaDeclIdList idList) {

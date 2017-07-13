@@ -131,6 +131,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "BCC"                     			{ return BCC; }
   "BEFORE"                  			{ return BEFORE; }
   "BOTTOM"                  			{ return BOTTOM; }
+  "BOX"                  			    { return BOX; }
   "BREAK"                   			{ return BREAK; }
   "BY"                      			{ return BY; }
   "CANCEL"                  			{ return CANCEL; }
@@ -145,6 +146,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "CHECK"                   			{ return CHECK; }
   "CHECKED"                 			{ return CHECKED; }
   "CLASS"                   			{ return CLASS; }
+  "CLASSCHOOSER"                   		{ return CLASSCHOOSER; }
   "CLOSE"                   			{ return CLOSE; }
   "COLUMNS"                 			{ return COLUMNS; }
   "COMPLEX"                 			{ return COMPLEX; }
@@ -203,6 +205,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "FILE"                  			    { return FILE; }
   "FILTER"                  			{ return FILTER; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
+  "FILTERGROUPS"             			{ return FILTERGROUPS; }
   "FILTERS"                 			{ return FILTERS; }
   "FINALLY"                             { return FINALLY; }
   "FIRST"                   			{ return FIRST; }
@@ -220,6 +223,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "FULL"              			        { return FULL; }
   "GLOBAL"                              { return GLOBAL; }
   "GRID"                    			{ return GRID; }
+  "GRIDBOX"                    			{ return GRIDBOX; }
   "GROUP"                   			{ return GROUP; }
   "GROUPCHANGE"                         { return GROUPCHANGE; }
   "EQUAL"                               { return EQUAL; }
@@ -351,6 +355,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "SHOW"                    			{ return SHOW; }
   "SHOWDEP"                 			{ return SHOWDEP; }
   "SHOWIF"                  			{ return SHOWIF; }
+  "SHOWTYPE"                  			{ return SHOWTYPE; }
   "SINGLE"                  			{ return SINGLE; }
   "SHEET"                  			    { return SHEET; }
   "SPLITH"                  			{ return SPLITH; }
@@ -370,10 +375,14 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "TO"                      			{ return TO; }
   "TODRAW"                  			{ return TODRAW; }
   "TOOLBAR"                 			{ return TOOLBAR; }
+  "TOOLBARBOX"                 			{ return TOOLBARBOX; }
+  "TOOLBARLEFT"                			{ return TOOLBARLEFT; }
+  "TOOLBARRIGHT"               			{ return TOOLBAR; }
   "TOP"                     			{ return TOP; }
   "TREE"                    			{ return TREE; }
   "TRY"                                 { return TRY; }
   "UNGROUP"                 			{ return UNGROUP; }
+  "USERFILTER"                 			{ return USERFILTER; }
   "VALIGN"                  			{ return VALIGN; }
   "VALUE"                               { return VALUE; }
   "VERTICAL"                			{ return VERTICAL; }

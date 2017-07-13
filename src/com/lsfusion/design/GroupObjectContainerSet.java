@@ -8,13 +8,19 @@ import com.lsfusion.design.ui.FlexAlignment;
 
 public class GroupObjectContainerSet {
     public static final String GROUP_CONTAINER = ".box";
-    public static final String GRID_CONTAINER = ".grid.box";
-    public static final String PANEL_CONTAINER = ".panel";
-    public static final String PANEL_PROPS_CONTAINER = ".panel.props";
-    public static final String FILTERS_CONTAINER = ".filters";
-    public static final String TOOLBAR_PROPS_CONTAINER = ".toolbar.props.box";
-    public static final String CONTROLS_CONTAINER = ".controls";
-    public static final String CONTROLS_RIGHT_CONTAINER = ".controls.right";
+        public static final String GRID_BOX_CONTAINER = ".grid.box";
+            public static final String CLASSCHOOSER_COMPONENT = ".classChooser"; // COMPONENT
+            public static final String GRID_COMPONENT = ".grid"; // COMPONENT
+        public static final String CONTROLS_CONTAINER = ".controls";
+            public static final String TOOLBAR_COMPONENT = " .toolbar"; // COMPONENT
+            public static final String CONTROLS_RIGHT_CONTAINER = ".controls.right";
+                public static final String FILTERS_CONTAINER = ".filters";
+                    public static final String FILTERSPREF_COMPONENT = "filters."; // COMPONENT
+                public static final String TOOLBAR_PROPS_CONTAINER = ".toolbar.props.box";
+                public static final String SHOWTYPE_COMPONENT = ".showType"; // COMPONENT
+        public static final String FILTER_COMPONENT = ".filter"; // COMPONENT
+        public static final String PANEL_CONTAINER = ".panel";
+            public static final String PANEL_PROPS_CONTAINER = ".panel.props";
 
     private ContainerView groupContainer;
     private ContainerView gridContainer;
@@ -68,7 +74,7 @@ public class GroupObjectContainerSet {
 
         set.gridContainer = factory.createContainer();
 //        set.gridContainer.setDescription(getString("form.layout.grid.part"));
-        set.gridContainer.setSID(group.getSID() + GRID_CONTAINER);
+        set.gridContainer.setSID(group.getSID() + GRID_BOX_CONTAINER);
 
         set.panelContainer = factory.createContainer();
 //        set.panelContainer.setDescription(getString("form.layout.panel"));

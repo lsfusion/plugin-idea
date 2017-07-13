@@ -1603,7 +1603,7 @@ componentStatement ::=      setObjectPropertyStatement
 }
 
 private component_statement_recover ::= !component_statement_recover_start 
-private component_statement_recover_start ::= ID | PARENT | PROPERTY | NEW | MOVE | REMOVE | SEMI | RBRACE 
+private component_statement_recover_start ::= ID | PARENT | PROPERTY | NEW | MOVE | REMOVE | SEMI | RBRACE | groupObjectTreeSingleSelectorType | globalSingleSelectorType | GROUP | FILTERGROUP 
 
 componentStubStatement ::= NEW ID
 {
@@ -1624,8 +1624,23 @@ componentInsertPosition ::= (   insertRelativePositionLiteral componentSelector
                             
 removeComponentStatement ::= REMOVE componentSelector SEMI {pin = 1}
 
+// GROUPOBJECT + TREE
+private componentSingleSelectorType ::=  BOX | PANEL | TOOLBARBOX | TOOLBARLEFT | TOOLBARRIGHT | TOOLBAR
+groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID | SHOWTYPE
+globalSingleSelectorType ::= componentSingleSelectorType 
+
+private groupObjectTreeSelector ::= TREE treeGroupSelector | groupObjectSelector { pin(".*") = 1 }
+private groupComponentSelector ::= (groupObjectSelector COMMA groupSelector? | groupSelector?) { pin(".*") = 2 }
+
+private pinnedGroupObjectTreeSelector ::= groupObjectTreeSingleSelectorType LBRAC groupObjectTreeSelector RBRAC {pin = 2}
+
+// should match component_statement_recover
 componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                 	|	PROPERTY LBRAC propertySelector RBRAC
+                	|   FILTERGROUP LBRAC filterGroupSelector RBRAC
+                	|   GROUP LBRAC groupComponentSelector RBRAC
+                	|   pinnedGroupObjectTreeSelector // pinned для нижнего правила
+                	|   globalSingleSelectorType
                     |	componentUsage
 {
     pin(".*") = 1
@@ -1652,6 +1667,10 @@ componentUsage ::= multiCompoundID
 }
 
 propertySelector ::= formPropertyDrawUsage
+groupObjectSelector ::= groupObjectUsage 
+treeGroupSelector ::= treeGroupUsage
+filterGroupSelector ::= filterGroupUsage 
+groupSelector ::= groupUsage
 
 setObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 2}
 
@@ -1803,6 +1822,9 @@ objectUsage ::= simpleName
 
 groupObjectUsage ::= simpleName
 {mixin="com.lsfusion.lang.psi.references.impl.LSFGroupObjectReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFGroupObjectReference"}
+
+treeGroupUsage ::= simpleName
+{mixin="com.lsfusion.lang.psi.references.impl.LSFTreeGroupReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFTreeGroupReference"}
 
 exprParameterNameUsage ::= classParamDeclare
 {mixin="com.lsfusion.lang.psi.references.impl.LSFExprParamReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFExprParamReference"}

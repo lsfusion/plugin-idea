@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.102</version>
+    <version>1.0.103</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,9 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.102</b><br>
+        <b>Version 1.0.103</b><br>
         <ul>
-            <li>DEFAULTCOMPARE for property</li>
+            <li>Design syntax changes</li>
         </ul>
     ]]>
     </change-notes>
