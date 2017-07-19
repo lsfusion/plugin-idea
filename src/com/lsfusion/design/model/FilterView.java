@@ -53,7 +53,7 @@ public class FilterView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         FlexPanel topPanel = new FlexPanel(false);
         topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER));
         topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_ADD));

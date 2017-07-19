@@ -7,6 +7,7 @@ import com.lsfusion.design.KeyStrokes;
 import com.lsfusion.design.model.entity.PropertyDrawEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.ClassViewType;
+import com.lsfusion.design.ui.JComponentPanel;
 import com.lsfusion.lang.classes.DataClass;
 import com.lsfusion.util.BaseUtils;
 
@@ -526,11 +527,11 @@ public class PropertyDrawView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         if (entity.isAction) {
-            return new ActionPanelView(project, this);
+            return new JComponentPanel(new ActionPanelView(project, this));
         } else {
-            return new DataPanelView(this);
+            return new JComponentPanel(new DataPanelView(this));
         }
     }
 

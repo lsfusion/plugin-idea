@@ -1,9 +1,8 @@
 package com.lsfusion.design.ui;
 
-import javax.swing.*;
 import java.awt.*;
 
-public class FlexPanel extends JPanel {
+public class FlexPanel extends JComponentPanel {
     private static final FlexConstraints DEFAULT_CONSTRAINTS = new FlexConstraints();
     
     private final boolean vertical;
@@ -13,7 +12,7 @@ public class FlexPanel extends JPanel {
     }
     
     public FlexPanel(boolean vertical, Alignment childrenAlignment) {
-        super(null);
+        setLayout(null);
         this.vertical = vertical;
 
         setLayout(new FlexLayout(this, vertical, childrenAlignment));

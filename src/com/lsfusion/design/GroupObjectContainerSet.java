@@ -124,7 +124,7 @@ public class GroupObjectContainerSet {
         set.rightControlsContainer.setFlex(1);
         set.rightControlsContainer.add(set.filtersContainer);
         set.rightControlsContainer.add(set.toolbarPropsContainer);
-        set.rightControlsContainer.add(group.showType);
+//        set.rightControlsContainer.add(group.showType);
 
         set.filtersContainer.setType(ContainerType.CONTAINERH);
         set.filtersContainer.setAlignment(FlexAlignment.CENTER);

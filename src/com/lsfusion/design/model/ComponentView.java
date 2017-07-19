@@ -6,9 +6,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.ui.components.JBPanel;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.FlexAlignment;
+import com.lsfusion.design.ui.JComponentPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -45,8 +45,8 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public boolean autoSize = false;
 
-    public double flex = 0;
-    public FlexAlignment alignment = FlexAlignment.LEADING;
+    public double flex = -1;
+    public FlexAlignment alignment;
 
     public int marginTop;
     public int marginBottom;
@@ -64,7 +64,7 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public String imagePath;
 
-    public ContainerView parent;
+    public ContainerView container;
 
     public boolean forceHide = false;
 
@@ -88,16 +88,16 @@ public abstract class ComponentView extends PropertiesContainer {
         this.sID = sID;
     }
 
-    public ContainerView getParent() {
-        return parent;
+    public ContainerView getContainer() {
+        return container;
     }
 
-    public void setParent(ContainerView parent) {
-        this.parent = parent;
+    public void setContainer(ContainerView container) {
+        this.container = container;
     }
 
     public boolean removeFromParent() {
-        return parent != null && parent.remove(this);
+        return container != null && container.remove(this);
     }
 
     public List<Property> getProperties() {
@@ -293,6 +293,11 @@ public abstract class ComponentView extends PropertiesContainer {
     }
 
     public Dimension getPreferredSize() {
+        if (preferredSize == null) {
+            if (container != null && container.isScroll()) {
+                return new Dimension(-1, 1);
+            }
+        }
         return preferredSize;
     }
 
@@ -301,11 +306,25 @@ public abstract class ComponentView extends PropertiesContainer {
     }
 
     public double getFlex() {
-        return flex;
+        if (flex >= 0) {
+            return flex;
+        }
+        ContainerView container = getContainer();
+        if (container != null && container.isScroll()) {
+            return 1;
+        }
+        return 0;
     }
 
     public FlexAlignment getAlignment() {
-        return alignment;
+        if (alignment != null) {
+            return alignment;
+        }
+        ContainerView container = getContainer();
+        if (container.isScroll() || container.isSplit()) {
+            return FlexAlignment.STRETCH;
+        }
+        return FlexAlignment.LEADING;
     }
 
     public int getMarginTop() {
@@ -362,38 +381,35 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public abstract Icon getIcon();
 
-    public JComponent createWidget(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget) {
+    public JComponentPanel createWidget(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget) {
         if (forceHide || !selection.get(this)) {
             return null;
         }
 
-        JComponent oldPanel = componentToWidget.get(this);
-        JComponent oldWidget = oldPanel == null ? null : (JComponent) oldPanel.getComponent(0);
+        JComponentPanel oldPanel = componentToWidget.get(this);
+        JComponentPanel oldWidget = oldPanel == null ? null : (JComponentPanel) oldPanel.getComponent(0);
 
-        JComponent widget = createWidgetImpl(project, selection, componentToWidget, oldWidget);
-        if (widget == null) {
-            return null;
+        JComponentPanel widget = createWidgetImpl(project, selection, componentToWidget, oldWidget);
+        if (widget != null) {
+            Border marginBorder = BorderFactory.createEmptyBorder(marginTop, marginLeft, marginBottom, marginRight);
+
+            if (widget.getComponent(0) instanceof DataPanelView) {
+                widget.setBorder(BorderFactory.createCompoundBorder(marginBorder, widget.getBorder()));
+            } else {
+                widget.setBorder(marginBorder);
+            }
+
+            componentToWidget.put(this, widget);
         }
-
-        JComponent result = widget;
-        Border marginBorder = BorderFactory.createEmptyBorder(marginTop, marginLeft, marginBottom, marginRight);
-
-        if (widget instanceof DataPanelView) {
-            result.setBorder(BorderFactory.createCompoundBorder(marginBorder, widget.getBorder()));
-        } else {
-            result = new JBPanel(new BorderLayout());
-            result.setBorder(marginBorder);
-            result.add(widget);
-        }
-
-        componentToWidget.put(this, result);
-        return result;
+        return widget;
     }
 
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         JLabel jLabel = new JLabel(getClass().getSimpleName());
         jLabel.setBorder(BorderFactory.createLineBorder(JBColor.BLACK, 1));
-        return jLabel;
+        JComponentPanel panel = new JComponentPanel(new BorderLayout());
+        panel.add(jLabel);
+        return panel;
     }
 
     public static <T> List<T> addToList(@NotNull List<T> list, T... rest) {

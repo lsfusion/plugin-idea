@@ -146,7 +146,7 @@ public class DesignInfo {
                         ComponentView component = formView.getComponentBySID(name);
 
                         if (component != null) {
-                            if (!(component instanceof PropertyDrawView) || component.getParent() != null) { // не добавляем свойства, которые уже добавлены в грид
+                            if (!(component instanceof PropertyDrawView) || component.getContainer() != null) { // не добавляем свойства, которые уже добавлены в грид
                                 LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
                                 if (parentComponent instanceof ContainerView) {
                                     addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
@@ -243,7 +243,7 @@ public class DesignInfo {
         if (lsfComponentSelector != null) {
             String componentSID = getComponentSID(lsfComponentSelector, form);
             ComponentView componentView = form.getComponentBySID(componentSID);
-            return componentView.getParent().getSID();
+            return componentView.getContainer().getSID();
         } else if (componentSelector.getPropertySelector() != null) {
             LSFFormPropertyDrawUsageImpl usage = (LSFFormPropertyDrawUsageImpl) componentSelector.getPropertySelector().getFormPropertyDrawUsage();
             LSFAliasUsage aliasUsage = usage.getAliasUsage();

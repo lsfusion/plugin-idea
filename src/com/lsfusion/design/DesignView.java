@@ -69,8 +69,8 @@ public class DesignView extends JPanel implements Disposable {
     private boolean highlighting = false;
     private List<Component> selectedComponents = new ArrayList<>();
 
-    private final Map<ComponentView, JComponent> componentToWidget = new HashMap<>();
-    private final Map<JComponent, ComponentView> widgetToComponent = new HashMap<>();
+    private final Map<ComponentView, JComponentPanel> componentToWidget = new HashMap<>();
+    private final Map<JComponentPanel, ComponentView> widgetToComponent = new HashMap<>();
     private final Map<ComponentView, Boolean> selection = new HashMap<>();
 
     private final MergingUpdateQueue myUpdateQueue;
@@ -396,9 +396,9 @@ public class DesignView extends JPanel implements Disposable {
             return new TreePath(rootNode);
         }
 
-        assert component.getParent() != null;
+        assert component.getContainer() != null;
 
-        TreePath parentPath = getComponentPath(component.getParent());
+        TreePath parentPath = getComponentPath(component.getContainer());
         ComponentTreeNode parentNode = (ComponentTreeNode) parentPath.getLastPathComponent();
         for (int i = 0; i < parentNode.getChildCount(); ++i) {
             ComponentTreeNode childNode = (ComponentTreeNode) parentNode.getChildAt(i);

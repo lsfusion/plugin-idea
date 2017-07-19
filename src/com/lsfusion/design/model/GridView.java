@@ -7,6 +7,7 @@ import com.lsfusion.LSFIcons;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.design.ui.FlexAlignment;
+import com.lsfusion.design.ui.JComponentPanel;
 
 import javax.swing.*;
 import java.util.List;
@@ -31,7 +32,7 @@ public class GridView extends ComponentView {
 
     private GroupObjectView groupObject;
 
-    private JComponent component;
+    private JComponentPanel component;
 
     public GridView(GroupObjectView groupObject) {
         this("");
@@ -96,10 +97,17 @@ public class GridView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         if (groupObject.entity.initClassView == ClassViewType.GRID && model.getColumnCount() > 0) {
-            GridTable gridTable = new GridTable(model, headerHeight);
-            return component = new JBScrollPane(gridTable);
+            GridTable gridTable = new GridTable(autoSize, model, headerHeight);
+            JBScrollPane scrollPane = new JBScrollPane(gridTable) {
+                @Override
+                public boolean isValidateRoot() {
+                    return false;
+                }
+            };
+            
+            return this.component = new JComponentPanel(scrollPane);
         } else {
             return null;
         }

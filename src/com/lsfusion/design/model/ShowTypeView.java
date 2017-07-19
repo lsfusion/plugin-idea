@@ -1,8 +1,8 @@
 package com.lsfusion.design.model;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBPanel;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.ui.JComponentPanel;
 import com.lsfusion.design.ui.ToolbarGridButton;
 
 import javax.swing.*;
@@ -32,12 +32,12 @@ public class ShowTypeView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         if (groupObject.entity.banClassView.size() > 1) {
             return null;
         }
 
-        JBPanel panel = new JBPanel();
+        JComponentPanel panel = new JComponentPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
 

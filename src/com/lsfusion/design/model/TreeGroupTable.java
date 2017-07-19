@@ -10,6 +10,8 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
+import static com.lsfusion.design.model.GridTable.DEFAULT_PREFERRED_SIZE;
+
 public class TreeGroupTable extends TreeTable {
     private final int HIERARCHICAL_COLUMN_MIN_WIDTH = 50;
     private final int HIERARCHICAL_COLUMN_MAX_WIDTH = 100000;
@@ -55,6 +57,11 @@ public class TreeGroupTable extends TreeTable {
                 return property.getTooltipText(property.getCaption());
             }
         };
+    }
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return (treeGroup != null && treeGroup.autoSize) ? getPreferredSize() : DEFAULT_PREFERRED_SIZE;
     }
 
     @Override

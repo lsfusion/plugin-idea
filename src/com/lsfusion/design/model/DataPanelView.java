@@ -10,7 +10,6 @@ import com.lsfusion.design.ui.SingleCellTable;
 import javax.swing.*;
 import java.awt.*;
 
-import static com.lsfusion.util.BaseUtils.overrideSize;
 import static java.lang.Math.max;
 
 public class DataPanelView extends JBPanel implements HasLabel {
@@ -27,9 +26,10 @@ public class DataPanelView extends JBPanel implements HasLabel {
             label.setHorizontalAlignment(SwingConstants.CENTER);
         }
 
-        table.setMinimumSize(overrideSize(table.getMinimumSize(), property.getMinimumValueSize(this)));
-        table.setMaximumSize(overrideSize(table.getMaximumSize(), property.getMaximumValueSize(this)));
-        table.setPreferredSize(overrideSize(table.getPreferredSize(), property.getPreferredValueSize(this)));
+        table.setMinimumSize(property.getMinimumValueSize(this));
+        table.setMaximumSize(property.getMaximumValueSize(this));
+        table.setPreferredSize(property.getPreferredValueSize(this));
+        
         if (property.font != null) {
             table.setFont(property.font.deriveFrom(table));
         }

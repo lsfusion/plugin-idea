@@ -8,6 +8,7 @@ import com.lsfusion.design.model.entity.GroupObjectEntity;
 import com.lsfusion.design.model.entity.TreeGroupEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.FlexAlignment;
+import com.lsfusion.design.ui.JComponentPanel;
 
 import javax.swing.*;
 import java.util.List;
@@ -52,8 +53,15 @@ public class TreeGroupView extends ComponentView implements GroupView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
-        return new JBScrollPane(new TreeGroupTable(this, model));
+    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+        JBScrollPane scrollPane = new JBScrollPane(new TreeGroupTable(this, model)) {
+            @Override
+            public boolean isValidateRoot() {
+                return false;
+            }
+        };
+
+        return new JComponentPanel(scrollPane);
     }
 
     public void addPropertyDraw(GroupObjectView groupObject, PropertyDrawView property, List<PropertyDrawView> formProperties) {

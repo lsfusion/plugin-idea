@@ -58,8 +58,8 @@ public class EditorPanel extends JPanel {
     private PropertyTable propertyTable;
     private boolean selecting = false;
 
-    private final Map<ComponentView, JComponent> componentToWidget = new HashMap<>();
-    private final Map<JComponent, ComponentView> widgetToComponent = new HashMap<>();
+    private final Map<ComponentView, JComponentPanel> componentToWidget = new HashMap<>();
+    private final Map<JComponentPanel, ComponentView> widgetToComponent = new HashMap<>();
     private final Map<ComponentView, Boolean> selection = new HashMap<>();
 
     public EditorPanel(@NotNull Project project, @NotNull LSFDesignVirtualFileImpl file) {
@@ -247,9 +247,9 @@ public class EditorPanel extends JPanel {
             return new TreePath(rootNode);
         }
         
-        assert component.getParent() != null;
+        assert component.getContainer() != null;
         
-        TreePath parentPath = getComponentPath(component.getParent());
+        TreePath parentPath = getComponentPath(component.getContainer());
         ComponentTreeNode parentNode = (ComponentTreeNode) parentPath.getLastPathComponent();
         for (int i = 0; i < parentNode.getChildCount(); ++i) {
             ComponentTreeNode childNode = (ComponentTreeNode) parentNode.getChildAt(i);

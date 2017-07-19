@@ -7,6 +7,7 @@ import com.lsfusion.LSFIcons;
 import com.lsfusion.design.FormView;
 import com.lsfusion.design.model.entity.RegularFilterEntity;
 import com.lsfusion.design.model.entity.RegularFilterGroupEntity;
+import com.lsfusion.design.ui.JComponentPanel;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -54,14 +55,14 @@ public class RegularFilterGroupView extends ComponentView {
     }
 
     @Override
-    protected JComponent createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponent> componentToWidget, JComponent oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         GroupObjectView groupObjectView = form.get(entity.getToDraw(form.entity));
         if (!groupObjectView.grid.isVisible()) {
             return null;
         }
         if (isSingle()) {
             RegularFilterEntity filterEntity = filters.get(0).entity;
-            return new JBCheckBox(filterEntity.getFullCaption(), filterEntity.isDefault);
+            return new JComponentPanel(new JBCheckBox(filterEntity.getFullCaption(), filterEntity.isDefault));
         } else {
             List<Object> items = new ArrayList<>();
             Object defaultItem = "(Все)";
@@ -75,7 +76,7 @@ public class RegularFilterGroupView extends ComponentView {
             }
             ComboBox comboBox = new ComboBox(items.toArray(new Object[items.size()]), -1);
             comboBox.setSelectedItem(defaultItem);
-            return comboBox;
+            return new JComponentPanel(comboBox);
         }
     }
 }

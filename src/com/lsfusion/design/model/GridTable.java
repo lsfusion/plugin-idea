@@ -3,6 +3,7 @@ package com.lsfusion.design.model;
 import com.intellij.ui.table.JBTable;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -11,12 +12,19 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class GridTable extends JBTable {
+    public static final int DEFAULT_HEADER_HEIGHT = 34;
+    public static Dimension DEFAULT_PREFERRED_SIZE = new Dimension(130, 130 - DEFAULT_HEADER_HEIGHT);
+
+    private final boolean autoSize;
     private final int headerHeight;
 
-    public GridTable(TableModel model, int headerHeight) {
+    public GridTable(boolean autoSize, TableModel model, int headerHeight) {
         super(model);
+        this.autoSize = autoSize;
         this.headerHeight = headerHeight;
         setColumnSelectionAllowed(false);
+        
+        setUI(new BasicTableUI());
 
         getTableHeader().setReorderingAllowed(false);
 
@@ -27,8 +35,7 @@ public class GridTable extends JBTable {
 
     @Override
     public Dimension getPreferredScrollableViewportSize() {
-        Dimension preferred = super.getPreferredScrollableViewportSize();
-        return new Dimension(preferred.width, 50);
+        return autoSize ? getPreferredSize() : DEFAULT_PREFERRED_SIZE;
     }
 
     @Override
@@ -125,7 +132,7 @@ public class GridTable extends JBTable {
     }
     
     private int getHeaderHeight() {
-        return headerHeight <= 0 ? 34 : headerHeight;
+        return headerHeight <= 0 ? DEFAULT_HEADER_HEIGHT : headerHeight;
     }
 
     private class GridTableHeader extends JTableHeader {
