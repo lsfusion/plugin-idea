@@ -386,8 +386,7 @@ public abstract class ComponentView extends PropertiesContainer {
             return null;
         }
 
-        JComponentPanel oldPanel = componentToWidget.get(this);
-        JComponentPanel oldWidget = oldPanel == null ? null : (JComponentPanel) oldPanel.getComponent(0);
+        JComponentPanel oldWidget = componentToWidget.get(this);
 
         JComponentPanel widget = createWidgetImpl(project, selection, componentToWidget, oldWidget);
         if (widget != null) {
