@@ -61,37 +61,84 @@ public class DefaultFormView extends FormView {
         mainContainer.add(noGroupPanelContainer);
         mainContainer.add(formButtonContainer);
     }
+
+    // SID BLOCK
+    public static String getToolbarBoxSID(String goName) {
+        return GroupObjectContainerSet.TOOLBARBOX_CONTAINER + "(" + goName + ")";
+    }
+
+    public static String getToolbarRightSID(String goName) {
+        return GroupObjectContainerSet.TOOLBARRIGHT_CONTAINER + "(" + goName + ")";
+    }
     
-    public static String getControlsSID(String goName) {
-        return goName + GroupObjectContainerSet.CONTROLS_CONTAINER;
+    public static String getToolbarLeftSID(String goName) {
+        return GroupObjectContainerSet.TOOLBARLEFT_CONTAINER + "(" + goName + ")";
     }
 
-    public static String getControlsRightSID(String goName) {
-        return goName + GroupObjectContainerSet.CONTROLS_RIGHT_CONTAINER;
-    }
-
-    public static String getFiltersSID(String goName) {
-        return goName + GroupObjectContainerSet.FILTERS_CONTAINER;
+    public static String getRegularFilterGroupsSID(String goName) {
+        return GroupObjectContainerSet.FILTERGROUPS_CONTAINER + "(" + goName + ")";
     }
 
     public static String getGridBoxSID(String goName) {
-        return goName + GroupObjectContainerSet.GRID_BOX_CONTAINER;
+        return GroupObjectContainerSet.GRID_BOX_CONTAINER + "(" + goName + ")";
     }
 
-    public static String getGroupSID(String goName) {
-        return goName + GroupObjectContainerSet.GROUP_CONTAINER;
+    public static String getBoxSID(String goName) {
+        return GroupObjectContainerSet.BOX_CONTAINER + "(" + goName + ")";
     }
 
     public static String getPanelSID(String goName) {
-        return goName + GroupObjectContainerSet.PANEL_CONTAINER;
+        return GroupObjectContainerSet.PANEL_CONTAINER + "(" + goName + ")";
     }
 
-    public static String getPanelPropsSID(String goName) {
-        return goName + GroupObjectContainerSet.PANEL_PROPS_CONTAINER;
+    public static String getToolbarSID(String goName) {
+        return GroupObjectContainerSet.TOOLBAR_CONTAINER + "(" + goName + ")";
     }
 
-    public static String getToolbarPropsSID(String goName) {
-        return goName + GroupObjectContainerSet.TOOLBAR_PROPS_CONTAINER;
+    public static String getNoGroupObjectSID(String pgName) {
+        return FormContainerSet.GROUP_CONTAINER + "(" + pgName + ")";
+    }
+
+    public static String getToolbarBoxSID() {
+        return FormContainerSet.TOOLBARBOX_CONTAINER;
+    }
+
+    public static String getToolbarLeftSID() {
+        return FormContainerSet.TOOLBARLEFT_CONTAINER;
+    }
+
+    public static String getToolbarRightSID() {
+        return FormContainerSet.TOOLBARRIGHT_CONTAINER;
+    }
+
+    public static String getPanelSID() {
+        return FormContainerSet.PANEL_CONTAINER;
+    }
+
+    public static String getToolbarSID() {
+        return FormContainerSet.TOOLBAR_CONTAINER;
+    }
+    
+    public static String getPropertyGroupContainerSID(String groupObjectSID, String propertyGroupSID) {
+        if(propertyGroupSID == null)
+            propertyGroupSID = "";
+        if(groupObjectSID == null)
+            return getNoGroupObjectSID(propertyGroupSID);
+        return GroupObjectContainerSet.GROUP_CONTAINER + "(" + groupObjectSID + "," + propertyGroupSID + ")";
+    }
+
+    private String getPropertyGroupContainerSID(PropertyDrawView propertyDraw, AbstractGroup propertyGroup) {
+        String propertyGroupSID = propertyGroup.sID;
+        if (propertyGroupSID.contains("_")) {
+            String[] sids = propertyGroupSID.split("_", 2);
+            propertyGroupSID = sids[1];
+        }
+        PropertyGroupContainerView propertyContainer = getPropertyContainer(propertyDraw);
+        String containerSID = null;
+        if(propertyContainer != null)
+            containerSID = propertyContainer.getPropertyGroupContainerSID();
+        
+        return getPropertyGroupContainerSID(containerSID, propertyGroupSID);
     }
 
     private void initProperties() {
@@ -145,6 +192,7 @@ public class DefaultFormView extends FormView {
         return toolbarPropsContainers.get(getPropertyContainer(propertyDraw));
     }
 
+    protected transient Map<PropertyGroupContainerView, ContainerView> leftControlsContainers = new HashMap<>();
     protected transient Map<PropertyGroupContainerView, ContainerView> rightControlsContainers = new HashMap<>();
 
     public ContainerView getRightControlsContainer(GroupObjectView groupObject) {
@@ -173,6 +221,7 @@ public class DefaultFormView extends FormView {
         registerComponent(set.getPanelContainer(), panelContainers, goView);
         registerComponent(set.getPanelPropsContainer(), panelPropsContainers, goView);
         registerComponent(set.getControlsContainer(), controlsContainers, goView);
+        registerComponent(set.getLeftControlsContainer(), leftControlsContainers, goView);
         registerComponent(set.getRightControlsContainer(), rightControlsContainers, goView);
         registerComponent(set.getFiltersContainer(), filtersContainers, goView);
         registerComponent(set.getToolbarPropsContainer(), toolbarPropsContainers, goView);
@@ -197,6 +246,7 @@ public class DefaultFormView extends FormView {
         registerComponent(treeSet.getPanelContainer(), panelContainers, treeGroup);
         registerComponent(treeSet.getPanelPropsContainer(), panelPropsContainers, treeGroup);
         registerComponent(treeSet.getControlsContainer(), controlsContainers, treeGroup);
+        registerComponent(treeSet.getLeftControlsContainer(), leftControlsContainers, treeGroup);
         registerComponent(treeSet.getRightControlsContainer(), rightControlsContainers, treeGroup);
         registerComponent(treeSet.getFiltersContainer(), filtersContainers, treeGroup);
         registerComponent(treeSet.getToolbarPropsContainer(), toolbarPropsContainers, treeGroup);
@@ -257,25 +307,6 @@ public class DefaultFormView extends FormView {
         return currentGroupContainer;
     }
 
-    private String getPropertyGroupContainerSID(PropertyDrawView propertyDraw, AbstractGroup propertyGroup) {
-        String propertyGroupSID = propertyGroup.sID;
-        if (propertyGroupSID.contains("_")) {
-            String[] sids = propertyGroupSID.split("_", 2);
-            propertyGroupSID = sids[1];
-        }
-        PropertyGroupContainerView propertyContainer = getPropertyContainer(propertyDraw);
-        String containerSID;
-        if(propertyContainer == null)
-            containerSID = "NOGROUP";
-        else
-            containerSID = propertyContainer.getPropertyGroupContainerSID();
-        return getPropertyGroupContainerSID(containerSID, propertyGroupSID);
-    }
-    
-    public static String getPropertyGroupContainerSID(String containerSID, String groupID) {
-        return containerSID + "." + groupID;
-    }
-
     private void addRegularFilterGroupView(RegularFilterGroupView filterGroup) {
         ContainerView filterContainer;
         filterContainer = getFilterContainer(filterGroup.entity.getToDraw(entity));
@@ -312,12 +343,12 @@ public class DefaultFormView extends FormView {
         PropertyDrawView closeFunction = get(entity.closeActionPropertyDraw);
         setupFormButton(closeFunction, KeyStrokes.getCloseKeyStroke(), null, true);
 
-        ContainerView leftControlsContainer = createContainer(null, FormContainerSet.LEFTCONTROLS_CONTAINER);
+        ContainerView leftControlsContainer = createContainer(null, getToolbarLeftSID());
         leftControlsContainer.setType(ContainerType.CONTAINERH);
         leftControlsContainer.childrenAlignment = Alignment.LEADING;
         leftControlsContainer.flex = 0;
 
-        ContainerView rightControlsContainer = createContainer(null, FormContainerSet.RIGHTCONTROLS_CONTAINER);
+        ContainerView rightControlsContainer = createContainer(null, getToolbarRightSID());
         rightControlsContainer.setType(ContainerType.CONTAINERH);
         rightControlsContainer.childrenAlignment = Alignment.TRAILING;
         rightControlsContainer.flex = 1;

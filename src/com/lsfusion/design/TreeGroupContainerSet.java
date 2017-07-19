@@ -6,16 +6,15 @@ import com.lsfusion.design.model.TreeGroupView;
 import com.lsfusion.design.ui.Alignment;
 import com.lsfusion.design.ui.FlexAlignment;
 
-import static com.lsfusion.design.GroupObjectContainerSet.*;
-
 public class TreeGroupContainerSet {
-    public static final String TREE_CONTAINER = ".tree";
+    public static final String TREE_CONTAINER = "TREE";
 
     private ContainerView boxContainer;
     private ContainerView gridBoxContainer;
     private ContainerView panelContainer;
     private ContainerView panelPropsContainer;
     private ContainerView controlsContainer;
+    private ContainerView leftControlsContainer;
     private ContainerView rightControlsContainer;
     private ContainerView filtersContainer;
     private ContainerView toolbarPropsContainer;
@@ -40,6 +39,10 @@ public class TreeGroupContainerSet {
         return controlsContainer;
     }
 
+    public ContainerView getLeftControlsContainer() {
+        return leftControlsContainer;
+    }
+
     public ContainerView getRightControlsContainer() {
         return rightControlsContainer;
     }
@@ -59,7 +62,7 @@ public class TreeGroupContainerSet {
         set.boxContainer = factory.createContainer();
 //        set.treeContainer.setCaption(getString("form.layout.tree"));
 //        set.treeContainer.setDescription(getString("form.layout.tree"));
-        set.boxContainer.setSID(DefaultFormView.getGroupSID(sid));
+        set.boxContainer.setSID(DefaultFormView.getBoxSID(sid));
 
         set.gridBoxContainer = factory.createContainer();
 //        set.gridContainer.setDescription(getString("form.layout.grid.part"));
@@ -70,22 +73,25 @@ public class TreeGroupContainerSet {
         set.panelContainer.setSID(DefaultFormView.getPanelSID(sid));
 
         set.panelPropsContainer = factory.createContainer();
-        set.panelPropsContainer.setSID(DefaultFormView.getPanelPropsSID(sid));
+        set.panelPropsContainer.setSID(GroupObjectContainerSet.GROUP_CONTAINER + "(" + sid + "," + ")");
         
         set.controlsContainer = factory.createContainer();
 //        set.controlsContainer.setDescription(getString("form.layout.control.objects"));
-        set.controlsContainer.setSID(DefaultFormView.getControlsSID(sid));
+        set.controlsContainer.setSID(DefaultFormView.getToolbarBoxSID(sid));
 
         set.toolbarPropsContainer = factory.createContainer();
 //        set.toolbarPropsContainer.setDescription(getString("form.layout.toolbar.props.container"));
-        set.toolbarPropsContainer.setSID(DefaultFormView.getToolbarPropsSID(sid));
+        set.toolbarPropsContainer.setSID(DefaultFormView.getToolbarSID(sid));
 
         set.filtersContainer = factory.createContainer();
 //        set.filtersContainer.setDescription(getString("form.layout.filters.container"));
-        set.filtersContainer.setSID(DefaultFormView.getFiltersSID(sid));
+        set.filtersContainer.setSID(DefaultFormView.getRegularFilterGroupsSID(sid));
 
         set.rightControlsContainer = factory.createContainer();
-        set.rightControlsContainer.setSID(DefaultFormView.getControlsRightSID(sid));
+        set.rightControlsContainer.setSID(DefaultFormView.getToolbarRightSID(sid));
+
+        set.leftControlsContainer = factory.createContainer();
+        set.leftControlsContainer.setSID(DefaultFormView.getToolbarLeftSID(sid));
 
         set.boxContainer.setType(ContainerType.CONTAINERV);
         set.boxContainer.setChildrenAlignment(Alignment.LEADING);
@@ -104,8 +110,13 @@ public class TreeGroupContainerSet {
         set.controlsContainer.setType(ContainerType.CONTAINERH);
         set.controlsContainer.setAlignment(FlexAlignment.STRETCH);
         set.controlsContainer.setChildrenAlignment(Alignment.LEADING);
-        set.controlsContainer.add(treeGroup.toolbar);
+        set.controlsContainer.add(set.leftControlsContainer);
         set.controlsContainer.add(set.rightControlsContainer);
+
+        set.leftControlsContainer.setType(ContainerType.CONTAINERH);
+        set.leftControlsContainer.setAlignment(FlexAlignment.CENTER);
+        set.leftControlsContainer.setChildrenAlignment(Alignment.TRAILING);
+        set.leftControlsContainer.add(treeGroup.toolbar);
 
         set.rightControlsContainer.setType(ContainerType.CONTAINERH);
         set.rightControlsContainer.setAlignment(FlexAlignment.CENTER);

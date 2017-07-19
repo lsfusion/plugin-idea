@@ -239,40 +239,111 @@ public class DesignInfo {
     }
 
     private String getComponentSID(LSFComponentSelector componentSelector, FormView form) {
-        LSFComponentSelector lsfComponentSelector = componentSelector.getComponentSelector();
-        if (lsfComponentSelector != null) {
-            String componentSID = getComponentSID(lsfComponentSelector, form);
+        LSFComponentSelector parentComponentSelector = componentSelector.getComponentSelector();
+        if (parentComponentSelector != null) {
+            String componentSID = getComponentSID(parentComponentSelector, form);
             ComponentView componentView = form.getComponentBySID(componentSID);
             return componentView.getContainer().getSID();
         } else if (componentSelector.getPropertySelector() != null) {
             LSFFormPropertyDrawUsageImpl usage = (LSFFormPropertyDrawUsageImpl) componentSelector.getPropertySelector().getFormPropertyDrawUsage();
             LSFAliasUsage aliasUsage = usage.getAliasUsage();
-            if (aliasUsage != null) {
-                return aliasUsage.getSimpleName().getName();
-            } else {
-                String name = usage.getSimpleName().getName();
+            String alias = null;
+            String name = null;
+            List<String> objectNames = null;
+            if (aliasUsage != null)
+                alias = aliasUsage.getSimpleName().getName();
+            else {
                 LSFObjectUsageList objectUsageList = usage.getObjectUsageList();
-                
+
                 assert objectUsageList != null;
-                
+
+                objectNames = new ArrayList<>();
+                name = usage.getSimpleName().getName();
                 LSFNonEmptyObjectUsageList usageList = objectUsageList.getNonEmptyObjectUsageList();
                 if (usageList != null) {
-                    name += "(";
                     List<LSFObjectUsage> objectUsages = usageList.getObjectUsageList();
                     for (LSFObjectUsage objectUsage : objectUsages) {
-                        name += objectUsage.getName();
-                        if (objectUsages.indexOf(objectUsage) < objectUsages.size() - 1) {
-                            name += ",";
-                        }
+                        objectNames.add(objectUsage.getName());
                     }
-                    name += ")";
                 }
-
-                return name;
             }
+            return FormView.getPropertySID(alias, name, objectNames);
+        } else if (componentSelector.getFilterGroupSelector() != null) {
+            String name = componentSelector.getFilterGroupSelector().getFilterGroupUsage().getName();
+            return FormView.getRegularFilterGroupSID(name);
+        } else if (componentSelector.getGroupObjectTreeSingleSelectorType() != null) {
+            LSFGroupObjectTreeSingleSelectorType gos = componentSelector.getGroupObjectTreeSingleSelectorType();
+            String groupName = getGroupObjectSID(componentSelector);
+            if(groupName != null) {
+                switch (gos.getText()) {
+                    case "TOOLBARSYSTEM" : 
+                        return FormView.getToolbarSystemSID(groupName);
+                    case "FILTERGROUPS" : 
+                        return DefaultFormView.getRegularFilterGroupsSID(groupName);
+                    case "USERFILTER" : 
+                        return FormView.getUserFilterSID(groupName);
+                    case "GRIDBOX" : 
+                        return DefaultFormView.getGridBoxSID(groupName);
+                    case "CLASSCHOOSER" : 
+                        return FormView.getClassChooserSID(groupName);
+                    case "GRID" : 
+                        return FormView.getGridSID(groupName);
+                    case "SHOWTYPE" : 
+                        return FormView.getShowTypeSID(groupName);
+                    case "BOX" : 
+                        return DefaultFormView.getBoxSID(groupName);
+                    case "PANEL" : 
+                        return DefaultFormView.getPanelSID(groupName);
+                    case "TOOLBARBOX" : 
+                        return DefaultFormView.getToolbarBoxSID(groupName);
+                    case "TOOLBARLEFT" : 
+                        return DefaultFormView.getToolbarLeftSID(groupName);
+                    case "TOOLBARRIGHT" : 
+                        return DefaultFormView.getToolbarRightSID(groupName);
+                    case "TOOLBAR" : 
+                        return DefaultFormView.getToolbarSID(groupName);
+                }
+            }
+        } else if (componentSelector.getGlobalSingleSelectorType() != null) {
+            switch (componentSelector.getGlobalSingleSelectorType().getText()) {
+                case "BOX":
+                    return FormView.getBoxSID();
+                case "PANEL":
+                    return DefaultFormView.getPanelSID();
+                case "TOOLBARBOX":
+                    return DefaultFormView.getToolbarBoxSID();
+                case "TOOLBARLEFT":
+                    return DefaultFormView.getToolbarLeftSID();
+                case "TOOLBARRIGHT":
+                    return DefaultFormView.getToolbarRightSID();
+                case "TOOLBAR":
+                    return DefaultFormView.getToolbarSID();
+            }
+        } else if (componentSelector.getGroupSingleSelectorType() != null) {
+            String groupObjectSID = getGroupObjectSID(componentSelector);
+            
+            String groupSID = null;
+            LSFGroupSelector groupSelector = componentSelector.getGroupSelector();
+            if(groupSelector != null)
+                groupSID = groupSelector.getGroupUsage().getName();
+
+            return DefaultFormView.getPropertyGroupContainerSID(groupObjectSID, groupSID);
         } else if (componentSelector.getComponentUsage() != null) {
             return componentSelector.getComponentUsage().getSimpleName().getName();
         }
         return null;
     }
+
+    private static String getGroupObjectSID(LSFComponentSelector componentSelector) {
+        LSFTreeGroupSelector treeGroupSelector = componentSelector.getTreeGroupSelector();
+        if(treeGroupSelector != null)
+            return FormView.getTreeSID(treeGroupSelector.getTreeGroupUsage().getName());
+        else {
+            LSFGroupObjectSelector groupObjectSelector = componentSelector.getGroupObjectSelector();
+            if(groupObjectSelector != null)
+                return groupObjectSelector.getGroupObjectUsage().getName();
+        }
+        return null;
+    }
+
 }

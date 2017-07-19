@@ -6,13 +6,13 @@ import com.lsfusion.design.ui.Alignment;
 import com.lsfusion.design.ui.FlexAlignment;
 
 public class FormContainerSet {
-    public static final String MAIN_CONTAINER = "main";
-    public static final String FUNCTIONS_CONTAINER = "functions.box";
-    public static final String LEFTCONTROLS_CONTAINER = "leftControls";
-    public static final String RIGHTCONTROLS_CONTAINER = "rightControls";
-    public static final String NOGROUP_PANEL_CONTAINER = "nogroup.panel";
-    public static final String NOGROUP_PANEL_PROPS_CONTAINER = "nogroup.panel.props";
-    public static final String NOGROUP_TOOLBAR_PROPS_CONTAINER = "nogroup.toolbar.props.box";
+    public static final String BOX_CONTAINER = "BOX";
+    public static final String TOOLBARBOX_CONTAINER = "TOOLBARBOX";
+    public static final String TOOLBARLEFT_CONTAINER = "TOOLBARLEFT";
+    public static final String TOOLBARRIGHT_CONTAINER = "TOOLBARRIGHT";
+    public static final String PANEL_CONTAINER = "PANEL";
+    public static final String GROUP_CONTAINER = "GROUP";
+    public static final String TOOLBAR_CONTAINER = "TOOLBAR";
 
     public static final String FUNCTIONSIN_CONTAINER = "functions.";
 
@@ -52,13 +52,13 @@ public class FormContainerSet {
 
         set.formButtonContainer = contFactory.createContainer();
 //        set.formButtonContainer.setDescription(getString("form.layout.service.buttons"));
-        set.formButtonContainer.setSID(FUNCTIONS_CONTAINER);
+        set.formButtonContainer.setSID(DefaultFormView.getToolbarBoxSID());
 
         set.noGroupPanelContainer = contFactory.createContainer();
-        set.noGroupPanelContainer.setSID(NOGROUP_PANEL_CONTAINER);
+        set.noGroupPanelContainer.setSID(DefaultFormView.getPanelSID());
 
         set.noGroupPanelPropsContainer = contFactory.createContainer();
-        set.noGroupPanelPropsContainer.setSID(NOGROUP_PANEL_PROPS_CONTAINER);
+        set.noGroupPanelPropsContainer.setSID(DefaultFormView.getNoGroupObjectSID(""));
 
         set.mainContainer.setChildrenAlignment(Alignment.LEADING);
         set.mainContainer.setFlex(1);
@@ -79,7 +79,7 @@ public class FormContainerSet {
 
         set.noGroupToolbarPropsContainer = contFactory.createContainer(); // контейнер тулбара
 //        set.noGroupToolbarPropsContainer.setDescription(LocalizedString.create("{form.layout.toolbar.props.container}"));
-        set.noGroupToolbarPropsContainer.setSID(NOGROUP_TOOLBAR_PROPS_CONTAINER);
+        set.noGroupToolbarPropsContainer.setSID(DefaultFormView.getToolbarSID());
 
         set.noGroupToolbarPropsContainer.setType(ContainerType.CONTAINERH);
         set.noGroupToolbarPropsContainer.setAlignment(FlexAlignment.CENTER);

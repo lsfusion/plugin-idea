@@ -76,8 +76,9 @@ public class FormView {
     protected FormView(FormEntity entity) {
         this.entity = entity;
 
-        mainContainer = new ContainerView(FormContainerSet.MAIN_CONTAINER);
-        setComponentSID(mainContainer, getMainContainerSID());
+        String mainContainerSID = getBoxSID();
+        mainContainer = new ContainerView(mainContainerSID);
+        setComponentSID(mainContainer, mainContainerSID);
 
         containerFactory = new ContainerFactory();
 
@@ -122,8 +123,8 @@ public class FormView {
 
         setComponentSID(groupObjectView.grid, getGridSID(groupObjectView));
         setComponentSID(groupObjectView.showType, getShowTypeSID(groupObjectView));
-        setComponentSID(groupObjectView.toolbar, getToolbarSID(groupObjectView));
-        setComponentSID(groupObjectView.filter, getFilterSID(groupObjectView));
+        setComponentSID(groupObjectView.toolbar, getToolbarSystemSID(groupObjectView));
+        setComponentSID(groupObjectView.filter, getUserFilterSID(groupObjectView));
 
         for (ObjectView object : groupObjectView) {
             setComponentSID(object.classChooser, getClassChooserSID(object));
@@ -139,8 +140,8 @@ public class FormView {
         treeGroups.add(treeGroupView);
 
         setComponentSID(treeGroupView, getGridSID(treeGroupView));
-        setComponentSID(treeGroupView.toolbar, getToolbarSID(treeGroupView));
-        setComponentSID(treeGroupView.filter, getFilterSID(treeGroupView));
+        setComponentSID(treeGroupView.toolbar, getToolbarSystemSID(treeGroupView));
+        setComponentSID(treeGroupView.filter, getUserFilterSID(treeGroupView));
         mtreeGroups.put(treeGroupEntity, treeGroupView);
     }
 
@@ -272,12 +273,13 @@ public class FormView {
         sidToComponent.remove(container.getSID());
     }
 
-    public static String getMainContainerSID() {
-        return FormContainerSet.MAIN_CONTAINER;
+//  SID BLOCK    
+    public static String getBoxSID() {
+        return FormContainerSet.BOX_CONTAINER;
     }
 
     public static String getTreeSID(String sID) {
-        return sID + TreeGroupContainerSet.TREE_CONTAINER;
+        return TreeGroupContainerSet.TREE_CONTAINER + " " + sID;
     }
 
     private static String getRegularFilterGroupSID(RegularFilterGroupView component) {
@@ -285,7 +287,7 @@ public class FormView {
     }
 
     public static String getRegularFilterGroupSID(String sID) {
-        return GroupObjectContainerSet.FILTERSPREF_COMPONENT + sID;
+        return GroupObjectContainerSet.FILTERGROUP_COMPONENT + "(" + sID + ")";
     }
 
     public static String getGridSID(PropertyGroupContainerView containerView) {
@@ -293,23 +295,23 @@ public class FormView {
     }
 
     public static String getGridSID(String sID) {
-        return sID + GroupObjectContainerSet.GRID_COMPONENT;
+        return GroupObjectContainerSet.GRID_COMPONENT + "(" + sID + ")";
     }
 
-    public static String getToolbarSID(PropertyGroupContainerView containerView) {
-        return getToolbarSID(containerView.getPropertyGroupContainerSID());
+    public static String getToolbarSystemSID(PropertyGroupContainerView containerView) {
+        return getToolbarSystemSID(containerView.getPropertyGroupContainerSID());
     }
 
-    public static String getToolbarSID(String sID) {
-        return sID + GroupObjectContainerSet.TOOLBAR_COMPONENT;
+    public static String getToolbarSystemSID(String sID) {
+        return GroupObjectContainerSet.TOOLBAR_SYSTEM_COMPONENT + "(" + sID + ")";
     }
 
-    public static String getFilterSID(PropertyGroupContainerView containerView) {
-        return getFilterSID(containerView.getPropertyGroupContainerSID());
+    public static String getUserFilterSID(PropertyGroupContainerView containerView) {
+        return getUserFilterSID(containerView.getPropertyGroupContainerSID());
     }
 
-    public static String getFilterSID(String sID) {
-        return sID + GroupObjectContainerSet.FILTER_COMPONENT;
+    public static String getUserFilterSID(String sID) {
+        return GroupObjectContainerSet.USERFILTER_COMPONENT + "(" + sID + ")";
     }
 
     public static String getShowTypeSID(PropertyGroupContainerView containerView) {
@@ -317,7 +319,7 @@ public class FormView {
     }
     
     public static String getShowTypeSID(String sID) {
-        return sID + GroupObjectContainerSet.SHOWTYPE_COMPONENT;
+        return GroupObjectContainerSet.SHOWTYPE_COMPONENT + "(" + sID + ")";
     }
 
     private static String getClassChooserSID(ObjectView component) {
@@ -325,11 +327,28 @@ public class FormView {
     }
 
     public static String getClassChooserSID(String sID) {
-        return sID + GroupObjectContainerSet.CLASSCHOOSER_COMPONENT;
+        return GroupObjectContainerSet.CLASSCHOOSER_COMPONENT + "(" + sID + ")";
     }
 
     public static String getClientFunctionSID(String type) {
         return FormContainerSet.FUNCTIONSIN_CONTAINER + type;
+    }
+
+    public static String getPropertySID(String alias, String name, List<String> objectNames) {
+        if (alias != null) {
+            return alias;
+        } else {
+            name += "(";
+            for (String objectUsage : objectNames) {
+                name += objectUsage;
+                if (objectNames.indexOf(objectUsage) < objectNames.size() - 1) {
+                    name += ",";
+                }
+            }
+            name += ")";
+
+            return name;
+        }
     }
 
     public class ContainerFactory {

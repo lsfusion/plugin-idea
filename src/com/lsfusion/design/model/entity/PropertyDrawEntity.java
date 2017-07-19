@@ -1,6 +1,7 @@
 package com.lsfusion.design.model.entity;
 
 import com.intellij.openapi.project.Project;
+import com.lsfusion.design.FormView;
 import com.lsfusion.design.model.AbstractGroup;
 import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.lang.classes.DataClass;
@@ -64,23 +65,13 @@ public class PropertyDrawEntity {
     public boolean showEditKey = true;
 
     public PropertyDrawEntity(String alias, String propertyName, List<ObjectEntity> objects, LSFPropDeclaration propDeclaration, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        if (alias != null) {
-            sID = alias;
-        } else {
-            sID = propertyName;
-            if (!objects.isEmpty()) {
-                sID += "(";
-                for (ObjectEntity obj : objects) {
-                    if (obj != null) {
-                        sID += obj.sID;
-                        if (objects.indexOf(obj) < objects.size() - 1) {
-                            sID += ",";
-                        }
-                    }
-                }
-                sID += ")";
+        List<String> objectNames = new ArrayList<>();
+        if(alias == null) {
+            for (ObjectEntity obj : objects) {
+                objectNames.add(obj.sID);
             }
         }
+        sID = FormView.getPropertySID(alias, propertyName, objectNames);
         this.propertyName = propertyName;
         
         initDefaultView();
