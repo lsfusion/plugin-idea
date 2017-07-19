@@ -391,12 +391,7 @@ public abstract class ComponentView extends PropertiesContainer {
         JComponentPanel widget = createWidgetImpl(project, selection, componentToWidget, oldWidget);
         if (widget != null) {
             Border marginBorder = BorderFactory.createEmptyBorder(marginTop, marginLeft, marginBottom, marginRight);
-
-            if (widget.getComponent(0) instanceof DataPanelView) {
-                widget.setBorder(BorderFactory.createCompoundBorder(marginBorder, widget.getBorder()));
-            } else {
-                widget.setBorder(marginBorder);
-            }
+            widget.setBorder(BorderFactory.createCompoundBorder(marginBorder, widget.getBorder()));
 
             componentToWidget.put(this, widget);
         }
