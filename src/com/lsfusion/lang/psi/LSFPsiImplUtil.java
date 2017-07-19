@@ -3230,6 +3230,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFComponentID objectID) {
+        return resolveFormDecl(objectID.getFormUsage());
+    }
+
+    @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormPropertyDrawID formPropertyDrawID) {
         return resolveFormDecl(formPropertyDrawID.getFormUsage());
     }
@@ -3249,14 +3254,6 @@ public class LSFPsiImplUtil {
         return resolveFormDecl(externalFormObject.getFormUsage());
     }
     
-    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFActivateActionPropertyDefinitionBody activateActionPDB) {
-        return resolveFormDecl(activateActionPDB.getFormUsage());
-    }
-
-    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFActiveTabPropertyDefinition activeTabPD) {
-        return resolveFormDecl(activeTabPD.getFormUsage());
-    }
-
     @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFSeekObjectActionPropertyDefinitionBodyImpl seekObjectActionBody) {
         LSFFormUsage formUsage = null;

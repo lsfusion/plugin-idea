@@ -9,9 +9,10 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.103</b><br>
+        <b>Version 1.0.104</b><br>
         <ul>
-            <li>Design syntax changes</li>
+            <li>Major design syntax changes</li>
+            <li>ACTIVATE/FOCUS syntax changes</li>
         </ul>
     ]]>
     </change-notes>

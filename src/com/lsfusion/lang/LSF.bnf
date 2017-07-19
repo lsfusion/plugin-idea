@@ -419,10 +419,10 @@ sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
-activeTabPropertyDefinition ::= ACTIVE TAB componentUsage FORM formUsage
+activeTabPropertyDefinition ::= ACTIVE TAB componentID
 {
-    implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.FormContext" 
-    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames resolveFormDecl]
+    implements = "com.lsfusion.lang.psi.context.LSFExpression" 
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]
 }
 
 propertyExprObject ::= LSQBR EQUALS (propertyCalcStatement) RSQBR
@@ -959,11 +959,14 @@ activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
 
 emptyActionPropertyDefinitionBody ::= 
 
-activateActionPropertyDefinitionBody ::= ACTIVATE ((FORM formUsage) | (TAB componentUsage FORM formUsage))
+activateActionPropertyDefinitionBody ::= ACTIVATE (  FORM formUsage 
+                                                   | TAB componentID
+                                                   | PROPERTY formPropertyDrawID
+                                                   )
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
-    methods = [inferActionParamClasses resolveFormDecl]
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
 }
 
 listActionPropertyDefinitionBody ::=    LBRACE
@@ -1884,6 +1887,13 @@ groupObjectID ::= <<innerIDCheck>> formUsage POINT groupObjectUsage
 }
 
 objectID ::= <<innerIDCheck>> formUsage POINT objectUsage
+{
+    pin = 3
+    implements="com.lsfusion.lang.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
+
+componentID ::= <<innerIDCheck>> formUsage POINT componentSelector
 {
     pin = 3
     implements="com.lsfusion.lang.psi.context.FormContext"
