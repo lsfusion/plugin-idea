@@ -140,17 +140,14 @@ public class LSFElementGenerator {
 
     public static List<? extends LSFComponentDeclaration> getBuiltInFormComponents(Project project) {
         if (builtInFormComponents == null) {
-            builtInFormComponents = createFormComponents(project, Arrays.asList(FormContainerSet.MAIN_CONTAINER, FormContainerSet.FUNCTIONS_CONTAINER, FormContainerSet.LEFTCONTROLS_CONTAINER, FormContainerSet.RIGHTCONTROLS_CONTAINER, FormContainerSet.NOGROUP_PANEL_CONTAINER, FormContainerSet.NOGROUP_PANEL_PROPS_CONTAINER));
+            builtInFormComponents = createFormComponents(project);
         }
         return builtInFormComponents;
     }
 
-    public static List<? extends LSFComponentDeclaration> createFormComponents(Project project, List<String> componentsNames) {
+    public static List<? extends LSFComponentDeclaration> createFormComponents(Project project) {
         String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEditReport,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
                 "DESIGN defaultForm {";
-        for (String name : componentsNames) {
-            text += "NEW " + name + ";";
-        }
         text += "}";
         final PsiFile dummyFile = createDummyFile(project, text);
         return new ArrayList<>(PsiTreeUtil.findChildrenOfType(dummyFile, LSFComponentDeclaration.class));    

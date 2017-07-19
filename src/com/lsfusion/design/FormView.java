@@ -109,7 +109,7 @@ public class FormView {
     }
 
     public String getCaption() {
-        return !caption.isEmpty() ? caption : entity.sID;
+        return caption != null && !caption.isEmpty() ? caption : entity.sID;
     }
 
     public ContainerView getMainContainer() {
@@ -138,7 +138,7 @@ public class FormView {
         TreeGroupView treeGroupView = new TreeGroupView(treeGroupEntity);
         treeGroups.add(treeGroupView);
 
-        setComponentSID(treeGroupView, getTreeSID(treeGroupView));
+        setComponentSID(treeGroupView, getGridSID(treeGroupView));
         setComponentSID(treeGroupView.toolbar, getToolbarSID(treeGroupView));
         setComponentSID(treeGroupView.filter, getFilterSID(treeGroupView));
         mtreeGroups.put(treeGroupEntity, treeGroupView);
@@ -169,17 +169,28 @@ public class FormView {
     }
 
     private void addPropertyDrawView(PropertyDrawView propertyDraw) {
+        addGridDrawView(propertyDraw);
+    }
+    
+    protected boolean addGridDrawView(PropertyDrawView propertyDraw) { // в том числе и HIDE
         GroupObjectEntity groupObject = propertyDraw.entity.getToDraw(entity);
         GroupObjectView groupObjectView = mgroupObjects.get(groupObject);
 
-        if (groupObject != null && groupObject.treeGroup != null) {
-            TreeGroupView treeGroupView = mtreeGroups.get(groupObject.treeGroup);
-            if (treeGroupView != null) {
-                treeGroupView.addPropertyDraw(groupObjectView, propertyDraw, properties);
-            }
-        } else if (putInGrid(propertyDraw, groupObjectView)) {
-            groupObjectView.addGridPropertyDraw(propertyDraw);
+        if (groupObjectView != null && groupObjectView.entity.initClassView == ClassViewType.HIDE || propertyDraw.hide || propertyDraw.isForceHide()) {
+            return true;
         }
+        if (putInGrid(propertyDraw, groupObjectView)) {
+            if (groupObject != null && groupObject.isInTree()) {
+                TreeGroupView treeGroupView = mtreeGroups.get(groupObject.treeGroup);
+                if (treeGroupView != null) {
+                    treeGroupView.addPropertyDraw(groupObjectView, propertyDraw, properties);
+                }
+            } else
+                groupObjectView.addGridPropertyDraw(propertyDraw);
+        } else
+            return false;
+        
+        return true;        
     }
 
     public boolean putInGrid(PropertyDrawView property, GroupObjectView groupObjectView) {
@@ -265,10 +276,6 @@ public class FormView {
         return FormContainerSet.MAIN_CONTAINER;
     }
 
-    private static String getTreeSID(TreeGroupView component) {
-        return getTreeSID(component.getSID());
-    }
-
     public static String getTreeSID(String sID) {
         return sID + TreeGroupContainerSet.TREE_CONTAINER;
     }
@@ -281,34 +288,34 @@ public class FormView {
         return GroupObjectContainerSet.FILTERSPREF_COMPONENT + sID;
     }
 
-    private static String getGridSID(GroupObjectView component) {
-        return getGridSID(component.getSID());
+    public static String getGridSID(PropertyGroupContainerView containerView) {
+        return getGridSID(containerView.getPropertyGroupContainerSID());        
     }
 
     public static String getGridSID(String sID) {
         return sID + GroupObjectContainerSet.GRID_COMPONENT;
     }
 
-    private static String getToolbarSID(GroupView component) {
-        return getToolbarSID(component.getSID());
+    public static String getToolbarSID(PropertyGroupContainerView containerView) {
+        return getToolbarSID(containerView.getPropertyGroupContainerSID());
     }
 
     public static String getToolbarSID(String sID) {
         return sID + GroupObjectContainerSet.TOOLBAR_COMPONENT;
     }
 
-    private static String getFilterSID(GroupView component) {
-        return getFilterSID(component.getSID());
+    public static String getFilterSID(PropertyGroupContainerView containerView) {
+        return getFilterSID(containerView.getPropertyGroupContainerSID());
     }
 
     public static String getFilterSID(String sID) {
         return sID + GroupObjectContainerSet.FILTER_COMPONENT;
     }
 
-    private static String getShowTypeSID(GroupObjectView component) {
-        return getShowTypeSID(component.getSID());
+    public static String getShowTypeSID(PropertyGroupContainerView containerView) {
+        return getShowTypeSID(containerView.getPropertyGroupContainerSID());
     }
-
+    
     public static String getShowTypeSID(String sID) {
         return sID + GroupObjectContainerSet.SHOWTYPE_COMPONENT;
     }
@@ -330,4 +337,6 @@ public class FormView {
             return new ContainerView();
         }
     }
+    
+    
 }

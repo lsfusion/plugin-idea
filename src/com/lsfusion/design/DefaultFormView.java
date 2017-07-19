@@ -7,7 +7,6 @@ import com.lsfusion.design.model.*;
 import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.model.entity.GroupObjectEntity;
 import com.lsfusion.design.ui.Alignment;
-import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.design.ui.FlexAlignment;
 
 import javax.swing.*;
@@ -19,6 +18,7 @@ public class DefaultFormView extends FormView {
     public ContainerView formButtonContainer;
     public ContainerView noGroupPanelContainer;
     public ContainerView noGroupPanelPropsContainer;
+    public ContainerView noGroupToolbarPropsContainer;
 
     public static DefaultFormView create(FormEntity entity) {
         DefaultFormView form = new DefaultFormView(entity);
@@ -39,12 +39,14 @@ public class DefaultFormView extends FormView {
         formButtonContainer = formSet.getFormButtonContainer();
         noGroupPanelContainer = formSet.getNoGroupPanelContainer();
         noGroupPanelPropsContainer = formSet.getNoGroupPanelPropsContainer();
+        noGroupToolbarPropsContainer = formSet.getNoGroupToolbarPropsContainer();
 
         panelContainers.put(null, noGroupPanelContainer);
         panelPropsContainers.put(null, noGroupPanelPropsContainer);
+        toolbarPropsContainers.put(null, noGroupToolbarPropsContainer);
 
         for (GroupObjectView groupObject : groupObjects) {
-            if (groupObject.entity.treeGroup == null)
+            if (!groupObject.entity.isInTree())
                 addGroupObjectView(groupObject);
         }
 
@@ -59,6 +61,38 @@ public class DefaultFormView extends FormView {
         mainContainer.add(noGroupPanelContainer);
         mainContainer.add(formButtonContainer);
     }
+    
+    public static String getControlsSID(String goName) {
+        return goName + GroupObjectContainerSet.CONTROLS_CONTAINER;
+    }
+
+    public static String getControlsRightSID(String goName) {
+        return goName + GroupObjectContainerSet.CONTROLS_RIGHT_CONTAINER;
+    }
+
+    public static String getFiltersSID(String goName) {
+        return goName + GroupObjectContainerSet.FILTERS_CONTAINER;
+    }
+
+    public static String getGridBoxSID(String goName) {
+        return goName + GroupObjectContainerSet.GRID_BOX_CONTAINER;
+    }
+
+    public static String getGroupSID(String goName) {
+        return goName + GroupObjectContainerSet.GROUP_CONTAINER;
+    }
+
+    public static String getPanelSID(String goName) {
+        return goName + GroupObjectContainerSet.PANEL_CONTAINER;
+    }
+
+    public static String getPanelPropsSID(String goName) {
+        return goName + GroupObjectContainerSet.PANEL_PROPS_CONTAINER;
+    }
+
+    public static String getToolbarPropsSID(String goName) {
+        return goName + GroupObjectContainerSet.TOOLBAR_PROPS_CONTAINER;
+    }
 
     private void initProperties() {
         for (PropertyDrawView propertyDraw : properties) {
@@ -68,37 +102,34 @@ public class DefaultFormView extends FormView {
         initFormButtons();
     }
 
-    protected Map<GroupObjectView, ContainerView> groupContainers = new HashMap<>();
-
-    public ContainerView getGroupObjectContainer(GroupObjectView groupObject) {
-        return groupContainers.get(groupObject);
+    private PropertyGroupContainerView getPropertyContainer(PropertyDrawView property) {
+        return getPropertyGroupContainer(property.entity.getToDraw(entity));
     }
 
-    protected Map<GroupObjectView, ContainerView> gridContainers = new HashMap<>();
-
-    public ContainerView getGridContainer(GroupObjectView treeGroup) {
-        return gridContainers.get(treeGroup);
+    private PropertyGroupContainerView getPropertyGroupContainer(GroupObjectEntity groupObject) {
+        if(groupObject == null)
+            return null;
+        if (groupObject.isInTree())
+            return get(groupObject.treeGroup);
+        return get(groupObject);
     }
 
-    protected Map<GroupObjectView, ContainerView> panelContainers = new HashMap<>();
+    protected Map<PropertyGroupContainerView, ContainerView> boxContainers = new HashMap<>();
+    protected Map<PropertyGroupContainerView, ContainerView> gridBoxContainers = new HashMap<>();
 
-    public ContainerView getPanelContainer(GroupObjectView groupObject) {
-        return panelContainers.get(groupObject);
+    protected Map<PropertyGroupContainerView, ContainerView> panelContainers = new HashMap<>();
+
+    public ContainerView getPanelContainer(PropertyDrawView propertyDraw) {
+        return panelContainers.get(getPropertyContainer(propertyDraw));
     }
 
-    protected transient Map<TreeGroupView, ContainerView> treeContainers = new HashMap<>();
+    protected final Map<PropertyGroupContainerView, ContainerView> panelPropsContainers = new HashMap<>();
 
-    public ContainerView getTreeContainer(TreeGroupView treeGroup) {
-        return treeContainers.get(treeGroup);
+    public ContainerView getPanelPropsContainer(PropertyDrawView propertyDraw) {
+        return panelPropsContainers.get(getPropertyContainer(propertyDraw));
     }
 
-    protected final Map<GroupView, ContainerView> panelPropsContainers = new HashMap<>();
-
-    public ContainerView getPanelPropsContainer(GroupObjectView groupObject) {
-        return panelPropsContainers.get(groupObject);
-    }
-
-    protected transient Map<GroupView, ContainerView> controlsContainers = new HashMap<>();
+    protected transient Map<PropertyGroupContainerView, ContainerView> controlsContainers = new HashMap<>();
 
     public ContainerView getControlsContainer(GroupObjectView groupObject) {
         return controlsContainers.get(groupObject);
@@ -108,17 +139,13 @@ public class DefaultFormView extends FormView {
         return controlsContainers.get(treeGroup);
     }
 
-    protected final Map<GroupView, ContainerView> toolbarPropsContainers = new HashMap<>();
+    protected final Map<PropertyGroupContainerView, ContainerView> toolbarPropsContainers = new HashMap<>();
 
-    public ContainerView getToolbarPropsContainer(GroupObjectView groupObject) {
-        return toolbarPropsContainers.get(groupObject);
+    public ContainerView getToolbarPropsContainer(PropertyDrawView propertyDraw) {
+        return toolbarPropsContainers.get(getPropertyContainer(propertyDraw));
     }
 
-    public ContainerView getToolbarPropsContainer(TreeGroupView treeGroup) {
-        return toolbarPropsContainers.get(treeGroup);
-    }
-
-    protected transient Map<GroupView, ContainerView> rightControlsContainers = new HashMap<>();
+    protected transient Map<PropertyGroupContainerView, ContainerView> rightControlsContainers = new HashMap<>();
 
     public ContainerView getRightControlsContainer(GroupObjectView groupObject) {
         return rightControlsContainers.get(groupObject);
@@ -128,166 +155,130 @@ public class DefaultFormView extends FormView {
         return rightControlsContainers.get(treeGroup);
     }
 
-    protected final Map<GroupView, ContainerView> filtersContainers = new HashMap<>();
+    protected final Map<PropertyGroupContainerView, ContainerView> filtersContainers = new HashMap<>();
 
-    public ContainerView getFilterContainer(GroupObjectView groupObject) {
-        return filtersContainers.get(groupObject);
+    public ContainerView getFilterContainer(GroupObjectEntity group) {
+        return filtersContainers.get(getPropertyGroupContainer(group));
     }
 
-    public ContainerView getFilterContainer(TreeGroupView treeGroup) {
-        return filtersContainers.get(treeGroup);
-    }
-
-    protected transient Table<Optional<GroupObjectView>, AbstractGroup, ContainerView> groupPropertyContainers = HashBasedTable.create();
-
-    public ContainerView getGroupPropertyContainer(GroupObjectView groupObject, AbstractGroup group) {
-        return groupPropertyContainers.get(Optional.fromNullable(groupObject), group);
-    }
-
-    public ContainerView getGroupPropertyContainer(GroupObjectEntity groupObject, AbstractGroup group) {
-        return getGroupPropertyContainer(get(groupObject), group);
-    }
-
+    protected transient Table<Optional<PropertyGroupContainerView>, AbstractGroup, ContainerView> groupPropertyContainers = HashBasedTable.create();
 
     public void addGroupObjectView(GroupObjectView goView) {
         GroupObjectContainerSet set = GroupObjectContainerSet.create(goView, containerFactory);
 
-        mainContainer.add(set.getGroupContainer());
-        groupContainers.put(goView, set.getGroupContainer());
-        setComponentSID(set.getGroupContainer(), set.getGroupContainer().getSID());
-        gridContainers.put(goView, set.getGridContainer());
-        setComponentSID(set.getGridContainer(), set.getGridContainer().getSID());
-        panelContainers.put(goView, set.getPanelContainer());
-        setComponentSID(set.getPanelContainer(), set.getPanelContainer().getSID());
-        panelPropsContainers.put(goView, set.getPanelPropsContainer());
-        setComponentSID(set.getPanelPropsContainer(), set.getPanelPropsContainer().getSID());
-        controlsContainers.put(goView, set.getControlsContainer());
-        setComponentSID(set.getControlsContainer(), set.getControlsContainer().getSID());
-        rightControlsContainers.put(goView, set.getRightControlsContainer());
-        setComponentSID(set.getRightControlsContainer(), set.getRightControlsContainer().getSID());
-        filtersContainers.put(goView, set.getFiltersContainer());
-        setComponentSID(set.getFiltersContainer(), set.getFiltersContainer().getSID());
-        toolbarPropsContainers.put(goView, set.getToolbarPropsContainer());
-        setComponentSID(set.getToolbarPropsContainer(), set.getToolbarPropsContainer().getSID());
+        mainContainer.add(set.getBoxContainer());
+
+        registerComponent(set.getBoxContainer(), boxContainers, goView);
+        registerComponent(set.getGridBoxContainer(), gridBoxContainers, goView);
+        registerComponent(set.getPanelContainer(), panelContainers, goView);
+        registerComponent(set.getPanelPropsContainer(), panelPropsContainers, goView);
+        registerComponent(set.getControlsContainer(), controlsContainers, goView);
+        registerComponent(set.getRightControlsContainer(), rightControlsContainers, goView);
+        registerComponent(set.getFiltersContainer(), filtersContainers, goView);
+        registerComponent(set.getToolbarPropsContainer(), toolbarPropsContainers, goView);
 
         //todo classChoosers
 
         if (goView.entity.isFixedPanel()) {
-            set.getGroupContainer().flex = 0;
+            set.getBoxContainer().flex = 0;
         }
+    }
+
+    public void registerComponent(ContainerView groupContainer, Map<PropertyGroupContainerView, ContainerView> boxContainers, PropertyGroupContainerView goView) {
+        boxContainers.put(goView, groupContainer);
+        setComponentSID(groupContainer, groupContainer.getSID());
     }
 
     public void addTreeGroupView(TreeGroupView treeGroup) {
         TreeGroupContainerSet treeSet = TreeGroupContainerSet.create(treeGroup, containerFactory);
 
-        treeContainers.put(treeGroup, treeSet.getTreeContainer());
-        setComponentSID(treeSet.getTreeContainer(), treeSet.getTreeContainer().getSID());
-        controlsContainers.put(treeGroup, treeSet.getControlsContainer());
-        setComponentSID(treeSet.getControlsContainer(), treeSet.getControlsContainer().getSID());
-        rightControlsContainers.put(treeGroup, treeSet.getRightControlsContainer());
-        setComponentSID(treeSet.getRightControlsContainer(), treeSet.getRightControlsContainer().getSID());
-        filtersContainers.put(treeGroup, treeSet.getFiltersContainer());
-        setComponentSID(treeSet.getFiltersContainer(), treeSet.getFiltersContainer().getSID());
-        toolbarPropsContainers.put(treeGroup, treeSet.getToolbarPropsContainer());
-        setComponentSID(treeSet.getToolbarPropsContainer(), treeSet.getToolbarPropsContainer().getSID());
+        registerComponent(treeSet.getBoxContainer(), boxContainers, treeGroup);
+        registerComponent(treeSet.getGridBoxContainer(), gridBoxContainers, treeGroup);
+        registerComponent(treeSet.getPanelContainer(), panelContainers, treeGroup);
+        registerComponent(treeSet.getPanelPropsContainer(), panelPropsContainers, treeGroup);
+        registerComponent(treeSet.getControlsContainer(), controlsContainers, treeGroup);
+        registerComponent(treeSet.getRightControlsContainer(), rightControlsContainers, treeGroup);
+        registerComponent(treeSet.getFiltersContainer(), filtersContainers, treeGroup);
+        registerComponent(treeSet.getToolbarPropsContainer(), toolbarPropsContainers, treeGroup);
 
         //вставляем перед первым groupObject в данной treeGroup
-        mainContainer.addBefore(treeSet.getTreeContainer(), groupContainers.get(mgroupObjects.get(treeGroup.entity.groups.get(0))));
+        mainContainer.addBefore(treeSet.getBoxContainer(), boxContainers.get(mgroupObjects.get(treeGroup.entity.groups.get(0))));
     }
 
     public void addPropertyDrawView(PropertyDrawView propertyDraw) {
-        GroupObjectEntity groupObject = propertyDraw.entity.getToDraw(entity);
-        GroupObjectView groupObjectView = mgroupObjects.get(groupObject);
+        if(!addGridDrawView(propertyDraw)) {
+            addPanelPropertyDrawView(propertyDraw);
+        }
+    }
 
-        if (groupObjectView != null && propertyDraw.entity.isToolbar(entity)) {
-            ContainerView propertyContainer;
-            if (groupObject.treeGroup != null) {
-                propertyContainer = getToolbarPropsContainer(mtreeGroups.get(groupObject.treeGroup));
-            } else {
-                propertyContainer = getToolbarPropsContainer(mgroupObjects.get(groupObject));
-            }
-
+    public void addPanelPropertyDrawView(PropertyDrawView propertyDraw) {
+        ContainerView propertyContainer;
+        if (propertyDraw.entity.isToolbar(entity)) {
+            propertyContainer = getToolbarPropsContainer(propertyDraw);
             propertyDraw.alignment = FlexAlignment.CENTER;
-
-            propertyContainer.add(propertyDraw);
         } else {
-            if (groupObject != null && groupObject.treeGroup != null) {
-                TreeGroupView treeGroupView = mtreeGroups.get(groupObject.treeGroup);
-                if (treeGroupView != null) {
-                    treeGroupView.addPropertyDraw(groupObjectView, propertyDraw, properties);
-                }
-            } else if (!putInGrid(propertyDraw, groupObjectView)) {
-                addPropertyDrawToLayout(groupObjectView, propertyDraw);
-            } else {
-                groupObjectView.addGridPropertyDraw(propertyDraw);
-            }
+            propertyContainer = getPropGroupContainer(propertyDraw, propertyDraw.entity.parent);
         }
+        propertyContainer.add(propertyDraw);
     }
 
-    private void addPropertyDrawToLayout(GroupObjectView groupObject, PropertyDrawView propertyDraw) {
-        if (groupObject != null && groupObject.entity.initClassView == ClassViewType.HIDE || propertyDraw.hide || propertyDraw.isForceHide()) {
-            return;
-        }
-
-        // иерархическая структура контейнеров групп: каждый контейнер группы - это CONTAINERH,
-        // в который сначала добавляется COLUMNS для свойств этой группы, а затем - контейнеры подгрупп
-        AbstractGroup propertyParentGroup = propertyDraw.entity.parent;
-
-        ContainerView propGroupContainer = getPropGroupContainer(groupObject, propertyParentGroup);
-        propGroupContainer.add(propertyDraw);
-    }
-
-    private ContainerView getPropGroupContainer(GroupObjectView groupObject, AbstractGroup currentGroup) {
+    private ContainerView getPropGroupContainer(PropertyDrawView propertyDraw, AbstractGroup currentGroup) {
         if (currentGroup == null) {
-            return panelPropsContainers.get(groupObject);
+            return getPanelPropsContainer(propertyDraw);
         }
 
         if (!currentGroup.createContainer) {
-            return getPropGroupContainer(groupObject, currentGroup.parent);
+            return getPropGroupContainer(propertyDraw, currentGroup.parent);
         }
 
+        PropertyGroupContainerView propertyContainer = getPropertyContainer(propertyDraw);
         //ищем в созданных
-        ContainerView currentGroupContainer = groupPropertyContainers.get(Optional.fromNullable(groupObject), currentGroup);
+        ContainerView currentGroupContainer = groupPropertyContainers.get(Optional.fromNullable(propertyContainer), currentGroup);
         if (currentGroupContainer == null) {
-            String currentGroupContainerSID = getPropertyGroupContainerSID(groupObject, currentGroup);
+            String currentGroupContainerSID = getPropertyGroupContainerSID(propertyDraw, currentGroup);
 
             //ищем по имени
             currentGroupContainer = getContainerBySID(currentGroupContainerSID);
             if (currentGroupContainer == null) {
                 //сначала создаём контейнеры для верхних групп, чтобы соблюдался порядок
-                getPropGroupContainer(groupObject, currentGroup.parent);
+                getPropGroupContainer(propertyDraw, currentGroup.parent);
 
                 //затем создаём контейнер для текущей группы
                 currentGroupContainer = createContainer(currentGroup.caption, currentGroupContainerSID);
                 currentGroupContainer.setType(ContainerType.COLUMNS);
                 currentGroupContainer.columns = 4;
 
-                panelContainers.get(groupObject).add(currentGroupContainer);
+                getPanelContainer(propertyDraw).add(currentGroupContainer);
             }
 
-            groupPropertyContainers.put(Optional.fromNullable(groupObject), currentGroup, currentGroupContainer);
+            groupPropertyContainers.put(Optional.fromNullable(propertyContainer), currentGroup, currentGroupContainer);
         }
 
         return currentGroupContainer;
     }
 
-    private static String getPropertyGroupContainerSID(GroupObjectView group, AbstractGroup propertyGroup) {
+    private String getPropertyGroupContainerSID(PropertyDrawView propertyDraw, AbstractGroup propertyGroup) {
         String propertyGroupSID = propertyGroup.sID;
         if (propertyGroupSID.contains("_")) {
             String[] sids = propertyGroupSID.split("_", 2);
             propertyGroupSID = sids[1];
         }
-        return (group == null ? "ABC" : group.entity.sID) + "." + propertyGroupSID;
+        PropertyGroupContainerView propertyContainer = getPropertyContainer(propertyDraw);
+        String containerSID;
+        if(propertyContainer == null)
+            containerSID = "NOGROUP";
+        else
+            containerSID = propertyContainer.getPropertyGroupContainerSID();
+        return getPropertyGroupContainerSID(containerSID, propertyGroupSID);
+    }
+    
+    public static String getPropertyGroupContainerSID(String containerSID, String groupID) {
+        return containerSID + "." + groupID;
     }
 
     private void addRegularFilterGroupView(RegularFilterGroupView filterGroup) {
         ContainerView filterContainer;
-        GroupObjectEntity groupObject = filterGroup.entity.getToDraw(entity);
-        if (groupObject != null && groupObject.treeGroup != null) {
-            filterContainer = getFilterContainer(mtreeGroups.get(groupObject.treeGroup));
-        } else {
-            filterContainer = getFilterContainer(mgroupObjects.get(groupObject));
-        }
+        filterContainer = getFilterContainer(filterGroup.entity.getToDraw(entity));
         if (filterContainer != null) {
             filterContainer.add(filterGroup);
         }
@@ -336,6 +327,7 @@ public class DefaultFormView extends FormView {
         leftControlsContainer.add(editFunction);
         leftControlsContainer.add(dropFunction);
 
+        rightControlsContainer.add(noGroupToolbarPropsContainer);
         rightControlsContainer.add(refreshFunction);
         rightControlsContainer.add(applyFunction);
         rightControlsContainer.add(cancelFunction);

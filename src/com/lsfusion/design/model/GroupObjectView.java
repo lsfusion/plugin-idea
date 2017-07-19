@@ -7,7 +7,7 @@ import com.lsfusion.util.BaseUtils;
 
 import java.util.ArrayList;
 
-public class GroupObjectView extends ArrayList<ObjectView> implements GroupView {
+public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGroupContainerView {
     public GroupObjectEntity entity;
 
     public GridView grid;
@@ -44,6 +44,11 @@ public class GroupObjectView extends ArrayList<ObjectView> implements GroupView 
     }
 
     public boolean isLastGroupInTree() {
-        return entity.treeGroup != null && BaseUtils.last(entity.treeGroup.groups) == entity;
+        return entity.isInTree() && BaseUtils.last(entity.treeGroup.groups) == entity;
+    }
+
+    @Override
+    public String getPropertyGroupContainerSID() {
+        return getSID();
     }
 }

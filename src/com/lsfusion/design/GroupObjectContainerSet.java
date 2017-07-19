@@ -22,8 +22,8 @@ public class GroupObjectContainerSet {
         public static final String PANEL_CONTAINER = ".panel";
             public static final String PANEL_PROPS_CONTAINER = ".panel.props";
 
-    private ContainerView groupContainer;
-    private ContainerView gridContainer;
+    private ContainerView boxContainer;
+    private ContainerView gridBoxContainer;
     private ContainerView panelContainer;
     private ContainerView panelPropsContainer;
     private ContainerView controlsContainer;
@@ -31,12 +31,12 @@ public class GroupObjectContainerSet {
     private ContainerView filtersContainer;
     private ContainerView toolbarPropsContainer;
 
-    public ContainerView getGroupContainer() {
-        return groupContainer;
+    public ContainerView getBoxContainer() {
+        return boxContainer;
     }
 
-    public ContainerView getGridContainer() {
-        return gridContainer;
+    public ContainerView getGridBoxContainer() {
+        return gridBoxContainer;
     }
 
     public ContainerView getPanelContainer() {
@@ -64,53 +64,53 @@ public class GroupObjectContainerSet {
     }
 
     public static GroupObjectContainerSet create(GroupObjectView group, DefaultFormView.ContainerFactory factory) {
-
         GroupObjectContainerSet set = new GroupObjectContainerSet();
+        String sid = group.getPropertyGroupContainerSID();
 
-        set.groupContainer = factory.createContainer();
-        set.groupContainer.setCaption(group.getCaption());
+        set.boxContainer = factory.createContainer();
+        set.boxContainer.setCaption(group.getCaption());
 //        set.groupContainer.setDescription(getString("form.layout.group.objects"));
-        set.groupContainer.setSID(group.getSID() + GROUP_CONTAINER);
+        set.boxContainer.setSID(DefaultFormView.getGroupSID(sid));
 
-        set.gridContainer = factory.createContainer();
+        set.gridBoxContainer = factory.createContainer();
 //        set.gridContainer.setDescription(getString("form.layout.grid.part"));
-        set.gridContainer.setSID(group.getSID() + GRID_BOX_CONTAINER);
+        set.gridBoxContainer.setSID(DefaultFormView.getGridBoxSID(sid));
 
         set.panelContainer = factory.createContainer();
 //        set.panelContainer.setDescription(getString("form.layout.panel"));
-        set.panelContainer.setSID(group.getSID() + PANEL_CONTAINER);
+        set.panelContainer.setSID(DefaultFormView.getPanelSID(sid));
 
         set.panelPropsContainer = factory.createContainer();
-        set.panelPropsContainer.setSID(group.getSID() + PANEL_PROPS_CONTAINER);
+        set.panelPropsContainer.setSID(DefaultFormView.getPanelPropsSID(sid));
 
         set.controlsContainer = factory.createContainer();
 //        set.controlsContainer.setDescription(getString("form.layout.control.objects"));
-        set.controlsContainer.setSID(group.getSID() + CONTROLS_CONTAINER);
+        set.controlsContainer.setSID(DefaultFormView.getControlsSID(sid));
 
         set.toolbarPropsContainer = factory.createContainer();
 //        set.toolbarPropsContainer.setDescription(getString("form.layout.toolbar.props.container"));
-        set.toolbarPropsContainer.setSID(group.getSID() + TOOLBAR_PROPS_CONTAINER);
+        set.toolbarPropsContainer.setSID(DefaultFormView.getToolbarPropsSID(sid));
 
         set.filtersContainer = factory.createContainer();
 //        set.filtersContainer.setDescription(getString("form.layout.filters.container"));
-        set.filtersContainer.setSID(group.getSID() + FILTERS_CONTAINER);
+        set.filtersContainer.setSID(DefaultFormView.getFiltersSID(sid));
 
         set.rightControlsContainer = factory.createContainer();
-        set.rightControlsContainer.setSID(group.getSID() + CONTROLS_RIGHT_CONTAINER);
+        set.rightControlsContainer.setSID(DefaultFormView.getControlsRightSID(sid));
 
-        set.groupContainer.setType(ContainerType.CONTAINERV);
-        set.groupContainer.setChildrenAlignment(Alignment.LEADING);
-        set.groupContainer.setAlignment(FlexAlignment.STRETCH);
-        set.groupContainer.setFlex(1);
-        set.groupContainer.add(set.gridContainer);
-        set.groupContainer.add(set.controlsContainer);
-        set.groupContainer.add(group.filter);
-        set.groupContainer.add(set.panelContainer);
+        set.boxContainer.setType(ContainerType.CONTAINERV);
+        set.boxContainer.setChildrenAlignment(Alignment.LEADING);
+        set.boxContainer.setAlignment(FlexAlignment.STRETCH);
+        set.boxContainer.setFlex(1);
+        set.boxContainer.add(set.gridBoxContainer);
+        set.boxContainer.add(set.controlsContainer);
+        set.boxContainer.add(group.filter);
+        set.boxContainer.add(set.panelContainer);
 
-        set.gridContainer.setType(ContainerType.SPLITH);
-        set.gridContainer.setAlignment(FlexAlignment.STRETCH);
-        set.gridContainer.setFlex(1);
-        set.gridContainer.add(group.grid);
+        set.gridBoxContainer.setType(ContainerType.SPLITH);
+        set.gridBoxContainer.setAlignment(FlexAlignment.STRETCH);
+        set.gridBoxContainer.setFlex(1);
+        set.gridBoxContainer.add(group.grid);
 
         set.controlsContainer.setType(ContainerType.CONTAINERH);
         set.controlsContainer.setAlignment(FlexAlignment.STRETCH);
@@ -141,8 +141,10 @@ public class GroupObjectContainerSet {
         set.panelPropsContainer.setType(ContainerType.COLUMNS);
         set.panelPropsContainer.setColumns(4);
 
+        group.filter.setAlignment(FlexAlignment.STRETCH);
         group.toolbar.setAlignment(FlexAlignment.CENTER);
         group.toolbar.setMargin(2);
+        
         group.showType.setAlignment(FlexAlignment.CENTER);
         group.showType.setMargin(2);
 

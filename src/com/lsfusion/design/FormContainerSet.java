@@ -12,6 +12,7 @@ public class FormContainerSet {
     public static final String RIGHTCONTROLS_CONTAINER = "rightControls";
     public static final String NOGROUP_PANEL_CONTAINER = "nogroup.panel";
     public static final String NOGROUP_PANEL_PROPS_CONTAINER = "nogroup.panel.props";
+    public static final String NOGROUP_TOOLBAR_PROPS_CONTAINER = "nogroup.toolbar.props.box";
 
     public static final String FUNCTIONSIN_CONTAINER = "functions.";
 
@@ -19,6 +20,7 @@ public class FormContainerSet {
     private ContainerView formButtonContainer;
     private ContainerView noGroupPanelContainer;
     private ContainerView noGroupPanelPropsContainer;
+    private ContainerView noGroupToolbarPropsContainer;
 
     public ContainerView getMainContainer() {
         return mainContainer;
@@ -34,6 +36,10 @@ public class FormContainerSet {
 
     public ContainerView getNoGroupPanelPropsContainer() {
         return noGroupPanelPropsContainer;
+    }
+
+    public ContainerView getNoGroupToolbarPropsContainer() {
+        return noGroupToolbarPropsContainer;
     }
 
     public static FormContainerSet fillContainers(FormView form, FormView.ContainerFactory contFactory) {
@@ -70,6 +76,13 @@ public class FormContainerSet {
 
         set.noGroupPanelPropsContainer.setType(ContainerType.COLUMNS);
         set.noGroupPanelPropsContainer.setColumns(2);
+
+        set.noGroupToolbarPropsContainer = contFactory.createContainer(); // контейнер тулбара
+//        set.noGroupToolbarPropsContainer.setDescription(LocalizedString.create("{form.layout.toolbar.props.container}"));
+        set.noGroupToolbarPropsContainer.setSID(NOGROUP_TOOLBAR_PROPS_CONTAINER);
+
+        set.noGroupToolbarPropsContainer.setType(ContainerType.CONTAINERH);
+        set.noGroupToolbarPropsContainer.setAlignment(FlexAlignment.CENTER);
 
         return set;
     }

@@ -95,6 +95,14 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     }
 
     @Override
+    public Collection<LSFGroupObjectDeclaration> getGroupObjectNoTreeDecls() {
+        Collection<LSFGroupObjectDeclaration> result = new ArrayList<>();
+        for (LSFFormGroupObjectsList formGroupObject : getFormGroupObjectsListList())
+            result.addAll(PsiTreeUtil.findChildrenOfType(formGroupObject, LSFGroupObjectDeclaration.class));
+        return result;
+    }
+
+    @Override
     public Collection<LSFTreeGroupDeclaration> getTreeGroupDecls() {
         Collection<LSFTreeGroupDeclaration> result = new ArrayList<>();
         for (LSFFormTreeGroupObjectList formGroupObject : getFormTreeGroupObjectListList())

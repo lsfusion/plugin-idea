@@ -4,17 +4,19 @@ import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.FormView;
 import com.lsfusion.design.model.entity.GroupObjectEntity;
 import com.lsfusion.design.model.entity.TreeGroupEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.FlexAlignment;
+import com.lsfusion.util.BaseUtils;
 import com.lsfusion.design.ui.JComponentPanel;
 
 import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 
-public class TreeGroupView extends ComponentView implements GroupView {
+public class TreeGroupView extends ComponentView implements PropertyGroupContainerView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
             new ReflectionProperty("expandOnClick")
@@ -83,5 +85,10 @@ public class TreeGroupView extends ComponentView implements GroupView {
     
     public boolean getExpandOnClick() {
         return expandOnClick;
+    }
+
+    @Override
+    public String getPropertyGroupContainerSID() {
+        return FormView.getTreeSID(entity.sID);
     }
 }

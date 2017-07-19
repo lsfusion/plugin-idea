@@ -14,6 +14,10 @@ public class GroupObjectEntity {
     public String sID;
 
     public TreeGroupEntity treeGroup;
+    
+    public boolean isInTree() {
+        return treeGroup != null;
+    }
 
     public List<ObjectEntity> objects = new ArrayList<>();
 
