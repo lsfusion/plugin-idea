@@ -54,11 +54,6 @@ public class LSFElementGenerator {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + name + ";");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFId.class).iterator().next();
     }
-    
-    public static LSFMultiCompoundID createMultiCompoundIdFromText(Project project, String name) {
-        List<? extends LSFComponentDeclaration> components = createFormComponents(project, Collections.singletonList(name));
-        return components.get(0).getMultiCompoundID();
-    }
 
     public static LSFCompoundID createCompoundIDFromText(Project myProject, String name) {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=" + name + "();");

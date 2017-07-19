@@ -1654,13 +1654,13 @@ componentStubDecl ::= componentDecl
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-componentDecl ::= multiCompoundID
+componentDecl ::= simpleName
 {
     implements="com.lsfusion.lang.psi.declarations.LSFComponentDeclaration"
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFComponentDeclarationImpl"
 }
 
-componentUsage ::= multiCompoundID
+componentUsage ::= simpleName
 {
     implements="com.lsfusion.lang.psi.references.LSFComponentReference"
     mixin="com.lsfusion.lang.psi.references.impl.LSFComponentReferenceImpl"
@@ -1894,13 +1894,6 @@ formPropertyDrawID ::= <<innerIDCheck>> formUsage POINT formPropertyDrawUsage
     pin = 3
     implements="com.lsfusion.lang.psi.context.FormContext"
     methods = [resolveFormDecl]
-}
-
-multiCompoundID ::= ID (POINT ID)*
-{
-    mixin="com.lsfusion.lang.psi.LSFIdImpl"
-    implements="com.lsfusion.lang.psi.LSFId"
-    methods = [ setName ]
 }
 
 exclusiveOverrideOption ::= OVERRIDE | EXCLUSIVE

@@ -3268,15 +3268,6 @@ public class LSFPsiImplUtil {
         return resolveFormDecl(formUsage);
     }
 
-    public static void setName(@NotNull LSFMultiCompoundID mcId, String name, MetaTransaction transaction) {
-        LSFMultiCompoundID genId = LSFElementGenerator.createMultiCompoundIdFromText(mcId.getProject(), name);
-
-        if(transaction != null)
-            transaction.regChange(Collections.singletonList(genId.getNode()), mcId.getNode(), MetaTransaction.Type.REPLACE);
-
-        mcId.getNode().getTreeParent().replaceChild(mcId.getNode(), genId.getNode());   
-    }
-
     @NotNull
     public static List<String> getMigrationClassNames(LSFDataPropertyDefinition dataPropertyDefinition) {
         LSFClassNameList classNameList = dataPropertyDefinition.getClassNameList();

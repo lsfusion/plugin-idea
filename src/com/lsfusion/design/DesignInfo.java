@@ -271,7 +271,7 @@ public class DesignInfo {
                 return name;
             }
         } else if (componentSelector.getComponentUsage() != null) {
-            return componentSelector.getComponentUsage().getMultiCompoundID().getName();
+            return componentSelector.getComponentUsage().getSimpleName().getName();
         }
         return null;
     }

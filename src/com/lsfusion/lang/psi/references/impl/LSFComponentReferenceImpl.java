@@ -25,9 +25,7 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
     }
 
     @Override
-    public LSFId getSimpleName() {
-        return getMultiCompoundID();
-    }
+    public abstract LSFId getSimpleName();
 
     @Override
     public LSFResolveResult resolveNoCache() {
@@ -40,40 +38,6 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
         for (LSFComponentStubDeclaration stubDecl : stubDecls) {
             if (formDeclaration == resolveForm(stubDecl.getComponentDecl(), false)) {
                 declarations.add(stubDecl.getComponentDecl());
-            }
-        }
-
-        if (declarations.isEmpty()) {
-            // список групп свойств
-            Set<String> groups = new HashSet<>();
-            for (String key : GroupIndex.getInstance().getAllKeys(getProject())) {
-                Collection<LSFGroupDeclaration> groupDeclarations = GroupIndex.getInstance().get(key, getProject(), getLSFFile().getRequireScope());
-                for (LSFGroupDeclaration groupDeclaration : groupDeclarations) {
-                    groups.add(groupDeclaration.getNameIdentifier().getName());
-                }
-            }
-            
-            // стандартные контейнеры групп объектов
-            if (formDeclaration != null) {
-                Collection<LSFFormExtend> formExtends = LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, getLSFFile()).findAll();
-                for (LSFFormExtend formExtend : formExtends) {
-                    LSFDeclaration declaration = getDefaultContainers(formExtend, groups).get(componentName);
-                    if (declaration != null) {
-                        declarations.add(declaration);
-                    }
-                }
-            }
-            
-            // стандартные контейнеры формы
-            LSFDeclaration builtInFormComponent = getBuiltInFormComponents().get(componentName);
-            if (builtInFormComponent != null) {
-                declarations.add(builtInFormComponent);
-            }
-
-            // стандартные контейнеры свойсв без группы
-            LSFDeclaration noGroupDeclaration = getNoGroupDeclarations(groups).get(componentName);
-            if (noGroupDeclaration != null) {
-                declarations.add(noGroupDeclaration);
             }
         }
 
@@ -99,91 +63,6 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
             }
         }
         return null;
-    }
-
-    private Map<String, LSFDeclaration> getDefaultContainers(LSFFormExtend formExtend, Set<String> groups) {
-        Map<String, LSFDeclaration> result = new HashMap<>();
-        
-        // стандартные контейнеры дерева объектов
-        for (LSFFormTreeGroupObjectList lsfFormTreeGroupObjectList : PsiTreeUtil.findChildrenOfType(formExtend, LSFFormTreeGroupObjectList.class)) {
-            LSFTreeGroupDeclaration treeGroupDeclaration = lsfFormTreeGroupObjectList.getTreeGroupDeclaration();
-            if (treeGroupDeclaration != null) {
-                String tgoName = treeGroupDeclaration.getSimpleName().getText();
-                if (tgoName != null) {
-                    String treeSID = FormView.getTreeSID(tgoName);
-                    result.put(treeSID, treeGroupDeclaration);
-                    result.put(treeSID + TreeGroupContainerSet.TREE_GROUP_CONTAINER, treeGroupDeclaration);
-                    result.put(treeSID + GroupObjectContainerSet.CONTROLS_CONTAINER, treeGroupDeclaration);
-                    result.put(treeSID + GroupObjectContainerSet.CONTROLS_RIGHT_CONTAINER, treeGroupDeclaration);
-                    result.put(treeSID + GroupObjectContainerSet.FILTERS_CONTAINER, treeGroupDeclaration);
-                    result.put(treeSID + GroupObjectContainerSet.TOOLBAR_PROPS_CONTAINER, treeGroupDeclaration);
-                    result.put(FormView.getToolbarSID(treeSID), treeGroupDeclaration);
-                    result.put(FormView.getFilterSID(treeSID), treeGroupDeclaration);
-                }
-            }
-        }
-
-        // стандартные контейнеры групп объектов
-        for (LSFGroupObjectDeclaration lsfGroupObjectDeclaration : formExtend.getGroupObjectDecls()) {
-            String goName = lsfGroupObjectDeclaration.getDeclName();
-            if (goName != null) {
-                result.put(goName + GroupObjectContainerSet.CONTROLS_CONTAINER, lsfGroupObjectDeclaration);
-                result.put(goName + GroupObjectContainerSet.CONTROLS_RIGHT_CONTAINER, lsfGroupObjectDeclaration);
-                result.put(goName + GroupObjectContainerSet.FILTERS_CONTAINER, lsfGroupObjectDeclaration);
-                result.put(goName + GroupObjectContainerSet.GRID_BOX_CONTAINER, lsfGroupObjectDeclaration);
-                result.put(goName + GroupObjectContainerSet.GROUP_CONTAINER, lsfGroupObjectDeclaration);
-                result.put(goName + GroupObjectContainerSet.PANEL_CONTAINER, lsfGroupObjectDeclaration);
-                result.put(goName + GroupObjectContainerSet.PANEL_PROPS_CONTAINER, lsfGroupObjectDeclaration);
-                result.put(goName + GroupObjectContainerSet.TOOLBAR_PROPS_CONTAINER, lsfGroupObjectDeclaration);
-                result.put(FormView.getGridSID(goName), lsfGroupObjectDeclaration);
-                result.put(FormView.getToolbarSID(goName), lsfGroupObjectDeclaration);
-                result.put(FormView.getFilterSID(goName), lsfGroupObjectDeclaration);
-                result.put(FormView.getShowTypeSID(goName), lsfGroupObjectDeclaration);
-                result.put(FormView.getClassChooserSID(goName), lsfGroupObjectDeclaration);
-
-                for (LSFFormObjectDeclaration lsfFormObjectDeclaration : lsfGroupObjectDeclaration.findObjectDecarations()) {
-                    LSFSimpleName simpleName = lsfFormObjectDeclaration.getSimpleName();
-                    if (simpleName != null) {
-                        String name = simpleName.getName();
-                        if (name != null) {
-                            result.put(FormView.getClassChooserSID(name), lsfFormObjectDeclaration);
-                        }
-                    }
-                }
-            }
-            
-            // контейнеры групп свойств
-            for (String group : groups) {
-                result.put(goName + "." + group, lsfGroupObjectDeclaration);    
-            }
-        }
-
-        // контенеры групп фильтров
-        for (LSFFilterGroupDeclaration filterGroupDeclaration : formExtend.getFilterGroupDecls()) {
-            result.put(FormView.getRegularFilterGroupSID(filterGroupDeclaration.getDeclName()), filterGroupDeclaration);    
-        }
-        
-        return result;
-    }
-    
-    private Map<String, LSFDeclaration> getBuiltInFormComponents() {
-        Map<String, LSFDeclaration> result = new HashMap<>();
-        for (LSFComponentDeclaration componentDeclaration : LSFElementGenerator.getBuiltInFormComponents(getProject())) {
-            result.put(componentDeclaration.getName(), componentDeclaration);
-        }    
-        return result;
-    }
-        
-    private Map<String, LSFDeclaration> getNoGroupDeclarations(Set<String> groups) {
-        List<String> nogroupGroupContainers = new ArrayList<>();
-        for (String group : groups) {
-            nogroupGroupContainers.add("NOGROUP." + group);
-        }
-        Map<String, LSFDeclaration> result = new HashMap<>();
-//        for (LSFComponentDeclaration componentDeclaration : LSFElementGenerator.createFormComponents(getProject(), nogroupGroupContainers)) {
-//            result.put(componentDeclaration.getName(), componentDeclaration);
-//        }    
-        return result;
     }
 
     @Override
