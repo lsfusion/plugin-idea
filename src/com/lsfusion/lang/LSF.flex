@@ -378,6 +378,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "TOOLBARBOX"                 			{ return TOOLBARBOX; }
   "TOOLBARLEFT"                			{ return TOOLBARLEFT; }
   "TOOLBARRIGHT"               			{ return TOOLBAR; }
+  "TOOLBARSYSTEM"              			{ return TOOLBARSYSTEM; }
   "TOP"                     			{ return TOP; }
   "TREE"                    			{ return TREE; }
   "TRY"                                 { return TRY; }
