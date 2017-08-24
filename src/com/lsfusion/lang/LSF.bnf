@@ -621,7 +621,6 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    fileActionPropertyDefinitionBody
                                       	|	    evalActionPropertyDefinitionBody
                                       	|	    drillDownActionPropertyDefinitionBody
-                                      	|	    focusActionPropertyDefinitionBody
                                       	|	    readActionPropertyDefinitionBody
                                       	|	    writeActionPropertyDefinitionBody
                                       	|	    importActionPropertyDefinitionBody
@@ -758,10 +757,10 @@ javaClassStringUsage ::= stringLiteral
     implements="com.lsfusion.lang.psi.references.LSFJavaClassStringReference"
 }
 
-private newWhereToClause ::= (TO mappedPropertyExprParam) { pin = 1 }
-private newWhereClause ::= (WHERE propertyExpression newWhereToClause?) { pin = 1 }
+private newWhereToClause ::= TO mappedPropertyExprParam { pin = 1 }
+private newWhereClause ::= WHERE propertyExpression newWhereToClause? { pin = 1 }
 
-newWhereActionPropertyDefinitionBody ::= NEW customClassUsage newWhereClause newWhereToClause?                                                                 
+newWhereActionPropertyDefinitionBody ::= NEW customClassUsage newWhereClause                                                                 
 {
     pin = 3
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
@@ -851,13 +850,6 @@ evalActionPropertyDefinitionBody ::= EVAL propertyExpression
     methods = [inferActionParamClasses]
 }
 
-focusActionPropertyDefinitionBody ::= FOCUS formPropertyDrawID
-{
-    pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
-}
-
 readActionPropertyDefinitionBody ::= READ propertyExpression TO propertyUsage ((MOVE propertyExpression) | (DELETE))?
 {
     pin = 1
@@ -936,14 +928,14 @@ drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
     methods = [inferActionParamClasses]
 }
 
-requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO actionPropertyDefinitionBody 
+requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO actionPropertyDefinitionBody (ELSE actionPropertyDefinitionBody)? 
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
 
-inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS propertyExpression)) CHANGE? inputDestination? doInputBody
+inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS propertyExpression)) (CHANGE (EQUALS propertyExpression)?)? inputDestination? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendInputParamContext"
@@ -1240,9 +1232,7 @@ formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptions
     methods = [ resolveParamClasses getParamList]
 }
 
-formPropertyOptionsList ::= (    EDITABLE
-                            |    READONLY
-                            |    SELECTOR
+formPropertyOptionsList ::= (    EDITABLE | READONLY | SELECTOR
                             |    formOptionSession
                             |    HINTNOUPDATE
                             |    HINTTABLE
@@ -1336,7 +1326,6 @@ formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 predefinedAddPropertyName ::=  NEW | NEWEDIT | EDIT
 
 predefinedFormPropertyName ::= VALUE
-                           |    SELECTION
                            |    predefinedAddPropertyName (LSQBR explicitPropClass RSQBR)?
                            |    DELETE
 {

@@ -345,7 +345,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "SAVE"                                { return SAVE; }
   "SCROLL"                              { return SCROLL; }
   "SEEK"                    			{ return SEEK; }
-  "SELECTION"               			{ return SELECTION; }
   "SELECTOR"                			{ return SELECTOR; }
   "SERIALIZABLE"                        { return SERIALIZABLE; }
   "SET"                     			{ return SET; }

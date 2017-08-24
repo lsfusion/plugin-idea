@@ -587,13 +587,16 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFClassSet resolveClass(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
-        LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
-        if(pe != null)
-            return LSFExClassSet.fromEx(pe.resolveValueClass(false));
-
         LSFBuiltInClassName builtInClassName = sourceStatement.getBuiltInClassName();
         if(builtInClassName != null)
             return resolve(builtInClassName);
+
+        List<LSFPropertyExpression> list = sourceStatement.getPropertyExpressionList();
+        if(!list.isEmpty()) {
+            LSFPropertyExpression pe = list.get(0);
+            if (pe != null)
+                return LSFExClassSet.fromEx(pe.resolveValueClass(false));
+        }
         
         return null;
     }    
@@ -2809,13 +2812,9 @@ public class LSFPsiImplUtil {
         if (expr != null)
             result = inferParamClasses(expr, null).filter(params);
 
-        List<LSFMappedPropertyExprParam> toList = body.getMappedPropertyExprParamList();
-        if (!toList.isEmpty()) {
-            assert toList.size() == 1;
-            LSFMappedPropertyExprParam to = BaseUtils.single(toList);
-            if( to != null)
-                result = inferParamClasses(to, LSFExClassSet.toEx(resolveClass(body.getCustomClassUsage()))).filter(params).override(result);
-        }
+        LSFMappedPropertyExprParam to = body.getMappedPropertyExprParam();
+        if (to != null)
+            result = inferParamClasses(to, LSFExClassSet.toEx(resolveClass(body.getCustomClassUsage()))).filter(params).override(result);
         return result;
     }
 
@@ -2840,7 +2839,7 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFInputActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        Inferred inputInferred = inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+        Inferred inputInferred = new ExprsContextInferrer(body.getPropertyExpressionList()).inferClasses(params);
         return inferDoInputBody(body.getDoInputBody(), inputInferred, params);
     }
 
