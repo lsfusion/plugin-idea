@@ -1385,8 +1385,8 @@ constraintStatement ::= CONSTRAINT baseEvent propertyExpression
 ///////////////////////////////// FOLLOWS STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS
-                     propertyExpression (RESOLVE LEFT? RIGHT? baseEvent)?		             
+followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS baseEvent
+                     propertyExpression (RESOLVE LEFT? RIGHT?)?		             
 		             SEMI
 {
     pin = 2
