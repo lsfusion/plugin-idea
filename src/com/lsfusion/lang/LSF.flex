@@ -183,7 +183,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "DROP"                    			{ return DROP; }
   "DROPCHANGED"             			{ return DROPCHANGED; }
   "DROPPED"                 			{ return DROPPED; }
-  "DROPSET"                 			{ return DROPSET; }
   "ECHO"                    			{ return ECHO; }
   "EDIT"                    			{ return EDIT; }
   "EDITFORM"                    		{ return EDITFORM; }
@@ -349,6 +348,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "SERIALIZABLE"                        { return SERIALIZABLE; }
   "SET"                     			{ return SET; }
   "SETCHANGED"              			{ return SETCHANGED; }
+  "SETDROPPED"                 			{ return SETDROPPED; }
   "SCHEDULE"              			    { return SCHEDULE; }
   "SHORTCUT"                			{ return SHORTCUT; }
   "SHOW"                    			{ return SHOW; }
