@@ -210,6 +210,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "FIRST"                   			{ return FIRST; }
   "FIXED"                   			{ return FIXED; }
   "FIXEDCHARWIDTH"          			{ return FIXEDCHARWIDTH; }
+  "FLOAT"                     			{ return FLOAT; }
   "FOCUS"                  				{ return FOCUS; }
   "FOOTER"                  			{ return FOOTER; }
   "FOR"                     			{ return FOR; }
