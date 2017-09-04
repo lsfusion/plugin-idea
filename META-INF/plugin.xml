@@ -12,6 +12,7 @@
         <b>Version 1.0.105</b><br>
         <ul>
             <li>TOOLBARSYSTEM syntax support</li>
+            <li>isdebug in RunConfiguration</li>
         </ul>
     ]]>
     </change-notes>

@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.lsfusion.debug.LSFDebuggerRunner.ISDEBUG_PROPERTY;
 import static com.lsfusion.module.LSFusionModuleBuilder.BOOTSTRAP_CLASS_NAME;
 
 public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunConfigurationModule> implements CommonJavaRunConfigurationParameters {//}, RunConfigurationWithSuppressedDefaultDebugAction {
@@ -39,6 +40,7 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
     public String WORKING_DIRECTORY;
     public boolean ALTERNATIVE_JRE_PATH_ENABLED;
     public String ALTERNATIVE_JRE_PATH;
+    public boolean DEBUG_MODE;
 
     public boolean PASS_PARENT_ENVS = true;
     private Map<String, String> myEnvs = new LinkedHashMap<>();
@@ -48,7 +50,7 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
     }
 
     public RunProfileState getState(@NotNull final Executor executor, @NotNull final ExecutionEnvironment env) throws ExecutionException {
-        final JavaCommandLineState state = new LSFServerCommandLineState(this, env);
+        final JavaCommandLineState state = new LSFServerCommandLineState(this, env, DEBUG_MODE);
         JavaRunConfigurationModule module = getConfigurationModule();
         state.setConsoleBuilder(TextConsoleBuilderFactory.getInstance().createBuilder(getProject(), module.getSearchScope()));
         return state;
@@ -181,10 +183,13 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
     public static class LSFServerCommandLineState extends JavaCommandLineState {
 
         private final LSFusionRunConfiguration myConfiguration;
+        private final boolean debugMode;
 
-        public LSFServerCommandLineState(@NotNull final LSFusionRunConfiguration configuration, final ExecutionEnvironment environment) {
+        public LSFServerCommandLineState(@NotNull final LSFusionRunConfiguration configuration, final ExecutionEnvironment environment, final boolean debugMode) {
             super(environment);
             myConfiguration = configuration;
+            this.debugMode = debugMode;
+
         }
 
         protected JavaParameters createJavaParameters() throws ExecutionException {
@@ -195,6 +200,7 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
             final String jreHome = myConfiguration.ALTERNATIVE_JRE_PATH_ENABLED ? myConfiguration.ALTERNATIVE_JRE_PATH : null;
             JavaParametersUtil.configureModule(module, params, classPathType, jreHome);
             JavaParametersUtil.configureConfiguration(params, myConfiguration);
+            params.getVMParametersList().addProperty(ISDEBUG_PROPERTY, String.valueOf(debugMode));
 
             params.setMainClass(MAIN_CLASS_NAME);
             for (RunConfigurationExtension ext : Extensions.getExtensions(RunConfigurationExtension.EP_NAME)) {

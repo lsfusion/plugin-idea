@@ -20,7 +20,8 @@ public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunCo
     private CommonJavaParametersPanel myCommonProgramParameters;
     private LabeledComponent<ModulesComboBox> myModule;
     private JrePathEditor myJREPanel;
-                                    
+    private JCheckBox debugModeCheckBox;
+
     private final ConfigurationModuleSelector myModuleSelector;
 
     public LSFusionRunConfigurationEditor(Project project) {
@@ -42,12 +43,14 @@ public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunCo
         myModuleSelector.applyTo(configuration);
         configuration.ALTERNATIVE_JRE_PATH = myJREPanel.getJrePathOrName();
         configuration.ALTERNATIVE_JRE_PATH_ENABLED = myJREPanel.isAlternativeJreSelected();
+        configuration.DEBUG_MODE = debugModeCheckBox.isSelected();
     }
 
     public void resetEditorFrom(final LSFusionRunConfiguration configuration) {
         myCommonProgramParameters.reset(configuration);
         myModuleSelector.reset(configuration);
         myJREPanel.setPathOrName(configuration.ALTERNATIVE_JRE_PATH, configuration.ALTERNATIVE_JRE_PATH_ENABLED);
+        debugModeCheckBox.setSelected(configuration.DEBUG_MODE);
     }
 
     @NotNull
