@@ -3057,10 +3057,6 @@ public class LSFPsiImplUtil {
         return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
     }
 
-    public static Inferred inferActionParamClasses(LSFFocusActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        return Inferred.EMPTY;
-    }
-
     public static Inferred inferActionParamClasses(LSFReadActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return Inferred.EMPTY;
     }
