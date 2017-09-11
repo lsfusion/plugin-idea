@@ -126,7 +126,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
                 return;
             }
     
-            final EvaluationContextImpl evaluationContext = new EvaluationContextImpl(context, frameProxy, null);
+            final EvaluationContextImpl evaluationContext = new EvaluationContextImpl(context, frameProxy, (Value) null);
     
             if (register) {
                 registerSteppingEvaluator.evaluate(evaluationContext);
