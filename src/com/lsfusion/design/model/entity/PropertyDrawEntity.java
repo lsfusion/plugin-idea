@@ -68,7 +68,9 @@ public class PropertyDrawEntity {
         List<String> objectNames = new ArrayList<>();
         if(alias == null) {
             for (ObjectEntity obj : objects) {
-                objectNames.add(obj.sID);
+                if (obj != null) {
+                    objectNames.add(obj.sID);
+                }
             }
         }
         sID = FormView.getPropertySID(alias, propertyName, objectNames);
