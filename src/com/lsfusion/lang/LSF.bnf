@@ -652,6 +652,7 @@ formActionPropertyDefinitionBody ::=
 
 		|   manageSessionClause
 		|   noCancelClause
+		|   formSessionScopeClause
 
 		|   CHECK
 		|   READONLY
@@ -663,6 +664,7 @@ formActionPropertyDefinitionBody ::=
 }
 
 manageSessionClause ::= MANAGESESSION | NOMANAGESESSION | MANAGESESSIONX | NOMANAGESESSIONX | AUTOX
+formSessionScopeClause ::= NEWSESSION | NESTEDSESSION
 noCancelClause ::= CANCEL | NOCANCEL 
 
 dialogActionPropertyDefinitionBody ::=
@@ -673,6 +675,7 @@ dialogActionPropertyDefinitionBody ::=
 
 		|   manageSessionClause
 		|   noCancelClause
+		|   formSessionScopeClause
 
 		|   CHECK
 		|   READONLY
