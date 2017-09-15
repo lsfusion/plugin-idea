@@ -20,7 +20,6 @@ public class ContainerView extends ComponentView {
             ComponentView.PROPERTIES,
             new ReflectionProperty("childrenAlignment"),
             new ReflectionProperty("columns"),
-            new ReflectionProperty("columnLabelsWidth"),
             new ReflectionProperty("type"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("description"),
@@ -35,7 +34,6 @@ public class ContainerView extends ComponentView {
     public ContainerType type = ContainerType.CONTAINERV;
     public Alignment childrenAlignment = Alignment.LEADING;
     public int columns = 4;
-    public int columnLabelsWidth = 0;
     public String showIf;
 
     public ContainerView() {
@@ -75,10 +73,6 @@ public class ContainerView extends ComponentView {
         this.columns = columns;
     }
 
-    public void setColumnLabelsWidth(int columnLabelsWidth) {
-        this.columnLabelsWidth = columnLabelsWidth;
-    }
-    
     public void setShowIf(String showIf) {
         this.showIf = showIf;
     }
@@ -89,10 +83,6 @@ public class ContainerView extends ComponentView {
 
     public int getColumns() {
         return columns;
-    }
-
-    public int getColumnLabelsWidth() {
-        return columnLabelsWidth;
     }
 
     public ContainerType getType() {
@@ -288,9 +278,6 @@ public class ContainerView extends ComponentView {
             childrenWidgets.add(childWidget);
             if (childWidget != null) {
                 hasChildren = true;
-            }
-            if (columnLabelsWidth > 0 && childWidget instanceof HasLabel) {
-                ((HasLabel) childWidget).setLabelWidth(columnLabelsWidth);
             }
         }
 

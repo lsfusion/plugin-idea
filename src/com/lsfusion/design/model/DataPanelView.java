@@ -12,7 +12,7 @@ import java.awt.*;
 
 import static java.lang.Math.max;
 
-public class DataPanelView extends JBPanel implements HasLabel {
+public class DataPanelView extends JBPanel {
     private int labelWidth = -1;
     private PropertyDrawView property;
 
@@ -39,11 +39,6 @@ public class DataPanelView extends JBPanel implements HasLabel {
         add(table);
 
         label.setToolTipText(property.getTooltipText(property.getCaption()));
-    }
-
-    @Override
-    public void setLabelWidth(int width) {
-        labelWidth = width;
     }
 
     private class DataPanelViewLayout extends CachableLayout {

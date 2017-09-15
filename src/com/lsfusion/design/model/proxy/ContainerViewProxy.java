@@ -46,10 +46,6 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.columns = columns;
     }
 
-    public void setColumnLabelsWidth(int columnLabelsWidth) {
-        target.columnLabelsWidth = columnLabelsWidth;
-    }
-    
     public void setShowIf(String showIf) {
         target.showIf = showIf;
     }
