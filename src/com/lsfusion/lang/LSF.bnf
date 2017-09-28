@@ -520,6 +520,7 @@ private semiPropertyOption ::= IN groupUsage
                            |	echoSymbolsSetting
                            |	indexSetting
                            |	aggPropSetting
+                           |    aggrSetting
                            |	notNullSetting
                            |	eventIdSetting
                            |   ATSIGN2 simpleName
@@ -547,6 +548,7 @@ loggableSetting ::= LOGGABLE
 echoSymbolsSetting ::= ECHO
 indexSetting ::= INDEXED
 aggPropSetting ::= AGGPROP
+aggrSetting ::= AGGR
 notNullSetting ::= nullOption (DELETE)? baseEvent
 onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody
 asEditActionSetting ::= ASON formEventType noContextPropertyUsage {pin = 1}
