@@ -1,35 +1,45 @@
 package com.lsfusion.design.ui;
 
+import com.lsfusion.design.model.ContainerView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
 public class ColumnsPanel extends FlexPanel {
-    private final int columnsCount;
-    private final JPanel[] columns;
 
-    public ColumnsPanel(int columnCount, List<Component> children) {
+    public ColumnsPanel(ContainerView container, List<Component> children) {
         super(false, Alignment.LEADING);
-        this.columnsCount = columnCount;
 
-        columns = new JPanel[columnsCount];
+        int columnsCount = container.columns;
+        JPanel[] columns = new JPanel[columnsCount];
+        double columnFlex = getColumnFlex(container);
         for (int i = 0; i < columnsCount; ++i) {
             JPanel column = new JPanel();
-            column.setLayout(new ColumnsLayout(column, 1));
-            super.addImpl(column, new FlexConstraints(), -1);
+            column.setLayout(new FlexLayout(column, true, Alignment.LEADING));
+            column.setBorder(BorderFactory.createEmptyBorder(0,0,0,4));
+            super.addImpl(column, new FlexConstraints(FlexAlignment.LEADING, columnFlex), -1);
 
             columns[i] = column;
         }
         
-        if (columnCount > 0) {
+        if (columnsCount > 0) {
             for (int i = 0; i < children.size(); ++i) {
                 Component child = children.get(i);
                 if (child != null) {
-                    int colIndex = i % columnCount;
-                    columns[colIndex].add(child, new ColumnsConstraints(FlexAlignment.STRETCH));
+                    int colIndex = i % columnsCount;
+                    columns[colIndex].add(child, new FlexConstraints(container.getChildren().get(i).getAlignment(), 0));
                 }
             }
         }
+    }
+
+    private double getColumnFlex(ContainerView container) {
+        ContainerView container2 = container.container;
+        if (container2 == null || !container2.isHorizontal()) {
+            return container.getAlignment() == FlexAlignment.STRETCH ? 1 : 0;
+        }
+        return container.getFlex();
     }
 
     @Override

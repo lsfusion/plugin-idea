@@ -25,6 +25,11 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     }
 
     @Override
+    public boolean isFlex() {
+        return true;
+    }
+
+    @Override
     public List<String> getSNames() {
         String name = getName();
         List<String> result = new ArrayList<>();

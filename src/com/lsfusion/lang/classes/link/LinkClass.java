@@ -7,4 +7,9 @@ public abstract class LinkClass extends DataClass {
     public String getPreferredMask() {
         return "1234567";
     }
+
+    @Override
+    public boolean isFlex() {
+        return false;
+    }
 }

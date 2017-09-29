@@ -9,7 +9,6 @@ import com.lsfusion.design.model.entity.GroupObjectEntity;
 import com.lsfusion.design.model.entity.TreeGroupEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.FlexAlignment;
-import com.lsfusion.util.BaseUtils;
 import com.lsfusion.design.ui.JComponentPanel;
 
 import javax.swing.*;
@@ -32,8 +31,8 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
 
     public TreeGroupView(TreeGroupEntity entity) {
         super(entity.sID);
-        flex = 1;
-        alignment = FlexAlignment.STRETCH;
+        setFlex(1);
+        setAlignment(FlexAlignment.STRETCH);
 
         this.entity = entity;
         toolbar = new ToolbarView(true);

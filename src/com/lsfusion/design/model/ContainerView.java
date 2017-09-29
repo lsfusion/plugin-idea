@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.lsfusion.design.model.ContainerType.*;
+
 public class ContainerView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
@@ -164,7 +166,7 @@ public class ContainerView extends ComponentView {
 
         JComponentPanel widget = null;
 
-        if (type.isTabbed() || type.isSplit()) {
+        if (isTabbedPane() || isSplit()) {
             if (oldWidget != null) {
                 ContainerType oldType = (ContainerType) oldWidget.getClientProperty("containerType");
                 if (oldType != type) {
@@ -172,17 +174,17 @@ public class ContainerView extends ComponentView {
                 }
             }
 
-            if (type.isTabbed()) {
+            if (isTabbedPane()) {
                 widget = createTabbedPanel(project, selection, componentToWidget, oldWidget);
-            } else if (type.isSplit()) {
+            } else if (isSplit()) {
                 widget = createSplitPanel(project, selection, componentToWidget, oldWidget);
             }
         } else {
-            if (type.isLinear()) {
+            if (isLinear()) {
                 widget = createLinearPanel(project, selection, componentToWidget);
-            } else if (type.isScroll()) {
+            } else if (isScroll()) {
                 widget = createScrollPanel(project, selection, componentToWidget);
-            } else if (type.isColumns()) {
+            } else if (isColumns()) {
                 widget = createColumnsPanel(project, selection, componentToWidget);
             }
         }
@@ -191,7 +193,7 @@ public class ContainerView extends ComponentView {
             return null;
         }
 
-        if (caption != null && container != null && !type.isTabbed() && !container.type.isTabbed()) {
+        if (caption != null && container != null && !isTabbedPane() && !container.isTabbedPane()) {
             widget.setBorder(BorderFactory.createTitledBorder(caption));
         }
 
@@ -201,7 +203,7 @@ public class ContainerView extends ComponentView {
     }
 
     private JComponentPanel createLinearPanel(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget) {
-        FlexPanel flexPanel = new FlexPanel(type.isVertical(), childrenAlignment);
+        FlexPanel flexPanel = new FlexPanel(isLinearVertical(), childrenAlignment);
         boolean hasChildren = false;
         for (ComponentView child : children) {
             JComponentPanel childWidget = child.createWidget(project, selection, componentToWidget);
@@ -237,7 +239,7 @@ public class ContainerView extends ComponentView {
     }
 
     private JComponentPanel createSplitPanel(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
-        JBSplitter splitPane = new JBSplitter(type.isVerticalSplit());
+        JBSplitter splitPane = new JBSplitter(isSplitVertical());
         boolean hasChildren = false;
         if (children.size() > 0) {
             JComponentPanel childWidget = children.get(0).createWidget(project, selection, componentToWidget);
@@ -281,14 +283,50 @@ public class ContainerView extends ComponentView {
             }
         }
 
-        return hasChildren ? new ColumnsPanel(columns, childrenWidgets) : null;
+        return hasChildren ? new ColumnsPanel(this, childrenWidgets) : null;
+    }
+
+    public boolean isTabbedPane() {
+        return type == TABBED;
+    }
+
+    public boolean isColumns() {
+        return type == COLUMNS;
     }
 
     public boolean isScroll() {
-        return getType().isScroll();
+        return type == SCROLL;
+    }
+
+    public boolean isSplitVertical() {
+        return type == SPLITV;
+    }
+
+    public boolean isSplitHorizontal() {
+        return type == SPLITH;
     }
     
     public boolean isSplit() {
-        return getType().isSplit();
+        return isSplitHorizontal() || isSplitVertical();
+    }
+
+    public boolean isLinearVertical() {
+        return type == CONTAINERV;
+    }
+
+    public boolean isLinearHorizontal() {
+        return type == CONTAINERH;
+    }
+
+    public boolean isLinear() {
+        return isLinearVertical() || isLinearHorizontal();
+    }
+
+    public boolean isVertical() {
+        return isLinearVertical() || isSplitVertical();
+    }
+
+    public boolean isHorizontal() {
+        return isLinearHorizontal() || isSplitHorizontal();
     }
 }

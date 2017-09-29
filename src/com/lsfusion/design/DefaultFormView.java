@@ -229,7 +229,7 @@ public class DefaultFormView extends FormView {
         //todo classChoosers
 
         if (goView.entity.isFixedPanel()) {
-            set.getBoxContainer().flex = 0;
+            set.getBoxContainer().setFlex(0);
         }
     }
 
@@ -265,7 +265,7 @@ public class DefaultFormView extends FormView {
         ContainerView propertyContainer;
         if (propertyDraw.entity.isToolbar(entity)) {
             propertyContainer = getToolbarPropsContainer(propertyDraw);
-            propertyDraw.alignment = FlexAlignment.CENTER;
+            propertyDraw.setAlignment(FlexAlignment.CENTER);
         } else {
             propertyContainer = getPropGroupContainer(propertyDraw, propertyDraw.entity.parent);
         }
@@ -346,12 +346,12 @@ public class DefaultFormView extends FormView {
         ContainerView leftControlsContainer = createContainer(null, getToolbarLeftSID());
         leftControlsContainer.setType(ContainerType.CONTAINERH);
         leftControlsContainer.childrenAlignment = Alignment.LEADING;
-        leftControlsContainer.flex = 0;
+        leftControlsContainer.setFlex(0);
 
         ContainerView rightControlsContainer = createContainer(null, getToolbarRightSID());
         rightControlsContainer.setType(ContainerType.CONTAINERH);
         rightControlsContainer.childrenAlignment = Alignment.TRAILING;
-        rightControlsContainer.flex = 1;
+        rightControlsContainer.setFlex(1);
 
         leftControlsContainer.add(printFunction);
         leftControlsContainer.add(xlsFunction);
@@ -380,7 +380,7 @@ public class DefaultFormView extends FormView {
     private void setupFormButton(PropertyDrawView action, KeyStroke editKey, String iconPath, boolean showCaption) {
         action.editKey = editKey;
         action.focusable = false;
-        action.alignment = FlexAlignment.STRETCH;
+        action.setAlignment(FlexAlignment.STRETCH);
         action.imagePath = iconPath;
         action.showCaption = showCaption;
 

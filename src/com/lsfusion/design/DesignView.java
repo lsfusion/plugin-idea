@@ -6,6 +6,7 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -138,7 +139,7 @@ public class DesignView extends JPanel implements Disposable {
             } else {
                 LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
                 if (designStatement != null) {
-                    formDeclaration = designStatement.resolveFormDecl();
+                    formDeclaration = DumbService.getInstance(project).runReadActionInSmartMode(designStatement::resolveFormDecl);
                 }
             }
 

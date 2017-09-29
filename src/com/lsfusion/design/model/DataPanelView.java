@@ -3,9 +3,7 @@ package com.lsfusion.design.model;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.table.JBTable;
-import com.lsfusion.design.ui.CachableLayout;
-import com.lsfusion.design.ui.FlexAlignment;
-import com.lsfusion.design.ui.SingleCellTable;
+import com.lsfusion.design.ui.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,24 +17,24 @@ public class DataPanelView extends JBPanel {
     public DataPanelView(PropertyDrawView property) {
         this.property = property;
 
-        SingleCellTable table = new SingleCellTable();
+        setLayout(new FlexLayout(this, property.panelCaptionAbove, Alignment.CENTER));
+
+        
 
         JBLabel label = new JBLabel(property.getEditCaption());
-        if (property.panelCaptionAbove) {
-            label.setHorizontalAlignment(SwingConstants.CENTER);
+        if (!property.panelCaptionAbove) {
+            label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
         }
 
-        table.setMinimumSize(property.getMinimumValueSize(this));
-        table.setMaximumSize(property.getMaximumValueSize(this));
-        table.setPreferredSize(property.getPreferredValueSize(this));
+        SingleCellTable table = new SingleCellTable();
+        table.setPreferredSize(new Dimension(property.getBaseValueWidth(this), property.getPreferredValueHeight(this)));
         
         if (property.font != null) {
             table.setFont(property.font.deriveFrom(table));
         }
 
-        setLayout(new DataPanelViewLayout(this, label, table));
-        add(label);
-        add(table);
+        add(label, new FlexConstraints(FlexAlignment.CENTER, 0));
+        add(table, new FlexConstraints(FlexAlignment.STRETCH, 1));
 
         label.setToolTipText(property.getTooltipText(property.getCaption()));
     }
@@ -103,11 +101,11 @@ public class DataPanelView extends JBPanel {
             }
 
             int tableWidth = tableSpace;
-            if (property.alignment != FlexAlignment.STRETCH) {
+            if (property.getAlignment() != FlexAlignment.STRETCH) {
                 tableWidth = Math.min(tableSpace, tablePref.width);
-                if (property.alignment == FlexAlignment.TRAILING) {
+                if (property.getAlignment() == FlexAlignment.TRAILING) {
                     tableLeft += tableSpace - tableWidth;
-                } else if (property.alignment == FlexAlignment.CENTER) {
+                } else if (property.getAlignment() == FlexAlignment.CENTER) {
                     tableLeft += (tableSpace - tableWidth) / 2;
                 }
             }

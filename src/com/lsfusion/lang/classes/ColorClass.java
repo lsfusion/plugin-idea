@@ -25,4 +25,9 @@ public class ColorClass extends DataClass {
     public int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics) {
         return 50;
     }
+
+    @Override
+    public boolean isFlex() {
+        return false;
+    }
 }

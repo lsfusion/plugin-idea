@@ -18,6 +18,8 @@ public interface LSFClassSet {
 
     boolean isAssignable(LSFClassSet set);
 
+    boolean isFlex();
+
     int getMinimumWidth(int minCharWidth, FontMetrics fontMetrics);
 
     int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics);

@@ -30,4 +30,9 @@ public class LogicalClass extends DataClass {
     public String getPreferredMask() {
         return "";
     }
+
+    @Override
+    public boolean isFlex() {
+        return false;
+    }
 }

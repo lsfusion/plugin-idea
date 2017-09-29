@@ -171,6 +171,46 @@ public class PropertyDrawView extends ComponentView {
         this.echoSymbols = echoSymbols;
     }
 
+    public boolean isFlexProperty() {
+        Boolean compareValueWidths = compareValueWidths();
+        if (compareValueWidths != null) {
+            return compareValueWidths;
+        }
+
+        Boolean compareCharWidths = compareCharWidths();
+        if (compareCharWidths != null) {
+            return compareCharWidths;
+        }
+
+        return entity.baseClass != null && entity.baseClass.isFlex();
+    }
+
+    private Boolean compareValueWidths() {
+        int baseValueWidth = -1;
+        if (minimumValueSize != null && minimumValueSize.width >= 0 && preferredValueSize != null && preferredValueSize.width >= 0) {
+            baseValueWidth = Math.min(minimumValueSize.width, preferredValueSize.width);
+        }
+        if (baseValueWidth >= 0 && maximumValueSize != null && maximumValueSize.width >= 0) {
+            return maximumValueSize.width > baseValueWidth;
+        }
+        return null;
+    }
+
+    private Boolean compareCharWidths() {
+        int baseCharWidth = -1;
+        if (minimumCharWidth > 0 && preferredCharWidth > 0) {
+            baseCharWidth = Math.min(minimumCharWidth, preferredCharWidth);
+        }
+        if (baseCharWidth > 0 && maximumCharWidth > 0) {
+            return maximumCharWidth > baseCharWidth;
+        }
+        return null;
+    }
+
+    public int getBaseValueWidth(JComponent comp) {
+        return BaseUtils.min(getMinimumValueWidth(comp), getPreferredValueWidth(comp));
+    }
+
     public void setMinimumCharWidth(int minimumCharWidth) {
         this.minimumCharWidth = minimumCharWidth;
     }

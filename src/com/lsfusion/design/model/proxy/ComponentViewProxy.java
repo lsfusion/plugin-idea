@@ -82,7 +82,7 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
     }
 
     public void setFlex(double flex) {
-        target.flex = flex;
+        target.setFlex(flex);
     }
 
     public void setAlign(FlexAlignment alignment) {

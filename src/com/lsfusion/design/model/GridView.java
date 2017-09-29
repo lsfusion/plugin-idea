@@ -41,8 +41,8 @@ public class GridView extends ComponentView {
 
     public GridView(String sID) {
         super(sID);
-        flex = 1;
-        alignment = FlexAlignment.STRETCH;
+        setFlex(1);
+        setAlignment(FlexAlignment.STRETCH);
     }
 
     @Override
