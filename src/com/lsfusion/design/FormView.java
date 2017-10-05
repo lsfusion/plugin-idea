@@ -216,9 +216,9 @@ public class FormView {
     }
 
     private void initButtons() {
-        printButton = setupFormButton(entity.printActionPropertyDraw, "print");
+//        printButton = setupFormButton(entity.printActionPropertyDraw, "print");
         editButton = setupFormButton(entity.editActionPropertyDraw, "edit");
-        xlsButton = setupFormButton(entity.xlsActionPropertyDraw, "xls");
+//        xlsButton = setupFormButton(entity.xlsActionPropertyDraw, "xls");
         refreshButton = setupFormButton(entity.refreshActionPropertyDraw, "refresh");
         applyButton = setupFormButton(entity.applyActionPropertyDraw, "apply");
         cancelButton = setupFormButton(entity.cancelActionPropertyDraw, "cancel");

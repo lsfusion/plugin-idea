@@ -316,11 +316,11 @@ public class DefaultFormView extends FormView {
     }
 
     private void initFormButtons() {
-        PropertyDrawView printFunction = get(entity.printActionPropertyDraw);
-        setupFormButton(printFunction, KeyStrokes.getPrintKeyStroke(), "print.png", false);
+//        PropertyDrawView printFunction = get(entity.printActionPropertyDraw);
+//        setupFormButton(printFunction, KeyStrokes.getPrintKeyStroke(), "print.png", false);
 
-        PropertyDrawView xlsFunction = get(entity.xlsActionPropertyDraw);
-        setupFormButton(xlsFunction, KeyStrokes.getXlsKeyStroke(), "xls.png", false);
+//        PropertyDrawView xlsFunction = get(entity.xlsActionPropertyDraw);
+//        setupFormButton(xlsFunction, KeyStrokes.getXlsKeyStroke(), "xls.png", false);
 
         PropertyDrawView editFunction = get(entity.editActionPropertyDraw);
         setupFormButton(editFunction, KeyStrokes.getEditKeyStroke(), "editReport.png", false);
@@ -353,8 +353,8 @@ public class DefaultFormView extends FormView {
         rightControlsContainer.childrenAlignment = Alignment.TRAILING;
         rightControlsContainer.setFlex(1);
 
-        leftControlsContainer.add(printFunction);
-        leftControlsContainer.add(xlsFunction);
+//        leftControlsContainer.add(printFunction);
+//        leftControlsContainer.add(xlsFunction);
         leftControlsContainer.add(editFunction);
         leftControlsContainer.add(dropFunction);
 

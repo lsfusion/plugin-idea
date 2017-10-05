@@ -16,7 +16,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.io.StringRef;
-import com.lsfusion.design.FormContainerSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
@@ -32,7 +31,9 @@ import com.lsfusion.lang.psi.references.impl.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class LSFElementGenerator {
     
@@ -130,7 +131,8 @@ public class LSFElementGenerator {
 
     public static List<? extends LSFPropertyDrawDeclaration> getBuiltInFormProps(final Project project) {
         if (builtInFormProps == null) {
-            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
+            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formEdit,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
+//            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
             builtInFormProps = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
         }
         return builtInFormProps;
@@ -146,7 +148,8 @@ public class LSFElementGenerator {
     }
 
     public static List<? extends LSFComponentDeclaration> createFormComponents(Project project) {
-        String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEditReport,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
+        String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formEditReport,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
+//        String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEditReport,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
                 "DESIGN defaultForm {";
         text += "}";
         final PsiFile dummyFile = createDummyFile(project, text);

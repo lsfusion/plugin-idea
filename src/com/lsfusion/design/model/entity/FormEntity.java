@@ -363,9 +363,9 @@ public class FormEntity {
     }
 
     private void initFormButtons() {
-        addPropertyDraw(printActionPropertyDraw = addFormButton("formPrint"), null);
+//        addPropertyDraw(printActionPropertyDraw = addFormButton("formPrint"), null);
         addPropertyDraw(editActionPropertyDraw = addFormButton("formEdit"), null);
-        addPropertyDraw(xlsActionPropertyDraw = addFormButton("formXls"), null);
+//        addPropertyDraw(xlsActionPropertyDraw = addFormButton("formXls"), null);
         addPropertyDraw(dropActionPropertyDraw = addFormButton("formDrop"), null);
         addPropertyDraw(refreshActionPropertyDraw = addFormButton("formRefresh"), null);
         addPropertyDraw(applyActionPropertyDraw = addFormButton("formApply"), null);
