@@ -46,6 +46,11 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
         return null;
     }
 
+    @Override
+    public LSFId getFormUsageNameIdentifier() {
+        return getDesignHeader().getFormUsage().getCompoundID().getSimpleName();
+    }
+    
     @Nullable
     @Override
     protected LSFFormDeclaration resolveExtendingDeclaration() {

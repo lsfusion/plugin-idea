@@ -36,6 +36,12 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement psi) {
+        LSFFormDeclaration decl = resolveFormDecl(psi);
+
+        if (decl != null && hasReportFiles(decl)) {
+            return createLineMarker(psi);
+        }
+        
         return null;
     }
 
@@ -44,7 +50,7 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
                 psi,
                 psi.getTextRange(),
                 LSFIcons.PRINT,
-                Pass.UPDATE_OVERRIDDEN_MARKERS,
+                Pass.LINE_MARKERS,
                 TooltipProvider.INSTANCE,
                 GotoJrxmlFileNavigationHandler.INSTANCE,
                 GutterIconRenderer.Alignment.RIGHT
@@ -53,13 +59,6 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
-        for (PsiElement element : elements) {
-            LSFFormDeclaration decl = resolveFormDecl(element);
-
-            if (decl != null && hasReportFiles(decl)) {
-                result.add(createLineMarker(element));
-            }
-        }
     }
 
     private static class TooltipProvider implements Function<PsiElement, String> {

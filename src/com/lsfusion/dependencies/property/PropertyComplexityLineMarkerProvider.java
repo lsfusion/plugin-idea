@@ -7,11 +7,15 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
 import com.lsfusion.actions.ToggleComplexityAction;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.cache.PropertyComplexityCache;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,23 +45,31 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
             if (document == null) {
                 document = PsiDocumentManager.getInstance(element.getProject()).getDocument(element.getContainingFile());
             }
-            if (element instanceof LSFPropertyStatement && ((LSFPropertyStatement) element).isCorrect() && !((LSFPropertyStatement) element).isAction() && !((LSFPropertyStatement) element).isStoredProperty()) {
-                int lineNumber = document.getLineNumber(element.getTextOffset());
-                if (!usedLines.contains(lineNumber)) {
-                    result.add(createLineMarker((LSFPropertyStatement) element));
-                    usedLines.add(lineNumber);
+            int lineNumber = document.getLineNumber(element.getTextOffset());
+            if (!usedLines.contains(lineNumber)) {
+                if (element instanceof LeafPsiElement && element.getParent() instanceof LSFSimpleName) {
+                    LSFGlobalPropDeclaration propDeclaration = PsiTreeUtil.getParentOfType(element, LSFGlobalPropDeclaration.class);
+                    if (propDeclaration != null) {
+                        LSFId nameIdentifier = propDeclaration.getNameIdentifier();
+                        if (nameIdentifier != null && nameIdentifier.getFirstChild() == element) {
+                            if (propDeclaration.isCorrect() && !propDeclaration.isAction() && !propDeclaration.isStoredProperty()) {
+                                result.add(createLineMarker(propDeclaration, element));
+                                usedLines.add(lineNumber);
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 
-    private LineMarkerInfo createLineMarker(LSFPropertyStatement psi) {
-        int complexity = PropertyComplexityCache.getInstance(psi.getProject()).resolveWithCaching(psi); 
+    private LineMarkerInfo createLineMarker(LSFGlobalPropDeclaration property, PsiElement element) {
+        int complexity = PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching(property); 
         return new LineMarkerInfo(
-                psi,
-                psi.getTextRange(),
+                element,
+                element.getTextRange(),
                 createIcon(complexity),
-                Pass.UPDATE_OVERRIDDEN_MARKERS,
+                Pass.LINE_MARKERS,
                 PropertyComplexityTooltipProvider.INSTANCE,
                 null,
                 GutterIconRenderer.Alignment.RIGHT

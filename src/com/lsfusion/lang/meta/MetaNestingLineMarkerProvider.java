@@ -5,10 +5,13 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
+import com.lsfusion.lang.psi.LSFMetaCodeStatement;
+import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,6 +25,23 @@ public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
+        if (element instanceof LeafPsiElement && element.getParent() instanceof LSFSimpleName) {
+            LSFMetaCodeStatement metaReference = PsiTreeUtil.getParentOfType(element, LSFMetaCodeStatement.class);
+            if (metaReference != null) {
+                if (metaReference.getMetaCodeStatementHeader().getMetacodeUsage().getCompoundID().getSimpleName().getFirstChild() == element) {
+                    int level = resolveNestingLevel(metaReference);
+                    if (level > 0) {
+                        return new LineMarkerInfo(element,
+                                element.getTextRange(),
+                                createIcon(level),
+                                Pass.LINE_MARKERS,
+                                MetaNestingLevelTooltipProvider.INSTANCE,
+                                null,
+                                GutterIconRenderer.Alignment.RIGHT);
+                    }
+                }
+            }
+        }
         return null;
     }
 
@@ -32,7 +52,7 @@ public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
                 String text = "" + level;
                 g.setColor(new JBColor(Gray._160, Gray._90));
 
-                g.drawRect(x, y, 12, 12);
+                g.drawRoundRect(x, y, 12, 12, 2, 2);
                 Font textFont = new Font("Dialog", Font.BOLD, 11);
                 g.setFont(textFont);
 
@@ -54,19 +74,6 @@ public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> lineMarkerInfos) {
-        for (PsiElement element : psiElements) {
-            if (element instanceof LSFMetaReference) {
-                int level = resolveNestingLevel(element);
-                if (level > 0) {
-                    lineMarkerInfos.add(new LineMarkerInfo(element,
-                            element.getTextRange(),
-                            createIcon(level),
-                            Pass.UPDATE_OVERRIDDEN_MARKERS,
-                            MetaNestingLevelTooltipProvider.INSTANCE,
-                            null,
-                            GutterIconRenderer.Alignment.RIGHT));                      }
-            }
-        }
     }
 
     public static int resolveNestingLevel(PsiElement element) {

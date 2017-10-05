@@ -8,10 +8,14 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
 import com.lsfusion.actions.ToggleShowTableAction;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFSimpleName;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.declarations.impl.LSFTableDeclarationImpl;
 import com.lsfusion.lang.psi.indexes.TableIndex;
@@ -46,22 +50,35 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
             if (document == null) {
                 document = PsiDocumentManager.getInstance(element.getProject()).getDocument(element.getContainingFile());
             }
-            if (element instanceof LSFPropertyStatement && ((LSFPropertyStatement) element).isCorrect() && (((LSFPropertyStatement) element).isDataStoredProperty() || ((LSFPropertyStatement) element).isPersistentProperty())) {
-                int lineNumber = document.getLineNumber(element.getTextOffset());
-                if (!usedLines.contains(lineNumber)) {
-                    result.add(createLineMarker((LSFPropertyStatement) element));
-                    usedLines.add(lineNumber);
+            int lineNumber = document.getLineNumber(element.getTextOffset());
+            if (!usedLines.contains(lineNumber)) {
+                LSFGlobalPropDeclaration propDeclaration = getPropertyDeclaration(element);
+                if (propDeclaration != null) {
+                    LSFId nameIdentifier = propDeclaration.getNameIdentifier();
+                    if (nameIdentifier != null && nameIdentifier.getFirstChild() == element) {
+                        if (propDeclaration.isCorrect() && (propDeclaration.isDataStoredProperty() || propDeclaration.isPersistentProperty())) {
+                            result.add(createLineMarker(element));
+                            usedLines.add(lineNumber);
+                        }
+                    }
                 }
             }
         }
     }
+    
+    private static LSFGlobalPropDeclaration getPropertyDeclaration(PsiElement element) {
+        if (element instanceof LeafPsiElement && element.getParent() instanceof LSFSimpleName) {
+            return PsiTreeUtil.getParentOfType(element, LSFGlobalPropDeclaration.class);
+        }
+        return null;
+    }
 
-    private LineMarkerInfo createLineMarker(LSFPropertyStatement psi) {
+    private LineMarkerInfo createLineMarker(PsiElement psi) {
         return new LineMarkerInfo(
                 psi,
                 psi.getTextRange(),
                 createIcon(),
-                Pass.UPDATE_OVERRIDDEN_MARKERS,
+                Pass.LINE_MARKERS,
                 PropertyShowTableTooltipProvider.INSTANCE,
                 ShowTableNavigationProvider.INSTANCE,
                 GutterIconRenderer.Alignment.RIGHT
@@ -100,7 +117,8 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public String fun(PsiElement psi) {
-            String name = psi instanceof LSFPropertyStatement ? ((LSFPropertyStatement) psi).getTableName() : null;
+            LSFGlobalPropDeclaration propertyDecl = getPropertyDeclaration(psi); 
+            String name = propertyDecl != null ? propertyDecl.getTableName() : null;
             return name == null ? "Unknown table" : ("Table: " + name);
         }
     }
@@ -111,7 +129,8 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(MouseEvent e, PsiElement psi) {
             if (e.getID() == MouseEvent.MOUSE_RELEASED) {
-                String name = psi instanceof LSFPropertyStatement ? ((LSFPropertyStatement) psi).getTableName() : null;
+                LSFGlobalPropDeclaration propertyDecl = getPropertyDeclaration(psi);
+                String name = propertyDecl != null ? propertyDecl.getTableName() : null;
                 if (name != null) {
                     int underscoreIndex = name.indexOf("_");
                     if (underscoreIndex != -1) {

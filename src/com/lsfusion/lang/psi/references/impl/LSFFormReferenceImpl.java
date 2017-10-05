@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.references.LSFFormReference;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -16,5 +17,10 @@ public abstract class LSFFormReferenceImpl extends LSFFullNameReferenceImpl<LSFF
     @Override
     protected FullNameStubElementType getStubElementType() {
         return LSFStubElementTypes.FORM;
+    }
+
+    @Override
+    public LSFId getFormUsageNameIdentifier() {
+        return getCompoundID().getSimpleName();
     }
 }

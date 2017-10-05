@@ -11,12 +11,12 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.impl.ToolWindowImpl;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.lang.psi.LSFDesignStatement;
-import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +30,8 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement psi) {
-        return null;
+        LSFFormDeclaration decl = resolveFormDecl(psi);
+        return decl == null ? null : createLineMarker(psi);
     }
 
     private LineMarkerInfo createLineMarker(PsiElement psi) {
@@ -38,7 +39,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
                 psi,
                 psi.getTextRange(),
                 LSFIcons.Design.DESIGN,
-                Pass.UPDATE_OVERRIDDEN_MARKERS,
+                Pass.LINE_MARKERS,
                 GetFormNameTooltipProvider.INSTANCE,
                 OpenDesignPreviewNavigationHandler.INSTANCE,
                 GutterIconRenderer.Alignment.RIGHT
@@ -47,22 +48,40 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
-        for (PsiElement element : elements) {
-            LSFFormDeclaration decl = resolveFormDecl(element);
-            if (decl != null) {
-                result.add(createLineMarker(element));
-            }
-        }
     }
 
     public static LSFFormDeclaration resolveFormDecl(PsiElement psi) {
-        LSFFormDeclaration decl = null;
-        if (psi instanceof LSFDesignStatement) {
-            decl = ((LSFDesignStatement) psi).resolveFormDecl();
-        } else if (psi instanceof LSFFormExtend) {
-            decl = ((LSFFormStatementImpl) psi).resolveFormDecl();
+        if (psi instanceof LeafPsiElement && psi.getParent() instanceof LSFSimpleName) {
+            LSFFormDeclaration formDeclaration = null;
+            LSFId nameIdentifier = null;
+            LSFFormStatementImpl formExtend = PsiTreeUtil.getParentOfType(psi, LSFFormStatementImpl.class);
+            if (formExtend != null) {
+                formDeclaration = formExtend.resolveFormDecl();
+                if (formDeclaration != null) {
+                    LSFFormDecl formDecl = formExtend.getFormDecl();
+                    if (formDecl != null) {
+                        nameIdentifier = formDecl.getNameIdentifier();
+                    } else {
+                        LSFExtendingFormDeclaration extendingFormDeclaration = formExtend.getExtendingFormDeclaration();
+                        if (extendingFormDeclaration != null) {
+                            nameIdentifier = extendingFormDeclaration.getFormUsageWrapper().getFormUsage().getFormUsageNameIdentifier();
+                        }
+                    }
+                }
+            } else {
+                LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(psi, LSFDesignStatement.class);
+                if (designStatement != null) {
+                    formDeclaration = designStatement.resolveFormDecl();
+                    if (formDeclaration != null) {
+                        nameIdentifier = designStatement.getFormUsageNameIdentifier();
+                    }
+                }
+            }
+            if (nameIdentifier != null && nameIdentifier.getFirstChild() == psi) {
+                return formDeclaration;
+            }
         }
-        return decl;
+        return null;
     }
 
     private static class GetFormNameTooltipProvider implements Function<PsiElement, String> {
