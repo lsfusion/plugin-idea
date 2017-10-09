@@ -12,6 +12,7 @@
         <b>Version 1.0.107</b><br>
         <ul>
             <li>IMPORT XLSX removed. Use IMPORT XLS for xls/xlsx files</li>
+            <li>Flex layout for properties in panel</li>
         </ul>
     ]]>
     </change-notes>
