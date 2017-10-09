@@ -9,10 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.106</b><br>
+        <b>Version 1.0.107</b><br>
         <ul>
-            <li>isdebug in RunConfiguration</li>
-            <li>NEWSESSION / NESTEDSESSION options in DIALOG / SHOW operators</li>
+            <li>IMPORT XLSX removed. Use IMPORT XLS for xls/xlsx files</li>
         </ul>
     ]]>
     </change-notes>

@@ -884,7 +884,6 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage importActionSourceTy
 }
 
 importActionSourceType ::=  XLS (SHEET propertyExpression)?
-                        |   XLSX (SHEET propertyExpression)?
                         |   DBF (MEMO propertyExpression)? (CHARSET stringLiteral)?
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
                         |   XML (ATTR)?
