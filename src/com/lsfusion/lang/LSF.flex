@@ -341,6 +341,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "RGB"                     			{ return RGB; }
   "RIGHT"                   			{ return RIGHT; }
   "ROUND"                   			{ return ROUND; }
+  "ROOT"                   			    { return ROOT; }
   "RTF"                     			{ return RTF; }
   "SAVE"                                { return SAVE; }
   "SCROLL"                              { return SCROLL; }

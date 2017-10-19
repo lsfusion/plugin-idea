@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.106</version>
+    <version>1.0.107</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -14,6 +14,7 @@
             <li>IMPORT XLSX removed. Use IMPORT XLS for xls/xlsx files</li>
             <li>Flex layout for properties in panel</li>
             <li>Correct resolving of IMPORT ... TO properties</li>
+            <li>IMPORT XML ROOT</li>
         </ul>
     ]]>
     </change-notes>
