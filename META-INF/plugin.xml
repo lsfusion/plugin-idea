@@ -13,6 +13,7 @@
         <ul>
             <li>IMPORT XLSX removed. Use IMPORT XLS for xls/xlsx files</li>
             <li>Flex layout for properties in panel</li>
+            <li>Correct resolving of IMPORT ... TO properties</li>
         </ul>
     ]]>
     </change-notes>

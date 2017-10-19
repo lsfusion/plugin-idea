@@ -2272,6 +2272,15 @@ public class LSFPsiImplUtil {
         return exprParameterUsageList == null ? null : LSFExClassSet.fromEx(resolveParamClasses(exprParameterUsageList));
     }
 
+    public static List<LSFClassSet> resolveParamClasses(LSFImportPropertyUsage sourceStatement) {
+        return Collections.singletonList(IntegerClass.instance);
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFImportPropertyUsage sourceStatement) {
+        return null;
+    }
+    
     // PROPERTYEXPRESSION.INFERPARAMCLASSES
 
     @NotNull

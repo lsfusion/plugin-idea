@@ -869,11 +869,17 @@ writeActionPropertyDefinitionBody ::= WRITE propertyExpression FROM propertyExpr
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT importActionSourceType TO nonEmptyPropertyUsageListWithIds FROM propertyExpression (WHERE propertyExpression)?
+importActionPropertyDefinitionBody ::= IMPORT importActionSourceType TO nonEmptyImportPropertyUsageListWithIds FROM propertyExpression (WHERE propertyExpression)?
 {
     pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
+}
+
+importPropertyUsage ::= propertyUsage
+{
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList]
 }
 
 importFormActionPropertyDefinitionBody ::= IMPORT formUsage importActionSourceType
@@ -921,9 +927,9 @@ newSessionActionPropertyDefinitionBody ::= (    NEWSESSION (NEWSQL)? nestedPrope
     methods = [inferActionParamClasses]
 }
 
-nonEmptyPropertyUsageListWithIds ::= propertyUsageWithId (COMMA propertyUsageWithId)*
+nonEmptyImportPropertyUsageListWithIds ::= importPropertyUsageWithId (COMMA importPropertyUsageWithId)*
 
-propertyUsageWithId ::= propertyUsage (EQUALS (ID | stringLiteral))? 
+importPropertyUsageWithId ::= importPropertyUsage (EQUALS (ID | stringLiteral))? 
 
 drillDownActionPropertyDefinitionBody ::= DRILLDOWN propertyExpression
 {
