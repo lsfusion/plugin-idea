@@ -21,7 +21,7 @@ public class AddObjectActionProperty extends PropertyDrawEntity {
         isAction = true;
         iconPath = "add.png";
         forceViewType = ClassViewType.TOOLBAR;
-        editKey = KeyStrokes.getAddActionPropertyKeyStroke();
-        showEditKey = false;
+        changeKey = KeyStrokes.getAddActionPropertyKeyStroke();
+        showChangeKey = false;
     }
 }

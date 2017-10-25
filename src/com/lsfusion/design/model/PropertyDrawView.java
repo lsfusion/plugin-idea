@@ -39,8 +39,8 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("minimumValueSize").setExpert(),
             new ReflectionProperty("maximumValueSize").setExpert(),
             new ReflectionProperty("preferredValueSize"),            
-            new ReflectionProperty("editKey"),
-            new ReflectionProperty("showEditKey").setExpert(),
+            new ReflectionProperty("changeKey"),
+            new ReflectionProperty("showChangeKey").setExpert(),
             new ReflectionProperty("focusable"),
             new ReflectionProperty("panelCaptionAbove"),
             new ReflectionProperty("caption"),
@@ -70,8 +70,8 @@ public class PropertyDrawView extends ComponentView {
     public Dimension maximumValueSize;
     public Dimension preferredValueSize;
 
-    public KeyStroke editKey;
-    public boolean showEditKey;
+    public KeyStroke changeKey;
+    public boolean showChangeKey;
 
     public Boolean focusable;
 
@@ -103,8 +103,8 @@ public class PropertyDrawView extends ComponentView {
         setMaximumCharWidth(entity.maximumCharWidth);
         setPreferredCharWidth(entity.preferredCharWidth);
         setImagePath(entity.iconPath);
-        setEditKey(entity.editKey);
-        setShowEditKey(entity.showEditKey);
+        setChangeKey(entity.changeKey);
+        setShowChangeKey(entity.showChangeKey);
     }
 
     public PropertyDrawView(String sID) {
@@ -134,8 +134,8 @@ public class PropertyDrawView extends ComponentView {
 
     public String getEditCaption() {
         String caption = getCaption();
-        return showEditKey && editKey != null
-                ? caption + " (" + getKeyStrokeCaption(editKey) + ")"
+        return showChangeKey && changeKey != null
+                ? caption + " (" + getKeyStrokeCaption(changeKey) + ")"
                 : caption;
     }
 
@@ -425,12 +425,12 @@ public class PropertyDrawView extends ComponentView {
         return cFont;
     }
 
-    public void setEditKey(KeyStroke editKey) {
-        this.editKey = editKey;
+    public void setChangeKey(KeyStroke editKey) {
+        this.changeKey = editKey;
     }
 
-    public void setShowEditKey(boolean showEditKey) {
-        this.showEditKey = showEditKey;
+    public void setShowChangeKey(boolean showEditKey) {
+        this.showChangeKey = showEditKey;
     }
 
     public void setFocusable(Boolean focusable) {
@@ -517,12 +517,12 @@ public class PropertyDrawView extends ComponentView {
         return preferredCharWidth;
     }
 
-    public KeyStroke getEditKey() {
-        return editKey;
+    public KeyStroke getChangeKey() {
+        return changeKey;
     }
 
-    public boolean isShowEditKey() {
-        return showEditKey;
+    public boolean isShowChangeKey() {
+        return showChangeKey;
     }
 
     public Boolean getFocusable() {
@@ -602,7 +602,7 @@ public class PropertyDrawView extends ComponentView {
 
     public String getTooltipText(String caption) {
         String propCaption = BaseUtils.nullTrim(!isRedundantString(toolTip) ? toolTip : caption);
-        String editKeyText = editKey == null ? "" : String.format(EDIT_KEY_TOOL_TIP_FORMAT, KeyStrokes.getKeyStrokeCaption(editKey));
+        String editKeyText = changeKey == null ? "" : String.format(EDIT_KEY_TOOL_TIP_FORMAT, KeyStrokes.getKeyStrokeCaption(changeKey));
 
         String sid = getDisplaySID();
 //        String tableName = this.tableName != null ? this.tableName : "&lt;none&gt;";

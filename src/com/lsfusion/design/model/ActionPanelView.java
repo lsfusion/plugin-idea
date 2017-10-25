@@ -45,8 +45,8 @@ public class ActionPanelView extends JButton {
     public void setToolTip(String caption) {
         String toolTip = !BaseUtils.isRedundantString(property.toolTip) ? property.toolTip : caption;
         toolTip += " (sID: " + property.getDisplaySID() + ")";
-        if (property.editKey != null) {
-            toolTip += " (" + KeyStrokes.getKeyStrokeCaption(property.editKey) + ")";
+        if (property.changeKey != null) {
+            toolTip += " (" + KeyStrokes.getKeyStrokeCaption(property.changeKey) + ")";
         }
         setToolTipText(toolTip);
     }

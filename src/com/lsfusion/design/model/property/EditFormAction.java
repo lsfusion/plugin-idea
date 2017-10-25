@@ -19,8 +19,8 @@ public class EditFormAction extends PropertyDrawEntity {
         caption = "Редактировать";
         isAction = true;
         iconPath = "edit.png";
-        editKey = KeyStrokes.getEditActionPropertyKeyStroke();
-        showEditKey = false;
+        changeKey = KeyStrokes.getEditActionPropertyKeyStroke();
+        showChangeKey = false;
         forceViewType = ClassViewType.TOOLBAR;
     }
 }

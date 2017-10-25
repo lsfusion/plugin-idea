@@ -378,14 +378,14 @@ public class DefaultFormView extends FormView {
     }
 
     private void setupFormButton(PropertyDrawView action, KeyStroke editKey, String iconPath, boolean showCaption) {
-        action.editKey = editKey;
+        action.changeKey = editKey;
         action.focusable = false;
         action.setAlignment(FlexAlignment.STRETCH);
         action.imagePath = iconPath;
         action.showCaption = showCaption;
 
         if (iconPath != null) {
-            action.showEditKey = false;
+            action.showChangeKey = false;
         }
     }
 }

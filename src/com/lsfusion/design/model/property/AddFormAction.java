@@ -19,8 +19,8 @@ public class AddFormAction extends PropertyDrawEntity {
         caption = "Добавить";
         isAction = true;
         iconPath = "add.png";
-        editKey = KeyStrokes.getAddActionPropertyKeyStroke();
-        showEditKey = false;
+        changeKey = KeyStrokes.getAddActionPropertyKeyStroke();
+        showChangeKey = false;
         forceViewType = ClassViewType.TOOLBAR;
     }
 }

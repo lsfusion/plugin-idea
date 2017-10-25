@@ -5,7 +5,6 @@ import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.model.entity.GroupObjectEntity;
 import com.lsfusion.design.model.entity.PropertyDrawEntity;
 import com.lsfusion.design.ui.ClassViewType;
-import com.lsfusion.lang.classes.LogicalClass;
 import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 
 public class DeleteAction extends PropertyDrawEntity {
@@ -21,8 +20,8 @@ public class DeleteAction extends PropertyDrawEntity {
         caption = "Удалить";
         isAction = true;
         iconPath = "delete.png";
-        editKey = KeyStrokes.getDeleteActionPropertyKeyStroke();
-        showEditKey = false;
+        changeKey = KeyStrokes.getDeleteActionPropertyKeyStroke();
+        showChangeKey = false;
         forceViewType = ClassViewType.TOOLBAR;
     }
 }

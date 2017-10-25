@@ -118,12 +118,12 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         setPreferredValueWidth(width);
     }
     
-    public void setEditKey(KeyStroke editKey) {
-        target.editKey = editKey;
+    public void setChangeKey(KeyStroke editKey) {
+        target.changeKey = editKey;
     }
 
-    public void setShowEditKey(boolean showEditKey) {
-        target.showEditKey = showEditKey;
+    public void setShowChangeKey(boolean showEditKey) {
+        target.showChangeKey = showEditKey;
     }
 
     public void setFocusable(Boolean focusable) {

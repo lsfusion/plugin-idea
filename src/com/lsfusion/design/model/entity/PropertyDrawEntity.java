@@ -61,8 +61,8 @@ public class PropertyDrawEntity {
     public int maximumCharWidth;
     public int preferredCharWidth;
     public String iconPath;
-    public KeyStroke editKey;
-    public boolean showEditKey = true;
+    public KeyStroke changeKey;
+    public boolean showChangeKey = true;
 
     public PropertyDrawEntity(String alias, String propertyName, List<ObjectEntity> objects, LSFPropDeclaration propDeclaration, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
         List<String> objectNames = new ArrayList<>();
@@ -147,9 +147,9 @@ public class PropertyDrawEntity {
             List<LSFEditKeySetting> editKeySettings = propertyOptions.getEditKeySettingList();
             if (!editKeySettings.isEmpty()) {
                 LSFEditKeySetting editKeySetting = editKeySettings.get(editKeySettings.size() - 1);
-                editKey = KeyStroke.getKeyStroke(editKeySetting.getStringLiteral().getValue());
+                changeKey = KeyStroke.getKeyStroke(editKeySetting.getStringLiteral().getValue());
                 if (editKeySetting.getHideEditKey() != null) {
-                    showEditKey = false;
+                    showChangeKey = false;
                 }
             }
 
