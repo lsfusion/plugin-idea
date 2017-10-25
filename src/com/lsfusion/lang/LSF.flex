@@ -120,11 +120,8 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "APPLY"                   			{ return APPLY; }
   "AS"                      			{ return AS; }
   "ASON"                      			{ return ASON; }
-  "ASSIGN"                  			{ return ASSIGN; }
   "ASYNCUPDATE"             			{ return ASYNCUPDATE; }
   "ATTACH"                  			{ return ATTACH; }
-  "AUTO"                                { return AUTO; }
-  "AUTOX"                               { return AUTOX; }
   "AUTOREFRESH"                         { return AUTOREFRESH; }
   "AUTOSET"                 			{ return AUTOSET; }
   "BACKGROUND"              			{ return BACKGROUND; }
@@ -140,6 +137,8 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "CENTER"                  			{ return CENTER; }
   "CHANGE"                  			{ return CHANGE; }
   "CHANGECLASS"             			{ return CHANGECLASS; }
+  "CHANGEABLE"                			{ return CHANGEABLE; }
+  "CHANGEKEY"                 			{ return CHANGEKEY; }
   "CHANGED"                 			{ return CHANGED; }
   "CHANGEWYS"               			{ return CHANGEWYS; }
   "CHARSET"               			    { return CHARSET; }
@@ -186,8 +185,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "ECHO"                    			{ return ECHO; }
   "EDIT"                    			{ return EDIT; }
   "EDITFORM"                    		{ return EDITFORM; }
-  "EDITABLE"                			{ return EDITABLE; }
-  "EDITKEY"                 			{ return EDITKEY; }
   "ELSE"                    			{ return ELSE; }
   "EMAIL"                   			{ return EMAIL; }
   "END"                     			{ return END; }
@@ -259,8 +256,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "LOGGABLE"                			{ return LOGGABLE; }
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "NOMANAGESESSION"                     { return NOMANAGESESSION; }
-  "MANAGESESSIONX"           			{ return MANAGESESSIONX; }
-  "NOMANAGESESSIONX"                    { return NOMANAGESESSIONX; }
   "MAX"                     			{ return MAX; }
   "MDB"                     			{ return MDB; }
   "LAST"                     			{ return LAST; }
@@ -288,7 +283,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NEWTHREAD"              			    { return NEWTHREAD; }
   "NO"                      			{ return NO; }
   "NOCANCEL"                			{ return NOCANCEL; }
-  "NOASSIGN"                			{ return NOASSIGN; }
+  "NOCHANGE"                			{ return NOCHANGE; }
   "NOCONSTRAINTFILTER"                  { return NOCONSTRAINTFILTER; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOHEADER"                			{ return NOHEADER; }
@@ -317,6 +312,8 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "POSITION"                			{ return POSITION; }
   "PREFCHARWIDTH"           			{ return PREFCHARWIDTH; }
   "PREV"                    			{ return PREV; }
+  "PREVIEW"                    			{ return PREVIEW; }
+  "NOPREVIEW"                  			{ return NOPREVIEW; }
   "PRINT"                   			{ return PRINT; }
   "PRIORITY"                			{ return PRIORITY; }
   "PROPERTIES"              			{ return PROPERTIES; }

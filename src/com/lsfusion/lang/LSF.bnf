@@ -540,7 +540,7 @@ maxCharWidthSetting ::= MAXCHARWIDTH intLiteral
 prefCharWidthSetting ::= PREFCHARWIDTH intLiteral
 imageSetting ::= IMAGE stringLiteral
 defaultCompareSetting ::= DEFAULTCOMPARE stringLiteral
-editKeySetting ::= EDITKEY stringLiteral (SHOW | hideEditKey)?
+editKeySetting ::= CHANGEKEY stringLiteral (SHOW | hideEditKey)?
 autosetSetting ::= AUTOSET
 confirmSetting ::= CONFIRM
 regexpSetting ::= REGEXP stringLiteral (stringLiteral)?
@@ -636,7 +636,7 @@ private mappedForm ::= ((   (LIST | EDIT) customClassUsage formSingleActionObjec
 formSingleActionObject ::= formActionObjectProps
 constraintFilter ::= (CONSTRAINTFILTER (EQUALS propertyExpression)?)
 objectInProps ::= EQUALS propertyExpression NULL? { pin = 1 }
-changeInput ::= (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOASSIGN?) { pin = 1 }
+changeInput ::= (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?) { pin = 1 }
 objectInputProps ::= (INPUT | changeInput) simpleName? NULL? inputDestination? constraintFilter? { pin = 1 } 
 private formActionObjectProps ::= objectInProps? objectInputProps? 
 formActionObjectUsage ::= objectUsage formActionObjectProps {
@@ -665,7 +665,7 @@ formActionPropertyDefinitionBody ::=
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
-manageSessionClause ::= MANAGESESSION | NOMANAGESESSION | MANAGESESSIONX | NOMANAGESESSIONX | AUTOX
+manageSessionClause ::= MANAGESESSION | NOMANAGESESSION
 formSessionScopeClause ::= NEWSESSION | NESTEDSESSION
 noCancelClause ::= CANCEL | NOCANCEL 
 
@@ -723,8 +723,8 @@ printActionPropertyDefinitionBody ::=
 		    )
 		|
 		    (
+            (PREVIEW | NOPREVIEW)?
 		    syncTypeLiteral?
-		    (AUTO)? 
 		    (TO propertyExpression)?
 		    )
         )		 
@@ -802,7 +802,7 @@ confirmActionPropertyDefinitionBody ::= (CONFIRM | ASK) propertyExpression ((par
     methods = [inferActionParamClasses resolveClass ensureClass getInputContextModifier getInputContextInferrer]
 }
 
-messageActionPropertyDefinitionBody ::= MESSAGE (NOWAIT)? propertyExpression
+messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression syncTypeLiteral?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -993,7 +993,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
 
 // some statements are not pinned after the first token, so we need these fake rules to pin incomplete statements (to support recovery assertion) 
 // Important ! after recover the rule should mandatory be pinned (matched)
-private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | ASSIGN | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
+private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | CHANGE | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOCUS | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPEN
                                             | READ | REQUEST | INPUT | RETURN | SAVE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
@@ -1029,7 +1029,7 @@ assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | ass
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-private assignActionPropertyDefinitionBody1 ::= ASSIGN mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 1}
+private assignActionPropertyDefinitionBody1 ::= CHANGE mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 1}
 private assignActionPropertyDefinitionBody2 ::= mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 2}
 
 tryActionPropertyDefinitionBody ::= TRY actionPropertyDefinitionBody (FINALLY actionPropertyDefinitionBody)?
@@ -1242,7 +1242,7 @@ formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptions
     methods = [ resolveParamClasses getParamList]
 }
 
-formPropertyOptionsList ::= (    EDITABLE | READONLY | SELECTOR
+formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    formOptionSession
                             |    HINTNOUPDATE
                             |    HINTTABLE
@@ -1329,7 +1329,7 @@ formExprDeclaration ::= propertyExpression
 formActionDeclaration ::= topActionPropertyDefinitionBody
 filterSetDefault ::= DEFAULT
 
-formOrderByList ::= ORDER BY formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
+formOrderByList ::= ORDER formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
 
 formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 
@@ -1633,7 +1633,7 @@ globalSingleSelectorType ::= componentSingleSelectorType
 
 private groupObjectTreeSelector ::= TREE treeGroupSelector | groupObjectSelector { pin(".*") = 1 }
 groupSingleSelectorType ::= GROUP
-private groupComponentSelector ::= (groupObjectTreeSelector COMMA groupSelector? | groupSelector?) { pin(".*") = 2 }
+private groupComponentSelector ::= groupSelector? (COMMA groupObjectTreeSelector)? { pin(".*") = 1 }
 
 private pinnedGroupObjectTreeSelector ::= groupObjectTreeSingleSelectorType LBRAC groupObjectTreeSelector RBRAC {pin = 2}
 
@@ -1958,18 +1958,6 @@ containerTypeLiteral ::=    CONTAINERV
 alignmentLiteral ::= LEADING | CENTER | TRAILING
 
 flexAlignmentLiteral ::= LEADING | CENTER | TRAILING | STRETCH
-
-formPrintTypeLiteral ::= PRINT ( XLSX | XLS | PDF | ((AUTO)? (TO propertyExpression)?)) {pin = 1}
-
-formExportLiteral ::= EXPORT (DOC
-                            | DOCX
-                            | PDF
-                            | XLS
-                            | XLSX
-                            | XML
-                            | JSON
-                            | CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
-                            | (DBF (CHARSET stringLiteral)?)) {pin = 1}
 
 emailRecipientTypeLiteral ::= TO | CC | BCC
 
