@@ -1829,9 +1829,11 @@ public class LSFPsiImplUtil {
     @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
         List<LSFStringLiteral> stringLiteralList = new ArrayList<>();
-        for (LSFFormulaPropertySyntax syntax : sourceStatement.
-                getFormulaPropertySyntaxList().getFormulaPropertySyntaxList()) {
-            stringLiteralList.add(syntax.getStringLiteral());    
+        LSFFormulaPropertySyntaxList formulaPropertySyntaxList = sourceStatement.getFormulaPropertySyntaxList();
+        if (formulaPropertySyntaxList != null) {
+            for (LSFFormulaPropertySyntax syntax : formulaPropertySyntaxList.getFormulaPropertySyntaxList()) {
+                stringLiteralList.add(syntax.getStringLiteral());
+            }
         }
             
         if (stringLiteralList.isEmpty()) {
