@@ -150,6 +150,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "COLUMNS"                 			{ return COLUMNS; }
   "COMPLEX"                 			{ return COMPLEX; }
   "CONNECTION"                 			{ return CONNECTION; }
+  "CONTEXTMENU"                			{ return CONTEXTMENU; }
   "NOHINT"                 			    { return NOHINT; }
   "CONCAT"                  			{ return CONCAT; }
   "CONFIRM"                 			{ return CONFIRM; }
@@ -349,7 +350,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "SETCHANGED"              			{ return SETCHANGED; }
   "SETDROPPED"                 			{ return SETDROPPED; }
   "SCHEDULE"              			    { return SCHEDULE; }
-  "SHORTCUT"                			{ return SHORTCUT; }
   "SHOW"                    			{ return SHOW; }
   "SHOWDEP"                 			{ return SHOWDEP; }
   "SHOWIF"                  			{ return SHOWIF; }

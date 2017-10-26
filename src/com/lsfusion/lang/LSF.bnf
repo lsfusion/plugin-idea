@@ -531,7 +531,7 @@ private nonSemiPropertyOption ::= onEditEventSetting
 //semiPropertyOption (SEMI | nonEmptyPropertyOptions) | nonSemiPropertyOption nonEmptyPropertyOptions?
 nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI | (semiPropertyOption* nonSemiPropertyOption)+)
 
-shortcutSetting ::= SHORTCUT noContextPropertyUsage {pin = 1}
+shortcutSetting ::= CONTEXTMENU noContextPropertyUsage {pin = 1}
 viewTypeSetting ::= classViewType
 persistentSetting ::= MATERIALIZED
 fixedCharWidthSetting ::= FIXEDCHARWIDTH intLiteral
@@ -637,7 +637,7 @@ formSingleActionObject ::= formActionObjectProps
 constraintFilter ::= (CONSTRAINTFILTER (EQUALS propertyExpression)?)
 objectInProps ::= EQUALS propertyExpression NULL? { pin = 1 }
 changeInput ::= (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?) { pin = 1 }
-objectInputProps ::= (INPUT | changeInput) simpleName? NULL? inputDestination? constraintFilter? { pin = 1 } 
+objectInputProps ::= (INPUT | changeInput) simpleName? NULL? constraintFilter? { pin = 1 } // inputDestination?  
 private formActionObjectProps ::= objectInProps? objectInputProps? 
 formActionObjectUsage ::= objectUsage formActionObjectProps {
     pin = 1
@@ -697,7 +697,7 @@ doMainBody ::= DO actionPropertyDefinitionBody
     methods = [ getContextModifier getContextInferrer ]
 }
 
-inputDestination ::= TO propertyUsage
+//inputDestination ::= TO propertyUsage
 
 syncTypeLiteral ::= WAIT | NOWAIT
 windowTypeLiteral ::= FLOAT | DOCKED
@@ -945,7 +945,7 @@ requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO 
     methods = [inferActionParamClasses]
 }
 
-inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS propertyExpression)) (CHANGE (EQUALS propertyExpression)?)? inputDestination? doInputBody
+inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS propertyExpression)) (CHANGE (EQUALS propertyExpression)?)? doInputBody // inputDestination? 
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendInputParamContext"
@@ -1263,7 +1263,7 @@ formOptionToDraw ::= TODRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
 formOptionsWithFormPropertyDraw ::= (BEFORE | AFTER | QUICKFILTER) formPropertyDrawUsage {pin = 1}
-formOptionsOnEvents ::= ON (formEventType | (SHORTCUT (localizedStringLiteral)?) ) formActionPropertyObject
+formOptionsOnEvents ::= ON (formEventType | (CONTEXTMENU (localizedStringLiteral)?) ) formActionPropertyObject
 {
     pin = 1
 }
