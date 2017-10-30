@@ -449,7 +449,7 @@ nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
 }
 
 abstractPropertyDefinition ::= ABSTRACT ((CASE | MULTI | VALUE) abstractExclusiveOverrideOption?)? 
-                               (CHECKED)? className LBRAC classNameList RBRAC
+                               (FULL)? className LBRAC classNameList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
@@ -566,7 +566,7 @@ abstractActionPropertyDefinition ::= ABSTRACT
                                     (   ((CASE | MULTI) abstractExclusiveOverrideOption?)
                                     |	(LIST abstractCaseAddOption?)
                                     )?
-                                    (CHECKED)?
+                                    (FULL)?
                                     LBRAC classNameList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
