@@ -368,7 +368,7 @@ casePropertyDefinition ::= CASE (exclusiveOverrideOption)?
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
 }
 
-multiPropertyDefinition ::= MULTI nonEmptyPropertyExpressionList (exclusiveOverrideOption)?
+multiPropertyDefinition ::= MULTI (exclusiveOverrideOption)? nonEmptyPropertyExpressionList
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
