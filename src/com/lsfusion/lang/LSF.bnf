@@ -503,7 +503,6 @@ private semiPropertyOption ::= IN groupUsage
                            |   COMPLEX
                            |   NOHINT
                            |	TABLE tableUsage
-                           |	shortcutSetting
                            |	asEditActionSetting
                            |	viewTypeSetting
                            |	fixedCharWidthSetting
@@ -531,7 +530,6 @@ private nonSemiPropertyOption ::= onEditEventSetting
 //semiPropertyOption (SEMI | nonEmptyPropertyOptions) | nonSemiPropertyOption nonEmptyPropertyOptions?
 nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI | (semiPropertyOption* nonSemiPropertyOption)+)
 
-shortcutSetting ::= CONTEXTMENU noContextPropertyUsage {pin = 1}
 viewTypeSetting ::= classViewType
 persistentSetting ::= MATERIALIZED
 fixedCharWidthSetting ::= FIXEDCHARWIDTH intLiteral
@@ -550,13 +548,14 @@ indexSetting ::= INDEXED
 aggPropSetting ::= AGGPROP
 aggrSetting ::= AGGR
 notNullSetting ::= nullOption (DELETE)? baseEvent
-onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody
+onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти
 asEditActionSetting ::= ASON formEventType noContextPropertyUsage {pin = 1}
 eventIdSetting ::= EVENTID stringLiteral
 
 hideEditKey ::= HIDE
 
-formEventType ::= (CHANGE | GROUPCHANGE | CHANGEWYS | EDIT)
+contextMenuEventType ::= CONTEXTMENU (localizedStringLiteral)? { pin = 1 }
+formEventType ::= CHANGE | GROUPCHANGE | CHANGEWYS | EDIT | contextMenuEventType
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// ACTION PROPERTIES ///////////////////////////
@@ -1263,7 +1262,7 @@ formOptionToDraw ::= TODRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
 formOptionsWithFormPropertyDraw ::= (BEFORE | AFTER | QUICKFILTER) formPropertyDrawUsage {pin = 1}
-formOptionsOnEvents ::= ON (formEventType | (CONTEXTMENU (localizedStringLiteral)?) ) formActionPropertyObject
+formOptionsOnEvents ::= ON formEventType formActionPropertyObject
 {
     pin = 1
 }

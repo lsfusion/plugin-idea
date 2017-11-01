@@ -60,14 +60,17 @@ public class LSFProblemsVisitor {
     }
 
     private static boolean hasShortCut(LSFDeclaration objectDecl) {
-        boolean hasShortCut = false;
         if(objectDecl != null && objectDecl instanceof LSFPropertyStatementImpl) {
             LSFNonEmptyPropertyOptions propertyOptions = ((LSFPropertyStatementImpl) objectDecl).getNonEmptyPropertyOptions();
             if(propertyOptions != null) {
-                hasShortCut = !propertyOptions.getShortcutSettingList().isEmpty();
+                for(LSFAsEditActionSetting editAction : propertyOptions.getAsEditActionSettingList()) {
+                    LSFFormEventType formEventType = editAction.getFormEventType();
+                    if(formEventType != null && formEventType.getContextMenuEventType() != null)
+                        return true;
+                }    
             }
         }
-        return hasShortCut;
+        return false;
     }
 
 
