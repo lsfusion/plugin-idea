@@ -152,10 +152,13 @@ public class FormEntity {
                     boolean reverseFor = relativeProsition != null && !relativeProsition.first;
                     for (int i = reverseFor ? mappedDeclList.size() - 1 : 0; (reverseFor && i >= 0) || (!reverseFor && i < mappedDeclList.size()); i = i + (reverseFor ? -1 : 1)) {
                         LSFFormPropertyDrawMappedDecl prop = mappedDeclList.get(i);
-                        LSFObjectUsageList objectUsageList = prop.getFormPropertyObject().getObjectUsageList();
+                        LSFFormPropertyObject formPropertyObject = prop.getFormPropertyObject();
+                        if(formPropertyObject != null) {
+                            LSFObjectUsageList objectUsageList = formPropertyObject.getObjectUsageList();
 
-                        String alias = prop.getSimpleName() != null ? prop.getSimpleName().getName() : null;
-                        addPropertyWithOptions(alias, prop.getFormPropertyObject().getFormPropertyName(), commonOptions, prop.getFormPropertyOptionsList(), relativeProsition, objectUsageList);
+                            String alias = prop.getSimpleName() != null ? prop.getSimpleName().getName() : null;
+                            addPropertyWithOptions(alias, formPropertyObject.getFormPropertyName(), commonOptions, prop.getFormPropertyOptionsList(), relativeProsition, objectUsageList);
+                        }
                     }
                 }
             } else {
