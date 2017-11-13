@@ -227,7 +227,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         actions.add(new AnAction(LSFIcons.GRAPH_EXPORT) {
             @Override
             public void actionPerformed(AnActionEvent e) {
-                new SVGExporter().exportSVG(jgraph);
+                if (jgraph != null) {
+                    new SVGExporter().exportSVG(jgraph);
+                }
             }
         });
 
@@ -327,21 +329,25 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             @Override
             protected void createBufferedImage(int width, int height) {
                 try {
-                    super.createBufferedImage(width, height);
+                    if (jgraph != null) {
+                        super.createBufferedImage(width, height);
+                    }
                 } catch (IllegalArgumentException e) {
-                    showUnableMessage();
+                    unableToDrawGraph();
                 }
             }
 
             @Override
             public String getToolTipText(MouseEvent e) {
-                DefaultGraphCell cell = (DefaultGraphCell) jgraph.getFirstCellForLocation(e.getPoint().x, e.getPoint().y);
-                if (cell != null) {
-                    Object userObject = cell.getUserObject();
-                    if (userObject instanceof GraphNode) {
-                        return ((GraphNode) userObject).getSID();
-                    } else if (userObject instanceof GraphEdge) {
-                        return ((GraphEdge) userObject).getSource().getSID() + " : " + ((GraphEdge) userObject).getTarget().getSID();
+                if (jgraph != null) {
+                    DefaultGraphCell cell = (DefaultGraphCell) jgraph.getFirstCellForLocation(e.getPoint().x, e.getPoint().y);
+                    if (cell != null) {
+                        Object userObject = cell.getUserObject();
+                        if (userObject instanceof GraphNode) {
+                            return ((GraphNode) userObject).getSID();
+                        } else if (userObject instanceof GraphEdge) {
+                            return ((GraphEdge) userObject).getSource().getSID() + " : " + ((GraphEdge) userObject).getTarget().getSID();
+                        }
                     }
                 }
                 return null;
@@ -388,13 +394,15 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
     
     private void zoom(int iterations) {
-        if (iterations == 0) {
-            latestScale = 1;
-        } else {
-            double scale = jgraph.getScale();
-            latestScale = scale - (scale * iterations * 0.05);
+        if (jgraph != null) {
+            if (iterations == 0) {
+                latestScale = 1;
+            } else {
+                double scale = jgraph.getScale();
+                latestScale = scale - (scale * iterations * 0.05);
+            }
+            jgraph.setScale(latestScale);
         }
-        jgraph.setScale(latestScale);    
     }
 
     private boolean changeLayout(boolean update) {
@@ -457,7 +465,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             });
 
         } catch (IllegalArgumentException e) {
-            showUnableMessage();
+            unableToDrawGraph();
             return false;
         }
 
@@ -476,14 +484,16 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     public void scrollToNode(final GraphNode node) {
         try {
-            DefaultGraphCell vertexCell = m_jgAdapter.getVertexCell(node);
-            if (vertexCell != null) {
-                Rectangle bounds = jgraph.getCellBounds(vertexCell).getBounds();
-                scrollPane.getHorizontalScrollBar().setValue(Math.min(bounds.x - 50, scrollPane.getHorizontalScrollBar().getMaximum()));
-                scrollPane.getVerticalScrollBar().setValue(Math.min(bounds.y - 50, scrollPane.getVerticalScrollBar().getMaximum()));
+            if (jgraph != null) {
+                DefaultGraphCell vertexCell = m_jgAdapter.getVertexCell(node);
+                if (vertexCell != null) {
+                    Rectangle bounds = jgraph.getCellBounds(vertexCell).getBounds();
+                    scrollPane.getHorizontalScrollBar().setValue(Math.min(bounds.x - 50, scrollPane.getHorizontalScrollBar().getMaximum()));
+                    scrollPane.getVerticalScrollBar().setValue(Math.min(bounds.y - 50, scrollPane.getVerticalScrollBar().getMaximum()));
+                }
             }
         } catch (IllegalArgumentException e) {
-            showUnableMessage();
+            unableToDrawGraph();
         }
     }
 
@@ -645,7 +655,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         }
     }
 
-    private void showUnableMessage() {
+    private void unableToDrawGraph() {
+        jgraph = null;
+        
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
