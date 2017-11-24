@@ -1,7 +1,5 @@
 package com.lsfusion.design;
 
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Query;
@@ -19,11 +17,8 @@ import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormPropertyDrawUsageImpl;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 
-import javax.help.UnsupportedOperationException;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 
 public class DesignInfo {
@@ -34,33 +29,40 @@ public class DesignInfo {
     public DesignInfo(LSFFormDeclaration formDecl, LSFFile lsfFile) {
         this.formDecl = formDecl;
 
-        Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile);
-
-        List<LSFFormExtend> formExtends = new ArrayList<>(lsfFormExtends.findAll());
-        formExtends.sort(REQUIRES_COMPARATOR);
-
         FormEntity formEntity = new FormEntity(lsfFile);
 
-        for (LSFFormExtend formExtend : formExtends) {
-            formEntity.extendForm(formExtend);
+        Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile);
+        
+        Map<LSFElement, LSFModuleDeclaration> elementToModule = new HashMap<>();
+        for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {
+            LSFModuleDeclaration moduleDeclaration = formExtend.getLSFFile().getModuleDeclaration();
+            if (moduleDeclaration != null) {
+                elementToModule.put(formExtend, moduleDeclaration);
+            }
         }
+        
+        for (LSFElement formExtend : sortByModules(elementToModule)) {
+            formEntity.extendForm((LSFFormExtend) formExtend);
+        }
+
+        formView = DefaultFormView.create(formEntity);
 
         Collection<PsiReference> refs = ReferencesSearch.search(formDecl.getNameIdentifier(), lsfFile.getRequireScope()).findAll();
 
-        List<LSFFormUsage> formDesignUsages = new ArrayList<>();
+        elementToModule = new HashMap<>();
         for (PsiReference ref : refs) {
             if (ref instanceof LSFFormUsage) {
-                PsiElement parent = ((LSFFormUsage) ref).getParent();
-                if (parent instanceof LSFDesignHeader) {
-                    formDesignUsages.add((LSFFormUsage) ref);
+                LSFFormUsage formUsage = (LSFFormUsage) ref;
+                if (formUsage.getParent() instanceof LSFDesignHeader) {
+                    LSFModuleDeclaration moduleDeclaration = formUsage.getLSFFile().getModuleDeclaration();
+                    if (moduleDeclaration != null) {
+                        elementToModule.put(formUsage, moduleDeclaration);
+                    }
                 }
             }
         }
-        formDesignUsages.sort(REQUIRES_COMPARATOR);
-
-        formView = DefaultFormView.create(formEntity);
         
-        for (LSFFormUsage ref : formDesignUsages) {
+        for (LSFElement ref : sortByModules(elementToModule)) {
             LSFDesignHeader designHeader = (LSFDesignHeader) ref.getParent();
             if (designHeader.getCustomFormDesignOption() != null) {
                 formView = FormView.create(formEntity);
@@ -69,38 +71,35 @@ public class DesignInfo {
             processComponentBody(formView.getMainContainer(), designStatement.getComponentBody());
         }
     }
+    
+    private List<LSFElement> sortByModules(Map<LSFElement, LSFModuleDeclaration> elementToModule) {
+        List<LSFModuleDeclaration> sortedModules = new ArrayList<>();
+        processSorting(formDecl.getLSFFile().getModuleDeclaration(), new HashSet<>(elementToModule.values()), new HashSet<>(), sortedModules);
 
-    private static final Comparator<LSFElement> REQUIRES_COMPARATOR = new Comparator<LSFElement>() {
-        @Override
-        public int compare(LSFElement o1, LSFElement o2) {
-            LSFModuleDeclaration decl1 = o1.getLSFFile().getModuleDeclaration();
-            if (decl1 != null) {
-                LSFModuleDeclaration decl2 = o2.getLSFFile().getModuleDeclaration();
-                if (decl2 != null) {
-                    if (decl1.requires(decl2)) {
-                        return 1;
-                    } else if (decl2.requires(decl1)) {
-                        return -1;
-                    }
+        List<LSFElement> elementList = new ArrayList<>(elementToModule.keySet());
+        elementList.sort((o1, o2) -> {
+            assert o1 != null && o2 != null;
+            LSFModuleDeclaration module1 = elementToModule.get(o1);
+            LSFModuleDeclaration module2 = elementToModule.get(o2);
+            if (module1 != module2) {
+                return sortedModules.indexOf(module2) - sortedModules.indexOf(module1);
+            }
+            return o1.getTextOffset() - o2.getTextOffset();
+        });
+        return elementList;
+    }
+    
+    private void processSorting(LSFModuleDeclaration currentModule, Set<LSFModuleDeclaration> all, Set<LSFModuleDeclaration> visited, List<LSFModuleDeclaration> sorted) {
+        visited.add(currentModule);
+        for (LSFModuleDeclaration moduleDecl : all) {
+            if (!visited.contains(moduleDecl)) {
+                if (moduleDecl.requires(currentModule)) {
+                    processSorting(moduleDecl, all, visited, sorted);
                 }
             }
-
-            String name1;
-            String name2;
-
-            if (o1 instanceof LSFFormExtend && o2 instanceof LSFFormExtend) {
-                name1 = ((LSFFormExtend) o1).getGlobalName();
-                name2 = ((LSFFormExtend) o2).getGlobalName();
-            } else if (o1 instanceof LSFFormUsage && o2 instanceof LSFFormUsage) {
-                name1 = ((LSFFormUsage) o1).getNameRef();
-                name2 = ((LSFFormUsage) o2).getNameRef();
-            } else {
-                throw new UnsupportedOperationException("Uncomparable classes");
-            }
-
-            return StringUtil.naturalCompare(name1, name2);
         }
-    };
+        sorted.add(currentModule);
+    }
 
     public String getFormCaption() {
         return formView.getCaption();
