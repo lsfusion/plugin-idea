@@ -37,22 +37,26 @@ public class CompletionUtils {
     }
 
     public static LookupElement createLookupElement(LSFDeclaration declaration, double priority) {
-        return createLookupElement(declaration.getDeclName(), declaration, "", "", declaration.getLSFFile().getName(), declaration.getIcon(0), priority);
+        String declName = declaration.getDeclName();
+        if (declName != null) {
+            return createLookupElement(declName, declaration, "", "", declaration.getLSFFile().getName(), declaration.getIcon(0), priority);
+        }
+        return null;
     }
 
-    public static LookupElement createLookupElement(String lookupString, PsiElement lookupObject, String additionalIdInfo, String additionalInfo, String typeText, Icon icon, double priority) {
+    public static LookupElement createLookupElement(@NotNull String lookupString, PsiElement lookupObject, String additionalIdInfo, String additionalInfo, String typeText, Icon icon, double priority) {
         return createLookupElement(lookupString, lookupObject, additionalIdInfo, additionalInfo, typeText, icon, priority, null, false, null);
     }
 
-    public static LookupElement createLookupElement(String lookupString, double priority, boolean bold, InsertHandler insertHandler) {
+    public static LookupElement createLookupElement(@NotNull String lookupString, double priority, boolean bold, InsertHandler insertHandler) {
         return createLookupElement(lookupString, null, null, null, priority, null, bold, insertHandler);
     }
 
-    public static LookupElement createLookupElement(String lookupString, String additionalInfo, String typeText, Icon icon, double priority, TailType tailType, boolean bold, InsertHandler insertHandler) {
+    public static LookupElement createLookupElement(@NotNull String lookupString, String additionalInfo, String typeText, Icon icon, double priority, TailType tailType, boolean bold, InsertHandler insertHandler) {
         return createLookupElement(lookupString, null, additionalInfo, "", typeText, icon, priority, tailType, bold, insertHandler);
     }
 
-    public static LookupElement createLookupElement(String lookupString, PsiElement lookupObject, String additionalIdInfo, String additionalInfo, String typeText, Icon icon, double priority, TailType tailType, boolean bold, InsertHandler insertHandler) {
+    public static LookupElement createLookupElement(@NotNull String lookupString, PsiElement lookupObject, String additionalIdInfo, String additionalInfo, String typeText, Icon icon, double priority, TailType tailType, boolean bold, InsertHandler insertHandler) {
 //        lookupObject = null;
         LookupElementBuilder elementBuilder;
         if (lookupObject != null) {
@@ -114,9 +118,10 @@ public class CompletionUtils {
                             }
                         }
                         if (add) {
-                            result.add(
-                                    createLookupElement(declaration, priority)
-                            );
+                            LookupElement lookupElement = createLookupElement(declaration, priority);
+                            if (lookupElement != null) {
+                                result.add(lookupElement);
+                            }
                         }
                     }
                 }

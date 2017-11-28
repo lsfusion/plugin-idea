@@ -351,7 +351,9 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private void addLookupElement(LookupElement lookupElement) {
-            result.addElement(lookupElement);
+            if (lookupElement != null) {
+                result.addElement(lookupElement);
+            }
         }
 
         private void addLookupElements(List<LookupElement> lookupElements) {
