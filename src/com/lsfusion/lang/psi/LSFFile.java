@@ -43,6 +43,11 @@ public class LSFFile extends PsiFileImpl implements ModifyParamContext {
     }
 
     @Override
+    public boolean isWritable() {
+        return true; // фиксили IncorrectOperationException: Cannot modify a read-only file на разворачивании метакодов
+    }
+
+    @Override
     public void accept(@NotNull PsiElementVisitor visitor) {
         visitor.visitFile(this);
     }
