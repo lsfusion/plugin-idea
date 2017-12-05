@@ -615,6 +615,7 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    formActionPropertyDefinitionBody
                                       	|	    printActionPropertyDefinitionBody
                                       	|	    exportActionPropertyDefinitionBody
+                                      	|       exportDataActionPropertyDefinitionBody // should be after export
                                       	|	    messageActionPropertyDefinitionBody
                                       	|	    asyncUpdateActionPropertyDefinitionBody
                                       	|	    seekObjectActionPropertyDefinitionBody
@@ -741,10 +742,30 @@ exportActionPropertyDefinitionBody ::=
         )
         staticDestination?
         {
-    pin = 1
+    pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl]
 }
+
+exportDataActionPropertyDefinitionBody ::=
+	    EXPORT
+        (   XML
+        |   JSON
+        |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
+        |   (DBF (CHARSET stringLiteral)?)
+        )
+        FROM nonEmptyAliasedPropertyExpressionList
+        (WHERE propertyExpression)?
+        staticDestination
+        {
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses]
+}
+
+nonEmptyAliasedPropertyExpressionList ::= aliasedPropertyExpression (COMMA aliasedPropertyExpression)* 
+        
+aliasedPropertyExpression ::= (ID EQUALS)? propertyExpression  
 
 formActionObjectList ::= OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)* {pin(".*") = 1}
 

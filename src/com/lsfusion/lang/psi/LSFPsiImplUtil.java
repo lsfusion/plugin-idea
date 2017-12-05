@@ -294,6 +294,26 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(sourceStatement);
     }
 
+    private static List<LSFPropertyExpression> getContextExprs(@NotNull LSFExportDataActionPropertyDefinitionBody sourceStatement) {
+        List<LSFPropertyExpression> result = new ArrayList<>();
+        LSFNonEmptyAliasedPropertyExpressionList neList = sourceStatement.getNonEmptyAliasedPropertyExpressionList();
+        if(neList != null)                
+            for(LSFAliasedPropertyExpression ape : neList.getAliasedPropertyExpressionList())
+                result.add(ape.getPropertyExpression());
+        LSFPropertyExpression where = sourceStatement.getPropertyExpression();
+        if(where != null)
+            result.add(where);
+        return result;
+    }
+
+    public static ContextModifier getContextModifier(@NotNull LSFExportDataActionPropertyDefinitionBody sourceStatement) {
+        return new ExprsContextModifier(getContextExprs(sourceStatement));
+    }
+    
+    public static ContextInferrer getContextInferrer(@NotNull LSFExportDataActionPropertyDefinitionBody sourceStatement) {
+        return new ExprsContextInferrer(getContextExprs(sourceStatement));
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFChangeClassActionPropertyDefinitionBody sourceStatement) {
         return getContextModifier(sourceStatement.getExprParameterUsage());
     }
@@ -2763,6 +2783,20 @@ public class LSFPsiImplUtil {
         LSFActionPropertyDefinitionBody elseAction = body.getActionPropertyDefinitionBody();
         if (elseAction != null) {
             result = result.or(inferActionParamClasses(elseAction, params));    
+        }
+        return result;
+    }
+
+    public static Inferred inferActionParamClasses(LSFExportDataActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        // берем условия for, если есть, для остальных из внутреннего action'а 
+        LSFPropertyExpression expr = body.getPropertyExpression();
+        Inferred result = Inferred.EMPTY;
+        if (expr != null)
+            result = result.and(inferParamClasses(expr, null).filter(params));
+        LSFNonEmptyAliasedPropertyExpressionList npeList = body.getNonEmptyAliasedPropertyExpressionList();
+        if (npeList != null) {
+            for (LSFAliasedPropertyExpression pe : npeList.getAliasedPropertyExpressionList())
+                result = result.and(inferParamClasses(pe.getPropertyExpression(), null).filter(params));
         }
         return result;
     }

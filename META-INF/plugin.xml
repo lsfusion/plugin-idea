@@ -9,9 +9,10 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.111</b><br>
+        <b>Version 1.0.112</b><br>
         <ul>
             <li>Several fixes</li>
+            <li>Operator EXPORT support</li>
         </ul>
     ]]>
     </change-notes>
