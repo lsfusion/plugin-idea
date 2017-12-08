@@ -847,7 +847,7 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)?
 }
 
 fileActionPropertyDefinitionBody ::= OPEN propertyExpression (NAME propertyExpression)?
-                                   | SAVE propertyExpression (NAME propertyExpression)?
+                                   | SAVE propertyExpression ((NAME | PATH) propertyExpression)? NODIALOG?
 {
     pin(".*") = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"

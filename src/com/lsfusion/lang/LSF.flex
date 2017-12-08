@@ -285,6 +285,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NOCANCEL"                			{ return NOCANCEL; }
   "NOCHANGE"                			{ return NOCHANGE; }
   "NOCONSTRAINTFILTER"                  { return NOCONSTRAINTFILTER; }
+  "NODIALOG"                            { return NODIALOG; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOHEADER"                			{ return NOHEADER; }
   "NOT"                     			{ return NOT; }
@@ -306,6 +307,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "PANEL"                   			{ return PANEL; }
   "PARENT"                  			{ return PARENT; }
   "PARTITION"               			{ return PARTITION; }
+  "PATH"                                { return PATH; }
   "PDF"                     			{ return PDF; }
   "PERIOD"                              { return PERIOD; }    
   "PG"                                  { return PG; }    

@@ -13,6 +13,7 @@
         <ul>
             <li>Several fixes</li>
             <li>Operator EXPORT support</li>
+            <li>SAVE file (NAME | PATH)? NODIALOG?</li>
         </ul>
     ]]>
     </change-notes>
