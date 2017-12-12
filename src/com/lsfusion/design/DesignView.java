@@ -328,6 +328,7 @@ public class DesignView extends JPanel implements Disposable {
         ComponentTreeCellRenderer renderer = new ComponentTreeCellRenderer();
         CheckboxTreeBase.CheckPolicy policy = new CheckboxTreeBase.CheckPolicy(true, true, false, false);
         componentTree = new ComponentTree(renderer, rootNode, policy);
+        componentTree.setRootVisible(true);
         componentTree.expandRow(0);
         return new JBScrollPane(componentTree);
     }

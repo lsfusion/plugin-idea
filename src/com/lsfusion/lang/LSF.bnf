@@ -1647,7 +1647,7 @@ componentInsertPosition ::= (   insertRelativePositionLiteral componentSelector
 removeComponentStatement ::= REMOVE componentSelector SEMI {pin = 1}
 
 // GROUPOBJECT + TREE
-private componentSingleSelectorType ::=  BOX | PANEL | TOOLBARBOX | TOOLBARLEFT | TOOLBARRIGHT | TOOLBAR
+private componentSingleSelectorType ::=  BOX | OBJECTS | PANEL | TOOLBARBOX | TOOLBARLEFT | TOOLBARRIGHT | TOOLBAR
 groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID | SHOWTYPE
 globalSingleSelectorType ::= componentSingleSelectorType 
 

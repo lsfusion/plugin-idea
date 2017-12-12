@@ -307,6 +307,8 @@ public class DesignInfo {
             switch (componentSelector.getGlobalSingleSelectorType().getText()) {
                 case "BOX":
                     return FormView.getBoxSID();
+                case "OBJECTS": 
+                    return DefaultFormView.getObjectsSID();
                 case "PANEL":
                     return DefaultFormView.getPanelSID();
                 case "TOOLBARBOX":
