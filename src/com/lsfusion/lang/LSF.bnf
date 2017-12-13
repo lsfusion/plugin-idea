@@ -93,22 +93,22 @@ private statement ::=   constraintStatement
                     |	navigatorStatement
                     |	metaCodeStatement // ?
                     |	metaCodeDeclarationStatement // ?
-                    |   externalStatement
+                    |   internalStatement
                     |	emptyStatement
                     |   stubStatement
                     
-externalStatement ::= EXTERNAL (externalProperty | externalClass | externalModule | externalPropertyDraw | externalFormObject) SEMI {pin = 1}
-externalProperty ::= PROPERTY nonEmptyNoContextPropertyUsageList {pin = 1} 
-externalClass ::= CLASS nonEmptyClassNameList {pin = 1}
-externalModule ::= MODULE nonEmptyModuleUsageList {pin = 1}
-externalPropertyDraw ::= PROPERTYDRAW formUsage formPropertyDrawUsage
+internalStatement ::= INTERNAL (internalProperty | internalClass | internalModule | internalPropertyDraw | internalFormObject) SEMI {pin = 1}
+internalProperty ::= PROPERTY nonEmptyNoContextPropertyUsageList {pin = 1}
+internalClass ::= CLASS nonEmptyClassNameList {pin = 1}
+internalModule ::= MODULE nonEmptyModuleUsageList {pin = 1}
+internalPropertyDraw ::= PROPERTYDRAW formUsage formPropertyDrawUsage
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.FormContext"
     methods = [resolveFormDecl]
 }
 
-externalFormObject ::= OBJECT formUsage objectUsage
+internalFormObject ::= OBJECT formUsage objectUsage
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.FormContext"
@@ -125,7 +125,7 @@ stubStatement ::=
 
 private script_statement_recover ::= !statement_start
 // Important ! after recover the rule should mandatory be pinned (matched)
-private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT | EXTERNAL
+private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT | INTERNAL
                             | CLASS | ATSIGN | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
 
 

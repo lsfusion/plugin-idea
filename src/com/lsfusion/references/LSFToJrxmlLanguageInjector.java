@@ -110,7 +110,7 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
             
             boolean first = true;
             for (Injection injection : injections) {
-                String prefix = "\nEXTERNAL " + (injection.isObjRef ? "OBJECT " : "PROPERTYDRAW ") + formName + " ";
+                String prefix = "\nINTERNAL " + (injection.isObjRef ? "OBJECT " : "PROPERTYDRAW ") + formName + " ";
                 if (first) {
                     prefix = "MODULE " + LSFElementGenerator.genName + "; REQUIRE " + requresList + "; " + prefix;
                     first = false;

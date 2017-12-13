@@ -3285,13 +3285,13 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFExternalPropertyDraw externalPropertyDraw) {
-        return resolveFormDecl(externalPropertyDraw.getFormUsage());
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFInternalPropertyDraw internalPropertyDraw) {
+        return resolveFormDecl(internalPropertyDraw.getFormUsage());
     }
 
     @Nullable
-    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFExternalFormObject externalFormObject) {
-        return resolveFormDecl(externalFormObject.getFormUsage());
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFInternalFormObject internalFormObject) {
+        return resolveFormDecl(internalFormObject.getFormUsage());
     }
     
     @Nullable

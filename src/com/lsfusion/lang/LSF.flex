@@ -198,7 +198,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NEWEXECUTOR"                    		{ return NEWEXECUTOR; }
   "EXPORT"                    			{ return EXPORT; }
   "EXTEND"                  			{ return EXTEND; }
-  "EXTERNAL"                  			{ return EXTERNAL; }
   "FILE"                  			    { return FILE; }
   "FILTER"                  			{ return FILTER; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
@@ -243,6 +242,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "INIT"                    			{ return INIT; }
   "INLINE"                  			{ return INLINE; }
   "INPUT"                   			{ return INPUT; }
+  "INTERNAL"                            { return INTERNAL; }
   "IS"                      			{ return IS; }
   "JDBC"                  			    { return JDBC; }
   "JOIN"                    			{ return JOIN; }

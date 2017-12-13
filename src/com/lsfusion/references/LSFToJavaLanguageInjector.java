@@ -326,7 +326,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
         private void resolveModuleRefs(PsiReferenceExpression methodExpression, PsiLiteralExpression element, InjectedLanguagePlaces injectionPlacesRegistrar) {
             String methodName = methodExpression.getReferenceName();
             if (isOneOfStrings(methodName, GET_MODULE)) {
-                injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), "MODULE", "EXTERNAL MODULE ");
+                injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), "MODULE", "INTERNAL MODULE ");
             }
         }
 
@@ -526,7 +526,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
             } else
                 prefix = "PROPERTY";
 
-            injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), moduleName, "EXTERNAL " + prefix + " ");
+            injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), moduleName, "INTERNAL " + prefix + " ");
         }
 
         private String getModuleForActionClass(final @NotNull PsiClass clazz) {
