@@ -784,7 +784,7 @@ externalActionPropertyDefinitionBody ::= EXTERNAL externalType (BODY intLiteral)
     methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
-externalType ::=  DB stringLiteral (EXEC stringLiteral)?
+externalType ::=  SQL stringLiteral (EXEC stringLiteral)?
               |   HTTP stringLiteral
               |   LSF stringLiteral
               |   JAVA stringLiteral

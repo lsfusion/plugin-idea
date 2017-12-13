@@ -167,7 +167,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "CUSTOM"                  			{ return CUSTOM; }
   "CYCLES"                  			{ return CYCLES; }
   "DATA"                    			{ return DATA; }
-  "DB"                    			    { return DB; }
   "DBF"                    			    { return DBF; }
   "DEFAULT"                 			{ return DEFAULT; }
   "DEFAULTCOMPARE"                 	    { return DEFAULTCOMPARE; }
@@ -365,6 +364,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "SHEET"                  			    { return SHEET; }
   "SPLITH"                  			{ return SPLITH; }
   "SPLITV"                  			{ return SPLITV; }
+  "SQL"                       			{ return SQL; }
   "STEP"                    			{ return STEP; }
   "STRICT"                  			{ return STRICT; }
   "STRUCT"                  			{ return STRUCT; }
