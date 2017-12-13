@@ -127,6 +127,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "BACKGROUND"              			{ return BACKGROUND; }
   "BCC"                     			{ return BCC; }
   "BEFORE"                  			{ return BEFORE; }
+  "BODY"                                { return BODY; }
   "BOTTOM"                  			{ return BOTTOM; }
   "BOX"                  			    { return BOX; }
   "BREAK"                   			{ return BREAK; }
@@ -166,6 +167,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "CUSTOM"                  			{ return CUSTOM; }
   "CYCLES"                  			{ return CYCLES; }
   "DATA"                    			{ return DATA; }
+  "DB"                    			    { return DB; }
   "DBF"                    			    { return DBF; }
   "DEFAULT"                 			{ return DEFAULT; }
   "DEFAULTCOMPARE"                 	    { return DEFAULTCOMPARE; }
@@ -195,6 +197,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "EXCEPTLAST"              			{ return EXCEPTLAST; }
   "EXCLUSIVE"               			{ return EXCLUSIVE; }
   "EXEC"                    			{ return EXEC; }
+  "EXTERNAL"                            { return EXTERNAL; }
   "NEWEXECUTOR"                    		{ return NEWEXECUTOR; }
   "EXPORT"                    			{ return EXPORT; }
   "EXTEND"                  			{ return EXTEND; }
@@ -232,6 +235,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "HINTTABLE"               			{ return HINTTABLE; }
   "HORIZONTAL"              			{ return HORIZONTAL; }
   "HTML"                    			{ return HTML; }
+  "HTTP"                    			{ return HTTP; }
   "IF"                      			{ return IF; }
   "IMAGE"                   			{ return IMAGE; }
   "IMPORT"                   			{ return IMPORT; }
@@ -244,6 +248,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "INPUT"                   			{ return INPUT; }
   "INTERNAL"                            { return INTERNAL; }
   "IS"                      			{ return IS; }
+  "JAVA"                  			    { return JAVA; }
   "JDBC"                  			    { return JDBC; }
   "JOIN"                    			{ return JOIN; }
   "JSON"                    			{ return JSON; }
@@ -254,6 +259,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "LOADFILE"                			{ return LOADFILE; }
   "LOCAL"                   			{ return LOCAL; }
   "LOGGABLE"                			{ return LOGGABLE; }
+  "LSF"                    			    { return LSF; }
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "NOMANAGESESSION"                     { return NOMANAGESESSION; }
   "MAX"                     			{ return MAX; }

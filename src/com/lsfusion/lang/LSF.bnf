@@ -230,7 +230,8 @@ propertyStatement ::= propertyDeclaration equalsSign
 propertyCalcStatement ::= (expressionUnfriendlyPD | propertyExpression)
 
 actionUnfriendlyPD ::= (abstractActionPropertyDefinition
-                        |	customActionPropertyDefinitionBody)
+                        |	customActionPropertyDefinitionBody
+                        |   externalActionPropertyDefinitionBody)
 {
     methods = [ resolveValueParamClasses]
 }
@@ -775,6 +776,18 @@ customActionPropertyDefinitionBody ::= CUSTOM ((javaClassStringUsage (LBRAC clas
     implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
+
+externalActionPropertyDefinitionBody ::= EXTERNAL externalType (BODY intLiteral)? (TO nonEmptyPropertyUsageList)?
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
+    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
+}
+
+externalType ::=  DB stringLiteral (EXEC stringLiteral)?
+              |   HTTP stringLiteral
+              |   LSF stringLiteral
+              |   JAVA stringLiteral
 
 javaClassStringUsage ::= stringLiteral
 {

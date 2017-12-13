@@ -1095,6 +1095,11 @@ public class LSFPsiImplUtil {
         return null;
     }
 
+    @Nullable
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFExternalActionPropertyDefinitionBody sourceStatement, boolean infer) {
+        return null;
+    }
+
     private static InferExResult inferGroupParamClasses(LSFGroupPropertyDefinition sourceStatement) {
         Inferred result = Inferred.EMPTY;
         for (LSFPropertyExpression expr : getContextExprs(sourceStatement))
@@ -1308,6 +1313,10 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFExternalActionPropertyDefinitionBody sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -1635,6 +1644,10 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
+    public static List<String> getValuePropertyNames(@NotNull LSFExternalActionPropertyDefinitionBody sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
     public static List<String> getValuePropertyNames(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
@@ -1829,6 +1842,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFExternalActionPropertyDefinitionBody sourceStatement) {
+        return null;
+    }
+
+    @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
@@ -1915,6 +1933,11 @@ public class LSFPsiImplUtil {
         LSFClassNameList classNameList = sourceStatement.getClassNameList();
         if(classNameList != null)
             return getClassNameRefs(classNameList);
+        return null;
+    }
+
+    @Nullable
+    public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFExternalActionPropertyDefinitionBody sourceStatement) {
         return null;
     }
 
