@@ -777,7 +777,7 @@ customActionPropertyDefinitionBody ::= CUSTOM ((javaClassStringUsage (LBRAC clas
     methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
-externalActionPropertyDefinitionBody ::= EXTERNAL externalType (BODY intLiteral)? (TO nonEmptyPropertyUsageList)?
+externalActionPropertyDefinitionBody ::= EXTERNAL externalType (TO nonEmptyPropertyUsageList)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
@@ -785,7 +785,7 @@ externalActionPropertyDefinitionBody ::= EXTERNAL externalType (BODY intLiteral)
 }
 
 externalType ::=  SQL stringLiteral (EXEC stringLiteral)?
-              |   HTTP stringLiteral
+              |   HTTP stringLiteral (BODY intLiteral)?
               |   LSF stringLiteral
               |   JAVA stringLiteral
 
