@@ -14,7 +14,6 @@
             <li>Several fixes</li>
             <li>Operator EXPORT support</li>
             <li>SAVE file (NAME | PATH)? NODIALOG?</li>
-            <li>OBJECTS container support</li>
             <li>Operator EXTERNAL support</li>
         </ul>
     ]]>

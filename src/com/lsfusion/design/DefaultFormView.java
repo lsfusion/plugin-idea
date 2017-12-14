@@ -15,7 +15,6 @@ import java.util.Map;
 
 public class DefaultFormView extends FormView {
 
-    public ContainerView objectsContainer;
     public ContainerView formButtonContainer;
     public ContainerView noGroupPanelContainer;
     public ContainerView noGroupPanelPropsContainer;
@@ -37,7 +36,6 @@ public class DefaultFormView extends FormView {
         setComponentSID(formSet.getNoGroupPanelContainer(), formSet.getNoGroupPanelContainer().getSID());
         setComponentSID(formSet.getNoGroupPanelPropsContainer(), formSet.getNoGroupPanelPropsContainer().getSID());
 
-        objectsContainer = formSet.getObjectsContainer();
         formButtonContainer = formSet.getFormButtonContainer();
         noGroupPanelContainer = formSet.getNoGroupPanelContainer();
         noGroupPanelPropsContainer = formSet.getNoGroupPanelPropsContainer();
@@ -99,10 +97,6 @@ public class DefaultFormView extends FormView {
 
     public static String getNoGroupObjectSID(String pgName) {
         return FormContainerSet.GROUP_CONTAINER + "(" + pgName + ")";
-    }
-
-    public static String getObjectsSID() {
-        return FormContainerSet.OBJECTS_CONTAINER;
     }
 
     public static String getToolbarBoxSID() {
@@ -220,7 +214,7 @@ public class DefaultFormView extends FormView {
     public void addGroupObjectView(GroupObjectView goView) {
         GroupObjectContainerSet set = GroupObjectContainerSet.create(goView, containerFactory);
 
-        objectsContainer.add(set.getBoxContainer());
+        mainContainer.add(set.getBoxContainer());
 
         registerComponent(set.getBoxContainer(), boxContainers, goView);
         registerComponent(set.getGridBoxContainer(), gridBoxContainers, goView);
@@ -258,7 +252,7 @@ public class DefaultFormView extends FormView {
         registerComponent(treeSet.getToolbarPropsContainer(), toolbarPropsContainers, treeGroup);
 
         //вставляем перед первым groupObject в данной treeGroup
-        objectsContainer.addBefore(treeSet.getBoxContainer(), boxContainers.get(mgroupObjects.get(treeGroup.entity.groups.get(0))));
+        mainContainer.addBefore(treeSet.getBoxContainer(), boxContainers.get(mgroupObjects.get(treeGroup.entity.groups.get(0))));
     }
 
     public void addPropertyDrawView(PropertyDrawView propertyDraw) {

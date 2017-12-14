@@ -7,7 +7,6 @@ import com.lsfusion.design.ui.FlexAlignment;
 
 public class FormContainerSet {
     public static final String BOX_CONTAINER = "BOX";
-    public static final String OBJECTS_CONTAINER = "OBJECTS";
     public static final String TOOLBARBOX_CONTAINER = "TOOLBARBOX";
     public static final String TOOLBARLEFT_CONTAINER = "TOOLBARLEFT";
     public static final String TOOLBARRIGHT_CONTAINER = "TOOLBARRIGHT";
@@ -18,7 +17,6 @@ public class FormContainerSet {
     public static final String FUNCTIONSIN_CONTAINER = "functions.";
 
     private ContainerView mainContainer;
-    private ContainerView objectsContainer;
     private ContainerView formButtonContainer;
     private ContainerView noGroupPanelContainer;
     private ContainerView noGroupPanelPropsContainer;
@@ -26,10 +24,6 @@ public class FormContainerSet {
 
     public ContainerView getMainContainer() {
         return mainContainer;
-    }
-    
-    public ContainerView getObjectsContainer() {
-        return objectsContainer;
     }
 
     public ContainerView getFormButtonContainer() {
@@ -55,9 +49,6 @@ public class FormContainerSet {
         set.mainContainer = form.getMainContainer();
         set.mainContainer.setType(ContainerType.CONTAINERV);
 //        set.mainContainer.setDescription(getString("form.layout.main.container"));
-        
-        set.objectsContainer = form.containerFactory.createContainer();
-        set.objectsContainer.setSID(DefaultFormView.getObjectsSID());
 
         set.formButtonContainer = contFactory.createContainer();
 //        set.formButtonContainer.setDescription(getString("form.layout.service.buttons"));
@@ -72,12 +63,8 @@ public class FormContainerSet {
         set.mainContainer.setChildrenAlignment(Alignment.LEADING);
         set.mainContainer.setFlex(1);
         set.mainContainer.setAlignment(FlexAlignment.STRETCH);
-        set.mainContainer.add(set.objectsContainer);
         set.mainContainer.add(set.noGroupPanelContainer);
         set.mainContainer.add(set.formButtonContainer);
-        
-        set.objectsContainer.setFlex(1);
-        set.objectsContainer.setAlignment(FlexAlignment.STRETCH);
 
         set.formButtonContainer.setType(ContainerType.CONTAINERH);
         set.formButtonContainer.setAlignment(FlexAlignment.STRETCH);
