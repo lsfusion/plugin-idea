@@ -9,12 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.112</b><br>
+        <b>Version 1.0.113</b><br>
         <ul>
-            <li>Several fixes</li>
-            <li>Operator EXPORT support</li>
-            <li>SAVE file (NAME | PATH)? NODIALOG?</li>
-            <li>Operator EXTERNAL support</li>
+            <li>EVAL pe [OBJECTS peList]</li>
         </ul>
     ]]>
     </change-notes>

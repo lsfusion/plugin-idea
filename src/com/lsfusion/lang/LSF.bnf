@@ -881,7 +881,7 @@ deleteActionPropertyDefinitionBody ::= DELETE exprParameterUsage (WHERE property
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-evalActionPropertyDefinitionBody ::= EVAL propertyExpression
+evalActionPropertyDefinitionBody ::= EVAL propertyExpression (OBJECTS propertyExpressionList)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
