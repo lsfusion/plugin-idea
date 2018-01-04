@@ -13,10 +13,12 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.lsfusion.LSFBundle;
@@ -25,6 +27,7 @@ import com.lsfusion.module.run.LSFusionRunConfiguration;
 import com.lsfusion.module.run.LSFusionRunConfigurationType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jps.model.java.JavaResourceRootType;
 
 import javax.swing.*;
 import java.io.*;
@@ -128,12 +131,14 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
         return new LSFusionLibrarySettingsStep(this, settingsStep);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
         super.setupRootModel(rootModel);
 
         Project project = rootModel.getProject();
         final String contentEntryPath = getContentEntryPath();
+        
         if (contentEntryPath != null) {
             if (createSettingsFile) {
                 File settingsFile = new File(contentEntryPath, SETTINGS_FILE);
@@ -161,13 +166,52 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
             }
 
             List<Pair<String, String>> sourcePaths = getSourcePaths();
+            LocalFileSystem localFileSystem = LocalFileSystem.getInstance();
             if (!sourcePaths.isEmpty()) {
                 Properties properties = new Properties();
                 properties.put("NAME", MAIN_LSF_NAME);
-                createFromTemplateAndOpen(project, TEMPLATE_LSFUSION_SCRIPT, new File(sourcePaths.iterator().next().first, MAIN_LSF_FILE), properties);
+                String srcPath = sourcePaths.iterator().next().first;
+                String mainPath = srcPath + "/main";
+                
+                String javaPath = mainPath + "/java";
+                new File(javaPath).mkdirs();
+                
+                String lsfusionPath = mainPath + "/lsfusion";
+                File lsfusionDir = new File(lsfusionPath);
+                
+                String resourcesPath = mainPath + "/resources";
+                new File(resourcesPath).mkdirs();
+
+                String testPath = srcPath + "/test";
+                new File(testPath).mkdirs();
+                
+                new File(lsfusionDir, "reports").mkdirs();
+                
+                ContentEntry contentEntry = doAddContentEntry(rootModel);
+                if (contentEntry != null) {
+                    contentEntry.clearSourceFolders();
+                    
+                    VirtualFile lsfusionVirtualFile = localFileSystem.refreshAndFindFileByPath(FileUtil.toSystemIndependentName(lsfusionPath));
+                    if (lsfusionVirtualFile != null) {
+                        contentEntry.addSourceFolder(lsfusionVirtualFile, false);
+                    }
+                    VirtualFile javaVirtualFile = localFileSystem.refreshAndFindFileByPath(FileUtil.toSystemIndependentName(javaPath));
+                    if (javaVirtualFile != null) {
+                        contentEntry.addSourceFolder(javaVirtualFile, false);
+                    }
+                    VirtualFile testVirtualFile = localFileSystem.refreshAndFindFileByPath(FileUtil.toSystemIndependentName(testPath));
+                    if (testVirtualFile != null) {
+                        contentEntry.addSourceFolder(testVirtualFile, true);
+                    }
+                    VirtualFile resourcesVirtualFile = localFileSystem.refreshAndFindFileByPath(FileUtil.toSystemIndependentName(resourcesPath));
+                    if (resourcesVirtualFile != null) {
+                        contentEntry.addSourceFolder(resourcesVirtualFile, JavaResourceRootType.RESOURCE);
+                    }
+                }
+                createFromTemplateAndOpen(project, TEMPLATE_LSFUSION_SCRIPT, new File(lsfusionDir, MAIN_LSF_FILE), properties);
             }
 
-            LocalFileSystem.getInstance().refresh(true);
+            localFileSystem.refresh(true);
         }
     }
 
