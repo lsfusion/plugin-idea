@@ -786,6 +786,7 @@ externalActionPropertyDefinitionBody ::= EXTERNAL externalType (TO nonEmptyPrope
 
 externalType ::=  SQL stringLiteral (EXEC stringLiteral)?
               |   HTTP stringLiteral (BODY intLiteral)?
+              |   DBF stringLiteral APPEND propertyUsage (CHARSET stringLiteral)?
               |   LSF stringLiteral
               |   JAVA stringLiteral
 

@@ -117,6 +117,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "AGGR"                    			{ return AGGR; }
   "NAGGR"                    			{ return NAGGR; }
   "AND"                     			{ return AND; }
+  "APPEND"                   			{ return APPEND; }
   "APPLY"                   			{ return APPLY; }
   "AS"                      			{ return AS; }
   "ASON"                      			{ return ASON; }
