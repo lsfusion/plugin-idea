@@ -12,7 +12,6 @@ public abstract class LSFPropertyDrawMappedDeclarationImpl extends LSFPropertyDr
         super(node);
     }
 
-    @NotNull
     protected abstract LSFFormPropertyObject getFormPropertyObject();
 
     @Nullable
@@ -35,7 +34,6 @@ public abstract class LSFPropertyDrawMappedDeclarationImpl extends LSFPropertyDr
         return formPropertyObject.getObjectUsageList();
     }
 
-    @NotNull
     public LSFFormPropertyName getFormPropertyName() {
         LSFFormPropertyObject formPropertyObject = getFormPropertyObject();
         if(formPropertyObject == null)

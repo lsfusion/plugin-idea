@@ -13,6 +13,8 @@
         <ul>
             <li>EVAL pe [OBJECTS peList]</li>
             <li>new directory structure for new project</li>
+            <li>EXTERNAL DBF</li>
+            <li>notnull fix</li>
         </ul>
     ]]>
     </change-notes>
