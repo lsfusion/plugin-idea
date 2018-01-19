@@ -128,7 +128,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "BACKGROUND"              			{ return BACKGROUND; }
   "BCC"                     			{ return BCC; }
   "BEFORE"                  			{ return BEFORE; }
-  "BODY"                                { return BODY; }
   "BOTTOM"                  			{ return BOTTOM; }
   "BOX"                  			    { return BOX; }
   "BREAK"                   			{ return BREAK; }
@@ -322,6 +321,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "PREV"                    			{ return PREV; }
   "PREVIEW"                    			{ return PREVIEW; }
   "NOPREVIEW"                  			{ return NOPREVIEW; }
+  "PARAMS"                   			{ return PARAMS; }
   "PRINT"                   			{ return PRINT; }
   "PRIORITY"                			{ return PRIORITY; }
   "PROPERTIES"              			{ return PROPERTIES; }

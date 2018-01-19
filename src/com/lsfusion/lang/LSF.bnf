@@ -231,7 +231,7 @@ propertyCalcStatement ::= (expressionUnfriendlyPD | propertyExpression)
 
 actionUnfriendlyPD ::= (abstractActionPropertyDefinition
                         |	customActionPropertyDefinitionBody
-                        |   externalActionPropertyDefinitionBody)
+                        )
 {
     methods = [ resolveValueParamClasses]
 }
@@ -630,6 +630,7 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    importFormActionPropertyDefinitionBody
                                       	|	    activeFormActionPropertyDefinitionBody
                                       	|	    activateActionPropertyDefinitionBody
+                                      	|       externalActionPropertyDefinitionBody
 
 private mappedForm ::= ((   (LIST | EDIT) customClassUsage formSingleActionObject)
                         |   (formUsage formActionObjectList?) ) {pin(".*") = 1 }
@@ -754,10 +755,12 @@ exportDataActionPropertyDefinitionBody ::=
         |   JSON
         |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
         |   (DBF (CHARSET stringLiteral)?)
-        )
+        |   LIST
+        |   JDBC
+        )?
         FROM nonEmptyAliasedPropertyExpressionList
         (WHERE propertyExpression)?
-        staticDestination
+        staticDestination?
         {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ExtendParamContext"
@@ -777,18 +780,21 @@ customActionPropertyDefinitionBody ::= CUSTOM ((javaClassStringUsage (LBRAC clas
     methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
-externalActionPropertyDefinitionBody ::= EXTERNAL externalType (TO nonEmptyPropertyUsageList)?
+externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyPropertyExpressionList)? (TO nonEmptyPropertyUsageList)?
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+//    implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
+//    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
-externalType ::=  SQL stringLiteral (EXEC stringLiteral)?
-              |   HTTP stringLiteral (BODY intLiteral)?
-              |   DBF stringLiteral APPEND propertyUsage (CHARSET stringLiteral)?
-              |   LSF stringLiteral
-              |   JAVA stringLiteral
+private externalType ::=  SQL propertyExpression EXEC propertyExpression
+              |   HTTP propertyExpression
+              |   DBF propertyExpression APPEND (CHARSET stringLiteral)?
+              |   LSF propertyExpression (EXEC | EVAL) propertyExpression
+              |   JAVA propertyExpression
+              {pin(".*") = 1}
 
 javaClassStringUsage ::= stringLiteral
 {
@@ -882,7 +888,7 @@ deleteActionPropertyDefinitionBody ::= DELETE exprParameterUsage (WHERE property
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-evalActionPropertyDefinitionBody ::= EVAL propertyExpression (OBJECTS propertyExpressionList)?
+evalActionPropertyDefinitionBody ::= EVAL propertyExpression (PARAMS propertyExpressionList)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1031,6 +1037,7 @@ private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | C
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPEN
                                             | READ | REQUEST | INPUT | RETURN | SAVE | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
+                                            | EXTERNAL
                                             | ID // pinned with execActionPropertyDefinitionBody
                                             | SEMI
                                             | LBRACE

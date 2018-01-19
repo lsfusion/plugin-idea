@@ -3124,6 +3124,20 @@ public class LSFPsiImplUtil {
         return Inferred.orClasses(list);
     }
 
+    public static Inferred inferActionParamClasses(LSFExternalActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        List<Inferred> list = new ArrayList<>();
+        
+        for(LSFPropertyExpression pe : body.getPropertyExpressionList())
+            list.add(inferParamClasses(pe, LSFExClassSet.text).filter(params));
+
+        LSFNonEmptyPropertyExpressionList exParams = body.getNonEmptyPropertyExpressionList();
+        if(exParams != null)
+            for(LSFPropertyExpression pe : exParams.getPropertyExpressionList())
+                list.add(inferParamClasses(pe, LSFExClassSet.text).filter(params));
+
+        return Inferred.orClasses(list);
+    }
+
     public static Inferred inferActionParamClasses(LSFFileActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return inferExpressionParamClasses(body.getPropertyExpressionList().get(0), null).filter(params);
     }

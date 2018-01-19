@@ -11,11 +11,12 @@
     <change-notes><![CDATA[
         <b>Version 1.0.113</b><br>
         <ul>
-            <li>EVAL pe [OBJECTS peList]</li>
+            <li>EVAL pe [PARAMS peList]</li>
             <li>new directory structure for new project</li>
             <li>EXTERNAL DBF</li>
             <li>notnull fix</li>
             <li>IMPORT XML LIST</li>
+            <li>EXTERNAL operator has been made context-dependent</li>
         </ul>
     ]]>
     </change-notes>
