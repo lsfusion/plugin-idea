@@ -87,7 +87,7 @@ public class GroupObjectContainerSet {
         set.panelContainer.setSID(DefaultFormView.getPanelSID(sid));
 
         set.panelPropsContainer = factory.createContainer();
-        set.panelPropsContainer.setSID(GROUP_CONTAINER + "(" + sid + "," + ")");
+        set.panelPropsContainer.setSID(GROUP_CONTAINER + "(," + sid + ")");
 
         set.controlsContainer = factory.createContainer();
 //        set.controlsContainer.setDescription(getString("form.layout.control.objects"));

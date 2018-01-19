@@ -124,7 +124,7 @@ public class DefaultFormView extends FormView {
             propertyGroupSID = "";
         if(groupObjectSID == null)
             return getNoGroupObjectSID(propertyGroupSID);
-        return GroupObjectContainerSet.GROUP_CONTAINER + "(" + groupObjectSID + "," + propertyGroupSID + ")";
+        return GroupObjectContainerSet.GROUP_CONTAINER + "(" + propertyGroupSID + "," + groupObjectSID + ")";
     }
 
     private String getPropertyGroupContainerSID(PropertyDrawView propertyDraw, AbstractGroup propertyGroup) {

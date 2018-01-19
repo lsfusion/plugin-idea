@@ -73,7 +73,7 @@ public class TreeGroupContainerSet {
         set.panelContainer.setSID(DefaultFormView.getPanelSID(sid));
 
         set.panelPropsContainer = factory.createContainer();
-        set.panelPropsContainer.setSID(GroupObjectContainerSet.GROUP_CONTAINER + "(" + sid + "," + ")");
+        set.panelPropsContainer.setSID(GroupObjectContainerSet.GROUP_CONTAINER + "(," + sid + ")");
         
         set.controlsContainer = factory.createContainer();
 //        set.controlsContainer.setDescription(getString("form.layout.control.objects"));
