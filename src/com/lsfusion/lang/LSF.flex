@@ -147,6 +147,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "CHECKED"                 			{ return CHECKED; }
   "CLASS"                   			{ return CLASS; }
   "CLASSCHOOSER"                   		{ return CLASSCHOOSER; }
+  "CLIENT"                   		    { return CLIENT; }
   "CLOSE"                   			{ return CLOSE; }
   "COLUMNS"                 			{ return COLUMNS; }
   "COMPLEX"                 			{ return COMPLEX; }

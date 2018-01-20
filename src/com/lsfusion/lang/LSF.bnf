@@ -895,7 +895,7 @@ evalActionPropertyDefinitionBody ::= EVAL propertyExpression (PARAMS propertyExp
     methods = [inferActionParamClasses]
 }
 
-readActionPropertyDefinitionBody ::= READ propertyExpression TO propertyUsage ((MOVE propertyExpression) | (DELETE))?
+readActionPropertyDefinitionBody ::= READ CLIENT? propertyExpression TO propertyUsage ((MOVE propertyExpression) | (DELETE))?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
