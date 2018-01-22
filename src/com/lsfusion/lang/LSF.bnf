@@ -751,7 +751,7 @@ exportActionPropertyDefinitionBody ::=
 
 exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
-        (   XML
+        (   XML (LIST|TABLE)?
         |   JSON
         |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
         |   (DBF (CHARSET stringLiteral)?)
