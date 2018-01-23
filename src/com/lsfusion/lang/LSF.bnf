@@ -1574,20 +1574,38 @@ dockPosition ::= POSITION LBRAC intLiteral COMMA intLiteral COMMA intLiteral COM
 navigatorStatement ::= NAVIGATOR navigatorElementStatementBody {pin=1 methods = [ getIcon ]}
 
 navigatorElementStatementBody ::=   (   LBRACE
-                                        (	addNavigatorElementStatement
-                                        |	newNavigatorElementStatement
-                                        |	setupNavigatorElementStatement
-                                        |	emptyStatement
-                                        )*
+                                        navigatorElementBodyStatement*
                                         RBRACE
-                                    ) | emptyStatement
+                                    ) 
+                                    |   emptyStatement
 
-addNavigatorElementStatement ::= ADD navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
+navigatorElementBodyStatement ::= (     moveNavigatorElementStatement
+                                  |     setupNavigatorElementStatement
+                                  |     newNavigatorElementStatement
+                                  |     emptyStatement
+                                  |     neStub
+                                  )
+{
+    recoverWhile = "ne_statement_recover"
+}
+
+neStub ::= NEW ID SEMI
+{
+    pin = 1
+} 
+
+private ne_statement_recover ::= !(ADD | MOVE | NEW | SEMI | RBRACE | ID) 
+
+moveNavigatorElementStatement ::= (ADD | MOVE) navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
 {
     pin = 1
 }
 
-newNavigatorElementStatement ::= NEW simpleName (localizedStringLiteral)? (ACTION noContextPropertyUsage)? navigatorElementOptions navigatorElementStatementBody
+//newNavigatorElementStatement ::= NEW simpleName localizedStringLiteral? navigatorElementDescription navigatorElementOptions navigatorElementStatementBody
+newNavigatorElementStatement ::= NEW 
+                                 (  navigatorElementDescription navigatorElementOptions navigatorElementStatementBody 
+                                 |  ((simpleName localizedStringLiteral?)? navigatorElementDescription navigatorElementOptions navigatorElementStatementBody) 
+                                 )
 {
     pin = 2
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFNavigatorElementDeclarationImpl"
@@ -1596,13 +1614,20 @@ newNavigatorElementStatement ::= NEW simpleName (localizedStringLiteral)? (ACTIO
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
+navigatorElementDescription ::= (   ACTION noContextPropertyUsage 
+                                |   FORM? formUsage
+                                |   FOLDER
+                                )
+ 
 setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
+{
+    pin = 1
+}
 
 navigatorElementOptions ::= (	WINDOW windowUsage
                             |	navigatorElementInsertPosition 
                             |	IMAGE stringLiteral
                             )*
-
 
 navigatorElementInsertPosition ::=	(   insertRelativePositionLiteral navigatorElementSelector
                                     |	FIRST

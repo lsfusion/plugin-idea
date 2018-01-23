@@ -3,8 +3,10 @@ package com.lsfusion.lang.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.lang.psi.LSFFormUsage;
 import com.lsfusion.lang.psi.LSFId;
-import com.lsfusion.lang.psi.LSFSimpleName;
+import com.lsfusion.lang.psi.LSFNavigatorElementDescription;
+import com.lsfusion.lang.psi.LSFNoContextPropertyUsage;
 import com.lsfusion.lang.psi.declarations.LSFNavigatorElementDeclaration;
 import com.lsfusion.lang.psi.stubs.NavigatorElementStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -24,12 +26,27 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
         super(navigatorElementStubElement, nodeType);
     }
 
-    protected abstract LSFSimpleName getSimpleName();
-
     @Nullable
     @Override
     public LSFId getNameIdentifier() {
-        return getSimpleName();
+        LSFId result = null;
+        if (getSimpleName() != null) {
+            result = getSimpleName();
+        } else {
+            LSFNavigatorElementDescription descr = getNavigatorElementDescription();
+            if (descr != null) {
+                LSFFormUsage form = descr.getFormUsage();
+                if (form != null) {
+                    result = form.getSimpleName();
+                } else {
+                    LSFNoContextPropertyUsage action = descr.getNoContextPropertyUsage();
+                    if (action != null) {
+                        result = action.getPropertyUsage().getSimpleName();
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     @Nullable

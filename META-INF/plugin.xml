@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.113</version>
+    <version>1.0.114</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -13,6 +13,7 @@
         <ul>
             <li>READ CLIENT</li>
             <li>EXPORT XML LIST</li>
+            <li>New Navigator statement syntax</li>
         </ul>
     ]]>
     </change-notes>
@@ -75,7 +76,9 @@
                     description="Toggle meta code sync mode"/>
             
             <separator/>
-            
+            <action id="Navigator.AddMove" class="com.lsfusion.actions.AddFolderKeywordAction" text="AddFolder"
+                    description="Add FOLDER keyword"/>
+            <separator/>            
             <action id="ToggleLSFCompletion" class="com.lsfusion.actions.ToggleCompletionAction"
                     text="lsFusion completion support"
                     description="Toggle lsFusion completion support"/>
