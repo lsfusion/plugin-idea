@@ -1594,14 +1594,13 @@ neStub ::= NEW ID SEMI
     pin = 1
 } 
 
-private ne_statement_recover ::= !(ADD | MOVE | NEW | SEMI | RBRACE | ID) 
+private ne_statement_recover ::= !(MOVE | NEW | SEMI | RBRACE | ID) 
 
-moveNavigatorElementStatement ::= (ADD | MOVE) navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
+moveNavigatorElementStatement ::= MOVE navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
 {
     pin = 1
 }
 
-//newNavigatorElementStatement ::= NEW simpleName localizedStringLiteral? navigatorElementDescription navigatorElementOptions navigatorElementStatementBody
 newNavigatorElementStatement ::= NEW 
                                  (  navigatorElementDescription navigatorElementOptions navigatorElementStatementBody 
                                  |  ((simpleName localizedStringLiteral?)? navigatorElementDescription navigatorElementOptions navigatorElementStatementBody) 

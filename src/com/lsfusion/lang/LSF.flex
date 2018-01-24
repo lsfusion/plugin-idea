@@ -109,7 +109,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "ASK"                			        { return ASK; }
   "NATIVE"                			    { return NATIVE; }
   "ACTION"                  			{ return ACTION; }
-  "ADD"                     			{ return ADD; }
   "ADDFORM"                     	    { return ADDFORM; }
   "AFTER"                   			{ return AFTER; }
   "GOAFTER"                   			{ return GOAFTER; }
