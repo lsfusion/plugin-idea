@@ -1601,10 +1601,7 @@ moveNavigatorElementStatement ::= MOVE navigatorElementSelector (localizedString
     pin = 1
 }
 
-newNavigatorElementStatement ::= NEW 
-                                 (  navigatorElementDescription navigatorElementOptions navigatorElementStatementBody 
-                                 |  ((simpleName localizedStringLiteral?)? navigatorElementDescription navigatorElementOptions navigatorElementStatementBody) 
-                                 )
+newNavigatorElementStatement ::= NEW navigatorElementDescription navigatorElementOptions navigatorElementStatementBody
 {
     pin = 2
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFNavigatorElementDeclarationImpl"
@@ -1613,9 +1610,9 @@ newNavigatorElementStatement ::= NEW
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-navigatorElementDescription ::= (   ACTION noContextPropertyUsage 
-                                |   FORM? formUsage
-                                |   FOLDER
+navigatorElementDescription ::= (   ACTION (simpleName localizedStringLiteral? EQUALS)? noContextPropertyUsage 
+                                |   FORM? (simpleName localizedStringLiteral? EQUALS)? formUsage
+                                |   FOLDER (simpleName localizedStringLiteral?)?
                                 )
  
 setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody

@@ -3,10 +3,7 @@ package com.lsfusion.lang.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.lang.psi.LSFFormUsage;
-import com.lsfusion.lang.psi.LSFId;
-import com.lsfusion.lang.psi.LSFNavigatorElementDescription;
-import com.lsfusion.lang.psi.LSFNoContextPropertyUsage;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFNavigatorElementDeclaration;
 import com.lsfusion.lang.psi.stubs.NavigatorElementStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -53,6 +50,14 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
     @Override
     public Icon getIcon(int flags) {
         return LSFIcons.NAVIGATOR_ELEMENT;
+    }
+
+    @Override
+    public LSFSimpleName getSimpleName() {
+        LSFNavigatorElementDescription navigatorElementDescription = getNavigatorElementDescription();
+        if(navigatorElementDescription != null)
+            return navigatorElementDescription.getSimpleName();
+        return null;
     }
 
     @Override
