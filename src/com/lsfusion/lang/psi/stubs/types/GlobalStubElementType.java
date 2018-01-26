@@ -22,6 +22,7 @@ public abstract class GlobalStubElementType<StubT extends GlobalStubElement<Stub
 
     @Override
     public void indexStub(@NotNull StubT stub, @NotNull IndexSink sink) {
+        // assert что в stub globalname - notNull
         sink.occurrence(getGlobalIndexKey(), stub.getGlobalName());
     }
 

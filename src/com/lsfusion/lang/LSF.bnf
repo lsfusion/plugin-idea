@@ -1610,9 +1610,10 @@ newNavigatorElementStatement ::= NEW navigatorElementDescription navigatorElemen
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-navigatorElementDescription ::= (   ACTION (simpleName localizedStringLiteral? EQUALS)? noContextPropertyUsage 
-                                |   FORM? (simpleName localizedStringLiteral? EQUALS)? formUsage
-                                |   FOLDER (simpleName localizedStringLiteral?)?
+private folderElementDescription ::= FOLDER simpleName localizedStringLiteral? { pin = 2 }
+navigatorElementDescription ::= (   ACTION (simpleName? localizedStringLiteral? EQUALS)? noContextPropertyUsage
+                                |   folderElementDescription
+                                |   FORM? (simpleName? localizedStringLiteral? EQUALS)? formUsage
                                 )
  
 setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody

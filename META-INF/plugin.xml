@@ -9,9 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.116</b><br>
+        <b>Version 1.0.117</b><br>
         <ul>
-            <li>Navigator syntax changes</li>
+            <li>Minor navigator syntax changes</li>
         </ul>
     ]]>
     </change-notes>
