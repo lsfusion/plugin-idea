@@ -12,6 +12,7 @@
         <b>Version 1.0.117</b><br>
         <ul>
             <li>Minor navigator syntax changes</li>
+            <li>EXPORT JSON LIST|TABLE</li>
         </ul>
     ]]>
     </change-notes>
