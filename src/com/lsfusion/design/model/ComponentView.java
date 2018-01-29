@@ -309,15 +309,18 @@ public abstract class ComponentView extends PropertiesContainer {
         if (flex >= 0) {
             return flex;
         }
+        return getDefaultFlex();
+    }
 
+    public double getDefaultFlex() {
         ContainerView container = getContainer();
-        if (container != null) {
+        if (container != null)
             if ((container.isScroll() || container.isSplit() || container.isTabbedPane())) {
                 return 1;
-            } else if (this instanceof PropertyDrawView && container.isHorizontal() && ((PropertyDrawView) this).isFlexProperty()) {
-                return ((PropertyDrawView) this).getBaseValueWidth(new JLabel());
             }
-        }
+        return getBaseDefaultFlex();
+    }
+    public double getBaseDefaultFlex() {
         return 0;
     }
 
@@ -330,9 +333,11 @@ public abstract class ComponentView extends PropertiesContainer {
         if (container != null)
             if ((container.isScroll() || container.isSplit() || container.isTabbedPane())) {
                 return FlexAlignment.STRETCH;
-            } else if (this instanceof PropertyDrawView && (container.isVertical() || container.isColumns()) && ((PropertyDrawView) this).isFlexProperty()) {
-                return FlexAlignment.STRETCH;
             }
+        return getBaseDefaultAlignment(container);
+    }
+
+    public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
         return FlexAlignment.LEADING;
     }
 

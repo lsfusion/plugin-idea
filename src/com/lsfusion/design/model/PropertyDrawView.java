@@ -7,6 +7,7 @@ import com.lsfusion.design.KeyStrokes;
 import com.lsfusion.design.model.entity.PropertyDrawEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.ClassViewType;
+import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.JComponentPanel;
 import com.lsfusion.lang.classes.DataClass;
 import com.lsfusion.util.BaseUtils;
@@ -183,6 +184,20 @@ public class PropertyDrawView extends ComponentView {
         }
 
         return entity.baseClass != null && entity.baseClass.isFlex();
+    }
+
+    @Override
+    public double getBaseDefaultFlex() {
+        if (container.isHorizontal() && isFlexProperty())
+            return getBaseValueWidth(new JLabel());
+        return super.getBaseDefaultFlex();
+    }
+
+    @Override
+    public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
+        if (container.isVertical() && isFlexProperty())
+            return FlexAlignment.STRETCH;
+        return super.getBaseDefaultAlignment(container);
     }
 
     private Boolean compareValueWidths() {
