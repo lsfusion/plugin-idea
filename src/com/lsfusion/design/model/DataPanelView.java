@@ -27,7 +27,7 @@ public class DataPanelView extends JBPanel {
         }
 
         SingleCellTable table = new SingleCellTable();
-        table.setPreferredSize(new Dimension(property.getBaseValueWidth(this), property.getPreferredValueHeight(this)));
+        table.setPreferredSize(new Dimension(property.getBaseValueWidth(this), property.getBaseValueHeight(this)));
         
         if (property.font != null) {
             table.setFont(property.font.deriveFrom(table));

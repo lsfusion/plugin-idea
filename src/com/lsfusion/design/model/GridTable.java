@@ -56,7 +56,7 @@ public class GridTable extends JBTable {
 
             column.setHeaderValue(getModel().getColumnName(i));
 
-            rowHeight = Math.max(rowHeight, cell.getPreferredValueHeight(this));
+            rowHeight = Math.max(rowHeight, cell.getBaseValueHeight(this));
         }
 
         if (getModel().getColumnCount() != 0) {

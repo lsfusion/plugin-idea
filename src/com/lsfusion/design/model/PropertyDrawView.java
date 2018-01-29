@@ -208,7 +208,10 @@ public class PropertyDrawView extends ComponentView {
     }
 
     public int getBaseValueWidth(JComponent comp) {
-        return BaseUtils.min(getMinimumValueWidth(comp), getPreferredValueWidth(comp));
+        return getMinimumValueWidth(comp);
+    }
+    public int getBaseValueHeight(JComponent comp) {
+        return BaseUtils.max(getMinimumValueHeight(comp), getPreferredValueHeight(comp));
     }
 
     public void setMinimumCharWidth(int minimumCharWidth) {
