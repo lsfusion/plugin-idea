@@ -932,8 +932,8 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage importActionSourceTy
 importActionSourceType ::=  XLS (SHEET propertyExpression)?
                         |   DBF (MEMO propertyExpression)? (CHARSET stringLiteral)?
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
-                        |   XML (ROOT propertyExpression)? (LIST|TABLE)?(ATTR)?
-                        |   JSON
+                        |   XML (ROOT propertyExpression)? (LIST|TABLE)? (ATTR)?
+                        |   JSON (ROOT propertyExpression)? (LIST|TABLE)?
                         |   JDBC
                         |   MDB
 

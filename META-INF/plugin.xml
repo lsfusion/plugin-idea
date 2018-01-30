@@ -13,6 +13,7 @@
         <ul>
             <li>Minor navigator syntax changes</li>
             <li>EXPORT JSON LIST|TABLE</li>
+            <li>IMPORT JSON ROOT LIST|TABLE</li>
         </ul>
     ]]>
     </change-notes>
