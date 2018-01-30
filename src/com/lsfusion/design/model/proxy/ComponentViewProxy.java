@@ -12,60 +12,6 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         super(target);
     }
 
-    public void setMinimumSize(Dimension minimumSize) {
-        target.setMinimumSize(minimumSize);
-    }
-
-    public void setMinimumHeight(int minHeight) {
-        target.setMinimumHeight(minHeight);
-    }
-
-    public void setMinimumWidth(int minWidth) {
-        target.setMinimumWidth(minWidth);
-    }
-
-    public void setMaximumSize(Dimension maximumSize) {
-        target.setMaximumSize(maximumSize);
-    }
-
-    public void setMaximumHeight(int maxHeight) {
-        target.setMaximumHeight(maxHeight);
-    }
-
-    public void setMaximumWidth(int maxWidth) {
-        target.setMaximumWidth(maxWidth);
-    }
-
-    public void setPreferredSize(Dimension preferredSize) {
-        target.setPreferredSize(preferredSize);
-    }
-
-    public void setPreferredHeight(int prefHeight) {
-        target.setPreferredHeight(prefHeight);
-    }
-
-    public void setPreferredWidth(int prefWidth) {
-        target.setPreferredWidth(prefWidth);
-    }
-
-    public void setFixedSize(Dimension size) {
-        setMinimumSize(size);
-        setMaximumSize(size);
-        setPreferredSize(size);
-    }
-
-    public void setFixedHeight(int height) {
-        setMinimumHeight(height);
-        setMaximumHeight(height);
-        setPreferredHeight(height);
-    }
-
-    public void setFixedWidth(int width) {
-        setMinimumWidth(width);
-        setMaximumWidth(width);
-        setPreferredWidth(width);
-    }
-
     public void setAutoSize(boolean autoSize) {
         target.autoSize = autoSize;
     }
@@ -164,5 +110,15 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
 
     public void setImagePath(String imagePath) {
         target.setImagePath(imagePath);
+    }
+
+    public void setSize(Dimension size) {
+        target.setPreferredSize(size);
+    }
+    public void setHeight(int prefHeight) {
+        target.setPreferredHeight(prefHeight);
+    }
+    public void setWidth(int prefWidth) {
+        target.setPreferredWidth(prefWidth);
     }
 }

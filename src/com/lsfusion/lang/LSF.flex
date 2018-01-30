@@ -142,6 +142,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "CHANGED"                 			{ return CHANGED; }
   "CHANGEWYS"               			{ return CHANGEWYS; }
   "CHARSET"               			    { return CHARSET; }
+  "CHARWIDTH"               			{ return CHARWIDTH; }
   "CHECK"                   			{ return CHECK; }
   "CHECKED"                 			{ return CHECKED; }
   "CLASS"                   			{ return CLASS; }
@@ -266,13 +267,11 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "MDB"                     			{ return MDB; }
   "LAST"                     			{ return LAST; }
   "MATERIALIZED"            			{ return MATERIALIZED; }
-  "MAXCHARWIDTH"            			{ return MAXCHARWIDTH; }
   "MENU"                    			{ return MENU; }
   "MEMO"                    			{ return MEMO; }
   "MESSAGE"                 			{ return MESSAGE; }
   "META"                    			{ return META; }
   "MIN"                     			{ return MIN; }
-  "MINCHARWIDTH"            			{ return MINCHARWIDTH; }
   "MODULE"                  			{ return MODULE; }
   "MOVE"                                { return MOVE; }
   "MS"                                  { return MS; }
@@ -318,7 +317,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "PERIOD"                              { return PERIOD; }    
   "PG"                                  { return PG; }    
   "POSITION"                			{ return POSITION; }
-  "PREFCHARWIDTH"           			{ return PREFCHARWIDTH; }
   "PREV"                    			{ return PREV; }
   "PREVIEW"                    			{ return PREVIEW; }
   "NOPREVIEW"                  			{ return NOPREVIEW; }

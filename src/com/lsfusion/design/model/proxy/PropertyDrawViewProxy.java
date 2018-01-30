@@ -52,72 +52,6 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.defaultCompare = defaultCompare;
     }
 
-    public void setMinimumCharWidth(int minimumCharWidth) {
-        target.setMinimumCharWidth(minimumCharWidth);
-    }
-
-    public void setMaximumCharWidth(int maximumCharWidth) {
-        target.setMaximumCharWidth(maximumCharWidth);
-    }
-
-    public void setPreferredCharWidth(int preferredCharWidth) {
-        target.setPreferredCharWidth(preferredCharWidth);
-    }
-
-    public void setMinimumValueSize(Dimension minimumSize) {
-        target.setMinimumValueSize(minimumSize);
-    }
-
-    public void setMinimumValueHeight(int minHeight) {
-        target.setMinimumValueHeight(minHeight);
-    }
-
-    public void setMinimumValueWidth(int minWidth) {
-        target.setMinimumValueWidth(minWidth);
-    }
-
-    public void setMaximumValueSize(Dimension maximumSize) {
-        target.setMaximumValueSize(maximumSize);
-    }
-
-    public void setMaximumValueHeight(int maxHeight) {
-        target.setMaximumValueHeight(maxHeight);
-    }
-
-    public void setMaximumValueWidth(int maxWidth) {
-        target.setMaximumValueWidth(maxWidth);
-    }
-
-    public void setPreferredValueSize(Dimension preferredSize) {
-        target.setPreferredValueSize(preferredSize);
-    }
-
-    public void setPreferredValueHeight(int prefHeight) {
-        target.setPreferredValueHeight(prefHeight);
-    }
-
-    public void setPreferredValueWidth(int prefWidth) {
-        target.setPreferredValueWidth(prefWidth);
-    }
-
-    public void setFixedValueSize(Dimension size) {
-        setMinimumValueSize(size);
-        setMaximumValueSize(size);
-        setPreferredValueSize(size);
-    }
-
-    public void setFixedValueHeight(int height) {
-        setMinimumValueHeight(height);
-        setMaximumValueHeight(height);
-        setPreferredValueHeight(height);
-    }
-
-    public void setFixedValueWidth(int width) {
-        setMinimumValueWidth(width);
-        setMaximumValueWidth(width);
-        setPreferredValueWidth(width);
-    }
-    
     public void setChangeKey(KeyStroke editKey) {
         target.changeKey = editKey;
     }
@@ -156,5 +90,18 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
 
     public void setNotNull(boolean notNull) {
         target.notNull = notNull;
+    }
+
+    public void setValueSize(Dimension size) {
+        target.setMinimumValueSize(size);
+    }
+    public void setValueHeight(int prefHeight) {
+        target.setMinimumValueHeight(prefHeight);
+    }
+    public void setValueWidth(int prefWidth) {
+        target.setMinimumValueWidth(prefWidth);
+    }
+    public void setCharWidth(int charWidth) {
+        target.setMinimumCharWidth(charWidth);
     }
 }

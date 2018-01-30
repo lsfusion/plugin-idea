@@ -124,19 +124,9 @@ public class PropertyDrawEntity {
                 fixedCharWidth = Integer.parseInt(fixedCharWidthSettings.get(fixedCharWidthSettings.size() - 1).getIntLiteral().getText());
             }
 
-            List<LSFMinCharWidthSetting> minCharWidthSettings = propertyOptions.getMinCharWidthSettingList();
+            List<LSFCharWidthSetting> minCharWidthSettings = propertyOptions.getCharWidthSettingList();
             if (!minCharWidthSettings.isEmpty()) {
                 minimumCharWidth = Integer.parseInt(minCharWidthSettings.get(minCharWidthSettings.size() - 1).getIntLiteral().getText());
-            }
-
-            List<LSFMaxCharWidthSetting> maxCharWidthSettings = propertyOptions.getMaxCharWidthSettingList();
-            if (!maxCharWidthSettings.isEmpty()) {
-                maximumCharWidth = Integer.parseInt(maxCharWidthSettings.get(maxCharWidthSettings.size() - 1).getIntLiteral().getText());
-            }
-
-            List<LSFPrefCharWidthSetting> prefCharWidthSettings = propertyOptions.getPrefCharWidthSettingList();
-            if (!prefCharWidthSettings.isEmpty()) {
-                preferredCharWidth = Integer.parseInt(prefCharWidthSettings.get(prefCharWidthSettings.size() - 1).getIntLiteral().getText());
             }
 
             List<LSFImageSetting> imageSettings = propertyOptions.getImageSettingList();

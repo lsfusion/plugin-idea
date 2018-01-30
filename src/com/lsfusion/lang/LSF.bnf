@@ -507,9 +507,7 @@ private semiPropertyOption ::= IN groupUsage
                            |	asEditActionSetting
                            |	viewTypeSetting
                            |	fixedCharWidthSetting
-                           |	minCharWidthSetting
-                           |	maxCharWidthSetting
-                           |	prefCharWidthSetting
+                           |	charWidthSetting
                            |	imageSetting
                            |    defaultCompareSetting
                            |	editKeySetting
@@ -533,10 +531,8 @@ nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI |
 
 viewTypeSetting ::= classViewType
 persistentSetting ::= MATERIALIZED
+charWidthSetting ::= CHARWIDTH intLiteral
 fixedCharWidthSetting ::= FIXEDCHARWIDTH intLiteral
-minCharWidthSetting ::= MINCHARWIDTH intLiteral
-maxCharWidthSetting ::= MAXCHARWIDTH intLiteral
-prefCharWidthSetting ::= PREFCHARWIDTH intLiteral
 imageSetting ::= IMAGE stringLiteral
 defaultCompareSetting ::= DEFAULTCOMPARE stringLiteral
 editKeySetting ::= CHANGEKEY stringLiteral (SHOW | hideEditKey)?
