@@ -78,7 +78,7 @@ public class FormView {
 
         String mainContainerSID = getBoxSID();
         mainContainer = new ContainerView(mainContainerSID);
-        setComponentSID(mainContainer, mainContainerSID);
+        addComponentToMapping(mainContainer);
 
         containerFactory = new ContainerFactory();
 
@@ -163,7 +163,7 @@ public class FormView {
         PropertyDrawView propertyDrawView = new PropertyDrawView(propertyDrawEntity);
         properties.add(propertyDrawView);
 
-        sidToComponent.put(propertyDrawView.getSID(), propertyDrawView);
+        addComponentToMapping(propertyDrawView);
         mproperties.put(propertyDrawEntity, propertyDrawView);
 
         return propertyDrawView;
@@ -236,17 +236,20 @@ public class FormView {
     public ContainerView createContainer(String caption, String sID) {
         ContainerView container = new ContainerView();
         container.setCaption(caption);
-        container.setSID(sID);
-        if (sID != null) {
-            sidToComponent.put(sID, container);
-        }
+        setComponentSID(container, sID);
         return container;
     }
 
     protected void setComponentSID(ComponentView component, String sid) {
         component.setSID(sid);
-        sidToComponent.put(component.getSID(), component);
+        addComponentToMapping(component);
     }
+    
+    public void addComponentToMapping(ComponentView component) {
+        if (component.getSID() != null) {
+            sidToComponent.put(component.getSID(), component);
+        }
+    } 
 
     public ComponentView getComponentBySID(String sid) {
         return sidToComponent.get(sid);

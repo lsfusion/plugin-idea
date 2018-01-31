@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.117</version>
+    <version>1.0.118</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,12 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.117</b><br>
+        <b>Version 1.0.118</b><br>
         <ul>
-            <li>Minor navigator syntax changes</li>
-            <li>EXPORT JSON LIST|TABLE</li>
-            <li>IMPORT JSON ROOT LIST|TABLE</li>
-            <li>Design sizing refactoring</li>
+            <li>Container 'OBJECTS' support</li>
         </ul>
     ]]>
     </change-notes>
