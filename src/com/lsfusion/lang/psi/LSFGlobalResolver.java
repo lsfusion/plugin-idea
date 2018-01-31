@@ -4,9 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.*;
 import com.intellij.util.containers.ContainerUtil;
@@ -30,8 +28,6 @@ import java.util.concurrent.ConcurrentMap;
 public class LSFGlobalResolver {
 
     public static ConcurrentMap<LSFModuleDeclaration, Set<LSFFile>> cached = ContainerUtil.newConcurrentMap();
-
-    public static ConcurrentMap<LSFModuleDeclaration, Set<PsiReference>> moduleRefsCache = ContainerUtil.newConcurrentMap();
 
     public static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration) {
         return getRequireModules(declaration, new HashSet<LSFFile>());
@@ -61,19 +57,6 @@ public class LSFGlobalResolver {
             if (toCache)
                 cached.put(declaration, result);
         }
-        return result;
-    }
-
-    public static Set<PsiReference> getModuleReferences(LSFModuleDeclaration declaration) {
-        Set<PsiReference> cachedRefs = moduleRefsCache.get(declaration);
-        if (cachedRefs != null)
-            return cachedRefs;
-
-        LSFId nameIdentifier = declaration.getNameIdentifier();
-
-        Set<PsiReference> result = new HashSet<>(ReferencesSearch.search(nameIdentifier, declaration.getUseScope()).findAll());
-
-        moduleRefsCache.put(declaration, result);
         return result;
     }
 

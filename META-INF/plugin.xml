@@ -256,6 +256,8 @@
                         serviceImplementation="com.lsfusion.lang.psi.cache.PropertyDependenciesCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyDependentsCache"
                         serviceImplementation="com.lsfusion.lang.psi.cache.PropertyDependentsCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.ModuleDependentsCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.ModuleDependentsCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyComplexityCache"
                         serviceImplementation="com.lsfusion.lang.psi.cache.PropertyComplexityCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.ParentsCache"

@@ -700,7 +700,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     void fireChangedModuleHeader() {
         LSFGlobalResolver.cached.clear(); // убираем все, потому как могут быть зависимости
-        LSFGlobalResolver.moduleRefsCache.clear();
     }
 
     private class MetaDeclProcessing implements Runnable {

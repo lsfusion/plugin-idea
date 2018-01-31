@@ -3,14 +3,11 @@ package com.lsfusion.dependencies.module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.dependencies.DependenciesView;
 import com.lsfusion.dependencies.GraphNode;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFGlobalResolver;
-import com.lsfusion.lang.psi.LSFModuleUsage;
-import com.lsfusion.lang.psi.LSFRequireList;
+import com.lsfusion.lang.psi.cache.ModuleDependentsCache;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.references.LSFReference;
@@ -89,21 +86,18 @@ public class ModuleDependenciesView extends DependenciesView {
     public void createDependentNode(PsiElement element, Set<PsiElement> proceeded) {
         LSFModuleDeclaration module = (LSFModuleDeclaration) element;
         
-        Set<PsiReference> refs = LSFGlobalResolver.getModuleReferences(module);
+        Set<LSFModuleDeclaration> refModules = ModuleDependentsCache.getInstance(project).resolveWithCaching(module);
+        if (refModules != null) {
+            for (LSFModuleDeclaration decl : refModules) {
+                assert decl != null;
+                String sourceDeclName = decl.getDeclName();
+                String targetDeclName = module.getDeclName();
+                if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
+                    addModelEdge(decl, module, false);
+                }
 
-        for (PsiReference ref : refs) {
-            if (ref instanceof LSFModuleUsage && PsiTreeUtil.getParentOfType((PsiElement) ref, LSFRequireList.class) != null) {
-                LSFModuleDeclaration decl = PsiTreeUtil.getParentOfType((PsiElement) ref, LSFModuleDeclaration.class);
-                if (decl != null) {
-                    String sourceDeclName = decl.getDeclName();
-                    String targetDeclName = module.getDeclName();
-                    if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
-                        addModelEdge(decl, module, false);
-                    }
-
-                    if (proceeded.add(decl)) {
-                        createDependentNode(decl, proceeded);
-                    }
+                if (proceeded.add(decl)) {
+                    createDependentNode(decl, proceeded);
                 }
             }
         }
