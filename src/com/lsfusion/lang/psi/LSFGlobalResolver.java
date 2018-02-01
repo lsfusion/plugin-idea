@@ -30,11 +30,11 @@ public class LSFGlobalResolver {
     // тут можно использовать или RequireModulesCache (но проблема в том, что тогда он будет очищаться каждый раз и заново будет делать resolveDecl, с другой стороны там все за stub'но, так что не сильно большой оверхед)
     // или ручной кэш, он очищается только при изменении структуры модулей
     // пока попробуем автоматический
-    public static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration) {
-        return getCachedRequireModules(declaration);
-//        return getManualCachedRequireModules(declaration, new HashSet<VirtualFile>());
+    public static Set<VirtualFile> getRequireModules(LSFModuleDeclaration declaration) {
+//        return getCachedRequireModules(declaration);
+        return getManualCachedRequireModules(declaration, new HashSet<VirtualFile>());
     }
-    private static Set<LSFFile> getCachedRequireModules(LSFModuleDeclaration declaration) {
+    private static Set<VirtualFile> getCachedRequireModules(LSFModuleDeclaration declaration) {
         String name = declaration.getGlobalName();
         boolean toCache = name != null && !name.equals(LSFElementGenerator.genName) && !LSFPsiUtils.isInjected(declaration);
         if (toCache) {
@@ -43,9 +43,9 @@ public class LSFGlobalResolver {
         return getRequireModulesNoCache(declaration);
     }
 
-    public static Set<LSFFile> getRequireModulesNoCache(LSFModuleDeclaration declaration) {
-        Set<LSFFile> result = new HashSet<>();
-        result.add(declaration.getLSFFile());
+    public static Set<VirtualFile> getRequireModulesNoCache(LSFModuleDeclaration declaration) {
+        Set<VirtualFile> result = new HashSet<>();
+        result.add(declaration.getLSFFile().getVirtualFile());
         for(LSFModuleDeclaration decl : declaration.getRequireModules())
             if(decl != null)
                 result.addAll(getCachedRequireModules(decl));
@@ -105,8 +105,8 @@ public class LSFGlobalResolver {
 
         Set<VirtualFile> vFiles = new HashSet<>();
         if (declaration != null) {
-            for (LSFFile f : getRequireModules(declaration)) {
-                vFiles.add(f.getVirtualFile()); // null может быть только для dumb
+            for (VirtualFile f : getRequireModules(declaration)) {
+                vFiles.add(f); // null может быть только для dumb
             }
         }
         return GlobalSearchScope.filesScope(project, vFiles);

@@ -78,7 +78,7 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
 
     @Override
     public boolean requires(LSFModuleDeclaration module) {
-        return LSFGlobalResolver.getRequireModules(this).contains(module.getLSFFile());
+        return LSFGlobalResolver.getRequireModules(this).contains(module.getLSFFile().getVirtualFile());
     }
 
     @Override
