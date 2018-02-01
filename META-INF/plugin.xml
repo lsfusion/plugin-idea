@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.118</version>
+    <version>1.0.119</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,9 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.118</b><br>
+        <b>Version 1.0.119</b><br>
         <ul>
-            <li>Container 'OBJECTS' support</li>
+            <li>Memory usage optimization</li>
         </ul>
     ]]>
     </change-notes>
@@ -256,6 +256,8 @@
                         serviceImplementation="com.lsfusion.lang.psi.cache.PropertyDependenciesCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyDependentsCache"
                         serviceImplementation="com.lsfusion.lang.psi.cache.PropertyDependentsCache"/>
+        <projectService serviceInterface="com.lsfusion.lang.psi.cache.RequireModulesCache"
+                        serviceImplementation="com.lsfusion.lang.psi.cache.RequireModulesCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.ModuleDependentsCache"
                         serviceImplementation="com.lsfusion.lang.psi.cache.ModuleDependentsCache"/>
         <projectService serviceInterface="com.lsfusion.lang.psi.cache.PropertyComplexityCache"

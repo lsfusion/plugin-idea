@@ -9,6 +9,7 @@ import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.*;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.psi.cache.RequireModulesCache;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
@@ -23,33 +24,53 @@ import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFPsiUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 
 public class LSFGlobalResolver {
 
-    public static ConcurrentMap<LSFModuleDeclaration, Set<LSFFile>> cached = ContainerUtil.newConcurrentMap();
-
+    // тут можно использовать или RequireModulesCache (но проблема в том, что тогда он будет очищаться каждый раз и заново будет делать resolveDecl, с другой стороны там все за stub'но, так что не сильно большой оверхед)
+    // или ручной кэш, он очищается только при изменении структуры модулей
+    // пока попробуем автоматический
     public static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration) {
-        return getRequireModules(declaration, new HashSet<LSFFile>());
+        return getCachedRequireModules(declaration);
+//        return getManualCachedRequireModules(declaration, new HashSet<VirtualFile>());
     }
-
-    private static Set<LSFFile> getRequireModules(LSFModuleDeclaration declaration, Set<LSFFile> alreadyGet) {
+    private static Set<LSFFile> getCachedRequireModules(LSFModuleDeclaration declaration) {
         String name = declaration.getGlobalName();
         boolean toCache = name != null && !name.equals(LSFElementGenerator.genName) && !LSFPsiUtils.isInjected(declaration);
         if (toCache) {
-            Set<LSFFile> cachedFiles = cached.get(declaration);
+            return RequireModulesCache.getInstance(declaration.getProject()).getRequireModulesWithCaching(declaration);
+        }
+        return getRequireModulesNoCache(declaration);
+    }
+
+    public static Set<LSFFile> getRequireModulesNoCache(LSFModuleDeclaration declaration) {
+        Set<LSFFile> result = new HashSet<>();
+        result.add(declaration.getLSFFile());
+        for(LSFModuleDeclaration decl : declaration.getRequireModules())
+            if(decl != null)
+                result.addAll(getCachedRequireModules(decl));
+        return result;
+    }
+
+    public static Map<LSFModuleDeclaration, Set<VirtualFile>> cached = ContainerUtil.createConcurrentWeakKeySoftValueMap();
+
+    private static Set<VirtualFile> getManualCachedRequireModules(LSFModuleDeclaration declaration, Set<VirtualFile> alreadyGet) {
+        String name = declaration.getGlobalName();
+        boolean toCache = name != null && !name.equals(LSFElementGenerator.genName) && !LSFPsiUtils.isInjected(declaration);
+        if (toCache) {
+            Set<VirtualFile> cachedFiles = cached.get(declaration);
             if (cachedFiles != null)
                 return cachedFiles;
         }
 
-        Set<LSFFile> result = new HashSet<>();
+        Set<VirtualFile> result = new HashSet<>();
 
-        LSFFile declarationFile = declaration.getLSFFile();
+        VirtualFile declarationFile = declaration.getLSFFile().getVirtualFile();
         if (!alreadyGet.contains(declarationFile)) {
             result.add(declarationFile);
             alreadyGet.add(declarationFile);
             for (LSFModuleDeclaration decl : declaration.getRequireModules()) {
-                Set<LSFFile> requireModules = getRequireModules(decl, alreadyGet);
+                Set<VirtualFile> requireModules = getManualCachedRequireModules(decl, alreadyGet);
 
                 result.addAll(requireModules);
             }
