@@ -12,6 +12,7 @@
         <b>Version 1.0.120</b><br>
         <ul>
             <li>OPEN file WAIT|NOWAIT</li>
+            <li>IMPORT default</li>
         </ul>
     ]]>
     </change-notes>
