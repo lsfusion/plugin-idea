@@ -862,7 +862,7 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)?
     methods = [inferActionParamClasses resolveFormDecl] 
 }
 
-fileActionPropertyDefinitionBody ::= OPEN propertyExpression (NAME propertyExpression)?
+fileActionPropertyDefinitionBody ::= OPEN propertyExpression (NAME propertyExpression)? syncTypeLiteral?
                                    | SAVE propertyExpression ((NAME | PATH) propertyExpression)? NODIALOG?
 {
     pin(".*") = 1

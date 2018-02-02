@@ -9,9 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.119</b><br>
+        <b>Version 1.0.120</b><br>
         <ul>
-            <li>Memory usage optimization</li>
+            <li>OPEN file WAIT|NOWAIT</li>
         </ul>
     ]]>
     </change-notes>
