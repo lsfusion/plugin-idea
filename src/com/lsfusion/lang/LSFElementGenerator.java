@@ -108,16 +108,15 @@ public class LSFElementGenerator {
 
         Project project = file.getProject();
         final PsiFile dummyFile = createDummyFile(project, tabbedText.toString());
-        Collection<LSFMetaCodeBody> childrenOfType = PsiTreeUtil.findChildrenOfType(dummyFile, LSFMetaCodeBody.class);
+        LSFMetaCodeBody body = PsiTreeUtil.findChildOfType(dummyFile, LSFMetaCodeBody.class);
 
-        if (childrenOfType.isEmpty()) {
+        if (body == null) {
             return null;
         }
-        LSFMetaCodeBody body = childrenOfType.iterator().next();
 
         List<LSFMetaCodeStatement> recMetaStatements = body.getMetaCodeStatementList();
 
-        MetaChangeDetector.syncUsageProcessing(file, recMetaStatements);
+        MetaChangeDetector.syncUsageProcessing(file, null, null, true, recMetaStatements);
 
         return body;
     }
