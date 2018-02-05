@@ -31,11 +31,19 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
 
     public TreeGroupView(TreeGroupEntity entity) {
         super(entity.sID);
-        setFlex(1);
-        setAlignment(FlexAlignment.STRETCH);
 
         this.entity = entity;
         toolbar = new ToolbarView(true);
+    }
+
+    @Override
+    public double getBaseDefaultFlex() {
+        return 1;
+    }
+
+    @Override
+    public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
+        return FlexAlignment.STRETCH;
     }
 
     @Override

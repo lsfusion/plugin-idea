@@ -41,8 +41,16 @@ public class GridView extends ComponentView {
 
     public GridView(String sID) {
         super(sID);
-        setFlex(1);
-        setAlignment(FlexAlignment.STRETCH);
+    }
+
+    @Override
+    public double getBaseDefaultFlex() {
+        return 1;
+    }
+
+    @Override
+    public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
+        return FlexAlignment.STRETCH;
     }
 
     @Override
