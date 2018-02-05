@@ -11,6 +11,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 
 import javax.swing.*;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class DefaultFormView extends FormView {
@@ -52,14 +53,25 @@ public class DefaultFormView extends FormView {
         addComponentToMapping(noGroupToolbarPropsContainer);
         toolbarPropsContainers.put(null, noGroupToolbarPropsContainer);
 
+        Iterator<TreeGroupView> treeIterator = treeGroups.iterator();
+        TreeGroupView treeNextGroup = treeIterator.hasNext() ? treeIterator.next() : null;
+        boolean groupStarted = false;
         for (GroupObjectView groupObject : groupObjects) {
-            if (!groupObject.entity.isInTree())
-                addGroupObjectView(groupObject);
+            //если группа началась, ставим флаг. Если группа закончилась, addTreeGroupView и флаг снимаем
+            if(treeNextGroup != null) {
+                boolean isInTree = groupObject.entity.isInTree();
+                if (isInTree && groupObject.entity.treeGroup.equals(treeNextGroup.entity)) {
+                    groupStarted = true;
+                } else if (groupStarted) {
+                    addTreeGroupView(treeNextGroup);
+                    treeNextGroup = treeIterator.hasNext() ? treeIterator.next() : null;
+                    groupStarted = isInTree && treeNextGroup != null && groupObject.entity.treeGroup.equals(treeNextGroup.entity);
+                }
+            }
+            addGroupObjectView(groupObject);
         }
-
-        for (TreeGroupView treeGroup : treeGroups) {
-            addTreeGroupView(treeGroup);
-        }
+        if(groupStarted)
+            addTreeGroupView(treeNextGroup);
 
         for (RegularFilterGroupView filterGroup : regularFilters) {
             addRegularFilterGroupView(filterGroup);

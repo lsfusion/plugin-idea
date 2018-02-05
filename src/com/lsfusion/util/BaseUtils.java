@@ -75,7 +75,7 @@ public class BaseUtils {
         return result;
     }
 
-    public static <K> List<K> add(List<K> set1, List<K> set2) {
+    public static <K> List<K> add(List<? extends K> set1, List<? extends K> set2) {
         List<K> result = new ArrayList<>(set1);
         result.addAll(set2);
         return result;

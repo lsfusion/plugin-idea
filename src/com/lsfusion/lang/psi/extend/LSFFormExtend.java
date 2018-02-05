@@ -23,7 +23,7 @@ public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubEl
 
     Collection<LSFFilterGroupDeclaration> getFilterGroupDecls();
 
-    Collection<LSFFormGroupObjectDeclaration> getFormGroupObjectDeclarations();
+    List<LSFFormGroupObjectDeclaration> getFormGroupObjectDeclarations();
 
     @NotNull
     List<LSFFormTreeGroupObjectList> getFormTreeGroupObjectListList();

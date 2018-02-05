@@ -2,6 +2,7 @@ package com.lsfusion.design.model.entity;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.design.KeyStrokes;
 import com.lsfusion.design.model.ModalityType;
@@ -17,9 +18,7 @@ import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class FormEntity {
     private LSFFile file;
@@ -60,14 +59,18 @@ public class FormEntity {
             sID = formDecl.getDeclName();
         }
 
-        for (LSFFormGroupObjectDeclaration formGroupObjectDeclaration : formExtend.getFormGroupObjectDeclarations()) {
-            LSFFormGroupObjectViewType viewType = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectViewTypeList());
-            LSFFormGroupObjectPageSize pageSize = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectPageSizeList());
-            addGroupObject(formGroupObjectDeclaration.getFormCommonGroupObject(), viewType, pageSize);
-        }
-
-        for (LSFFormTreeGroupObjectList tgobjDecl : formExtend.getFormTreeGroupObjectListList()) {
-            addTreeGroupObject(tgobjDecl);
+        List<PsiElement> sortedDecls = new ArrayList<>();
+        sortedDecls.addAll(formExtend.getFormGroupObjectDeclarations());
+        sortedDecls.addAll(formExtend.getFormTreeGroupObjectListList());
+        sortedDecls.sort(Comparator.comparingInt(PsiElement::getTextOffset));
+        for (PsiElement element : sortedDecls) {
+            if(element instanceof LSFFormGroupObjectDeclaration) {
+                LSFFormGroupObjectDeclaration formGroupObjectDeclaration = (LSFFormGroupObjectDeclaration) element;
+                LSFFormGroupObjectViewType viewType = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectViewTypeList());
+                LSFFormGroupObjectPageSize pageSize = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectPageSizeList());
+                addGroupObject(formGroupObjectDeclaration.getFormCommonGroupObject(), viewType, pageSize);
+            } else
+                addTreeGroupObject((LSFFormTreeGroupObjectList)element);
         }
 
         extractPropertyDraws(formExtend);
