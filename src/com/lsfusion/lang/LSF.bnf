@@ -1752,7 +1752,7 @@ componentPropertyValue ::=  colorLiteral
 ////////////////////////////////// META STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList RBRAC anyTokens END {
+metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList? RBRAC anyTokens END {
     pin=2
     mixin = "com.lsfusion.lang.psi.declarations.impl.LSFMetaDeclarationImpl"
     implements = "com.lsfusion.lang.psi.declarations.LSFMetaDeclaration"

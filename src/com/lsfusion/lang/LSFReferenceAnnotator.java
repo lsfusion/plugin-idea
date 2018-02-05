@@ -23,7 +23,6 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.impl.LSFLocalDataPropertyDefinitionImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.LSFExprParamReference;
@@ -234,10 +233,20 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
         checkReference(o);
     }
-
+    
     public void visitMetaCodeDeclarationStatement(@NotNull LSFMetaCodeDeclarationStatement o) {
         super.visitMetaCodeDeclarationStatement(o);
-
+        if (o.getMetaDeclIdList() == null || o.getParamCount() == 0) {
+            int leftBrace = o.getText().indexOf('(');
+            int rightBrace = o.getText().indexOf(')');
+            if (rightBrace > leftBrace && leftBrace >= 0) {
+                TextRange bracesRange = new TextRange(o.getTextRange().getStartOffset() + leftBrace, o.getTextRange().getStartOffset() + rightBrace + 1);
+                Annotation annotation = myHolder.createInfoAnnotation(bracesRange, "Metacode should have at least one parameter");
+                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                addError(o, annotation);
+            }
+        }
+        
         LSFAnyTokens statements = o.getAnyTokens();
         if (statements != null) {
             Annotation annotation = myHolder.createInfoAnnotation(statements.getTextRange(), "");
@@ -564,8 +573,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void addColumnInfo(PsiElement element, String tableName, String columnName) {
         final Annotation annotation = myHolder.createInfoAnnotation(element.getTextRange(), "Table: " + tableName + "; columnName: " + columnName);
-        TextAttributes error = IMPLICIT_DECL;
-        annotation.setEnforcedTextAttributes(error);
+        annotation.setEnforcedTextAttributes(IMPLICIT_DECL);
     }
 
     private void addAlreadyDefinedError(LSFDeclaration decl) {
