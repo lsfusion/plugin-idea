@@ -238,14 +238,14 @@ public abstract class ComponentView extends PropertiesContainer {
         return autoSize;
     }
     
-    public double getFlex() { // нужно для проставления в Form Design в блоке свойства (используется через reflextion) 
+    public double getFlex() { // нужно для проставления в Form Design в блоке свойства (используется через reflection) 
         return getFlex(null);
     }
     public double getFlex(FormEntity formEntity) {
         ContainerView container = getContainer();
         if (container != null)
             if (container.isScroll() || container.isSplit()) {
-                return 1;
+                return flex != -1 && flex != 0 ? flex : 1;
             }
             
         if (flex >= 0) {
