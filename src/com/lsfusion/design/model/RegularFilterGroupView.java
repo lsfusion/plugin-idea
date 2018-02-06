@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.FormView;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.model.entity.RegularFilterEntity;
 import com.lsfusion.design.model.entity.RegularFilterGroupEntity;
 import com.lsfusion.design.ui.JComponentPanel;
@@ -55,7 +56,7 @@ public class RegularFilterGroupView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         GroupObjectView groupObjectView = form.get(entity.getToDraw(form.entity));
         if (!groupObjectView.grid.isVisible()) {
             return null;

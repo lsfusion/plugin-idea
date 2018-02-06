@@ -42,12 +42,7 @@ public abstract class IntegralClass extends DataClass {
     }
 
     @Override
-    public String getMinimumMask() {
-        return "99 999 999";
-    }
-
-    @Override
-    public String getPreferredMask() {
+    public String getMask() {
         return "99 999 999";
     }
 

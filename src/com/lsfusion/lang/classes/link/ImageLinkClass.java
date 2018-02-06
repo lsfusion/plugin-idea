@@ -15,14 +15,4 @@ public class ImageLinkClass extends StaticFormatLinkClass {
     public String getName() {
         return "IMAGELINK";
     }
-
-    @Override
-    public int getMaximumHeight(FontMetrics fontMetrics) {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    public int getMaximumWidth(int maxCharWidth, FontMetrics fontMetrics) {
-        return Integer.MAX_VALUE;
-    }
 }

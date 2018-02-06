@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.*;
 
@@ -53,7 +54,7 @@ public class FilterView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         FlexPanel topPanel = new FlexPanel(false);
         topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER));
         topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_ADD));

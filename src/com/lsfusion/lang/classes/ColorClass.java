@@ -17,13 +17,13 @@ public class ColorClass extends DataClass {
     }
 
     @Override
-    public String getPreferredMask() {
+    public String getMask() {
         return "";
     }
 
     @Override
-    public int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics) {
-        return 50;
+    public int getWidth(int minCharWidth, FontMetrics fontMetrics) {
+        return 40;
     }
 
     @Override

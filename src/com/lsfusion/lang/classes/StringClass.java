@@ -14,8 +14,7 @@ public class StringClass extends DataClass {
     public final boolean rich;
     public final ExtInt length;
 
-    private String minimumMask;
-    private String preferredMask;
+    private String mask;
 
     public StringClass(boolean blankPadded, boolean caseInsensitive, ExtInt length) {
         this(blankPadded, caseInsensitive, false, length);
@@ -28,12 +27,10 @@ public class StringClass extends DataClass {
         this.length = length;
 
         if (length.isUnlimited()) {
-            minimumMask = "999 999";
-            preferredMask = "9 999 999";
+            mask = "999 999";
         } else {
             int lengthValue = length.getValue();
-            minimumMask = BaseUtils.replicate('0', lengthValue <= 12 ? lengthValue : (int) round(12 + pow(lengthValue - 12, 0.7)));
-            preferredMask = BaseUtils.replicate('0', lengthValue <= 20 ? lengthValue : (int) round(pow(lengthValue, 0.8)));
+            mask = BaseUtils.replicate('0', lengthValue <= 12 ? lengthValue : (int) round(12 + pow(lengthValue - 12, 0.7)));
         }
     }
 
@@ -65,34 +62,15 @@ public class StringClass extends DataClass {
     }
 
     @Override
-    public String getMinimumMask() {
-        return minimumMask;
+    public String getMask() {
+        return mask;
     }
 
     @Override
-    public String getPreferredMask() {
-        return preferredMask;
-    }
-
-    @Override
-    public int getPreferredHeight(FontMetrics fontMetrics) {
+    public int getHeight(FontMetrics fontMetrics) {
         if (length.isUnlimited())
             return 4 * (fontMetrics.getHeight() + 1);
-        return super.getPreferredHeight(fontMetrics);
-    }
-
-    @Override
-    public int getMaximumHeight(FontMetrics fontMetrics) {
-        if (length.isUnlimited())
-            return Integer.MAX_VALUE;
-        return super.getPreferredHeight(fontMetrics);
-    }
-
-    @Override
-    public int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics) {
-        if (length.isUnlimited())
-            return fontMetrics.charWidth('0') * 25;
-        return super.getPreferredWidth(prefCharWidth, fontMetrics);
+        return super.getHeight(fontMetrics);
     }
 
     @Override

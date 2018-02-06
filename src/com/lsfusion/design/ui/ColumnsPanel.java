@@ -1,6 +1,7 @@
 package com.lsfusion.design.ui;
 
 import com.lsfusion.design.model.ContainerView;
+import com.lsfusion.design.model.entity.FormEntity;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,12 +9,12 @@ import java.util.List;
 
 public class ColumnsPanel extends FlexPanel {
 
-    public ColumnsPanel(ContainerView container, List<Component> children) {
+    public ColumnsPanel(ContainerView container, FormEntity formEntity, List<Component> children) {
         super(false, Alignment.LEADING);
 
         int columnsCount = container.columns;
         JPanel[] columns = new JPanel[columnsCount];
-        double columnFlex = getColumnFlex(container);
+        double columnFlex = getColumnFlex(formEntity, container);
         for (int i = 0; i < columnsCount; ++i) {
             JPanel column = new JPanel();
             column.setLayout(new FlexLayout(column, true, Alignment.LEADING));
@@ -34,12 +35,12 @@ public class ColumnsPanel extends FlexPanel {
         }
     }
 
-    private double getColumnFlex(ContainerView container) {
+    private double getColumnFlex(FormEntity formEntity, ContainerView container) {
         ContainerView container2 = container.container;
         if (container2 == null || !container2.isHorizontal()) {
             return container.getAlignment() == FlexAlignment.STRETCH ? 1 : 0;
         }
-        return container.getFlex();
+        return container.getFlex(formEntity);
     }
 
     @Override

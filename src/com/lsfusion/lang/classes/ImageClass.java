@@ -15,14 +15,4 @@ public class ImageClass extends StaticFormatFileClass {
     public String getName() {
         return "IMAGEFILE";
     }
-
-    @Override
-    public int getMaximumHeight(FontMetrics fontMetrics) {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    public int getMaximumWidth(int maxCharWidth, FontMetrics fontMetrics) {
-        return Integer.MAX_VALUE;
-    }
 }

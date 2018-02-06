@@ -3,6 +3,7 @@ package com.lsfusion.design.model;
 import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.JComponentPanel;
 import com.lsfusion.design.ui.ToolbarGridButton;
@@ -126,7 +127,7 @@ public class ToolbarView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         if (!visible) {
             return null;
         }

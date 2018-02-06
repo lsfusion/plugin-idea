@@ -23,6 +23,7 @@ import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.model.*;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.ui.*;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
@@ -51,6 +52,7 @@ public class DesignView extends JPanel implements Disposable {
     private final Project project;
     private final ToolWindowEx toolWindow;
     private ContainerView rootComponent;
+    private FormEntity formEntity;
     private ComponentTreeNode rootNode;
 
     private LSFModuleDeclaration module;
@@ -193,6 +195,7 @@ public class DesignView extends JPanel implements Disposable {
 
         removeAll();
         rootComponent = designInfo.formView.mainContainer;
+        formEntity = designInfo.formView.entity;
         formTitle = designInfo.getFormCaption();
         createLayout();
 
@@ -366,7 +369,7 @@ public class DesignView extends JPanel implements Disposable {
     private void redrawForm() {
         formPanel.removeAll();
 
-        JComponent rootWidget = rootComponent.createWidget(project, selection, componentToWidget);
+        JComponent rootWidget = rootComponent.createWidget(project, formEntity, selection, componentToWidget);
         widgetToComponent.clear();
         BaseUtils.reverse(componentToWidget, widgetToComponent);
 

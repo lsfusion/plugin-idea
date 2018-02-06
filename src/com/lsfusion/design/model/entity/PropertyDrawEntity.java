@@ -37,6 +37,11 @@ public class PropertyDrawEntity {
         GroupObjectEntity toDraw = getToDraw(entity);
         return toDraw != null && toDraw.initClassView.isToolbar();
     }
+
+    public boolean isGrid(FormEntity entity) {
+        GroupObjectEntity toDraw = getToDraw(entity);
+        return toDraw != null && toDraw.initClassView.isGrid() && (forceViewType == null || forceViewType.isGrid());
+    }
     
     public ClassViewType forceViewType = null;
     public GroupObjectEntity toDraw;
@@ -57,9 +62,7 @@ public class PropertyDrawEntity {
 
     // следующие параметры берутся из объявления свойства и используются в качестве значений по умолчанию в дизайне 
     public int fixedCharWidth;
-    public int minimumCharWidth;
-    public int maximumCharWidth;
-    public int preferredCharWidth;
+    public int charWidth;
     public String iconPath;
     public KeyStroke changeKey;
     public boolean showChangeKey = true;
@@ -126,7 +129,7 @@ public class PropertyDrawEntity {
 
             List<LSFCharWidthSetting> minCharWidthSettings = propertyOptions.getCharWidthSettingList();
             if (!minCharWidthSettings.isEmpty()) {
-                minimumCharWidth = Integer.parseInt(minCharWidthSettings.get(minCharWidthSettings.size() - 1).getIntLiteral().getText());
+                charWidth = Integer.parseInt(minCharWidthSettings.get(minCharWidthSettings.size() - 1).getIntLiteral().getText());
             }
 
             List<LSFImageSetting> imageSettings = propertyOptions.getImageSettingList();

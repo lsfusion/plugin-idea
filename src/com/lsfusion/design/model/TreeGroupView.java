@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.FormView;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.model.entity.GroupObjectEntity;
 import com.lsfusion.design.model.entity.TreeGroupEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
@@ -37,7 +38,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     }
 
     @Override
-    public double getBaseDefaultFlex() {
+    public double getBaseDefaultFlex(FormEntity formEntity) {
         return 1;
     }
 
@@ -62,7 +63,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         JBScrollPane scrollPane = new JBScrollPane(new TreeGroupTable(this, model)) {
             @Override
             public boolean isValidateRoot() {
@@ -78,7 +79,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
         toolbar.visible = true;
     }
 
-    public int calculatePreferredSize() {
+    public int calculateSize() {
         int size = 0;
         for (GroupObjectEntity groupObject : entity.groups) {
             size += groupObject.isParent ? 35 * 4 : 35;

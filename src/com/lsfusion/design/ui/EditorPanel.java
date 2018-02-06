@@ -12,6 +12,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.DesignInfo;
 import com.lsfusion.design.model.*;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.vfs.LSFDesignVirtualFileImpl;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +48,7 @@ public class EditorPanel extends JPanel {
     private final Project project;
     private LSFDesignVirtualFileImpl file;
     private ContainerView rootComponent;
+    private FormEntity formEntity;
     private ComponentTreeNode rootNode;
 
     private SimpleActionGroup actions = new SimpleActionGroup();
@@ -69,6 +71,7 @@ public class EditorPanel extends JPanel {
         this.file = file;
 
         rootComponent = file.getDesignInfo().formView.mainContainer;
+        formEntity = file.getDesignInfo().formView.entity;
 
         createLayout();
         initUiHandlers();
@@ -215,7 +218,7 @@ public class EditorPanel extends JPanel {
     private void rebuildForm() {
         formPanel.removeAll();
 
-        JComponent rootWidget = rootComponent.createWidget(project, selection, componentToWidget);
+        JComponent rootWidget = rootComponent.createWidget(project, formEntity, selection, componentToWidget);
         widgetToComponent.clear();
         BaseUtils.reverse(componentToWidget, widgetToComponent);
         

@@ -4,6 +4,7 @@ import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.KeyStrokes;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.model.entity.PropertyDrawEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.ClassViewType;
@@ -34,12 +35,8 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("echoSymbols"),
             new ReflectionProperty("noSort").setExpert(),
             new ReflectionProperty("notNull"),
-            new ReflectionProperty("minimumCharWidth").setExpert(),
-            new ReflectionProperty("maximumCharWidth").setExpert(),
-            new ReflectionProperty("preferredCharWidth"),
-            new ReflectionProperty("minimumValueSize").setExpert(),
-            new ReflectionProperty("maximumValueSize").setExpert(),
-            new ReflectionProperty("preferredValueSize"),            
+            new ReflectionProperty("charWidth").setExpert(),
+            new ReflectionProperty("valueSize").setExpert(),
             new ReflectionProperty("changeKey"),
             new ReflectionProperty("showChangeKey").setExpert(),
             new ReflectionProperty("focusable"),
@@ -63,13 +60,9 @@ public class PropertyDrawView extends ComponentView {
     public Long maxValue;
     public boolean echoSymbols;
 
-    public int minimumCharWidth;
-    public int maximumCharWidth;
-    public int preferredCharWidth;
-
-    public Dimension minimumValueSize;
-    public Dimension maximumValueSize;
-    public Dimension preferredValueSize;
+    public int charWidth;    
+    public Dimension valueSize;
+    private Boolean valueFlex;
 
     public KeyStroke changeKey;
     public boolean showChangeKey;
@@ -100,9 +93,7 @@ public class PropertyDrawView extends ComponentView {
         this.entity = entity;
 
         setFixedCharWidth(entity.fixedCharWidth);
-        setMinimumCharWidth(entity.minimumCharWidth);
-        setMaximumCharWidth(entity.maximumCharWidth);
-        setPreferredCharWidth(entity.preferredCharWidth);
+        setCharWidth(entity.charWidth);
         setImagePath(entity.iconPath);
         setChangeKey(entity.changeKey);
         setShowChangeKey(entity.showChangeKey);
@@ -172,205 +163,41 @@ public class PropertyDrawView extends ComponentView {
         this.echoSymbols = echoSymbols;
     }
 
-    public boolean isFlexProperty() {
-        Boolean compareValueWidths = compareValueWidths();
-        if (compareValueWidths != null) {
-            return compareValueWidths;
-        }
-
-        Boolean compareCharWidths = compareCharWidths();
-        if (compareCharWidths != null) {
-            return compareCharWidths;
-        }
-
+    public boolean isHorizontalValueFlex() {
+        if(valueFlex != null)
+            return valueFlex;
         return entity.baseClass != null && entity.baseClass.isFlex();
     }
 
     @Override
-    public double getBaseDefaultFlex() {
-        if (container.isHorizontal() && isFlexProperty())
-            return getBaseValueWidth(new JLabel());
-        return super.getBaseDefaultFlex();
+    public double getBaseDefaultFlex(FormEntity formEntity) {
+        if ((container.isHorizontal() || entity.isGrid(formEntity)) && isHorizontalValueFlex())
+            return getValueWidth(new JLabel());
+        return super.getBaseDefaultFlex(formEntity);
     }
 
     @Override
     public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
-        if (container.isVertical() && isFlexProperty())
+        if (container.isVertical() && isHorizontalValueFlex())
             return FlexAlignment.STRETCH;
         return super.getBaseDefaultAlignment(container);
     }
 
-    private Boolean compareValueWidths() {
-        int baseValueWidth = -1;
-        if (minimumValueSize != null && minimumValueSize.width >= 0 && preferredValueSize != null && preferredValueSize.width >= 0) {
-            baseValueWidth = Math.min(minimumValueSize.width, preferredValueSize.width);
-        }
-        if (baseValueWidth >= 0 && maximumValueSize != null && maximumValueSize.width >= 0) {
-            return maximumValueSize.width > baseValueWidth;
-        }
-        return null;
-    }
-
-    private Boolean compareCharWidths() {
-        int baseCharWidth = -1;
-        if (minimumCharWidth > 0 && preferredCharWidth > 0) {
-            baseCharWidth = Math.min(minimumCharWidth, preferredCharWidth);
-        }
-        if (baseCharWidth > 0 && maximumCharWidth > 0) {
-            return maximumCharWidth > baseCharWidth;
-        }
-        return null;
-    }
-
-    public int getBaseValueWidth(JComponent comp) {
-        return getMinimumValueWidth(comp);
-    }
-    public int getBaseValueHeight(JComponent comp) {
-        return getMinimumValueHeight(comp);
-    }
-
-    public void setMinimumCharWidth(int minimumCharWidth) {
-        this.minimumCharWidth = minimumCharWidth;
-    }
-
-    public void setMaximumCharWidth(int maximumCharWidth) {
-        this.maximumCharWidth = maximumCharWidth;
-    }
-
-    public void setPreferredCharWidth(int preferredCharWidth) {
-        this.preferredCharWidth = preferredCharWidth;
-    }
-
-    public void setFixedCharWidth(int charWidth) {
-        setMinimumCharWidth(charWidth);
-        setMaximumCharWidth(charWidth);
-        setPreferredCharWidth(charWidth);
-    }
-
-    public void setMinimumValueSize(Dimension minimumSize) {
-        this.minimumValueSize = minimumSize;
-    }
-
-    public void setMinimumValueHeight(int minHeight) {
-        if (this.minimumValueSize == null) {
-            this.minimumValueSize = new Dimension(-1, minHeight);
-        } else {
-            this.minimumValueSize.height = minHeight;
-        }
-    }
-
-    public void setMinimumValueWidth(int minWidth) {
-        if (this.minimumValueSize == null) {
-            this.minimumValueSize = new Dimension(minWidth, -1);
-        } else {
-            this.minimumValueSize.width = minWidth;
-        }
-    }
-
-    public void setMaximumValueSize(Dimension maximumSize) {
-        this.maximumValueSize = maximumSize;
-    }
-
-    public void setMaximumValueHeight(int maxHeight) {
-        if (this.maximumValueSize == null) {
-            this.maximumValueSize = new Dimension(-1, maxHeight);
-        } else {
-            this.maximumValueSize.height = maxHeight;
-        }
-    }
-
-    public void setMaximumValueWidth(int maxWidth) {
-        if (this.maximumValueSize == null) {
-            this.maximumValueSize = new Dimension(maxWidth, -1);
-        } else {
-            this.maximumValueSize.width = maxWidth;
-        }
-    }
-
-    public Dimension getMinimumValueSize() {
-        return minimumValueSize;
-    }
-
-    public Dimension getMaximumValueSize() {
-        return maximumValueSize;
-    }
-
-    public Dimension getPreferredValueSize() {
-        return preferredValueSize;
-    }
-
-    public void setPreferredValueSize(Dimension preferredSize) {
-        this.preferredValueSize = preferredSize;
-    }
-
-    public void setPreferredValueHeight(int prefHeight) {
-        if (this.preferredValueSize == null) {
-            this.preferredValueSize = new Dimension(-1, prefHeight);
-        } else {
-            this.preferredValueSize.height = prefHeight;
-        }
-    }
-
-    public void setPreferredValueWidth(int prefWidth) {
-        if (this.preferredValueSize == null) {
-            this.preferredValueSize = new Dimension(prefWidth, -1);
-        } else {
-            this.preferredValueSize.width = prefWidth;
-        }
-    }
-
-    public int getMinimumValueWidth(JComponent comp) {
-        if (minimumValueSize != null && minimumValueSize.width > -1) {
-            return minimumValueSize.width;
+    public int getValueWidth(JComponent comp) {
+        if (valueSize != null && valueSize.width > -1) {
+            return valueSize.width;
         }
         return entity.baseClass != null ?
-                entity.baseClass.getMinimumWidth(minimumCharWidth, comp.getFontMetrics(getFont(comp))) :
-                getDefaultMinimumWidth(minimumCharWidth, comp.getFontMetrics(getFont(comp)));
+                entity.baseClass.getWidth(charWidth, comp.getFontMetrics(getFont(comp))) :
+                getDefaultWidth(charWidth, comp.getFontMetrics(getFont(comp)));
     }
-
-    private int getDefaultMinimumWidth(int minCharWidth, FontMetrics fontMetrics) {
-        String minMask = minCharWidth != 0
-                ? BaseUtils.replicate('0', minCharWidth)
-                : "1234567";
-
-        return fontMetrics.stringWidth(minMask) + 8;
-    }
-
-    public int getMinimumValueHeight(JComponent comp) {
-        if (minimumValueSize != null && minimumValueSize.height > -1) {
-            return minimumValueSize.height;
-        }
-        return getPreferredValueHeight(comp);
-    }
-
-    public Dimension getMinimumValueSize(JComponent comp) {
-        return new Dimension(getMinimumValueWidth(comp), getMinimumValueHeight(comp));
-    }
-
-    public int getPreferredValueWidth(JComponent comp) {
-        if (preferredValueSize != null && preferredValueSize.width > -1) {
-            return preferredValueSize.width;
-        }
-        return entity.baseClass != null ?
-                entity.baseClass.getPreferredWidth(preferredCharWidth, comp.getFontMetrics(getFont(comp))) :
-                getDefaultPreferredWidth(preferredCharWidth, comp.getFontMetrics(getFont(comp)));
-    }
-
-    private int getDefaultPreferredWidth(int prefCharWidth, FontMetrics fontMetrics) {
-        String prefMask = prefCharWidth != 0
-                ? BaseUtils.replicate('0', prefCharWidth)
-                : "1234567";
-
-        return fontMetrics.stringWidth(prefMask) + 8;
-    }
-
-    public int getPreferredValueHeight(JComponent comp) {
-        if (preferredValueSize != null && preferredValueSize.height > -1) {
-            return preferredValueSize.height;
+    public int getValueHeight(JComponent comp) {
+        if (valueSize != null && valueSize.height > -1) {
+            return valueSize.height;
         }
         int height = entity.baseClass != null ?
-                entity.baseClass.getPreferredHeight(comp.getFontMetrics(getFont(comp))) :
-                getDefaultPreferredHeight(comp.getFontMetrics(getFont(comp)));
+                entity.baseClass.getHeight(comp.getFontMetrics(getFont(comp))) :
+                comp.getFontMetrics(getFont(comp)).getHeight() + 1;
         if (imagePath != null) { // предпочитаемую высоту берем исходя из размера иконки
             Icon icon = BaseUtils.loadIcon(entity.project, "/images/design/" + imagePath);
             if(icon != null)
@@ -379,51 +206,41 @@ public class PropertyDrawView extends ComponentView {
         return height;
     }
 
-    private int getDefaultPreferredHeight(FontMetrics fontMetrics) {
-        return fontMetrics.getHeight() + 1;
+    public void setCharWidth(int charWidth) {
+        this.charWidth = charWidth;
     }
 
-    public Dimension getPreferredValueSize(JComponent comp) {
-        return new Dimension(getPreferredValueWidth(comp), getPreferredValueHeight(comp));
+    public void setFixedCharWidth(int charWidth) {
+        setCharWidth(charWidth);
+        valueFlex = true;
     }
 
-    public int getMaximumValueWidth(JComponent comp) {
-        int result;
-        if (maximumValueSize != null && maximumValueSize.width > -1) {
-            result = maximumValueSize.width;
+    public void setValueSize(Dimension minimumSize) {
+        this.valueSize = minimumSize;
+    }
+
+    public void setValueHeight(int minHeight) {
+        if (this.valueSize == null) {
+            this.valueSize = new Dimension(-1, minHeight);
         } else {
-            result = entity.baseClass != null ?
-                    entity.baseClass.getMaximumWidth(maximumCharWidth, comp.getFontMetrics(getFont(comp))) :
-                    getDefaultMaximumWidth(maximumCharWidth, comp.getFontMetrics(getFont(comp)));
+            this.valueSize.height = minHeight;
         }
-        return max(result, getPreferredValueWidth(comp));
     }
 
-    private int getDefaultMaximumWidth(int maxCharWidth, FontMetrics fontMetrics) {
-        if (maxCharWidth != 0)
-            return fontMetrics.stringWidth(BaseUtils.replicate('0', maxCharWidth)) + 8;
-        else
-            return Integer.MAX_VALUE;
-    }
-
-    public int getMaximumValueHeight(JComponent comp) {
-        int result;
-        if (maximumValueSize != null && maximumValueSize.width > -1) {
-            result = maximumValueSize.height;
+    public void setValueWidth(int minWidth) {
+        if (this.valueSize == null) {
+            this.valueSize = new Dimension(minWidth, -1);
         } else {
-            result = entity.baseClass != null ?
-                    entity.baseClass.getMaximumHeight(comp.getFontMetrics(getFont(comp))) :
-                    getDefaultMaximumHeight(comp.getFontMetrics(getFont(comp)));
+            this.valueSize.width = minWidth;
         }
-        return max(result, getPreferredValueHeight(comp));
     }
 
-    private int getDefaultMaximumHeight(FontMetrics fontMetrics) {
-        return getDefaultPreferredHeight(fontMetrics);
-    }
+    private int getDefaultWidth(int minCharWidth, FontMetrics fontMetrics) {
+        String minMask = minCharWidth != 0
+                ? BaseUtils.replicate('0', minCharWidth)
+                : "1234567";
 
-    public Dimension getMaximumValueSize(JComponent comp) {
-        return new Dimension(getMaximumValueWidth(comp), getMaximumValueHeight(comp));
+        return fontMetrics.stringWidth(minMask) + 8;
     }
 
     private Font getFont(Component component) {
@@ -523,16 +340,8 @@ public class PropertyDrawView extends ComponentView {
         return echoSymbols;
     }
 
-    public int getMinimumCharWidth() {
-        return minimumCharWidth;
-    }
-
-    public int getMaximumCharWidth() {
-        return maximumCharWidth;
-    }
-
-    public int getPreferredCharWidth() {
-        return preferredCharWidth;
+    public int getCharWidth() {
+        return charWidth;
     }
 
     public KeyStroke getChangeKey() {
@@ -585,7 +394,7 @@ public class PropertyDrawView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         if (entity.isAction) {
             return new JComponentPanel(new ActionPanelView(project, this));
         } else {

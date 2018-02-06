@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.JComponentPanel;
@@ -21,7 +22,7 @@ public abstract class ComponentView extends PropertiesContainer {
     public static final List<Property> PROPERTIES = Arrays.<Property>asList(
             new ReflectionProperty("minimumSize").setExpert(),
             new ReflectionProperty("maximumSize").setExpert(),
-            new ReflectionProperty("preferredSize"),
+            new ReflectionProperty("size"),
             new ReflectionProperty("autoSize"),
             new ReflectionProperty("flex"),
             new ReflectionProperty("alignment"),
@@ -36,12 +37,10 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("foreground"),
             new ReflectionProperty("imagePath").setExpert()
     );
-
+    
     private String sID;
 
-    public Dimension minimumSize;
-    public Dimension maximumSize;
-    public Dimension preferredSize;
+    public Dimension size;
 
     public boolean autoSize = false;
 
@@ -104,82 +103,24 @@ public abstract class ComponentView extends PropertiesContainer {
         return PROPERTIES;
     }
 
-    public void setMinimumSize(Dimension minimumSize) {
-        this.minimumSize = minimumSize;
+    public void setSize(Dimension size) {
+        this.size = size;
     }
 
-    public void setMinimumHeight(int minHeight) {
-        if (this.minimumSize == null) {
-            this.minimumSize = new Dimension(-1, minHeight);
+    public void setHeight(int prefHeight) {
+        if (this.size == null) {
+            this.size = new Dimension(-1, prefHeight);
         } else {
-            this.minimumSize.height = minHeight;
+            this.size.height = prefHeight;
         }
     }
 
-    public void setMinimumWidth(int minWidth) {
-        if (this.minimumSize == null) {
-            this.minimumSize = new Dimension(minWidth, -1);
+    public void setWidth(int prefWidth) {
+        if (this.size == null) {
+            this.size = new Dimension(prefWidth, -1);
         } else {
-            this.minimumSize.width = minWidth;
+            this.size.width = prefWidth;
         }
-    }
-
-    public void setMaximumSize(Dimension maximumSize) {
-        this.maximumSize = maximumSize;
-    }
-
-    public void setMaximumHeight(int maxHeight) {
-        if (this.maximumSize == null) {
-            this.maximumSize = new Dimension(-1, maxHeight);
-        } else {
-            this.maximumSize.height = maxHeight;
-        }
-    }
-
-    public void setMaximumWidth(int maxWidth) {
-        if (this.maximumSize == null) {
-            this.maximumSize = new Dimension(maxWidth, -1);
-        } else {
-            this.maximumSize.width = maxWidth;
-        }
-    }
-
-    public void setPreferredSize(Dimension preferredSize) {
-        this.preferredSize = preferredSize;
-    }
-
-    public void setPreferredHeight(int prefHeight) {
-        if (this.preferredSize == null) {
-            this.preferredSize = new Dimension(-1, prefHeight);
-        } else {
-            this.preferredSize.height = prefHeight;
-        }
-    }
-
-    public void setPreferredWidth(int prefWidth) {
-        if (this.preferredSize == null) {
-            this.preferredSize = new Dimension(prefWidth, -1);
-        } else {
-            this.preferredSize.width = prefWidth;
-        }
-    }
-
-    public void setFixedSize(Dimension size) {
-        setMinimumSize(size);
-        setMaximumSize(size);
-        setPreferredSize(size);
-    }
-
-    public void setFixedHeight(int height) {
-        setMinimumHeight(height);
-        setMaximumHeight(height);
-        setPreferredHeight(height);
-    }
-
-    public void setFixedWidth(int width) {
-        setMinimumWidth(width);
-        setMaximumWidth(width);
-        setPreferredWidth(width);
     }
 
     public void setAutoSize(boolean autoSize) {
@@ -284,28 +225,23 @@ public abstract class ComponentView extends PropertiesContainer {
     }
 
 
-    public Dimension getMinimumSize() {
-        return minimumSize;
-    }
-
-    public Dimension getMaximumSize() {
-        return maximumSize;
-    }
-
-    public Dimension getPreferredSize() {
-        if (preferredSize == null) {
+    public Dimension getSize() {
+        if (size == null) {
             if (container != null && container.isScroll()) {
                 return new Dimension(-1, 1);
             }
         }
-        return preferredSize;
+        return size;
     }
 
     public boolean isAutoSize() {
         return autoSize;
     }
-
-    public double getFlex() {
+    
+    public double getFlex() { // нужно для проставления в Form Design в блоке свойства (используется через reflextion) 
+        return getFlex(null);
+    }
+    public double getFlex(FormEntity formEntity) {
         ContainerView container = getContainer();
         if (container != null)
             if (container.isScroll() || container.isSplit()) {
@@ -315,18 +251,18 @@ public abstract class ComponentView extends PropertiesContainer {
         if (flex >= 0) {
             return flex;
         }
-        return getDefaultFlex();
+        return getDefaultFlex(formEntity); // тут в верхней 
     }
 
-    public double getDefaultFlex() {
+    public double getDefaultFlex(FormEntity formEntity) {
         ContainerView container = getContainer();
         if (container != null)
             if (container.isTabbedPane()) {
                 return 1;
             }
-        return getBaseDefaultFlex();
+        return getBaseDefaultFlex(formEntity);
     }
-    public double getBaseDefaultFlex() {
+    public double getBaseDefaultFlex(FormEntity formEntity) {
         return 0;
     }
 
@@ -401,14 +337,14 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public abstract Icon getIcon();
 
-    public JComponentPanel createWidget(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget) {
+    public JComponentPanel createWidget(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget) {
         if (forceHide || !selection.get(this)) {
             return null;
         }
 
         JComponentPanel oldWidget = componentToWidget.get(this);
 
-        JComponentPanel widget = createWidgetImpl(project, selection, componentToWidget, oldWidget);
+        JComponentPanel widget = createWidgetImpl(project, formEntity, selection, componentToWidget, oldWidget);
         if (widget != null) {
             Border marginBorder = BorderFactory.createEmptyBorder(marginTop, marginLeft, marginBottom, marginRight);
             widget.setBorder(BorderFactory.createCompoundBorder(marginBorder, widget.getBorder()));
@@ -418,7 +354,7 @@ public abstract class ComponentView extends PropertiesContainer {
         return widget;
     }
 
-    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         JLabel jLabel = new JLabel(getClass().getSimpleName());
         jLabel.setBorder(BorderFactory.createLineBorder(JBColor.BLACK, 1));
         JComponentPanel panel = new JComponentPanel(new BorderLayout());

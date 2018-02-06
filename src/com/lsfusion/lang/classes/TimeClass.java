@@ -19,7 +19,7 @@ public class TimeClass extends DataClass {
     }
 
     @Override
-    public String getPreferredMask() {
+    public String getMask() {
         return DateUtils.timeEditFormat.format(DateUtils.wideFormattableDateTime) + "BT";
     }
 

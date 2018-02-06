@@ -17,7 +17,7 @@ public class DateClass extends DataClass {
     }
 
     @Override
-    public String getPreferredMask() {
+    public String getMask() {
         return DateUtils.dateEditFormat.format(DateUtils.wideFormattableDate) + "BTN";
     }
 

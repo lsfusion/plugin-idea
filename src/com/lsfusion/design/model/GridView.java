@@ -4,6 +4,7 @@ import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.design.ui.FlexAlignment;
@@ -44,7 +45,7 @@ public class GridView extends ComponentView {
     }
 
     @Override
-    public double getBaseDefaultFlex() {
+    public double getBaseDefaultFlex(FormEntity formEntity) {
         return 1;
     }
 
@@ -105,7 +106,7 @@ public class GridView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         if (groupObject.entity.initClassView == ClassViewType.GRID && model.getColumnCount() > 0) {
             GridTable gridTable = new GridTable(autoSize, model, headerHeight);
             JBScrollPane scrollPane = new JBScrollPane(gridTable) {

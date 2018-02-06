@@ -115,10 +115,10 @@ public class TreeGroupTable extends TreeTable {
     }
 
     private void resetPreferredColumnWidths() {
-        getColumnModel().getColumn(0).setPreferredWidth(treeGroup.calculatePreferredSize());
+        getColumnModel().getColumn(0).setPreferredWidth(treeGroup.calculateSize());
         for (int i = 1; i < getModel().getColumnCount(); ++i) {
             PropertyDrawView cell = getColumnProperty(i);
-            getColumnModel().getColumn(i).setPreferredWidth(cell.getPreferredValueWidth(this));
+            getColumnModel().getColumn(i).setPreferredWidth(cell.getValueWidth(this));
         }
     }
 }

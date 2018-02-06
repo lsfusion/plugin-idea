@@ -2,6 +2,7 @@ package com.lsfusion.design.model;
 
 import com.intellij.openapi.project.Project;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.ui.JComponentPanel;
 import com.lsfusion.design.ui.ToolbarGridButton;
 
@@ -32,7 +33,7 @@ public class ShowTypeView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
         if (groupObject.entity.banClassView.size() > 1) {
             return null;
         }

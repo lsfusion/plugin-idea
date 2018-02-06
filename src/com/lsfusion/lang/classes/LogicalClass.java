@@ -17,17 +17,12 @@ public class LogicalClass extends DataClass {
     }
 
     @Override
-    public int getMinimumWidth(int minCharWidth, FontMetrics fontMetrics) {
+    public int getWidth(int minCharWidth, FontMetrics fontMetrics) {
         return 25;
     }
 
     @Override
-    public int getPreferredWidth(int prefCharWidth, FontMetrics fontMetrics) {
-        return 25;
-    }
-
-    @Override
-    public String getPreferredMask() {
+    public String getMask() {
         return "";
     }
 

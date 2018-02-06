@@ -24,35 +24,15 @@ public class JComponentPanel extends JBPanel {
     public JComponentPanel() {
     }
 
-    private Dimension componentMinimumSize;
-    private Dimension componentMaximumSize;
-    private Dimension componentPreferredSize;
+    private Dimension componentSize;
 
-    public void setComponentMinimumSize(Dimension componentMinimumSize) {
-        this.componentMinimumSize = componentMinimumSize;
-    }
-
-    public void setComponentMaximumSize(Dimension componentMaximumSize) {
-        this.componentMaximumSize = componentMaximumSize;
-    }
-
-    public void setComponentPreferredSize(Dimension componentPreferredSize) {
-        this.componentPreferredSize = componentPreferredSize;
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return overrideSize(super.getMinimumSize(), componentMinimumSize);
-    }
-
-    @Override
-    public Dimension getMaximumSize() {
-        return overrideSize(super.getMaximumSize(), componentMaximumSize);
+    public void setComponentSize(Dimension componentSize) {
+        this.componentSize = componentSize;
     }
 
     @Override
     public Dimension getPreferredSize() {
-        return overrideSize(super.getPreferredSize(), componentPreferredSize);
+        return overrideSize(super.getPreferredSize(), componentSize);
     }
 
 }

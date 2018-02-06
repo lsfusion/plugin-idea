@@ -32,7 +32,7 @@ public class LongClass extends IntClass {
     }
 
     @Override
-    public String getPreferredMask() {
+    public String getMask() {
         return "9 999 999 999 999 999 999";
     }
 }
