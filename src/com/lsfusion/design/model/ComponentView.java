@@ -306,6 +306,12 @@ public abstract class ComponentView extends PropertiesContainer {
     }
 
     public double getFlex() {
+        ContainerView container = getContainer();
+        if (container != null)
+            if (container.isScroll() || container.isSplit()) {
+                return 1;
+            }
+            
         if (flex >= 0) {
             return flex;
         }
@@ -315,7 +321,7 @@ public abstract class ComponentView extends PropertiesContainer {
     public double getDefaultFlex() {
         ContainerView container = getContainer();
         if (container != null)
-            if ((container.isScroll() || container.isSplit() || container.isTabbedPane())) {
+            if (container.isTabbedPane()) {
                 return 1;
             }
         return getBaseDefaultFlex();
