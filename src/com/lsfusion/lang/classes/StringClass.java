@@ -97,4 +97,9 @@ public class StringClass extends DataClass {
     public boolean isAssignable(LSFClassSet set) {
         return !(set instanceof StringClass && length.less(((StringClass) set).length)) && super.isAssignable(set);
     }
+
+    @Override
+    public boolean isFlex() {
+        return true;
+    }
 }

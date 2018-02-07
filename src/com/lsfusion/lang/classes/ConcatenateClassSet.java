@@ -82,7 +82,7 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
 
     @Override
     public boolean isFlex() {
-        return true;
+        return false;
     }
 
     @Override

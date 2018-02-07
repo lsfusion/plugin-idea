@@ -398,7 +398,7 @@ public class CustomClassSet implements LSFClassSet {
 
     @Override
     public boolean isFlex() {
-        return true;
+        return false;
     }
 
     @Override

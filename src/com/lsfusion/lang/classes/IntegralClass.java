@@ -55,4 +55,9 @@ public abstract class IntegralClass extends DataClass {
     public boolean fixedSize() {
         return false;
     }
+
+    @Override
+    public boolean isFlex() {
+        return true;
+    }
 }

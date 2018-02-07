@@ -20,9 +20,4 @@ public class DateClass extends DataClass {
     public String getMask() {
         return DateUtils.dateEditFormat.format(DateUtils.wideFormattableDate) + "BTN";
     }
-
-    @Override
-    public boolean isFlex() {
-        return false;
-    }
 }

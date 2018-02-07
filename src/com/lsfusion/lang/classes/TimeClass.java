@@ -23,11 +23,6 @@ public class TimeClass extends DataClass {
         return DateUtils.timeEditFormat.format(DateUtils.wideFormattableDateTime) + "BT";
     }
 
-    @Override
-    public boolean isFlex() {
-        return false;
-    }
-
     public String formatString(Object obj) throws ParseException {
         if (obj != null) {
             return DateUtils.timeFormat.format(obj);

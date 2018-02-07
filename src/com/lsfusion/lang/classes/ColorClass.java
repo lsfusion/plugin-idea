@@ -25,9 +25,4 @@ public class ColorClass extends DataClass {
     public int getWidth(int minCharWidth, FontMetrics fontMetrics) {
         return 40;
     }
-
-    @Override
-    public boolean isFlex() {
-        return false;
-    }
 }

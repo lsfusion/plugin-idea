@@ -28,9 +28,4 @@ public class DateTimeClass extends DataClass {
     public String getMask() {
         return DateUtils.dateTimeEditFormat.format(DateUtils.wideFormattableDateTime) + "BTN";
     }
-
-    @Override
-    public boolean isFlex() {
-        return false;
-    }
 }

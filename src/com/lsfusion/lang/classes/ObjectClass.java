@@ -27,9 +27,4 @@ public class ObjectClass extends DataClass {
     public String getMask() {
         return "1234";
     }
-
-    @Override
-    public boolean isFlex() {
-        return false;
-    }
 }
