@@ -1,5 +1,6 @@
 package com.lsfusion.dependencies.module;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
@@ -9,7 +10,7 @@ public class ModuleDependenciesViewToolWindowFactory implements ToolWindowFactor
     @Override
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         ModuleDependenciesViewFactory factory = ModuleDependenciesViewFactory.getInstance();
-        factory.initToolWindow(project, (ToolWindowEx) toolWindow);
+        DumbService.getInstance(project).smartInvokeLater(() -> factory.initToolWindow(project, (ToolWindowEx) toolWindow));
     }
 
     @Override

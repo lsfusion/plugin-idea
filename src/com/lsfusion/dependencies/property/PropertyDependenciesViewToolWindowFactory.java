@@ -1,5 +1,6 @@
 package com.lsfusion.dependencies.property;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
@@ -9,7 +10,7 @@ public class PropertyDependenciesViewToolWindowFactory implements ToolWindowFact
     @Override
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         PropertyDependenciesViewFactory factory = PropertyDependenciesViewFactory.getInstance();
-        factory.initToolWindow(project, (ToolWindowEx) toolWindow);    
+        DumbService.getInstance(project).smartInvokeLater(() -> factory.initToolWindow(project, (ToolWindowEx) toolWindow));
     }
 
     @Override

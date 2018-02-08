@@ -19,6 +19,7 @@ import com.intellij.ui.CheckboxTreeBase;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.content.Content;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
@@ -187,6 +188,11 @@ public class DesignView extends JPanel implements Disposable {
         this.module = module;
         this.formDeclaration = formDeclaration;
 
+        Content content = toolWindow.getContentManager().getContent(this);
+        if (content != null) {
+            content.setDisplayName(formDeclaration.getDeclName());
+        }
+        
         layoutDesign(module, formDeclaration);
     }
 

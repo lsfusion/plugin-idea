@@ -10,7 +10,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Pair;
@@ -21,6 +20,7 @@ import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.DarculaColors;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.content.Content;
 import com.jgraph.layout.JGraphFacade;
 import com.jgraph.layout.JGraphLayout;
 import com.jgraph.layout.graph.JGraphSimpleLayout;
@@ -270,14 +270,11 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     private void redraw() {
-        DumbService.getInstance(project).smartInvokeLater(() -> {
-            PsiElement newCurrentElement = getSelectedElement();
-            if (newCurrentElement != null && newCurrentElement != currentElement) {
-                currentElement = newCurrentElement;
-                redrawCurrent();
-            }
-        });
-        
+        PsiElement newCurrentElement = getSelectedElement();
+        if (newCurrentElement != null && newCurrentElement != currentElement) {
+            currentElement = newCurrentElement;
+            redrawCurrent();
+        }
     }
 
     private void redrawCurrent() {
@@ -332,8 +329,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         jgraph.refresh();
 
-        if (dataModel.rootNode != null) {
-            toolWindow.getContentManager().getContent(this).setDisplayName(dataModel.rootNode.getSID());
+        Content content = toolWindow.getContentManager().getContent(this);
+        if (content != null && dataModel.rootNode != null) {
+            content.setDisplayName(dataModel.rootNode.getSID());
         }
         
         revalidate();

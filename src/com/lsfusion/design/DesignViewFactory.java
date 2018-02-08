@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.ui.content.impl.ContentImpl;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
@@ -56,9 +57,8 @@ public class DesignViewFactory {
 
         designView = new DesignView(project, toolWindow);
 
-        toolWindow.getComponent().removeAll();
-        toolWindow.getComponent().add(designView);
-        toolWindow.getComponent().repaint();
+        ContentImpl content = new ContentImpl(designView, "", true);
+        toolWindow.getContentManager().addContent(content);
 
         if (moduleDeclaration != null && formDeclaration != null) {
             designView.scheduleRebuild(moduleDeclaration, formDeclaration);
