@@ -359,7 +359,7 @@ public class ContainerView extends ComponentView {
     }
 
     public boolean isVertical() {
-        return isLinearVertical() || isSplitVertical() || isColumns();
+        return isLinearVertical() || isSplitVertical() || isColumns() || isScroll() || isTabbedPane();
     }
 
     public boolean isHorizontal() {

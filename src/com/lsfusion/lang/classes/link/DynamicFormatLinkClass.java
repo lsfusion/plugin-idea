@@ -15,14 +15,4 @@ public class DynamicFormatLinkClass extends LinkClass {
     public String getName() {
         return "CUSTOMLINK";
     }
-
-    @Override
-    public int getHeight(FontMetrics font) {
-        return 18;
-    }
-
-    @Override
-    public int getWidth(int minCharWidth, FontMetrics font) {
-        return 18;
-    }
 }

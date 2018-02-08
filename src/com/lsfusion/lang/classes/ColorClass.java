@@ -18,7 +18,7 @@ public class ColorClass extends DataClass {
 
     @Override
     public String getMask() {
-        return "";
+        throw new UnsupportedOperationException();
     }
 
     @Override

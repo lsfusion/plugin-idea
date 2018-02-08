@@ -23,6 +23,6 @@ public class LogicalClass extends DataClass {
 
     @Override
     public String getMask() {
-        return "";
+        throw new UnsupportedOperationException();
     }
 }

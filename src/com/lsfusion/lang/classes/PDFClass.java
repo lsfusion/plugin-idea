@@ -15,14 +15,4 @@ public class PDFClass extends StaticFormatFileClass {
     public String getName() {
         return "PDFFILE";
     }
-
-    @Override
-    public int getHeight(FontMetrics font) {
-        return 18;
-    }
-
-    @Override
-    public int getWidth(int minCharWidth, FontMetrics font) {
-        return 18;
-    }
 }

@@ -212,7 +212,8 @@ public class PropertyDrawView extends ComponentView {
 
     public void setFixedCharWidth(int charWidth) {
         setCharWidth(charWidth);
-        valueFlex = true;
+        if(charWidth > 0)
+            valueFlex = false;
     }
 
     public void setValueSize(Dimension minimumSize) {

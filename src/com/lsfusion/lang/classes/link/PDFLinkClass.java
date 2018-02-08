@@ -15,14 +15,4 @@ public class PDFLinkClass extends StaticFormatLinkClass {
     public String getName() {
         return "PDFLINK";
     }
-
-    @Override
-    public int getHeight(FontMetrics font) {
-        return 18;
-    }
-
-    @Override
-    public int getWidth(int minCharWidth, FontMetrics font) {
-        return 18;
-    }
 }
