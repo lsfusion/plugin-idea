@@ -47,6 +47,7 @@ import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.Timer;
 
 import static com.lsfusion.dependencies.GraphLayoutComboAction.*;
 
@@ -104,6 +105,15 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
         };
         ActionManager.getInstance().addTimerListener(500, timerListener);
+        
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!toolWindow.isVisible() && jgraph != null && jgraph.getOffscreen() != null && jgraph.getOffgraphics() != null) {
+                    jgraph.releaseOffscreenResources();
+                }
+            }
+        }, 0, 5 * 60 * 1000);
 
         ActionToolbar toolbar = createToolbar();
 
@@ -260,13 +270,14 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     private void redraw() {
-        PsiElement newCurrentElement = getSelectedElement();
-
-        if (newCurrentElement != null && newCurrentElement != currentElement) {
-            currentElement = newCurrentElement;
-
-            DumbService.getInstance(project).smartInvokeLater(this::redrawCurrent);
-        }
+        DumbService.getInstance(project).smartInvokeLater(() -> {
+            PsiElement newCurrentElement = getSelectedElement();
+            if (newCurrentElement != null && newCurrentElement != currentElement) {
+                currentElement = newCurrentElement;
+                redrawCurrent();
+            }
+        });
+        
     }
 
     private void redrawCurrent() {
@@ -320,6 +331,10 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         recolorGraph(true);
 
         jgraph.refresh();
+
+        if (dataModel.rootNode != null) {
+            toolWindow.getContentManager().getContent(this).setDisplayName(dataModel.rootNode.getSID());
+        }
         
         revalidate();
     }

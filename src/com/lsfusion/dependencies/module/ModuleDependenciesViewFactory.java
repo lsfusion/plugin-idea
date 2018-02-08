@@ -2,6 +2,7 @@ package com.lsfusion.dependencies.module;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.ui.content.impl.ContentImpl;
 
 public class ModuleDependenciesViewFactory {
     private static final ModuleDependenciesViewFactory INSTANCE = new ModuleDependenciesViewFactory();
@@ -13,8 +14,7 @@ public class ModuleDependenciesViewFactory {
     public void initToolWindow(Project project, ToolWindowEx toolWindow) {
         ModuleDependenciesView view = new ModuleDependenciesView(project, toolWindow);
 
-        toolWindow.getComponent().removeAll();
-        toolWindow.getComponent().add(view);
-        toolWindow.getComponent().repaint();
+        ContentImpl content = new ContentImpl(view, "", true);
+        toolWindow.getContentManager().addContent(content);
     }
 }
