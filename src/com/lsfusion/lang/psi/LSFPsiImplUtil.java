@@ -2321,9 +2321,12 @@ public class LSFPsiImplUtil {
 
         LSFImportActionPropertyDefinitionBody importDB = PsiTreeUtil.getParentOfType(sourceStatement, LSFImportActionPropertyDefinitionBody.class);
         if(importDB != null) {
-            String importType = importDB.getImportActionSourceType().getText();
-            if(importType != null && importType.contains("XML") && importType.contains("LIST"))
-                return Collections.emptyList();
+            LSFImportActionSourceType sourceType = importDB.getImportActionSourceType();
+            if(sourceType != null) {
+                String importType = sourceType.getText();
+                if (importType != null && importType.contains("XML") && importType.contains("LIST"))
+                    return Collections.emptyList();
+            }
         }
         return Collections.singletonList(IntegerClass.instance);
     }
