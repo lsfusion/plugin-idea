@@ -9,11 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.120</b><br>
+        <b>Version 1.0.121</b><br>
         <ul>
-            <li>Enabling/disabling meta codes optimization</li>
-            <li>OPEN file WAIT|NOWAIT</li>
-            <li>IMPORT default</li>
+            <li>WRITE CLIENT</li>
         </ul>
     ]]>
     </change-notes>
