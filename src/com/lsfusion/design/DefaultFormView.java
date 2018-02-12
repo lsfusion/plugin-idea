@@ -365,12 +365,12 @@ public class DefaultFormView extends FormView {
 
         ContainerView leftControlsContainer = createContainer(null, getToolbarLeftSID());
         leftControlsContainer.setType(ContainerType.CONTAINERH);
-        leftControlsContainer.childrenAlignment = Alignment.LEADING;
+        leftControlsContainer.childrenAlignment = Alignment.START;
         leftControlsContainer.setFlex(0);
 
         ContainerView rightControlsContainer = createContainer(null, getToolbarRightSID());
         rightControlsContainer.setType(ContainerType.CONTAINERH);
-        rightControlsContainer.childrenAlignment = Alignment.TRAILING;
+        rightControlsContainer.childrenAlignment = Alignment.END;
         rightControlsContainer.setFlex(1);
 
 //        leftControlsContainer.add(printFunction);

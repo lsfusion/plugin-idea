@@ -8,7 +8,7 @@ public class FlexPanel extends JComponentPanel {
     private final boolean vertical;
 
     public FlexPanel(boolean vertical) {
-        this(vertical, Alignment.LEADING);
+        this(vertical, Alignment.START);
     }
     
     public FlexPanel(boolean vertical, Alignment childrenAlignment) {
@@ -19,7 +19,7 @@ public class FlexPanel extends JComponentPanel {
     }
 
     public void add(Component child, double flex) {
-        add(child, flex, FlexAlignment.LEADING);
+        add(child, flex, FlexAlignment.START);
     }
 
     public void add(Component child, FlexAlignment align) {

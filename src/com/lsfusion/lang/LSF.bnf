@@ -2014,9 +2014,9 @@ containerTypeLiteral ::=    CONTAINERV
 	                    |	SPLITH
 	                    |	SPLITV
 	                    
-alignmentLiteral ::= LEADING | CENTER | TRAILING
+alignmentLiteral ::= START | CENTER | END
 
-flexAlignmentLiteral ::= LEADING | CENTER | TRAILING | STRETCH
+flexAlignmentLiteral ::= START | CENTER | END | STRETCH
 
 emailRecipientTypeLiteral ::= TO | CC | BCC
 

@@ -24,7 +24,7 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
 
     public void setFill(double fill) {
         setFlex(fill);
-        setAlignment(fill == 0 ? FlexAlignment.LEADING : FlexAlignment.STRETCH);
+        setAlignment(fill == 0 ? FlexAlignment.START : FlexAlignment.STRETCH);
     }
 
     public void setFlex(double flex) {

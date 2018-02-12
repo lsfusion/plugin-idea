@@ -10,16 +10,16 @@ import java.util.List;
 public class ColumnsPanel extends FlexPanel {
 
     public ColumnsPanel(ContainerView container, FormEntity formEntity, List<Component> children) {
-        super(false, Alignment.LEADING);
+        super(false, Alignment.START);
 
         int columnsCount = container.columns;
         JPanel[] columns = new JPanel[columnsCount];
         double columnFlex = getColumnFlex(formEntity, container);
         for (int i = 0; i < columnsCount; ++i) {
             JPanel column = new JPanel();
-            column.setLayout(new FlexLayout(column, true, Alignment.LEADING));
+            column.setLayout(new FlexLayout(column, true, Alignment.START));
             column.setBorder(BorderFactory.createEmptyBorder(0,0,0,4));
-            super.addImpl(column, new FlexConstraints(FlexAlignment.LEADING, columnFlex), -1);
+            super.addImpl(column, new FlexConstraints(FlexAlignment.START, columnFlex), -1);
 
             columns[i] = column;
         }

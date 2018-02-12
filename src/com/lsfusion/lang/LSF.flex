@@ -160,8 +160,8 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "CONTAINERH"              			{ return CONTAINERH; }
   "CONTAINERV"              			{ return CONTAINERV; }
   "COLUMNS"             			    { return COLUMNS; }
-  "LEADING"             			    { return LEADING; }
-  "TRAILING"             			    { return TRAILING; }
+  "START"             			        { return START; }
+  "END"             			        { return END; }
   "STRETCH"             			    { return STRETCH; }
   "CANONICALNAME"                  		{ return CANONICALNAME; }
   "CSV"                  			    { return CSV; }

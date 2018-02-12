@@ -69,7 +69,7 @@ public class FormContainerSet {
         set.noGroupPanelPropsContainer = contFactory.createContainer();
         set.noGroupPanelPropsContainer.setSID(DefaultFormView.getNoGroupObjectSID(""));
 
-        set.mainContainer.setChildrenAlignment(Alignment.LEADING);
+        set.mainContainer.setChildrenAlignment(Alignment.START);
         set.mainContainer.setFlex(1);
         set.mainContainer.setAlignment(FlexAlignment.STRETCH);
         set.mainContainer.add(set.objectsContainer);
@@ -84,7 +84,7 @@ public class FormContainerSet {
 
         set.noGroupPanelContainer.setType(ContainerType.CONTAINERH);
         set.noGroupPanelContainer.setAlignment(FlexAlignment.STRETCH);
-        set.noGroupPanelContainer.setChildrenAlignment(Alignment.LEADING);
+        set.noGroupPanelContainer.setChildrenAlignment(Alignment.START);
         set.noGroupPanelContainer.add(set.noGroupPanelPropsContainer);
 
         set.noGroupPanelPropsContainer.setType(ContainerType.COLUMNS);

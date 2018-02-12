@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.121</version>
+    <version>1.0.122</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,10 +9,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.121</b><br>
+        <b>Version 1.0.122</b><br>
         <ul>
             <li>WRITE CLIENT</li>
             <li>IMPORT/EXPORT JDBC -> TABLE</li>
+            <li>Design: LEADING -> START, TRAILING -> END</li>
         </ul>
     ]]>
     </change-notes>

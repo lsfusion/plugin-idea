@@ -22,7 +22,7 @@ public class TestData {
         main.background = null;
         main.foreground = null;
         main.imagePath = null;
-        main.childrenAlignment = Alignment.LEADING;
+        main.childrenAlignment = Alignment.START;
         main.columns = 4;
         main.type = ContainerType.CONTAINERV;
         main.caption = null;
@@ -41,7 +41,7 @@ public class TestData {
         g_box.background = null;
         g_box.foreground = null;
         g_box.imagePath = null;
-        g_box.childrenAlignment = Alignment.LEADING;
+        g_box.childrenAlignment = Alignment.START;
         g_box.columns = 4;
         g_box.type = ContainerType.CONTAINERV;
         g_box.caption = "Классификатор SKU";
@@ -60,7 +60,7 @@ public class TestData {
         g_grid_box.background = null;
         g_grid_box.foreground = null;
         g_grid_box.imagePath = null;
-        g_grid_box.childrenAlignment = Alignment.LEADING;
+        g_grid_box.childrenAlignment = Alignment.START;
         g_grid_box.columns = 4;
         g_grid_box.type = ContainerType.SPLITH;
         g_grid_box.caption = null;
@@ -111,7 +111,7 @@ public class TestData {
         g_controls.background = null;
         g_controls.foreground = null;
         g_controls.imagePath = null;
-        g_controls.childrenAlignment = Alignment.LEADING;
+        g_controls.childrenAlignment = Alignment.START;
         g_controls.columns = 4;
         g_controls.type = ContainerType.CONTAINERH;
         g_controls.caption = null;
@@ -147,7 +147,7 @@ public class TestData {
         g_controls_right.background = null;
         g_controls_right.foreground = null;
         g_controls_right.imagePath = null;
-        g_controls_right.childrenAlignment = Alignment.TRAILING;
+        g_controls_right.childrenAlignment = Alignment.END;
         g_controls_right.columns = 4;
         g_controls_right.type = ContainerType.CONTAINERH;
         g_controls_right.caption = null;
@@ -166,7 +166,7 @@ public class TestData {
         g_filters.background = null;
         g_filters.foreground = null;
         g_filters.imagePath = null;
-        g_filters.childrenAlignment = Alignment.TRAILING;
+        g_filters.childrenAlignment = Alignment.END;
         g_filters.columns = 4;
         g_filters.type = ContainerType.CONTAINERH;
         g_filters.caption = null;
@@ -186,7 +186,7 @@ public class TestData {
         g_toolbar_props_box.background = null;
         g_toolbar_props_box.foreground = null;
         g_toolbar_props_box.imagePath = null;
-        g_toolbar_props_box.childrenAlignment = Alignment.LEADING;
+        g_toolbar_props_box.childrenAlignment = Alignment.START;
         g_toolbar_props_box.columns = 4;
         g_toolbar_props_box.type = ContainerType.CONTAINERH;
         g_toolbar_props_box.caption = null;
@@ -239,7 +239,7 @@ public class TestData {
         g_panel.background = null;
         g_panel.foreground = null;
         g_panel.imagePath = null;
-        g_panel.childrenAlignment = Alignment.LEADING;
+        g_panel.childrenAlignment = Alignment.START;
         g_panel.columns = 4;
         g_panel.type = ContainerType.CONTAINERV;
         g_panel.caption = null;
@@ -247,7 +247,7 @@ public class TestData {
         ContainerView g_panel_props = new ContainerView("g.panel.props");
         g_panel_props.size = null;
         g_panel_props.setFlex(0.0);
-        g_panel_props.setAlignment(FlexAlignment.LEADING);
+        g_panel_props.setAlignment(FlexAlignment.START);
         g_panel_props.marginTop = 0;
         g_panel_props.marginBottom = 0;
         g_panel_props.marginLeft = 0;
@@ -258,7 +258,7 @@ public class TestData {
         g_panel_props.background = null;
         g_panel_props.foreground = null;
         g_panel_props.imagePath = null;
-        g_panel_props.childrenAlignment = Alignment.LEADING;
+        g_panel_props.childrenAlignment = Alignment.START;
         g_panel_props.columns = 4;
         g_panel_props.type = ContainerType.COLUMNS;
         g_panel_props.caption = null;
@@ -266,7 +266,7 @@ public class TestData {
         PropertyDrawView nameGroup_g_ = new PropertyDrawView("nameGroup(g)");
         nameGroup_g_.size = null;
         nameGroup_g_.setFlex(0.0);
-        nameGroup_g_.setAlignment(FlexAlignment.LEADING);
+        nameGroup_g_.setAlignment(FlexAlignment.START);
         nameGroup_g_.marginTop = 2;
         nameGroup_g_.marginBottom = 2;
         nameGroup_g_.marginLeft = 2;
@@ -313,7 +313,7 @@ public class TestData {
         nogroup_panel.background = null;
         nogroup_panel.foreground = null;
         nogroup_panel.imagePath = null;
-        nogroup_panel.childrenAlignment = Alignment.LEADING;
+        nogroup_panel.childrenAlignment = Alignment.START;
         nogroup_panel.columns = 4;
         nogroup_panel.type = ContainerType.CONTAINERH;
         nogroup_panel.caption = null;
@@ -321,7 +321,7 @@ public class TestData {
         ContainerView nogroup_panel_props = new ContainerView("nogroup.panel.props");
         nogroup_panel_props.size = null;
         nogroup_panel_props.setFlex(0.0);
-        nogroup_panel_props.setAlignment(FlexAlignment.LEADING);
+        nogroup_panel_props.setAlignment(FlexAlignment.START);
         nogroup_panel_props.marginTop = 0;
         nogroup_panel_props.marginBottom = 0;
         nogroup_panel_props.marginLeft = 0;
@@ -332,7 +332,7 @@ public class TestData {
         nogroup_panel_props.background = null;
         nogroup_panel_props.foreground = null;
         nogroup_panel_props.imagePath = null;
-        nogroup_panel_props.childrenAlignment = Alignment.LEADING;
+        nogroup_panel_props.childrenAlignment = Alignment.START;
         nogroup_panel_props.columns = 2;
         nogroup_panel_props.type = ContainerType.COLUMNS;
         nogroup_panel_props.caption = null;
@@ -353,7 +353,7 @@ public class TestData {
         rootContainer.background = null;
         rootContainer.foreground = null;
         rootContainer.imagePath = null;
-        rootContainer.childrenAlignment = Alignment.LEADING;
+        rootContainer.childrenAlignment = Alignment.START;
         rootContainer.columns = 4;
         rootContainer.type = ContainerType.SPLITH;
         rootContainer.caption = null;
@@ -372,7 +372,7 @@ public class TestData {
         row1.background = null;
         row1.foreground = null;
         row1.imagePath = null;
-        row1.childrenAlignment = Alignment.LEADING;
+        row1.childrenAlignment = Alignment.START;
         row1.columns = 4;
         row1.type = ContainerType.CONTAINERV;
         row1.caption = "Классификатор";
@@ -391,7 +391,7 @@ public class TestData {
         gt_box.background = null;
         gt_box.foreground = null;
         gt_box.imagePath = null;
-        gt_box.childrenAlignment = Alignment.LEADING;
+        gt_box.childrenAlignment = Alignment.START;
         gt_box.columns = 4;
         gt_box.type = ContainerType.CONTAINERV;
         gt_box.caption = "Тип классификатора SKU";
@@ -410,7 +410,7 @@ public class TestData {
         gt_grid_box.background = null;
         gt_grid_box.foreground = null;
         gt_grid_box.imagePath = null;
-        gt_grid_box.childrenAlignment = Alignment.LEADING;
+        gt_grid_box.childrenAlignment = Alignment.START;
         gt_grid_box.columns = 4;
         gt_grid_box.type = ContainerType.SPLITH;
         gt_grid_box.caption = null;
@@ -461,7 +461,7 @@ public class TestData {
         gt_controls.background = null;
         gt_controls.foreground = null;
         gt_controls.imagePath = null;
-        gt_controls.childrenAlignment = Alignment.LEADING;
+        gt_controls.childrenAlignment = Alignment.START;
         gt_controls.columns = 4;
         gt_controls.type = ContainerType.CONTAINERH;
         gt_controls.caption = null;
@@ -497,7 +497,7 @@ public class TestData {
         gt_controls_right.background = null;
         gt_controls_right.foreground = null;
         gt_controls_right.imagePath = null;
-        gt_controls_right.childrenAlignment = Alignment.TRAILING;
+        gt_controls_right.childrenAlignment = Alignment.END;
         gt_controls_right.columns = 4;
         gt_controls_right.type = ContainerType.CONTAINERH;
         gt_controls_right.caption = null;
@@ -516,7 +516,7 @@ public class TestData {
         gt_filters.background = null;
         gt_filters.foreground = null;
         gt_filters.imagePath = null;
-        gt_filters.childrenAlignment = Alignment.TRAILING;
+        gt_filters.childrenAlignment = Alignment.END;
         gt_filters.columns = 4;
         gt_filters.type = ContainerType.CONTAINERH;
         gt_filters.caption = null;
@@ -536,7 +536,7 @@ public class TestData {
         gt_toolbar_props_box.background = null;
         gt_toolbar_props_box.foreground = null;
         gt_toolbar_props_box.imagePath = null;
-        gt_toolbar_props_box.childrenAlignment = Alignment.LEADING;
+        gt_toolbar_props_box.childrenAlignment = Alignment.START;
         gt_toolbar_props_box.columns = 4;
         gt_toolbar_props_box.type = ContainerType.CONTAINERH;
         gt_toolbar_props_box.caption = null;
@@ -589,7 +589,7 @@ public class TestData {
         gt_panel.background = null;
         gt_panel.foreground = null;
         gt_panel.imagePath = null;
-        gt_panel.childrenAlignment = Alignment.LEADING;
+        gt_panel.childrenAlignment = Alignment.START;
         gt_panel.columns = 4;
         gt_panel.type = ContainerType.CONTAINERV;
         gt_panel.caption = null;
@@ -597,7 +597,7 @@ public class TestData {
         ContainerView gt_panel_props = new ContainerView("gt.panel.props");
         gt_panel_props.size = null;
         gt_panel_props.setFlex(0.0);
-        gt_panel_props.setAlignment(FlexAlignment.LEADING);
+        gt_panel_props.setAlignment(FlexAlignment.START);
         gt_panel_props.marginTop = 0;
         gt_panel_props.marginBottom = 0;
         gt_panel_props.marginLeft = 0;
@@ -608,7 +608,7 @@ public class TestData {
         gt_panel_props.background = null;
         gt_panel_props.foreground = null;
         gt_panel_props.imagePath = null;
-        gt_panel_props.childrenAlignment = Alignment.LEADING;
+        gt_panel_props.childrenAlignment = Alignment.START;
         gt_panel_props.columns = 4;
         gt_panel_props.type = ContainerType.COLUMNS;
         gt_panel_props.caption = null;
@@ -616,7 +616,7 @@ public class TestData {
         PropertyDrawView nameGroupType_gt_ = new PropertyDrawView("nameGroupType(gt)");
         nameGroupType_gt_.size = null;
         nameGroupType_gt_.setFlex(0.0);
-        nameGroupType_gt_.setAlignment(FlexAlignment.LEADING);
+        nameGroupType_gt_.setAlignment(FlexAlignment.START);
         nameGroupType_gt_.marginTop = 2;
         nameGroupType_gt_.marginBottom = 2;
         nameGroupType_gt_.marginLeft = 2;
@@ -663,7 +663,7 @@ public class TestData {
         itemImage.background = null;
         itemImage.foreground = null;
         itemImage.imagePath = null;
-        itemImage.childrenAlignment = Alignment.LEADING;
+        itemImage.childrenAlignment = Alignment.START;
         itemImage.columns = 4;
         itemImage.type = ContainerType.SPLITV;
         itemImage.caption = null;
@@ -682,7 +682,7 @@ public class TestData {
         groupTree_tree_box.background = null;
         groupTree_tree_box.foreground = null;
         groupTree_tree_box.imagePath = null;
-        groupTree_tree_box.childrenAlignment = Alignment.LEADING;
+        groupTree_tree_box.childrenAlignment = Alignment.START;
         groupTree_tree_box.columns = 4;
         groupTree_tree_box.type = ContainerType.CONTAINERV;
         groupTree_tree_box.caption = "Дерево";
@@ -717,7 +717,7 @@ public class TestData {
         groupTree_tree_controls.background = null;
         groupTree_tree_controls.foreground = null;
         groupTree_tree_controls.imagePath = null;
-        groupTree_tree_controls.childrenAlignment = Alignment.LEADING;
+        groupTree_tree_controls.childrenAlignment = Alignment.START;
         groupTree_tree_controls.columns = 4;
         groupTree_tree_controls.type = ContainerType.CONTAINERH;
         groupTree_tree_controls.caption = null;
@@ -725,7 +725,7 @@ public class TestData {
         ToolbarView groupTree_toolbar = new ToolbarView("groupTree.toolbar");
         groupTree_toolbar.size = null;
         groupTree_toolbar.setFlex(0.0);
-        groupTree_toolbar.setAlignment(FlexAlignment.LEADING);
+        groupTree_toolbar.setAlignment(FlexAlignment.START);
         groupTree_toolbar.marginTop = 2;
         groupTree_toolbar.marginBottom = 2;
         groupTree_toolbar.marginLeft = 2;
@@ -753,7 +753,7 @@ public class TestData {
         groupTree_tree_controls_right.background = null;
         groupTree_tree_controls_right.foreground = null;
         groupTree_tree_controls_right.imagePath = null;
-        groupTree_tree_controls_right.childrenAlignment = Alignment.TRAILING;
+        groupTree_tree_controls_right.childrenAlignment = Alignment.END;
         groupTree_tree_controls_right.columns = 4;
         groupTree_tree_controls_right.type = ContainerType.CONTAINERH;
         groupTree_tree_controls_right.caption = null;
@@ -772,7 +772,7 @@ public class TestData {
         groupTree_tree_filters.background = null;
         groupTree_tree_filters.foreground = null;
         groupTree_tree_filters.imagePath = null;
-        groupTree_tree_filters.childrenAlignment = Alignment.TRAILING;
+        groupTree_tree_filters.childrenAlignment = Alignment.END;
         groupTree_tree_filters.columns = 4;
         groupTree_tree_filters.type = ContainerType.CONTAINERH;
         groupTree_tree_filters.caption = null;
@@ -781,7 +781,7 @@ public class TestData {
 //        filters_inactive.size = null;
 
 //        filters_inactive.setFlex(0.0;
-//        filters_inactive.setAlignment(FlexAlignment.LEADING;
+//        filters_inactive.setAlignment(FlexAlignment.START;
 //        filters_inactive.marginTop = 0;
 //        filters_inactive.marginBottom = 0;
 //        filters_inactive.marginLeft = 0;
@@ -808,7 +808,7 @@ public class TestData {
         groupTree_tree_toolbar_props_box.background = null;
         groupTree_tree_toolbar_props_box.foreground = null;
         groupTree_tree_toolbar_props_box.imagePath = null;
-        groupTree_tree_toolbar_props_box.childrenAlignment = Alignment.LEADING;
+        groupTree_tree_toolbar_props_box.childrenAlignment = Alignment.START;
         groupTree_tree_toolbar_props_box.columns = 4;
         groupTree_tree_toolbar_props_box.type = ContainerType.CONTAINERH;
         groupTree_tree_toolbar_props_box.caption = null;
@@ -881,7 +881,7 @@ public class TestData {
         row2.background = null;
         row2.foreground = null;
         row2.imagePath = null;
-        row2.childrenAlignment = Alignment.LEADING;
+        row2.childrenAlignment = Alignment.START;
         row2.columns = 4;
         row2.type = ContainerType.CONTAINERV;
         row2.caption = null;
@@ -889,7 +889,7 @@ public class TestData {
         ContainerView row21 = new ContainerView("row21");
         row21.size = null;
         row21.setFlex(0.0);
-        row21.setAlignment(FlexAlignment.LEADING);
+        row21.setAlignment(FlexAlignment.START);
         row21.marginTop = 0;
         row21.marginBottom = 0;
         row21.marginLeft = 0;
@@ -900,7 +900,7 @@ public class TestData {
         row21.background = null;
         row21.foreground = null;
         row21.imagePath = null;
-        row21.childrenAlignment = Alignment.LEADING;
+        row21.childrenAlignment = Alignment.START;
         row21.columns = 4;
         row21.type = ContainerType.CONTAINERH;
         row21.caption = null;
@@ -908,7 +908,7 @@ public class TestData {
         PropertyDrawView seekBarcode__ = new PropertyDrawView("seekBarcode()");
         seekBarcode__.size = null;
         seekBarcode__.setFlex(0.0);
-        seekBarcode__.setAlignment(FlexAlignment.LEADING);
+        seekBarcode__.setAlignment(FlexAlignment.START);
         seekBarcode__.marginTop = 2;
         seekBarcode__.marginBottom = 2;
         seekBarcode__.marginLeft = 2;
@@ -941,7 +941,7 @@ public class TestData {
         PropertyDrawView replaceItem_i_ = new PropertyDrawView("replaceItem(i)");
         replaceItem_i_.size = null;
         replaceItem_i_.setFlex(0.0);
-        replaceItem_i_.setAlignment(FlexAlignment.LEADING);
+        replaceItem_i_.setAlignment(FlexAlignment.START);
         replaceItem_i_.marginTop = 2;
         replaceItem_i_.marginBottom = 2;
         replaceItem_i_.marginLeft = 2;
@@ -986,7 +986,7 @@ public class TestData {
         i_box.background = null;
         i_box.foreground = null;
         i_box.imagePath = null;
-        i_box.childrenAlignment = Alignment.LEADING;
+        i_box.childrenAlignment = Alignment.START;
         i_box.columns = 4;
         i_box.type = ContainerType.CONTAINERV;
         i_box.caption = "Товар";
@@ -1005,7 +1005,7 @@ public class TestData {
         i_grid_box.background = null;
         i_grid_box.foreground = null;
         i_grid_box.imagePath = null;
-        i_grid_box.childrenAlignment = Alignment.LEADING;
+        i_grid_box.childrenAlignment = Alignment.START;
         i_grid_box.columns = 4;
         i_grid_box.type = ContainerType.SPLITH;
         i_grid_box.caption = null;
@@ -1057,7 +1057,7 @@ public class TestData {
         i_controls.background = null;
         i_controls.foreground = null;
         i_controls.imagePath = null;
-        i_controls.childrenAlignment = Alignment.LEADING;
+        i_controls.childrenAlignment = Alignment.START;
         i_controls.columns = 4;
         i_controls.type = ContainerType.CONTAINERH;
         i_controls.caption = null;
@@ -1093,7 +1093,7 @@ public class TestData {
         i_controls_right.background = null;
         i_controls_right.foreground = null;
         i_controls_right.imagePath = null;
-        i_controls_right.childrenAlignment = Alignment.TRAILING;
+        i_controls_right.childrenAlignment = Alignment.END;
         i_controls_right.columns = 4;
         i_controls_right.type = ContainerType.CONTAINERH;
         i_controls_right.caption = null;
@@ -1112,7 +1112,7 @@ public class TestData {
         i_filters.background = null;
         i_filters.foreground = null;
         i_filters.imagePath = null;
-        i_filters.childrenAlignment = Alignment.TRAILING;
+        i_filters.childrenAlignment = Alignment.END;
         i_filters.columns = 4;
         i_filters.type = ContainerType.CONTAINERH;
         i_filters.caption = null;
@@ -1120,7 +1120,7 @@ public class TestData {
 //        RegularFilterGroupView filters_inactive2 = new RegularFilterGroupView("filters.inactive");
 //        filters_inactive2.size = null;
 //        filters_inactive2.setFlex(0.0;
-//        filters_inactive2.setAlignment(FlexAlignment.LEADING;
+//        filters_inactive2.setAlignment(FlexAlignment.START;
 //        filters_inactive2.marginTop = 0;
 //        filters_inactive2.marginBottom = 0;
 //        filters_inactive2.marginLeft = 0;
@@ -1135,7 +1135,7 @@ public class TestData {
 //        RegularFilterGroupView filters_groupFilters = new RegularFilterGroupView("filters.groupFilters");
 //        filters_groupFilters.size = null;
 //        filters_groupFilters.setFlex(0.0;
-//        filters_groupFilters.setAlignment(FlexAlignment.LEADING;
+//        filters_groupFilters.setAlignment(FlexAlignment.START;
 //        filters_groupFilters.marginTop = 0;
 //        filters_groupFilters.marginBottom = 0;
 //        filters_groupFilters.marginLeft = 0;
@@ -1162,7 +1162,7 @@ public class TestData {
         i_toolbar_props_box.background = null;
         i_toolbar_props_box.foreground = null;
         i_toolbar_props_box.imagePath = null;
-        i_toolbar_props_box.childrenAlignment = Alignment.LEADING;
+        i_toolbar_props_box.childrenAlignment = Alignment.START;
         i_toolbar_props_box.columns = 4;
         i_toolbar_props_box.type = ContainerType.CONTAINERH;
         i_toolbar_props_box.caption = null;
@@ -1347,7 +1347,7 @@ public class TestData {
         i_panel.background = null;
         i_panel.foreground = null;
         i_panel.imagePath = null;
-        i_panel.childrenAlignment = Alignment.LEADING;
+        i_panel.childrenAlignment = Alignment.START;
         i_panel.columns = 4;
         i_panel.type = ContainerType.CONTAINERV;
         i_panel.caption = null;
@@ -1355,7 +1355,7 @@ public class TestData {
         ContainerView i_panel_props = new ContainerView("i.panel.props");
         i_panel_props.size = null;
         i_panel_props.setFlex(0.0);
-        i_panel_props.setAlignment(FlexAlignment.LEADING);
+        i_panel_props.setAlignment(FlexAlignment.START);
         i_panel_props.marginTop = 0;
         i_panel_props.marginBottom = 0;
         i_panel_props.marginLeft = 0;
@@ -1366,7 +1366,7 @@ public class TestData {
         i_panel_props.background = null;
         i_panel_props.foreground = null;
         i_panel_props.imagePath = null;
-        i_panel_props.childrenAlignment = Alignment.LEADING;
+        i_panel_props.childrenAlignment = Alignment.START;
         i_panel_props.columns = 4;
         i_panel_props.type = ContainerType.COLUMNS;
         i_panel_props.caption = null;
@@ -1374,7 +1374,7 @@ public class TestData {
         PropertyDrawView idBarcodeSku_i_ = new PropertyDrawView("idBarcodeSku(i)");
         idBarcodeSku_i_.size = null;
         idBarcodeSku_i_.setFlex(0.0);
-        idBarcodeSku_i_.setAlignment(FlexAlignment.LEADING);
+        idBarcodeSku_i_.setAlignment(FlexAlignment.START);
         idBarcodeSku_i_.marginTop = 2;
         idBarcodeSku_i_.marginBottom = 2;
         idBarcodeSku_i_.marginLeft = 2;
@@ -1407,7 +1407,7 @@ public class TestData {
         PropertyDrawView idItem_i_ = new PropertyDrawView("idItem(i)");
         idItem_i_.size = null;
         idItem_i_.setFlex(0.0);
-        idItem_i_.setAlignment(FlexAlignment.LEADING);
+        idItem_i_.setAlignment(FlexAlignment.START);
         idItem_i_.marginTop = 2;
         idItem_i_.marginBottom = 2;
         idItem_i_.marginLeft = 2;
@@ -1440,7 +1440,7 @@ public class TestData {
         PropertyDrawView nameAttributeItem_i_ = new PropertyDrawView("nameAttributeItem(i)");
         nameAttributeItem_i_.size = null;
         nameAttributeItem_i_.setFlex(0.0);
-        nameAttributeItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameAttributeItem_i_.setAlignment(FlexAlignment.START);
         nameAttributeItem_i_.marginTop = 2;
         nameAttributeItem_i_.marginBottom = 2;
         nameAttributeItem_i_.marginLeft = 2;
@@ -1473,7 +1473,7 @@ public class TestData {
         PropertyDrawView canonicalNameGroupGroupTypeSku_gt_i_ = new PropertyDrawView("canonicalNameGroupGroupTypeSku(gt,i)");
         canonicalNameGroupGroupTypeSku_gt_i_.size = null;
         canonicalNameGroupGroupTypeSku_gt_i_.setFlex(0.0);
-        canonicalNameGroupGroupTypeSku_gt_i_.setAlignment(FlexAlignment.LEADING);
+        canonicalNameGroupGroupTypeSku_gt_i_.setAlignment(FlexAlignment.START);
         canonicalNameGroupGroupTypeSku_gt_i_.marginTop = 2;
         canonicalNameGroupGroupTypeSku_gt_i_.marginBottom = 2;
         canonicalNameGroupGroupTypeSku_gt_i_.marginLeft = 2;
@@ -1506,7 +1506,7 @@ public class TestData {
         PropertyDrawView inItem_i_ = new PropertyDrawView("inItem(i)");
         inItem_i_.size = null;
         inItem_i_.setFlex(0.0);
-        inItem_i_.setAlignment(FlexAlignment.LEADING);
+        inItem_i_.setAlignment(FlexAlignment.START);
         inItem_i_.marginTop = 2;
         inItem_i_.marginBottom = 2;
         inItem_i_.marginLeft = 2;
@@ -1540,7 +1540,7 @@ public class TestData {
         ContainerView i_itemBase = new ContainerView("i.itemBase");
         i_itemBase.size = null;
         i_itemBase.setFlex(0.0);
-        i_itemBase.setAlignment(FlexAlignment.LEADING);
+        i_itemBase.setAlignment(FlexAlignment.START);
         i_itemBase.marginTop = 0;
         i_itemBase.marginBottom = 0;
         i_itemBase.marginLeft = 0;
@@ -1551,7 +1551,7 @@ public class TestData {
         i_itemBase.background = null;
         i_itemBase.foreground = null;
         i_itemBase.imagePath = null;
-        i_itemBase.childrenAlignment = Alignment.LEADING;
+        i_itemBase.childrenAlignment = Alignment.START;
         i_itemBase.columns = 4;
         i_itemBase.type = ContainerType.COLUMNS;
         i_itemBase.caption = "Базовые свойства";
@@ -1559,7 +1559,7 @@ public class TestData {
         PropertyDrawView captionItem_i_ = new PropertyDrawView("captionItem(i)");
         captionItem_i_.size = null;
         captionItem_i_.setFlex(0.0);
-        captionItem_i_.setAlignment(FlexAlignment.LEADING);
+        captionItem_i_.setAlignment(FlexAlignment.START);
         captionItem_i_.marginTop = 2;
         captionItem_i_.marginBottom = 2;
         captionItem_i_.marginLeft = 2;
@@ -1592,7 +1592,7 @@ public class TestData {
         PropertyDrawView nameUOMItem_i_ = new PropertyDrawView("nameUOMItem(i)");
         nameUOMItem_i_.size = null;
         nameUOMItem_i_.setFlex(0.0);
-        nameUOMItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameUOMItem_i_.setAlignment(FlexAlignment.START);
         nameUOMItem_i_.marginTop = 2;
         nameUOMItem_i_.marginBottom = 2;
         nameUOMItem_i_.marginLeft = 2;
@@ -1625,7 +1625,7 @@ public class TestData {
         PropertyDrawView nameBrandItem_i_ = new PropertyDrawView("nameBrandItem(i)");
         nameBrandItem_i_.size = null;
         nameBrandItem_i_.setFlex(0.0);
-        nameBrandItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameBrandItem_i_.setAlignment(FlexAlignment.START);
         nameBrandItem_i_.marginTop = 2;
         nameBrandItem_i_.marginBottom = 2;
         nameBrandItem_i_.marginLeft = 2;
@@ -1658,7 +1658,7 @@ public class TestData {
         PropertyDrawView nameCountryItem_i_ = new PropertyDrawView("nameCountryItem(i)");
         nameCountryItem_i_.size = null;
         nameCountryItem_i_.setFlex(0.0);
-        nameCountryItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameCountryItem_i_.setAlignment(FlexAlignment.START);
         nameCountryItem_i_.marginTop = 2;
         nameCountryItem_i_.marginBottom = 2;
         nameCountryItem_i_.marginLeft = 2;
@@ -1691,7 +1691,7 @@ public class TestData {
         PropertyDrawView nameManufacturerItem_i_ = new PropertyDrawView("nameManufacturerItem(i)");
         nameManufacturerItem_i_.size = null;
         nameManufacturerItem_i_.setFlex(0.0);
-        nameManufacturerItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameManufacturerItem_i_.setAlignment(FlexAlignment.START);
         nameManufacturerItem_i_.marginTop = 2;
         nameManufacturerItem_i_.marginBottom = 2;
         nameManufacturerItem_i_.marginLeft = 2;
@@ -1724,7 +1724,7 @@ public class TestData {
         PropertyDrawView compositionItem_i_ = new PropertyDrawView("compositionItem(i)");
         compositionItem_i_.size = null;
         compositionItem_i_.setFlex(0.0);
-        compositionItem_i_.setAlignment(FlexAlignment.LEADING);
+        compositionItem_i_.setAlignment(FlexAlignment.START);
         compositionItem_i_.marginTop = 2;
         compositionItem_i_.marginBottom = 2;
         compositionItem_i_.marginLeft = 2;
@@ -1757,7 +1757,7 @@ public class TestData {
         PropertyDrawView nameWareItem_i_ = new PropertyDrawView("nameWareItem(i)");
         nameWareItem_i_.size = null;
         nameWareItem_i_.setFlex(0.0);
-        nameWareItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameWareItem_i_.setAlignment(FlexAlignment.START);
         nameWareItem_i_.marginTop = 2;
         nameWareItem_i_.marginBottom = 2;
         nameWareItem_i_.marginLeft = 2;
@@ -1791,7 +1791,7 @@ public class TestData {
         ContainerView i_itemOriginal = new ContainerView("i.itemOriginal");
         i_itemOriginal.size = null;
         i_itemOriginal.setFlex(0.0);
-        i_itemOriginal.setAlignment(FlexAlignment.LEADING);
+        i_itemOriginal.setAlignment(FlexAlignment.START);
         i_itemOriginal.marginTop = 0;
         i_itemOriginal.marginBottom = 0;
         i_itemOriginal.marginLeft = 0;
@@ -1802,7 +1802,7 @@ public class TestData {
         i_itemOriginal.background = null;
         i_itemOriginal.foreground = null;
         i_itemOriginal.imagePath = null;
-        i_itemOriginal.childrenAlignment = Alignment.LEADING;
+        i_itemOriginal.childrenAlignment = Alignment.START;
         i_itemOriginal.columns = 4;
         i_itemOriginal.type = ContainerType.COLUMNS;
         i_itemOriginal.caption = "Оригинальные свойства";
@@ -1810,7 +1810,7 @@ public class TestData {
         PropertyDrawView originalCaptionItem_i_ = new PropertyDrawView("originalCaptionItem(i)");
         originalCaptionItem_i_.size = null;
         originalCaptionItem_i_.setFlex(0.0);
-        originalCaptionItem_i_.setAlignment(FlexAlignment.LEADING);
+        originalCaptionItem_i_.setAlignment(FlexAlignment.START);
         originalCaptionItem_i_.marginTop = 2;
         originalCaptionItem_i_.marginBottom = 2;
         originalCaptionItem_i_.marginLeft = 2;
@@ -1843,7 +1843,7 @@ public class TestData {
         PropertyDrawView originalCompositionItem_i_ = new PropertyDrawView("originalCompositionItem(i)");
         originalCompositionItem_i_.size = null;
         originalCompositionItem_i_.setFlex(0.0);
-        originalCompositionItem_i_.setAlignment(FlexAlignment.LEADING);
+        originalCompositionItem_i_.setAlignment(FlexAlignment.START);
         originalCompositionItem_i_.marginTop = 2;
         originalCompositionItem_i_.marginBottom = 2;
         originalCompositionItem_i_.marginLeft = 2;
@@ -1876,7 +1876,7 @@ public class TestData {
         PropertyDrawView originalCustomsGroupItem_i_ = new PropertyDrawView("originalCustomsGroupItem(i)");
         originalCustomsGroupItem_i_.size = null;
         originalCustomsGroupItem_i_.setFlex(0.0);
-        originalCustomsGroupItem_i_.setAlignment(FlexAlignment.LEADING);
+        originalCustomsGroupItem_i_.setAlignment(FlexAlignment.START);
         originalCustomsGroupItem_i_.marginTop = 2;
         originalCustomsGroupItem_i_.marginBottom = 2;
         originalCustomsGroupItem_i_.marginLeft = 2;
@@ -1910,7 +1910,7 @@ public class TestData {
         ContainerView i_itemSize = new ContainerView("i.itemSize");
         i_itemSize.size = null;
         i_itemSize.setFlex(0.0);
-        i_itemSize.setAlignment(FlexAlignment.LEADING);
+        i_itemSize.setAlignment(FlexAlignment.START);
         i_itemSize.marginTop = 0;
         i_itemSize.marginBottom = 0;
         i_itemSize.marginLeft = 0;
@@ -1921,7 +1921,7 @@ public class TestData {
         i_itemSize.background = null;
         i_itemSize.foreground = null;
         i_itemSize.imagePath = null;
-        i_itemSize.childrenAlignment = Alignment.LEADING;
+        i_itemSize.childrenAlignment = Alignment.START;
         i_itemSize.columns = 4;
         i_itemSize.type = ContainerType.COLUMNS;
         i_itemSize.caption = "Габариты товара";
@@ -1929,7 +1929,7 @@ public class TestData {
         PropertyDrawView netWeightItem_i_ = new PropertyDrawView("netWeightItem(i)");
         netWeightItem_i_.size = null;
         netWeightItem_i_.setFlex(0.0);
-        netWeightItem_i_.setAlignment(FlexAlignment.LEADING);
+        netWeightItem_i_.setAlignment(FlexAlignment.START);
         netWeightItem_i_.marginTop = 2;
         netWeightItem_i_.marginBottom = 2;
         netWeightItem_i_.marginLeft = 2;
@@ -1962,7 +1962,7 @@ public class TestData {
         PropertyDrawView grossWeightItem_i_ = new PropertyDrawView("grossWeightItem(i)");
         grossWeightItem_i_.size = null;
         grossWeightItem_i_.setFlex(0.0);
-        grossWeightItem_i_.setAlignment(FlexAlignment.LEADING);
+        grossWeightItem_i_.setAlignment(FlexAlignment.START);
         grossWeightItem_i_.marginTop = 2;
         grossWeightItem_i_.marginBottom = 2;
         grossWeightItem_i_.marginLeft = 2;
@@ -1995,7 +1995,7 @@ public class TestData {
         PropertyDrawView lengthItem_i_ = new PropertyDrawView("lengthItem(i)");
         lengthItem_i_.size = null;
         lengthItem_i_.setFlex(0.0);
-        lengthItem_i_.setAlignment(FlexAlignment.LEADING);
+        lengthItem_i_.setAlignment(FlexAlignment.START);
         lengthItem_i_.marginTop = 2;
         lengthItem_i_.marginBottom = 2;
         lengthItem_i_.marginLeft = 2;
@@ -2028,7 +2028,7 @@ public class TestData {
         PropertyDrawView widthItem_i_ = new PropertyDrawView("widthItem(i)");
         widthItem_i_.size = null;
         widthItem_i_.setFlex(0.0);
-        widthItem_i_.setAlignment(FlexAlignment.LEADING);
+        widthItem_i_.setAlignment(FlexAlignment.START);
         widthItem_i_.marginTop = 2;
         widthItem_i_.marginBottom = 2;
         widthItem_i_.marginLeft = 2;
@@ -2061,7 +2061,7 @@ public class TestData {
         PropertyDrawView heightItem_i_ = new PropertyDrawView("heightItem(i)");
         heightItem_i_.size = null;
         heightItem_i_.setFlex(0.0);
-        heightItem_i_.setAlignment(FlexAlignment.LEADING);
+        heightItem_i_.setAlignment(FlexAlignment.START);
         heightItem_i_.marginTop = 2;
         heightItem_i_.marginBottom = 2;
         heightItem_i_.marginLeft = 2;
@@ -2094,7 +2094,7 @@ public class TestData {
         PropertyDrawView volumeItem_i_ = new PropertyDrawView("volumeItem(i)");
         volumeItem_i_.size = null;
         volumeItem_i_.setFlex(0.0);
-        volumeItem_i_.setAlignment(FlexAlignment.LEADING);
+        volumeItem_i_.setAlignment(FlexAlignment.START);
         volumeItem_i_.marginTop = 2;
         volumeItem_i_.marginBottom = 2;
         volumeItem_i_.marginLeft = 2;
@@ -2128,7 +2128,7 @@ public class TestData {
         ContainerView i_itemArticle = new ContainerView("i.itemArticle");
         i_itemArticle.size = null;
         i_itemArticle.setFlex(0.0);
-        i_itemArticle.setAlignment(FlexAlignment.LEADING);
+        i_itemArticle.setAlignment(FlexAlignment.START);
         i_itemArticle.marginTop = 0;
         i_itemArticle.marginBottom = 0;
         i_itemArticle.marginLeft = 0;
@@ -2139,7 +2139,7 @@ public class TestData {
         i_itemArticle.background = null;
         i_itemArticle.foreground = null;
         i_itemArticle.imagePath = null;
-        i_itemArticle.childrenAlignment = Alignment.LEADING;
+        i_itemArticle.childrenAlignment = Alignment.START;
         i_itemArticle.columns = 4;
         i_itemArticle.type = ContainerType.COLUMNS;
         i_itemArticle.caption = "Артикул";
@@ -2147,7 +2147,7 @@ public class TestData {
         PropertyDrawView idArticleItem_i_ = new PropertyDrawView("idArticleItem(i)");
         idArticleItem_i_.size = null;
         idArticleItem_i_.setFlex(0.0);
-        idArticleItem_i_.setAlignment(FlexAlignment.LEADING);
+        idArticleItem_i_.setAlignment(FlexAlignment.START);
         idArticleItem_i_.marginTop = 2;
         idArticleItem_i_.marginBottom = 2;
         idArticleItem_i_.marginLeft = 2;
@@ -2180,7 +2180,7 @@ public class TestData {
         PropertyDrawView nameColorItem_i_ = new PropertyDrawView("nameColorItem(i)");
         nameColorItem_i_.size = null;
         nameColorItem_i_.setFlex(0.0);
-        nameColorItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameColorItem_i_.setAlignment(FlexAlignment.START);
         nameColorItem_i_.marginTop = 2;
         nameColorItem_i_.marginBottom = 2;
         nameColorItem_i_.marginLeft = 2;
@@ -2213,7 +2213,7 @@ public class TestData {
         PropertyDrawView nameSizeItem_i_ = new PropertyDrawView("nameSizeItem(i)");
         nameSizeItem_i_.size = null;
         nameSizeItem_i_.setFlex(0.0);
-        nameSizeItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameSizeItem_i_.setAlignment(FlexAlignment.START);
         nameSizeItem_i_.marginTop = 2;
         nameSizeItem_i_.marginBottom = 2;
         nameSizeItem_i_.marginLeft = 2;
@@ -2246,7 +2246,7 @@ public class TestData {
         PropertyDrawView nameSeasonYearItem_i_ = new PropertyDrawView("nameSeasonYearItem(i)");
         nameSeasonYearItem_i_.size = null;
         nameSeasonYearItem_i_.setFlex(0.0);
-        nameSeasonYearItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameSeasonYearItem_i_.setAlignment(FlexAlignment.START);
         nameSeasonYearItem_i_.marginTop = 2;
         nameSeasonYearItem_i_.marginBottom = 2;
         nameSeasonYearItem_i_.marginLeft = 2;
@@ -2279,7 +2279,7 @@ public class TestData {
         PropertyDrawView nameSeasonItem_i_ = new PropertyDrawView("nameSeasonItem(i)");
         nameSeasonItem_i_.size = null;
         nameSeasonItem_i_.setFlex(0.0);
-        nameSeasonItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameSeasonItem_i_.setAlignment(FlexAlignment.START);
         nameSeasonItem_i_.marginTop = 2;
         nameSeasonItem_i_.marginBottom = 2;
         nameSeasonItem_i_.marginLeft = 2;
@@ -2312,7 +2312,7 @@ public class TestData {
         PropertyDrawView nameCollectionItem_i_ = new PropertyDrawView("nameCollectionItem(i)");
         nameCollectionItem_i_.size = null;
         nameCollectionItem_i_.setFlex(0.0);
-        nameCollectionItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameCollectionItem_i_.setAlignment(FlexAlignment.START);
         nameCollectionItem_i_.marginTop = 2;
         nameCollectionItem_i_.marginBottom = 2;
         nameCollectionItem_i_.marginLeft = 2;
@@ -2346,7 +2346,7 @@ public class TestData {
         ContainerView i_itemDescription = new ContainerView("i.itemDescription");
         i_itemDescription.size = null;
         i_itemDescription.setFlex(0.0);
-        i_itemDescription.setAlignment(FlexAlignment.LEADING);
+        i_itemDescription.setAlignment(FlexAlignment.START);
         i_itemDescription.marginTop = 0;
         i_itemDescription.marginBottom = 0;
         i_itemDescription.marginLeft = 0;
@@ -2357,7 +2357,7 @@ public class TestData {
         i_itemDescription.background = null;
         i_itemDescription.foreground = null;
         i_itemDescription.imagePath = null;
-        i_itemDescription.childrenAlignment = Alignment.LEADING;
+        i_itemDescription.childrenAlignment = Alignment.START;
         i_itemDescription.columns = 4;
         i_itemDescription.type = ContainerType.COLUMNS;
         i_itemDescription.caption = "Описание";
@@ -2365,7 +2365,7 @@ public class TestData {
         PropertyDrawView nameTypeItem_i_ = new PropertyDrawView("nameTypeItem(i)");
         nameTypeItem_i_.size = null;
         nameTypeItem_i_.setFlex(0.0);
-        nameTypeItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameTypeItem_i_.setAlignment(FlexAlignment.START);
         nameTypeItem_i_.marginTop = 2;
         nameTypeItem_i_.marginBottom = 2;
         nameTypeItem_i_.marginLeft = 2;
@@ -2398,7 +2398,7 @@ public class TestData {
         PropertyDrawView nameSortItem_i_ = new PropertyDrawView("nameSortItem(i)");
         nameSortItem_i_.size = null;
         nameSortItem_i_.setFlex(0.0);
-        nameSortItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameSortItem_i_.setAlignment(FlexAlignment.START);
         nameSortItem_i_.marginTop = 2;
         nameSortItem_i_.marginBottom = 2;
         nameSortItem_i_.marginLeft = 2;
@@ -2431,7 +2431,7 @@ public class TestData {
         PropertyDrawView nameFormItem_i_ = new PropertyDrawView("nameFormItem(i)");
         nameFormItem_i_.size = null;
         nameFormItem_i_.setFlex(0.0);
-        nameFormItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameFormItem_i_.setAlignment(FlexAlignment.START);
         nameFormItem_i_.marginTop = 2;
         nameFormItem_i_.marginBottom = 2;
         nameFormItem_i_.marginLeft = 2;
@@ -2464,7 +2464,7 @@ public class TestData {
         PropertyDrawView nameFeatureItem_i_ = new PropertyDrawView("nameFeatureItem(i)");
         nameFeatureItem_i_.size = null;
         nameFeatureItem_i_.setFlex(0.0);
-        nameFeatureItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameFeatureItem_i_.setAlignment(FlexAlignment.START);
         nameFeatureItem_i_.marginTop = 2;
         nameFeatureItem_i_.marginBottom = 2;
         nameFeatureItem_i_.marginLeft = 2;
@@ -2497,7 +2497,7 @@ public class TestData {
         PropertyDrawView namePackItem_i_ = new PropertyDrawView("namePackItem(i)");
         namePackItem_i_.size = null;
         namePackItem_i_.setFlex(0.0);
-        namePackItem_i_.setAlignment(FlexAlignment.LEADING);
+        namePackItem_i_.setAlignment(FlexAlignment.START);
         namePackItem_i_.marginTop = 2;
         namePackItem_i_.marginBottom = 2;
         namePackItem_i_.marginLeft = 2;
@@ -2530,7 +2530,7 @@ public class TestData {
         PropertyDrawView propertyItem_i_ = new PropertyDrawView("propertyItem(i)");
         propertyItem_i_.size = null;
         propertyItem_i_.setFlex(0.0);
-        propertyItem_i_.setAlignment(FlexAlignment.LEADING);
+        propertyItem_i_.setAlignment(FlexAlignment.START);
         propertyItem_i_.marginTop = 2;
         propertyItem_i_.marginBottom = 2;
         propertyItem_i_.marginLeft = 2;
@@ -2563,7 +2563,7 @@ public class TestData {
         PropertyDrawView numberComponentsItem_i_ = new PropertyDrawView("numberComponentsItem(i)");
         numberComponentsItem_i_.size = null;
         numberComponentsItem_i_.setFlex(0.0);
-        numberComponentsItem_i_.setAlignment(FlexAlignment.LEADING);
+        numberComponentsItem_i_.setAlignment(FlexAlignment.START);
         numberComponentsItem_i_.marginTop = 2;
         numberComponentsItem_i_.marginBottom = 2;
         numberComponentsItem_i_.marginLeft = 2;
@@ -2597,7 +2597,7 @@ public class TestData {
         ContainerView i_itemFashion = new ContainerView("i.itemFashion");
         i_itemFashion.size = null;
         i_itemFashion.setFlex(0.0);
-        i_itemFashion.setAlignment(FlexAlignment.LEADING);
+        i_itemFashion.setAlignment(FlexAlignment.START);
         i_itemFashion.marginTop = 0;
         i_itemFashion.marginBottom = 0;
         i_itemFashion.marginLeft = 0;
@@ -2608,7 +2608,7 @@ public class TestData {
         i_itemFashion.background = null;
         i_itemFashion.foreground = null;
         i_itemFashion.imagePath = null;
-        i_itemFashion.childrenAlignment = Alignment.LEADING;
+        i_itemFashion.childrenAlignment = Alignment.START;
         i_itemFashion.columns = 4;
         i_itemFashion.type = ContainerType.COLUMNS;
         i_itemFashion.caption = "Одежда";
@@ -2616,7 +2616,7 @@ public class TestData {
         PropertyDrawView sizeHeightItem_i_ = new PropertyDrawView("sizeHeightItem(i)");
         sizeHeightItem_i_.size = null;
         sizeHeightItem_i_.setFlex(0.0);
-        sizeHeightItem_i_.setAlignment(FlexAlignment.LEADING);
+        sizeHeightItem_i_.setAlignment(FlexAlignment.START);
         sizeHeightItem_i_.marginTop = 2;
         sizeHeightItem_i_.marginBottom = 2;
         sizeHeightItem_i_.marginLeft = 2;
@@ -2649,7 +2649,7 @@ public class TestData {
         PropertyDrawView sizeChestItem_i_ = new PropertyDrawView("sizeChestItem(i)");
         sizeChestItem_i_.size = null;
         sizeChestItem_i_.setFlex(0.0);
-        sizeChestItem_i_.setAlignment(FlexAlignment.LEADING);
+        sizeChestItem_i_.setAlignment(FlexAlignment.START);
         sizeChestItem_i_.marginTop = 2;
         sizeChestItem_i_.marginBottom = 2;
         sizeChestItem_i_.marginLeft = 2;
@@ -2682,7 +2682,7 @@ public class TestData {
         PropertyDrawView sizeUnderChestItem_i_ = new PropertyDrawView("sizeUnderChestItem(i)");
         sizeUnderChestItem_i_.size = null;
         sizeUnderChestItem_i_.setFlex(0.0);
-        sizeUnderChestItem_i_.setAlignment(FlexAlignment.LEADING);
+        sizeUnderChestItem_i_.setAlignment(FlexAlignment.START);
         sizeUnderChestItem_i_.marginTop = 2;
         sizeUnderChestItem_i_.marginBottom = 2;
         sizeUnderChestItem_i_.marginLeft = 2;
@@ -2715,7 +2715,7 @@ public class TestData {
         PropertyDrawView sizeCupBraItem_i_ = new PropertyDrawView("sizeCupBraItem(i)");
         sizeCupBraItem_i_.size = null;
         sizeCupBraItem_i_.setFlex(0.0);
-        sizeCupBraItem_i_.setAlignment(FlexAlignment.LEADING);
+        sizeCupBraItem_i_.setAlignment(FlexAlignment.START);
         sizeCupBraItem_i_.marginTop = 2;
         sizeCupBraItem_i_.marginBottom = 2;
         sizeCupBraItem_i_.marginLeft = 2;
@@ -2748,7 +2748,7 @@ public class TestData {
         PropertyDrawView sizeHipsItem_i_ = new PropertyDrawView("sizeHipsItem(i)");
         sizeHipsItem_i_.size = null;
         sizeHipsItem_i_.setFlex(0.0);
-        sizeHipsItem_i_.setAlignment(FlexAlignment.LEADING);
+        sizeHipsItem_i_.setAlignment(FlexAlignment.START);
         sizeHipsItem_i_.marginTop = 2;
         sizeHipsItem_i_.marginBottom = 2;
         sizeHipsItem_i_.marginLeft = 2;
@@ -2781,7 +2781,7 @@ public class TestData {
         PropertyDrawView sizeWaistItem_i_ = new PropertyDrawView("sizeWaistItem(i)");
         sizeWaistItem_i_.size = null;
         sizeWaistItem_i_.setFlex(0.0);
-        sizeWaistItem_i_.setAlignment(FlexAlignment.LEADING);
+        sizeWaistItem_i_.setAlignment(FlexAlignment.START);
         sizeWaistItem_i_.marginTop = 2;
         sizeWaistItem_i_.marginBottom = 2;
         sizeWaistItem_i_.marginLeft = 2;
@@ -2814,7 +2814,7 @@ public class TestData {
         PropertyDrawView sizeNeckItem_i_ = new PropertyDrawView("sizeNeckItem(i)");
         sizeNeckItem_i_.size = null;
         sizeNeckItem_i_.setFlex(0.0);
-        sizeNeckItem_i_.setAlignment(FlexAlignment.LEADING);
+        sizeNeckItem_i_.setAlignment(FlexAlignment.START);
         sizeNeckItem_i_.marginTop = 2;
         sizeNeckItem_i_.marginBottom = 2;
         sizeNeckItem_i_.marginLeft = 2;
@@ -2847,7 +2847,7 @@ public class TestData {
         PropertyDrawView sizeHeadItem_i_ = new PropertyDrawView("sizeHeadItem(i)");
         sizeHeadItem_i_.size = null;
         sizeHeadItem_i_.setFlex(0.0);
-        sizeHeadItem_i_.setAlignment(FlexAlignment.LEADING);
+        sizeHeadItem_i_.setAlignment(FlexAlignment.START);
         sizeHeadItem_i_.marginTop = 2;
         sizeHeadItem_i_.marginBottom = 2;
         sizeHeadItem_i_.marginLeft = 2;
@@ -2880,7 +2880,7 @@ public class TestData {
         PropertyDrawView sizeHandItem_i_ = new PropertyDrawView("sizeHandItem(i)");
         sizeHandItem_i_.size = null;
         sizeHandItem_i_.setFlex(0.0);
-        sizeHandItem_i_.setAlignment(FlexAlignment.LEADING);
+        sizeHandItem_i_.setAlignment(FlexAlignment.START);
         sizeHandItem_i_.marginTop = 2;
         sizeHandItem_i_.marginBottom = 2;
         sizeHandItem_i_.marginLeft = 2;
@@ -2913,7 +2913,7 @@ public class TestData {
         PropertyDrawView footLengthItem_i_ = new PropertyDrawView("footLengthItem(i)");
         footLengthItem_i_.size = null;
         footLengthItem_i_.setFlex(0.0);
-        footLengthItem_i_.setAlignment(FlexAlignment.LEADING);
+        footLengthItem_i_.setAlignment(FlexAlignment.START);
         footLengthItem_i_.marginTop = 2;
         footLengthItem_i_.marginBottom = 2;
         footLengthItem_i_.marginLeft = 2;
@@ -2946,7 +2946,7 @@ public class TestData {
         PropertyDrawView insoleLengthItem_i_ = new PropertyDrawView("insoleLengthItem(i)");
         insoleLengthItem_i_.size = null;
         insoleLengthItem_i_.setFlex(0.0);
-        insoleLengthItem_i_.setAlignment(FlexAlignment.LEADING);
+        insoleLengthItem_i_.setAlignment(FlexAlignment.START);
         insoleLengthItem_i_.marginTop = 2;
         insoleLengthItem_i_.marginBottom = 2;
         insoleLengthItem_i_.marginLeft = 2;
@@ -2980,7 +2980,7 @@ public class TestData {
         ContainerView i_itemSticker = new ContainerView("i.itemSticker");
         i_itemSticker.size = null;
         i_itemSticker.setFlex(0.0);
-        i_itemSticker.setAlignment(FlexAlignment.LEADING);
+        i_itemSticker.setAlignment(FlexAlignment.START);
         i_itemSticker.marginTop = 0;
         i_itemSticker.marginBottom = 0;
         i_itemSticker.marginLeft = 0;
@@ -2991,7 +2991,7 @@ public class TestData {
         i_itemSticker.background = null;
         i_itemSticker.foreground = null;
         i_itemSticker.imagePath = null;
-        i_itemSticker.childrenAlignment = Alignment.LEADING;
+        i_itemSticker.childrenAlignment = Alignment.START;
         i_itemSticker.columns = 4;
         i_itemSticker.type = ContainerType.COLUMNS;
         i_itemSticker.caption = "Стикер";
@@ -2999,7 +2999,7 @@ public class TestData {
         PropertyDrawView compositionStickerItem_i_ = new PropertyDrawView("compositionStickerItem(i)");
         compositionStickerItem_i_.size = null;
         compositionStickerItem_i_.setFlex(0.0);
-        compositionStickerItem_i_.setAlignment(FlexAlignment.LEADING);
+        compositionStickerItem_i_.setAlignment(FlexAlignment.START);
         compositionStickerItem_i_.marginTop = 2;
         compositionStickerItem_i_.marginBottom = 2;
         compositionStickerItem_i_.marginLeft = 2;
@@ -3033,7 +3033,7 @@ public class TestData {
         ContainerView i_itemFood = new ContainerView("i.itemFood");
         i_itemFood.size = null;
         i_itemFood.setFlex(0.0);
-        i_itemFood.setAlignment(FlexAlignment.LEADING);
+        i_itemFood.setAlignment(FlexAlignment.START);
         i_itemFood.marginTop = 0;
         i_itemFood.marginBottom = 0;
         i_itemFood.marginLeft = 0;
@@ -3044,7 +3044,7 @@ public class TestData {
         i_itemFood.background = null;
         i_itemFood.foreground = null;
         i_itemFood.imagePath = null;
-        i_itemFood.childrenAlignment = Alignment.LEADING;
+        i_itemFood.childrenAlignment = Alignment.START;
         i_itemFood.columns = 4;
         i_itemFood.type = ContainerType.COLUMNS;
         i_itemFood.caption = "Пищевые характеристики";
@@ -3052,7 +3052,7 @@ public class TestData {
         PropertyDrawView nameTasteItem_i_ = new PropertyDrawView("nameTasteItem(i)");
         nameTasteItem_i_.size = null;
         nameTasteItem_i_.setFlex(0.0);
-        nameTasteItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameTasteItem_i_.setAlignment(FlexAlignment.START);
         nameTasteItem_i_.marginTop = 2;
         nameTasteItem_i_.marginBottom = 2;
         nameTasteItem_i_.marginLeft = 2;
@@ -3085,7 +3085,7 @@ public class TestData {
         PropertyDrawView nameCoolingDegreeItem_i_ = new PropertyDrawView("nameCoolingDegreeItem(i)");
         nameCoolingDegreeItem_i_.size = null;
         nameCoolingDegreeItem_i_.setFlex(0.0);
-        nameCoolingDegreeItem_i_.setAlignment(FlexAlignment.LEADING);
+        nameCoolingDegreeItem_i_.setAlignment(FlexAlignment.START);
         nameCoolingDegreeItem_i_.marginTop = 2;
         nameCoolingDegreeItem_i_.marginBottom = 2;
         nameCoolingDegreeItem_i_.marginLeft = 2;
@@ -3118,7 +3118,7 @@ public class TestData {
         PropertyDrawView percentFatItem_i_ = new PropertyDrawView("percentFatItem(i)");
         percentFatItem_i_.size = null;
         percentFatItem_i_.setFlex(0.0);
-        percentFatItem_i_.setAlignment(FlexAlignment.LEADING);
+        percentFatItem_i_.setAlignment(FlexAlignment.START);
         percentFatItem_i_.marginTop = 2;
         percentFatItem_i_.marginBottom = 2;
         percentFatItem_i_.marginLeft = 2;
@@ -3151,7 +3151,7 @@ public class TestData {
         PropertyDrawView percentAlcoholItem_i_ = new PropertyDrawView("percentAlcoholItem(i)");
         percentAlcoholItem_i_.size = null;
         percentAlcoholItem_i_.setFlex(0.0);
-        percentAlcoholItem_i_.setAlignment(FlexAlignment.LEADING);
+        percentAlcoholItem_i_.setAlignment(FlexAlignment.START);
         percentAlcoholItem_i_.marginTop = 2;
         percentAlcoholItem_i_.marginBottom = 2;
         percentAlcoholItem_i_.marginLeft = 2;
@@ -3200,7 +3200,7 @@ public class TestData {
         functions_box.background = null;
         functions_box.foreground = null;
         functions_box.imagePath = null;
-        functions_box.childrenAlignment = Alignment.LEADING;
+        functions_box.childrenAlignment = Alignment.START;
         functions_box.columns = 4;
         functions_box.type = ContainerType.CONTAINERH;
         functions_box.caption = null;
@@ -3208,7 +3208,7 @@ public class TestData {
         ContainerView leftControls = new ContainerView(DefaultFormView.getToolbarLeftSID());
         leftControls.size = null;
         leftControls.setFlex(0.0);
-        leftControls.setAlignment(FlexAlignment.LEADING);
+        leftControls.setAlignment(FlexAlignment.START);
         leftControls.marginTop = 0;
         leftControls.marginBottom = 0;
         leftControls.marginLeft = 0;
@@ -3219,7 +3219,7 @@ public class TestData {
         leftControls.background = null;
         leftControls.foreground = null;
         leftControls.imagePath = null;
-        leftControls.childrenAlignment = Alignment.LEADING;
+        leftControls.childrenAlignment = Alignment.START;
         leftControls.columns = 4;
         leftControls.type = ContainerType.CONTAINERH;
         leftControls.caption = null;
@@ -3360,7 +3360,7 @@ public class TestData {
         PropertyDrawView isEditable__ = new PropertyDrawView("isEditable()");
         isEditable__.size = null;
         isEditable__.setFlex(0.0);
-        isEditable__.setAlignment(FlexAlignment.LEADING);
+        isEditable__.setAlignment(FlexAlignment.START);
         isEditable__.marginTop = 2;
         isEditable__.marginBottom = 2;
         isEditable__.marginLeft = 2;
@@ -3393,7 +3393,7 @@ public class TestData {
         ContainerView rightControls = new ContainerView(DefaultFormView.getToolbarRightSID());
         rightControls.size = null;
         rightControls.setFlex(1.0);
-        rightControls.setAlignment(FlexAlignment.LEADING);
+        rightControls.setAlignment(FlexAlignment.START);
         rightControls.marginTop = 0;
         rightControls.marginBottom = 0;
         rightControls.marginLeft = 0;
@@ -3404,7 +3404,7 @@ public class TestData {
         rightControls.background = null;
         rightControls.foreground = null;
         rightControls.imagePath = null;
-        rightControls.childrenAlignment = Alignment.TRAILING;
+        rightControls.childrenAlignment = Alignment.END;
         rightControls.columns = 4;
         rightControls.type = ContainerType.CONTAINERH;
         rightControls.caption = null;

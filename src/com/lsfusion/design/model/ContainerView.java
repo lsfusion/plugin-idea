@@ -37,7 +37,7 @@ public class ContainerView extends ComponentView {
     public String description;
     @NotNull
     public ContainerType type = ContainerType.CONTAINERV;
-    public Alignment childrenAlignment = Alignment.LEADING;
+    public Alignment childrenAlignment = Alignment.START;
     public int columns = 4;
     public String showIf;
 
@@ -282,7 +282,7 @@ public class ContainerView extends ComponentView {
         for (ComponentView child : getChildren()) {
             JComponentPanel childWidget = child.createWidget(project, formEntity, selection, componentToWidget);
             if (childWidget != null) {
-                FlexPanel flexPanel = new FlexPanel(true, Alignment.LEADING);
+                FlexPanel flexPanel = new FlexPanel(true, Alignment.START);
                 flexPanel.add(childWidget, child.getFlex(formEntity), child.getAlignment());
                 flexPanel.putClientProperty("componentView", child);
                 

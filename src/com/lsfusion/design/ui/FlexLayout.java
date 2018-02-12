@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.lsfusion.design.ui.Alignment.CENTER;
-import static com.lsfusion.design.ui.Alignment.LEADING;
+import static com.lsfusion.design.ui.Alignment.START;
 
 public class FlexLayout extends CachableLayout<FlexConstraints> {
 
@@ -87,7 +87,7 @@ public class FlexLayout extends CachableLayout<FlexConstraints> {
         int fillSpace = Math.max(0, vertical ? parentHeight - totalSize : parentWidth - totalSize);
 
         //All alignment
-        if (totalFlex == 0 && alignment != LEADING && fillSpace > 0) {
+        if (totalFlex == 0 && alignment != START && fillSpace > 0) {
             int alignmentOffset = alignment == CENTER ? fillSpace / 2 : fillSpace;
             if (vertical) {
                 in.top += alignmentOffset;
@@ -147,9 +147,9 @@ public class FlexLayout extends CachableLayout<FlexConstraints> {
 
     private int getAlignmentOffset(FlexAlignment alignment, int zeroOffset, int totalSize, int componentSize) {
         switch (alignment) {
-            case LEADING: return zeroOffset;
+            case START: return zeroOffset;
             case CENTER: return zeroOffset + Math.max(0, (totalSize - componentSize)/2);
-            case TRAILING: return zeroOffset + Math.max(0, totalSize - componentSize);
+            case END: return zeroOffset + Math.max(0, totalSize - componentSize);
             case STRETCH: return zeroOffset;
             default :
                 throw new IllegalStateException("Wrong alignment value");

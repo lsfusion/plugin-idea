@@ -108,7 +108,7 @@ public class GroupObjectContainerSet {
         set.leftControlsContainer.setSID(DefaultFormView.getToolbarLeftSID(sid));
 
         set.boxContainer.setType(ContainerType.CONTAINERV);
-        set.boxContainer.setChildrenAlignment(Alignment.LEADING);
+        set.boxContainer.setChildrenAlignment(Alignment.START);
         set.boxContainer.setAlignment(FlexAlignment.STRETCH);
         set.boxContainer.setFlex(1);
         set.boxContainer.add(set.gridBoxContainer);
@@ -123,18 +123,18 @@ public class GroupObjectContainerSet {
 
         set.controlsContainer.setType(ContainerType.CONTAINERH);
         set.controlsContainer.setAlignment(FlexAlignment.STRETCH);
-        set.controlsContainer.setChildrenAlignment(Alignment.LEADING);
+        set.controlsContainer.setChildrenAlignment(Alignment.START);
         set.controlsContainer.add(set.leftControlsContainer);
         set.controlsContainer.add(set.rightControlsContainer);
 
         set.leftControlsContainer.setType(ContainerType.CONTAINERH);
         set.leftControlsContainer.setAlignment(FlexAlignment.CENTER);
-        set.leftControlsContainer.setChildrenAlignment(Alignment.TRAILING);
+        set.leftControlsContainer.setChildrenAlignment(Alignment.END);
         set.leftControlsContainer.add(group.toolbar);
 
         set.rightControlsContainer.setType(ContainerType.CONTAINERH);
         set.rightControlsContainer.setAlignment(FlexAlignment.CENTER);
-        set.rightControlsContainer.setChildrenAlignment(Alignment.TRAILING);
+        set.rightControlsContainer.setChildrenAlignment(Alignment.END);
         set.rightControlsContainer.setFlex(1);
         set.rightControlsContainer.add(set.filtersContainer);
         set.rightControlsContainer.add(set.toolbarPropsContainer);
@@ -142,14 +142,14 @@ public class GroupObjectContainerSet {
 
         set.filtersContainer.setType(ContainerType.CONTAINERH);
         set.filtersContainer.setAlignment(FlexAlignment.CENTER);
-        set.filtersContainer.setChildrenAlignment(Alignment.TRAILING);
+        set.filtersContainer.setChildrenAlignment(Alignment.END);
 
         set.toolbarPropsContainer.setType(ContainerType.CONTAINERH);
         set.toolbarPropsContainer.setAlignment(FlexAlignment.CENTER);
 
         set.panelContainer.setType(ContainerType.CONTAINERV);
         set.panelContainer.setAlignment(FlexAlignment.STRETCH);
-        set.panelContainer.setChildrenAlignment(Alignment.LEADING);
+        set.panelContainer.setChildrenAlignment(Alignment.START);
         set.panelContainer.add(set.panelPropsContainer);
 
         set.panelPropsContainer.setType(ContainerType.COLUMNS);

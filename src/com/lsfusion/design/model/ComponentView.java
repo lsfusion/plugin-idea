@@ -135,7 +135,7 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public void setFill(double fill) {
         setFlex(fill);
-        setAlignment(fill == 0 ? FlexAlignment.LEADING : FlexAlignment.STRETCH);
+        setAlignment(fill == 0 ? FlexAlignment.START : FlexAlignment.STRETCH);
     }
 
     public void setFlex(double flex) {
@@ -280,7 +280,7 @@ public abstract class ComponentView extends PropertiesContainer {
     }
 
     public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
-        return FlexAlignment.LEADING;
+        return FlexAlignment.START;
     }
 
     public int getMarginTop() {

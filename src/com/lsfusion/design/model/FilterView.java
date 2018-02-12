@@ -69,8 +69,8 @@ public class FilterView extends ComponentView {
         bottomPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_DEL), 0, FlexAlignment.CENTER);
 
         FlexPanel panel = new FlexPanel(true);
-        panel.add(topPanel, 0, FlexAlignment.LEADING);
-        panel.add(bottomPanel, 0, FlexAlignment.LEADING);
+        panel.add(topPanel, 0, FlexAlignment.START);
+        panel.add(bottomPanel, 0, FlexAlignment.START);
 
         return panel;
     }

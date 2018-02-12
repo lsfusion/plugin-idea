@@ -27,17 +27,17 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
     public void setChildrenAlignment(FlexAlignment falign) {
         Alignment align;
         switch (falign) {
-            case LEADING:
-                align = Alignment.LEADING;
+            case START:
+                align = Alignment.START;
                 break;
             case CENTER:
                 align = Alignment.CENTER;
                 break;
-            case TRAILING:
-                align = Alignment.TRAILING;
+            case END:
+                align = Alignment.END;
                 break;
             default:
-                throw new IllegalStateException("Children alignment should be either of LEADING, CENTER, TRAILING");
+                throw new IllegalStateException("Children alignment should be either of START, CENTER, END");
         }
         target.setChildrenAlignment(align);
     }

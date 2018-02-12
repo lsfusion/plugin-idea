@@ -8,7 +8,7 @@ public class FlexConstraints implements Cloneable, Serializable {
     private FlexAlignment alignment;
 
     public FlexConstraints() {
-        this(FlexAlignment.LEADING, 0);
+        this(FlexAlignment.START, 0);
     }
 
     public FlexConstraints(FlexAlignment alignment, double flex) {

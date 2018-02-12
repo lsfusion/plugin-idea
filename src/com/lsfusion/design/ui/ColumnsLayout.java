@@ -100,10 +100,10 @@ public class ColumnsLayout extends CachableLayout<ColumnsConstraints> {
                             case CENTER:
                                 childLeft = (columnWidth - childWidth) / 2;
                                 break;
-                            case TRAILING:
+                            case END:
                                 childLeft = columnWidth - childWidth;
                                 break;
-                            case LEADING:
+                            case START:
                             case STRETCH:
                             default:
                                 break;
