@@ -250,7 +250,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "INTERNAL"                            { return INTERNAL; }
   "IS"                      			{ return IS; }
   "JAVA"                  			    { return JAVA; }
-  "JDBC"                  			    { return JDBC; }
   "JOIN"                    			{ return JOIN; }
   "JSON"                    			{ return JSON; }
   "LAST"                                { return LAST; }

@@ -752,7 +752,7 @@ exportDataActionPropertyDefinitionBody ::=
         |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
         |   (DBF (CHARSET stringLiteral)?)
         |   LIST
-        |   JDBC
+        |   TABLE
         )?
         FROM nonEmptyAliasedPropertyExpressionList
         (WHERE propertyExpression)?
@@ -930,7 +930,7 @@ importActionSourceType ::=  XLS (SHEET propertyExpression)?
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
                         |   XML (ROOT propertyExpression)? (LIST|TABLE)? (ATTR)?
                         |   JSON (ROOT propertyExpression)? (LIST|TABLE)?
-                        |   JDBC
+                        |   TABLE
                         |   MDB
 
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody

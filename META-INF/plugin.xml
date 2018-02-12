@@ -12,6 +12,7 @@
         <b>Version 1.0.121</b><br>
         <ul>
             <li>WRITE CLIENT</li>
+            <li>IMPORT/EXPORT JDBC -> TABLE</li>
         </ul>
     ]]>
     </change-notes>
