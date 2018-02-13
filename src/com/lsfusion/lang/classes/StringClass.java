@@ -14,8 +14,6 @@ public class StringClass extends DataClass {
     public final boolean rich;
     public final ExtInt length;
 
-    private String mask;
-
     public StringClass(boolean blankPadded, boolean caseInsensitive, ExtInt length) {
         this(blankPadded, caseInsensitive, false, length);
     }
@@ -25,13 +23,6 @@ public class StringClass extends DataClass {
         this.caseInsensitive = caseInsensitive;
         this.rich = rich;
         this.length = length;
-
-        if (length.isUnlimited()) {
-            mask = "999 999";
-        } else {
-            int lengthValue = length.getValue();
-            mask = BaseUtils.replicate('0', lengthValue <= 12 ? lengthValue : (int) round(12 + pow(lengthValue - 12, 0.7)));
-        }
     }
 
     public DataClass op(DataClass compClass, boolean or, boolean string) {
@@ -62,15 +53,20 @@ public class StringClass extends DataClass {
     }
 
     @Override
-    public String getMask() {
-        return mask;
+    public int getDefaultHeight(FontMetrics fontMetrics) {
+        if (length.isUnlimited())
+            return 4 * (fontMetrics.getHeight() + 1);
+        return super.getDefaultHeight(fontMetrics);
     }
 
     @Override
-    public int getHeight(FontMetrics fontMetrics) {
-        if (length.isUnlimited())
-            return 4 * (fontMetrics.getHeight() + 1);
-        return super.getHeight(fontMetrics);
+    public int getDefaultCharWidth() {
+        if(length.isUnlimited()) {
+            return 15;
+        } else {
+            int lengthValue = length.getValue();
+            return lengthValue <= 12 ? lengthValue : (int) round(12 + pow(lengthValue - 12, 0.7));
+        }
     }
 
     @Override

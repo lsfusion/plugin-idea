@@ -1,8 +1,33 @@
 package com.lsfusion.lang.classes;
 
+import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.util.DateUtils;
 
-public class DateClass extends DataClass {
+import java.awt.*;
+import java.text.DateFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+
+public class DateClass extends FormatClass {
+
+    @Override
+    protected SimpleDateFormat getEditFormat(Format format) {
+        return DateUtils.createDateEditFormat((DateFormat) format);
+    }
+
+    @Override
+    protected Object getDefaultWidthValue() {
+        return DateUtils.wideFormattableDate;
+    }
+
+    @Override
+    public SimpleDateFormat createUserFormat(String pattern) {
+        return new SimpleDateFormat(pattern);
+    }
+
+    public Format getDefaultFormat() {
+        return DateUtils.dateFormat;
+    }
 
     public final static DateClass instance = new DateClass();
 
@@ -17,7 +42,7 @@ public class DateClass extends DataClass {
     }
 
     @Override
-    public String getMask() {
-        return DateUtils.dateEditFormat.format(DateUtils.wideFormattableDate) + "BTN";
+    public int getFullWidthString(String widthString, FontMetrics fontMetrics) {
+        return super.getFullWidthString(widthString, fontMetrics) + 21;
     }
 }

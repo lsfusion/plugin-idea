@@ -11,10 +11,15 @@ import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.JComponentPanel;
 import com.lsfusion.lang.classes.DataClass;
+import com.lsfusion.lang.classes.FormatClass;
+import com.lsfusion.lang.classes.IntegralClass;
+import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.util.BaseUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.Format;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -183,20 +188,45 @@ public class PropertyDrawView extends ComponentView {
         return super.getBaseDefaultAlignment(container);
     }
 
+    public Format getFormat() {
+        assert entity.baseClass instanceof FormatClass;
+        Format result = pattern != null ? ((FormatClass)entity.baseClass).createUserFormat(pattern) : null;
+        Format defaultFormat = ((FormatClass)entity.baseClass).getDefaultFormat();
+        if (result == null)
+            return defaultFormat;
+        if(entity.baseClass instanceof IntegralClass) {
+            ((NumberFormat) result).setParseIntegerOnly(((NumberFormat) defaultFormat).isParseIntegerOnly());
+            ((NumberFormat) result).setMaximumIntegerDigits(((NumberFormat) defaultFormat).getMaximumIntegerDigits());
+            ((NumberFormat) result).setGroupingUsed(((NumberFormat) defaultFormat).isGroupingUsed());
+        }
+        return result;
+    }
+
+
     public int getValueWidth(JComponent comp) {
         if (valueSize != null && valueSize.width > -1) {
             return valueSize.width;
         }
-        return entity.baseClass != null ?
-                entity.baseClass.getWidth(charWidth, comp.getFontMetrics(getFont(comp))) :
-                getDefaultWidth(charWidth, comp.getFontMetrics(getFont(comp)));
+        FontMetrics fontMetrics = comp.getFontMetrics(getFont(comp));
+        LSFClassSet baseClass = entity.baseClass;
+        if(baseClass != null) {
+            String widthString = null;
+            if(widthString == null && charWidth != 0)
+                widthString = BaseUtils.replicate('0', charWidth);
+            if(widthString != null)
+                return baseClass.getFullWidthString(widthString, fontMetrics);
+
+            return baseClass.getDefaultWidth(fontMetrics, this);
+        }
+            
+        return getDefaultWidth(charWidth, fontMetrics);
     }
     public int getValueHeight(JComponent comp) {
         if (valueSize != null && valueSize.height > -1) {
             return valueSize.height;
         }
         int height = entity.baseClass != null ?
-                entity.baseClass.getHeight(comp.getFontMetrics(getFont(comp))) :
+                entity.baseClass.getDefaultHeight(comp.getFontMetrics(getFont(comp))) :
                 comp.getFontMetrics(getFont(comp)).getHeight() + 1;
         if (imagePath != null) { // предпочитаемую высоту берем исходя из размера иконки
             Icon icon = BaseUtils.loadIcon(entity.project, "/images/design/" + imagePath);

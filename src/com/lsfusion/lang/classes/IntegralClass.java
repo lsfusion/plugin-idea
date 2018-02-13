@@ -2,9 +2,25 @@ package com.lsfusion.lang.classes;
 
 import com.lsfusion.util.BaseUtils;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Collection;
 
-public abstract class IntegralClass extends DataClass {
+import static java.lang.Math.pow;
+import static java.lang.Math.round;
+
+public abstract class IntegralClass extends FormatClass {
+
+    public NumberFormat getDefaultFormat() {
+        NumberFormat format = NumberFormat.getInstance();
+        format.setGroupingUsed(true);
+        return format;
+    }
+
+    @Override
+    public NumberFormat createUserFormat(String pattern) {
+        return new DecimalFormat(pattern);
+    }
 
     abstract int getWhole();
 
@@ -42,8 +58,9 @@ public abstract class IntegralClass extends DataClass {
     }
 
     @Override
-    public String getMask() {
-        return "99 999 999";
+    public int getDefaultCharWidth() {
+        int lengthValue = this instanceof DoubleClass ? 10 : getWhole() + getPrecision();
+        return lengthValue <= 6 ? lengthValue : (int) round(6 + pow(lengthValue - 6, 0.7));
     }
 
     @Override

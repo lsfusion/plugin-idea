@@ -1,6 +1,24 @@
 package com.lsfusion.lang.classes;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+
 public class DoubleClass extends IntegralClass {
+
+    public NumberFormat getDefaultFormat() {
+        NumberFormat format = super.getDefaultFormat();
+        format.setMaximumFractionDigits(10);
+
+        DecimalFormat decimalFormat = (DecimalFormat) format;
+        DecimalFormatSymbols dfs = decimalFormat.getDecimalFormatSymbols();
+        if (dfs.getGroupingSeparator() != '.') {
+            dfs.setDecimalSeparator('.');
+        }
+        decimalFormat.setDecimalFormatSymbols(dfs);
+
+        return format;
+    }
 
     public final static DoubleClass instance = new DoubleClass();
 
@@ -13,7 +31,7 @@ public class DoubleClass extends IntegralClass {
     }
 
     public boolean equals(Object obj) {
-        return obj instanceof DoubleClass;
+        return obj == this;
     }
 
     public int hashCode() {

@@ -1,6 +1,8 @@
 package com.lsfusion.lang.classes;
 
-public class NumericClass extends IntegralClass {
+import java.text.NumberFormat;
+
+public class NumericClass extends DoubleClass {
 
     private final int length;
     private final int precision;
@@ -8,6 +10,13 @@ public class NumericClass extends IntegralClass {
     public NumericClass(int length, int precision) {
         this.length = length;
         this.precision = precision;
+    }
+
+    public NumberFormat getDefaultFormat() {
+        NumberFormat format = super.getDefaultFormat();
+        format.setMaximumIntegerDigits(length - precision);
+        format.setMaximumFractionDigits(precision);
+        return format;
     }
 
     @Override

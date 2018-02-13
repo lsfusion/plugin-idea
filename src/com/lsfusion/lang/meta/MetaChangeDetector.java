@@ -1000,9 +1000,9 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 for (final String module : allKeys) {
                     indicator.setText("Processing : " + module);
 
-                    GlobalSearchScope modulesScope = getScope(modulesToInclude, myProject);
-                    
                     ApplicationManager.getApplication().runReadAction(() -> {
+                        GlobalSearchScope modulesScope = getScope(modulesToInclude, myProject);
+
                         Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, modulesScope);
                         for (LSFModuleDeclaration declaration : moduleDeclarations) {
                             LSFFile file = declaration.getLSFFile();

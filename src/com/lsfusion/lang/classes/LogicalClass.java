@@ -1,5 +1,7 @@
 package com.lsfusion.lang.classes;
 
+import com.lsfusion.design.model.PropertyDrawView;
+
 import java.awt.*;
 
 public class LogicalClass extends DataClass {
@@ -17,12 +19,7 @@ public class LogicalClass extends DataClass {
     }
 
     @Override
-    public int getWidth(int minCharWidth, FontMetrics fontMetrics) {
+    public int getDefaultWidth(FontMetrics fontMetrics, PropertyDrawView propertyDraw) {
         return 25;
-    }
-
-    @Override
-    public String getMask() {
-        throw new UnsupportedOperationException();
     }
 }

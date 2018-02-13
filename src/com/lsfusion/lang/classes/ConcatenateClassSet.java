@@ -2,6 +2,7 @@ package com.lsfusion.lang.classes;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.refactoring.ClassCanonicalNameUtils;
 
 import java.awt.*;
@@ -86,12 +87,12 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
     }
 
     @Override
-    public int getWidth(int minCharWidth, FontMetrics fontMetrics) {
-        return fontMetrics.stringWidth("999 999") + 8;
+    public int getDefaultWidth(FontMetrics fontMetrics, PropertyDrawView propertyDraw) {
+        return 40;
     }
 
     @Override
-    public int getHeight(FontMetrics fontMetrics) {
+    public int getDefaultHeight(FontMetrics fontMetrics) {
         return fontMetrics.getHeight() + 1;
     }
 
@@ -131,5 +132,10 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
     @Override
     public String getCanonicalName() {
         return ClassCanonicalNameUtils.createName(this);
+    }
+
+    @Override
+    public int getFullWidthString(String widthString, FontMetrics fontMetrics) {
+        return fontMetrics.stringWidth(widthString) + 8;
     }
 }

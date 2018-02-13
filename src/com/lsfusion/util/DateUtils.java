@@ -8,11 +8,9 @@ import java.util.GregorianCalendar;
 
 public class DateUtils {
     public static DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-    public static DateFormat dateEditFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+    public static DateFormat dateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
     public static DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
-    public static DateFormat timeEditFormat = createTimeEditFormat(timeFormat);
-    public static DateFormat dateTimeFormat = createDateEditFormat(dateFormat);
-    public static DateFormat dateTimeEditFormat = createDateTimeEditFormat(dateTimeFormat);
+    
     public static Date wideFormattableDate = createWideFormattableDate();
     public static Date wideFormattableDateTime = createWideFormattableDate();
 

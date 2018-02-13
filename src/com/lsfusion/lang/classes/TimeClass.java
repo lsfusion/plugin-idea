@@ -1,10 +1,16 @@
 package com.lsfusion.lang.classes;
 
+import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.util.DateUtils;
 
+import java.text.DateFormat;
+import java.text.Format;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
-public class TimeClass extends DataClass {
+import static com.lsfusion.util.DateUtils.wideFormattableDateTime;
+
+public class TimeClass extends FormatClass {
 
     public final static TimeClass instance = new TimeClass();
 
@@ -19,8 +25,23 @@ public class TimeClass extends DataClass {
     }
 
     @Override
-    public String getMask() {
-        return DateUtils.timeEditFormat.format(DateUtils.wideFormattableDateTime) + "BT";
+    protected SimpleDateFormat getEditFormat(Format format) {
+        return DateUtils.createTimeEditFormat((DateFormat)format);
+    }
+
+    @Override
+    public SimpleDateFormat createUserFormat(String pattern) {
+        return new SimpleDateFormat(pattern);
+    }
+
+    @Override
+    protected Object getDefaultWidthValue() {
+        return wideFormattableDateTime;
+    }
+
+    @Override
+    public Format getDefaultFormat() {
+        return DateUtils.timeFormat;
     }
 
     public String formatString(Object obj) throws ParseException {

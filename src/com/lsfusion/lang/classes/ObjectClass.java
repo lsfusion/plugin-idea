@@ -1,5 +1,7 @@
 package com.lsfusion.lang.classes;
 
+import com.lsfusion.design.model.PropertyDrawView;
+
 import java.awt.*;
 
 public class ObjectClass extends DataClass {
@@ -14,17 +16,12 @@ public class ObjectClass extends DataClass {
     }
 
     @Override
-    public int getWidth(int minCharWidth, FontMetrics fontMetrics) {
-        return fontMetrics.stringWidth("999 999") + 8;
+    public int getDefaultWidth(FontMetrics fontMetrics, PropertyDrawView propertyDraw) {
+        return getFullWidthString("0000000", fontMetrics);
     }
 
     @Override
-    public int getHeight(FontMetrics fontMetrics) {
+    public int getDefaultHeight(FontMetrics fontMetrics) {
         return fontMetrics.getHeight() + 1;
-    }
-
-    @Override
-    public String getMask() {
-        return "1234";
     }
 }

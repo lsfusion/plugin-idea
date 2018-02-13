@@ -2,6 +2,7 @@ package com.lsfusion.lang.classes;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.util.BaseUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -96,19 +97,29 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
         return getName();
     }
 
-    public int getWidth(int minCharWidth, FontMetrics fontMetrics) {
-        String minMask = minCharWidth != 0
-                ? BaseUtils.replicate('0', minCharWidth)
-                : getMask();
-
-        return fontMetrics.stringWidth(minMask) + 8;
+    // добавляет поправку на кнопки и другие элементы 
+    public int getFullWidthString(String widthString, FontMetrics fontMetrics) {
+        return fontMetrics.stringWidth(widthString) + 8;
     }
 
-    public int getHeight(FontMetrics fontMetrics) {
+    public int getDefaultWidth(FontMetrics fontMetrics, PropertyDrawView propertyDraw) {
+        return getFullWidthString(getDefaultWidthString(propertyDraw), fontMetrics);
+    }
+
+    protected int getDefaultCharWidth() {
+        return 0;
+    }
+
+    protected String getDefaultWidthString(PropertyDrawView propertyDraw) {
+        int defaultCharWidth = getDefaultCharWidth();
+        if(defaultCharWidth != 0)
+            return BaseUtils.replicate('0', defaultCharWidth);
+        throw new UnsupportedOperationException();
+    }
+
+    public int getDefaultHeight(FontMetrics fontMetrics) {
         return fontMetrics.getHeight() + 1;
     }
-
-    public abstract String getMask();
 
     @Override
     public String getCanonicalName() {

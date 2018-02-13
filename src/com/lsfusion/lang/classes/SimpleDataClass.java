@@ -17,11 +17,6 @@ public class SimpleDataClass extends DataClass {
         return null;
     }
 
-    @Override
-    public String getMask() {
-        return "1234567";
-    }
-
     public boolean equals(Object o) {
         return this == o || o instanceof SimpleDataClass && dataName.equals(((SimpleDataClass) o).dataName);
     }

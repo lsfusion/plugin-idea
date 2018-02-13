@@ -1,6 +1,7 @@
 package com.lsfusion.lang.classes;
 
 import com.intellij.psi.search.GlobalSearchScope;
+import com.lsfusion.design.model.PropertyDrawView;
 
 import java.awt.*;
 
@@ -20,9 +21,11 @@ public interface LSFClassSet {
 
     boolean isFlex();
 
-    int getWidth(int minCharWidth, FontMetrics fontMetrics);
+    int getFullWidthString(String widthString, FontMetrics fontMetrics);
 
-    int getHeight(FontMetrics fontMetrics);
+    int getDefaultWidth(FontMetrics fontMetrics, PropertyDrawView propertyDraw);
+
+    int getDefaultHeight(FontMetrics fontMetrics);
 
     String getCanonicalName();
 }
