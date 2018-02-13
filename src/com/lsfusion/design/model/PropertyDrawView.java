@@ -20,6 +20,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.text.Format;
 import java.text.NumberFormat;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -218,7 +219,7 @@ public class PropertyDrawView extends ComponentView {
 
             return baseClass.getDefaultWidth(fontMetrics, this);
         }
-            
+
         return getDefaultWidth(charWidth, fontMetrics);
     }
     public int getValueHeight(JComponent comp) {
@@ -425,7 +426,7 @@ public class PropertyDrawView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
         if (entity.isAction) {
             return new JComponentPanel(new ActionPanelView(project, this));
         } else {
