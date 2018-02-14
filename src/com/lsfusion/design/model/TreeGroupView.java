@@ -13,6 +13,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.JComponentPanel;
 
 import javax.swing.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
         JBScrollPane scrollPane = new JBScrollPane(new TreeGroupTable(this, model)) {
             @Override
             public boolean isValidateRoot() {

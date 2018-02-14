@@ -11,6 +11,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.JComponentPanel;
 
 import javax.swing.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -106,7 +107,7 @@ public class GridView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
         if (groupObject.entity.initClassView == ClassViewType.GRID && model.getColumnCount() > 0) {
             GridTable gridTable = new GridTable(autoSize, model, headerHeight);
             JBScrollPane scrollPane = new JBScrollPane(gridTable) {

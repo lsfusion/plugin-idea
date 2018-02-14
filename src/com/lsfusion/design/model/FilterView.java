@@ -10,6 +10,7 @@ import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.*;
 
 import javax.swing.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class FilterView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
         FlexPanel topPanel = new FlexPanel(false);
         topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER));
         topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_ADD));

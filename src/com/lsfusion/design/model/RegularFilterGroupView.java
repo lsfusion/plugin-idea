@@ -12,6 +12,7 @@ import com.lsfusion.design.ui.JComponentPanel;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +57,7 @@ public class RegularFilterGroupView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
         GroupObjectView groupObjectView = form.get(entity.getToDraw(form.entity));
         if (!groupObjectView.grid.isVisible()) {
             return null;

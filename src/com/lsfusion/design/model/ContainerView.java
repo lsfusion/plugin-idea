@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -163,7 +164,7 @@ public class ContainerView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
 
         JComponentPanel widget = null;
 
@@ -176,17 +177,17 @@ public class ContainerView extends ComponentView {
             }
 
             if (isTabbedPane()) {
-                widget = createTabbedPanel(project, formEntity, selection, componentToWidget, oldWidget);
+                widget = createTabbedPanel(project, formEntity, selection, componentToWidget, oldWidget, recursionGuard);
             } else if (isSplit()) {
-                widget = createSplitPanel(project, formEntity, selection, componentToWidget, oldWidget);
+                widget = createSplitPanel(project, formEntity, selection, componentToWidget, oldWidget, recursionGuard);
             }
         } else {
             if (isLinear()) {
-                widget = createLinearPanel(project, formEntity, selection, componentToWidget);
+                widget = createLinearPanel(project, formEntity, selection, componentToWidget, recursionGuard);
             } else if (isScroll()) {
-                widget = createScrollPanel(project, formEntity, selection, componentToWidget);
+                widget = createScrollPanel(project, formEntity, selection, componentToWidget, recursionGuard);
             } else if (isColumns()) {
-                widget = createColumnsPanel(project, formEntity, selection, componentToWidget);
+                widget = createColumnsPanel(project, formEntity, selection, componentToWidget, recursionGuard);
             }
         }
 
@@ -203,33 +204,39 @@ public class ContainerView extends ComponentView {
         return widget;
     }
 
-    private JComponentPanel createLinearPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget) {
+    private JComponentPanel createLinearPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, HashSet<ComponentView> recursionGuard) {
         FlexPanel flexPanel = new FlexPanel(isLinearVertical(), childrenAlignment);
         boolean hasChildren = false;
         for (ComponentView child : children) {
-            JComponentPanel childWidget = child.createWidget(project, formEntity, selection, componentToWidget);
-            if (childWidget != null) {
-                hasChildren = true;
-                flexPanel.add(childWidget, child.getFlex(formEntity), child.getAlignment());
-                setSizes(childWidget, child);
+            if (!recursionGuard.contains(child)) {
+                recursionGuard.add(child);
+                JComponentPanel childWidget = child.createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
+                if (childWidget != null) {
+                    hasChildren = true;
+                    flexPanel.add(childWidget, child.getFlex(formEntity), child.getAlignment());
+                    setSizes(childWidget, child);
+                }
             }
         }
         return hasChildren ? flexPanel : null;
     }
 
-    private JComponentPanel createScrollPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget) {
+    private JComponentPanel createScrollPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, HashSet<ComponentView> recursionGuard) {
         JBScrollPane scrollPane = new JBScrollPane();
         boolean hasChildren = false;
         JComponentPanel componentPanel = null;
         
         for (ComponentView child : children) {
-            JComponent childWidget = child.createWidget(project, formEntity, selection, componentToWidget);
-            if (childWidget != null) {
-                hasChildren = true;
-                scrollPane.setViewportView(childWidget);
+            if (!recursionGuard.contains(child)) {
+                recursionGuard.add(child);
+                JComponent childWidget = child.createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
+                if (childWidget != null) {
+                    hasChildren = true;
+                    scrollPane.setViewportView(childWidget);
+                }
+                componentPanel = new JComponentPanel(scrollPane);
+                setSizes(componentPanel, child);
             }
-            componentPanel = new JComponentPanel(scrollPane);
-            setSizes(componentPanel, child);
         }
         JComponentPanel scrollPanel = null;
         if (hasChildren) {
@@ -239,11 +246,11 @@ public class ContainerView extends ComponentView {
         return scrollPanel;
     }
 
-    private JComponentPanel createSplitPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    private JComponentPanel createSplitPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
         JBSplitter splitPane = new JBSplitter(isSplitVertical());
         boolean hasChildren = false;
         if (children.size() > 0) {
-            JComponentPanel childWidget = children.get(0).createWidget(project, formEntity, selection, componentToWidget);
+            JComponentPanel childWidget = children.get(0).createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
             if (childWidget != null) {
                 hasChildren = true;
                 splitPane.setFirstComponent(childWidget);
@@ -251,7 +258,7 @@ public class ContainerView extends ComponentView {
             }
         }
         if (children.size() > 1) {
-            JComponentPanel childWidget = children.get(1).createWidget(project, formEntity, selection, componentToWidget);
+            JComponentPanel childWidget = children.get(1).createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
             if (childWidget != null) {
                 hasChildren = true;
                 splitPane.setSecondComponent(childWidget);
@@ -269,7 +276,7 @@ public class ContainerView extends ComponentView {
         return hasChildren ? new JComponentPanel(splitPane) : null;
     }
 
-    private JComponentPanel createTabbedPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    private JComponentPanel createTabbedPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
         ComponentView selectedChild = null;
         if (oldWidget != null) {
             TabbedPane oldTabbedPane = (TabbedPane) oldWidget.getComponent(0);
@@ -280,21 +287,24 @@ public class ContainerView extends ComponentView {
         TabbedPane tabbedPane = new TabbedPane();
         boolean hasChildren = false;
         for (ComponentView child : getChildren()) {
-            JComponentPanel childWidget = child.createWidget(project, formEntity, selection, componentToWidget);
-            if (childWidget != null) {
-                FlexPanel flexPanel = new FlexPanel(true, Alignment.START);
-                flexPanel.add(childWidget, child.getFlex(formEntity), child.getAlignment());
-                flexPanel.putClientProperty("componentView", child);
-                
-                hasChildren = true;
-                String caption = child.getCaption();
-                if (caption == null) {
-                    caption = "";
-                }
+            if (!recursionGuard.contains(child)) {
+                recursionGuard.add(child);
+                JComponentPanel childWidget = child.createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
+                if (childWidget != null) {
+                    FlexPanel flexPanel = new FlexPanel(true, Alignment.START);
+                    flexPanel.add(childWidget, child.getFlex(formEntity), child.getAlignment());
+                    flexPanel.putClientProperty("componentView", child);
 
-                tabbedPane.addTab(caption, flexPanel);
-                if (child == selectedChild) {
-                    selectedWidget = flexPanel;
+                    hasChildren = true;
+                    String caption = child.getCaption();
+                    if (caption == null) {
+                        caption = "";
+                    }
+
+                    tabbedPane.addTab(caption, flexPanel);
+                    if (child == selectedChild) {
+                        selectedWidget = flexPanel;
+                    }
                 }
             }
         }
@@ -308,14 +318,17 @@ public class ContainerView extends ComponentView {
         return null;
     }
 
-    private JComponentPanel createColumnsPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget) {
+    private JComponentPanel createColumnsPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, HashSet<ComponentView> recursionGuard) {
         List<Component> childrenWidgets = new ArrayList<>();
         boolean hasChildren = false;
         for (ComponentView child : children) {
-            Component childWidget = child.createWidget(project, formEntity, selection, componentToWidget);
-            childrenWidgets.add(childWidget);
-            if (childWidget != null) {
-                hasChildren = true;
+            if (!recursionGuard.contains(child)) {
+                recursionGuard.add(child);
+                Component childWidget = child.createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
+                childrenWidgets.add(childWidget);
+                if (childWidget != null) {
+                    hasChildren = true;
+                }
             }
         }
 

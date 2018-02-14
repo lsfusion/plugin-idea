@@ -8,6 +8,7 @@ import com.lsfusion.design.ui.ToolbarGridButton;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashSet;
 import java.util.Map;
 
 public class ShowTypeView extends ComponentView {
@@ -33,7 +34,7 @@ public class ShowTypeView extends ComponentView {
     }
 
     @Override
-    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
         if (groupObject.entity.banClassView.size() > 1) {
             return null;
         }

@@ -218,7 +218,7 @@ public class EditorPanel extends JPanel {
     private void rebuildForm() {
         formPanel.removeAll();
 
-        JComponent rootWidget = rootComponent.createWidget(project, formEntity, selection, componentToWidget);
+        JComponent rootWidget = rootComponent.createWidget(project, formEntity, selection, componentToWidget, new HashSet<>());
         widgetToComponent.clear();
         BaseUtils.reverse(componentToWidget, widgetToComponent);
         

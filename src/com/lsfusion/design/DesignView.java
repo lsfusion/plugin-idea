@@ -333,7 +333,7 @@ public class DesignView extends JPanel implements Disposable {
     }
 
     private JComponent createComponentTree() {
-        rootNode = createComponentNode(rootComponent);
+        rootNode = createComponentNode(rootComponent, new HashSet<>());
         ComponentTreeCellRenderer renderer = new ComponentTreeCellRenderer();
         CheckboxTreeBase.CheckPolicy policy = new CheckboxTreeBase.CheckPolicy(true, true, false, false);
         componentTree = new ComponentTree(renderer, rootNode, policy);
@@ -342,7 +342,11 @@ public class DesignView extends JPanel implements Disposable {
         return new JBScrollPane(componentTree);
     }
 
-    private ComponentTreeNode createComponentNode(ComponentView component) {
+    private ComponentTreeNode createComponentNode(ComponentView component, Set<ComponentView> recursionGuard) {
+        if (recursionGuard.contains(component))
+            return null;
+        else
+            recursionGuard.add(component);
         boolean selected = defaultSelection(component);
         selection.put(component, selected);
 
@@ -351,8 +355,9 @@ public class DesignView extends JPanel implements Disposable {
         if (component instanceof ContainerView) {
             ContainerView container = (ContainerView) component;
             for (ComponentView child : container.getChildren()) {
-                ComponentTreeNode childNode = createComponentNode(child);
-                node.add(childNode);
+                ComponentTreeNode childNode = createComponentNode(child, recursionGuard);
+                if (childNode != null)
+                    node.add(childNode);
             }
         }
         return node;
@@ -375,7 +380,7 @@ public class DesignView extends JPanel implements Disposable {
     private void redrawForm() {
         formPanel.removeAll();
 
-        JComponent rootWidget = rootComponent.createWidget(project, formEntity, selection, componentToWidget);
+        JComponent rootWidget = rootComponent.createWidget(project, formEntity, selection, componentToWidget, new HashSet<>());
         widgetToComponent.clear();
         BaseUtils.reverse(componentToWidget, widgetToComponent);
 

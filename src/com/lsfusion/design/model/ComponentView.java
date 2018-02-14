@@ -337,14 +337,14 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public abstract Icon getIcon();
 
-    public JComponentPanel createWidget(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget) {
+    public JComponentPanel createWidget(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, HashSet<ComponentView> recursionGuard) {
         if (forceHide || !selection.get(this)) {
             return null;
         }
 
         JComponentPanel oldWidget = componentToWidget.get(this);
 
-        JComponentPanel widget = createWidgetImpl(project, formEntity, selection, componentToWidget, oldWidget);
+        JComponentPanel widget = createWidgetImpl(project, formEntity, selection, componentToWidget, oldWidget, recursionGuard);
         if (widget != null) {
             Border marginBorder = BorderFactory.createEmptyBorder(marginTop, marginLeft, marginBottom, marginRight);
             widget.setBorder(BorderFactory.createCompoundBorder(marginBorder, widget.getBorder()));
@@ -354,7 +354,9 @@ public abstract class ComponentView extends PropertiesContainer {
         return widget;
     }
 
-    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget) {
+    protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget,
+                                               JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
+
         JLabel jLabel = new JLabel(getClass().getSimpleName());
         jLabel.setBorder(BorderFactory.createLineBorder(JBColor.BLACK, 1));
         JComponentPanel panel = new JComponentPanel(new BorderLayout());
