@@ -6,10 +6,6 @@ import com.lsfusion.lang.classes.DataClass;
 import java.awt.*;
 
 public abstract class LinkClass extends DataClass {
-    @Override
-    public int getDefaultHeight(FontMetrics font) {
-        return 18;
-    }
 
     @Override
     public int getDefaultWidth(FontMetrics font, PropertyDrawView propertyDraw) {
