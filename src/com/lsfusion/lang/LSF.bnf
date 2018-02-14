@@ -622,8 +622,8 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    drillDownActionPropertyDefinitionBody
                                       	|	    readActionPropertyDefinitionBody
                                       	|	    writeActionPropertyDefinitionBody
-                                      	|	    importActionPropertyDefinitionBody
                                       	|	    importFormActionPropertyDefinitionBody
+                                        |	    importActionPropertyDefinitionBody
                                       	|	    activeFormActionPropertyDefinitionBody
                                       	|	    activateActionPropertyDefinitionBody
                                       	|       externalActionPropertyDefinitionBody
@@ -907,7 +907,7 @@ writeActionPropertyDefinitionBody ::= WRITE ((CLIENT DIALOG? propertyExpression?
 
 importActionPropertyDefinitionBody ::= IMPORT importActionSourceType? TO nonEmptyImportPropertyUsageListWithIds FROM propertyExpression (WHERE propertyExpression)?
 {
-    pin = 2
+    pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
@@ -920,7 +920,7 @@ importPropertyUsage ::= propertyUsage
 
 importFormActionPropertyDefinitionBody ::= IMPORT formUsage importActionSourceType
 {
-    pin = 1
+    pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
