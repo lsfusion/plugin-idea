@@ -10,11 +10,9 @@ import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.JComponentPanel;
-import com.lsfusion.lang.classes.DataClass;
-import com.lsfusion.lang.classes.FormatClass;
-import com.lsfusion.lang.classes.IntegralClass;
-import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.classes.*;
 import com.lsfusion.util.BaseUtils;
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -190,12 +188,15 @@ public class PropertyDrawView extends ComponentView {
     }
 
     public Format getFormat() {
-        assert entity.baseClass instanceof FormatClass;
-        Format result = pattern != null ? ((FormatClass)entity.baseClass).createUserFormat(pattern) : null;
-        Format defaultFormat = ((FormatClass)entity.baseClass).getDefaultFormat();
+        LSFClassSet formatClass = entity.baseClass;
+        if(formatClass instanceof CustomClassSet)
+            formatClass = LongClass.instance;
+            
+        Format result = pattern != null ? ((FormatClass) formatClass).createUserFormat(pattern) : null;
+        Format defaultFormat = ((FormatClass) formatClass).getDefaultFormat();
         if (result == null)
             return defaultFormat;
-        if(entity.baseClass instanceof IntegralClass) {
+        if(formatClass instanceof IntegralClass) {
             ((NumberFormat) result).setParseIntegerOnly(((NumberFormat) defaultFormat).isParseIntegerOnly());
             ((NumberFormat) result).setMaximumIntegerDigits(((NumberFormat) defaultFormat).getMaximumIntegerDigits());
             ((NumberFormat) result).setGroupingUsed(((NumberFormat) defaultFormat).isGroupingUsed());
