@@ -9,11 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.122</b><br>
+        <b>Version 1.0.123</b><br>
         <ul>
-            <li>WRITE CLIENT</li>
-            <li>IMPORT/EXPORT JDBC -> TABLE</li>
-            <li>Design: LEADING -> START, TRAILING -> END</li>
+            <li>Operator LIKE</li>
         </ul>
     ]]>
     </change-notes>
