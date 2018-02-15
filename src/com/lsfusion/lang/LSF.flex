@@ -254,6 +254,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "JSON"                    			{ return JSON; }
   "LAST"                                { return LAST; }
   "LEFT"                    			{ return LEFT; }
+  "LIKE"                   			    { return LIKE; }
   "LIMIT"                   			{ return LIMIT; }
   "LIST"                    			{ return LIST; }
   "LOADFILE"                			{ return LOADFILE; }

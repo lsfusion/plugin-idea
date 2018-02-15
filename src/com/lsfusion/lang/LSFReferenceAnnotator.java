@@ -517,7 +517,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void checkRelationalPE(LSFRelationalPE relationalPE) {
-        List<LSFAdditiveORPE> children = relationalPE.getAdditiveORPEList();
+        List<LSFLikePE> children = relationalPE.getLikePEList();
         if (children.size() == 2) {
             LSFClassSet class1 = getLSFClassSet(children.get(0));
             LSFClassSet class2 = getLSFClassSet(children.get(1));
@@ -538,7 +538,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private LSFClassSet getLSFClassSet(LSFAdditiveORPE element) {
+    private LSFClassSet getLSFClassSet(LSFLikePE element) {
         return LSFExClassSet.fromEx(element.resolveInferredValueClass(null));
     }
 

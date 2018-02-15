@@ -702,7 +702,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFRelationalPE sourceStatement, @Nullable InferExResult inferred) {
-        List<LSFAdditiveORPE> list = sourceStatement.getAdditiveORPEList();
+        List<LSFLikePE> list = sourceStatement.getLikePEList();
         if (list.size() == 2)
             return LSFExClassSet.logical;
 
@@ -764,6 +764,14 @@ public class LSFPsiImplUtil {
             fixedClasses.add(ex);
         }
         return orClasses(fixedClasses, true);
+    }
+
+    @Nullable
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFLikePE sourceStatement, @Nullable InferExResult inferred) {
+        List<LSFExClassSet> orClasses = new ArrayList<>();
+        for (LSFAdditiveORPE pe : sourceStatement.getAdditiveORPEList())
+            orClasses.add(resolveInferredValueClass(pe, inferred));
+        return orClasses(orClasses, false);
     }
 
     @Nullable
@@ -1196,12 +1204,12 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFRelationalPE sourceStatement) {
-        List<LSFAdditiveORPE> additiveORPEs = sourceStatement.getAdditiveORPEList();
-        if (additiveORPEs.size() == 2) {
+        List<LSFLikePE> likePEs = sourceStatement.getLikePEList();
+        if (likePEs.size() == 2) {
             return singletonList(LogicalClass.instance.getName());
         }
 
-        List<String> result = getValueClassNames(additiveORPEs.get(0));
+        List<String> result = getValueClassNames(likePEs.get(0));
 
         LSFTypePropertyDefinition typePD = sourceStatement.getTypePropertyDefinition();
         if (typePD != null) {
@@ -1213,6 +1221,14 @@ public class LSFPsiImplUtil {
                     result = singletonList(typeDefClass);
                 }
             }
+        }
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFLikePE sourceStatement) {
+        List<String> result = new ArrayList<>();
+        for (LSFAdditiveORPE addPE : sourceStatement.getAdditiveORPEList()) {
+            result.addAll(getValueClassNames(addPE));
         }
         return result;
     }
@@ -1549,8 +1565,8 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFRelationalPE sourceStatement) {
-        List<LSFAdditiveORPE> additiveORPEs = sourceStatement.getAdditiveORPEList();
-        if (additiveORPEs.size() == 2) {
+        List<LSFLikePE> likePEs = sourceStatement.getLikePEList();
+        if (likePEs.size() == 2) {
             return Collections.EMPTY_LIST;
         }
 
@@ -1559,7 +1575,15 @@ public class LSFPsiImplUtil {
             return Collections.EMPTY_LIST;
         }
 
-        return getValuePropertyNames(additiveORPEs.get(0));
+        return getValuePropertyNames(likePEs.get(0));
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFLikePE sourceStatement) {
+        List<String> result = new ArrayList<>();
+        for (LSFAdditiveORPE addORPE : sourceStatement.getAdditiveORPEList()) {
+            result.addAll(getValuePropertyNames(addORPE));
+        }
+        return result;
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFAdditiveORPE sourceStatement) {
@@ -2417,7 +2441,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFRelationalPE sourceStatement, @Nullable LSFExClassSet valueClass) {
-        List<LSFAdditiveORPE> list = sourceStatement.getAdditiveORPEList();
+        List<LSFLikePE> list = sourceStatement.getLikePEList();
 
         LSFTypePropertyDefinition typeDef = sourceStatement.getTypePropertyDefinition();
         if (typeDef != null)
@@ -2426,6 +2450,14 @@ public class LSFPsiImplUtil {
         if (list.size() == 2)
             return Inferred.create(new Relationed(list.get(0), list.get(1)));
         return inferParamClasses(list.get(0), valueClass);
+    }
+
+    @NotNull
+    public static Inferred inferParamClasses(@NotNull LSFLikePE sourceStatement, @Nullable LSFExClassSet valueClass) {
+        List<Inferred> maps = new ArrayList<>();
+        for (LSFAdditiveORPE additiveORPE : sourceStatement.getAdditiveORPEList())
+            maps.add(inferParamClasses(additiveORPE, valueClass));
+        return Inferred.orClasses(maps);
     }
 
     @NotNull
