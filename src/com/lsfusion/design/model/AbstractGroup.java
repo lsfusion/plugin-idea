@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public class AbstractGroup {
-    private static final List<String> NO_CONTAINER_GROUPS = Arrays.asList("root", "public", "private", "base", "recognize", "drilldown", "propertyPolicy"); 
+    private static final List<String> NO_CONTAINER_GROUPS = Arrays.asList("root", "public", "private", "base", "recognize", "drillDown", "propertyPolicy"); 
     
     public String caption;
     public boolean createContainer = true;
