@@ -12,10 +12,8 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
 
     public GridView grid;
     public ShowTypeView showType;
-    public ToolbarView toolbar;
-    public FilterView filter = new FilterView();
-
-    public Boolean needVerticalScroll = true;
+    public ToolbarView toolbarSystem;
+    public FilterView userFilter = new FilterView();
 
     public GroupObjectView(GroupObjectEntity entity) {
         this.entity = entity;
@@ -25,7 +23,7 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
         }
 
         grid = new GridView(this);
-        toolbar = new ToolbarView(false);
+        toolbarSystem = new ToolbarView(false);
         showType = new ShowTypeView(this);
     }
 
@@ -40,7 +38,7 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
 
     public void addGridPropertyDraw(PropertyDrawView property) {
         grid.addPropertyDraw(property);
-        toolbar.visible = entity.initClassView == ClassViewType.GRID;
+        toolbarSystem.visible = entity.initClassView == ClassViewType.GRID;
     }
 
     public boolean isLastGroupInTree() {

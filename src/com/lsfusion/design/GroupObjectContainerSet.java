@@ -8,7 +8,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 
 public class GroupObjectContainerSet {
     public static final String BOX_CONTAINER = "BOX";
-        public static final String GRID_BOX_CONTAINER = "GRIDBOX";
+        public static final String GRIDBOX_CONTAINER = "GRIDBOX";
             public static final String CLASSCHOOSER_COMPONENT = "CLASSCHOOSER"; // COMPONENT
             public static final String GRID_COMPONENT = "GRID"; // COMPONENT
         public static final String TOOLBARBOX_CONTAINER = "TOOLBARBOX";
@@ -26,12 +26,12 @@ public class GroupObjectContainerSet {
     private ContainerView boxContainer;
     private ContainerView gridBoxContainer;
     private ContainerView panelContainer;
-    private ContainerView panelPropsContainer;
-    private ContainerView controlsContainer;
-    private ContainerView leftControlsContainer;
-    private ContainerView rightControlsContainer;
-    private ContainerView filtersContainer;
-    private ContainerView toolbarPropsContainer;
+    private ContainerView groupContainer;
+    private ContainerView toolbarBoxContainer;
+    private ContainerView toolbarLeftContainer;
+    private ContainerView toolbarRightContainer;
+    private ContainerView filterGroupsContainer;
+    private ContainerView toolbarContainer;
 
     public ContainerView getBoxContainer() {
         return boxContainer;
@@ -45,28 +45,28 @@ public class GroupObjectContainerSet {
         return panelContainer;
     }
 
-    public ContainerView getPanelPropsContainer() {
-        return panelPropsContainer;
+    public ContainerView getGroupContainer() {
+        return groupContainer;
     }
 
-    public ContainerView getControlsContainer() {
-        return controlsContainer;
+    public ContainerView getToolbarBoxContainer() {
+        return toolbarBoxContainer;
     }
 
-    public ContainerView getLeftControlsContainer() {
-        return leftControlsContainer;
+    public ContainerView getToolbarLeftContainer() {
+        return toolbarLeftContainer;
     }
 
-    public ContainerView getRightControlsContainer() {
-        return rightControlsContainer;
+    public ContainerView getToolbarRightContainer() {
+        return toolbarRightContainer;
     }
 
-    public ContainerView getFiltersContainer() {
-        return filtersContainer;
+    public ContainerView getFilterGroupsContainer() {
+        return filterGroupsContainer;
     }
 
-    public ContainerView getToolbarPropsContainer() {
-        return toolbarPropsContainer;
+    public ContainerView getToolbarContainer() {
+        return toolbarContainer;
     }
 
     public static GroupObjectContainerSet create(GroupObjectView group, DefaultFormView.ContainerFactory factory) {
@@ -76,44 +76,44 @@ public class GroupObjectContainerSet {
         set.boxContainer = factory.createContainer();
         set.boxContainer.setCaption(group.getCaption());
 //        set.groupContainer.setDescription(getString("form.layout.group.objects"));
-        set.boxContainer.setSID(DefaultFormView.getBoxSID(sid));
+        set.boxContainer.setSID(DefaultFormView.getBoxContainerSID(sid));
 
         set.gridBoxContainer = factory.createContainer();
 //        set.gridContainer.setDescription(getString("form.layout.grid.part"));
-        set.gridBoxContainer.setSID(DefaultFormView.getGridBoxSID(sid));
+        set.gridBoxContainer.setSID(DefaultFormView.getGridBoxContainerSID(sid));
 
         set.panelContainer = factory.createContainer();
 //        set.panelContainer.setDescription(getString("form.layout.panel"));
-        set.panelContainer.setSID(DefaultFormView.getPanelSID(sid));
+        set.panelContainer.setSID(DefaultFormView.getPanelContainerSID(sid));
 
-        set.panelPropsContainer = factory.createContainer();
-        set.panelPropsContainer.setSID(GROUP_CONTAINER + "(," + sid + ")");
+        set.groupContainer = factory.createContainer();
+        set.groupContainer.setSID(DefaultFormView.getGOGroupContainerSID("," + sid));
 
-        set.controlsContainer = factory.createContainer();
-//        set.controlsContainer.setDescription(getString("form.layout.control.objects"));
-        set.controlsContainer.setSID(DefaultFormView.getToolbarBoxSID(sid));
+        set.toolbarBoxContainer = factory.createContainer();
+//        set.toolbarBoxContainer.setDescription(getString("form.layout.control.objects"));
+        set.toolbarBoxContainer.setSID(DefaultFormView.getToolbarBoxContainerSID(sid));
 
-        set.toolbarPropsContainer = factory.createContainer();
-//        set.toolbarPropsContainer.setDescription(getString("form.layout.toolbar.props.container"));
-        set.toolbarPropsContainer.setSID(DefaultFormView.getToolbarSID(sid));
+        set.toolbarContainer = factory.createContainer();
+//        set.toolbarContainer.setDescription(getString("form.layout.toolbar.props.container"));
+        set.toolbarContainer.setSID(DefaultFormView.getToolbarContainerSID(sid));
 
-        set.filtersContainer = factory.createContainer();
-//        set.filtersContainer.setDescription(getString("form.layout.filters.container"));
-        set.filtersContainer.setSID(DefaultFormView.getRegularFilterGroupsSID(sid));
+        set.filterGroupsContainer = factory.createContainer();
+//        set.filterGroupsContainer.setDescription(getString("form.layout.filters.container"));
+        set.filterGroupsContainer.setSID(DefaultFormView.getFilterGroupsContainerSID(sid));
 
-        set.rightControlsContainer = factory.createContainer();
-        set.rightControlsContainer.setSID(DefaultFormView.getToolbarRightSID(sid));
+        set.toolbarRightContainer = factory.createContainer();
+        set.toolbarRightContainer.setSID(DefaultFormView.getToolbarRightContainerSID(sid));
 
-        set.leftControlsContainer = factory.createContainer();
-        set.leftControlsContainer.setSID(DefaultFormView.getToolbarLeftSID(sid));
+        set.toolbarLeftContainer = factory.createContainer();
+        set.toolbarLeftContainer.setSID(DefaultFormView.getToolbarLeftContainerSID(sid));
 
         set.boxContainer.setType(ContainerType.CONTAINERV);
         set.boxContainer.setChildrenAlignment(Alignment.START);
         set.boxContainer.setAlignment(FlexAlignment.STRETCH);
         set.boxContainer.setFlex(1);
         set.boxContainer.add(set.gridBoxContainer);
-        set.boxContainer.add(set.controlsContainer);
-        set.boxContainer.add(group.filter);
+        set.boxContainer.add(set.toolbarBoxContainer);
+        set.boxContainer.add(group.userFilter);
         set.boxContainer.add(set.panelContainer);
 
         set.gridBoxContainer.setType(ContainerType.SPLITH);
@@ -121,43 +121,43 @@ public class GroupObjectContainerSet {
         set.gridBoxContainer.setFlex(1);
         set.gridBoxContainer.add(group.grid);
 
-        set.controlsContainer.setType(ContainerType.CONTAINERH);
-        set.controlsContainer.setAlignment(FlexAlignment.STRETCH);
-        set.controlsContainer.setChildrenAlignment(Alignment.START);
-        set.controlsContainer.add(set.leftControlsContainer);
-        set.controlsContainer.add(set.rightControlsContainer);
+        set.toolbarBoxContainer.setType(ContainerType.CONTAINERH);
+        set.toolbarBoxContainer.setAlignment(FlexAlignment.STRETCH);
+        set.toolbarBoxContainer.setChildrenAlignment(Alignment.START);
+        set.toolbarBoxContainer.add(set.toolbarLeftContainer);
+        set.toolbarBoxContainer.add(set.toolbarRightContainer);
 
-        set.leftControlsContainer.setType(ContainerType.CONTAINERH);
-        set.leftControlsContainer.setAlignment(FlexAlignment.CENTER);
-        set.leftControlsContainer.setChildrenAlignment(Alignment.END);
-        set.leftControlsContainer.add(group.toolbar);
+        set.toolbarLeftContainer.setType(ContainerType.CONTAINERH);
+        set.toolbarLeftContainer.setAlignment(FlexAlignment.CENTER);
+        set.toolbarLeftContainer.setChildrenAlignment(Alignment.END);
+        set.toolbarLeftContainer.add(group.toolbarSystem);
 
-        set.rightControlsContainer.setType(ContainerType.CONTAINERH);
-        set.rightControlsContainer.setAlignment(FlexAlignment.CENTER);
-        set.rightControlsContainer.setChildrenAlignment(Alignment.END);
-        set.rightControlsContainer.setFlex(1);
-        set.rightControlsContainer.add(set.filtersContainer);
-        set.rightControlsContainer.add(set.toolbarPropsContainer);
-//        set.rightControlsContainer.add(group.showType);
+        set.toolbarRightContainer.setType(ContainerType.CONTAINERH);
+        set.toolbarRightContainer.setAlignment(FlexAlignment.CENTER);
+        set.toolbarRightContainer.setChildrenAlignment(Alignment.END);
+        set.toolbarRightContainer.setFlex(1);
+        set.toolbarRightContainer.add(set.filterGroupsContainer);
+        set.toolbarRightContainer.add(set.toolbarContainer);
+//        set.toolbarRightContainer.add(group.showType);
 
-        set.filtersContainer.setType(ContainerType.CONTAINERH);
-        set.filtersContainer.setAlignment(FlexAlignment.CENTER);
-        set.filtersContainer.setChildrenAlignment(Alignment.END);
+        set.filterGroupsContainer.setType(ContainerType.CONTAINERH);
+        set.filterGroupsContainer.setAlignment(FlexAlignment.CENTER);
+        set.filterGroupsContainer.setChildrenAlignment(Alignment.END);
 
-        set.toolbarPropsContainer.setType(ContainerType.CONTAINERH);
-        set.toolbarPropsContainer.setAlignment(FlexAlignment.CENTER);
+        set.toolbarContainer.setType(ContainerType.CONTAINERH);
+        set.toolbarContainer.setAlignment(FlexAlignment.CENTER);
 
         set.panelContainer.setType(ContainerType.CONTAINERV);
         set.panelContainer.setAlignment(FlexAlignment.STRETCH);
         set.panelContainer.setChildrenAlignment(Alignment.START);
-        set.panelContainer.add(set.panelPropsContainer);
+        set.panelContainer.add(set.groupContainer);
 
-        set.panelPropsContainer.setType(ContainerType.COLUMNS);
-        set.panelPropsContainer.setColumns(4);
+        set.groupContainer.setType(ContainerType.COLUMNS);
+        set.groupContainer.setColumns(4);
 
-        group.filter.setAlignment(FlexAlignment.STRETCH);
-        group.toolbar.setAlignment(FlexAlignment.CENTER);
-        group.toolbar.setMargin(2);
+        group.userFilter.setAlignment(FlexAlignment.STRETCH);
+        group.toolbarSystem.setAlignment(FlexAlignment.CENTER);
+        group.toolbarSystem.setMargin(2);
         
         group.showType.setAlignment(FlexAlignment.CENTER);
         group.showType.setMargin(2);

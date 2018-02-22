@@ -25,8 +25,8 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     
     public TreeGroupEntity entity;
 
-    public ToolbarView toolbar;
-    public FilterView filter = new FilterView();
+    public ToolbarView toolbarSystem;
+    public FilterView userFilter = new FilterView();
 
     private TreeGroupTableModel model = new TreeGroupTableModel();
     public boolean expandOnClick;
@@ -35,7 +35,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
         super(entity.sID);
 
         this.entity = entity;
-        toolbar = new ToolbarView(true);
+        toolbarSystem = new ToolbarView(true);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
 
     public void addPropertyDraw(GroupObjectView groupObject, PropertyDrawView property, List<PropertyDrawView> formProperties) {
         model.addPropertyDraw(groupObject, property, formProperties);
-        toolbar.visible = true;
+        toolbarSystem.visible = true;
     }
 
     public int calculateSize() {

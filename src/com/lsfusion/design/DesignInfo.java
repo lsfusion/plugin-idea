@@ -266,10 +266,10 @@ public class DesignInfo {
                     }
                 }
             }
-            return FormView.getPropertySID(alias, name, objectNames);
+            return FormView.getPropertyDrawSID(alias, name, objectNames);
         } else if (componentSelector.getFilterGroupSelector() != null) {
             String name = componentSelector.getFilterGroupSelector().getFilterGroupUsage().getName();
-            return FormView.getRegularFilterGroupSID(name);
+            return FormView.getFilterGroupSID(name);
         } else if (componentSelector.getGroupObjectTreeSingleSelectorType() != null) {
             LSFGroupObjectTreeSingleSelectorType gos = componentSelector.getGroupObjectTreeSingleSelectorType();
             String groupName = getGroupObjectSID(componentSelector);
@@ -278,11 +278,11 @@ public class DesignInfo {
                     case "TOOLBARSYSTEM" : 
                         return FormView.getToolbarSystemSID(groupName);
                     case "FILTERGROUPS" : 
-                        return DefaultFormView.getRegularFilterGroupsSID(groupName);
+                        return DefaultFormView.getFilterGroupsContainerSID(groupName);
                     case "USERFILTER" : 
                         return FormView.getUserFilterSID(groupName);
                     case "GRIDBOX" : 
-                        return DefaultFormView.getGridBoxSID(groupName);
+                        return DefaultFormView.getGridBoxContainerSID(groupName);
                     case "CLASSCHOOSER" : 
                         return FormView.getClassChooserSID(groupName);
                     case "GRID" : 
@@ -290,35 +290,35 @@ public class DesignInfo {
                     case "SHOWTYPE" : 
                         return FormView.getShowTypeSID(groupName);
                     case "BOX" : 
-                        return DefaultFormView.getBoxSID(groupName);
+                        return DefaultFormView.getBoxContainerSID(groupName);
                     case "PANEL" : 
-                        return DefaultFormView.getPanelSID(groupName);
+                        return DefaultFormView.getPanelContainerSID(groupName);
                     case "TOOLBARBOX" : 
-                        return DefaultFormView.getToolbarBoxSID(groupName);
+                        return DefaultFormView.getToolbarBoxContainerSID(groupName);
                     case "TOOLBARLEFT" : 
-                        return DefaultFormView.getToolbarLeftSID(groupName);
+                        return DefaultFormView.getToolbarLeftContainerSID(groupName);
                     case "TOOLBARRIGHT" : 
-                        return DefaultFormView.getToolbarRightSID(groupName);
+                        return DefaultFormView.getToolbarRightContainerSID(groupName);
                     case "TOOLBAR" : 
-                        return DefaultFormView.getToolbarSID(groupName);
+                        return DefaultFormView.getToolbarContainerSID(groupName);
                 }
             }
         } else if (componentSelector.getGlobalSingleSelectorType() != null) {
             switch (componentSelector.getGlobalSingleSelectorType().getText()) {
                 case "BOX":
-                    return FormView.getBoxSID();
+                    return FormView.getBoxContainerSID();
                 case "OBJECTS": 
-                    return DefaultFormView.getObjectsSID();
+                    return DefaultFormView.getObjectsContainerSID();
                 case "PANEL":
-                    return DefaultFormView.getPanelSID();
+                    return DefaultFormView.getPanelContainerSID();
                 case "TOOLBARBOX":
-                    return DefaultFormView.getToolbarBoxSID();
+                    return DefaultFormView.getToolbarBoxContainerSID();
                 case "TOOLBARLEFT":
-                    return DefaultFormView.getToolbarLeftSID();
+                    return DefaultFormView.getToolbarLeftContainerSID();
                 case "TOOLBARRIGHT":
-                    return DefaultFormView.getToolbarRightSID();
+                    return DefaultFormView.getToolbarRightContainerSID();
                 case "TOOLBAR":
-                    return DefaultFormView.getToolbarSID();
+                    return DefaultFormView.getToolbarContainerSID();
             }
         } else if (componentSelector.getGroupSingleSelectorType() != null) {
             String groupObjectSID = getGroupObjectSID(componentSelector);

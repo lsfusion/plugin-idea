@@ -3,6 +3,7 @@ package com.lsfusion.design.model;
 import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.FormView;
 import com.lsfusion.design.KeyStrokes;
 import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.model.entity.PropertyDrawEntity;
@@ -12,7 +13,6 @@ import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.JComponentPanel;
 import com.lsfusion.lang.classes.*;
 import com.lsfusion.util.BaseUtils;
-import com.sun.org.apache.bcel.internal.generic.ObjectType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +24,6 @@ import java.util.Map;
 
 import static com.lsfusion.util.BaseUtils.getKeyStrokeCaption;
 import static com.lsfusion.util.BaseUtils.isRedundantString;
-import static java.lang.Math.max;
 
 public class PropertyDrawView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
@@ -92,7 +91,7 @@ public class PropertyDrawView extends ComponentView {
     }
 
     public PropertyDrawView(PropertyDrawEntity entity) {
-        this(entity.sID);
+        this(FormView.getPropertyDrawSID(entity.sID));
 
         this.entity = entity;
 
@@ -449,12 +448,23 @@ public class PropertyDrawView extends ComponentView {
 
     public static final String DETAILED_TOOL_TIP_FORMAT =
             "<hr>" +
-                    "<b>sID:</b> %3$s<br>" +
+                    "<b>Каноническое имя:</b> %3$s<br>" +
 //                    "<b>Таблица:</b> %4$s<br>" +
                     "<b>Объекты:</b> %4$s<br>" +
-                    "<b>Сигнатура:</b> %6$s <i>%3$s</i> (%5$s)<br>" +
+                    "<b>Сигнатура:</b> %6$s (%5$s)<br>" +
                     "<b>Скрипт:</b> %7$s<br>" +
-                    "<b>Путь:</b> %8$s" +
+                    "<b>Путь:</b> %8$s<br>" +
+                    "<hr>" +
+                    "<b>Имя на форме:</b> %9$s" +
+                    "</html>";
+
+    public static final String DETAILED_ACTION_TOOL_TIP_FORMAT =
+            "<hr>" +
+                    "<b>Каноническое имя:</b> %3$s<br>" +
+                    "<b>Объекты:</b> %4$s<br>" +
+                    "<b>Путь:</b> %5$s<br>" +
+                    "<hr>" +
+                    "<b>Имя на форме:</b> %6$s" +
                     "</html>";
 
     public static final String EDIT_KEY_TOOL_TIP_FORMAT =
@@ -464,21 +474,25 @@ public class PropertyDrawView extends ComponentView {
         String propCaption = BaseUtils.nullTrim(!isRedundantString(toolTip) ? toolTip : caption);
         String editKeyText = changeKey == null ? "" : String.format(EDIT_KEY_TOOL_TIP_FORMAT, KeyStrokes.getKeyStrokeCaption(changeKey));
 
-        String sid = getDisplaySID();
 //        String tableName = this.tableName != null ? this.tableName : "&lt;none&gt;";
         String ifaceObjects = BaseUtils.toString(", ", entity.objectClasses.toArray());
-        String ifaceClasses = BaseUtils.toString(", ", entity.interfeceClasses.toArray());
-        String returnClass = "";
-        if (entity.baseClass != null) {
-            if (entity.baseClass instanceof DataClass) {
-                returnClass = ((DataClass) entity.baseClass).getCaption();
-            } else {
-                returnClass = entity.baseClass.toString();
-            }
-        }
-
-        String script = entity.declText != null ? entity.declText.replace("\n", "<br>") : "";
         String scriptPath = entity.declLocation != null ? entity.declLocation.replace("\n", "<br>") : "";
-        return String.format(TOOL_TIP_FORMAT + DETAILED_TOOL_TIP_FORMAT, propCaption, editKeyText, sid/*, tableName*/, ifaceObjects, ifaceClasses, returnClass, script, scriptPath);
+        
+        if (entity.isAction) {
+            return String.format(TOOL_TIP_FORMAT + DETAILED_ACTION_TOOL_TIP_FORMAT, propCaption, editKeyText, entity.canonicalName, ifaceObjects, scriptPath, entity.sID);
+        } else {
+            String ifaceClasses = BaseUtils.toString(", ", entity.interfeceClasses.toArray());
+            String returnClass = "";
+            if (entity.baseClass != null) {
+                if (entity.baseClass instanceof DataClass) {
+                    returnClass = ((DataClass) entity.baseClass).getCaption();
+                } else {
+                    returnClass = entity.baseClass.toString();
+                }
+            }
+            String script = entity.declText != null ? entity.declText.replace("\n", "<br>") : "";
+            
+            return String.format(TOOL_TIP_FORMAT + DETAILED_TOOL_TIP_FORMAT, propCaption, editKeyText, entity.canonicalName/*, tableName*/, ifaceObjects, ifaceClasses, returnClass, script, scriptPath, entity.sID);
+        }
     }
 }

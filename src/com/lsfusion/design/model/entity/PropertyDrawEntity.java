@@ -7,9 +7,10 @@ import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.lang.classes.DataClass;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGroupDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
+import com.lsfusion.refactoring.PropertyCanonicalNameUtils;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class PropertyDrawEntity {
     public boolean askConfirm;
     public String askConfirmMessage;
 
+    public String canonicalName = "";
     public String declText;
     public String declLocation;
     public List<String> interfeceClasses = new ArrayList<>();
@@ -76,7 +78,7 @@ public class PropertyDrawEntity {
                 }
             }
         }
-        sID = FormView.getPropertySID(alias, propertyName, objectNames);
+        sID = FormView.getPropertyDrawName(alias, propertyName, objectNames);
         this.propertyName = propertyName;
         
         initDefaultView();
@@ -91,22 +93,23 @@ public class PropertyDrawEntity {
 
         LSFNonEmptyPropertyOptions propertyOptions = null;
         if (propDeclaration != null) {
-            if(((LSFPropertyStatement) propDeclaration).getPropertyCalcStatement() != null)
+            LSFPropertyStatementImpl propertyStatement = (LSFPropertyStatementImpl) propDeclaration;
+            if(propertyStatement.getPropertyCalcStatement() != null)
                 forceViewType = ClassViewType.GRID;
             else
                 forceViewType = ClassViewType.PANEL;
                 
-            propertyOptions = ((LSFPropertyStatement) propDeclaration).getNonEmptyPropertyOptions();
-            caption = ((LSFGlobalPropDeclaration) propDeclaration).getCaption();
+            propertyOptions = propertyStatement.getNonEmptyPropertyOptions();
+            caption = propertyStatement.getCaption();
 //            if (caption == null) {
-//                caption = propDeclaration.getDeclName();
+//                caption = propertyStatement.getDeclName();
 //            }
-            isAction = ((LSFGlobalPropDeclaration) propDeclaration).isAction();
-            baseClass = propDeclaration.resolveValueClass();
+            isAction = propertyStatement.isAction();
+            baseClass = propertyStatement.resolveValueClass();
 
-            declText = propDeclaration.getText();
-            declLocation = propDeclaration.getLocationString();
-            List<LSFClassSet> paramClasses = propDeclaration.resolveParamClasses();
+            declText = propertyStatement.getText();
+            declLocation = propertyStatement.getLocationString();
+            List<LSFClassSet> paramClasses = propertyStatement.resolveParamClasses();
             if (paramClasses != null) {
                 for (LSFClassSet classSet : paramClasses) {
                     if (classSet instanceof DataClass) {
@@ -115,6 +118,7 @@ public class PropertyDrawEntity {
                         interfeceClasses.add(classSet.toString());
                     }
                 }
+                canonicalName = PropertyCanonicalNameUtils.createName(propertyStatement.getNamespaceName(), propertyStatement.getGlobalName(), paramClasses);
             }
         }
 

@@ -2,7 +2,6 @@ package com.lsfusion.design.model;
 
 import com.intellij.openapi.project.Project;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.design.KeyStrokes;
 import com.lsfusion.util.BaseUtils;
 
 import javax.swing.*;
@@ -39,16 +38,7 @@ public class ActionPanelView extends JButton {
             setFont(property.font.deriveFrom(this));
         }
 
-        setToolTip(property.getCaption());
-    }
-
-    public void setToolTip(String caption) {
-        String toolTip = !BaseUtils.isRedundantString(property.toolTip) ? property.toolTip : caption;
-        toolTip += " (sID: " + property.getDisplaySID() + ")";
-        if (property.changeKey != null) {
-            toolTip += " (" + KeyStrokes.getKeyStrokeCaption(property.changeKey) + ")";
-        }
-        setToolTipText(toolTip);
+        setToolTipText(property.getTooltipText(property.getCaption()));
     }
 
     @Override

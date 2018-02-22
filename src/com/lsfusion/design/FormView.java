@@ -18,9 +18,7 @@ public class FormView {
 
     public Integer overridePageWidth;
 
-    protected PropertyDrawView printButton;
     protected PropertyDrawView editButton;
-    protected PropertyDrawView xlsButton;
     protected PropertyDrawView dropButton;
     protected PropertyDrawView refreshButton;
     protected PropertyDrawView applyButton;
@@ -76,7 +74,7 @@ public class FormView {
     protected FormView(FormEntity entity) {
         this.entity = entity;
 
-        String mainContainerSID = getBoxSID();
+        String mainContainerSID = getBoxContainerSID();
         mainContainer = new ContainerView(mainContainerSID);
         addComponentToMapping(mainContainer);
 
@@ -96,7 +94,7 @@ public class FormView {
 
         for (RegularFilterGroupEntity filterGroup : entity.regularFilterGroups) {
             if (!filterGroup.filters.isEmpty()) {
-                addRegularFilterGroupBase(filterGroup);
+                addFilterGroupBase(filterGroup);
             }
         }
     }
@@ -123,8 +121,8 @@ public class FormView {
 
         setComponentSID(groupObjectView.grid, getGridSID(groupObjectView));
         setComponentSID(groupObjectView.showType, getShowTypeSID(groupObjectView));
-        setComponentSID(groupObjectView.toolbar, getToolbarSystemSID(groupObjectView));
-        setComponentSID(groupObjectView.filter, getUserFilterSID(groupObjectView));
+        setComponentSID(groupObjectView.toolbarSystem, getToolbarSystemSID(groupObjectView));
+        setComponentSID(groupObjectView.userFilter, getUserFilterSID(groupObjectView));
 
         for (ObjectView object : groupObjectView) {
             setComponentSID(object.classChooser, getClassChooserSID(object));
@@ -140,8 +138,8 @@ public class FormView {
         treeGroups.add(treeGroupView);
 
         setComponentSID(treeGroupView, getGridSID(treeGroupView));
-        setComponentSID(treeGroupView.toolbar, getToolbarSystemSID(treeGroupView));
-        setComponentSID(treeGroupView.filter, getUserFilterSID(treeGroupView));
+        setComponentSID(treeGroupView.toolbarSystem, getToolbarSystemSID(treeGroupView));
+        setComponentSID(treeGroupView.userFilter, getUserFilterSID(treeGroupView));
         mtreeGroups.put(treeGroupEntity, treeGroupView);
     }
 
@@ -149,13 +147,13 @@ public class FormView {
         mfilters.put(filterGroupView.entity, filterGroupView);
     }
 
-    private RegularFilterGroupView addRegularFilterGroupBase(RegularFilterGroupEntity filterGroup) {
+    private RegularFilterGroupView addFilterGroupBase(RegularFilterGroupEntity filterGroup) {
         RegularFilterGroupView filterGroupView = new RegularFilterGroupView(this, filterGroup);
         regularFilters.add(filterGroupView);
         addRegularFilterGroupView(filterGroupView);
 
         mfilters.put(filterGroupView.entity, filterGroupView);
-        setComponentSID(filterGroupView, getRegularFilterGroupSID(filterGroupView));
+        setComponentSID(filterGroupView, getFilterGroupSID(filterGroupView));
         return filterGroupView;
     }
 
@@ -216,21 +214,13 @@ public class FormView {
     }
 
     private void initButtons() {
-//        printButton = setupFormButton(entity.printActionPropertyDraw, "print");
-        editButton = setupFormButton(entity.editActionPropertyDraw, "edit");
-//        xlsButton = setupFormButton(entity.xlsActionPropertyDraw, "xls");
-        refreshButton = setupFormButton(entity.refreshActionPropertyDraw, "refresh");
-        applyButton = setupFormButton(entity.applyActionPropertyDraw, "apply");
-        cancelButton = setupFormButton(entity.cancelActionPropertyDraw, "cancel");
-        okButton = setupFormButton(entity.okActionPropertyDraw, "ok");
-        closeButton = setupFormButton(entity.closeActionPropertyDraw, "close");
-        dropButton = setupFormButton(entity.dropActionPropertyDraw, "drop");
-    }
-
-    private PropertyDrawView setupFormButton(PropertyDrawEntity function, String type) {
-        PropertyDrawView functionView = getProperty(function);
-        setComponentSID(functionView, getClientFunctionSID(type));
-        return functionView;
+        editButton = getProperty(entity.editActionPropertyDraw);
+        refreshButton = getProperty(entity.refreshActionPropertyDraw);
+        applyButton = getProperty(entity.applyActionPropertyDraw);
+        cancelButton = getProperty(entity.cancelActionPropertyDraw);
+        okButton = getProperty(entity.okActionPropertyDraw);
+        closeButton = getProperty(entity.closeActionPropertyDraw);
+        dropButton = getProperty(entity.dropActionPropertyDraw);
     }
 
     public ContainerView createContainer(String caption, String sID) {
@@ -277,19 +267,19 @@ public class FormView {
     }
 
 //  SID BLOCK    
-    public static String getBoxSID() {
+    public static String getBoxContainerSID() {
         return FormContainerSet.BOX_CONTAINER;
     }
 
     public static String getTreeSID(String sID) {
-        return TreeGroupContainerSet.TREE_CONTAINER + " " + sID;
+        return TreeGroupContainerSet.TREE_PREFIX + " " + sID;
     }
 
-    private static String getRegularFilterGroupSID(RegularFilterGroupView component) {
-        return getRegularFilterGroupSID(component.getSID());
+    private static String getFilterGroupSID(RegularFilterGroupView component) {
+        return getFilterGroupSID(component.getSID());
     }
 
-    public static String getRegularFilterGroupSID(String sID) {
+    public static String getFilterGroupSID(String sID) {
         return GroupObjectContainerSet.FILTERGROUP_COMPONENT + "(" + sID + ")";
     }
 
@@ -333,25 +323,29 @@ public class FormView {
         return GroupObjectContainerSet.CLASSCHOOSER_COMPONENT + "(" + sID + ")";
     }
 
-    public static String getClientFunctionSID(String type) {
-        return FormContainerSet.FUNCTIONSIN_CONTAINER + type;
+    public static String getPropertyDrawSID(String name) {
+        return "PROPERTY(" + name + ")";
     }
 
-    public static String getPropertySID(String alias, String name, List<String> objectNames) {
+    public static String getPropertyDrawSID(String alias, String name, List<String> objectNames) {
+        return getPropertyDrawSID(getPropertyDrawName(alias, name, objectNames));
+    }
+    
+    public static String getPropertyDrawName(String alias, String name, List<String> objectNames) {
+        StringBuilder propName;
         if (alias != null) {
-            return alias;
+            propName = new StringBuilder(alias);
         } else {
-            name += "(";
+            propName = new StringBuilder(name + "(");
             for (String objectUsage : objectNames) {
-                name += objectUsage;
+                propName.append(objectUsage);
                 if (objectNames.indexOf(objectUsage) < objectNames.size() - 1) {
-                    name += ",";
+                    propName.append(",");
                 }
             }
-            name += ")";
-
-            return name;
+            propName.append(")");
         }
+        return propName.toString();
     }
 
     public class ContainerFactory {

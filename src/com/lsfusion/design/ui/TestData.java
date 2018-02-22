@@ -3186,7 +3186,7 @@ public class TestData {
         row2.add(i_box);
         rootContainer.add(row2);
         main.add(rootContainer);
-        ContainerView functions_box = new ContainerView(DefaultFormView.getToolbarBoxSID());
+        ContainerView functions_box = new ContainerView(DefaultFormView.getToolbarBoxContainerSID());
         functions_box.size = null;
         functions_box.setFlex(0.0);
         functions_box.setAlignment(FlexAlignment.STRETCH);
@@ -3205,7 +3205,7 @@ public class TestData {
         functions_box.type = ContainerType.CONTAINERH;
         functions_box.caption = null;
         functions_box.description = "Служебные кнопки";
-        ContainerView leftControls = new ContainerView(DefaultFormView.getToolbarLeftSID());
+        ContainerView leftControls = new ContainerView(DefaultFormView.getToolbarLeftContainerSID());
         leftControls.size = null;
         leftControls.setFlex(0.0);
         leftControls.setAlignment(FlexAlignment.START);
@@ -3390,7 +3390,7 @@ public class TestData {
         isEditable__.askConfirm = false;
         isEditable__.askConfirmMessage = null;
         functions_box.add(isEditable__);
-        ContainerView rightControls = new ContainerView(DefaultFormView.getToolbarRightSID());
+        ContainerView rightControls = new ContainerView(DefaultFormView.getToolbarRightContainerSID());
         rightControls.size = null;
         rightControls.setFlex(1.0);
         rightControls.setAlignment(FlexAlignment.START);

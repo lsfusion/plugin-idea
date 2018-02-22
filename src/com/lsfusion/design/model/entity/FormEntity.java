@@ -18,7 +18,10 @@ import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 public class FormEntity {
     private LSFFile file;
@@ -28,9 +31,7 @@ public class FormEntity {
     public List<PropertyDrawEntity> propertyDraws = new ArrayList<>();
     public List<RegularFilterGroupEntity> regularFilterGroups = new ArrayList<>();
 
-    public PropertyDrawEntity printActionPropertyDraw;
     public PropertyDrawEntity editActionPropertyDraw;
-    public PropertyDrawEntity xlsActionPropertyDraw;
     public PropertyDrawEntity dropActionPropertyDraw;
     public PropertyDrawEntity refreshActionPropertyDraw;
     public PropertyDrawEntity applyActionPropertyDraw;
@@ -371,9 +372,7 @@ public class FormEntity {
     }
 
     private void initFormButtons() {
-//        addPropertyDraw(printActionPropertyDraw = addFormButton("formPrint"), null);
         addPropertyDraw(editActionPropertyDraw = addFormButton("formEdit"), null);
-//        addPropertyDraw(xlsActionPropertyDraw = addFormButton("formXls"), null);
         addPropertyDraw(dropActionPropertyDraw = addFormButton("formDrop"), null);
         addPropertyDraw(refreshActionPropertyDraw = addFormButton("formRefresh"), null);
         addPropertyDraw(applyActionPropertyDraw = addFormButton("formApply"), null);
