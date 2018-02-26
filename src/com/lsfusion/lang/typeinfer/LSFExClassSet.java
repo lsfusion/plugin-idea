@@ -120,4 +120,8 @@ public class LSFExClassSet {
         if(set == null) return set;
         return set.orAny();
     }
+    
+    public LSFExClassSet extend(int times) {
+        return new LSFExClassSet(classSet instanceof StringClass ? ((StringClass) classSet).extend(times) : classSet, orAny);
+    }
 }

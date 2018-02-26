@@ -98,4 +98,10 @@ public class StringClass extends DataClass {
     public boolean isFlex() {
         return true;
     }
+
+    public StringClass extend(int times) {
+        if(length.isUnlimited())
+            return this;
+        return new StringClass(blankPadded, caseInsensitive, rich, new ExtInt(BaseUtils.min(length.getValue() * times, 4000)));
+    }
 }

@@ -1117,7 +1117,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFGroupPropertyDefinition sourceStatement, boolean infer) {
-        return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), infer ? inferGroupParamClasses(sourceStatement) : null);
+        LSFExClassSet lsfExClassSet = resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), infer ? inferGroupParamClasses(sourceStatement) : null);
+        LSFGroupingType groupingType = sourceStatement.getGroupingType();
+        if(groupingType.getText().equals("CONCAT"))
+            lsfExClassSet = lsfExClassSet.extend(10);
+        return lsfExClassSet;
     }
 
     @Nullable
