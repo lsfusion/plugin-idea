@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class LSFDebuggerRunner extends GenericDebuggerRunner {
     public static final String DEBUG_ACTIONS_PROPERTY = "lsfusion.server.debug.actions";
-    public static final String ISDEBUG_PROPERTY = "lsfusion.server.isdebug";
+    public static final String LIGHT_START_PROPERTY = "lsfusion.server.lightstart";
     public static final Key<Integer> DEBUGGER_PROPERTY_KEY = new Key<>("lsfusin.debuggerPort");
     
     @Override
