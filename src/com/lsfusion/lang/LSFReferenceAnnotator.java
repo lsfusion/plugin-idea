@@ -158,15 +158,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
         LSFClassName className = o.getClassParamDeclare().getClassName();
         if (o.resolveDecl() == o.getClassParamDeclare().getParamDeclare()) {
-            if(className != null)
+            if (className != null)
                 addImplicitDecl(o);
             else
                 addUntypedImplicitDecl(o);
         }
 
-        if(className != null) {
+        if (className != null) {
             LSFExprParamReference parentRef = PsiTreeUtil.getParentOfType(o.resolveDecl(), LSFExprParamReference.class);
-            if(parentRef == null || o != parentRef) {
+            if (parentRef == null || o != parentRef) {
                 Annotation annotation = myHolder.createErrorAnnotation(o, "Redefinition of reference '" + o.getNameRef() + "'");
                 annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
                 addError(o, annotation);
@@ -272,16 +272,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
         List<LSFClassSet> groupByParams = new ArrayList<>();
         LSFPropertyCalcStatement propertyCalcStatement = o.getPropertyCalcStatement();
-        if(propertyCalcStatement != null) {
+        if (propertyCalcStatement != null) {
             LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
-            if(expressionUnfriendlyPD != null) {
+            if (expressionUnfriendlyPD != null) {
                 LSFGroupPropertyDefinition groupPropertyDefinition = expressionUnfriendlyPD.getGroupPropertyDefinition();
                 if (groupPropertyDefinition != null) {
                     LSFGroupPropertyBy groupPropertyBy = groupPropertyDefinition.getGroupPropertyBy();
                     if (groupPropertyBy != null) {
                         for (LSFPropertyExpression expr : groupPropertyBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList()) {
                             LSFExClassSet valueClass = expr.resolveValueClass(false);
-                            if(valueClass != null) {
+                            if (valueClass != null) {
                                 groupByParams.add(valueClass.classSet);
                             }
                         }
@@ -306,7 +306,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                                     error = true;
                                 }
                             }
-                            if(error) {
+                            if (error) {
                                 Annotation annotation = myHolder.createErrorAnnotation(o,
                                         String.format("Incorrect GROUP BY params: required %s; found %s", listToString(exprParams), listToString(groupByParams)));
                                 annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
@@ -321,7 +321,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private String listToString(List<LSFClassSet> list) {
         String result = "";
-        for(LSFClassSet value : list) {
+        for (LSFClassSet value : list) {
             result += (result.isEmpty() ? "" : ", ") + value;
         }
         return result;
@@ -358,7 +358,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitStaticObjectReference(@NotNull LSFStaticObjectReference o) {
         super.visitStaticObjectReference(o);
-        
+
         checkReference(o);
     }
 
@@ -489,15 +489,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitLocalizedStringValueLiteral(o);
         checkEscapeSequences(o, "nrt'\\{}");
     }
-    
+
     private void checkEscapeSequences(PsiElement element, final String escapedSymbols) {
         String text = element.getText();
         for (int i = 0; i < text.length(); ++i) {
             char curCh = text.charAt(i);
             if (curCh == '\\') {
-                if (i + 1 < text.length() && !escapedSymbols.contains(text.substring(i+1, i+2))) {
+                if (i + 1 < text.length() && !escapedSymbols.contains(text.substring(i + 1, i + 2))) {
                     TextRange textRange = TextRange.create(element.getTextRange().getStartOffset() + i, element.getTextRange().getStartOffset() + i + 2);
-                    Annotation annotation = myHolder.createErrorAnnotation(textRange, "Wrong escape sequence " + text.substring(i, i+2));
+                    Annotation annotation = myHolder.createErrorAnnotation(textRange, "Wrong escape sequence " + text.substring(i, i + 2));
                     annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
                     addError(element, annotation);
                 } else {
@@ -506,7 +506,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         }
     }
-    
+
     private boolean checkReference(LSFReference reference) {
         Annotation errorAnnotation = reference.resolveErrorAnnotation(myHolder);
         if (!isInMetaDecl(reference) && errorAnnotation != null) {
@@ -528,10 +528,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         } else {
             LSFTypePropertyDefinition type = relationalPE.getTypePropertyDefinition();
-            if(type != null && relationalPE.getChildren().length == 2) {
+            if (type != null && relationalPE.getChildren().length == 2) {
                 LSFClassSet class1 = getLSFClassSet(children.get(0));
                 LSFClassSet class2 = LSFPsiImplUtil.resolveClass(type.getClassName());
-                if(class1 != null && class2 != null && !class1.haveCommonChildren(class2, null)) {
+                if (class1 != null && class2 != null && !class1.haveCommonChildren(class2, null)) {
                     myHolder.createWarningAnnotation(relationalPE, String.format("Type mismatch: can't cast %s to %s", class1, class2));
                 }
             }
@@ -564,7 +564,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             addAlreadyDefinedError(declaration);
         }
     }
-    
+
     private void addDuplicateColumnNameError(PsiElement element, String tableName, String columnName) {
         Annotation annotation = myHolder.createErrorAnnotation(element, "The property has duplicate column name. Table: " + tableName + ", column: " + columnName);
         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
@@ -626,8 +626,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitOverrideStatement(@NotNull LSFOverrideStatement element) {
-        Result<LSFClassSet> required = new Result<>(); Result<LSFClassSet> found = new Result<>();
-        if(!LSFPsiImplUtil.checkOverrideValue(element, required, found)) {
+        Result<LSFClassSet> required = new Result<>();
+        Result<LSFClassSet> found = new Result<>();
+        if (!LSFPsiImplUtil.checkOverrideValue(element, required, found)) {
             String requiredClass = required.getResult() instanceof LSFValueClass ? ((LSFValueClass) required.getResult()).getCaption() : required.getResult().getCanonicalName();
             String foundClass = found.getResult() instanceof LSFValueClass ? ((LSFValueClass) found.getResult()).getCaption() : found.getResult().getCanonicalName();
             Annotation annotation = myHolder.createErrorAnnotation(element, "Wrong value class. Required : " + requiredClass + ", found : " + foundClass);
@@ -670,7 +671,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
                     if (!rightPropertyExpressionList.isEmpty()) {
                         LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
-                        if(leftClass != null && rightClass != null) {
+                        if (leftClass != null && rightClass != null) {
                             if (!leftClass.isCompatible(rightClass))
                                 addTypeMismatchError(o, rightClass, leftClass);
                         }
@@ -696,7 +697,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addError(o, annotation);
     }
 
-    private void addTypeMismatchError(LSFAssignActionPropertyDefinitionBody o, LSFClassSet class1,  LSFClassSet class2) {
+    private void addTypeMismatchError(LSFAssignActionPropertyDefinitionBody o, LSFClassSet class1, LSFClassSet class2) {
         Annotation annotation = myHolder.createErrorAnnotation(o, String.format("Type mismatch: can't cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName()));
         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
         addError(o, annotation, LSFErrorLevel.ERROR);
@@ -717,10 +718,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitTypeMult(@NotNull LSFTypeMult o) {
-        for(PsiElement child : o.getParent().getChildren()) {
-            if(child instanceof LSFUnaryMinusPE) {
+        for (PsiElement child : o.getParent().getChildren()) {
+            if (child instanceof LSFUnaryMinusPE) {
                 LSFClassSet classSet = LSFExClassSet.fromEx(((LSFUnaryMinusPE) child).resolveInferredValueClass(null));
-                if(classSet != null && !(classSet instanceof IntegralClass)) {
+                if (classSet != null && !(classSet instanceof IntegralClass)) {
                     Annotation annotation = myHolder.createErrorAnnotation(child, "Can't multiply / divide " + classSet + " value");
                     annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
                     addError(child, annotation);
@@ -732,7 +733,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitAdditiveORPE(@NotNull LSFAdditiveORPE o) {
         List<LSFAdditivePE> additivePEList = o.getAdditivePEList();
-        if(additivePEList.size() > 1) {
+        if (additivePEList.size() > 1) {
             for (LSFAdditivePE child : additivePEList) {
                 LSFClassSet classSet = LSFExClassSet.fromEx(child.resolveInferredValueClass(null));
                 if (classSet != null && !(classSet instanceof IntegralClass)) {
@@ -743,5 +744,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         }
     }
-}
 
+    @Override
+    public void visitModuleUsage(@NotNull LSFModuleUsage moduleUsage) {
+        if (moduleUsage.resolveDecl() == null) {
+            addError(moduleUsage, moduleUsage.resolveErrorAnnotation(myHolder));
+        }
+    }
+}
