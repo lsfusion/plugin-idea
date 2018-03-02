@@ -9,9 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.124</b><br>
+        <b>Version 1.0.125</b><br>
         <ul>
-            <li>Is debug -> Light start</li>
+            <li>Usage of an unexisted module error</li>
         </ul>
     ]]>
     </change-notes>
