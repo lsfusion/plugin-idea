@@ -1195,7 +1195,7 @@ listFormDeclaration ::= LIST customClassUsage OBJECT objectUsage {pin = 1}
 editFormDeclaration ::= EDIT customClassUsage OBJECT objectUsage {pin = 1}
 
 reportFilesDeclaration ::= REPORTFILES groupObjectReportPath (COMMA groupObjectReportPath)* {pin = 1}
-groupObjectReportPath ::= (TOP | groupObjectUsage) formPropertyObject
+groupObjectReportPath ::= (TOP | groupObjectUsage) formCalcPropertyObject
 
 formDecl ::= FORM simpleNameWithCaption
 		            (   IMAGE stringLiteral
@@ -1308,7 +1308,7 @@ formOptionsOnEvents ::= ON formEventType formActionPropertyObject
     pin = 1
 }
 
-designCalcPropertyObject ::= formPropertyObject
+designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formPropertyObject | formExprDeclaration
 formActionPropertyObject ::= formPropertyObject | formActionDeclaration
 
