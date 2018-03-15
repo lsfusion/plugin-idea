@@ -1383,7 +1383,7 @@ predefinedFormPropertyName ::= VALUE
     implements="com.lsfusion.lang.psi.LSFId"
 }
 
-formPropertyName ::= propertyUsage | predefinedFormPropertyName
+formPropertyName ::= (ACTION? propertyUsage) | predefinedFormPropertyName
 
 formPropertyDrawObject ::= formPropertyName LBRAC objectUsageList RBRAC
 {
