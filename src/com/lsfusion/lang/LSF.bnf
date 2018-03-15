@@ -493,7 +493,7 @@ filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
-reflectionPropertyDefinition ::= REFLECTION reflectionPropertyType propertyUsage
+reflectionPropertyDefinition ::= REFLECTION reflectionPropertyType actionOrPropertyUsage
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE" 
     methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
