@@ -2255,6 +2255,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFNoContextActionOrPropertyUsage sourceStatement) {
+        return null;
+    }
+
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFPartitionPropertyDefinition sourceStatement) {
         LSFPartitionPropertyBy by = sourceStatement.getPartitionPropertyBy();
         if (by != null)
@@ -2274,6 +2279,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static PsiElement getParamList(@NotNull LSFNoContextPropertyUsage sourceStatement) {
+        return null;
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFNoContextActionOrPropertyUsage sourceStatement) {
         return null;
     }
 

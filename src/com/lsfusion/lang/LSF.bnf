@@ -435,6 +435,8 @@ propertyExprObject ::= LSQBR EQUALS (propertyCalcStatement) RSQBR
 propertyObject ::=  propertyUsage | propertyExprObject
 noContextPropertyUsage ::= propertyUsage
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
+noContextActionOrPropertyUsage ::= actionOrPropertyUsage
+{implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 
 dataPropertyDefinition ::= DATA (dataPropertySessionModifier)? className (LBRAC classNameList RBRAC)
@@ -549,7 +551,7 @@ aggPropSetting ::= AGGPROP
 aggrSetting ::= AGGR
 notNullSetting ::= nullOption (DELETE)? baseEvent
 onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти
-asEditActionSetting ::= ASON formEventType noContextPropertyUsage {pin = 1}
+asEditActionSetting ::= ASON formEventType noContextActionOrPropertyUsage {pin = 1}
 eventIdSetting ::= EVENTID stringLiteral
 
 hideEditKey ::= HIDE
@@ -1383,7 +1385,9 @@ predefinedFormPropertyName ::= VALUE
     implements="com.lsfusion.lang.psi.LSFId"
 }
 
-formPropertyName ::= (ACTION? propertyUsage) | predefinedFormPropertyName
+formPropertyName ::= actionOrPropertyUsage | predefinedFormPropertyName
+
+private actionOrPropertyUsage ::= (ACTION? propertyUsage)
 
 formPropertyDrawObject ::= formPropertyName LBRAC objectUsageList RBRAC
 {
@@ -1477,7 +1481,7 @@ eventStatement ::= WHEN baseEvent propertyExpression (ORDER (DESC)? nonEmptyProp
 //////////////////////////// GLOBAL EVENT STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP ID)? actionPropertyDefinitionBody
+globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP noContextActionOrPropertyUsage)? actionPropertyDefinitionBody
 {
     pin=1
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
@@ -1492,7 +1496,7 @@ inlineOption ::=   (NOINLINE (LBRAC exprParameterUsageList RBRAC)? )? (INLINE)?
 //////////////////////////////// SHOWDEP STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-showDepStatement ::= SHOWDEP noContextPropertyUsage FROM noContextPropertyUsage SEMI {pin=1 methods = [ getIcon ]}
+showDepStatement ::= SHOWDEP noContextActionOrPropertyUsage FROM noContextActionOrPropertyUsage SEMI {pin=1 methods = [ getIcon ]}
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// ASPECT STATEMENT //////////////////////////////
