@@ -2298,6 +2298,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static PsiElement getParamList(@NotNull LSFFormPropertyDrawObject sourceStatement) {
+        return sourceStatement.getObjectUsageList();
+    }
+
+    @Nullable
     public static PsiElement getParamList(@NotNull LSFMappedPropertyClassParamDeclare sourceStatement) {
         return sourceStatement.getClassParamDeclareList();
     }
@@ -2331,6 +2336,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFFormPropertyObject sourceStatement) {
+        return resolveParamClasses(sourceStatement.getObjectUsageList());
+    }
+
+    @Nullable
+    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFFormPropertyDrawObject sourceStatement) {
         return resolveParamClasses(sourceStatement.getObjectUsageList());
     }
 

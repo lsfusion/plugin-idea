@@ -12,7 +12,7 @@ public abstract class LSFPropertyDrawMappedDeclarationImpl extends LSFPropertyDr
         super(node);
     }
 
-    protected abstract LSFFormPropertyObject getFormPropertyObject();
+    protected abstract LSFFormPropertyDrawObject getFormPropertyDrawObject();
 
     @Nullable
     @Override
@@ -21,21 +21,21 @@ public abstract class LSFPropertyDrawMappedDeclarationImpl extends LSFPropertyDr
         if(simpleName != null)
             return simpleName;
 
-        LSFFormPropertyObject formPropertyObject = getFormPropertyObject();
+        LSFFormPropertyDrawObject formPropertyObject = getFormPropertyDrawObject();
         if(formPropertyObject == null)
             return null;
         return LSFPropertyDrawNameDeclarationImpl.getNameIdentifier(formPropertyObject.getFormPropertyName());
     }
 
     public LSFObjectUsageList getObjectUsageList() {
-        LSFFormPropertyObject formPropertyObject = getFormPropertyObject();
+        LSFFormPropertyDrawObject formPropertyObject = getFormPropertyDrawObject();
         if(formPropertyObject == null)
             return null;
         return formPropertyObject.getObjectUsageList();
     }
 
     public LSFFormPropertyName getFormPropertyName() {
-        LSFFormPropertyObject formPropertyObject = getFormPropertyObject();
+        LSFFormPropertyDrawObject formPropertyObject = getFormPropertyDrawObject();
         if(formPropertyObject == null)
             return null;
         return formPropertyObject.getFormPropertyName();

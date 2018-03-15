@@ -1312,7 +1312,7 @@ designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formPropertyObject | formExprDeclaration
 formActionPropertyObject ::= formPropertyObject | formActionDeclaration
 
-formPropertyDrawMappedDecl ::= (((simpleNameOrWithCaption EQUALS)? formPropertyObject)  
+formPropertyDrawMappedDecl ::= (((simpleNameOrWithCaption EQUALS)? formPropertyDrawObject)  
                                | (simpleNameOrWithCaption? EQUALS (formExprDeclaration | formActionDeclaration)))
                                 formPropertyOptionsList
 {
@@ -1385,7 +1385,13 @@ predefinedFormPropertyName ::= VALUE
 
 formPropertyName ::= propertyUsage | predefinedFormPropertyName
 
-formPropertyObject ::= formPropertyName LBRAC objectUsageList RBRAC
+formPropertyDrawObject ::= formPropertyName LBRAC objectUsageList RBRAC
+{
+//    pin = 1 // formPropertyObject before propertyExpression
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList ]
+}
+formPropertyObject ::= propertyUsage LBRAC objectUsageList RBRAC
 {
 //    pin = 1 // formPropertyObject before propertyExpression
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"

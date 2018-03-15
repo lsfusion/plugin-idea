@@ -156,7 +156,7 @@ public class FormEntity {
                     boolean reverseFor = relativeProsition != null && !relativeProsition.first;
                     for (int i = reverseFor ? mappedDeclList.size() - 1 : 0; (reverseFor && i >= 0) || (!reverseFor && i < mappedDeclList.size()); i = i + (reverseFor ? -1 : 1)) {
                         LSFFormPropertyDrawMappedDecl prop = mappedDeclList.get(i);
-                        LSFFormPropertyObject formPropertyObject = prop.getFormPropertyObject();
+                        LSFFormPropertyDrawObject formPropertyObject = prop.getFormPropertyDrawObject();
                         if(formPropertyObject != null) {
                             LSFObjectUsageList objectUsageList = formPropertyObject.getObjectUsageList();
 
