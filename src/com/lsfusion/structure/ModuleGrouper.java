@@ -5,6 +5,7 @@ import com.intellij.ide.util.treeView.smartTree.*;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -22,9 +23,9 @@ public class ModuleGrouper implements Grouper {
         LinkedHashMap<String, Group> map = new LinkedHashMap<>();
 
         for (TreeElement child : children) {
-            if (child instanceof LSFPropertyStatementTreeElement) {
-                LSFPropertyStatementTreeElement psChild = (LSFPropertyStatementTreeElement) child;
-                LSFPropertyStatement propStatement = psChild.getElement();
+            if (child instanceof LSFActionOrPropertyStatementTreeElement) {
+                LSFActionOrPropertyStatementTreeElement<?> psChild = (LSFActionOrPropertyStatementTreeElement) child;
+                LSFActionOrPropDeclaration propStatement = psChild.getElement();
                 String moduleName = ((LSFFile) propStatement.getContainingFile()).getModuleDeclaration().getName();
                 ModuleGroup group = (ModuleGroup) map.get(moduleName);
                 if (group == null) {

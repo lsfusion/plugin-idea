@@ -202,7 +202,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
                         String methodName = methodExpression.getReferenceName();
                         if (isOneOfStrings(methodName, FIND_ACTION, FIND_PROPERTY, FIND_CLASS, FIND_PROPERTIES)) {
-                            boolean classRef = FIND_CLASS.equals(methodName);
+                            String prefix = FIND_CLASS.equals(methodName) ? "CLASS" : (FIND_ACTION.equals(methodName) ? "ACTION" : "PROPERTY");
 
                             PsiClass thisClass = resolveThisClass(methodExpression);
                             if (thisClass != null) {
@@ -213,14 +213,14 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                                 }
                                 
                                 if (hasSuperClasses.equals(0)) { // если наследуется от ScriptingActionProperty
-                                    referenceFromScriptingActionProperty(thisClass, literalExpression, classRef, false, injectionPlacesRegistrar);
+                                    referenceFromScriptingActionProperty(thisClass, literalExpression, prefix, false, injectionPlacesRegistrar);
                                 } else if (hasSuperClasses.equals(1)) { // если наследуется от ScriptingLogicsModule
                                     Set<String> modules = new HashSet<>();
                                     getModulesFromConstructor(modules, thisClass);
-                                    javaOrPropertyReference(literalExpression, classRef, BaseUtils.toString(modules, ","), false, injectionPlacesRegistrar);
+                                    javaOrPropertyReference(literalExpression, prefix, BaseUtils.toString(modules, ","), false, injectionPlacesRegistrar);
                                 }
                             } else {
-                                resolveModuleMethodsRef(methodExpression.getQualifierExpression(), literalExpression, classRef, false, injectionPlacesRegistrar);
+                                resolveModuleMethodsRef(methodExpression.getQualifierExpression(), literalExpression, prefix, false, injectionPlacesRegistrar);
                             }
                         }
                     }
@@ -330,12 +330,12 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
             }
         }
 
-        private void resolveModuleMethodsRef(PsiExpression qualifierExpression, PsiLiteralExpression element, boolean classRef, boolean onlyModule, InjectedLanguagePlaces injectionPlacesRegistrar) {
+        private void resolveModuleMethodsRef(PsiExpression qualifierExpression, PsiLiteralExpression element, String prefix, boolean onlyModule, InjectedLanguagePlaces injectionPlacesRegistrar) {
             if (qualifierExpression != null) {
                 String moduleName = getModuleName(qualifierExpression);
                 if (moduleName == null)
                     moduleName = LSFFileUtils.getTopModule(qualifierExpression);
-                javaOrPropertyReference(element, classRef, moduleName, onlyModule, injectionPlacesRegistrar);
+                javaOrPropertyReference(element, prefix, moduleName, onlyModule, injectionPlacesRegistrar);
             }
         }
 
@@ -514,18 +514,12 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
             return null;
         }
 
-        private void referenceFromScriptingActionProperty(PsiClass clazz, PsiLiteralExpression element, boolean classRef, boolean onlyModule, InjectedLanguagePlaces injectionPlacesRegistrar) {
+        private void referenceFromScriptingActionProperty(PsiClass clazz, PsiLiteralExpression element, String prefix, boolean onlyModule, InjectedLanguagePlaces injectionPlacesRegistrar) {
             //прямой вызов => ищем модуль, в котором инстанцируется данный класс
-            javaOrPropertyReference(element, classRef, getModuleForActionClass(clazz), onlyModule, injectionPlacesRegistrar);
+            javaOrPropertyReference(element, prefix, getModuleForActionClass(clazz), onlyModule, injectionPlacesRegistrar);
         }
 
-        private void javaOrPropertyReference(PsiLiteralExpression element, boolean classRef, String moduleName, boolean onlyModule, InjectedLanguagePlaces injectionPlacesRegistrar) {
-            String prefix;
-            if (classRef) {
-                prefix = "CLASS";
-            } else
-                prefix = "PROPERTY";
-
+        private void javaOrPropertyReference(PsiLiteralExpression element, String prefix, String moduleName, boolean onlyModule, InjectedLanguagePlaces injectionPlacesRegistrar) {
             injectionPlacesRegistrar.addStatementUsage(new TextRange(1, element.getTextLength() - 1), moduleName, "INTERNAL " + prefix + " ");
         }
 

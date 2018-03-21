@@ -1,6 +1,7 @@
 package com.lsfusion.refactoring;
 
 import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 
 import java.util.List;
@@ -8,35 +9,37 @@ import java.util.List;
 public class PropertyMigration extends ElementMigration {
 
     private final boolean isStored;
+    private final boolean isAction;
     
-    public static PropertyMigration create(LSFGlobalPropDeclaration decl, String oldName, String newName) {
+    public static PropertyMigration create(LSFActionOrGlobalPropDeclaration decl, String oldName, String newName) {
         String namespace = decl.getNamespaceName();
         
         List<LSFClassSet> paramsClasses = decl.resolveParamClasses();
         String oldFullName = PropertyCanonicalNameUtils.createName(namespace, oldName, paramsClasses);
         String newFullName = PropertyCanonicalNameUtils.createName(namespace, newName, paramsClasses);
         
-        return new PropertyMigration(decl, oldFullName, newFullName, decl.isStoredProperty());
+        return new PropertyMigration(decl, oldFullName, newFullName);
     }
 
-    public static PropertyMigration create(LSFGlobalPropDeclaration decl, List<LSFClassSet> oldClasses, List<LSFClassSet> newClasses) {
+    public static PropertyMigration create(LSFActionOrGlobalPropDeclaration decl, List<LSFClassSet> oldClasses, List<LSFClassSet> newClasses) {
         String namespace = decl.getNamespaceName();
         
         String name = decl.getDeclName();
         String oldFullName = PropertyCanonicalNameUtils.createName(namespace, name, oldClasses);
         String newFullName = PropertyCanonicalNameUtils.createName(namespace, name, newClasses);
 
-        return new PropertyMigration(decl, oldFullName, newFullName, decl.isStoredProperty());
+        return new PropertyMigration(decl, oldFullName, newFullName);
     }
 
-    public PropertyMigration(LSFGlobalPropDeclaration decl, String oldName, String newName, boolean isStored) {
+    public PropertyMigration(LSFActionOrGlobalPropDeclaration decl, String oldName, String newName) {
         super(decl, oldName, newName);
         
-        this.isStored = isStored;
+        this.isAction = decl.isAction(); 
+        this.isStored = decl instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration) decl).isStoredProperty();
     }
 
     @Override
     public String getPrefix() {
-        return (isStored ? "STORED " : "") + "PROPERTY";
+        return isAction ? "ACTION" : ((isStored ? "STORED " : "") + "PROPERTY");
     }
 }

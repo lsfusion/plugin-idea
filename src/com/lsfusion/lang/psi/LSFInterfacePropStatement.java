@@ -20,6 +20,8 @@ public interface LSFInterfacePropStatement extends PsiElement {
     String getValuePresentableText();
 
     PsiElement getLookupObject(); // пока не совсем понятно зачем
+    
+    boolean isAction();
 
 //    LSFPropertyStatement getPropertyStatement(); // вызывать только если парсинг не критичен
 

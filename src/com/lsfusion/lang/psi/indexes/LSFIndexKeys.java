@@ -16,6 +16,7 @@ public class LSFIndexKeys {
     public static final StubIndexKey<String, LSFModuleDeclaration> MODULE = StubIndexKey.createIndexKey("lsf.indices.module");
     public static final StubIndexKey<String, LSFNavigatorElementDeclaration> NAVIGATORELEMENT = StubIndexKey.createIndexKey("lsf.indices.navigator.element");
     public static final StubIndexKey<String, LSFGlobalPropDeclaration> PROP = StubIndexKey.createIndexKey("lsf.indices.prop");
+    public static final StubIndexKey<String, LSFActionDeclaration> ACTION = StubIndexKey.createIndexKey("lsf.indices.action");
     public static final StubIndexKey<String, LSFTableDeclaration> TABLE = StubIndexKey.createIndexKey("lsf.indices.table");
     public static final StubIndexKey<String, LSFWindowDeclaration> WINDOW = StubIndexKey.createIndexKey("lsf.indices.window");
 
@@ -26,8 +27,10 @@ public class LSFIndexKeys {
     public static final StubIndexKey<String, LSFClassExtend> EXTENDCLASS_SHORT = StubIndexKey.createIndexKey("lsf.indices.extends.class.short");
     public static final StubIndexKey<String, LSFDesign> DESIGN = StubIndexKey.createIndexKey("lsf.indices.design");
 
-    public static final StubIndexKey<String, LSFExplicitInterfacePropStatement> EXPLICIT_INTERFACE = StubIndexKey.createIndexKey("lsf.indices.explicit.interface");
+    public static final StubIndexKey<String, LSFExplicitInterfacePropStatement> EXPLICIT_INTERFACE_PROP = StubIndexKey.createIndexKey("lsf.indices.explicit.prop.interface");
     public static final StubIndexKey<String, LSFExplicitValuePropStatement> EXPLICIT_VALUE = StubIndexKey.createIndexKey("lsf.indices.explicit.value");
     public static final StubIndexKey<String, LSFImplicitInterfacePropStatement> IMPLICIT_INTERFACE = StubIndexKey.createIndexKey("lsf.indices.implicit.interface");
     public static final StubIndexKey<String, LSFImplicitValuePropStatement> IMPLICIT_VALUE = StubIndexKey.createIndexKey("lsf.indices.implicit.value");
+
+    public static final StubIndexKey<String, LSFExplicitInterfaceActionStatement> EXPLICIT_INTERFACE_ACTION = StubIndexKey.createIndexKey("lsf.indices.explicit.action.interface");
 }

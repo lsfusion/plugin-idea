@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawNameDeclaration;
+import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +18,9 @@ public abstract class LSFPropertyDrawNameDeclarationImpl extends LSFPropertyDraw
     public abstract LSFFormPropertyName getFormPropertyName();
 
     public static LSFId getNameIdentifier(LSFFormPropertyName name) {
-        LSFPropertyUsage pUsage = name.getPropertyUsage();
+        LSFActionOrPropReference<?, ?> pUsage = name.getPropertyElseActionUsage();
+        if(pUsage == null)
+            pUsage = name.getActionUsage();
         if(pUsage != null)
             return pUsage.getSimpleName();
         return name.getPredefinedFormPropertyName();

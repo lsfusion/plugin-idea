@@ -25,10 +25,7 @@ import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
-import com.lsfusion.lang.psi.references.LSFExprParamReference;
-import com.lsfusion.lang.psi.references.LSFPropReference;
-import com.lsfusion.lang.psi.references.LSFReference;
-import com.lsfusion.lang.psi.references.LSFStaticObjectReference;
+import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -83,6 +80,22 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitPropertyUsage(@NotNull LSFPropertyUsage o) {
         super.visitPropertyUsage(o);
+        checkIndirectUsage(o);
+    }
+
+    @Override
+    public void visitActionUsage(@NotNull LSFActionUsage o) {
+        super.visitActionUsage(o);
+        checkIndirectUsage(o);
+    }
+
+    @Override
+    public void visitPropertyElseActionUsage(@NotNull LSFPropertyElseActionUsage o) {
+        super.visitPropertyElseActionUsage(o);
+        checkIndirectUsage(o);
+    }
+
+    public void checkIndirectUsage(@NotNull LSFActionOrPropReference o) {
         if (checkReference(o) && !o.isDirect())
             addIndirectProp(o);
     }
@@ -600,7 +613,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         annotation.setEnforcedTextAttributes(error);
     }
 
-    private void addIndirectProp(LSFPropReference reference) {
+    private void addIndirectProp(LSFActionOrPropReference reference) {
         final Annotation annotation = myHolder.createWeakWarningAnnotation(reference.getTextRange(), "Indirect usage");
         TextAttributes error = IMPLICIT_DECL;
         if (isInMetaUsage(reference))
@@ -625,7 +638,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
-    public void visitOverrideStatement(@NotNull LSFOverrideStatement element) {
+    public void visitOverridePropertyStatement(@NotNull LSFOverridePropertyStatement element) {
         Result<LSFClassSet> required = new Result<>();
         Result<LSFClassSet> found = new Result<>();
         if (!LSFPsiImplUtil.checkOverrideValue(element, required, found)) {
@@ -636,6 +649,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             addError(element, annotation);
         }
 
+        if (!LSFPsiImplUtil.checkNonRecursiveOverride(element)) {
+            Annotation annotation = myHolder.createErrorAnnotation(element, "Recursive implement");
+            annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+            addError(element, annotation);
+        }
+    }
+    @Override
+    public void visitOverrideActionStatement(@NotNull LSFOverrideActionStatement element) {
         if (!LSFPsiImplUtil.checkNonRecursiveOverride(element)) {
             Annotation annotation = myHolder.createErrorAnnotation(element, "Recursive implement");
             annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);

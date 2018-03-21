@@ -6,6 +6,7 @@ import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -19,11 +20,11 @@ public class ParameterNumberSorter implements Sorter {
         return new Comparator() {
             @Override
             public int compare(Object o1, Object o2) {
-                if (o1 instanceof LSFPropertyStatementTreeElement && o2 instanceof LSFPropertyStatementTreeElement) {
-                    LSFPropertyStatement el1 = ((LSFPropertyStatementTreeElement) o1).getElement();
-                    LSFPropertyStatement el2 = ((LSFPropertyStatementTreeElement) o2).getElement();
-                    String class1Name = ((LSFPropertyStatementTreeElement) o1).getClassName();
-                    String class2Name = ((LSFPropertyStatementTreeElement) o2).getClassName();
+                if (o1 instanceof LSFActionOrPropertyStatementTreeElement && o2 instanceof LSFActionOrPropertyStatementTreeElement) {
+                    LSFActionOrPropDeclaration el1 = ((LSFActionOrPropertyStatementTreeElement<?>) o1).getElement();
+                    LSFActionOrPropDeclaration el2 = ((LSFActionOrPropertyStatementTreeElement<?>) o2).getElement();
+                    String class1Name = ((LSFActionOrPropertyStatementTreeElement) o1).getClassName();
+                    String class2Name = ((LSFActionOrPropertyStatementTreeElement) o2).getClassName();
 
                     List<LSFClassSet> classes1 = el1.resolveParamClasses();
                     int index1 = 0;

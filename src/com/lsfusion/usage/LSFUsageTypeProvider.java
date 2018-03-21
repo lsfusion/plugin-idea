@@ -41,7 +41,8 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
 
     public static final UsageType CONSTRAINT_STATEMENT = new UsageType("CONSTRAINT statement");
     public static final UsageType GROUP_STATEMENT = new UsageType("GROUP statement");
-    public static final UsageType OVERRIDE_STATEMENT = new UsageType("OVERRIDE statement");
+    public static final UsageType OVERRIDE_PROPERTY_STATEMENT = new UsageType("OVERRIDE property statement");
+    public static final UsageType OVERRIDE_ACTION_STATEMENT = new UsageType("OVERRIDE action statement");
     public static final UsageType CLASS_STATEMENT = new UsageType("CLASS statement");
     public static final UsageType FOLLOWS_STATEMENT = new UsageType("FOLLOWS statement");
     public static final UsageType WRITE_WHEN = new UsageType("WRITE WHEN statement");
@@ -84,8 +85,10 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
             return CLASS_STATEMENT;
         } else if (element instanceof LSFGroupDeclaration) {
             return GROUP_STATEMENT;
-        } else if (element instanceof LSFOverrideStatement) {
-            return OVERRIDE_STATEMENT;
+        } else if (element instanceof LSFOverridePropertyStatement) {
+            return OVERRIDE_PROPERTY_STATEMENT;
+        } else if (element instanceof LSFOverrideActionStatement) {
+            return OVERRIDE_ACTION_STATEMENT;
         } else if (element instanceof LSFConstraintStatement) {
             return CONSTRAINT_STATEMENT;
         } else if (element instanceof LSFFollowsStatement) {

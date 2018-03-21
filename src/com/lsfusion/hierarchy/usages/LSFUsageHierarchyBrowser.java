@@ -14,6 +14,8 @@ import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionOrPropStatement;
+import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionStatement;
 import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -126,8 +128,8 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
     private class UsageTypeComparator implements Comparator<NodeDescriptor> {
         private boolean withAlpha;
 
-        private final List<Class> classOrder = new ArrayList<Class>(Arrays.asList(LSFClassDeclaration.class, LSFExplicitInterfacePropertyStatement.class,
-                LSFOverrideStatement.class, LSFEventStatement.class, LSFGlobalEventStatement.class, LSFFollowsStatement.class,
+        private final List<Class> classOrder = new ArrayList<Class>(Arrays.asList(LSFClassDeclaration.class, LSFExplicitInterfacePropertyStatement.class, LSFExplicitInterfaceActionStatement.class,
+                LSFOverridePropertyStatement.class, LSFOverrideActionStatement.class, LSFEventStatement.class, LSFGlobalEventStatement.class, LSFFollowsStatement.class,
                 LSFWriteWhenStatement.class, LSFAspectStatement.class, LSFShowDepStatement.class, LSFConstraintStatement.class,
                 LSFFormStatement.class, LSFDesignStatement.class, LSFNavigatorStatement.class, LSFTableStatement.class,
                 LSFLoggableStatement.class, LSFIndexStatement.class));
@@ -161,9 +163,9 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
         private int compareEqual(LSFUsageHierarchyNodeDescriptor d1, LSFUsageHierarchyNodeDescriptor d2) {
             PsiElement nodeElement1 = d1.getPsiElement();
             PsiElement nodeElement2 = d2.getPsiElement();
-            if (nodeElement1 instanceof LSFExplicitInterfacePropertyStatement && nodeElement2 instanceof LSFExplicitInterfacePropertyStatement) {
-                boolean isAction1 = ((LSFExplicitInterfacePropertyStatement) nodeElement1).getExplicitValuePropertyStatement().getPropertyStatement().isAction();
-                boolean isAction2 = ((LSFExplicitInterfacePropertyStatement) nodeElement2).getExplicitValuePropertyStatement().getPropertyStatement().isAction();
+            if (nodeElement1 instanceof LSFExplicitInterfaceActionOrPropStatement && nodeElement2 instanceof LSFExplicitInterfaceActionOrPropStatement) {
+                boolean isAction1 = ((LSFExplicitInterfaceActionOrPropStatement) nodeElement1).isAction();
+                boolean isAction2 = ((LSFExplicitInterfaceActionOrPropStatement) nodeElement2).isAction();
 
                 if (isAction1) {
                     if (!isAction2) {

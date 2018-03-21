@@ -9,7 +9,9 @@ import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionOrPropStatement;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -67,13 +69,15 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
         if (myElement instanceof LSFFormStatement) {
             LSFFormDeclaration formDeclaration = ((LSFFormStatement) myElement).resolveFormDecl();
             return formDeclaration != null ? formDeclaration.getNameIdentifier() : null;
-        } else if (myElement instanceof LSFOverrideStatement) {
-            return ((LSFOverrideStatement) myElement).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage().getCompoundID().getSimpleName();
+        } else if (myElement instanceof LSFOverridePropertyStatement) {
+            return ((LSFOverridePropertyStatement) myElement).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage().getCompoundID().getSimpleName();
+        } else if (myElement instanceof LSFOverrideActionStatement) {
+            return ((LSFOverrideActionStatement) myElement).getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage().getCompoundID().getSimpleName();
         } else if (myElement instanceof LSFDesignStatement) {
             LSFFormDeclaration formDeclaration = ((LSFDesignStatement) myElement).resolveFormDecl();
             return formDeclaration != null ? formDeclaration.getNameIdentifier() : null;
-        } else if (myElement instanceof LSFExplicitInterfacePropertyStatement) {
-            return ((LSFExplicitInterfacePropertyStatement) myElement).getPropertyStatement().getNameIdentifier();
+        } else if (myElement instanceof LSFExplicitInterfaceActionOrPropStatement) {
+            return ((LSFExplicitInterfaceActionOrPropStatement) myElement).getDeclaration().getNameIdentifier();
         } else if (myElement instanceof LSFClassStatement) {
             LSFClassDecl classDecl = ((LSFClassStatement) myElement).getClassDecl();
             return classDecl != null ? classDecl.getNameIdentifier() : null;
@@ -83,6 +87,6 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof LSFUsageHierarchyNodeDescriptor && getPsiElement().equals(((LSFUsageHierarchyNodeDescriptor) obj).getPsiElement());
+        return obj instanceof LSFUsageHierarchyNodeDescriptor && BaseUtils.nullEquals(getPsiElement(),((LSFUsageHierarchyNodeDescriptor) obj).getPsiElement());
     }
 }

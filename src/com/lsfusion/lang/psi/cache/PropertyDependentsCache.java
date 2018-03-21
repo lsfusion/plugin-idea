@@ -4,16 +4,17 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-public class PropertyDependentsCache extends PsiDependentCache<LSFPropDeclaration, Set<LSFPropDeclaration>> {
-    public static final PsiResolver<LSFPropDeclaration, Set<LSFPropDeclaration>> RESOLVER = new PsiResolver<LSFPropDeclaration, Set<LSFPropDeclaration>>() {
+public class PropertyDependentsCache extends PsiDependentCache<LSFActionOrGlobalPropDeclaration, Set<LSFActionOrGlobalPropDeclaration>> {
+    public static final PsiResolver<LSFActionOrGlobalPropDeclaration, Set<LSFActionOrGlobalPropDeclaration>> RESOLVER = new PsiResolver<LSFActionOrGlobalPropDeclaration, Set<LSFActionOrGlobalPropDeclaration>>() {
         @Override
-        public Set<LSFPropDeclaration> resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
+        public Set<LSFActionOrGlobalPropDeclaration> resolve(@NotNull LSFActionOrGlobalPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.getDependents();
         }
 
@@ -23,7 +24,7 @@ public class PropertyDependentsCache extends PsiDependentCache<LSFPropDeclaratio
                 return false;
             
             for(Object element : (Set)result)
-                if(!(element instanceof LSFPropDeclaration))
+                if(!(element instanceof LSFActionOrGlobalPropDeclaration))
                     return false;
             return true;
         }
@@ -39,7 +40,7 @@ public class PropertyDependentsCache extends PsiDependentCache<LSFPropDeclaratio
     }
 
     @Nullable
-    public Set<LSFPropDeclaration> resolveWithCaching(@NotNull LSFPropDeclaration element) {
+    public Set<LSFActionOrGlobalPropDeclaration> resolveWithCaching(@NotNull LSFActionOrGlobalPropDeclaration element) {
         return super.resolveWithCaching(element, RESOLVER, false, false);
     }
 }

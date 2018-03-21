@@ -91,18 +91,8 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     }
 
     @Override
-    public LSFResolveResult resolveNoCache() {
-        Collection<LSFMetaCodeDeclarationStatement> declarations = new ArrayList<>((Collection<? extends LSFMetaCodeDeclarationStatement>) super.resolveNoCache().declarations);
-
-        LSFResolveResult.ErrorAnnotator errorAnnotator = null;
-        if (declarations.size() > 1) {
-            errorAnnotator = new LSFResolveResult.AmbigiousErrorAnnotator(this, declarations);
-        } else if (declarations.isEmpty()) {
-            declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getLSFFile(), getStubElementTypes(), Condition.TRUE, Finalizer.EMPTY);
-            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, declarations);
-        }
-
-        return new LSFResolveResult(declarations, errorAnnotator);
+    protected Collection<? extends LSFMetaDeclaration> resolveNoConditionDeclarations() {
+        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), Condition.TRUE, Finalizer.EMPTY);
     }
 
     @Override
@@ -165,7 +155,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public boolean isResolveToVirt(LSFMetaDeclaration virtDecl) {
-        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), Collections.singleton(getStubElementType()), getCondition(), virtDecl).contains(virtDecl);
+        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), Collections.singleton(getStubElementType()), getCondition(), Collections.singletonList(virtDecl)).contains(virtDecl);
     }
 
     @Override

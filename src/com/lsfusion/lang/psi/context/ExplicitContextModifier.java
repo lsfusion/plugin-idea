@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.context;
 
 import com.lsfusion.lang.psi.LSFClassParamDeclareList;
+import com.lsfusion.lang.psi.LSFMappedActionClassParamDeclare;
 import com.lsfusion.lang.psi.LSFMappedPropertyClassParamDeclare;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
@@ -13,6 +14,10 @@ public class ExplicitContextModifier implements ContextModifier {
     private final LSFClassParamDeclareList explicit;
     
     public ExplicitContextModifier(LSFMappedPropertyClassParamDeclare decl) {
+        this(decl.getClassParamDeclareList());
+    }
+    
+    public ExplicitContextModifier(LSFMappedActionClassParamDeclare decl) {
         this(decl.getClassParamDeclareList());
     }
     

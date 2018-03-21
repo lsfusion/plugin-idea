@@ -24,7 +24,7 @@ public class LSFClassInterfacesTreeModel extends TextEditorBasedStructureViewMod
 
     @Override
     public boolean isAlwaysLeaf(StructureViewTreeElement element) {
-        return element instanceof LSFPropertyStatementTreeElement;
+        return element instanceof LSFActionOrPropertyStatementTreeElement;
     }
 
     @NotNull

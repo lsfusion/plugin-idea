@@ -12,7 +12,9 @@ import com.lsfusion.lang.classes.ObjectClass;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.indexes.ActionIndex;
 import com.lsfusion.lang.psi.indexes.PropIndex;
+import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.Nullable;
@@ -194,7 +196,9 @@ public class FormEntity {
     private void addPropertyWithOptions(String alias, LSFFormPropertyName formPropertyName, LSFFormPropertyOptionsList commonOptions,
                                         LSFFormPropertyOptionsList formPropertyOptions, Pair<Boolean, PropertyDrawEntity> relativeProsition, LSFObjectUsageList objectUsageList) {
         if(formPropertyName != null) {
-            LSFPropReference propUsage = formPropertyName.getPropertyUsage();
+            LSFActionOrPropReference<?, ?> propUsage = formPropertyName.getPropertyElseActionUsage();
+            if(propUsage == null)
+                propUsage = formPropertyName.getActionUsage();
 
             List<ObjectEntity> objects = new ArrayList<>();
             if (objectUsageList != null) {
@@ -209,7 +213,7 @@ public class FormEntity {
 
             PropertyDrawEntity propertyDraw = null;
             if (propUsage != null) {
-                LSFPropDeclaration propDeclaration = propUsage.resolveDecl();
+                LSFActionOrGlobalPropDeclaration propDeclaration = (LSFActionOrGlobalPropDeclaration)propUsage.resolveDecl();
                 propertyDraw = new PropertyDrawEntity(alias, propUsage.getNameRef(), objects, propDeclaration, commonOptions, formPropertyOptions, this);
             } else {
                 LSFPredefinedFormPropertyName predef = formPropertyName.getPredefinedFormPropertyName();
@@ -382,8 +386,8 @@ public class FormEntity {
     }
 
     private PropertyDrawEntity addFormButton(String sID) {
-        LSFGlobalPropDeclaration declaration = null;
-        Collection<LSFGlobalPropDeclaration> propDeclarations = PropIndex.getInstance().get(sID, getProject(), file.getRequireScope());
+        LSFActionDeclaration declaration = null;
+        Collection<LSFActionDeclaration> propDeclarations = ActionIndex.getInstance().get(sID, getProject(), file.getRequireScope());
         if (!propDeclarations.isEmpty()) {
             declaration = propDeclarations.iterator().next();
         }

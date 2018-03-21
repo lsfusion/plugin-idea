@@ -36,9 +36,9 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
                 if (form != null) {
                     result = form.getSimpleName();
                 } else {
-                    LSFNoContextPropertyUsage action = descr.getNoContextPropertyUsage();
+                    LSFNoContextActionUsage action = descr.getNoContextActionUsage();
                     if (action != null) {
-                        result = action.getPropertyUsage().getSimpleName();
+                        result = action.getActionUsage().getSimpleName();
                     }
                 }
             }

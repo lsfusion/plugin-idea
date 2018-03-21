@@ -5,7 +5,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.LSFClassStatement;
 import com.lsfusion.lang.psi.LSFFormStatement;
-import com.lsfusion.lang.psi.LSFOverrideStatement;
+import com.lsfusion.lang.psi.LSFOverrideActionStatement;
+import com.lsfusion.lang.psi.LSFOverridePropertyStatement;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,9 +25,14 @@ public class LSFPsiListCellRenderer extends DefaultPsiElementCellRenderer {
     
     @Nullable
     private PsiElement getParentElement(PsiElement baseElement) {
-        LSFOverrideStatement overrideStatement = PsiTreeUtil.getParentOfType(baseElement, LSFOverrideStatement.class);
-        if (overrideStatement != null) {
-            return overrideStatement;
+        LSFOverridePropertyStatement overridePropertyStatement = PsiTreeUtil.getParentOfType(baseElement, LSFOverridePropertyStatement.class);
+        if (overridePropertyStatement != null) {
+            return overridePropertyStatement;
+        }
+
+        LSFOverrideActionStatement overrideActionStatement = PsiTreeUtil.getParentOfType(baseElement, LSFOverrideActionStatement.class);
+        if (overrideActionStatement != null) {
+            return overrideActionStatement;
         }
 
         LSFFormStatement formStatement = PsiTreeUtil.getParentOfType(baseElement, LSFFormStatement.class);

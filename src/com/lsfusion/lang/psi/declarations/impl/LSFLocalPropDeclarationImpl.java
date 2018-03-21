@@ -7,6 +7,7 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.ParamClassesCache;
 import com.lsfusion.lang.psi.cache.ValueClassCache;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
@@ -84,7 +85,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     public List<LSFClassSet> resolveParamClasses() {
-        return LSFGlobalPropDeclarationImpl.finishParamClasses(this);
+        return LSFActionOrGlobalPropDeclarationImpl.finishParamClasses(this);
     }
 
     public LSFClassSet resolveValueClass() {
@@ -108,7 +109,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
             for (PsiElement child : action.getChildren()) {
                 if (child instanceof LSFLocalPropDeclaration && !(this.equals(child))) {
                     LSFLocalPropDeclaration local = (LSFLocalPropDeclaration) child;
-                    if (getDeclName().equals(local.getDeclName()) && LSFGlobalPropDeclarationImpl.resolveEquals(resolveParamClasses(), local.resolveParamClasses())) {
+                    if (getDeclName().equals(local.getDeclName()) && LSFActionOrGlobalPropDeclarationImpl.resolveEquals(resolveParamClasses(), local.resolveParamClasses())) {
                         return true;
                     }
                 }
@@ -126,16 +127,6 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     @Override
-    public Set<LSFPropDeclaration> getDependencies() {
-        return LSFGlobalPropDeclarationImpl.getPropDependencies(this);
-    }
-
-    @Override
-    public Set<LSFPropDeclaration> getDependents() {
-        return LSFGlobalPropDeclarationImpl.getPropDependents(this);
-    }
-
-    @Override
     public Integer getComplexity() {
         return LSFGlobalPropDeclarationImpl.getPropComplexity(this);
     }
@@ -147,5 +138,10 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
 
     public PsiElement getLookupObject() { // пока не совсем понятно зачем
         return this;
+    }
+
+    @Override
+    public boolean isAction() {
+        return false;
     }
 }

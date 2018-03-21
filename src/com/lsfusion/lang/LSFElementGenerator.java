@@ -155,9 +155,9 @@ public class LSFElementGenerator {
         return new ArrayList<>(PsiTreeUtil.findChildrenOfType(dummyFile, LSFComponentDeclaration.class));    
     }
 
-    private static Collection<? extends LSFWindowDeclaration> builtInWindows = null;
+    private static Collection<LSFWindowDeclaration> builtInWindows = null;
 
-    public static Collection<? extends LSFWindowDeclaration> getBuiltInWindows(final Project project) {
+    public static Collection<LSFWindowDeclaration> getBuiltInWindows(final Project project) {
         if (builtInWindows == null) {
             final PsiFile dummyFile = createDummyFile(project,
                     "MODULE System;" +

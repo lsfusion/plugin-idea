@@ -1,6 +1,7 @@
 package com.lsfusion.refactoring;
 
 import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFObjectUsageList;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.LSFSimpleName;
@@ -18,7 +19,7 @@ public class PropertyDrawMigration extends ElementMigration {
         String oldName;
         LSFSimpleName aliasName = decl.getSimpleName();
         if(aliasName == null) { // значит внутри rename'ся, нужно добавить postfix
-            LSFSimpleName nameDecl = LSFRenameFullNameProcessor.getDeclPropName(decl);
+            LSFId nameDecl = LSFRenameFullNameProcessor.getDeclPropName(decl);
             if(nameDecl == null)
                 return null;
             

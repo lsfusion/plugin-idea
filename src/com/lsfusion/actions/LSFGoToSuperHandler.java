@@ -13,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.util.LSFPsiUtils;
@@ -52,8 +53,13 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
                     if (statementId != null) {
                         targets.add(statementId);
                     }
-                } else if (statement instanceof LSFOverrideStatement) {
-                    LSFPropDeclaration propertyDecl = ((LSFOverrideStatement) statement).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage().resolveDecl();
+                } else if (statement instanceof LSFOverridePropertyStatement) {
+                    LSFPropDeclaration propertyDecl = ((LSFOverridePropertyStatement) statement).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage().resolveDecl();
+                    if (propertyDecl != null) {
+                        targets.add(propertyDecl);
+                    }
+                } else if (statement instanceof LSFOverrideActionStatement) {
+                    LSFActionDeclaration propertyDecl = ((LSFOverrideActionStatement) statement).getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage().resolveDecl();
                     if (propertyDecl != null) {
                         targets.add(propertyDecl);
                     }

@@ -46,7 +46,7 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
     public boolean processElementUsages(@NotNull final PsiElement element, @NotNull final Processor<UsageInfo> processor, @NotNull FindUsagesOptions options) {
         if (options.isUsages) {
             LSFDeclaration decl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
-            if (decl instanceof LSFPropDeclaration && SearchForPropertyUsagesAction.PROPERTY_DRAW_USAGES.equals(SearchForPropertyUsagesAction.propertyUsagesSearchMode)) {
+            if (decl instanceof LSFActionOrPropDeclaration && SearchForPropertyUsagesAction.PROPERTY_DRAW_USAGES.equals(SearchForPropertyUsagesAction.propertyUsagesSearchMode)) {
                 // propertyDraw from formPropertyDraw declaration
                 LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(SearchForPropertyUsagesAction.sourceElement, LSFPropertyDrawDeclaration.class);
                 ReferencesSearch.search(propDrawDecl.getNameIdentifier()).forEach(new Processor<PsiReference>() {

@@ -10,6 +10,8 @@ import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFInterfacePropStatement;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,14 +39,18 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
         if (valueClass != null && getElement() != null) {
             GlobalSearchScope scope = LSFGlobalResolver.getRequireScope((LSFFile) getElement());
 
-            for (LSFPropertyStatementTreeElement statement : LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFPropertyStatementTreeElement>() {
+            children.addAll(LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFPropertyStatementTreeElement>() {
                 @Override
                 public LSFPropertyStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
-                    return new LSFPropertyStatementTreeElement(valueClass, ((LSFPropertyStatement) statement), navigationHandler);
+                    return new LSFPropertyStatementTreeElement(valueClass, ((LSFGlobalPropDeclaration) statement), navigationHandler);
                 }
-            }, true, true)) {
-                children.add(statement);
-            }
+            }, true, true));
+            children.addAll(LSFPsiUtils.mapActionsApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFActionStatementTreeElement>() {
+                @Override
+                public LSFActionStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
+                    return new LSFActionStatementTreeElement(valueClass, ((LSFActionDeclaration) statement), navigationHandler);
+                }
+            }, true, true));
         }
         Collections.sort(children, Sorter.ALPHA_SORTER.getComparator());
         return children;

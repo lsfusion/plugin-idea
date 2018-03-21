@@ -1,14 +1,13 @@
 package com.lsfusion.lang.psi.indexes;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFImplicitInterfacePropStatement;
 import org.jetbrains.annotations.NotNull;
 
-public class ImplicitInterfaceIndex extends LSFStringStubIndex<LSFImplicitInterfacePropStatement> {
-    private static final ImplicitInterfaceIndex INSTANCE = new ImplicitInterfaceIndex();
+public class ImplicitInterfacePropIndex extends LSFStringStubIndex<LSFImplicitInterfacePropStatement> {
+    private static final ImplicitInterfacePropIndex INSTANCE = new ImplicitInterfacePropIndex();
 
-    public static ImplicitInterfaceIndex getInstance() {
+    public static ImplicitInterfacePropIndex getInstance() {
         return INSTANCE;
     }
 

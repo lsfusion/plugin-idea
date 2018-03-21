@@ -75,11 +75,13 @@ namespaceName ::= NAMESPACE namespaceUsage SEMI
 
 private statement ::=   constraintStatement
                     |	groupStatement
-                    |	overrideStatement // starts with ID
+                    |	overrideActionStatement // starts with ID
+                    |	overridePropertyStatement // starts with ID
                     |	classStatement
                     |	followsStatement // starts with ID
                     |	writeWhenStatement // starts with ID
                     |	explicitInterfacePropertyStatement
+                    |   explicitInterfaceActStatement
                     |	eventStatement
                     |	showDepStatement
                     |	globalEventStatement
@@ -97,8 +99,9 @@ private statement ::=   constraintStatement
                     |	emptyStatement
                     |   stubStatement
                     
-internalStatement ::= INTERNAL (internalProperty | internalClass | internalModule | internalPropertyDraw | internalFormObject) SEMI {pin = 1}
+internalStatement ::= INTERNAL (internalProperty | internalAction | internalClass | internalModule | internalPropertyDraw | internalFormObject) SEMI {pin = 1}
 internalProperty ::= PROPERTY nonEmptyNoContextPropertyUsageList {pin = 1}
+internalAction ::= ACTION nonEmptyNoContextActionUsageList {pin = 1}
 internalClass ::= CLASS nonEmptyClassNameList {pin = 1}
 internalModule ::= MODULE nonEmptyModuleUsageList {pin = 1}
 internalPropertyDraw ::= PROPERTYDRAW formUsage formPropertyDrawUsage
@@ -186,7 +189,7 @@ explicitInterfacePropertyStatement ::= explicitValuePropertyStatement
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFExplicitInterfacePropStatementImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement"
-    stubClass="com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceStubElement"
+    stubClass="com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfacePropStubElement"
     elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
@@ -214,15 +217,34 @@ implicitInterfacePropertyStatement ::= propertyStatement
     elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-propertyStatement ::= propertyDeclaration equalsSign
-                        (   (actionUnfriendlyPD | propertyCalcStatement) (nonEmptyPropertyOptions | SEMI)
+propertyStatement ::= propertyDeclaration equalsSign propertyCalcStatement (nonEmptyPropertyOptions | SEMI)
+                        
+{
+    pin = 3
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFGlobalPropDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.LSFInterfacePropStatement"
+    stubClass = "com.lsfusion.lang.psi.stubs.PropStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
+    methods = [ getContextModifier getContextInferrer ]
+}
+
+explicitInterfaceActStatement ::= actionStatement
+{
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFExplicitInterfaceActionStatementImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionStatement"
+    stubClass="com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceActionStubElement"
+    elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
+}
+
+actionStatement ::= propertyDeclaration equalsSign
+                        (   actionUnfriendlyPD (nonEmptyPropertyOptions | SEMI)
                         |   topActionPropertyDefinitionBody nonEmptyPropertyOptions?
                         )                      
 {
     pin(".*") = 1
-    mixin="com.lsfusion.lang.psi.declarations.impl.LSFGlobalPropDeclarationImpl"
-    implements="com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.LSFInterfacePropStatement"
-    stubClass = "com.lsfusion.lang.psi.stubs.PropStubElement"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFActionDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFActionDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.LSFInterfacePropStatement"
+    stubClass = "com.lsfusion.lang.psi.stubs.ActionStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
     methods = [ getContextModifier getContextInferrer ]
 }
@@ -434,6 +456,8 @@ propertyExprObject ::= LSQBR EQUALS (propertyCalcStatement) RSQBR
 
 propertyObject ::=  propertyUsage | propertyExprObject
 noContextPropertyUsage ::= propertyUsage
+{implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
+noContextActionUsage ::= actionUsage
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 noContextActionOrPropertyUsage ::= actionOrPropertyUsage
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
@@ -1060,9 +1084,9 @@ execActionPropertyDefinitionBody ::= execActionPropertyDefinitionBody1 | execAct
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ resolveParamClasses inferActionParamClasses getParamList ]
 }
-private execActionPropertyDefinitionBody1 ::= EXEC propertyObject LBRAC propertyExpressionList RBRAC {pin = 1}
+private execActionPropertyDefinitionBody1 ::= EXEC actionUsage LBRAC propertyExpressionList RBRAC {pin = 1}
 //EXEC - последнее правило, которое может начинаться с ID, поэтому спокойно пиним
-private execActionPropertyDefinitionBody2 ::= propertyObject LBRAC propertyExpressionList RBRAC {pin = 1}
+private execActionPropertyDefinitionBody2 ::= actionUsage LBRAC propertyExpressionList RBRAC {pin = 1}
 
 //Разбиваем правило, чтобы была возможность запинить по ASSIGN
 assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | assignActionPropertyDefinitionBody2
@@ -1312,7 +1336,7 @@ formOptionsOnEvents ::= ON formEventType formActionPropertyObject
 
 designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formPropertyObject | formExprDeclaration
-formActionPropertyObject ::= formPropertyObject | formActionDeclaration
+formActionPropertyObject ::= formActionObject | formActionDeclaration
 
 formPropertyDrawMappedDecl ::= (((simpleNameOrWithCaption EQUALS)? formPropertyDrawObject)  
                                | (simpleNameOrWithCaption? EQUALS (formExprDeclaration | formActionDeclaration)))
@@ -1387,7 +1411,7 @@ predefinedFormPropertyName ::= VALUE
 
 formPropertyName ::= actionOrPropertyUsage | predefinedFormPropertyName
 
-private actionOrPropertyUsage ::= (ACTION? propertyUsage)
+private actionOrPropertyUsage ::= ACTION actionUsage | propertyElseActionUsage { pin(".*") = 1 }
 
 formPropertyDrawObject ::= formPropertyName LBRAC objectUsageList RBRAC
 {
@@ -1396,6 +1420,12 @@ formPropertyDrawObject ::= formPropertyName LBRAC objectUsageList RBRAC
     methods = [ resolveParamClasses getParamList ]
 }
 formPropertyObject ::= propertyUsage LBRAC objectUsageList RBRAC
+{
+//    pin = 1 // formPropertyObject before propertyExpression
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList ]
+}
+formActionObject ::= actionUsage LBRAC objectUsageList RBRAC
 {
 //    pin = 1 // formPropertyObject before propertyExpression
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
@@ -1416,11 +1446,19 @@ formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage 
 /////////////////////////////OVERRIDE STATEMENT/////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-overrideStatement ::= mappedPropertyClassParamDeclare PLUSEQ
+
+overrideActionStatement ::= mappedActionClassParamDeclare PLUSEQ
 		                (WHEN propertyExpression THEN)?
-		                (	(propertyExpression SEMI)
-		                |	topActionPropertyDefinitionBody
-		                )
+		                topActionPropertyDefinitionBody		                
+{
+//    pin = 2;
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon ]
+}
+
+overridePropertyStatement ::= mappedPropertyClassParamDeclare PLUSEQ
+		                (WHEN propertyExpression THEN)?
+		                propertyExpression SEMI
 {
     pin = 2;
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
@@ -1502,7 +1540,7 @@ showDepStatement ::= SHOWDEP noContextActionOrPropertyUsage FROM noContextAction
 //////////////////////////////// ASPECT STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-aspectStatement ::= (BEFORE | AFTER) mappedPropertyClassParamDeclare DO actionPropertyDefinitionBody
+aspectStatement ::= (BEFORE | AFTER) mappedActionClassParamDeclare DO actionPropertyDefinitionBody
 {
     pin=1
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
@@ -1620,7 +1658,7 @@ newNavigatorElementStatement ::= NEW navigatorElementDescription navigatorElemen
 }
 
 private folderElementDescription ::= FOLDER simpleName localizedStringLiteral? { pin = 2 }
-navigatorElementDescription ::= (   ACTION (simpleName? localizedStringLiteral? EQUALS)? noContextPropertyUsage
+navigatorElementDescription ::= (   ACTION (simpleName? localizedStringLiteral? EQUALS)? noContextActionUsage
                                 |   folderElementDescription
                                 |   FORM? (simpleName? localizedStringLiteral? EQUALS)? formUsage
                                 )
@@ -1823,8 +1861,15 @@ mappedPropertyClassParamDeclare ::= propertyUsageWrapper LBRAC classParamDeclare
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList ]
 }
+mappedActionClassParamDeclare ::= actionUsageWrapper LBRAC classParamDeclareList RBRAC // temporary domain logic
+{
+    pin = 1
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList ]
+}
 
 propertyUsageWrapper ::= propertyUsage // for usages search filter
+actionUsageWrapper ::= actionUsage // for usages search filter
 
 mappedPropertyExprParam ::= propertyUsage LBRAC exprParameterUsageList RBRAC // temporary mixed logic
 {
@@ -1855,6 +1900,7 @@ nonEmptyClassNameList ::= className (COMMA className)* { pin(".*") = 1}
 nonEmptyPropertyUsageList ::= propertyUsage (COMMA propertyUsage)*  { pin(".*") = 1}
 
 nonEmptyNoContextPropertyUsageList ::= noContextPropertyUsage (COMMA noContextPropertyUsage)*  { pin(".*") = 1}
+nonEmptyNoContextActionUsageList ::= noContextActionUsage (COMMA noContextActionUsage)*  { pin(".*") = 1}
 
 nonEmptyFormUsageList ::= formUsage (COMMA formUsage)*  { pin(".*") = 1}
 
@@ -1925,6 +1971,12 @@ emptyExplicitPropClassList ::= nonEmptyExplicitPropClassList?
 explicitPropClassUsage ::= LSQBR emptyExplicitPropClassList RSQBR
 propertyUsage ::= compoundID explicitPropClassUsage?
 {mixin="com.lsfusion.lang.psi.references.impl.LSFPropReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFPropReference"}
+
+actionUsage ::= compoundID explicitPropClassUsage?
+{mixin="com.lsfusion.lang.psi.references.impl.LSFActionReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFActionReference"}
+
+propertyElseActionUsage ::= compoundID explicitPropClassUsage?
+{mixin="com.lsfusion.lang.psi.references.impl.LSFPropElseActionReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFPropElseActionReference"}
 
 tableUsage ::= compoundID
 {mixin="com.lsfusion.lang.psi.references.impl.LSFTableReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFTableReference"}

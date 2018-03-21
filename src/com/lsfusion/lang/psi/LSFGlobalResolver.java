@@ -121,15 +121,24 @@ public class LSFGlobalResolver {
         return null;
     }
 
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, String fqName, LSFFile file, Collection<FullNameStubElementType> types, Condition<T> condition, Finalizer<T> finalizer) {
-        return findElements(name, fqName, file, BaseUtils.<Collection<FullNameStubElementType<S, T>>>immutableCast(types), condition, finalizer);
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, String fqName, Collection<FullNameStubElementType> types, LSFFile file, Condition<T> condition, Finalizer<T> finalizer) {
+        return findElements(name, fqName, types, file, condition, finalizer, new ArrayList<T>());
     }
 
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, T... virtDecls) {
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, String fqName, Collection<FullNameStubElementType> types, LSFFile file, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
+        Collection<FullNameStubElementType<S, T>> fullNameStubElementTypes = BaseUtils.<Collection<FullNameStubElementType<S, T>>>immutableCast(types);
+        return findElements(name, fqName, file, fullNameStubElementTypes, condition, finalizer, virtDecls);
+    }
+
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition) {
+        return findElements(name, fqName, file, types, condition, new ArrayList<>());
+    }
+
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, List<T> virtDecls) {
         return findElements(name, fqName, file, types, condition, Finalizer.EMPTY, virtDecls);
     }
 
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, T... virtDecls) {
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
         if (fqName != null) {
             final Condition<T> fCondition = condition;
             condition = new Condition<T>() {
@@ -190,7 +199,10 @@ public class LSFGlobalResolver {
         }
     }
 
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, T... virtDecls) {
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer) {
+        return findElements(name, file, types, condition, finalizer, new ArrayList<>());
+    }
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, LSFFile file, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
 
         GlobalSearchScope scope = file.getRequireScope();
 

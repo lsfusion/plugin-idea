@@ -21,9 +21,9 @@ public class ExtendedClassGrouper implements Grouper {
 
         LinkedHashMap<LSFValueClass, Group> groupMap = new LinkedHashMap<>();
         for (TreeElement child : children) {
-            if (child instanceof LSFPropertyStatementTreeElement) {
-                LSFPropertyStatementTreeElement psChild = (LSFPropertyStatementTreeElement) child;
-                LSFValueClass psClass = psChild.getValueClass();
+            if (child instanceof LSFActionOrPropertyStatementTreeElement) {
+                LSFActionOrPropertyStatementTreeElement psChild = (LSFActionOrPropertyStatementTreeElement) child;
+                LSFValueClass psClass = psChild.getParamClass();
                 ExtendedClassesGroup classGroup = (ExtendedClassesGroup) groupMap.get(psClass);
                 if (classGroup == null) {
                     String namespace = null;

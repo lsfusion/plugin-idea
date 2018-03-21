@@ -76,7 +76,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
         return result;
     }
 
-    public static List<LSFFullNameReference> findFullNameUsages(final String name, final LSFFullNameDeclaration decl) {
+    public static List<LSFFullNameReference> findRenameConflicts(final String name, final LSFFullNameDeclaration decl) {
         final List<LSFFullNameReference> result = new ArrayList<>();
         searchWordUsages(GlobalSearchScope.allScope(decl.getProject()), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
             public boolean process(PsiReference ref) {

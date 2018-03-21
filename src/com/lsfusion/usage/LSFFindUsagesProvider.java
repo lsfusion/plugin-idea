@@ -50,8 +50,8 @@ public class LSFFindUsagesProvider implements FindUsagesProvider {
             return "navigator element";
         } else if (parent instanceof LSFWindowDeclaration) {
             return "window";
-        } else if (parent instanceof LSFGlobalPropDeclaration) {
-            return ((LSFGlobalPropDeclaration) parent).isAction() ? "action" : "property";
+        } else if (parent instanceof LSFActionOrGlobalPropDeclaration) {
+            return ((LSFActionOrGlobalPropDeclaration) parent).isAction() ? "action" : "property";
         } else if (parent instanceof LSFTableDeclaration) {
             return "table";
         } else if (parent instanceof LSFGroupDeclaration) {

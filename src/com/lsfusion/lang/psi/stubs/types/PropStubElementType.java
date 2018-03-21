@@ -6,6 +6,7 @@ import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
+import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.impl.PropStubImpl;
 import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class PropStubElementType extends FullNameStubElementType<PropStubElement, LSFGlobalPropDeclaration> {
+public class PropStubElementType extends ActionOrPropStubElementType<PropStubElement, LSFGlobalPropDeclaration> {
 
     public PropStubElementType() {
         super("PROP");

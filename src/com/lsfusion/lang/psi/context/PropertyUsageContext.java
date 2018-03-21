@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+// action or prop одновременно, позже возможно надо будет рефакторить
 public interface PropertyUsageContext extends PsiElement {
     
     @Nullable

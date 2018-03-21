@@ -43,38 +43,6 @@ import static com.lsfusion.util.LSFPsiUtils.getLastChildOfType;
 
 public class ShortenNamesProcessor {
     private static final String INITIAL_MIGRATION_VERSION = "1.0.0";
-    private static PropInMetaRef[] exceptions = new PropInMetaRef[] {
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementConsignmentHeader", "Consignment", 1), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementConsignmentHeaderData", "Consignment", 1), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Label", 1), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Machinery", 1), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocument", "Machinery", 2), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPriceTransactionDocumentStock", "Machinery", 3), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementSaleLedgerCustom", "SaleLedger", 3), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementStockDocumentLedger", "StockDocument", 2), false, true),
-            new PropInMetaRef(new PropRef("stock", "StockDocument", Collections.singletonList(new ClassRef("StockDocumentLedger", "StockDocument")), true), new MetacodeRef("implementStockDocumentLedger", "StockDocument", 3), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementSkuLedger", "Stock", 3), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementDocument", "Stock", 1), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementBatchCustom", "Stock", 4), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementPurchaseLedgerCustom", "PurchaseLedger", 3), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementDocumentPrefix", "Stock", 3), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, true), new MetacodeRef("implementOutContractLedger", "ContractLedger", 2), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, false), new MetacodeRef("extendFormFilterAccessLegalEntity", "EmployeeLegalEntity", 5), false, true),
-            new PropInMetaRef(new PropRef("batch", "Stock", Collections.singletonList(new ClassRef("DocumentDetail", "Stock")), true), new MetacodeRef("implementDocumentBatch", "Stock", 1), false, true),
-            new PropInMetaRef(new PropRef("batch", "Stock", Collections.singletonList(new ClassRef("DocumentDetail", "Stock")), true), new MetacodeRef("implementDocumentBatch", "Stock", 2), false, true),
-            new PropInMetaRef(new PropRef("name", "Box", Collections.singletonList(new ClassRef("Box", "Box")), false), new MetacodeRef("defineDocumentDetailBoxCustom", "Box", 3), true, false),
-            new PropInMetaRef(new PropRef("name", "Box", Collections.singletonList(new ClassRef("Box", "Box")), false), new MetacodeRef("defineDocumentAbstractDetailBoxCustom", "Box", 3), true, false),
-            new PropInMetaRef(new PropRef("skip", "Machinery", Collections.singletonList(new ClassRef("PriceTransactionDocument", "Machinery")), false), new MetacodeRef("defineDocumentMachineryPriceTransaction", "Machinery", 4), true, false),
-            new PropInMetaRef(new PropRef("skip", "Label", Collections.singletonList(new ClassRef("PriceTransactionDocument", "Label")), false), new MetacodeRef("defineDocumentLabelTransaction", "Label", 5), true, false),
-            new PropInMetaRef(new PropRef("stock", "Invoice", Collections.singletonList(new ClassRef("InvoiceDetail", "Invoice")), true), new MetacodeRef("defineInvoice", "Invoice", 4), false, true),
-            new PropInMetaRef(new PropRef(null, null, null, false), new MetacodeRef("implementZoneLedgerCustom", "Zone", 4), true, false),
-            new PropInMetaRef(new PropRef("invoiceDetail", "Pricing", Collections.singletonList(new ClassRef("PricingDetail", "Pricing")), true), new MetacodeRef("defineInvoicePricingAggregation", "Pricing", 7), true, false),
-            new PropInMetaRef(new PropRef("countUsers", null, null, false), new MetacodeRef("extendFormFilterRoleAccessNSPrefix", "Operation", 5), true, false),
-            new PropInMetaRef(new PropRef("description", null, null, false), new MetacodeRef("defineDocumentDetailBatchCustomPrefixInner", "Stock", 4), true, false),
-            new PropInMetaRef(new PropRef("sku", null, null, false), new MetacodeRef("defineDocumentWare", "Ware", 2), true, true),
-            new PropInMetaRef(new PropRef("quantity", null, null, false), new MetacodeRef("defineDocumentWare", "Ware", 2), true, true),
-            new PropInMetaRef(new PropRef("skipCreateWare", null, null, false), new MetacodeRef("defineDocumentWare", "Ware", 2), false, true),
-    };                                                                                          
 
     private static boolean isPredefinedWord(String s) {
         return s.equals("VAT") || s.equals("UOM");
@@ -105,7 +73,7 @@ public class ShortenNamesProcessor {
         return result;
     }
 
-    private static String shortenName(LSFPropDeclaration decl) {
+    private static String shortenName(LSFActionOrPropDeclaration decl) {
         String declName = decl.getDeclName();
         
         List<String> declWords = getWords(declName);
@@ -114,8 +82,8 @@ public class ShortenNamesProcessor {
         List<String> result = new ArrayList<>();
 
         List<String> paramNames = null;
-        if(decl instanceof LSFGlobalPropDeclaration)
-            paramNames = ((LSFGlobalPropDeclaration)decl).resolveParamNames();
+        if(decl instanceof LSFActionOrGlobalPropDeclaration)
+            paramNames = ((LSFActionOrGlobalPropDeclaration)decl).resolveParamNames();
 
         boolean firstAte = false;
         List<LSFClassSet> paramClasses = decl.resolveParamClasses();
@@ -352,14 +320,14 @@ public class ShortenNamesProcessor {
         Project project = files.iterator().next().getProject();
         MetaChangeDetector.getInstance(project).setMetaEnabled(false, false);
 
-        Map<LSFPropDeclaration, String> propertyDecls = new HashMap<>();
+        Map<LSFActionOrPropDeclaration, String> propertyDecls = new HashMap<>();
         Map<LSFPropertyDrawDeclaration, String> propertyDrawDecls = new HashMap<>();
         
         System.out.println("Collecting property decls...");
         int i = 0;
         for(LSFFile file : files) {
             i++;
-            for(LSFPropDeclaration decl : PsiTreeUtil.findChildrenOfType(file, LSFPropDeclaration.class))
+            for(LSFActionOrPropDeclaration decl : PsiTreeUtil.findChildrenOfType(file, LSFActionOrPropDeclaration.class))
                 propertyDecls.put(decl, shortenName(decl));
             if (i % 1000 == 0) {
                 System.out.println(i + " of " + files.size() + ": " + (double) i / ((double) files.size()));
@@ -372,8 +340,8 @@ public class ShortenNamesProcessor {
         i = 0;
         for (LSFFile file : files) {
             i++;
-            for (LSFPropReference ref : PsiTreeUtil.findChildrenOfType(file, LSFPropReference.class)) {
-                LSFPropDeclaration decl = ref.resolveDecl();
+            for (LSFActionOrPropReference<?, ?> ref : PsiTreeUtil.findChildrenOfType(file, LSFActionOrPropReference.class)) {
+                LSFActionOrPropDeclaration decl = ref.resolveDecl();
                 if (decl != null) {
                     List<LSFClassSet> paramClasses = decl.resolveParamClasses();
                     if (paramClasses != null) {
@@ -446,12 +414,12 @@ public class ShortenNamesProcessor {
 
         System.out.println("Migrating decls..."); // отдельно так как resolve вызывается, но нужно вызывать до изменения psi так как используется resolveClasses
         i = 0;
-        for(Map.Entry<LSFPropDeclaration, String> e : propertyDecls.entrySet()) {
-            LSFPropDeclaration decl = e.getKey();
+        for(Map.Entry<LSFActionOrPropDeclaration, String> e : propertyDecls.entrySet()) {
+            LSFActionOrPropDeclaration decl = e.getKey();
             String newName = e.getValue();
 
-            if (decl instanceof LSFGlobalPropDeclaration) {
-                LSFGlobalPropDeclaration globalDecl = (LSFGlobalPropDeclaration) decl;
+            if (decl instanceof LSFActionOrGlobalPropDeclaration) {
+                LSFActionOrGlobalPropDeclaration globalDecl = (LSFActionOrGlobalPropDeclaration) decl;
                 String oldName = decl.getDeclName();
                 if (!oldName.equals(newName)) {
                     migrations.add(PropertyMigration.create(globalDecl, oldName, newName));
@@ -510,7 +478,7 @@ public class ShortenNamesProcessor {
 
             String newPropName = propertyDecls.get(resolvedRef.decl);
 
-            LSFPropReference propRef = resolvedRef.ref;
+            LSFActionOrPropReference propRef = resolvedRef.ref;
 
             propRef.handleElementRename(newPropName, transaction);
             if(!resolvedRef.qualClasses)
@@ -525,8 +493,8 @@ public class ShortenNamesProcessor {
 
         System.out.println("Renaming decls...");
         i = 0;
-        for(Map.Entry<LSFPropDeclaration, String> e : propertyDecls.entrySet()) {
-            LSFPropDeclaration decl = e.getKey();
+        for(Map.Entry<LSFActionOrPropDeclaration, String> e : propertyDecls.entrySet()) {
+            LSFActionOrPropDeclaration decl = e.getKey();
             String newName = e.getValue();
             i++;
             decl.setName(newName, transaction);
@@ -546,21 +514,14 @@ public class ShortenNamesProcessor {
         }
     }
 
-    static void unqualifyConflict(LSFPropReference ref, LSFPropDeclaration decl, List<LSFClassSet> explicitClasses, MetaTransaction transaction) {
-        PropInMetaRef excRef = null;
-        for(PropInMetaRef exception : exceptions)
-            if(exception.equalsRef(ref, decl)) {
-                excRef = exception;
-                break;
-            }
-        
-        if(decl instanceof LSFFullNameDeclaration && ref.getFullNameRef() != null && (excRef == null || !excRef.qualNamespace)) {
+    static void unqualifyConflict(LSFActionOrPropReference ref, LSFActionOrPropDeclaration decl, List<LSFClassSet> explicitClasses, MetaTransaction transaction) {
+        if(decl instanceof LSFFullNameDeclaration && ref.getFullNameRef() != null) {
             ref.dropFullNameRef(transaction);
             if(ref.resolveDecl() != decl)
                 ref.setFullNameRef(((LSFFullNameDeclaration) decl).getNamespaceName(), transaction);
         }
         
-        if(ref.getExplicitClasses() != null && !ref.isNoContext() && (excRef == null || !excRef.qualClasses)) {
+        if(ref.getExplicitClasses() != null && !ref.isNoContext()) {
             List<LSFClassSet> declClasses = decl.resolveParamClasses();
             if(declClasses != null)
                 ref.dropExplicitClasses(transaction);
@@ -575,9 +536,9 @@ public class ShortenNamesProcessor {
         int i = 0;
         for(LSFFile file : files) {
             i++;
-            for(LSFPropReference ref : PsiTreeUtil.findChildrenOfType(file, LSFPropReference.class)) {
+            for(LSFActionOrPropReference<?, ?> ref : PsiTreeUtil.findChildrenOfType(file, LSFActionOrPropReference.class)) {
                 if(ref.getExplicitClasses()!=null || ref.getFullNameRef()!=null) {
-                    LSFPropDeclaration decl = ref.resolveDecl();
+                    LSFActionOrPropDeclaration decl = ref.resolveDecl();
                     if(decl!=null) {
                         List<LSFClassSet> declClasses = decl.resolveParamClasses();
                         if(declClasses!=null && declClasses.size() > 0)
@@ -590,13 +551,13 @@ public class ShortenNamesProcessor {
     }
 
     private static class ExtPropRef {
-        public final LSFPropReference ref;
-        public final LSFPropDeclaration decl;
+        public final LSFActionOrPropReference ref;
+        public final LSFActionOrPropDeclaration decl;
         public final List<LSFClassSet> classes;
         public final boolean qualClasses;
         public final boolean qualNamespace;
 
-        private ExtPropRef(LSFPropReference ref, LSFPropDeclaration decl, List<LSFClassSet> classes, boolean qualClasses, boolean qualNamespace) {
+        private ExtPropRef(LSFActionOrPropReference ref, LSFActionOrPropDeclaration decl, List<LSFClassSet> classes, boolean qualClasses, boolean qualNamespace) {
             this.ref = ref;
             this.decl = decl;
             this.classes = classes;
@@ -710,81 +671,6 @@ public class ShortenNamesProcessor {
         }
     }
 
-    private static class PropRef extends FullNameRef<LSFPropDeclaration, LSFGlobalPropDeclaration, LSFPropReference> {
-        private List<ClassRef> classes;
-        private Boolean isImplement;
-
-        @Override
-        protected boolean isFullName(LSFPropDeclaration decl) {
-            return decl instanceof LSFGlobalPropDeclaration;
-        }
-
-        @Override
-        public boolean equalsRef(LSFPropReference ref, LSFPropDeclaration decl) {
-            if(LSFPropReferenceImpl.enableAbstractImpl && isImplement != null && (isImplement != ref.isImplement()))
-                return false;
-            return super.equalsRef(ref, decl);
-        }
-
-        @Override
-        public boolean equalsFullDecl(LSFGlobalPropDeclaration decl) {
-            if(!super.equalsFullDecl(decl))
-                return false;
-            
-            if(classes == null)
-                return true;
-
-            List<LSFClassSet> paramClasses = decl.resolveParamClasses();
-            if(paramClasses == null || paramClasses.size() != classes.size())
-                return false;
-                
-            for(int i=0;i<classes.size();i++)
-                if(!classes.get(i).equalsValueClass(paramClasses.get(i).getCommonClass()))
-                    return false;
-            
-            return true;
-        }
-
-        private PropRef(String name, String namespace, List<ClassRef> classes, Boolean implement) {
-            super(name, namespace);
-            this.classes = classes;
-            isImplement = implement;
-        }
-
-        @Override
-        protected boolean isEmpty() {
-            return super.isEmpty() && classes == null; 
-        }
-    }
-
-    private static class PropInMetaRef {
-        private PropRef propRef;
-        private MetacodeRef metaRef;
-        
-        public boolean equalsRef(LSFPropReference prop, LSFPropDeclaration decl) {
-            if(!propRef.equalsRef(prop, decl))
-                return false;
-            
-            if(metaRef!=null) {
-                LSFMetaCodeStatement inMeta = PsiTreeUtil.getParentOfType(prop, LSFMetaCodeStatement.class);
-                if(inMeta == null || !metaRef.equalsRef(inMeta, null))
-                    return false;                    
-            }
-            
-            return true;
-        }
-        
-        private boolean qualNamespace;
-        private boolean qualClasses;
-
-        private PropInMetaRef(PropRef propRef, MetacodeRef metaRef, boolean qualNamespace, boolean qualClasses) {
-            this.propRef = propRef;
-            this.metaRef = metaRef;
-            this.qualNamespace = qualNamespace;
-            this.qualClasses = qualClasses;
-        }
-    }
-    
     private interface CalcGraph {
         void proceedFile(Map<PropId, Set<PropId>> result, LSFFile file);        
     }
@@ -795,7 +681,7 @@ public class ShortenNamesProcessor {
         
         private final String canonicalName;
 
-        private PropId(LSFGlobalPropDeclaration decl) {
+        private PropId(LSFActionOrGlobalPropDeclaration decl) {
             this.file = decl.getLSFFile().getName();
             this.range = decl.getTextRange();
 
@@ -865,8 +751,8 @@ public class ShortenNamesProcessor {
         return calcGraph(myProject, new CalcGraph() {
             public void proceedFile(Map<PropId, Set<PropId>> result, LSFFile file) {
                 LSFFile projectFile = LSFElementGenerator.createProjectLSFFile(file);
-                for (PsiElement statement : PsiTreeUtil.findChildrenOfType(file, LSFPropertyStatement.class)) {
-                    LSFPropertyStatement propStatement = (LSFPropertyStatement) statement;
+                for (PsiElement statement : PsiTreeUtil.findChildrenOfType(file, LSFActionOrGlobalPropDeclaration.class)) {
+                    LSFActionOrGlobalPropDeclaration propStatement = (LSFActionOrGlobalPropDeclaration) statement;
                     
                     PropId propId = new PropId(propStatement);
                     props.add(propId);
@@ -879,7 +765,7 @@ public class ShortenNamesProcessor {
                         if (!(resResult.errorAnnotator instanceof LSFResolveResult.NotFoundErrorAnnotator)) {
                             if(!resResult.declarations.contains(propStatement)) {
                                 for (LSFDeclaration decl : resResult.declarations) {
-                                    PropId abstId = new PropId((LSFGlobalPropDeclaration) decl);
+                                    PropId abstId = new PropId((LSFActionOrGlobalPropDeclaration) decl);
                                     Set<PropId> impls = result.get(abstId);
                                     if (impls == null) {
                                         impls = new HashSet<>();
@@ -906,9 +792,9 @@ public class ShortenNamesProcessor {
     public static Map<PropId, Set<PropId>> calcImplementGraph(Project myProject) {
         return calcGraph(myProject, new CalcGraph() {
             public void proceedFile(Map<PropId, Set<PropId>> result, LSFFile file) {
-                for (PsiElement statement : PsiTreeUtil.findChildrenOfType(file, LSFOverrideStatement.class)) {
-                    
-                    LSFOverrideStatement ovStatement = (LSFOverrideStatement) statement;
+                for (PsiElement statement : PsiTreeUtil.findChildrenOfType(file, LSFOverridePropertyStatement.class)) {
+
+                    LSFOverridePropertyStatement ovStatement = (LSFOverridePropertyStatement) statement;
                     LSFMappedPropertyClassParamDeclare mappedDeclare = ovStatement.getMappedPropertyClassParamDeclare();
                     LSFPropertyUsage usage = mappedDeclare.getPropertyUsageWrapper().getPropertyUsage();
                     LSFGlobalPropDeclaration decl = (LSFGlobalPropDeclaration) usage.resolveDecl();
@@ -916,17 +802,17 @@ public class ShortenNamesProcessor {
                         List<LSFParamDeclaration> params = LSFPsiImplUtil.resolveParams(mappedDeclare.getClassParamDeclareList());
                         if (params != null) {
                             List<LSFPropertyExpression> peList = ovStatement.getPropertyExpressionList();
-                            LSFListActionPropertyDefinitionBody body = ovStatement.getListActionPropertyDefinitionBody();
-                            if (body != null) {
-                                if (peList.size() > 0)
-                                    break;
-                                proceedImpl(body, decl, params, result);
-                            } else {
+//                            LSFListActionPropertyDefinitionBody body = ovStatement.getListActionPropertyDefinitionBody();
+//                            if (body != null) {
+//                                if (peList.size() > 0)
+//                                    break;
+//                                proceedImpl(body, decl, params, result);
+//                            } else {
                                 if (peList.size() == 1) {
                                     LSFPropertyExpression pe = peList.get(0);
                                     proceedImpl(pe, decl, params, result);
                                 }
-                            }
+//                            }
                         }
                     }
                 }
@@ -946,11 +832,14 @@ public class ShortenNamesProcessor {
     }
     
     private static void proceedImpl(LSFListActionPropertyDefinitionBody pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Map<PropId, Set<PropId>> result) {
-        proceedImpl(pe, abst, params, LSFExecActionPropertyDefinitionBody.class, new Getter<LSFExecActionPropertyDefinitionBody>() {
-            public Pair<LSFPropertyObject, LSFPropertyExpressionList> get(LSFExecActionPropertyDefinitionBody element) {
-                return Pair.create(element.getPropertyObject(), element.getPropertyExpressionList());
-            }
-        }, result);
+        if(1==1)
+            return;
+        return;
+//        proceedImpl(pe, abst, params, LSFExecActionPropertyDefinitionBody.class, new Getter<LSFExecActionPropertyDefinitionBody>() {
+//            public Pair<LSFActionUsage, LSFPropertyExpressionList> get(LSFExecActionPropertyDefinitionBody element) {
+//                return Pair.create(element.getActionUsage(), element.getPropertyExpressionList());
+//            }
+//        }, result);
     }
     
     private static <T extends PsiElement> void proceedImpl(PsiElement pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Class<T> aClass, Getter<T> getter, Map<PropId, Set<PropId>> result) {

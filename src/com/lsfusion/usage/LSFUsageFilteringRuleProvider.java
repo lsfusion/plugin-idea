@@ -11,7 +11,8 @@ import com.intellij.usages.rules.UsageFilteringRule;
 import com.intellij.usages.rules.UsageFilteringRuleProvider;
 import com.lsfusion.lang.psi.LSFClassStatement;
 import com.lsfusion.lang.psi.LSFFormStatement;
-import com.lsfusion.lang.psi.LSFOverrideStatement;
+import com.lsfusion.lang.psi.LSFOverrideActionStatement;
+import com.lsfusion.lang.psi.LSFOverridePropertyStatement;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +50,8 @@ public class LSFUsageFilteringRuleProvider implements UsageFilteringRuleProvider
     }
 
     public static boolean filterOut(PsiElement statement, PsiElement element) {
-        if (statement instanceof LSFOverrideStatement && ((LSFOverrideStatement) statement).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage().equals(element) ||
+        if (statement instanceof LSFOverridePropertyStatement && ((LSFOverridePropertyStatement) statement).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage().equals(element) ||
+                statement instanceof LSFOverrideActionStatement && ((LSFOverrideActionStatement) statement).getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage().equals(element) ||
                 statement instanceof LSFFormStatement && ((LSFFormStatement) statement).getExtendingFormDeclaration() != null &&
                         ((LSFFormStatement) statement).getExtendingFormDeclaration().getFormUsageWrapper().getFormUsage().equals(element) ||
                 statement instanceof LSFClassStatement && ((LSFClassStatement) statement).getExtendingClassDeclaration() != null &&

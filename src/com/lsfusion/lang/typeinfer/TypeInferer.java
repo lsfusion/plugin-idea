@@ -10,6 +10,7 @@ import com.lsfusion.lang.psi.LSFResolver;
 import com.lsfusion.lang.psi.context.ContextModifier;
 import com.lsfusion.lang.psi.context.ExtendParamContext;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
@@ -72,8 +73,8 @@ public class TypeInferer {
 
             boolean unfr = false;
             ModifyParamContext modifyContext = (ModifyParamContext) element;
-            if (element instanceof LSFPropertyStatement) {
-                LSFPropertyStatement ps = (LSFPropertyStatement) element;
+            if (element instanceof LSFActionOrGlobalPropDeclaration) {
+                LSFActionOrGlobalPropDeclaration ps = (LSFActionOrGlobalPropDeclaration) element;
                 if (ps.isUnfriendly())
                     unfr = true;
             }

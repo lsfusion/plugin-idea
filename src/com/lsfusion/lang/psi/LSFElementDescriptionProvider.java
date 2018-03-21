@@ -34,10 +34,10 @@ public class LSFElementDescriptionProvider implements ElementDescriptionProvider
                 type = "window";
                 name = statement.getNameIdentifier().getText();
             }
-        } else if (element instanceof LSFExplicitInterfacePropertyStatement) {
-            LSFPropertyStatement propertyStatement = ((LSFExplicitInterfacePropertyStatement) element).getPropertyStatement();
+        } else if (element instanceof LSFExplicitInterfaceActionOrPropStatement) {
+            LSFActionOrPropDeclaration propertyStatement = ((LSFExplicitInterfaceActionOrPropStatement) element).getDeclaration();
             if (propertyStatement != null) {
-                type = "property";
+                type = propertyStatement.isAction()? "action" : "property";
                 name = propertyStatement.getNameIdentifier().getText();
             }
         } else if (element instanceof LSFNewComponentStatement) {

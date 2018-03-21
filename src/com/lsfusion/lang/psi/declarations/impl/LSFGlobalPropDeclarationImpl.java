@@ -18,6 +18,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.indexes.TableClassesIndex;
+import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -34,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.*;
 
-public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclarationImpl<LSFGlobalPropDeclaration, PropStubElement> implements LSFGlobalPropDeclaration {
+public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalPropDeclarationImpl<LSFGlobalPropDeclaration, PropStubElement> implements LSFGlobalPropDeclaration {
 
     public static final String TABLE_BASE_PREFIX = "base";
     public static final String TABLE_BASE0 = TABLE_BASE_PREFIX + 0;
@@ -47,30 +48,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         super(propStubElement, nodeType);
     }
 
-    @Override
-    public List<String> resolveParamNames() {
-        LSFPropertyDeclaration decl = getPropertyDeclaration();
-        LSFPropertyDeclParams declList = decl.getPropertyDeclParams();
-        List<LSFExprParamDeclaration> params = null;
-        if(declList!=null)
-            params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(declList.getClassParamDeclareList()));
-        else {
-            LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
-            if(pCalcStatement != null) {
-                LSFPropertyExpression pe = pCalcStatement.getPropertyExpression();
-                if (pe != null)
-                    params = LSFPsiImplUtil.resolveParams(pe);
-            }
-        }
-        return LSFPsiImplUtil.resolveParamNames(params);
-    }
-
     public abstract LSFPropertyDeclaration getPropertyDeclaration();
-
-    @Nullable
-    public abstract LSFActionUnfriendlyPD getActionUnfriendlyPD();
-
-    public abstract LSFListActionPropertyDefinitionBody getListActionPropertyDefinitionBody();
 
     @Nullable
     public abstract LSFPropertyCalcStatement getPropertyCalcStatement();
@@ -86,11 +64,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             if (unfriend != null) {
                 return unfriend.getAbstractPropertyDefinition() != null;
             }
-        } else {
-            LSFActionUnfriendlyPD unfriend = getActionUnfriendlyPD();
-            if (unfriend != null) {
-                return unfriend.getAbstractActionPropertyDefinition() != null;
-            }
         }
         return false;
     }
@@ -98,23 +71,9 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     public boolean isUnfriendly() {
         LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
-        if(pCalcStatement != null) {
+        if(pCalcStatement != null)
             return pCalcStatement.getExpressionUnfriendlyPD() != null;
-        } else {
-            return getActionUnfriendlyPD() != null;
-        }
-    }
-
-    @Override
-    @Nullable
-    public LSFId getNameIdentifier() {
-        return getPropertyDeclaration().getSimpleNameWithCaption().getSimpleName();
-    }
-
-    @Override
-    public String getCaption() {
-        LSFLocalizedStringLiteral stringLiteral = getPropertyDeclaration().getSimpleNameWithCaption().getLocalizedStringLiteral();
-        return stringLiteral != null ? stringLiteral.getValue() : null;
+        return false;
     }
 
     @Override
@@ -139,7 +98,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     @Nullable
-    private List<LSFExClassSet> resolveValueParamClasses() {
+    protected List<LSFExClassSet> resolveValueParamClasses() {
         LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
         if(pCalcStatement != null) {
             LSFExpressionUnfriendlyPD unfr = pCalcStatement.getExpressionUnfriendlyPD();
@@ -149,51 +108,8 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
             LSFPropertyExpression expr = pCalcStatement.getPropertyExpression();
             if (expr != null)
                 return LSFExClassSet.toEx(LSFPsiImplUtil.resolveValueParamClasses(expr));
-        } else {
-            return LSFPsiImplUtil.resolveValueParamClasses(getActionUnfriendlyPD(), getListActionPropertyDefinitionBody());
         }
-
         return null;
-
-    }
-
-    @Override
-    @Nullable
-    public List<LSFExClassSet> resolveExParamClasses() {
-        return ParamClassesCache.getInstance(getProject()).resolveParamClassesWithCaching(this);
-    }
-
-    @Override
-    public List<LSFExClassSet> resolveExParamClassesNoCache() {
-        LSFPropertyDeclaration decl = getPropertyDeclaration();
-        LSFPropertyDeclParams cpd = decl.getPropertyDeclParams();
-        List<LSFExClassSet> declareClasses = null;
-        if (cpd != null) {
-            declareClasses = LSFExClassSet.toEx(LSFPsiImplUtil.resolveExplicitClass(cpd.getClassParamDeclareList()));
-            if (LSFPsiUtils.allClassesDeclared(declareClasses)) // оптимизация
-                return declareClasses;
-        }
-
-        List<LSFExClassSet> valueClasses = resolveValueParamClasses();
-        if (valueClasses == null)
-            return declareClasses;
-
-        if (declareClasses == null)
-            return valueClasses;
-
-        List<LSFExClassSet> mixed = new ArrayList<>(declareClasses);
-        for (int i = 0, size = declareClasses.size(); i < size; i++) {
-            if (i >= valueClasses.size())
-                break;
-
-            if (declareClasses.get(i) == null)
-                mixed.set(i, valueClasses.get(i));
-        }
-        return Collections.unmodifiableList(mixed);
-    }
-
-    public static List<LSFClassSet> finishParamClasses(LSFPropDeclaration decl) {
-        return LSFExClassSet.fromEx(decl.resolveExParamClasses());
     }
 
     public static LSFClassSet finishValueClass(LSFPropDeclaration decl) {
@@ -201,34 +117,11 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
     
     @Override
-    public List<LSFClassSet> resolveParamClasses() {
-        return finishParamClasses(this);
-    }
-
-    @Override
     public LSFClassSet resolveValueClass() {
         return finishValueClass(this);
     }
 
-    @Override
-    @Nullable
-    public List<LSFExClassSet> inferParamClasses(LSFExClassSet valueClass) {
-
-        List<LSFExClassSet> resultClasses = resolveExParamClasses();
-        if (resultClasses == null)
-            return null;
-        
-        resultClasses = new ArrayList<>(resultClasses);
-
-        //        LSFActionStatement action = sourceStatement.getActionPropertyDefinition();
-//        return 
-
-        List<LSFExprParamDeclaration> params = null;
-        LSFPropertyDeclaration decl = getPropertyDeclaration();
-        LSFPropertyDeclParams cpd = decl.getPropertyDeclParams();
-        if (cpd != null)
-            params = BaseUtils.<List<LSFExprParamDeclaration>>immutableCast(LSFPsiImplUtil.resolveParams(cpd.getClassParamDeclareList()));
-
+    public InferExResult inferExParamClasses(LSFExClassSet valueClass, List<LSFExClassSet> resultClasses, Result<List<LSFExprParamDeclaration>> rParams) {
         InferExResult inferredClasses = null;
         LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
         if(pCalcStatement != null) {
@@ -241,36 +134,21 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
                         if (resultClasses.get(i) == null && i < inferredValueClasses.size()) { // не определены, возьмем выведенные
                             resultClasses.set(i, inferredValueClasses.get(i));
                         }
-                    return resultClasses;
                 }
             } else {
                 LSFPropertyExpression expr = pCalcStatement.getPropertyExpression();
                 assert expr != null;
-                if (params == null)
-                    params = expr.resolveParams();
+                if (rParams.getResult() == null)
+                    rParams.setResult(expr.resolveParams());
 
                 inferredClasses = LSFPsiImplUtil.inferParamClasses(expr, valueClass).finishEx();
             }
-        } else {
-            if(getListActionPropertyDefinitionBody() != null) {
-                if (params != null) // может быть action unfriendly
-                    inferredClasses = LSFPsiImplUtil.inferActionParamClasses(getListActionPropertyDefinitionBody(), new HashSet<>(params)).finishEx();
-            }
         }
-
-        if (inferredClasses != null) {
-            assert resultClasses.size() == params.size();
-            for (int i = 0; i < resultClasses.size(); i++)
-                if (resultClasses.get(i) == null) { // не определены, возьмем выведенные
-                    resultClasses.set(i, inferredClasses.get(params.get(i)));
-                }
-        }
-
-        return resultClasses;
+        return inferredClasses;
     }
 
     public boolean isAction() {
-        return getActionUnfriendlyPD() != null || getListActionPropertyDefinitionBody() != null;
+        return false;
     }
 
     public LSFDataPropertyDefinition getDataPropertyDefinition() {
@@ -303,29 +181,8 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return isDataStoredProperty() || isPersistentProperty();
     }
 
-    @Nullable
-    @Override
-    public Icon getIcon(int flags) {
-        return getIcon(getPropType());
-    }
-
-    public static Icon getIcon(byte propType) {
-        switch (propType) {
-            case 3:
-                return LSFIcons.ACTION;
-            case 2:
-                return LSFIcons.ABSTRACT_PROPERTY;
-            case 1:
-                return LSFIcons.DATA_PROPERTY;
-            default:
-                return LSFIcons.PROPERTY;
-        }
-    }
-
     public byte getPropType() {
-        if (isAction()) {
-            return 3;
-        } else if (isAbstract()) {
+        if (isAbstract()) {
             return 2;
         } else if (isDataProperty()) {
             return 1;
@@ -334,58 +191,15 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         }
     }
 
-    @Override
-    public String getPresentableText() {
-        return getDeclName() + getParamPresentableText();
-    }
-
-    public String getParamPresentableText() {
-//        List<LSFStringClassRef> params = getExplicitParams();
-        return getParamPresentableText(resolveParamClasses());
-    }
-
-    public static String getParamPresentableText(List<?> paramClasses) {
-        String result = "";
-        if(paramClasses != null) {
-            for (Object paramClass : paramClasses)
-                result = (result.isEmpty() ? "" : result + ",") + (paramClass != null ? paramClass.toString() : "?");
-        } else
-            result = "?";
-        return "(" + result + ")";
-    }
-
     @NotNull
     public String getValuePresentableText() {
-        String valueClassString = "";
-        if (!isAction()) {
-            LSFClassSet valueClass = resolveValueClass();
-            valueClassString = ": " + (valueClass == null ? "?" : valueClass);
-        }
+        String valueClassString;
+        LSFClassSet valueClass = resolveValueClass();
+        valueClassString = ": " + (valueClass == null ? "?" : valueClass);
         return valueClassString;
     }
 
-    public LSFExplicitClasses getExplicitParams() {
-        LSFExplicitSignature declParams = getDeclExplicitParams();
-        if (declParams != null && declParams.allClassesDeclared()) // оптимизация
-            return declParams;
-
-        LSFExplicitClasses implicitParams = getImplicitExplicitParams();
-        if(implicitParams == null)
-            return declParams;
-        if(declParams == null || !(implicitParams instanceof LSFExplicitSignature)) // если группировка забиваем на explicit
-            return implicitParams;
-
-        return declParams.merge((LSFExplicitSignature) implicitParams);
-    }
-
-    private LSFExplicitSignature getDeclExplicitParams() {
-        List<LSFParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
-        if(params != null)
-            return LSFPsiImplUtil.getClassNameRefs(params);
-        return null;
-    }
-
-    private LSFExplicitClasses getImplicitExplicitParams() {
+    protected LSFExplicitClasses getImplicitExplicitParams() {
         LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
         if(pCalcStatement != null) {
             LSFPropertyExpression pExpression = pCalcStatement.getPropertyExpression();
@@ -394,10 +208,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
 
             LSFExpressionUnfriendlyPD unfriend = pCalcStatement.getExpressionUnfriendlyPD();
             if(unfriend != null)
-                return LSFPsiImplUtil.getValueParamClassNames(unfriend);
-        } else {
-            LSFActionUnfriendlyPD unfriend = getActionUnfriendlyPD();
-            if (unfriend != null)
                 return LSFPsiImplUtil.getValueParamClassNames(unfriend);
         }
         return null;
@@ -423,61 +233,14 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         return LSFStubElementTypes.PROP;
     }
 
-    public static boolean resolveEquals(List<LSFClassSet> list1, List<LSFClassSet> list2) {
-        if (list1 == null && list2 == null) {
-            return true;
-        }
-        if (list1 == null || list2 == null || list1.size() != list2.size()) {
-            return false;
-        }
-
-        for (int i = 0; i < list1.size(); i++) {
-            if (list1.get(i) == null) {
-                if (list2.get(i) != null) {
-                    return false;
-                }
-            } else {
-                if (!list1.get(i).equals(list2.get(i))) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     @Override
-    public PsiElement[] processImplementationsSearch() {
-        LSFId nameIdentifier = getNameIdentifier();
-        if (nameIdentifier == null) {
-            return PsiElement.EMPTY_ARRAY;
-        }
-        Collection<PsiReference> refs = ReferencesSearch.search(nameIdentifier, GlobalSearchScope.allScope(getProject())).findAll();
-
-        List<PsiElement> result = new ArrayList<>();
-        for (PsiReference ref : refs) {
-            LSFOverrideStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) ref, LSFOverrideStatement.class);
-            if (overrideStatement != null && ref.equals(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage())) {
-                result.add(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper());    
-            }
-        }
-        return result.toArray(new PsiElement[result.size()]);
+    protected LSFPropReference getImplementation(PsiReference ref) {
+        LSFOverridePropertyStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) ref, LSFOverridePropertyStatement.class);
+        if (overrideStatement != null && ref.equals(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage()))
+           return overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage();
+        return null;
     }
 
-    @Override
-    protected Condition<LSFGlobalPropDeclaration> getFindDuplicatesCondition() {
-        return new Condition<LSFGlobalPropDeclaration>() {
-            @Override
-            public boolean value(LSFGlobalPropDeclaration decl) {
-                LSFId nameIdentifier = getNameIdentifier();
-                LSFId otherNameIdentifier = decl.getNameIdentifier();
-                return nameIdentifier != null && otherNameIdentifier != null &&
-                       nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
-                       resolveEquals(resolveParamClasses(), decl.resolveParamClasses());
-            }
-        };
-    }
-    
     protected Condition<LSFGlobalPropDeclaration> getFindDuplicateColumnsCondition() {
         return new Condition<LSFGlobalPropDeclaration>() {
             @Override
@@ -500,7 +263,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     public boolean resolveDuplicateColumns() {
         CollectionQuery<LSFGlobalPropDeclaration> declarations = new CollectionQuery<>(
                 LSFGlobalResolver.findElements(
-                        getDeclName(), null, getLSFFile(), getTypes(), getFindDuplicateColumnsCondition(), Finalizer.EMPTY
+                        getDeclName(), null, getTypes(), getLSFFile(), getFindDuplicateColumnsCondition(), Finalizer.EMPTY
                 )
         );
         return declarations.findAll().size() > 1;
@@ -635,66 +398,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     }
 
     @Override
-    public ElementMigration getMigration(String newName) {
-        return PropertyMigration.create(this, getGlobalName(), newName);
-    }
-    
-    @Override
-    public Set<LSFPropDeclaration> getDependencies() {
-        return getPropDependencies(this);
-    }
-    
-    public static Set<LSFPropDeclaration> getPropDependencies(LSFPropDeclaration prop) {
-        Set<LSFPropDeclaration> result = new HashSet<>();
-
-        Collection<LSFPropReference> propReferences;
-
-        if (prop instanceof LSFGlobalPropDeclaration && prop.isAbstract()) {
-            Collection<PsiReference> references = ReferencesSearch.search(prop.getNameIdentifier()).findAll();
-            propReferences = new ArrayList<>();
-            for (PsiReference reference : references) {
-                LSFOverrideStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) reference, LSFOverrideStatement.class);
-                if (overrideStatement != null && reference.equals(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage())) {
-                    for (LSFPropertyExpression propertyExpression : overrideStatement.getPropertyExpressionList()) {
-                        propReferences.addAll(PsiTreeUtil.findChildrenOfType(propertyExpression, LSFPropReference.class));    
-                    }
-                }    
-            }
-        } else {
-            propReferences = PsiTreeUtil.findChildrenOfType(prop, LSFPropReference.class);
-        }
-
-        for (LSFPropReference propReference : propReferences) {
-            LSFPropDeclaration propDeclaration = propReference.resolveDecl();
-            if (propDeclaration != null) {
-                result.add(propDeclaration);
-            }
-        }
-
-        return result;    
-    }
-
-    @Override
-    public Set<LSFPropDeclaration> getDependents() {
-        return getPropDependents(this);
-    }
-    
-    public static Set<LSFPropDeclaration> getPropDependents(LSFPropDeclaration prop) {
-        Set<LSFPropDeclaration> result = new HashSet<>();
-
-        Set<PsiReference> refs = new HashSet<>(ReferencesSearch.search(prop.getNameIdentifier(), prop.getUseScope()).findAll());
-
-        for (PsiReference ref : refs) {
-            LSFPropDeclaration dependent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFPropDeclaration.class);
-            if (dependent != null) {
-                result.add(dependent);
-            }
-        }
-
-        return result;     
-    }
-
-    @Override
     public Integer getComplexity() {
         return getPropComplexity(this);
     }
@@ -707,10 +410,10 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
         Integer complexity = 1;
         if (!processed.contains(prop)) {
             processed.add(prop);
-            if (!(prop instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration) prop).isPersistentProperty())) {
-                Set<LSFPropDeclaration> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching(prop);
-                for (LSFPropDeclaration dependency : dependencies) {
-                    complexity += getPropComplexity(dependency, processed);
+            if (prop instanceof LSFGlobalPropDeclaration && !((LSFGlobalPropDeclaration) prop).isPersistentProperty()) {
+                Set<LSFActionOrGlobalPropDeclaration> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching((LSFGlobalPropDeclaration)prop);
+                for (LSFActionOrGlobalPropDeclaration dependency : dependencies) {
+                    complexity += getPropComplexity((LSFGlobalPropDeclaration)dependency, processed);
                 }
             }
         }
@@ -721,5 +424,29 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFFullNameDeclaratio
     @Override
     public Icon getIcon() {
         return getIcon(0);
+    }
+
+    @Override
+    protected List<LSFExprParamDeclaration> resolveValueParamNames() {
+        LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
+        if(pCalcStatement != null) {
+            LSFPropertyExpression pe = pCalcStatement.getPropertyExpression();
+            if (pe != null)
+                return LSFPsiImplUtil.resolveParams(pe);
+        }
+        return null;
+    }
+
+    @Override
+    protected PsiElement getDependenciesBody() {
+        return getPropertyCalcStatement();
+    }
+
+    @Override
+    protected void fillImplementationDependencies(LSFActionOrPropReference impRef, Collection<LSFActionOrPropReference> references) {
+        LSFOverridePropertyStatement overrideStatement = PsiTreeUtil.getParentOfType(impRef, LSFOverridePropertyStatement.class);
+        for (LSFPropertyExpression propertyExpression : overrideStatement.getPropertyExpressionList()) {
+            references.addAll(PsiTreeUtil.findChildrenOfType(propertyExpression, LSFPropReference.class));
+        }
     }
 }

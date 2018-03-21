@@ -16,6 +16,7 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.indexes.ModuleIndex;
@@ -48,7 +49,7 @@ public class ProjectTypeInferAction extends AnAction {
                         
                         Collection<String> allKeys = ModuleIndex.getInstance().getAllKeys(myProject);
                         
-                        Map<LSFGlobalPropDeclaration, List<LSFClassSet>> propertyDecls = new HashMap<>();
+                        Map<LSFActionOrGlobalPropDeclaration, List<LSFClassSet>> propertyDecls = new HashMap<>();
                         
                         int i = 0;
                         System.out.println("Processing param classes...");
@@ -59,7 +60,7 @@ public class ProjectTypeInferAction extends AnAction {
                                 LSFFile file = declaration.getLSFFile();
                                 indicator.setText2("Statements : " + file.getChildren().length);
                                 
-                                for(LSFGlobalPropDeclaration decl : PsiTreeUtil.findChildrenOfType(file, LSFGlobalPropDeclaration.class))
+                                for(LSFActionOrGlobalPropDeclaration decl : PsiTreeUtil.findChildrenOfType(file, LSFActionOrGlobalPropDeclaration.class))
                                     propertyDecls.put(decl, decl.resolveParamClasses());
                                 
                                 indicator.setText2("");
@@ -84,11 +85,11 @@ public class ProjectTypeInferAction extends AnAction {
                         }
                         
                         List<ElementMigration> migrations = new ArrayList<>();
-                        for(Map.Entry<LSFGlobalPropDeclaration, List<LSFClassSet>> propertyDeclEntry : propertyDecls.entrySet()) {
-                            LSFGlobalPropDeclaration decl = propertyDeclEntry.getKey();
+                        for(Map.Entry<LSFActionOrGlobalPropDeclaration, List<LSFClassSet>> propertyDeclEntry : propertyDecls.entrySet()) {
+                            LSFActionOrGlobalPropDeclaration decl = propertyDeclEntry.getKey();
                             List<LSFClassSet> oldClasses = propertyDeclEntry.getValue();
                             List<LSFClassSet> newClasses = decl.resolveParamClasses();
-                            if(newClasses != null && !newClasses.equals(oldClasses))
+                            if (newClasses != null && !newClasses.equals(oldClasses))
                                 migrations.add(PropertyMigration.create(decl, oldClasses, newClasses));
                         }
                         ShortenNamesProcessor.modifyMigrationScripts(migrations, MigrationChangePolicy.INCREMENT_VERSION, myProject, ProjectScope.getProjectScope(myProject));

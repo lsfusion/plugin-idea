@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.indexes.*;
 import org.jetbrains.annotations.NotNull;
@@ -60,12 +61,12 @@ public class LSFSymbolContributor extends LSFNameContributor {
 
     @Override
     protected Collection<String> getIndexKeys(StringStubIndexExtension index, String pattern, Project project, boolean includeNonProjectItems) {
-        if (index instanceof PropIndex) {
+        if (index instanceof ActionOrPropIndex) {
             List<String> result = new ArrayList<>();
             Collection<String> allKeys = index.getAllKeys(project);
             final GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
             for (String key : allKeys) {
-                for (LSFGlobalPropDeclaration decl : ((PropIndex) index).get(key, project, scope)) {
+                for (LSFActionOrGlobalPropDeclaration decl : ((ActionOrPropIndex<?>) index).get(key, project, scope)) {
                     if (pattern != null && !matches(key, pattern)) {
                         continue;
                     }

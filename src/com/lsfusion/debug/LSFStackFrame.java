@@ -22,6 +22,7 @@ import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.lang.psi.LSFActionStatement;
 import com.lsfusion.lang.psi.LSFPropertyDeclaration;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
 import org.jetbrains.annotations.NotNull;
@@ -90,7 +91,7 @@ public class LSFStackFrame extends XStackFrame {
             SourcePosition pos = SourcePosition.createFromLine(file, position.getLine());
             PsiElement currentElement = pos.getElementAt();
             if (currentElement != null) {
-                LSFPropertyStatement statement = PsiTreeUtil.getParentOfType(currentElement, LSFPropertyStatement.class);
+                LSFActionStatement statement = PsiTreeUtil.getParentOfType(currentElement, LSFActionStatement.class);
                 if (statement != null) {
                     LSFPropertyDeclaration decl = statement.getPropertyDeclaration();
                     return decl.getSimpleNameWithCaption().getSimpleName().getName();

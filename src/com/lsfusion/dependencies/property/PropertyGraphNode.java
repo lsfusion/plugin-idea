@@ -3,19 +3,21 @@ package com.lsfusion.dependencies.property;
 import com.intellij.pom.Navigatable;
 import com.lsfusion.dependencies.GraphNode;
 import com.lsfusion.lang.psi.cache.PropertyComplexityCache;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 
 public class PropertyGraphNode implements GraphNode {
     private String name;
     private boolean dependency;
-    public LSFPropDeclaration property;
+    public LSFActionOrGlobalPropDeclaration property;
     private int complexity;
     
-    public PropertyGraphNode(LSFPropDeclaration property, boolean dependency) {
+    public PropertyGraphNode(LSFActionOrGlobalPropDeclaration property, boolean dependency) {
         this.dependency = dependency;
         this.property = property;
         
-        complexity = PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching(property);
+        complexity = property instanceof LSFGlobalPropDeclaration ? PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching((LSFGlobalPropDeclaration)property) : 0;
         name = property.getPresentableText();
     }
 

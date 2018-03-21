@@ -20,10 +20,8 @@ import com.intellij.util.containers.MultiMap;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.util.LSFFileUtils;
@@ -91,7 +89,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
                     LSFPropertyDrawDeclaration propDrawDecl = (LSFPropertyDrawDeclaration)refParent;
                     //ищем propertyDraw без alias'а
                     if (propDrawDecl.getSimpleName() == null) {
-                        LSFSimpleName propUsageId = getDeclPropName(propDrawDecl);
+                        LSFId propUsageId = getDeclPropName(propDrawDecl);
                         if(propUsageId != null) {
                             allRenames.put(propUsageId, newName);
                             cascadePostRenames.add(getMigrationRunnable(propUsageId, newName));
@@ -105,9 +103,11 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
                 //переименование propertyDraw без alias => нужно переименовать и соответствующее свойство
                 LSFFormPropertyName formPropertyName = propDrawDecl.getFormPropertyName();
                 if(formPropertyName != null) {
-                    LSFPropertyUsage propertyUsage = formPropertyName.getPropertyUsage();
+                    LSFActionOrPropReference<?,?> propertyUsage = formPropertyName.getPropertyElseActionUsage();
+                    if(propertyUsage == null)
+                        propertyUsage = formPropertyName.getActionUsage();
                     if (propertyUsage != null) {
-                        LSFPropDeclaration decl = propertyUsage.resolveDecl();
+                        LSFActionOrPropDeclaration decl = propertyUsage.resolveDecl();
                         if (decl != null) {
                             allRenames.put(decl.getNameIdentifier(), newName);
                             cascadePostRenames.add(getMigrationRunnable(decl.getNameIdentifier(), newName));
@@ -118,15 +118,17 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         }
     }
 
-    public static LSFSimpleName getDeclPropName(LSFPropertyDrawDeclaration propDrawDecl) {
+    public static LSFId getDeclPropName(LSFPropertyDrawDeclaration propDrawDecl) {
         LSFFormPropertyName formPropertyName = propDrawDecl.getFormPropertyName();
         if(formPropertyName == null)
             return null;
-        
-        LSFPropertyUsage propertyUsage = formPropertyName.getPropertyUsage();
-        LSFSimpleName propUsageId = null;
+
+        LSFActionOrPropReference<?,?> propertyUsage = formPropertyName.getPropertyElseActionUsage();
+        if(propertyUsage == null)
+            propertyUsage = formPropertyName.getActionUsage();
+        LSFId propUsageId = null;
         if (propertyUsage != null) {
-            propUsageId = propertyUsage.getCompoundID().getSimpleName();
+            propUsageId = propertyUsage.getSimpleName();
         }
         return propUsageId;
     }
@@ -136,7 +138,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         LSFFullNameDeclaration decl = getFullNameDecl(element);
         if(decl != null) {
             List<Pair<LSFFullNameReference, LSFDeclaration>> possibleConflicts = new ArrayList<>();
-            for (LSFFullNameReference possibleConflict : LSFResolver.findFullNameUsages(newName, decl)) {
+            for (LSFFullNameReference possibleConflict : LSFResolver.findRenameConflicts(newName, decl)) {
                 possibleConflicts.add(Pair.create(possibleConflict, possibleConflict.resolveDecl()));
             }
 
@@ -217,13 +219,13 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         
         // работаем везде на "горячем" PSI (то есть без копий, dummy и т.п.)
 
-        if(ref instanceof LSFPropReference && ((LSFPropReference)ref).getExplicitClasses()==null) {
-            LSFPropDeclaration propDecl = (LSFPropDeclaration) decl;
+        if(ref instanceof LSFActionOrPropReference && ((LSFActionOrPropReference)ref).getExplicitClasses()==null) {
+            LSFActionOrPropDeclaration propDecl = (LSFActionOrPropDeclaration) decl;
             if(propDecl == null)
                 return;
             List<LSFClassSet> declClasses = propDecl.resolveParamClasses();
             if(declClasses != null)
-                ((LSFPropReference)ref).setExplicitClasses(declClasses, transaction);
+                ((LSFActionOrPropReference)ref).setExplicitClasses(declClasses, transaction);
 
             if(ref.resolveDecl() == decl)
                 return;

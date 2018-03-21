@@ -8,11 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Set;
 
-public interface LSFPropDeclaration extends LSFDeclaration, LSFInterfacePropStatement {
-
-    boolean isAbstract();
-    
-    List<LSFClassSet> resolveParamClasses();
+public interface LSFPropDeclaration extends LSFActionOrPropDeclaration {
     
     LSFClassSet resolveValueClass();
 
@@ -23,14 +19,5 @@ public interface LSFPropDeclaration extends LSFDeclaration, LSFInterfacePropStat
     @Nullable
     List<LSFExClassSet> inferParamClasses(LSFExClassSet valueClass); // минимум кол-во параметров мы выведем
 
-    @Nullable
-    List<LSFExClassSet> resolveExParamClasses();
-
-    List<LSFExClassSet> resolveExParamClassesNoCache();
-
-    Set<LSFPropDeclaration> getDependencies();
-
-    Set<LSFPropDeclaration> getDependents();
-    
     Integer getComplexity();
 }

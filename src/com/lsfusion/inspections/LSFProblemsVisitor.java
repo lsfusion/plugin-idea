@@ -14,9 +14,7 @@ import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.impl.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +41,7 @@ public class LSFProblemsVisitor {
 
     static void visitLSFSimpleNameWithCaption(ProblemsHolder holder, LSFSimpleNameWithCaption element, boolean warningsSearchMode) {
         PsiElement parent = element.getParent();
-        if (parent instanceof LSFPropertyDeclaration || parent instanceof LSFGroupStatement || parent instanceof LSFClassDecl) {
+        if (parent instanceof LSFActionOrPropDeclaration || parent instanceof LSFGroupStatement || parent instanceof LSFClassDecl) {
             LSFDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
             if (objectDecl != null && objectDecl.getNameIdentifier() != null && !hasShortCut(objectDecl) &&
                     ReferencesSearch.search(objectDecl.getNameIdentifier(), element.getUseScope(), true).findFirst() == null) {
@@ -78,6 +76,8 @@ public class LSFProblemsVisitor {
         String warningText;
         if (element instanceof LSFPropertyDeclaration) {
             warningText = "Unused Property";
+        } else if (element instanceof LSFActionDeclaration) {
+            warningText = "Unused Action";
         } else if (element instanceof LSFGroupStatement) {
             warningText = "Unused Group Statement";
         } else {

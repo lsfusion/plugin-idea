@@ -8,7 +8,7 @@ import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.DataClass;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
-import com.lsfusion.lang.psi.declarations.impl.LSFGlobalPropDeclarationImpl;
+import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -87,6 +87,6 @@ public class LSFStringClassRef {
         for(LSFStringClassRef classRef : classes) {
             result.add(classRef != null ? classRef.name : null);
         }
-        return LSFGlobalPropDeclarationImpl.getParamPresentableText(result);
+        return LSFActionOrGlobalPropDeclarationImpl.getParamPresentableText(result);
     }
 }

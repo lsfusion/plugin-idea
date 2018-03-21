@@ -3,7 +3,6 @@ package com.lsfusion.actions;
 import com.intellij.codeInsight.unwrap.ScopeHighlighter;
 import com.intellij.ide.structureView.StructureView;
 import com.intellij.ide.util.FileStructurePopup;
-import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
@@ -14,13 +13,10 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pass;
 import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.refactoring.IntroduceTargetChooser;
-import com.intellij.refactoring.RefactoringActionHandler;
 import com.intellij.refactoring.RefactoringBundle;
-import com.intellij.refactoring.actions.BaseRefactoringAction;
 import com.intellij.refactoring.util.CommonRefactoringUtil;
 import com.intellij.util.Function;
 import com.lsfusion.LSFBundle;
@@ -32,14 +28,14 @@ import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.context.LSFExpression;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
-import com.lsfusion.structure.LSFPropertyStatementTreeElement;
+import com.lsfusion.structure.LSFActionOrPropertyStatementTreeElement;
 import com.lsfusion.structure.LSFStructureViewNavigationHandler;
 import com.lsfusion.structure.LSFTreeBasedStructureViewBuilder;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -145,7 +141,7 @@ public class InsertCompositionAction extends AnAction {
             final LSFValueClass valueClass = classSet.getCommonClass();
             LSFStructureViewNavigationHandler navigationHandler = new LSFStructureViewNavigationHandler() {
                 @Override
-                public void navigate(LSFPropertyStatementTreeElement element, boolean requestFocus) {
+                public <T extends LSFActionOrPropDeclaration> void navigate(LSFActionOrPropertyStatementTreeElement<T> element, boolean requestFocus) {
                     insertComposition(editor, expr, valueClass, element.getElement());
                 }
             };
@@ -160,7 +156,7 @@ public class InsertCompositionAction extends AnAction {
         showErrorMessage(project, editor, LSFBundle.message("insert.composition.cant.determine.type"));
     }
 
-    private void insertComposition(final Editor editor, final LSFExpression expr, final LSFValueClass valueClass, final LSFPropertyStatement composition) {
+    private <T extends LSFActionOrPropDeclaration> void insertComposition(final Editor editor, final LSFExpression expr, final LSFValueClass valueClass, final T composition) {
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             @Override
             public void run() {

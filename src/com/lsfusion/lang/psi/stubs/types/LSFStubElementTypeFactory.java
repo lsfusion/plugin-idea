@@ -14,6 +14,8 @@ public class LSFStubElementTypeFactory {
                 return LSFStubElementTypes.CLASS;
             case "PROPERTY_STATEMENT":
                 return LSFStubElementTypes.PROP;
+            case "ACTION_STATEMENT":
+                return LSFStubElementTypes.ACTION;
             case "META_CODE_DECLARATION_STATEMENT":
                 return LSFStubElementTypes.META;
             case "FORM_DECL":
@@ -33,7 +35,7 @@ public class LSFStubElementTypeFactory {
             case "CLASS_STATEMENT":
                 return LSFStubElementTypes.EXTENDCLASS;
             case "EXPLICIT_INTERFACE_PROPERTY_STATEMENT":
-                return LSFStubElementTypes.EXPLICIT_INTERFACE;
+                return LSFStubElementTypes.EXPLICIT_INTERFACE_PROP;
             case "EXPLICIT_VALUE_PROPERTY_STATEMENT":
                 return LSFStubElementTypes.EXPLICIT_VALUE;
             case "IMPLICIT_VALUE_PROPERTY_STATEMENT":
@@ -42,6 +44,8 @@ public class LSFStubElementTypeFactory {
                 return LSFStubElementTypes.IMPLICIT_INTERFACE;
             case "COMPONENT_STUB_DECL":
                 return LSFStubElementTypes.COMPONENT;
+            case "EXPLICIT_INTERFACE_ACT_STATEMENT":
+                return LSFStubElementTypes.EXPLICIT_INTERFACE_ACTION;
         }
 
         throw new UnsupportedOperationException();

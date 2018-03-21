@@ -10,8 +10,10 @@ import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.psi.stubs.types.WindowStubElementType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public abstract class LSFWindowReferenceImpl extends LSFFullNameReferenceImpl<LSFWindowDeclaration, LSFWindowDeclaration> implements LSFWindowReference {
     
@@ -25,18 +27,8 @@ public abstract class LSFWindowReferenceImpl extends LSFFullNameReferenceImpl<LS
     }
 
     @Override
-    public LSFResolveResult resolveNoCache() {
-        Collection<? extends LSFWindowDeclaration> builtInWindows = LSFElementGenerator.getBuiltInWindows(getProject());
-        LSFWindowDeclaration builtInWndsArr[] = builtInWindows.toArray(new LSFWindowDeclaration[builtInWindows.size()]);
-        Collection<LSFWindowDeclaration> decls =
-                LSFGlobalResolver.findElements(
-                        getNameRef(),
-                        getFullNameRef(),
-                        getLSFFile(),
-                        Collections.singleton(LSFStubElementTypes.WINDOW),
-                        getCondition(),
-                        getFinalizer(),
-                        builtInWndsArr);
-        return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls));
+    protected List<LSFWindowDeclaration> getVirtDecls() {
+        Collection<LSFWindowDeclaration> builtInWindows = LSFElementGenerator.getBuiltInWindows(getProject());
+        return new ArrayList<>(builtInWindows);
     }
 }

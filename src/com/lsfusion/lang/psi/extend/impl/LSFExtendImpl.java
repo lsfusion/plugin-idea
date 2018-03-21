@@ -40,7 +40,7 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
 
         //noinspection RedundantTypeArguments
         return LSFResolveUtil.<LSFFullNameDeclaration>singleResolve(
-                LSFGlobalResolver.findElements(getGlobalName(), namespace, lsfFile, getStubTypes(), Condition.TRUE, Finalizer.EMPTY)
+                LSFGlobalResolver.findElements(getGlobalName(), namespace, getStubTypes(), lsfFile, Condition.TRUE, Finalizer.EMPTY)
         );
     }
 

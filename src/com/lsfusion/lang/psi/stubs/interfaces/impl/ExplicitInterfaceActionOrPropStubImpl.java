@@ -4,28 +4,29 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.lsfusion.lang.psi.LSFExplicitClasses;
+import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionOrPropStatement;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
-import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceStubElement;
+import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceActionOrPropStubElement;
+import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfacePropStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-public class ExplicitInterfaceStubImpl extends StubBase<LSFExplicitInterfacePropStatement> implements ExplicitInterfaceStubElement {
+public abstract class ExplicitInterfaceActionOrPropStubImpl<T extends LSFExplicitInterfaceActionOrPropStatement> extends StubBase<T> implements ExplicitInterfaceActionOrPropStubElement<T> {
+
     private String name;
     private LSFExplicitClasses paramClasses;
-    private Set<String> valueClasses;
     private byte propType;
 
-    public ExplicitInterfaceStubImpl(StubElement parent, @NotNull final LSFExplicitInterfacePropStatement psi) {
-        this(parent, psi.getElementType(), psi.getName(), psi.getExplicitParams(), psi.getExplicitValues(), psi.getPropType());
+    public ExplicitInterfaceActionOrPropStubImpl(StubElement parent, @NotNull final T psi) {
+        this(parent, psi.getElementType(), psi.getName(), psi.getExplicitParams(), psi.getPropType());
     }
 
-    public ExplicitInterfaceStubImpl(StubElement parentStub, IStubElementType type, String name, LSFExplicitClasses params, Set<String> values, byte propType) {
+    public ExplicitInterfaceActionOrPropStubImpl(StubElement parentStub, IStubElementType type, String name, LSFExplicitClasses params, byte propType) {
         super(parentStub, type);
         this.name = name;
         this.paramClasses = params;
-        this.valueClasses = values;
         this.propType = propType;
     }
 
@@ -39,11 +40,6 @@ public class ExplicitInterfaceStubImpl extends StubBase<LSFExplicitInterfaceProp
     @Nullable
     public LSFExplicitClasses getParamExplicitClasses() {
         return paramClasses;
-    }
-    @Override
-    @Nullable
-    public Set<String> getParamExplicitValues() {
-        return valueClasses;
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
@@ -12,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Set;
 
-public class ParamClassesCache extends PsiDependentCache<LSFPropDeclaration, List<LSFExClassSet>> {
-    public static final PsiResolver<LSFPropDeclaration, List<LSFExClassSet>> RESOLVER = new PsiResolver<LSFPropDeclaration, List<LSFExClassSet>>() {
+public class ParamClassesCache extends PsiDependentCache<LSFActionOrPropDeclaration, List<LSFExClassSet>> {
+    public static final PsiResolver<LSFActionOrPropDeclaration, List<LSFExClassSet>> RESOLVER = new PsiResolver<LSFActionOrPropDeclaration, List<LSFExClassSet>>() {
         @Override
-        public List<LSFExClassSet> resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
+        public List<LSFExClassSet> resolve(@NotNull LSFActionOrPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.resolveExParamClassesNoCache();
         }
 
@@ -40,7 +41,7 @@ public class ParamClassesCache extends PsiDependentCache<LSFPropDeclaration, Lis
         super(messageBus);
     }
     
-    public List<LSFExClassSet> resolveParamClassesWithCaching(LSFPropDeclaration element) {
+    public List<LSFExClassSet> resolveParamClassesWithCaching(LSFActionOrPropDeclaration element) {
         return resolveWithCaching(element, RESOLVER, true, false);
     }
 }

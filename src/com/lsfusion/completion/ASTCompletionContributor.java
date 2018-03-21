@@ -269,6 +269,8 @@ public class ASTCompletionContributor extends CompletionContributor {
         BooleanValueHolder componentCompleted = new BooleanValueHolder(false);
         boolean parameterCompleted = false;
         boolean propertyCompleted = false;
+        boolean actionCompleted = false;
+        boolean propertyElseActionCompleted = false;
         final ExecType type;
 
         private static final double NAMESPACE_PRIORITY = 1.5;
@@ -287,6 +289,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         private static final double PARAM_PRIORITY = 5;
 
         private static final double PROPERTY_PRIORITY = 2; // при USE_ANY еще добавляются количество подходящих классов
+        private static final double ACTION_PRIORITY = 2; // при USE_ANY еще добавляются количество подходящих классов
 
         private static final double KEYWORD_PRIORITY = 2;
 
@@ -380,6 +383,8 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (!res) res = completePropertyDrawUsage();
                 if (!res) res = completeParameterUsage();
                 if (!res) res = completePropertyUsage();
+                if (!res) res = completeActionUsage();
+                if (!res) res = completePropertyElseActionUsage();
                 if (!res) res = completeDesignProperties();
             } catch (ProcessCanceledException pce) {
                 LOGGER.debug("ProcessCanceledException while filling ID completion variants ", pce);
@@ -612,12 +617,51 @@ public class ASTCompletionContributor extends CompletionContributor {
                     quickLog("Completing propertyUsage");
                     propertyCompleted = true;
 
-                    boolean res = completePropertyInContextOfFormPropertyObject(propUsage);
-                    if (!res) res = completePropertyInContextOfMappedPropertiesList(propUsage);
+                    boolean res = false;
+                    if (!res) res = completePropertyInContextOfFormPropertyObject(propUsage);
                     if (!res) res = completePropertyInFormContext(propUsage);
                     if (!res) res = completePropertyInNoContext(propUsage);
                     if (!res) res = completePropertyInModifyParamContext(propUsage);
                     quickLog("Completed propertyUsage");
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        private boolean completeActionUsage() {
+            Frame propUsage = getLastFrameOfType(null, ACTION_USAGE);
+            if (propUsage != null) {
+                if (type.isProps() && !actionCompleted) {
+                    quickLog("Completing actionUsage");
+                    actionCompleted = true;
+
+                    boolean res = false;
+                    if (!res) res = completeActionInContextOfFormPropertyObject(propUsage);
+                    if (!res) res = completeActionInContextOfMappedPropertiesList(propUsage);
+                    if (!res) res = completeActionInFormContext(propUsage);
+                    if (!res) res = completeActionInNoContext(propUsage);
+                    if (!res) res = completeActionInModifyParamContext(propUsage);
+                    quickLog("Completed actionUsage");
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        private boolean completePropertyElseActionUsage() {
+            Frame propUsage = getLastFrameOfType(null, PROPERTY_ELSE_ACTION_USAGE);
+            if (propUsage != null) {
+                if (type.isProps() && !propertyElseActionCompleted) {
+                    quickLog("Completing propertyElseActionUsage");
+                    propertyElseActionCompleted = true;
+
+                    boolean res = false;
+                    if (!res) res = completePropertyElseActionInContextOfMappedPropertiesList(propUsage);
+                    if (!res) res = completePropertyElseActionInNoContext(propUsage);
+                    quickLog("Completed propertyElseActionUsage");
                 }
 
                 return true;
@@ -644,6 +688,22 @@ public class ASTCompletionContributor extends CompletionContributor {
             }
             return false;
         }
+        private boolean completeActionInNoContext(Frame propUsage) {
+            Frame frame = getLastFrameOfType(propUsage, NO_CONTEXT_ACTION_USAGE);
+            if (frame != null) {
+                completeActions(Collections.EMPTY_LIST, MAY_USE_ANY, true);
+                return true;
+            }
+            return false;
+        }
+        private boolean completePropertyElseActionInNoContext(Frame propUsage) {
+            Frame frame = getLastFrameOfType(propUsage, NO_CONTEXT_ACTION_OR_PROPERTY_USAGE);
+            if (frame != null) {
+                completePropertyElseActions(Collections.EMPTY_LIST, MAY_USE_ANY, true);
+                return true;
+            }
+            return false;
+        }
 
         private boolean completePropertyInModifyParamContext(Frame propUsage) {
             ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class);
@@ -653,18 +713,45 @@ public class ASTCompletionContributor extends CompletionContributor {
             }
             return false;
         }
+        private boolean completeActionInModifyParamContext(Frame propUsage) {
+            ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class);
+            if (psi != null) {
+                completeActions(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
+                return true;
+            }
+            return false;
+        }
 
         private boolean completePropertyInContextOfFormPropertyObject(Frame propUsage) {
-            Frame formMappedProperty = getLastFrameOfType(propUsage, FORM_CALC_PROPERTY_OBJECT, FORM_ACTION_PROPERTY_OBJECT);
+            Frame formMappedProperty = getLastFrameOfType(propUsage, FORM_CALC_PROPERTY_OBJECT);
             return formMappedProperty != null && completePropertyInFormContext(formMappedProperty);
         }
 
-        private boolean completePropertyInContextOfMappedPropertiesList(Frame propUsage) {
+        private boolean completeActionInContextOfFormPropertyObject(Frame propUsage) {
+            Frame formMappedProperty = getLastFrameOfType(propUsage, FORM_ACTION_PROPERTY_OBJECT);
+            return formMappedProperty != null && completeActionInFormContext(formMappedProperty);
+        }
+
+        private boolean completeActionInContextOfMappedPropertiesList(Frame propUsage) {
             Frame mappedPropertiesList = getLastFrameOfType(propUsage, FORM_MAPPED_NAME_PROPERTIES_LIST);
             if (mappedPropertiesList != null) {
                 LSFFormMappedNamePropertiesList psiMappedPropertiesList = getPsiOfTypeForFrame(mappedPropertiesList, LSFFormMappedNamePropertiesList.class);
                 if (psiMappedPropertiesList != null) {
-                    completeProperties(
+                    completeActions(
+                            resolveParamClasses(psiMappedPropertiesList),
+                            MUST_USE_ALL
+                    );
+                }
+                return true;
+            }
+            return false;
+        }
+        private boolean completePropertyElseActionInContextOfMappedPropertiesList(Frame propUsage) {
+            Frame mappedPropertiesList = getLastFrameOfType(propUsage, FORM_MAPPED_NAME_PROPERTIES_LIST);
+            if (mappedPropertiesList != null) {
+                LSFFormMappedNamePropertiesList psiMappedPropertiesList = getPsiOfTypeForFrame(mappedPropertiesList, LSFFormMappedNamePropertiesList.class);
+                if (psiMappedPropertiesList != null) {
+                    completePropertyElseActions(
                             resolveParamClasses(psiMappedPropertiesList),
                             MUST_USE_ALL
                     );
@@ -682,11 +769,26 @@ public class ASTCompletionContributor extends CompletionContributor {
             }
             return false;
         }
+        private boolean completeActionInFormContext(Frame propUsage) {
+            Frame formStatement = getLastFrameOfType(propUsage, FORM_STATEMENT);
+            if (formStatement != null) {
+                completeActionInContextOfFormStatement(formStatement);
+                return true;
+            }
+            return false;
+        }
 
         private void completePropertyInContextOfFormStatement(Frame startFrom) {
             LSFFormStatement psiFormStatement = getFormStatementPSI(startFrom);
             if (psiFormStatement != null) {
                 completeProperties(getContextClasses(psiFormStatement, true), MUST_USE_ANY);
+            }
+        }
+
+        private void completeActionInContextOfFormStatement(Frame startFrom) {
+            LSFFormStatement psiFormStatement = getFormStatementPSI(startFrom);
+            if (psiFormStatement != null) {
+                completeActions(getContextClasses(psiFormStatement, true), MUST_USE_ANY);
             }
         }
 
@@ -715,6 +817,12 @@ public class ASTCompletionContributor extends CompletionContributor {
 
         private void completeProperties(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy) {
             completeProperties(contextClasses, classUsagePolicy, false);
+        }
+        private void completeActions(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy) {
+            completeActions(contextClasses, classUsagePolicy, false);
+        }
+        private void completePropertyElseActions(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy) {
+            completePropertyElseActions(contextClasses, classUsagePolicy, false);
         }
         
         private void completeProperties(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy, boolean forceAll) {
@@ -762,17 +870,72 @@ public class ASTCompletionContributor extends CompletionContributor {
             }
         }
 
+        private void completeActions(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy, boolean forceAll) {
+            quickLog("After getContextClasses..");
+
+            String namespaceName = extractNamespace();
+
+            boolean isLight = type.isLight();
+            boolean isHeavy = type.isHeavy();
+
+            for (LSFClassSet classSet : contextClasses) {
+                if (classSet != null) {
+                    LSFValueClass valueClass = classSet.getCommonClass();
+                    if (valueClass != null) {
+                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getActionsApplicableToClass(valueClass, project, getRequireScope(), isLight, isHeavy));
+                    }
+                }
+            }
+
+            quickLog("After getDeclarationsFromScope..");
+
+            if ((!isBasicCompletion || forceAll) && !isLight) {
+                //search any other declarations
+                Collection<LSFActionStatement> globalDeclarations = getDeclarationsFromScope(project, getRequireScope(), ActionIndex.getInstance());
+                addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, globalDeclarations);
+            }
+        }
+
+        private void completePropertyElseActions(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy, boolean forceAll) {
+            quickLog("After getContextClasses..");
+
+            String namespaceName = extractNamespace();
+
+            boolean isLight = type.isLight();
+            boolean isHeavy = type.isHeavy();
+
+            for (LSFClassSet classSet : contextClasses) {
+                if (classSet != null) {
+                    LSFValueClass valueClass = classSet.getCommonClass();
+                    if (valueClass != null) {
+                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getActionsApplicableToClass(valueClass, project, getRequireScope(), isLight, isHeavy));
+                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, getRequireScope(), isLight, isHeavy));
+                    }
+                }
+            }
+
+            quickLog("After getDeclarationsFromScope..");
+
+            if ((!isBasicCompletion || forceAll) && !isLight) {
+                //search any other declarations
+                Collection<LSFInterfacePropStatement> globalDeclarations = new ArrayList<>(); 
+                globalDeclarations.addAll(getDeclarationsFromScope(project, getRequireScope(), PropIndex.getInstance()));
+                globalDeclarations.addAll(getDeclarationsFromScope(project, getRequireScope(), ActionIndex.getInstance()));
+                addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, globalDeclarations);
+            }
+        }
+
         private <G extends LSFInterfacePropStatement> void addDeclarationsToLookup(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy, String namespace, Collection<G> declarations) {
             boolean useAll = classUsagePolicy == MUST_USE_ALL;
 
             for (G declaration : declarations) {
 //                assert namespace == null || declaration instanceof LSFGlobalPropDeclaration; // неправильный
 
-                if (namespace != null && !(declaration instanceof LSFGlobalPropDeclaration && namespace.equals(((LSFGlobalPropDeclaration)declaration).getNamespaceName()))) {
+                if (namespace != null && !(declaration instanceof LSFActionOrGlobalPropDeclaration && namespace.equals(((LSFActionOrGlobalPropDeclaration)declaration).getNamespaceName()))) {
                     continue;
                 }
 
-                double priority = PROPERTY_PRIORITY;
+                double priority = declaration.isAction() ? ACTION_PRIORITY : PROPERTY_PRIORITY;
 
                 List<LSFClassSet> declClasses = declaration.resolveParamClasses();
                 if (declClasses != null) {
@@ -822,7 +985,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                                 createLookupElement(
                                         name, declaration.getLookupObject(),
                                         declaration.getParamPresentableText(),
-                                        declaration.getValuePresentableText(), declaration.getLSFFile().getName(),
+                                        declaration.isAction() ? "a" : "p", declaration.getValuePresentableText(), declaration.getLSFFile().getName(),
                                         declaration.getIcon(),
                                         priority
                                 ));

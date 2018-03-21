@@ -2,12 +2,13 @@ package com.lsfusion.lang.psi.declarations;
 
 import com.lsfusion.lang.psi.LSFDataPropertyDefinition;
 import com.lsfusion.lang.psi.LSFPropertyCalcStatement;
+import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlobalPropDeclaration, PropStubElement>, LSFPropDeclaration {
+public interface LSFGlobalPropDeclaration extends LSFActionOrGlobalPropDeclaration<LSFGlobalPropDeclaration, PropStubElement>, LSFPropDeclaration {
 
     @Nullable
     LSFDataPropertyDefinition getDataPropertyDefinition();
@@ -28,8 +29,6 @@ public interface LSFGlobalPropDeclaration extends LSFFullNameDeclaration<LSFGlob
     boolean isDataStoredProperty();
 
     boolean isUnfriendly();
-
-    List<String> resolveParamNames();
 
     boolean resolveDuplicateColumns();
 
