@@ -118,8 +118,8 @@ public class FormJavaReferenceContributor extends PsiReferenceContributor {
     private PsiReference[] resolveLogicsModuleMethodsRefs(PsiReferenceExpression methodExpression, PsiElement element, String elementText) {
         String methodName = methodExpression.getReferenceName();
         if (isOneOfStrings(methodName, GET_LCPBY_OLD_NAME, GET_LAPBY_OLD_NAME, GET_CLASS_BY_NAME)) {
-            boolean classRef = GET_CLASS_BY_NAME.equals(methodName);
-            return resolveModuleMethodsRef(methodExpression, element, elementText, classRef, true);
+            JavaReferenceType refType = GET_CLASS_BY_NAME.equals(methodName) ? JavaReferenceType.CLASS : (GET_LCPBY_OLD_NAME.equals(methodName) ? JavaReferenceType.PROPERTY : JavaReferenceType.ACTION);
+            return resolveModuleMethodsRef(methodExpression, element, elementText, refType, true);
         }
         return null;
     }
@@ -127,18 +127,18 @@ public class FormJavaReferenceContributor extends PsiReferenceContributor {
     private PsiReference[] resolveScriptingLogicsModuleMethodsRefs(PsiReferenceExpression methodExpression, PsiElement element, String elementText) {
         String methodName = methodExpression.getReferenceName();
         if (isOneOfStrings(methodName, FIND_LCPBY_COMPOUND_OLD_NAME, FIND_LAPBY_COMPOUND_OLD_NAME, FIND_CLASS_BY_COMPOUND_NAME)) {
-            boolean classRef = FIND_CLASS_BY_COMPOUND_NAME.equals(methodName);
-            return resolveModuleMethodsRef(methodExpression, element, elementText, classRef, false);
+            JavaReferenceType refType = FIND_CLASS_BY_COMPOUND_NAME.equals(methodName) ? JavaReferenceType.CLASS : (FIND_LCPBY_COMPOUND_OLD_NAME.equals(methodName) ? JavaReferenceType.PROPERTY : JavaReferenceType.ACTION);
+            return resolveModuleMethodsRef(methodExpression, element, elementText, refType, false);
         }
         return null;
     }
 
-    private PsiReference[] resolveModuleMethodsRef(PsiReferenceExpression methodExpression, PsiElement element, String elementText, boolean classRef, boolean onlyModule) {
+    private PsiReference[] resolveModuleMethodsRef(PsiReferenceExpression methodExpression, PsiElement element, String elementText, JavaReferenceType refType, boolean onlyModule) {
         if (hasScriptingActionPropertyLMQualifier(methodExpression)) {
-            return referenceFromScriptingActionProperty(methodExpression, element, elementText, classRef, onlyModule);
+            return referenceFromScriptingActionProperty(methodExpression, element, elementText, refType, onlyModule);
         }
         String moduleName = getModuleName(methodExpression);
-        return javaOrPropertyReference(element, elementText, classRef, moduleName, onlyModule);
+        return javaOrPropertyReference(element, elementText, refType, moduleName, onlyModule);
     }
 
     private String getModuleName(PsiReferenceExpression methodExpression) {
@@ -275,22 +275,23 @@ public class FormJavaReferenceContributor extends PsiReferenceContributor {
         if (isOneOfStrings(methodName, GET_LAP, GET_LCP, GET_CLASS)) {
             PsiElement qualifier = methodExpression.getQualifier();
             if (qualifier == null) {
-                return referenceFromScriptingActionProperty(methodExpression, element, elementText, GET_CLASS.equals(methodName), false);
+                JavaReferenceType refType = GET_CLASS.equals(methodName) ? JavaReferenceType.CLASS : (GET_LCP.equals(methodName) ? JavaReferenceType.PROPERTY : JavaReferenceType.ACTION);
+                return referenceFromScriptingActionProperty(methodExpression, element, elementText, refType, false);
             }
         }
         return null;
     }
 
-    private PsiReference[] referenceFromScriptingActionProperty(PsiReferenceExpression methodExpression, PsiElement element, String elementText, boolean classRef, boolean onlyModule) {
+    private PsiReference[] referenceFromScriptingActionProperty(PsiReferenceExpression methodExpression, PsiElement element, String elementText, JavaReferenceType refType, boolean onlyModule) {
         //прямой вызов getLAP, getLCP => ищем модуль, в котором инстанцируется данный класс
         PsiClass clazz = PsiTreeUtil.getParentOfType(methodExpression, PsiClass.class);
         if (clazz != null) {
-            return javaOrPropertyReference(element, elementText, classRef, getModuleForActionClass(clazz), onlyModule);
+            return javaOrPropertyReference(element, elementText, refType, getModuleForActionClass(clazz), onlyModule);
         }
         return null;
     }
 
-    private PsiReference[] javaOrPropertyReference(PsiElement element, String elementText, boolean classRef, String moduleName, boolean onlyModule) {
+    private PsiReference[] javaOrPropertyReference(PsiElement element, String elementText, JavaReferenceType referenceType, String moduleName, boolean onlyModule) {
         String namespaceName;
         TextRange textRange;
         if (!onlyModule && elementText.contains(".")) {
@@ -302,9 +303,15 @@ public class FormJavaReferenceContributor extends PsiReferenceContributor {
             textRange = new TextRange(1, elementText.length() + 1);
         }
 
-        return classRef
-               ? new PsiReference[]{new FromJavaClassReference(element, textRange, moduleName, namespaceName, !onlyModule)}
-               : new PsiReference[]{new FromJavaPropertyReference(element, textRange, moduleName, namespaceName, !onlyModule)};
+        switch (referenceType) {
+            case CLASS:
+                return new PsiReference[]{new FromJavaClassReference(element, textRange, moduleName, namespaceName, !onlyModule)};
+            case PROPERTY:
+                return new PsiReference[]{new FromJavaPropertyReference(element, textRange, moduleName, namespaceName, !onlyModule)};
+            case ACTION:
+                return new PsiReference[]{new FromJavaActionReference(element, textRange, moduleName, namespaceName, !onlyModule)};
+        }
+        throw new UnsupportedOperationException();
     }
 
     private String getModuleForActionClass(@NotNull PsiClass clazz) {

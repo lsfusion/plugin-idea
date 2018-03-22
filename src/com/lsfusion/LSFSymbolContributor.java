@@ -43,6 +43,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
         indices.add(ExplicitNamespaceIndex.getInstance());
         indices.add(MetaIndex.getInstance());
         indices.add(PropIndex.getInstance());
+        indices.add(ActionIndex.getInstance());
         indices.add(FormIndex.getInstance());
         indices.add(GroupIndex.getInstance());
         indices.add(TableIndex.getInstance());
@@ -95,7 +96,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
 
     @Override
     protected Collection<NavigationItem> getItemsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {
-        if (index instanceof PropIndex) {
+        if (index instanceof ActionOrPropIndex) {
             List<NavigationItem> decls = getPropertyDeclarationsMap(name, false);
             return decls != null
                    ? decls
