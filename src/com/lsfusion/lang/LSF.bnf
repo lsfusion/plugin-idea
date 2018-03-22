@@ -860,7 +860,7 @@ formEmailToObjects ::= formUsage formActionObjectList?
     methods = [resolveFormDecl]
 }
 
-confirmActionPropertyDefinitionBody ::= (CONFIRM | ASK) propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody
+confirmActionPropertyDefinitionBody ::= ASK propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression,com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendInputParamContext"
