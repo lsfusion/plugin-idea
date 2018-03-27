@@ -5,6 +5,7 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFNavigatorElementDeclaration;
+import com.lsfusion.lang.psi.references.LSFFormElseNoParamsActionReference;
 import com.lsfusion.lang.psi.stubs.NavigatorElementStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -36,9 +37,12 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
                 if (form != null) {
                     result = form.getSimpleName();
                 } else {
-                    LSFNoContextActionUsage action = descr.getNoContextActionUsage();
+                    LSFNoParamsActionUsage action = descr.getNoParamsActionUsage();
                     if (action != null) {
                         result = action.getActionUsage().getSimpleName();
+                    } else {
+                        LSFFormElseNoParamsActionUsage formOrAction = descr.getFormElseNoParamsActionUsage();
+                        result = formOrAction.getSimpleName();
                     }
                 }
             }

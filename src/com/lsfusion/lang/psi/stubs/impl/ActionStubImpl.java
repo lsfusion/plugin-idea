@@ -11,7 +11,7 @@ import com.lsfusion.lang.psi.stubs.types.PropStubElementType;
 
 import java.io.IOException;
 
-public class ActionStubImpl extends FullNameStubImpl<ActionStubElement, LSFActionDeclaration> implements ActionStubElement {
+public class ActionStubImpl extends ActionOrPropStubImpl<ActionStubElement, LSFActionDeclaration> implements ActionStubElement {
 
     public ActionStubImpl(StubElement parent, LSFActionDeclaration psi) {
         super(parent, psi);

@@ -93,6 +93,17 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
         return finishParamClasses(this);
     }
 
+    @Override
+    public boolean isNoParams() {
+        Stub stub = getStub();
+        if(stub != null)
+            return stub.isNoParams();
+
+        LSFExplicitClasses explicitParams = getExplicitParams();
+        if(explicitParams instanceof LSFExplicitSignature)
+            return ((LSFExplicitSignature) explicitParams).isNoParams();
+        return false;
+    }
 
     public abstract LSFPropertyDeclaration getPropertyDeclaration();
 

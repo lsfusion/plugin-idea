@@ -88,6 +88,11 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
         return LSFActionOrGlobalPropDeclarationImpl.finishParamClasses(this);
     }
 
+    @Override
+    public boolean isNoParams() {
+        return resolveParamClasses().isEmpty();
+    }
+
     public LSFClassSet resolveValueClass() {
         return LSFGlobalPropDeclarationImpl.finishValueClass(this);
     }

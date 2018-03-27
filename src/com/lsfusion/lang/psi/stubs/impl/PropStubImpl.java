@@ -8,7 +8,7 @@ import com.lsfusion.lang.psi.stubs.types.PropStubElementType;
 
 import java.io.IOException;
 
-public class PropStubImpl extends FullNameStubImpl<PropStubElement, LSFGlobalPropDeclaration> implements PropStubElement {
+public class PropStubImpl extends ActionOrPropStubImpl<PropStubElement, LSFGlobalPropDeclaration> implements PropStubElement {
 
     public PropStubImpl(StubElement parent, LSFGlobalPropDeclaration psi) {
         super(parent, psi);

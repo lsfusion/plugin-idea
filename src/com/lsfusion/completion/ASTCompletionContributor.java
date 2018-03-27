@@ -271,6 +271,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         boolean propertyCompleted = false;
         boolean actionCompleted = false;
         boolean propertyElseActionCompleted = false;
+        boolean formElseNoParamsActionCompleted = false;
         final ExecType type;
 
         private static final double NAMESPACE_PRIORITY = 1.5;
@@ -385,6 +386,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (!res) res = completePropertyUsage();
                 if (!res) res = completeActionUsage();
                 if (!res) res = completePropertyElseActionUsage();
+                if (!res) res = completeFormElseNoParamsActionUsage();
                 if (!res) res = completeDesignProperties();
             } catch (ProcessCanceledException pce) {
                 LOGGER.debug("ProcessCanceledException while filling ID completion variants ", pce);
@@ -669,6 +671,31 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
+        private boolean completeFormElseNoParamsActionUsage() {
+            Frame propUsage = getLastFrameOfType(null, FORM_ELSE_NO_PARAMS_ACTION_USAGE);
+            if (propUsage != null) {
+                if (type.isProps() && !formElseNoParamsActionCompleted) {
+                    quickLog("Completing formElseNoParamsActionUsage");
+                    formElseNoParamsActionCompleted = true;
+
+                    String namespaceName = extractNamespace();
+
+                    GlobalSearchScope scope = getRequireScope();
+                    addLookupElements(
+                            getVariantsFromIndices(namespaceName, file, asList(FormIndex.getInstance()), FORM_PRIORITY, scope)
+                    );
+
+                    Collection<LSFActionDeclaration> globalDeclarations = getDeclarationsFromScope(project, scope, ActionIndex.getInstance());
+                    addDeclarationsToLookup(new ArrayList<>(), null, namespaceName, globalDeclarations);
+
+                    quickLog("Completed formElseNoParamsActionUsage");
+                }
+
+                return true;
+            }
+            return false;
+        }
+
         private boolean completeDesignProperties() {
             Frame frame = getLastFrameOfType(null, DESIGN_STATEMENT);
             if (frame != null) {
@@ -926,52 +953,56 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private <G extends LSFInterfacePropStatement> void addDeclarationsToLookup(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy, String namespace, Collection<G> declarations) {
-            boolean useAll = classUsagePolicy == MUST_USE_ALL;
 
             for (G declaration : declarations) {
 //                assert namespace == null || declaration instanceof LSFGlobalPropDeclaration; // неправильный
 
-                if (namespace != null && !(declaration instanceof LSFActionOrGlobalPropDeclaration && namespace.equals(((LSFActionOrGlobalPropDeclaration)declaration).getNamespaceName()))) {
+                if (namespace != null && !(declaration instanceof LSFActionOrGlobalPropDeclaration && namespace.equals(((LSFActionOrGlobalPropDeclaration) declaration).getNamespaceName()))) {
                     continue;
                 }
 
                 double priority = declaration.isAction() ? ACTION_PRIORITY : PROPERTY_PRIORITY;
 
-                List<LSFClassSet> declClasses = declaration.resolveParamClasses();
-                if (declClasses != null) {
-                    if (useAll) {
-                        if (declClasses.size() != contextClasses.size()) {
-                            priority = -1;
-                        } else {
-                            for (int i = 0; i < declClasses.size(); ++i) {
-                                LSFClassSet declClass = declClasses.get(i);
-                                LSFClassSet contextClass = contextClasses.get(i);
+                if (contextClasses.isEmpty()) { // оптимизация для noParamsUsage (formElseNoParamsContextUsage например), при isNoParams все достается из stub'а без парсинга
+                    if(!declaration.isNoParams())
+                        priority = -1;
+                } else {
+                    List<LSFClassSet> declClasses = declaration.resolveParamClasses();
+                    if (declClasses != null) {
+                        if (classUsagePolicy == MUST_USE_ALL) {
+                            if (declClasses.size() != contextClasses.size()) {
+                                priority = -1;
+                            } else {
+                                for (int i = 0; i < declClasses.size(); ++i) {
+                                    LSFClassSet declClass = declClasses.get(i);
+                                    LSFClassSet contextClass = contextClasses.get(i);
 
-                                if (declClass != null && contextClass != null && !declClass.containsAll(contextClass, true)) {
-                                    priority = -1;
-                                    break;
-                                }
-                            }
-                            if(priority != -1)
-                                priority += declClasses.size();
-                        }
-                    } else {
-                        for (LSFClassSet declClass : declClasses) {
-                            if (declClass != null) {
-                                boolean foundInContext = false;
-                                for(LSFClassSet contextClass : contextClasses) {
-                                    if(declClass.containsAll(contextClass, true)) {
-                                        foundInContext = true;
+                                    if (declClass != null && contextClass != null && !declClass.containsAll(contextClass, true)) {
+                                        priority = -1;
                                         break;
                                     }
                                 }
-                                
-                                if (foundInContext) {
-                                    priority++;
-                                } else {
-                                    if (classUsagePolicy == MUST_USE_ANY) {
-                                        priority = -1;
-                                        break;
+                                if (priority != -1)
+                                    priority += declClasses.size();
+                            }
+                        } else {
+                            for (LSFClassSet declClass : declClasses) {
+                                if (declClass != null) {
+                                    boolean foundInContext = false;
+                                    for (LSFClassSet contextClass : contextClasses) {
+                                        if (declClass.containsAll(contextClass, true)) {
+                                            foundInContext = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (foundInContext) {
+                                        priority++;
+                                    } else {
+                                        if (classUsagePolicy == MUST_USE_ANY) {
+                                            priority = -1;
+                                            break;
+                                        }
                                     }
                                 }
                             }

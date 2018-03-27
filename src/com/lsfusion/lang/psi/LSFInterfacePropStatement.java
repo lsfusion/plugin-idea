@@ -10,6 +10,8 @@ import java.util.List;
 public interface LSFInterfacePropStatement extends PsiElement {
 
     List<LSFClassSet> resolveParamClasses();
+    
+    boolean isNoParams();
 
     String getName();
 

@@ -105,7 +105,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitFormPropertyDrawUsage(o);
         checkReference(o);
     }
-    
+
+    @Override
+    public void visitFormElseNoParamsActionReference(@NotNull LSFFormElseNoParamsActionReference o) {
+        super.visitFormElseNoParamsActionReference(o);
+        checkReference(o);
+    }
+
     @Override
     public void visitComponentUsage(@NotNull LSFComponentUsage o) {
         super.visitComponentUsage(o);
@@ -302,12 +308,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                         List<LSFClassSet> exprParams = new ArrayList<>();
                         LSFPropertyDeclParams propertyDeclParams = o.getPropertyDeclaration().getPropertyDeclParams();
                         if (propertyDeclParams != null) {
-                            LSFNonEmptyClassParamDeclareList classParamDeclareList = propertyDeclParams.getClassParamDeclareList().getNonEmptyClassParamDeclareList();
-                            if (classParamDeclareList != null) {
-                                for (LSFClassParamDeclare classParamDeclare : classParamDeclareList.getClassParamDeclareList()) {
-                                    exprParams.add(classParamDeclare.resolveClass());
-                                }
-                            }
+                            for(LSFParamDeclaration param : LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList()))
+                                exprParams.add(param != null ? param.resolveClass() : null);
                         }
 
                         if (exprParams.size() == groupByParams.size()) {

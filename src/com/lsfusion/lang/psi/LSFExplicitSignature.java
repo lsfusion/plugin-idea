@@ -19,6 +19,10 @@ public class LSFExplicitSignature extends LSFExplicitClasses {
         this.signature = signature;
     }
 
+    public boolean isNoParams() {
+        return signature.isEmpty();
+    }
+    
     @NotNull
     @Override
     public Set<String> getIndexedClasses() {

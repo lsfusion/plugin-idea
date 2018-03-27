@@ -72,6 +72,17 @@ public abstract class LSFExplicitInterfaceActionOrPropStatementImpl<Stub extends
     }
 
     @Override
+    public boolean isNoParams() {
+        LSFExplicitClasses explicitParams = getExplicitParams();
+        if(explicitParams instanceof LSFExplicitSignature) {
+            return ((LSFExplicitSignature) explicitParams).isNoParams();
+        }
+
+        assert false; // по идее не должно заходить, только isLight
+        return resolveParamClasses().isEmpty();
+    }
+
+    @Override
     public String getParamPresentableText() {
         LSFExplicitClasses paramExplicitClasses = getExplicitParams();
         if(paramExplicitClasses instanceof LSFExplicitSignature)

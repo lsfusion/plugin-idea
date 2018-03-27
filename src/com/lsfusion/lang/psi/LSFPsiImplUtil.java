@@ -2138,14 +2138,9 @@ public class LSFPsiImplUtil {
     @Nullable
     public static List<LSFParamDeclaration> resolveParamDecls(@NotNull LSFPropertyDeclaration propertyDeclaration) {
         List<LSFParamDeclaration> result = null;
-        if (propertyDeclaration.getPropertyDeclParams() != null) {
-            LSFNonEmptyClassParamDeclareList paramDeclareList = propertyDeclaration.getPropertyDeclParams().getClassParamDeclareList().getNonEmptyClassParamDeclareList();
-            if (paramDeclareList != null) {
-                result = new ArrayList<>();
-                for (LSFClassParamDeclare paramDeclare : paramDeclareList.getClassParamDeclareList())
-                    result.add(paramDeclare.getParamDeclare());
-            }
-        }
+        LSFPropertyDeclParams propertyDeclParams = propertyDeclaration.getPropertyDeclParams();
+        if (propertyDeclParams != null)
+            return resolveParams(propertyDeclParams.getClassParamDeclareList());
         return result;
     }
 
@@ -2278,9 +2273,17 @@ public class LSFPsiImplUtil {
         return null;
     }
 
+    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFNoParamsPropertyUsage sourceStatement) {
+        return new ArrayList<>();
+    }
+
     @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFNoContextActionUsage sourceStatement) {
         return null;
+    }
+
+    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFNoParamsActionUsage sourceStatement) {
+        return new ArrayList<>();
     }
 
     @Nullable
@@ -2312,7 +2315,17 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static PsiElement getParamList(@NotNull LSFNoParamsPropertyUsage sourceStatement) {
+        return null;
+    }
+
+    @Nullable
     public static PsiElement getParamList(@NotNull LSFNoContextActionUsage sourceStatement) {
+        return null;
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFNoParamsActionUsage sourceStatement) {
         return null;
     }
 

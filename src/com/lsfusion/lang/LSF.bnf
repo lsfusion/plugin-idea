@@ -461,6 +461,10 @@ noContextActionUsage ::= actionUsage
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 noContextActionOrPropertyUsage ::= actionOrPropertyUsage
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
+noParamsPropertyUsage ::= propertyUsage
+{implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
+noParamsActionUsage ::= actionUsage
+{implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 
 dataPropertyDefinition ::= DATA (dataPropertySessionModifier)? className (LBRAC classNameList RBRAC)
@@ -729,7 +733,7 @@ doMainBody ::= DO actionPropertyDefinitionBody
 syncTypeLiteral ::= WAIT | NOWAIT
 windowTypeLiteral ::= FLOAT | DOCKED
 
-staticDestination ::= TO propertyUsage
+staticDestination ::= TO noParamsPropertyUsage
 
 printActionPropertyDefinitionBody ::=
 	    PRINT mappedForm
@@ -805,7 +809,7 @@ customActionPropertyDefinitionBody ::= CUSTOM ((javaClassStringUsage (LBRAC clas
     methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
-externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyPropertyExpressionList)? (TO nonEmptyPropertyUsageList)?
+externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyPropertyExpressionList)? (TO nonEmptyNoParamsPropertyUsageList)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -920,7 +924,7 @@ evalActionPropertyDefinitionBody ::= EVAL propertyExpression (PARAMS propertyExp
     methods = [inferActionParamClasses]
 }
 
-readActionPropertyDefinitionBody ::= READ CLIENT? propertyExpression TO propertyUsage ((MOVE propertyExpression) | (DELETE))?
+readActionPropertyDefinitionBody ::= READ CLIENT? propertyExpression TO noParamsPropertyUsage ((MOVE propertyExpression) | (DELETE))?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1658,9 +1662,10 @@ newNavigatorElementStatement ::= NEW navigatorElementDescription navigatorElemen
 }
 
 private folderElementDescription ::= FOLDER simpleName localizedStringLiteral? { pin = 2 }
-navigatorElementDescription ::= (   ACTION (simpleName? localizedStringLiteral? EQUALS)? noContextActionUsage
+navigatorElementDescription ::= (   ACTION (simpleName? localizedStringLiteral? EQUALS)? noParamsActionUsage
+                                |   FORM (simpleName? localizedStringLiteral? EQUALS)? formUsage
                                 |   folderElementDescription
-                                |   FORM? (simpleName? localizedStringLiteral? EQUALS)? formUsage
+                                |   (simpleName? localizedStringLiteral? EQUALS)? formElseNoParamsActionUsage
                                 )
  
 setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
@@ -1899,6 +1904,7 @@ nonEmptyClassNameList ::= className (COMMA className)* { pin(".*") = 1}
 
 nonEmptyPropertyUsageList ::= propertyUsage (COMMA propertyUsage)*  { pin(".*") = 1}
 
+nonEmptyNoParamsPropertyUsageList ::= noParamsPropertyUsage (COMMA noParamsPropertyUsage)*  { pin(".*") = 1}
 nonEmptyNoContextPropertyUsageList ::= noContextPropertyUsage (COMMA noContextPropertyUsage)*  { pin(".*") = 1}
 nonEmptyNoContextActionUsageList ::= noContextActionUsage (COMMA noContextActionUsage)*  { pin(".*") = 1}
 
@@ -1986,6 +1992,9 @@ groupUsage ::= compoundID
 
 formUsage ::= compoundID
 {mixin="com.lsfusion.lang.psi.references.impl.LSFFormReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFFormReference"}
+
+formElseNoParamsActionUsage ::= compoundID
+{mixin="com.lsfusion.lang.psi.references.impl.LSFFormElseNoParamsActionReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFFormElseNoParamsActionReference"}
 
 windowUsage ::= compoundID
 {mixin="com.lsfusion.lang.psi.references.impl.LSFWindowReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFWindowReference"}

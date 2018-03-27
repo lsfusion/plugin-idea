@@ -33,7 +33,7 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
     }
 
     protected FullNameStubElementType<?, LSFGlobalPropDeclaration> getStubElementType() {
-        return LSFStubElementTypes.PROP; // по умолчанию ищем сво2ства
+        return LSFStubElementTypes.PROP; // по умолчанию ищем свойства
     }
 
     @Override
