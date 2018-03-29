@@ -505,9 +505,8 @@ formulaPropertySyntaxType ::= (PG | MS)?
 groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | EQUAL | LAST | NAGGR
 groupPropertyBy ::= BY nonEmptyPropertyExpressionList;
 orderPropertyBy ::= ORDER (DESC)? nonEmptyPropertyExpressionList 
-groupPropertyDefinition ::= GROUP groupingType
+groupPropertyDefinition ::= GROUP groupPropertyBy? groupingType
 		                    nonEmptyPropertyExpressionList
-		                    (groupPropertyBy)?
 		                    (orderPropertyBy)?
 		                    (WHERE propertyExpression)?
 {

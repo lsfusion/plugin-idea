@@ -83,6 +83,10 @@ public class LSFParserDefinition implements ParserDefinition {
         return WHITE_SPACES.contains(type) || COMMENTS.contains(type);
     }
 
+    public static boolean isComment(IElementType type) {
+        return COMMENTS.contains(type);
+    }
+
     @NotNull
     @Override
     public Lexer createLexer(Project project) {

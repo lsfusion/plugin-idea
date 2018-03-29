@@ -303,8 +303,8 @@ public class MetaTransaction {
 
             if(nextOpt.size() == needed.size()) { // подошел
                 opts.add(new Option<>(BaseUtils.add(commonTokens, needed), needSd ? ift : ift + 1, needSd ? isd + 1 : isd));
-                if(opts.size() > 100000)
-                    opts = opts;
+                if(opts.size() > 10000)
+                    return;
             } else {
                 if(nextOpt.size() > needed.size()) { // ищем в противоположном списке
                     findNextOpts(nextOpt.subList(needed.size(), nextOpt.size()), !needSd, first, second, needSd ? ift : ift + 1, needSd ? isd + 1 : isd, BaseUtils.add(commonTokens, needed), opts);

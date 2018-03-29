@@ -179,10 +179,10 @@ public class LSFPsiImplUtil {
 
     private static List<LSFPropertyExpression> getContextExprs(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         List<LSFPropertyExpression> result = new ArrayList<>();
-        result.addAll(sourceStatement.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
         LSFGroupPropertyBy by = sourceStatement.getGroupPropertyBy();
         if (by != null)
             result.addAll(by.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
+        result.addAll(sourceStatement.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
         LSFOrderPropertyBy orderBy = sourceStatement.getOrderPropertyBy();
         if (orderBy != null)
             result.addAll(orderBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
