@@ -2435,12 +2435,18 @@ public class LSFPsiImplUtil {
     public static List<LSFClassSet> resolveParamClasses(LSFImportPropertyUsage sourceStatement) {
 
         LSFImportActionPropertyDefinitionBody importDB = PsiTreeUtil.getParentOfType(sourceStatement, LSFImportActionPropertyDefinitionBody.class);
-        if(importDB != null) {
+        if (importDB != null) {
             LSFImportActionSourceType sourceType = importDB.getImportActionSourceType();
-            if(sourceType != null) {
+            if (sourceType != null) {
                 String importType = sourceType.getText();
-                if (importType != null && importType.contains("XML") && importType.contains("LIST"))
-                    return Collections.emptyList();
+                if (importType != null) {
+                    LSFPropertyExpression pe = sourceType.getPropertyExpression();
+                    if (pe != null) {
+                        importType = importType.replace(pe.getText(), "");
+                        if ((importType.contains("XML") || importType.contains("JSON")) && importType.contains("LIST"))
+                            return Collections.emptyList();
+                    }
+                }
             }
         }
         return Collections.singletonList(IntegerClass.instance);
