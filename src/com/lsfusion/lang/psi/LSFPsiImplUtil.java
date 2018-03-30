@@ -2441,11 +2441,10 @@ public class LSFPsiImplUtil {
                 String importType = sourceType.getText();
                 if (importType != null) {
                     LSFPropertyExpression pe = sourceType.getPropertyExpression();
-                    if (pe != null) {
+                    if (pe != null)
                         importType = importType.replace(pe.getText(), "");
-                        if ((importType.contains("XML") || importType.contains("JSON")) && importType.contains("LIST"))
-                            return Collections.emptyList();
-                    }
+                    if ((importType.contains("XML") || importType.contains("JSON")) && importType.contains("LIST"))
+                        return Collections.emptyList();
                 }
             }
         }
