@@ -403,13 +403,14 @@ multiPropertyDefinition ::= MULTI (exclusiveOverrideOption)? nonEmptyPropertyExp
 
 partitionPropertyBy ::= BY nonEmptyPropertyExpressionList
 partitionPropertyDefinition ::= PARTITION
+                                (partitionPropertyBy)?
                                 (   (SUM | PREV)
                                 |   UNGROUP propertyUsage
                                     (   PROPORTION (STRICT)? ROUND LBRAC LEX_UINT_LITERAL RBRAC
                                     |   LIMIT (STRICT)?
                                     )
                                 )
-                                propertyExpression (partitionPropertyBy)?
+                                propertyExpression
                                 (ORDER (DESC )? nonEmptyPropertyExpressionList)?
                                 (WINDOW EXCEPTLAST)?
 {
@@ -937,7 +938,7 @@ writeActionPropertyDefinitionBody ::= WRITE ((CLIENT DIALOG? propertyExpression?
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT importActionSourceType? TO nonEmptyImportPropertyUsageListWithIds FROM propertyExpression (WHERE propertyExpression)?
+importActionPropertyDefinitionBody ::= IMPORT importActionSourceType? FROM propertyExpression TO nonEmptyImportPropertyUsageListWithIds (WHERE propertyExpression)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
