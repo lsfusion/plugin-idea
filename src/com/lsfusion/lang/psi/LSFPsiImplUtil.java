@@ -31,7 +31,7 @@ import static java.util.Collections.singletonList;
 @SuppressWarnings("UnusedParameters")
 public class LSFPsiImplUtil {
 
-    public static ContextModifier getContextAPModifier(@Nullable LSFPropertyCalcStatement calcStatement, @Nullable LSFActionUnfriendlyPD actionUnfriendlyPD, LSFListActionPropertyDefinitionBody listAction) {
+    public static ContextModifier getContextAPModifier(@Nullable LSFPropertyCalcStatement calcStatement) {
         if(calcStatement != null) {
             LSFPropertyExpression expression = calcStatement.getPropertyExpression();
             if (expression != null)
@@ -41,7 +41,7 @@ public class LSFPsiImplUtil {
         return ContextModifier.EMPTY;
     }
     
-    public static ContextInferrer getContextAPInferrer(@Nullable LSFPropertyCalcStatement calcStatement, @Nullable LSFActionUnfriendlyPD actionStatement, LSFListActionPropertyDefinitionBody body) {
+    public static ContextInferrer getContextAPInferrer(@Nullable LSFPropertyCalcStatement calcStatement) {
         if(calcStatement != null) {
             LSFPropertyExpression expression = calcStatement.getPropertyExpression();
             if (expression != null)
@@ -57,11 +57,12 @@ public class LSFPsiImplUtil {
             return new ExplicitContextModifier(decl.getClassParamDeclareList());
         return null; 
     }
+    // кривовато с unfriendly но пока непонятно как по другому
     public static ContextModifier getContextModifier(@NotNull LSFPropertyStatement sourceStatement) {
         ExplicitContextModifier explicitModifier = getExplicitContextModifier(sourceStatement);
         if(explicitModifier != null)
             return explicitModifier;
-        return getContextAPModifier(sourceStatement.getPropertyCalcStatement(), null, null);
+        return getContextAPModifier(sourceStatement.getPropertyCalcStatement());
     }
     public static ContextModifier getContextModifier(@NotNull LSFActionStatement sourceStatement) {
         ExplicitContextModifier explicitModifier = getExplicitContextModifier(sourceStatement);
@@ -69,15 +70,26 @@ public class LSFPsiImplUtil {
             return explicitModifier;
         return ContextModifier.EMPTY;
     }
+    // кривовато с unfriendly но пока непонятно как по другому
+    public static ContextModifier getContextModifier(@NotNull LSFPropertyStatementBody body) {
+        LSFPropertyStatement statement = PsiTreeUtil.getParentOfType(body, LSFPropertyStatement.class);
+        ExplicitContextModifier explicitModifier = statement.isUnfriendly() ? null : getExplicitContextModifier(statement);
+        if(explicitModifier != null)
+            return explicitModifier;
+        return getContextAPModifier(body.getPropertyCalcStatement());
+    }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFPropertyStatement sourceStatement) {
-        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement(), null, null);
+        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement());
     }
     public static ContextInferrer getContextInferrer(@NotNull LSFActionStatement sourceStatement) {
         LSFListActionPropertyDefinitionBody body = sourceStatement.getListActionPropertyDefinitionBody();
         if(body != null)
             return new ActionInferrer(body);
         return ContextInferrer.EMPTY;
+    }
+    public static ContextInferrer getContextInferrer(@NotNull LSFPropertyStatementBody sourceStatement) {
+        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement());
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFOverridePropertyStatement sourceStatement) {
@@ -177,11 +189,10 @@ public class LSFPsiImplUtil {
         return new MappedActionContextInferrer(decl);
     }
 
-    private static List<LSFPropertyExpression> getContextExprs(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+    private static List<LSFPropertyExpression> getContextExprs(@NotNull LSFGroupPropertyBody sourceStatement) {
+        if(sourceStatement == null)
+            return Collections.emptyList();
         List<LSFPropertyExpression> result = new ArrayList<>();
-        LSFGroupPropertyBy by = sourceStatement.getGroupPropertyBy();
-        if (by != null)
-            result.addAll(by.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
         result.addAll(sourceStatement.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
         LSFOrderPropertyBy orderBy = sourceStatement.getOrderPropertyBy();
         if (orderBy != null)
@@ -189,6 +200,15 @@ public class LSFPsiImplUtil {
         LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
         if (pe != null)
             result.add(pe);
+        return result;
+    }
+
+    public static List<LSFPropertyExpression> getContextExprs(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+        List<LSFPropertyExpression> result = new ArrayList<>();
+        LSFGroupPropertyBy by = sourceStatement.getGroupPropertyBy();
+        if (by != null)
+            result.addAll(by.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
+        result.addAll(getContextExprs(sourceStatement.getGroupPropertyBody()));
         return result;
     }
 
@@ -200,12 +220,20 @@ public class LSFPsiImplUtil {
         return new ExprsContextInferrer(getContextExprs(sourceStatement));
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFGroupExprPropertyDefinition sourceStatement) {
+        return new ExprsContextModifier(getContextExprs(sourceStatement.getGroupPropertyBody()));
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFGroupExprPropertyDefinition sourceStatement) {
+        return new ExprsContextInferrer(getContextExprs(sourceStatement.getGroupPropertyBody()));
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFPropertyExprObject sourceStatement) {
-        return getContextAPModifier(sourceStatement.getPropertyCalcStatement(), null, null); // sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
+        return getContextAPModifier(sourceStatement.getPropertyCalcStatement()); // sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFPropertyExprObject sourceStatement) {
-        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement(), null, null); //sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
+        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement()); //sourceStatement.getActionUnfriendlyPD(), sourceStatement.getListActionPropertyDefinitionBody());
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFForActionPropertyMainBody sourceStatement) {
@@ -1141,11 +1169,23 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFGroupPropertyDefinition sourceStatement, boolean infer) {
-        LSFExClassSet lsfExClassSet = resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), infer ? inferGroupParamClasses(sourceStatement) : null);
-        LSFGroupingType groupingType = sourceStatement.getGroupingType();
-        if(lsfExClassSet != null && groupingType.getText().equals("CONCAT"))
-            lsfExClassSet = lsfExClassSet.extend(10);
+        return resolveInferredValueClass(sourceStatement.getGroupPropertyBody(), infer ? inferGroupParamClasses(sourceStatement) : null);
+    }
+
+    public static LSFExClassSet resolveInferredValueClass(LSFGroupPropertyBody body, InferExResult inferred) {
+        LSFExClassSet lsfExClassSet = null;
+        if(body != null) {
+            lsfExClassSet = resolveInferredValueClass(body.getNonEmptyPropertyExpressionList(), inferred);
+            LSFGroupingType groupingType = body.getGroupingType();
+            if (lsfExClassSet != null && groupingType.getText().equals("CONCAT"))
+                lsfExClassSet = lsfExClassSet.extend(10);
+        }
         return lsfExClassSet;
+    }
+
+    @Nullable
+    public static LSFExClassSet resolveInferredValueClass(LSFGroupExprPropertyDefinition groupDef, InferExResult inferred) {
+        return resolveInferredValueClass(groupDef.getGroupPropertyBody(), inferred);
     }
 
     @Nullable
@@ -1380,7 +1420,17 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFGroupPropertyDefinition sourceStatement) {
-        return getValueClassNames(sourceStatement.getNonEmptyPropertyExpressionList());
+        LSFGroupPropertyBody body = sourceStatement.getGroupPropertyBody();
+        if(body != null)
+            return getValueClassNames(body.getNonEmptyPropertyExpressionList());
+        return Collections.emptyList();
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFGroupExprPropertyDefinition sourceStatement) {
+        LSFGroupPropertyBody body = sourceStatement.getGroupPropertyBody();
+        if(body != null)
+            return getValueClassNames(body.getNonEmptyPropertyExpressionList());
+        return Collections.emptyList();
     }
 
     public static List<String> getValueClassNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {
@@ -1709,6 +1759,10 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFGroupExprPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -2836,6 +2890,23 @@ public class LSFPsiImplUtil {
         }
 
         return inferred.or(inferParamClasses(peList.get(1), valueClass));
+    }
+
+    @NotNull
+    public static Inferred inferParamClasses(@NotNull LSFGroupExprPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+        LSFGroupPropertyBody body = sourceStatement.getGroupPropertyBody();
+        if(body != null) {
+            List<Inferred> classes = new ArrayList<>();
+            classes.add(inferParamClasses(body.getNonEmptyPropertyExpressionList(), valueClass));
+            LSFOrderPropertyBy order = body.getOrderPropertyBy();
+            if(order != null)
+                classes.add(inferParamClasses(order.getNonEmptyPropertyExpressionList(), null));
+            LSFPropertyExpression where = body.getPropertyExpression();
+            if(where != null)
+                classes.add(inferParamClasses(where, null));
+            return Inferred.andClasses(classes);
+        }
+        return Inferred.EMPTY;
     }
 
     @NotNull

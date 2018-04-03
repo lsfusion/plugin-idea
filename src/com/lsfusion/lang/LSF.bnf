@@ -217,7 +217,13 @@ implicitInterfacePropertyStatement ::= propertyStatement
     elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-propertyStatement ::= propertyDeclaration equalsSign propertyCalcStatement (nonEmptyPropertyOptions | SEMI)
+propertyStatementBody ::= propertyCalcStatement // нужен чтобы GROUP BY не видел верхнего контекста
+{
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer ]
+}
+
+propertyStatement ::= propertyDeclaration equalsSign propertyStatementBody (nonEmptyPropertyOptions | SEMI)
                         
 {
     pin = 3
@@ -337,6 +343,7 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	maxPropertyDefinition
 	    |	casePropertyDefinition
 	    |	partitionPropertyDefinition
+	    |	groupExprPropertyDefinition
 	    |	recursivePropertyDefinition
 	    |	structCreationPropertyDefinition
 	    |	concatPropertyDefinition
@@ -453,7 +460,7 @@ activeTabPropertyDefinition ::= ACTIVE TAB componentID
 }
 
 propertyExprObject ::= LSQBR EQUALS (propertyCalcStatement) RSQBR
-{implements="com.lsfusion.lang.psi.context.ModifyParamContext" methods = [ getContextModifier getContextInferrer ] }
+{implements="com.lsfusion.lang.psi.context.ExtendParamContext" methods = [ getContextModifier getContextInferrer ] }
 
 propertyObject ::=  propertyUsage | propertyExprObject
 noContextPropertyUsage ::= propertyUsage
@@ -505,14 +512,23 @@ formulaPropertySyntaxType ::= (PG | MS)?
 
 groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | EQUAL | LAST | NAGGR
 groupPropertyBy ::= BY nonEmptyPropertyExpressionList;
-orderPropertyBy ::= ORDER (DESC)? nonEmptyPropertyExpressionList 
-groupPropertyDefinition ::= GROUP groupPropertyBy? groupingType
-		                    nonEmptyPropertyExpressionList
-		                    (orderPropertyBy)?
-		                    (WHERE propertyExpression)?
+orderPropertyBy ::= ORDER (DESC)? nonEmptyPropertyExpressionList
+groupPropertyBody ::= groupingType
+                      nonEmptyPropertyExpressionList
+                      (orderPropertyBy)?
+                      (WHERE propertyExpression)?
+  
+groupPropertyDefinition ::= GROUP groupPropertyBy 
+                            groupPropertyBody
 {
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext, com.lsfusion.lang.psi.context.UnfriendlyPE"
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ] 
+}		
+
+groupExprPropertyDefinition ::= GROUP groupPropertyBody
+{
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.LSFExpression"
+    methods = [ resolveInferredValueClass inferParamClasses getContextModifier getContextInferrer getValueClassNames getValuePropertyNames ] 
 }		                    
 
 filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID

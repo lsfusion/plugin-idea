@@ -19,6 +19,9 @@ public class AddObjectContextModifier implements ContextModifier {
 
     @Override
     public List<LSFExprParamDeclaration> resolveParams(int offset, Set<LSFExprParamDeclaration> currentParams) {
+        if(clause.getTextOffset() > offset) // если идет после искомого элемента, не интересует
+            return new ArrayList<>();
+            
         LSFParamDeclare paramDeclare = clause.getParamDeclare();
         if(paramDeclare!=null)
             return Collections.<LSFExprParamDeclaration>singletonList(paramDeclare);
