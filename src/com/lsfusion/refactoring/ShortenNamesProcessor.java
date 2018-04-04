@@ -821,12 +821,12 @@ public class ShortenNamesProcessor {
     }
 
     private interface Getter<T> {
-        Pair<LSFPropertyObject, LSFPropertyExpressionList> get(T element);
+        Pair<LSFPropertyUsage, LSFPropertyExpressionList> get(T element);
     }
     private static void proceedImpl(LSFPropertyExpression pe, LSFGlobalPropDeclaration abst, List<LSFParamDeclaration> params, Map<PropId, Set<PropId>> result) {
         proceedImpl(pe, abst, params, LSFJoinPropertyDefinition.class, new Getter<LSFJoinPropertyDefinition>() {
-            public Pair<LSFPropertyObject, LSFPropertyExpressionList> get(LSFJoinPropertyDefinition element) {
-                return Pair.create(element.getPropertyObject(), element.getPropertyExpressionList());
+            public Pair<LSFPropertyUsage, LSFPropertyExpressionList> get(LSFJoinPropertyDefinition element) {
+                return Pair.create(element.getPropertyUsage(), element.getPropertyExpressionList());
             }
         }, result);
     }
@@ -850,9 +850,9 @@ public class ShortenNamesProcessor {
             if (!isCompleteElement(pe, element))
                 break;
 
-            Pair<LSFPropertyObject, LSFPropertyExpressionList> usageWithExprs = getter.get((T) element);
+            Pair<LSFPropertyUsage, LSFPropertyExpressionList> usageWithExprs = getter.get((T) element);
 
-            LSFPropertyUsage propUsage = usageWithExprs.first.getPropertyUsage();
+            LSFPropertyUsage propUsage = usageWithExprs.first;
             if (propUsage != null) {
                 String nameRef = propUsage.getNameRef();
                 if (!nameRef.equals(declName)) // проверяем имя

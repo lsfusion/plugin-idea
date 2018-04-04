@@ -1,24 +1,31 @@
 package com.lsfusion.lang;
 
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.Language;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
+import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
 import com.lsfusion.lang.classes.IntegralClass;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
+import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
@@ -27,8 +34,11 @@ import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
+import com.lsfusion.refactoring.ElementMigration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +57,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final TextAttributes WARNING = new TextAttributes(new JBColor(Gray._211, new Color(100, 100, 255)), null, null, null, Font.PLAIN);
     public static final TextAttributes WAVE_UNDERSCORED_WARNING = new TextAttributes(null, null, new JBColor(Gray._211, new Color(100, 100, 255)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
     public static final TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
+    public static final TextAttributes OUTER_PARAM = new TextAttributes(new JBColor(new Color(102, 14, 122), new Color(152, 118, 170)), null, null, null, Font.PLAIN);
     public static final TextAttributes UNTYPED_IMPLICIT_DECL = new TextAttributes(new JBColor(new Color(56, 96, 255), new Color(100, 100, 255)), null, null, null, Font.PLAIN);
 
     private AnnotationHolder myHolder;
@@ -190,8 +201,34 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
                 addError(o, annotation);
             }
+        } else {
+            LSFPropertyExprObject pExprObject = PsiTreeUtil.getParentOfType(o, LSFPropertyExprObject.class);
+            if(pExprObject != null) {
+                LSFExprParamDeclaration decl = o.resolveDecl();
+                if(decl != null && isOuter(decl, pExprObject))
+                    addOuterRef(o);
+            }
         }
     }
+
+    private void addOuterRef(LSFReference reference) {
+        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Outer param");
+        TextAttributes error = OUTER_PARAM;
+        if (isInMetaUsage(reference))
+            error = TextAttributes.merge(error, META_USAGE);
+        annotation.setEnforcedTextAttributes(error);
+    }
+
+    private static boolean isOuter(LSFExprParamDeclaration decl, LSFPropertyExprObject pExprObject) {
+        if(decl.getTextOffset() < pExprObject.getTextOffset())
+            return true;
+
+        if(decl instanceof LSFObjectDeclaration) // если объект то может быть и позже
+            return decl.getTextOffset() > pExprObject.getTextOffset() + pExprObject.getTextLength();
+
+        return false;
+    }
+
 
     @Override
     public void visitGroupObjectUsage(@NotNull LSFGroupObjectUsage o) {
@@ -298,10 +335,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 if (groupPropertyDefinition != null) {
                     LSFGroupPropertyBy groupPropertyBy = groupPropertyDefinition.getGroupPropertyBy();
                     if (groupPropertyBy != null) {
-                        for (LSFPropertyExpression expr : groupPropertyBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList()) {
-                            LSFExClassSet valueClass = expr.resolveValueClass(false);
-                            if (valueClass != null) {
-                                groupByParams.add(valueClass.classSet);
+                        LSFNonEmptyPropertyExpressionList neList = groupPropertyBy.getNonEmptyPropertyExpressionList();
+                        if(neList != null) {
+                            for (LSFPropertyExpression expr : neList.getPropertyExpressionList()) {
+                                LSFExClassSet valueClass = expr.resolveValueClass(false);
+                                if (valueClass != null) {
+                                    groupByParams.add(valueClass.classSet);
+                                }
                             }
                         }
 

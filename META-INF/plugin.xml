@@ -9,10 +9,10 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.129</b><br>
+        <b>Version 1.0.130</b><br>
         <ul>
-            <li>Made possible to use GROUP operator in expressions</li>
-            <li>Made possible to use outer parameters in anonymous properties</li>
+            <li>Advanced pinning of some rules</li>
+            <li>Outer params highlighting in anonymous properties</li>
         </ul>
     ]]>
     </change-notes>

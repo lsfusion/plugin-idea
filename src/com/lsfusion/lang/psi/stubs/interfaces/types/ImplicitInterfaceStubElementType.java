@@ -44,8 +44,11 @@ public class ImplicitInterfaceStubElementType extends LSFStubElementType<Implici
                     LSFGroupPropertyBy groupPropertyBy = groupPropertyDefinition.getGroupPropertyBy();
                     if (groupPropertyBy != null) {
                         List<String> props = new ArrayList<>();
-                        for (LSFPropertyExpression pe : groupPropertyBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList()) {
-                            props.addAll(LSFPsiImplUtil.getValuePropertyNames(pe));
+                        LSFNonEmptyPropertyExpressionList neList = groupPropertyBy.getNonEmptyPropertyExpressionList();
+                        if(neList != null) {
+                            for (LSFPropertyExpression pe : neList.getPropertyExpressionList()) {
+                                props.addAll(LSFPsiImplUtil.getValuePropertyNames(pe));
+                            }
                         }
                         stub.setParamProperties(props);
                     }
