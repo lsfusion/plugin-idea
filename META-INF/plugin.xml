@@ -13,6 +13,7 @@
         <ul>
             <li>Advanced pinning of some rules</li>
             <li>Outer params highlighting in anonymous properties</li>
+            <li>WRITE CLIENT filename is necessary</li>
         </ul>
     ]]>
     </change-notes>
