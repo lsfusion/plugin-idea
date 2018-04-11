@@ -41,7 +41,7 @@ public class LSFProblemsVisitor {
 
     static void visitLSFSimpleNameWithCaption(ProblemsHolder holder, LSFSimpleNameWithCaption element, boolean warningsSearchMode) {
         PsiElement parent = element.getParent();
-        if (parent instanceof LSFPropertyDeclaration || parent instanceof LSFGroupStatement || parent instanceof LSFClassDecl) {
+        if (parent instanceof LSFPropertyDeclaration || parent instanceof LSFActionDeclaration || parent instanceof LSFGroupStatement || parent instanceof LSFClassDecl) {
             LSFDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
             if (objectDecl != null && objectDecl.getNameIdentifier() != null && !hasShortCut(objectDecl) &&
                     ReferencesSearch.search(objectDecl.getNameIdentifier(), element.getUseScope(), true).findFirst() == null) {
