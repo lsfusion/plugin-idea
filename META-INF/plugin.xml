@@ -15,6 +15,7 @@
             <li>Outer params highlighting in anonymous properties</li>
             <li>WRITE CLIENT filename is necessary</li>
             <li>READ CLIENT DIALOG</li>
+            <li>Unused property warning fixed</li>
         </ul>
     ]]>
     </change-notes>
