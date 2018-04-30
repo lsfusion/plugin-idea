@@ -1903,46 +1903,45 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
-
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement) {
-        return ((UnfriendlyPE) sourceStatement.getChildren()[0]).resolveValueParamClasses();
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement, List<LSFParamDeclaration> declareParams) {
+        return ((UnfriendlyPE) sourceStatement.getChildren()[0]).resolveValueParamClasses(declareParams);
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(LSFActionUnfriendlyPD unfriendlyPD, LSFListActionPropertyDefinitionBody listBody) {
+    public static List<LSFExClassSet> resolveValueParamClasses(LSFActionUnfriendlyPD unfriendlyPD, LSFListActionPropertyDefinitionBody listBody, List<LSFParamDeclaration> declareParams) {
         if(unfriendlyPD != null)
-            return LSFPsiImplUtil.resolveValueParamClasses(unfriendlyPD);
+            return LSFPsiImplUtil.resolveValueParamClasses(unfriendlyPD, declareParams);
         return null;
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFActionUnfriendlyPD actionDef) {
-        return ((UnfriendlyPE) actionDef.getChildren()[0]).resolveValueParamClasses();
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFActionUnfriendlyPD actionDef, List<LSFParamDeclaration> declareParams) {
+        return ((UnfriendlyPE) actionDef.getChildren()[0]).resolveValueParamClasses(declareParams);
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFNativePropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFNativePropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement, List<LSFParamDeclaration> declareParams) {
         LSFClassNameList classNameList = sourceStatement.getClassNameList();
         if (classNameList != null)
             return LSFExClassSet.toEx(resolveClasses(classNameList));
@@ -1950,17 +1949,37 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFExternalActionPropertyDefinitionBody sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFExternalActionPropertyDefinitionBody sourceStatement, List<LSFParamDeclaration> declareParams) {
         return null;
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
             return new ArrayList<>();
+        
+        List<LSFExClassSet> groupProps = resolveParamClasses(groupBy.getNonEmptyPropertyExpressionList());
+        if(declareParams == null)
+            return groupProps;
 
-        return resolveParamClasses(groupBy.getNonEmptyPropertyExpressionList());
+        Set<String> usedInterfaces = new ExprsContextModifier(getContextExprs(sourceStatement)).resolveUsedParams();
+//        нужно groupProps в дырки вставить для context independent группировки
+        int ga = 0;
+        int groupSize = groupProps.size();
+        List<LSFExClassSet> allGroupProps = new ArrayList<>();
+        for (LSFParamDeclaration declareParam : declareParams) {
+
+            LSFExClassSet add;
+            if (ga >= groupSize || usedInterfaces.contains(declareParam.getDeclName()))
+                // тут тоже возможно нужна проверка на соответствие классов
+                add = null;
+            else
+                add = groupProps.get(ga++);
+            allGroupProps.add(add);
+        }   
+
+        return allGroupProps;
     }
 
     @NotNull
@@ -1973,7 +1992,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         List<LSFStringLiteral> stringLiteralList = new ArrayList<>();
         LSFFormulaPropertySyntaxList formulaPropertySyntaxList = sourceStatement.getFormulaPropertySyntaxList();
         if (formulaPropertySyntaxList != null) {
@@ -2001,7 +2020,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         LSFGroupObjectUsage groupObjectUsage = sourceStatement.getGroupObjectID().getGroupObjectUsage();
         if (groupObjectUsage != null) {
             return LSFExClassSet.toEx(groupObjectUsage.resolveClasses());
@@ -2010,7 +2029,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFReflectionPropertyDefinition sourceStatement) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFReflectionPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         return null;
     }
 
@@ -2144,7 +2163,7 @@ public class LSFPsiImplUtil {
     }
 
     // LSFPropertyExpression.resolveValueParamClasses
-    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFPropertyExpression sourceStatement) {
+    public static List<LSFClassSet> resolveValueParamClasses(@NotNull LSFPropertyExpression sourceStatement, List<LSFParamDeclaration> declareParams) {
         List<LSFClassSet> result = new ArrayList<>();
         for (LSFExprParamDeclaration param : sourceStatement.resolveParams())
             result.add(param.resolveClass());
@@ -2778,7 +2797,7 @@ public class LSFPsiImplUtil {
                 if (element instanceof LSFGroupPropertyDefinition) {
                     joinClasses = inferGroupValueParamClasses((LSFGroupPropertyDefinition) element);
                 } else
-                    joinClasses = unfriendlyPD.resolveValueParamClasses();
+                    joinClasses = unfriendlyPD.resolveValueParamClasses(null);
             }
 //                else {
 //                LSFListActionPropertyDefinitionBody body = exprObject.getListActionPropertyDefinitionBody();

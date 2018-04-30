@@ -219,7 +219,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         annotation.setEnforcedTextAttributes(error);
     }
 
-    private static boolean isOuter(LSFExprParamDeclaration decl, LSFPropertyExprObject pExprObject) {
+    public static boolean isOuter(LSFExprParamDeclaration decl, LSFPropertyExprObject pExprObject) {
         if(decl.getTextOffset() < pExprObject.getTextOffset())
             return true;
 
@@ -229,6 +229,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         return false;
     }
 
+    public static boolean isOuter(LSFExprParamDeclaration decl, PsiElement pExprObject) {
+        if(decl.getTextOffset() < pExprObject.getTextOffset())
+            return true;
+
+        return false;
+    }
 
     @Override
     public void visitGroupObjectUsage(@NotNull LSFGroupObjectUsage o) {

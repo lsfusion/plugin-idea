@@ -219,8 +219,8 @@ implicitInterfacePropertyStatement ::= propertyStatement
 
 propertyStatementBody ::= propertyCalcStatement // нужен чтобы GROUP BY не видел верхнего контекста
 {
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
-    methods = [ getContextModifier getContextInferrer ]
+//    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+//    methods = [ getContextModifier getContextInferrer ]
 }
 
 propertyStatement ::= propertyDeclaration equalsSign propertyStatementBody (nonEmptyPropertyOptions | SEMI)
@@ -522,10 +522,10 @@ groupPropertyBody ::= groupingType
                       (orderPropertyBy)?
                       (WHERE propertyExpression)?
   
-groupPropertyDefinition ::= GROUP groupPropertyBy 
-                            groupPropertyBody
+private groupByBefore ::= GROUP groupPropertyBy groupPropertyBody {pin = 2};
+//private groupByAfter ::= GROUP groupPropertyBody groupPropertyBy;
+groupPropertyDefinition ::= groupByBefore //| groupByAfter
 {
-    pin = 2
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ] 
 }		

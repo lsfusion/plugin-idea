@@ -12,18 +12,21 @@ public abstract class ElementsContextModifier implements ContextModifier {
 
     protected abstract List<? extends PsiElement> getElements();
 
-    private static void recResolveParams(PsiElement modifier, int offset, Set<String> foundParams, List<LSFExprParamDeclaration> extParams) {
+    private static void recResolveParams(PsiElement modifier, int offset, Set<String> foundParams, Set<String> usedParams, List<LSFExprParamDeclaration> extParams) {
         if(modifier.getTextOffset() > offset) // если идет после искомого элемента, не интересует
             return;
 
         if (modifier instanceof LSFExprParamDeclaration) {
             LSFExprParamDeclaration param = (LSFExprParamDeclaration)modifier;
-            if(foundParams.add(param.getDeclName()))
+            String paramName = param.getDeclName();
+            if(foundParams != null && foundParams.add(paramName))
                 extParams.add((LSFExprParamDeclaration) modifier);
+            if(usedParams != null)
+                usedParams.add(paramName);
         }
         if (!(modifier instanceof ModifyParamContext)) { // hardcode конечно, но иначе придется все вручную делать
             for (PsiElement child : modifier.getChildren())
-                recResolveParams(child, offset, foundParams, extParams);
+                recResolveParams(child, offset, foundParams, usedParams, extParams);
         }
     }
     
@@ -34,8 +37,14 @@ public abstract class ElementsContextModifier implements ContextModifier {
 
         List<LSFExprParamDeclaration> extParams = new ArrayList<>();
         for(PsiElement element : getElements())
-            recResolveParams(element, offset, paramNames, extParams);
+            recResolveParams(element, offset, paramNames, null, extParams);
         return extParams;
+    }
 
+    public Set<String> resolveUsedParams() {
+        Set<String> usedParams = new HashSet<>();
+        for(PsiElement element : getElements())
+            recResolveParams(element, Integer.MAX_VALUE, null, usedParams, null);
+        return usedParams;
     }
 }

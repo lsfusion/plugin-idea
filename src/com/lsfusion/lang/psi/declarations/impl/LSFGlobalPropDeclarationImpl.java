@@ -4,12 +4,9 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.CollectionQuery;
-import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.ColumnNamingPolicy;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -25,10 +22,7 @@ import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
-import com.lsfusion.refactoring.ElementMigration;
-import com.lsfusion.refactoring.PropertyMigration;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -106,16 +100,16 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalProp
     }
 
     @Nullable
-    protected List<LSFExClassSet> resolveValueParamClasses() {
+    protected List<LSFExClassSet> resolveValueParamClasses(List<LSFParamDeclaration> declareParams) {
         LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
         if(pCalcStatement != null) {
             LSFExpressionUnfriendlyPD unfr = pCalcStatement.getExpressionUnfriendlyPD();
             if (unfr != null)
-                return unfr.resolveValueParamClasses();
+                return unfr.resolveValueParamClasses(declareParams);
 
             LSFPropertyExpression expr = pCalcStatement.getPropertyExpression();
             if (expr != null)
-                return LSFExClassSet.toEx(LSFPsiImplUtil.resolveValueParamClasses(expr));
+                return LSFExClassSet.toEx(LSFPsiImplUtil.resolveValueParamClasses(expr, declareParams));
         }
         return null;
     }

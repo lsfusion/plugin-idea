@@ -8,6 +8,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFActionReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
@@ -47,8 +48,8 @@ public abstract class LSFActionDeclarationImpl extends LSFActionOrGlobalPropDecl
     }
 
     @Nullable
-    protected List<LSFExClassSet> resolveValueParamClasses() {
-        return LSFPsiImplUtil.resolveValueParamClasses(getActionUnfriendlyPD(), getListActionPropertyDefinitionBody());
+    protected List<LSFExClassSet> resolveValueParamClasses(List<LSFParamDeclaration> declareParams) {
+        return LSFPsiImplUtil.resolveValueParamClasses(getActionUnfriendlyPD(), getListActionPropertyDefinitionBody(), declareParams);
     }
 
     public byte getPropType() {

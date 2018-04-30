@@ -1,9 +1,8 @@
 package com.lsfusion.lang.psi.context;
 
 import com.intellij.psi.PsiElement;
-import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFExplicitClasses;
-import com.lsfusion.lang.psi.LSFStringClassRef;
+import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public interface UnfriendlyPE extends PsiElement {
 
     // и у property и у action'ов
 
-    List<LSFExClassSet> resolveValueParamClasses();
+    List<LSFExClassSet> resolveValueParamClasses(List<LSFParamDeclaration> declareParams);
 
     LSFExplicitClasses getValueParamClassNames();
 

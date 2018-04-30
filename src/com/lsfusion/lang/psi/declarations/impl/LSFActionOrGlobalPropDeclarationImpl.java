@@ -14,7 +14,6 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.ParamClassesCache;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
-import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
 import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
@@ -115,7 +114,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
     }
     
     protected abstract LSFExplicitClasses getImplicitExplicitParams();
-    protected abstract List<LSFExClassSet> resolveValueParamClasses();
+    protected abstract List<LSFExClassSet> resolveValueParamClasses(List<LSFParamDeclaration> declareParams);
 
     public LSFExplicitClasses getExplicitParams() {
         LSFExplicitSignature declParams = getDeclExplicitParams();
@@ -157,8 +156,12 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
             if (LSFPsiUtils.allClassesDeclared(declareClasses)) // оптимизация
                 return declareClasses;
         }
+        
+        List<LSFParamDeclaration> declareParams = null;
+        if (cpd != null)
+            declareParams = LSFPsiImplUtil.resolveParams(cpd.getClassParamDeclareList());
 
-        List<LSFExClassSet> valueClasses = resolveValueParamClasses();
+        List<LSFExClassSet> valueClasses = resolveValueParamClasses(declareParams);
         if (valueClasses == null)
             return declareClasses;
 
