@@ -16,6 +16,7 @@
             <li>WRITE CLIENT filename is necessary</li>
             <li>READ CLIENT DIALOG</li>
             <li>Unused property warning fixed</li>
+            <li>GROUP BY refactoring</li>
         </ul>
     ]]>
     </change-notes>
