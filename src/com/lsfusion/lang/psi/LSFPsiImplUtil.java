@@ -205,15 +205,15 @@ public class LSFPsiImplUtil {
 
     public static List<LSFPropertyExpression> getContextExprs(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         List<LSFPropertyExpression> result = new ArrayList<>();
+        LSFGroupPropertyBody body = sourceStatement.getGroupPropertyBody();
+        if  (body != null)
+            result.addAll(getContextExprs(body));
         LSFGroupPropertyBy by = sourceStatement.getGroupPropertyBy();
         if (by != null) {
             LSFNonEmptyPropertyExpressionList neList = by.getNonEmptyPropertyExpressionList();
             if(neList != null)
                 result.addAll(neList.getPropertyExpressionList());
         }
-        LSFGroupPropertyBody body = sourceStatement.getGroupPropertyBody();
-        if  (body != null)
-            result.addAll(getContextExprs(body));
         return result;
     }
 

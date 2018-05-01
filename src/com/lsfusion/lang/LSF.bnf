@@ -522,7 +522,7 @@ groupPropertyBody ::= groupingType
                       (orderPropertyBy)?
                       (WHERE propertyExpression)?
   
-private groupByBefore ::= GROUP groupPropertyBy groupPropertyBody {pin = 2};
+private groupByBefore ::= GROUP groupPropertyBody groupPropertyBy
 //private groupByAfter ::= GROUP groupPropertyBody groupPropertyBy;
 groupPropertyDefinition ::= groupByBefore //| groupByAfter
 {
