@@ -24,10 +24,10 @@ public abstract class ElementsContextModifier implements ContextModifier {
             if(usedParams != null)
                 usedParams.add(paramName);
         }
-        if (!(modifier instanceof ModifyParamContext)) { // hardcode конечно, но иначе придется все вручную делать
-            for (PsiElement child : modifier.getChildren())
-                recResolveParams(child, offset, foundParams, usedParams, extParams);
-        }
+        if(foundParams != null && modifier instanceof ModifyParamContext) // hardcode конечно, но иначе придется все вручную делать
+            return;
+        for (PsiElement child : modifier.getChildren())
+            recResolveParams(child, offset, foundParams, usedParams, extParams);
     }
     
     public List<LSFExprParamDeclaration> resolveParams(int offset, Set<LSFExprParamDeclaration> currentParams) {

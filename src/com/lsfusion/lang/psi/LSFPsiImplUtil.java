@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.lang.ASTFactory;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafElement;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -1982,6 +1983,45 @@ public class LSFPsiImplUtil {
         return allGroupProps;
     }
 
+    public static <T extends PsiElement> Pair<List<LSFParamDeclaration>, Map<LSFPropertyExpression, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement, @NotNull List<LSFParamDeclaration> declareParams) {
+        LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
+        assert groupBy != null;
+
+        List<LSFParamDeclaration> incorrectParams = new ArrayList<>();
+        Map<LSFPropertyExpression, Pair<LSFClassSet, LSFClassSet>> incorrectBys = new HashMap<>();
+
+        LSFNonEmptyPropertyExpressionList groupExprsList = groupBy.getNonEmptyPropertyExpressionList();
+        List<LSFPropertyExpression> groupExprs = groupExprsList == null ? Collections.emptyList() : groupExprsList.getPropertyExpressionList(); 
+        List<LSFClassSet> groupClasses = finishParamClasses(groupExprsList);
+        List<LSFClassSet> declareClasses = resolveParamDeclClasses(declareParams);
+
+        Set<String> usedInterfaces = new ExprsContextModifier(getContextExprs(sourceStatement)).resolveUsedParams();
+//        нужно groupProps в дырки вставить для context independent группировки
+        int ga = 0;
+        int groupSize = groupClasses.size();
+        for (int i = 0; i < declareParams.size(); i++) {
+            LSFParamDeclaration declareParam = declareParams.get(i);
+
+            boolean usedParam = usedInterfaces.contains(declareParam.getDeclName());
+            if (ga >= groupSize || usedParam) {
+                if (!usedParam)
+                    incorrectParams.add(declareParam);
+            } else {
+                LSFClassSet groupClass = groupClasses.get(ga);
+                LSFClassSet declareClass = declareClasses.get(i);
+                if (declareClass != null && groupClass != null && !declareClass.isCompatible(groupClass)) {
+                    incorrectBys.put(groupExprs.get(ga), new Pair<>(groupClass, declareClass));
+                }
+                ga++;
+            }
+        }
+        
+        for(;ga<groupSize;ga++)
+            incorrectBys.put(groupExprs.get(ga), null);
+
+        return new Pair<>(incorrectParams, incorrectBys);
+    }
+
     @NotNull
     public static List<LSFExClassSet> inferGroupValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
@@ -2227,12 +2267,8 @@ public class LSFPsiImplUtil {
     @NotNull
     public static List<LSFClassSet> resolveParamDeclClasses(Collection<? extends LSFExprParamDeclaration> decls) {
         List<LSFClassSet> result = new ArrayList<>();
-        for (LSFExprParamDeclaration decl : decls) {
-            LSFClassSet classSet = decl.resolveClass();
-            if (classSet != null) {
-                result.add(classSet);
-            }
-        }
+        for (LSFExprParamDeclaration decl : decls)
+            result.add(decl.resolveClass());
         return result;
     }
 

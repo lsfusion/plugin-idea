@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.129</version>
+    <version>1.0.130</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -17,6 +17,7 @@
             <li>READ CLIENT DIALOG</li>
             <li>Unused property warning fixed</li>
             <li>GROUP BY refactoring</li>
+            <li>Added minor warnings</li>
         </ul>
     ]]>
     </change-notes>

@@ -9,6 +9,7 @@ import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
@@ -27,6 +28,7 @@ import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.context.ExprsContextModifier;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
@@ -35,6 +37,7 @@ import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.refactoring.ElementMigration;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +45,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
@@ -332,60 +336,52 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         }
 
-        List<LSFClassSet> groupByParams = new ArrayList<>();
-        LSFPropertyCalcStatement propertyCalcStatement = o.getPropertyCalcStatement();
-        if (propertyCalcStatement != null) {
-            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
-            if (expressionUnfriendlyPD != null) {
-                LSFGroupPropertyDefinition groupPropertyDefinition = expressionUnfriendlyPD.getGroupPropertyDefinition();
-                if (groupPropertyDefinition != null) {
-                    LSFGroupPropertyBy groupPropertyBy = groupPropertyDefinition.getGroupPropertyBy();
-                    if (groupPropertyBy != null) {
-                        LSFNonEmptyPropertyExpressionList neList = groupPropertyBy.getNonEmptyPropertyExpressionList();
-                        if(neList != null) {
-                            for (LSFPropertyExpression expr : neList.getPropertyExpressionList()) {
-                                LSFExClassSet valueClass = expr.resolveValueClass(false);
-                                if (valueClass != null) {
-                                    groupByParams.add(valueClass.classSet);
-                                }
-                            }
-                        }
+        LSFPropertyDeclParams propertyDeclParams = o.getPropertyDeclaration().getPropertyDeclParams();
+        if(propertyDeclParams != null) {
+            LSFPropertyCalcStatement propertyCalcStatement = o.getPropertyCalcStatement();
+            if (propertyCalcStatement != null) {
+                LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
+                if (expressionUnfriendlyPD != null) {
+                    LSFGroupPropertyDefinition groupPropertyDefinition = expressionUnfriendlyPD.getGroupPropertyDefinition();
+                    if (groupPropertyDefinition != null) {
+                        LSFGroupPropertyBy groupPropertyBy = groupPropertyDefinition.getGroupPropertyBy();
+                        if (groupPropertyBy != null) {
+                            List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
+                            Pair<List<LSFParamDeclaration>, Map<LSFPropertyExpression, Pair<LSFClassSet, LSFClassSet>>> incorrect = LSFPsiImplUtil.checkValueParamClasses(groupPropertyDefinition, declareParams);
 
-                        List<LSFClassSet> exprParams = new ArrayList<>();
-                        LSFPropertyDeclParams propertyDeclParams = o.getPropertyDeclaration().getPropertyDeclParams();
-                        if (propertyDeclParams != null) {
-                            for(LSFParamDeclaration param : LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList()))
-                                exprParams.add(param != null ? param.resolveClass() : null);
-                        }
-
-                        if (exprParams.size() == groupByParams.size()) {
-                            boolean error = false;
-                            for (int i = 0; i < exprParams.size(); i++) {
-                                LSFClassSet exprParam = exprParams.get(i);
-                                LSFClassSet groupByParam = groupByParams.get(i);
-                                if (exprParam != null && groupByParam != null && !exprParam.isCompatible(groupByParam)) {
-                                    error = true;
-                                }
-                            }
-                            if (error) {
-                                Annotation annotation = myHolder.createErrorAnnotation(o,
-                                        String.format("Incorrect GROUP BY params: required %s; found %s", listToString(exprParams), listToString(groupByParams)));
+                            for (LSFParamDeclaration incParam : incorrect.first) {
+                                Annotation annotation = myHolder.createErrorAnnotation(incParam, "Not used / No implementation found in BY clause found");
                                 annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                                addError(o, annotation);
+                                addError(incParam, annotation);
+                            }
+
+                            for (Map.Entry<LSFPropertyExpression, Pair<LSFClassSet, LSFClassSet>> incBy : incorrect.second.entrySet()) {
+                                Annotation annotation;
+                                if (incBy.getValue() != null)
+                                    annotation = myHolder.createErrorAnnotation(incBy.getKey(),
+                                            String.format("Incorrect GROUP BY param: required %s; found %s", incBy.getValue().second, incBy.getValue().first));
+                                else
+                                    annotation = myHolder.createErrorAnnotation(incBy.getKey(), "No param for this BY clause found");
+                                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                                addError(incBy.getKey(), annotation);
                             }
                         }
                     }
+                } else {
+                    LSFPropertyExpression propertyExpression = propertyCalcStatement.getPropertyExpression();
+                    List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
+                    Set<String> usedParameter = new ExprsContextModifier(propertyExpression).resolveUsedParams();
+                    for(LSFParamDeclaration declareParam : declareParams)
+                        if(!usedParameter.contains(declareParam.getName())) {
+                            final Annotation annotation = myHolder.createWarningAnnotation(declareParam, "Parameter is not used");
+                            TextAttributes error = UNTYPED_IMPLICIT_DECL;
+                            if (isInMetaUsage(declareParam))
+                                error = TextAttributes.merge(error, META_USAGE);
+                            annotation.setEnforcedTextAttributes(error);
+                        }   
                 }
             }
         }
-    }
-
-    private String listToString(List<LSFClassSet> list) {
-        String result = "";
-        for (LSFClassSet value : list) {
-            result += (result.isEmpty() ? "" : ", ") + value;
-        }
-        return result;
     }
 
     @Override
