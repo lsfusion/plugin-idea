@@ -71,14 +71,6 @@ public class LSFPsiImplUtil {
             return explicitModifier;
         return ContextModifier.EMPTY;
     }
-    // кривовато с unfriendly но пока непонятно как по другому
-    public static ContextModifier getContextModifier(@NotNull LSFPropertyStatementBody body) {
-        LSFPropertyStatement statement = PsiTreeUtil.getParentOfType(body, LSFPropertyStatement.class);
-        ExplicitContextModifier explicitModifier = statement.isUnfriendly() ? null : getExplicitContextModifier(statement);
-        if(explicitModifier != null)
-            return explicitModifier;
-        return getContextAPModifier(body.getPropertyCalcStatement());
-    }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFPropertyStatement sourceStatement) {
         return getContextAPInferrer(sourceStatement.getPropertyCalcStatement());
@@ -88,9 +80,6 @@ public class LSFPsiImplUtil {
         if(body != null)
             return new ActionInferrer(body);
         return ContextInferrer.EMPTY;
-    }
-    public static ContextInferrer getContextInferrer(@NotNull LSFPropertyStatementBody sourceStatement) {
-        return getContextAPInferrer(sourceStatement.getPropertyCalcStatement());
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFOverridePropertyStatement sourceStatement) {
