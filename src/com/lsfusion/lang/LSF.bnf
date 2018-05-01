@@ -217,13 +217,7 @@ implicitInterfacePropertyStatement ::= propertyStatement
     elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-propertyStatementBody ::= propertyCalcStatement // нужен чтобы GROUP BY не видел верхнего контекста
-{
-//    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
-//    methods = [ getContextModifier getContextInferrer ]
-}
-
-propertyStatement ::= propertyDeclaration equalsSign propertyStatementBody (nonEmptyPropertyOptions | SEMI)
+propertyStatement ::= propertyDeclaration equalsSign propertyCalcStatement (nonEmptyPropertyOptions | SEMI)
                         
 {
     pin = 3

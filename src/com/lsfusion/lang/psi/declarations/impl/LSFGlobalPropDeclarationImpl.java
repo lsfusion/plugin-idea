@@ -45,15 +45,7 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalProp
     public abstract LSFPropertyDeclaration getPropertyDeclaration();
 
     @Nullable
-    public LSFPropertyCalcStatement getPropertyCalcStatement() {
-        LSFPropertyStatementBody body = getPropertyStatementBody();
-        if(body != null)
-            return body.getPropertyCalcStatement();
-        return null;
-    }
-
-    @Nullable
-    public abstract LSFPropertyStatementBody getPropertyStatementBody();
+    public abstract LSFPropertyCalcStatement getPropertyCalcStatement();
 
     @Nullable
     public abstract LSFNonEmptyPropertyOptions getNonEmptyPropertyOptions();
