@@ -415,7 +415,6 @@ multiPropertyDefinition ::= MULTI (exclusiveOverrideOption)? nonEmptyPropertyExp
 
 partitionPropertyBy ::= BY nonEmptyPropertyExpressionList
 partitionPropertyDefinition ::= PARTITION
-                                (partitionPropertyBy)?
                                 (   (SUM | PREV)
                                 |   UNGROUP propertyUsage
                                     (   PROPORTION (STRICT)? ROUND LBRAC LEX_UINT_LITERAL RBRAC
@@ -425,6 +424,7 @@ partitionPropertyDefinition ::= PARTITION
                                 propertyExpression
                                 (ORDER (DESC )? nonEmptyPropertyExpressionList)?
                                 (WINDOW EXCEPTLAST)?
+                                partitionPropertyBy?
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.PropertyUsageContext"
