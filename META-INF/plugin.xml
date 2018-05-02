@@ -9,15 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.130</b><br>
+        <b>Version 1.0.131</b><br>
         <ul>
-            <li>Advanced pinning of some rules</li>
-            <li>Outer params highlighting in anonymous properties</li>
-            <li>WRITE CLIENT filename is necessary</li>
-            <li>READ CLIENT DIALOG</li>
-            <li>Unused property warning fixed</li>
-            <li>GROUP BY refactoring</li>
-            <li>Added minor warnings</li>
+            <li>PRINT XLS|XLSX PASSWORD</li>
         </ul>
     ]]>
     </change-notes>

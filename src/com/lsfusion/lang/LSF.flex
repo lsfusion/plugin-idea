@@ -312,6 +312,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "PANEL"                   			{ return PANEL; }
   "PARENT"                  			{ return PARENT; }
   "PARTITION"               			{ return PARTITION; }
+  "PASSWORD"                            { return PASSWORD; }
   "PATH"                                { return PATH; }
   "PDF"                     			{ return PDF; }
   "PERIOD"                              { return PERIOD; }    
