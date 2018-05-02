@@ -255,7 +255,7 @@ actionUnfriendlyPD ::= (abstractActionPropertyDefinition
                         |	customActionPropertyDefinitionBody
                         )
 {
-    methods = [ resolveValueParamClasses]
+    methods = [ resolveValueParamClasses checkValueParamClasses ]
 }
 
 propertyDeclParams ::= LBRAC classParamDeclareList RBRAC
@@ -358,7 +358,7 @@ expressionUnfriendlyPD ::= dataPropertyDefinition
                            |   groupPropertyDefinition
                            |   filterPropertyDefinition
                            |   reflectionPropertyDefinition
-{methods = [ resolveUnfriendValueClass resolveValueParamClasses]}
+{methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses]}
 
 // для pin
 private joinUsagePropertyDefinition ::= propertyUsage LBRAC propertyExpressionList RBRAC { pin = 2 }
@@ -477,7 +477,7 @@ dataPropertyDefinition ::= DATA (dataPropertySessionModifier)? className (LBRAC 
 {
     pin(".*") = 1;
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getMigrationClassNames ]
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getMigrationClassNames ]
 }
 dataPropertySessionModifier ::= LOCAL nestedLocalModifier
 
@@ -485,21 +485,21 @@ nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
 abstractPropertyDefinition ::= ABSTRACT ((CASE | MULTI | VALUE) abstractExclusiveOverrideOption?)? 
                                (FULL)? className LBRAC classNameList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
 formulaPropertyDefinition ::= FORMULA (NULL)? (builtInClassName)? formulaPropertySyntaxList
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
 formulaPropertySyntaxList ::= formulaPropertySyntax (COMMA formulaPropertySyntax)*
@@ -521,7 +521,7 @@ private groupByBefore ::= GROUP groupPropertyBody groupPropertyBy
 groupPropertyDefinition ::= groupByBefore //| groupByAfter
 {
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ] 
+    methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ] 
 }		
 
 groupExprPropertyDefinition ::= GROUP groupPropertyBody
@@ -534,13 +534,13 @@ groupExprPropertyDefinition ::= GROUP groupPropertyBody
 filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
 reflectionPropertyDefinition ::= REFLECTION reflectionPropertyType actionOrPropertyUsage
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE" 
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
 reflectionPropertyType ::= CANONICALNAME
@@ -615,7 +615,7 @@ abstractActionPropertyDefinition ::= ABSTRACT
                                     LBRAC classNameList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 
 private topActionPropertyDefinitionBody ::= listActionPropertyDefinitionBody
@@ -822,7 +822,7 @@ customActionPropertyDefinitionBody ::= CUSTOM ((javaClassStringUsage (LBRAC clas
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
+    methods = [resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
 externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyPropertyExpressionList)? (TO nonEmptyNoParamsPropertyUsageList)?
@@ -831,7 +831,7 @@ externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyP
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 //    implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
-//    methods = [resolveUnfriendValueClass resolveValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
+//    methods = [resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames]
 }
 
 private externalType ::=  SQL propertyExpression EXEC propertyExpression

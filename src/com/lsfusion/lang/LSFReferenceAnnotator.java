@@ -342,30 +342,24 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (propertyCalcStatement != null) {
                 LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
                 if (expressionUnfriendlyPD != null) {
-                    LSFGroupPropertyDefinition groupPropertyDefinition = expressionUnfriendlyPD.getGroupPropertyDefinition();
-                    if (groupPropertyDefinition != null) {
-                        LSFGroupPropertyBy groupPropertyBy = groupPropertyDefinition.getGroupPropertyBy();
-                        if (groupPropertyBy != null) {
-                            List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
-                            Pair<List<LSFParamDeclaration>, Map<LSFPropertyExpression, Pair<LSFClassSet, LSFClassSet>>> incorrect = LSFPsiImplUtil.checkValueParamClasses(groupPropertyDefinition, declareParams);
+                    List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
+                    Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> incorrect = expressionUnfriendlyPD.checkValueParamClasses(declareParams);
 
-                            for (LSFParamDeclaration incParam : incorrect.first) {
-                                Annotation annotation = myHolder.createErrorAnnotation(incParam, "Not used / No implementation found in BY clause found");
-                                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                                addError(incParam, annotation);
-                            }
+                    for (LSFParamDeclaration incParam : incorrect.first) {
+                        Annotation annotation = myHolder.createErrorAnnotation(incParam, "Not used / No implementation found");
+                        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                        addError(incParam, annotation);
+                    }
 
-                            for (Map.Entry<LSFPropertyExpression, Pair<LSFClassSet, LSFClassSet>> incBy : incorrect.second.entrySet()) {
-                                Annotation annotation;
-                                if (incBy.getValue() != null)
-                                    annotation = myHolder.createErrorAnnotation(incBy.getKey(),
-                                            String.format("Incorrect GROUP BY param: required %s; found %s", incBy.getValue().second, incBy.getValue().first));
-                                else
-                                    annotation = myHolder.createErrorAnnotation(incBy.getKey(), "No param for this BY clause found");
-                                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                                addError(incBy.getKey(), annotation);
-                            }
-                        }
+                    for (Map.Entry<PsiElement, Pair<LSFClassSet, LSFClassSet>> incBy : incorrect.second.entrySet()) {
+                        Annotation annotation;
+                        if (incBy.getValue() != null)
+                            annotation = myHolder.createErrorAnnotation(incBy.getKey(),
+                                    String.format("Incorrect param implementation: required %s; found %s", incBy.getValue().second, incBy.getValue().first));
+                        else
+                            annotation = myHolder.createErrorAnnotation(incBy.getKey(), "No param for this implementation found");
+                        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                        addError(incBy.getKey(), annotation);
                     }
                 } else {
                     LSFPropertyExpression propertyExpression = propertyCalcStatement.getPropertyExpression();
@@ -374,7 +368,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     for(LSFParamDeclaration declareParam : declareParams)
                         if(!usedParameter.contains(declareParam.getName())) {
                             final Annotation annotation = myHolder.createWarningAnnotation(declareParam, "Parameter is not used");
-                            TextAttributes error = UNTYPED_IMPLICIT_DECL;
+                            TextAttributes error = WARNING;
                             if (isInMetaUsage(declareParam))
                                 error = TextAttributes.merge(error, META_USAGE);
                             annotation.setEnforcedTextAttributes(error);
