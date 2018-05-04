@@ -2050,7 +2050,7 @@ public class LSFPsiImplUtil {
         return allGroupProps;
     }
 
-    public static <T extends PsiElement> Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement, @NotNull List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         assert groupBy != null;
 
