@@ -912,7 +912,6 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)?
 }
 
 fileActionPropertyDefinitionBody ::= OPEN propertyExpression (NAME propertyExpression)? syncTypeLiteral?
-                                   | SAVE propertyExpression ((NAME | PATH) propertyExpression)? NODIALOG?
 {
     pin(".*") = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1080,7 +1079,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
 // Important ! after recover the rule should mandatory be pinned (matched)
 private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | CANCEL | CHANGE | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
                                             | DRILLDOWN | EDITFORM | EMAIL | EVAL | EXEC | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOADFILE | LOCAL | MESSAGE | MULTI | OPEN
-                                            | READ | REQUEST | INPUT | RETURN | SAVE | SEEK | WHILE| WRITE
+                                            | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | EXTERNAL
                                             | ID // pinned with execActionPropertyDefinitionBody

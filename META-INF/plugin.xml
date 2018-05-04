@@ -13,6 +13,7 @@
         <ul>
             <li>PRINT XLS|XLSX PASSWORD</li>
             <li>Added minor warnings / errors</li>
+            <li>SAVE removed</li>
         </ul>
     ]]>
     </change-notes>

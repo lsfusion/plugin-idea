@@ -290,7 +290,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "NOCANCEL"                			{ return NOCANCEL; }
   "NOCHANGE"                			{ return NOCHANGE; }
   "NOCONSTRAINTFILTER"                  { return NOCONSTRAINTFILTER; }
-  "NODIALOG"                            { return NODIALOG; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOHEADER"                			{ return NOHEADER; }
   "NOT"                     			{ return NOT; }
@@ -313,7 +312,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "PARENT"                  			{ return PARENT; }
   "PARTITION"               			{ return PARTITION; }
   "PASSWORD"                            { return PASSWORD; }
-  "PATH"                                { return PATH; }
   "PDF"                     			{ return PDF; }
   "PERIOD"                              { return PERIOD; }    
   "PG"                                  { return PG; }    
@@ -348,7 +346,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "ROUND"                   			{ return ROUND; }
   "ROOT"                   			    { return ROOT; }
   "RTF"                     			{ return RTF; }
-  "SAVE"                                { return SAVE; }
   "SCROLL"                              { return SCROLL; }
   "SEEK"                    			{ return SEEK; }
   "SELECTOR"                			{ return SELECTOR; }
