@@ -973,7 +973,7 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage importActionSourceTy
     methods = [inferActionParamClasses]
 }
 
-importActionSourceType ::=  XLS (SHEET propertyExpression)?
+importActionSourceType ::=  XLS (SHEET (propertyExpression | ALL))?
                         |   DBF (MEMO propertyExpression)? (CHARSET stringLiteral)?
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
                         |   XML (ROOT propertyExpression)? (LIST|TABLE)? (ATTR)?
