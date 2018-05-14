@@ -12,6 +12,7 @@
         <b>Version 1.0.132</b><br>
         <ul>
             <li>IMPORT XLS SHEET ALL</li>
+            <li>PRINT XLS SHEET name</li>
         </ul>
     ]]>
     </change-notes>

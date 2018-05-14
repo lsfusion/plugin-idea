@@ -754,8 +754,8 @@ staticDestination ::= TO noParamsPropertyUsage
 printActionPropertyDefinitionBody ::=
 	    PRINT mappedForm
 		(   (
-		    (   XLSX (PASSWORD propertyExpression)?
-		    |   XLS (PASSWORD propertyExpression)?
+		    (   XLSX (SHEET stringLiteral)? (PASSWORD propertyExpression)?
+		    |   XLS (SHEET stringLiteral)? (PASSWORD propertyExpression)?
 		    |   PDF 
 		    |   DOC 
 		    |   DOCX
