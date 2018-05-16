@@ -13,6 +13,7 @@
         <ul>
             <li>IMPORT XLS SHEET ALL</li>
             <li>PRINT XLS SHEET name</li>
+            <li>EXPORT form XML HEADERS</li>
         </ul>
     ]]>
     </change-notes>

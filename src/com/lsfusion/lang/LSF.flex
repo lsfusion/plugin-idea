@@ -230,6 +230,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "EQUAL"                               { return EQUAL; }
   "HALIGN"                  			{ return HALIGN; }
   "HEADER"                  			{ return HEADER; }
+  "HEADERS"                  			{ return HEADERS; }
   "HIDE"                    			{ return HIDE; }
   "HIDESCROLLBARS"          			{ return HIDESCROLLBARS; }
   "HIDETITLE"               			{ return HIDETITLE; }
