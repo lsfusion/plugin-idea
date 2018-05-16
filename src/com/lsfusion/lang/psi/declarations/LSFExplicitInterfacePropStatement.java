@@ -12,9 +12,4 @@ import java.util.Set;
 public interface LSFExplicitInterfacePropStatement extends LSFExplicitInterfaceActionOrPropStatement<ExplicitInterfacePropStubElement> {
 
     Set<String> getExplicitValues();    
-
-    @NotNull
-    LSFPropertyStatement getPropertyStatement();
-
-    LSFExplicitValuePropStatement getExplicitValuePropertyStatement();
 }

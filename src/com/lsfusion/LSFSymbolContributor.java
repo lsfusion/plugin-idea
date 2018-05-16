@@ -6,7 +6,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.indexes.*;
 import org.jetbrains.annotations.NotNull;
 

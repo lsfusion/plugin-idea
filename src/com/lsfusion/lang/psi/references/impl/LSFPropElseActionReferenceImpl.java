@@ -18,10 +18,12 @@ import com.lsfusion.lang.psi.references.LSFPropElseActionReference;
 import com.lsfusion.lang.psi.stubs.ActionStubElement;
 import com.lsfusion.lang.psi.stubs.types.ActionStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -32,8 +34,14 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
         super(node);
     }
 
-    protected FullNameStubElementType<?, LSFGlobalPropDeclaration> getStubElementType() {
-        return LSFStubElementTypes.PROP; // по умолчанию ищем свойства
+    @Override
+    protected Collection<FullNameStubElementType> getStubElementTypes() {
+        return Arrays.asList(LSFStubElementTypes.STATEMENTPROP, LSFStubElementTypes.AGGRPARAMPROP); // по умолчанию ищем свойства
+    }
+
+    @Override
+    protected FullNameStubElementType getStubElementType() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -11,7 +11,8 @@ public interface LSFStubElementTypes {
     ModuleStubElementType MODULE = new ModuleStubElementType();
     ExplicitNamespaceStubElementType EXPLICIT_NAMESPACE = new ExplicitNamespaceStubElementType();
     MetaStubElementType META = new MetaStubElementType();
-    PropStubElementType PROP = new PropStubElementType();
+    StatementPropStubElementType STATEMENTPROP = new StatementPropStubElementType();
+    AggrParamPropStubElementType AGGRPARAMPROP = new AggrParamPropStubElementType();
     ActionStubElementType ACTION = new ActionStubElementType();
     FormStubElementType FORM = new FormStubElementType();
     GroupStubElementType GROUP = new GroupStubElementType();

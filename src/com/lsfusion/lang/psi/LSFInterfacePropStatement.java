@@ -6,7 +6,8 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import javax.swing.*;
 import java.util.List;
 
-// класс для того чтобы использовать Stub'ы и не парсить лишний раз
+// класс для того чтобы использовать Light версии statement'ов (то есть statement'ов где информацию можно достать без resolve'га, соответственно parse'инг не нужен)
+// !!!! соответственно все имплементации по возможности должны все из stub'ов доставать !!!!! 
 public interface LSFInterfacePropStatement extends PsiElement {
 
     List<LSFClassSet> resolveParamClasses();

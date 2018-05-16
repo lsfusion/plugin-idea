@@ -37,8 +37,13 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
         super(node);
     }
 
-    protected FullNameStubElementType<?, LSFGlobalPropDeclaration> getStubElementType() {
-        return LSFStubElementTypes.PROP;
+    @Override
+    protected Collection<FullNameStubElementType> getStubElementTypes() {
+        return Arrays.asList(LSFStubElementTypes.STATEMENTPROP, LSFStubElementTypes.AGGRPARAMPROP);
+    }
+
+    protected FullNameStubElementType getStubElementType() {
+        throw new UnsupportedOperationException();
     }
 
     public boolean isImplement() {

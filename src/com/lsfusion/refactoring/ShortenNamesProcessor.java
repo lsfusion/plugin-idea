@@ -23,6 +23,7 @@ import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
 import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.psi.references.impl.LSFPropReferenceImpl;
@@ -82,8 +83,8 @@ public class ShortenNamesProcessor {
         List<String> result = new ArrayList<>();
 
         List<String> paramNames = null;
-        if(decl instanceof LSFActionOrGlobalPropDeclaration)
-            paramNames = ((LSFActionOrGlobalPropDeclaration)decl).resolveParamNames();
+        if(decl instanceof LSFActionOrGlobalPropDeclarationImpl)
+            paramNames = ((LSFActionOrGlobalPropDeclarationImpl)decl).resolveParamNames();
 
         boolean firstAte = false;
         List<LSFClassSet> paramClasses = decl.resolveParamClasses();

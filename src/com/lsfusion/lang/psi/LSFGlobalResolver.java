@@ -120,9 +120,9 @@ public class LSFGlobalResolver {
             return finalizer.finalize(decls);
         return null;
     }
-
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, String fqName, Collection<FullNameStubElementType> types, LSFFile file, Condition<T> condition, Finalizer<T> finalizer) {
-        return findElements(name, fqName, types, file, condition, finalizer, new ArrayList<T>());
+    public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findElements(String name, String fqName, Collection<FullNameStubElementType> types, LSFFile file, Condition<T> condition, Finalizer<T> finalizer) {
+        Condition<TC> conditionC = BaseUtils.immutableCast(condition); Finalizer<TC> finalizerC = BaseUtils.immutableCast(finalizer);
+        return BaseUtils.<Collection<T>>immutableCast(LSFGlobalResolver.<SC, TC>findElements(name, fqName, types, file, conditionC, finalizerC, new ArrayList<TC>()));
     }
 
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, String fqName, Collection<FullNameStubElementType> types, LSFFile file, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
@@ -207,8 +207,12 @@ public class LSFGlobalResolver {
         GlobalSearchScope scope = file.getRequireScope();
 
         Collection<T> decls = new ArrayList<>();
-        for (FullNameStubElementType<S, T> type : types)
-            decls.addAll(type.getGlobalIndex().get(name, file.getProject(), scope));
+        Set<StringStubIndexExtension> usedIndices = new HashSet<>();
+        for (FullNameStubElementType<S, T> type : types) {
+            StringStubIndexExtension<T> index = type.getGlobalIndex();
+            if(usedIndices.add(index))
+                decls.addAll(index.get(name, file.getProject(), scope));
+        }
         for (T virtDecl : virtDecls) {
             if (virtDecl != null && name != null && name.equals(virtDecl.getDeclName())) {
                 VirtualFile virtualFile = virtDecl.getLSFFile().getVirtualFile();

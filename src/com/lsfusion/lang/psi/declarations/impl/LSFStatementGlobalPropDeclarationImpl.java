@@ -18,6 +18,7 @@ import com.lsfusion.lang.psi.indexes.TableClassesIndex;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
+import com.lsfusion.lang.psi.stubs.StatementPropStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.typeinfer.InferExResult;
@@ -29,16 +30,13 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.*;
 
-public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalPropDeclarationImpl<LSFGlobalPropDeclaration, PropStubElement> implements LSFGlobalPropDeclaration {
+public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrGlobalPropDeclarationImpl<LSFStatementGlobalPropDeclaration, StatementPropStubElement> implements LSFStatementGlobalPropDeclaration {
 
-    public static final String TABLE_BASE_PREFIX = "base";
-    public static final String TABLE_BASE0 = TABLE_BASE_PREFIX + 0;
-
-    public LSFGlobalPropDeclarationImpl(@NotNull ASTNode node) {
+    public LSFStatementGlobalPropDeclarationImpl(@NotNull ASTNode node) {
         super(node);
     }
 
-    public LSFGlobalPropDeclarationImpl(@NotNull PropStubElement propStubElement, @NotNull IStubElementType nodeType) {
+    public LSFStatementGlobalPropDeclarationImpl(@NotNull StatementPropStubElement propStubElement, @NotNull IStubElementType nodeType) {
         super(propStubElement, nodeType);
     }
 
@@ -46,9 +44,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalProp
 
     @Nullable
     public abstract LSFPropertyCalcStatement getPropertyCalcStatement();
-
-    @Nullable
-    public abstract LSFNonEmptyPropertyOptions getNonEmptyPropertyOptions();
 
     @Override
     public boolean isAbstract() {
@@ -68,11 +63,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalProp
         if(pCalcStatement != null)
             return pCalcStatement.getExpressionUnfriendlyPD() != null;
         return false;
-    }
-
-    @Override
-    public LSFExClassSet resolveExValueClass(boolean infer) {
-        return ValueClassCache.getInstance(getProject()).resolveValueClassWithCaching(this, infer);
     }
 
     @Override
@@ -110,11 +100,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalProp
         return LSFExClassSet.fromEx(decl.resolveExValueClass(false));
     }
     
-    @Override
-    public LSFClassSet resolveValueClass() {
-        return finishValueClass(this);
-    }
-
     public InferExResult inferExParamClasses(LSFExClassSet valueClass, List<LSFExClassSet> resultClasses, Result<List<LSFExprParamDeclaration>> rParams) {
         InferExResult inferredClasses = null;
         LSFPropertyCalcStatement pCalcStatement = getPropertyCalcStatement();
@@ -175,16 +160,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalProp
         return isDataStoredProperty() || isPersistentProperty();
     }
 
-    public byte getPropType() {
-        if (isAbstract()) {
-            return 2;
-        } else if (isDataProperty()) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
     @NotNull
     public String getValuePresentableText() {
         String valueClassString;
@@ -223,8 +198,8 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalProp
     }
 
     @Override
-    protected FullNameStubElementType getType() {
-        return LSFStubElementTypes.PROP;
+    public Collection<FullNameStubElementType> getTypes() {
+        return Arrays.asList(LSFStubElementTypes.STATEMENTPROP, LSFStubElementTypes.AGGRPARAMPROP);
     }
 
     @Override
@@ -233,167 +208,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalProp
         if (overrideStatement != null && ref.equals(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage()))
            return overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage();
         return null;
-    }
-
-    protected Condition<LSFGlobalPropDeclaration> getFindDuplicateColumnsCondition() {
-        return new Condition<LSFGlobalPropDeclaration>() {
-            @Override
-            public boolean value(LSFGlobalPropDeclaration decl) {
-                String tableName = getTableName();
-                String otherTableName = decl.getTableName();
-
-                if (tableName != null && tableName.equals(otherTableName)) {
-                    String columnName = getColumnName();
-                    String otherColumnName = decl.getColumnName();
-
-                    return columnName != null && columnName.equals(otherColumnName);
-                }
-                
-                return false;
-            }
-        };
-    }
-    
-    public boolean resolveDuplicateColumns() {
-        CollectionQuery<LSFGlobalPropDeclaration> declarations = new CollectionQuery<>(
-                LSFGlobalResolver.findElements(
-                        getDeclName(), null, getTypes(), getLSFFile(), getFindDuplicateColumnsCondition(), Finalizer.EMPTY
-                )
-        );
-        return declarations.findAll().size() > 1;
-    }
-
-    @Nullable
-    @Override
-    public String getTableName() {
-        return TableNameCache.getInstance(getProject()).getTableNameWithCaching(this);
-    }
-
-    @Nullable
-    @Override
-    public String getTableNameNoCache() {
-        if (!isStoredProperty()) {
-            return null;
-        }
-        
-        List<LSFClassSet> classesList = resolveParamClasses();
-        if (classesList == null) {
-            return null;
-        }
-        
-        int paramCount = classesList.size();
-        
-        if (paramCount == 0) {
-            return TABLE_BASE0;
-        }
-
-        boolean useBase = false;
-        LSFValueClass classes[][] = new LSFValueClass[paramCount][];
-        int currentInd[] = new int[paramCount];
-        LSFValueClass currentSet[] = new LSFValueClass[paramCount];
-        for (int i = 0; i < paramCount; i++) {
-            LSFClassSet classSet = classesList.get(i);
-            if (classSet == null) {
-                useBase = true;
-                break;
-            } else {
-                Collection<LSFValueClass> parents = CustomClassSet.getClassParentsRecursively(classSet.getCommonClass());
-                classes[i] = new LSFValueClass[parents.size()];
-                int j = 0;
-                for (LSFValueClass parent : parents) {
-                    classes[i][j++] = parent;
-                }
-                if (j == 0) {
-                    useBase = true;
-                    break;
-                }
-                
-                currentSet[i] = classes[i][0];
-                currentInd[i] = 0;
-            }
-        }
-        
-        if (!useBase) {
-            //перебираем возможные классы параметров
-            do {
-                String tableName = findAppropriateTable(currentSet);
-                if (tableName != null) {
-                    return tableName;
-                }
-
-                int i = paramCount - 1;
-                while (i >= 0 && currentInd[i] == classes[i].length - 1) {
-                    currentInd[i] = 0;
-                    currentSet[i] = classes[i][0];
-                    --i;
-                }
-
-                if (i < 0) {
-                    break;
-                }
-
-                currentInd[i]++;
-                currentSet[i] = classes[i][currentInd[i]];
-            } while (true);
-        }
-
-        return TABLE_BASE_PREFIX + paramCount;
-    }
-
-    @Nullable
-    private String findAppropriateTable(@NotNull LSFValueClass[] currentSet) {
-        String names[] = new String[currentSet.length];
-        for (int i = 0; i < currentSet.length; i++) {
-            names[i] = currentSet[i].getName();
-        }
-
-        String key = BaseUtils.toString(names);
-        
-        Collection<LSFTableDeclaration> tables = TableClassesIndex.getInstance().get(key, getProject(), getLSFFile().getRequireScope());
-        for (LSFTableDeclaration table : tables) {
-            LSFValueClass[] tableClasses = table.getClasses();
-
-            if (tableClasses.length != currentSet.length) {
-                continue;
-            }
-
-            boolean fit = true;
-            for (int i = 0; i < currentSet.length; ++i) {
-                if (tableClasses[i] != currentSet[i]) {
-                    fit = false;
-                    break;
-                }
-            }
-
-            if (fit) {
-                return table.getNamespaceName() + "_" + table.getName();
-            }
-        }
-
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public String getColumnName() {
-        return ColumnNameCache.getInstance(getProject()).getColumnNameWithCaching(this);
-    }
-
-    @Nullable
-    @Override
-    public String getColumnNameNoCache() {
-        if (!isStoredProperty()) {
-            return null;
-        }
-
-        LSFFile lsfFile = getLSFFile();
-        ColumnNamingPolicy columnNamingPolicy = ColumnNamingPolicyCache.getInstance(lsfFile).getColumnNamingPolicyWithCaching(lsfFile);
-        return columnNamingPolicy == null ? null : columnNamingPolicy.getColumnName(this);
-    }
-
-    @Override
-    public Integer getComplexity() {
-        return getPropComplexity(this);
     }
 
     public static Integer getPropComplexity(LSFPropDeclaration prop) {
@@ -413,11 +227,6 @@ public abstract class LSFGlobalPropDeclarationImpl extends LSFActionOrGlobalProp
         }
 
         return complexity;    
-    }
-
-    @Override
-    public Icon getIcon() {
-        return getIcon(0);
     }
 
     @Override

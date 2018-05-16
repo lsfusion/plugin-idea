@@ -1,11 +1,11 @@
 package com.lsfusion.lang.psi.indexes;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
+import com.lsfusion.lang.psi.declarations.LSFExplicitValueProp;
 import org.jetbrains.annotations.NotNull;
 
-public class ExplicitValueIndex extends LSFStringStubIndex<LSFExplicitValuePropStatement> {
+public class ExplicitValueIndex extends LSFStringStubIndex<LSFExplicitValueProp> {
     private static final ExplicitValueIndex INSTANCE = new ExplicitValueIndex();
 
     public static ExplicitValueIndex getInstance() {
@@ -14,12 +14,12 @@ public class ExplicitValueIndex extends LSFStringStubIndex<LSFExplicitValuePropS
 
     @NotNull
     @Override
-    public StubIndexKey<String, LSFExplicitValuePropStatement> getKey() {
+    public StubIndexKey<String, LSFExplicitValueProp> getKey() {
         return LSFIndexKeys.EXPLICIT_VALUE;
     }
 
     @Override
-    protected Class<LSFExplicitValuePropStatement> getPsiClass() {
-        return LSFExplicitValuePropStatement.class;
+    protected Class<LSFExplicitValueProp> getPsiClass() {
+        return LSFExplicitValueProp.class;
     }
 }

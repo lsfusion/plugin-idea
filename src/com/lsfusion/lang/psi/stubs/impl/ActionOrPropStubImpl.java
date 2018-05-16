@@ -31,11 +31,6 @@ public abstract class ActionOrPropStubImpl<This extends ActionOrPropStubElement<
         dataStream.writeBoolean(isNoParams);
     }
 
-    public ActionOrPropStubImpl(StubElement parent, IStubElementType elementType, StringRef name, boolean isNoParams) {
-        super(parent, elementType, name);
-        this.isNoParams = isNoParams;
-    }
-
     public boolean isNoParams() {
         return isNoParams;
     }

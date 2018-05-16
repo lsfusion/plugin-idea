@@ -13,6 +13,7 @@ import com.lsfusion.refactoring.ElementMigration;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -98,5 +99,19 @@ public abstract class LSFDeclarationImpl extends LSFElementImpl implements LSFDe
     @Override
     public ElementMigration getMigration(String newName) {
         return getMigration(this, newName);
+    }
+
+    // множественное наследование
+    public static PsiElement getNavigationElement(LSFDeclaration element) {
+        LSFId nameIdentifier = element.getNameIdentifier();
+        if(nameIdentifier != null)
+            return nameIdentifier;
+        return element;
+    }
+
+    @NotNull
+    @Override
+    public PsiElement getNavigationElement() {
+        return getNavigationElement(this);
     }
 }

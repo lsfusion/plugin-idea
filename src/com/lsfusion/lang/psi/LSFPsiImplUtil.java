@@ -14,6 +14,7 @@ import com.lsfusion.lang.classes.link.*;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
 import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
@@ -37,6 +38,12 @@ public class LSFPsiImplUtil {
             LSFPropertyExpression expression = calcStatement.getPropertyExpression();
             if (expression != null)
                 return new ExprsContextModifier(expression);
+            LSFAggrPropertyDefinition aggrDef = calcStatement.getExpressionUnfriendlyPD().getAggrPropertyDefinition(); // aggr немного unfriendly, а немного expression
+            if(aggrDef != null) {
+                expression = aggrDef.getPropertyExpression();
+                if(expression != null)
+                    return new ExprsContextModifier(expression);
+            }   
         }
 
         return ContextModifier.EMPTY;
@@ -47,26 +54,32 @@ public class LSFPsiImplUtil {
             LSFPropertyExpression expression = calcStatement.getPropertyExpression();
             if (expression != null)
                 return new ExprsContextInferrer(expression);
+            LSFAggrPropertyDefinition aggrDef = calcStatement.getExpressionUnfriendlyPD().getAggrPropertyDefinition(); // aggr немного unfriendly, а немного expression
+            if(aggrDef != null) {
+                expression = aggrDef.getPropertyExpression();
+                if(expression != null)
+                    return new ExprsContextInferrer(expression);
+            }
         }
 
         return ContextInferrer.EMPTY;
     }
 
-    public static ExplicitContextModifier getExplicitContextModifier(@NotNull LSFActionOrGlobalPropDeclaration sourceStatement) {
-        LSFPropertyDeclParams decl = sourceStatement.getPropertyDeclaration().getPropertyDeclParams();
-        if (decl != null)
-            return new ExplicitContextModifier(decl.getClassParamDeclareList());
+    public static ExplicitContextModifier getExplicitContextModifier(@NotNull LSFPropertyDeclaration decl) {
+        LSFPropertyDeclParams declParams = decl.getPropertyDeclParams();
+        if (declParams != null)
+            return new ExplicitContextModifier(declParams.getClassParamDeclareList());
         return null; 
     }
     // кривовато с unfriendly но пока непонятно как по другому
     public static ContextModifier getContextModifier(@NotNull LSFPropertyStatement sourceStatement) {
-        ExplicitContextModifier explicitModifier = getExplicitContextModifier(sourceStatement);
+        ExplicitContextModifier explicitModifier = getExplicitContextModifier(sourceStatement.getPropertyDeclaration());
         if(explicitModifier != null)
             return explicitModifier;
         return getContextAPModifier(sourceStatement.getPropertyCalcStatement());
     }
     public static ContextModifier getContextModifier(@NotNull LSFActionStatement sourceStatement) {
-        ExplicitContextModifier explicitModifier = getExplicitContextModifier(sourceStatement);
+        ExplicitContextModifier explicitModifier = getExplicitContextModifier(sourceStatement.getPropertyDeclaration());
         if(explicitModifier != null)
             return explicitModifier;
         return ContextModifier.EMPTY;
@@ -611,7 +624,7 @@ public class LSFPsiImplUtil {
 
         LSFPropertyDeclaration propDecl = PsiTreeUtil.getParentOfType(sourceStatement, LSFPropertyDeclaration.class);
         if(propDecl != null) {
-            LSFActionOrGlobalPropDeclaration statement = PsiTreeUtil.getParentOfType(sourceStatement, LSFActionOrGlobalPropDeclaration.class);
+            LSFActionOrGlobalPropDeclarationImpl statement = PsiTreeUtil.getParentOfType(sourceStatement, LSFActionOrGlobalPropDeclarationImpl.class);
             if(statement.isUnfriendly()) { // оптимизация, хотя в некоторых случаях все же меняет поведение
                 int paramNum = PsiTreeUtil.getParentOfType(sourceStatement, LSFNonEmptyClassParamDeclareList.class).getClassParamDeclareList().indexOf(sourceStatement);
                 assert paramNum >= 0;
@@ -623,6 +636,21 @@ public class LSFPsiImplUtil {
         return resolveExplicitClass(sourceStatement);
     }
 
+    public static LSFClassName getClassName(@NotNull LSFClassParamDeclare sourceStatement) {
+        LSFAggrParamPropDeclare aggDeclare = sourceStatement.getAggrParamPropDeclare();
+        if(aggDeclare != null)
+            return aggDeclare.getClassName();
+        return null;
+    }
+
+    @NotNull
+    public static LSFParamDeclare getParamDeclare(@NotNull LSFClassParamDeclare sourceStatement) {
+        LSFAggrParamPropDeclare aggDeclare = sourceStatement.getAggrParamPropDeclare();
+        if(aggDeclare != null)
+            return aggDeclare.getParamDeclare();
+        return sourceStatement.getUntypedParamDeclare().getParamDeclare();
+    }
+    
     @Nullable
     public static LSFClassSet resolveExplicitClass(@NotNull LSFClassParamDeclare sourceStatement) {
         LSFClassName className = sourceStatement.getClassName();
@@ -1196,6 +1224,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFAggrPropertyDefinition sourceStatement, boolean infer) {
+        return LSFExClassSet.toEx(resolveClass(sourceStatement.getCustomClassUsage()));
+    }
+
+    @Nullable
     public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFReflectionPropertyDefinition sourceStatement, boolean infer) {
         switch (LSFReflectionType.valueOf(sourceStatement.getReflectionPropertyType().getText())) {
             case CANONICALNAME:
@@ -1376,6 +1409,13 @@ public class LSFPsiImplUtil {
         List<String> result = new ArrayList<>();
         LSFClassName className = sourceStatement.getClassName();
         result.add(getClassName(className));
+        return result;
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFAggrPropertyDefinition sourceStatement) {
+        List<String> result = new ArrayList<>();
+        LSFCustomClassUsage className = sourceStatement.getCustomClassUsage();
+        result.add(className != null ? className.getName() : null);
         return result;
     }
 
@@ -1763,6 +1803,10 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
+    public static List<String> getValuePropertyNames(@NotNull LSFAggrPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
     public static List<String> getValuePropertyNames(@NotNull LSFReflectionPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
@@ -1913,7 +1957,7 @@ public class LSFPsiImplUtil {
     }
     
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull UnfriendlyPE pe, List<PsiElement> elements, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull UnfriendlyPE pe, List<? extends PsiElement> elements, List<LSFParamDeclaration> declareParams) {
         List<LSFParamDeclaration> incorrectParams = new ArrayList<>();
         Map<PsiElement, Pair<LSFClassSet, LSFClassSet>> incorrectBys = new HashMap<>();
 
@@ -2049,7 +2093,7 @@ public class LSFPsiImplUtil {
 
         return allGroupProps;
     }
-
+    
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         assert groupBy != null;
@@ -2140,6 +2184,14 @@ public class LSFPsiImplUtil {
         return null;
     }
 
+    @Nullable
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAggrPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+        LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
+        if(pe != null)
+            return LSFExClassSet.toEx(resolveValueParamClasses(pe, declareParams));
+        return Collections.emptyList();
+    }
+
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         LSFGroupObjectUsage groupObjectUsage = sourceStatement.getGroupObjectID().getGroupObjectUsage();
@@ -2147,6 +2199,12 @@ public class LSFPsiImplUtil {
             return checkValueParamClasses(sourceStatement, groupObjectUsage, declareParams);
         }
         return new Pair<>(Collections.emptyList(), Collections.emptyMap());
+    }
+
+    @NotNull
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFAggrPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+        LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
+        return checkValueParamClasses(sourceStatement, pe != null ? pe.resolveParams() : Collections.emptyList(), declareParams);
     }
 
     @Nullable
@@ -2218,6 +2276,13 @@ public class LSFPsiImplUtil {
     }
 
     public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {
+        return null;
+    }
+
+    public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFAggrPropertyDefinition sourceStatement) {
+        LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
+        if(pe != null)
+            return LSFPsiImplUtil.getClassNameRefs(BaseUtils.<List<LSFParamDeclaration>>immutableCast(pe.resolveParams()));
         return null;
     }
 

@@ -259,20 +259,20 @@ public class LSFPsiUtils {
         Set<LSFInterfacePropStatement> resultStatements = newActionsOrPropertiesApplicableToClass(project, scope, isLight, isHeavy, ExplicitInterfacePropIndex.getInstance(), valueClass, classParents);
 
         if(isHeavy) {
-            List<LSFPropertyStatement> statementsWithClassAsResult = new ArrayList<>();
+            List<LSFGlobalPropDeclaration> statementsWithClassAsResult = new ArrayList<>();
             for (LSFValueClass clazz : classParents) {
-                Collection<LSFExplicitValuePropStatement> evStatements = ExplicitValueIndex.getInstance().get(clazz.getName(), project, scope);
-                for (LSFExplicitValuePropStatement evStatement : evStatements) {
-                    statementsWithClassAsResult.add(evStatement.getPropertyStatement());
+                Collection<LSFExplicitValueProp> evStatements = ExplicitValueIndex.getInstance().get(clazz.getName(), project, scope);
+                for (LSFExplicitValueProp evStatement : evStatements) {
+                    statementsWithClassAsResult.add(evStatement.getDeclaration());
                 }
             }
 
             Set<String> namesOfStatementsWithClassAsResult = new HashSet<>();
             int i = 0;
             LSFClassSet valueClassSet = valueClass instanceof LSFClassDeclaration ? new CustomClassSet((LSFClassDeclaration) valueClass) : (LSFClassSet) valueClass;
-            Set<LSFPropertyStatement> skipStatemens = new HashSet<>();
+            Set<LSFGlobalPropDeclaration> skipStatemens = new HashSet<>();
             while (i < statementsWithClassAsResult.size()) {
-                LSFPropertyStatement statement = statementsWithClassAsResult.get(i);
+                LSFGlobalPropDeclaration statement = statementsWithClassAsResult.get(i);
                 String statementName = statement.getName();
 
                 if (!namesOfStatementsWithClassAsResult.contains(statementName) && !skipStatemens.contains(statement)) {
@@ -303,7 +303,7 @@ public class LSFPsiUtils {
     }
 
     // возвращает mutable set
-    public static <T extends LSFExplicitInterfaceActionOrPropStatement> Set<LSFInterfacePropStatement> newActionsOrPropertiesApplicableToClass(Project project, GlobalSearchScope scope, boolean isLight, boolean isHeavy, ExplicitInterfaceActionOrPropIndex<T> index, LSFValueClass valueClass, Collection<LSFValueClass> classParents) {
+    public static <T extends LSFExplicitInterfaceProp> Set<LSFInterfacePropStatement> newActionsOrPropertiesApplicableToClass(Project project, GlobalSearchScope scope, boolean isLight, boolean isHeavy, ExplicitInterfaceActionOrPropIndex<T> index, LSFValueClass valueClass, Collection<LSFValueClass> classParents) {
         assert isLight || isHeavy;
 
         Set<LSFInterfacePropStatement> resultStatements = new HashSet<>();

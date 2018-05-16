@@ -5,6 +5,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFImplicitValuePropStatement;
 import com.lsfusion.lang.psi.stubs.interfaces.ExplicitValueStubElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,9 +23,17 @@ public abstract class LSFExplicitValuePropStatementImpl extends StubBasedPsiElem
     }
 
     @NotNull
+    protected abstract LSFImplicitValuePropStatement getImplicitValuePropertyStatement();
+
+    @NotNull
     @Override
     public LSFPropertyStatement getPropertyStatement() {
         return getImplicitValuePropertyStatement().getPropertyStatement();
+    }
+
+    @Override
+    public LSFGlobalPropDeclaration getDeclaration() {
+        return getPropertyStatement();
     }
 
     @Nullable

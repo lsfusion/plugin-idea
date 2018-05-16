@@ -7,9 +7,7 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.ParamClassesCache;
 import com.lsfusion.lang.psi.cache.ValueClassCache;
-import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;
-import java.util.Set;
 
 public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl implements LSFLocalPropDeclaration {
 
@@ -42,19 +39,8 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     @Override
-    public LSFExClassSet resolveExValueClass(boolean infer) {
-        return ValueClassCache.getInstance(getProject()).resolveValueClassWithCaching(this, infer);
-    }
-
-    @Override
     public LSFExClassSet resolveExValueClassNoCache(boolean infer) {
         return LSFExClassSet.toEx(LSFPsiImplUtil.resolveClass(getClassName()));
-    }
-
-    @Override
-    @Nullable
-    public List<LSFExClassSet> resolveExParamClasses() {
-        return ParamClassesCache.getInstance(getProject()).resolveParamClassesWithCaching(this);
     }
 
     @Override
@@ -79,22 +65,9 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
         return getDeclName() + getParamPresentableText();
     }
 
-    public String getParamPresentableText() {
-        List<LSFClassSet> classes = resolveParamClasses();
-        return "(" + StringUtils.join(classes, ", ") + ")";
-    }
-
-    public List<LSFClassSet> resolveParamClasses() {
-        return LSFActionOrGlobalPropDeclarationImpl.finishParamClasses(this);
-    }
-
     @Override
     public boolean isNoParams() {
         return resolveParamClasses().isEmpty();
-    }
-
-    public LSFClassSet resolveValueClass() {
-        return LSFGlobalPropDeclarationImpl.finishValueClass(this);
     }
 
     @NotNull
@@ -129,11 +102,6 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     @Override
     public boolean isAbstract() {
         return false;
-    }
-
-    @Override
-    public Integer getComplexity() {
-        return LSFGlobalPropDeclarationImpl.getPropComplexity(this);
     }
 
     @Override

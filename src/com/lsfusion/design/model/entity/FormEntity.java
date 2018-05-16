@@ -13,9 +13,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.indexes.ActionIndex;
-import com.lsfusion.lang.psi.indexes.PropIndex;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
-import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.Nullable;
 

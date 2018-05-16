@@ -29,7 +29,7 @@ public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclara
         return caption.getSimpleName().getText();
     }
 
-    protected Collection<FullNameStubElementType> getTypes() {
+    public Collection<FullNameStubElementType> getTypes() {
         return Collections.singleton(getType());
     }
 

@@ -87,10 +87,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
         }
     }
 
-    @Override
-    public List<LSFClassSet> resolveParamClasses() {
-        return finishParamClasses(this);
-    }
+    public abstract boolean isUnfriendly();
 
     @Override
     public boolean isNoParams() {
@@ -135,16 +132,6 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
     public Icon getIcon(int flags) {
         return getIcon(getPropType());
     }
-    @Override
-    public Icon getIcon() {
-        return getIcon(getPropType());
-    }
-
-    @Override
-    @Nullable
-    public List<LSFExClassSet> resolveExParamClasses() {
-        return ParamClassesCache.getInstance(getProject()).resolveParamClassesWithCaching(this);
-    }
 
     @Override
     public List<LSFExClassSet> resolveExParamClassesNoCache() {
@@ -179,11 +166,6 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
         return Collections.unmodifiableList(mixed);
     }
 
-    public String getParamPresentableText() {
-//        List<LSFStringClassRef> params = getExplicitParams();
-        return getParamPresentableText(resolveParamClasses());
-    }
-
     @Override
     protected Condition<Decl> getFindDuplicatesCondition() {
         return new Condition<Decl>() {
@@ -202,7 +184,6 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
     public String getPresentableText() {
         return getDeclName() + getParamPresentableText();
     }
-
 
     @Override
     public PsiElement[] processImplementationsSearch() {
@@ -280,7 +261,6 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
         return PropertyMigration.create(this, getGlobalName(), newName);
     }
 
-    @Override
     public List<String> resolveParamNames() {
         LSFPropertyDeclaration decl = getPropertyDeclaration();
         LSFPropertyDeclParams declList = decl.getPropertyDeclParams();
@@ -322,21 +302,4 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
 
         return result;
     }
-
-    @Override
-    public Set<LSFActionOrGlobalPropDeclaration> getDependents() {
-        Set<LSFActionOrGlobalPropDeclaration> result = new HashSet<>();
-
-        Set<PsiReference> refs = new HashSet<>(ReferencesSearch.search(getNameIdentifier(), getUseScope()).findAll());
-
-        for (PsiReference ref : refs) {
-            LSFActionOrGlobalPropDeclaration dependent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFActionOrGlobalPropDeclaration.class);
-            if (dependent != null) {
-                result.add(dependent);
-            }
-        }
-
-        return result;
-    }
-
 }

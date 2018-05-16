@@ -221,9 +221,9 @@ propertyStatement ::= propertyDeclaration equalsSign propertyCalcStatement (nonE
                         
 {
     pin = 3
-    mixin="com.lsfusion.lang.psi.declarations.impl.LSFGlobalPropDeclarationImpl"
-    implements="com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.LSFInterfacePropStatement"
-    stubClass = "com.lsfusion.lang.psi.stubs.PropStubElement"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFStatementGlobalPropDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFStatementGlobalPropDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.LSFInterfacePropStatement"
+    stubClass = "com.lsfusion.lang.psi.stubs.StatementPropStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
     methods = [ getContextModifier getContextInferrer ]
 }
@@ -269,10 +269,20 @@ paramDeclare ::= simpleName
     implements="com.lsfusion.lang.psi.declarations.LSFParamDeclaration"
 }
 
-classParamDeclare ::= (className paramDeclare) | paramDeclare
+aggrParamPropDeclare ::= className paramDeclare
+{
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFAggrParamGlobalPropDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFAggrParamGlobalPropDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.AggrParamPropStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
+}
+
+untypedParamDeclare ::= paramDeclare
+
+classParamDeclare ::= aggrParamPropDeclare | untypedParamDeclare
 {
     implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext"
-    methods = [ resolveClass ensureClass ]
+    methods = [ resolveClass ensureClass getClassName getParamDeclare ]
 }
 
 classParamDeclareList ::= (nonEmptyClassParamDeclareList)?
@@ -356,9 +366,16 @@ expressionUnfriendlyPD ::= dataPropertyDefinition
                            |   abstractPropertyDefinition
                            |   formulaPropertyDefinition
                            |   groupPropertyDefinition
+                           |   aggrPropertyDefinition
                            |   filterPropertyDefinition
                            |   reflectionPropertyDefinition
 {methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses]}
+
+aggrPropertyDefinition ::= AGGR customClassUsage WHERE propertyExpression {
+    pin = 1;
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
+} 
 
 // для pin
 private joinUsagePropertyDefinition ::= propertyUsage LBRAC propertyExpressionList RBRAC { pin = 2 }

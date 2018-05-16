@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.indexes;
 
 import com.intellij.psi.stubs.StubIndexKey;
+import com.lsfusion.lang.psi.LSFInterfacePropStatement;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFDesign;
@@ -27,8 +28,8 @@ public class LSFIndexKeys {
     public static final StubIndexKey<String, LSFClassExtend> EXTENDCLASS_SHORT = StubIndexKey.createIndexKey("lsf.indices.extends.class.short");
     public static final StubIndexKey<String, LSFDesign> DESIGN = StubIndexKey.createIndexKey("lsf.indices.design");
 
-    public static final StubIndexKey<String, LSFExplicitInterfacePropStatement> EXPLICIT_INTERFACE_PROP = StubIndexKey.createIndexKey("lsf.indices.explicit.prop.interface");
-    public static final StubIndexKey<String, LSFExplicitValuePropStatement> EXPLICIT_VALUE = StubIndexKey.createIndexKey("lsf.indices.explicit.value");
+    public static final StubIndexKey<String, LSFExplicitInterfaceProp> EXPLICIT_INTERFACE_PROP = StubIndexKey.createIndexKey("lsf.indices.explicit.prop.interface");
+    public static final StubIndexKey<String, LSFExplicitValueProp> EXPLICIT_VALUE = StubIndexKey.createIndexKey("lsf.indices.explicit.value");
     public static final StubIndexKey<String, LSFImplicitInterfacePropStatement> IMPLICIT_INTERFACE = StubIndexKey.createIndexKey("lsf.indices.implicit.interface");
     public static final StubIndexKey<String, LSFImplicitValuePropStatement> IMPLICIT_VALUE = StubIndexKey.createIndexKey("lsf.indices.implicit.value");
 

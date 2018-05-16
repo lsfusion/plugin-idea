@@ -97,4 +97,10 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
     public PsiElement getLookupObject() { // пока не совсем понятно зачем
         return this;
     }
+
+    @NotNull
+    @Override
+    public PsiElement getNavigationElement() {
+        return LSFDeclarationImpl.getNavigationElement(this);
+    }
 }

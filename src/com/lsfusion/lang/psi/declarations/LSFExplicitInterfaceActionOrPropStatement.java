@@ -8,11 +8,5 @@ import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfacePropStubElement;
 
 import java.util.Set;
 
-public interface LSFExplicitInterfaceActionOrPropStatement<Stub extends ExplicitInterfaceActionOrPropStubElement> extends StubBasedPsiElement<Stub>, LSFInterfacePropStatement {
-
-    LSFExplicitClasses getExplicitParams();
-    
-    LSFActionOrPropDeclaration getDeclaration();
-
-    byte getPropType();
+public interface LSFExplicitInterfaceActionOrPropStatement<Stub extends ExplicitInterfaceActionOrPropStubElement> extends LSFExplicitInterfaceProp<Stub> {
 }

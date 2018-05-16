@@ -1,20 +1,17 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
-import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
+import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
 import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfacePropStubElement;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.List;
 import java.util.Set;
 
 public abstract class LSFExplicitInterfacePropStatementImpl extends LSFExplicitInterfaceActionOrPropStatementImpl<ExplicitInterfacePropStubElement> implements LSFExplicitInterfacePropStatement {
@@ -26,9 +23,10 @@ public abstract class LSFExplicitInterfacePropStatementImpl extends LSFExplicitI
         super(node);
     }
 
+    protected abstract LSFExplicitValuePropStatement getExplicitValuePropertyStatement(); 
+
     @NotNull
-    @Override
-    public LSFPropertyStatement getPropertyStatement() {
+    protected LSFPropertyStatement getPropertyStatement() {
         return getExplicitValuePropertyStatement().getPropertyStatement();
     }
 
@@ -49,7 +47,7 @@ public abstract class LSFExplicitInterfacePropStatementImpl extends LSFExplicitI
         if(stub != null) {
             return stub.getParamExplicitValues();
         }
-        return ((LSFGlobalPropDeclarationImpl)getPropertyStatement()).getExplicitValues();
+        return ((LSFStatementGlobalPropDeclarationImpl)getPropertyStatement()).getExplicitValues();
     }
 
     @Override

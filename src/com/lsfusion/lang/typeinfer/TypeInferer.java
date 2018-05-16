@@ -14,6 +14,7 @@ import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
+import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
 import com.lsfusion.util.BaseUtils;
 
 import java.util.HashSet;
@@ -73,8 +74,8 @@ public class TypeInferer {
 
             boolean unfr = false;
             ModifyParamContext modifyContext = (ModifyParamContext) element;
-            if (element instanceof LSFActionOrGlobalPropDeclaration) {
-                LSFActionOrGlobalPropDeclaration ps = (LSFActionOrGlobalPropDeclaration) element;
+            if (element instanceof LSFActionOrGlobalPropDeclarationImpl) {
+                LSFActionOrGlobalPropDeclarationImpl ps = (LSFActionOrGlobalPropDeclarationImpl) element;
                 if (ps.isUnfriendly())
                     unfr = true;
             }

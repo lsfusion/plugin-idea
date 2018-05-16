@@ -709,8 +709,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (propertyUsage != null) {
             LSFPropDeclaration declaration = propertyUsage.resolveDecl();
             if (declaration != null) {
-                if (declaration instanceof LSFPropertyStatementImpl) {
-                    LSFPropertyCalcStatement propertyStatement = ((LSFPropertyStatementImpl) declaration).getPropertyCalcStatement();
+                if (declaration instanceof LSFPropertyStatement) {
+                    LSFPropertyCalcStatement propertyStatement = ((LSFPropertyStatement) declaration).getPropertyCalcStatement();
                     if (propertyStatement == null) {
                         addAssignError(o);
                     } else {

@@ -13,7 +13,9 @@ public class LSFStubElementTypeFactory {
             case "CLASS_DECL":
                 return LSFStubElementTypes.CLASS;
             case "PROPERTY_STATEMENT":
-                return LSFStubElementTypes.PROP;
+                return LSFStubElementTypes.STATEMENTPROP;
+            case "AGGR_PARAM_PROP_DECLARE":
+                return LSFStubElementTypes.AGGRPARAMPROP;
             case "ACTION_STATEMENT":
                 return LSFStubElementTypes.ACTION;
             case "META_CODE_DECLARATION_STATEMENT":
