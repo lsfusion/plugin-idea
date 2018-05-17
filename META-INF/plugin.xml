@@ -9,12 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.132</b><br>
+        <b>Version 1.0.133</b><br>
         <ul>
-            <li>AGGR operator support</li>
-            <li>IMPORT XLS SHEET ALL</li>
-            <li>PRINT XLS SHEET name</li>
-            <li>EXPORT form XML HEADERS</li>
+            <li>Minor checks and warnings</li>
         </ul>
     ]]>
     </change-notes>

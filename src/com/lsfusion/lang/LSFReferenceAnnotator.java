@@ -185,6 +185,23 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitPropertyExprObject(@NotNull LSFPropertyExprObject o) {
+        super.visitPropertyExprObject(o);
+
+        LSFPropertyCalcStatement propStatement = o.getPropertyCalcStatement();
+        if(propStatement != null) {
+            LSFExpressionUnfriendlyPD unfriend = propStatement.getExpressionUnfriendlyPD();
+            if(unfriend != null) {
+                if(unfriend.getAggrPropertyDefinition() != null || unfriend.getDataPropertyDefinition() != null || unfriend.getAbstractPropertyDefinition() != null) {
+                    Annotation annotation = myHolder.createErrorAnnotation(o, "This operator cannot be used in [= ]");
+                    annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+                    addError(o, annotation);
+                }                    
+            }
+        }
+    }
+
+    @Override
     public void visitExprParameterNameUsage(@NotNull LSFExprParameterNameUsage o) {
         super.visitExprParameterNameUsage(o);
 
