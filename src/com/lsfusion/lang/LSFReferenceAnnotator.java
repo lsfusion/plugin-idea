@@ -192,7 +192,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if(propStatement != null) {
             LSFExpressionUnfriendlyPD unfriend = propStatement.getExpressionUnfriendlyPD();
             if(unfriend != null) {
-                if(unfriend.getAggrPropertyDefinition() != null || unfriend.getDataPropertyDefinition() != null || unfriend.getAbstractPropertyDefinition() != null) {
+                if(unfriend.getAggrPropertyDefinition() != null || unfriend.getDataPropertyDefinition() != null) {
                     Annotation annotation = myHolder.createErrorAnnotation(o, "This operator cannot be used in [= ]");
                     annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
                     addError(o, annotation);
