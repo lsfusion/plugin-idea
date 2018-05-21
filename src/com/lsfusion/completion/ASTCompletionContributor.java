@@ -871,15 +871,15 @@ public class ASTCompletionContributor extends CompletionContributor {
 
             quickLog("After getDeclarationsFromScope..");
             
-            final Collection<LSFLocalDataPropertyDefinition> localDeclarations = new ArrayList<>();
+            final Collection<LSFLocalPropDeclaration> localDeclarations = new ArrayList<>();
             // search local properties
             PsiElement lastElement = getLastPsiOfType(PsiElement.class);
             if (lastElement != null) {
                 PsiTreeUtil.treeWalkUp(new BaseScopeProcessor() {
                     @Override
                     public boolean execute(@NotNull PsiElement element, @NotNull ResolveState state) {
-                        if (element instanceof LSFLocalDataPropertyDefinition) {
-                            localDeclarations.add((LSFLocalDataPropertyDefinition) element);
+                        if (element instanceof LSFLocalPropDeclaration) {
+                            localDeclarations.add((LSFLocalPropDeclaration) element);
                         }
                         return true;
                     }

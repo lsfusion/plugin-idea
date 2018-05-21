@@ -1,24 +1,16 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.annotation.Annotation;
-import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
-import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.CollectionQuery;
-import com.lsfusion.lang.LSFElementGenerator;
-import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.classes.LSFClassSet;
-import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.PropertyUsageContext;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
@@ -29,7 +21,10 @@ import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<LSFPropDeclaration, LSFGlobalPropDeclaration> implements LSFPropReference {
 
@@ -71,11 +66,16 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
 
         @Override
         public boolean execute(@NotNull PsiElement element, ResolveState state) {
-            if(element instanceof LSFLocalPropDeclaration) {
-                LSFLocalPropDeclaration decl = (LSFLocalPropDeclaration) element;
-                String declName = decl.getName();
-                if (declName != null && declName.equals(this.name) && condition.value(decl)) {
-                    found.add(decl);
+            if (element instanceof LSFLocalDataPropertyDefinition) {
+                LSFNonEmptyLocalPropertyDeclarationNameList declList = ((LSFLocalDataPropertyDefinition) element).getNonEmptyLocalPropertyDeclarationNameList();
+                if (declList != null) {
+                    List<LSFLocalPropertyDeclarationName> nameList = declList.getLocalPropertyDeclarationNameList();
+                    for (LSFLocalPropertyDeclarationName name : nameList) {
+                        String nameStr = name.getName();
+                        if (nameStr != null && nameStr.equals(this.name) && condition.value(name)) {
+                            found.add(name);
+                        }
+                    }
                 }
             }
             return true;

@@ -2,14 +2,12 @@ package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.cache.ParamClassesCache;
-import com.lsfusion.lang.psi.cache.ValueClassCache;
 import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,10 +24,22 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     public abstract LSFSimpleName getSimpleName();
 
     @Nullable
-    protected abstract LSFClassName getClassName();
+    public LSFClassName getClassName() {
+        LSFLocalDataPropertyDefinition def = PsiTreeUtil.getParentOfType(this, LSFLocalDataPropertyDefinition.class, false);
+        if (def != null) {
+            return def.getClassName();
+        }
+        return null;
+    }
 
     @Nullable
-    protected abstract LSFClassNameList getClassNameList();
+    public LSFClassNameList getClassNameList() {
+        LSFLocalDataPropertyDefinition def = PsiTreeUtil.getParentOfType(this, LSFLocalDataPropertyDefinition.class, false);
+        if (def != null) {
+            return def.getClassNameList();
+        }
+        return null;
+    }
 
 
     @Nullable

@@ -1105,14 +1105,20 @@ private list_action_statement_recover ::= !(ACTIVATE | ADDFORM | NEW | APPLY | C
                                             | RBRACE // would not be pinned (matched) but we will consider it the end of list statement
                                            )
 
-localDataPropertyDefinition ::= LOCAL nestedLocalModifier simpleName EQUALS className LBRAC classNameList RBRAC
+localDataPropertyDefinition ::= LOCAL nestedLocalModifier nonEmptyLocalPropertyDeclarationNameList EQUALS className LBRAC classNameList RBRAC
 {
     pin = 1
-    mixin="com.lsfusion.lang.psi.declarations.impl.LSFLocalPropDeclarationImpl"
-    implements="com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration"
 }
 
 nestedLocalModifier ::= (NESTED manageSessionClause?)?
+
+nonEmptyLocalPropertyDeclarationNameList ::= localPropertyDeclarationName (COMMA localPropertyDeclarationName)*
+
+localPropertyDeclarationName ::= simpleName
+{
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFLocalPropDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration"
+}
 
 //Разбиваем правило, чтобы была возможность запинить по EXEC
 execActionPropertyDefinitionBody ::= execActionPropertyDefinitionBody1 | execActionPropertyDefinitionBody2

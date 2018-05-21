@@ -21,7 +21,7 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpointTypeBase;
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointGroupingRule;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.psi.LSFDataPropertyDefinition;
-import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
+import com.lsfusion.lang.psi.LSFLocalDataPropertyDefinition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.breakpoints.properties.JavaLineBreakpointProperties;
@@ -37,7 +37,7 @@ public class LSFPropertyBreakpointType  extends XLineBreakpointTypeBase implemen
     private static Condition<PsiElement> isInPropDeclaration = new Condition<PsiElement>() {
         @Override
         public boolean value(PsiElement psiElement) {
-            return psiElement instanceof LSFLocalPropDeclaration || psiElement instanceof LSFDataPropertyDefinition;
+            return psiElement instanceof LSFLocalDataPropertyDefinition || psiElement instanceof LSFDataPropertyDefinition;
         }
     };
     
