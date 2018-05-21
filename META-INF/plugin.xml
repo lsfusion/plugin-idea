@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.132</version>
+    <version>1.0.133</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -12,6 +12,7 @@
         <b>Version 1.0.133</b><br>
         <ul>
             <li>Minor checks and warnings</li>
+            <li>Multiple locals declaration</li>
         </ul>
     ]]>
     </change-notes>
