@@ -799,7 +799,7 @@ printActionPropertyDefinitionBody ::=
 }
 exportActionPropertyDefinitionBody ::=
 	    EXPORT mappedForm
-        (   XML HEADERS objectUsage stringLiteral (COMMA objectUsage stringLiteral)*
+        (   XML (HEADERS objectUsage stringLiteral (COMMA objectUsage stringLiteral)*)?
         |   JSON
         |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
         |   (DBF (CHARSET stringLiteral)?)

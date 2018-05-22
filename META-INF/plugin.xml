@@ -9,10 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.133</b><br>
+        <b>Version 1.0.134</b><br>
         <ul>
-            <li>Minor checks and warnings</li>
-            <li>Multiple locals declaration</li>
+            <li>HEADERS fix</li>
         </ul>
     ]]>
     </change-notes>
