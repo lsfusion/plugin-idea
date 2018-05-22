@@ -8,11 +8,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class InputContextModifier implements ContextModifier {
+public class ExprParamContextModifier implements ContextModifier {
 
     private final LSFExprParamDeclaration paramDeclare;
 
-    public InputContextModifier(LSFExprParamDeclaration paramDeclare) {
+    public ExprParamContextModifier(LSFExprParamDeclaration paramDeclare) {
         this.paramDeclare = paramDeclare;
     }
 

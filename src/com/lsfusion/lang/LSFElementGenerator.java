@@ -20,10 +20,7 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFComponentDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
@@ -124,6 +121,19 @@ public class LSFElementGenerator {
     public static LSFAnyTokens createMetaCodeFromText(final Project project, final String text) {
         final PsiFile dummyFile = createDummyFile(project, "MODULE " + genName + "; META dummy(dummy) " + text + " END");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFAnyTokens.class).iterator().next();
+    }
+
+    private static LSFExprParamDeclaration rowParamDecl = null;
+    public static LSFExprParamDeclaration createRowParam(Project project) {
+        final PsiFile dummyFile = createDummyFile(project, "MODULE " + genName + "; f(INTEGER row)=1");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFExprParamDeclaration.class).iterator().next();
+    }
+    
+    public static LSFExprParamDeclaration getRowParam(Project project) {
+        if(rowParamDecl == null) {
+            rowParamDecl = createRowParam(project);
+        }
+        return rowParamDecl;
     }
 
     private static List<? extends LSFPropertyDrawDeclaration> builtInFormProps = null;

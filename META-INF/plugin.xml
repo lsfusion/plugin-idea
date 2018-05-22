@@ -11,6 +11,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.134</b><br>
         <ul>
+            <li>FIELDS..DO clause in IMPORT operator</li>
             <li>HEADERS fix</li>
         </ul>
     ]]>

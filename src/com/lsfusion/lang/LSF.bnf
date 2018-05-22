@@ -637,7 +637,7 @@ abstractActionPropertyDefinition ::= ABSTRACT
 
 private topActionPropertyDefinitionBody ::= listActionPropertyDefinitionBody
 
-// leaf before recursive to match newWhere before new (because first one is deeper)
+// leaf before recursive to match newWhere before new (because first one is deeper) and importForm before import
 actionPropertyDefinitionBody ::=    (   leafActionPDB
                                     |   recursiveActionPDB
                                     )                                    
@@ -662,6 +662,7 @@ private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
                                         |	    caseActionPropertyDefinitionBody
                                         |	    multiActionPropertyDefinitionBody	
                                         |	    applyActionPropertyDefinitionBody
+                                        |	    importActionPropertyDefinitionBody // mixed
                                         |       newThreadActionPropertyDefinitionBody // mixed
                                         |	    newExecutorActionPropertyDefinitionBody // mixed, recursive but allways semi
 
@@ -689,7 +690,6 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    readActionPropertyDefinitionBody
                                       	|	    writeActionPropertyDefinitionBody
                                       	|	    importFormActionPropertyDefinitionBody
-                                        |	    importActionPropertyDefinitionBody
                                       	|	    activeFormActionPropertyDefinitionBody
                                       	|	    activateActionPropertyDefinitionBody
                                       	|       externalActionPropertyDefinitionBody
@@ -748,8 +748,8 @@ dialogActionPropertyDefinitionBody ::=
 		)*
 		doInputBody
 {
-    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext, com.lsfusion.lang.psi.context.ExtendInputParamContext"
-    methods = [inferActionParamClasses resolveFormDecl getInputContextModifier getInputContextInferrer]
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
+    methods = [inferActionParamClasses resolveFormDecl getDoContextModifier getDoContextInferrer]
 }
 
 doInputBody ::= SEMI | (doMainBody (ELSE actionPropertyDefinitionBody)?)
@@ -900,8 +900,8 @@ formEmailToObjects ::= formUsage formActionObjectList?
 confirmActionPropertyDefinitionBody ::= ASK propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression,com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendInputParamContext"
-    methods = [inferActionParamClasses resolveClass ensureClass getInputContextModifier getInputContextInferrer]
+    implements="com.lsfusion.lang.psi.context.ActionExpression,com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
+    methods = [inferActionParamClasses resolveClass ensureClass getDoContextModifier getDoContextInferrer]
 }
 
 messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression syncTypeLiteral?
@@ -970,11 +970,22 @@ writeActionPropertyDefinitionBody ::= WRITE (CLIENT DIALOG?)? propertyExpression
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT importActionSourceType? FROM propertyExpression TO nonEmptyImportPropertyUsageListWithIds (WHERE propertyExpression)?
+importActionPropertyDefinitionBody ::= IMPORT importActionSourceType? FROM propertyExpression (FIELDS nonEmptyImportFieldDefinitions | TO nonEmptyImportPropertyUsageListWithIds) (WHERE propertyExpression)? doInputBody
 {
-    pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
+    pin(".*") = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ExtendDoParamContext"
+    methods = [inferActionParamClasses getDoContextModifier getDoContextInferrer]
+}
+
+nonEmptyImportFieldDefinitions ::= importFieldDefinition (COMMA importFieldDefinition)*
+
+importFieldAlias ::= simpleName
+importFieldName ::= simpleName | stringLiteral
+
+importFieldDefinition ::= builtInClassName (importFieldAlias EQ)? importFieldName NULL? {
+    implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext,com.lsfusion.lang.psi.declarations.LSFImportFieldParamDeclaration"
+    extends="com.lsfusion.lang.psi.declarations.impl.LSFImportFieldParamDeclartionImpl"
+    methods = [ resolveClass ensureClass ]
 }
 
 importPropertyUsage ::= propertyUsage
@@ -1049,8 +1060,8 @@ requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO 
 inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS propertyExpression)) (CHANGE (EQUALS propertyExpression)?)? doInputBody // inputDestination? 
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendInputParamContext"
-    methods = [inferActionParamClasses resolveClass ensureClass getInputContextModifier getInputContextInferrer]
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
+    methods = [inferActionParamClasses resolveClass ensureClass getDoContextModifier getDoContextInferrer]
 }
 
 activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage

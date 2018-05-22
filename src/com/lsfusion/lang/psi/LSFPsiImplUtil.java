@@ -281,14 +281,14 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(sourceStatement);
     }
 
-    public static ContextModifier getInputContextModifier(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
+    public static ContextModifier getDoContextModifier(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
         ContextModifier result = null;
 
         LSFFormActionObjectList formList = sourceStatement.getFormActionObjectList();
         if(formList != null) {
             for(LSFFormActionObjectUsage object : formList.getFormActionObjectUsageList()) {
                 if(object.getObjectInputProps() != null) {
-                    ContextModifier inputModifier = new InputContextModifier(object);
+                    ContextModifier inputModifier = new ExprParamContextModifier(object);
                     if (result == null)
                         result = inputModifier;
                     else
@@ -309,33 +309,53 @@ public class LSFPsiImplUtil {
         return result != null ? result : ContextModifier.EMPTY;
     }
 
-    public static ContextInferrer getInputContextInferrer(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
+    public static ContextInferrer getDoContextInferrer(@NotNull LSFDialogActionPropertyDefinitionBody sourceStatement) {
         return new ActionExprInferrer(sourceStatement);
     }
 
-    public static ContextModifier getInputContextModifier(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
-        return new InputContextModifier(sourceStatement.getParamDeclare());
+    public static ContextModifier getDoContextModifier(@NotNull LSFImportActionPropertyDefinitionBody sourceStatement) {
+        ContextModifier result = new ExprParamContextModifier(LSFElementGenerator.getRowParam(sourceStatement.getProject()));
+
+        LSFNonEmptyImportFieldDefinitions fieldDefs = sourceStatement.getNonEmptyImportFieldDefinitions();
+        if(fieldDefs != null) {
+            for(LSFImportFieldDefinition fieldDef : fieldDefs.getImportFieldDefinitionList()) {
+                ContextModifier inputModifier = new ExprParamContextModifier(fieldDef);
+                if (result == null)
+                    result = inputModifier;
+                else
+                    result = new AndContextModifier(result, inputModifier);
+            }
+        }
+        return result != null ? result : ContextModifier.EMPTY;
+    }
+
+    public static ContextInferrer getDoContextInferrer(@NotNull LSFImportActionPropertyDefinitionBody sourceStatement) {
+        return new ActionExprInferrer(sourceStatement);
+    }
+
+    public static ContextModifier getDoContextModifier(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
+        return new ExprParamContextModifier(sourceStatement.getParamDeclare());
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFDoMainBody sourceStatement) {
-        ExtendInputParamContext context = PsiTreeUtil.getParentOfType(sourceStatement, ExtendInputParamContext.class);
-        return context == null ? null : context.getInputContextModifier();
+        ExtendDoParamContext context = PsiTreeUtil.getParentOfType(sourceStatement, ExtendDoParamContext.class);
+        return context == null ? null : context.getDoContextModifier();
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFDoMainBody sourceStatement) {
-        ExtendInputParamContext context = PsiTreeUtil.getParentOfType(sourceStatement, ExtendInputParamContext.class);
-        return context == null ? null : context.getInputContextInferrer();
+        ExtendDoParamContext context = PsiTreeUtil.getParentOfType(sourceStatement, ExtendDoParamContext.class);
+        return context == null ? null : context.getDoContextInferrer();
     }
 
-    public static ContextInferrer getInputContextInferrer(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
+    public static ContextInferrer getDoContextInferrer(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
         return new ActionExprInferrer(sourceStatement);
     }
 
-    public static ContextModifier getInputContextModifier(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
-        return new InputContextModifier(sourceStatement.getParamDeclare());
+    public static ContextModifier getDoContextModifier(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
+        return new ExprParamContextModifier(sourceStatement.getParamDeclare());
     }
 
-    public static ContextInferrer getInputContextInferrer(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
+    public static ContextInferrer getDoContextInferrer(@NotNull LSFConfirmActionPropertyDefinitionBody sourceStatement) {
         return new ActionExprInferrer(sourceStatement);
     }
 
@@ -678,6 +698,11 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFClassSet resolveClass(@NotNull LSFFormActionObjectUsage sourceStatement) {
         return sourceStatement.getObjectUsage().resolveClass();
+    }
+
+    @Nullable
+    public static LSFClassSet resolveClass(@NotNull LSFImportFieldDefinition sourceStatement) {
+        return resolve(sourceStatement.getBuiltInClassName());
     }
 
     @Nullable
@@ -3191,6 +3216,9 @@ public class LSFPsiImplUtil {
     }
 
     public static void ensureClass(@NotNull LSFFormActionObjectUsage sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
+    }
+
+    public static void ensureClass(@NotNull LSFImportFieldDefinition sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
     }
 
     public static void ensureClass(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement, @NotNull LSFValueClass valueClass, MetaTransaction metaTrans) {
