@@ -255,6 +255,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "JAVA"                  			    { return JAVA; }
   "JOIN"                    			{ return JOIN; }
   "JSON"                    			{ return JSON; }
+  "KEYPRESS"                    		{ return KEYPRESS; }
   "LAST"                                { return LAST; }
   "LEFT"                    			{ return LEFT; }
   "LIKE"                   			    { return LIKE; }

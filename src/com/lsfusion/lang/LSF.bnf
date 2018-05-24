@@ -618,7 +618,8 @@ eventIdSetting ::= EVENTID stringLiteral
 hideEditKey ::= HIDE
 
 contextMenuEventType ::= CONTEXTMENU (localizedStringLiteral)? { pin = 1 }
-formEventType ::= CHANGE | GROUPCHANGE | CHANGEWYS | EDIT | contextMenuEventType
+keyPressedEventType ::= KEYPRESS stringLiteral  { pin = 1 }
+formEventType ::= CHANGE | GROUPCHANGE | CHANGEWYS | EDIT | contextMenuEventType | keyPressedEventType
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// ACTION PROPERTIES ///////////////////////////
