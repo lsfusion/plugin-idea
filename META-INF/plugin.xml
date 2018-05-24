@@ -13,6 +13,7 @@
         <ul>
             <li>FIELDS..DO clause in IMPORT operator</li>
             <li>HEADERS fix</li>
+            <li>indirect locals before direct globals in property resolving</li>
         </ul>
     ]]>
     </change-notes>

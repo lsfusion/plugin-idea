@@ -96,21 +96,19 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
     protected Collection<? extends LSFPropDeclaration> resolveDeclarations() {
         Collection<? extends LSFPropDeclaration> declarations = BaseUtils.emptyList();
 
-        if (getFullNameRef() == null)
+        if (getFullNameRef() == null) {
             declarations = resolveLocals(BaseUtils.immutableCast(getCondition()), getFinalizer());
-
-        if (declarations.isEmpty()) {
-            declarations = super.resolveDeclarations();
-        }
-
-        if(canBeUsedInDirect()) {
-            if(declarations.isEmpty())
+            if (declarations.isEmpty() && canBeUsedInDirect()) {
                 declarations = resolveLocals(getInDirectCondition(), Finalizer.EMPTY);
-
-            if(declarations.isEmpty())
-                declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), BaseUtils.<Condition<LSFGlobalPropDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
+            }
         }
         
+        if (declarations.isEmpty()) {
+            declarations = super.resolveDeclarations();
+            if (declarations.isEmpty() && canBeUsedInDirect()) {
+                declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), BaseUtils.<Condition<LSFGlobalPropDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
+            }
+        }        
         return declarations;
     }
 
