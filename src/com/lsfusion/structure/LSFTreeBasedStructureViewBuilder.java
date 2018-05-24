@@ -26,6 +26,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
     private final LSFFile file;
 
     private final LSFValueClass valueClass;
+    private final ActionOrPropType type;
 
     private final LSFStructureFileCaretListener caretListener;
 
@@ -34,18 +35,19 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
     private boolean needTotalExpansion = true;
 
     public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFStructureFileCaretListener caretListener) {
-        this(file, null, caretListener, null);
+        this(file, null, caretListener, null, ActionOrPropType.ACTION_OR_PROP);
     }
 
     public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler) {
-        this(file, valueClass, null, navigationHandler);
+        this(file, valueClass, null, navigationHandler, ActionOrPropType.PROP);
     }
 
-    public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFStructureFileCaretListener caretListener, LSFStructureViewNavigationHandler navigationHandler) {
+    public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFStructureFileCaretListener caretListener, LSFStructureViewNavigationHandler navigationHandler, ActionOrPropType type) {
         this.file = file;
         this.valueClass = valueClass;
         this.navigationHandler = navigationHandler;
         this.caretListener = caretListener;
+        this.type = type;
     }
 
     @NotNull
@@ -79,7 +81,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
         }
 
         needTotalExpansion = true;
-        return new LSFClassInterfacesTreeModel(file, currentClass, navigationHandler);
+        return new LSFClassInterfacesTreeModel(file, currentClass, navigationHandler, type);
     }
 
     @NotNull

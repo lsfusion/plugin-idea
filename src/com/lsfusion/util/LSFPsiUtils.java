@@ -81,10 +81,10 @@ public class LSFPsiUtils {
         final List<TextRange> ranges = new ArrayList<>();
         final List<LSFExpression> expressions = new ArrayList<>();
 
-        fillLsfExpressions(file, offset, ranges, expressions);
         if (!isLsfIdentifierPart(documentText.charAt(offset)) && offset > 0) {
             fillLsfExpressions(file, offset - 1, ranges, expressions);
         }
+        fillLsfExpressions(file, offset, ranges, expressions);
 
         return expressions;
     }
@@ -105,7 +105,8 @@ public class LSFPsiUtils {
     }
 
     public static boolean isLsfIdentifierPart(char ch) {
-        return Character.isJavaIdentifierPart(ch);
+        // [a-zA-Z_0-9]
+        return (ch >= 'a' && ch <='z') || (ch >= 'A' && ch <='Z') || (ch >= '0' && ch <='9') || ch == '_';  
     }
 
     public static String getPresentableText(LSFGlobalPropDeclaration property) {

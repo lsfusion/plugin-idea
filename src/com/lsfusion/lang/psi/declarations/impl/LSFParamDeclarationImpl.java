@@ -39,8 +39,8 @@ public abstract class LSFParamDeclarationImpl extends LSFExprParamDeclarationImp
 
     @Override
     public LSFStringClassRef getClassName() {
-        PsiElement parent = getParent();
-        if (parent instanceof LSFClassParamDeclare) {
+        ClassParamDeclareContext parent = PsiTreeUtil.getParentOfType(this, ClassParamDeclareContext.class, false);
+        if (parent != null) {
             LSFClassName cName = ((LSFClassParamDeclare) parent).getClassName();
             if (cName != null) {
                 return LSFPsiImplUtil.getClassNameRef(cName);

@@ -408,7 +408,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "##"                                  { return FAKETWODASHES;}
   "###"                                 { return FAKETHREEDASHES;}
 
-  {FIRST_ID_LETTER} {NEXT_ID_LETTER}*   { return ID; }
+  {FIRST_ID_LETTER} {NEXT_ID_LETTER}*   { return ID; } // used in isLsfIdentifierPart
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
 public class LSFClassInterfacesTreeModel extends TextEditorBasedStructureViewModel implements StructureViewModel.ElementInfoProvider {
     private final LSFStructureTreeElementBase rootElement;
 
-    protected LSFClassInterfacesTreeModel(PsiFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler) {
+    protected LSFClassInterfacesTreeModel(PsiFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler, ActionOrPropType type) {
         super(file);
-        this.rootElement = new LSFStructureTreeElementBase(file, valueClass, navigationHandler);
+        this.rootElement = new LSFStructureTreeElementBase(file, valueClass, navigationHandler, type);
     }
 
     @Override

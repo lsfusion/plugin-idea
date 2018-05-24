@@ -24,11 +24,13 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
 
     private final LSFValueClass valueClass;
     private final LSFStructureViewNavigationHandler navigationHandler;
+    private final ActionOrPropType type;
 
-    protected LSFStructureTreeElementBase(PsiFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler) {
+    protected LSFStructureTreeElementBase(PsiFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler, ActionOrPropType type) {
         super(file);
         this.valueClass = valueClass;
         this.navigationHandler = navigationHandler;
+        this.type = type;
     }
 
     @NotNull
@@ -39,18 +41,20 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
         if (valueClass != null && getElement() != null) {
             GlobalSearchScope scope = LSFGlobalResolver.getRequireScope((LSFFile) getElement());
 
-            children.addAll(LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFPropertyStatementTreeElement>() {
-                @Override
-                public LSFPropertyStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
-                    return new LSFPropertyStatementTreeElement(valueClass, ((LSFGlobalPropDeclaration) statement), navigationHandler);
-                }
-            }, true, true));
-            children.addAll(LSFPsiUtils.mapActionsApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFActionStatementTreeElement>() {
-                @Override
-                public LSFActionStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
-                    return new LSFActionStatementTreeElement(valueClass, ((LSFActionDeclaration) statement), navigationHandler);
-                }
-            }, true, true));
+            if(type.isProp())
+                children.addAll(LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFPropertyStatementTreeElement>() {
+                    @Override
+                    public LSFPropertyStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
+                        return new LSFPropertyStatementTreeElement(valueClass, ((LSFGlobalPropDeclaration) statement), navigationHandler);
+                    }
+                }, true, true));
+            if(type.isAction())
+                children.addAll(LSFPsiUtils.mapActionsApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFActionStatementTreeElement>() {
+                    @Override
+                    public LSFActionStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
+                        return new LSFActionStatementTreeElement(valueClass, ((LSFActionDeclaration) statement), navigationHandler);
+                    }
+                }, true, true));
         }
         Collections.sort(children, Sorter.ALPHA_SORTER.getComparator());
         return children;
