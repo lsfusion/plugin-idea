@@ -622,6 +622,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     boolean res = false;
                     if (!res) res = completePropertyInContextOfFormPropertyObject(propUsage);
                     if (!res) res = completePropertyInFormContext(propUsage);
+                    if (!res) res = completePropertyInImportUsage(propUsage);
                     if (!res) res = completePropertyInNoContext(propUsage);
                     if (!res) res = completePropertyInModifyParamContext(propUsage);
                     quickLog("Completed propertyUsage");
@@ -661,6 +662,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     propertyElseActionCompleted = true;
 
                     boolean res = false;
+                    if (!res) res = completePropertyElseActionInContextOfFormPropertyObject(propUsage);
                     if (!res) res = completePropertyElseActionInContextOfMappedPropertiesList(propUsage);
                     if (!res) res = completePropertyElseActionInNoContext(propUsage);
                     quickLog("Completed propertyElseActionUsage");
@@ -701,6 +703,21 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (frame != null) {
                 for (String designProperty : DESIGN_PROPERTIES) {
                     addLookupElement(createLookupElement(designProperty, DESIGN_PRIORITY, true, null));
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private boolean completePropertyInImportUsage(Frame propUsage) {
+            Frame importPropertyUsage = getLastFrameOfType(propUsage, IMPORT_PROPERTY_USAGE);
+            if (importPropertyUsage != null) {
+                LSFImportPropertyUsage psiImportPropertyUsage = getPsiOfTypeForFrame(importPropertyUsage, LSFImportPropertyUsage.class);
+                if(psiImportPropertyUsage != null) {
+                    completeProperties(
+                            psiImportPropertyUsage.resolveParamClasses(),
+                            MUST_USE_ALL
+                    );
                 }
                 return true;
             }
@@ -759,13 +776,18 @@ public class ASTCompletionContributor extends CompletionContributor {
             return formMappedProperty != null && completeActionInFormContext(formMappedProperty);
         }
 
+        private boolean completePropertyElseActionInContextOfFormPropertyObject(Frame propUsage) {
+            Frame formMappedProperty = getLastFrameOfType(propUsage, FORM_PROPERTY_DRAW_OBJECT);
+            return formMappedProperty != null && completePropertyElseActionInFormContext(formMappedProperty);
+        }
+
         private boolean completeActionInContextOfMappedPropertiesList(Frame propUsage) {
             Frame mappedPropertiesList = getLastFrameOfType(propUsage, FORM_MAPPED_NAME_PROPERTIES_LIST);
             if (mappedPropertiesList != null) {
                 LSFFormMappedNamePropertiesList psiMappedPropertiesList = getPsiOfTypeForFrame(mappedPropertiesList, LSFFormMappedNamePropertiesList.class);
                 if (psiMappedPropertiesList != null) {
                     completeActions(
-                            resolveParamClasses(psiMappedPropertiesList),
+                            psiMappedPropertiesList.resolveParamClasses(),
                             MUST_USE_ALL
                     );
                 }
@@ -779,7 +801,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 LSFFormMappedNamePropertiesList psiMappedPropertiesList = getPsiOfTypeForFrame(mappedPropertiesList, LSFFormMappedNamePropertiesList.class);
                 if (psiMappedPropertiesList != null) {
                     completePropertyElseActions(
-                            resolveParamClasses(psiMappedPropertiesList),
+                            psiMappedPropertiesList.resolveParamClasses(),
                             MUST_USE_ALL
                     );
                 }
@@ -804,6 +826,14 @@ public class ASTCompletionContributor extends CompletionContributor {
             }
             return false;
         }
+        private boolean completePropertyElseActionInFormContext(Frame propUsage) {
+            Frame formStatement = getLastFrameOfType(propUsage, FORM_STATEMENT);
+            if (formStatement != null) {
+                completePropertyElseActionInContextOfFormStatement(formStatement);
+                return true;
+            }
+            return false;
+        }
 
         private void completePropertyInContextOfFormStatement(Frame startFrom) {
             LSFFormStatement psiFormStatement = getFormStatementPSI(startFrom);
@@ -816,6 +846,13 @@ public class ASTCompletionContributor extends CompletionContributor {
             LSFFormStatement psiFormStatement = getFormStatementPSI(startFrom);
             if (psiFormStatement != null) {
                 completeActions(getContextClasses(psiFormStatement, true), MUST_USE_ANY);
+            }
+        }
+
+        private void completePropertyElseActionInContextOfFormStatement(Frame startFrom) {
+            LSFFormStatement psiFormStatement = getFormStatementPSI(startFrom);
+            if (psiFormStatement != null) {
+                completePropertyElseActions(getContextClasses(psiFormStatement, true), MUST_USE_ANY);
             }
         }
 
