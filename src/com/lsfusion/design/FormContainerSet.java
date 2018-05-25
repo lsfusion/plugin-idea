@@ -70,8 +70,8 @@ public class FormContainerSet {
         set.mainContainer.setChildrenAlignment(Alignment.START);
         set.mainContainer.setFlex(1);
         set.mainContainer.setAlignment(FlexAlignment.STRETCH);
-        set.mainContainer.add(set.objectsContainer);
         set.mainContainer.add(set.panelContainer);
+        set.mainContainer.add(set.objectsContainer);
         set.mainContainer.add(set.toolbarBoxContainer);
         
         set.objectsContainer.setFlex(1);
