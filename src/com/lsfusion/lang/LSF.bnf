@@ -919,7 +919,7 @@ asyncUpdateActionPropertyDefinitionBody ::= ASYNCUPDATE propertyExpression
     methods = [inferActionParamClasses]
 }
 
-seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST)? 
+seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST | NULL)? 
                                             (   (objectID EQUALS propertyExpression) 
                                             |   (groupObjectID (OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)*)?) 
                                             )
@@ -1326,7 +1326,7 @@ classViewType ::= PANEL | GRID | TOOLBAR
 
 formGroupObjectPageSize ::= PAGESIZE intLiteral
 
-formGroupObjectUpdate ::= FIRST | LAST | PREV
+formGroupObjectUpdate ::= FIRST | LAST | PREV | NULL
 
 formGroupObjectRelativePosition ::= AFTER groupObjectUsage | BEFORE groupObjectUsage  
 
@@ -1334,7 +1334,7 @@ formSingleGroupObjectDeclaration ::= formObjectDeclaration
 
 formMultiGroupObjectDeclaration ::= (simpleName EQUALS)?
 		                            LBRAC
-			                        formObjectDeclaration (COMMA formObjectDeclaration)+
+			                        formObjectDeclaration (COMMA formObjectDeclaration)*
 		                            RBRAC
 
 formObjectDeclaration ::= (simpleName EQUALS)?
