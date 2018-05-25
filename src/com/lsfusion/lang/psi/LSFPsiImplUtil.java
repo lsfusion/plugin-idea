@@ -2100,7 +2100,7 @@ public class LSFPsiImplUtil {
         if(declareParams == null)
             return groupProps;
 
-        Set<String> usedInterfaces = new ExprsContextModifier(getContextExprs(sourceStatement)).resolveUsedParams();
+        Set<String> usedInterfaces = new ExprsContextModifier(getContextExprs(sourceStatement)).resolveAllParams();
 //        нужно groupProps в дырки вставить для context independent группировки
         int ga = 0;
         int groupSize = groupProps.size();
@@ -2131,7 +2131,7 @@ public class LSFPsiImplUtil {
         List<LSFClassSet> groupClasses = finishParamClasses(groupExprsList);
         List<LSFClassSet> declareClasses = resolveParamDeclClasses(declareParams);
 
-        Set<String> usedInterfaces = new ExprsContextModifier(getContextExprs(sourceStatement)).resolveUsedParams();
+        Set<String> usedInterfaces = new ExprsContextModifier(getContextExprs(sourceStatement)).resolveAllParams();
 //        нужно groupProps в дырки вставить для context independent группировки
         int ga = 0;
         int groupSize = groupClasses.size();
@@ -2386,9 +2386,20 @@ public class LSFPsiImplUtil {
         return result;
     }
 
+    // по идее должен вызываться если подразумевается отсутствие внешнего контекста
     @NotNull
     public static List<LSFExprParamDeclaration> resolveParams(@NotNull LSFPropertyExpression sourceStatement) {
         return new ExprsContextModifier(sourceStatement).resolveParams(Integer.MAX_VALUE, new HashSet<LSFExprParamDeclaration>());
+    }
+
+    @NotNull
+    public static Set<String> resolveAllParams(@NotNull LSFPropertyExpression sourceStatement) {
+        return new ExprsContextModifier(sourceStatement).resolveAllParams();
+    }
+
+    @NotNull
+    public static Set<String> resolveAllParams(@NotNull LSFListActionPropertyDefinitionBody sourceStatement) {
+        return new ActionContextModifier(sourceStatement).resolveAllParams();
     }
 
     public static List<LSFParamDeclaration> resolveParams(@Nullable LSFClassParamDeclareList classNameList) {

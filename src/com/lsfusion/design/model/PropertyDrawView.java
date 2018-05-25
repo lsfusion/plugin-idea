@@ -481,7 +481,7 @@ public class PropertyDrawView extends ComponentView {
         if (entity.isAction) {
             return String.format(TOOL_TIP_FORMAT + DETAILED_ACTION_TOOL_TIP_FORMAT, propCaption, editKeyText, entity.canonicalName, ifaceObjects, scriptPath, entity.sID);
         } else {
-            String ifaceClasses = BaseUtils.toString(", ", entity.interfeceClasses.toArray());
+            String ifaceClasses = BaseUtils.toString(", ", entity.interfaceClasses.toArray());
             String returnClass = "";
             if (entity.baseClass != null) {
                 if (entity.baseClass instanceof DataClass) {

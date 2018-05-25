@@ -11,16 +11,14 @@ import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 
 public class AddObjectActionProperty extends PropertyDrawEntity {
-    public AddObjectActionProperty(String alias, GroupObjectEntity groupObject, LSFActionOrGlobalPropDeclaration propDeclaration, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        super(alias, "NEW", groupObject.objects, propDeclaration, commonFormOptions, propertyFormOptions, form);
+    public AddObjectActionProperty(String alias, String caption, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
+        super(alias, "NEW", caption != null ? caption : "Добавить", groupObject.objects, commonFormOptions, propertyFormOptions, form);
     }
 
     @Override
     protected void initDefaultView() {
         super.initDefaultView();
 
-        caption = "Добавить";
-        isAction = true;
         iconPath = "add.png";
         forceViewType = ClassViewType.TOOLBAR;
         changeKey = KeyStrokes.getAddActionPropertyKeyStroke();

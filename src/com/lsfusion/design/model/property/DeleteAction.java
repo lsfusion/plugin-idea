@@ -8,17 +8,14 @@ import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 
 public class DeleteAction extends PropertyDrawEntity {
-    public DeleteAction(String alias, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        super(alias, "DELETE", groupObject.objects,
-                null, commonFormOptions, propertyFormOptions, form);
+    public DeleteAction(String alias, String caption, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
+        super(alias, "DELETE", caption != null ? caption : "Удалить", groupObject.objects, commonFormOptions, propertyFormOptions, form);
     }
 
     @Override
     protected void initDefaultView() {
         super.initDefaultView();
 
-        caption = "Удалить";
-        isAction = true;
         iconPath = "delete.png";
         changeKey = KeyStrokes.getDeleteActionPropertyKeyStroke();
         showChangeKey = false;

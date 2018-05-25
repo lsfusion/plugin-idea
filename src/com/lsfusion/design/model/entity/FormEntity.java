@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.lsfusion.design.KeyStrokes;
 import com.lsfusion.design.model.ModalityType;
 import com.lsfusion.design.model.property.*;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -14,14 +13,12 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.indexes.ActionIndex;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
+import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class FormEntity {
     private LSFFile file;
@@ -129,10 +126,8 @@ public class FormEntity {
     private void addFiltersToFilterGroup(RegularFilterGroupEntity filterGroup, List<LSFRegularFilterDeclaration> regularFilterDeclarationList) {
         for (LSFRegularFilterDeclaration regularFilterDeclaration : regularFilterDeclarationList) {
 
-            List<ObjectEntity> params = new ArrayList<>();
-            for (LSFExprParamDeclaration paramDeclaration : regularFilterDeclaration.getFormExprDeclaration().getPropertyExpression().resolveParams()) {
-                params.add(getObject(paramDeclaration.getDeclName()));
-            }
+            LSFFormExprDeclaration formExprDeclaration = regularFilterDeclaration.getFormExprDeclaration();
+            Set<ObjectEntity> params = getObjects(formExprDeclaration);
 
             LSFStringLiteral stringLiteral = regularFilterDeclaration.getStringLiteral();
             boolean isDefault = regularFilterDeclaration.getFilterSetDefault() != null;
@@ -143,6 +138,22 @@ public class FormEntity {
             RegularFilterEntity filter = new RegularFilterEntity(regularFilterDeclaration.getLocalizedStringLiteral().getValue(), keyStroke, params, isDefault);
             filterGroup.addFilter(filter);
         }
+    }
+
+    private Set<ObjectEntity> getObjects(LSFFormExprDeclaration formExprDeclaration) {
+        Set<ObjectEntity> params = new HashSet<>();
+        for (String paramDeclaration : formExprDeclaration.getPropertyExpression().resolveAllParams()) {
+            params.add(getObject(paramDeclaration));
+        }
+        return params;
+    }
+
+    private Set<ObjectEntity> getObjects(LSFFormActionDeclaration formActionDeclaration) {
+        Set<ObjectEntity> params = new HashSet<>();
+        for (String paramDeclaration : formActionDeclaration.getListActionPropertyDefinitionBody().resolveAllParams()) {
+            params.add(getObject(paramDeclaration));
+        }
+        return params;
     }
 
     private void extractPropertyDraws(LSFFormExtend formExtend) {
@@ -156,19 +167,34 @@ public class FormEntity {
                     boolean reverseFor = relativeProsition != null && !relativeProsition.first;
                     for (int i = reverseFor ? mappedDeclList.size() - 1 : 0; (reverseFor && i >= 0) || (!reverseFor && i < mappedDeclList.size()); i = i + (reverseFor ? -1 : 1)) {
                         LSFFormPropertyDrawMappedDecl prop = mappedDeclList.get(i);
-                        LSFFormPropertyDrawObject formPropertyObject = prop.getFormPropertyDrawObject();
-                        if(formPropertyObject != null) {
-                            LSFObjectUsageList objectUsageList = formPropertyObject.getObjectUsageList();
+                        String alias = prop.getSimpleName() != null ? prop.getSimpleName().getName() : null;
+                        
+                        boolean isAction = false;
+                        LSFClassSet valueClass = null;
 
-                            String alias = prop.getSimpleName() != null ? prop.getSimpleName().getName() : null;
-                            addPropertyWithOptions(alias, formPropertyObject.getFormPropertyName(), commonOptions, prop.getFormPropertyOptionsList(), relativeProsition, objectUsageList);
+                        List<ObjectEntity> objectUsageList;
+                        LSFFormPropertyDrawObject formPropertyObject = prop.getFormPropertyDrawObject();
+                        LSFFormPropertyName formPropertyName = null;
+                        if(formPropertyObject != null) {
+                            formPropertyName = formPropertyObject.getFormPropertyName();
+                            objectUsageList = getObjects(formPropertyObject.getObjectUsageList());
+                        } else {
+                            LSFFormExprDeclaration formExprDeclaration = prop.getFormExprDeclaration();
+                            if(formExprDeclaration != null) {
+                                valueClass = LSFExClassSet.fromEx(formExprDeclaration.getPropertyExpression().resolveValueClass(false));
+                                objectUsageList = new ArrayList<>(getObjects(formExprDeclaration));
+                            } else {
+                                isAction = true;
+                                objectUsageList = new ArrayList<>(getObjects(prop.getFormActionDeclaration()));
+                            }
                         }
+                        addPropertyWithOptions(alias, prop.getLocalizedStringLiteral(), formPropertyName, isAction, valueClass, commonOptions, prop.getFormPropertyOptionsList(), relativeProsition, objectUsageList);
                     }
                 }
             } else {
                 LSFFormMappedNamePropertiesList mappedProps = formProperties.getFormMappedNamePropertiesList();
                 if (mappedProps != null) {
-                    LSFObjectUsageList objectUsageList = mappedProps.getObjectUsageList();
+                    List<ObjectEntity> objectUsageList = getObjects(mappedProps.getObjectUsageList());
 
                     commonOptions = mappedProps.getFormPropertyOptionsList();
                     Pair<Boolean, PropertyDrawEntity> relativePosition = getRelativePosition(commonOptions);
@@ -182,7 +208,7 @@ public class FormEntity {
                         for (int i = reverseFor ? formPropertyDrawNameDeclList.size() - 1 : 0; (reverseFor && i >= 0) || (!reverseFor && i < formPropertyDrawNameDeclList.size()); i = i + (reverseFor ? -1 : 1)) {
                             LSFFormPropertyDrawNameDecl prop = formPropertyDrawNameDeclList.get(i);
                             String alias = prop.getSimpleName() != null ? prop.getSimpleName().getName() : null;
-                            addPropertyWithOptions(alias, prop.getFormPropertyName(), commonOptions, prop.getFormPropertyOptionsList(), relativePosition, objectUsageList);
+                            addPropertyWithOptions(alias, prop.getLocalizedStringLiteral(), prop.getFormPropertyName(), false,  null, commonOptions, prop.getFormPropertyOptionsList(), relativePosition, objectUsageList);
                         }
                     }
                 }
@@ -191,69 +217,64 @@ public class FormEntity {
         }
     }
 
-    private void addPropertyWithOptions(String alias, LSFFormPropertyName formPropertyName, LSFFormPropertyOptionsList commonOptions,
-                                        LSFFormPropertyOptionsList formPropertyOptions, Pair<Boolean, PropertyDrawEntity> relativeProsition, LSFObjectUsageList objectUsageList) {
+    private void addPropertyWithOptions(String alias, LSFLocalizedStringLiteral captionLiteral, LSFFormPropertyName formPropertyName, boolean isAction, LSFClassSet valueClass, LSFFormPropertyOptionsList commonOptions,
+                                        LSFFormPropertyOptionsList formPropertyOptions, Pair<Boolean, PropertyDrawEntity> relativeProsition, List<ObjectEntity> objects) {
+
+        String caption = captionLiteral != null ? captionLiteral.getValue() : null;
+        
+        PropertyDrawEntity propertyDraw = null;
+        GroupObjectEntity groupObject = getApplyObject(objects);
+        
         if(formPropertyName != null) {
             LSFActionOrPropReference<?, ?> propUsage = formPropertyName.getPropertyElseActionUsage();
             if(propUsage == null)
                 propUsage = formPropertyName.getActionUsage();
 
-            List<ObjectEntity> objects = new ArrayList<>();
-            if (objectUsageList != null) {
-                LSFNonEmptyObjectUsageList nonEmptyObjectUsageList = objectUsageList.getNonEmptyObjectUsageList();
-                if (nonEmptyObjectUsageList != null) {
-                    for (LSFObjectUsage objectUsage : nonEmptyObjectUsageList.getObjectUsageList()) {
-                        objects.add(getObject(objectUsage.getNameRef()));
-                    }
-                }
-            }
-            GroupObjectEntity groupObject = getApplyObject(objects);
-
-            PropertyDrawEntity propertyDraw = null;
             if (propUsage != null) {
                 LSFActionOrGlobalPropDeclaration propDeclaration = (LSFActionOrGlobalPropDeclaration)propUsage.resolveDecl();
-                propertyDraw = new PropertyDrawEntity(alias, propUsage.getNameRef(), objects, propDeclaration, commonOptions, formPropertyOptions, this);
+                propertyDraw = new PropertyDrawEntity(alias, propUsage.getNameRef(), objects, propDeclaration, caption, commonOptions, formPropertyOptions, this);
             } else {
                 LSFPredefinedFormPropertyName predef = formPropertyName.getPredefinedFormPropertyName();
                 if (predef != null && groupObject != null) {
                     String name = predef.getName();
                     if ("VALUE".equals(name)) {
-                        propertyDraw = new ObjectValueProperty(alias, groupObject, commonOptions, formPropertyOptions, this);
+                        propertyDraw = new ObjectValueProperty(alias, caption, groupObject, commonOptions, formPropertyOptions, this);
                         propertyDraw.baseClass = new ObjectClass();
-                    } else if ("SELECTION".equals(name)) {
-                        String sIDPostfix = "";
-                        for (int i = 0; i < objects.size(); i++) {
-                            sIDPostfix += objects.get(i).valueClass.getName();
-                            if (i + 1 < objects.size()) {
-                                sIDPostfix += '|';
-                            }
-                        }
-
-                        propertyDraw = new SelectionProperty(alias, groupObject, sIDPostfix, commonOptions, formPropertyOptions, this);
-                        RegularFilterGroupEntity filterGroup = new RegularFilterGroupEntity(null);
-                        RegularFilterEntity filter = new RegularFilterEntity("Отмеченные", KeyStrokes.getSelectionFilterKeyStroke(), objects);
-                        filterGroup.addFilter(filter);
-                        regularFilterGroups.add(filterGroup);
                     } else if ("NEW".equals(name)) {
-                        propertyDraw = new AddObjectActionProperty(alias, groupObject, null, commonOptions, formPropertyOptions, this);
+                        propertyDraw = new AddObjectActionProperty(alias, caption, groupObject, commonOptions, formPropertyOptions, this);
                     } else if ("NEWEDIT".equals(name)) {
-                        propertyDraw = new AddFormAction(alias, groupObject, commonOptions, formPropertyOptions, this);
+                        propertyDraw = new AddFormAction(alias, caption, groupObject, commonOptions, formPropertyOptions, this);
                     } else if ("EDIT".equals(name)) {
-                        propertyDraw = new EditFormAction(alias, groupObject, commonOptions, formPropertyOptions, this);
+                        propertyDraw = new EditFormAction(alias, caption, groupObject, commonOptions, formPropertyOptions, this);
                     } else if ("DELETE".equals(name)) {
-                        propertyDraw = new DeleteAction(alias, groupObject, commonOptions, formPropertyOptions, this);
+                        propertyDraw = new DeleteAction(alias, caption, groupObject, commonOptions, formPropertyOptions, this);
                     }
                 }
             }
+        } else // expr or listAction
+            propertyDraw = new PropertyDrawEntity(alias, null, objects, isAction, caption, valueClass, commonOptions, formPropertyOptions, this);
+        
+        if (propertyDraw != null) {
+            addPropertyDraw(propertyDraw,
+                    relativeProsition == null ? getRelativePosition(formPropertyOptions) : relativeProsition);
+            if (groupObject != null && propertyDraw.toDraw == null) {
+                propertyDraw.toDraw = groupObject;
+            }
+        }
 
-            if (propertyDraw != null) {
-                addPropertyDraw(propertyDraw,
-                        relativeProsition == null ? getRelativePosition(formPropertyOptions) : relativeProsition);
-                if (groupObject != null && propertyDraw.toDraw == null) {
-                    propertyDraw.toDraw = groupObject;
+    }
+
+    private List<ObjectEntity> getObjects(LSFObjectUsageList objectUsageList) {
+        List<ObjectEntity> objects = new ArrayList<>();
+        if (objectUsageList != null) {
+            LSFNonEmptyObjectUsageList nonEmptyObjectUsageList = objectUsageList.getNonEmptyObjectUsageList();
+            if (nonEmptyObjectUsageList != null) {
+                for (LSFObjectUsage objectUsage : nonEmptyObjectUsageList.getObjectUsageList()) {
+                    objects.add(getObject(objectUsage.getNameRef()));
                 }
             }
         }
+        return objects;
     }
 
     private Pair<Boolean, PropertyDrawEntity> getRelativePosition(LSFFormPropertyOptionsList options) {
@@ -389,7 +410,7 @@ public class FormEntity {
         if (!propDeclarations.isEmpty()) {
             declaration = propDeclarations.iterator().next();
         }
-        return new PropertyDrawEntity(null, sID, new ArrayList<ObjectEntity>(), declaration, null, null, this);
+        return new PropertyDrawEntity(null, sID, new ArrayList<ObjectEntity>(), declaration, true, null, null, null, null, this);
     }
 
     public boolean isModal() {

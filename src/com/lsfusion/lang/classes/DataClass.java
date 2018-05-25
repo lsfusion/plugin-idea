@@ -125,4 +125,9 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     public String getCanonicalName() {
         return getName();
     }
+
+    @Override
+    public LSFClassSet getUpSet() {
+        return this;
+    }
 }

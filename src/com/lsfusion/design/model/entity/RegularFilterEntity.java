@@ -4,19 +4,16 @@ import com.lsfusion.design.KeyStrokes;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Set;
 
 public class RegularFilterEntity {
     public String name = "";
     public KeyStroke key;
     public boolean showKey = true;
-    public List<ObjectEntity> objects;
+    public Set<ObjectEntity> objects;
     public boolean isDefault;
 
-    public RegularFilterEntity(String iname, KeyStroke ikey, List<ObjectEntity> objects) {
-        this(iname, ikey, objects, false);
-    }
-
-    public RegularFilterEntity(String iname, KeyStroke ikey, List<ObjectEntity> objects, boolean isDefault) {
+    public RegularFilterEntity(String iname, KeyStroke ikey, Set<ObjectEntity> objects, boolean isDefault) {
         name = iname;
         key = ikey;
         this.objects = objects;

@@ -8,6 +8,8 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.containers.ArrayListSet;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.classes.CustomClassSet;
+import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
@@ -97,5 +99,10 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
             return stringLiteral.getValue();
         }
         return null;
+    }
+
+    @Override
+    public LSFClassSet getUpSet() {
+        return new CustomClassSet(this);
     }
 }

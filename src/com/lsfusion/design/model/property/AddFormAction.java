@@ -8,16 +8,14 @@ import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 
 public class AddFormAction extends PropertyDrawEntity {
-    public AddFormAction(String alias, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        super(alias, "ADDFORM", groupObject.objects, null, commonFormOptions, propertyFormOptions, form);
+    public AddFormAction(String alias, String caption, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
+        super(alias, "ADDFORM", caption != null ? caption : "Добавить", groupObject.objects, commonFormOptions, propertyFormOptions, form);
     }
 
     @Override
     protected void initDefaultView() {
         super.initDefaultView();
 
-        caption = "Добавить";
-        isAction = true;
         iconPath = "add.png";
         changeKey = KeyStrokes.getAddActionPropertyKeyStroke();
         showChangeKey = false;

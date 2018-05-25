@@ -3,10 +3,7 @@ package com.lsfusion.lang.psi.context;
 import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class ElementsContextModifier implements ContextModifier {
 
@@ -24,12 +21,13 @@ public abstract class ElementsContextModifier implements ContextModifier {
             if(usedParams != null)
                 usedParams.add(paramName);
         }
-        if(foundParams != null && modifier instanceof ModifyParamContext) // hardcode конечно, но иначе придется все вручную делать
+        if(foundParams != null && modifier instanceof ModifyParamContext) // hardcode конечно, но иначе придется все вручную делать 
             return;
         for (PsiElement child : modifier.getChildren())
             recResolveParams(child, offset, foundParams, usedParams, extParams);
     }
     
+    // по идее должен вызываться если подразумевается отсутствие (или специальная обработка используется) внешнего контекста
     public List<LSFExprParamDeclaration> resolveParams(int offset, Set<LSFExprParamDeclaration> currentParams) {
         Set<String> paramNames = new HashSet<>();
         for(LSFExprParamDeclaration currentParam : currentParams)
@@ -41,8 +39,9 @@ public abstract class ElementsContextModifier implements ContextModifier {
         return extParams;
     }
 
-    public Set<String> resolveUsedParams() {
-        Set<String> usedParams = new HashSet<>();
+    // вообще orderedHashSet
+    public Set<String> resolveAllParams() {
+        Set<String> usedParams = new LinkedHashSet<>();
         for(PsiElement element : getElements())
             recResolveParams(element, Integer.MAX_VALUE, null, usedParams, null);
         return usedParams;

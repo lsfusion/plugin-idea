@@ -270,7 +270,7 @@ public class LSFPsiUtils {
 
             Set<String> namesOfStatementsWithClassAsResult = new HashSet<>();
             int i = 0;
-            LSFClassSet valueClassSet = valueClass instanceof LSFClassDeclaration ? new CustomClassSet((LSFClassDeclaration) valueClass) : (LSFClassSet) valueClass;
+            LSFClassSet valueClassSet = valueClass.getUpSet();
             Set<LSFGlobalPropDeclaration> skipStatemens = new HashSet<>();
             while (i < statementsWithClassAsResult.size()) {
                 LSFGlobalPropDeclaration statement = statementsWithClassAsResult.get(i);

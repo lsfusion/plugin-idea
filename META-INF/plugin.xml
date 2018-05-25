@@ -16,6 +16,7 @@
             <li>indirect locals before direct globals in property resolving</li>
             <li>NULL support for form objects</li>            
             <li>KEYPRESS event</li>
+            <li>Expression and action property draws in form design</li>
             <li>Minor bug fixes</li>
         </ul>
     ]]>

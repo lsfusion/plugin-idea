@@ -10,6 +10,8 @@ public interface LSFValueClass {
     String getQName(PsiElement context);
 
     String getCaption();
-
+    
     List<String> getSNames();
+    
+    LSFClassSet getUpSet();
 }

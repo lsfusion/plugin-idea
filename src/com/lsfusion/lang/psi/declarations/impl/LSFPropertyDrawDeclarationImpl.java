@@ -38,8 +38,8 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
     @Override
     public Condition getDuplicateCondition() {
         final LSFObjectUsageList objectUsageList = getObjectUsageList();
-        if (objectUsageList == null)
-            return super.getDuplicateCondition();
+//        if (objectUsageList == null)
+//            return super.getDuplicateCondition();
         
         final LSFSimpleName alias = getSimpleName();
 

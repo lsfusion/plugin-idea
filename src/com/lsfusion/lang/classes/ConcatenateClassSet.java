@@ -138,4 +138,9 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
     public int getFullWidthString(String widthString, FontMetrics fontMetrics) {
         return fontMetrics.stringWidth(widthString) + 8;
     }
+
+    @Override
+    public LSFClassSet getUpSet() {
+        return this;
+    }
 }

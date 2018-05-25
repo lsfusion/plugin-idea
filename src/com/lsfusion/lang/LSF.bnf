@@ -291,7 +291,7 @@ nonEmptyClassParamDeclareList ::= classParamDeclare (COMMA classParamDeclare)*
 propertyExpression ::= ifPE
 {
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
-    methods = [ resolveValueClass resolveParams resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]
+    methods = [ resolveValueClass resolveParams resolveAllParams resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]
 }
 
 ifPE ::= orPE (IF orPE)*
@@ -1091,7 +1091,7 @@ listActionPropertyDefinitionBody ::=    LBRACE
     pin = 1
     mixin="com.lsfusion.lang.psi.LSFListActionImpl"
     implements="com.lsfusion.lang.psi.LSFListAction, com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
+    methods = [inferActionParamClasses resolveAllParams]
 }
 
 private nestedPropertiesSelector ::= NESTED (LOCAL | (LBRAC nonEmptyNoContextPropertyUsageList RBRAC))

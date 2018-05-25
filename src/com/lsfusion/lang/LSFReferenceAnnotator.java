@@ -1,49 +1,34 @@
 package com.lsfusion.lang;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.lang.Language;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
-import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
 import com.lsfusion.lang.classes.IntegralClass;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
-import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.ExprsContextModifier;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
-import com.lsfusion.refactoring.ElementMigration;
-import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -381,7 +366,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 } else {
                     LSFPropertyExpression propertyExpression = propertyCalcStatement.getPropertyExpression();
                     List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
-                    Set<String> usedParameter = new ExprsContextModifier(propertyExpression).resolveUsedParams();
+                    Set<String> usedParameter = new ExprsContextModifier(propertyExpression).resolveAllParams();
                     for(LSFParamDeclaration declareParam : declareParams)
                         if(!usedParameter.contains(declareParam.getName())) {
                             final Annotation annotation = myHolder.createWarningAnnotation(declareParam, "Parameter is not used");

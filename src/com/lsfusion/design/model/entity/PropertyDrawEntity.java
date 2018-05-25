@@ -8,10 +8,8 @@ import com.lsfusion.lang.classes.DataClass;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGroupDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
-import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
 import com.lsfusion.refactoring.PropertyCanonicalNameUtils;
 
 import javax.swing.*;
@@ -61,7 +59,7 @@ public class PropertyDrawEntity {
     public String canonicalName = "";
     public String declText;
     public String declLocation;
-    public List<String> interfeceClasses = new ArrayList<>();
+    public List<String> interfaceClasses = new ArrayList<>();
     public List<String> objectClasses = new ArrayList<>();
 
     // следующие параметры берутся из объявления свойства и используются в качестве значений по умолчанию в дизайне 
@@ -71,7 +69,16 @@ public class PropertyDrawEntity {
     public KeyStroke changeKey;
     public boolean showChangeKey = true;
 
-    public PropertyDrawEntity(String alias, String propertyName, List<ObjectEntity> objects, LSFActionOrGlobalPropDeclaration propDeclaration, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
+    public PropertyDrawEntity(String alias, String propertyName, List<ObjectEntity> objects, LSFActionOrGlobalPropDeclaration propDeclaration, String caption, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
+        this(alias, propertyName, objects, propDeclaration, propDeclaration != null && propDeclaration.isAction(), caption != null ? caption : (propDeclaration != null ? propDeclaration.getCaption() : null), propDeclaration instanceof LSFPropDeclaration ? ((LSFPropDeclaration)propDeclaration).resolveValueClass() : null, commonFormOptions, propertyFormOptions, form);
+    }
+    public PropertyDrawEntity(String alias, String propertyName, String caption, List<ObjectEntity> objects, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
+        this(alias, propertyName, objects, null, true, "", null, commonFormOptions, propertyFormOptions, form);
+    }
+    public PropertyDrawEntity(String alias, String propertyName, List<ObjectEntity> objects, boolean isAction, String caption, LSFClassSet valueClass, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
+        this(alias, propertyName, objects, null, isAction, caption, valueClass, commonFormOptions, propertyFormOptions, form);
+    }
+    public PropertyDrawEntity(String alias, String propertyName, List<ObjectEntity> objects, LSFActionOrGlobalPropDeclaration propDeclaration, boolean isAction, String caption, LSFClassSet baseClass, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
         List<String> objectNames = new ArrayList<>();
         if(alias == null) {
             for (ObjectEntity obj : objects) {
@@ -93,30 +100,30 @@ public class PropertyDrawEntity {
             }
         }
 
+        this.isAction = isAction;
+        this.baseClass = baseClass;
+        this.caption = caption;
+
+        if(!isAction)
+            forceViewType = ClassViewType.GRID;
+        else
+            forceViewType = ClassViewType.PANEL;
+
         LSFNonEmptyPropertyOptions propertyOptions = null;
         if (propDeclaration != null) {
-            isAction = propDeclaration.isAction();
-            if(!isAction)
-                forceViewType = ClassViewType.GRID;
-            else
-                forceViewType = ClassViewType.PANEL;
-                
             propertyOptions = propDeclaration.getNonEmptyPropertyOptions();
-            caption = propDeclaration.getCaption();
 //            if (caption == null) {
 //                caption = propertyStatement.getDeclName();
 //            }
-            baseClass = propDeclaration instanceof LSFPropDeclaration ? ((LSFPropDeclaration)propDeclaration).resolveValueClass() : null;
-
             declText = propDeclaration.getText();
             declLocation = propDeclaration.getLocationString();
             List<LSFClassSet> paramClasses = propDeclaration.resolveParamClasses();
             if (paramClasses != null) {
                 for (LSFClassSet classSet : paramClasses) {
                     if (classSet instanceof DataClass) {
-                        interfeceClasses.add(((DataClass) classSet).getCaption());
+                        interfaceClasses.add(((DataClass) classSet).getCaption());
                     } else if (classSet != null) {
-                        interfeceClasses.add(classSet.toString());
+                        interfaceClasses.add(classSet.toString());
                     }
                 }
                 canonicalName = PropertyCanonicalNameUtils.createName(propDeclaration.getNamespaceName(), propDeclaration.getGlobalName(), paramClasses);
