@@ -378,10 +378,10 @@ public class DefaultFormView extends FormView {
         toolbarRightContainer.setFlex(1);
 
         toolbarLeftContainer.add(editFunction);
-        toolbarLeftContainer.add(dropFunction);
 
         toolbarRightContainer.add(toolbarContainer);
         toolbarRightContainer.add(refreshFunction);
+        toolbarLeftContainer.add(dropFunction);
         toolbarRightContainer.add(applyFunction);
         toolbarRightContainer.add(cancelFunction);
         toolbarRightContainer.add(okFunction);
