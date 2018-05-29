@@ -17,6 +17,7 @@
             <li>NULL support for form objects</li>            
             <li>KEYPRESS event</li>
             <li>Expression and action property draws in form design</li>
+            <li>Human readable token type names</li>
             <li>Minor bug fixes</li>
         </ul>
     ]]>

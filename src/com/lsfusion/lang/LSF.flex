@@ -2,12 +2,66 @@ package com.lsfusion.lang;
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
 import static com.lsfusion.lang.psi.LSFTypes.*;
+import com.lsfusion.lang.psi.LSFTokenType;
+import java.util.HashMap;
 
 %%
 
 %{
   public LSFLexer() {
     this((java.io.Reader)null);
+  }
+    
+  private static final HashMap<IElementType, String> tokenDebugNames = new HashMap<>();
+  static {
+    tokenDebugNames.put(com.intellij.psi.TokenType.WHITE_SPACE, "White Space");
+    tokenDebugNames.put(COMMENTS, "Comment");
+    tokenDebugNames.put(LEX_LOGICAL_LITERAL, "Logical");
+    tokenDebugNames.put(PRIMITIVE_TYPE, "Primitive Type");
+    tokenDebugNames.put(LEX_STRING_LITERAL, "String");
+    tokenDebugNames.put(LEX_UINT_LITERAL, "Integer");
+    tokenDebugNames.put(LEX_ULONG_LITERAL, "Long");
+    tokenDebugNames.put(LEX_UDOUBLE_LITERAL, "Double");
+    tokenDebugNames.put(LEX_UNUMERIC_LITERAL, "Numeric");
+    tokenDebugNames.put(LEX_DATE_LITERAL, "Date");
+    tokenDebugNames.put(LEX_DATETIME_LITERAL, "Datetime");
+    tokenDebugNames.put(LEX_TIME_LITERAL, "Time");
+    tokenDebugNames.put(LEX_COLOR_LITERAL, "Color");
+    tokenDebugNames.put(LEX_CODE_LITERAL, "Code");
+    tokenDebugNames.put(DOLLAR, "$");
+    tokenDebugNames.put(EQ_OPERAND, "==/!=");
+    tokenDebugNames.put(LESS_EQUALS, "<=");
+    tokenDebugNames.put(LESS, "<");
+    tokenDebugNames.put(GREATER_EQUALS, ">=");
+    tokenDebugNames.put(GREATER, ">");
+    tokenDebugNames.put(QUESTION, "?");
+    tokenDebugNames.put(MINUS, "-");
+    tokenDebugNames.put(PLUS, "+");
+    tokenDebugNames.put(MULT, "*");
+    tokenDebugNames.put(DIV, "/");
+    tokenDebugNames.put(ADDOR_OPERAND, "(+)/(-)");
+    tokenDebugNames.put(SEMI, ";");
+    tokenDebugNames.put(COLON, ":");
+    tokenDebugNames.put(COMMA, ",");
+    tokenDebugNames.put(POINT, ".");
+    tokenDebugNames.put(EQUALS, "=");
+    tokenDebugNames.put(PLUSEQ, "+=");
+    tokenDebugNames.put(ARROW, "<-");
+    tokenDebugNames.put(FOLLOWS, "=>");
+    tokenDebugNames.put(LBRAC, "(");
+    tokenDebugNames.put(RBRAC, ")");
+    tokenDebugNames.put(LBRACE, "{");
+    tokenDebugNames.put(RBRACE, "}");
+    tokenDebugNames.put(LSQBR, "[");
+    tokenDebugNames.put(RSQBR, "]");
+    tokenDebugNames.put(ATSIGN, "@");
+    tokenDebugNames.put(ATSIGN2, "@@");
+    tokenDebugNames.put(FAKETWODASHES, "##");
+    tokenDebugNames.put(FAKETHREEDASHES, "###");
+  }
+    
+  public static String getTokenDebugName(IElementType elementType) {
+    return tokenDebugNames.get(elementType); 
   }
 %}
 

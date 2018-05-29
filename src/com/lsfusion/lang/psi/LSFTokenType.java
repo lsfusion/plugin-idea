@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.psi.tree.IElementType;
 import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.LSFLexer;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +17,7 @@ public class LSFTokenType extends IElementType {
 
     @Override
     public String toString() {
-        return "LSFTokenType." + super.toString();
+        String string = LSFLexer.getTokenDebugName(this);
+        return string != null ? string : super.toString();
     }
 }
