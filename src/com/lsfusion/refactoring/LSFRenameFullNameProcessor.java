@@ -20,10 +20,12 @@ import com.intellij.util.containers.MultiMap;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
-import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -92,7 +94,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
                         LSFId propUsageId = getDeclPropName(propDrawDecl);
                         if(propUsageId != null) {
                             allRenames.put(propUsageId, newName);
-                            cascadePostRenames.add(getMigrationRunnable(propUsageId, newName));
+                            cascadePostRenames.add(getMigrationRunnable(propUsageId, newName, MigrationChangePolicy.USE_LAST_VERSION));
                         }
                     }
                 }
@@ -109,8 +111,13 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
                     if (propertyUsage != null) {
                         LSFActionOrPropDeclaration decl = propertyUsage.resolveDecl();
                         if (decl != null) {
+                            // Делаем так, чтобы в allRenames сначало добавилось само свойство, а только потом соответствующее
+                            // свойсnво на форме. Делается это для того, чтобы в миграционный скрипт эти переименования
+                            // записались в одну версию
+                            allRenames.remove(element);
                             allRenames.put(decl.getNameIdentifier(), newName);
-                            cascadePostRenames.add(getMigrationRunnable(decl.getNameIdentifier(), newName));
+                            allRenames.put(element, newName);
+                            cascadePostRenames.add(getMigrationRunnable(element, newName, MigrationChangePolicy.USE_LAST_VERSION));
                         }
                     }
                 }
@@ -179,7 +186,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     @Override
     public Runnable getPostRenameCallback(final PsiElement element, String newName, RefactoringElementListener elementListener) {
         if (migrationPolicy != null) {
-            final Runnable migrationRunnable = getMigrationRunnable(element, newName);
+            final Runnable migrationRunnable = getMigrationRunnable(element, newName, migrationPolicy);
             if(!cascadePostRenames.isEmpty()) {
                 final List<Runnable> fCascadePostRenames = cascadePostRenames;
                 cascadePostRenames = new ArrayList<>();
@@ -198,7 +205,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         return null;
     }
 
-    public Runnable getMigrationRunnable(final PsiElement element, String newName) {
+    public Runnable getMigrationRunnable(final PsiElement element, String newName, MigrationChangePolicy migrationPolicy) {
         final ElementMigration migration;
         if((migration = getMigration(element, newName)) != null) {
             final GlobalSearchScope scope = LSFFileUtils.getModuleWithDependantsScope(element);

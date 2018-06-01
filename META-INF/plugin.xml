@@ -13,13 +13,14 @@
         <ul>
             <li>FIELDS..DO clause in IMPORT operator</li>
             <li>HEADERS fix</li>
-            <li>indirect locals before direct globals in property resolving</li>
+            <li>Indirect locals before direct globals in property resolving</li>
             <li>NULL support for form objects</li>            
             <li>KEYPRESS event</li>
             <li>Expression and action property draws in form design</li>
             <li>Human readable token type names</li>
             <li>Zero-parameters TABLE support</li>
             <li>Minor bug fixes</li>
+            <li>migration.script lines addition when renaming form properties and/or their usages fixed</li>
         </ul>
     ]]>
     </change-notes>
