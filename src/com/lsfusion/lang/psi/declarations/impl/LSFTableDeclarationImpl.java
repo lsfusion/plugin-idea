@@ -46,11 +46,15 @@ public abstract class LSFTableDeclarationImpl extends LSFFullNameDeclarationImpl
     }
 
     @Nullable
-    public abstract LSFNonEmptyClassNameList getNonEmptyClassNameList();
-
+    public abstract LSFClassNameList getClassNameList();
+    
     @NotNull
     public LSFValueClass[] getClasses() {
-        LSFNonEmptyClassNameList nonEmptyClassNameList = getNonEmptyClassNameList();
+        LSFClassNameList classNameList = getClassNameList();
+        if (classNameList == null)
+            return new LSFValueClass[0];
+        
+        LSFNonEmptyClassNameList nonEmptyClassNameList = classNameList.getNonEmptyClassNameList();
         if (nonEmptyClassNameList == null) {
             return new LSFValueClass[0];
         }
@@ -68,16 +72,19 @@ public abstract class LSFTableDeclarationImpl extends LSFFullNameDeclarationImpl
     @NotNull
     @Override
     public String[] getClassNames() {
-        LSFNonEmptyClassNameList nonEmptyList = getNonEmptyClassNameList();
-        if (nonEmptyList != null) {
-            List<LSFClassName> list = nonEmptyList.getClassNameList();
-            
-            String[] classNames = new String[list.size()];
-            for (int i = 0; i < list.size(); i++) {
-                classNames[i] = LSFPsiImplUtil.getClassName(list.get(i));
+        LSFClassNameList classNameList = getClassNameList();
+        if (classNameList != null) {
+            LSFNonEmptyClassNameList nonEmptyList = classNameList.getNonEmptyClassNameList();
+            if (nonEmptyList != null) {
+                List<LSFClassName> list = nonEmptyList.getClassNameList();
+
+                String[] classNames = new String[list.size()];
+                for (int i = 0; i < list.size(); i++) {
+                    classNames[i] = LSFPsiImplUtil.getClassName(list.get(i));
+                }
+
+                return classNames;
             }
-            
-            return classNames;
         }
         
         return new String[0];
