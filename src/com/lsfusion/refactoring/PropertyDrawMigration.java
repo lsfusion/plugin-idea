@@ -1,16 +1,11 @@
 package com.lsfusion.refactoring;
 
-import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFId;
-import com.lsfusion.lang.psi.LSFObjectUsageList;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.LSFSimpleName;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
-import static com.lsfusion.lang.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl.getNameIdentifier;
 
 public class PropertyDrawMigration extends ElementMigration {
 
@@ -40,7 +35,7 @@ public class PropertyDrawMigration extends ElementMigration {
         return new PropertyDrawMigration(decl, oldName, newName);
     }
 
-    public PropertyDrawMigration(LSFPropertyDrawDeclaration decl, String oldName, String newName) {
+    private PropertyDrawMigration(LSFPropertyDrawDeclaration decl, String oldName, String newName) {
         super(decl, oldName, newName);
     }
 

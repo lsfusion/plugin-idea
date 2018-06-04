@@ -9,6 +9,8 @@ import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.stubs.TableStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.refactoring.ElementMigration;
+import com.lsfusion.refactoring.TableMigration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -88,5 +90,10 @@ public abstract class LSFTableDeclarationImpl extends LSFFullNameDeclarationImpl
         }
         
         return new String[0];
+    }
+    
+    @Override
+    public ElementMigration getMigration(String newName) {
+        return TableMigration.create(this, getName(), newName);
     }
 }

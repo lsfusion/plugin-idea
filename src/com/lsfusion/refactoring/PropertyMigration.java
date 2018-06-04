@@ -31,7 +31,7 @@ public class PropertyMigration extends ElementMigration {
         return new PropertyMigration(decl, oldFullName, newFullName);
     }
 
-    public PropertyMigration(LSFActionOrGlobalPropDeclaration decl, String oldName, String newName) {
+    private PropertyMigration(LSFActionOrGlobalPropDeclaration decl, String oldName, String newName) {
         super(decl, oldName, newName);
         
         this.isAction = decl.isAction(); 
