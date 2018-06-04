@@ -19,6 +19,7 @@
             <li>Expression and action property draws in form design</li>
             <li>Human readable token type names</li>
             <li>Zero-parameters TABLE support</li>
+            <li>RAWFILE / RAWLINK support</li>
             <li>Minor bug fixes</li>
             <li>migration.script lines addition when renaming form properties and/or their usages fixed</li>
             <li>default READ (without TO)</li>

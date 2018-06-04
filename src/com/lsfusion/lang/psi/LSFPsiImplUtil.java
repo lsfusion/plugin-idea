@@ -565,6 +565,8 @@ public class LSFPsiImplUtil {
                 return ImageClass.instance;
             case "PDFFILE":
                 return PDFClass.instance;
+            case "RAWFILE":
+                return RawClass.instance;
             case "CUSTOMFILE":
                 return DynamicFormatFileClass.instance;
             case "EXCELFILE":
@@ -575,6 +577,8 @@ public class LSFPsiImplUtil {
                 return ImageLinkClass.instance;
             case "PDFLINK":
                 return PDFLinkClass.instance;
+            case "RAWLINK":
+                return RawLinkClass.instance;
             case "CUSTOMLINK":
                 return DynamicFormatLinkClass.instance;
             case "EXCELLINK":

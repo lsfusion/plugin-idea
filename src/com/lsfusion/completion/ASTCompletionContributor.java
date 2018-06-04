@@ -69,8 +69,8 @@ public class ASTCompletionContributor extends CompletionContributor {
     private static final String[] PRIMITIVE_TYPES = new String[]{"INTEGER", "LONG", "NUMERIC[,]", "DOUBLE",
                                                                  "DATE", "DATETIME", "TIME", "YEAR",
                                                                  "STRING[]", "ISTRING[]", "VARSTRING[]", "VARISTRING[]", "TEXT",
-                                                                 "WORDFILE", "IMAGEFILE", "PDFFILE", "CUSTOMFILE", "EXCELFILE",
-                                                                 "WORDLINK", "IMAGELINK", "PDFLINK", "CUSTOMLINK", "EXCELLINK",
+                                                                 "WORDFILE", "IMAGEFILE", "PDFFILE", "RAWFILE", "CUSTOMFILE", "EXCELFILE",
+                                                                 "WORDLINK", "IMAGELINK", "PDFLINK", "RAWLINK", "CUSTOMLINK", "EXCELLINK",
                                                                  "BOOLEAN", "COLOR"};
     
     private static final Set<String> DESIGN_PROPERTIES = new LinkedHashSet<String>() {

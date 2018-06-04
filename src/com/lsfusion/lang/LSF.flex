@@ -100,8 +100,8 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   | "DATE" | "DATETIME" | "TIME" | "YEAR"
   | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]" | "VARSTRING[" {DIGITS} "]" | "VARISTRING[" {DIGITS} "]"
   | "TEXT" | "ITEXT" | "RICHTEXT"
-  | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "CUSTOMFILE" | "EXCELFILE"
-  | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "CUSTOMLINK" | "EXCELLINK"
+  | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "RAWFILE" | "CUSTOMFILE" | "EXCELFILE"
+  | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "RAWLINK"  | "CUSTOMLINK" | "EXCELLINK"
   | "BOOLEAN"
   | "COLOR"                             { return PRIMITIVE_TYPE; }
 
