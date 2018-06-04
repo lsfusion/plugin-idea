@@ -21,6 +21,7 @@
             <li>Zero-parameters TABLE support</li>
             <li>Minor bug fixes</li>
             <li>migration.script lines addition when renaming form properties and/or their usages fixed</li>
+            <li>default READ (without TO)</li>
         </ul>
     ]]>
     </change-notes>
