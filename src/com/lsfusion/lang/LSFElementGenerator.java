@@ -360,6 +360,11 @@ public class LSFElementGenerator {
             }
 
             @Override
+            protected boolean isInline() {
+                return false;
+            }
+
+            @Override
             public int getParamCount() {
                 return paramCount;
             }

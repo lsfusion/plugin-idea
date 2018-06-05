@@ -23,6 +23,7 @@
             <li>Minor bug fixes</li>
             <li>migration.script lines addition when renaming form properties and/or their usages fixed</li>
             <li>default READ (without TO)</li>
+            <li>Metacode inline virtual operator (@@)</li>
             <li>Addition of the TABLE string to the migration.script files when renaming table</li> 
         </ul>
     ]]>

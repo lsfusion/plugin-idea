@@ -1,6 +1,7 @@
 package com.lsfusion.lang.meta;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.lang.ASTFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ProjectComponent;
@@ -305,11 +306,35 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             this.version = version;
         }
 
-        public LSFMetaCodeBody parse(LSFFile file) {
+        public LSFMetaCodeBody parse(LSFFile file, boolean untab) {
             if (tokens == null)
                 return null;
-            else
-                return LSFElementGenerator.createMetaBodyFromText(file, parseText(tokens, usages, decls));
+            else {
+                String text = parseText(tokens, usages, decls);
+                if(untab) {
+                    int nextLine = text.indexOf('\n');
+                    if(nextLine >= 0) {
+                        int i = nextLine +1;
+                        String shiftString = "";
+                        for(int size = text.length();i<size;i++) {
+                            char charat = text.charAt(i);
+                            if(charat == '\t' || charat == ' ')
+                                shiftString += charat;
+                            else {
+                                if(charat == '\n')
+                                    shiftString = "";
+                                else
+                                    break;
+                            }
+                        }
+                        text = text.substring(i, text.length());
+                        if(!shiftString.isEmpty())
+                            text = text.replace("\n" + shiftString, "\n");
+                    }
+
+                }
+                return LSFElementGenerator.createMetaBodyFromText(file, text);
+            }
         }
     }
 
@@ -368,7 +393,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 });
 
                 if (toParse.getResult() != null) {
-                    final LSFMetaCodeBody parsed = toParse.getResult().parse(file);
+                    final LSFMetaCodeBody parsed = toParse.getResult().parse(file, false);
                     Runnable inlineRun = new Runnable() {
                         public void run() {
                             metaUsage.setInlinedBody(parsed);
@@ -498,7 +523,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                         boolean keep = false;
                         if (metaUsage.isValid() && metaUsage.isCorrect()) {
                             if (!DumbService.isDumb(myProject)) {
-                                LSFMetaDeclaration metaDecl = (forcedEnabled != null ? forcedEnabled : enabled) ? metaUsage.resolveDecl() : null;
+                                LSFMetaDeclaration metaDecl = (forcedEnabled != null ? forcedEnabled : enabled) || metaUsage.isInline() ? metaUsage.resolveDecl() : null;
                                 assert metaDecl == null || metaDecl.isValid();
                                 if (metaDecl == null || !declPending.processing.contains(getLongLivingDecl(metaDecl))) { // не обновляем, потому как все равно обновится при обработке metaDeclChanged
                                     if (metaDecl == null || !metaDecl.isCorrect())
@@ -576,7 +601,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                                     boolean prevEnabled = enabled;
                                                     enabled = false; // выключаем чтобы каскадно не вызывались события
 
-                                                    gen.usage.setInlinedBody(gen.toParse.parse(file));
+                                                    gen.usage.setInlinedBody(gen.toParse.parse(file, gen.usage.isInline()));
                                                     
                                                     enabled = prevEnabled;
 
@@ -705,7 +730,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     private final MetaUsagesPending usagesPending = new MetaUsagesPending();
 
     private void addUsageProcessing(Collection<LSFMetaCodeStatement> used) { // в синхронном режиме может вызываться должен быть достаточно быстрым
-        assert enabled;
+//        assert enabled;
         usagesPending.add(used);
     }
 
@@ -1071,10 +1096,10 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 if (element instanceof LSFAnyTokens || element instanceof LSFMetaCodeBody) {
                     inMetaBody = true;
                 }
-
-                if (element instanceof LSFMetaCodeStatement) {
-                    addUsageProcessing((LSFMetaCodeStatement) element);
-                }
+            }
+                
+            if (element instanceof LSFMetaCodeStatement && (enabled || ((LSFMetaCodeStatement) element).isInline())) {
+                addUsageProcessing((LSFMetaCodeStatement) element);
             }
 
             if (element instanceof LSFModuleHeader) {
@@ -1093,23 +1118,23 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private void fireAdded(PsiElement element) {
-        if (!enabled) {
+//        if (!enabled) {
 /*            assert !(element instanceof LSFStatements);
             if(element instanceof LSFMetaCodeBody) // нужно перегенерировать тело использования
                 for(PsiElement child : ((LSFMetaCodeBody)element).getStatements().getChildren())
                     if(child instanceof LSFMetaCodeStatement) // нужно перегенерировать тело использования
                         addUsageProcessing((LSFMetaCodeStatement)child);
 */
-            return;
-        }
+//            return;
+//        }
 
 
         Collection<PsiElement> children = findChildrenOfType(element, LSFMetaCodeStatement.class, LSFMetaCodeDeclarationStatement.class);
         for (PsiElement child : children) {
-            if (child instanceof LSFMetaCodeStatement) {
+            if (child instanceof LSFMetaCodeStatement && (enabled || ((LSFMetaCodeStatement) child).isInline())) {
                 // нужно перегенерировать тело использования
                 addUsageProcessing((LSFMetaCodeStatement) child);
-            } else if (child instanceof LSFMetaCodeDeclarationStatement) {
+            } else if (enabled && child instanceof LSFMetaCodeDeclarationStatement) {
                 // нужно перегенерить все usage'ы этого метакода
                 addDeclProcessing((LSFMetaCodeDeclarationStatement) child);
             }

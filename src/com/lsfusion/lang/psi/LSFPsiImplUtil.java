@@ -1426,6 +1426,10 @@ public class LSFPsiImplUtil {
         }
         return result;
     }
+    
+    public static boolean isInline(@NotNull LSFMetaCodeStatement metaCodeStatement) {
+        return metaCodeStatement.getMetaCodeStatementHeader().getMetaCodeStatementType().getText().equals("@@");
+    }
 
     public static List<String> getValueClassNames(@Nullable LSFExpressionUnfriendlyPD sourceStatement) {
         if (sourceStatement != null) {

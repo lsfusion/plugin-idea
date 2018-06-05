@@ -122,14 +122,14 @@ internalFormObject ::= OBJECT formUsage objectUsage
 stubStatement ::=
     EXTEND (CLASS | FORM | DESIGN) ID
     | CLASS (ABSTRACT | NATIVE)? COMPLEX? ID
-    | (ATSIGN | FORM | GROUP | META | DESIGN | TABLE) ID
+    | (ATSIGN | ATSIGN2 | FORM | GROUP | META | DESIGN | TABLE) ID
     | WINDOW windowType ID
     {pin(".*") = 1}
 
 private script_statement_recover ::= !statement_start
 // Important ! after recover the rule should mandatory be pinned (matched)
 private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT | INTERNAL
-                            | CLASS | ATSIGN | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
+                            | CLASS | ATSIGN | ATSIGN2 | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1880,9 +1880,11 @@ metaCodeStatement ::= metaCodeStatementHeader metaCodeBody? metaCodeStatementSem
     pin=2
     mixin="com.lsfusion.lang.psi.references.impl.LSFMetaReferenceImpl"
     implements="com.lsfusion.lang.psi.references.LSFMetaReference"
+    methods=[isInline]
 }
 
-metaCodeStatementHeader ::= ATSIGN metacodeUsage LBRAC metaCodeIdList RBRAC
+metaCodeStatementType ::= ATSIGN | ATSIGN2
+metaCodeStatementHeader ::= metaCodeStatementType metacodeUsage LBRAC metaCodeIdList RBRAC
 metaCodeStatementSemi ::= SEMI
 
 metaDeclId ::=  ID

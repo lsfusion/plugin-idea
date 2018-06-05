@@ -1,16 +1,20 @@
 package com.lsfusion.lang.psi.references.impl;
 
+import com.intellij.lang.ASTFactory;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.impl.LSFScriptStatementImpl;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.psi.stubs.types.MetaStubElementType;
@@ -54,6 +58,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
         return super.getLSFFile();
     }
 
+    protected abstract boolean isInline(); 
     public abstract LSFMetaCodeBody getMetaCodeBody();
 
     protected abstract LSFMetaCodeStatementHeader getMetaCodeStatementHeader();
@@ -160,17 +165,80 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public void setInlinedBody(LSFMetaCodeBody parsed) {
-        LSFMetaCodeBody body = getMetaCodeBody();
-        if (parsed == null || !isCorrect()) {
-            if (body != null && body.isWritable())
-                body.delete();
+        if(isInline()) {
+            if(parsed != null && isCorrect()) {
+                PsiElement parent = getParent();
+                if(parent instanceof LSFScriptStatement) {
+                    ASTNode scriptNode = parent.getNode();
+                    ASTNode metaNode = getNode();
+                    List<ASTNode> inlineNodes = new ArrayList<>();
+                    
+                    // вырезаем первую { и перевод строки
+                    ASTNode from = parsed.getNode().getFirstChildNode();
+                    while(from.getElementType() != LSFTypes.META_CODE_BODY_LEFT_BRACE)
+                        from = from.getTreeNext();
+                    from = from.getTreeNext();
+                    while(LSFParserDefinition.isWhiteSpace(from.getElementType())) {
+                        String text = from.getText();
+                        from = from.getTreeNext();
+
+                        int nextLine = text.indexOf('\n');
+                        if(nextLine >= 0) {
+                            text = text.substring(nextLine+1, text.length());
+                            if(!text.isEmpty())
+                                inlineNodes.add(ASTFactory.whitespace(text));
+                            break;
+                        }                            
+                    }
+
+                    // вырезаем последнюю { и перевод строки
+                    ASTNode lastNode = null;
+                    ASTNode to = parsed.getNode().getLastChildNode();
+                    while(to.getElementType() != LSFTypes.META_CODE_BODY_RIGHT_BRACE)
+                        to = to.getTreePrev();
+                    to = to.getTreePrev();
+                    while(LSFParserDefinition.isWhiteSpace(to.getElementType())) {
+                        String text = to.getText();
+                        to = to.getTreePrev();
+                        int nextLine = text.indexOf('\n');
+                        if(nextLine >= 0) {
+                            text = text.substring(0, nextLine);
+                            if(!text.isEmpty())
+                                lastNode = ASTFactory.whitespace(text);
+                            break;
+                        }
+                    }
+
+                    ASTNode child = from;
+                    while (true) {
+                        inlineNodes.add(child);
+                        
+                        if(child.equals(to))
+                            break;
+                        child = child.getTreeNext();
+                    }
+                    if(lastNode != null)
+                        inlineNodes.add(lastNode);
+
+                    ASTNode nextNode = metaNode.getTreeNext();
+                    for(ASTNode inlineNode : inlineNodes)
+                        scriptNode.addChild(inlineNode, nextNode);
+                    scriptNode.removeChild(metaNode);
+                }
+            }
         } else {
-            if (body != null) {
-                if (!body.getText().equals(parsed.getText()))
-                    body.replace(parsed);
+            LSFMetaCodeBody body = getMetaCodeBody();
+            if (parsed == null || !isCorrect()) {
+                if (body != null && body.isWritable())
+                    body.delete();
             } else {
-                LSFMetaCodeStatementSemi semi = PsiTreeUtil.getChildOfType(this, LSFMetaCodeStatementSemi.class);
-                getNode().addChild(parsed.getNode(), semi != null ? semi.getNode() : null);
+                if (body != null) {
+                    if (!body.getText().equals(parsed.getText()))
+                        body.replace(parsed);
+                } else {
+                    LSFMetaCodeStatementSemi semi = PsiTreeUtil.getChildOfType(this, LSFMetaCodeStatementSemi.class);
+                    getNode().addChild(parsed.getNode(), semi != null ? semi.getNode() : null);
+                }
             }
         }
     }
