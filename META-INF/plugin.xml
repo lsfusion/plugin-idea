@@ -9,22 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.134</b><br>
+        <b>Version 1.0.135</b><br>
         <ul>
-            <li>FIELDS..DO clause in IMPORT operator</li>
-            <li>HEADERS fix</li>
-            <li>Indirect locals before direct globals in property resolving</li>
-            <li>NULL support for form objects</li>            
-            <li>KEYPRESS event</li>
-            <li>Expression and action property draws in form design</li>
-            <li>Human readable token type names</li>
-            <li>Zero-parameters TABLE support</li>
-            <li>RAWFILE / RAWLINK support</li>
-            <li>Minor bug fixes</li>
-            <li>migration.script lines addition when renaming form properties and/or their usages fixed</li>
-            <li>default READ (without TO)</li>
-            <li>Metacode inline virtual operator (@@)</li>
-            <li>Addition of the TABLE string to the migration.script files when renaming table</li> 
+            <li>PRINT XLS SHEET propertyUsage</li>
         </ul>
     ]]>
     </change-notes>
