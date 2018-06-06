@@ -9,7 +9,7 @@ import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 
 public class AddFormAction extends PropertyDrawEntity {
     public AddFormAction(String alias, String caption, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        super(alias, "ADDFORM", caption != null ? caption : "Добавить", groupObject.objects, commonFormOptions, propertyFormOptions, form);
+        super(alias, "NEWEDIT", caption != null ? caption : "Добавить", groupObject.objects, commonFormOptions, propertyFormOptions, form);
     }
 
     @Override

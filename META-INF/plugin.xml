@@ -13,6 +13,7 @@
         <ul>
             <li>PRINT XLS SHEET propertyUsage</li>
             <li>Increased AS / IS operators priority</li>
+            <li>Minor bug fixes</li>
         </ul>
     ]]>
     </change-notes>

@@ -1000,7 +1000,7 @@ public class ASTCompletionContributor extends CompletionContributor {
 
                 double priority = declaration.isAction() ? ACTION_PRIORITY : PROPERTY_PRIORITY;
 
-                if (contextClasses.isEmpty()) { // оптимизация для noParamsUsage (formElseNoParamsContextUsage например), при isNoParams все достается из stub'а без парсинга
+                if (contextClasses.isEmpty() && classUsagePolicy != MAY_USE_ANY) { // оптимизация для noParamsUsage (formElseNoParamsContextUsage например), при isNoParams все достается из stub'а без парсинга
                     if(!declaration.isNoParams())
                         priority = -1;
                 } else {

@@ -73,7 +73,7 @@ public class PropertyDrawEntity {
         this(alias, propertyName, objects, propDeclaration, propDeclaration != null && propDeclaration.isAction(), caption != null ? caption : (propDeclaration != null ? propDeclaration.getCaption() : null), propDeclaration instanceof LSFPropDeclaration ? ((LSFPropDeclaration)propDeclaration).resolveValueClass() : null, commonFormOptions, propertyFormOptions, form);
     }
     public PropertyDrawEntity(String alias, String propertyName, String caption, List<ObjectEntity> objects, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        this(alias, propertyName, objects, null, true, "", null, commonFormOptions, propertyFormOptions, form);
+        this(alias, propertyName, objects, null, true, caption, null, commonFormOptions, propertyFormOptions, form);
     }
     public PropertyDrawEntity(String alias, String propertyName, List<ObjectEntity> objects, boolean isAction, String caption, LSFClassSet valueClass, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
         this(alias, propertyName, objects, null, isAction, caption, valueClass, commonFormOptions, propertyFormOptions, form);
