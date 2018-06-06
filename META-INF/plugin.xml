@@ -12,6 +12,7 @@
         <b>Version 1.0.135</b><br>
         <ul>
             <li>PRINT XLS SHEET propertyUsage</li>
+            <li>Increased AS / IS operators priority</li>
         </ul>
     ]]>
     </change-notes>

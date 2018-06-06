@@ -312,7 +312,7 @@ notPE ::= (NOT notPE) | equalityPE
 equalityPE ::= relationalPE ((EQ_OPERAND | EQUALS) relationalPE)?
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
-relationalPE ::= likePE (((LESS | GREATER | LESS_EQUALS | GREATER_EQUALS) likePE) | typePropertyDefinition)?
+relationalPE ::= likePE ((LESS | GREATER | LESS_EQUALS | GREATER_EQUALS) likePE)?
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 likePE ::= additiveORPE (LIKE additiveORPE)?
@@ -331,7 +331,7 @@ multiplicativePE ::= unaryMinusPE (typeMult unaryMinusPE)*
 unaryMinusPE ::= (MINUS unaryMinusPE) | postfixUnaryPE
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
-postfixUnaryPE ::= simplePE (LSQBR uintLiteral RSQBR)?
+postfixUnaryPE ::= simplePE ((LSQBR uintLiteral RSQBR) | typePropertyDefinition)?
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 simplePE ::= (LBRAC propertyExpression RBRAC) | expressionPrimitive

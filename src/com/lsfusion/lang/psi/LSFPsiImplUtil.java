@@ -810,23 +810,7 @@ public class LSFPsiImplUtil {
         if (list.size() == 2)
             return LSFExClassSet.logical;
 
-        LSFExClassSet result = resolveInferredValueClass(list.get(0), inferred);
-
-        LSFTypePropertyDefinition typeDef = sourceStatement.getTypePropertyDefinition();
-        if (typeDef != null) {
-            if (typeDef.getTypeIs().getText().equals("IS"))
-                return LSFExClassSet.logical;
-            else {
-                LSFExClassSet resolveClass = LSFExClassSet.toEx(resolveClass(typeDef.getClassName()));
-                if (resolveClass != null) {
-                    if (result == null)
-                        result = resolveClass;
-                    else
-                        result = result.op(resolveClass, false);
-                }
-            }
-        }
-        return result;
+        return resolveInferredValueClass(list.get(0), inferred);
     }
 
     private static LSFExClassSet orClasses(List<LSFExClassSet> classes, boolean string) {
@@ -925,7 +909,21 @@ public class LSFPsiImplUtil {
                 return LSFExClassSet.checkNull(((ConcatenateClassSet) classSet).getSet(Integer.valueOf(uintLiteral.getText()) - 1), valueClass.orAny);
             return null;
         }
-
+        
+        LSFTypePropertyDefinition typeDef = sourceStatement.getTypePropertyDefinition();
+        if (typeDef != null) {
+            if (typeDef.getTypeIs().getText().equals("IS"))
+                return LSFExClassSet.logical;
+            else {
+                LSFExClassSet resolveClass = LSFExClassSet.toEx(resolveClass(typeDef.getClassName()));
+                if (resolveClass != null) {
+                    if (valueClass == null)
+                        valueClass = resolveClass;
+                    else
+                        valueClass = valueClass.op(resolveClass, false);
+                }
+            }
+        }
         return valueClass;
     }
 
@@ -1333,20 +1331,7 @@ public class LSFPsiImplUtil {
             return singletonList(LogicalClass.instance.getName());
         }
 
-        List<String> result = getValueClassNames(likePEs.get(0));
-
-        LSFTypePropertyDefinition typePD = sourceStatement.getTypePropertyDefinition();
-        if (typePD != null) {
-            if (typePD.getTypeIs().getText().equals("IS")) {
-                return singletonList(LogicalClass.instance.getName());
-            } else {
-                String typeDefClass = getClassName(typePD.getClassName());
-                if (typeDefClass != null) {
-                    result = singletonList(typeDefClass);
-                }
-            }
-        }
-        return result;
+        return getValueClassNames(likePEs.get(0));
     }
 
     public static List<String> getValueClassNames(@NotNull LSFLikePE sourceStatement) {
@@ -1391,6 +1376,18 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFPostfixUnaryPE sourceStatement) {
+        LSFTypePropertyDefinition typePD = sourceStatement.getTypePropertyDefinition();
+        if (typePD != null) {
+            if (typePD.getTypeIs().getText().equals("IS")) {
+                return singletonList(LogicalClass.instance.getName());
+            } else {
+                String typeDefClass = getClassName(typePD.getClassName());
+                if (typeDefClass != null) {
+                    return singletonList(typeDefClass);
+                }
+            }
+        }
+
         return getValueClassNames(sourceStatement.getSimplePE());
     }
 
@@ -1714,11 +1711,6 @@ public class LSFPsiImplUtil {
             return Collections.EMPTY_LIST;
         }
 
-        LSFTypePropertyDefinition typePD = sourceStatement.getTypePropertyDefinition();
-        if (typePD != null) {
-            return Collections.EMPTY_LIST;
-        }
-
         return getValuePropertyNames(likePEs.get(0));
     }
 
@@ -1764,6 +1756,11 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFPostfixUnaryPE sourceStatement) {
+        LSFTypePropertyDefinition typePD = sourceStatement.getTypePropertyDefinition();
+        if (typePD != null) {
+            return Collections.EMPTY_LIST;
+        }
+
         return getValuePropertyNames(sourceStatement.getSimplePE());
     }
 
@@ -2856,10 +2853,6 @@ public class LSFPsiImplUtil {
     public static Inferred inferParamClasses(@NotNull LSFRelationalPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFLikePE> list = sourceStatement.getLikePEList();
 
-        LSFTypePropertyDefinition typeDef = sourceStatement.getTypePropertyDefinition();
-        if (typeDef != null)
-            return inferParamClasses(list.get(0), LSFExClassSet.toEx(resolveClass(typeDef.getClassName())));
-
         if (list.size() == 2)
             return Inferred.create(new Relationed(list.get(0), list.get(1)));
         return inferParamClasses(list.get(0), valueClass);
@@ -2919,6 +2912,10 @@ public class LSFPsiImplUtil {
             else
                 valueClass = null;
         }
+
+        LSFTypePropertyDefinition typeDef = sourceStatement.getTypePropertyDefinition();
+        if (typeDef != null)
+            return inferParamClasses(sourceStatement.getSimplePE(), LSFExClassSet.toEx(resolveClass(typeDef.getClassName())));
 
         return inferParamClasses(sourceStatement.getSimplePE(), valueClass);
     }

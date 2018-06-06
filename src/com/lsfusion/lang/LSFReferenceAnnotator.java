@@ -423,6 +423,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitPostfixUnaryPE(@NotNull LSFPostfixUnaryPE o) {
+        super.visitPostfixUnaryPE(o);
+        
+        checkPostfixPE(o);
+    }
+
+    @Override
     public void visitEqualityPE(@NotNull LSFEqualityPE o) {
         super.visitEqualityPE(o);
 
@@ -579,14 +586,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
                 addError(relationalPE, annotation);
             }
-        } else {
-            LSFTypePropertyDefinition type = relationalPE.getTypePropertyDefinition();
-            if (type != null && relationalPE.getChildren().length == 2) {
-                LSFClassSet class1 = getLSFClassSet(children.get(0));
-                LSFClassSet class2 = LSFPsiImplUtil.resolveClass(type.getClassName());
-                if (class1 != null && class2 != null && !class1.haveCommonChildren(class2, null)) {
-                    myHolder.createWarningAnnotation(relationalPE, String.format("Type mismatch: can't cast %s to %s", class1, class2));
-                }
+        }
+    }
+    
+    private void checkPostfixPE(LSFPostfixUnaryPE relationalPE) {
+        LSFTypePropertyDefinition type = relationalPE.getTypePropertyDefinition();
+        if (type != null && relationalPE.getChildren().length == 2) {
+            LSFClassSet class1 = getLSFClassSet(relationalPE.getSimplePE());
+            LSFClassSet class2 = LSFPsiImplUtil.resolveClass(type.getClassName());
+            if (class1 != null && class2 != null && !class1.haveCommonChildren(class2, null)) {
+                myHolder.createWarningAnnotation(relationalPE, String.format("Type mismatch: can't cast %s to %s", class1, class2));
             }
         }
     }
@@ -609,6 +618,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private LSFClassSet getLSFClassSet(LSFRelationalPE element) {
+        return LSFExClassSet.fromEx(element.resolveInferredValueClass(null));
+    }
+
+    private LSFClassSet getLSFClassSet(LSFSimplePE element) {
         return LSFExClassSet.fromEx(element.resolveInferredValueClass(null));
     }
 
