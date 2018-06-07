@@ -20,16 +20,18 @@ import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContaine
 import com.intellij.openapi.util.NotNullComputable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
 import com.intellij.util.PlatformIcons;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -40,6 +42,7 @@ import java.util.List;
 public class LibraryOptionsPanel {
     private JComboBox myExistingLibraryComboBox;
     private JButton myCreateButton;
+    private JButton myDownloadButton;
     private JPanel mySimplePanel;
 
     private LibraryCompositionSettings mySettings;
@@ -104,12 +107,8 @@ public class LibraryOptionsPanel {
             }
         });
 
-        myCreateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                doCreate();
-            }
-        });
+        myCreateButton.addActionListener(e -> doCreate());
+        myDownloadButton.addActionListener(e -> doDownload());
     }
 
     private List<Library> calculateSuitableLibraries() {
@@ -144,6 +143,33 @@ public class LibraryOptionsPanel {
             }
             myLibraryComboBoxModel.add(libraryEditor);
             myLibraryComboBoxModel.setSelectedItem(libraryEditor);
+        }
+    }
+
+    private void doDownload() {
+        try {
+            String url = "https://lsfusion.ru/download/fsl-server-latest.jar";
+            VirtualFile baseDirectory = getBaseDirectory();
+            if (baseDirectory != null) {
+                File file = new File(baseDirectory.getPath() + "/fsl-server-latest.jar");
+                FileUtils.copyURLToFile(new URL(url), file);
+
+                final NewLibraryConfiguration libraryConfiguration = new NewLibraryConfiguration(file.getAbsolutePath()) {
+                    @Override
+                    public void addRoots(@NotNull LibraryEditor libraryEditor) {
+                        libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(file), OrderRootType.CLASSES);
+                    }
+                };
+                final NewLibraryEditor libraryEditor = new NewLibraryEditor(libraryConfiguration.getLibraryType(), libraryConfiguration.getProperties());
+                libraryEditor.setName(myLibrariesContainer.suggestUniqueLibraryName(libraryConfiguration.getDefaultLibraryName()));
+                libraryConfiguration.addRoots(libraryEditor);
+                if (myLibraryComboBoxModel.get(0) == null) {
+                    myLibraryComboBoxModel.remove(0);
+                }
+                myLibraryComboBoxModel.add(libraryEditor);
+                myLibraryComboBoxModel.setSelectedItem(libraryEditor);
+            }
+        } catch (Exception ignored) {
         }
     }
 
