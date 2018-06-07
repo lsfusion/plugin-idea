@@ -193,4 +193,26 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
     public Icon getIcon(int flags) {
         return LSFIcons.CLASS;
     }
+    
+    public String getClassName() {
+        LSFClassDecl decl = getClassDeclaration();
+        return decl == null ? null : decl.getName();
+    }
+    
+    public String getClassNamespace() {
+        LSFClassDecl decl = getClassDeclaration();
+        return decl == null ? null : decl.getNamespaceName();        
+    }
+    
+    private LSFClassDecl getClassDeclaration() {
+        LSFClassDecl decl = getClassDecl();
+        if (decl == null) {
+            LSFExtendingClassDeclaration extend = getExtendingClassDeclaration();
+            if (extend != null) {
+                LSFCustomClassUsage classUsage = extend.getCustomClassUsageWrapper().getCustomClassUsage();
+                return (LSFClassDecl) classUsage.resolveDecl();
+            }
+        }
+        return decl;
+    }
 }

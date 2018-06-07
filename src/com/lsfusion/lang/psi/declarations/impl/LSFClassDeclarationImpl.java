@@ -18,6 +18,8 @@ import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.stubs.ClassStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.refactoring.ClassMigration;
+import com.lsfusion.refactoring.ElementMigration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -104,5 +106,10 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
     @Override
     public LSFClassSet getUpSet() {
         return new CustomClassSet(this);
+    }
+
+    @Override
+    public ElementMigration getMigration(String newName) {
+        return ClassMigration.create(this, getName(), newName);
     }
 }

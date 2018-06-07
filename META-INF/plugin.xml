@@ -14,6 +14,7 @@
             <li>PRINT XLS SHEET propertyUsage</li>
             <li>Increased AS / IS operators priority</li>
             <li>Minor bug fixes</li>
+            <li>OBJECT migration support</li>
         </ul>
     ]]>
     </change-notes>
