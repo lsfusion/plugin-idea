@@ -855,7 +855,7 @@ externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyP
 private externalType ::=  SQL propertyExpression EXEC propertyExpression
               |   HTTP propertyExpression
               |   DBF propertyExpression APPEND (CHARSET stringLiteral)?
-              |   LSF propertyExpression (EXEC | EVAL) propertyExpression
+              |   LSF propertyExpression (EXEC | (EVAL (ACTION)?)) propertyExpression
               |   JAVA propertyExpression
               {pin(".*") = 1}
 
@@ -950,7 +950,7 @@ deleteActionPropertyDefinitionBody ::= DELETE exprParameterUsage (WHERE property
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-evalActionPropertyDefinitionBody ::= EVAL propertyExpression (PARAMS propertyExpressionList)?
+evalActionPropertyDefinitionBody ::= EVAL (ACTION)? propertyExpression (PARAMS propertyExpressionList)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
