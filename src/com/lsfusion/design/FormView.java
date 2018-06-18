@@ -194,7 +194,7 @@ public class FormView {
 
     public boolean putInGrid(PropertyDrawView property, GroupObjectView groupObjectView) {
         if (groupObjectView != null) {
-            if (!groupObjectView.entity.isFixedPanel() && groupObjectView.entity.initClassView == ClassViewType.GRID && !property.isForcedPanel()) {
+            if (!groupObjectView.entity.isFixedPanel() && groupObjectView.entity.initClassView == ClassViewType.GRID && !property.isForcedPanel() && !property.entity.isToolbar(entity)) {
                 return true;
             }
         }
