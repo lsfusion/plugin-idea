@@ -25,13 +25,15 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
 import com.intellij.util.PlatformIcons;
-import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -152,7 +154,12 @@ public class LibraryOptionsPanel {
             VirtualFile baseDirectory = getBaseDirectory();
             if (baseDirectory != null) {
                 File file = new File(baseDirectory.getPath() + "/fsl-server-latest.jar");
-                FileUtils.copyURLToFile(new URL(url), file);
+                //todo: replace after idea 2018.2
+                //FileUtils.copyURLToFile(new URL(url), file);
+                URL website = new URL(url);
+                try (InputStream in = website.openStream()) {
+                    Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
 
                 final NewLibraryConfiguration libraryConfiguration = new NewLibraryConfiguration(file.getAbsolutePath()) {
                     @Override
