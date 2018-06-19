@@ -812,6 +812,8 @@ exportActionPropertyDefinitionBody ::=
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
+propertyExpressionWithOrder ::= propertyExpression (DESC)?
+
 exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
         (   XML (LIST|TABLE)?
@@ -822,6 +824,7 @@ exportDataActionPropertyDefinitionBody ::=
         |   TABLE
         )?
         FROM nonEmptyAliasedPropertyExpressionList
+        (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)?
         (WHERE propertyExpression)?
         staticDestination?
         {

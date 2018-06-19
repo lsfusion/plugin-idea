@@ -16,6 +16,7 @@
             <li>Minor bug fixes</li>
             <li>OBJECT migration support</li>
             <li>EVAL ACTION support</li>
+            <li>EXPORT ORDER support</li>
         </ul>
     ]]>
     </change-notes>
