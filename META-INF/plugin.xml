@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.134</version>
+    <version>1.0.135</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -13,10 +13,10 @@
         <ul>
             <li>PRINT XLS SHEET propertyUsage</li>
             <li>Increased AS / IS operators priority</li>
-            <li>Minor bug fixes</li>
             <li>OBJECT migration support</li>
             <li>EVAL ACTION support</li>
             <li>EXPORT ORDER support</li>
+            <li>Minor bug fixes</li>
         </ul>
     ]]>
     </change-notes>
