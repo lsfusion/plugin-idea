@@ -824,8 +824,8 @@ exportDataActionPropertyDefinitionBody ::=
         |   TABLE
         )?
         FROM nonEmptyAliasedPropertyExpressionList
-        (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)?
         (WHERE propertyExpression)?
+        (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)?
         staticDestination?
         {
     pin = 1
