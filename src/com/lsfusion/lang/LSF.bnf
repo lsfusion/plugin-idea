@@ -816,7 +816,7 @@ propertyExpressionWithOrder ::= propertyExpression (DESC)?
 
 exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
-        (   XML (LIST|TABLE)?
+        (   XML (LIST|TABLE)? ATTR?
         |   JSON (LIST|TABLE)?
         |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
         |   (DBF (CHARSET stringLiteral)?)

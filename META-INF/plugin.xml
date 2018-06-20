@@ -9,14 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.135</b><br>
+        <b>Version 1.0.136</b><br>
         <ul>
-            <li>PRINT XLS SHEET propertyUsage</li>
-            <li>Increased AS / IS operators priority</li>
-            <li>OBJECT migration support</li>
-            <li>EVAL ACTION support</li>
-            <li>EXPORT ORDER support</li>
-            <li>Minor bug fixes</li>
+            <li>EXPORT XML ATTR support</li>
         </ul>
     ]]>
     </change-notes>
