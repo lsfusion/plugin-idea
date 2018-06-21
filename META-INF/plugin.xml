@@ -12,6 +12,7 @@
         <b>Version 1.0.136</b><br>
         <ul>
             <li>EXPORT XML ATTR support</li>
+            <li>IMPORT LIST support</li>
         </ul>
     ]]>
     </change-notes>

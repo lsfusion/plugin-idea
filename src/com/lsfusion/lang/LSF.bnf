@@ -1010,6 +1010,7 @@ importActionSourceType ::=  XLS (SHEET (propertyExpression | ALL))?
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
                         |   XML (ROOT propertyExpression)? (LIST|TABLE)? (ATTR)?
                         |   JSON (ROOT propertyExpression)? (LIST|TABLE)?
+                        |   LIST
                         |   TABLE
                         |   MDB
 
