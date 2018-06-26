@@ -13,6 +13,7 @@
         <ul>
             <li>EXPORT XML ATTR support</li>
             <li>IMPORT LIST support</li>
+            <li>Minor bugfixes</li>
         </ul>
     ]]>
     </change-notes>

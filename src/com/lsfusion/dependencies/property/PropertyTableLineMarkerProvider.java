@@ -15,6 +15,7 @@ import com.intellij.util.Function;
 import com.lsfusion.actions.ToggleShowTableAction;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFSimpleName;
+import com.lsfusion.lang.psi.declarations.LSFAggrParamGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.declarations.impl.LSFTableDeclarationImpl;
@@ -56,9 +57,11 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
                 if (propDeclaration != null) {
                     LSFId nameIdentifier = propDeclaration.getNameIdentifier();
                     if (nameIdentifier != null && nameIdentifier.getFirstChild() == element) {
-                        if (propDeclaration.isCorrect() && (propDeclaration.isDataStoredProperty() || propDeclaration.isPersistentProperty())) {
-                            result.add(createLineMarker(element));
-                            usedLines.add(lineNumber);
+                        if(!(propDeclaration instanceof LSFAggrParamGlobalPropDeclaration && ((LSFAggrParamGlobalPropDeclaration) propDeclaration).getAggrPropertyDefinition() == null)) {
+                            if (propDeclaration.isCorrect() && (propDeclaration.isDataStoredProperty() || propDeclaration.isPersistentProperty())) {
+                                result.add(createLineMarker(element));
+                                usedLines.add(lineNumber);
+                            }
                         }
                     }
                 }

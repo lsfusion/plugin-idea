@@ -38,7 +38,7 @@ public class AggrParamPropStubElementType extends PropStubElementType<AggrParamP
     @Override
     public boolean shouldCreateStub(ASTNode node) {
         PsiElement psi = node.getPsi();
-        if(((LSFAggrParamGlobalPropDeclarationImpl)psi).getAggrPropertyDefinition() != null)
+        if(((LSFAggrParamGlobalPropDeclaration)psi).getAggrPropertyDefinition() != null)
             return true;
         return false;
     }
