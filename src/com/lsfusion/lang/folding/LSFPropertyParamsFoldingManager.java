@@ -159,7 +159,7 @@ public class LSFPropertyParamsFoldingManager {
     
     public static void updateFoldRegions(Editor editor) {
         Project project = editor.getProject();
-        if (project != null) {
+        if (project != null && !project.isDisposed()) {
             PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
             Runnable runnable = CodeFoldingManager.getInstance(project).updateFoldRegionsAsync(editor, true);
             if (runnable != null) {
