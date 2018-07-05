@@ -1299,7 +1299,7 @@ formUsageWrapper ::= formUsage // for usages search filter
 
 formGroupObjectsList ::= OBJECTS formGroupObjectDeclaration (COMMA formGroupObjectDeclaration)* {pin = 1}
 
-formTreeGroupObjectList ::= TREE (treeGroupDeclaration)? formTreeGroupObjectDeclaration (COMMA formTreeGroupObjectDeclaration)* {pin = 1}
+formTreeGroupObjectList ::= TREE (treeGroupDeclaration)? formTreeGroupObjectDeclaration (COMMA formTreeGroupObjectDeclaration)* formTreeGroupObjectOptions {pin = 1}
 
 treeGroupDeclaration ::= simpleName
 {
@@ -1314,6 +1314,9 @@ formGroupObjectOptions ::= (    formGroupObjectViewType
                            |    formGroupObjectUpdate
                            |    formGroupObjectRelativePosition
                            )*
+
+formTreeGroupObjectOptions ::= (   formGroupObjectRelativePosition
+                               )*
                            
 formTreeGroupObjectDeclaration ::= formCommonGroupObject (treeGroupParentDeclaration)?
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
@@ -1332,7 +1335,8 @@ formGroupObjectPageSize ::= PAGESIZE intLiteral
 
 formGroupObjectUpdate ::= FIRST | LAST | PREV | NULL
 
-formGroupObjectRelativePosition ::= AFTER groupObjectUsage | BEFORE groupObjectUsage  
+formGroupObjectRelativePositionType ::= AFTER | BEFORE
+formGroupObjectRelativePosition ::= formGroupObjectRelativePositionType groupObjectUsage { pin = 1}
 
 formSingleGroupObjectDeclaration ::= formObjectDeclaration
 

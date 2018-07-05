@@ -66,9 +66,13 @@ public class FormEntity {
                 LSFFormGroupObjectDeclaration formGroupObjectDeclaration = (LSFFormGroupObjectDeclaration) element;
                 LSFFormGroupObjectViewType viewType = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectViewTypeList());
                 LSFFormGroupObjectPageSize pageSize = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectPageSizeList());
-                addGroupObject(formGroupObjectDeclaration.getFormCommonGroupObject(), viewType, pageSize);
-            } else
-                addTreeGroupObject((LSFFormTreeGroupObjectList)element);
+                LSFFormGroupObjectRelativePosition neighbour = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectRelativePositionList());
+                addGroupObject(formGroupObjectDeclaration.getFormCommonGroupObject(), neighbour, viewType, pageSize);
+            } else {
+                LSFFormTreeGroupObjectList treeGroupObjectDeclaration = (LSFFormTreeGroupObjectList) element;
+                LSFFormGroupObjectRelativePosition neighbour = BaseUtils.last(treeGroupObjectDeclaration.getFormTreeGroupObjectOptions().getFormGroupObjectRelativePositionList());
+                addTreeGroupObject(treeGroupObjectDeclaration, neighbour);
+            }
         }
 
         extractPropertyDraws(formExtend);
@@ -82,7 +86,37 @@ public class FormEntity {
         }
     }
 
-    private GroupObjectEntity addGroupObject(LSFGroupObjectDeclaration gobjDecl, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
+    private GroupObjectEntity addGroupObject(LSFGroupObjectDeclaration gobjDecl, LSFFormGroupObjectRelativePosition neighbour, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
+        GroupObjectEntity neighbourGroupObject = getGroupObject(neighbour);
+        boolean isRight = neighbourGroupObject != null ? LSFPsiImplUtil.isRight(neighbour) : false;
+        return addGroupObject(gobjDecl, neighbourGroupObject, isRight, viewType, pageSize);
+    }
+
+    private GroupObjectEntity getGroupObject(@Nullable LSFFormGroupObjectRelativePosition neighbour) {
+        if(neighbour != null) {
+            GroupObjectEntity neighbourGroupObject = getGroupObject(neighbour.getGroupObjectUsage());
+            if(neighbourGroupObject != null && neighbourGroupObject.isInTree()) { // later check this in reference annotator (as an error) 
+                boolean isRight = LSFPsiImplUtil.isRight(neighbour);
+                if(isRight) {
+                    if(!neighbourGroupObject.equals(BaseUtils.last(neighbourGroupObject.treeGroup.groups)))
+                        return null;
+                } else {
+                    if(!neighbourGroupObject.equals(neighbourGroupObject.treeGroup.groups.get(0)))
+                        return null;
+                }
+            }
+            return neighbourGroupObject;
+        }
+        return null;
+    }
+
+    private GroupObjectEntity getGroupObject(@Nullable LSFGroupObjectUsage groupObjectUsage) {
+        if(groupObjectUsage != null)
+            return getGroupObject(groupObjectUsage.getNameRef());
+        return null;
+    }
+
+    private GroupObjectEntity addGroupObject(LSFGroupObjectDeclaration gobjDecl, GroupObjectEntity neighbour, boolean isRight, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
         GroupObjectEntity groupObject = new GroupObjectEntity(gobjDecl.getDeclName(), viewType, pageSize);
         Collection<LSFFormObjectDeclaration> objectDecarations = gobjDecl.findObjectDecarations();
         for (LSFFormObjectDeclaration objDecl : objectDecarations) {
@@ -92,7 +126,14 @@ public class FormEntity {
             }
         }
         if (!groupObject.objects.isEmpty()) {
-            groups.add(groupObject);
+            if(neighbour != null) {
+                int neighbourIndex = groups.indexOf(neighbour);
+                if(isRight)
+                    neighbourIndex++;
+                groups.add(neighbourIndex, groupObject);
+            } else {
+                groups.add(groupObject);
+            }
         }
 
         return groupObject;
@@ -293,7 +334,7 @@ public class FormEntity {
         return null;
     }
 
-    private void addTreeGroupObject(LSFFormTreeGroupObjectList tgobjDecl) {
+    private void addTreeGroupObject(LSFFormTreeGroupObjectList tgobjDecl, LSFFormGroupObjectRelativePosition neighbour) {
         LSFTreeGroupDeclaration treeGroupDeclaration = tgobjDecl.getTreeGroupDeclaration();
         String sID = null;
         if (treeGroupDeclaration != null) {
@@ -302,8 +343,14 @@ public class FormEntity {
         TreeGroupEntity treeGroup = new TreeGroupEntity(sID);
         treeGroups.add(treeGroup);
 
-        for (LSFFormTreeGroupObjectDeclaration treeGroupObjectDeclaration : tgobjDecl.getFormTreeGroupObjectDeclarationList()) {
-            GroupObjectEntity groupObjectEntity = addGroupObject(treeGroupObjectDeclaration.getFormCommonGroupObject(), null, null);
+        GroupObjectEntity neighbourGroupObject = getGroupObject(neighbour);
+        boolean isRight = neighbourGroupObject != null ? LSFPsiImplUtil.isRight(neighbour) : false;
+
+        List<LSFFormTreeGroupObjectDeclaration> gobjList = tgobjDecl.getFormTreeGroupObjectDeclarationList();
+        for (LSFFormTreeGroupObjectDeclaration treeGroupObjectDeclaration : (neighbourGroupObject != null && !isRight ? BaseUtils.reverse(gobjList) : gobjList)) {
+            GroupObjectEntity groupObjectEntity = addGroupObject(treeGroupObjectDeclaration.getFormCommonGroupObject(), neighbourGroupObject, isRight, null, null);
+            if(neighbourGroupObject != null)
+                neighbourGroupObject = groupObjectEntity;
             treeGroup.addGroupObject(groupObjectEntity);
 
             LSFTreeGroupParentDeclaration parentDeclaration = treeGroupObjectDeclaration.getTreeGroupParentDeclaration();

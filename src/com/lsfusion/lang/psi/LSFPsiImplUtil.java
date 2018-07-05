@@ -3996,4 +3996,8 @@ public class LSFPsiImplUtil {
         }
         return false;
     }
+
+    public static boolean isRight(@NotNull LSFFormGroupObjectRelativePosition position) {
+        return position.getFormGroupObjectRelativePositionType().getText().equals("AFTER");
+    }
 }
