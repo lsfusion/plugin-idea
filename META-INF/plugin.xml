@@ -15,6 +15,7 @@
             <li>IMPORT LIST support</li>
             <li>Add BEFORE / AFTER option for trees</li>
             <li>Minor bugfixes</li>
+            <li>EXPORT XML HEADERS another syntax</li>
         </ul>
     ]]>
     </change-notes>
