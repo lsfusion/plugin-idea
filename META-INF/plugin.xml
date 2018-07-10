@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.135</version>
+    <version>1.0.136</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -16,6 +16,7 @@
             <li>Add BEFORE / AFTER option for trees</li>
             <li>Minor bugfixes</li>
             <li>EXPORT XML HEADERS another syntax</li>
+            <li>EXPORT NOESCAPE</li>
         </ul>
     ]]>
     </change-notes>

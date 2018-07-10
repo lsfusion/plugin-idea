@@ -818,7 +818,7 @@ exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
         (   XML (LIST|TABLE)? ATTR?
         |   JSON (LIST|TABLE)?
-        |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
+        |   CSV (stringLiteral)? (NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
         |   (DBF (CHARSET stringLiteral)?)
         |   LIST
         |   TABLE
