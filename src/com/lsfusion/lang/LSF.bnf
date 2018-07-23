@@ -998,11 +998,11 @@ importPropertyUsage ::= propertyUsage
     methods = [ resolveParamClasses getParamList]
 }
 
-importFormActionPropertyDefinitionBody ::= IMPORT formUsage importActionSourceType
+importFormActionPropertyDefinitionBody ::= IMPORT formUsage importFormActionSourceType
 {
     pin = 2
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
 }
 
 importActionSourceType ::=  XLS (SHEET (propertyExpression | ALL))?
@@ -1013,6 +1013,11 @@ importActionSourceType ::=  XLS (SHEET (propertyExpression | ALL))?
                         |   LIST
                         |   TABLE
                         |   MDB
+
+importFormActionSourceType ::=  DBF (CHARSET stringLiteral)?
+                            |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
+                            |   XML (ROOT propertyExpression)? (ATTR)? (HEADERS stringLiteral EQUALS objectUsage (COMMA stringLiteral EQUALS objectUsage)*)?
+                            |   JSON (ROOT propertyExpression)?
 
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
                                         (   (   CONNECTION propertyExpression

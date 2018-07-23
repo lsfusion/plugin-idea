@@ -9,14 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.136</b><br>
+        <b>Version 1.0.137</b><br>
         <ul>
-            <li>EXPORT XML ATTR support</li>
-            <li>IMPORT LIST support</li>
-            <li>Add BEFORE / AFTER option for trees</li>
-            <li>Minor bugfixes</li>
-            <li>EXPORT XML HEADERS another syntax</li>
-            <li>EXPORT NOESCAPE</li>
+            <li>IMPORT form XML HEADERS</li>
         </ul>
     ]]>
     </change-notes>

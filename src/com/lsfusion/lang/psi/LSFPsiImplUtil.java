@@ -3769,6 +3769,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFImportFormActionPropertyDefinitionBody formActionBody) {
+        return resolveFormDecl(formActionBody.getFormUsage());
+    }
+
+    @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormEmailToObjects formEmailToObjects) {
         return resolveFormDecl(formEmailToObjects.getFormUsage());
     }
