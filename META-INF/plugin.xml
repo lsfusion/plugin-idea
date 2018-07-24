@@ -12,6 +12,7 @@
         <b>Version 1.0.137</b><br>
         <ul>
             <li>IMPORT form XML HEADERS</li>
+            <li>forceViewType fix</li>
         </ul>
     ]]>
     </change-notes>

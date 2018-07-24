@@ -104,10 +104,12 @@ public class PropertyDrawEntity {
         this.baseClass = baseClass;
         this.caption = caption;
 
-        if(!isAction)
-            forceViewType = ClassViewType.GRID;
-        else
-            forceViewType = ClassViewType.PANEL;
+        if(forceViewType == null) {
+            if (!isAction)
+                forceViewType = ClassViewType.GRID;
+            else
+                forceViewType = ClassViewType.PANEL;
+        }
 
         LSFNonEmptyPropertyOptions propertyOptions = null;
         if (propDeclaration != null) {
