@@ -163,7 +163,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "ASK"                			        { return ASK; }
   "NATIVE"                			    { return NATIVE; }
   "ACTION"                  			{ return ACTION; }
-  "ADDFORM"                     	    { return ADDFORM; }
   "AFTER"                   			{ return AFTER; }
   "GOAFTER"                   			{ return GOAFTER; }
   "AGGPROP"                 			{ return AGGPROP; }
@@ -242,7 +241,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "DROPPED"                 			{ return DROPPED; }
   "ECHO"                    			{ return ECHO; }
   "EDIT"                    			{ return EDIT; }
-  "EDITFORM"                    		{ return EDITFORM; }
   "ELSE"                    			{ return ELSE; }
   "EMAIL"                   			{ return EMAIL; }
   "END"                     			{ return END; }
@@ -315,7 +313,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "LIKE"                   			    { return LIKE; }
   "LIMIT"                   			{ return LIMIT; }
   "LIST"                    			{ return LIST; }
-  "LOADFILE"                			{ return LOADFILE; }
   "LOCAL"                   			{ return LOCAL; }
   "LOGGABLE"                			{ return LOGGABLE; }
   "LSF"                    			    { return LSF; }
