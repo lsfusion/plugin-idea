@@ -10,9 +10,8 @@ import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 public class ImplementationsSearch extends QueryExecutorBase<PsiElement, PsiElement> {
-
     @Override
-    public void processQuery(@NotNull PsiElement sourceElement, @NotNull final Processor<PsiElement> consumer) {
+    public void processQuery(@NotNull PsiElement sourceElement, @NotNull Processor<? super PsiElement> consumer) {
         if (sourceElement instanceof LSFId) {
 
             final LSFDeclaration declParent = PsiTreeUtil.getParentOfType(sourceElement, LSFDeclaration.class);

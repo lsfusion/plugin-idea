@@ -11,6 +11,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.137</b><br>
         <ul>
+            <li>Idea 2018.2 support</li>
             <li>IMPORT form XML HEADERS</li>
             <li>forceViewType fix</li>
         </ul>

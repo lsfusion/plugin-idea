@@ -165,7 +165,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "ACTION"                  			{ return ACTION; }
   "AFTER"                   			{ return AFTER; }
   "GOAFTER"                   			{ return GOAFTER; }
-  "AGGPROP"                 			{ return AGGPROP; }
   "AGGR"                    			{ return AGGR; }
   "NAGGR"                    			{ return NAGGR; }
   "ALL"                     			{ return ALL; }
