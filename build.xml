@@ -112,21 +112,16 @@
         <pathelement location="${buildLib}/grammar-kit.jar"/>
         <file name="${basedir}/lib/psiImplUtils.jar"/>
         <fileset dir="${idea.home}/lib">
-            <include name="jdom.jar"/>
-            <include name="openapi.jar"/>
-            <include name="util.jar"/>
-            <include name="idea.jar"/>
-            <include name="picocontainer.jar"/>
-            <include name="extensions.jar"/>
-            <include name="trove4j.jar"/>
-            <include name="resources.jar"/>
-            <include name="jsr166e.jar"/>
-            <include name="asm.jar"/>
             <include name="asm-all.jar"/>
-            <include name="guava-19.0.jar"/>
-            <include name="cglib-nodep-3.2.4.jar"/>
-            <include name="automaton.jar"/>
-            <include name="asm-commons.jar"/>
+            <include name="automaton-1.12-1.jar"/>
+            <include name="extensions.jar"/>
+            <include name="guava-23.6-jre.jar"/>
+            <include name="idea.jar"/>
+            <include name="picocontainer-1.2.jar"/>
+            <include name="platform-api.jar"/>
+            <include name="platform-impl.jar"/>
+            <include name="trove4j.jar"/>
+            <include name="util.jar"/>
         </fileset>
     </path>
 
