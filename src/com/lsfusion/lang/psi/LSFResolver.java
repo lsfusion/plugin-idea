@@ -41,7 +41,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
         SearchRequestCollector request = new SearchRequestCollector(new SearchSession());
         request.searchWord(compoundID, scope, UsageSearchContext.IN_CODE, true, new RequestResultProcessor() {
             @Override
-            public boolean processTextOccurrence(@NotNull PsiElement element, int offsetInElement, @NotNull Processor<? super PsiReference> consumer) {
+            public boolean processTextOccurrence(@NotNull PsiElement element, int offsetInElement, @NotNull Processor consumer) {
                 for (PsiReference ref : element.getReferences())
                     if (ReferenceRange.containsOffsetInElement(ref, offsetInElement) && !consumer.process(ref)) {
                         return false;

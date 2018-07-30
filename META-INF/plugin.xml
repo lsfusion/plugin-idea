@@ -9,17 +9,16 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.137</b><br>
+        <b>Version 1.0.138</b><br>
         <ul>
-            <li>Idea 2018.2 support</li>
-            <li>IMPORT form XML HEADERS</li>
-            <li>forceViewType fix</li>
+            <li>Idea <2018.2 support</li>
+            <li>Minor bugfixes</li>
         </ul>
     ]]>
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="182.3684.101"/>
+    <idea-version since-build="171.3780.107"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->

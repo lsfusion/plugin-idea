@@ -4,10 +4,7 @@ import com.intellij.codeInsight.navigation.GotoTargetHandler;
 import com.intellij.codeInsight.navigation.GotoTargetRendererProvider;
 import com.intellij.ide.util.PsiElementListCellRenderer;
 import com.intellij.psi.PsiElement;
-import com.lsfusion.lang.psi.LSFCustomClassUsageWrapper;
-import com.lsfusion.lang.psi.LSFElement;
-import com.lsfusion.lang.psi.LSFFormUsageWrapper;
-import com.lsfusion.lang.psi.LSFPropertyUsageWrapper;
+import com.lsfusion.lang.psi.*;
 import org.jetbrains.annotations.Nullable;
 
 public class LSFGoToTargetRendererProvider implements GotoTargetRendererProvider {
@@ -15,7 +12,7 @@ public class LSFGoToTargetRendererProvider implements GotoTargetRendererProvider
     @Override
     public PsiElementListCellRenderer getRenderer(PsiElement element, GotoTargetHandler.GotoData gotoData) {
         if (element instanceof LSFElement || element instanceof LSFCustomClassUsageWrapper ||
-                element instanceof LSFFormUsageWrapper || element instanceof LSFPropertyUsageWrapper) {
+                element instanceof LSFFormUsageWrapper || element instanceof LSFPropertyUsageWrapper || element instanceof LSFActionUsageWrapper) {
             return new LSFPsiListCellRenderer();
         }
         return null;

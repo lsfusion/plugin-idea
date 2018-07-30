@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ImplementationsSearch extends QueryExecutorBase<PsiElement, PsiElement> {
     @Override
-    public void processQuery(@NotNull PsiElement sourceElement, @NotNull Processor<? super PsiElement> consumer) {
+    public void processQuery(@NotNull PsiElement sourceElement, @NotNull Processor consumer) {
         if (sourceElement instanceof LSFId) {
 
             final LSFDeclaration declParent = PsiTreeUtil.getParentOfType(sourceElement, LSFDeclaration.class);
