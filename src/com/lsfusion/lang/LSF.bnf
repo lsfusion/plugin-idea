@@ -683,7 +683,6 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    asyncUpdateActionPropertyDefinitionBody
                                       	|	    seekObjectActionPropertyDefinitionBody
                                       	|	    emailActionPropertyDefinitionBody
-                                      	|	    fileActionPropertyDefinitionBody
                                       	|	    evalActionPropertyDefinitionBody
                                       	|	    drillDownActionPropertyDefinitionBody
                                       	|	    readActionPropertyDefinitionBody
@@ -930,13 +929,6 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST | NULL)?
     methods = [inferActionParamClasses resolveFormDecl] 
 }
 
-fileActionPropertyDefinitionBody ::= OPEN propertyExpression (NAME propertyExpression)? syncTypeLiteral?
-{
-    pin(".*") = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression"
-    methods = [inferActionParamClasses]
-}
-
 changeClassActionPropertyDefinitionBody ::= CHANGECLASS exprParameterUsage TO customClassUsage (WHERE propertyExpression)?
 {
     pin = 1
@@ -958,7 +950,7 @@ evalActionPropertyDefinitionBody ::= EVAL (ACTION)? propertyExpression (PARAMS p
     methods = [inferActionParamClasses]
 }
 
-readActionPropertyDefinitionBody ::= READ (CLIENT DIALOG?)? propertyExpression (TO noParamsPropertyUsage)? ((MOVE propertyExpression) | (DELETE))?
+readActionPropertyDefinitionBody ::= READ (CLIENT DIALOG?)? propertyExpression (TO noParamsPropertyUsage)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1114,7 +1106,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
 // some statements are not pinned after the first token, so we need these fake rules to pin incomplete statements (to support recovery assertion) 
 // Important ! after recover the rule should mandatory be pinned (matched)
 private list_action_statement_recover ::= !(ACTIVATE | NEW | NEWEDIT | APPLY | CANCEL | CHANGE | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | CUSTOM | DELETE
-                                            | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI | OPEN
+                                            | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
                                             | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | EXTERNAL

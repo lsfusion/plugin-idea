@@ -357,7 +357,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "CONSTRAINTFILTER"              		{ return CONSTRAINTFILTER; }
   "OK"                      			{ return OK; }
   "ON"                      			{ return ON; }
-  "OPEN"                			    { return OPEN; }
   "OPTIMISTICASYNC"                     { return OPTIMISTICASYNC; }
   "OR"                      			{ return OR; }
   "ORDER"                   			{ return ORDER; }
