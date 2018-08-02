@@ -1,5 +1,6 @@
 package com.lsfusion.design;
 
+import com.google.common.base.Throwables;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Query;
@@ -14,7 +15,6 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.impl.LSFFormPropertyDrawUsageImpl;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 
 import java.awt.*;
@@ -244,29 +244,7 @@ public class DesignInfo {
             ComponentView componentView = form.getComponentBySID(componentSID);
             return componentView.getContainer().getSID();
         } else if (componentSelector.getPropertySelector() != null) {
-            LSFFormPropertyDrawUsageImpl usage = (LSFFormPropertyDrawUsageImpl) componentSelector.getPropertySelector().getFormPropertyDrawUsage();
-            LSFAliasUsage aliasUsage = usage.getAliasUsage();
-            String alias = null;
-            String name = null;
-            List<String> objectNames = null;
-            if (aliasUsage != null)
-                alias = aliasUsage.getSimpleName().getName();
-            else {
-                LSFObjectUsageList objectUsageList = usage.getObjectUsageList();
-
-                assert objectUsageList != null;
-
-                objectNames = new ArrayList<>();
-                name = usage.getSimpleName().getName();
-                LSFNonEmptyObjectUsageList usageList = objectUsageList.getNonEmptyObjectUsageList();
-                if (usageList != null) {
-                    List<LSFObjectUsage> objectUsages = usageList.getObjectUsageList();
-                    for (LSFObjectUsage objectUsage : objectUsages) {
-                        objectNames.add(objectUsage.getName());
-                    }
-                }
-            }
-            return FormView.getPropertyDrawSID(alias, name, objectNames);
+            return FormView.getPropertyDrawSID(FormView.getPropertyDrawName(componentSelector.getPropertySelector().getFormPropertyDrawUsage()));
         } else if (componentSelector.getFilterGroupSelector() != null) {
             String name = componentSelector.getFilterGroupSelector().getFilterGroupUsage().getName();
             return FormView.getFilterGroupSID(name);

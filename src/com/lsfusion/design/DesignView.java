@@ -166,7 +166,7 @@ public class DesignView extends JPanel implements Disposable {
         myUpdateQueue.queue(new Update("rebuild") {
             @Override
             public void run() {
-                if (!project.isDisposed()) {
+                if (!project.isDisposed() && formDeclaration.isValid()) {
                     update(module, formDeclaration);
                 }
             }

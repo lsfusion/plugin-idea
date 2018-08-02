@@ -1,5 +1,6 @@
 package com.lsfusion;
 
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -8,6 +9,7 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.indexes.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -58,6 +60,43 @@ public class LSFSymbolContributor extends LSFNameContributor {
         clearPropertyDeclarationsMap();
         return super.getNames(project, includeNonProjectItems);
     }
+    
+    private static class ActionOrPropFullNavigationItem implements NavigationItem {
+        private final String fullName;
+        private final NavigationItem decl;
+
+        public ActionOrPropFullNavigationItem(String fullName, LSFActionOrGlobalPropDeclaration decl) {
+            this.fullName = fullName;
+            this.decl = (NavigationItem) decl;
+        }
+
+        @Nullable
+        @Override
+        public String getName() {
+            return fullName;
+        }
+
+        @Nullable
+        @Override
+        public ItemPresentation getPresentation() {
+            return decl.getPresentation();
+        }
+
+        @Override
+        public void navigate(boolean requestFocus) {
+            decl.navigate(requestFocus);
+        }
+
+        @Override
+        public boolean canNavigate() {
+            return decl.canNavigate();
+        }
+
+        @Override
+        public boolean canNavigateToSource() {
+            return decl.canNavigateToSource();
+        }
+    }
 
     @Override
     protected Collection<String> getIndexKeys(StringStubIndexExtension index, String pattern, Project project, boolean includeNonProjectItems) {
@@ -83,7 +122,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
 
                     String withParams = key + paramsString;
                     List<NavigationItem> decls = getPropertyDeclarationsMap(withParams, true);
-                    decls.add((NavigationItem) decl);
+                    decls.add(new ActionOrPropFullNavigationItem(withParams, decl));
                     result.add(withParams);
                 }
             }

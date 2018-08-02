@@ -3,6 +3,9 @@ package com.lsfusion.design;
 import com.lsfusion.design.model.*;
 import com.lsfusion.design.model.entity.*;
 import com.lsfusion.design.ui.ClassViewType;
+import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.impl.LSFFormPropertyDrawUsageImpl;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -327,10 +330,33 @@ public class FormView {
         return "PROPERTY(" + name + ")";
     }
 
-    public static String getPropertyDrawSID(String alias, String name, List<String> objectNames) {
-        return getPropertyDrawSID(getPropertyDrawName(alias, name, objectNames));
+    @NotNull
+    public static String getPropertyDrawName(@NotNull LSFFormPropertyDrawUsage usage) {
+        LSFFormPropertyDrawUsageImpl usageImpl = (LSFFormPropertyDrawUsageImpl) usage;
+        LSFAliasUsage aliasUsage = usageImpl.getAliasUsage();
+        String alias = null;
+        String name = null;
+        List<String> objectNames = null;
+        if (aliasUsage != null)
+            alias = aliasUsage.getSimpleName().getName();
+        else {
+            LSFObjectUsageList objectUsageList = usageImpl.getObjectUsageList();
+
+            assert objectUsageList != null;
+
+            objectNames = new ArrayList<>();
+            name = usageImpl.getSimpleName().getName();
+            LSFNonEmptyObjectUsageList usageList = objectUsageList.getNonEmptyObjectUsageList();
+            if (usageList != null) {
+                List<LSFObjectUsage> objectUsages = usageList.getObjectUsageList();
+                for (LSFObjectUsage objectUsage : objectUsages) {
+                    objectNames.add(objectUsage.getName());
+                }
+            }
+        }
+        return getPropertyDrawName(alias, name, objectNames);
     }
-    
+
     public static String getPropertyDrawName(String alias, String name, List<String> objectNames) {
         StringBuilder propName;
         if (alias != null) {

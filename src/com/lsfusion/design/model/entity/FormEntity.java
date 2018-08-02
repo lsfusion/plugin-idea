@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.lsfusion.design.FormView;
 import com.lsfusion.design.model.ModalityType;
 import com.lsfusion.design.model.property.*;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -323,11 +324,14 @@ public class FormEntity {
             List<LSFFormOptionsWithFormPropertyDraw> formOptionsWithFormPropertyDrawList = options.getFormOptionsWithFormPropertyDrawList();
             if (!formOptionsWithFormPropertyDrawList.isEmpty()) {
                 LSFFormOptionsWithFormPropertyDraw beforeAfterOption = formOptionsWithFormPropertyDrawList.get(formOptionsWithFormPropertyDrawList.size() - 1);
-                String formPropertyName = beforeAfterOption.getFormPropertyDrawUsage().getNameRef();
-                if (beforeAfterOption.getText().startsWith("BEFORE")) {
-                    return new Pair<>(true, getPropertyDraw(formPropertyName));
-                } else if (beforeAfterOption.getText().startsWith("AFTER")) {
-                    return new Pair<>(false, getPropertyDraw(formPropertyName));
+                LSFFormPropertyDrawUsage formPropertyDrawUsage = beforeAfterOption.getFormPropertyDrawUsage();
+                if(formPropertyDrawUsage != null) {
+                    String formPropertyName = FormView.getPropertyDrawName(formPropertyDrawUsage);
+                    if (beforeAfterOption.getText().startsWith("BEFORE")) {
+                        return new Pair<>(true, getPropertyDraw(formPropertyName));
+                    } else if (beforeAfterOption.getText().startsWith("AFTER")) {
+                        return new Pair<>(false, getPropertyDraw(formPropertyName));
+                    }
                 }
             }
         }

@@ -37,9 +37,4 @@ public class LSFFileType extends LanguageFileType {
     public Icon getIcon() {
         return LSFIcons.FILE;
     }
-
-    @Override
-    public boolean isJVMDebuggingSupported() {
-        return true;
-    }
 }
