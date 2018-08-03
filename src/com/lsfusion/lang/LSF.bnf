@@ -236,7 +236,7 @@ explicitInterfaceActStatement ::= actionStatement
     elementTypeFactory="com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-actionStatement ::= propertyDeclaration equalsSign
+actionStatement ::= propertyDeclaration
                         (   actionUnfriendlyPD (nonEmptyPropertyOptions | SEMI)
                         |   topActionPropertyDefinitionBody nonEmptyPropertyOptions?
                         )                      
@@ -1504,7 +1504,7 @@ formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage 
 ////////////////////////////////////////////////////////////////////////////////
 
 
-overrideActionStatement ::= mappedActionClassParamDeclare PLUSEQ
+overrideActionStatement ::= mappedActionClassParamDeclare PLUS
 		                (WHEN propertyExpression THEN)?
 		                topActionPropertyDefinitionBody		                
 {

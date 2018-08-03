@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.138</version>
+    <version>1.0.139</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,13 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.138</b><br>
+        <b>Version 1.0.139</b><br>
         <ul>
-            <li>Idea 2018.2- support</li>
-            <li>Bugfix for BEFORE / AFTER property options in form design</li>
-            <li>Bugfix for redundant java line breakpoint variant in LSFs in Idea 2018.2</li>
-            <li>Bugfix for "property with classes" in symbol search in Idea 2018.2</li>
-            <li>Minor bugfixes</li>
+            <li>Removed = from actions</li>
         </ul>
     ]]>
     </change-notes>
