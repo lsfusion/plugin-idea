@@ -13,6 +13,6 @@ public class DynamicFormatFileClass extends FileClass {
 
     @Override
     public String getName() {
-        return "CUSTOMFILE";
+        return "FILE";
     }
 }

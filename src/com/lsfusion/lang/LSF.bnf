@@ -883,7 +883,7 @@ emailActionPropertyDefinitionBody ::=
 		(   INLINE HTML propertyExpression
 		|	INLINE formEmailToObjects
 		|	ATTACH emailAttachFormat (NAME propertyExpression)? formEmailToObjects
-		|   ATTACH FILE propertyExpression (NAME propertyExpression)?
+		|   ATTACH propertyExpression (NAME propertyExpression)?
 		)*
 {
     pin = 1

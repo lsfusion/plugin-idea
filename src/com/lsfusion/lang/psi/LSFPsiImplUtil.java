@@ -567,7 +567,7 @@ public class LSFPsiImplUtil {
                 return PDFClass.instance;
             case "RAWFILE":
                 return RawClass.instance;
-            case "CUSTOMFILE":
+            case "FILE":
                 return DynamicFormatFileClass.instance;
             case "EXCELFILE":
                 return ExcelClass.instance;

@@ -12,6 +12,7 @@
         <b>Version 1.0.140</b><br>
         <ul>
             <li>Moved object caption closer to id (like in properties block)</li>
+            <li>Renamed CUSTOMFILE to FILE</li>            
         </ul>
     ]]>
     </change-notes>
