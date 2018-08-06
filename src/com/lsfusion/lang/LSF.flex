@@ -262,7 +262,6 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   "FINALLY"                             { return FINALLY; }
   "FIRST"                   			{ return FIRST; }
   "FIXED"                   			{ return FIXED; }
-  "FIXEDCHARWIDTH"          			{ return FIXEDCHARWIDTH; }
   "FLOAT"                     			{ return FLOAT; }
   "FOLDER"                              { return FOLDER; }
   "FOOTER"                  			{ return FOOTER; }
