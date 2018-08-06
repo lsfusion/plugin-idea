@@ -1340,8 +1340,8 @@ formMultiGroupObjectDeclaration ::= (simpleName EQUALS)?
 			                        formObjectDeclaration (COMMA formObjectDeclaration)*
 		                            RBRAC
 
-formObjectDeclaration ::= (simpleName EQUALS)?
-		                  className (localizedStringLiteral)?
+formObjectDeclaration ::= (simpleName? localizedStringLiteral? EQUALS)?
+		                  className
 		                  (ON CHANGE formActionPropertyObject)?
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFObjectDeclarationImpl"

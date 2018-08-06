@@ -9,9 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.139</b><br>
+        <b>Version 1.0.140</b><br>
         <ul>
-            <li>Removed = from actions</li>
+            <li>Moved object caption closer to id (like in properties block)</li>
         </ul>
     ]]>
     </change-notes>
