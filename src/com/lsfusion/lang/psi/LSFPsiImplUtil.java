@@ -579,7 +579,7 @@ public class LSFPsiImplUtil {
                 return PDFLinkClass.instance;
             case "RAWLINK":
                 return RawLinkClass.instance;
-            case "CUSTOMLINK":
+            case "LINK":
                 return DynamicFormatLinkClass.instance;
             case "EXCELLINK":
                 return ExcelLinkClass.instance;

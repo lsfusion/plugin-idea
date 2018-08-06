@@ -9,12 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.140</b><br>
+        <b>Version 1.0.141</b><br>
         <ul>
-            <li>Moved object caption closer to id (like in properties block)</li>
-            <li>Renamed CUSTOMFILE to FILE</li>            
-            <li>FIXEDCHARWIDTH -> CHARWIDTH FIXED</li>            
-            <li>CUSTOM -> INTERNAL</li>            
+            <li>Renamed CUSTOMLINK to LINK</li>            
         </ul>
     ]]>
     </change-notes>

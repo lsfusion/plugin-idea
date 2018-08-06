@@ -101,7 +101,7 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
   | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]" | "VARSTRING[" {DIGITS} "]" | "VARISTRING[" {DIGITS} "]"
   | "TEXT" | "ITEXT" | "RICHTEXT"
   | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "RAWFILE" | "FILE" | "EXCELFILE"
-  | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "RAWLINK"  | "CUSTOMLINK" | "EXCELLINK"
+  | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "RAWLINK"  | "LINK" | "EXCELLINK"
   | "BOOLEAN"
   | "COLOR"                             { return PRIMITIVE_TYPE; }
 

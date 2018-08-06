@@ -70,7 +70,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "DATE", "DATETIME", "TIME", "YEAR",
                                                                  "STRING[]", "ISTRING[]", "VARSTRING[]", "VARISTRING[]", "TEXT",
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "RAWFILE", "FILE", "EXCELFILE",
-                                                                 "WORDLINK", "IMAGELINK", "PDFLINK", "RAWLINK", "CUSTOMLINK", "EXCELLINK",
+                                                                 "WORDLINK", "IMAGELINK", "PDFLINK", "RAWLINK", "LINK", "EXCELLINK",
                                                                  "BOOLEAN", "COLOR"};
     
     private static final Set<String> DESIGN_PROPERTIES = new LinkedHashSet<String>() {
