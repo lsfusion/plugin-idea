@@ -14,6 +14,7 @@
             <li>Moved object caption closer to id (like in properties block)</li>
             <li>Renamed CUSTOMFILE to FILE</li>            
             <li>FIXEDCHARWIDTH -> CHARWIDTH FIXED</li>            
+            <li>CUSTOM -> INTERNAL</li>            
         </ul>
     ]]>
     </change-notes>
