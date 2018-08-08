@@ -46,6 +46,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("panelCaptionAbove"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("clearText").setExpert(),
+            new ReflectionProperty("notSelectAll").setExpert(),
             new ReflectionProperty("toolTip"),
             new ReflectionProperty("askConfirm"),
             new ReflectionProperty("askConfirmMessage"),
@@ -77,6 +78,7 @@ public class PropertyDrawView extends ComponentView {
     public String caption;
     public boolean showCaption = true;
     public boolean clearText;
+    public boolean notSelectAll;
     public String toolTip;
 
     public boolean askConfirm;
@@ -316,6 +318,10 @@ public class PropertyDrawView extends ComponentView {
         this.clearText = clearText;
     }
 
+    public void setNotSelectAll(boolean notSelectAll) {
+        this.notSelectAll = notSelectAll;
+    }
+
     public void setAskConfirm(boolean askConfirm) {
         this.askConfirm = askConfirm;
     }
@@ -394,6 +400,10 @@ public class PropertyDrawView extends ComponentView {
 
     public boolean isClearText() {
         return clearText;
+    }
+
+    public boolean isNotSelectAll() {
+        return notSelectAll;
     }
 
     public String getToolTip() {

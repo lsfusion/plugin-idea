@@ -76,6 +76,10 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.clearText = clearText;
     }
 
+    public void setNotSelectAll(boolean notSelectAll) {
+        target.notSelectAll = notSelectAll;
+    }
+
     public void setAskConfirm(boolean askConfirm) {
         target.entity.askConfirm = askConfirm;
     }
