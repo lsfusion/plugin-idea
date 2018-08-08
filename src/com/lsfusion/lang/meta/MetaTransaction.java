@@ -475,13 +475,16 @@ public class MetaTransaction {
                 if(statement != null) {
                     SingleTransaction transaction = transactions.get(statement);
                     if(transaction != null) {
-                        List<List<ExtToken>> oldTokens = new ArrayList<>();
+                        List<ExtToken> oldTokens = new ArrayList<>();
                         List<InToken> usageParams = statement.getUsageParams();
-                        List<InToken> newTokens = MetaChangeDetector.getNewTokens(texts, usageParams, declParams, oldTokens);
+                        List<String> newTokenTexts = MetaChangeDetector.getNewTokens(texts, usageParams, declParams, oldTokens);
+                        List<InToken> newTokens = new ArrayList<>();
+                        for(String newtTokenText : newTokenTexts)
+                            newTokens.add(new InToken(newtTokenText, 1));                            
 
                         List<Collection<List<ExtToken>>> oldColTokens = new ArrayList<>();
-                        for(List<ExtToken> oldToken : oldTokens)
-                            oldColTokens.add(Collections.singleton(oldToken));
+                        for(ExtToken oldToken : oldTokens)
+                            oldColTokens.add(Collections.singleton(Collections.singletonList(oldToken)));
 
                         for(Change change : transaction.changes)
                             change.apply(newTokens, oldColTokens, usageParams, declParams);

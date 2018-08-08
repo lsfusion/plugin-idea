@@ -215,7 +215,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         return new MetaCodeFragment(decls, tokens).getCode(usages);
     }
 
-    public static List<MetaTransaction.InToken> getNewTokens(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, List<List<MetaTransaction.ExtToken>> oldTokens) {
+    public static List<String> getNewTokens(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, List<MetaTransaction.ExtToken> oldTokens) {
         return new MetaCodeFragment(decls, tokens).getNewTokens(usages, oldTokens);
     }
 

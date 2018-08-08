@@ -11,7 +11,8 @@
     <change-notes><![CDATA[
         <b>Version 1.0.141</b><br>
         <ul>
-            <li>Renamed CUSTOMLINK to LINK</li>            
+            <li>Renamed CUSTOMLINK to LINK</li>
+            <li>Moved ## in meta codes inside lexems (to make metacodes parseable)</li>            
         </ul>
     ]]>
     </change-notes>

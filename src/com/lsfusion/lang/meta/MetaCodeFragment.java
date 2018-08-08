@@ -27,119 +27,85 @@ public class MetaCodeFragment {
     }
 
     public String getCode(List<MetaTransaction.InToken> params) {
-        List<MetaTransaction.InToken> newTokens = getNewTokens(params, null);
+        List<String> newTokens = getNewTokens(params, null);
         return getNewCode(newTokens);
     }
     
     public int mapOffset(int offset, List<MetaTransaction.InToken> params) {
-        List<List<MetaTransaction.ExtToken>> oldTokens = new ArrayList<>();
-        List<MetaTransaction.InToken> newTokens = getNewTokens(params, oldTokens);
+        List<String> newTokens = getNewTokens(params, null);
+        assert newTokens.size() == tokens.size();
         int mapOffset = 0;
-        int j=0;
         for(int i=0;i<newTokens.size();i++) {
-            offset = offset - newTokens.get(i).text.length();
+            offset = offset - newTokens.get(i).length();
 
             if(offset < 0)
                 return mapOffset;
 
-            for(int k=0;k<oldTokens.get(i).size();k++) {
-                mapOffset = mapOffset + tokens.get(j).length();
-                j++;
-            }
+            mapOffset = mapOffset + tokens.get(i).length();
         }
         
         return mapOffset;
     }
-    
-    private static boolean isConcat(IElementType type) {
-        return type == LSFTypes.ID || type == LSFTypes.LEX_STRING_LITERAL;
-    }
 
-    public List<MetaTransaction.InToken> getNewTokens(List<MetaTransaction.InToken> params, List<List<MetaTransaction.ExtToken>> oldTokens) {
-        ArrayList<MetaTransaction.InToken> newTokens = new ArrayList<>();
-        List<IElementType> newTokTypes = new ArrayList<>();
-
+    public List<String> getNewTokens(List<MetaTransaction.InToken> params, List<MetaTransaction.ExtToken> oldTokens) {
+        List<String> newTokens = new ArrayList<>();
         for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+            IElementType tokenType = types.get(i);
+            boolean isMeta = tokenType == LSFTypes.FAKEMETAID;
             Result<Boolean> transformed = new Result<>();
-            MetaTransaction.InToken tokenStr = transformedToken(params, tokens.get(i), transformed);
-            if (tokenStr.text.equals("##") || tokenStr.text.equals("###")) {
-                if (!newTokens.isEmpty() && i+1 < tokens.size()) { // если не первый и не последний
-                    MetaTransaction.InToken nextToken = transformedToken(params, tokens.get(i + 1), transformed);
-                    if(isConcat(newTokTypes.get(newTokTypes.size()-1))) {
-                        MetaTransaction.InToken lastToken = newTokens.get(newTokens.size() - 1);
-
-                        newTokens.set(newTokens.size()-1, concatTokens(lastToken, nextToken, tokenStr.text.equals("###")));
-                        if(oldTokens != null) {
-                            List<MetaTransaction.ExtToken> prev = oldTokens.get(oldTokens.size() - 1);
-                            prev.add(new MetaTransaction.ExtToken(tokens.get(i), true));
-                            prev.add(new MetaTransaction.ExtToken(tokens.get(i+1), transformed.getResult()));
-                        }
-                    } else {
-                        if(tokenStr.text.equals("###"))
-                            nextToken = capToken(nextToken);
-                        newTokens.add(nextToken);
-                        newTokTypes.add(types.get(i+1)); 
-                        if(oldTokens!=null) {
-                            List<MetaTransaction.ExtToken> prev = new ArrayList<>();
-                            prev.add(new MetaTransaction.ExtToken(tokens.get(i), true));
-                            prev.add(new MetaTransaction.ExtToken(tokens.get(i+1), transformed.getResult()));
-                            oldTokens.add(prev);
-                        }
-                    }
-                    ++i;
-                }
-            } else {
-                newTokens.add(tokenStr);
-                newTokTypes.add(types.get(i));
-                if(oldTokens!=null) {
-                    List<MetaTransaction.ExtToken> prev = new ArrayList<>();
-                    prev.add(new MetaTransaction.ExtToken(tokens.get(i), transformed.getResult()));
-                    oldTokens.add(prev);
-                }
-            }
+            if(isMeta || tokenType == LSFTypes.ID) // ID also can be meta parameter
+                token = transformToken(params, tokens.get(i), isMeta, transformed);
+            newTokens.add(token);
         }
         return newTokens;
     }
 
-    public static String getNewCode(List<MetaTransaction.InToken> newTokens) {
+    public static String getNewCode(List<String> newTokens) {
         StringBuilder transformedCode = new StringBuilder();
-        for (MetaTransaction.InToken newToken : newTokens) transformedCode.append(newToken.text);
+        for (String newToken : newTokens) transformedCode.append(newToken);
         return transformedCode.toString();
     }
 
-    public static String getOldCode(List<List<String>> oldTokens) {
-        StringBuilder transformedCode = new StringBuilder();
-        for (List<String> oldmTokens : oldTokens)
-            for(String oldToken : oldmTokens)
-                transformedCode.append(oldToken);
-        return transformedCode.toString();
-    }
-
-    private MetaTransaction.InToken transformedToken(List<MetaTransaction.InToken> actualParams, String token, Result<Boolean> transformed) {
+    private String transformParamToken(List<MetaTransaction.InToken> actualParams, String token, Result<Boolean> transformed) {
         int index = parameters.indexOf(token);
-        if(index >= 0 && index < actualParams.size()) {
+        if(index >= 0)
             transformed.setResult(true);
-            return actualParams.get(index);
+        return index >= 0 ? actualParams.get(index).text : token;
+    }
+    private String transformToken(List<MetaTransaction.InToken> actualParams, String token, boolean isMeta, Result<Boolean> transformed) {
+        if(!isMeta) { // optimization;
+            assert !token.contains("##");
+            return transformParamToken(actualParams, token, transformed);
+        }
+        transformed.setResult(true);
+        String[] parts = token.split("##");
+        boolean isStringLiteral = false;
+        String result = "";
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i];
+
+            boolean capitalize = false;
+            if (part.startsWith("#")) {
+                assert i > 0;
+                capitalize = !result.isEmpty() || (i == 1 && parts[0].isEmpty()); // when there is ###param, forcing its capitalization
+                part = part.substring(1);
+            }
+
+            part = transformParamToken(actualParams, part, transformed);
+
+            if (!part.isEmpty() && part.charAt(0) == QUOTE) {
+                isStringLiteral = true;
+                part = unquote(part);
+            }
+
+            result += capitalize(part, capitalize);
         }
 
-        transformed.setResult(false);
-        return new MetaTransaction.InToken(token, 1);
-    }
+        if(isStringLiteral)
+            result = QUOTE + result + QUOTE;
 
-    private MetaTransaction.InToken concatTokens(MetaTransaction.InToken t1, MetaTransaction.InToken t2, boolean toCapitalize) {
-        if (t1.text.isEmpty() || t2.text.isEmpty()) {
-            return new MetaTransaction.InToken(t1.text + capitalize(t2.text, toCapitalize && !t1.text.isEmpty()), t1.tokCount + t2.tokCount);
-        } else if (t1.text.charAt(0) == QUOTE || t2.text.charAt(0) == QUOTE) {
-            return new MetaTransaction.InToken(QUOTE + unquote(t1.text) + capitalize(unquote(t2.text), toCapitalize) + QUOTE, t1.tokCount + t2.tokCount - 1);
-        } else {
-            return new MetaTransaction.InToken(t1.text + capitalize(t2.text, toCapitalize), t1.tokCount + t2.tokCount - 1);
-        }
-    }
-    
-    private MetaTransaction.InToken capToken(MetaTransaction.InToken t) {
-        if(!t.text.isEmpty() && t.text.charAt(0) == QUOTE)
-            return new MetaTransaction.InToken(capitalize(unquote(t.text), true), t.tokCount);
-        return new MetaTransaction.InToken(capitalize(t.text, true), t.tokCount);
+        return result;
     }
 
     private String unquote(String s) {

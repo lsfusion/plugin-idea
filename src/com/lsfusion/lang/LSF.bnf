@@ -22,8 +22,7 @@
   // additional tokens
   tokens = [
     COMMENTS='COMMENTS'
-    FAKETWODASHES='##'
-    FAKETHREEDASHES='###'
+    FAKEMETAID='META_ID'
   ]
 }
 
