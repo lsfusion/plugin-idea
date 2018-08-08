@@ -205,9 +205,9 @@
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFTypeMismatchInspectionTool" hasStaticDescription="true"/>
 
-        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFClassViewTypeInPrint" displayName="LSF ClassViewType in PRINT"
-                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
-                         implementationClass="com.lsfusion.inspections.LSFClassViewTypeInPrintInspectionTool" hasStaticDescription="true"/>
+        <!--<localInspection groupPath="Lsf" language="Lsf" shortName="LSFClassViewTypeInPrint" displayName="LSF ClassViewType in PRINT"-->
+                         <!--groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"-->
+                         <!--implementationClass="com.lsfusion.inspections.LSFClassViewTypeInPrintInspectionTool" hasStaticDescription="true"/>-->
 
         <internalFileTemplate name="lsFusion script"/>
         <internalFileTemplate name="lsFusion settings"/>

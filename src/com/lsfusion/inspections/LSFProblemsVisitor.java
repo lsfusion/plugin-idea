@@ -31,8 +31,8 @@ public class LSFProblemsVisitor {
                     visitLSFSimpleNameWithCaption(null, (LSFSimpleNameWithCaption) element, true);
                 } else if (element instanceof LSFAssignActionPropertyDefinitionBody) {
                     visitLSFAssignActionPropertyDefinitionBody(null, (LSFAssignActionPropertyDefinitionBody) element, true);
-                } else if (element instanceof LSFPrintActionPropertyDefinitionBody) {
-                    visitLSFPrintActionPropertyDefinitionBody(null, (LSFPrintActionPropertyDefinitionBody) element, true);
+//                } else if (element instanceof LSFPrintActionPropertyDefinitionBody) {
+//                    visitLSFPrintActionPropertyDefinitionBody(null, (LSFPrintActionPropertyDefinitionBody) element, true);
                 }
             }
         } catch (Exception ignored) {
@@ -117,75 +117,75 @@ public class LSFProblemsVisitor {
         }
     }
 
-    static void visitLSFPrintActionPropertyDefinitionBody(ProblemsHolder holder, LSFPrintActionPropertyDefinitionBody element, boolean warningsSearchMode) {
-        LSFFormUsage formUsage = element.getFormUsage();
-        LSFFormActionObjectList formActionObjectList = element.getFormActionObjectList();
-        if (formActionObjectList != null && formUsage != null) {
-
-            //get objects in PRINT
-            List<String> formObjects = new ArrayList<>();
-            List<LSFFormActionObjectUsage> formActionObjectUsageList = formActionObjectList.getFormActionObjectUsageList();
-            for (LSFFormActionObjectUsage formActionObject : formActionObjectUsageList) {
-                LSFSimpleName objectUsage = formActionObject.getObjectUsage().getSimpleName();
-                formObjects.add(objectUsage.getText());
-            }
-
-            //get objects in FORM declaration
-            LSFFormDeclaration formDecl = formUsage.resolveDecl();
-            if (formDecl != null) {
-                PsiElement formStatement = formDecl.getParent();
-                if (formStatement != null && formStatement instanceof LSFFormStatement) {
-                    for (LSFFormGroupObjectsList groupObjectsList : ((LSFFormStatement) formStatement).getFormGroupObjectsListList()) {
-                        for (LSFFormGroupObjectDeclaration formGroupObjectDecl : groupObjectsList.getFormGroupObjectDeclarationList()) {
-
-                            boolean isPanel = false;
-                            for (LSFFormGroupObjectViewType formGroupObjectViewType : formGroupObjectDecl.getFormGroupObjectOptions().getFormGroupObjectViewTypeList()) {
-                                if(!isPanel)
-                                    isPanel = formGroupObjectViewType.getClassViewType().getText().equals("PANEL");
-                            }
-
-                            List<LSFFormObjectDeclaration> formObjectDecls = new ArrayList<>();
-                            LSFFormMultiGroupObjectDeclaration formMultiGroupObjectDecl = formGroupObjectDecl.getFormCommonGroupObject().getFormMultiGroupObjectDeclaration();
-                            if(formMultiGroupObjectDecl != null) {
-                                formObjectDecls.addAll(formMultiGroupObjectDecl.getFormObjectDeclarationList());
-                            }
-                            LSFFormSingleGroupObjectDeclaration formSingleGroupObjectDecl = formGroupObjectDecl.getFormCommonGroupObject().getFormSingleGroupObjectDeclaration();
-                            if(formSingleGroupObjectDecl != null) {
-                                formObjectDecls.add(formSingleGroupObjectDecl.getFormObjectDeclaration());
-                            }
-                            for (LSFFormObjectDeclaration formObjectDecl : formObjectDecls) {
-                                LSFSimpleName formObject = formObjectDecl.getSimpleName();
-                                if (formObject != null) {
-                                    if (formObjects.contains(formObject.getText())) {
-                                        if (!isPanel)
-                                            createObjectShouldBeInPanelWarning(holder, element, formObject, warningsSearchMode);
-                                    } else {
-                                        if (isPanel)
-                                            createNoRequiredObjectWarning(holder, element, formObject, warningsSearchMode);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    static void visitLSFPrintActionPropertyDefinitionBody(ProblemsHolder holder, LSFPrintActionPropertyDefinitionBody element, boolean warningsSearchMode) {
+//        LSFFormUsage formUsage = element.getFormUsage();
+//        LSFFormActionObjectList formActionObjectList = element.getFormActionObjectList();
+//        if (formActionObjectList != null && formUsage != null) {
+//
+//            //get objects in PRINT
+//            List<String> formObjects = new ArrayList<>();
+//            List<LSFFormActionObjectUsage> formActionObjectUsageList = formActionObjectList.getFormActionObjectUsageList();
+//            for (LSFFormActionObjectUsage formActionObject : formActionObjectUsageList) {
+//                LSFSimpleName objectUsage = formActionObject.getObjectUsage().getSimpleName();
+//                formObjects.add(objectUsage.getText());
+//            }
+//
+//            //get objects in FORM declaration
+//            LSFFormDeclaration formDecl = formUsage.resolveDecl();
+//            if (formDecl != null) {
+//                PsiElement formStatement = formDecl.getParent();
+//                if (formStatement != null && formStatement instanceof LSFFormStatement) {
+//                    for (LSFFormGroupObjectsList groupObjectsList : ((LSFFormStatement) formStatement).getFormGroupObjectsListList()) {
+//                        for (LSFFormGroupObjectDeclaration formGroupObjectDecl : groupObjectsList.getFormGroupObjectDeclarationList()) {
+//
+//                            boolean isPanel = false;
+//                            for (LSFFormGroupObjectViewType formGroupObjectViewType : formGroupObjectDecl.getFormGroupObjectOptions().getFormGroupObjectViewTypeList()) {
+//                                if(!isPanel)
+//                                    isPanel = formGroupObjectViewType.getClassViewType().getText().equals("PANEL");
+//                            }
+//
+//                            List<LSFFormObjectDeclaration> formObjectDecls = new ArrayList<>();
+//                            LSFFormMultiGroupObjectDeclaration formMultiGroupObjectDecl = formGroupObjectDecl.getFormCommonGroupObject().getFormMultiGroupObjectDeclaration();
+//                            if(formMultiGroupObjectDecl != null) {
+//                                formObjectDecls.addAll(formMultiGroupObjectDecl.getFormObjectDeclarationList());
+//                            }
+//                            LSFFormSingleGroupObjectDeclaration formSingleGroupObjectDecl = formGroupObjectDecl.getFormCommonGroupObject().getFormSingleGroupObjectDeclaration();
+//                            if(formSingleGroupObjectDecl != null) {
+//                                formObjectDecls.add(formSingleGroupObjectDecl.getFormObjectDeclaration());
+//                            }
+//                            for (LSFFormObjectDeclaration formObjectDecl : formObjectDecls) {
+//                                LSFSimpleName formObject = formObjectDecl.getSimpleName();
+//                                if (formObject != null) {
+//                                    if (formObjects.contains(formObject.getText())) {
+//                                        if (!isPanel)
+//                                            createObjectShouldBeInPanelWarning(holder, element, formObject, warningsSearchMode);
+//                                    } else {
+//                                        if (isPanel)
+//                                            createNoRequiredObjectWarning(holder, element, formObject, warningsSearchMode);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private static void showTypeMismatchWarning(ProblemsHolder holder, PsiElement element, LSFClassSet class1, LSFClassSet class2, boolean warningsSearchMode) {
         String message = String.format("Type mismatch: unsafe cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName());
         createWeakWarning(holder, element, message);
     }
 
-    private static void createObjectShouldBeInPanelWarning(ProblemsHolder holder, PsiElement element, LSFSimpleName objectUsage, boolean warningsSearchMode) {
-        String message = String.format("Object %s in PRINT should be PANEL", objectUsage.getText());
-        createWeakWarning(holder, element, message);
-    }
-
-    private static void createNoRequiredObjectWarning(ProblemsHolder holder, PsiElement element, LSFSimpleName objectUsage, boolean warningsSearchMode) {
-        String message = String.format("No required object %s in PRINT", objectUsage.getText());
-        createWeakWarning(holder, element, message);
-    }
+//    private static void createObjectShouldBeInPanelWarning(ProblemsHolder holder, PsiElement element, LSFSimpleName objectUsage, boolean warningsSearchMode) {
+//        String message = String.format("Object %s in PRINT should be PANEL", objectUsage.getText());
+//        createWeakWarning(holder, element, message);
+//    }
+//
+//    private static void createNoRequiredObjectWarning(ProblemsHolder holder, PsiElement element, LSFSimpleName objectUsage, boolean warningsSearchMode) {
+//        String message = String.format("No required object %s in PRINT", objectUsage.getText());
+//        createWeakWarning(holder, element, message);
+//    }
 
     private static void createWeakWarning(ProblemsHolder holder, PsiElement element, String message) {
         if (holder == null) {

@@ -18,9 +18,9 @@ public class LSFClassViewTypeInPrintInspectionTool extends LocalInspectionTool {
         return new LSFElementVisitor() {
             @Override
             public void visit(PsiElement element) {
-                if (element instanceof LSFPrintActionPropertyDefinitionBody) {
-                    LSFProblemsVisitor.visitLSFPrintActionPropertyDefinitionBody(holder, (LSFPrintActionPropertyDefinitionBody) element, false);
-                }
+//                if (element instanceof LSFPrintActionPropertyDefinitionBody) {
+//                    LSFProblemsVisitor.visitLSFPrintActionPropertyDefinitionBody(holder, (LSFPrintActionPropertyDefinitionBody) element, false);
+//                }
             }
         };
     }
