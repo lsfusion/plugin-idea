@@ -975,7 +975,7 @@ nonEmptyImportFieldDefinitions ::= importFieldDefinition (COMMA importFieldDefin
 importFieldAlias ::= simpleName
 importFieldName ::= simpleName | stringLiteral
 
-importFieldDefinition ::= builtInClassName (importFieldAlias EQ)? importFieldName NULL? {
+importFieldDefinition ::= builtInClassName (importFieldAlias EQUALS)? importFieldName NULL? {
     implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext,com.lsfusion.lang.psi.declarations.LSFImportFieldParamDeclaration"
     extends="com.lsfusion.lang.psi.declarations.impl.LSFImportFieldParamDeclartionImpl"
     methods = [ resolveClass ensureClass ]
