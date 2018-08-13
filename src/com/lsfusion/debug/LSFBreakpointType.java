@@ -38,8 +38,10 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
     private static Condition<PsiElement> inListAction = new Condition<PsiElement>() {
         @Override
         public boolean value(PsiElement psiElement) {
-            return !(psiElement instanceof LSFListActionPropertyDefinitionBody)
-                   && psiElement.getParent() instanceof LSFActionPropertyDefinitionBody;
+            return true;
+            // in theory we can pre-check rules that are debuggable, but there are a lot of them, and in that case we need to keep it consistent with DebugInfo, and for example java does not do that, so i don't see any reason why we should 
+//            return !(psiElement instanceof LSFListActionPropertyDefinitionBody)
+//                   && psiElement.getParent() instanceof LSFActionPropertyDefinitionBody;
         }
     };
 

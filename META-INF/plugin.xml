@@ -9,9 +9,10 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.142</b><br>
+        <b>Version 1.0.143</b><br>
         <ul>
             <li>option for property 'notSelectAll'</li>
+            <li>Bugfix with breakpoints on events and constraints</li>
             <li>Minor bug fixes</li>
         </ul>
     ]]>
