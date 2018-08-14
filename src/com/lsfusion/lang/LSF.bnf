@@ -796,7 +796,7 @@ printActionPropertyDefinitionBody ::=
 }
 exportActionPropertyDefinitionBody ::=
 	    EXPORT mappedForm
-        (   XML (HEADERS stringLiteral EQUALS objectUsage (COMMA stringLiteral EQUALS objectUsage)*)?
+        (   XML (ATTR (objectUsage (COMMA objectUsage)*))? (HEADERS stringLiteral EQUALS objectUsage (COMMA stringLiteral EQUALS objectUsage)*)?
         |   JSON
         |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
         |   (DBF (CHARSET stringLiteral)?)
@@ -1005,7 +1005,7 @@ importActionSourceType ::=  XLS (SHEET (propertyExpression | ALL))?
 
 importFormActionSourceType ::=  DBF (CHARSET stringLiteral)?
                             |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
-                            |   XML (ROOT propertyExpression)? (ATTR)? (HEADERS stringLiteral EQUALS objectUsage (COMMA stringLiteral EQUALS objectUsage)*)?
+                            |   XML (ROOT propertyExpression)? (ATTR (objectUsage (COMMA objectUsage)*))? (HEADERS stringLiteral EQUALS objectUsage (COMMA stringLiteral EQUALS objectUsage)*)?
                             |   JSON (ROOT propertyExpression)?
 
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
