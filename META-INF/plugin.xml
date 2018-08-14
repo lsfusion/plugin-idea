@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.142</version>
+    <version>1.0.143</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,7 +9,7 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.142</b><br>
+        <b>Version 1.0.143</b><br>
         <ul>
             <li>option for property 'notSelectAll'</li>
             <li>Bugfix with breakpoints on events and constraints</li>
