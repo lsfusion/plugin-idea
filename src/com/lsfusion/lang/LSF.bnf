@@ -987,7 +987,7 @@ importPropertyUsage ::= propertyUsage
     methods = [ resolveParamClasses getParamList]
 }
 
-importFormActionPropertyDefinitionBody ::= IMPORT formUsage importFormActionSourceType
+importFormActionPropertyDefinitionBody ::= IMPORT formUsage importFormActionSourceType (FROM propertyUsage)?
 {
     pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"

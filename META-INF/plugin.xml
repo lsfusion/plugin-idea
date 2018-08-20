@@ -9,9 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.144</b><br>
+        <b>Version 1.0.145</b><br>
         <ul>
-            <li>IMPORT/EXPORT XML: ATTR in form declaration</li>
+            <li>IMPORT form FROM</li>
         </ul>
     ]]>
     </change-notes>
