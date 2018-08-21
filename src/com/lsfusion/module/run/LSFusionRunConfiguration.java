@@ -92,7 +92,7 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
     }
 
     public String getWorkingDirectory() {
-        return ExternalizablePath.localPathValue(WORKING_DIRECTORY);
+        return WORKING_DIRECTORY != null ? ExternalizablePath.localPathValue(WORKING_DIRECTORY) : "$MODULE_DIR$";
     }
 
     public void setPassParentEnvs(boolean passParentEnvs) {
