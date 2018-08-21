@@ -178,15 +178,14 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
                 
                 String lsfusionPath = mainPath + "/lsfusion";
                 File lsfusionDir = new File(lsfusionPath);
-                
+                lsfusionDir.mkdirs();
+
                 String resourcesPath = mainPath + "/resources";
                 new File(resourcesPath).mkdirs();
 
                 String testPath = srcPath + "/test";
                 new File(testPath).mkdirs();
-                
-                new File(lsfusionDir, "reports").mkdirs();
-                
+
                 ContentEntry contentEntry = doAddContentEntry(rootModel);
                 if (contentEntry != null) {
                     contentEntry.clearSourceFolders();
