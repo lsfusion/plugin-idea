@@ -25,17 +25,25 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
 import com.intellij.util.PlatformIcons;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import javax.swing.*;
+import java.awt.event.*;
 import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -45,7 +53,13 @@ public class LibraryOptionsPanel {
     private JComboBox myExistingLibraryComboBox;
     private JButton myCreateButton;
     private JButton myDownloadButton;
+    private JPopupMenu myPopupMenu;
+    private JButton myPopupButton;
     private JPanel mySimplePanel;
+
+    private String downloadUrl = "https://download.lsfusion.org";;
+    private String subDirPattern = "(\\d+(\\.)?)*/";
+    private String jarPattern = "lsfusion-server-(\\d+(\\.)?)*\\.jar";
 
     private LibraryCompositionSettings mySettings;
     private final LibrariesContainer myLibrariesContainer;
@@ -70,6 +84,7 @@ public class LibraryOptionsPanel {
 
     private void showSettingsPanel() {
         List<Library> libraries = calculateSuitableLibraries();
+        List<LibraryEditor> existingLibraryEditors = findExistingLibraryEditors();
 
         myLibraryComboBoxModel = new SortedComboBoxModel<>(new Comparator<LibraryEditor>() {
             @Override
@@ -87,8 +102,9 @@ public class LibraryOptionsPanel {
             }
             myLibraryComboBoxModel.add(libraryEditor);
         }
+        myLibraryComboBoxModel.addAll(existingLibraryEditors);
         myExistingLibraryComboBox.setModel(myLibraryComboBoxModel);
-        if (libraries.isEmpty()) {
+        if (libraries.isEmpty() && existingLibraryEditors.isEmpty()) {
             myLibraryComboBoxModel.add(null);
         }
         myExistingLibraryComboBox.setSelectedIndex(0);
@@ -110,7 +126,14 @@ public class LibraryOptionsPanel {
         });
 
         myCreateButton.addActionListener(e -> doCreate());
-        myDownloadButton.addActionListener(e -> doDownload());
+        myDownloadButton.addActionListener(e -> doDownload(null));
+        myPopupMenu = new JPopupMenu();
+        myPopupButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showPopupMenu(e);
+            }
+        });
     }
 
     private List<Library> calculateSuitableLibraries() {
@@ -124,6 +147,31 @@ public class LibraryOptionsPanel {
             }
         }
         return suitableLibraries;
+    }
+
+    private List<LibraryEditor> findExistingLibraryEditors() {
+        List<LibraryEditor> libraryEditorList = new ArrayList<>();
+        VirtualFile baseDirectory = getBaseDirectory();
+        if (baseDirectory != null) {
+            File[] listFiles = new File(baseDirectory.getPath()).listFiles();
+            if (listFiles != null) {
+                for (File file : listFiles) {
+                    if (file.getName().matches(jarPattern)) {
+                        final NewLibraryConfiguration libraryConfiguration = new NewLibraryConfiguration(file.getAbsolutePath()) {
+                            @Override
+                            public void addRoots(@NotNull LibraryEditor libraryEditor) {
+                                libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(file), OrderRootType.CLASSES);
+                            }
+                        };
+                        final NewLibraryEditor libraryEditor = new NewLibraryEditor(libraryConfiguration.getLibraryType(), libraryConfiguration.getProperties());
+                        libraryEditor.setName(myLibrariesContainer.suggestUniqueLibraryName(libraryConfiguration.getDefaultLibraryName()));
+                        libraryConfiguration.addRoots(libraryEditor);
+                        libraryEditorList.add(libraryEditor);
+                    }
+                }
+            }
+        }
+        return libraryEditorList;
     }
 
     private Project getProject() {
@@ -148,35 +196,50 @@ public class LibraryOptionsPanel {
         }
     }
 
-    private void doDownload() {
+    private void doDownload(String lsfusionServerJar) {
         try {
-            String url = "https://lsfusion.ru/download/fsl-server-latest.jar";
-            VirtualFile baseDirectory = getBaseDirectory();
-            if (baseDirectory != null) {
-                File file = new File(baseDirectory.getPath() + "/fsl-server-latest.jar");
-                //todo: replace after idea 2018.2
-                //FileUtils.copyURLToFile(new URL(url), file);
-                URL website = new URL(url);
-                try (InputStream in = website.openStream()) {
-                    Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                }
-
+            File file = lsfusionServerJar != null ? downloadFile(lsfusionServerJar) : getLatestLsfusionServerJar();
+            if (file != null) {
                 final NewLibraryConfiguration libraryConfiguration = new NewLibraryConfiguration(file.getAbsolutePath()) {
                     @Override
                     public void addRoots(@NotNull LibraryEditor libraryEditor) {
                         libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(file), OrderRootType.CLASSES);
                     }
                 };
-                final NewLibraryEditor libraryEditor = new NewLibraryEditor(libraryConfiguration.getLibraryType(), libraryConfiguration.getProperties());
-                libraryEditor.setName(myLibrariesContainer.suggestUniqueLibraryName(libraryConfiguration.getDefaultLibraryName()));
-                libraryConfiguration.addRoots(libraryEditor);
+
+                String defaultLibraryName = libraryConfiguration.getDefaultLibraryName();
                 if (myLibraryComboBoxModel.get(0) == null) {
                     myLibraryComboBoxModel.remove(0);
                 }
+                Iterator<LibraryEditor> i = myLibraryComboBoxModel.iterator();
+                while (i.hasNext()) {
+                    LibraryEditor library = i.next();
+                    if(library.getName().equals(defaultLibraryName)) {
+                        i.remove();
+                    }
+                }
+
+                final NewLibraryEditor libraryEditor = new NewLibraryEditor(libraryConfiguration.getLibraryType(), libraryConfiguration.getProperties());
+                libraryEditor.setName(libraryConfiguration.getDefaultLibraryName());
+                libraryConfiguration.addRoots(libraryEditor);
                 myLibraryComboBoxModel.add(libraryEditor);
                 myLibraryComboBoxModel.setSelectedItem(libraryEditor);
             }
         } catch (Exception ignored) {
+        }
+    }
+
+    private void showPopupMenu(MouseEvent mouseEvent) {
+        try {
+            myPopupMenu.removeAll();
+            List<String> lsfusionServerJarList = getLsfusionServerJarList();
+            for(String lsfusionServerJar : lsfusionServerJarList) {
+                JMenuItem menuItem = new JMenuItem(lsfusionServerJar);
+                menuItem.addActionListener(e -> doDownload(lsfusionServerJar));
+                myPopupMenu.add(menuItem);
+            }
+            myPopupMenu.show(mouseEvent.getComponent(), 0, mouseEvent.getComponent().getHeight());
+        } catch (IOException ignored) {
         }
     }
 
@@ -189,6 +252,65 @@ public class LibraryOptionsPanel {
             dir = LocalFileSystem.getInstance().findFileByPath(path);
         }
         return dir;
+    }
+
+    private File getLatestLsfusionServerJar() throws IOException {
+        String latestLsfusionServerJar = null;
+        List<String> directoryList = parseURL(downloadUrl, subDirPattern);
+        for (int i = directoryList.size() - 1; i >= 0; i--) {
+            String subDirectory = downloadUrl + "/" + directoryList.get(i);
+            List<String> files = parseURL(subDirectory, jarPattern);
+            if (!files.isEmpty()) {
+                latestLsfusionServerJar = subDirectory + files.get(files.size() - 1);
+                break;
+            }
+        }
+        return downloadFile(latestLsfusionServerJar);
+    }
+
+    private List<String> getLsfusionServerJarList() throws IOException {
+        List<String> lsfusionServerJarList = new ArrayList<>();
+        List<String> directoryList = parseURL(downloadUrl, subDirPattern);
+        for (int i = directoryList.size() - 1; i >= 0; i--) {
+            String subDirectory = downloadUrl + "/" + directoryList.get(i);
+            List<String> files = parseURL(subDirectory, jarPattern);
+            if (!files.isEmpty()) {
+                lsfusionServerJarList.add(subDirectory + files.get(files.size() - 1));
+            }
+        }
+        return lsfusionServerJarList;
+    }
+
+    private List<String> parseURL(String url, String pattern) throws IOException {
+        List<String> result = new ArrayList<>();
+        Connection connection = Jsoup.connect(url);
+        connection.timeout(10000);
+        Document doc = connection.get();
+        for (Element item : doc.getElementsByTag("a")) {
+            String href = item.attr("href");
+            if (href != null && href.matches(pattern)) {
+                result.add(href);
+            }
+        }
+        return result;
+    }
+
+    private File downloadFile(String url) throws IOException {
+        VirtualFile baseDirectory = getBaseDirectory();
+        if(baseDirectory != null) {
+            String userAgent = "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36";
+            File file = new File(baseDirectory.getPath() + "/" + FilenameUtils.getName(url));
+            if (url != null) {
+                HttpGet httpGet = new HttpGet(url);
+                httpGet.addHeader("User-Agent", userAgent);
+                HttpEntity fileEntity = HttpClients.createDefault().execute(httpGet).getEntity();
+                if (fileEntity != null) {
+                    FileUtils.copyInputStreamToFile(fileEntity.getContent(), file);
+                    return file;
+                }
+            }
+        }
+        return null;
     }
 
     @Nullable
