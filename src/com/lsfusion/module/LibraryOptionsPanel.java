@@ -86,7 +86,6 @@ public class LibraryOptionsPanel {
 
     private void showSettingsPanel() {
         List<Library> libraries = calculateSuitableLibraries();
-        List<LibraryEditor> existingLibraryEditors = findExistingLibraryEditors();
 
         myLibraryComboBoxModel = new SortedComboBoxModel<>(new Comparator<LibraryEditor>() {
             @Override
@@ -104,9 +103,8 @@ public class LibraryOptionsPanel {
             }
             myLibraryComboBoxModel.add(libraryEditor);
         }
-        myLibraryComboBoxModel.addAll(existingLibraryEditors);
         myExistingLibraryComboBox.setModel(myLibraryComboBoxModel);
-        if (libraries.isEmpty() && existingLibraryEditors.isEmpty()) {
+        if (libraries.isEmpty()) {
             myLibraryComboBoxModel.add(null);
         }
         myExistingLibraryComboBox.setSelectedIndex(0);
@@ -149,31 +147,6 @@ public class LibraryOptionsPanel {
             }
         }
         return suitableLibraries;
-    }
-
-    private List<LibraryEditor> findExistingLibraryEditors() {
-        List<LibraryEditor> libraryEditorList = new ArrayList<>();
-        VirtualFile baseDirectory = getBaseDirectory();
-        if (baseDirectory != null) {
-            File[] listFiles = new File(baseDirectory.getPath()).listFiles();
-            if (listFiles != null) {
-                for (File file : listFiles) {
-                    if (file.getName().matches(jarPattern)) {
-                        final NewLibraryConfiguration libraryConfiguration = new NewLibraryConfiguration(file.getAbsolutePath()) {
-                            @Override
-                            public void addRoots(@NotNull LibraryEditor libraryEditor) {
-                                libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(file), OrderRootType.CLASSES);
-                            }
-                        };
-                        final NewLibraryEditor libraryEditor = new NewLibraryEditor(libraryConfiguration.getLibraryType(), libraryConfiguration.getProperties());
-                        libraryEditor.setName(myLibrariesContainer.suggestUniqueLibraryName(libraryConfiguration.getDefaultLibraryName()));
-                        libraryConfiguration.addRoots(libraryEditor);
-                        libraryEditorList.add(libraryEditor);
-                    }
-                }
-            }
-        }
-        return libraryEditorList;
     }
 
     private Project getProject() {
