@@ -36,6 +36,7 @@ versionLiteral ::= VERSION
 versionBlockBody ::= LBRACE statement* RBRACE
 
 statement ::=   propertyRename
+            |   actionRename
             |   storedPropertyRename
             |   classRename
             |   tableRename
@@ -47,12 +48,13 @@ statement ::=   propertyRename
 }
 
 private statement_recover ::= !statement_start
-private statement_start ::= STORED | FORM | PROPERTY | CLASS | NAVIGATOR | TABLE | OBJECT | RBRACE
+private statement_start ::= STORED | FORM | PROPERTY | ACTION | CLASS | NAVIGATOR | TABLE | OBJECT | RBRACE
             
-storedPropertyRename ::= STORED PROPERTY propertyFullRename {pin = 1}             
-propertyRename ::= PROPERTY propertyFullRename {pin = 1}
+storedPropertyRename ::= STORED PROPERTY propertyOrActionFullRename {pin = 1}             
+propertyRename ::= PROPERTY propertyOrActionFullRename {pin = 1}
+actionRename ::= ACTION propertyOrActionFullRename {pin = 1}
 
-propertyFullRename ::= compoundID signature ARROW compoundID (signature)?
+propertyOrActionFullRename ::= compoundID signature ARROW compoundID (signature)?
  
 classRename ::= CLASS sidRename {pin = 1}
 

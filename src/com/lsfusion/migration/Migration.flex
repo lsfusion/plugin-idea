@@ -65,6 +65,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
     "PROPERTY"                			{ return PROPERTY; }
     "TABLE"                   			{ return TABLE; }
     "NAVIGATOR"                         { return NAVIGATOR; }
+    "ACTION"                            { return ACTION; }
     "CONCAT"                            { return CONCAT; }
     "STORED"                            { return STORED; }
     "FORM"                              { return FORM; }
