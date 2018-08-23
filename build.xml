@@ -88,7 +88,7 @@
         <pathelement location="${basedir}/lib/jgrapht-ext-0.9.0.jar"/>
         <pathelement location="${basedir}/lib/jgrapht-core-0.9.0.jar"/>
         <pathelement location="${basedir}/lib/commons-lang3-3.4.jar"/>
-        <pathelement location="${basedir}/lib/jsoup-1.11.3.jar.jar"/>
+        <pathelement location="${basedir}/lib/jsoup-1.11.3.jar"/>
     </path>
 
     <patternset id="excluded.from.compilation">
