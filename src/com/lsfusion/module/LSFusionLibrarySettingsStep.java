@@ -62,6 +62,7 @@ public class LSFusionLibrarySettingsStep extends ModuleWizardStep {
         settingsPanel = createSettingsPanel(moduleNameField);
 
         settingsStep.addSettingsField(LSFBundle.message("module.wizard.lsfusion.library"), libraryPanel.getSimplePanel());
+        settingsStep.addSettingsComponent(new JLabel("*Will be added automatically to project dependency"));
         settingsStep.addSettingsComponent(settingsPanel.getPanel());
     }
 

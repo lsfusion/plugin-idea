@@ -213,7 +213,7 @@ public class LibraryOptionsPanel {
                 menuItem.addActionListener(e -> doDownload(lsfusionServerJar));
                 myPopupMenu.add(menuItem);
             }
-            myPopupMenu.show(mouseEvent.getComponent(), 0, mouseEvent.getComponent().getHeight());
+            myPopupMenu.show(myDownloadButton, 0, myDownloadButton.getHeight());
         } catch (IOException ignored) {
         }
     }

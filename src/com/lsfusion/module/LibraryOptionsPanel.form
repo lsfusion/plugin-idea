@@ -8,7 +8,7 @@
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="a8a95" binding="mySimplePanel" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="a8a95" binding="mySimplePanel" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -30,23 +30,44 @@
               <text value="&amp;Create..."/>
             </properties>
           </component>
-          <component id="4ed34" class="javax.swing.JButton" binding="myDownloadButton">
+          <grid id="e50c3" layout-manager="GridBagLayout">
             <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="&amp;Download"/>
+              <alignmentX value="0.0"/>
+              <alignmentY value="0.0"/>
+              <autoscrolls value="false"/>
             </properties>
-          </component>
-          <component id="a1454" class="javax.swing.JButton" binding="myPopupButton">
-            <constraints>
-              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <inheritsPopupMenu value="false"/>
-              <text value="..."/>
-            </properties>
-          </component>
+            <border type="none"/>
+            <children>
+              <component id="4ed34" class="javax.swing.JButton" binding="myDownloadButton">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="1.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="0"/>
+                  <text value="&amp;Download"/>
+                </properties>
+              </component>
+              <component id="a1454" class="javax.swing.JButton" binding="myPopupButton">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="1.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <icon value="images/expand_arrow.png"/>
+                  <inheritsPopupMenu value="false"/>
+                  <label value=""/>
+                  <maximumSize width="24" height="24"/>
+                  <minimumSize width="24" height="24"/>
+                  <preferredSize width="24" height="24"/>
+                  <text value=""/>
+                </properties>
+              </component>
+            </children>
+          </grid>
         </children>
       </grid>
     </children>
