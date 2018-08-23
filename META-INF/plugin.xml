@@ -12,6 +12,7 @@
         <b>Version 1.0.145</b><br>
         <ul>
             <li>IMPORT form FROM</li>
+            <li>navigator elements migration support</li>
         </ul>
     ]]>
     </change-notes>

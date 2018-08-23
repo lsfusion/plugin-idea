@@ -39,6 +39,7 @@ statement ::=   propertyRename
             |   storedPropertyRename
             |   classRename
             |   tableRename
+            |   navigatorElementRename
             |   objectRename
             |   propertyDrawRename
 {
@@ -46,7 +47,7 @@ statement ::=   propertyRename
 }
 
 private statement_recover ::= !statement_start
-private statement_start ::= STORED | FORM | PROPERTY | CLASS | TABLE | OBJECT | RBRACE
+private statement_start ::= STORED | FORM | PROPERTY | CLASS | NAVIGATOR | TABLE | OBJECT | RBRACE
             
 storedPropertyRename ::= STORED PROPERTY propertyFullRename {pin = 1}             
 propertyRename ::= PROPERTY propertyFullRename {pin = 1}
@@ -56,6 +57,8 @@ propertyFullRename ::= compoundID signature ARROW compoundID (signature)?
 classRename ::= CLASS sidRename {pin = 1}
 
 tableRename ::= TABLE sidRename  {pin = 1}
+
+navigatorElementRename ::= NAVIGATOR sidRename {pin = 1}
 
 objectRename ::= OBJECT objectSidRename  {pin = 1}
 

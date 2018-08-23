@@ -5,10 +5,11 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFNavigatorElementDeclaration;
-import com.lsfusion.lang.psi.references.LSFFormElseNoParamsActionReference;
 import com.lsfusion.lang.psi.stubs.NavigatorElementStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.refactoring.ElementMigration;
+import com.lsfusion.refactoring.NavigatorElementMigration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,5 +68,10 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
     @Override
     protected FullNameStubElementType getType() {
         return LSFStubElementTypes.NAVIGATORELEMENT;
+    }
+
+    @Override
+    public ElementMigration getMigration(String newName) {
+        return NavigatorElementMigration.create(this, getName(), newName);
     }
 }

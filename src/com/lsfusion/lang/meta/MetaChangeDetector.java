@@ -1,7 +1,6 @@
 package com.lsfusion.lang.meta;
 
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.lang.ASTFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ProjectComponent;
@@ -991,7 +990,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 int blockSize = 500;
                 int blocks = (postponed.size() - 1) / blockSize + 1;
                 for(int i=0;i<blocks;i++) {
-                    indicator.setText2("Inlining meta code body : " + i + "\\" + blocks);
+                    indicator.setText2("Inlining meta code body : " + i + "/" + blocks);
                     final int fi = i;
                     runEDTWriteUndo(() -> {
                         for(int j=fi*blockSize;j<BaseUtils.min((fi+1)*blockSize, postponed.size());j++) {

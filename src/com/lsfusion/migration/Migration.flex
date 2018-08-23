@@ -64,6 +64,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
     "OBJECT"                  			{ return OBJECT; }
     "PROPERTY"                			{ return PROPERTY; }
     "TABLE"                   			{ return TABLE; }
+    "NAVIGATOR"                         { return NAVIGATOR; }
     "CONCAT"                            { return CONCAT; }
     "STORED"                            { return STORED; }
     "FORM"                              { return FORM; }
