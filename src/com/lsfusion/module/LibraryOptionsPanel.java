@@ -1,7 +1,6 @@
 package com.lsfusion.module;
 
 import com.intellij.facet.impl.ui.libraries.LibraryCompositionSettings;
-import com.intellij.framework.library.FrameworkLibraryVersion;
 import com.intellij.framework.library.FrameworkLibraryVersionFilter;
 import com.intellij.ide.util.frameworkSupport.OldCustomLibraryDescription;
 import com.intellij.openapi.project.Project;
@@ -38,13 +37,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import javax.swing.*;
-import java.awt.event.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * based on com.intellij.facet.impl.ui.libraries.LibraryOptionsPanel
@@ -77,7 +79,7 @@ public class LibraryOptionsPanel {
             public String compute() {
                 return baseDirectoryPath;
             }
-        }, versionFilter, new ArrayList<FrameworkLibraryVersion>());
+        }, versionFilter, new ArrayList<>());
 
         showSettingsPanel();
     }
@@ -254,7 +256,7 @@ public class LibraryOptionsPanel {
         return dir;
     }
 
-    private File getLatestLsfusionServerJar() throws IOException {
+    private File getLatestLsfusionServerJar() throws IOException, ExecutionException, InterruptedException {
         String latestLsfusionServerJar = null;
         List<String> directoryList = parseURL(downloadUrl, subDirPattern);
         for (int i = directoryList.size() - 1; i >= 0; i--) {
@@ -295,22 +297,41 @@ public class LibraryOptionsPanel {
         return result;
     }
 
-    private File downloadFile(String url) throws IOException {
-        VirtualFile baseDirectory = getBaseDirectory();
-        if(baseDirectory != null) {
-            String userAgent = "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36";
-            File file = new File(baseDirectory.getPath() + "/" + FilenameUtils.getName(url));
-            if (url != null) {
-                HttpGet httpGet = new HttpGet(url);
-                httpGet.addHeader("User-Agent", userAgent);
-                HttpEntity fileEntity = HttpClients.createDefault().execute(httpGet).getEntity();
-                if (fileEntity != null) {
-                    FileUtils.copyInputStreamToFile(fileEntity.getContent(), file);
-                    return file;
+    private File downloadFile(String url) throws ExecutionException, InterruptedException {
+
+        final JDialog dialog = new ProgressDialog(url);
+
+        SwingWorker<File, Void> mySwingWorker = new SwingWorker<File, Void>() {
+            @Override
+            protected File doInBackground() throws Exception {
+                VirtualFile baseDirectory = getBaseDirectory();
+                if (baseDirectory != null) {
+                    String userAgent = "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36";
+                    File file = new File(baseDirectory.getPath() + "/" + FilenameUtils.getName(url));
+                    if (url != null) {
+                        HttpGet httpGet = new HttpGet(url);
+                        httpGet.addHeader("User-Agent", userAgent);
+                        HttpEntity fileEntity = HttpClients.createDefault().execute(httpGet).getEntity();
+                        if (fileEntity != null) {
+                            FileUtils.copyInputStreamToFile(fileEntity.getContent(), file);
+                            return file;
+                        }
+                    }
                 }
+                return null;
             }
-        }
-        return null;
+
+            @Override
+            protected void done() {
+                dialog.dispose();
+            }
+        };
+
+        mySwingWorker.execute();
+
+        dialog.setVisible(true);
+
+        return mySwingWorker.get();
     }
 
     @Nullable
@@ -336,5 +357,34 @@ public class LibraryOptionsPanel {
 
     public JComponent getSimplePanel() {
         return mySimplePanel;
+    }
+
+    private class ProgressDialog extends JDialog {
+
+        ProgressDialog(String url) {
+            super((Frame) null, "Please wait", true);
+            setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            setLocationRelativeTo(null);
+            setAlwaysOnTop(true);
+
+            JPanel messagePanel = new JPanel();
+            messagePanel.add(new JLabel("<html><center>Downloading file " + url + "...</center></html>"));
+
+            JProgressBar progressBar = new JProgressBar();
+            progressBar.setIndeterminate(true);
+            JPanel progressPanel = new JPanel();
+            progressPanel.add(progressBar);
+
+            Container contentPane = getContentPane();
+            contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+            contentPane.add(messagePanel);
+            contentPane.add(progressPanel);
+
+            pack();
+            setMinimumSize(new Dimension(300, 100));
+            setResizable(false);
+
+            setFocusableWindowState(false);
+        }
     }
 }
