@@ -13,11 +13,11 @@ public final class LSFIcons {
     public static final Icon CONSTRAINT = AllIcons.Ide.Warning_notifications;
     public static final Icon DATA_PROPERTY = IconLoader.getIcon("/images/data_property.png");
     public static final Icon EVENT = AllIcons.Actions.Execute;
-    public static final Icon FILE = IconLoader.getIcon("/images/lsf_file.png");
-    public static final Icon MODULE = IconLoader.getIcon("/images/lsf_module.png");
-    public static final Icon MODULE_2X = IconLoader.getIcon("/images/lsf_module_2x.png");
-    public static final Icon LIBRARY = IconLoader.getIcon("/images/lsf_module.png"); //todo:library.png
-    public static final Icon RUN = IconLoader.getIcon("/images/lsf_run.png");
+    public static final Icon FILE = IconLoader.getIcon("/images/lsf_logo.png");
+    public static final Icon MODULE = IconLoader.getIcon("/images/lsf_logo.png");
+    public static final Icon MODULE_2X = IconLoader.getIcon("/images/lsf_logo_2x.png");
+    public static final Icon LIBRARY = IconLoader.getIcon("/images/lsf_logo.png");
+    public static final Icon RUN = IconLoader.getIcon("/images/lsf_logo.png");
     public static final Icon FOLLOWS = AllIcons.Duplicates.SendToTheRight;
     public static final Icon FORM = AllIcons.FileTypes.UiForm;
     public static final Icon GROUP = AllIcons.Actions.GroupByModuleGroup;

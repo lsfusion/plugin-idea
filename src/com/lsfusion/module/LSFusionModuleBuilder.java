@@ -121,8 +121,8 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
     }
 
     @Override
-    public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ModulesProvider modulesProvider) {
-        return ModuleWizardStep.EMPTY_ARRAY;
+    public ModuleWizardStep modifyProjectTypeStep(@NotNull SettingsStep settingsStep) {
+        return new LSFusionLibraryProjectTypeStep(this, settingsStep);
     }
 
     @Nullable
