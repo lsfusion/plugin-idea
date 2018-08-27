@@ -58,6 +58,7 @@ public class LibraryOptionsPanel {
     private JPopupMenu myPopupMenu;
     private JButton myPopupButton;
     private JPanel mySimplePanel;
+    private JTextPane willBeAddedAutomaticallyTextPane;
 
     private String downloadUrl = "https://download.lsfusion.org";;
     private String subDirPattern = "(\\d+(\\.)?)*/";
