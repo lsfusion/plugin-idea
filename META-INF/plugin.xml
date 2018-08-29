@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.145</version>
+    <version>1.0.146</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -9,10 +9,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.145</b><br>
+        <b>Version 1.0.146</b><br>
         <ul>
-            <li>IMPORT form FROM</li>
-            <li>navigator elements migration support</li>
+            <li>'New LSF project' dialog refactoring</li>
+            <li>Logo icons</li>
+            <li>Minor bug fixes</li>
         </ul>
     ]]>
     </change-notes>
