@@ -367,37 +367,31 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     indicator.setText2("Statements : " + (i++) + '\\' + usages.size());
 
                 final Result<ToParse> toParse = new Result<>();
-                ApplicationManager.getApplication().runReadAction(new Runnable() {
-                    public void run() {
-                        if (metaUsage.isCorrect()) {
-                            LSFMetaDeclaration metaDecl;
-                            if(enabled) {
-                                LSFMetaReference reference;
-                                if (inlineProcessor == null)
-                                    reference = LSFElementGenerator.createMetaRefFromText(metaUsage.getNameRef(), metaUsage.getFullNameRef(), file, metaUsage.getParamCount());
-                                else
-                                    reference = metaUsage;
-                                metaDecl = reference.resolveDecl();
-                            } else {
-                                metaDecl = null;
-                            }
-
-                            assert metaDecl == null || metaDecl.isValid();
-                            if (metaDecl == null || !metaDecl.isCorrect())
-                                toParse.setResult(new ToParse(null, null, null, version));
+                DumbService.getInstance(metaUsage.getProject()).runReadActionInSmartMode(() -> {
+                    if (metaUsage.isCorrect()) {
+                        LSFMetaDeclaration metaDecl;
+                        if(enabled) {
+                            LSFMetaReference reference;
+                            if (inlineProcessor == null)
+                                reference = LSFElementGenerator.createMetaRefFromText(metaUsage.getNameRef(), metaUsage.getFullNameRef(), file, metaUsage.getParamCount());
                             else
-                                toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), version));
+                                reference = metaUsage;
+                            metaDecl = reference.resolveDecl();
+                        } else {
+                            metaDecl = null;
                         }
+
+                        assert metaDecl == null || metaDecl.isValid();
+                        if (metaDecl == null || !metaDecl.isCorrect())
+                            toParse.setResult(new ToParse(null, null, null, version));
+                        else
+                            toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), version));
                     }
                 });
 
                 if (toParse.getResult() != null) {
                     final LSFMetaCodeBody parsed = toParse.getResult().parse(file, false);
-                    Runnable inlineRun = new Runnable() {
-                        public void run() {
-                            metaUsage.setInlinedBody(parsed);
-                        }
-                    };
+                    Runnable inlineRun = () -> metaUsage.setInlinedBody(parsed);
                     if(inlineProcessor != null)
                         inlineProcessor.proceed(inlineRun);
                     else

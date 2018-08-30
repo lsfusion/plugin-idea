@@ -9,10 +9,8 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.146</b><br>
+        <b>Version 1.0.147</b><br>
         <ul>
-            <li>'New LSF project' dialog refactoring</li>
-            <li>Logo icons</li>
             <li>Minor bug fixes</li>
         </ul>
     ]]>
