@@ -9,10 +9,9 @@
       ]]></description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.147</b><br>
+        <b>Version 1.0.148</b><br>
         <ul>
-            <li>Changed [= to [ in JOIN operator</li>
-            <li>Minor bug fixes</li>
+            <li>IMPORT/EXPORT form: IN group for objects</li>
         </ul>
     ]]>
     </change-notes>

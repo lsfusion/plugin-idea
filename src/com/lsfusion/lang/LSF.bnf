@@ -1307,6 +1307,7 @@ formGroupObjectOptions ::= (    formGroupObjectViewType
                            |    formGroupObjectPageSize
                            |    formGroupObjectUpdate
                            |    formGroupObjectRelativePosition
+                           |    formGroupObjectGroup
                            )*
 
 formTreeGroupObjectOptions ::= (   formGroupObjectRelativePosition
@@ -1331,6 +1332,8 @@ formGroupObjectUpdate ::= FIRST | LAST | PREV | NULL
 
 formGroupObjectRelativePositionType ::= AFTER | BEFORE
 formGroupObjectRelativePosition ::= formGroupObjectRelativePositionType groupObjectUsage { pin = 1}
+
+formGroupObjectGroup ::= IN compoundID
 
 formSingleGroupObjectDeclaration ::= formObjectDeclaration
 
