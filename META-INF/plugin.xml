@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion support</name>
-    <version>1.0.146</version>
+    <version>1.0.147</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description><![CDATA[
@@ -11,6 +11,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.147</b><br>
         <ul>
+            <li>Changed [= to [ in JOIN operator</li?
             <li>Minor bug fixes</li>
         </ul>
     ]]>

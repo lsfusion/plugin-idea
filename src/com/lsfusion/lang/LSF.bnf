@@ -474,8 +474,8 @@ activeTabPropertyDefinition ::= ACTIVE TAB componentID
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]
 }
 
-propertyExprObject ::= LSQBR EQUALS (propertyCalcStatement) RSQBR
-{ pin = 2 implements="com.lsfusion.lang.psi.context.ExtendParamContext" methods = [ getContextModifier getContextInferrer ] }
+propertyExprObject ::= LSQBR (propertyCalcStatement) RSQBR
+{ pin = 1 implements="com.lsfusion.lang.psi.context.ExtendParamContext" methods = [ getContextModifier getContextInferrer ] }
 
 noContextPropertyUsage ::= propertyUsage
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
