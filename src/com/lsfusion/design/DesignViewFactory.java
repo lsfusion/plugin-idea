@@ -1,7 +1,7 @@
 package com.lsfusion.design;
 
 import com.intellij.execution.actions.ConfigurationContext;
-import com.intellij.ide.impl.DataManagerImpl;
+import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -35,7 +35,7 @@ public class DesignViewFactory {
         LSFModuleDeclaration moduleDeclaration = null;
 
         if (editor != null) {
-            DataContext dataContext = new DataManagerImpl.MyDataContext(editor.getComponent());
+            DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
             PsiElement targetElement = ConfigurationContext.getFromContext(dataContext).getPsiLocation();
 
             if (targetElement != null) {

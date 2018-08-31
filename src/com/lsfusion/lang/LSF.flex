@@ -262,7 +262,6 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "EXPORT"                    			{ return EXPORT; }
   "EXTEND"                  			{ return EXTEND; }
   "FIELDS"                  			{ return FIELDS; }
-  "FILE"                  			    { return FILE; }
   "FILTER"                  			{ return FILTER; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
   "FILTERGROUPS"             			{ return FILTERGROUPS; }

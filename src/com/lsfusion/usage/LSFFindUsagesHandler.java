@@ -5,19 +5,21 @@ import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.find.findUsages.FindUsagesOptions;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageInfo;
 import com.intellij.util.Processor;
 import com.lsfusion.ImplementationsSearch;
-import com.lsfusion.actions.SearchForPropertyUsagesAction;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFFormActionObjectUsage;
 import com.lsfusion.lang.psi.LSFFormObjectDeclaration;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.lsfusion.actions.UsagesSearchAction.*;
 
 public class LSFFindUsagesHandler extends FindUsagesHandler {
     private final LSFFindUsagesOptions options;
@@ -46,47 +48,35 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
     public boolean processElementUsages(@NotNull final PsiElement element, @NotNull final Processor<UsageInfo> processor, @NotNull FindUsagesOptions options) {
         if (options.isUsages) {
             LSFDeclaration decl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
-            if (decl instanceof LSFActionOrPropDeclaration && SearchForPropertyUsagesAction.PROPERTY_DRAW_USAGES.equals(SearchForPropertyUsagesAction.propertyUsagesSearchMode)) {
+            if (decl instanceof LSFActionOrPropDeclaration && PROPERTY_DRAW_USAGES.equals(propertyUsagesSearchMode)) {
                 // propertyDraw from formPropertyDraw declaration
-                LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(SearchForPropertyUsagesAction.sourceElement, LSFPropertyDrawDeclaration.class);
-                ReferencesSearch.search(propDrawDecl.getNameIdentifier()).forEach(new Processor<PsiReference>() {
-                    @Override
-                    public boolean process(PsiReference psiReference) {
+                LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFPropertyDrawDeclaration.class);
+                ReferencesSearch.search(propDrawDecl.getNameIdentifier()).forEach(psiReference -> {
+                    processor.process(new UsageInfo(psiReference));
+                    return true;
+                });
+            } else if (PARAMETER_USAGES.equals(propertyUsagesSearchMode)) {
+                LSFParamDeclaration paramDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFParamDeclaration.class);
+                if (paramDecl != null && paramDecl.getNameIdentifier() != null) {
+                    ReferencesSearch.search(paramDecl.getNameIdentifier()).forEach(psiReference -> {
                         processor.process(new UsageInfo(psiReference));
                         return true;
-                    }
-                });
-            } else {
-                if (SearchForPropertyUsagesAction.PARAMETER_USAGES.equals(SearchForPropertyUsagesAction.propertyUsagesSearchMode)) {
-                    LSFParamDeclaration paramDecl = PsiTreeUtil.getParentOfType(SearchForPropertyUsagesAction.sourceElement, LSFParamDeclaration.class);
-                    if (paramDecl != null && paramDecl.getNameIdentifier() != null) {
-                        ReferencesSearch.search(paramDecl.getNameIdentifier()).forEach(new Processor<PsiReference>() {
-                            @Override
-                            public boolean process(PsiReference psiReference) {
-                                processor.process(new UsageInfo(psiReference));
-                                return true;
-                            }
-                        });
-                    }
-                } else {
-                    if (SearchForPropertyUsagesAction.OBJECT_USAGES.equals(SearchForPropertyUsagesAction.propertyUsagesSearchMode)) {
-                        LSFFormObjectDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFFormObjectDeclaration.class);
-                        if (objectDecl != null && objectDecl.getNameIdentifier() != null) {
-                            super.processElementUsages(element, processor, options);
-                        }
-                    } else
-                        super.processElementUsages(element, processor, options);
+                    });
                 }
+            } else if (OBJECT_USAGES.equals(propertyUsagesSearchMode)) {
+                LSFFormObjectDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFFormObjectDeclaration.class);
+                if (objectDecl != null && objectDecl.getNameIdentifier() != null) {
+                    super.processElementUsages(element, processor, options);
+                }
+            } else {
+                super.processElementUsages(element, processor, options);
             }
         }
         if (((LSFFindUsagesOptions) options).isImplementingMethods) {
             ImplementationsSearch is = new ImplementationsSearch();
-            is.processQuery(element, new Processor<PsiElement>() {
-                @Override
-                public boolean process(PsiElement psiElement) {
-                    processor.process(new UsageInfo(psiElement.getParent()));
-                    return true;
-                }
+            is.processQuery(element, (Processor<PsiElement>) psiElement -> {
+                processor.process(new UsageInfo(psiElement.getParent()));
+                return true;
             });
         }
         return true;

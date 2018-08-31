@@ -134,10 +134,10 @@
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
         
-        <action id="PreFindUsagesAction" class="com.lsfusion.actions.PreShowPropertyUsagesAction">
+        <action id="PreFindUsagesAction" class="com.lsfusion.actions.PreShowUsagesAction">
             <keyboard-shortcut first-keystroke="ctrl alt F7" keymap="$default"/>
         </action>
-        <action id="PreFastFindUsagesAction" class="com.lsfusion.actions.PreFindPropertyUsagesAction">
+        <action id="PreFastFindUsagesAction" class="com.lsfusion.actions.PreFindUsagesAction">
             <keyboard-shortcut first-keystroke="alt F7" keymap="$default"/>
         </action>
     </actions>

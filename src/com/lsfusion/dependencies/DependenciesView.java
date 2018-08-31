@@ -2,7 +2,6 @@ package com.lsfusion.dependencies;
 
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
-import com.intellij.ide.impl.DataManagerImpl;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CheckboxAction;
@@ -682,7 +681,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     public PsiElement getTargetEditorPsiElement() {
         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
         if (editor != null) {
-            DataContext dataContext = new DataManagerImpl.MyDataContext(editor.getComponent());
+            DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
             return ConfigurationContext.getFromContext(dataContext).getPsiLocation();
         }
         return null;
