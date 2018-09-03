@@ -22,8 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.lsfusion.lang.psi.references.impl.LSFPropReferenceImpl.enableAbstractImpl;
-
 public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDeclaration, G extends LSFActionOrGlobalPropDeclaration> extends LSFFullNameReferenceImpl<T, G> implements LSFActionOrPropReference<T, G> {
 
     public LSFActionOrPropReferenceImpl(@NotNull ASTNode node) {
@@ -100,7 +98,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
     }
 
     protected boolean canBeUsedInDirect() {
-        return getExplicitClasses() == null && getUsageContext() != null && !isImplement();
+        return getUsageContext() != null && !isImplement(); // getExplicitClasses() == null && 
     }
 
     protected Condition<T> getDirectCondition() {
@@ -112,7 +110,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         }
 
         final List<LSFClassSet> fDirectClasses = directClasses;
-        final boolean isImplement = enableAbstractImpl && isImplement();
+        final boolean isImplement = isImplement();
         return new Condition<T>() {
             public boolean value(T decl) {
                 if(isImplement && !decl.isAbstract())
@@ -127,7 +125,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
     protected Condition<T> getInDirectCondition() {
         final List<LSFClassSet> usageClasses = getUsageContext();
         assert canBeUsedInDirect(); // потому как иначе direct бы подошел  
-        final boolean isImplement = enableAbstractImpl && isImplement();
+        final boolean isImplement = isImplement();
 
         return new Condition<T>() {
             public boolean value(T decl) {
@@ -150,7 +148,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
                 return Finalizer.EMPTY;
         }
         final boolean onlyNotEquals = onlyNotEquals();
-        final boolean isNotEquals = onlyNotEquals || (enableAbstractImpl && isImplement() && explicitClasses == null);
+        final boolean isNotEquals = onlyNotEquals || (isImplement() && explicitClasses == null);
 
         final List<LSFClassSet> fDirectClasses = directClasses;
         return new Finalizer<T>() {
@@ -289,8 +287,6 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         }
         return annotation;
     }
-
-    public static final boolean enableAbstractImpl = true;
 
     public boolean isDirect() {
         List<LSFClassSet> usageContext = getExplicitClasses();

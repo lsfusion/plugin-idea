@@ -112,13 +112,8 @@ public class LSFGlobalResolver {
         return GlobalSearchScope.filesScope(project, vFiles);
     }
 
-    private static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findInNamespace(Collection<T> decls, Finalizer<T> finalizer) {
-        if (decls == null)
-            return null;
-
-        if (decls.size() > 0)
-            return finalizer.finalize(decls);
-        return null;
+    private static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findInNamespace(Collection<T> decls) {
+        return decls == null || decls.isEmpty() ? null : decls;
     }
     public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findElements(String name, String fqName, Collection<FullNameStubElementType> types, LSFFile file, Condition<T> condition, Finalizer<T> finalizer) {
         Condition<TC> conditionC = BaseUtils.immutableCast(condition); Finalizer<TC> finalizerC = BaseUtils.immutableCast(finalizer);
@@ -181,20 +176,21 @@ public class LSFGlobalResolver {
                 nameList.add(decl);
             }
 
+            List<String> fullPrioritiesList = new ArrayList<>();
+            fullPrioritiesList.add(moduleDeclaration.getNamespace());
+            for (LSFNamespaceReference priority : moduleDeclaration.getPriorityRefs())
+                fullPrioritiesList.add(priority.getNameRef());
+                
             // смотрим на priority
             //noinspection RedundantTypeArguments - отказывается компилироваться с language level 8
-            Collection<T> result = LSFGlobalResolver.<FullNameStubElement, T>findInNamespace(mapDecls.get(moduleDeclaration.getNamespace()), finalizer);
-            if (result != null)
-                return result;
-
-            for (LSFNamespaceReference priority : moduleDeclaration.getPriorityRefs()) {
-                String resolve = priority.getNameRef();
+            for (String priority : fullPrioritiesList) {
                 //noinspection RedundantTypeArguments - отказывается компилироваться с language level 8
-                result = LSFGlobalResolver.<FullNameStubElement, T>findInNamespace(mapDecls.get(resolve), finalizer);
-                if (result != null)
-                    return result;
+                Collection<T> priorityDecls = mapDecls.get(priority);
+                if (priorityDecls != null && !priorityDecls.isEmpty()) {
+                    decls = priorityDecls;
+                    break;
+                }
             }
-
             return finalizer.finalize(decls);
         }
     }
