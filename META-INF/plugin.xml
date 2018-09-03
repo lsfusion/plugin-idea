@@ -12,6 +12,7 @@
         <b>Version 1.0.148</b><br>
         <ul>
             <li>IMPORT/EXPORT form: IN group for objects</li>
+            <li>IN group for property (declaration at form)</li>
         </ul>
     ]]>
     </change-notes>

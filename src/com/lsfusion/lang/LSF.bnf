@@ -1307,7 +1307,7 @@ formGroupObjectOptions ::= (    formGroupObjectViewType
                            |    formGroupObjectPageSize
                            |    formGroupObjectUpdate
                            |    formGroupObjectRelativePosition
-                           |    formGroupObjectGroup
+                           |    formInGroup
                            )*
 
 formTreeGroupObjectOptions ::= (   formGroupObjectRelativePosition
@@ -1332,8 +1332,6 @@ formGroupObjectUpdate ::= FIRST | LAST | PREV | NULL
 
 formGroupObjectRelativePositionType ::= AFTER | BEFORE
 formGroupObjectRelativePosition ::= formGroupObjectRelativePositionType groupObjectUsage { pin = 1}
-
-formGroupObjectGroup ::= IN compoundID
 
 formSingleGroupObjectDeclaration ::= formObjectDeclaration
 
@@ -1380,6 +1378,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    formOptionsWithFormPropertyDraw
                             |    formOptionsOnEvents
                             |    ATTR
+                            |    formInGroup
                             )*
 
 formOptionSession ::= NEWSESSION | NESTEDSESSION;
@@ -1393,6 +1392,8 @@ formOptionsOnEvents ::= ON formEventType formActionPropertyObject
 {
     pin = 1
 }
+
+formInGroup ::= IN compoundID
 
 designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formPropertyObject | formExprDeclaration
