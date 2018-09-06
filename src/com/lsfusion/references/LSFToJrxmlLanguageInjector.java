@@ -26,6 +26,7 @@ import static com.lsfusion.references.FormDeclByReportNameResolver.resolveFormFu
 public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
     public static final String headerPostfix = ".header";
     public static final String footerPostfix = ".footer";
+    public static final String showifPostfix = ".showif";
     public static final String objectPostfix = ".object";
     public static final Pattern fieldExprPattern = Pattern.compile("(\\$F\\s*\\{\\s*)([\\w\\(\\)\\,\\.]+)(\\s*\\})");
 
@@ -92,15 +93,15 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
             private void resolveAndAddInjection(PsiElement host, String refText, int startOffset, int endOffset) {
                 assert host instanceof PsiLanguageInjectionHost;
                 
-                boolean isObjRef = refText.endsWith(objectPostfix);
-                if (isObjRef) {
-                    endOffset -= objectPostfix.length();
-                } else if (refText.endsWith(headerPostfix)) {
-                    endOffset -= headerPostfix.length();
-                } else if (refText.endsWith(footerPostfix)) {
-                    endOffset -= footerPostfix.length();
+                String[] postfixes = {objectPostfix, headerPostfix, footerPostfix, showifPostfix};
+                for (String postfix : postfixes) {
+                    if (refText.endsWith(postfix)) {
+                        endOffset -= postfix.length();
+                        break;
+                    }
                 }
                 
+                boolean isObjRef = refText.endsWith(objectPostfix);
                 injections.add(new Injection(isObjRef, (PsiLanguageInjectionHost) host, new TextRange(startOffset, endOffset)));
             }
         });

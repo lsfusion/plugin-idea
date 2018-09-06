@@ -11,6 +11,7 @@
         <ul>
             <li>IMPORT/EXPORT form: IN group for objects</li>
             <li>IN group for property (declaration at form)</li>
+            <li>.showif fields support in jrxml language injection</li>
         </ul>
     ]]>
     </change-notes>
