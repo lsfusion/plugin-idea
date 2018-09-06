@@ -1,12 +1,10 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
-    <name>lsFusion support</name>
+    <name>lsFusion</name>
     <version>1.0.148</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
-    <description><![CDATA[
-      Plugin adds editing and navigation support for lsFusion scripting files (*.lsf)
-      ]]></description>
+    <description><![CDATA[lsFusion language support]]></description>
 
     <change-notes><![CDATA[
         <b>Version 1.0.148</b><br>
