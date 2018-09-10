@@ -17,7 +17,7 @@ public class LSFFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getName() {
-        return "lsFusion script file";
+        return "lsFusion module";
     }
 
     @NotNull

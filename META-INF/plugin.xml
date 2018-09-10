@@ -209,7 +209,7 @@
                          <!--groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"-->
                          <!--implementationClass="com.lsfusion.inspections.LSFClassViewTypeInPrintInspectionTool" hasStaticDescription="true"/>-->
 
-        <internalFileTemplate name="lsFusion script"/>
+        <internalFileTemplate name="lsFusion module"/>
         <internalFileTemplate name="lsFusion settings"/>
 
         <moduleBuilder builderClass="com.lsfusion.module.LSFusionModuleBuilder"/>

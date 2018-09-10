@@ -8,14 +8,12 @@ import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.SettingsStep;
-import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
@@ -34,7 +32,7 @@ import java.io.*;
 import java.util.List;
 import java.util.Properties;
 
-import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_SCRIPT;
+import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_MODULE;
 import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_SETTINGS;
 
 public class LSFusionModuleBuilder extends JavaModuleBuilder {
@@ -207,7 +205,7 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
                         contentEntry.addSourceFolder(resourcesVirtualFile, JavaResourceRootType.RESOURCE);
                     }
                 }
-                createFromTemplateAndOpen(project, TEMPLATE_LSFUSION_SCRIPT, new File(lsfusionDir, MAIN_LSF_FILE), properties);
+                createFromTemplateAndOpen(project, TEMPLATE_LSFUSION_MODULE, new File(lsfusionDir, MAIN_LSF_FILE), properties);
             }
 
             localFileSystem.refresh(true);

@@ -8,7 +8,7 @@ import com.intellij.psi.PsiDirectory;
 import com.lsfusion.LSFBundle;
 import com.lsfusion.LSFIcons;
 
-import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_SCRIPT;
+import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_MODULE;
 
 public class NewLsfFileAction extends CreateFileFromTemplateAction implements DumbAware {
     public NewLsfFileAction() {
@@ -19,7 +19,7 @@ public class NewLsfFileAction extends CreateFileFromTemplateAction implements Du
     protected void buildDialog(Project project, PsiDirectory directory, CreateFileFromTemplateDialog.Builder builder) {
         builder
                 .setTitle(LSFBundle.message("newfile.action.dlg.title"))
-                .addKind(LSFBundle.message("newfile.action.menu.text"), LSFIcons.FILE, TEMPLATE_LSFUSION_SCRIPT);
+                .addKind(LSFBundle.message("newfile.action.menu.text"), LSFIcons.FILE, TEMPLATE_LSFUSION_MODULE);
     }
 
     @Override
