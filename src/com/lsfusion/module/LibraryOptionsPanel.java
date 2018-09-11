@@ -24,7 +24,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
 import com.intellij.util.PlatformIcons;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -42,6 +41,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -287,7 +288,7 @@ public class LibraryOptionsPanel {
                         httpGet.addHeader("User-Agent", userAgent);
                         HttpEntity fileEntity = HttpClients.createDefault().execute(httpGet).getEntity();
                         if (fileEntity != null) {
-                            FileUtils.copyInputStreamToFile(fileEntity.getContent(), file);
+                            Files.copy(fileEntity.getContent(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
                             return file;
                         }
                     }
