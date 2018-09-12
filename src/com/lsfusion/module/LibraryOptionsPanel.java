@@ -202,7 +202,8 @@ public class LibraryOptionsPanel {
                 myLibraryComboBoxModel.add(libraryEditor);
                 myLibraryComboBoxModel.setSelectedItem(libraryEditor);
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Download lsfusion server failed", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -274,15 +275,19 @@ public class LibraryOptionsPanel {
 
     private File downloadFile(String url) throws ExecutionException, InterruptedException {
 
-        final JDialog dialog = new ProgressDialog(url);
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Choose directory to downoad");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 
-        SwingWorker<File, Void> mySwingWorker = new SwingWorker<File, Void>() {
-            @Override
-            protected File doInBackground() throws Exception {
-                VirtualFile baseDirectory = getBaseDirectory();
-                if (baseDirectory != null) {
+            final JDialog dialog = new ProgressDialog(url);
+
+            SwingWorker<File, Void> mySwingWorker = new SwingWorker<File, Void>() {
+                @Override
+                protected File doInBackground() throws Exception {
                     String userAgent = "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36";
-                    File file = new File(baseDirectory.getPath() + "/" + FilenameUtils.getName(url));
+                    File file = new File(chooser.getSelectedFile().getAbsolutePath() + "/" + FilenameUtils.getName(url));
                     if (url != null) {
                         HttpGet httpGet = new HttpGet(url);
                         httpGet.addHeader("User-Agent", userAgent);
@@ -292,21 +297,21 @@ public class LibraryOptionsPanel {
                             return file;
                         }
                     }
+                    return null;
                 }
-                return null;
-            }
 
-            @Override
-            protected void done() {
-                dialog.dispose();
-            }
-        };
+                @Override
+                protected void done() {
+                    dialog.dispose();
+                }
+            };
 
-        mySwingWorker.execute();
+            mySwingWorker.execute();
 
-        dialog.setVisible(true);
+            dialog.setVisible(true);
 
-        return mySwingWorker.get();
+            return mySwingWorker.get();
+        } else return null;
     }
 
     @Nullable
@@ -338,7 +343,7 @@ public class LibraryOptionsPanel {
 
         ProgressDialog(String url) {
             super((Frame) null, "Please wait", true);
-            setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             setLocationRelativeTo(null);
             setAlwaysOnTop(true);
 
