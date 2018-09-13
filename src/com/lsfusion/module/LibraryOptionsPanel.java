@@ -24,7 +24,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
 import com.intellij.util.PlatformIcons;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
@@ -287,8 +286,10 @@ public class LibraryOptionsPanel {
                 @Override
                 protected File doInBackground() throws Exception {
                     String userAgent = "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36";
-                    File file = new File(chooser.getSelectedFile().getAbsolutePath() + "/" + FilenameUtils.getName(url));
                     if (url != null) {
+                        //compatibility with idea 2017
+                        String fileName = url.substring(url.lastIndexOf('/') + 1); //FilenameUtils.getName(url));
+                        File file = new File(chooser.getSelectedFile().getAbsolutePath() + "/" + fileName);
                         HttpGet httpGet = new HttpGet(url);
                         httpGet.addHeader("User-Agent", userAgent);
                         HttpEntity fileEntity = HttpClients.createDefault().execute(httpGet).getEntity();
