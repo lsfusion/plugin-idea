@@ -4,7 +4,7 @@
     <version>1.0.148</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
-    <description><![CDATA[lsFusion language support]]></description>
+    <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
         <b>Version 1.0.148</b><br>
