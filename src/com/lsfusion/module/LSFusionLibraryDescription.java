@@ -47,21 +47,23 @@ public class LSFusionLibraryDescription extends CustomLibraryDescription {
         descriptor.setDescription("Choose a directory containing lsFusion Platform distribution");
 
         final VirtualFile dir = FileChooser.chooseFile(descriptor, parentComponent, null, null);
-        if (dir == null) {
-            return null;
-        }
-
-        final String jarName = getLSFusionServerFileName(dir);
-        if (jarName == null) {
-            return null;
-        }
-
-        return new NewLibraryConfiguration(jarName) {
-            @Override
-            public void addRoots(@NotNull LibraryEditor libraryEditor) {
-                libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(new File(jarName)), OrderRootType.CLASSES);
+        if (dir != null) {
+            final String jarName = getLSFusionServerFileName(dir);
+            if (jarName != null) {
+                return new NewLibraryConfiguration(jarName) {
+                    @Override
+                    public void addRoots(@NotNull LibraryEditor libraryEditor) {
+                        libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(new File(jarName)), OrderRootType.CLASSES);
+                        
+                        File sourcesJar = new File(jarName.substring(0, jarName.length() - 4) + "-sources.jar");
+                        if (sourcesJar.exists()) {
+                            libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(sourcesJar), OrderRootType.SOURCES);
+                        }
+                    }
+                };
             }
-        };
+        }
+        return null;
     }
 
     public static boolean isLSFusionServerDirectory(VirtualFile file) {
