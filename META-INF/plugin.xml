@@ -7,11 +7,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.148</b><br>
+        <b>Version 1.0.149</b><br>
         <ul>
-            <li>IMPORT/EXPORT form: IN group for objects</li>
-            <li>IN group for property (declaration at form)</li>
             <li>.showif fields support in jrxml language injection</li>
+            <li>New project: download lsfusion server sources</li>
         </ul>
     ]]>
     </change-notes>

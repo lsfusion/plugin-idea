@@ -14,10 +14,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Collections;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LSFusionLibraryDescription extends CustomLibraryDescription {
@@ -74,20 +72,11 @@ public class LSFusionLibraryDescription extends CustomLibraryDescription {
         if (directory != null && directory.isDirectory()) {
             final String path = directory.getPath();
             final Pattern pattern = Pattern.compile(LSFUSION_SERVER_LIBRARY_PATTERN);
-            File[] serverFiles = new File(path).listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return pattern.matcher(name).matches();
-                }
-            });
+            File[] serverFiles = new File(path).listFiles((dir, name) -> pattern.matcher(name).matches() && !name.contains("-sources"));
 
             if (serverFiles != null && serverFiles.length > 0) {
-                File jarFile = serverFiles[0];
-                String jarName = jarFile.getName();
-                Matcher matcher = pattern.matcher(jarName);
-                if (matcher.matches()) {
-                    return jarFile.getPath();
-                }
+                assert pattern.matcher(serverFiles[0].getName()).matches();
+                return serverFiles[0].getPath();
             }
         }
         return null;

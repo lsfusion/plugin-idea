@@ -3,6 +3,13 @@ package com.lsfusion.module;
 import com.intellij.facet.impl.ui.libraries.LibraryCompositionSettings;
 import com.intellij.framework.library.FrameworkLibraryVersionFilter;
 import com.intellij.ide.util.frameworkSupport.OldCustomLibraryDescription;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Progressive;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.OrderRootType;
@@ -16,13 +23,14 @@ import com.intellij.openapi.roots.ui.configuration.libraryEditor.ExistingLibrary
 import com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditor;
 import com.intellij.openapi.roots.ui.configuration.libraryEditor.NewLibraryEditor;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainer;
-import com.intellij.openapi.util.NotNullComputable;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
+import com.intellij.util.Function;
 import com.intellij.util.PlatformIcons;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -35,23 +43,28 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.*;
+
+import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 
 /**
  * based on com.intellij.facet.impl.ui.libraries.LibraryOptionsPanel
  */
 public class LibraryOptionsPanel {
+    private final String DOWNLOAD_URL = "https://download.lsfusion.org";
+    private final String SUB_DIR_PATTERN = "(\\d+(\\.)?)*/";
+    private final String SERVER_PATTERN = "lsfusion-server-(\\d+(\\.)?)*\\.jar";
+    private final String SOURCES_PATTERN = "lsfusion-server-(\\d+(\\.)?)*-sources\\.jar";
+
+    private final String SERVER_JAR_KEY = "serverJar";
+    private final String SOURCES_JAR_KEY = "sourcesJar";
+    
     private JComboBox myExistingLibraryComboBox;
     private JButton myCreateButton;
     private JButton myDownloadButton;
@@ -59,10 +72,6 @@ public class LibraryOptionsPanel {
     private JButton myPopupButton;
     private JPanel mySimplePanel;
     private JTextPane willBeAddedAutomaticallyTextPane;
-
-    private String downloadUrl = "https://download.lsfusion.org";;
-    private String subDirPattern = "(\\d+(\\.)?)*/";
-    private String jarPattern = "lsfusion-server-(\\d+(\\.)?)*\\.jar";
 
     private LibraryCompositionSettings mySettings;
     private final LibrariesContainer myLibrariesContainer;
@@ -74,13 +83,7 @@ public class LibraryOptionsPanel {
                                @NotNull final LibrariesContainer librariesContainer) {
         myLibrariesContainer = librariesContainer;
 
-        mySettings = new LibraryCompositionSettings(libraryDescription, new NotNullComputable<String>() {
-            @NotNull
-            @Override
-            public String compute() {
-                return baseDirectoryPath;
-            }
-        }, versionFilter, new ArrayList<>());
+        mySettings = new LibraryCompositionSettings(libraryDescription, () -> baseDirectoryPath, versionFilter, new ArrayList<>());
 
         showSettingsPanel();
     }
@@ -88,13 +91,10 @@ public class LibraryOptionsPanel {
     private void showSettingsPanel() {
         List<Library> libraries = calculateSuitableLibraries();
 
-        myLibraryComboBoxModel = new SortedComboBoxModel<>(new Comparator<LibraryEditor>() {
-            @Override
-            public int compare(LibraryEditor o1, LibraryEditor o2) {
-                final String name1 = o1.getName();
-                final String name2 = o2.getName();
-                return -StringUtil.notNullize(name1).compareToIgnoreCase(StringUtil.notNullize(name2));
-            }
+        myLibraryComboBoxModel = new SortedComboBoxModel<>((o1, o2) -> {
+            final String name1 = o1.getName();
+            final String name2 = o2.getName();
+            return -StringUtil.notNullize(name1).compareToIgnoreCase(StringUtil.notNullize(name2));
         });
 
         for (Library library : libraries) {
@@ -111,7 +111,7 @@ public class LibraryOptionsPanel {
         myExistingLibraryComboBox.setSelectedIndex(0);
         myExistingLibraryComboBox.setRenderer(new ColoredListCellRenderer() {
             @Override
-            protected void customizeCellRenderer(JList list, Object value, int index, boolean selected, boolean hasFocus) {
+            protected void customizeCellRenderer(@NotNull JList list, Object value, int index, boolean selected, boolean hasFocus) {
                 if (value == null) {
                     append("[No library selected]");
                 } else if (value instanceof ExistingLibraryEditor) {
@@ -127,12 +127,22 @@ public class LibraryOptionsPanel {
         });
 
         myCreateButton.addActionListener(e -> doCreate());
-        myDownloadButton.addActionListener(e -> doDownload(null));
+        myDownloadButton.addActionListener(e -> downloadSelected(null));
         myPopupMenu = new JPopupMenu();
         myPopupButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                showPopupMenu(e);
+                try {
+                    myPopupMenu.removeAll();
+                    iterateLsfusionServerJars(serverUrls -> {
+                        JMenuItem menuItem = new JMenuItem(serverUrls.get(SERVER_JAR_KEY));
+                        menuItem.addActionListener(event -> downloadSelected(serverUrls));
+                        myPopupMenu.add(menuItem);
+                        return false;
+                    });
+                    myPopupMenu.show(myDownloadButton, 0, myDownloadButton.getHeight());
+                } catch (IOException ignored) {
+                }
             }
         });
     }
@@ -172,90 +182,88 @@ public class LibraryOptionsPanel {
         }
     }
 
-    private void doDownload(String lsfusionServerJar) {
+    private void downloadSelected(Map<String, String> lsfusionServerUrls) { // server with sources
         try {
-            File file = lsfusionServerJar != null ? downloadFile(lsfusionServerJar) : getLatestLsfusionServerJar();
-            if (file != null) {
-                final NewLibraryConfiguration libraryConfiguration = new NewLibraryConfiguration(file.getAbsolutePath()) {
-                    @Override
-                    public void addRoots(@NotNull LibraryEditor libraryEditor) {
-                        libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(file), OrderRootType.CLASSES);
-                    }
-                };
+            Map<String, File> files = lsfusionServerUrls != null ? downloadFiles(lsfusionServerUrls) : getLatestLsfusionServerJar();
+            if (files != null) {
+                File serverJar = files.get(SERVER_JAR_KEY);
+                if (serverJar != null) {
+                    final NewLibraryConfiguration libraryConfiguration = new NewLibraryConfiguration(serverJar.getAbsolutePath()) {
+                        @Override
+                        public void addRoots(@NotNull LibraryEditor libraryEditor) {
+                            libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(serverJar), OrderRootType.CLASSES);
 
-                String defaultLibraryName = libraryConfiguration.getDefaultLibraryName();
-                if (myLibraryComboBoxModel.get(0) == null) {
-                    myLibraryComboBoxModel.remove(0);
-                }
-                Iterator<LibraryEditor> i = myLibraryComboBoxModel.iterator();
-                while (i.hasNext()) {
-                    LibraryEditor library = i.next();
-                    if(library.getName().equals(defaultLibraryName)) {
-                        i.remove();
-                    }
-                }
+                            File sourcesJar = files.get(SOURCES_JAR_KEY);
+                            if (sourcesJar != null && sourcesJar.exists()) {
+                                libraryEditor.addRoot(VfsUtil.getUrlForLibraryRoot(sourcesJar), OrderRootType.SOURCES);
+                            }
+                        }
+                    };
 
-                final NewLibraryEditor libraryEditor = new NewLibraryEditor(libraryConfiguration.getLibraryType(), libraryConfiguration.getProperties());
-                libraryEditor.setName(libraryConfiguration.getDefaultLibraryName());
-                libraryConfiguration.addRoots(libraryEditor);
-                myLibraryComboBoxModel.add(libraryEditor);
-                myLibraryComboBoxModel.setSelectedItem(libraryEditor);
+                    String defaultLibraryName = libraryConfiguration.getDefaultLibraryName();
+                    if (myLibraryComboBoxModel.get(0) == null) {
+                        myLibraryComboBoxModel.remove(0);
+                    }
+                    Iterator<LibraryEditor> i = myLibraryComboBoxModel.iterator();
+                    while (i.hasNext()) {
+                        LibraryEditor library = i.next();
+                        if (library.getName().equals(defaultLibraryName)) {
+                            i.remove();
+                        }
+                    }
+
+                    final NewLibraryEditor libraryEditor = new NewLibraryEditor(libraryConfiguration.getLibraryType(), libraryConfiguration.getProperties());
+                    libraryEditor.setName(libraryConfiguration.getDefaultLibraryName());
+                    libraryConfiguration.addRoots(libraryEditor);
+                    myLibraryComboBoxModel.add(libraryEditor);
+                    myLibraryComboBoxModel.setSelectedItem(libraryEditor);
+                }
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage(), "Download lsfusion server failed", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void showPopupMenu(MouseEvent mouseEvent) {
-        try {
-            myPopupMenu.removeAll();
-            List<String> lsfusionServerJarList = getLsfusionServerJarList();
-            for(String lsfusionServerJar : lsfusionServerJarList) {
-                JMenuItem menuItem = new JMenuItem(lsfusionServerJar);
-                menuItem.addActionListener(e -> doDownload(lsfusionServerJar));
-                myPopupMenu.add(menuItem);
-            }
-            myPopupMenu.show(myDownloadButton, 0, myDownloadButton.getHeight());
-        } catch (IOException ignored) {
+            Messages.showErrorDialog(getProject(), getStackTrace(e), "Saving lsFusion server failed");
         }
     }
 
     @Nullable
     private VirtualFile getBaseDirectory() {
         String path = mySettings.getBaseDirectoryPath();
-        VirtualFile dir = LocalFileSystem.getInstance().findFileByPath(path);
+        LocalFileSystem fileSystem = LocalFileSystem.getInstance();
+        VirtualFile dir = fileSystem.findFileByPath(path);
         if (dir == null) {
             path = path.substring(0, path.lastIndexOf('/'));
-            dir = LocalFileSystem.getInstance().findFileByPath(path);
+            dir = fileSystem.findFileByPath(path);
         }
         return dir;
     }
 
-    private File getLatestLsfusionServerJar() throws IOException, ExecutionException, InterruptedException {
-        String latestLsfusionServerJar = null;
-        List<String> directoryList = parseURL(downloadUrl, subDirPattern);
-        for (int i = directoryList.size() - 1; i >= 0; i--) {
-            String subDirectory = downloadUrl + "/" + directoryList.get(i);
-            List<String> files = parseURL(subDirectory, jarPattern);
-            if (!files.isEmpty()) {
-                latestLsfusionServerJar = subDirectory + files.get(files.size() - 1);
-                break;
-            }
-        }
-        return downloadFile(latestLsfusionServerJar);
+    private Map<String, File> getLatestLsfusionServerJar() throws IOException {
+        final Map<String, String>[] latestLsfusionServerJarUrls = new Map[]{new HashMap<>()};
+        iterateLsfusionServerJars(fileUrls -> {
+            latestLsfusionServerJarUrls[0] = fileUrls;
+            return true;
+        });
+        return downloadFiles(latestLsfusionServerJarUrls[0]);
     }
 
-    private List<String> getLsfusionServerJarList() throws IOException {
-        List<String> lsfusionServerJarList = new ArrayList<>();
-        List<String> directoryList = parseURL(downloadUrl, subDirPattern);
-        for (int i = directoryList.size() - 1; i >= 0; i--) {
-            String subDirectory = downloadUrl + "/" + directoryList.get(i);
-            List<String> files = parseURL(subDirectory, jarPattern);
-            if (!files.isEmpty()) {
-                lsfusionServerJarList.add(subDirectory + files.get(files.size() - 1));
+    private void iterateLsfusionServerJars(Function<Map<String, String>, Boolean> function) throws IOException {
+        List<String> dirList = parseURL(DOWNLOAD_URL, SUB_DIR_PATTERN);
+        for (int i = dirList.size() - 1; i >= 0; i--) {
+            String subDir = DOWNLOAD_URL + "/" + dirList.get(i);
+            List<String> serverUrls = parseURL(subDir, SERVER_PATTERN);
+            if (!serverUrls.isEmpty()) {
+                Map<String, String> fileUrls = new HashMap<>();
+                fileUrls.put(SERVER_JAR_KEY, subDir + serverUrls.get(serverUrls.size() - 1));
+                
+                List<String> sources = parseURL(subDir, SOURCES_PATTERN);
+                if (!sources.isEmpty()) {
+                    fileUrls.put(SOURCES_JAR_KEY, subDir + sources.get(sources.size() - 1));
+                }
+                Boolean stopIteration = function.fun(fileUrls);
+                if (stopIteration) {
+                    break;
+                }
             }
         }
-        return lsfusionServerJarList;
     }
 
     private List<String> parseURL(String url, String pattern) throws IOException {
@@ -271,101 +279,76 @@ public class LibraryOptionsPanel {
         }
         return result;
     }
+    
+    private Map<String, File> downloadFiles(Map<String, String> serverJarUrls) {
+        Map<String, File> resultFiles = new HashMap<>();
 
-    private File downloadFile(String url) throws ExecutionException, InterruptedException {
+        final FileChooserDescriptor dirChooser = FileChooserDescriptorFactory.createSingleFolderDescriptor();
+        FileChooser.chooseFiles(dirChooser, getProject(), null, paths -> {
+            if (!paths.isEmpty()) {
+                String targetPath = paths.get(0).getPath();
+                resultFiles.putAll(downloadToDir(serverJarUrls, targetPath));
+            }
+        });
 
-        JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Choose directory to downoad");
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setAcceptAllFileFilterUsed(false);
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-
-            final JDialog dialog = new ProgressDialog(url);
-
-            SwingWorker<File, Void> mySwingWorker = new SwingWorker<File, Void>() {
-                @Override
-                protected File doInBackground() throws Exception {
-                    String userAgent = "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36";
-                    if (url != null) {
+        return resultFiles;
+    }
+    
+    private Map<String, File> downloadToDir(Map<String, String> urls, String targetPath) {
+        final Map<String, File> resultFiles = new HashMap<>();
+        final Progressive run = indicator -> {
+            for (Map.Entry<String, String> urlEntry : urls.entrySet()) {
+                String url = urlEntry.getValue();
+                
+                if (url != null) {
+                    indicator.setText(url);
+                    try {
                         //compatibility with idea 2017
                         String fileName = url.substring(url.lastIndexOf('/') + 1); //FilenameUtils.getName(url));
-                        File file = new File(chooser.getSelectedFile().getAbsolutePath() + "/" + fileName);
+                        File file = new File(targetPath + "/" + fileName);
                         HttpGet httpGet = new HttpGet(url);
-                        httpGet.addHeader("User-Agent", userAgent);
+                        httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36");
                         HttpEntity fileEntity = HttpClients.createDefault().execute(httpGet).getEntity();
                         if (fileEntity != null) {
                             Files.copy(fileEntity.getContent(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            return file;
+                            resultFiles.put(urlEntry.getKey(), file);
                         }
+                    } catch (Exception e) {
+                        Messages.showErrorDialog(getProject(), getStackTrace(e), "Download lsFusion server failed");
                     }
-                    return null;
                 }
-
-                @Override
-                protected void done() {
-                    dialog.dispose();
-                }
-            };
-
-            mySwingWorker.execute();
-
-            dialog.setVisible(true);
-
-            return mySwingWorker.get();
-        } else return null;
+            }
+        };
+        
+        ProgressManager.getInstance().run(new Task.Modal(getProject(), "Downloading file", false) {
+            public void run(final @NotNull ProgressIndicator indicator) {
+                run.run(indicator);
+            }
+        });
+        
+        return resultFiles;
     }
 
     @Nullable
     public LibraryCompositionSettings apply() {
-        if (mySettings == null) {
-            return null;
-        }
+        if (mySettings != null) {
+            final Object item = myExistingLibraryComboBox.getSelectedItem();
+            if (item instanceof ExistingLibraryEditor) {
+                mySettings.setSelectedExistingLibrary(((ExistingLibraryEditor) item).getLibrary());
+            } else {
+                mySettings.setSelectedExistingLibrary(null);
+            }
 
-        final Object item = myExistingLibraryComboBox.getSelectedItem();
-        if (item instanceof ExistingLibraryEditor) {
-            mySettings.setSelectedExistingLibrary(((ExistingLibraryEditor) item).getLibrary());
-        } else {
-            mySettings.setSelectedExistingLibrary(null);
-        }
-
-        if (item instanceof NewLibraryEditor) {
-            mySettings.setNewLibraryEditor((NewLibraryEditor) item);
-        } else {
-            mySettings.setNewLibraryEditor(null);
+            if (item instanceof NewLibraryEditor) {
+                mySettings.setNewLibraryEditor((NewLibraryEditor) item);
+            } else {
+                mySettings.setNewLibraryEditor(null);
+            }
         }
         return mySettings;
     }
 
     public JComponent getSimplePanel() {
         return mySimplePanel;
-    }
-
-    private class ProgressDialog extends JDialog {
-
-        ProgressDialog(String url) {
-            super((Frame) null, "Please wait", true);
-            setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-            setLocationRelativeTo(null);
-            setAlwaysOnTop(true);
-
-            JPanel messagePanel = new JPanel();
-            messagePanel.add(new JLabel("<html><center>Downloading file " + url + "...</center></html>"));
-
-            JProgressBar progressBar = new JProgressBar();
-            progressBar.setIndeterminate(true);
-            JPanel progressPanel = new JPanel();
-            progressPanel.add(progressBar);
-
-            Container contentPane = getContentPane();
-            contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-            contentPane.add(messagePanel);
-            contentPane.add(progressPanel);
-
-            pack();
-            setMinimumSize(new Dimension(300, 100));
-            setResizable(false);
-
-            setFocusableWindowState(false);
-        }
     }
 }
