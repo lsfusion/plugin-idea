@@ -53,10 +53,8 @@ public class StringClass extends DataClass {
     }
 
     @Override
-    public int getDefaultHeight(FontMetrics fontMetrics) {
-        if (length.isUnlimited())
-            return 4 * (fontMetrics.getHeight() + 1);
-        return super.getDefaultHeight(fontMetrics);
+    public int getDefaultHeight(FontMetrics fontMetrics, int numRowHeight) {
+        return super.getDefaultHeight(fontMetrics, numRowHeight == 1 && length.isUnlimited() ? 4 : numRowHeight);
     }
 
     @Override

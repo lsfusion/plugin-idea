@@ -25,7 +25,7 @@ public interface LSFClassSet {
 
     int getDefaultWidth(FontMetrics fontMetrics, PropertyDrawView propertyDraw);
 
-    int getDefaultHeight(FontMetrics fontMetrics);
+    int getDefaultHeight(FontMetrics fontMetrics, int numRowHeight);
 
     String getCanonicalName();
 }
