@@ -27,9 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class LSFFileUtils {
     public static boolean hasFilesWithShortNameInProject(PsiElement scopeElement, final String fileName) {
@@ -191,33 +190,44 @@ public class LSFFileUtils {
     }
 
     public static String getTopModule(PsiElement element) {
-        List<PsiFile> filesByPath = findFilesByPath(element, "lsfusion.properties");
-        for (PsiFile file : filesByPath) {
-            if (file instanceof PropertiesFile) {
-                PropertiesFile propFile = (PropertiesFile) file;
-                IProperty property = propFile.findPropertyByKey("logics.topModule");
-                if (property != null) {
-                    return BaseUtils.nullTrim(property.getValue());
-                }
-            }
-        }
-        return "dumb";
+        String value = getPropertyValue(element, "logics.topModule");
+        return value == null ? "dumb" : value;
     }
 
+    public static List<String> getPossibleTopModules(PsiElement element) {
+        List<PsiFile> propertyFiles = findFilesByPath(element, "lsfusion.properties");
+        String possibleTopModulesString = getPropertyValue(propertyFiles, "logics.possibleTopModules");
+        if (possibleTopModulesString != null && !possibleTopModulesString.trim().isEmpty()) {
+            return Arrays.stream(possibleTopModulesString.split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
+        }
+
+        String topModuleName = getPropertyValue(propertyFiles, "logics.topModule");
+        return topModuleName == null ? Collections.emptyList() : Collections.singletonList(topModuleName);
+    }
+     
     public static String getDBNamingPolicy(PsiElement element) {
-        List<PsiFile> filesByPath = findFilesByPath(element, "lsfusion.properties");
-        for (PsiFile file : filesByPath) {
+        return getPropertyValue(element, "db.namingPolicy");
+    }
+
+    private static String getPropertyValue(PsiElement element, String propertyName) {
+        List<PsiFile> files = findFilesByPath(element, "lsfusion.properties");
+        return getPropertyValue(files, propertyName);
+    }
+
+    private static String getPropertyValue(List<PsiFile> files, String propertyName) {
+        for (PsiFile file : files) {
             if (file instanceof PropertiesFile) {
-                PropertiesFile propFile = (PropertiesFile) file;
-                IProperty property = propFile.findPropertyByKey("db.namingPolicy");
+                IProperty property = ((PropertiesFile) file).findPropertyByKey(propertyName);
                 if (property != null) {
                     return BaseUtils.nullTrim(property.getValue());
                 }
             }
         }
         return null;
-    }
-
+    }    
+    
     public static GlobalSearchScope getElementRequireScope(PsiElement myElement, String moduleName, boolean searchInRequiredModules) {
         GlobalSearchScope projectScope = getModuleWithDependenciesScope(myElement);
 

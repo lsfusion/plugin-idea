@@ -236,12 +236,17 @@ public class ShortenNamesProcessor {
                     createNewVersionBlock = LSFFileUtils.isFileCommited(project, file);
                 }
 
-                String topModule = LSFFileUtils.getTopModule(psiFile);
-                GlobalSearchScope moduleScope = LSFFileUtils.getElementRequireScope(psiFile, topModule, true);
-
+                List<String> topModulesNames = LSFFileUtils.getPossibleTopModules(psiFile);
+                
+                GlobalSearchScope searchScope = GlobalSearchScope.EMPTY_SCOPE;
+                for (String topModuleName : topModulesNames) {
+                    GlobalSearchScope moduleScope = LSFFileUtils.getElementRequireScope(psiFile, topModuleName, true);
+                    searchScope = searchScope.union(moduleScope);
+                }
+                
                 MigrationFile migrationFile = (MigrationFile)psiFile;
                 
-                String statements = filterMigrationsToString(migrations, moduleScope);
+                 String statements = filterMigrationsToString(migrations, searchScope);
                 if (statements.isEmpty()) {
                     continue;
                 }

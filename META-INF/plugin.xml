@@ -12,6 +12,7 @@
             <li>.showif fields support in jrxml language injection</li>
             <li>New project: download lsfusion server sources</li>
             <li>numRowHeight option for property</li>
+            <li>addition of possibleTopModules property</li> 
         </ul>
     ]]>
     </change-notes>
