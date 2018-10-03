@@ -170,7 +170,7 @@ staticObjectDecl ::= simpleNameWithCaption
 ////////////////////////////////// GROUP STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-groupStatement ::= GROUP simpleNameWithCaption (COLON groupUsage)? SEMI
+groupStatement ::= GROUP simpleNameWithCaption formExtID? (COLON groupUsage)? SEMI
 {
     pin = 2
     implements="com.lsfusion.lang.psi.declarations.LSFGroupDeclaration"
@@ -1308,6 +1308,7 @@ formGroupObjectOptions ::= (    formGroupObjectViewType
                            |    formGroupObjectUpdate
                            |    formGroupObjectRelativePosition
                            |    formInGroup
+                           |    formExtID
                            )*
 
 formTreeGroupObjectOptions ::= (   formGroupObjectRelativePosition
@@ -1379,6 +1380,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    formOptionsOnEvents
                             |    ATTR
                             |    formInGroup
+                            |    formExtID
                             )*
 
 formOptionSession ::= NEWSESSION | NESTEDSESSION;
@@ -1393,7 +1395,9 @@ formOptionsOnEvents ::= ON formEventType formActionPropertyObject
     pin = 1
 }
 
-formInGroup ::= IN compoundID
+formInGroup ::= IN groupUsage
+
+formExtID ::= EXTID stringLiteral
 
 designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formPropertyObject | formExprDeclaration
