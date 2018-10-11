@@ -55,7 +55,6 @@ import static com.lsfusion.completion.CompletionUtils.createLookupElement;
 import static com.lsfusion.completion.CompletionUtils.getVariantsFromIndices;
 import static com.lsfusion.lang.LSFParserDefinition.NOT_KEYWORDS;
 import static com.lsfusion.lang.parser.GeneratedParserUtilBase.*;
-import static com.lsfusion.lang.psi.LSFPsiImplUtil.resolveParamClasses;
 import static com.lsfusion.lang.psi.LSFTypes.*;
 import static com.lsfusion.lang.psi.LSFTypes.Factory.getPsiElementClassByType;
 import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.*;
@@ -70,7 +69,9 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "DATE", "DATETIME", "TIME", "YEAR",
                                                                  "STRING[]", "ISTRING[]", "VARSTRING[]", "VARISTRING[]", "TEXT",
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "RAWFILE", "FILE", "EXCELFILE",
+                                                                 "CSVFILE", "HTMLFILE", "JSONFILE", "XMLFILE",
                                                                  "WORDLINK", "IMAGELINK", "PDFLINK", "RAWLINK", "LINK", "EXCELLINK",
+                                                                 "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK",
                                                                  "BOOLEAN", "COLOR"};
     
     private static final Set<String> DESIGN_PROPERTIES = new LinkedHashSet<String>() {
