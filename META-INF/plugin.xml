@@ -10,6 +10,7 @@
         <b>Version 1.0.150</b><br>
         <ul>
             <li>Added EXTID support</li>
+            <li>Added HEADERS support to EXTERNAL HTTP</li>
         </ul>
     ]]>
     </change-notes>

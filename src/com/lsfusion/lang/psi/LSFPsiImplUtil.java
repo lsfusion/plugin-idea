@@ -2762,6 +2762,10 @@ public class LSFPsiImplUtil {
         return exprParameterUsageList == null ? null : LSFExClassSet.fromEx(resolveParamClasses(exprParameterUsageList));
     }
 
+    public static List<LSFClassSet> resolveParamClasses(LSFHeadersPropertyUsage sourceStatement) {
+        return Collections.singletonList(new StringClass(false, false, false, ExtInt.UNLIMITED));
+    }
+
     public static List<LSFClassSet> resolveParamClasses(LSFImportPropertyUsage sourceStatement) {
 
         LSFImportActionPropertyDefinitionBody importDB = PsiTreeUtil.getParentOfType(sourceStatement, LSFImportActionPropertyDefinitionBody.class);
@@ -2779,6 +2783,11 @@ public class LSFPsiImplUtil {
             }
         }
         return Collections.singletonList(IntegerClass.instance);
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFHeadersPropertyUsage sourceStatement) {
+        return null;
     }
 
     @Nullable

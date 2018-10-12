@@ -289,6 +289,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "EQUAL"                               { return EQUAL; }
   "HALIGN"                  			{ return HALIGN; }
   "HEADER"                  			{ return HEADER; }
+  "HEADERS"                  			{ return HEADERS; }
   "HIDE"                    			{ return HIDE; }
   "HIDESCROLLBARS"          			{ return HIDESCROLLBARS; }
   "HIDETITLE"               			{ return HIDETITLE; }
