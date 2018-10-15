@@ -12,6 +12,7 @@
             <li>Added EXTID support</li>
             <li>Added HEADERS support to EXTERNAL HTTP</li>
             <li>System.StaticObject implicit inheritance support</li>
+            <li>Added NODEFAULT option for tables</li>
         </ul>
     ]]>
     </change-notes>

@@ -92,6 +92,14 @@ public abstract class LSFTableDeclarationImpl extends LSFFullNameDeclarationImpl
         return new String[0];
     }
     
+    @Nullable
+    protected abstract LSFNoDefault getNoDefault();
+
+    @Override
+    public boolean isExplicit() {
+        return getNoDefault() != null;
+    }
+
     @Override
     public ElementMigration getMigration(String newName) {
         return TableMigration.create(this, getName(), newName);

@@ -10,4 +10,6 @@ public interface LSFTableDeclaration extends LSFFullNameDeclaration<LSFTableDecl
 
     @NotNull
     String[] getClassNames();
+    
+    boolean isExplicit();
 }

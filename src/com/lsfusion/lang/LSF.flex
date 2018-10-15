@@ -349,6 +349,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "NEWTHREAD"              			    { return NEWTHREAD; }
   "NO"                      			{ return NO; }
   "NOCANCEL"                			{ return NOCANCEL; }
+  "NODEFAULT"                			{ return NODEFAULT; }
   "NOESCAPE"                			{ return NOESCAPE; }
   "NOCHANGE"                			{ return NOCHANGE; }
   "NOCONSTRAINTFILTER"                  { return NOCONSTRAINTFILTER; }

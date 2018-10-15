@@ -80,6 +80,16 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
             return null;
         }
 
+        LSFNonEmptyPropertyOptions options = getNonEmptyPropertyOptions();
+        if(options != null) {
+            List<LSFTableUsage> tableUsages = options.getTableUsageList();
+            if(tableUsages.size() > 0) {
+                LSFTableDeclaration table = tableUsages.get(0).resolveDecl();
+                if(table != null)
+                    return table.getNamespaceName() + "_" + table.getName();
+            }
+        }
+
         List<LSFClassSet> classesList = resolveParamClasses();
         if (classesList == null) {
             return null;

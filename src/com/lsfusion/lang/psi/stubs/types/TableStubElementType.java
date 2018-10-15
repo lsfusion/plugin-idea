@@ -47,13 +47,14 @@ public class TableStubElementType extends FullNameStubElementType<TableStubEleme
     public void serialize(@NotNull TableStubElement stub, @NotNull StubOutputStream dataStream) throws IOException {
         super.serialize(stub, dataStream);
         dataStream.writeUTFFast(stub.getClassNamesString());
+        dataStream.writeBoolean(stub.isExplicit());
     }
 
     @Override
     public void indexStub(@NotNull TableStubElement stub, @NotNull IndexSink sink) {
         super.indexStub(stub, sink);
         String classNames = stub.getClassNamesString();
-        if (!classNames.isEmpty()) {
+        if (!stub.isExplicit() && !classNames.isEmpty()) {
             sink.occurrence(LSFIndexKeys.TABLE_CLASSES, classNames);
         }
     }

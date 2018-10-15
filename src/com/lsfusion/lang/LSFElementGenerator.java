@@ -182,9 +182,9 @@ public class LSFElementGenerator {
         if (builtInWindows == null || builtInWindows.iterator().next().getProject().isDisposed()) {
             final PsiFile dummyFile = createDummyFile(project,
                     "MODULE System;" +
-                            "WINDOW PANEL log 'log';" +
-                            "WINDOW PANEL status 'status';" +
-                            "WINDOW PANEL forms 'forms';");
+                            "WINDOW log 'log' PANEL;" +
+                            "WINDOW status 'status' PANEL;" +
+                            "WINDOW forms 'forms' PANEL;");
             builtInWindows = PsiTreeUtil.findChildrenOfType(dummyFile, LSFWindowDeclaration.class);
         }
         return builtInWindows;

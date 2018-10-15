@@ -13,6 +13,7 @@ import java.io.IOException;
 public class TableStubImpl extends FullNameStubImpl<TableStubElement, LSFTableDeclaration> implements TableStubElement {
     
     private final String classNamesString;
+    private final boolean isExplicit;
 
     public TableStubImpl(StubElement parent, LSFTableDeclaration psi) {
         super(parent, psi);
@@ -20,16 +21,23 @@ public class TableStubImpl extends FullNameStubImpl<TableStubElement, LSFTableDe
         String[] classNames = psi.getClassNames();
         
         classNamesString = classNames.length == 0 ? "" : BaseUtils.toString(classNames);
+        isExplicit = psi.isExplicit();
     }
 
     public TableStubImpl(StubInputStream dataStream, StubElement parentStub, TableStubElementType type) throws IOException {
         super(dataStream, parentStub, type);
         classNamesString = dataStream.readUTFFast();
+        isExplicit = dataStream.readBoolean();
     }
 
     @NotNull
     @Override
     public String getClassNamesString() {
         return classNamesString;
+    }
+
+    @Override
+    public boolean isExplicit() {
+        return isExplicit;
     }
 }

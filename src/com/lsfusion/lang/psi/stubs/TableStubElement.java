@@ -6,4 +6,6 @@ import org.jetbrains.annotations.NotNull;
 public interface TableStubElement extends FullNameStubElement<TableStubElement, LSFTableDeclaration> {
     @NotNull
     String getClassNamesString();
+
+    boolean isExplicit();
 }

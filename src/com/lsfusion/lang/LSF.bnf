@@ -1623,7 +1623,9 @@ aspectStatement ::= (BEFORE | AFTER) mappedActionClassParamDeclare DO actionProp
 ////////////////////////////////// TABLE STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-tableStatement ::= TABLE simpleName LBRAC classNameList RBRAC (FULL)? SEMI 
+noDefault ::= NODEFAULT 
+
+tableStatement ::= TABLE simpleName LBRAC classNameList RBRAC (FULL | noDefault)? SEMI 
 {
     pin = 2
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFTableDeclarationImpl"
