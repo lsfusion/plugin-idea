@@ -139,7 +139,7 @@ public class LSFElementGenerator {
     private static List<? extends LSFPropertyDrawDeclaration> builtInFormProps = null;
 
     public static List<? extends LSFPropertyDrawDeclaration> getBuiltInFormProps(final Project project) {
-        if (builtInFormProps == null) {
+        if (builtInFormProps == null || builtInFormProps.iterator().next().getProject().isDisposed()) {
             final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formEdit,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
 //            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
             builtInFormProps = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
@@ -147,10 +147,21 @@ public class LSFElementGenerator {
         return builtInFormProps;
     }
 
+    private static LSFClassReference staticObjectClassRef = null;
+    
+    public static LSFClassReference getStaticObjectClassRef(Project project) {
+//        return createClassRefFromText("StaticObject", "System", file);
+        if (staticObjectClassRef == null || staticObjectClassRef.getProject().isDisposed()) {
+            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; CLASS A : StaticObject;");
+            staticObjectClassRef = PsiTreeUtil.findChildrenOfType(dummyFile, LSFClassReference.class).iterator().next();
+        }
+        return staticObjectClassRef;
+    }
+
     private static List<? extends LSFComponentDeclaration> builtInFormComponents = null;
 
     public static List<? extends LSFComponentDeclaration> getBuiltInFormComponents(Project project) {
-        if (builtInFormComponents == null) {
+        if (builtInFormComponents == null || builtInFormComponents.iterator().next().getProject().isDisposed()) {
             builtInFormComponents = createFormComponents(project);
         }
         return builtInFormComponents;
@@ -168,7 +179,7 @@ public class LSFElementGenerator {
     private static Collection<LSFWindowDeclaration> builtInWindows = null;
 
     public static Collection<LSFWindowDeclaration> getBuiltInWindows(final Project project) {
-        if (builtInWindows == null) {
+        if (builtInWindows == null || builtInWindows.iterator().next().getProject().isDisposed()) {
             final PsiFile dummyFile = createDummyFile(project,
                     "MODULE System;" +
                             "WINDOW PANEL log 'log';" +

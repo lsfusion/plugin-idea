@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi.extend.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
@@ -95,18 +96,29 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
             return LSFStringClassRef.resolveDecls(stub.getExtends(), getLSFFile());
         }
 
-        LSFClassParentsList parents = getClassParentsList();
-        if (parents == null)
-            return new ArrayList<>();
         List<LSFClassDeclaration> result = new ArrayList<>();
-        LSFNonEmptyCustomClassUsageList nonEmptyCustomClassUsageList = parents.getNonEmptyCustomClassUsageList();
-        if (nonEmptyCustomClassUsageList != null) {
-            for (LSFCustomClassUsage usage : nonEmptyCustomClassUsageList.getCustomClassUsageList()) {
-                LSFClassDeclaration decl = usage.resolveDecl();
-                if (decl != null)
+        
+        LSFClassParentsList parents = getClassParentsList();
+        if (parents != null) {
+            LSFNonEmptyCustomClassUsageList nonEmptyCustomClassUsageList = parents.getNonEmptyCustomClassUsageList();
+            if (nonEmptyCustomClassUsageList != null) {
+                for (LSFCustomClassUsage usage : nonEmptyCustomClassUsageList.getCustomClassUsageList()) {
+                    LSFClassDeclaration decl = usage.resolveDecl();
+                    if (decl != null) 
+                        result.add(decl);
+                }
+            }
+        }
+        LSFStaticObjectDeclList staticObjectDeclList = getStaticObjectDeclList();
+        if(staticObjectDeclList != null) {
+            LSFNonEmptyStaticObjectDeclList nonEmptyStaticObjectDeclList = staticObjectDeclList.getNonEmptyStaticObjectDeclList();
+            if(nonEmptyStaticObjectDeclList != null) {
+                LSFClassDeclaration decl = LSFElementGenerator.getStaticObjectClassRef(getProject()).resolveDecl();
+                if(decl != null)
                     result.add(decl);
             }
         }
+
         return result;
     }
 
@@ -125,20 +137,28 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
 
     public List<LSFStringClassRef> getExtends() {
         ExtendClassStubElement stub = getStub();
-        if (stub != null)
+        if (stub != null) 
             return stub.getExtends();
 
-        LSFClassParentsList parents = getClassParentsList();
-        if (parents == null)
-            return new ArrayList<>();
-
         List<LSFStringClassRef> result = new ArrayList<>();
-        LSFNonEmptyCustomClassUsageList nonEmptyCustomClassUsageList = parents.getNonEmptyCustomClassUsageList();
-        if (nonEmptyCustomClassUsageList != null) {
-            for (LSFCustomClassUsage usage : nonEmptyCustomClassUsageList.getCustomClassUsageList()) {
-                result.add(LSFPsiImplUtil.getClassNameRef(usage));
+
+        LSFClassParentsList parents = getClassParentsList();
+        if (parents != null) {
+            LSFNonEmptyCustomClassUsageList nonEmptyCustomClassUsageList = parents.getNonEmptyCustomClassUsageList();
+            if (nonEmptyCustomClassUsageList != null) {
+                for (LSFCustomClassUsage usage : nonEmptyCustomClassUsageList.getCustomClassUsageList()) {
+                    result.add(LSFPsiImplUtil.getClassNameRef(usage));
+                }
             }
         }
+
+        LSFStaticObjectDeclList staticObjectDeclList = getStaticObjectDeclList();
+        if(staticObjectDeclList != null) {
+            LSFNonEmptyStaticObjectDeclList nonEmptyStaticObjectDeclList = staticObjectDeclList.getNonEmptyStaticObjectDeclList();
+            if(nonEmptyStaticObjectDeclList != null)
+                result.add(new LSFStringClassRef("System", "StaticObject"));
+        }
+
         return result;
     }
 
