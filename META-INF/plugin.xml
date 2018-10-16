@@ -13,6 +13,7 @@
             <li>Added HEADERS support to EXTERNAL HTTP</li>
             <li>System.StaticObject implicit inheritance support</li>
             <li>Added NODEFAULT option for tables</li>
+            <li>Added INLINE PROPERTY support to EMAIL</li>
         </ul>
     ]]>
     </change-notes>
