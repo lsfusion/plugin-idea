@@ -15,6 +15,7 @@
             <li>Added NODEFAULT option for tables</li>
             <li>Added INLINE PROPERTY support to EMAIL</li>
             <li>Added CATCH support to TRY</li>
+            <li>Added semantic checks to FORMULA operator</li>
         </ul>
     ]]>
     </change-notes>

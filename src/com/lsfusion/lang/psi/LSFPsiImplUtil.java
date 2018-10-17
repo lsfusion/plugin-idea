@@ -26,6 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.lsfusion.lang.psi.LSFReflectionType.CANONICAL_NAME_VALUE_CLASS;
 import static java.util.Collections.singletonList;
@@ -2218,9 +2220,49 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
-        return new Pair<>(Collections.emptyList(), Collections.emptyMap());
+        Map<LSFStringLiteral, Set<Integer>> implementationsParams = getFormulaParams(sourceStatement);
+        
+        List<LSFParamDeclaration> unusedDeclarations = new ArrayList<>();
+        for (int paramIndex = 0; paramIndex < declareParams.size(); ++paramIndex) {
+            for (Set<Integer> implParameters : implementationsParams.values()) {
+                if (!implParameters.contains(paramIndex+1)) {
+                    unusedDeclarations.add(declareParams.get(paramIndex));
+                    break;
+                }
+            }
+        }
+
+        Map<PsiElement, Pair<LSFClassSet, LSFClassSet>> wrongImplementations = new HashMap<>();
+        for (Map.Entry<LSFStringLiteral, Set<Integer>> entry : implementationsParams.entrySet()) {
+            Set<Integer> usedParameters = entry.getValue();
+            if (!usedParameters.isEmpty() && (Collections.max(usedParameters) > declareParams.size() || Collections.min(usedParameters) < 1)) {
+                wrongImplementations.put(entry.getKey(), null);
+            }
+        }
+        return new Pair<>(unusedDeclarations, wrongImplementations);
     }
 
+    private static Map<LSFStringLiteral, Set<Integer>> getFormulaParams(LSFFormulaPropertyDefinition definition) {
+        Map<LSFStringLiteral, Set<Integer>> params = new HashMap<>();
+        if (definition.getFormulaPropertySyntaxList() != null) {
+            for (LSFFormulaPropertySyntax syntax : definition.getFormulaPropertySyntaxList().getFormulaPropertySyntaxList()) {
+                LSFStringLiteral literal = syntax.getStringLiteral();
+                params.put(literal, new HashSet<>());
+                String code = syntax.getStringLiteral().getValue();
+                if (code != null) {
+                    Pattern pattern = Pattern.compile("\\$\\d+");
+                    Matcher matcher = pattern.matcher(code);
+                    while (matcher.find()) {
+                        String group = matcher.group();
+                        int paramIndex = Integer.valueOf(group.substring(1));
+                        params.get(literal).add(paramIndex);
+                    }
+                }
+            }
+        }
+        return params; 
+    }
+    
     @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
         LSFGroupObjectUsage groupObjectUsage = sourceStatement.getGroupObjectID().getGroupObjectUsage();
