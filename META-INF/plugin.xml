@@ -14,6 +14,7 @@
             <li>System.StaticObject implicit inheritance support</li>
             <li>Added NODEFAULT option for tables</li>
             <li>Added INLINE PROPERTY support to EMAIL</li>
+            <li>Added CATCH support to TRY</li>
         </ul>
     ]]>
     </change-notes>

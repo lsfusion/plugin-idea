@@ -195,6 +195,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "CANCEL"                  			{ return CANCEL; }
   "CASE"                    			{ return CASE; }
   "CC"                      			{ return CC; }
+  "CATCH"                  			    { return CATCH; }
   "CENTER"                  			{ return CENTER; }
   "CHANGE"                  			{ return CHANGE; }
   "CHANGECLASS"             			{ return CHANGECLASS; }
