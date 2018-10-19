@@ -275,7 +275,6 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "FOLDER"                              { return FOLDER; }
   "FOOTER"                  			{ return FOOTER; }
   "FOR"                     			{ return FOR; }
-  "FORCE"                   			{ return FORCE; }
   "FOREGROUND"              			{ return FOREGROUND; }
   "FORM"                    			{ return FORM; }
   "FORMS"                   			{ return FORMS; }

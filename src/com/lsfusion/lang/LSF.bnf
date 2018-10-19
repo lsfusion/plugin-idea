@@ -1398,7 +1398,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
 
 formOptionSession ::= NEWSESSION | NESTEDSESSION;
 formOptionColumns ::= COLUMNS (stringLiteral)? LBRAC nonEmptyGroupObjectUsageList RBRAC {pin = 1}
-formOptionForce ::= FORCE? classViewType
+formOptionForce ::= classViewType
 formOptionToDraw ::= TODRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
