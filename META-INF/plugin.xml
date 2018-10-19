@@ -7,15 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.150</b><br>
+        <b>Version 1.0.151</b><br>
         <ul>
-            <li>Added EXTID support</li>
-            <li>Added HEADERS support to EXTERNAL HTTP</li>
-            <li>System.StaticObject implicit inheritance support</li>
-            <li>Added NODEFAULT option for tables</li>
-            <li>Added INLINE PROPERTY support to EMAIL</li>
-            <li>Added CATCH support to TRY</li>
-            <li>Added semantic checks to FORMULA operator</li>
+            <li>Added THROW support</li>
         </ul>
     ]]>
     </change-notes>

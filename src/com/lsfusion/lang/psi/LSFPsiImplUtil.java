@@ -3720,6 +3720,10 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
+    public static Inferred inferActionParamClasses(LSFThrowActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+    }
+
     public static Inferred inferActionParamClasses(LSFTryActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
 
         List<LSFActionPropertyDefinitionBody> actions = body.getActionPropertyDefinitionBodyList();
