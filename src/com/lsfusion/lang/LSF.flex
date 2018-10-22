@@ -437,7 +437,6 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "TEXTVALIGN"              			{ return TEXTVALIGN; }
   "THEN"                    			{ return THEN; }
   "THREADS"                    			{ return THREADS; }
-  "THROW"                    			{ return THROW; }
   "TO"                      			{ return TO; }
   "TODRAW"                  			{ return TODRAW; }
   "TOOLBAR"                 			{ return TOOLBAR; }

@@ -655,7 +655,6 @@ private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
                                         |	    confirmActionPropertyDefinitionBody// mixed, input
                                         |	    newSessionActionPropertyDefinitionBody
                                         |	    requestActionPropertyDefinitionBody
-                                        |	    throwActionPropertyDefinitionBody
                                         |	    tryActionPropertyDefinitionBody // mixed
                                         |	    ifActionPropertyDefinitionBody
                                         |	    caseActionPropertyDefinitionBody
@@ -1112,7 +1111,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
 // some statements are not pinned after the first token, so we need these fake rules to pin incomplete statements (to support recovery assertion) 
 // Important ! after recover the rule should mandatory be pinned (matched)
 private list_action_statement_recover ::= !(ACTIVATE | NEW | NEWEDIT | APPLY | CANCEL | CHANGE | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | INTERNAL | DELETE
-                                            | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FOR | SHOW | DIALOG | PRINT | EXPORT | THROW | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
+                                            | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
                                             | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | EXTERNAL
@@ -1156,12 +1155,6 @@ assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | ass
 
 private assignActionPropertyDefinitionBody1 ::= CHANGE mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 1}
 private assignActionPropertyDefinitionBody2 ::= mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 2}
-
-throwActionPropertyDefinitionBody ::= THROW propertyExpression
-{
-    pin = 1
-    implements="com.lsfusion.lang.psi.context.ActionExpression" methods = [inferActionParamClasses]
-}
 
 tryActionPropertyDefinitionBody ::= TRY actionPropertyDefinitionBody (CATCH actionPropertyDefinitionBody)? (FINALLY actionPropertyDefinitionBody)?
 {
