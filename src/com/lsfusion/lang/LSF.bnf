@@ -852,7 +852,7 @@ externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyP
 }
 
 private externalType ::=  SQL propertyExpression EXEC propertyExpression
-              |   HTTP propertyExpression (HEADERS headersPropertyUsage)?
+              |   HTTP (DELETE| GET | POST | PUT)? propertyExpression (HEADERS headersPropertyUsage)?
               |   DBF propertyExpression APPEND (CHARSET stringLiteral)?
               |   LSF propertyExpression (EXEC | (EVAL (ACTION)?)) propertyExpression
               |   JAVA propertyExpression

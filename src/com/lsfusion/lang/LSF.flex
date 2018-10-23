@@ -281,6 +281,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "FORMULA"                 			{ return FORMULA; }
   "FROM"                    			{ return FROM; }
   "FULL"              			        { return FULL; }
+  "GET"                                 { return GET; }
   "GLOBAL"                              { return GLOBAL; }
   "GRID"                    			{ return GRID; }
   "GRIDBOX"                    			{ return GRIDBOX; }
@@ -378,6 +379,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "PERIOD"                              { return PERIOD; }    
   "PG"                                  { return PG; }    
   "POSITION"                			{ return POSITION; }
+  "POST"                			    { return POST; }
   "PREV"                    			{ return PREV; }
   "PREVIEW"                    			{ return PREVIEW; }
   "NOPREVIEW"                  			{ return NOPREVIEW; }
@@ -388,6 +390,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "PROPERTY"                			{ return PROPERTY; }
   "PROPERTYDRAW"               			{ return PROPERTYDRAW; }
   "PROPORTION"              			{ return PROPORTION; }
+  "PUT"              			        { return PUT; }
   "QUERYCLOSE"              			{ return QUERYCLOSE; }
   "QUERYOK"                 			{ return QUERYOK; }
   "QUICKFILTER"                         { return QUICKFILTER; }
