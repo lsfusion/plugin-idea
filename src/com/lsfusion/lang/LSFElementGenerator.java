@@ -158,24 +158,6 @@ public class LSFElementGenerator {
         return staticObjectClassRef;
     }
 
-    private static List<? extends LSFComponentDeclaration> builtInFormComponents = null;
-
-    public static List<? extends LSFComponentDeclaration> getBuiltInFormComponents(Project project) {
-        if (builtInFormComponents == null || builtInFormComponents.iterator().next().getProject().isDisposed()) {
-            builtInFormComponents = createFormComponents(project);
-        }
-        return builtInFormComponents;
-    }
-
-    public static List<? extends LSFComponentDeclaration> createFormComponents(Project project) {
-        String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formEditReport,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
-//        String text = "MODULE lsFusionT; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEditReport,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;" +
-                "DESIGN defaultForm {";
-        text += "}";
-        final PsiFile dummyFile = createDummyFile(project, text);
-        return new ArrayList<>(PsiTreeUtil.findChildrenOfType(dummyFile, LSFComponentDeclaration.class));    
-    }
-
     private static Collection<LSFWindowDeclaration> builtInWindows = null;
 
     public static Collection<LSFWindowDeclaration> getBuiltInWindows(final Project project) {
