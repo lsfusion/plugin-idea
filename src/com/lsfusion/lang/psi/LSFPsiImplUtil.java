@@ -2819,8 +2819,15 @@ public class LSFPsiImplUtil {
                     LSFPropertyExpression pe = sourceType.getPropertyExpression();
                     if (pe != null)
                         importType = importType.replace(pe.getText(), "");
-                    if (importType.equals("LIST") || ((importType.contains("XML") || importType.contains("JSON")) && importType.contains("LIST")))
+                    if (importType.equals("LIST"))
                         return Collections.emptyList();
+                }
+                LSFClassNameList classNameList = importDB.getClassNameList();
+                if(classNameList != null) {
+                    LSFNonEmptyClassNameList nonEmptyClassNameList = classNameList.getNonEmptyClassNameList();
+                    if(nonEmptyClassNameList == null) {
+                        return Collections.emptyList();
+                    }
                 }
             }
         }

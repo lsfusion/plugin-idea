@@ -971,7 +971,8 @@ writeActionPropertyDefinitionBody ::= WRITE (CLIENT DIALOG?)? propertyExpression
     methods = [inferActionParamClasses]
 }
 
-importActionPropertyDefinitionBody ::= IMPORT importActionSourceType? FROM propertyExpression (FIELDS nonEmptyImportFieldDefinitions | TO nonEmptyImportPropertyUsageListWithIds) doInputBody
+importActionPropertyDefinitionBody ::= IMPORT importActionSourceType? FROM propertyExpression
+    ((FIELDS (LBRAC classParamDeclareList RBRAC)? nonEmptyImportFieldDefinitions doInputBody) | (TO (LBRAC classNameList RBRAC)? nonEmptyImportPropertyUsageListWithIds))
 {
     pin(".*") = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ExtendDoParamContext"
@@ -1005,8 +1006,8 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage importFormActionSour
 importActionSourceType ::=  XLS (SHEET (propertyExpression | ALL))?
                         |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
-                        |   XML (ROOT propertyExpression)? (LIST|TABLE)? (ATTR)?
-                        |   JSON (ROOT propertyExpression)? (LIST|TABLE)?
+                        |   XML (ROOT propertyExpression)? (ATTR)?
+                        |   JSON (ROOT propertyExpression)?
                         |   LIST
                         |   TABLE
                         |   MDB
