@@ -1312,6 +1312,7 @@ treeGroupDeclaration ::= simpleName
 
 formGroupObjectDeclaration ::= formCommonGroupObject formGroupObjectOptions
 formGroupObjectOptions ::= (    formGroupObjectViewType 
+                           |    formSubReport 
                            |    formGroupObjectInitViewType 
                            |    formGroupObjectPageSize
                            |    formGroupObjectUpdate
@@ -1333,6 +1334,8 @@ formCommonGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjec
 
 formGroupObjectViewType ::= classViewType
 formGroupObjectInitViewType ::= INIT | FIXED
+
+formSubReport ::= SUBREPORT formCalcPropertyObject?
 
 classViewType ::= PANEL | GRID | TOOLBAR
 
