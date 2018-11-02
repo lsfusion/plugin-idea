@@ -12,6 +12,7 @@
             <li>Added EXTERNAL HTTP (DELETE| GET | POST | PUT)? support</li>
             <li>Added EXPORT XLS | XLSX | (CSV NOHEADER) support</li>
             <li>IMPORT new syntax</li>
+            <li>EXPORT TO new syntax</li>
         </ul>
     ]]>
     </change-notes>
