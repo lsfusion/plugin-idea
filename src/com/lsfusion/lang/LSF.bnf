@@ -1006,7 +1006,10 @@ importPropertyUsage ::= propertyUsage
     methods = [ resolveParamClasses getParamList]
 }
 
-importFormActionPropertyDefinitionBody ::= IMPORT formUsage importFormActionSourceType (FROM propertyUsage)?
+importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
+    (importFormPlainActionSourceType FROM groupObjectUsage EQUALS propertyExpression (COMMA groupObjectUsage EQUALS propertyExpression)*)
+    |
+    (importFormHierarchicalActionSourceType (FROM (propertyExpression))?))
 {
     pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
@@ -1022,10 +1025,11 @@ importActionSourceType ::=  XLS (SHEET (propertyExpression | ALL))?
                         |   TABLE
                         |   MDB
 
-importFormActionSourceType ::=  DBF (CHARSET stringLiteral)?
-                            |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
-                            |   XML (ROOT propertyExpression)?
-                            |   JSON (ROOT propertyExpression)?
+importFormPlainActionSourceType ::=  DBF (CHARSET stringLiteral)?
+                                 |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
+
+importFormHierarchicalActionSourceType ::=  XML (ROOT propertyExpression)?
+                                        |   JSON (ROOT propertyExpression)?
 
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
                                         (   (   CONNECTION propertyExpression
