@@ -13,6 +13,7 @@
             <li>Added EXPORT XLS | XLSX | (CSV NOHEADER) support</li>
             <li>IMPORT new syntax</li>
             <li>EXPORT TO new syntax</li>
+            <li>Added GROUP NATIVE support</li> 
         </ul>
     ]]>
     </change-notes>

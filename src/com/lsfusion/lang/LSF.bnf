@@ -170,7 +170,7 @@ staticObjectDecl ::= simpleNameWithCaption
 ////////////////////////////////// GROUP STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-groupStatement ::= GROUP simpleNameWithCaption formExtID? (COLON groupUsage)? SEMI
+groupStatement ::= GROUP NATIVE? simpleNameWithCaption formExtID? (COLON groupUsage)? SEMI
 {
     pin = 2
     implements="com.lsfusion.lang.psi.declarations.LSFGroupDeclaration"
