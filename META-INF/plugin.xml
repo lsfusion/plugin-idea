@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.151</version>
+    <version>1.0.152</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -10,6 +10,7 @@
         <b>Version 1.0.152</b><br>
         <ul>
             <li>EXPORT form FROM new syntax</li>
+            <li>SUBREPORT and REPORT keywords support in FORM operator</li>
         </ul>
     ]]>
     </change-notes>

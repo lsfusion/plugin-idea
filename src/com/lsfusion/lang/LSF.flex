@@ -402,6 +402,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "REGEXP"                  			{ return REGEXP; }
   "REMOVE"                  			{ return REMOVE; }
   "SUBREPORT"              			    { return SUBREPORT; }
+  "REPORT"              			    { return REPORT; }
   "REPORTFILES"              			{ return REPORTFILES; }
   "REQUEST"                 			{ return REQUEST; }
   "REQUIRE"                 			{ return REQUIRE; }
