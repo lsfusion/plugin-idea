@@ -443,7 +443,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "THEN"                    			{ return THEN; }
   "THREADS"                    			{ return THREADS; }
   "TO"                      			{ return TO; }
-  "TODRAW"                  			{ return TODRAW; }
+  "DRAW"                  			    { return DRAW; }
   "TOOLBAR"                 			{ return TOOLBAR; }
   "TOOLBARBOX"                 			{ return TOOLBARBOX; }
   "TOOLBARLEFT"                			{ return TOOLBARLEFT; }

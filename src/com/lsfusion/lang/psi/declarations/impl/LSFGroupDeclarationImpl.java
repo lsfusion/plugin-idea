@@ -29,7 +29,10 @@ public abstract class LSFGroupDeclarationImpl extends LSFFullNameDeclarationImpl
 
     @Override
     public LSFId getNameIdentifier() {
-        return getSimpleNameWithCaption().getSimpleName();
+        LSFSimpleNameWithCaption simpleNameWithCaption = getSimpleNameWithCaption();
+        if(simpleNameWithCaption != null)
+            return simpleNameWithCaption.getSimpleName();
+        return null;
     }
 
     @Nullable
