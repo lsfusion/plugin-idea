@@ -10,6 +10,7 @@
         <b>Version 1.0.153</b><br>
         <ul>
             <li>Renamed TODRAW to DRAW</li>
+            <li>IMPORT/EXPORT XLS/XLSX NOHEADER</li>
         </ul>
     ]]>
     </change-notes>

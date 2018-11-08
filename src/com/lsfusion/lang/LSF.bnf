@@ -825,8 +825,8 @@ exportDataActionPropertyDefinitionBody ::=
         (   XML (LIST|TABLE)? ATTR?
         |   JSON (LIST|TABLE)?
         |   CSV (stringLiteral)? (NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
-        |   XLS
-        |   XLSX
+        |   XLS (NOHEADER)?
+        |   XLSX (NOHEADER)?
         |   (DBF (CHARSET stringLiteral)?)
         |   LIST
         |   TABLE
@@ -1016,7 +1016,7 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
-importActionSourceType ::=  XLS (SHEET (propertyExpression | ALL))?
+importActionSourceType ::=  XLS (NOHEADER)? (SHEET (propertyExpression | ALL))?
                         |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
                         |   XML (ROOT propertyExpression)? (ATTR)?
