@@ -382,9 +382,10 @@ public class LSFPsiImplUtil {
         if(neList != null)                
             for(LSFAliasedPropertyExpression ape : neList.getAliasedPropertyExpressionList())
                 result.add(ape.getPropertyExpression());
-        LSFPropertyExpression where = sourceStatement.getPropertyExpression();
-        if(where != null)
-            result.add(where);
+        LSFWherePropertyExpression whereProperty = sourceStatement.getWherePropertyExpression();
+        if(whereProperty != null) {
+            result.add(whereProperty.getPropertyExpression());
+        }
         return result;
     }
 

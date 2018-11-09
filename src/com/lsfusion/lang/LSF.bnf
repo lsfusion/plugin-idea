@@ -822,7 +822,7 @@ propertyExpressionWithOrder ::= propertyExpression (DESC)?
 
 exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
-        (   XML (LIST|TABLE)? ATTR?
+        (   XML (ROOT propertyExpression)? (LIST|TABLE)? ATTR?
         |   JSON (LIST|TABLE)?
         |   CSV (stringLiteral)? (NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
         |   XLS (NOHEADER)?
@@ -832,7 +832,7 @@ exportDataActionPropertyDefinitionBody ::=
         |   TABLE
         )?
         FROM nonEmptyAliasedPropertyExpressionList
-        (WHERE propertyExpression)?
+        wherePropertyExpression?
         (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)?
         staticDestination?
         {
@@ -840,6 +840,8 @@ exportDataActionPropertyDefinitionBody ::=
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses]
 }
+
+wherePropertyExpression ::= WHERE propertyExpression
 
 nonEmptyAliasedPropertyExpressionList ::= aliasedPropertyExpression (COMMA aliasedPropertyExpression)* 
         

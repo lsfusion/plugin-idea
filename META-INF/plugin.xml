@@ -7,10 +7,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.153</b><br>
+        <b>Version 1.0.154</b><br>
         <ul>
-            <li>Renamed TODRAW to DRAW</li>
             <li>IMPORT/EXPORT XLS/XLSX NOHEADER</li>
+            <li>EXPORT XML ROOT?</li>
         </ul>
     ]]>
     </change-notes>
