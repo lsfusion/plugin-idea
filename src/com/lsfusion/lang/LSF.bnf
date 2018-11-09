@@ -845,7 +845,7 @@ wherePropertyExpression ::= WHERE propertyExpression
 
 nonEmptyAliasedPropertyExpressionList ::= aliasedPropertyExpression (COMMA aliasedPropertyExpression)* 
         
-aliasedPropertyExpression ::= (ID EQUALS)? propertyExpression  
+aliasedPropertyExpression ::= ((ID | stringLiteral) EQUALS)? propertyExpression
 
 formActionObjectList ::= OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)* {pin(".*") = 1}
 
