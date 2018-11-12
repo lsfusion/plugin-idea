@@ -323,6 +323,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitActionStatement(@NotNull LSFActionStatement o) {
+        super.visitActionStatement(o);
+
+        if (o.resolveDuplicates()) {
+            addAlreadyDefinedError(o.getPropertyDeclaration(), o.getPresentableText());
+        } 
+    }
+    
+    @Override
     public void visitPropertyStatement(@NotNull LSFPropertyStatement o) {
         super.visitPropertyStatement(o);
 

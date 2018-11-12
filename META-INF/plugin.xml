@@ -10,6 +10,7 @@
         <b>Version 1.0.155</b><br>
         <ul>
             <li>IMPORT WHERE support</li>
+            <li>Duplicate actions check added</li>
         </ul>
     ]]>
     </change-notes>
