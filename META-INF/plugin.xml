@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.154</b><br>
+        <b>Version 1.0.155</b><br>
         <ul>
-            <li>IMPORT/EXPORT XLS/XLSX NOHEADER</li>
-            <li>EXPORT XML ROOT?</li>
+            <li>IMPORT WHERE support</li>
         </ul>
     ]]>
     </change-notes>
