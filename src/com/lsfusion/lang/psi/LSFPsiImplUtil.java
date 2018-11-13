@@ -3365,10 +3365,10 @@ public class LSFPsiImplUtil {
 
     public static Inferred inferActionParamClasses(LSFExportDataActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         // берем условия for, если есть, для остальных из внутреннего action'а 
-        LSFPropertyExpression expr = body.getPropertyExpression();
+        LSFWherePropertyExpression expr = body.getWherePropertyExpression();
         Inferred result = Inferred.EMPTY;
         if (expr != null)
-            result = result.and(inferParamClasses(expr, null).filter(params));
+            result = result.and(inferParamClasses(expr.getPropertyExpression(), null).filter(params));
         LSFNonEmptyAliasedPropertyExpressionList npeList = body.getNonEmptyAliasedPropertyExpressionList();
         if (npeList != null) {
             for (LSFAliasedPropertyExpression pe : npeList.getAliasedPropertyExpressionList())

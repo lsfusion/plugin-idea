@@ -438,6 +438,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "TAB"                   		        { return TAB; }
   "TABBED"                  			{ return TABBED; }
   "TABLE"                   			{ return TABLE; }
+  "TAG"                   			    { return TAG; }
   "TEXTHALIGN"              			{ return TEXTHALIGN; }
   "TEXTVALIGN"              			{ return TEXTVALIGN; }
   "THEN"                    			{ return THEN; }

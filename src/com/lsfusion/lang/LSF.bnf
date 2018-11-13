@@ -822,7 +822,7 @@ propertyExpressionWithOrder ::= propertyExpression (DESC)?
 
 exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
-        (   XML (ROOT propertyExpression)? (LIST|TABLE)? ATTR?
+        (   XML (ROOT propertyExpression)? (TAG propertyExpression)? (LIST|TABLE)? ATTR?
         |   JSON (LIST|TABLE)?
         |   CSV (stringLiteral)? (NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
         |   XLS (NOHEADER)?

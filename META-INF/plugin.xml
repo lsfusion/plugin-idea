@@ -11,6 +11,7 @@
         <ul>
             <li>IMPORT WHERE support</li>
             <li>Duplicate actions check added</li>
+            <li>EXPORT XML TAG support</li>
         </ul>
     ]]>
     </change-notes>
