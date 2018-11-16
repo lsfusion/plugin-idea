@@ -799,15 +799,18 @@ exportActionPropertyDefinitionBody ::=
 	    EXPORT mappedForm
         (
             (
-                (   XML
-                |   JSON
+                (   JSON
+                |   XML
                 )
                 staticDestination?
             )
         |
             (
-                (   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
-                |   (DBF (CHARSET stringLiteral)?)
+                (   CSV (stringLiteral)? (HEADER|NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
+                |   DBF (CHARSET stringLiteral)?
+                |   XLS (HEADER|NOHEADER)?
+                |   XLSX (HEADER|NOHEADER)?
+                |   TABLE
                 )
                 groupObjectDestination
             )
@@ -822,13 +825,12 @@ propertyExpressionWithOrder ::= propertyExpression (DESC)?
 
 exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
-        (   XML (ROOT propertyExpression)? (TAG propertyExpression)? (LIST|TABLE)? ATTR?
-        |   JSON (LIST|TABLE)?
-        |   CSV (stringLiteral)? (NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
-        |   XLS (NOHEADER)?
-        |   XLSX (NOHEADER)?
-        |   (DBF (CHARSET stringLiteral)?)
-        |   LIST
+        (   CSV (stringLiteral)? (HEADER|NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
+        |   DBF (CHARSET stringLiteral)?
+        |   XLS (HEADER|NOHEADER)?
+        |   XLSX (HEADER|NOHEADER)?
+        |   JSON
+        |   XML (ROOT propertyExpression)? (TAG propertyExpression)? ATTR?
         |   TABLE
         )?
         FROM nonEmptyAliasedPropertyExpressionList
@@ -1019,20 +1021,20 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
-importActionSourceType ::=  XLS (NOHEADER)? (SHEET (propertyExpression | ALL))?
+importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (CHARSET stringLiteral)?
                         |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
-                        |   (CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?)
-                        |   XML (ROOT propertyExpression)? (ATTR)?
+                        |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))?
                         |   JSON (ROOT propertyExpression)?
-                        |   LIST
+                        |   XML (ROOT propertyExpression)? (ATTR)?
                         |   TABLE
-                        |   MDB
 
-importFormPlainActionSourceType ::=  DBF (CHARSET stringLiteral)?
-                                 |   CSV (stringLiteral)? (NOHEADER)? (CHARSET stringLiteral)?
+importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (CHARSET stringLiteral)?
+                                 |   DBF (CHARSET stringLiteral)?
+                                 |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))?
+                                 |   TABLE
 
-importFormHierarchicalActionSourceType ::=  XML (ROOT propertyExpression)?
-                                        |   JSON (ROOT propertyExpression)?
+importFormHierarchicalActionSourceType ::=  JSON (ROOT propertyExpression)?
+                                        |   XML (ROOT propertyExpression)?
 
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
                                         (   (   CONNECTION propertyExpression

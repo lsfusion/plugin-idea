@@ -326,7 +326,6 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "NOMANAGESESSION"                     { return NOMANAGESESSION; }
   "MAX"                     			{ return MAX; }
-  "MDB"                     			{ return MDB; }
   "LAST"                     			{ return LAST; }
   "MATERIALIZED"            			{ return MATERIALIZED; }
   "MENU"                    			{ return MENU; }

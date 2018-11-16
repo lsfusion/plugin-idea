@@ -2815,14 +2815,6 @@ public class LSFPsiImplUtil {
         if (importDB != null) {
             LSFImportActionSourceType sourceType = importDB.getImportActionSourceType();
             if (sourceType != null) {
-                String importType = sourceType.getText();
-                if (importType != null) {
-                    LSFPropertyExpression pe = sourceType.getPropertyExpression();
-                    if (pe != null)
-                        importType = importType.replace(pe.getText(), "");
-                    if (importType.equals("LIST"))
-                        return Collections.emptyList();
-                }
                 LSFClassNameList classNameList = importDB.getClassNameList();
                 if(classNameList != null) {
                     LSFNonEmptyClassNameList nonEmptyClassNameList = classNameList.getNonEmptyClassNameList();
