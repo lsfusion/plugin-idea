@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.154</version>
+    <version>1.0.155</version>
     <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -12,6 +12,7 @@
             <li>IMPORT WHERE support</li>
             <li>Duplicate actions check added</li>
             <li>EXPORT XML TAG support</li>
+            <li>HEADER/NOHEADER in IMPORT/EXPORT</li>
         </ul>
     ]]>
     </change-notes>
