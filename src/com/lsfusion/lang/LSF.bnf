@@ -986,8 +986,7 @@ writeActionPropertyDefinitionBody ::= WRITE (CLIENT DIALOG?)? propertyExpression
 }
 
 importActionPropertyDefinitionBody ::= IMPORT importActionSourceType? FROM propertyExpression
-    ((FIELDS (LBRAC classParamDeclareList RBRAC)? nonEmptyImportFieldDefinitions doInputBody) | (TO (LBRAC classNameList RBRAC)? nonEmptyImportPropertyUsageListWithIds))
-    (WHERE propertyUsage)?
+    ((FIELDS (LBRAC classParamDeclareList RBRAC)? nonEmptyImportFieldDefinitions doInputBody) | (TO (LBRAC classNameList RBRAC)? nonEmptyImportPropertyUsageListWithIds (WHERE propertyUsage)?))
 {
     pin(".*") = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ExtendDoParamContext"
