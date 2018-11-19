@@ -799,13 +799,6 @@ exportActionPropertyDefinitionBody ::=
 	    EXPORT mappedForm
         (
             (
-                (   JSON
-                |   XML
-                )
-                staticDestination?
-            )
-        |
-            (
                 (   CSV (stringLiteral)? (HEADER|NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
                 |   DBF (CHARSET stringLiteral)?
                 |   XLS (HEADER|NOHEADER)?
@@ -813,6 +806,13 @@ exportActionPropertyDefinitionBody ::=
                 |   TABLE
                 )
                 groupObjectDestination
+            )
+        |
+            (
+                (   JSON
+                |   XML
+                )?
+                staticDestination?
             )
         )
         {
@@ -1014,7 +1014,7 @@ importPropertyUsage ::= propertyUsage
 importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
     (importFormPlainActionSourceType FROM groupObjectUsage EQUALS propertyExpression (COMMA groupObjectUsage EQUALS propertyExpression)*)
     |
-    (importFormHierarchicalActionSourceType (FROM (propertyExpression))?))
+    (importFormHierarchicalActionSourceType? (FROM (propertyExpression))?))
 {
     pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
