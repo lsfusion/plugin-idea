@@ -252,6 +252,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "ELSE"                    			{ return ELSE; }
   "EMAIL"                   			{ return EMAIL; }
   "END"                     			{ return END; }
+  "ESCAPE"                			    { return ESCAPE; }
   "EVAL"                    			{ return EVAL; }
   "EVENTID"                 			{ return EVENTID; }
   "EVENTS"                  			{ return EVENTS; }

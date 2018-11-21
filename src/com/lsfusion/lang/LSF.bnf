@@ -799,7 +799,7 @@ exportActionPropertyDefinitionBody ::=
 	    EXPORT mappedForm
         (
             (
-                (   CSV (stringLiteral)? (HEADER|NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
+                (   CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
                 |   DBF (CHARSET stringLiteral)?
                 |   XLS (HEADER|NOHEADER)?
                 |   XLSX (HEADER|NOHEADER)?
@@ -825,7 +825,7 @@ propertyExpressionWithOrder ::= propertyExpression (DESC)?
 
 exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
-        (   CSV (stringLiteral)? (HEADER|NOHEADER)? (NOESCAPE)? (CHARSET stringLiteral)?
+        (   CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
         |   DBF (CHARSET stringLiteral)?
         |   XLS (HEADER|NOHEADER)?
         |   XLSX (HEADER|NOHEADER)?
@@ -1020,14 +1020,14 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
-importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (CHARSET stringLiteral)?
+importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
                         |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))?
                         |   JSON (ROOT propertyExpression)?
                         |   XML (ROOT propertyExpression)? (ATTR)?
                         |   TABLE
 
-importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (CHARSET stringLiteral)?
+importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
                                  |   DBF (CHARSET stringLiteral)?
                                  |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))?
                                  |   TABLE
