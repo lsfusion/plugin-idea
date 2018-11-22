@@ -11,6 +11,7 @@
         <ul>
             <li>IMPORT form default type</li>
             <li>CSV ESCAPE|NOESCAPE</li>
+            <li>IMPORT/EXPORT CHARSET refactoring</li>
         </ul>
     ]]>
     </change-notes>

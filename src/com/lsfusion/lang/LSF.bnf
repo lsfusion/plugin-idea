@@ -809,8 +809,8 @@ exportActionPropertyDefinitionBody ::=
             )
         |
             (
-                (   JSON
-                |   XML
+                (   JSON (CHARSET stringLiteral)?
+                |   XML (CHARSET stringLiteral)?
                 )?
                 staticDestination?
             )
@@ -829,8 +829,8 @@ exportDataActionPropertyDefinitionBody ::=
         |   DBF (CHARSET stringLiteral)?
         |   XLS (HEADER|NOHEADER)?
         |   XLSX (HEADER|NOHEADER)?
-        |   JSON
-        |   XML (ROOT propertyExpression)? (TAG propertyExpression)? ATTR?
+        |   JSON (CHARSET stringLiteral)?
+        |   XML (ROOT propertyExpression)? (TAG propertyExpression)? ATTR? (CHARSET stringLiteral)?
         |   TABLE
         )?
         FROM nonEmptyAliasedPropertyExpressionList
@@ -1023,8 +1023,8 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
 importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
                         |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))?
-                        |   JSON (ROOT propertyExpression)?
-                        |   XML (ROOT propertyExpression)? (ATTR)?
+                        |   JSON (ROOT propertyExpression)? (CHARSET stringLiteral)?
+                        |   XML (ROOT propertyExpression)? (ATTR)? (CHARSET stringLiteral)?
                         |   TABLE
 
 importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
@@ -1032,8 +1032,8 @@ importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ES
                                  |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))?
                                  |   TABLE
 
-importFormHierarchicalActionSourceType ::=  JSON (ROOT propertyExpression)?
-                                        |   XML (ROOT propertyExpression)?
+importFormHierarchicalActionSourceType ::=  JSON (ROOT propertyExpression)? (CHARSET stringLiteral)?
+                                        |   XML (ROOT propertyExpression)? (CHARSET stringLiteral)?
 
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
                                         (   (   CONNECTION propertyExpression
