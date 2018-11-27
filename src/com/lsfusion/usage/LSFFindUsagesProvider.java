@@ -1,6 +1,6 @@
 package com.lsfusion.usage;
 
-import com.intellij.find.impl.HelpID;
+import com.intellij.lang.HelpID;
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.lang.findUsages.FindUsagesProvider;
@@ -8,7 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.LSFLexerAdapter;
-import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFSimpleName;
+import com.lsfusion.lang.psi.LSFTypes;
 import com.lsfusion.lang.psi.declarations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +37,7 @@ public class LSFFindUsagesProvider implements FindUsagesProvider {
     @Nullable
     @Override
     public String getHelpId(@NotNull PsiElement psiElement) {
-        return HelpID.FIND_IN_PROJECT;
+        return HelpID.FIND_OTHER_USAGES;
     }
 
     @NotNull

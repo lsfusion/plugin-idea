@@ -2,6 +2,7 @@ package com.lsfusion.module.run;
 
 import com.intellij.diagnostic.logging.LogConfigurationPanel;
 import com.intellij.execution.*;
+import com.intellij.execution.configuration.AbstractRunConfiguration;
 import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
@@ -29,7 +30,7 @@ import java.util.Map;
 import static com.lsfusion.debug.LSFDebuggerRunner.LIGHT_START_PROPERTY;
 import static com.lsfusion.module.LSFusionModuleBuilder.BOOTSTRAP_CLASS_NAME;
 
-public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunConfigurationModule> implements CommonJavaRunConfigurationParameters {//}, RunConfigurationWithSuppressedDefaultDebugAction {
+public class LSFusionRunConfiguration extends AbstractRunConfiguration implements CommonJavaRunConfigurationParameters {//}, RunConfigurationWithSuppressedDefaultDebugAction {
 
     public static final String MAIN_CLASS_NAME = BOOTSTRAP_CLASS_NAME;
 
@@ -49,6 +50,11 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
         super(name, new JavaRunConfigurationModule(project, true), factory);
     }
 
+    @Override
+    public JavaRunConfigurationModule getConfigurationModule() {
+        return (JavaRunConfigurationModule) super.getConfigurationModule();
+    }
+
     public RunProfileState getState(@NotNull final Executor executor, @NotNull final ExecutionEnvironment env) throws ExecutionException {
         final JavaCommandLineState state = new LSFServerCommandLineState(this, env, LIGHT_START);
         JavaRunConfigurationModule module = getConfigurationModule();
@@ -61,7 +67,7 @@ public class LSFusionRunConfiguration extends ModuleBasedConfiguration<JavaRunCo
         SettingsEditorGroup<LSFusionRunConfiguration> group = new SettingsEditorGroup<>();
         group.addEditor(ExecutionBundle.message("run.configuration.configuration.tab.title"), new LSFusionRunConfigurationEditor(getProject()));
         JavaRunConfigurationExtensionManager.getInstance().appendEditors(this, group);
-        group.addEditor(ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel<LSFusionRunConfiguration>());
+        group.addEditor(ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel<>());
         return group;
     }
 
