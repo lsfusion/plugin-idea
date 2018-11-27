@@ -774,6 +774,8 @@ printActionPropertyDefinitionBody ::=
 		    |   PDF 
 		    |   DOC 
 		    |   DOCX
+		    |   RTF
+		    |   HTML
 		    ) 
 		    staticDestination?
 		    ) 
