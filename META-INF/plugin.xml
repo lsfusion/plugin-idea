@@ -12,6 +12,7 @@
             <li>IMPORT form default type</li>
             <li>CSV ESCAPE|NOESCAPE</li>
             <li>IMPORT/EXPORT CHARSET refactoring</li>
+            <li>EMAIL: INLINE HTML and INLINE PROPERTY united</li>
         </ul>
     ]]>
     </change-notes>

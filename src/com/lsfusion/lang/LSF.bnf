@@ -903,7 +903,7 @@ emailActionPropertyDefinitionBody ::=
 		(FROM propertyExpression)?
 		SUBJECT propertyExpression
 		(emailRecipientTypeLiteral propertyExpression)*
-		(   INLINE (HTML | PROPERTY) propertyExpression
+		(   INLINE PROPERTY propertyExpression
 		|	INLINE formEmailToObjects
 		|	ATTACH emailAttachFormat (NAME propertyExpression)? formEmailToObjects
 		|   ATTACH propertyExpression (NAME propertyExpression)?
