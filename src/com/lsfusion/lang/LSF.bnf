@@ -1024,7 +1024,7 @@ importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOES
                         |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))?
                         |   JSON (ROOT propertyExpression)? (CHARSET stringLiteral)?
-                        |   XML (ROOT propertyExpression)? (ATTR)? (CHARSET stringLiteral)?
+                        |   XML (ROOT propertyExpression)? (ATTR)?
                         |   TABLE
 
 importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
