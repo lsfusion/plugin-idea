@@ -582,6 +582,8 @@ public class LSFPsiImplUtil {
                 return JSONClass.instance;
             case "XMLFILE":
                 return XMLClass.instance;
+            case "TABLEFILE":
+                return TableClass.instance;
             case "WORDLINK":
                 return WordLinkClass.instance;
             case "IMAGELINK":
@@ -602,6 +604,8 @@ public class LSFPsiImplUtil {
                 return JSONLinkClass.instance;
             case "XMLLINK":
                 return XMLLinkClass.instance;
+            case "TABLELINK":
+                return TableLinkClass.instance;
             case "BOOLEAN":
                 return LogicalClass.instance;
             case "DATE":
