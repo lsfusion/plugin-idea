@@ -10,6 +10,7 @@
         <b>Version 1.0.157</b><br>
         <ul>
             <li>numRowHeight renamed to charHeight</li>
+            <li>TABLEFILE/TABLELINK classes support</li>
         </ul>
     ]]>
     </change-notes>
