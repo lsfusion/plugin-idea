@@ -21,7 +21,7 @@ public class ObjectClass extends DataClass {
     }
 
     @Override
-    public int getDefaultHeight(FontMetrics fontMetrics, int numRowHeight) {
-        return fontMetrics.getHeight() * numRowHeight + 1;
+    public int getDefaultHeight(FontMetrics fontMetrics, int charHeight) {
+        return fontMetrics.getHeight() * charHeight + 1;
     }
 }

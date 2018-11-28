@@ -38,7 +38,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("echoSymbols"),
             new ReflectionProperty("noSort").setExpert(),
             new ReflectionProperty("notNull"),
-            new ReflectionProperty("numRowHeight").setExpert(),
+            new ReflectionProperty("charHeight").setExpert(),
             new ReflectionProperty("charWidth").setExpert(),
             new ReflectionProperty("valueSize").setExpert(),
             new ReflectionProperty("changeKey"),
@@ -65,7 +65,7 @@ public class PropertyDrawView extends ComponentView {
     public Long maxValue;
     public boolean echoSymbols;
 
-    public int numRowHeight;
+    public int charHeight;
     public int charWidth;
     public Dimension valueSize;
     private Boolean valueFlex;
@@ -231,7 +231,7 @@ public class PropertyDrawView extends ComponentView {
             return valueSize.height;
         }
         int height = entity.baseClass != null ?
-                entity.baseClass.getDefaultHeight(comp.getFontMetrics(getFont(comp)), numRowHeight == 0 ? 1 : numRowHeight) :
+                entity.baseClass.getDefaultHeight(comp.getFontMetrics(getFont(comp)), charHeight == 0 ? 1 : charHeight) :
                 comp.getFontMetrics(getFont(comp)).getHeight() + 1;
         if (imagePath != null) { // предпочитаемую высоту берем исходя из размера иконки
             Icon icon = BaseUtils.loadIcon(entity.project, "/images/design/" + imagePath);
@@ -241,8 +241,8 @@ public class PropertyDrawView extends ComponentView {
         return height;
     }
 
-    public void setNumRowHeight(int numRowHeight) {
-        this.numRowHeight = numRowHeight;
+    public void setCharHeight(int charHeight) {
+        this.charHeight = charHeight;
     }
 
     public void setCharWidth(int charWidth) {
@@ -384,8 +384,8 @@ public class PropertyDrawView extends ComponentView {
         return echoSymbols;
     }
 
-    public int getNumRowHeight() {
-        return numRowHeight;
+    public int getCharHeight() {
+        return charHeight;
     }
 
     public int getCharWidth() {

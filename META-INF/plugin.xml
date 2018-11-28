@@ -7,12 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.156</b><br>
+        <b>Version 1.0.157</b><br>
         <ul>
-            <li>IMPORT form default type</li>
-            <li>CSV ESCAPE|NOESCAPE</li>
-            <li>IMPORT/EXPORT CHARSET refactoring</li>
-            <li>EMAIL INLINE</li>
+            <li>numRowHeight renamed to charHeight</li>
         </ul>
     ]]>
     </change-notes>

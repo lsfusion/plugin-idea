@@ -117,8 +117,8 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
         throw new UnsupportedOperationException();
     }
 
-    public int getDefaultHeight(FontMetrics fontMetrics, int numRowHeight) {
-        return fontMetrics.getHeight() * numRowHeight + 1;
+    public int getDefaultHeight(FontMetrics fontMetrics, int charHeight) {
+        return fontMetrics.getHeight() * charHeight + 1;
     }
 
     @Override
