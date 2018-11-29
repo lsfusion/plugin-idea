@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.lsfusion.debug.LSFDebuggerRunner.LIGHT_START_PROPERTY;
+import static com.lsfusion.debug.LSFDebuggerRunner.PLUGIN_ENABLED_PROPERTY;
 import static com.lsfusion.module.LSFusionModuleBuilder.BOOTSTRAP_CLASS_NAME;
 
 public class LSFusionRunConfiguration extends AbstractRunConfiguration implements CommonJavaRunConfigurationParameters {//}, RunConfigurationWithSuppressedDefaultDebugAction {
@@ -207,6 +208,10 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
             JavaParametersUtil.configureModule(module, params, classPathType, jreHome);
             JavaParametersUtil.configureConfiguration(params, myConfiguration);
             params.getVMParametersList().addProperty(LIGHT_START_PROPERTY, String.valueOf(lightStart));
+
+            if (!params.getVMParametersList().hasProperty(PLUGIN_ENABLED_PROPERTY)) {
+                params.getVMParametersList().addProperty(PLUGIN_ENABLED_PROPERTY, "true");
+            }
 
             params.setMainClass(MAIN_CLASS_NAME);
             for (RunConfigurationExtension ext : Extensions.getExtensions(RunConfigurationExtension.EP_NAME)) {
