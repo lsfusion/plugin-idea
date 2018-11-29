@@ -11,7 +11,7 @@
         <ul>
             <li>numRowHeight renamed to charHeight</li>
             <li>TABLEFILE/TABLELINK classes support</li>
-            <li>devMode refactoring</>
+            <li>devMode refactoring</li>
         </ul>
     ]]>
     </change-notes>
