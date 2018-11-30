@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.158</b><br>
+        <b>Version 1.0.159</b><br>
         <ul>
-            <li>numRowHeight renamed to charHeight</li>
-            <li>TABLEFILE/TABLELINK classes support</li>
-            <li>devMode refactoring</li>
+            <li>EMAIL syntax changed</li>
         </ul>
     ]]>
     </change-notes>

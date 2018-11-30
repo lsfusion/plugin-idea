@@ -904,20 +904,12 @@ emailActionPropertyDefinitionBody ::=
 		SUBJECT propertyExpression
 		(emailRecipientTypeLiteral propertyExpression)*
 		(   INLINE propertyExpression
-		|	ATTACH emailAttachFormat (NAME propertyExpression)? formEmailToObjects
 		|   ATTACH propertyExpression (NAME propertyExpression)?
 		)*
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
-}
-
-formEmailToObjects ::= formUsage formActionObjectList?
-{
-    pin = 1
-    implements="com.lsfusion.lang.psi.context.FormContext"
-    methods = [resolveFormDecl]
 }
 
 confirmActionPropertyDefinitionBody ::= ASK propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody

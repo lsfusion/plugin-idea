@@ -3645,20 +3645,6 @@ public class LSFPsiImplUtil {
 
     public static Inferred inferActionParamClasses(LSFEmailActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         List<Inferred> list = new ArrayList<>();
-
-        List<LSFFormEmailToObjects> objects = body.getFormEmailToObjectsList();
-        for (LSFFormEmailToObjects object : objects) {
-            LSFFormActionObjectList actionObjList = object.getFormActionObjectList();
-            if (actionObjList != null) {
-                for (LSFFormActionObjectUsage ou : actionObjList.getFormActionObjectUsageList()) {
-                    LSFObjectInProps objectInProps = ou.getObjectInProps();
-                    if(objectInProps != null) {
-                        list.add(inferExpressionParamClasses(objectInProps.getPropertyExpression(), LSFExClassSet.toEx(ou.getObjectUsage().resolveClass())).filter(params));
-                    }
-                }
-            }
-        }
-
         for (LSFPropertyExpression pe : body.getPropertyExpressionList()) {
             list.add(inferParamClasses(pe, null).filter(params));
         }
@@ -3838,11 +3824,6 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFImportFormActionPropertyDefinitionBody formActionBody) {
         return resolveFormDecl(formActionBody.getFormUsage());
-    }
-
-    @Nullable
-    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormEmailToObjects formEmailToObjects) {
-        return resolveFormDecl(formEmailToObjects.getFormUsage());
     }
 
     @Nullable
