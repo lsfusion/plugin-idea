@@ -9,7 +9,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.159</b><br>
         <ul>
-            <li>EMAIL syntax changed</li>
+            <li>EMAIL: BODY instead of INLINE</li>
         </ul>
     ]]>
     </change-notes>

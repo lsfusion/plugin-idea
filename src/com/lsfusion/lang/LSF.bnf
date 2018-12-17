@@ -901,11 +901,10 @@ newWhereActionPropertyDefinitionBody ::= NEW customClassUsage newWhereClause
 emailActionPropertyDefinitionBody ::=
 		EMAIL
 		(FROM propertyExpression)?
-		SUBJECT propertyExpression
-		(emailRecipientTypeLiteral propertyExpression)*
-		(   INLINE propertyExpression
-		|   ATTACH propertyExpression (NAME propertyExpression)?
-		)*
+		(SUBJECT propertyExpression)?
+		(emailRecipientTypeLiteral propertyExpression)+
+		(BODY propertyExpression)?
+		(ATTACH propertyExpression (NAME propertyExpression)?)*
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
