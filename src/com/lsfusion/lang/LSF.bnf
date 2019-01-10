@@ -970,7 +970,7 @@ readActionPropertyDefinitionBody ::= READ (CLIENT DIALOG?)? propertyExpression (
     methods = [inferActionParamClasses]
 }
 
-writeActionPropertyDefinitionBody ::= WRITE (CLIENT DIALOG?)? propertyExpression FROM propertyExpression APPEND?
+writeActionPropertyDefinitionBody ::= WRITE (CLIENT DIALOG?)? propertyExpression TO propertyExpression APPEND?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"

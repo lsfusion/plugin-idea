@@ -10,6 +10,7 @@
         <b>Version 1.0.159</b><br>
         <ul>
             <li>EMAIL: BODY instead of INLINE</li>
+            <li>WRITE url FROM fileExpr -> WRITE fileExpr TO url</li>
         </ul>
     ]]>
     </change-notes>
