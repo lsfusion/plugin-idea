@@ -189,6 +189,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "BCC"                     			{ return BCC; }
   "BEFORE"                  			{ return BEFORE; }
   "BODY"                  			    { return BODY; }
+  "BODYURL"                  			{ return BODYURL; }
   "BOTTOM"                  			{ return BOTTOM; }
   "BOX"                  			    { return BOX; }
   "BREAK"                   			{ return BREAK; }

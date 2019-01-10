@@ -11,6 +11,7 @@
         <ul>
             <li>EMAIL: BODY instead of INLINE</li>
             <li>WRITE url FROM fileExpr -> WRITE fileExpr TO url</li>
+            <li>EXTERNAL: BODYURL support</li>
         </ul>
     ]]>
     </change-notes>
