@@ -15,8 +15,7 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
-import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
-import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
+import com.lsfusion.lang.psi.impl.*;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.typeinfer.*;
@@ -3987,14 +3986,39 @@ public class LSFPsiImplUtil {
 
         Collection<LSFJoinPropertyDefinition> joinProps = PsiTreeUtil.findChildrenOfType(override, LSFJoinPropertyDefinition.class);
         for (LSFJoinPropertyDefinition joinProp : joinProps) {
-            LSFPropertyUsage rightUsage = joinProp.getPropertyUsage();
-            if (equalReferences(leftUsage, rightUsage)) {
-                if (equalParams(leftParams, joinProp.getParamList()))
-                    return false;
-            }
+            if(!checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinProp.getPropertyUsage(), joinProp.getParamList()))
+                return false;
         }
         return true;
     }
+
+    private static boolean checkNonRecursiveOverrideRecursively(LSFPropertyUsage leftUsage, int leftParams, LSFPropertyUsage rightUsage, PsiElement rightParamList) {
+        if (equalReferences(leftUsage, rightUsage, leftParams, rightParamList)) {
+            return false;
+        }
+
+        LSFPropDeclaration rightUsageDecl = rightUsage.resolveDecl();
+        Collection<LSFJoinPropertyDefinition> joinProps = PsiTreeUtil.findChildrenOfType(rightUsageDecl, LSFJoinPropertyDefinition.class);
+        for (LSFJoinPropertyDefinition joinProp : joinProps) {
+            if (!checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinProp.getPropertyUsage(), joinProp.getParamList())) {
+                return false;
+            }
+        }
+        //executes too long
+        /*for (PsiElement element : rightUsageDecl.processImplementationsSearch()) {
+            if (element instanceof LSFPropertyUsageWrapper) {
+                LSFOverridePropertyStatement override = PsiTreeUtil.getParentOfType(element, LSFOverridePropertyStatement.class);
+                for (LSFJoinPropertyDefinition joinProp : PsiTreeUtil.findChildrenOfType(override, LSFJoinPropertyDefinition.class)) {
+                    boolean result = checkNonRecursiveOverrideRecursively(leftUsage, joinProp.getPropertyUsage(), leftParams, joinProp.getParamList());
+                    if (!result) {
+                        return false;
+                    }
+                }
+            }
+        }*/
+        return true;
+    }
+
     public static boolean checkNonRecursiveOverride(@NotNull LSFOverrideActionStatement override) {
         LSFActionUsage leftUsage = override.getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage();
 
@@ -4048,6 +4072,10 @@ public class LSFPsiImplUtil {
             }
         }
         return false;
+    }
+
+    private static boolean equalReferences(@NotNull LSFActionOrPropReference left, LSFActionOrPropReference right, int leftParams, PsiElement paramList) {
+        return equalReferences(left, right) && equalParams(leftParams, paramList);
     }
 
     public static boolean isRight(@NotNull LSFFormGroupObjectRelativePosition position) {
