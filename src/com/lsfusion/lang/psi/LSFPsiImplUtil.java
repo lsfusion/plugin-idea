@@ -3997,11 +3997,13 @@ public class LSFPsiImplUtil {
             return false;
         }
 
-        LSFPropDeclaration rightUsageDecl = rightUsage.resolveDecl();
-        Collection<LSFJoinPropertyDefinition> joinProps = PsiTreeUtil.findChildrenOfType(rightUsageDecl, LSFJoinPropertyDefinition.class);
-        for (LSFJoinPropertyDefinition joinProp : joinProps) {
-            if (!checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinProp.getPropertyUsage(), joinProp.getParamList())) {
-                return false;
+        if(rightUsage != null) {
+            Collection<LSFJoinPropertyDefinition> joinProps = PsiTreeUtil.findChildrenOfType(rightUsage.resolveDecl(), LSFJoinPropertyDefinition.class);
+            for (LSFJoinPropertyDefinition joinProp : joinProps) {
+                LSFPropertyUsage joinPropUsage = joinProp.getPropertyUsage();
+                if (!rightUsage.equals(joinPropUsage) && !checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinPropUsage, joinProp.getParamList())) {
+                    return false;
+                }
             }
         }
         //executes too long
@@ -4055,7 +4057,7 @@ public class LSFPsiImplUtil {
     }
 
     private static boolean equalParams(int leftParams, PsiElement paramList) {
-        if (paramList != null && paramList instanceof LSFPropertyExpressionListImpl) {
+        if (paramList instanceof LSFPropertyExpressionListImpl) {
             LSFNonEmptyPropertyExpressionList nonEmptyPropertyExpressionList = ((LSFPropertyExpressionListImpl) paramList).getNonEmptyPropertyExpressionList();
             if (nonEmptyPropertyExpressionList != null) {
                 List<LSFPropertyExpression> rightParams = nonEmptyPropertyExpressionList.getPropertyExpressionList();
