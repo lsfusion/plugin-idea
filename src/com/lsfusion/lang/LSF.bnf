@@ -1278,6 +1278,7 @@ formStatement ::=	(	formDecl
                     |	editFormDeclaration
                     |   reportFilesDeclaration
                     |   reportSetting
+                    |   formExtIDSetting
                     )*
                     SEMI
 {
@@ -1295,6 +1296,8 @@ editFormDeclaration ::= EDIT customClassUsage OBJECT objectUsage {pin = 1}
 reportFilesDeclaration ::= REPORTFILES groupObjectReportPath (COMMA groupObjectReportPath)* {pin = 1}
 
 reportSetting ::= REPORT formCalcPropertyObject {pin = 1}
+
+formExtIDSetting ::= FORMEXTID stringLiteral {pin = 1}
 
 groupObjectReportPath ::= (TOP | groupObjectUsage) formCalcPropertyObject
 

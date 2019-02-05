@@ -280,6 +280,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "FOR"                     			{ return FOR; }
   "FOREGROUND"              			{ return FOREGROUND; }
   "FORM"                    			{ return FORM; }
+  "FORMEXTID"                    		{ return FORMEXTID; }
   "FORMS"                   			{ return FORMS; }
   "FORMULA"                 			{ return FORMULA; }
   "FROM"                    			{ return FROM; }
