@@ -295,6 +295,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "HALIGN"                  			{ return HALIGN; }
   "HEADER"                  			{ return HEADER; }
   "HEADERS"                  			{ return HEADERS; }
+  "HEADERSTO"                  			{ return HEADERSTO; }
   "HIDE"                    			{ return HIDE; }
   "HIDESCROLLBARS"          			{ return HIDESCROLLBARS; }
   "HIDETITLE"               			{ return HIDETITLE; }
