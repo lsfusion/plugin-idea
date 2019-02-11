@@ -106,7 +106,9 @@ public class LSFGlobalResolver {
         Set<VirtualFile> vFiles = new HashSet<>();
         if (declaration != null) {
             for (VirtualFile f : getRequireModules(declaration)) {
-                vFiles.add(f); // null может быть только для dumb
+                if (f != null) {
+                    vFiles.add(f); // null может быть только для dumb
+                }
             }
         }
         return GlobalSearchScope.filesScope(project, vFiles);
