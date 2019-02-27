@@ -12,6 +12,7 @@
             <li>Added HTTP HEADERSTO support</li>
             <li>Bugfix for name contributor in IDEA 2018.3</li>
             <li>Minor parser optimization</li>
+            <li>HTTP COOKIES, COOKIESTO</li>
         </ul>
     ]]>
     </change-notes>
