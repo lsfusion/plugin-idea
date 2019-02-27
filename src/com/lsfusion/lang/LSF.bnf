@@ -119,7 +119,7 @@ internalFormObject ::= OBJECT formUsage objectUsage
 
 // some statements are not pinned after the first token, so we need these fake rules to pin incomplete statements (to support recovery assertion) 
 stubStatement ::=
-    EXTEND (CLASS | FORM | DESIGN) ID
+    EXTEND (CLASS | FORM) ID
     | CLASS (ABSTRACT | NATIVE)? COMPLEX? ID
     | (ATSIGN | ATSIGN2 | FORM | GROUP | META | DESIGN | TABLE) ID
     | WINDOW windowType ID

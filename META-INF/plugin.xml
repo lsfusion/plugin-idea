@@ -9,7 +9,9 @@
     <change-notes><![CDATA[
         <b>Version 1.0.162</b><br>
         <ul>
-            <li>added HTTP HEADERSTO support</li>
+            <li>Added HTTP HEADERSTO support</li>
+            <li>Bugfix for name contributor in IDEA 2018.3</li>
+            <li>Minor parser optimization</li>
         </ul>
     ]]>
     </change-notes>

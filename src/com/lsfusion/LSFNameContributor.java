@@ -25,7 +25,7 @@ public abstract class LSFNameContributor implements ChooseByNameContributor {
     public String[] getNames(Project project, boolean includeNonProjectItems) {
         String pattern = null;
         final Component focusedComponent = WindowManagerEx.getInstanceEx().getFocusedComponent(project);
-        if (focusedComponent != null && focusedComponent.getParent() instanceof ChooseByNameBase.JPanelProvider && focusedComponent instanceof JTextField) { // подразумевается ChooseByNameBase.MyTextField
+        if (focusedComponent instanceof JTextField) {
             pattern = ((JTextField) focusedComponent).getText();
         }
         

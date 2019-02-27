@@ -29,22 +29,22 @@ public class LSFParserImpl extends LSFParser {
         if (tokenType == null) {
             return false;
         }
-        //assert tokenType in {
-        // ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT
-        //    | CLASS | ATSIGN | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
-        // },
-        // because of recoverWhile in moduleHeader
+        //assert tokenType in script_statement_recover (recoverWhile in scriptStatement) {
+        // ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT | INTERNAL
+        // | CLASS | ATSIGN | ATSIGN2 | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
+        // to cut parsing we can use tokens (or token chains) that can be only used in top rules
 
+        IElementType prevTokenType = tokenType;
+        
         Marker lazyStatement = builder_.mark();
         builder_.advanceLexer();
 
-        boolean isMetaDecl = tokenType == META;
-        boolean isMetaUsage = tokenType == ATSIGN;
-        boolean isMetaEnd = false;
+        boolean isTopMetaDecl = tokenType == META;
+        boolean isTopMetaUsage = tokenType == ATSIGN;
 
-        boolean isExtend = tokenType == EXTEND;
-        int metaCount = isMetaDecl ? 1 : 0;
+        int metaCount = isTopMetaDecl ? 1 : 0;
         int braceCount = 0;
+        int tokenCount = 0;
         boolean greedyBlock = false;
         while (true) {
             tokenType = builder_.getTokenType();
@@ -72,32 +72,46 @@ public class LSFParserImpl extends LSFParser {
                 if (tokenType == NAVIGATOR) break;
                 if (tokenType == ATSIGN) break;
                 if (tokenType == META) break;
-                if (tokenType == EXTEND && builder_.lookAhead(1) != FILTERGROUP) 
-                {
+                if (tokenType == DESIGN) break;
+                if (tokenCount > 40) { // we don't want to have very small non-recursive lazy blocks 
+                    if (tokenType == EXTEND && builder_.lookAhead(1) != FILTERGROUP) {
+                        break;
+                    }
+                    if (tokenType == CLASS && prevTokenType != EXTEND) {
+                        if (builder_.lookAhead(1) != LBRAC) { // to avoid CLASS()
+                            break;
+                        }
+                    }
+                    if(tokenType == FORM && prevTokenType != EXTEND && prevTokenType != ACTIVATE && prevTokenType != ACTIVE) {
+                        // there is also usage in navigator, but there braceCount will be > 0
+                        break;
+                    }
+                    if(tokenType == WHEN && (prevTokenType == SEMI || prevTokenType == RBRACE)) {
+                        // it's not CASE and not implementation (+, +=) and not (<- WHEN) 
+                        break;
+                    }
+                    
+                    if (tokenType == INDEX) break;
+                    if (tokenType == CONSTRAINT) break;
+                }
+
+                // here it's tricky, because it is not guaranteed that if there is an error, that parser will recover to the next token after SEMI (which may lead to unpredictable behaviour, but so far we didn't have any problems with that)
+                if(isTopMetaUsage && builder_.lookAhead(1) == SEMI) { // @f();
+                    builder_.advanceLexer(); // eat RBRACE | RBRAC
+                    builder_.advanceLexer(); // eat SEMI
                     break;
                 }
-                if (!isExtend && tokenType == DESIGN) break;
-
-                if(isMetaUsage && builder_.lookAhead(1) == SEMI) {
-                    builder_.advanceLexer(); // съедаем SEMI 
-                    isMetaEnd = true;
+                if(isTopMetaDecl) { // META END
+                    assert tokenType == END;
+                    builder_.advanceLexer(); // eat END
+                    break;
                 }
-                if(isMetaDecl)
-                    isMetaEnd = true;
-//
-                // не выделяем мелкие statement'ы в отдельные куски, т.к. это только тормозит парсинг
-//              if (tokenType == INDEX) break;
-//              if (tokenType == CONSTRAINT) break;
-//              if (tokenType == HIDE && builder_.lookAhead(1) == WINDOW) break;
-//              if (tokenType == WINDOW) break;
             }
 
+            prevTokenType = tokenType;
             builder_.advanceLexer();
 
-            isExtend = false;
-            
-            if(isMetaEnd) // нужно чтобы meta code'ы попали в один lazyScript, чтобы корректно работал meta change detector
-                break;
+            tokenCount++;
         }
 
         lazyStatement.collapse(LAZY_SCRIPT_STATEMENT);
