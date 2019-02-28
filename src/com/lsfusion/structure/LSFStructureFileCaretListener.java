@@ -8,6 +8,7 @@ import com.intellij.ide.structureView.StructureViewWrapper;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.CaretAdapter;
 import com.intellij.openapi.editor.event.CaretEvent;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
@@ -36,18 +37,20 @@ public class LSFStructureFileCaretListener extends CaretAdapter {
 
     @Override
     public void caretPositionChanged(CaretEvent e) {
-        PsiElement targetElement = TargetElementUtil.findTargetElement(e.getEditor(), ImplementationSearcher.getFlags());
+        DumbService.getInstance(project).smartInvokeLater(() -> {
+            PsiElement targetElement = TargetElementUtil.findTargetElement(e.getEditor(), ImplementationSearcher.getFlags());
 
-        if (targetElement instanceof LSFId) {
-            PsiElement parent = PsiTreeUtil.getParentOfType(targetElement, LSFClassDecl.class, LSFBuiltInClassName.class);
+            if (targetElement instanceof LSFId) {
+                PsiElement parent = PsiTreeUtil.getParentOfType(targetElement, LSFClassDecl.class, LSFBuiltInClassName.class);
 
-            if (parent != null && parent != currentClassElement) {
-                currentClassElement = parent;
-                StructureViewWrapper structureViewWrapper = StructureViewFactoryEx.getInstanceEx(project).getStructureViewWrapper();
-                if (structureViewWrapper instanceof StructureViewWrapperImpl) {
-                    ((StructureViewWrapperImpl) structureViewWrapper).rebuild();
+                if (parent != null && parent != currentClassElement) {
+                    currentClassElement = parent;
+                    StructureViewWrapper structureViewWrapper = StructureViewFactoryEx.getInstanceEx(project).getStructureViewWrapper();
+                    if (structureViewWrapper instanceof StructureViewWrapperImpl) {
+                        ((StructureViewWrapperImpl) structureViewWrapper).rebuild();
+                    }
                 }
             }
-        }
+        });
     }
 }
