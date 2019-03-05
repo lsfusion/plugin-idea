@@ -12,10 +12,9 @@ import com.intellij.util.Processor;
 import com.lsfusion.ImplementationsSearch;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFFormObjectDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFNewNavigatorElementStatement;
+import com.lsfusion.lang.psi.declarations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,23 +50,24 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
             if (decl instanceof LSFActionOrPropDeclaration && PROPERTY_DRAW_USAGES.equals(propertyUsagesSearchMode)) {
                 // propertyDraw from formPropertyDraw declaration
                 LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFPropertyDrawDeclaration.class);
-                ReferencesSearch.search(propDrawDecl.getNameIdentifier()).forEach(psiReference -> {
-                    processor.process(new UsageInfo(psiReference));
-                    return true;
-                });
+                referencesSearch(processor, propDrawDecl);
             } else if (PARAMETER_USAGES.equals(propertyUsagesSearchMode)) {
                 LSFParamDeclaration paramDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFParamDeclaration.class);
-                if (paramDecl != null && paramDecl.getNameIdentifier() != null) {
-                    ReferencesSearch.search(paramDecl.getNameIdentifier()).forEach(psiReference -> {
-                        processor.process(new UsageInfo(psiReference));
-                        return true;
-                    });
-                }
+                referencesSearch(processor, paramDecl);
             } else if (OBJECT_USAGES.equals(propertyUsagesSearchMode)) {
                 LSFFormObjectDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFFormObjectDeclaration.class);
                 if (objectDecl != null && objectDecl.getNameIdentifier() != null) {
                     super.processElementUsages(element, processor, options);
                 }
+            } else if (FORM_USAGES.equals(propertyUsagesSearchMode)) {
+                LSFDeclaration formDecl = PsiTreeUtil.getParentOfType(element, LSFFormDeclaration.class);
+                referencesSearch(processor, formDecl);
+            } else if (NAVIGATOR_ELEMENT_USAGES.equals(propertyUsagesSearchMode)) {
+                LSFNavigatorElementDeclaration navigatorElementDecl = PsiTreeUtil.getParentOfType(element, LSFNavigatorElementDeclaration.class); //move
+                if(navigatorElementDecl == null) {
+                    navigatorElementDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFNewNavigatorElementStatement.class); //new
+                }
+                referencesSearch(processor, navigatorElementDecl);
             } else {
                 super.processElementUsages(element, processor, options);
             }
@@ -80,5 +80,17 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
             });
         }
         return true;
+    }
+
+    private void referencesSearch(Processor<UsageInfo> processor, LSFDeclaration declaration) {
+        if(declaration != null) {
+            LSFId identifier = declaration.getNameIdentifier();
+            if (identifier != null) {
+                ReferencesSearch.search(identifier).forEach(psiReference -> {
+                    processor.process(new UsageInfo(psiReference));
+                    return true;
+                });
+            }
+        }
     }
 }

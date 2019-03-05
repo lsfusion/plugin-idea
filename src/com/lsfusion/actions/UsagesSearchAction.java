@@ -22,6 +22,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.awt.RelativePoint;
+import com.lsfusion.lang.psi.LSFSimpleElementDescription;
 import com.lsfusion.lang.psi.declarations.LSFObjectInputParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,8 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
     public static final String PROPERTY_DRAW_USAGES = "Property Draw";
     public static final String OBJECT_USAGES = "Object";
     public static final String PARAMETER_USAGES = "Parameter";
+    public static final String FORM_USAGES = "Form";
+    public static final String NAVIGATOR_ELEMENT_USAGES = "Navigator Element";
 
     public static String propertyUsagesSearchMode;
     public static PsiElement sourceElement;
@@ -71,7 +74,12 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
             if (propDrawDecl == null) {
                 LSFObjectInputParamDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFObjectInputParamDeclaration.class);
                 if (objectDecl == null) {
-                    getPlatformAction().actionPerformed(event);
+                    LSFSimpleElementDescription simpleElementDescription = PsiTreeUtil.getParentOfType(element, LSFSimpleElementDescription.class);
+                    if(simpleElementDescription == null) {
+                        getPlatformAction().actionPerformed(event);
+                    } else {
+                        showChoicePopup(element, navigatorUsagesAlternatives);
+                    }
                 } else {
                     showChoicePopup(element, parameterUsagesAlternatives);
                 }
@@ -107,7 +115,8 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
 
     private List<String> propertyUsagesAlternatives = Arrays.asList(PROPERTY_DRAW_USAGES, PROPERTY_USAGES);
     private List<String> parameterUsagesAlternatives = Arrays.asList(OBJECT_USAGES, PARAMETER_USAGES);
-    
+    private List<String> navigatorUsagesAlternatives = Arrays.asList(FORM_USAGES, NAVIGATOR_ELEMENT_USAGES);
+
     private void showChoicePopup(PsiElement element, List<String> alternatives) {
         RelativePoint rp = JBPopupFactory.getInstance().guessBestPopupLocation(event.getDataContext());
         Component component = event.getData(PlatformDataKeys.CONTEXT_COMPONENT);
