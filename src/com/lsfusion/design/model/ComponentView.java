@@ -238,7 +238,7 @@ public abstract class ComponentView extends PropertiesContainer {
         return autoSize;
     }
     
-    public double getFlex() { // нужно для проставления в Form Design в блоке свойства (используется через reflection) 
+    public double getFlex() { // нужно для проставления в Design в блоке свойства (используется через reflection)
         return getFlex(null);
     }
     public double getFlex(FormEntity formEntity) {

@@ -7,12 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.162</b><br>
+        <b>Version 1.0.163</b><br>
         <ul>
-            <li>Added HTTP HEADERSTO support</li>
-            <li>Bugfix for name contributor in IDEA 2018.3</li>
-            <li>Minor parser optimization</li>
-            <li>HTTP COOKIES, COOKIESTO</li>
+            <li>ToolWindows refactoring</li>
         </ul>
     ]]>
     </change-notes>
@@ -283,14 +280,12 @@
 
         <fileDocumentSynchronizationVetoer implementation="com.lsfusion.JarDocumentSavingVetoer"/>
 
-        <toolWindow id="Form Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
-                    anchor="right" icon="AllIcons.FileTypes.UiForm"/>
+        <toolWindow id="Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
+                    anchor="right" icon="/images/lsf_logo.png"/>
 
-        <toolWindow id="LSF Module DEPs" anchor="right" icon="AllIcons.Nodes.Deploy"
-                    factoryClass="com.lsfusion.dependencies.module.ModuleDependenciesViewToolWindowFactory"/>
+        <toolWindow id="LSF dependencies" factoryClass="com.lsfusion.dependencies.DependenciesViewToolWindowFactory"
+                    anchor="right" icon="/images/lsf_logo.png"/>
 
-        <toolWindow id="LSF Property DEPs" anchor="right" icon="AllIcons.Nodes.Deploy"
-                    factoryClass="com.lsfusion.dependencies.property.PropertyDependenciesViewToolWindowFactory"/>
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.dependencies.property.PropertyComplexityLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="Lsf"
