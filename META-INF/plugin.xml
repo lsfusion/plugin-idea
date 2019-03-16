@@ -159,7 +159,6 @@
 
         <multiHostInjector implementation="com.lsfusion.references.LSFToJavaLanguageInjector"/>
         <multiHostInjector implementation="com.lsfusion.references.LSFToJrxmlLanguageInjector"/>
-        <!--<psi.referenceContributor implementation="com.lsfusion.references.FormJavaReferenceContributor"/>-->
         <lang.syntaxHighlighterFactory language="Lsf"
                                        implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>

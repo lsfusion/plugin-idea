@@ -27,11 +27,11 @@ import static com.lsfusion.util.JavaPsiUtils.*;
 import static com.lsfusion.util.LSFFileUtils.getModuleWithDependenciesScope;
 
 public class LSFToJavaLanguageInjector implements MultiHostInjector {
-    public static final String LSF_LOGICS_PARSER_FQN = "lsfusion.server.LsfLogicsParser";
-    public static final String LSF_LOGICS_LEXER_FQN = "lsfusion.server.LsfLogicsLexer";
-    public static final String SCRIPTING_ACTION_PROPERTY_FQN = "lsfusion.server.logics.scripted.ScriptingActionProperty";
+    public static final String LSF_LOGICS_PARSER_FQN = "lsfusion.server.language.LsfLogicsParser";
+    public static final String LSF_LOGICS_LEXER_FQN = "lsfusion.server.language.LsfLogicsLexer";
+    public static final String INTERNAL_ACTION_FQN = "lsfusion.server.physics.dev.integration.internal.to.InternalAction";
     public static final String LOGICS_MODULE_FQN = "lsfusion.server.logics.LogicsModule";
-    public static final String SCRIPTING_LOGICS_MODULE_FQN = "lsfusion.server.logics.scripted.ScriptingLogicsModule";
+    public static final String SCRIPTING_LOGICS_MODULE_FQN = "lsfusion.server.language.ScriptingLogicsModule";
 
     public static final String SCRIPTING_ACTION_PROPERTY_LM_FIELD = "LM";
 
@@ -208,7 +208,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                             if (thisClass != null) {
                                 Integer hasSuperClasses = superClassesCaches.get(thisClass);
                                 if(hasSuperClasses == null) {
-                                    hasSuperClasses = hasOneOfSuperClasses(thisClass, SCRIPTING_ACTION_PROPERTY_FQN, SCRIPTING_LOGICS_MODULE_FQN);
+                                    hasSuperClasses = hasOneOfSuperClasses(thisClass, INTERNAL_ACTION_FQN, SCRIPTING_LOGICS_MODULE_FQN);
                                     superClassesCaches.put(thisClass, hasSuperClasses);
                                 }
                                 
@@ -265,7 +265,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                     if (lmRef instanceof PsiField) {
                         PsiField lmField = (PsiField) lmRef;
                         PsiClass clazz = lmField.getContainingClass();
-                        if (isClass(clazz, SCRIPTING_ACTION_PROPERTY_FQN)) {
+                        if (isClass(clazz, INTERNAL_ACTION_FQN)) {
                             return true;
                         }
                     }
@@ -302,7 +302,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                     if (lmRef instanceof PsiField) {
                         PsiField lmField = (PsiField) lmRef;
                         PsiClass clazz = lmField.getContainingClass();
-                        if (isClass(clazz, SCRIPTING_ACTION_PROPERTY_FQN)) {
+                        if (isClass(clazz, INTERNAL_ACTION_FQN)) {
                             return true;
                         }
                     }

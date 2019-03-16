@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.lsfusion.debug.DebugUtils.*;
-import static com.lsfusion.references.LSFToJavaLanguageInjector.SCRIPTING_ACTION_PROPERTY_FQN;
+import static com.lsfusion.references.LSFToJavaLanguageInjector.INTERNAL_ACTION_FQN;
 import static com.lsfusion.util.ReflectionUtils.getPrivateFieldValueByClass;
 import static com.sun.jdi.request.StepRequest.STEP_INTO;
 import static com.sun.jdi.request.StepRequest.STEP_OUT;
@@ -187,11 +187,11 @@ public class LSFDebugProcess extends JavaDebugProcess {
                 try {
                     JavaCodeFragmentFactory codeFragmentFactory = JavaCodeFragmentFactory.getInstance(getProject());
                     
-                    String evalString = "lsfusion.server.logics.debug.ActionPropertyDebugger.getInstance().registerStepping()";
+                    String evalString = ACTION_DEBUGGER_FQN + ".getInstance().registerStepping()";
                     final JavaCodeFragment codeFragment = codeFragmentFactory.createCodeBlockCodeFragment(evalString, null, true);
                     registerSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(codeFragment, null);
 
-                    String unEvalString = "lsfusion.server.logics.debug.ActionPropertyDebugger.getInstance().unregisterStepping()";
+                    String unEvalString = ACTION_DEBUGGER_FQN + ".getInstance().unregisterStepping()";
                     final JavaCodeFragment unregisterCodeFragment = codeFragmentFactory.createCodeBlockCodeFragment(unEvalString, null, true);
                     unregisterSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(unregisterCodeFragment, null);
                 } catch (Exception e) {
@@ -366,7 +366,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         boolean isScriptingActionProperty = false;
         while (clazz != null) {
             String name = clazz.name();
-            if (SCRIPTING_ACTION_PROPERTY_FQN.equals(name)) {
+            if (INTERNAL_ACTION_FQN.equals(name)) {
                 isScriptingActionProperty = true;
                 break;
             }
@@ -686,7 +686,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
         @Override
         protected Location getLocation() {
-            return firstLocationInMethod(getVirtualMachineProxy(), SCRIPTING_ACTION_PROPERTY_FQN, COMMON_CUSTOM_DELEGATE_METHOD_NAME);
+            return firstLocationInMethod(getVirtualMachineProxy(), INTERNAL_ACTION_FQN, COMMON_CUSTOM_DELEGATE_METHOD_NAME);
         }
     }
 }

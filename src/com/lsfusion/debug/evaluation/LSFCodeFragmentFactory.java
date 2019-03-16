@@ -13,6 +13,7 @@ import com.intellij.psi.JavaCodeFragmentFactory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.JavaDummyHolder;
+import com.lsfusion.debug.DebugUtils;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.psi.LSFCodeFragment;
@@ -70,7 +71,7 @@ public class LSFCodeFragmentFactory extends DefaultCodeFragmentFactory {
             String evalMethod = item.getKind() == CodeFragmentKind.EXPRESSION ? "eval" : "evalAction";
 
             String evalString = "\"" + StringEscapeUtils.escapeJava(text) + "\"";
-            String javaEvalString = "lsfusion.server.logics.debug.ActionPropertyDebugger.getInstance()" +
+            String javaEvalString = DebugUtils.ACTION_DEBUGGER_FQN + ".getInstance()" +
                                     "." + evalMethod + "(action, context," + namespace + ", " + require + ", " + priorities + ", " + evalString + ")";
             return JavaCodeFragmentFactory.getInstance(project).createCodeBlockCodeFragment(javaEvalString, null, true);
         } else {

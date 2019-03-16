@@ -36,7 +36,7 @@ import java.util.Set;
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
 
 public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
-    public static final String ACTION_PROPERTY_FQN = "lsfusion.server.logics.property.ActionProperty";
+    public static final String ACTION_FQN = "lsfusion.server.logics.Action";
 
     public static final TextAttributes META_USAGE = new TextAttributes(null, new JBColor(Gray._239, Gray._61), null, null, Font.PLAIN);
     public static final TextAttributes META_NESTING_USAGE = new TextAttributes(new JBColor(Gray._180, Gray._91), null, null, null, Font.PLAIN);
@@ -540,9 +540,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 annotation.setEnforcedTextAttributes(ERROR);
             } else if (refRange.getEndOffset() == elementRange.getLength() - 1) {
                 //последний компонент должен быть ActionProperty
-                boolean correctClass = resolved instanceof PsiClass && hasSuperClass((PsiClass) resolved, ACTION_PROPERTY_FQN);
+                boolean correctClass = resolved instanceof PsiClass && hasSuperClass((PsiClass) resolved, ACTION_FQN);
                 if (!correctClass) {
-                    Annotation annotation = myHolder.createErrorAnnotation(refFileRange, "Class " + elementText + " should extend ActionProperty");
+                    Annotation annotation = myHolder.createErrorAnnotation(refFileRange, "Class " + elementText + " should extend Action");
                     annotation.setEnforcedTextAttributes(ERROR);
                 }
             }
