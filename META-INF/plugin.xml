@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.162</version>
-    <vendor email="luxsoft@adsl.by" url="http://luxsoft.by">Luxsoft</vendor>
+    <version>1.0.163</version>
+    <vendor email="info@lsfusion.org" url="http://lsfusion.org">Luxsoft</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
@@ -10,6 +10,7 @@
         <b>Version 1.0.163</b><br>
         <ul>
             <li>ToolWindows refactoring</li>
+            <li>Minor debug fixes</li>
         </ul>
     ]]>
     </change-notes>
@@ -95,36 +96,36 @@
             </action>
 
             <separator/>
-            
-            <action id="TypeInfer.File" class="com.lsfusion.lang.typeinfer.FileTypeInferAction" text="Infer _types for file"
-                    description="Infer types for file">
-                <keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>
-            </action>
-            <action id="TypeInfer.Project" class="com.lsfusion.actions.ProjectTypeInferAction"
-                    text="Infer _types for project" description="Infer types for project">
-                <keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>
-            </action>
-            <action id="Check.Abstract" class="com.lsfusion.actions.ProjectCheckAbstractAction"
-                    text="Check abstract for project" description="Check abstract for project"/>
-            <action id="TypeInfer.Check" class="com.lsfusion.lang.typeinfer.FindNotInferredAction" text="Find not inferred"
-                    description="Find not inferred elements for project"/>
+            <!---->
+            <!--<action id="TypeInfer.File" class="com.lsfusion.lang.typeinfer.FileTypeInferAction" text="Infer _types for file"-->
+                    <!--description="Infer types for file">-->
+                <!--<keyboard-shortcut first-keystroke="control alt shift I" keymap="$default"/>-->
+            <!--</action>-->
+            <!--<action id="TypeInfer.Project" class="com.lsfusion.actions.ProjectTypeInferAction"-->
+                    <!--text="Infer _types for project" description="Infer types for project">-->
+                <!--<keyboard-shortcut first-keystroke="control alt shift P" keymap="$default"/>-->
+            <!--</action>-->
+            <!--<action id="Check.Abstract" class="com.lsfusion.actions.ProjectCheckAbstractAction"-->
+                    <!--text="Check abstract for project" description="Check abstract for project"/>-->
+            <!--<action id="TypeInfer.Check" class="com.lsfusion.lang.typeinfer.FindNotInferredAction" text="Find not inferred"-->
+                    <!--description="Find not inferred elements for project"/>-->
             <action id="InsertComposition" class="com.lsfusion.actions.InsertCompositionAction">
                 <keyboard-shortcut first-keystroke="control alt shift W" keymap="$default"/>
             </action>
             <action id="FastInsertComposition" class="com.lsfusion.actions.FastInsertCompositionAction">
                 <keyboard-shortcut first-keystroke="control alt W" keymap="$default"/>
             </action>
-            <action id="Project.Shorten" class="com.lsfusion.actions.ProjectShortenNamesAction"
-                    text="Shorten names for project" description="Shorten names for project">
-                <keyboard-shortcut first-keystroke="control alt shift U" keymap="$default"/>
-            </action>
-            <action id="Project.InferShorten" class="com.lsfusion.actions.ProjectInferShortenAction"
-                    text="Infer types and shorten names for project"
-                    description="Infer types and shorten names for project"/>
-            <action id="Project.UnqualifyRefs" class="com.lsfusion.actions.ProjectUnqualifyRefsAction"
-                    text="Unqualify refs for project" description="Unqualify refs for project"/>
-            <action id="File.UnqualifyRefs" class="com.lsfusion.actions.FileUnqualifyRefsAction"
-                    text="Unqualify refs for file" description="Unqualify refs for file"/>
+            <!--<action id="Project.Shorten" class="com.lsfusion.actions.ProjectShortenNamesAction"-->
+                    <!--text="Shorten names for project" description="Shorten names for project">-->
+                <!--<keyboard-shortcut first-keystroke="control alt shift U" keymap="$default"/>-->
+            <!--</action>-->
+            <!--<action id="Project.InferShorten" class="com.lsfusion.actions.ProjectInferShortenAction"-->
+                    <!--text="Infer types and shorten names for project"-->
+                    <!--description="Infer types and shorten names for project"/>-->
+            <!--<action id="Project.UnqualifyRefs" class="com.lsfusion.actions.ProjectUnqualifyRefsAction"-->
+                    <!--text="Unqualify refs for project" description="Unqualify refs for project"/>-->
+            <!--<action id="File.UnqualifyRefs" class="com.lsfusion.actions.FileUnqualifyRefsAction"-->
+                    <!--text="Unqualify refs for file" description="Unqualify refs for file"/>-->
             <!--<action id="Project.RenameFields" class="com.lsfusion.actions.RenameJrxmlFieldsToNewFormat" text="Rename jrxml fields" description="Rename jrxml fields to new format"/>-->
         </group>
         
