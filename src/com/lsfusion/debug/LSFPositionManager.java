@@ -26,6 +26,7 @@ import com.intellij.debugger.jdi.StackFrameProxyImpl;
 import com.intellij.debugger.requests.ClassPrepareRequestor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiDocumentManager;
@@ -85,7 +86,7 @@ public class LSFPositionManager extends PositionManagerEx {
                     return null;
                 }
 
-                Collection<LSFModuleDeclaration> some = ModuleIndex.getInstance().get(moduleName, project, debugProcess.getSearchScope());
+                Collection<LSFModuleDeclaration> some = DumbService.getInstance(project).runReadActionInSmartMode(() -> ModuleIndex.getInstance().get(moduleName, project, debugProcess.getSearchScope()));
                 if (some.isEmpty()) {
                     return null;
                 }
