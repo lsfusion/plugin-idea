@@ -1,13 +1,13 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.163</version>
+    <version>1.0.164</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">Luxsoft</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.163</b><br>
+        <b>Version 1.0.164</b><br>
         <ul>
             <li>ToolWindows refactoring</li>
             <li>Minor debug fixes</li>

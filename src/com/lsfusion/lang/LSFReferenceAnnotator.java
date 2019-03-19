@@ -36,7 +36,7 @@ import java.util.Set;
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
 
 public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
-    public static final String ACTION_FQN = "lsfusion.server.logics.Action";
+    public static final String ACTION_FQN = "lsfusion.server.logics.action.Action";
 
     public static final TextAttributes META_USAGE = new TextAttributes(null, new JBColor(Gray._239, Gray._61), null, null, Font.PLAIN);
     public static final TextAttributes META_NESTING_USAGE = new TextAttributes(new JBColor(Gray._180, Gray._91), null, null, null, Font.PLAIN);
