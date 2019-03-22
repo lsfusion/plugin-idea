@@ -283,7 +283,7 @@
         <toolWindow id="Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
                     anchor="right" icon="/images/lsf_logo.png"/>
 
-        <toolWindow id="LSF dependencies" factoryClass="com.lsfusion.dependencies.DependenciesViewToolWindowFactory"
+        <toolWindow id="Dependencies" factoryClass="com.lsfusion.dependencies.DependenciesViewToolWindowFactory"
                     anchor="right" icon="/images/lsf_logo.png"/>
 
         <codeInsight.lineMarkerProvider language="Lsf"
