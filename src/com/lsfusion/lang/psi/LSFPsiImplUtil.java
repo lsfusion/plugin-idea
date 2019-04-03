@@ -4001,7 +4001,7 @@ public class LSFPsiImplUtil {
             Collection<LSFJoinPropertyDefinition> joinProps = PsiTreeUtil.findChildrenOfType(rightUsage.resolveDecl(), LSFJoinPropertyDefinition.class);
             for (LSFJoinPropertyDefinition joinProp : joinProps) {
                 LSFPropertyUsage joinPropUsage = joinProp.getPropertyUsage();
-                if (!rightUsage.equals(joinPropUsage) && !checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinPropUsage, joinProp.getParamList())) {
+                if (!equalReferences(rightUsage, joinPropUsage) && !checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinPropUsage, joinProp.getParamList())) {
                     return false;
                 }
             }
@@ -4054,6 +4054,14 @@ public class LSFPsiImplUtil {
 
     private static boolean equalReferences(@NotNull LSFActionOrPropReference left, LSFActionOrPropReference right) {
         return right != null && Objects.equals(left.resolve(), right.resolve());
+    }
+
+    private static boolean equalReferences(@NotNull LSFPropertyUsage left, LSFPropertyUsage right) {
+       if(left.equals(right)) return true;
+       else {
+           LSFPropDeclaration leftDecl = left.resolveDecl();
+           return leftDecl != null && leftDecl.equals(right.resolveDecl());
+       }
     }
 
     private static boolean equalParams(int leftParams, PsiElement paramList) {
