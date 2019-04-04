@@ -22,6 +22,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.awt.RelativePoint;
+import com.lsfusion.lang.psi.LSFFormUsage;
 import com.lsfusion.lang.psi.LSFSimpleElementDescription;
 import com.lsfusion.lang.psi.declarations.LSFObjectInputParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
@@ -75,7 +76,8 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
                 LSFObjectInputParamDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFObjectInputParamDeclaration.class);
                 if (objectDecl == null) {
                     LSFSimpleElementDescription simpleElementDescription = PsiTreeUtil.getParentOfType(element, LSFSimpleElementDescription.class);
-                    if(simpleElementDescription == null) {
+                    LSFFormUsage formUsage = PsiTreeUtil.getParentOfType(element, LSFFormUsage.class);
+                    if(simpleElementDescription == null && formUsage == null) {
                         getPlatformAction().actionPerformed(event);
                     } else {
                         showChoicePopup(element, navigatorUsagesAlternatives);
