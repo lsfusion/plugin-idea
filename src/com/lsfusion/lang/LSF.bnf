@@ -807,6 +807,7 @@ exportActionPropertyDefinitionBody ::=
                 |   XLSX (HEADER|NOHEADER)?
                 |   TABLE
                 )
+                (TOP intLiteral)?
                 groupObjectDestination
             )
         |
@@ -814,6 +815,7 @@ exportActionPropertyDefinitionBody ::=
                 (   JSON (CHARSET stringLiteral)?
                 |   XML (CHARSET stringLiteral)?
                 )?
+                (TOP intLiteral)?
                 staticDestination?
             )
         )
@@ -835,6 +837,7 @@ exportDataActionPropertyDefinitionBody ::=
         |   XML (ROOT propertyExpression)? (TAG propertyExpression)? ATTR? (CHARSET stringLiteral)?
         |   TABLE
         )?
+        (TOP intLiteral)?
         FROM nonEmptyAliasedPropertyExpressionList
         wherePropertyExpression?
         (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)?

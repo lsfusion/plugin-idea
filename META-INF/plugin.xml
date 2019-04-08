@@ -7,10 +7,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.164</b><br>
+        <b>Version 1.0.165</b><br>
         <ul>
-            <li>ToolWindows refactoring</li>
-            <li>Minor debug fixes</li>
+            <li>form/navigator element, action/navigator element search in NAVIGATOR</li>
+            <li>EXPORT TOP support</li>
         </ul>
     ]]>
     </change-notes>
