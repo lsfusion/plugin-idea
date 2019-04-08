@@ -4,6 +4,7 @@ import com.intellij.find.findUsages.AbstractFindUsagesDialog;
 import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.find.findUsages.FindUsagesOptions;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -63,11 +64,13 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
                 LSFDeclaration formDecl = PsiTreeUtil.getParentOfType(element, LSFFormDeclaration.class);
                 referencesSearch(processor, formDecl);
             } else if (NAVIGATOR_ELEMENT_USAGES.equals(propertyUsagesSearchMode)) {
-                LSFNavigatorElementDeclaration navigatorElementDecl = PsiTreeUtil.getParentOfType(element, LSFNavigatorElementDeclaration.class); //move
-                if(navigatorElementDecl == null) {
-                    navigatorElementDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFNewNavigatorElementStatement.class); //new
-                }
-                referencesSearch(processor, navigatorElementDecl);
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    LSFNavigatorElementDeclaration navigatorElementDecl = PsiTreeUtil.getParentOfType(element, LSFNavigatorElementDeclaration.class); //move
+                    if(navigatorElementDecl == null) {
+                        navigatorElementDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFNewNavigatorElementStatement.class); //new
+                    }
+                    referencesSearch(processor, navigatorElementDecl);
+                });
             } else {
                 super.processElementUsages(element, processor, options);
             }
