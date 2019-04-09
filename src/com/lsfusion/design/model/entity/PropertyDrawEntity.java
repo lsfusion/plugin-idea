@@ -136,7 +136,7 @@ public class PropertyDrawEntity {
             for(LSFViewTypeSetting viewType : propertyOptions.getViewTypeSettingList())
                 forceViewType = valueOf(viewType.getClassViewType().getText());
 
-            List<LSFFixedCharWidthSetting> fixedCharWidthSettings = propertyOptions.getFixedCharWidthSettingList();
+            List<LSFFlexCharWidthSetting> fixedCharWidthSettings = propertyOptions.getFlexCharWidthSettingList();
             if (!fixedCharWidthSettings.isEmpty()) {
                 fixedCharWidth = Integer.parseInt(fixedCharWidthSettings.get(fixedCharWidthSettings.size() - 1).getIntLiteral().getText());
             }

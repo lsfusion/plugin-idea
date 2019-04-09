@@ -11,6 +11,7 @@
         <ul>
             <li>form/navigator element, action/navigator element search in NAVIGATOR</li>
             <li>EXPORT TOP support</li>
+            <li>CHARWIDTH n FIXED -> CHARWIDTH n FLEX|NOFLEX (FIXED -> NOFLEX)</li>
         </ul>
     ]]>
     </change-notes>

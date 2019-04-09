@@ -571,7 +571,7 @@ private semiPropertyOption ::= IN groupUsage
                            |	TABLE tableUsage
                            |	asEditActionSetting
                            |	viewTypeSetting
-                           |	fixedCharWidthSetting
+                           |	flexCharWidthSetting
                            |	charWidthSetting
                            |	imageSetting
                            |    defaultCompareSetting
@@ -596,7 +596,7 @@ nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI |
 viewTypeSetting ::= classViewType
 persistentSetting ::= MATERIALIZED
 charWidthSetting ::= CHARWIDTH intLiteral
-fixedCharWidthSetting ::= CHARWIDTH intLiteral FIXED
+flexCharWidthSetting ::= CHARWIDTH intLiteral (FLEX | NOFLEX)
 imageSetting ::= IMAGE stringLiteral
 defaultCompareSetting ::= DEFAULTCOMPARE stringLiteral
 editKeySetting ::= CHANGEKEY stringLiteral (SHOW | hideEditKey)?

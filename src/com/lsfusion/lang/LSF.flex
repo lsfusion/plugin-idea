@@ -276,6 +276,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "FINALLY"                             { return FINALLY; }
   "FIRST"                   			{ return FIRST; }
   "FIXED"                   			{ return FIXED; }
+  "FLEX"                   			    { return FLEX; }
   "FLOAT"                     			{ return FLOAT; }
   "FOLDER"                              { return FOLDER; }
   "FOOTER"                  			{ return FOOTER; }
@@ -358,6 +359,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "NOCANCEL"                			{ return NOCANCEL; }
   "NODEFAULT"                			{ return NODEFAULT; }
   "NOESCAPE"                			{ return NOESCAPE; }
+  "NOFLEX"                			    { return NOFLEX; }
   "NOCHANGE"                			{ return NOCHANGE; }
   "NOCONSTRAINTFILTER"                  { return NOCONSTRAINTFILTER; }
   "NOINLINE"                			{ return NOINLINE; }
