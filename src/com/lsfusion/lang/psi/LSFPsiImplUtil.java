@@ -4060,7 +4060,7 @@ public class LSFPsiImplUtil {
        if(left.equals(right)) return true;
        else {
            LSFPropDeclaration leftDecl = left.resolveDecl();
-           return leftDecl != null && leftDecl.equals(right.resolveDecl());
+           return leftDecl != null && right != null && leftDecl.equals(right.resolveDecl());
        }
     }
 

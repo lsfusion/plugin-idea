@@ -1,13 +1,13 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.165</version>
+    <version>1.0.166</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">Luxsoft</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.165</b><br>
+        <b>Version 1.0.166</b><br>
         <ul>
             <li>form/navigator element, action/navigator element search in NAVIGATOR</li>
             <li>EXPORT TOP support</li>
