@@ -14,13 +14,13 @@ public abstract class ColumnNamingPolicy {
         String policyName = LSFFileUtils.getDBNamingPolicy(element);
         if (!BaseUtils.isRedundantString(policyName)) {
             switch (policyName) {
-                case "lsfusion.server.logics.DefaultDBNamePolicy":
+                case "lsfusion.server.physics.dev.id.name.DefaultDBNamingPolicy":
                     policy = new DefaultColumnNamingPolicy();
                     break;
-                case "lsfusion.server.logics.SimpleDBNamePolicy":
+                case "lsfusion.server.physics.dev.id.name.ShortDBNamingPolicy":
                     policy = new SimpleColumnNamingPolicy();
                     break;
-                case "lsfusion.server.logics.NamespaceNameDBNamePolicy":
+                case "lsfusion.server.physics.dev.id.name.NamespaceNameDBNamingPolicy":
                     policy = new NamespaceNameColumnNamingPolicy();
                     break;
             }
