@@ -276,9 +276,10 @@ public class FormEntity {
                 LSFActionOrGlobalPropDeclaration propDeclaration = (LSFActionOrGlobalPropDeclaration)propUsage.resolveDecl();
                 propertyDraw = new PropertyDrawEntity(alias, propUsage.getNameRef(), objects, propDeclaration, caption, commonOptions, formPropertyOptions, this);
             } else {
-                LSFPredefinedFormPropertyName predef = formPropertyName.getPredefinedFormPropertyName();
-                if (predef != null && groupObject != null) {
-                    String name = predef.getName();
+                LSFPredefinedFormPropertyName predefinedFormPropertyName = formPropertyName.getPredefinedFormPropertyName();
+                if (predefinedFormPropertyName != null && groupObject != null) {
+                    LSFPredefinedAddPropertyName predefinedAddPropertyName = predefinedFormPropertyName.getPredefinedAddPropertyName();
+                    String name = predefinedAddPropertyName != null ? predefinedAddPropertyName.getText() : predefinedFormPropertyName.getName();
                     if ("VALUE".equals(name)) {
                         propertyDraw = new ObjectValueProperty(alias, caption, groupObject, commonOptions, formPropertyOptions, this);
                         propertyDraw.baseClass = new ObjectClass();
