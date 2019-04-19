@@ -555,9 +555,9 @@ public class LSFPsiImplUtil {
             String precision = name.substring(name.indexOf(",") + 1, name.length() - 1);
             return new NumericClass(Integer.parseInt(length), Integer.parseInt(precision));
         } else if (name.equals("TEXT")) {
-            return new StringClass(false, false, false, ExtInt.UNLIMITED);
+            return TextClass.instance;
         } else if (name.equals("RICHTEXT")) {
-            return new StringClass(false, false, true, ExtInt.UNLIMITED);
+            return TextClass.richInstance;
         }
 
         switch (name) {
@@ -1178,7 +1178,7 @@ public class LSFPsiImplUtil {
         LSFLocalizedStringValueLiteral stringLiteral = sourceStatement.getLocalizedStringLiteral();
         if (stringLiteral != null) {
             if (stringLiteral.needToBeLocalized()) {
-                return new StringClass(false, false, false, ExtInt.UNLIMITED);
+                return new StringClass(false, false, ExtInt.UNLIMITED);
             } else {
                 return new StringClass(false, false, new ExtInt(stringLiteral.getValue().length()));
             }
@@ -2809,7 +2809,7 @@ public class LSFPsiImplUtil {
     }
 
     public static List<LSFClassSet> resolveParamClasses(LSFHeadersPropertyUsage sourceStatement) {
-        return Collections.singletonList(new StringClass(false, false, false, ExtInt.UNLIMITED));
+        return Collections.singletonList(new StringClass(false, false, ExtInt.UNLIMITED));
     }
 
     public static List<LSFClassSet> resolveParamClasses(LSFImportPropertyUsage sourceStatement) {

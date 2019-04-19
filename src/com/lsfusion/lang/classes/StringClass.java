@@ -11,17 +11,11 @@ public class StringClass extends DataClass {
 
     public final boolean blankPadded;
     public final boolean caseInsensitive;
-    public final boolean rich;
     public final ExtInt length;
 
     public StringClass(boolean blankPadded, boolean caseInsensitive, ExtInt length) {
-        this(blankPadded, caseInsensitive, false, length);
-    }
-
-    public StringClass(boolean blankPadded, boolean caseInsensitive, boolean rich, ExtInt length) {
         this.blankPadded = blankPadded;
         this.caseInsensitive = caseInsensitive;
-        this.rich = rich;
         this.length = length;
     }
 
@@ -31,7 +25,7 @@ public class StringClass extends DataClass {
         assert or || !string;
         StringClass stringClass = (StringClass) compClass;
         return new StringClass(BaseUtils.cmp(blankPadded, stringClass.blankPadded, or && !string), BaseUtils.cmp(caseInsensitive, stringClass.caseInsensitive, or),
-                BaseUtils.cmp(rich, stringClass.rich, or), length.cmp(stringClass.length, or));
+                length.cmp(stringClass.length, or));
     }
 
     @Override
@@ -44,17 +38,12 @@ public class StringClass extends DataClass {
     }
 
     public String getName() {
-        return length.isUnlimited() ? (rich ? "RICHTEXT" : "TEXT") : (blankPadded ? "" : "VAR") + (caseInsensitive ? "I" : "") + "STRING[" + length.getValue() + "]";
+        return (blankPadded ? "" : "VAR") + (caseInsensitive ? "I" : "") + "STRING" + (length.isUnlimited() ? "" : "[" + length.getValue() + "]");
     }
 
     @Override
     public String getCaption() {
         return "Строка" + (caseInsensitive ? " без регистра" : "") + (blankPadded ? " с паддингом" : "") + "(" + length + ")";
-    }
-
-    @Override
-    public int getDefaultHeight(FontMetrics fontMetrics, int charHeight) {
-        return super.getDefaultHeight(fontMetrics, charHeight == 1 && length.isUnlimited() ? 4 : charHeight);
     }
 
     @Override
@@ -100,6 +89,6 @@ public class StringClass extends DataClass {
     public StringClass extend(int times) {
         if(length.isUnlimited())
             return this;
-        return new StringClass(blankPadded, caseInsensitive, rich, new ExtInt(BaseUtils.min(length.getValue() * times, 4000)));
+        return new StringClass(blankPadded, caseInsensitive, new ExtInt(BaseUtils.min(length.getValue() * times, 4000)));
     }
 }
