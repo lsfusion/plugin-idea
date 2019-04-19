@@ -8,7 +8,7 @@ import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferen
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import com.lsfusion.lang.psi.LSFFile;
-import lsfusion.server.logics.debug.DebuggerService;
+import lsfusion.server.physics.dev.debug.DebuggerService;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
