@@ -10,6 +10,7 @@
         <b>Version 1.0.167</b><br>
         <ul>
             <li>Support of string types without length restrictions</li>
+            <li>STRING -> BPSTRING, ISTRING -> BPISTRING</li>
         </ul>
     ]]>
     </change-notes>

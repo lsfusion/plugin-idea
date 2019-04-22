@@ -40,7 +40,7 @@ public class StringClass extends DataClass {
     }
 
     public String getName() {
-        return (blankPadded ? "" : "VAR") + (caseInsensitive ? "I" : "") + "STRING" + (length.isUnlimited() ? "" : "[" + length.getValue() + "]");
+        return (blankPadded ? "BP" : "VAR") + (caseInsensitive ? "I" : "") + "STRING" + (length.isUnlimited() ? "" : "[" + length.getValue() + "]");
     }
 
     @Override

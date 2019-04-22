@@ -538,11 +538,11 @@ public class LSFPsiImplUtil {
         if (name.equals("YEAR"))
             return YearClass.instance;
 
-        if (name.startsWith("STRING[")) {
-            name = name.substring("STRING[".length(), name.length() - 1);
+        if (name.startsWith("BPSTRING[")) {
+            name = name.substring("BPSTRING[".length(), name.length() - 1);
             return new StringClass(true, false, new ExtInt(Integer.parseInt(name)));
-        } else if (name.startsWith("ISTRING[")) {
-            name = name.substring("ISTRING[".length(), name.length() - 1);
+        } else if (name.startsWith("BPISTRING[")) {
+            name = name.substring("BPISTRING[".length(), name.length() - 1);
             return new StringClass(true, true, new ExtInt(Integer.parseInt(name)));
         } else if (name.startsWith("VARSTRING[")) {
             name = name.substring("VARSTRING[".length(), name.length() - 1);
@@ -558,9 +558,9 @@ public class LSFPsiImplUtil {
             return TextClass.instance;
         } else if (name.equals("RICHTEXT")) {
             return TextClass.richInstance;
-        } else if (name.equals("STRING")) {
+        } else if (name.equals("BPSTRING")) {
             return new StringClass(true, false, ExtInt.UNLIMITED);
-        } else if (name.equals("ISTRING")) {
+        } else if (name.equals("BPISTRING")) {
             return new StringClass(true, true, ExtInt.UNLIMITED);
         } else if (name.equals("VARSTRING")) {
             return new StringClass(false, false, ExtInt.UNLIMITED);
@@ -3946,9 +3946,9 @@ public class LSFPsiImplUtil {
             return "NUMERIC";
         }
 
-        if (name.startsWith("STRING") ||
+        if (name.startsWith("BPSTRING") ||
             name.startsWith("VARSTRING") ||
-            name.startsWith("ISTRING") ||
+            name.startsWith("BPISTRING") ||
             name.startsWith("VARISTRING") ||
             name.equals("TEXT") ||
             name.equals("RICHTEXT")) {
