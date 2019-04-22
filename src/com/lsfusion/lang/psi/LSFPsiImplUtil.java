@@ -544,11 +544,11 @@ public class LSFPsiImplUtil {
         } else if (name.startsWith("BPISTRING[")) {
             name = name.substring("BPISTRING[".length(), name.length() - 1);
             return new StringClass(true, true, new ExtInt(Integer.parseInt(name)));
-        } else if (name.startsWith("VARSTRING[")) {
-            name = name.substring("VARSTRING[".length(), name.length() - 1);
+        } else if (name.startsWith("STRING[")) {
+            name = name.substring("STRING[".length(), name.length() - 1);
             return new StringClass(false, false, new ExtInt(Integer.parseInt(name)));
-        } else if (name.startsWith("VARISTRING[")) {
-            name = name.substring("VARISTRING[".length(), name.length() - 1);
+        } else if (name.startsWith("ISTRING[")) {
+            name = name.substring("ISTRING[".length(), name.length() - 1);
             return new StringClass(false, true, new ExtInt(Integer.parseInt(name)));
         } else if (name.startsWith("NUMERIC[")) {
             String length = name.substring("NUMERIC[".length(), name.indexOf(","));
@@ -562,9 +562,9 @@ public class LSFPsiImplUtil {
             return new StringClass(true, false, ExtInt.UNLIMITED);
         } else if (name.equals("BPISTRING")) {
             return new StringClass(true, true, ExtInt.UNLIMITED);
-        } else if (name.equals("VARSTRING")) {
+        } else if (name.equals("STRING")) {
             return new StringClass(false, false, ExtInt.UNLIMITED);
-        } else if (name.equals("VARISTRING")) {
+        } else if (name.equals("ISTRING")) {
             return new StringClass(false, true, ExtInt.UNLIMITED);
         }
 
@@ -3947,9 +3947,9 @@ public class LSFPsiImplUtil {
         }
 
         if (name.startsWith("BPSTRING") ||
-            name.startsWith("VARSTRING") ||
+            name.startsWith("STRING") ||
             name.startsWith("BPISTRING") ||
-            name.startsWith("VARISTRING") ||
+            name.startsWith("ISTRING") ||
             name.equals("TEXT") ||
             name.equals("RICHTEXT")) {
             return "STRING";
