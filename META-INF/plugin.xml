@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.166</version>
+    <version>1.0.167</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">Luxsoft</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -11,6 +11,7 @@
         <ul>
             <li>Support of string types without length restrictions</li>
             <li>STRING -> BPSTRING, ISTRING -> BPISTRING</li>
+            <li>VARSTRING -> STRING, VARISTRING -> ISTRING</li>
         </ul>
     ]]>
     </change-notes>
