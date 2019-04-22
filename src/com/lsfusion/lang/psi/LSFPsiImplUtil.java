@@ -558,6 +558,14 @@ public class LSFPsiImplUtil {
             return TextClass.instance;
         } else if (name.equals("RICHTEXT")) {
             return TextClass.richInstance;
+        } else if (name.equals("STRING")) {
+            return new StringClass(true, false, ExtInt.UNLIMITED);
+        } else if (name.equals("ISTRING")) {
+            return new StringClass(true, true, ExtInt.UNLIMITED);
+        } else if (name.equals("VARSTRING")) {
+            return new StringClass(false, false, ExtInt.UNLIMITED);
+        } else if (name.equals("VARISTRING")) {
+            return new StringClass(false, true, ExtInt.UNLIMITED);
         }
 
         switch (name) {

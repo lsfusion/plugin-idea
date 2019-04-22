@@ -21,6 +21,8 @@ public class StringClass extends DataClass {
 
     public DataClass op(DataClass compClass, boolean or, boolean string) {
         if (!(compClass instanceof StringClass)) return null;
+        if(compClass instanceof TextClass)
+            return compClass.op(this, or, string);
 
         assert or || !string;
         StringClass stringClass = (StringClass) compClass;
