@@ -67,7 +67,7 @@ public class RegularFilterGroupView extends ComponentView {
             return new JComponentPanel(new JBCheckBox(filterEntity.getFullCaption(), filterEntity.isDefault));
         } else {
             List<Object> items = new ArrayList<>();
-            Object defaultItem = "(Все)";
+            Object defaultItem = "(All)";
             items.add(defaultItem);
             for (RegularFilterView regFilter : filters) {
                 String filterItem = regFilter.entity.getFullCaption();

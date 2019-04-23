@@ -6,7 +6,7 @@ public class XMLLinkClass extends StaticFormatLinkClass {
 
     @Override
     public String getCaption() {
-        return "Ссылка на файл XML";
+        return "XML link";
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.lsfusion.lang.classes;
 
-import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.util.DateUtils;
 
 import java.text.DateFormat;
@@ -21,7 +20,7 @@ public class TimeClass extends FormatClass {
 
     @Override
     public String getCaption() {
-        return "Время";
+        return "Time";
     }
 
     @Override

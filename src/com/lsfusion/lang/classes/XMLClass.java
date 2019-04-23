@@ -6,7 +6,7 @@ public class XMLClass extends StaticFormatFileClass {
 
     @Override
     public String getCaption() {
-        return "Файл XML";
+        return "XML file";
     }
 
     @Override

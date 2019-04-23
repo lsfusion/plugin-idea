@@ -29,7 +29,7 @@ public class TextClass extends StringClass {
 
     @Override
     public String getCaption() {
-        return "Текст" + (rich ? " (rich)" : "");
+        return "Text" + (rich ? " (rich)" : "");
     }
 
     @Override

@@ -6,7 +6,7 @@ public class RawClass extends StaticFormatFileClass {
 
     @Override
     public String getCaption() {
-        return "Неизвестный файл";
+        return "Raw file";
     }
 
     @Override

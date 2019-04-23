@@ -21,6 +21,6 @@ public class YearClass extends IntegerClass {
 
     @Override
     public String getCaption() {
-        return "Год";
+        return "Year";
     }
 }

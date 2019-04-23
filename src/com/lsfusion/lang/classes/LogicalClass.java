@@ -15,7 +15,7 @@ public class LogicalClass extends DataClass {
 
     @Override
     public String getCaption() {
-        return "Логическое значение";
+        return "Boolean";
     }
 
     @Override

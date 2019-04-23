@@ -6,7 +6,7 @@ public class TableClass extends StaticFormatFileClass {
 
     @Override
     public String getCaption() {
-        return "Файл таблицы";
+        return "Table file";
     }
 
     @Override

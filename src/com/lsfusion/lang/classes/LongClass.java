@@ -1,7 +1,5 @@
 package com.lsfusion.lang.classes;
 
-import java.text.NumberFormat;
-
 public class LongClass extends IntClass {
 
     public final static LongClass instance = new LongClass();
@@ -30,6 +28,6 @@ public class LongClass extends IntClass {
 
     @Override
     public String getCaption() {
-        return "Длинное целое число";
+        return "Long";
     }
 }

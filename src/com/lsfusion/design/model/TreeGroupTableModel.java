@@ -63,7 +63,7 @@ public class TreeGroupTableModel extends DefaultTreeModel implements TreeTableMo
     @Override
     public String getColumnName(int column) {
         if (column == 0) {
-            return "Дерево";
+            return "Tree";
         }
         return columnProperties.get(column - 1).getCaption();
     }

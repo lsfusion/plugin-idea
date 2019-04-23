@@ -35,6 +35,6 @@ public class IntegerClass extends IntClass {
 
     @Override
     public String getCaption() {
-        return "Целое число";
+        return "Integer";
     }
 }

@@ -6,7 +6,7 @@ public class TableLinkClass extends StaticFormatLinkClass {
 
     @Override
     public String getCaption() {
-        return "Ссылка на файл таблицы";
+        return "Table file link";
     }
 
     @Override

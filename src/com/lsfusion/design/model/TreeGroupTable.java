@@ -50,7 +50,7 @@ public class TreeGroupTable extends TreeTable {
                 }
 
                 if (index == 0) {
-                    return "Дерево";
+                    return "Tree";
                 }
 
                 PropertyDrawView property = getColumnProperty(index);

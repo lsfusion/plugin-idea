@@ -45,7 +45,7 @@ public class StringClass extends DataClass {
 
     @Override
     public String getCaption() {
-        return "Строка" + (caseInsensitive ? " без регистра" : "") + (blankPadded ? " с паддингом" : "") + "(" + length + ")";
+        return "String" + (caseInsensitive ? " case insensitive" : "") + (blankPadded ? " blankpadded" : "") + "(" + length + ")";
     }
 
     @Override

@@ -7,6 +7,6 @@ import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 
 public class ObjectValueProperty extends PropertyDrawEntity {
     public ObjectValueProperty(String alias, String caption, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        super(alias, "VALUE", groupObject.objects, null, false, caption != null ? caption : (groupObject != null ? groupObject.getCaption() : "Объект"), groupObject.getValueClass().getUpSet(), commonFormOptions, propertyFormOptions, form);
+        super(alias, "VALUE", groupObject.objects, null, false, caption != null ? caption : (groupObject != null ? groupObject.getCaption() : "Object"), groupObject.getValueClass().getUpSet(), commonFormOptions, propertyFormOptions, form);
     }
 }

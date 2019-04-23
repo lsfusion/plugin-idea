@@ -6,7 +6,7 @@ public class JSONLinkClass extends StaticFormatLinkClass {
 
     @Override
     public String getCaption() {
-        return "Ссылка на файл JSON";
+        return "JSON link";
     }
 
     @Override

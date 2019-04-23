@@ -6,7 +6,7 @@ public class HTMLClass extends StaticFormatFileClass {
 
     @Override
     public String getCaption() {
-        return "Файл HTML";
+        return "HTML file";
     }
 
     @Override

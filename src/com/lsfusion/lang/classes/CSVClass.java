@@ -6,7 +6,7 @@ public class CSVClass extends StaticFormatFileClass {
 
     @Override
     public String getCaption() {
-        return "Файл CSV";
+        return "CSV file";
     }
 
     @Override

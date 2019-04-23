@@ -15,7 +15,7 @@ public class ColorClass extends DataClass {
 
     @Override
     public String getCaption() {
-        return "Цвет";
+        return "Color";
     }
 
     @Override

@@ -6,7 +6,7 @@ public class CSVLinkClass extends StaticFormatLinkClass {
 
     @Override
     public String getCaption() {
-        return "Ссылка на файл CSV";
+        return "CSV link";
     }
 
     @Override

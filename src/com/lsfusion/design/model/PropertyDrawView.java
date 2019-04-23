@@ -468,27 +468,27 @@ public class PropertyDrawView extends ComponentView {
 
     public static final String DETAILED_TOOL_TIP_FORMAT =
             "<hr>" +
-                    "<b>Каноническое имя:</b> %3$s<br>" +
+                    "<b>Canonical name:</b> %3$s<br>" +
 //                    "<b>Таблица:</b> %4$s<br>" +
-                    "<b>Объекты:</b> %4$s<br>" +
-                    "<b>Сигнатура:</b> %6$s (%5$s)<br>" +
-                    "<b>Скрипт:</b> %7$s<br>" +
-                    "<b>Путь:</b> %8$s<br>" +
+                    "<b>Objects:</b> %4$s<br>" +
+                    "<b>Signature:</b> %6$s (%5$s)<br>" +
+                    "<b>Script:</b> %7$s<br>" +
+                    "<b>Path:</b> %8$s<br>" +
                     "<hr>" +
-                    "<b>Имя на форме:</b> %9$s" +
+                    "<b>Form property name:</b> %9$s" +
                     "</html>";
 
     public static final String DETAILED_ACTION_TOOL_TIP_FORMAT =
             "<hr>" +
-                    "<b>Каноническое имя:</b> %3$s<br>" +
-                    "<b>Объекты:</b> %4$s<br>" +
-                    "<b>Путь:</b> %5$s<br>" +
+                    "<b>Canonical name:</b> %3$s<br>" +
+                    "<b>Objects:</b> %4$s<br>" +
+                    "<b>Path:</b> %5$s<br>" +
                     "<hr>" +
-                    "<b>Имя на форме:</b> %6$s" +
+                    "<b>Form property name:</b> %6$s" +
                     "</html>";
 
     public static final String EDIT_KEY_TOOL_TIP_FORMAT =
-            "<hr><b>Горячая клавиша:</b> %1$s<br>";
+            "<hr><b>Hotkey:</b> %1$s<br>";
 
     public String getTooltipText(String caption) {
         String propCaption = BaseUtils.nullTrim(!isRedundantString(toolTip) ? toolTip : caption);

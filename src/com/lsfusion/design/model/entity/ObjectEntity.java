@@ -23,6 +23,6 @@ public class ObjectEntity {
                 ? caption
                 : !BaseUtils.isRedundantString(valueClass.getCaption())
                 ? valueClass.getCaption()
-                : "Неопределённый объект";
+                : "Undefined object";
     }
 }

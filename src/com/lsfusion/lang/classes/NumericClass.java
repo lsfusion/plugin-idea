@@ -45,7 +45,7 @@ public class NumericClass extends DoubleClass {
 
     @Override
     public String getCaption() {
-        return "Число" + '[' + length + ',' + precision + ']';
+        return "Numeric" + '[' + length + ',' + precision + ']';
     }
 
     @Override

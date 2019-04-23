@@ -44,6 +44,6 @@ public class DoubleClass extends IntegralClass {
 
     @Override
     public String getCaption() {
-        return "Вещественное число";
+        return "Double";
     }
 }

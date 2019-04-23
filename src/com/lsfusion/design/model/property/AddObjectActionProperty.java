@@ -6,13 +6,10 @@ import com.lsfusion.design.model.entity.GroupObjectEntity;
 import com.lsfusion.design.model.entity.PropertyDrawEntity;
 import com.lsfusion.design.ui.ClassViewType;
 import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
-import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 
 public class AddObjectActionProperty extends PropertyDrawEntity {
     public AddObjectActionProperty(String alias, String caption, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        super(alias, "NEW", caption != null ? caption : "Добавить", groupObject.objects, commonFormOptions, propertyFormOptions, form);
+        super(alias, "NEW", caption != null ? caption : "Add", groupObject.objects, commonFormOptions, propertyFormOptions, form);
     }
 
     @Override

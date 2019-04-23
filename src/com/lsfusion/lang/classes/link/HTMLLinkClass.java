@@ -6,7 +6,7 @@ public class HTMLLinkClass extends StaticFormatLinkClass {
 
     @Override
     public String getCaption() {
-        return "Ссылка на файл HTML";
+        return "HTML link";
     }
 
     @Override

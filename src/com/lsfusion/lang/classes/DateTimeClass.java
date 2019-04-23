@@ -1,6 +1,5 @@
 package com.lsfusion.lang.classes;
 
-import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.util.DateUtils;
 
 import java.awt.*;
@@ -33,7 +32,7 @@ public class DateTimeClass extends FormatClass {
 
     @Override
     public String getCaption() {
-        return "Дата со временем";
+        return "Datetime";
     }
 
     @Override

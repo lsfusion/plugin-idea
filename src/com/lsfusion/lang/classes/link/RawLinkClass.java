@@ -6,7 +6,7 @@ public class RawLinkClass extends StaticFormatLinkClass {
 
     @Override
     public String getCaption() {
-        return "Ссылка на неизвестный файл";
+        return "Raw file link";
     }
 
     @Override

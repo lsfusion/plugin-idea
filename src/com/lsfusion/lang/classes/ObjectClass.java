@@ -7,7 +7,7 @@ import java.awt.*;
 public class ObjectClass extends DataClass {
     @Override
     public String getCaption() {
-        return "Объект";
+        return "Object";
     }
 
     @Override

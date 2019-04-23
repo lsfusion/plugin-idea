@@ -6,7 +6,7 @@ public class JSONClass extends StaticFormatFileClass {
 
     @Override
     public String getCaption() {
-        return "Файл JSON";
+        return "JSON file";
     }
 
     @Override

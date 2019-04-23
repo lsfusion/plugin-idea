@@ -9,7 +9,7 @@ import com.lsfusion.lang.psi.LSFFormPropertyOptionsList;
 
 public class DeleteAction extends PropertyDrawEntity {
     public DeleteAction(String alias, String caption, GroupObjectEntity groupObject, LSFFormPropertyOptionsList commonFormOptions, LSFFormPropertyOptionsList propertyFormOptions, FormEntity form) {
-        super(alias, "DELETE", caption != null ? caption : "Удалить", groupObject.objects, commonFormOptions, propertyFormOptions, form);
+        super(alias, "DELETE", caption != null ? caption : "Delete", groupObject.objects, commonFormOptions, propertyFormOptions, form);
     }
 
     @Override
