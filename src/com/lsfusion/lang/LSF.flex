@@ -224,11 +224,8 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "CONSTRAINT"              			{ return CONSTRAINT; }
   "CONTAINERH"              			{ return CONTAINERH; }
   "CONTAINERV"              			{ return CONTAINERV; }
-  "COLUMNS"             			    { return COLUMNS; }
   "COOKIES"             			    { return COOKIES; }
   "COOKIESTO"             			    { return COOKIESTO; }
-  "START"             			        { return START; }
-  "END"             			        { return END; }
   "STRETCH"             			    { return STRETCH; }
   "CANONICALNAME"                  		{ return CANONICALNAME; }
   "CSV"                  			    { return CSV; }
@@ -335,7 +332,6 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "NOMANAGESESSION"                     { return NOMANAGESESSION; }
   "MAX"                     			{ return MAX; }
-  "LAST"                     			{ return LAST; }
   "MATERIALIZED"            			{ return MATERIALIZED; }
   "MENU"                    			{ return MENU; }
   "MEMO"                    			{ return MEMO; }
@@ -439,6 +435,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "SPLITH"                  			{ return SPLITH; }
   "SPLITV"                  			{ return SPLITV; }
   "SQL"                       			{ return SQL; }
+  "START"             			        { return START; }
   "STEP"                    			{ return STEP; }
   "STRICT"                  			{ return STRICT; }
   "STRUCT"                  			{ return STRUCT; }
