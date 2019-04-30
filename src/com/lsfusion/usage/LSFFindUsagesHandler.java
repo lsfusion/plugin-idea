@@ -5,6 +5,7 @@ import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.find.findUsages.FindUsagesOptions;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -47,30 +48,27 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
     @Override
     public boolean processElementUsages(@NotNull final PsiElement element, @NotNull final Processor<UsageInfo> processor, @NotNull FindUsagesOptions options) {
         if (options.isUsages) {
-            LSFDeclaration decl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
+            LSFDeclaration decl = getParentDeclaration(element, LSFDeclaration.class);
             if (decl instanceof LSFActionOrPropDeclaration && PROPERTY_DRAW_USAGES.equals(propertyUsagesSearchMode)) {
-                // propertyDraw from formPropertyDraw declaration
-                LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFPropertyDrawDeclaration.class);
+                LSFPropertyDrawDeclaration propDrawDecl = getParentDeclaration(sourceElement, LSFPropertyDrawDeclaration.class);
                 referencesSearch(processor, propDrawDecl);
             } else if (PARAMETER_USAGES.equals(propertyUsagesSearchMode)) {
-                LSFParamDeclaration paramDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFParamDeclaration.class);
+                LSFParamDeclaration paramDecl = getParentDeclaration(sourceElement, LSFParamDeclaration.class);
                 referencesSearch(processor, paramDecl);
             } else if (OBJECT_USAGES.equals(propertyUsagesSearchMode)) {
-                LSFFormObjectDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFFormObjectDeclaration.class);
+                LSFFormObjectDeclaration objectDecl = getParentDeclaration(element, LSFFormObjectDeclaration.class);
                 if (objectDecl != null && objectDecl.getNameIdentifier() != null) {
                     super.processElementUsages(element, processor, options);
                 }
             } else if (FORM_USAGES.equals(propertyUsagesSearchMode)) {
-                LSFDeclaration formDecl = PsiTreeUtil.getParentOfType(element, LSFFormDeclaration.class);
+                LSFDeclaration formDecl = getParentDeclaration(element, LSFFormDeclaration.class);
                 referencesSearch(processor, formDecl);
             } else if (NAVIGATOR_ELEMENT_USAGES.equals(propertyUsagesSearchMode)) {
-                ApplicationManager.getApplication().runReadAction(() -> {
-                    LSFNavigatorElementDeclaration navigatorElementDecl = PsiTreeUtil.getParentOfType(element, LSFNavigatorElementDeclaration.class); //move
-                    if(navigatorElementDecl == null) {
-                        navigatorElementDecl = PsiTreeUtil.getParentOfType(sourceElement, LSFNewNavigatorElementStatement.class); //new
-                    }
-                    referencesSearch(processor, navigatorElementDecl);
-                });
+                LSFNavigatorElementDeclaration navigatorElementDecl = getParentDeclaration(element, LSFNavigatorElementDeclaration.class); //move
+                if(navigatorElementDecl == null) {
+                    navigatorElementDecl = getParentDeclaration(sourceElement, LSFNewNavigatorElementStatement.class); //new
+                }
+                referencesSearch(processor, navigatorElementDecl);
             } else {
                 super.processElementUsages(element, processor, options);
             }
@@ -83,6 +81,10 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
             });
         }
         return true;
+    }
+    
+    private <T extends PsiElement> T getParentDeclaration(PsiElement element, Class<T> declClass) {
+        return ApplicationManager.getApplication().runReadAction((Computable<T>) () -> PsiTreeUtil.getParentOfType(element, declClass));
     }
 
     private void referencesSearch(Processor<UsageInfo> processor, LSFDeclaration declaration) {
