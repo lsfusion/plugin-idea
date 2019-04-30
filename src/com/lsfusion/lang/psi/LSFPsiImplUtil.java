@@ -15,7 +15,8 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
-import com.lsfusion.lang.psi.impl.*;
+import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
+import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.typeinfer.*;
@@ -124,17 +125,25 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFConstraintStatement sourceStatement) {
-        LSFPropertyExpression decl = sourceStatement.getPropertyExpressionList().get(0);
-        if (decl == null)
-            return ContextModifier.EMPTY;
-        return new ExprsContextModifier(decl);
+        List<LSFPropertyExpression> propertyExpressionList = sourceStatement.getPropertyExpressionList();
+        if (!propertyExpressionList.isEmpty()) {
+            LSFPropertyExpression decl = propertyExpressionList.get(0);
+            if (decl != null) {
+                return new ExprsContextModifier(decl);
+            }
+        }
+        return ContextModifier.EMPTY;
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFConstraintStatement sourceStatement) {
-        LSFPropertyExpression decl = sourceStatement.getPropertyExpressionList().get(0);
-        if (decl == null)
-            return ContextInferrer.EMPTY;
-        return new ExprsContextInferrer(decl);
+        List<LSFPropertyExpression> propertyExpressionList = sourceStatement.getPropertyExpressionList();
+        if (!propertyExpressionList.isEmpty()) {
+            LSFPropertyExpression decl = propertyExpressionList.get(0);
+            if (decl != null) {
+                return new ExprsContextInferrer(decl);
+            }
+        }
+        return ContextInferrer.EMPTY;
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFFollowsStatement sourceStatement) {
