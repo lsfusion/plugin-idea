@@ -19,7 +19,7 @@ public class LSFusionRunConfigurationType implements ConfigurationType {
     public LSFusionRunConfigurationType() {
         myFactory = new ConfigurationFactoryEx(this) {
             public RunConfiguration createTemplateConfiguration(Project project) {
-                return new LSFusionRunConfiguration("", project, this);
+                return new LSFusionRunConfiguration("", project, this, true);
             }
 
             @Override

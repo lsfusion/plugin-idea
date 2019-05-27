@@ -51,6 +51,11 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
         super(name, new JavaRunConfigurationModule(project, true), factory);
     }
 
+    protected LSFusionRunConfiguration(final String name, final Project project, final ConfigurationFactory factory, boolean lightStart) {
+        super(name, new JavaRunConfigurationModule(project, true), factory);
+        this.LIGHT_START = lightStart;
+    }
+
     @Override
     public JavaRunConfigurationModule getConfigurationModule() {
         return (JavaRunConfigurationModule) super.getConfigurationModule();
