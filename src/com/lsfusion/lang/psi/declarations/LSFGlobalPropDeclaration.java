@@ -10,9 +10,9 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.ColumnNameCache;
 import com.lsfusion.lang.psi.cache.ColumnNamingPolicyCache;
 import com.lsfusion.lang.psi.cache.TableNameCache;
-import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
+import com.lsfusion.lang.psi.declarations.policies.DBNamingPolicy;
+import com.lsfusion.lang.psi.declarations.policies.DefaultDBNamingPolicy;
 import com.lsfusion.lang.psi.indexes.TableClassesIndex;
-import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.util.BaseUtils;
@@ -71,8 +71,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
         return TableNameCache.getInstance(getProject()).getTableNameWithCaching(this);
     }
 
-    String TABLE_BASE_PREFIX = "base";
-    String TABLE_BASE0 = TABLE_BASE_PREFIX + 0;
+    DBNamingPolicy dbNamingPolicy = new DefaultDBNamingPolicy(63);
 
     @Nullable
     default String getTableNameNoCache() {
@@ -98,17 +97,17 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
         int paramCount = classesList.size();
 
         if (paramCount == 0) {
-            return TABLE_BASE0;
+            return dbNamingPolicy.getAutoTablesPrefix();
         }
 
-        boolean useBase = false;
+        boolean useAuto = false;
         LSFValueClass classes[][] = new LSFValueClass[paramCount][];
         int currentInd[] = new int[paramCount];
         LSFValueClass currentSet[] = new LSFValueClass[paramCount];
         for (int i = 0; i < paramCount; i++) {
             LSFClassSet classSet = classesList.get(i);
             if (classSet == null) {
-                useBase = true;
+                useAuto = true;
                 break;
             } else {
                 Collection<LSFValueClass> parents = CustomClassSet.getClassParentsRecursively(classSet.getCommonClass());
@@ -118,7 +117,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
                     classes[i][j++] = parent;
                 }
                 if (j == 0) {
-                    useBase = true;
+                    useAuto = true;
                     break;
                 }
 
@@ -127,7 +126,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
             }
         }
 
-        if (!useBase) {
+        if (!useAuto) {
             //перебираем возможные классы параметров
             do {
                 String tableName = findAppropriateTable(currentSet);
@@ -151,7 +150,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
             } while (true);
         }
 
-        return TABLE_BASE_PREFIX + paramCount;
+        return dbNamingPolicy.transformTableCNToDBName(dbNamingPolicy.createAutoTableDBName(classesList));
     }
 
     default String findAppropriateTable(@NotNull LSFValueClass[] currentSet) {
