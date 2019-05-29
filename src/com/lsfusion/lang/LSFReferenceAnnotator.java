@@ -7,7 +7,9 @@ import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
@@ -29,9 +31,11 @@ import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
 
@@ -833,5 +837,67 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (moduleUsage.resolveDecl() == null) {
             addError(moduleUsage, moduleUsage.resolveErrorAnnotation(myHolder));
         }
+    }
+
+    @Override
+    public void visitJoinPropertyDefinition(@NotNull LSFJoinPropertyDefinition o) {
+        LSFPropertyExprObject propertyExprObject = o.getPropertyExprObject();
+        if(propertyExprObject != null) {
+            LSFPropertyCalcStatement propertyCalcStatement = propertyExprObject.getPropertyCalcStatement();
+            if (propertyCalcStatement != null) {
+                LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
+                if (expressionUnfriendlyPD != null) {
+                    LSFGroupPropertyDefinition groupPropertyDefinition = expressionUnfriendlyPD.getGroupPropertyDefinition();
+                    if (groupPropertyDefinition != null) {
+                        LSFNonEmptyPropertyExpressionList leftPropertyExpressionList = groupPropertyDefinition.getGroupPropertyBy().getNonEmptyPropertyExpressionList();
+                        if (leftPropertyExpressionList != null) {
+                            List<LSFClassSet> leftClassList = new ArrayList<>();
+                            List<LSFClassSet> rightClassList = new ArrayList<>();
+
+                            for (LSFPropertyExpression propertyExpression : leftPropertyExpressionList.getPropertyExpressionList()) {
+                                leftClassList.add(LSFExClassSet.fromEx(propertyExpression.resolveValueClass(false)));
+                            }
+
+                            LSFPropertyExpressionList propertyExpressionList = o.getPropertyExpressionList();
+                            if (propertyExpressionList != null) {
+                                LSFNonEmptyPropertyExpressionList rightPropertyExpressionList = propertyExpressionList.getNonEmptyPropertyExpressionList();
+                                if (rightPropertyExpressionList != null) {
+                                    for(LSFPropertyExpression propertyExpression : rightPropertyExpressionList.getPropertyExpressionList()) {
+                                        rightClassList.add(LSFExClassSet.fromEx(propertyExpression.resolveValueClass(false)));
+                                    }
+                                }
+                            }
+
+                            if(!isCompatible(leftClassList, rightClassList)) {
+                                addTypeMismatchError(o, leftClassList, rightClassList);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isCompatible(List<LSFClassSet> leftClassList, List<LSFClassSet> rightClassList) {
+        boolean compatible = leftClassList.size() == rightClassList.size();
+        if(compatible) {
+            for (int i = 0; i < leftClassList.size(); i++) {
+                LSFClassSet leftClass = leftClassList.get(i);
+                LSFClassSet rightClass = rightClassList.get(i);
+                if (leftClass != null && rightClass != null && !leftClass.isCompatible(rightClass)) {
+                    compatible = false;
+                    break;
+                }
+            }
+        }
+        return compatible;
+    }
+
+    private void addTypeMismatchError(LSFJoinPropertyDefinition o, List<LSFClassSet> leftClassList, List<LSFClassSet> rightClassList) {
+        Annotation annotation = myHolder.createErrorAnnotation(o, "Type mismatch. Expected params: " +
+                leftClassList.stream().map(LSFClassSet::getCanonicalName).collect(Collectors.joining(", ")) + "; got: " +
+                rightClassList.stream().map(LSFClassSet::getCanonicalName).collect(Collectors.joining(", ")));
+        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+        addError(o, annotation);
     }
 }
