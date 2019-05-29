@@ -492,10 +492,11 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
+        //because EXPR_PARAMETER_NAME_USAGE also can be an object
         private boolean completeObjectUsage() {
             return completeFormContextObject(
                     objectCompleted,
-                    OBJECT_USAGE,
+                    new IElementType[] {OBJECT_USAGE, EXPR_PARAMETER_NAME_USAGE},
                     new FormExtendProcessor<LSFObjectDeclaration>() {
                         @Override
                         public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
@@ -558,7 +559,11 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private <T extends LSFDeclaration> boolean completeFormContextObject(BooleanValueHolder completed, IElementType frameType, FormExtendProcessor<T> formExtendProcessor) {
-            Frame elementUsage = getLastFrameOfType(null, frameType);
+            return completeFormContextObject(completed, new IElementType[]{frameType}, formExtendProcessor);
+        }
+
+        private <T extends LSFDeclaration> boolean completeFormContextObject(BooleanValueHolder completed, IElementType[] frameTypes, FormExtendProcessor<T> formExtendProcessor) {
+            Frame elementUsage = getLastFrameOfType(null, frameTypes);
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
