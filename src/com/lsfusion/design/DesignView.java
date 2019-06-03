@@ -43,8 +43,8 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static javax.swing.BorderFactory.*;
 
@@ -138,7 +138,7 @@ public class DesignView extends JPanel implements Disposable {
             LSFFormDeclaration formDeclaration = null;
             LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
             if (formExtend != null) {
-                formDeclaration = ((LSFFormStatementImpl) formExtend).resolveFormDecl();
+                formDeclaration = DumbService.getInstance(project).runReadActionInSmartMode(((LSFFormStatementImpl) formExtend)::resolveFormDecl);
             } else {
                 LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
                 if (designStatement != null) {
