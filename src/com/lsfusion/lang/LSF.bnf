@@ -566,7 +566,8 @@ typePropertyDefinition ::= typeIs className {pin = 1}
 
 private semiPropertyOption ::= IN groupUsage
                            |	persistentSetting
-                           |   COMPLEX
+                           |    complexSetting
+                           |    prereadSetting
                            |   NOHINT
                            |	TABLE tableUsage
                            |	asEditActionSetting
@@ -595,6 +596,8 @@ nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI |
 
 viewTypeSetting ::= classViewType
 persistentSetting ::= MATERIALIZED
+complexSetting ::= COMPLEX | NOCOMPLEX
+prereadSetting ::= PREREAD
 charWidthSetting ::= CHARWIDTH intLiteral
 flexCharWidthSetting ::= CHARWIDTH intLiteral (FLEX | NOFLEX)
 imageSetting ::= IMAGE stringLiteral

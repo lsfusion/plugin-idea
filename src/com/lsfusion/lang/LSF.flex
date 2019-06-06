@@ -354,6 +354,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "NEWTHREAD"              			    { return NEWTHREAD; }
   "NO"                      			{ return NO; }
   "NOCANCEL"                			{ return NOCANCEL; }
+  "NOCOMPLEX"                 			{ return NOCOMPLEX; }
   "NODEFAULT"                			{ return NODEFAULT; }
   "NOESCAPE"                			{ return NOESCAPE; }
   "NOFLEX"                			    { return NOFLEX; }
@@ -385,6 +386,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "PG"                                  { return PG; }    
   "POSITION"                			{ return POSITION; }
   "POST"                			    { return POST; }
+  "PREREAD"                			    { return PREREAD; }
   "PREV"                    			{ return PREV; }
   "PREVIEW"                    			{ return PREVIEW; }
   "NOPREVIEW"                  			{ return NOPREVIEW; }

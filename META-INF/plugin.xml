@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.167</b><br>
+        <b>Version 1.0.168</b><br>
         <ul>
-            <li>Support of string types without length restrictions</li>
-            <li>STRING -> BPSTRING, ISTRING -> BPISTRING</li>
-            <li>VARSTRING -> STRING, VARISTRING -> ISTRING</li>
+            <li>Added NOCOMPLEX and PREREAD property option support</li>
         </ul>
     ]]>
     </change-notes>
