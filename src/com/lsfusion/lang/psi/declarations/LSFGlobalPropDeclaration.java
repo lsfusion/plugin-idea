@@ -2,16 +2,14 @@ package com.lsfusion.lang.psi.declarations;
 
 import com.intellij.openapi.util.Condition;
 import com.intellij.util.CollectionQuery;
-import com.lsfusion.lang.ColumnNamingPolicy;
+import com.lsfusion.lang.DBNamingPolicy;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.ColumnNameCache;
-import com.lsfusion.lang.psi.cache.ColumnNamingPolicyCache;
+import com.lsfusion.lang.psi.cache.DBNamingPolicyCache;
 import com.lsfusion.lang.psi.cache.TableNameCache;
-import com.lsfusion.lang.psi.declarations.policies.DBNamingPolicy;
-import com.lsfusion.lang.psi.declarations.policies.DefaultDBNamingPolicy;
 import com.lsfusion.lang.psi.indexes.TableClassesIndex;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -71,13 +69,13 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
         return TableNameCache.getInstance(getProject()).getTableNameWithCaching(this);
     }
 
-    DBNamingPolicy dbNamingPolicy = new DefaultDBNamingPolicy(63);
-
     @Nullable
     default String getTableNameNoCache() {
         if (!isStoredProperty()) {
             return null;
         }
+
+        DBNamingPolicy dbNamingPolicy = DBNamingPolicy.getInstance(this);
 
         LSFNonEmptyPropertyOptions options = getNonEmptyPropertyOptions();
         if(options != null) {
@@ -85,7 +83,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
             if(tableUsages.size() > 0) {
                 LSFTableDeclaration table = tableUsages.get(0).resolveDecl();
                 if(table != null)
-                    return table.getNamespaceName() + "_" + table.getName();
+                    return dbNamingPolicy.getTableName(table);
             }
         }
 
@@ -96,64 +94,62 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
 
         int paramCount = classesList.size();
 
-        if (paramCount == 0) {
-            return dbNamingPolicy.getAutoTablesPrefix();
-        }
-
-        boolean useAuto = false;
-        LSFValueClass classes[][] = new LSFValueClass[paramCount][];
-        int currentInd[] = new int[paramCount];
-        LSFValueClass currentSet[] = new LSFValueClass[paramCount];
-        for (int i = 0; i < paramCount; i++) {
-            LSFClassSet classSet = classesList.get(i);
-            if (classSet == null) {
-                useAuto = true;
-                break;
-            } else {
-                Collection<LSFValueClass> parents = CustomClassSet.getClassParentsRecursively(classSet.getCommonClass());
-                classes[i] = new LSFValueClass[parents.size()];
-                int j = 0;
-                for (LSFValueClass parent : parents) {
-                    classes[i][j++] = parent;
-                }
-                if (j == 0) {
+        boolean useAuto = paramCount == 0;
+        if (!useAuto) {
+            LSFValueClass classes[][] = new LSFValueClass[paramCount][];
+            int currentInd[] = new int[paramCount];
+            LSFValueClass currentSet[] = new LSFValueClass[paramCount];
+            for (int i = 0; i < paramCount; i++) {
+                LSFClassSet classSet = classesList.get(i);
+                if (classSet == null) {
                     useAuto = true;
                     break;
-                }
+                } else {
+                    Collection<LSFValueClass> parents = CustomClassSet.getClassParentsRecursively(classSet.getCommonClass());
+                    classes[i] = new LSFValueClass[parents.size()];
+                    int j = 0;
+                    for (LSFValueClass parent : parents) {
+                        classes[i][j++] = parent;
+                    }
+                    if (j == 0) {
+                        useAuto = true;
+                        break;
+                    }
 
-                currentSet[i] = classes[i][0];
-                currentInd[i] = 0;
+                    currentSet[i] = classes[i][0];
+                    currentInd[i] = 0;
+                }
+            }
+
+
+            if (!useAuto) {
+                //перебираем возможные классы параметров
+                do {
+                    LSFTableDeclaration table = findAppropriateTable(currentSet);
+                    if (table != null) {
+                        return dbNamingPolicy.getTableName(table);
+                    }
+
+                    int i = paramCount - 1;
+                    while (i >= 0 && currentInd[i] == classes[i].length - 1) {
+                        currentInd[i] = 0;
+                        currentSet[i] = classes[i][0];
+                        --i;
+                    }
+
+                    if (i < 0) {
+                        break;
+                    }
+
+                    currentInd[i]++;
+                    currentSet[i] = classes[i][currentInd[i]];
+                } while (true);
             }
         }
-
-        if (!useAuto) {
-            //перебираем возможные классы параметров
-            do {
-                String tableName = findAppropriateTable(currentSet);
-                if (tableName != null) {
-                    return tableName;
-                }
-
-                int i = paramCount - 1;
-                while (i >= 0 && currentInd[i] == classes[i].length - 1) {
-                    currentInd[i] = 0;
-                    currentSet[i] = classes[i][0];
-                    --i;
-                }
-
-                if (i < 0) {
-                    break;
-                }
-
-                currentInd[i]++;
-                currentSet[i] = classes[i][currentInd[i]];
-            } while (true);
-        }
-
-        return dbNamingPolicy.transformTableCNToDBName(dbNamingPolicy.createAutoTableDBName(classesList));
+        return dbNamingPolicy.createAutoTableDBName(classesList);
     }
 
-    default String findAppropriateTable(@NotNull LSFValueClass[] currentSet) {
+    default LSFTableDeclaration findAppropriateTable(@NotNull LSFValueClass[] currentSet) {
         String names[] = new String[currentSet.length];
         for (int i = 0; i < currentSet.length; i++) {
             names[i] = currentSet[i].getName();
@@ -178,7 +174,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
             }
 
             if (fit) {
-                return table.getNamespaceName() + "_" + table.getName();
+                return table;
             }
         }
 
@@ -197,8 +193,8 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
         }
 
         LSFFile lsfFile = getLSFFile();
-        ColumnNamingPolicy columnNamingPolicy = ColumnNamingPolicyCache.getInstance(lsfFile).getColumnNamingPolicyWithCaching(lsfFile);
-        return columnNamingPolicy == null ? null : columnNamingPolicy.getColumnName(this);
+        DBNamingPolicy dbNamingPolicy = DBNamingPolicyCache.getInstance(lsfFile).getDBNamingPolicyWithCaching(lsfFile);
+        return dbNamingPolicy == null ? null : dbNamingPolicy.getColumnName(this);
     }
 
     default byte getPropType() {

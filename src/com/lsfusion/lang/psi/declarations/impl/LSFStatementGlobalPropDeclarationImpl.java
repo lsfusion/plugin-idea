@@ -1,23 +1,16 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.CollectionQuery;
-import com.lsfusion.lang.ColumnNamingPolicy;
-import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
-import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.*;
 import com.lsfusion.lang.psi.declarations.*;
-import com.lsfusion.lang.psi.indexes.TableClassesIndex;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
-import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.StatementPropStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -27,7 +20,6 @@ import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.*;
 
 public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrGlobalPropDeclarationImpl<LSFStatementGlobalPropDeclaration, StatementPropStubElement> implements LSFStatementGlobalPropDeclaration {

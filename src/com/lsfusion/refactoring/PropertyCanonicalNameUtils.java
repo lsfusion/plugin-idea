@@ -16,18 +16,19 @@ public final class PropertyCanonicalNameUtils {
     static public final String UNKNOWNCLASS = "?";
 
     static public final String classDataPropPrefix = "_CLASS_";
-    static public final String policyPropPrefix = "_POLICY_";
-    static public final String logPropPrefix = "_LOG_";
-    static public final String drillDownPrefix = "_DRILLDOWN_";
 
     static public String createName(String namespace, String name, List<LSFClassSet> signature) {
         return createName(namespace, name, createSignature(signature));
     }
-    
+
+    /*  Позволяет создавать канонические имена, а также часть канонического имени, передавая
+     *  null в качестве пространства имен либо сигнатуры
+     */
     static public String createName(String namespace, String name, String signature) {
         StringBuilder builder = new StringBuilder();
-        builder.append(namespace);
-        builder.append(".");
+        if (namespace != null) {
+            appendNamespace(builder, namespace);
+        }
         builder.append(name);
         if (signature != null) {
             builder.append(signature);
@@ -35,6 +36,11 @@ public final class PropertyCanonicalNameUtils {
         return builder.toString();
     }
 
+    static private void appendNamespace(StringBuilder builder, String namespace) {
+        builder.append(namespace);
+        builder.append(CanonicalNameUtils.DELIMITER);
+    }
+    
     private static String createSignature(List<LSFClassSet> signature) {
         StringBuilder snBuilder = new StringBuilder();
         snBuilder.append(signatureLBracket);

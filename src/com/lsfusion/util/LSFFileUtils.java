@@ -30,6 +30,8 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.lsfusion.util.BaseUtils.isRedundantString;
+
 public class LSFFileUtils {
     public static boolean hasFilesWithShortNameInProject(PsiElement scopeElement, final String fileName) {
         Project project = scopeElement.getProject();
@@ -211,6 +213,17 @@ public class LSFFileUtils {
         return getPropertyValue(element, "db.namingPolicy");
     }
 
+    public static int getDBMaxIdSize(PsiElement element) {
+        String value = getPropertyValue(element, "db.maxIdLength");
+        if (!isRedundantString(value)) {
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return 63;
+    }
+    
     private static String getPropertyValue(PsiElement element, String propertyName) {
         List<PsiFile> files = findFilesByPath(element, "lsfusion.properties");
         return getPropertyValue(files, propertyName);
