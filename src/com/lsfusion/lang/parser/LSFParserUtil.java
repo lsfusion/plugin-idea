@@ -47,6 +47,26 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         return true;
     }
 
+    private static Key<Integer> MATCHEDDRAWOBJECT = Key.create("lsf.matched.draw.object");
+
+    public static boolean checkFormExpr(PsiBuilder builder_, int level_) {
+        builder_.putUserData(MATCHEDDRAWOBJECT, null);
+        return true;
+    }
+    public static boolean matchedFormDrawObject(PsiBuilder builder_, int level_) {
+        builder_.putUserData(MATCHEDDRAWOBJECT, builder_.rawTokenIndex());
+        return true;
+    }
+
+    public static boolean matchedFormExpr(PsiBuilder builder_, int level_) {
+        Integer userData = builder_.getUserData(MATCHEDDRAWOBJECT);
+        if (userData != null && userData == builder_.rawTokenIndex()) {
+            builder_.putUserData(MATCHEDDRAWOBJECT, null); // just in case
+            return false;
+        }        
+        return true;
+    }
+
     private static Key<Boolean> FULLCOMPOUND = Key.create("lsf.full.compound.param.declare");
 
     public static boolean fullCompoundParamDeclareStop(PsiBuilder builder_, int level_) {

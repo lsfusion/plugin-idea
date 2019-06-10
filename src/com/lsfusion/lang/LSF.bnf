@@ -1438,8 +1438,12 @@ designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formPropertyObject | formExprDeclaration
 formActionPropertyObject ::= formActionObject | formActionDeclaration
 
-formPropertyDrawMappedDecl ::= (((simpleNameOrWithCaption EQUALS)? formPropertyDrawObject)  
-                               | (simpleNameOrWithCaption? EQUALS (formExprDeclaration | formActionDeclaration)))
+formPropertyDrawMappedDecl ::= (formPropertyDrawObject  
+                               | (simpleNameOrWithCaption? EQUALS (
+                                                        // pretty tricky solution, we do lookahead to match formPropertyDrawObject, then we save last token and compare it to last token in formExprDeclaration, if the same - move to formPropertyDrawObject, otherwise map formExprDeclaration  
+                                                        (<<checkFormExpr>> &((formPropertyDrawObject <<matchedFormDrawObject>>)?) formExprDeclaration <<matchedFormExpr>>) | 
+                                                        formPropertyDrawObject | 
+                                                        formActionDeclaration)))
                                 formPropertyOptionsList
 {
     pin = 1
