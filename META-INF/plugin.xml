@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.168</b><br>
+        <b>Version 1.0.169</b><br>
         <ul>
-            <li>Added NOCOMPLEX and PREREAD property option support</li>
-            <li>Parser fix in PROPERTIES and SHOWIF blocks (for c=x(a)*g(a) cases)</li>
+            <li>Null pointer exception during table name determination fixed</li> 
         </ul>
     ]]>
     </change-notes>

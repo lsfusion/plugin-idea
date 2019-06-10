@@ -31,6 +31,9 @@ public abstract class FixedSizeUnderscoreDBNamingPolicy extends DBNamingPolicy {
     public String createAutoTableDBName(List<LSFClassSet> classes) {
         StringBuilder builder = new StringBuilder(autoTablesPrefix);
         for (LSFClassSet valueClass : classes) {
+            if (valueClass == null) {
+                return null;
+            }
             builder.append('_');
             // todo [dale]: вообще, это не совсем правильно, в платформе в этом месте вызывается ValueClass.getSID().
             // При стандартной замене всех спец. символов на символ подчеркивания разница не такая большая, но есть 
