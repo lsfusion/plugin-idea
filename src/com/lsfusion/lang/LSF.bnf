@@ -1435,7 +1435,7 @@ formInGroup ::= IN groupUsage
 formExtID ::= EXTID stringLiteral
 
 designCalcPropertyObject ::= formCalcPropertyObject
-formCalcPropertyObject ::= formPropertyObject | formExprDeclaration
+formCalcPropertyObject ::= formExprDeclaration
 formActionPropertyObject ::= formActionObject | formActionDeclaration
 
 formPropertyDrawMappedDecl ::= (formPropertyDrawObject  
