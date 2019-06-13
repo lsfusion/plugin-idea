@@ -30,7 +30,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
-import com.intellij.util.Function;
 import com.intellij.util.PlatformIcons;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -57,8 +56,7 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
  * based on com.intellij.facet.impl.ui.libraries.LibraryOptionsPanel
  */
 public class LibraryOptionsPanel {
-    private final String DOWNLOAD_URL = "https://download.lsfusion.org";
-    private final String SUB_DIR_PATTERN = "(\\d+(\\.)?)*/";
+    private final String DOWNLOAD_URL = "https://download.lsfusion.org/java";
     private final String SERVER_PATTERN = "lsfusion-server-(\\d+(\\.)?)*\\.jar";
     private final String SOURCES_PATTERN = "lsfusion-server-(\\d+(\\.)?)*-sources\\.jar";
 
@@ -134,12 +132,11 @@ public class LibraryOptionsPanel {
             public void mousePressed(MouseEvent e) {
                 try {
                     myPopupMenu.removeAll();
-                    iterateLsfusionServerJars(serverUrls -> {
+                    for(Map<String, String> serverUrls : getLsfusionServerJars(false)) {
                         JMenuItem menuItem = new JMenuItem(serverUrls.get(SERVER_JAR_KEY));
                         menuItem.addActionListener(event -> downloadSelected(serverUrls));
                         myPopupMenu.add(menuItem);
-                        return false;
-                    });
+                    }
                     myPopupMenu.show(myDownloadButton, 0, myDownloadButton.getHeight());
                 } catch (IOException ignored) {
                 }
@@ -237,33 +234,29 @@ public class LibraryOptionsPanel {
     }
 
     private Map<String, File> getLatestLsfusionServerJar() throws IOException {
-        final Map<String, String>[] latestLsfusionServerJarUrls = new Map[]{new HashMap<>()};
-        iterateLsfusionServerJars(fileUrls -> {
-            latestLsfusionServerJarUrls[0] = fileUrls;
-            return true;
-        });
-        return downloadFiles(latestLsfusionServerJarUrls[0]);
+        List<Map<String, String>> serverJarUrlsList = getLsfusionServerJars(true);
+        return !serverJarUrlsList.isEmpty() ? downloadFiles(serverJarUrlsList.get(0)) : null;
     }
 
-    private void iterateLsfusionServerJars(Function<Map<String, String>, Boolean> function) throws IOException {
-        List<String> dirList = parseURL(DOWNLOAD_URL, SUB_DIR_PATTERN);
-        for (int i = dirList.size() - 1; i >= 0; i--) {
-            String subDir = DOWNLOAD_URL + "/" + dirList.get(i);
-            List<String> serverUrls = parseURL(subDir, SERVER_PATTERN);
-            if (!serverUrls.isEmpty()) {
-                Map<String, String> fileUrls = new HashMap<>();
-                fileUrls.put(SERVER_JAR_KEY, subDir + serverUrls.get(serverUrls.size() - 1));
-                
-                List<String> sources = parseURL(subDir, SOURCES_PATTERN);
-                if (!sources.isEmpty()) {
-                    fileUrls.put(SOURCES_JAR_KEY, subDir + sources.get(sources.size() - 1));
-                }
-                Boolean stopIteration = function.fun(fileUrls);
-                if (stopIteration) {
-                    break;
-                }
+    private List<Map<String, String>> getLsfusionServerJars(boolean latest) throws IOException {
+        List<Map<String, String>> serverJarUrlsList = new ArrayList<>();
+        List<String> serverUrls = parseURL(DOWNLOAD_URL, SERVER_PATTERN);
+        List<String> sourceUrls = parseURL(DOWNLOAD_URL, SOURCES_PATTERN);
+        for(int i = serverUrls.size() - 1; i >=0; i--) {
+            String serverUrl = serverUrls.get(i);
+            Map<String, String> fileUrls = new HashMap<>();
+            fileUrls.put(SERVER_JAR_KEY, DOWNLOAD_URL + "/" + serverUrl);
+
+            String sourceUrl = serverUrl.replace(".jar", "-sources.jar");
+            if(sourceUrls.contains(sourceUrl)) {
+                fileUrls.put(SOURCES_JAR_KEY, DOWNLOAD_URL + "/" + sourceUrl);
+            }
+            serverJarUrlsList.add(fileUrls);
+            if (latest) {
+                break;
             }
         }
+        return serverJarUrlsList;
     }
 
     private List<String> parseURL(String url, String pattern) throws IOException {
