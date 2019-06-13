@@ -10,6 +10,7 @@
         <b>Version 1.0.170</b><br>
         <ul>
             <li>Minor parser bugfixes</li> 
+            <li>TEXTFILE and TEXTLINK classes</li>
         </ul>
     ]]>
     </change-notes>

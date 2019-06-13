@@ -590,6 +590,8 @@ public class LSFPsiImplUtil {
                 return DynamicFormatFileClass.instance;
             case "EXCELFILE":
                 return ExcelClass.instance;
+            case "TEXTFILE":
+                return TXTClass.instance;
             case "CSVFILE":
                 return CSVClass.instance;
             case "HTMLFILE":
@@ -612,6 +614,8 @@ public class LSFPsiImplUtil {
                 return DynamicFormatLinkClass.instance;
             case "EXCELLINK":
                 return ExcelLinkClass.instance;
+            case "TEXTLINK":
+                return TXTLinkClass.instance;
             case "CSVLINK":
                 return CSVLinkClass.instance;
             case "HTMLLINK":

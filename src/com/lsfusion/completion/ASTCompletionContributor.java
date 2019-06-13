@@ -70,9 +70,9 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "BPSTRING[]", "BPISTRING[]", "STRING[]", "ISTRING[]",
                                                                  "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT",
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "RAWFILE", "FILE", "EXCELFILE",
-                                                                 "CSVFILE", "HTMLFILE", "JSONFILE", "XMLFILE", "TABLEFILE",
+                                                                 "TEXTFILE", "CSVFILE", "HTMLFILE", "JSONFILE", "XMLFILE", "TABLEFILE",
                                                                  "WORDLINK", "IMAGELINK", "PDFLINK", "RAWLINK", "LINK", "EXCELLINK",
-                                                                 "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK", "TABLELINK",
+                                                                 "TEXTLINK", "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK", "TABLELINK",
                                                                  "BOOLEAN", "COLOR"};
     
     private static final Set<String> DESIGN_PROPERTIES = new LinkedHashSet<String>() {
