@@ -69,7 +69,6 @@ public class LibraryOptionsPanel {
     private JPopupMenu myPopupMenu;
     private JButton myPopupButton;
     private JPanel mySimplePanel;
-    private JTextPane willBeAddedAutomaticallyTextPane;
 
     private LibraryCompositionSettings mySettings;
     private final LibrariesContainer myLibrariesContainer;
