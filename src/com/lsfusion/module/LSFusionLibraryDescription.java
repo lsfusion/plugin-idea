@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class LSFusionLibraryDescription extends CustomLibraryDescription {
 
-    private static final String LSFUSION_SERVER_LIBRARY_PATTERN = "lsfusion.*server.*\\.jar";
+    private static final String LSFUSION_SERVER_LIBRARY_PATTERN = ".*server.*\\.jar";
 
 
     @NotNull
@@ -43,8 +43,8 @@ public class LSFusionLibraryDescription extends CustomLibraryDescription {
                 return super.isFileSelectable(file) && isLSFusionServerDirectory(file);
             }
         };
-        descriptor.setTitle("lsFusion Platform");
-        descriptor.setDescription("Choose a directory containing lsFusion Platform distribution");
+        descriptor.setTitle("lsFusion");
+        descriptor.setDescription("Choose a directory containing lsFusion distribution");
 
         final VirtualFile dir = FileChooser.chooseFile(descriptor, parentComponent, null, null);
         if (dir != null) {
