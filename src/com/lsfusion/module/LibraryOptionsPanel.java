@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 
@@ -295,15 +297,18 @@ public class LibraryOptionsPanel {
                 if (url != null) {
                     indicator.setText(url);
                     try {
-                        //compatibility with idea 2017
-                        String fileName = url.substring(url.lastIndexOf('/') + 1); //FilenameUtils.getName(url));
-                        File file = new File(targetPath + "/" + fileName);
-                        HttpGet httpGet = new HttpGet(url);
-                        httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36");
-                        HttpEntity fileEntity = HttpClients.createDefault().execute(httpGet).getEntity();
-                        if (fileEntity != null) {
-                            Files.copy(fileEntity.getContent(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            resultFiles.put(urlEntry.getKey(), file);
+                        Pattern p = Pattern.compile(".*/lsfusion-server-(\\d+)[\\d.]*(-sources)?\\.jar");
+                        Matcher m = p.matcher(url);
+                        if(m.matches()) {
+                            String fileName = "lsfusion-" + m.group(1) + (m.group(2) != null ? m.group(2) : "") + ".jar";
+                            File file = new File(targetPath + "/" + fileName);
+                            HttpGet httpGet = new HttpGet(url);
+                            httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36");
+                            HttpEntity fileEntity = HttpClients.createDefault().execute(httpGet).getEntity();
+                            if (fileEntity != null) {
+                                Files.copy(fileEntity.getContent(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                                resultFiles.put(urlEntry.getKey(), file);
+                            }
                         }
                     } catch (Exception e) {
                         Messages.showErrorDialog(getProject(), getStackTrace(e), "Download lsFusion server failed");

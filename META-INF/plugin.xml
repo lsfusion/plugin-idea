@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.170</b><br>
+        <b>Version 1.0.171</b><br>
         <ul>
-            <li>Minor parser bugfixes</li> 
-            <li>TEXTFILE and TEXTLINK classes</li>
+            <li>lsfusion server library name on downloading now lsfusion-majorVersion</li>
         </ul>
     ]]>
     </change-notes>
