@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.cache;
 
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
@@ -9,7 +8,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.impl.AnyPsiChangeListener;
 import com.intellij.psi.impl.PsiManagerImpl;
-import com.intellij.psi.impl.source.tree.SharedImplUtil;
 import com.intellij.reference.SoftReference;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.messages.MessageBus;
@@ -57,11 +55,7 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
 
     @Nullable
     public TResult resolveWithCaching(@NotNull Psi element, @NotNull PsiResolver<Psi, TResult> resolver, boolean needToPreventRecursion, boolean incompleteCode) {
-        boolean isPhysical = false;
-        if (!(element instanceof StubBasedPsiElementBase && SharedImplUtil.getContainingFile(element.getNode()) == null)) { // PsiInvalidElementAccessException fix
-            isPhysical = element.isPhysical();
-        }
-        return resolve(element, resolver, needToPreventRecursion, incompleteCode, isPhysical);
+        return resolve(element, resolver, needToPreventRecursion, incompleteCode, element.isPhysical());
     }
 
     @Nullable
