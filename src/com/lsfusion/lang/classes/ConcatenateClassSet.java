@@ -143,4 +143,9 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
     public LSFClassSet getUpSet() {
         return this;
     }
+
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 }

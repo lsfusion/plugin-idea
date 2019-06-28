@@ -14,4 +14,6 @@ public interface LSFValueClass {
     List<String> getSNames();
     
     LSFClassSet getUpSet();
+
+    boolean isValid();
 }

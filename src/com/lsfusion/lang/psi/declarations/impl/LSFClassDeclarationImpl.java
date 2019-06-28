@@ -112,4 +112,9 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
     public ElementMigration getMigration(String newName) {
         return ClassMigration.create(this, getName(), newName);
     }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid();
+    }
 }
