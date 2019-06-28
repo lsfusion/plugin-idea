@@ -568,7 +568,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
-                    FormContext psi = getLastPsiOfType(FormContext.class);
+                    FormContext psi = getLastPsiOfType(FormContext.class, false);
                     if (psi != null) {
                         Set<T> declaration = processFormContext(psi, elementUsage.offset, formExtendProcessor);
                         for (T elementDecl : declaration) {
@@ -586,7 +586,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
-                    FormContext psi = getLastPsiOfType(FormContext.class);
+                    FormContext psi = getLastPsiOfType(FormContext.class, false);
                     if (psi != null) {
                         Set<T> declaration = processDesignContext(psi, elementUsage.offset, designProcessor);
                         for (T elementDecl : declaration) {
@@ -604,7 +604,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (paramDeclare != null) {
                 if (type.isBase() && !parameterCompleted) {
                     parameterCompleted = true;
-                    PsiElement psi = getLastPsiOfType(ModifyParamContext.class);
+                    PsiElement psi = getLastPsiOfType(ModifyParamContext.class, true);
                     if (psi != null) {
                         LSFExprParamDeclaration currentParamDeclaration = getPsiOfTypeForFrame(paramDeclare, LSFExprParamDeclaration.class);
                         for (LSFExprParamDeclaration paramDeclaration : LSFPsiUtils.getContextParams(psi, getOriginalFrameOffset(paramDeclare), false)) {
@@ -624,7 +624,6 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (propUsage != null) {
                 if (type.isProps() && !propertyCompleted) {
                     quickLog("Completing propertyUsage");
-                    propertyCompleted = true;
 
                     boolean res = false;
                     if (!res) res = completePropertyInContextOfFormPropertyObject(propUsage);
@@ -633,6 +632,8 @@ public class ASTCompletionContributor extends CompletionContributor {
                     if (!res) res = completePropertyInNoContext(propUsage);
                     if (!res) res = completePropertyInModifyParamContext(propUsage);
                     quickLog("Completed propertyUsage");
+                    
+                    propertyCompleted = res;
                 }
 
                 return true;
@@ -757,7 +758,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private boolean completePropertyInModifyParamContext(Frame propUsage) {
-            ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class);
+            ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class, true);
             if (psi != null) {
                 completeProperties(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
                 return true;
@@ -765,7 +766,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
         private boolean completeActionInModifyParamContext(Frame propUsage) {
-            ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class);
+            ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class, false);
             if (psi != null) {
                 completeActions(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
                 return true;
@@ -917,7 +918,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             
             final Collection<LSFLocalPropDeclaration> localDeclarations = new ArrayList<>();
             // search local properties
-            PsiElement lastElement = getLastPsiOfType(PsiElement.class);
+            PsiElement lastElement = getLastPsiOfType(PsiElement.class, false);
             if (lastElement != null) {
                 PsiTreeUtil.treeWalkUp(new BaseScopeProcessor() {
                     @Override
@@ -1122,7 +1123,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         @Nullable
-        private <T extends PsiElement> T getLastPsiOfType(@NotNull Class<T> psiClass) {
+        private <T extends PsiElement> T getLastPsiOfType(@NotNull Class<T> psiClass, boolean hackFlag) {
             try {
                 T result = null;
                 for (int i = 0; i < framesCount; ++i) {
@@ -1131,6 +1132,11 @@ public class ASTCompletionContributor extends CompletionContributor {
                     if (i == 0 || (elementType != null && !(elementType instanceof LSFTokenType))) {
                         PsiElement psiElement = i == 0 ? file : getPsiOfTypeForFrame(currFrame, getPsiElementClassByType(elementType));
                         if (psiElement == null) {
+                            if (hackFlag) {
+                                if (elementType == EXPRESSION_UNFRIENDLY_PD && i + 1 < framesCount && frames.get(i+1).type == GROUP_PROPERTY_DEFINITION) {
+                                    return null; 
+                                }
+                            }
                             break;
                         }
                         if (psiClass.isInstance(psiElement)) {
