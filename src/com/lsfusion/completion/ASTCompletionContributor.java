@@ -493,11 +493,10 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
-        //because EXPR_PARAMETER_NAME_USAGE also can be an object
         private boolean completeObjectUsage() {
             return completeFormContextObject(
                     objectCompleted,
-                    new IElementType[] {OBJECT_USAGE, EXPR_PARAMETER_NAME_USAGE},
+                    OBJECT_USAGE,
                     new FormExtendProcessor<LSFObjectDeclaration>() {
                         @Override
                         public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
@@ -560,15 +559,11 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private <T extends LSFDeclaration> boolean completeFormContextObject(BooleanValueHolder completed, IElementType frameType, FormExtendProcessor<T> formExtendProcessor) {
-            return completeFormContextObject(completed, new IElementType[]{frameType}, formExtendProcessor);
-        }
-
-        private <T extends LSFDeclaration> boolean completeFormContextObject(BooleanValueHolder completed, IElementType[] frameTypes, FormExtendProcessor<T> formExtendProcessor) {
-            Frame elementUsage = getLastFrameOfType(null, frameTypes);
+            Frame elementUsage = getLastFrameOfType(null, frameType);
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
-                    FormContext psi = getLastPsiOfType(FormContext.class, false);
+                    FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
                         Set<T> declaration = processFormContext(psi, elementUsage.offset, formExtendProcessor);
                         for (T elementDecl : declaration) {
@@ -586,7 +581,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
-                    FormContext psi = getLastPsiOfType(FormContext.class, false);
+                    FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
                         Set<T> declaration = processDesignContext(psi, elementUsage.offset, designProcessor);
                         for (T elementDecl : declaration) {
@@ -604,15 +599,11 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (paramDeclare != null) {
                 if (type.isBase() && !parameterCompleted) {
                     parameterCompleted = true;
-                    PsiElement psi = getLastPsiOfType(ModifyParamContext.class, true);
-                    if (psi != null) {
-                        LSFExprParamDeclaration currentParamDeclaration = getPsiOfTypeForFrame(paramDeclare, LSFExprParamDeclaration.class);
-                        for (LSFExprParamDeclaration paramDeclaration : LSFPsiUtils.getContextParams(psi, getOriginalFrameOffset(paramDeclare), false)) {
-                            if (paramDeclaration != currentParamDeclaration) {
-                                addLookupElement(createLookupElement(paramDeclaration, PARAM_PRIORITY));
-                            }
-                        }
-                    }
+                    quickLog("Completing parameter");
+
+                    boolean res = false;
+                    if (!res) res = completeParameterInModifyParamOrFormContext(paramDeclare);
+                    quickLog("Completed parameter");
                 }
                 return true;
             }
@@ -623,19 +614,15 @@ public class ASTCompletionContributor extends CompletionContributor {
             Frame propUsage = getLastFrameOfType(null, PROPERTY_USAGE);
             if (propUsage != null) {
                 if (type.isProps() && !propertyCompleted) {
+                    propertyCompleted = true;
                     quickLog("Completing propertyUsage");
 
                     boolean res = false;
-                    if (!res) res = completePropertyInContextOfFormPropertyObject(propUsage);
-                    if (!res) res = completePropertyInFormContext(propUsage);
                     if (!res) res = completePropertyInImportUsage(propUsage);
                     if (!res) res = completePropertyInNoContext(propUsage);
-                    if (!res) res = completePropertyInModifyParamContext(propUsage);
+                    if (!res) res = completePropertyInModifyParamOrFormContext(propUsage);
                     quickLog("Completed propertyUsage");
-                    
-                    propertyCompleted = res;
                 }
-
                 return true;
             }
             return false;
@@ -757,26 +744,13 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
-        private boolean completePropertyInModifyParamContext(Frame propUsage) {
-            ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class, true);
-            if (psi != null) {
-                completeProperties(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
-                return true;
-            }
-            return false;
-        }
         private boolean completeActionInModifyParamContext(Frame propUsage) {
-            ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class, false);
+            ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class);
             if (psi != null) {
                 completeActions(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
                 return true;
             }
             return false;
-        }
-
-        private boolean completePropertyInContextOfFormPropertyObject(Frame propUsage) {
-            Frame formMappedProperty = getLastFrameOfType(propUsage, FORM_CALC_PROPERTY_OBJECT);
-            return formMappedProperty != null && completePropertyInFormContext(formMappedProperty);
         }
 
         private boolean completeActionInContextOfFormPropertyObject(Frame propUsage) {
@@ -818,14 +792,33 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
-        private boolean completePropertyInFormContext(Frame propUsage) {
-            Frame formStatement = getLastFrameOfType(propUsage, FORM_STATEMENT);
-            if (formStatement != null) {
-                completePropertyInContextOfFormStatement(formStatement);
+        // should be together because there can be modify param context and form context simultaneously (in form operator)
+        private boolean completePropertyInModifyParamOrFormContext(Frame propUsage) {
+            PsiElement psi = getLastPsiOfType(true, ModifyParamContext.class, LSFFormStatement.class);
+            if (psi != null) {
+                completeProperties(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
                 return true;
             }
             return false;
         }
+
+        // should be together because there can be modify param context and form context simultaneously (in form operator)
+        private boolean completeParameterInModifyParamOrFormContext(Frame paramDeclare) {
+            PsiElement psi = getLastPsiOfType(true, ModifyParamContext.class, LSFFormStatement.class);
+            if (psi != null) {
+                LSFExprParamDeclaration currentParamDeclaration = getPsiOfTypeForFrame(paramDeclare, LSFExprParamDeclaration.class);
+                
+                Set<? extends LSFExprParamDeclaration> declarations = LSFPsiUtils.getContextParams(psi, getOriginalFrameOffset(paramDeclare), false);
+                for (LSFExprParamDeclaration paramDeclaration : declarations) {
+                    if (paramDeclaration != currentParamDeclaration) {
+                        addLookupElement(createLookupElement(paramDeclaration, PARAM_PRIORITY));
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
         private boolean completeActionInFormContext(Frame propUsage) {
             Frame formStatement = getLastFrameOfType(propUsage, FORM_STATEMENT);
             if (formStatement != null) {
@@ -841,13 +834,6 @@ public class ASTCompletionContributor extends CompletionContributor {
                 return true;
             }
             return false;
-        }
-
-        private void completePropertyInContextOfFormStatement(Frame startFrom) {
-            LSFFormStatement psiFormStatement = getFormStatementPSI(startFrom);
-            if (psiFormStatement != null) {
-                completeProperties(getContextClasses(psiFormStatement, true), MUST_USE_ANY);
-            }
         }
 
         private void completeActionInContextOfFormStatement(Frame startFrom) {
@@ -918,7 +904,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             
             final Collection<LSFLocalPropDeclaration> localDeclarations = new ArrayList<>();
             // search local properties
-            PsiElement lastElement = getLastPsiOfType(PsiElement.class, false);
+            PsiElement lastElement = getLastPsiOfType(PsiElement.class);
             if (lastElement != null) {
                 PsiTreeUtil.treeWalkUp(new BaseScopeProcessor() {
                     @Override
@@ -1123,7 +1109,11 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         @Nullable
-        private <T extends PsiElement> T getLastPsiOfType(@NotNull Class<T> psiClass, boolean hackFlag) {
+        private <T extends PsiElement> T getLastPsiOfType(@NotNull Class<T> psiClass) {
+            return getLastPsiOfType(false, psiClass);
+        }
+        @Nullable
+        private <T extends PsiElement> T getLastPsiOfType(boolean hackFlag, Class... psiClasses) {
             try {
                 T result = null;
                 for (int i = 0; i < framesCount; ++i) {
@@ -1132,15 +1122,25 @@ public class ASTCompletionContributor extends CompletionContributor {
                     if (i == 0 || (elementType != null && !(elementType instanceof LSFTokenType))) {
                         PsiElement psiElement = i == 0 ? file : getPsiOfTypeForFrame(currFrame, getPsiElementClassByType(elementType));
                         if (psiElement == null) {
+                            // it's tricky here, first of all, there are two rules where one is prefix of another : GROUP as and expr, and GROUP BY as expression unfriendly pd
+                            // so GROUP BY is parsed first but there can be no BY in the end so PSI will be of GROUP as and expr branch, so thats the case we check below
+                            // and in theory we continue proceeding frames since further there is no difference in groupPropertyDefinition and groupExprPropertyDefinition
                             if (hackFlag) {
                                 if (elementType == EXPRESSION_UNFRIENDLY_PD && i + 1 < framesCount && frames.get(i+1).type == GROUP_PROPERTY_DEFINITION) {
-                                    return null; 
+                                    psiElement = getPsiOfTypeForFrame(currFrame, getPsiElementClassByType(PROPERTY_EXPRESSION));
+                                    if(psiElement == null)
+                                        break;
+                                    i++;
+                                    psiElement = getPsiOfTypeForFrame(currFrame, getPsiElementClassByType(GROUP_EXPR_PROPERTY_DEFINITION));
+                                    if(psiElement == null)
+                                        break;
                                 }
                             }
-                            break;
                         }
-                        if (psiClass.isInstance(psiElement)) {
-                            result = (T) psiElement;
+                        for(Class<T> psiClass : psiClasses) {
+                            if (psiClass.isInstance(psiElement)) {
+                                result = (T) psiElement;
+                            }
                         }
                     }
                 }
