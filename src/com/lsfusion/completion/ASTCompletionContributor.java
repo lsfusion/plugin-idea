@@ -636,11 +636,10 @@ public class ASTCompletionContributor extends CompletionContributor {
                     actionCompleted = true;
 
                     boolean res = false;
-                    if (!res) res = completeActionInContextOfFormPropertyObject(propUsage);
+                    if (!res) res = completeActionInContextOfFormActionObject(propUsage);
                     if (!res) res = completeActionInContextOfMappedPropertiesList(propUsage);
-                    if (!res) res = completeActionInFormContext(propUsage);
                     if (!res) res = completeActionInNoContext(propUsage);
-                    if (!res) res = completeActionInModifyParamContext(propUsage);
+                    if (!res) res = completeActionInModifyParamOrFormContext(propUsage);
                     quickLog("Completed actionUsage");
                 }
 
@@ -744,8 +743,8 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
-        private boolean completeActionInModifyParamContext(Frame propUsage) {
-            ModifyParamContext psi = getLastPsiOfType(ModifyParamContext.class);
+        private boolean completeActionInModifyParamOrFormContext(Frame propUsage) {
+            PsiElement psi = getLastPsiOfType(false, ModifyParamContext.class, LSFFormStatement.class);
             if (psi != null) {
                 completeActions(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
                 return true;
@@ -753,8 +752,8 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
-        private boolean completeActionInContextOfFormPropertyObject(Frame propUsage) {
-            Frame formMappedProperty = getLastFrameOfType(propUsage, FORM_ACTION_PROPERTY_OBJECT);
+        private boolean completeActionInContextOfFormActionObject(Frame propUsage) {
+            Frame formMappedProperty = getLastFrameOfType(propUsage, FORM_ACTION_OBJECT);
             return formMappedProperty != null && completeActionInFormContext(formMappedProperty);
         }
 
