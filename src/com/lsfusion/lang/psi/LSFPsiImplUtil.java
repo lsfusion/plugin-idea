@@ -369,15 +369,21 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(sourceStatement);
     }
 
-    public static ContextModifier getContextModifier(@NotNull LSFAssignActionPropertyDefinitionBody sourceStatement) {
-        LSFMappedPropertyExprParam mappedPropertyExprParam = sourceStatement.getMappedPropertyExprParam();
-        if (mappedPropertyExprParam != null) {
-            LSFExprParameterUsageList exprParameterUsageList = mappedPropertyExprParam.getExprParameterUsageList();
+    private static List<LSFPropertyExpression> getContextExprs(@NotNull LSFAssignActionPropertyDefinitionBody sourceStatement) {
+        LSFChangePropertyBody changePropertyBody = sourceStatement.getChangePropertyBody();
+        if (changePropertyBody != null) {
+            LSFPropertyExpressionList exprParameterUsageList = changePropertyBody.getPropertyExpressionList();
             if (exprParameterUsageList != null) {
-                return new ExprParamUsageContextModifier(exprParameterUsageList.getExprParameterUsageList());
+                LSFNonEmptyPropertyExpressionList nonEmptyPropertyExpressionList = exprParameterUsageList.getNonEmptyPropertyExpressionList();
+                if(nonEmptyPropertyExpressionList != null)
+                    return nonEmptyPropertyExpressionList.getPropertyExpressionList();
             }
         }
-        return new ExprParamUsageContextModifier(Collections.<LSFExprParameterUsage>emptyList());
+        return Collections.emptyList();
+    }
+
+    public static ContextModifier getContextModifier(@NotNull LSFAssignActionPropertyDefinitionBody sourceStatement) {
+        return new ExprsContextModifier(getContextExprs(sourceStatement));
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFAssignActionPropertyDefinitionBody sourceStatement) {
@@ -2666,6 +2672,15 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFChangePropertyBody sourceStatement) {
+        LSFPropertyExpressionList peList = sourceStatement.getPropertyExpressionList();
+        if (peList == null) {
+            return Collections.emptyList();
+        }
+        return resolveParamClasses(peList);
+    }
+
+    @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFNoContextPropertyUsage sourceStatement) {
         return null;
     }
@@ -2733,6 +2748,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static PsiElement getParamList(@NotNull LSFExecActionPropertyDefinitionBody sourceStatement) {
+        return sourceStatement.getPropertyExpressionList();
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFChangePropertyBody sourceStatement) {
         return sourceStatement.getPropertyExpressionList();
     }
 
@@ -3344,11 +3364,11 @@ public class LSFPsiImplUtil {
             return Inferred.EMPTY;
         }
         LSFPropertyExpression peValue = peList.get(0);
-        LSFMappedPropertyExprParam peTo = body.getMappedPropertyExprParam();
+        LSFChangePropertyBody peTo = body.getChangePropertyBody();
 
         assert peTo != null; // т.к. !peList.isEmpty()
 
-        Inferred result = inferParamClasses(peTo, peValue.resolveValueClass(true)).filter(params);
+        Inferred result = inferJoinParamClasses(peTo.getPropertyUsage(), null, peTo.getPropertyExpressionList(), peValue.resolveValueClass(true)).filter(params);
         //orClasses(BaseUtils.filterNullable(inferParamClasses(peValue, resolveValueClass(peTo.getPropertyUsage(), true)), params)
         if (peList.size() == 2)
             result = result.and(inferParamClasses(peList.get(1), null).filter(params));

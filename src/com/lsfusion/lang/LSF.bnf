@@ -1172,8 +1172,14 @@ assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | ass
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-private assignActionPropertyDefinitionBody1 ::= CHANGE mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 1}
-private assignActionPropertyDefinitionBody2 ::= mappedPropertyExprParam ARROW propertyExpression (WHERE propertyExpression)? {pin = 2}
+changePropertyBody ::= propertyUsage LBRAC propertyExpressionList RBRAC
+{
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList ]
+}
+
+private assignActionPropertyDefinitionBody1 ::= CHANGE changePropertyBody ARROW propertyExpression (WHERE propertyExpression)? {pin = 1}
+private assignActionPropertyDefinitionBody2 ::= changePropertyBody ARROW propertyExpression (WHERE propertyExpression)? {pin = 2}
 
 tryActionPropertyDefinitionBody ::= TRY actionPropertyDefinitionBody (CATCH actionPropertyDefinitionBody)? (FINALLY actionPropertyDefinitionBody)?
 {

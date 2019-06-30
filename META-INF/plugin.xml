@@ -9,6 +9,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.171</b><br>
         <ul>
+            <li>Support expressions in the left part of CHANGE operator</li>
             <li>Bugfix of incorrect property completion in functional GROUP operator</li>
             <li>Bugfix of incorrect property and action completion in some parts of FORM operator</li>
             <li>lsFusion server library name after download is lsfusion-majorVersion</li>
