@@ -46,6 +46,14 @@ public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclara
         return getLSFFile().getModuleDeclaration().getNamespace();
     }
 
+    public int getOffset() {
+        Stub stub = getStub();
+        if(stub != null)
+            return stub.getOffset();
+
+        return getTextOffset();
+    }
+
     @Override
     public String getPresentableText() {
         return getDeclName();
@@ -53,7 +61,7 @@ public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclara
 
     @Override
     public boolean resolveDuplicates() {
-        CollectionQuery<This> declarations = new CollectionQuery<>(LSFGlobalResolver.findElements(getDeclName(), null, getTypes(), getLSFFile(), getFindDuplicatesCondition(), Finalizer.EMPTY));
+        CollectionQuery<This> declarations = new CollectionQuery<>(LSFGlobalResolver.findElements(getDeclName(), null, getTypes(), getLSFFile(), null, getFindDuplicatesCondition(), Finalizer.EMPTY));
         return declarations.findAll().size() > 1;
     }
 

@@ -36,6 +36,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.impl.LSFFormExtendElement;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
@@ -478,7 +479,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     String namespace = namespaceAndClassName[0];
                     String className = namespaceAndClassName[1];
 
-                    Collection<LSFClassDeclaration> classDeclarations = LSFGlobalResolver.findElements(className, namespace, file, Collections.singleton(LSFStubElementTypes.CLASS), Condition.TRUE);
+                    Collection<LSFClassDeclaration> classDeclarations = LSFGlobalResolver.findElements(className, namespace, file, null, Collections.singleton(LSFStubElementTypes.CLASS), Condition.TRUE);
                     for (LSFClassDeclaration classDecl : classDeclarations) {
                         for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(classDecl, LSFStubElementTypes.EXTENDCLASS, project, getRequireScope())) {
                             for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {
@@ -558,14 +559,14 @@ public class ASTCompletionContributor extends CompletionContributor {
             );
         }
 
-        private <T extends LSFDeclaration> boolean completeFormContextObject(BooleanValueHolder completed, IElementType frameType, FormExtendProcessor<T> formExtendProcessor) {
+        private <T extends LSFFormExtendElement> boolean completeFormContextObject(BooleanValueHolder completed, IElementType frameType, FormExtendProcessor<T> formExtendProcessor) {
             Frame elementUsage = getLastFrameOfType(null, frameType);
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
                     FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
-                        Set<T> declaration = processFormContext(psi, elementUsage.offset, formExtendProcessor);
+                        Set<T> declaration = processFormContext(psi, getOriginalFrameOffset(elementUsage), formExtendProcessor);
                         for (T elementDecl : declaration) {
                             addLookupElement(createLookupElement(elementDecl, FORM_OBJECT_PRIORITY));
                         }

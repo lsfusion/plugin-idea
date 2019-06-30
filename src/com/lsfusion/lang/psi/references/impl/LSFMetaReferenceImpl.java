@@ -14,7 +14,6 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
-import com.lsfusion.lang.psi.impl.LSFScriptStatementImpl;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.psi.stubs.types.MetaStubElementType;
@@ -97,7 +96,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     protected Collection<? extends LSFMetaDeclaration> resolveNoConditionDeclarations() {
-        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), Condition.TRUE, Finalizer.EMPTY);
+        return LSFFullNameReferenceImpl.findNoConditionElements(this, Finalizer.EMPTY);
     }
 
     @Override
@@ -129,9 +128,9 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     }
 
     @Override
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations) {
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
         if (similarDeclarations.isEmpty()) {
-            return super.resolveNotFoundErrorAnnotation(holder, similarDeclarations);
+            return super.resolveNotFoundErrorAnnotation(holder, similarDeclarations, canBeDeclaredAfterAndNotChecked);
         }
 
         String errorText = "Unable to resolve '" + getNameRef() + "' meta: ";
@@ -160,7 +159,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public boolean isResolveToVirt(LSFMetaDeclaration virtDecl) {
-        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), Collections.singleton(getStubElementType()), getCondition(), Collections.singletonList(virtDecl)).contains(virtDecl);
+        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), getOffsetRef(), Collections.singleton(getStubElementType()), getCondition(), Collections.singletonList(virtDecl)).contains(virtDecl);
     }
 
     @Override

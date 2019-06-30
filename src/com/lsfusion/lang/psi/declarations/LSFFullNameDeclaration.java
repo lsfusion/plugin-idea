@@ -7,4 +7,6 @@ public interface LSFFullNameDeclaration<This extends LSFFullNameDeclaration<This
     String getNamespaceName();
 
     String getCanonicalName(); // каноническое имя "по умолчанию"
+    
+    int getOffset();
 }

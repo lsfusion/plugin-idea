@@ -59,18 +59,18 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
 
         if(declarations.isEmpty()) {
             if (canBeUsedInDirect()) {
-                declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), BaseUtils.<Condition<LSFGlobalPropDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
+                declarations = LSFFullNameReferenceImpl.findElements(this, BaseUtils.<Condition<LSFGlobalPropDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
             }
         }
 
         // ищем действия
         if(declarations.isEmpty()) {
-            declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), Collections.singletonList(LSFStubElementTypes.ACTION), getLSFFile(), BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getDirectCondition()), BaseUtils.immutableCast(getFinalizer()));
+            declarations = LSFFullNameReferenceImpl.findElements(this, Collections.singletonList(LSFStubElementTypes.ACTION), BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getDirectCondition()), BaseUtils.immutableCast(getFinalizer()));
         }
 
         if(declarations.isEmpty()) {
             if (canBeUsedInDirect()) {
-                declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), Collections.singletonList(LSFStubElementTypes.ACTION), getLSFFile(), BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
+                declarations = LSFFullNameReferenceImpl.findElements(this, Collections.singletonList(LSFStubElementTypes.ACTION), BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
             }
         }
 
@@ -85,10 +85,10 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
         if (usageClasses != null) {
             Finalizer<LSFActionOrPropDeclaration> noConditionFinalizer = getNoConditionFinalizer(usageClasses);
             if(declarations.isEmpty())
-                declarations = new CollectionQuery<LSFGlobalPropDeclaration>(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), Condition.TRUE, BaseUtils.immutableCast(noConditionFinalizer))).findAll();
+                declarations = new CollectionQuery<LSFGlobalPropDeclaration>(LSFFullNameReferenceImpl.findNoConditionElements(this, BaseUtils.immutableCast(noConditionFinalizer))).findAll();
 
             if(declarations.isEmpty())
-                declarations = new CollectionQuery<LSFActionDeclaration>(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), Condition.TRUE, BaseUtils.immutableCast(noConditionFinalizer))).findAll();
+                declarations = new CollectionQuery<LSFActionDeclaration>(LSFFullNameReferenceImpl.findNoConditionElements(this, BaseUtils.immutableCast(noConditionFinalizer))).findAll();
         }
         return declarations;
     }

@@ -9,8 +9,6 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.PropertyUsageContext;
 import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.psi.references.LSFActionReference;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -51,7 +49,7 @@ public abstract class LSFActionReferenceImpl extends LSFActionOrPropReferenceImp
 
         if(canBeUsedInDirect()) {
             if(declarations.isEmpty())
-                declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
+                declarations = LSFFullNameReferenceImpl.findElements(this, BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
         }
 
         return declarations;
@@ -65,7 +63,7 @@ public abstract class LSFActionReferenceImpl extends LSFActionOrPropReferenceImp
         if (usageClasses != null) {
             Finalizer<LSFActionDeclaration> noConditionFinalizer = getNoConditionFinalizer(usageClasses);
             if(declarations.isEmpty())
-                declarations = new CollectionQuery<LSFActionDeclaration>(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), Condition.TRUE, BaseUtils.immutableCast(noConditionFinalizer))).findAll();
+                declarations = new CollectionQuery<LSFActionDeclaration>(LSFFullNameReferenceImpl.findNoConditionElements(this, BaseUtils.immutableCast(noConditionFinalizer))).findAll();
         }
         return declarations;
     }

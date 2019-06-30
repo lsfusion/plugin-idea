@@ -1,4 +1,6 @@
 package com.lsfusion.lang.psi.declarations;
 
-public interface LSFObjectDeclaration extends LSFExprParamDeclaration {
+import com.lsfusion.lang.psi.declarations.impl.LSFFormExtendElement;
+
+public interface LSFObjectDeclaration extends LSFExprParamDeclaration, LSFFormExtendElement {
 }

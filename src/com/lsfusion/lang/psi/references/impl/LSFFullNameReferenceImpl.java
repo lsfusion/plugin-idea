@@ -7,8 +7,6 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -25,6 +23,20 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
 
     protected LSFFullNameReferenceImpl(@NotNull ASTNode node) {
         super(node);
+    }
+
+    public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findElements(LSFFullNameReference ref, Collection<FullNameStubElementType> types, Condition<T> condition, Finalizer<T> finalizer) {
+        return LSFGlobalResolver.findElements(ref.getNameRef(), ref.getFullNameRef(), types, ref.getLSFFile(), ref.getOffsetRef(), condition, finalizer);
+    }
+    public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findElements(LSFFullNameReferenceImpl refImpl, Condition<T> condition, Finalizer<T> finalizer) {
+        return findElements(refImpl, refImpl.getStubElementTypes(), condition, finalizer);
+    }
+
+    public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findNoConditionElements(LSFFullNameReference ref, Collection<FullNameStubElementType> types, Finalizer<T> finalizer) {
+        return LSFGlobalResolver.findElements(ref.getNameRef(), ref.getFullNameRef(), types, ref.getLSFFile(), null, Condition.TRUE, finalizer);
+    }
+    public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findNoConditionElements(LSFFullNameReferenceImpl refImpl, Finalizer<T> finalizer) {
+        return findNoConditionElements(refImpl, refImpl.getStubElementTypes(), finalizer);
     }
 
     protected abstract LSFCompoundID getCompoundID();
@@ -53,6 +65,10 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
         LSFNamespaceUsage namespace = getCompoundID().getNamespaceUsage();
         return namespace == null ? null : namespace.getText();
     }
+    
+    public Integer getOffsetRef() {
+        return getTextOffset();
+    }
 
     protected Collection<FullNameStubElementType> getStubElementTypes() {
         return Collections.singleton(getStubElementType());
@@ -79,7 +95,7 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     }
     protected Collection<? extends T> resolveDeclarations() {
         List<G> virtDecls = getVirtDecls();
-        Collection decls = LSFGlobalResolver.<FullNameStubElement, G>findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), getCondition(), getFinalizer(), virtDecls);
+        Collection decls = LSFGlobalResolver.<FullNameStubElement, G>findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), getOffsetRef(), getCondition(), getFinalizer(), virtDecls);
         return (Collection<? extends T>) decls;        
     } 
 
@@ -97,7 +113,7 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
         } else if (declarations.isEmpty()) {
             declarations = resolveNoConditionDeclarations();
 
-            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, declarations);
+            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, declarations, false);
         }
 
         return new LSFResolveResult(declarations, errorAnnotator);

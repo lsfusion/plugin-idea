@@ -69,6 +69,6 @@ public abstract class LSFAbstractParamReferenceImpl<T extends LSFExprParamDeclar
                 }
             }
         }
-        return new LSFResolveResult(objects, resolveDefaultErrorAnnotator(objects));
+        return new LSFResolveResult(objects, resolveDefaultErrorAnnotator(objects, true));
     }
 }

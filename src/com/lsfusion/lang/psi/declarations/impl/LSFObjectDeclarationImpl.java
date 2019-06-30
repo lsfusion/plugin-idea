@@ -14,7 +14,7 @@ import java.util.Collection;
 
 import static com.lsfusion.lang.psi.declarations.impl.LSFFormElementDeclarationImpl.Processor;
 
-public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationImpl implements LSFObjectDeclaration, LSFFormExtendElement {
+public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationImpl implements LSFObjectDeclaration {
 
     public LSFObjectDeclarationImpl(@NotNull ASTNode node) {
         super(node);
@@ -62,5 +62,10 @@ public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationIm
                 return getNameIdentifier().getText().equals(lsfDeclaration.getNameIdentifier().getText());
             }
         };
+    }
+
+    @Override
+    public int getOffset() {
+        return getTextOffset();
     }
 }

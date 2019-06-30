@@ -2,7 +2,9 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
+import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.references.impl.LSFReferenceImpl;
 
 import java.util.Collection;
@@ -56,13 +58,26 @@ public class LSFResolveResult {
 
     
     public static class NotFoundErrorAnnotator extends ErrorAnnotator {
+        
+        private boolean canBeDeclaredAfterAndNotChecked;
 
-        public NotFoundErrorAnnotator(LSFReferenceImpl ref, Collection<? extends LSFDeclaration> decls) {
+        public NotFoundErrorAnnotator(LSFReferenceImpl ref, Collection<? extends LSFDeclaration> decls, boolean canBeDeclaredAfterAndNotChecked) {
             super(ref, decls);
+            
+            this.canBeDeclaredAfterAndNotChecked = canBeDeclaredAfterAndNotChecked;
         }
 
         public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-            return ref.resolveNotFoundErrorAnnotation(holder, decls);
+            if(decls.size() == 1) {
+                LSFDeclaration singleDecl = decls.iterator().next();
+                if(singleDecl instanceof LSFFullNameDeclaration && LSFGlobalResolver.isAfter(ref.getLSFFile(), ref.getTextOffset(), (LSFFullNameDeclaration) singleDecl)) {
+                    String errorText = "Symbol '" + ref.getNameRef() + "' is declared after it is used";
+                    Annotation error = holder.createErrorAnnotation(ref, errorText);
+                    error.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
+                    return error;
+                }
+            }
+            return ref.resolveNotFoundErrorAnnotation(holder, decls, canBeDeclaredAfterAndNotChecked);
         }
     }
 }

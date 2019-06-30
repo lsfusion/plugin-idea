@@ -6,7 +6,7 @@ import com.lsfusion.lang.psi.declarations.LSFTreeGroupDecl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LSFTreeGroupDeclImpl extends LSFDeclarationImpl implements LSFTreeGroupDecl {
+public abstract class LSFTreeGroupDeclImpl extends LSFFormElementDeclarationImpl implements LSFTreeGroupDecl {
     public LSFTreeGroupDeclImpl(@NotNull ASTNode node) {
         super(node);
     }

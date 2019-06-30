@@ -254,6 +254,11 @@ public class LSFElementGenerator {
             }
 
             @Override
+            public Integer getOffsetRef() {
+                return null;
+            }
+
+            @Override
             public void setFullNameRef(String name, MetaTransaction transaction) {
                 throw new UnsupportedOperationException();
             }
@@ -303,6 +308,11 @@ public class LSFElementGenerator {
             @Override
             public String getFullNameRef() {
                 return fname;
+            }
+
+            @Override
+            public Integer getOffsetRef() {
+                return null;
             }
 
             @Override
@@ -374,6 +384,11 @@ public class LSFElementGenerator {
             @Override
             public String getFullNameRef() {
                 return fname;
+            }
+
+            @Override
+            public Integer getOffsetRef() {
+                return null;
             }
 
             @Override

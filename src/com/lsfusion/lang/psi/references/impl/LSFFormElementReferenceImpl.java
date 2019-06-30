@@ -3,12 +3,14 @@ package com.lsfusion.lang.psi.references.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.util.EmptyQuery;
 import com.intellij.util.Query;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.FormContext;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFormElementDeclaration;
+import com.lsfusion.lang.psi.declarations.impl.LSFFormExtendElement;
 import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFFormElementReference;
@@ -17,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> extends LSFReferenceImpl<T> implements LSFFormElementReference<T> {
-
+public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclaration> extends LSFReferenceImpl<T> implements LSFFormElementReference<T> {
+    
     protected LSFFormElementReferenceImpl(@NotNull ASTNode node) {
         super(node);
     }
@@ -39,7 +41,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
                 }
             }
         }
-        return new LSFResolveResult(objects, resolveDefaultErrorAnnotator(objects));
+        return new LSFResolveResult(objects, resolveDefaultErrorAnnotator(objects, true));
     }
 
     protected Condition<T> getResolvedDeclarationsFilter() {
@@ -61,12 +63,12 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
 
     protected abstract FormExtendProcessor<T> getElementsCollector();
 
-    public interface FormExtendProcessor<T> {
+    public interface FormExtendProcessor<T extends LSFFormExtendElement> {
         Collection<T> process(LSFFormExtend formExtend);
     }
 
-    public static <T> Set<T> processFormContext(PsiElement current, int offset, final FormExtendProcessor<T> processor) {
-        Set<T> processedContext = processFormContext(current, processor, true);
+    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, int offset, final FormExtendProcessor<T> processor) {
+        Set<T> processedContext = processFormContext(current, processor, offset, true);
         if (processedContext != null) {
             return processedContext;
         }
@@ -79,7 +81,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
         return new HashSet<>();
     }
 
-    public static <T> Set<T> processFormContext(PsiElement current, final FormExtendProcessor<T> processor, boolean objectRef) {
+    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, final FormExtendProcessor<T> processor, final int offset, boolean objectRef) {
         Query<LSFFormExtend> extendForms = null;
         if (current instanceof FormContext && (objectRef || current instanceof LSFFormStatement)) {
             LSFFormDeclaration formDecl = ((FormContext) current).resolveFormDecl();
@@ -90,9 +92,13 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFDeclaration> exte
 
         if (extendForms != null) {
             final Set<T> finalResult = new HashSet<>();
+            final PsiFile currentFile = current.getContainingFile();
             extendForms.forEach(new com.intellij.util.Processor<LSFFormExtend>() {
                 public boolean process(LSFFormExtend formExtend) {
-                    finalResult.addAll(processor.process(formExtend));
+                    boolean sameFile = currentFile == formExtend.getLSFFile();
+                    for(T element : processor.process(formExtend))
+                        if(!(sameFile && LSFGlobalResolver.isAfter(offset, element)))
+                            finalResult.add(element);
                     return true;
                 }
             });

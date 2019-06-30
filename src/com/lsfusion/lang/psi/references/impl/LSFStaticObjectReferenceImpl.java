@@ -30,7 +30,7 @@ public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFS
                 }
             }
         }
-        return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls));
+        return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls, false));
     }
 
     @Override

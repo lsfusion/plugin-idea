@@ -12,6 +12,8 @@ public interface LSFFullNameReference<T extends LSFDeclaration, G extends LSFFul
     Condition<G> getFullCondition();
 
     String getFullNameRef();
+    
+    Integer getOffsetRef();
 
     void setFullNameRef(String name, MetaTransaction transaction);
 }

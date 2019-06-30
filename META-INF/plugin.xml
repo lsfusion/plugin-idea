@@ -7,13 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.171</b><br>
+        <b>Version 1.0.172</b><br>
         <ul>
-            <li>Support expressions in the left part of CHANGE operator</li>
-            <li>Support expressions in the left part of DELETE / CHANGECLASS operators</li>
-            <li>Bugfix of incorrect property completion in functional GROUP operator</li>
-            <li>Bugfix of incorrect property and action completion in some parts of FORM operator</li>
-            <li>lsFusion server library name after download is lsfusion-majorVersion</li>
+            <li>Added check that element declaration should be before its reference when they are in the same file</li>
         </ul>
     ]]>
     </change-notes>

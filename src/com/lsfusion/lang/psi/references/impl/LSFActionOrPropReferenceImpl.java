@@ -244,7 +244,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
     protected abstract String getErrorName();
 
     @Override
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations) {
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
         String errorText;
         boolean noSuchProperty = similarDeclarations.size() == 0;
         if (similarDeclarations.size() != 1) {

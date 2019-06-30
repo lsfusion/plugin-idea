@@ -59,9 +59,12 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
     public static List<LSFMetaCodeStatement> findMetaUsages(final String name, int paramCount, final LSFFile file) {
 
         // песец не надежно, но что поделаешь
-        final LSFMetaDeclaration virtDecl = new LSFMetaCodeDeclarationStatementImpl(new MetaStubImpl(name, paramCount), LSFStubElementTypes.META) {
+        final LSFMetaDeclaration virtDecl = new LSFMetaCodeDeclarationStatementImpl(new MetaStubImpl(name, paramCount, 0), LSFStubElementTypes.META) {
             public LSFFile getLSFFile() {
                 return file;
+            }
+            public int getTextOffset() {
+                return 0;
             }
         };
         final List<LSFMetaCodeStatement> result = new ArrayList<>();

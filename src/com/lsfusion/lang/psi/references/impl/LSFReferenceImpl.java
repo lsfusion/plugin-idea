@@ -101,10 +101,10 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
         return ResolveCache.getInstance(getProject()).resolveWithCaching(this, LSFResolver.INSTANCE, true, incompleteCode);
     }
 
-    public LSFResolveResult.ErrorAnnotator resolveDefaultErrorAnnotator(final Collection<? extends LSFDeclaration> decls) {
+    public LSFResolveResult.ErrorAnnotator resolveDefaultErrorAnnotator(final Collection<? extends LSFDeclaration> decls, boolean canBeDeclaredAfterAndNotChecked) {
         LSFResolveResult.ErrorAnnotator errorAnnotator = null;
         if (decls.isEmpty()) {
-            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, decls);
+            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, decls, canBeDeclaredAfterAndNotChecked);
         } else if (decls.size() > 1) {
             errorAnnotator = new LSFResolveResult.AmbigiousErrorAnnotator(this, decls);
         }
@@ -122,8 +122,8 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
         return annotation;
     }
 
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations) {
-        return holder.createErrorAnnotation(getTextRange(), "Cannot resolve symbol '" + getNameRef() + "'");
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
+        return holder.createErrorAnnotation(getTextRange(), "Cannot resolve symbol '" + getNameRef() + "'" + (canBeDeclaredAfterAndNotChecked ? " or maybe it is declared later" : ""));
     }
 
     @NotNull

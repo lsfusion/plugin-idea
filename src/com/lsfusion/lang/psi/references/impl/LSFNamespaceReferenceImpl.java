@@ -18,6 +18,6 @@ public abstract class LSFNamespaceReferenceImpl extends LSFGlobalReferenceImpl<L
     @Override
     public LSFResolveResult resolveNoCache() {
         Collection<LSFNamespaceDeclaration> decls = LSFGlobalResolver.findNamespaces(getNameRef(), getScope()).findAll();
-        return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls));
+        return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls, false));
     }
 }

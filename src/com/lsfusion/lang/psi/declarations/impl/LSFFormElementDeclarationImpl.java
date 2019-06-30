@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public abstract class LSFFormElementDeclarationImpl<T extends LSFDeclaration> extends LSFDeclarationImpl implements LSFFormElementDeclaration, LSFFormExtendElement {
+public abstract class LSFFormElementDeclarationImpl<T extends LSFDeclaration> extends LSFDeclarationImpl implements LSFFormElementDeclaration {
 
     public interface Processor<T> {
         Collection<T> process(LSFFormExtend formExtend);
@@ -32,6 +32,11 @@ public abstract class LSFFormElementDeclarationImpl<T extends LSFDeclaration> ex
                        return declName.equals(decl.getDeclName());
                    }
                };
+    }
+
+    @Override
+    public int getOffset() {
+        return getTextOffset();
     }
 
     @NotNull

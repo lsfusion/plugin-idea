@@ -47,6 +47,6 @@ public abstract class GlobalStubImpl<This extends GlobalStubElement<This, Decl>,
 
     @Override
     public boolean isCorrect() {
-        return true;
+        return isCorrect;
     }
 }

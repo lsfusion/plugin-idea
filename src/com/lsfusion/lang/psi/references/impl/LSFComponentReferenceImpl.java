@@ -45,7 +45,7 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
         if (declarations.size() > 1) {
             errorAnnotator = new LSFResolveResult.AmbigiousErrorAnnotator(this, declarations);
         } else if (declarations.isEmpty()) {
-            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, declarations);
+            errorAnnotator = new LSFResolveResult.NotFoundErrorAnnotator(this, declarations, false);
         }
 
         return new LSFResolveResult(declarations, errorAnnotator);

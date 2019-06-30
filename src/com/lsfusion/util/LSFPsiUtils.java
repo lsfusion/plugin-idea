@@ -143,7 +143,7 @@ public class LSFPsiUtils {
             public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
                 return formExtend.getObjectDecls();
             }
-        }, objectRef);
+        }, offset, objectRef);
         if (objects != null) {
             return BaseUtils.immutableCast(objects);
         }

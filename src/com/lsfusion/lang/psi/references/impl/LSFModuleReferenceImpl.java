@@ -18,6 +18,6 @@ public abstract class LSFModuleReferenceImpl extends LSFGlobalReferenceImpl<LSFM
     @Override
     public LSFResolveResult resolveNoCache() {
         Collection<LSFModuleDeclaration> decls = LSFGlobalResolver.findModules(getNameRef(), getScope()).findAll();
-        return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls));
+        return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls, false));
     }
 }

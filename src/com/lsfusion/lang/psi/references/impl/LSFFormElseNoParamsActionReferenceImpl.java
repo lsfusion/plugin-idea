@@ -4,14 +4,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
-import com.intellij.psi.PsiElement;
 import com.intellij.util.CollectionQuery;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.classes.LSFClassSet;
-import com.lsfusion.lang.psi.Finalizer;
-import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
-import com.lsfusion.lang.psi.context.PropertyUsageContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.LSFFormElseNoParamsActionReference;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -55,7 +51,7 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
 
         // ищем действия
         if(declarations.isEmpty()) {
-            declarations = LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), Collections.singletonList(LSFStubElementTypes.ACTION), getLSFFile(), getActionCondition(), BaseUtils.immutableCast(getFinalizer()));
+            declarations = LSFFullNameReferenceImpl.findElements(this, Collections.singletonList(LSFStubElementTypes.ACTION), getActionCondition(), BaseUtils.immutableCast(getFinalizer()));
         }
 
         return declarations;
@@ -66,13 +62,13 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
         Collection<? extends LSFFormOrActionDeclaration> declarations = BaseUtils.emptyList();
 
         if(declarations.isEmpty())
-            declarations = new CollectionQuery<LSFActionDeclaration>(LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), Collections.singletonList(LSFStubElementTypes.ACTION), getLSFFile(), Condition.TRUE, BaseUtils.immutableCast(getFinalizer()))).findAll();
+            declarations = new CollectionQuery<LSFActionDeclaration>(LSFFullNameReferenceImpl.findNoConditionElements(this, Collections.singletonList(LSFStubElementTypes.ACTION), BaseUtils.immutableCast(getFinalizer()))).findAll();
 
         return declarations;
     }
 
     @Override
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations) {
+    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
         String errorText;
         boolean noSuchProperty = similarDeclarations.size() == 0;
         if (similarDeclarations.size() != 1) {
