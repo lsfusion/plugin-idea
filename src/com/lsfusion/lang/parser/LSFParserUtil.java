@@ -67,6 +67,26 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         return true;
     }
 
+    private static Key<Integer> MATCHEDSINGLEPARAMETER = Key.create("lsf.matched.single.parameter");
+
+    public static boolean checkChangeClassExpr(PsiBuilder builder_, int level_) {
+        builder_.putUserData(MATCHEDSINGLEPARAMETER, null);
+        return true;
+    }
+    public static boolean matchedSingleParameter(PsiBuilder builder_, int level_) {
+        builder_.putUserData(MATCHEDSINGLEPARAMETER, builder_.rawTokenIndex());
+        return true;
+    }
+
+    public static boolean matchedChangeClassExpr(PsiBuilder builder_, int level_) {
+        Integer userData = builder_.getUserData(MATCHEDSINGLEPARAMETER);
+        if (userData != null && userData == builder_.rawTokenIndex()) {
+            builder_.putUserData(MATCHEDSINGLEPARAMETER, null); // just in case
+            return false;
+        }        
+        return true;
+    }
+
     private static Key<Boolean> FULLCOMPOUND = Key.create("lsf.full.compound.param.declare");
 
     public static boolean fullCompoundParamDeclareStop(PsiBuilder builder_, int level_) {

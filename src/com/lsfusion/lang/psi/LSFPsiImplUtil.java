@@ -412,10 +412,13 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFChangeClassActionPropertyDefinitionBody sourceStatement) {
-        return getContextModifier(sourceStatement.getExprParameterUsage());
+        return getContextModifier(sourceStatement.getChangeClassObjectBody());
     }
-
-    private static ContextModifier getContextModifier(LSFExprParameterUsage exprParameterUsage) {
+    
+    private static ContextModifier getContextModifier(@Nullable LSFChangeClassObjectBody body) {
+        LSFExprParameterUsage exprParameterUsage = null;
+        if(body != null)
+            exprParameterUsage = body.getExprParameterUsage();
         return new ExprParamUsageContextModifier(exprParameterUsage == null ? Collections.<LSFExprParameterUsage>emptyList() : singletonList(exprParameterUsage));
     }
 
@@ -424,7 +427,7 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFDeleteActionPropertyDefinitionBody sourceStatement) {
-        return getContextModifier(sourceStatement.getExprParameterUsage());
+        return getContextModifier(sourceStatement.getChangeClassObjectBody());
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFDeleteActionPropertyDefinitionBody sourceStatement) {
@@ -3436,14 +3439,18 @@ public class LSFPsiImplUtil {
         return inferActionParamClasses(body.getActionPropertyDefinitionBody(), params).override(forClasses);
     }
 
+    public static Inferred inferActionParamClasses(@Nullable LSFChangeClassWhere where) {
+        if(where != null)
+            return inferExpressionParamClasses(where.getPropertyExpression(), null);
+        return Inferred.EMPTY;        
+    }
     public static Inferred inferActionParamClasses(LSFChangeClassActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         // берем условия for, если есть, для остальных из внутреннего action'а
-        return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+        return inferActionParamClasses(body.getChangeClassWhere()).filter(params);
     }
 
     public static Inferred inferActionParamClasses(LSFDeleteActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        // берем условия for, если есть, для остальных из внутреннего action'а
-        return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+        return inferActionParamClasses(body.getChangeClassWhere()).filter(params);
     }
 
     public static Inferred inferParamClasses(LSFMappedPropertyExprParam mappedProperty, @Nullable LSFExClassSet valueClass) {

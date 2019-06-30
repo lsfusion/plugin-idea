@@ -948,14 +948,20 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST | NULL)?
     methods = [inferActionParamClasses resolveFormDecl] 
 }
 
-changeClassActionPropertyDefinitionBody ::= CHANGECLASS exprParameterUsage TO customClassUsage (WHERE propertyExpression)?
+// the same trick as with formPropertyDrawMappedDecl
+changeClassObjectBody ::=
+        (<<checkChangeClassExpr>> &((exprParameterUsage <<matchedSingleParameter>>)?) propertyExpression <<matchedChangeClassExpr>>) | 
+        exprParameterUsage
+changeClassWhere ::= WHERE propertyExpression
+
+changeClassActionPropertyDefinitionBody ::= CHANGECLASS changeClassObjectBody TO customClassUsage changeClassWhere?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-deleteActionPropertyDefinitionBody ::= DELETE exprParameterUsage (WHERE propertyExpression)?
+deleteActionPropertyDefinitionBody ::= DELETE changeClassObjectBody changeClassWhere?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
@@ -1446,7 +1452,7 @@ formActionPropertyObject ::= formActionObject | formActionDeclaration
 
 formPropertyDrawMappedDecl ::= (formPropertyDrawObject  
                                | (simpleNameOrWithCaption? EQUALS (
-                                                        // pretty tricky solution, we do lookahead to match formPropertyDrawObject, then we save last token and compare it to last token in formExprDeclaration, if the same - move to formPropertyDrawObject, otherwise map formExprDeclaration  
+                                                        // pretty tricky solution, we do lookahead to match formPropertyDrawObject, then we save last token and compare it to last token in formExprDeclaration, if the same - move to formPropertyDrawObject, otherwise map formExprDeclaration, the same approach is used in CHANGECLASS / DELETE  
                                                         (<<checkFormExpr>> &((formPropertyDrawObject <<matchedFormDrawObject>>)?) formExprDeclaration <<matchedFormExpr>>) | 
                                                         formPropertyDrawObject | 
                                                         formActionDeclaration)))
