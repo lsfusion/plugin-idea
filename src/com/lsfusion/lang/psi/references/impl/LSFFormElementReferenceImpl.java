@@ -83,7 +83,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclar
 
     public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, final FormExtendProcessor<T> processor, final int offset, boolean objectRef) {
         Query<LSFFormExtend> extendForms = null;
-        if (current instanceof FormContext && (objectRef || current instanceof LSFFormStatement)) {
+        if (current instanceof FormContext && (objectRef || current instanceof LSFFormStatement || current instanceof LSFDesignStatement)) {
             LSFFormDeclaration formDecl = ((FormContext) current).resolveFormDecl();
             extendForms = formDecl == null
                           ? new EmptyQuery<LSFFormExtend>()

@@ -745,7 +745,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         private boolean completeActionInModifyParamOrFormContext(Frame propUsage) {
-            PsiElement psi = getLastPsiOfType(false, ModifyParamContext.class, LSFFormStatement.class);
+            PsiElement psi = getLastPsiOfType(false, ModifyParamContext.class, LSFFormStatement.class, LSFDesignStatement.class);
             if (psi != null) {
                 completeActions(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
                 return true;
@@ -794,7 +794,7 @@ public class ASTCompletionContributor extends CompletionContributor {
 
         // should be together because there can be modify param context and form context simultaneously (in form operator)
         private boolean completePropertyInModifyParamOrFormContext(Frame propUsage) {
-            PsiElement psi = getLastPsiOfType(true, ModifyParamContext.class, LSFFormStatement.class);
+            PsiElement psi = getLastPsiOfType(true, ModifyParamContext.class, LSFFormStatement.class, LSFDesignStatement.class);
             if (psi != null) {
                 completeProperties(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
                 return true;
@@ -804,7 +804,7 @@ public class ASTCompletionContributor extends CompletionContributor {
 
         // should be together because there can be modify param context and form context simultaneously (in form operator)
         private boolean completeParameterInModifyParamOrFormContext(Frame paramDeclare) {
-            PsiElement psi = getLastPsiOfType(true, ModifyParamContext.class, LSFFormStatement.class);
+            PsiElement psi = getLastPsiOfType(true, ModifyParamContext.class, LSFFormStatement.class, LSFDesignStatement.class);
             if (psi != null) {
                 LSFExprParamDeclaration currentParamDeclaration = getPsiOfTypeForFrame(paramDeclare, LSFExprParamDeclaration.class);
                 
