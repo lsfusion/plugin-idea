@@ -949,19 +949,22 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST | NULL)?
 }
 
 // the same trick as with formPropertyDrawMappedDecl
-changeClassObjectBody ::=
-        (<<checkChangeClassExpr>> &((exprParameterUsage <<matchedSingleParameter>>)?) propertyExpression <<matchedChangeClassExpr>>) | 
+parameterOrExpression ::=
+        (<<checParameterOrExpression>> &((exprParameterUsage <<matchedSingleParameter>>)?) propertyExpression <<matchedParameterOrExpression>>) | 
         exprParameterUsage
+nonEmptyParameterOrExpressionList ::= parameterOrExpression (COMMA parameterOrExpression)* { pin(".*") = 1}
+parameterOrExpressionList ::= (nonEmptyParameterOrExpressionList)?
+        
 changeClassWhere ::= WHERE propertyExpression
 
-changeClassActionPropertyDefinitionBody ::= CHANGECLASS changeClassObjectBody TO customClassUsage changeClassWhere?
+changeClassActionPropertyDefinitionBody ::= CHANGECLASS parameterOrExpression TO customClassUsage changeClassWhere?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-deleteActionPropertyDefinitionBody ::= DELETE changeClassObjectBody changeClassWhere?
+deleteActionPropertyDefinitionBody ::= DELETE parameterOrExpression changeClassWhere?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
@@ -1178,7 +1181,7 @@ assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | ass
     methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
 }
 
-changePropertyBody ::= propertyUsage LBRAC propertyExpressionList RBRAC
+changePropertyBody ::= propertyUsage LBRAC parameterOrExpressionList RBRAC
 {
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList ]

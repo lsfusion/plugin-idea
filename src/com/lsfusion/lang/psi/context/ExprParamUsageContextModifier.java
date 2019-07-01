@@ -25,8 +25,11 @@ public class ExprParamUsageContextModifier implements ContextModifier {
 
         List<LSFExprParamDeclaration> result = new ArrayList<>();
         for(LSFExprParameterUsage paramUsage : paramUsages) {
+            if(paramUsage.getTextOffset() > offset) // we don't need param usages after resolving offset
+                continue;
+
             LSFExprParameterNameUsage nameUsage = paramUsage.getExprParameterNameUsage();
-            if(nameUsage!=null && !paramNames.contains(nameUsage.getNameRef()))
+            if(!paramNames.contains(nameUsage.getNameRef()))
                 result.add(nameUsage.getClassParamDeclare().getParamDeclare());
         }
         return result;

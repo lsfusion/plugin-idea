@@ -10,6 +10,7 @@
         <b>Version 1.0.172</b><br>
         <ul>
             <li>Added check that element declaration should be before its reference when they are in the same file</li>
+            <li>Minor parameter resolving fix in CHANGE operator</li>
         </ul>
     ]]>
     </change-notes>

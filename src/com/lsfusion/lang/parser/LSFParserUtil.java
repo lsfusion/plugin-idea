@@ -69,7 +69,7 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
 
     private static Key<Integer> MATCHEDSINGLEPARAMETER = Key.create("lsf.matched.single.parameter");
 
-    public static boolean checkChangeClassExpr(PsiBuilder builder_, int level_) {
+    public static boolean checParameterOrExpression(PsiBuilder builder_, int level_) {
         builder_.putUserData(MATCHEDSINGLEPARAMETER, null);
         return true;
     }
@@ -78,7 +78,7 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         return true;
     }
 
-    public static boolean matchedChangeClassExpr(PsiBuilder builder_, int level_) {
+    public static boolean matchedParameterOrExpression(PsiBuilder builder_, int level_) {
         Integer userData = builder_.getUserData(MATCHEDSINGLEPARAMETER);
         if (userData != null && userData == builder_.rawTokenIndex()) {
             builder_.putUserData(MATCHEDSINGLEPARAMETER, null); // just in case
