@@ -27,7 +27,7 @@ public class LSFReadWriteAccessDetector extends ReadWriteAccessDetector {
         PsiElement element = expression;
         while (element != null) {
             if (element.getParent() != null) {
-                if (element.getParent() instanceof LSFAssignActionPropertyDefinitionBody && element instanceof LSFMappedPropertyExprParam) {
+                if (element.getParent() instanceof LSFAssignActionPropertyDefinitionBody && element instanceof LSFChangePropertyBody) {
                     return Access.Write;
                 }
                 if (element.getParent() instanceof LSFWriteWhenStatement && element instanceof LSFMappedPropertyClassParamDeclare) {

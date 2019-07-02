@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.172</b><br>
+        <b>Version 1.0.173</b><br>
         <ul>
-            <li>Added check that element declaration should be before its reference when they are in the same file</li>
-            <li>Bugfix of param resolving / completion in DESIGN operator</li>
-            <li>Minor parameter resolving fix in CHANGE operator</li>
+            <li>Property write access fix</li>
         </ul>
     ]]>
     </change-notes>
