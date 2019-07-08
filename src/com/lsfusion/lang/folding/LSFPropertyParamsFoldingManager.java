@@ -162,7 +162,7 @@ public class LSFPropertyParamsFoldingManager {
         if (project != null && !project.isDisposed()) {
             PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
             Runnable runnable = CodeFoldingManager.getInstance(project).updateFoldRegionsAsync(editor, true);
-            if (runnable != null) {
+            if (runnable != null && !editor.isDisposed()) {
                 runnable.run();
                 foldingsRebuilt(editor);
             }
