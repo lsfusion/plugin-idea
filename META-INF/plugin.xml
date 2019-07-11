@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.173</b><br>
+        <b>Version 1.0.174</b><br>
         <ul>
-            <li>Property write access fix</li>
+            <li>Generate FORM from json</li>
         </ul>
     ]]>
     </change-notes>
@@ -92,6 +92,10 @@
             <action id="Errors" class="com.lsfusion.actions.ShowErrorsAction" text="Show errors"
                     description="Show all current errors in all files">
                 <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
+            </action>
+
+            <action id="GenerateForm" class="com.lsfusion.actions.generate.GenerateFormAction" text="Generate FORM from json"
+                    description="Generate form from json">
             </action>
 
             <separator/>
