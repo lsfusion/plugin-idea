@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.174</b><br>
+        <b>Version 1.0.175</b><br>
         <ul>
-            <li>Generate FORM from json</li>
+            <li>Removed line breakpoint option for property and declarations</li>
         </ul>
     ]]>
     </change-notes>

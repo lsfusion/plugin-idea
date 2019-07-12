@@ -20,8 +20,8 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.breakpoints.XLineBreakpointTypeBase;
 import com.intellij.xdebugger.breakpoints.ui.XBreakpointGroupingRule;
 import com.lsfusion.lang.LSFFileType;
-import com.lsfusion.lang.psi.LSFActionPropertyDefinitionBody;
-import com.lsfusion.lang.psi.LSFListActionPropertyDefinitionBody;
+import com.lsfusion.lang.psi.LSFClassStatement;
+import com.lsfusion.lang.psi.LSFPropertyStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.debugger.breakpoints.properties.JavaBreakpointProperties;
@@ -72,7 +72,7 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
             XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<PsiElement>() {
                 @Override
                 public boolean process(PsiElement psiElement) {
-                    if (psiElement instanceof PsiWhiteSpace) {
+                    if (psiElement instanceof PsiWhiteSpace || hasPropertyBreakpoint(psiElement) || hasClassBreakpoint(psiElement)) {
                         return true;
                     }
                     
@@ -88,6 +88,14 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
         }
 
         return false;
+    }
+
+    private boolean hasPropertyBreakpoint(PsiElement psiElement) {
+        return PsiTreeUtil.getParentOfType(psiElement, LSFPropertyStatement.class) != null;
+    }
+
+    private boolean hasClassBreakpoint(PsiElement psiElement) {
+        return PsiTreeUtil.getParentOfType(psiElement, LSFClassStatement.class) != null;
     }
 
     @NotNull
