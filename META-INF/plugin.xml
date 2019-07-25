@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.174</version>
+    <version>1.0.175</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -10,6 +10,7 @@
         <b>Version 1.0.175</b><br>
         <ul>
             <li>Removed line breakpoint option for property and declarations</li>
+            <li>IDEA 2019.2 support</li>
         </ul>
     ]]>
     </change-notes>

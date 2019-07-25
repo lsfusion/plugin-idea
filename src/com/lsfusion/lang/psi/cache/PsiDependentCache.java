@@ -77,7 +77,7 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         }
 
         RecursionGuard.StackStamp stamp = myGuard.markStack();
-        result = needToPreventRecursion ? myGuard.doPreventingRecursion(Pair.create(psi, incompleteCode), true, new Computable<TResult>() {
+        result = needToPreventRecursion ? (TResult) myGuard.doPreventingRecursion(Pair.create(psi, incompleteCode), true, new Computable<TResult>() {
             @Override
             public TResult compute() {
                 return resolver.resolve(psi, incompleteCode);

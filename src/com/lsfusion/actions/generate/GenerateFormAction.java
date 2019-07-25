@@ -15,11 +15,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.intellij.testFramework.LightPlatformTestCase.getProject;
 
 public class GenerateFormAction extends AnAction {
 
@@ -29,7 +27,7 @@ public class GenerateFormAction extends AnAction {
     public void actionPerformed(final AnActionEvent e) {
 
         final FileChooserDescriptor fileChooser = FileChooserDescriptorFactory.createSingleFileDescriptor("json");
-        FileChooser.chooseFiles(fileChooser, getProject(), null, paths -> {
+        FileChooser.chooseFiles(fileChooser, e.getProject(), null, paths -> {
             if (!paths.isEmpty()) {
                 String jsonPath = paths.get(0).getPath();
 
