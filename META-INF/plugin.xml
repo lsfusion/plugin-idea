@@ -10,6 +10,7 @@
         <b>Version 1.0.176</b><br>
         <ul>
             <li>Generate FORM from xml</li>
+            <li>Small caches issue fix (IDEA 2019.2)</li>
         </ul>
     ]]>
     </change-notes>

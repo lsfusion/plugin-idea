@@ -72,24 +72,23 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         Getter<TResult> reference = map.get(psi);
         TResult result = reference == null ? null : reference.get();
 
-        if (result != null) {
-            return result;
-        }
+        if (result == null) {
+            RecursionGuard.StackStamp stamp = myGuard.markStack();
+            result = needToPreventRecursion ? (TResult) myGuard.doPreventingRecursion(Pair.create(psi, incompleteCode), true, new Computable<TResult>() {
+                @Override
+                public TResult compute() {
+                    return resolver.resolve(psi, incompleteCode);
+                }
+            }) : resolver.resolve(psi, incompleteCode);
+            PsiElement element = result instanceof ResolveResult ? ((ResolveResult) result).getElement() : null;
 
-        RecursionGuard.StackStamp stamp = myGuard.markStack();
-        result = needToPreventRecursion ? (TResult) myGuard.doPreventingRecursion(Pair.create(psi, incompleteCode), true, new Computable<TResult>() {
-            @Override
-            public TResult compute() {
-                return resolver.resolve(psi, incompleteCode);
+            LOG.assertTrue(element == null || element.isValid(), result);
+
+            if (stamp.mayCacheNow()) {
+                cache(psi, map, result);
             }
-        }) : resolver.resolve(psi, incompleteCode);
-        PsiElement element = result instanceof ResolveResult ? ((ResolveResult) result).getElement() : null;
-
-        LOG.assertTrue(element == null || element.isValid(), result);
-
-        if (stamp.mayCacheNow()) {
-            cache(psi, map, result);
         }
+        
         if(result != null && !resolver.checkResultClass(result))
             return null;
         return result;
