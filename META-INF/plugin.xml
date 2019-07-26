@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.175</b><br>
+        <b>Version 1.0.176</b><br>
         <ul>
-            <li>Removed line breakpoint option for property and declarations</li>
-            <li>IDEA 2019.2 support</li>
+            <li>Generate FORM from xml</li>
         </ul>
     ]]>
     </change-notes>

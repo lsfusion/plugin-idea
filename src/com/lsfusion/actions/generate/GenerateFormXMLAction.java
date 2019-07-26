@@ -60,7 +60,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
                     List<ParseNode> nChildren = new ArrayList<>();
                     nChildren.add(mergedChild);
 
-                    children.add(new GroupObjectParseNode(childKey, nChildren, integrationKey));
+                    children.add(new GroupObjectParseNode(childKey, nChildren, getElementNamespace(element), integrationKey));
 
                 } else { //propertyGroupParseNode, childrenList.size() == 1
 
@@ -75,7 +75,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
             }
         }
 
-        return new PropertyGroupParseNode(key, children);
+        return new PropertyGroupParseNode(key, children, getElementNamespace(element));
     }
 
     private Map<String, List<Element>> getChildrenMap(Element element) {
@@ -88,5 +88,11 @@ public class GenerateFormXMLAction extends GenerateFormAction {
             childrenMap.put(child.getName(), childrenList);
         }
         return childrenMap;
+    }
+
+    private ElementNamespace getElementNamespace(Element element) {
+        String prefix = element.getNamespacePrefix();
+        String uri = element.getNamespaceURI();
+        return !prefix.isEmpty() ? new ElementNamespace(prefix, uri) : null;
     }
 }

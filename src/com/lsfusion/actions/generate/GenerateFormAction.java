@@ -9,6 +9,7 @@ import org.json.JSONException;
 
 import javax.swing.*;
 import java.awt.*;
+import java.beans.Introspector;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ public class GenerateFormAction extends AnAction {
 
     private Set<String> usedObjectIds = new HashSet<>();
     private Set<String> usedGroupIds = new HashSet<>();
+    private Set<String> usedNamespacePrefixes = new HashSet<>();
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
@@ -26,6 +28,7 @@ public class GenerateFormAction extends AnAction {
             if (rootElement != null) {
                 usedObjectIds = new HashSet<>();
                 usedGroupIds = new HashSet<>();
+                usedNamespacePrefixes = new HashSet<>();
                 ParseNode hierarchy = generateHierarchy(rootElement, null);
                 CodeBlock formCodeBlock = generateForm(hierarchy, null, null, null, null, null);
                 showFormScript(formCodeBlock);
@@ -97,7 +100,7 @@ public class GenerateFormAction extends AnAction {
         Set<String> groupDeclarationScripts = new LinkedHashSet<>();
         Set<String> propertyDeclarationScripts = new LinkedHashSet<>();
         Set<String> objectsScripts = new LinkedHashSet<>();
-        Set<ElementKey> properties = new LinkedHashSet<>();
+        Set<ElementProperty> properties = new LinkedHashSet<>();
         String propertiesScript = null;
         String filtersScript = null;
         List<CodeBlock> children = new ArrayList<>();
@@ -108,11 +111,11 @@ public class GenerateFormAction extends AnAction {
             if(((GroupObjectParseNode) element).isIndex()) {
                 filterProperty = getFilterProperty(parentKey, key);
                 propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key, "INTEGER"));
-                objectsScripts.add(getObjectsScript(key, parentInGroupKey));
-                propertiesScript = getPropertiesScript(key, null, new LinkedHashSet<>(Collections.singletonList(new ElementKey("value", key.ID))));
+                objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentInGroupKey));
+                propertiesScript = getPropertiesScript(key, null, new LinkedHashSet<>(Collections.singletonList(new ElementProperty(new ElementKey("value", key.ID), ((GroupObjectParseNode) element).namespace, false))));
             } else {
                 filterProperty = getFilterProperty(lastGroupObjectParent, key);
-                objectsScripts.add(getObjectsScript(key, parentKey));
+                objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentKey));
 
                 for (ParseNode childElement : element.children) {
                     children.add(generateForm(childElement, key, element, parentKey, parentElement instanceof PropertyGroupParseNode ? key : null, key));
@@ -128,24 +131,22 @@ public class GenerateFormAction extends AnAction {
 
             if(hasPropertyGroupParseNodeChildren(element)) {
                 if(lastGroupObjectParent != null) {
-                    objectsScripts.add(getObjectsScript(key, parentKey));
+                    objectsScripts.add(getObjectsScript(key, ((PropertyGroupParseNode) element).namespace, parentKey));
                     if (parentKey != null) {
-                        groupDeclarationScripts.add(getGroupDeclarationScript(parentKey, null));
+                        groupDeclarationScripts.add(getGroupDeclarationScript(parentKey, ((PropertyGroupParseNode) element).namespace, null));
                     }
                 }
             }
 
             if(parentElement instanceof PropertyGroupParseNode) {
-                groupDeclarationScripts.add(getGroupDeclarationScript(key, parentInGroupKey));
+                groupDeclarationScripts.add(getGroupDeclarationScript(key, ((PropertyGroupParseNode) element).namespace, parentInGroupKey));
             }
 
             for(ParseNode childElement : element.children) {
                 ElementKey childElementKey = new ElementKey(childElement.key);
 
                 if(childElement instanceof PropertyParseNode) {
-                    if(((PropertyParseNode) childElement).isAttr())
-                        childElementKey.attr = true;
-                    properties.add(childElementKey);
+                    properties.add(new ElementProperty(childElementKey, ((PropertyGroupParseNode) element).namespace, ((PropertyParseNode) childElement).attr));
                 }
 
                 children.add(generateForm(childElement, childElementKey, element, key, parentElement instanceof PropertyGroupParseNode ? key : null, lastGroupObjectParent));
@@ -194,11 +195,11 @@ public class GenerateFormAction extends AnAction {
         return key != null ? (key.ID + BaseUtils.capitalize(childKey.ID)) : null;
     }
 
-    private String getGroupDeclarationScript(ElementKey groupKey, ElementKey parentGroupKey) {
+    private String getGroupDeclarationScript(ElementKey groupKey, ElementNamespace groupNamespace, ElementKey parentGroupKey) {
         if(groupKey != null && !usedGroupIds.contains(groupKey.ID)) {
             usedGroupIds.add(groupKey.ID);
-            String extID = groupKey.ID.equals(groupKey.extID) ? "" : (" EXTID '" + groupKey.extID + "'");
-            String parent = parentGroupKey == null ? "" : (" : " + parentGroupKey.ID);
+            String extID = getExtIDScript(groupKey, groupNamespace);
+            String parent = parentGroupKey != null ? (" : " + parentGroupKey.ID) : "";
             return "GROUP " + groupKey.ID + extID + parent + ";";
         } else return null;
     }
@@ -218,6 +219,7 @@ public class GenerateFormAction extends AnAction {
     }
 
     private String generateObjectId(String id) {
+        id = Introspector.decapitalize(id);
         int count = 0;
         while(usedObjectIds.contains(id + (count == 0 ? "" : count))) {
             count++;
@@ -227,17 +229,30 @@ public class GenerateFormAction extends AnAction {
         return id;
     }
 
-    private String getObjectsScript(ElementKey elementKey, ElementKey inGroupKey) {
+    private String getObjectsScript(ElementKey elementKey, ElementNamespace namespace, ElementKey inGroupKey) {
         if(elementKey != null) {
-            String extID = elementKey.ID.equals(elementKey.extID) ? "" : (" EXTID '" + elementKey.extID + "'");
+            String extID = getExtIDScript(elementKey, namespace);
             String inGroup = (inGroupKey == null || inGroupKey.ID == null ? "" : (" IN " + inGroupKey.ID));
             return "\nOBJECTS " + elementKey.ID + " = INTEGER" + extID + inGroup;
         } else return null;
     }
 
-    private String getPropertiesScript(ElementKey object, ElementKey inGroup, Set<ElementKey> properties) {
+    private String getExtIDScript(ElementKey key, ElementNamespace namespace) {
+        String namespaceScript = "";
+        if (namespace != null) {
+            if (!usedNamespacePrefixes.contains(namespace.prefix)) {
+                usedNamespacePrefixes.add(namespace.prefix);
+                namespaceScript = namespace.prefix + "=" + namespace.uri + ":";
+            } else {
+                namespaceScript = namespace.prefix + ":";
+            }
+        }
+        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + namespaceScript + key.extID + "'") : "";
+    }
+
+    private String getPropertiesScript(ElementKey object, ElementKey inGroup, Set<ElementProperty> properties) {
         if(!properties.isEmpty()) {
-            return "PROPERTIES(" + (object == null ? "" : object.ID) + ") " + (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) + properties.stream().map(ElementKey::getScript).collect(Collectors.joining(", "));
+            return "PROPERTIES(" + (object == null ? "" : object.ID) + ") " + (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) + properties.stream().map(ElementProperty::getScript).collect(Collectors.joining(", "));
         } else return null;
     }
 
@@ -250,7 +265,6 @@ public class GenerateFormAction extends AnAction {
     private class ElementKey {
         String extID;
         String ID;
-        boolean attr;
 
         ElementKey(String extID) {
             this(extID, generateObjectId(extID));
@@ -259,10 +273,6 @@ public class GenerateFormAction extends AnAction {
         ElementKey(String extID, String ID) {
             this.extID = extID;
             this.ID = ID;
-        }
-
-        public String getScript() {
-            return ID + (ID.equals(extID) ? "" : (" EXTID '" + extID + "'")) + (attr ? " ATTR" : "");
         }
 
         @Override
@@ -302,7 +312,7 @@ public class GenerateFormAction extends AnAction {
         }
     }
 
-    class ParseNode {
+    abstract class ParseNode {
         String key;
         List<ParseNode> children;
         ParseNode(String key, List<ParseNode> children) {
@@ -323,11 +333,20 @@ public class GenerateFormAction extends AnAction {
         }
     }
 
-    class GroupObjectParseNode extends ParseNode {
+    abstract class GroupParseNode extends ParseNode {
+        ElementNamespace namespace;
+
+        GroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace) {
+            super(key, children);
+            this.namespace = namespace;
+        }
+    }
+
+    class GroupObjectParseNode extends GroupParseNode {
         private boolean integrationKey; // key (key in JSON, tag in XML, fields in plain formats) or index (array in JSON, multiple object name tags in xml, order in plain formats)
 
-        GroupObjectParseNode(String key, List<ParseNode> children, boolean integrationKey) {
-            super(key, children);
+        GroupObjectParseNode(String key, List<ParseNode> children, ElementNamespace namespace, boolean integrationKey) {
+            super(key, children, namespace);
             this.integrationKey = integrationKey;
         }
 
@@ -336,21 +355,44 @@ public class GenerateFormAction extends AnAction {
         }
     }
 
-    class PropertyGroupParseNode extends ParseNode {
-        PropertyGroupParseNode(String key, List<ParseNode> children) {
-            super(key, children);
+    class PropertyGroupParseNode extends GroupParseNode {
+        PropertyGroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace) {
+            super(key, children, namespace);
         }
     }
 
     class PropertyParseNode extends ParseNode {
-        private boolean attr;
+        boolean attr;
         PropertyParseNode(String key, boolean attr) {
             super(key, new ArrayList<>());
             this.attr = attr;
         }
+    }
 
-        public boolean isAttr() {
-            return attr;
+    class ElementProperty {
+        ElementKey key;
+        ElementNamespace namespace;
+        boolean attr;
+
+        ElementProperty(ElementKey key, ElementNamespace namespace, boolean attr) {
+            this.key = key;
+            this.namespace = namespace;
+            this.attr = attr;
+        }
+
+        public String getScript() {
+            return key.ID + getExtIDScript(key, namespace) + (attr ? " ATTR" : "");
         }
     }
+
+    class ElementNamespace {
+        String prefix;
+        String uri;
+
+        ElementNamespace(String prefix, String uri) {
+            this.prefix = prefix;
+            this.uri = uri;
+        }
+    }
+
 }

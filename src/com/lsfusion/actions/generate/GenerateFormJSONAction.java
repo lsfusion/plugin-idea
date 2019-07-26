@@ -38,7 +38,7 @@ public class GenerateFormJSONAction extends GenerateFormAction {
             List<ParseNode> nChildren = new ArrayList<>();
             nChildren.add(mergedChild);
 
-            return new GroupObjectParseNode(key, nChildren, integrationKey);
+            return new GroupObjectParseNode(key, nChildren, null, integrationKey);
 
         } else if (element instanceof JSONObject) {
 
@@ -53,7 +53,7 @@ public class GenerateFormJSONAction extends GenerateFormAction {
 
             }
 
-            return new PropertyGroupParseNode(key, localChildren);
+            return new PropertyGroupParseNode(key, localChildren, null);
 
         } else {
             return new PropertyParseNode(key, false);
