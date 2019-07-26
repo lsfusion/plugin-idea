@@ -95,10 +95,6 @@
                 <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
             </action>
 
-            <action id="GenerateForm" class="com.lsfusion.actions.generate.GenerateFormAction" text="Generate FORM from json"
-                    description="Generate form from json">
-            </action>
-
             <separator/>
             <!---->
             <!--<action id="TypeInfer.File" class="com.lsfusion.lang.typeinfer.FileTypeInferAction" text="Infer _types for file"-->
@@ -113,6 +109,14 @@
                     <!--text="Check abstract for project" description="Check abstract for project"/>-->
             <!--<action id="TypeInfer.Check" class="com.lsfusion.lang.typeinfer.FindNotInferredAction" text="Find not inferred"-->
                     <!--description="Find not inferred elements for project"/>-->
+
+            <group id="generateFormFolding" popup="true" text="Generate FORM">
+                <action id="GenerateFormJSON" class="com.lsfusion.actions.generate.GenerateFormJSONAction" text="From json"
+                        description="Generate FORM from json"/>
+                <action id="GenerateFormXML" class="com.lsfusion.actions.generate.GenerateFormXMLAction" text="From xml"
+                        description="Generate FORM from xml"/>
+            </group>
+
             <action id="InsertComposition" class="com.lsfusion.actions.InsertCompositionAction">
                 <keyboard-shortcut first-keystroke="control alt shift W" keymap="$default"/>
             </action>
