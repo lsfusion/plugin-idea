@@ -900,4 +900,27 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
         addError(o, annotation);
     }
+
+    @Override
+    public void visitEditFormDeclaration(@NotNull LSFEditFormDeclaration o) {
+        visitEditOrListFormDeclaration(o, o.getObjectUsage(), o.getCustomClassUsage());
+    }
+
+    @Override
+    public void visitListFormDeclaration(@NotNull LSFListFormDeclaration o) {
+        visitEditOrListFormDeclaration(o, o.getObjectUsage(), o.getCustomClassUsage());
+    }
+
+    private void visitEditOrListFormDeclaration(PsiElement o, LSFObjectUsage objectUsage, LSFCustomClassUsage customClassUsage) {
+        if(objectUsage != null) {
+            LSFObjectDeclaration objectUsageDecl = objectUsage.resolveDecl();
+            if(objectUsageDecl != null) {
+                LSFClassSet leftClass = LSFPsiImplUtil.resolveClass(customClassUsage);
+                LSFClassSet rightClass = objectUsageDecl.resolveClass();
+                if (leftClass != null && rightClass != null && !leftClass.haveCommonChildren(rightClass, null)) {
+                    myHolder.createWarningAnnotation(o, String.format("Type mismatch: can't cast %s to %s", leftClass, rightClass));
+                }
+            }
+        }
+    }
 }
