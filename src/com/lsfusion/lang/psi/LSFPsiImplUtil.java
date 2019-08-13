@@ -283,6 +283,14 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(sourceStatement);
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFRecalculateActionPropertyDefinitionBody sourceStatement) {
+        return new ExprsContextModifier(sourceStatement.getPropertyExpressionList());
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFRecalculateActionPropertyDefinitionBody sourceStatement) {
+        return new ActionExprInferrer(sourceStatement);
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFWhileActionPropertyDefinitionBody sourceStatement) {
         return new ExprsContextModifier(sourceStatement.getPropertyExpression());
     }
@@ -3495,6 +3503,10 @@ public class LSFPsiImplUtil {
             result = inferActionParamClasses(doAction, params);
         }
         return result;
+    }
+
+    public static Inferred inferActionParamClasses(LSFRecalculateActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
     }
 
     public static Inferred inferActionParamClasses(LSFWhileActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {

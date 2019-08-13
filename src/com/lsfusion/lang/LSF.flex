@@ -404,6 +404,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "READ"                			    { return READ; }
   "READONLY"                			{ return READONLY; }
   "READONLYIF"              			{ return READONLYIF; }
+  "RECALCULATE"               			{ return RECALCULATE; }
   "RECURSION"               			{ return RECURSION; }
   "REFLECTION"                  		{ return REFLECTION; }
   "REGEXP"                  			{ return REGEXP; }

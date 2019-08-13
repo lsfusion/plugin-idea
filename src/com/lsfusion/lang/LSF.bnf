@@ -653,6 +653,7 @@ private recursiveExtendContextActionPDB ::=  	forActionPropertyDefinitionBody
                                             |	dialogActionPropertyDefinitionBody // mixed, input
                                             |	inputActionPropertyDefinitionBody // mixed, input
                                             |	newActionPropertyDefinitionBody // should be after newWhere
+                                            |	recalculateActionPropertyDefinitionBody
 
 private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
                                         |	    confirmActionPropertyDefinitionBody// mixed, input
@@ -1248,6 +1249,13 @@ forActionPropertyDefinitionBody ::= forActionPropertyMainBody
 
 newActionPropertyDefinitionBody ::= forAddObjClause
                               actionPropertyDefinitionBody
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses ]
+}
+
+recalculateActionPropertyDefinitionBody ::= RECALCULATE propertyExpression (WHERE propertyExpression)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"

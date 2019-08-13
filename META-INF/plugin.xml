@@ -10,6 +10,7 @@
         <b>Version 1.0.177</b><br>
         <ul>
             <li>EDIT / LIST in FORM class cast warnings</li>
+            <li>RECALCULATE action</li>
         </ul>
     ]]>
     </change-notes>
