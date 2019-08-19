@@ -50,10 +50,11 @@ public class GenerateFormAction extends AnAction {
 
     private void showFormScript(CodeBlock formCodeBlock) {
         Form form = generateFormFromCodeBlocks(formCodeBlock);
+        String formHeaderScript = "FORM " + (form.formName != null ? Introspector.decapitalize(form.formName) : "generated");
 
         String formScript = (form.groupDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.groupDeclarationScripts, "\n") + "\n\n")) +
                 (form.propertyDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.propertyDeclarationScripts, "\n") + "\n\n")) +
-                "FORM generated\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
+                formHeaderScript + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
 
         JTextPane textPane = new JTextPane();
         textPane.setText(formScript);
@@ -92,11 +93,12 @@ public class GenerateFormAction extends AnAction {
                 }
             }
         }
-        return new Form(groupDeclarationScripts, propertyDeclarationScripts, formScripts);
+        return new Form(codeBlock.formName, groupDeclarationScripts, propertyDeclarationScripts, formScripts);
 
     }
 
     private CodeBlock generateForm(ParseNode element, ElementKey key, ParseNode parentElement, ElementKey parentKey, ElementKey parentInGroupKey, ElementKey lastGroupObjectParent) {
+        String formName = null;
         Set<String> groupDeclarationScripts = new LinkedHashSet<>();
         Set<String> propertyDeclarationScripts = new LinkedHashSet<>();
         Set<String> objectsScripts = new LinkedHashSet<>();
@@ -128,6 +130,7 @@ public class GenerateFormAction extends AnAction {
             }
 
         } else if(element instanceof PropertyGroupParseNode) {
+            formName = ((PropertyGroupParseNode) element).formName;
 
             if(hasPropertyGroupParseNodeChildren(element)) {
                 if(lastGroupObjectParent != null) {
@@ -158,7 +161,7 @@ public class GenerateFormAction extends AnAction {
         }
 
         propertiesScript = propertiesScript != null ? propertiesScript : getPropertiesScript(lastGroupObjectParent, parentElement instanceof PropertyGroupParseNode ? key : null, properties);
-        return new CodeBlock(groupDeclarationScripts, propertyDeclarationScripts, objectsScripts, propertiesScript, filtersScript, children);
+        return new CodeBlock(formName, groupDeclarationScripts, propertyDeclarationScripts, objectsScripts, propertiesScript, filtersScript, children);
     }
 
     private boolean hasPropertyGroupParseNodeChildren(ParseNode element) {
@@ -282,6 +285,7 @@ public class GenerateFormAction extends AnAction {
     }
 
     private class CodeBlock {
+        String formName;
         Set<String> groupDeclarationScripts;
         Set<String> propertyDeclarationScripts;
         Set<String> objectsScripts;
@@ -290,7 +294,9 @@ public class GenerateFormAction extends AnAction {
 
         List<CodeBlock> children;
 
-        CodeBlock(Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts, Set<String> objectsScripts, String propertiesScript, String filtersScript, List<CodeBlock> children) {
+        CodeBlock(String formName, Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts,
+                  Set<String> objectsScripts, String propertiesScript, String filtersScript, List<CodeBlock> children) {
+            this.formName = formName;
             this.groupDeclarationScripts = groupDeclarationScripts;
             this.propertyDeclarationScripts = propertyDeclarationScripts;
             this.objectsScripts = objectsScripts;
@@ -301,11 +307,13 @@ public class GenerateFormAction extends AnAction {
     }
 
     private class Form {
+        String formName;
         Set<String> groupDeclarationScripts;
         Set<String> propertyDeclarationScripts;
         List<String> formScripts;
 
-        Form(Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts, List<String> formScripts) {
+        Form(String formName, Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts, List<String> formScripts) {
+            this.formName = formName;
             this.groupDeclarationScripts = groupDeclarationScripts;
             this.propertyDeclarationScripts = propertyDeclarationScripts;
             this.formScripts = formScripts;
@@ -356,8 +364,10 @@ public class GenerateFormAction extends AnAction {
     }
 
     class PropertyGroupParseNode extends GroupParseNode {
-        PropertyGroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace) {
+        String formName;
+        PropertyGroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace, String formName) {
             super(key, children, namespace);
+            this.formName = formName;
         }
     }
 

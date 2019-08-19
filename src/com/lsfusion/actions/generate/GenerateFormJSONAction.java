@@ -53,7 +53,7 @@ public class GenerateFormJSONAction extends GenerateFormAction {
 
             }
 
-            return new PropertyGroupParseNode(key, localChildren, null);
+            return new PropertyGroupParseNode(key, localChildren, null, null);
 
         } else {
             return new PropertyParseNode(key, false);

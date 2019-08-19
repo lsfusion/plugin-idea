@@ -75,7 +75,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
             }
         }
 
-        return new PropertyGroupParseNode(key, children, getElementNamespace(element));
+        return new PropertyGroupParseNode(key, children, getElementNamespace(element), key == null ? element.getName() : null);
     }
 
     private Map<String, List<Element>> getChildrenMap(Element element) {
