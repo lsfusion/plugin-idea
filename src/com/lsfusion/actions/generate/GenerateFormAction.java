@@ -50,11 +50,12 @@ public class GenerateFormAction extends AnAction {
 
     private void showFormScript(CodeBlock formCodeBlock) {
         Form form = generateFormFromCodeBlocks(formCodeBlock);
-        String formHeaderScript = "FORM " + (form.formName != null ? Introspector.decapitalize(form.formName) : "generated");
+        String formId = form.formName == null ? "generated" : Introspector.decapitalize(form.formName);
+        String formExtId = form.formName == null || formId.equals(form.formName) ? "" : (" FORMEXTID '" + form.formName + "'");
 
         String formScript = (form.groupDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.groupDeclarationScripts, "\n") + "\n\n")) +
                 (form.propertyDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.propertyDeclarationScripts, "\n") + "\n\n")) +
-                formHeaderScript + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
+                "FORM " + formId + formExtId + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
 
         JTextPane textPane = new JTextPane();
         textPane.setText(formScript);
