@@ -11,6 +11,7 @@
         <ul>
             <li>EDIT / LIST in FORM class cast warnings</li>
             <li>RECALCULATE action</li>
+            <li>Generate Form from xml/json fixes</li>
         </ul>
     ]]>
     </change-notes>

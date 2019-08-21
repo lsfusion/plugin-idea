@@ -33,7 +33,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
     private ParseNode generateHierarchyXML(Element element, String key) {
         List<ParseNode> children = new ArrayList<>();
 
-        boolean isPropertyParseNode = element.getChildren().isEmpty();
+        boolean isPropertyParseNode = element.getChildren().isEmpty() && element.getAttributes().isEmpty();
 
         if (isPropertyParseNode) {
             return new PropertyParseNode(key, false);
