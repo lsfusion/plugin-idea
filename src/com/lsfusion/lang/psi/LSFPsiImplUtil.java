@@ -15,6 +15,8 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
+import com.lsfusion.lang.psi.impl.LSFCollapseGroupObjectActionPropertyDefinitionBodyImpl;
+import com.lsfusion.lang.psi.impl.LSFExpandGroupObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
 import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
@@ -3774,6 +3776,14 @@ public class LSFPsiImplUtil {
         return inferExpressionParamClasses(body.getPropertyExpression(), LSFExClassSet.toEx(valueClass)).filter(params);
     }
 
+    public static Inferred inferActionParamClasses(LSFExpandGroupObjectActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
+    public static Inferred inferActionParamClasses(LSFCollapseGroupObjectActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
     public static Inferred inferActionParamClasses(LSFEmailActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         List<Inferred> list = new ArrayList<>();
         for (LSFPropertyExpression pe : body.getPropertyExpressionList()) {
@@ -4005,6 +4015,24 @@ public class LSFPsiImplUtil {
             formUsage = seekObjectActionBody.getGroupObjectID().getFormUsage();
         } else if (seekObjectActionBody.getObjectID() != null) {
             formUsage = seekObjectActionBody.getObjectID().getFormUsage();
+        }
+        return resolveFormDecl(formUsage);
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFExpandGroupObjectActionPropertyDefinitionBodyImpl expandGroupObjectActionBody) {
+        LSFFormUsage formUsage = null;
+        if (expandGroupObjectActionBody.getGroupObjectID() != null) {
+            formUsage = expandGroupObjectActionBody.getGroupObjectID().getFormUsage();
+        }
+        return resolveFormDecl(formUsage);
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFCollapseGroupObjectActionPropertyDefinitionBodyImpl collapseGroupObjectActionBody) {
+        LSFFormUsage formUsage = null;
+        if (collapseGroupObjectActionBody.getGroupObjectID() != null) {
+            formUsage = collapseGroupObjectActionBody.getGroupObjectID().getFormUsage();
         }
         return resolveFormDecl(formUsage);
     }

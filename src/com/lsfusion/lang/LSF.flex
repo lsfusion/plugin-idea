@@ -219,6 +219,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "CONNECTION"                 			{ return CONNECTION; }
   "CONTEXTMENU"                			{ return CONTEXTMENU; }
   "NOHINT"                 			    { return NOHINT; }
+  "COLLAPSE"                  			{ return COLLAPSE; }
   "CONCAT"                  			{ return CONCAT; }
   "CONFIRM"                 			{ return CONFIRM; }
   "CONSTRAINT"              			{ return CONSTRAINT; }
@@ -244,6 +245,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "DOC"                      			{ return DOC; }
   "DOCKED"                  			{ return DOCKED; }
   "DOCX"                    			{ return DOCX; }
+  "DOWN"                    			{ return DOWN; }
   "DRAWROOT"                			{ return DRAWROOT; }
   "DRILLDOWN"                    	    { return DRILLDOWN; }
   "DROP"                    			{ return DROP; }
@@ -261,6 +263,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "EXCEPTLAST"              			{ return EXCEPTLAST; }
   "EXCLUSIVE"               			{ return EXCLUSIVE; }
   "EXEC"                    			{ return EXEC; }
+  "EXPAND"                    			{ return EXPAND; }
   "EXTERNAL"                            { return EXTERNAL; }
   "NEWEXECUTOR"                    		{ return NEWEXECUTOR; }
   "EXPORT"                    			{ return EXPORT; }
@@ -463,6 +466,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "TREE"                    			{ return TREE; }
   "TRY"                                 { return TRY; }
   "UNGROUP"                 			{ return UNGROUP; }
+  "UP"                 			        { return UP; }
   "USERFILTER"                 			{ return USERFILTER; }
   "VALIGN"                  			{ return VALIGN; }
   "VALUE"                               { return VALUE; }

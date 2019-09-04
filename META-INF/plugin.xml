@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.177</b><br>
+        <b>Version 1.0.178</b><br>
         <ul>
-            <li>EDIT / LIST in FORM class cast warnings</li>
-            <li>RECALCULATE action</li>
-            <li>Generate Form from xml/json fixes</li>
+            <li>EXPAND / COLLAPSE tree</li>
         </ul>
     ]]>
     </change-notes>

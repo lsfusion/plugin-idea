@@ -685,6 +685,8 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    messageActionPropertyDefinitionBody
                                       	|	    asyncUpdateActionPropertyDefinitionBody
                                       	|	    seekObjectActionPropertyDefinitionBody
+                                      	|	    expandGroupObjectActionPropertyDefinitionBody
+                                      	|	    collapseGroupObjectActionPropertyDefinitionBody
                                       	|	    emailActionPropertyDefinitionBody
                                       	|	    evalActionPropertyDefinitionBody
                                       	|	    drillDownActionPropertyDefinitionBody
@@ -947,6 +949,22 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST | NULL)?
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl] 
+}
+
+expandGroupObjectActionPropertyDefinitionBody ::= EXPAND (DOWN | UP | ALL (TOP)?)?
+                                            groupObjectID (OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)*)?
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
+collapseGroupObjectActionPropertyDefinitionBody ::= COLLAPSE (DOWN | ALL (TOP)?)?
+                                            groupObjectID (OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)*)?
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
 }
 
 // the same trick as with formPropertyDrawMappedDecl
