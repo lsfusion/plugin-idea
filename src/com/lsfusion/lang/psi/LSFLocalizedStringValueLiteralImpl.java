@@ -2,16 +2,21 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.injection.InjectedLanguageManager;
+import com.intellij.lang.properties.BundleNameEvaluator;
 import com.intellij.lang.properties.PropertiesFileType;
-import com.intellij.lang.properties.psi.impl.PropertyImpl;
+import com.intellij.lang.properties.PropertiesReferenceManager;
+import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.lang.properties.references.PropertyReference;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.ProjectScope;
 import com.intellij.util.IncorrectOperationException;
+import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +45,7 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         if (propertyFiles == null) {
             propertyFiles = new HashSet<>();
             Pattern pattern = Pattern.compile("[^/]*ResourceBundle\\.properties");
-            GlobalSearchScope scope = ProjectScope.getProjectScope(getProject());
+            GlobalSearchScope scope = LSFFileUtils.getModuleWithDependenciesScope(this);
             for (VirtualFile file : FileTypeIndex.getFiles(PropertiesFileType.INSTANCE, scope)) {
                 if (pattern.matcher(file.getName()).matches()) {
                     propertyFiles.add(file);
@@ -85,7 +90,7 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
                     if (!insideKey || i - startPos == 1) {
                         break;
                     } else {
-                        refs.add(new PropertyFileItemMultiReference(startPos, i+1));
+                        refs.add(new PropertyFileItemMultiReference(this, new TextRange(startPos, i+1)));
                         insideKey = false;
                     }
                 } else if (insideKey && literal.charAt(i) == ' ') break; 
@@ -141,48 +146,56 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
     public PsiReference[] getReferences() {
         String literal = getText();
         List<PsiReference> refs = findAllRefs(literal);
-        return refs.toArray(new PsiReference[refs.size()]);
+        return refs.toArray(new PsiReference[0]);
     }
     
-    public class PropertyFileItemMultiReference implements PsiPolyVariantReference {
-        private TextRange range;
-        
-        public PropertyFileItemMultiReference(int start, int end) {
-            this.range = new TextRange(start, end);
+    public class PropertyFileItemMultiReference extends PsiPolyVariantReferenceBase {
+        public PropertyFileItemMultiReference(PsiElement element, TextRange range) {
+            super(element, range);
         }
+        
+        private class AllScopePropertyReference extends PropertyReference {
+            public AllScopePropertyReference(@NotNull String key, @NotNull PsiElement element, @Nullable String bundleName, boolean soft, TextRange range) {
+                super(key, element, bundleName, soft, range);
+            }
+
+            @Override    
+            protected List<PropertiesFile> retrievePropertyFilesByBundleName(String resourceBundleName, PsiElement element) {
+                // based on the com.intellij.lang.properties.references.I18nUtil.propertiesFilesByBundleName method
+                if (resourceBundleName != null) {
+                    PsiFile containingFile = element.getContainingFile();
+                    PsiElement containingFileContext = InjectedLanguageManager.getInstance(containingFile.getProject()).getInjectionHost(containingFile);
+                    if (containingFileContext != null) containingFile = containingFileContext.getContainingFile();
+
+                    VirtualFile virtualFile = containingFile.getVirtualFile();
+                    if (virtualFile == null) {
+                        virtualFile = containingFile.getOriginalFile().getVirtualFile();
+                    }
+
+                    if (virtualFile != null) {
+                        Project project = containingFile.getProject();
+                        PropertiesReferenceManager refManager = PropertiesReferenceManager.getInstance(project);
+                        return refManager.findPropertiesFiles(LSFFileUtils.getModuleWithDependenciesScope(getElement()), resourceBundleName, BundleNameEvaluator.DEFAULT);
+                    }
+                }
+                return Collections.emptyList();
+            }
+        } 
         
         @NotNull
         @Override
         public ResolveResult[] multiResolve(boolean incompleteCode) {
-            List<ResolveResult> results = new ArrayList<>();
+            Set<ResolveResult> results = new HashSet<>();
             String key = getReferenceId();
             for (VirtualFile file : propertyFiles) {
-                PropertyReference ref = new PropertyReference(key, LSFLocalizedStringValueLiteralImpl.this, file.getNameWithoutExtension(), true, range);
-                ResolveResult[] result = ref.multiResolve(false);
-                Collections.addAll(results, result);
+                try {
+                    PropertyReference ref = new AllScopePropertyReference(key, LSFLocalizedStringValueLiteralImpl.this, file.getNameWithoutExtension(), true, getRangeInElement());
+                    ResolveResult[] result = ref.multiResolve(incompleteCode);
+                    Collections.addAll(results, result);
+                } catch (ProcessCanceledException ignored) {
+                } 
             }
-            return results.toArray(new ResolveResult[results.size()]);
-        }
-
-        @Override
-        public PsiElement getElement() {
-            return LSFLocalizedStringValueLiteralImpl.this;
-        }
-
-        @Override
-        public TextRange getRangeInElement() {
-            return range;    
-        }
-
-        @Nullable
-        @Override
-        public PsiElement resolve() {
-            ResolveResult[] res = multiResolve(false);
-            if (res.length == 1) {
-                return res[0].getElement();
-            } else {
-                return null;
-            }
+            return results.toArray(new ResolveResult[0]);
         }
 
         @NotNull
@@ -192,36 +205,25 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         }
 
         private String getReferenceId() {
-            return LSFLocalizedStringValueLiteralImpl.this.getText().substring(range.getStartOffset() + 1, range.getEndOffset() - 1);
+            return LSFLocalizedStringValueLiteralImpl.this.getText().substring(
+                    getRangeInElement().getStartOffset() + 1, 
+                    getRangeInElement().getEndOffset() - 1
+            );
         }
         
+        // do we need to override?
         @Override
-        public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-            String newText = getText().substring(0, range.getStartOffset() + 1) + newElementName + getText().substring(range.getEndOffset() - 1); 
+        public PsiElement handleElementRename(@NotNull String newElementName) throws IncorrectOperationException {
+            String newText = getText().substring(0, getRangeInElement().getStartOffset() + 1) + newElementName + getText().substring(getRangeInElement().getEndOffset() - 1); 
             LSFLocalizedStringValueLiteral newLiteral = createLocalizedStringValueLiteral(getProject(), newText);
             LSFLocalizedStringValueLiteralImpl.this.replace(newLiteral);
             return null;
         }
-
-        @Override
-        public PsiElement bindToElement(@NotNull PsiElement element) throws IncorrectOperationException {
-            return null;
-        }
-
-        @Override
-        public boolean isReferenceTo(PsiElement element) {
-            return (element instanceof PropertyImpl && getReferenceId().equals(((PropertyImpl) element).getKey()));
-        }
-
+        
         @NotNull
         @Override
         public Object[] getVariants() {
-            return new Object[0];
-        }
-
-        @Override
-        public boolean isSoft() {
-            return false;
+            return new Object[0];    
         }
     }    
 }

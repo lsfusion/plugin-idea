@@ -1113,7 +1113,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             return getLastPsiOfType(false, psiClass);
         }
         @Nullable
-        private <T extends PsiElement> T getLastPsiOfType(boolean hackFlag, Class... psiClasses) {
+        private <T extends PsiElement> T getLastPsiOfType(boolean groupPropertyCheck, Class... psiClasses) {
             try {
                 T result = null;
                 for (int i = 0; i < framesCount; ++i) {
@@ -1125,7 +1125,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                             // it's tricky here, first of all, there are two rules where one is prefix of another : GROUP as and expr, and GROUP BY as expression unfriendly pd
                             // so GROUP BY is parsed first but there can be no BY in the end so PSI will be of GROUP as and expr branch, so thats the case we check below
                             // and in theory we continue proceeding frames since further there is no difference in groupPropertyDefinition and groupExprPropertyDefinition
-                            if (hackFlag) {
+                            if (groupPropertyCheck) {
                                 if (elementType == EXPRESSION_UNFRIENDLY_PD && i + 1 < framesCount && frames.get(i+1).type == GROUP_PROPERTY_DEFINITION) {
                                     psiElement = getPsiOfTypeForFrame(currFrame, getPsiElementClassByType(PROPERTY_EXPRESSION));
                                     if(psiElement == null)

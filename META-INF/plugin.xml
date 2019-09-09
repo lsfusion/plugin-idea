@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.178</b><br>
+        <b>Version 1.0.179</b><br>
         <ul>
-            <li>EXPAND / COLLAPSE tree</li>
-            <li>IMPORT fields params fix</li>
+            <li>Fixes ctrl+b for localized literals inside .jar (issue #40)</li> 
         </ul>
     ]]>
     </change-notes>
