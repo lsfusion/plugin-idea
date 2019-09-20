@@ -2921,14 +2921,11 @@ public class LSFPsiImplUtil {
 
         LSFImportActionPropertyDefinitionBody importDB = PsiTreeUtil.getParentOfType(sourceStatement, LSFImportActionPropertyDefinitionBody.class);
         if (importDB != null) {
-            LSFImportActionSourceType sourceType = importDB.getImportActionSourceType();
-            if (sourceType != null) {
-                LSFClassNameList classNameList = importDB.getClassNameList();
-                if(classNameList != null) {
-                    LSFNonEmptyClassNameList nonEmptyClassNameList = classNameList.getNonEmptyClassNameList();
-                    if(nonEmptyClassNameList == null) {
-                        return Collections.emptyList();
-                    }
+            LSFClassNameList classNameList = importDB.getClassNameList();
+            if(classNameList != null) {
+                LSFNonEmptyClassNameList nonEmptyClassNameList = classNameList.getNonEmptyClassNameList();
+                if(nonEmptyClassNameList == null) {
+                    return Collections.emptyList();
                 }
             }
         }

@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.177</version>
+    <version>1.0.178</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -10,6 +10,7 @@
         <b>Version 1.0.178</b><br>
         <ul>
             <li>EXPAND / COLLAPSE tree</li>
+            <li>IMPORT fields params fix</li>
         </ul>
     ]]>
     </change-notes>
