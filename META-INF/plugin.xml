@@ -22,6 +22,7 @@
          on how to target different products -->
     <depends>com.intellij.properties</depends>
     <depends>AntSupport</depends>
+    <depends>com.intellij.modules.java</depends>
 
     <application-components>
         <!-- Add your application components here -->
