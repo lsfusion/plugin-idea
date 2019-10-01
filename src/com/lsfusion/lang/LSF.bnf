@@ -1507,7 +1507,6 @@ formEventDeclaration ::= ON
                         |    INIT
                         |    CANCEL
                         |    DROP
-                        |    QUERYOK
                         |    QUERYCLOSE
                         |    CHANGE ID
                         )
