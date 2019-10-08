@@ -688,7 +688,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addImplicitDecl(LSFReference reference) {
-        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Implicit declaration");
+        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Implicit parameter declaration");
         TextAttributes error = IMPLICIT_DECL;
         if (isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
@@ -696,7 +696,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addUntypedImplicitDecl(LSFReference reference) {
-        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Untyped implicit declaration");
+        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Untyped implicit parameter declaration");
         TextAttributes error = UNTYPED_IMPLICIT_DECL;
         if (isInMetaUsage(reference))
             error = TextAttributes.merge(error, META_USAGE);
