@@ -775,8 +775,8 @@ groupObjectDestination ::= TO groupObjectUsage EQUALS propertyUsage (COMMA group
 printActionPropertyDefinitionBody ::=
 	    PRINT mappedForm
 		(   (
-		    (   XLSX (SHEET propertyUsage)? (PASSWORD propertyExpression)?
-		    |   XLS (SHEET propertyUsage)? (PASSWORD propertyExpression)?
+		    (   XLSX (SHEET propertyExpression)? (PASSWORD propertyExpression)?
+		    |   XLS (SHEET propertyExpression)? (PASSWORD propertyExpression)?
 		    |   PDF 
 		    |   DOC 
 		    |   DOCX
