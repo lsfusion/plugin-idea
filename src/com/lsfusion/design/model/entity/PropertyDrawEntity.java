@@ -151,9 +151,9 @@ public class PropertyDrawEntity {
                 iconPath = imageSettings.get(imageSettings.size() - 1).getStringLiteral().getValue();
             }
 
-            List<LSFEditKeySetting> editKeySettings = propertyOptions.getEditKeySettingList();
+            List<LSFChangeKeySetting> editKeySettings = propertyOptions.getChangeKeySettingList();
             if (!editKeySettings.isEmpty()) {
-                LSFEditKeySetting editKeySetting = editKeySettings.get(editKeySettings.size() - 1);
+                LSFChangeKeySetting editKeySetting = editKeySettings.get(editKeySettings.size() - 1);
                 changeKey = KeyStroke.getKeyStroke(editKeySetting.getStringLiteral().getValue());
                 if (editKeySetting.getHideEditKey() != null) {
                     showChangeKey = false;

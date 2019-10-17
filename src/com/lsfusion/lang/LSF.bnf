@@ -576,7 +576,8 @@ private semiPropertyOption ::= IN groupUsage
                            |	charWidthSetting
                            |	imageSetting
                            |    defaultCompareSetting
-                           |	editKeySetting
+                           |	changeKeySetting
+                           |	changeMouseSetting
                            |	autosetSetting
                            |	confirmSetting
                            |	regexpSetting
@@ -602,7 +603,8 @@ charWidthSetting ::= CHARWIDTH intLiteral
 flexCharWidthSetting ::= CHARWIDTH intLiteral (FLEX | NOFLEX)
 imageSetting ::= IMAGE stringLiteral
 defaultCompareSetting ::= DEFAULTCOMPARE stringLiteral
-editKeySetting ::= CHANGEKEY stringLiteral (SHOW | hideEditKey)?
+changeKeySetting ::= CHANGEKEY stringLiteral (SHOW | hideEditKey)?
+changeMouseSetting ::= CHANGEMOUSE stringLiteral (SHOW | hideEditKey)?
 autosetSetting ::= AUTOSET
 confirmSetting ::= CONFIRM
 regexpSetting ::= REGEXP stringLiteral (stringLiteral)?

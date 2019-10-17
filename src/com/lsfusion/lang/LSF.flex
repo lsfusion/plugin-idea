@@ -205,6 +205,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "CHANGEABLE"                			{ return CHANGEABLE; }
   "CHANGEKEY"                 			{ return CHANGEKEY; }
   "CHANGED"                 			{ return CHANGED; }
+  "CHANGEMOUSE"                 		{ return CHANGEMOUSE; }
   "CHANGEWYS"               			{ return CHANGEWYS; }
   "CHARSET"               			    { return CHARSET; }
   "CHARWIDTH"               			{ return CHARWIDTH; }
