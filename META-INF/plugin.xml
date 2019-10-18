@@ -10,6 +10,7 @@
         <b>Version 1.0.181</b><br>
         <ul>
             <li>CHANGEMOUSE support</li>
+            <li>Generate form from JSON now support jsonarray in root</li>
         </ul>
     ]]>
     </change-notes>

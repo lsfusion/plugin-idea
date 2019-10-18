@@ -7,6 +7,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,7 +21,17 @@ public class GenerateFormJSONAction extends GenerateFormAction {
     protected Object getRootElement(AnActionEvent e) throws IOException {
         final FileChooserDescriptor fileChooser = FileChooserDescriptorFactory.createSingleFileDescriptor("json");
         VirtualFile file = FileChooser.chooseFile(fileChooser, e.getProject(), null);
-        return file != null ? new JSONObject(new String(Files.readAllBytes(Paths.get(file.getPath())))) : null;
+
+        if (file != null) {
+            Object object = new JSONTokener(new String(Files.readAllBytes(Paths.get(file.getPath())))).nextValue();
+            if (object instanceof JSONObject) {
+                return object;
+            } else {
+                JSONObject virtObject = new JSONObject();
+                virtObject.put("value", object);
+                return virtObject;
+            }
+        } else return null;
     }
 
     @Override
