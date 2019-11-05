@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.181</b><br>
+        <b>Version 1.0.182</b><br>
         <ul>
-            <li>CHANGEMOUSE support</li>
-            <li>Generate form from JSON now support jsonarray in root</li>
+            <li>TREE PARENT propertyUsage -> propertyExpression</li>
         </ul>
     ]]>
     </change-notes>

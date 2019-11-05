@@ -2860,7 +2860,7 @@ public class LSFPsiImplUtil {
         return sourceStatement.getExprParameterUsageList();
     }
 
-    private static List<LSFFormObjectDeclaration> getObjectDecls(LSFFormCommonGroupObject commonGroup) {
+    private static List<LSFFormObjectDeclaration> getObjectDecls(LSFFormGroupObject commonGroup) {
         LSFFormSingleGroupObjectDeclaration singleGroup = commonGroup.getFormSingleGroupObjectDeclaration();
         if (singleGroup != null)
             return singletonList(singleGroup.getFormObjectDeclaration());
@@ -2874,7 +2874,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFFormTreeGroupObjectDeclaration sourceStatement) {
-        return resolveParamDeclClasses(getObjectDecls(sourceStatement.getFormCommonGroupObject()));
+        return resolveParamDeclClasses(getObjectDecls(sourceStatement.getFormGroupObject()));
     }
 
     @Nullable

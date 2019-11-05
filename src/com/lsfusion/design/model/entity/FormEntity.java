@@ -68,7 +68,7 @@ public class FormEntity {
                 LSFFormGroupObjectViewType viewType = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectViewTypeList());
                 LSFFormGroupObjectPageSize pageSize = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectPageSizeList());
                 LSFFormGroupObjectRelativePosition neighbour = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectRelativePositionList());
-                addGroupObject(formGroupObjectDeclaration.getFormCommonGroupObject(), neighbour, viewType, pageSize);
+                addGroupObject(formGroupObjectDeclaration.getFormGroupObject(), neighbour, viewType, pageSize);
             } else {
                 LSFFormTreeGroupObjectList treeGroupObjectDeclaration = (LSFFormTreeGroupObjectList) element;
                 LSFFormGroupObjectRelativePosition neighbour = BaseUtils.last(treeGroupObjectDeclaration.getFormTreeGroupObjectOptions().getFormGroupObjectRelativePositionList());
@@ -353,20 +353,16 @@ public class FormEntity {
 
         List<LSFFormTreeGroupObjectDeclaration> gobjList = tgobjDecl.getFormTreeGroupObjectDeclarationList();
         for (LSFFormTreeGroupObjectDeclaration treeGroupObjectDeclaration : (neighbourGroupObject != null && !isRight ? BaseUtils.reverse(gobjList) : gobjList)) {
-            GroupObjectEntity groupObjectEntity = addGroupObject(treeGroupObjectDeclaration.getFormCommonGroupObject(), neighbourGroupObject, isRight, null, null);
+            GroupObjectEntity groupObjectEntity = addGroupObject(treeGroupObjectDeclaration.getFormGroupObject(), neighbourGroupObject, isRight, null, null);
             if(neighbourGroupObject != null)
                 neighbourGroupObject = groupObjectEntity;
             treeGroup.addGroupObject(groupObjectEntity);
 
             LSFTreeGroupParentDeclaration parentDeclaration = treeGroupObjectDeclaration.getTreeGroupParentDeclaration();
             if (parentDeclaration != null) {
-                List<LSFPropertyUsage> properties = new ArrayList<>();
-                if (parentDeclaration.getPropertyUsage() != null) {
-                    properties.add(parentDeclaration.getPropertyUsage());
-                } else {
-                    if (parentDeclaration.getNonEmptyPropertyUsageList() != null) {
-                        properties.addAll(parentDeclaration.getNonEmptyPropertyUsageList().getPropertyUsageList());
-                    }
+                List<LSFPropertyExpression> properties = new ArrayList<>();
+                for(LSFFormExprDeclaration formExprDeclaration : parentDeclaration.getFormExprDeclarationList()) {
+                    properties.add(formExprDeclaration.getPropertyExpression());
                 }
                 // todo setIsParents?
             }
