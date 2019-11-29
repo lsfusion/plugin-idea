@@ -7,9 +7,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.182</b><br>
+        <b>Version 1.0.183</b><br>
         <ul>
-            <li>TREE PARENT propertyUsage -> propertyExpression</li>
+            <li>IDEA 2019.3 compatibility</li>
+            <li>fixed usage type sorting in usage hierarchy</li>
         </ul>
     ]]>
     </change-notes>

@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
@@ -121,7 +122,7 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
             Finalizer<LSFPropDeclaration> noConditionFinalizer = getNoConditionFinalizer(usageClasses);
 
             if (getFullNameRef() == null)
-                declarations = resolveLocals(Condition.TRUE, BaseUtils.immutableCast(noConditionFinalizer));
+                declarations = resolveLocals(Conditions.alwaysTrue(), BaseUtils.immutableCast(noConditionFinalizer));
             
             if(declarations.isEmpty())
                 declarations = new CollectionQuery<LSFPropDeclaration>(LSFFullNameReferenceImpl.findNoConditionElements(this, BaseUtils.<Finalizer>immutableCast(noConditionFinalizer))).findAll();

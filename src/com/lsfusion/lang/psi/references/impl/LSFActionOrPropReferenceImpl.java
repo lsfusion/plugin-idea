@@ -14,7 +14,9 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.PropertyUsageContext;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -106,7 +108,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         if(directClasses == null) {
             directClasses = getUsageContext();
             if(directClasses==null) // невозможно определить классы, подходят все
-                return Condition.TRUE;
+                return Conditions.alwaysTrue();
         }
 
         final List<LSFClassSet> fDirectClasses = directClasses;

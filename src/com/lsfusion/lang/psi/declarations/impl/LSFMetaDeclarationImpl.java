@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
@@ -136,7 +137,7 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     protected Condition<LSFMetaDeclaration> getFindDuplicatesCondition() {
         LSFMetaDeclIdList metaDeclIdList = getMetaDeclIdList();
         if (metaDeclIdList == null) {
-            return Condition.FALSE;
+            return Conditions.alwaysFalse();
         }
         final int paramCount = metaDeclIdList.getMetaDeclIdList().size();
         return new Condition<LSFMetaDeclaration>() {

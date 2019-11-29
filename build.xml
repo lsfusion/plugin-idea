@@ -62,7 +62,7 @@
     <path id="javac2.classpath">
         <pathelement location="${javac2.home}/javac2.jar"/>
         <pathelement location="${javac2.home}/jdom.jar"/>
-        <pathelement location="${javac2.home}/asm-all.jar"/>
+        <pathelement location="${javac2.home}/asm-all-7.0.jar"/>
         <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
     </path>
     <target name="register.custom.compilers">
@@ -114,10 +114,10 @@
         <pathelement location="${buildLib}/grammar-kit.jar"/>
         <file name="${basedir}/lib/psiImplUtils.jar"/>
         <fileset dir="${idea.home}/lib">
-            <include name="asm-all.jar"/>
+            <include name="asm-all-7.0.jar"/>
             <include name="automaton-1.12-1.jar"/>
             <include name="extensions.jar"/>
-            <include name="guava-23.6-jre.jar"/>
+            <include name="guava-25.1-jre.jar"/>
             <include name="idea.jar"/>
             <include name="picocontainer-1.2.jar"/>
             <include name="platform-api.jar"/>

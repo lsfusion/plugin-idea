@@ -1,7 +1,7 @@
 package com.lsfusion.lang.psi.extend.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
@@ -40,7 +40,7 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
 
         //noinspection RedundantTypeArguments
         return LSFResolveUtil.<LSFFullNameDeclaration>singleResolve(
-                LSFGlobalResolver.findElements(getGlobalName(), namespace, getStubTypes(), lsfFile, null, Condition.TRUE, Finalizer.EMPTY)
+                LSFGlobalResolver.findElements(getGlobalName(), namespace, getStubTypes(), lsfFile, null, Conditions.<LSFFullNameDeclaration>alwaysTrue(), Finalizer.EMPTY)
         );
     }
 

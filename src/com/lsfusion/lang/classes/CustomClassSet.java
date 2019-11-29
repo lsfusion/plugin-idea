@@ -1,7 +1,7 @@
 package com.lsfusion.lang.classes;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.Query;
 import com.lsfusion.design.model.PropertyDrawView;
@@ -17,8 +17,8 @@ import com.lsfusion.refactoring.ClassCanonicalNameUtils;
 import com.lsfusion.util.BaseUtils;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class CustomClassSet implements LSFClassSet {
 
@@ -310,7 +310,7 @@ public class CustomClassSet implements LSFClassSet {
 
     public static LSFClassDeclaration getBaseClass(Project project) {
         LSFModuleDeclaration systemModule = LSFGlobalResolver.findModules("System", GlobalSearchScope.allScope(project)).findFirst();
-        Collection<LSFClassDeclaration> objects = LSFGlobalResolver.findElements("Object", systemModule.getLSFFile(), null, Collections.singleton(LSFStubElementTypes.CLASS), Condition.TRUE, Finalizer.EMPTY);
+        Collection<LSFClassDeclaration> objects = LSFGlobalResolver.findElements("Object", systemModule.getLSFFile(), null, Collections.singleton(LSFStubElementTypes.CLASS), Conditions.alwaysTrue(), Finalizer.EMPTY);
         return objects.iterator().next();
     }
 

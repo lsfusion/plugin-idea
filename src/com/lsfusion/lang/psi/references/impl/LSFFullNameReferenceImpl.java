@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
@@ -33,7 +34,7 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     }
 
     public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findNoConditionElements(LSFFullNameReference ref, Collection<FullNameStubElementType> types, Finalizer<T> finalizer) {
-        return LSFGlobalResolver.findElements(ref.getNameRef(), ref.getFullNameRef(), types, ref.getLSFFile(), null, Condition.TRUE, finalizer);
+        return LSFGlobalResolver.findElements(ref.getNameRef(), ref.getFullNameRef(), types, ref.getLSFFile(), null, Conditions.alwaysTrue(), finalizer);
     }
     public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findNoConditionElements(LSFFullNameReferenceImpl refImpl, Finalizer<T> finalizer) {
         return findNoConditionElements(refImpl, refImpl.getStubElementTypes(), finalizer);
@@ -79,7 +80,7 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     }
 
     public Condition<G> getCondition() {
-        return Condition.TRUE;
+        return Conditions.alwaysTrue();
     }
 
     protected Finalizer<G> getFinalizer() {

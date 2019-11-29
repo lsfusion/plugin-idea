@@ -9,7 +9,7 @@ import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.patterns.PlatformPatterns;
@@ -479,7 +479,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     String namespace = namespaceAndClassName[0];
                     String className = namespaceAndClassName[1];
 
-                    Collection<LSFClassDeclaration> classDeclarations = LSFGlobalResolver.findElements(className, namespace, file, null, Collections.singleton(LSFStubElementTypes.CLASS), Condition.TRUE);
+                    Collection<LSFClassDeclaration> classDeclarations = LSFGlobalResolver.findElements(className, namespace, file, null, Collections.singleton(LSFStubElementTypes.CLASS), Conditions.alwaysTrue());
                     for (LSFClassDeclaration classDecl : classDeclarations) {
                         for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(classDecl, LSFStubElementTypes.EXTENDCLASS, project, getRequireScope())) {
                             for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {

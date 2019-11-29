@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.CollectionQuery;
 import com.lsfusion.lang.psi.Finalizer;
@@ -38,7 +39,7 @@ public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclara
     }
 
     protected Condition<This> getFindDuplicatesCondition() {
-        return Condition.TRUE;
+        return Conditions.alwaysTrue();
     }
 
     @Override

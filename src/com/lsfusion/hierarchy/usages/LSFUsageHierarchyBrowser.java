@@ -1,7 +1,10 @@
 package com.lsfusion.hierarchy.usages;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.hierarchy.*;
+import com.intellij.ide.hierarchy.CallHierarchyBrowserBase;
+import com.intellij.ide.hierarchy.HierarchyBrowserManager;
+import com.intellij.ide.hierarchy.HierarchyNodeDescriptor;
+import com.intellij.ide.hierarchy.HierarchyTreeStructure;
 import com.intellij.ide.util.treeView.AlphaComparator;
 import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.SourceComparator;
@@ -56,11 +59,8 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
             public void setSelected(AnActionEvent e, boolean state) {
                 sortByType = state;
 
-                final Comparator<NodeDescriptor> comparator = getComparator();
-                final Collection<HierarchyTreeBuilder> builders = myBuilders.values();
-                for (final HierarchyTreeBuilder builder : builders) {
-                    builder.setNodeDescriptorComparator(comparator);
-                }
+                // incompatible with IDEA < 2018.3 
+                getTreeModel(getCurrentViewType()).setComparator(getComparator());
             }
         });
         actionGroup.add(new AlphaSortAction());
