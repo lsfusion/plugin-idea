@@ -224,6 +224,8 @@ public class GenerateFormAction extends AnAction {
 
     private String generateObjectId(String id) {
         id = Introspector.decapitalize(id);
+        if(id != null)
+            id = id.replace("-", "_");
         int count = 0;
         while(usedObjectIds.contains(id + (count == 0 ? "" : count))) {
             count++;
