@@ -42,7 +42,7 @@ public abstract class IntegralClass extends FormatClass {
 
     public DataClass scale(IntegralClass compClass, boolean mult) {
 
-        if(!(this instanceof NumericClass) || !(compClass instanceof NumericClass))
+        if(!(this instanceof NumericClass) && !(compClass instanceof NumericClass))
             return op(compClass, true, false);
 
         int whole;

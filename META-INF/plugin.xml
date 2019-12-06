@@ -11,6 +11,7 @@
         <ul>
             <li>IDEA 2019.3 compatibility</li>
             <li>fixed usage type sorting in usage hierarchy</li>
+            <li>fix in NUMERIC type inference</li>
         </ul>
     ]]>
     </change-notes>

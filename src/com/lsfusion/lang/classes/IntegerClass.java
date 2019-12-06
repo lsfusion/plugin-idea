@@ -9,7 +9,7 @@ public class IntegerClass extends IntClass {
     public final static IntegerClass instance = new IntegerClass();
 
     int getWhole() {
-        return 8;
+        return 10;
     }
 
     int getPrecision() {

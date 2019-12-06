@@ -5,7 +5,7 @@ public class LongClass extends IntClass {
     public final static LongClass instance = new LongClass();
 
     int getWhole() {
-        return 10;
+        return 20;
     }
 
     int getPrecision() {
