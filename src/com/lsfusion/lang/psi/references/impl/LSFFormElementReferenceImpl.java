@@ -68,7 +68,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclar
     }
 
     public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, int offset, final FormExtendProcessor<T> processor) {
-        Set<T> processedContext = processFormContext(current, processor, offset, true);
+        Set<T> processedContext = processFormContext(current, processor, offset, true, false);
         if (processedContext != null) {
             return processedContext;
         }
@@ -81,7 +81,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclar
         return new HashSet<>();
     }
 
-    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, final FormExtendProcessor<T> processor, final int offset, boolean objectRef) {
+    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, final FormExtendProcessor<T> processor, final int offset, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
         Query<LSFFormExtend> extendForms = null;
         if (current instanceof FormContext && (objectRef || current instanceof LSFFormStatement || current instanceof LSFDesignStatement)) {
             LSFFormDeclaration formDecl = ((FormContext) current).resolveFormDecl();
@@ -97,7 +97,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclar
                 public boolean process(LSFFormExtend formExtend) {
                     boolean sameFile = currentFile == formExtend.getLSFFile();
                     for(T element : processor.process(formExtend))
-                        if(!(sameFile && LSFGlobalResolver.isAfter(offset, element)))
+                        if(ignoreUseBeforeDeclarationCheck || !(sameFile && LSFGlobalResolver.isAfter(offset, element)))
                             finalResult.add(element);
                     return true;
                 }

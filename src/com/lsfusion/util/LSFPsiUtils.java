@@ -132,18 +132,23 @@ public class LSFPsiUtils {
     }
 
     @NotNull
-    public static Set<LSFExprParamDeclaration> getContextParams(@NotNull PsiElement current, boolean objectRef) {
-        return getContextParams(current, current.getTextOffset(), objectRef);
+    public static Set<LSFExprParamDeclaration> getContextParams(@NotNull PsiElement current, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
+        return getContextParams(current, current.getTextOffset(), objectRef, ignoreUseBeforeDeclarationCheck);
     }
 
     @NotNull
     public static Set<LSFExprParamDeclaration> getContextParams(PsiElement current, int offset, boolean objectRef) {
+        return getContextParams(current, offset, objectRef, false);
+    }
+
+    @NotNull
+    public static Set<LSFExprParamDeclaration> getContextParams(PsiElement current, int offset, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
         // current instanceof FormContext || current instancof LSFFormStatement
         Set<LSFObjectDeclaration> objects = LSFFormElementReferenceImpl.processFormContext(current, new LSFFormElementReferenceImpl.FormExtendProcessor<LSFObjectDeclaration>() {
             public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
                 return formExtend.getObjectDecls();
             }
-        }, offset, objectRef);
+        }, offset, objectRef, ignoreUseBeforeDeclarationCheck);
         if (objects != null) {
             return BaseUtils.immutableCast(objects);
         }
@@ -166,7 +171,7 @@ public class LSFPsiUtils {
                 if(context == null)
                     upParams = new HashSet<>();
                 else
-                    upParams = getContextParams(context, upOffset, objectRef);
+                    upParams = getContextParams(context, upOffset, objectRef, ignoreUseBeforeDeclarationCheck);
                 result.addAll(upParams);
             } else { // не extend - останавливаемся
                 upParams = new HashSet<>();
@@ -177,7 +182,7 @@ public class LSFPsiUtils {
 
         PsiElement parent = current.getParent();
         if (parent != null) {
-            return getContextParams(parent, offset, objectRef); // бежим выше
+            return getContextParams(parent, offset, objectRef, ignoreUseBeforeDeclarationCheck); // бежим выше
         }
 
         return new HashSet<>();
@@ -185,7 +190,7 @@ public class LSFPsiUtils {
 
     @NotNull
     public static List<LSFClassSet> getContextClasses(PsiElement psiElement, boolean objectRef) {
-        return LSFPsiImplUtil.resolveParamDeclClasses(getContextParams(psiElement, objectRef));
+        return LSFPsiImplUtil.resolveParamDeclClasses(getContextParams(psiElement, objectRef, true));
     }
 
     @NotNull

@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.184</b><br>
+        <b>Version 1.0.185</b><br>
         <ul>
-            <li>fix in NUMERIC type inference</li>
-            <li>generate form: replace "-" for "_" in identificators</li>
+            <li>Completion for PROPERTIES without brackets in FORM declaration (closes #209)</li>
         </ul>
     ]]>
     </change-notes>

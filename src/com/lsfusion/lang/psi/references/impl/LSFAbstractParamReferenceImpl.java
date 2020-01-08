@@ -34,7 +34,7 @@ public abstract class LSFAbstractParamReferenceImpl<T extends LSFExprParamDeclar
 
     private Set<LSFExprParamDeclaration> getContextParams() {
         PsiElement paramDecl = getParamDeclare();
-        return LSFPsiUtils.getContextParams(paramDecl, this instanceof LSFObjectReference);
+        return LSFPsiUtils.getContextParams(paramDecl, this instanceof LSFObjectReference, false);
     }
 
     @Nullable
