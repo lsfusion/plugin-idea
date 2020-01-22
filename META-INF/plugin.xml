@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.185</b><br>
+        <b>Version 1.0.186</b><br>
         <ul>
-            <li>Completion for PROPERTIES without brackets in FORM declaration (closes #209)</li>
-            <li>Project closing is fixed (issue #45)</li>
+            <li>RECALCULATE fix (issue #46)</li>
         </ul>
     ]]>
     </change-notes>

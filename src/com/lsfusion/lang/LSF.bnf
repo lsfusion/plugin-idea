@@ -655,7 +655,6 @@ private recursiveExtendContextActionPDB ::=  	forActionPropertyDefinitionBody
                                             |	dialogActionPropertyDefinitionBody // mixed, input
                                             |	inputActionPropertyDefinitionBody // mixed, input
                                             |	newActionPropertyDefinitionBody // should be after newWhere
-                                            |	recalculateActionPropertyDefinitionBody
 
 private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
                                         |	    confirmActionPropertyDefinitionBody// mixed, input
@@ -676,6 +675,7 @@ private leafExtendContextActionPDB ::=          assignActionPropertyDefinitionBo
                                         |	    changeClassActionPropertyDefinitionBody
                                         |	    deleteActionPropertyDefinitionBody
                                         |	    newWhereActionPropertyDefinitionBody // should be before new
+                                        |       recalculateActionPropertyDefinitionBody
 
 private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody // should be after assign	
                                         |	    terminalFlowActionPropertyDefinitionBody
@@ -1161,7 +1161,7 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
 // Important ! after recover the rule should mandatory be pinned (matched)
 private list_action_statement_recover ::= !(ACTIVATE | NEW | NEWEDIT | APPLY | CANCEL | CHANGE | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | INTERNAL | DELETE
                                             | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
-                                            | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE
+                                            | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE | RECALCULATE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | EXTERNAL
                                             | ID // pinned with execActionPropertyDefinitionBody
