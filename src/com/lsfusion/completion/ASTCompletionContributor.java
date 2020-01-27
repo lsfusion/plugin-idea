@@ -66,7 +66,7 @@ public class ASTCompletionContributor extends CompletionContributor {
     public static final Logger LOGGER = Logger.getInstance("com.lsfusion.completion.ASTCompletionContributor");
 
     private static final String[] LOGICAL_LITERALS = new String[]{"TRUE", "FALSE"};
-    private static final String[] PRIMITIVE_TYPES = new String[]{"INTEGER", "LONG", "NUMERIC[,]", "DOUBLE",
+    private static final String[] PRIMITIVE_TYPES = new String[]{"INTEGER", "LONG", "NUMERIC", "NUMERIC[,]", "DOUBLE",
                                                                  "DATE", "DATETIME", "TIME", "YEAR",
                                                                  "BPSTRING[]", "BPISTRING[]", "STRING[]", "ISTRING[]",
                                                                  "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT",

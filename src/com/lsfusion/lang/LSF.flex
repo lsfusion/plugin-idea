@@ -102,7 +102,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
 
   ("TRUE" | "FALSE")                    { return LEX_LOGICAL_LITERAL; }
 
-    "INTEGER" | "LONG" | "NUMERIC[" {DIGITS} "," {DIGITS} "]" | "DOUBLE"
+    "INTEGER" | "LONG" | "NUMERIC" ("[" {DIGITS} "," {DIGITS} "]")? | "DOUBLE"
   | "DATE" | "DATETIME" | "TIME" | "YEAR"
   | "BPSTRING" | "BPISTRING" | "STRING" | "ISTRING"
   | "BPSTRING[" {DIGITS} "]" | "BPISTRING[" {DIGITS} "]" | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]"

@@ -4,30 +4,39 @@ import java.text.NumberFormat;
 
 public class NumericClass extends DoubleClass {
 
-    private final int length;
-    private final int precision;
+    private final ExtInt length;
+    private final ExtInt precision;
 
     public NumericClass(int length, int precision) {
+        this(new ExtInt(length), new ExtInt(precision));
+    }
+
+    public NumericClass(ExtInt length, ExtInt precision) {
         this.length = length;
         this.precision = precision;
     }
 
     public NumberFormat getDefaultFormat() {
         NumberFormat format = super.getDefaultFormat();
-        format.setMaximumIntegerDigits(length - precision);
-        format.setMaximumFractionDigits(precision);
+        format.setMaximumIntegerDigits(getWhole());
+        format.setMaximumFractionDigits(getPrecision());
         return format;
     }
 
     @Override
     int getWhole() {
-        return length - precision;
+        return getLength() - getPrecision();
+    }
+
+    int getLength() {
+        return length.isUnlimited() ? 127 : length.value;
     }
 
     @Override
     int getPrecision() {
-        return precision;
+        return precision.isUnlimited() ? 32 : precision.value;
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -36,16 +45,20 @@ public class NumericClass extends DoubleClass {
 
     @Override
     public int hashCode() {
-        return length * 31 + precision;
+        return length.value * 31 + precision.value;
+    }
+
+    private boolean isUnlimited() {
+        return length.isUnlimited();
     }
 
     public String getName() {
-        return "NUMERIC[" + length + "," + precision + "]";
+        return "NUMERIC" + (isUnlimited() ? "" : ("[" + length + "," + precision + "]"));
     }
 
     @Override
     public String getCaption() {
-        return "Numeric" + '[' + length + ',' + precision + ']';
+        return "Numeric" + (isUnlimited() ? "" : ("[" + length + "," + precision + "]"));
     }
 
     @Override
@@ -56,6 +69,6 @@ public class NumericClass extends DoubleClass {
 
     @Override
     public boolean isAssignable(LSFClassSet set) {
-        return !(set instanceof NumericClass && (length < ((NumericClass) set).length || precision < ((NumericClass) set).precision)) && super.isAssignable(set);
+        return !(set instanceof NumericClass && !isUnlimited() && (((NumericClass) set).isUnlimited() || length.value < ((NumericClass) set).length.value || precision.value < ((NumericClass) set).precision.value)) && super.isAssignable(set);
     }
 }

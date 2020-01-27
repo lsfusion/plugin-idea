@@ -590,6 +590,8 @@ public class LSFPsiImplUtil {
             String length = name.substring("NUMERIC[".length(), name.indexOf(","));
             String precision = name.substring(name.indexOf(",") + 1, name.length() - 1);
             return new NumericClass(Integer.parseInt(length), Integer.parseInt(precision));
+        } else if (name.equals("NUMERIC")) {
+            return new NumericClass(ExtInt.UNLIMITED, ExtInt.UNLIMITED);
         } else if (name.equals("TEXT")) {
             return TextClass.instance;
         } else if (name.equals("RICHTEXT")) {
