@@ -1,6 +1,7 @@
 package com.lsfusion.design.model.proxy;
 
 import com.lsfusion.design.model.PropertyDrawView;
+import com.lsfusion.design.ui.FlexAlignment;
 
 import javax.swing.*;
 import java.awt.*;
@@ -110,5 +111,9 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
     }
     public void setCharWidth(int charWidth) {
         target.setCharWidth(charWidth);
+    }
+    
+    public void setValueAlignment(FlexAlignment valueAlignment) {
+        this.setValueAlignment(valueAlignment);
     }
 }

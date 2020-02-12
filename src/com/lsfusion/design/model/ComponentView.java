@@ -15,13 +15,11 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public abstract class ComponentView extends PropertiesContainer {
     public static final List<Property> PROPERTIES = Arrays.<Property>asList(
-            new ReflectionProperty("minimumSize").setExpert(),
-            new ReflectionProperty("maximumSize").setExpert(),
             new ReflectionProperty("size"),
             new ReflectionProperty("autoSize"),
             new ReflectionProperty("flex"),

@@ -41,6 +41,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("charHeight").setExpert(),
             new ReflectionProperty("charWidth").setExpert(),
             new ReflectionProperty("valueSize").setExpert(),
+            new ReflectionProperty("valueAlignment"),
             new ReflectionProperty("changeKey"),
             new ReflectionProperty("showChangeKey").setExpert(),
             new ReflectionProperty("focusable"),
@@ -69,6 +70,8 @@ public class PropertyDrawView extends ComponentView {
     public int charWidth;
     public Dimension valueSize;
     private Boolean valueFlex;
+    
+    public FlexAlignment valueAlignment;
 
     public KeyStroke changeKey;
     public boolean showChangeKey;
@@ -299,6 +302,14 @@ public class PropertyDrawView extends ComponentView {
         }
         return cFont;
     }
+    
+    public FlexAlignment getValueAlignment() {
+        return valueAlignment;
+    }
+    
+    public void setValueAlignment(FlexAlignment valueAlignment) {
+        this.valueAlignment = valueAlignment;
+    } 
 
     public void setChangeKey(KeyStroke editKey) {
         this.changeKey = editKey;
@@ -390,6 +401,10 @@ public class PropertyDrawView extends ComponentView {
 
     public int getCharWidth() {
         return charWidth;
+    }
+    
+    public Dimension getValueSize() {
+        return valueSize;
     }
 
     public KeyStroke getChangeKey() {

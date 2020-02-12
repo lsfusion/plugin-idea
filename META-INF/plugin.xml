@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.186</b><br>
+        <b>Version 1.0.187</b><br>
         <ul>
-            <li>RECALCULATE fix (issue #46)</li>
-            <li>Implement NUMERIC type (without size)</li>
+            <li>Custom horizontal alignment for property value support</li>
         </ul>
     ]]>
     </change-notes>
