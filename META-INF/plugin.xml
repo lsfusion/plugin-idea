@@ -10,6 +10,7 @@
         <b>Version 1.0.187</b><br>
         <ul>
             <li>Custom horizontal alignment for property value support</li>
+            <li>Support vertical containers for group-to-columns properties</li>
         </ul>
     ]]>
     </change-notes>
