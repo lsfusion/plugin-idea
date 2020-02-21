@@ -21,6 +21,7 @@ import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
 import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
+import com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl;
 import com.lsfusion.lang.typeinfer.*;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -355,6 +356,17 @@ public class LSFPsiImplUtil {
 
     public static ContextModifier getDoContextModifier(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
         return new ExprParamContextModifier(sourceStatement.getParamDeclare());
+    }
+
+    public static ContextModifier getContextModifier(@NotNull LSFContextFiltersClause sourceStatement) {
+        FormContext formContext = PsiTreeUtil.getParentOfType(sourceStatement, FormContext.class);
+        Set<LSFObjectDeclaration> objects = formContext != null ? LSFFormElementReferenceImpl.processFormContext(formContext, formExtend -> formExtend.getObjectDecls(), formContext.getTextOffset(), true, false) : null;
+
+        return (offset, currentParams) -> objects != null ? new ArrayList<>(objects) : new ArrayList<>();
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFContextFiltersClause sourceStatement) {
+        return new ExprsContextInferrer(sourceStatement.getPropertyExpressionList());
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFDoMainBody sourceStatement) {

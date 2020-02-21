@@ -717,8 +717,10 @@ formActionObjectUsage ::= objectUsage formActionObjectProps {
 formActionPropertyDefinitionBody ::=
 	    SHOW
 	     mappedForm
-		(   
-            syncTypeLiteral
+		(
+		    contextFiltersClause
+
+        |   syncTypeLiteral
 		|   windowTypeLiteral
 
 		|   manageSessionClause
@@ -741,8 +743,10 @@ noCancelClause ::= CANCEL | NOCANCEL
 dialogActionPropertyDefinitionBody ::=
 	    DIALOG
 	    mappedForm
-		(   
-            windowTypeLiteral
+		(
+		    contextFiltersClause
+
+        |   windowTypeLiteral
 
 		|   manageSessionClause
 		|   noCancelClause
@@ -775,7 +779,7 @@ staticDestination ::= TO noParamsPropertyUsage
 groupObjectDestination ::= TO groupObjectUsage EQUALS propertyUsage (COMMA groupObjectUsage EQUALS propertyUsage)*
 
 printActionPropertyDefinitionBody ::=
-	    PRINT mappedForm
+	    PRINT mappedForm contextFiltersClause?
 		(   (
 		    (   XLSX (SHEET propertyExpression)? (PASSWORD propertyExpression)?
 		    |   XLS (SHEET propertyExpression)? (PASSWORD propertyExpression)?
@@ -806,7 +810,7 @@ printActionPropertyDefinitionBody ::=
     methods = [inferActionParamClasses resolveFormDecl]
 }
 exportActionPropertyDefinitionBody ::=
-	    EXPORT mappedForm
+	    EXPORT mappedForm contextFiltersClause?
         (
             (
                 (   CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
@@ -831,6 +835,12 @@ exportActionPropertyDefinitionBody ::=
     pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl]
+}
+
+contextFiltersClause ::= FILTERS propertyExpression (COMMA propertyExpression)* {
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer ]
 }
 
 propertyExpressionWithOrder ::= propertyExpression (DESC)?

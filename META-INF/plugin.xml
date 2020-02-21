@@ -11,6 +11,7 @@
         <ul>
             <li>Custom horizontal alignment for property value support</li>
             <li>Support vertical containers for group-to-columns properties</li>
+            <li>Support FILTERS clause in form operators (SHOW, DIALOG, EXPORT, PRINT)</li>
         </ul>
     ]]>
     </change-notes>
