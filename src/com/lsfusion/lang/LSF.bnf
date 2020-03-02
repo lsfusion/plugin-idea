@@ -1058,12 +1058,12 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
-importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
+importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
-                        |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))?
+                        |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))? (WHERE propertyExpression)?
                         |   JSON (ROOT propertyExpression)? (CHARSET stringLiteral)?
                         |   XML (ROOT propertyExpression)? (ATTR)?
-                        |   TABLE
+                        |   TABLE (WHERE propertyExpression)?
 
 importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
                                  |   DBF (CHARSET stringLiteral)?
