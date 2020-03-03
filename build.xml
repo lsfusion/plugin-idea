@@ -90,6 +90,7 @@
         <pathelement location="${basedir}/lib/commons-lang3-3.4.jar"/>
         <pathelement location="${basedir}/lib/jsoup-1.11.3.jar"/>
         <pathelement location="${basedir}/lib/json-20180813.jar"/>
+        <pathelement location="${basedir}/lib/junidecode-0.4.1.jar"/>
     </path>
 
     <patternset id="excluded.from.compilation">

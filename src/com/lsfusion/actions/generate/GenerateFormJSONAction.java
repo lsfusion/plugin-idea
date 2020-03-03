@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class GenerateFormJSONAction extends GenerateFormAction {
         VirtualFile file = FileChooser.chooseFile(fileChooser, e.getProject(), null);
 
         if (file != null) {
-            Object object = new JSONTokener(new String(Files.readAllBytes(Paths.get(file.getPath())))).nextValue();
+            Object object = new JSONTokener(new String(Files.readAllBytes(Paths.get(file.getPath())), StandardCharsets.UTF_8)).nextValue();
             if (object instanceof JSONObject) {
                 return object;
             } else {

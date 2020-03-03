@@ -3,6 +3,7 @@ package com.lsfusion.actions.generate;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.lsfusion.util.BaseUtils;
+import net.gcardone.junidecode.Junidecode;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
@@ -225,7 +226,7 @@ public class GenerateFormAction extends AnAction {
     private String generateObjectId(String id) {
         id = Introspector.decapitalize(id);
         if(id != null)
-            id = id.replace("-", "_");
+            id = Junidecode.unidecode(id).replaceAll("[-.@']", "_");
         int count = 0;
         while(usedObjectIds.contains(id + (count == 0 ? "" : count))) {
             count++;

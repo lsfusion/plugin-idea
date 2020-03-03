@@ -17,5 +17,6 @@
     <orderEntry type="library" name="commons-lang3-3.4" level="project" />
     <orderEntry type="library" name="jsoup-1.11.3" level="project" />
     <orderEntry type="library" name="json-20180813" level="project" />
+    <orderEntry type="library" name="junidecode-0.4.1" level="project" />
   </component>
 </module>
