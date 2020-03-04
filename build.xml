@@ -223,6 +223,7 @@
             <file name="${basedir}/lib/jgrapht-core-0.9.0.jar"/>
             <file name="${basedir}/lib/jsoup-1.11.3.jar"/>
             <file name="${basedir}/lib/json-20180813.jar"/>
+            <file name="${basedir}/lib/junidecode-0.4.1.jar"/>
         </copy>
         <zip destfile="${basedir}/lsfusion-idea-plugin.zip">
             <fileset dir="${tmp.dir}"/>
