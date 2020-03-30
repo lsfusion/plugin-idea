@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.189</b><br>
+        <b>Version 1.0.190</b><br>
         <ul>
-            <li>Generate form from XML/JSON: transliterate ids</li>
+            <li>ZDATETIME data type</li>
         </ul>
     ]]>
     </change-notes>

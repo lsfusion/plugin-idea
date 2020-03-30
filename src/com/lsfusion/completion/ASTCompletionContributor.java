@@ -67,7 +67,7 @@ public class ASTCompletionContributor extends CompletionContributor {
 
     private static final String[] LOGICAL_LITERALS = new String[]{"TRUE", "FALSE"};
     private static final String[] PRIMITIVE_TYPES = new String[]{"INTEGER", "LONG", "NUMERIC", "NUMERIC[,]", "DOUBLE",
-                                                                 "DATE", "DATETIME", "TIME", "YEAR",
+                                                                 "DATE", "DATETIME", "TIME", "YEAR", "ZDATETIME",
                                                                  "BPSTRING[]", "BPISTRING[]", "STRING[]", "ISTRING[]",
                                                                  "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT",
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "RAWFILE", "FILE", "EXCELFILE",

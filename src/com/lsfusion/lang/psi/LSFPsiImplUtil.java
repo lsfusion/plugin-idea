@@ -675,6 +675,8 @@ public class LSFPsiImplUtil {
                 return TimeClass.instance;
             case "DATETIME":
                 return DateTimeClass.instance;
+            case "ZDATETIME":
+                return ZDateTimeClass.instance;
             case "COLOR":
                 return ColorClass.instance;
         }

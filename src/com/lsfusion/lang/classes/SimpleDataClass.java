@@ -32,6 +32,8 @@ public class SimpleDataClass extends DataClass {
     public Collection<String> getExtraNames() {
         if(dataName.equals("DATETIME"))
             return Collections.singletonList("DateTime");
+        else if(dataName.equals("ZDATETIME"))
+            return Collections.singletonList("ZDateTime");
         return super.getExtraNames();
     }
 

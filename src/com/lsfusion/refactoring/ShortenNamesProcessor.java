@@ -105,8 +105,8 @@ public class ShortenNamesProcessor {
                     if(prmClass!=null)
                         prmCheck = prmClass.getCommonClass().getName();
                     if(prmCheck != null) {
-                        if((declName.equals("toDate") && prmCheck.equals(DateTimeClass.instance.getName())) ||
-                            (declName.equals("toTime") && prmCheck.equals(DateTimeClass.instance.getName())) ||
+                        if((declName.equals("toDate") && (prmCheck.equals(DateTimeClass.instance.getName()) || prmCheck.equals(ZDateTimeClass.instance.getName()))) ||
+                            (declName.equals("toTime") && (prmCheck.equals(DateTimeClass.instance.getName()) || prmCheck.equals(ZDateTimeClass.instance.getName()))) ||
                             (declName.equals("toDateTime") && prmCheck.equals(DateClass.instance.getName())) ||
                             (declName.equals("objectClass") && prmCheck.equals("Object")))
                             return declName;                            
