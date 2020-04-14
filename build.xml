@@ -54,6 +54,7 @@
         <fileset dir="${idea.home}">
             <include name="lib/*.jar"/>
             <include name="plugins/properties/lib/properties.jar"/>
+            <include name="plugins/java/lib/*.jar"/>
         </fileset>
     </path>
 
@@ -62,8 +63,7 @@
     <path id="javac2.classpath">
         <pathelement location="${javac2.home}/javac2.jar"/>
         <pathelement location="${javac2.home}/jdom.jar"/>
-        <pathelement location="${javac2.home}/asm-all-7.0.jar"/>
-        <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+        <pathelement location="${javac2.home}/asm-all-7.0.1.jar"/>
     </path>
     <target name="register.custom.compilers">
         <!--suppress AntResolveInspection : used in Linux -->
