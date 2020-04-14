@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.190</b><br>
+        <b>Version 1.0.191</b><br>
         <ul>
-            <li>ZDATETIME data type</li>
+            <li>IDEA 2020.1 support</li>
         </ul>
     ]]>
     </change-notes>

@@ -8,9 +8,9 @@ import javax.swing.*;
 
 public final class LSFIcons {
     public static final Icon ABSTRACT_PROPERTY = IconLoader.getIcon("/images/abstract_property.png");
-    public static final Icon ACTION = AllIcons.Javaee.PersistenceAttribute;
+    public static final Icon ACTION = IconLoader.getIcon("/images/action.png");
     public static final Icon CLASS = AllIcons.Nodes.Class;
-    public static final Icon CONSTRAINT = AllIcons.Ide.Warning_notifications;
+    public static final Icon CONSTRAINT = AllIcons.General.Warning;
     public static final Icon DATA_PROPERTY = IconLoader.getIcon("/images/data_property.png");
     public static final Icon EVENT = AllIcons.Actions.Execute;
     public static final Icon FILE = IconLoader.getIcon("/images/lsf_logo.png");
@@ -25,7 +25,7 @@ public final class LSFIcons {
     public static final Icon GROUP_BY_CLASS = AllIcons.Actions.GroupByClass;
     public static final Icon GROUP_BY_MODULE = AllIcons.Actions.GroupByModule;
     public static final Icon GROUP_OBJECT = AllIcons.Actions.GroupByPrefix;
-    public static final Icon INDEX = AllIcons.Graph.PrintPreview;
+    public static final Icon INDEX = AllIcons.Graph.Layout;
     public static final Icon LOGGABLE = AllIcons.FileTypes.Archive;
     public static final Icon META_DECLARATION = AllIcons.Nodes.AbstractMethod;
     public static final Icon META_REFERENCE = AllIcons.Nodes.Method;
@@ -36,10 +36,10 @@ public final class LSFIcons {
     public static final Icon PARAMETER = AllIcons.Nodes.Parameter;
     public static final Icon LOCAL_PROPERTY = AllIcons.Nodes.Variable;
     public static final Icon STATIC_OBJECT = AllIcons.Nodes.Static;
-    public static final Icon PRINT = AllIcons.Graph.Print;
+    public static final Icon PRINT = IconLoader.getIcon("/images/print.png");
     public static final Icon PROPERTY = AllIcons.Nodes.Property;
     public static final Icon PROPERTY_DRAW = AllIcons.Nodes.PropertyRead;
-    public static final Icon SHOW_DEP = AllIcons.Nodes.DataView;
+    public static final Icon SHOW_DEP = AllIcons.Nodes.DataTables;
     public static final Icon TABLE = AllIcons.Nodes.DataTables;
     public static final Icon WINDOW = AllIcons.RunConfigurations.Applet;
     public static final Icon WRITE_WHEN = AllIcons.Nodes.PropertyWrite;
@@ -48,7 +48,7 @@ public final class LSFIcons {
     public static final Icon DEPENDENCY_ZOOM_OUT = AllIcons.Graph.ZoomOut;
     public static final Icon DEPENDENCY_ACTUAL_ZOOM = AllIcons.Graph.ActualZoom;
 
-    public static final Icon GRAPH_EXPORT = AllIcons.Graph.Export;
+    public static final Icon GRAPH_EXPORT = AllIcons.ToolbarDecorator.Export;
 
     public static final class Design {
         public static final Icon DESIGN = AllIcons.FileTypes.UiForm;
@@ -63,7 +63,7 @@ public final class LSFIcons {
         public static final Icon TREE_GROUP = AllIcons.Actions.ShowAsTree; //todo:
         public static final Icon TOOLBAR = AllIcons.Ide.Macro.Recording_1;
         public static final Icon GRID = AllIcons.Nodes.DataTables;
-        public static final Icon PROPERTY = AllIcons.Css.Property;
+        public static final Icon PROPERTY = AllIcons.Nodes.Property;
 
         public static final Icon EXPERT_PROPS = AllIcons.General.Filter;
         public static final Icon FIND = AllIcons.Actions.Find;

@@ -4,7 +4,6 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.ide.util.treeView.smartTree.*;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +14,7 @@ import java.util.LinkedHashMap;
 public class ModuleGrouper implements Grouper {
     @NotNull
     @Override
-    public Collection<Group> group(AbstractTreeNode parent, Collection<TreeElement> children) {
+    public Collection<Group> group(AbstractTreeNode<?> parent, Collection<TreeElement> children) {
         if (isParentGrouped(parent)) {
             return Collections.emptyList();
         }

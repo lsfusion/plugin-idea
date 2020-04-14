@@ -36,17 +36,7 @@ public class LSFPropertyBreakpoint extends LineBreakpoint {
     }
 
     @Override
-    protected Icon getInvalidIcon(boolean isMuted) {
-        return isMuted? AllIcons.Debugger.Db_muted_invalid_field_breakpoint : AllIcons.Debugger.Db_invalid_field_breakpoint;
-    }
-
-    @Override
     protected Icon getVerifiedIcon(boolean isMuted) {
-        return isMuted? AllIcons.Debugger.Db_muted_verified_field_breakpoint : AllIcons.Debugger.Db_verified_field_breakpoint;
-    }
-
-    @Override
-    protected Icon getVerifiedWarningsIcon(boolean isMuted) {
-        return isMuted? AllIcons.Debugger.Db_muted_field_warning_breakpoint : AllIcons.Debugger.Db_field_warning_breakpoint;
+        return isMuted? AllIcons.Debugger.Db_muted_field_breakpoint : AllIcons.Debugger.Db_verified_field_breakpoint;
     }
 }

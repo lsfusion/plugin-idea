@@ -11,11 +11,11 @@ import static com.lsfusion.lang.psi.LSFTypes.*;
 public class LSFParserImpl extends LSFParser {
 
     @Override
-    public boolean parseImpl(IElementType root_, PsiBuilder builder_) {
+    public boolean parse_root_(IElementType root_, PsiBuilder builder_) {
         if (root_ == LAZY_SCRIPT_STATEMENT) {
             return lazyScriptStatementDeep(builder_, 0);
         } else {
-            return super.parseImpl(root_, builder_);
+            return super.parse_root_(root_, builder_);
         }
     }
 

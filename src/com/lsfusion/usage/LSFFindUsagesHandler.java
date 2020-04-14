@@ -46,7 +46,7 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
     }
 
     @Override
-    public boolean processElementUsages(@NotNull final PsiElement element, @NotNull final Processor<UsageInfo> processor, @NotNull FindUsagesOptions options) {
+    public boolean processElementUsages(@NotNull PsiElement element, @NotNull Processor<? super UsageInfo> processor, @NotNull FindUsagesOptions options) {
         if (options.isUsages) {
             LSFDeclaration decl = getParentDeclaration(element, LSFDeclaration.class);
             if (decl instanceof LSFActionOrPropDeclaration && PROPERTY_DRAW_USAGES.equals(propertyUsagesSearchMode)) {
@@ -87,7 +87,7 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
         return ApplicationManager.getApplication().runReadAction((Computable<T>) () -> PsiTreeUtil.getParentOfType(element, declClass));
     }
 
-    private void referencesSearch(Processor<UsageInfo> processor, LSFDeclaration declaration) {
+    private void referencesSearch(Processor<? super UsageInfo> processor, LSFDeclaration declaration) {
         if(declaration != null) {
             LSFId identifier = declaration.getNameIdentifier();
             if (identifier != null) {

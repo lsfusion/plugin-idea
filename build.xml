@@ -115,14 +115,16 @@
         <pathelement location="${buildLib}/grammar-kit.jar"/>
         <file name="${basedir}/lib/psiImplUtils.jar"/>
         <fileset dir="${idea.home}/lib">
-            <include name="asm-all-7.0.jar"/>
+            <include name="asm-all-7.0.1.jar"/>
             <include name="automaton-1.12-1.jar"/>
             <include name="extensions.jar"/>
-            <include name="guava-25.1-jre.jar"/>
+            <include name="guava-28.2-jre.jar"/>
             <include name="idea.jar"/>
-            <include name="picocontainer-1.2.jar"/>
+            <include name="jdom.jar"/>
             <include name="platform-api.jar"/>
+            <include name="platform-concurrency.jar"/>
             <include name="platform-impl.jar"/>
+            <include name="testFramework.jar"/>
             <include name="trove4j.jar"/>
             <include name="util.jar"/>
         </fileset>

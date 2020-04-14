@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 public class ExtendedClassGrouper implements Grouper {
     @NotNull
     @Override
-    public Collection<Group> group(AbstractTreeNode parent, Collection<TreeElement> children) {
+    public Collection<Group> group(AbstractTreeNode<?> parent, Collection<TreeElement> children) {
         if (isParentGrouped(parent)) {
             return Collections.emptyList();
         }

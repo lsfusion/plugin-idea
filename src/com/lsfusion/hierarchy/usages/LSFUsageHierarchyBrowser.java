@@ -115,7 +115,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
 
     @Nullable
     @Override
-    protected Comparator<NodeDescriptor> getComparator() {
+    protected Comparator<NodeDescriptor<?>> getComparator() {
         if (sortByType) {
             return HierarchyBrowserManager.getInstance(myProject).getState().SORT_ALPHABETICALLY ? usageTypeComparatorWithAlpha : usageTypeComparatorWithoutAlpha;
         }
@@ -125,7 +125,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
         return SourceComparator.INSTANCE;
     }
 
-    private class UsageTypeComparator implements Comparator<NodeDescriptor> {
+    private class UsageTypeComparator implements Comparator<NodeDescriptor<?>> {
         private boolean withAlpha;
 
         private final List<Class> classOrder = new ArrayList<Class>(Arrays.asList(LSFClassDeclaration.class, LSFExplicitInterfacePropertyStatement.class, LSFExplicitInterfaceActionStatement.class,
