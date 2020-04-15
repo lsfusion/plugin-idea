@@ -1,15 +1,15 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.191</version>
+    <version>1.0.192</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.191</b><br>
+        <b>Version 1.0.192</b><br>
         <ul>
-            <li>IDEA 2020.1 support</li>
+            <li>backward compatibility (find usages dialog in 2019.3-)</li>
         </ul>
     ]]>
     </change-notes>
