@@ -34,7 +34,8 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
     @Override
     public AbstractFindUsagesDialog getFindUsagesDialog(boolean isSingleFile, boolean toShowInNewTab, boolean mustOpenInNewTab) {
         if (getPsiElement().getContainingFile() instanceof LSFFile) {
-            return new LSFFindUsagesDialog(getPsiElement(), getProject(), options, toShowInNewTab, mustOpenInNewTab, isSingleFile, this);
+            boolean searchForTextOccurrencesAvailable = !isSingleFile && isSearchForTextOccurrencesAvailable(getPsiElement(), false);
+            return new LSFFindUsagesDialog(getPsiElement(), getProject(), options, toShowInNewTab, mustOpenInNewTab, isSingleFile, searchForTextOccurrencesAvailable);
         }
         return super.getFindUsagesDialog(isSingleFile, toShowInNewTab, mustOpenInNewTab);
     }
