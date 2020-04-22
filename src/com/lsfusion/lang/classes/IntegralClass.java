@@ -52,7 +52,8 @@ public abstract class IntegralClass extends FormatClass {
             precision = getPrecision() + compClass.getPrecision();
         } else {
             whole = getWhole() + compClass.getPrecision();
-            precision = getPrecision() + compClass.getWhole();
+//            precision = getPrecision() + compClass.getWhole();
+            precision = NumericClass.MAX_PRECISION;
         }
         return new NumericClass(whole + precision, precision);
     }

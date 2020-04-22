@@ -7,9 +7,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.192</b><br>
+        <b>Version 1.0.193</b><br>
         <ul>
-            <li>backward compatibility (find usages dialog in 2019.3-)</li>
+            <li>New rule for determing division result class</li>
+            <li>Support of max NUMERIC length and precision</li>
         </ul>
     ]]>
     </change-notes>
