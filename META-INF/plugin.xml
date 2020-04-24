@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.192</version>
+    <version>1.0.193</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -11,6 +11,7 @@
         <ul>
             <li>New rule for determing division result class</li>
             <li>Support of max NUMERIC length and precision</li>
+            <li>Several optimizations in navigating to symbol</li>
         </ul>
     ]]>
     </change-notes>

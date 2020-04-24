@@ -19,7 +19,10 @@ import java.util.List;
 
 public abstract class LSFNameContributor implements ChooseByNameContributor {
     protected abstract Collection<StringStubIndexExtension> getIndices();
-    
+
+    // it's hacky here, but all that pattern obtaining is a big hack
+    // the problem is that when you press CTRL+SHIFT+N - editor is focused, so we can't get pattern from there, but we'll assume that there will be previous pattern (default idea behaviour)
+    private static String prevPattern = null;
     @NotNull
     @Override
     public String[] getNames(Project project, boolean includeNonProjectItems) {
@@ -27,6 +30,9 @@ public abstract class LSFNameContributor implements ChooseByNameContributor {
         final Component focusedComponent = WindowManagerEx.getInstanceEx().getFocusedComponent(project);
         if (focusedComponent instanceof JTextField) {
             pattern = ((JTextField) focusedComponent).getText();
+            prevPattern = pattern;
+        } else {
+            pattern = prevPattern;
         }
         
         List<String> result = new ArrayList<>();

@@ -8,8 +8,8 @@ public abstract class LSFElementVisitor extends PsiElementVisitor {
 
     @Override
     public void visitElement(PsiElement element) {
-        boolean isInMetaUsage = LSFReferenceAnnotator.isInMetaUsage(element);
-        if(element.getContainingFile().isWritable() && (onlyInMeta() ? isInMetaUsage : (!disabledInMeta() || !isInMetaUsage)))
+        // we don't want to call isInMetaUsage everytime since it accesses PSI and can lead to unnecessary parsings
+        if(element.getContainingFile().isWritable() && (onlyInMeta() ? LSFReferenceAnnotator.isInMetaUsage(element) : (!disabledInMeta() || !LSFReferenceAnnotator.isInMetaUsage(element))))
             visit(element);
         super.visitElement(element);
     }

@@ -105,11 +105,10 @@ public class LSFSymbolContributor extends LSFNameContributor {
             Collection<String> allKeys = index.getAllKeys(project);
             final GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
             for (String key : allKeys) {
+                if (pattern != null && !matches(key, pattern)) {
+                    continue;
+                }
                 for (LSFActionOrGlobalPropDeclaration decl : ((ActionOrPropIndex<?>) index).get(key, project, scope)) {
-                    if (pattern != null && !matches(key, pattern)) {
-                        continue;
-                    }
-                    
                     List<LSFClassSet> paramClasses = decl.resolveParamClasses();
                     String paramsString = "";
                     if (paramClasses != null) {
