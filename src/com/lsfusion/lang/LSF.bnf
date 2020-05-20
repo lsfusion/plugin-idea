@@ -1551,7 +1551,7 @@ formExprDeclaration ::= propertyExpression
 formActionDeclaration ::= topActionPropertyDefinitionBody
 filterSetDefault ::= DEFAULT
 
-formOrderByList ::= ORDER formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
+formOrderByList ::= ORDERS formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
 
 formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 

@@ -379,6 +379,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "OPTIMISTICASYNC"                     { return OPTIMISTICASYNC; }
   "OR"                      			{ return OR; }
   "ORDER"                   			{ return ORDER; }
+  "ORDERS"                   			{ return ORDERS; }
   "OVERRIDE"                			{ return OVERRIDE; }
   "PAGESIZE"                			{ return PAGESIZE; }
   "PANEL"                   			{ return PANEL; }
