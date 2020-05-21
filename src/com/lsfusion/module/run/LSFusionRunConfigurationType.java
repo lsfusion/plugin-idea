@@ -26,6 +26,12 @@ public class LSFusionRunConfigurationType implements ConfigurationType {
             public void onNewConfigurationCreated(@NotNull RunConfiguration configuration) {
                 ((LSFusionRunConfiguration)configuration).onNewConfigurationCreated();
             }
+
+            @NotNull
+            @Override
+            public String getId() {
+                return getName();
+            }
         };
     }
 
