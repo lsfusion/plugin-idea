@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.194</b><br>
+        <b>Version 1.0.195</b><br>
         <ul>
-            <li>EXTERNAL HTTP CLIENT support</li>
-            <li>Rename ORDER to ORDERS in FORM declaration</li>
+            <li>FILTER, ORDER options for property, PIVOT options support</li>
         </ul>
     ]]>
     </change-notes>

@@ -1333,6 +1333,7 @@ formStatement ::=	(	formDecl
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
                     |	formOrderByList
+                    |	formPivotOptionsDeclaration
                     |	listFormDeclaration
                     |	editFormDeclaration
                     |   reportFilesDeclaration
@@ -1408,12 +1409,16 @@ treeGroupParentDeclaration ::= PARENT (formExprDeclaration | LBRAC formExprDecla
 formGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDeclaration
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFGroupObjectDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration"}
 
-formGroupObjectViewType ::= classViewType
+formGroupObjectViewType ::= classViewType | listViewType
 formGroupObjectInitViewType ::= INIT | FIXED
 
 formSubReport ::= SUBREPORT formCalcPropertyObject?
 
 classViewType ::= PANEL | GRID | TOOLBAR
+
+listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | MAP
+
+pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS))*
 
 formGroupObjectPageSize ::= PAGESIZE intLiteral
 
@@ -1469,6 +1474,11 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    ATTR
                             |    formInGroup
                             |    formExtID
+                            |    ORDER (DESC)?
+                            |    FILTER
+                            |    COLUMN
+                            |    ROW
+                            |    MEASURE
                             )*
 
 formOptionSession ::= NEWSESSION | NESTEDSESSION;
@@ -1552,6 +1562,15 @@ formActionDeclaration ::= topActionPropertyDefinitionBody
 filterSetDefault ::= DEFAULT
 
 formOrderByList ::= ORDERS formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
+
+formPivotOptionsDeclaration ::= PIVOT (
+        (groupObjectUsage pivotOptions)
+     |  (COLUMNS pivotPropertyDrawList (COMMA pivotPropertyDrawList)*)
+     |  (ROWS pivotPropertyDrawList (COMMA pivotPropertyDrawList)*)
+     |  (MEASURES formPropertyDrawUsage (COMMA formPropertyDrawUsage)*)
+     )+
+
+pivotPropertyDrawList ::= formPropertyDrawUsage | (LBRAC formPropertyDrawUsage (COMMA formPropertyDrawUsage)* RBRAC)
 
 formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 

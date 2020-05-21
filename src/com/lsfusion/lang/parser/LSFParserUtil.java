@@ -47,6 +47,14 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         return true;
     }
 
+    public static boolean pivotCheck(PsiBuilder builder_, int level_) {
+        IElementType token = builder_.getTokenType();
+        return  token != LSFTypes.GROUP_OBJECT_USAGE &&
+                token != LSFTypes.COLUMNS &&
+                token != LSFTypes.ROWS &&
+                token != LSFTypes.MEASURES;
+    }
+
     private static Key<Integer> MATCHEDDRAWOBJECT = Key.create("lsf.matched.draw.object");
 
     public static boolean checkFormExpr(PsiBuilder builder_, int level_) {

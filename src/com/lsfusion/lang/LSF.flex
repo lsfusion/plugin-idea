@@ -215,6 +215,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "CLASSCHOOSER"                   		{ return CLASSCHOOSER; }
   "CLIENT"                   		    { return CLIENT; }
   "CLOSE"                   			{ return CLOSE; }
+  "COLUMN"                 			    { return COLUMN; }
   "COLUMNS"                 			{ return COLUMNS; }
   "COMPLEX"                 			{ return COMPLEX; }
   "CONNECTION"                 			{ return CONNECTION; }
@@ -335,8 +336,11 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "LSF"                    			    { return LSF; }
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "NOMANAGESESSION"                     { return NOMANAGESESSION; }
+  "MAP"                     			{ return MAP; }
   "MAX"                     			{ return MAX; }
   "MATERIALIZED"            			{ return MATERIALIZED; }
+  "MEASURE"                    			{ return MEASURE; }
+  "MEASURES"                    		{ return MEASURES; }
   "MENU"                    			{ return MENU; }
   "MEMO"                    			{ return MEMO; }
   "MESSAGE"                 			{ return MESSAGE; }
@@ -366,6 +370,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "NOCONSTRAINTFILTER"                  { return NOCONSTRAINTFILTER; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOHEADER"                			{ return NOHEADER; }
+  "NOSETTINGS"                     	    { return NOSETTINGS; }
   "NOT"                     			{ return NOT; }
   "WAIT"                                { return WAIT; }
   "NOWAIT"                              { return NOWAIT; }
@@ -387,7 +392,8 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "PARTITION"               			{ return PARTITION; }
   "PASSWORD"                            { return PASSWORD; }
   "PDF"                     			{ return PDF; }
-  "PERIOD"                              { return PERIOD; }    
+  "PERIOD"                              { return PERIOD; }
+  "PIVOT"                               { return PIVOT; }
   "PG"                                  { return PG; }    
   "POSITION"                			{ return POSITION; }
   "POST"                			    { return POST; }
@@ -424,6 +430,8 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "RIGHT"                   			{ return RIGHT; }
   "ROUND"                   			{ return ROUND; }
   "ROOT"                   			    { return ROOT; }
+  "ROW"                   			    { return ROW; }
+  "ROWS"                   			    { return ROWS; }
   "RTF"                     			{ return RTF; }
   "SCROLL"                              { return SCROLL; }
   "SEEK"                    			{ return SEEK; }
@@ -432,6 +440,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "SET"                     			{ return SET; }
   "SETCHANGED"              			{ return SETCHANGED; }
   "SETDROPPED"                 			{ return SETDROPPED; }
+  "SETTINGS"                 			{ return SETTINGS; }
   "SCHEDULE"              			    { return SCHEDULE; }
   "SHOW"                    			{ return SHOW; }
   "SHOWDEP"                 			{ return SHOWDEP; }
