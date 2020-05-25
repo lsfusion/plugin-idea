@@ -1,9 +1,9 @@
 package com.lsfusion;
 
+import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.navigation.ChooseByNameContributorEx;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ex.WindowManagerEx;
 import com.intellij.psi.codeStyle.MinusculeMatcher;
 import com.intellij.psi.codeStyle.NameUtil;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -14,29 +14,26 @@ import com.intellij.util.indexing.IdFilter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.Collection;
 
 public abstract class LSFNameContributor implements ChooseByNameContributorEx {
+
+
     protected abstract Collection<StringStubIndexExtension> getIndices();
 
-    // it's hacky here, but all that pattern obtaining is a big hack
-    // the problem is that when you press CTRL+SHIFT+N - editor is focused, so we can't get pattern from there, but we'll assume that there will be previous pattern (default idea behaviour)
-    private static String prevPattern = null;
+
+    protected Processor<? super String> getProcessor(StringStubIndexExtension index,  Processor<? super String> processor,
+                                                     GlobalSearchScope scope, String pattern) {
+        return processor;
+    }
 
     @Override
     public void processNames(@NotNull Processor<? super String> processor, @NotNull GlobalSearchScope scope, @Nullable IdFilter filter) {
-        String pattern;
-        final Component focusedComponent = WindowManagerEx.getInstanceEx().getFocusedComponent(scope.getProject());
-        if (focusedComponent instanceof JTextField) {
-            pattern = ((JTextField) focusedComponent).getText();
-            prevPattern = pattern;
-        } else {
-            pattern = prevPattern;
-        }
+
+        String pattern = scope.getProject().getUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN);
+
         for (StringStubIndexExtension index : getIndices()) {
-            processIndexKey(index, pattern, scope.getProject(), true, processor);
+            index.processAllKeys(scope.getProject(), getProcessor(index, processor, scope, pattern));
         }
     }
 
@@ -48,14 +45,6 @@ public abstract class LSFNameContributor implements ChooseByNameContributorEx {
             for (NavigationItem itemsFromIndex : navigationItems) {
                 processor.process(itemsFromIndex);
             }
-        }
-    }
-
-    protected void processIndexKey(StringStubIndexExtension index, String pattern, Project project,
-                                   boolean includeNonProjectItems, Processor<? super String> processor) {
-        Collection<String> allKeys = index.getAllKeys(project);
-        for (String allKey : allKeys) {
-            processor.process(allKey);
         }
     }
 

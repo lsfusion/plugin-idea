@@ -5,8 +5,6 @@ import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
-import com.intellij.psi.stubs.StubIndex;
-import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.IdFilter;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -103,36 +101,34 @@ public class LSFSymbolContributor extends LSFNameContributor {
     }
 
     @Override
-    protected void processIndexKey(StringStubIndexExtension index, String pattern, Project project,
-                                   boolean includeNonProjectItems, Processor<? super String> processor) {
-
-        final GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
+    protected Processor<? super String> getProcessor(StringStubIndexExtension index,
+                                                     Processor<? super String> processor,
+                                                     GlobalSearchScope scope,
+                                                     String pattern) {
         if (index instanceof ActionOrPropIndex) {
-            Collection<String> allKeys = index.getAllKeys(project);
-            for (String key : allKeys) {
-                if (pattern != null && !matches(key, pattern)) {
-                    continue;
-                }
-                for (LSFActionOrGlobalPropDeclaration decl : ((ActionOrPropIndex<?>) index).get(key, project, scope)) {
-                    List<LSFClassSet> paramClasses = decl.resolveParamClasses();
-                    String paramsString = "";
-                    if (paramClasses != null) {
-                        for (LSFClassSet classSet : paramClasses) {
-                            if (classSet != null) {
-                                paramsString += classSet;
+            return (Processor<String>) s -> {
+                if (pattern != null && matches(s, pattern)) {
+                    for (LSFActionOrGlobalPropDeclaration decl : ((ActionOrPropIndex<?>) index).get(s, scope.getProject(), GlobalSearchScope.allScope(scope.getProject()))) {
+                        List<LSFClassSet> paramClasses = decl.resolveParamClasses();
+                        String paramsString = "";
+                        if (paramClasses != null) {
+                            for (LSFClassSet classSet : paramClasses) {
+                                if (classSet != null) {
+                                    paramsString += classSet;
+                                }
                             }
                         }
+                        String withParams = s + paramsString;
+                        List<NavigationItem> decls = getPropertyDeclarationsMap(withParams, true);
+                        decls.add(new ActionOrPropFullNavigationItem(withParams, decl));
+                        processor.process(withParams);
                     }
-
-                    String withParams = key + paramsString;
-                    List<NavigationItem> decls = getPropertyDeclarationsMap(withParams, true);
-                    decls.add(new ActionOrPropFullNavigationItem(withParams, decl));
-                    processor.process(withParams);
+                    return true;
                 }
-            }
-        } else {
-            super.processIndexKey(index, pattern, project, includeNonProjectItems, processor);
+                return true;
+            };
         }
+        return super.getProcessor(index, processor, scope, pattern);
     }
 
     @Override
@@ -140,8 +136,8 @@ public class LSFSymbolContributor extends LSFNameContributor {
         if (index instanceof ActionOrPropIndex) {
             List<NavigationItem> decls = getPropertyDeclarationsMap(name, false);
             return decls != null
-                   ? decls
-                   : super.getItemsFromIndex(index, name, project, scope);
+                    ? decls
+                    : super.getItemsFromIndex(index, name, project, scope);
         } else {
             return super.getItemsFromIndex(index, name, project, scope);
         }
