@@ -1,10 +1,13 @@
 package com.lsfusion;
 
+import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
+import com.intellij.util.Processor;
+import com.intellij.util.indexing.IdFilter;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.indexes.*;
@@ -17,12 +20,12 @@ public class LSFSymbolContributor extends LSFNameContributor {
     // полагаем, что состояние не меняется между вызовами getNames() и getItemsByName()
     // оба вызова осуществляются в рамках одного метода. (см. DefaultChooseByNameItemProvider.filterElements(), SearchEverywhereAction.buildSymbols())
     private final Map<String, List<NavigationItem>> propertyDeclarationsMap = new HashMap<>();
-    
+
     private void clearPropertyDeclarationsMap() {
         synchronized (propertyDeclarationsMap) {
             propertyDeclarationsMap.clear();
         }
-            
+
     }
 
     private List<NavigationItem> getPropertyDeclarationsMap(String withParams, boolean putIfIsEmpty) {
@@ -56,11 +59,11 @@ public class LSFSymbolContributor extends LSFNameContributor {
 
     @NotNull
     @Override
-    public String[] getNames(Project project, boolean includeNonProjectItems) {
+    public void processNames(@NotNull Processor<? super String> processor, @NotNull GlobalSearchScope scope, @Nullable IdFilter filter) {
         clearPropertyDeclarationsMap();
-        return super.getNames(project, includeNonProjectItems);
+        super.processNames(processor, scope, filter);
     }
-    
+
     private static class ActionOrPropFullNavigationItem implements NavigationItem {
         private final String fullName;
         private final NavigationItem decl;
@@ -99,36 +102,36 @@ public class LSFSymbolContributor extends LSFNameContributor {
     }
 
     @Override
-    protected Collection<String> getIndexKeys(StringStubIndexExtension index, String pattern, Project project, boolean includeNonProjectItems) {
+    protected Processor<? super String> getProcessor(StringStubIndexExtension index,
+                                                     Processor<? super String> processor,
+                                                     GlobalSearchScope scope) {
+
+        String pattern = scope.getProject().getUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN);
+
         if (index instanceof ActionOrPropIndex) {
-            List<String> result = new ArrayList<>();
-            Collection<String> allKeys = index.getAllKeys(project);
-            final GlobalSearchScope scope = includeNonProjectItems ? GlobalSearchScope.allScope(project) : GlobalSearchScope.projectScope(project);
-            for (String key : allKeys) {
-                if (pattern != null && !matches(key, pattern)) {
-                    continue;
-                }
-                for (LSFActionOrGlobalPropDeclaration decl : ((ActionOrPropIndex<?>) index).get(key, project, scope)) {
-                    List<LSFClassSet> paramClasses = decl.resolveParamClasses();
-                    String paramsString = "";
-                    if (paramClasses != null) {
-                        for (LSFClassSet classSet : paramClasses) {
-                            if (classSet != null) {
-                                paramsString += classSet;
+            return (Processor<String>) s -> {
+                if (pattern != null && matches(s, pattern)) {
+                    for (LSFActionOrGlobalPropDeclaration decl : ((ActionOrPropIndex<?>) index).get(s, scope.getProject(), GlobalSearchScope.allScope(scope.getProject()))) {
+                        List<LSFClassSet> paramClasses = decl.resolveParamClasses();
+                        String paramsString = "";
+                        if (paramClasses != null) {
+                            for (LSFClassSet classSet : paramClasses) {
+                                if (classSet != null) {
+                                    paramsString += classSet;
+                                }
                             }
                         }
+                        String withParams = s + paramsString;
+                        List<NavigationItem> decls = getPropertyDeclarationsMap(withParams, true);
+                        decls.add(new ActionOrPropFullNavigationItem(withParams, decl));
+                        processor.process(withParams);
                     }
-
-                    String withParams = key + paramsString;
-                    List<NavigationItem> decls = getPropertyDeclarationsMap(withParams, true);
-                    decls.add(new ActionOrPropFullNavigationItem(withParams, decl));
-                    result.add(withParams);
+                    return true;
                 }
-            }
-            return result;
-        } else {
-            return super.getIndexKeys(index, pattern, project, includeNonProjectItems);
+                return true;
+            };
         }
+        return super.getProcessor(index, processor, scope);
     }
 
     @Override
@@ -136,8 +139,8 @@ public class LSFSymbolContributor extends LSFNameContributor {
         if (index instanceof ActionOrPropIndex) {
             List<NavigationItem> decls = getPropertyDeclarationsMap(name, false);
             return decls != null
-                   ? decls
-                   : super.getItemsFromIndex(index, name, project, scope);
+                    ? decls
+                    : super.getItemsFromIndex(index, name, project, scope);
         } else {
             return super.getItemsFromIndex(index, name, project, scope);
         }
