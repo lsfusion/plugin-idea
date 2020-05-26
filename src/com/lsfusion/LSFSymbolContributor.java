@@ -1,5 +1,6 @@
 package com.lsfusion;
 
+import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
@@ -103,8 +104,10 @@ public class LSFSymbolContributor extends LSFNameContributor {
     @Override
     protected Processor<? super String> getProcessor(StringStubIndexExtension index,
                                                      Processor<? super String> processor,
-                                                     GlobalSearchScope scope,
-                                                     String pattern) {
+                                                     GlobalSearchScope scope) {
+
+        String pattern = scope.getProject().getUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN);
+
         if (index instanceof ActionOrPropIndex) {
             return (Processor<String>) s -> {
                 if (pattern != null && matches(s, pattern)) {
@@ -128,7 +131,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
                 return true;
             };
         }
-        return super.getProcessor(index, processor, scope, pattern);
+        return super.getProcessor(index, processor, scope);
     }
 
     @Override

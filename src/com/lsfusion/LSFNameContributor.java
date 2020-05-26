@@ -1,6 +1,5 @@
 package com.lsfusion;
 
-import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.navigation.ChooseByNameContributorEx;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
@@ -23,17 +22,15 @@ public abstract class LSFNameContributor implements ChooseByNameContributorEx {
 
 
     protected Processor<? super String> getProcessor(StringStubIndexExtension index,  Processor<? super String> processor,
-                                                     GlobalSearchScope scope, String pattern) {
+                                                     GlobalSearchScope scope) {
         return processor;
     }
 
     @Override
     public void processNames(@NotNull Processor<? super String> processor, @NotNull GlobalSearchScope scope, @Nullable IdFilter filter) {
 
-        String pattern = scope.getProject().getUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN);
-
         for (StringStubIndexExtension index : getIndices()) {
-            index.processAllKeys(scope.getProject(), getProcessor(index, processor, scope, pattern));
+            index.processAllKeys(scope.getProject(), getProcessor(index, processor, scope));
         }
     }
 
