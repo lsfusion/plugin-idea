@@ -128,25 +128,30 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFConstraintStatement sourceStatement) {
-        List<LSFPropertyExpression> propertyExpressionList = sourceStatement.getPropertyExpressionList();
-        if (!propertyExpressionList.isEmpty()) {
-            LSFPropertyExpression decl = propertyExpressionList.get(0);
-            if (decl != null) {
-                return new ExprsContextModifier(decl);
-            }
+        LSFPropertyExpression decl = sourceStatement.getPropertyExpression();
+        if (decl != null) {
+            return new ExprsContextModifier(decl);
+        } else {
+            return ContextModifier.EMPTY;
         }
-        return ContextModifier.EMPTY;
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFConstraintStatement sourceStatement) {
-        List<LSFPropertyExpression> propertyExpressionList = sourceStatement.getPropertyExpressionList();
-        if (!propertyExpressionList.isEmpty()) {
-            LSFPropertyExpression decl = propertyExpressionList.get(0);
-            if (decl != null) {
-                return new ExprsContextInferrer(decl);
-            }
+        LSFPropertyExpression decl = sourceStatement.getPropertyExpression();
+        if (decl != null) {
+            return new ExprsContextInferrer(decl);
+        } else {
+            return ContextInferrer.EMPTY;
         }
-        return ContextInferrer.EMPTY;
+    }
+
+    public static ContextModifier getContextModifier(@NotNull LSFMessagePropertyExpression sourceStatement) {
+        return new ExprsContextModifier(sourceStatement.getPropertyExpression());
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFMessagePropertyExpression sourceStatement) {
+        LSFPropertyExpression decl = sourceStatement.getPropertyExpression();
+        return new ExprsContextInferrer(decl);
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFFollowsStatement sourceStatement) {

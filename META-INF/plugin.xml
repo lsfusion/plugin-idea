@@ -10,6 +10,7 @@
         <b>Version 1.0.196</b><br>
         <ul>
             <li>CONSTRAINT PROPERTIES support</li>
+            <li>MESSAGE clause shouldn't see parameters of CONSTRAINT clause (closes #50)</li>
         </ul>
     ]]>
     </change-notes>

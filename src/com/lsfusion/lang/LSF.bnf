@@ -1646,9 +1646,16 @@ overridePropertyStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 
 constraintStatement ::= CONSTRAINT baseEvent propertyExpression
 		                (CHECKED (BY nonEmptyNoContextPropertyUsageList)? )?
-		                MESSAGE propertyExpression
+		                MESSAGE messagePropertyExpression
 		                (PROPERTIES nonEmptyPropertyExpressionList)?
 		                SEMI
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon ]
+}
+
+messagePropertyExpression ::= propertyExpression
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
