@@ -52,7 +52,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("toolTip"),
             new ReflectionProperty("askConfirm"),
             new ReflectionProperty("askConfirmMessage"),
-            new ReflectionProperty("columnKeysVertical"),
+            new ReflectionProperty("panelColumnVertical"),
             new ReflectionProperty("defaultCompare")
     );
 
@@ -81,7 +81,7 @@ public class PropertyDrawView extends ComponentView {
 
     public boolean panelCaptionVertical = false;
 
-    public boolean columnKeysVertical;
+    public boolean panelColumnVertical;
 
     public String caption;
     public boolean showCaption = true;
@@ -350,8 +350,8 @@ public class PropertyDrawView extends ComponentView {
         this.askConfirmMessage = askConfirmMessage;
     }
 
-    public void setColumnKeysVertical(boolean columnKeysVertical) {
-        this.columnKeysVertical = columnKeysVertical;
+    public void setPanelColumnVertical(boolean panelColumnVertical) {
+        this.panelColumnVertical = panelColumnVertical;
     }
 
     public void setNoSort(boolean noSort) {
@@ -450,8 +450,8 @@ public class PropertyDrawView extends ComponentView {
         return askConfirmMessage;
     }
 
-    public boolean getColumnKeysVertical() {
-        return columnKeysVertical;
+    public boolean getPanelColumnVertical() {
+        return panelColumnVertical;
     }
 
     public boolean getNoSort() {

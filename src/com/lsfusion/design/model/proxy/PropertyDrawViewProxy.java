@@ -89,6 +89,10 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.entity.askConfirmMessage = askConfirmMessage;
     }
 
+    public void setPanelColumnVertical(boolean panelColumnVertical) {
+        target.panelColumnVertical = panelColumnVertical;
+    }
+
     public void setToolTip(String toolTip) {
         target.toolTip = toolTip;
     }
