@@ -12,6 +12,7 @@
             <li>CONSTRAINT PROPERTIES support</li>
             <li>MESSAGE clause shouldn't see parameters of CONSTRAINT clause (closes #50)</li>
             <li>Allow action images to be dynamic (calculated and not set with literal)</li>
+            <li>Rename panelCaptionAbove -> panelCaptionVertical</li>
         </ul>
     ]]>
     </change-notes>

@@ -65,8 +65,8 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.focusable = focusable;
     }
 
-    public void setPanelCaptionAbove(boolean panelCaptionAbove) {
-        target.panelCaptionAbove = panelCaptionAbove;
+    public void setPanelCaptionVertical(boolean panelCaptionVertical) {
+        target.panelCaptionVertical = panelCaptionVertical;
     }
 
     public void setCaption(String caption) {

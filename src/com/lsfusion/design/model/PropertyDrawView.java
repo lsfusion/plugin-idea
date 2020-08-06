@@ -45,7 +45,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("changeKey"),
             new ReflectionProperty("showChangeKey").setExpert(),
             new ReflectionProperty("focusable"),
-            new ReflectionProperty("panelCaptionAbove"),
+            new ReflectionProperty("panelCaptionVertical"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("clearText").setExpert(),
             new ReflectionProperty("notSelectAll").setExpert(),
@@ -79,7 +79,7 @@ public class PropertyDrawView extends ComponentView {
 
     public Boolean focusable;
 
-    public boolean panelCaptionAbove = false;
+    public boolean panelCaptionVertical = false;
 
     public boolean columnKeysVertical;
 
@@ -326,8 +326,8 @@ public class PropertyDrawView extends ComponentView {
         this.focusable = focusable;
     }
 
-    public void setPanelCaptionAbove(boolean panelCaptionAbove) {
-        this.panelCaptionAbove = panelCaptionAbove;
+    public void setPanelCaptionVertical(boolean panelCaptionVertical) {
+        this.panelCaptionVertical = panelCaptionVertical;
     }
 
     public void setCaption(String caption) {
@@ -426,8 +426,8 @@ public class PropertyDrawView extends ComponentView {
         return focusable;
     }
 
-    public boolean isPanelCaptionAbove() {
-        return panelCaptionAbove;
+    public boolean isPanelCaptionVertical() {
+        return panelCaptionVertical;
     }
 
     public boolean isClearText() {

@@ -17,12 +17,12 @@ public class DataPanelView extends JBPanel {
     public DataPanelView(PropertyDrawView property) {
         this.property = property;
 
-        setLayout(new FlexLayout(this, property.panelCaptionAbove, Alignment.CENTER));
+        setLayout(new FlexLayout(this, property.panelCaptionVertical, Alignment.CENTER));
 
         
 
         JBLabel label = new JBLabel(property.getEditCaption());
-        if (!property.panelCaptionAbove) {
+        if (!property.panelCaptionVertical) {
             label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
         }
 
@@ -55,7 +55,7 @@ public class DataPanelView extends JBPanel {
             Dimension tableSize = sizeGetter.get(table);
             int width;
             int height;
-            if (property.panelCaptionAbove) {
+            if (property.panelCaptionVertical) {
                 width = max(labelSize.width, tableSize.width);
                 height = limitedSum(labelSize.height, tableSize.height);
             } else {
@@ -68,7 +68,7 @@ public class DataPanelView extends JBPanel {
 
         @Override
         public void layoutContainer(Container parent) {
-            boolean vertical = property.panelCaptionAbove;
+            boolean vertical = property.panelCaptionVertical;
             boolean tableFirst = property.panelCaptionAfter;
 
             Insets in = parent.getInsets();
