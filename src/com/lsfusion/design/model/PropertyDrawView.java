@@ -29,7 +29,7 @@ public class PropertyDrawView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
             new ReflectionProperty("panelCaptionAfter").setExpert(),
-            new ReflectionProperty("editOnSingleClick").setExpert(),
+            new ReflectionProperty("changeOnSingleClick").setExpert(),
             new ReflectionProperty("hide").setExpert(),
             new ReflectionProperty("regexp"),
             new ReflectionProperty("regexpMessage"),
@@ -59,7 +59,7 @@ public class PropertyDrawView extends ComponentView {
     public PropertyDrawEntity entity;
 
     public boolean panelCaptionAfter;
-    public boolean editOnSingleClick;
+    public boolean changeOnSingleClick;
     public boolean hide;
     public String regexp;
     public String regexpMessage;
@@ -148,8 +148,8 @@ public class PropertyDrawView extends ComponentView {
         this.panelCaptionAfter = panelCaptionAfter;
     }
 
-    public void setEditOnSingleClick(boolean editOnSingleClick) {
-        this.editOnSingleClick = editOnSingleClick;
+    public void setChangeOnSingleClick(boolean changeOnSingleClick) {
+        this.changeOnSingleClick = changeOnSingleClick;
     }
 
     public void setHide(boolean hide) {
@@ -374,8 +374,8 @@ public class PropertyDrawView extends ComponentView {
         return panelCaptionAfter;
     }
 
-    public boolean isEditOnSingleClick() {
-        return editOnSingleClick;
+    public boolean isChangeOnSingleClick() {
+        return changeOnSingleClick;
     }
 
     public boolean isHide() {

@@ -7,13 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.196</b><br>
+        <b>Version 1.0.197</b><br>
         <ul>
-            <li>CONSTRAINT PROPERTIES support</li>
-            <li>MESSAGE clause shouldn't see parameters of CONSTRAINT clause (closes #50)</li>
-            <li>Allow action images to be dynamic (calculated and not set with literal)</li>
-            <li>Rename panelCaptionAbove -> panelCaptionVertical</li>
-            <li>Rename columnKeysVertical -> panelColumnVertical</li>
+            <li>renamed editOnSingleClick -> changeOnSingleClick</li>
         </ul>
     ]]>
     </change-notes>
