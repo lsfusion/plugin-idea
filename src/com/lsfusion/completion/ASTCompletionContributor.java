@@ -69,7 +69,7 @@ public class ASTCompletionContributor extends CompletionContributor {
     private static final String[] PRIMITIVE_TYPES = new String[]{"INTEGER", "LONG", "NUMERIC", "NUMERIC[,]", "DOUBLE",
                                                                  "DATE", "DATETIME", "TIME", "YEAR", "ZDATETIME",
                                                                  "BPSTRING[]", "BPISTRING[]", "STRING[]", "ISTRING[]",
-                                                                 "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT",
+                                                                 "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT", "RICHTEXT",
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "RAWFILE", "FILE", "EXCELFILE",
                                                                  "TEXTFILE", "CSVFILE", "HTMLFILE", "JSONFILE", "XMLFILE", "TABLEFILE",
                                                                  "WORDLINK", "IMAGELINK", "PDFLINK", "RAWLINK", "LINK", "EXCELLINK",

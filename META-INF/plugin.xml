@@ -10,6 +10,7 @@
         <b>Version 1.0.197</b><br>
         <ul>
             <li>renamed editOnSingleClick -> changeOnSingleClick</li>
+            <li>RICHTEXT completion fix</li>
         </ul>
     ]]>
     </change-notes>
