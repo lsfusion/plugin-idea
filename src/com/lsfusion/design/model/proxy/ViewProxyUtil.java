@@ -1,6 +1,6 @@
 package com.lsfusion.design.model.proxy;
 
-import com.intellij.util.containers.SoftHashMap;
+import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.design.model.FontInfo;
 import com.lsfusion.design.properties.converters.FontInfoConverter;
 import com.lsfusion.design.properties.converters.KeyStrokeConverter;
@@ -9,6 +9,7 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import javax.swing.*;
+import java.util.Map;
 
 public class ViewProxyUtil {
     static {
@@ -16,7 +17,7 @@ public class ViewProxyUtil {
         ConvertUtils.register(new KeyStrokeConverter(), KeyStroke.class);
     }
 
-    private static final SoftHashMap<Object, ViewProxy> viewProxies = new SoftHashMap<>();
+    private static final Map<Object, ViewProxy> viewProxies = ContainerUtil.createSoftMap();
 
     /**
      * not thread-safe

@@ -2,8 +2,8 @@ package com.lsfusion;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.event.CaretAdapter;
 import com.intellij.openapi.editor.event.CaretEvent;
+import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Key;
 import com.lsfusion.lang.folding.LSFPropertyParamsFoldingManager;
@@ -11,7 +11,7 @@ import com.lsfusion.lang.folding.LSFPropertyParamsFoldingManager;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class LSFFileEditorCaretListener extends CaretAdapter {
+public class LSFFileEditorCaretListener implements CaretListener {
     private CaretListenerTimerTask latestTask;
 
     @Override

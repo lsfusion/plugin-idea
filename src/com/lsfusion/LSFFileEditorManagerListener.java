@@ -4,12 +4,12 @@ import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
-public class LSFFileEditorManagerListener extends FileEditorManagerAdapter {
+public class LSFFileEditorManagerListener implements FileEditorManagerListener {
     private final LSFFileEditorCaretListener CARET_LISTENER = new LSFFileEditorCaretListener(); 
     
     @Override
