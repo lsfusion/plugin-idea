@@ -11,6 +11,7 @@
         <ul>
             <li>renamed editOnSingleClick -> changeOnSingleClick</li>
             <li>RICHTEXT completion fix</li>
+            <li>FIRST insertion type in form properties and form group objects</li>
         </ul>
     ]]>
     </change-notes>

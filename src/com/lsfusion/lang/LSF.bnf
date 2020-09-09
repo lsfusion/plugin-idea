@@ -1424,8 +1424,7 @@ formGroupObjectPageSize ::= PAGESIZE intLiteral
 
 formGroupObjectUpdate ::= FIRST | LAST | PREV | NULL
 
-formGroupObjectRelativePositionType ::= AFTER | BEFORE
-formGroupObjectRelativePosition ::= formGroupObjectRelativePositionType groupObjectUsage { pin = 1}
+formGroupObjectRelativePosition ::= FIRST | (AFTER | BEFORE) groupObjectUsage {pin = 1}
 
 formSingleGroupObjectDeclaration ::= formObjectDeclaration
 
@@ -1469,8 +1468,9 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    formOptionEventId
                             |    formOptionColumns
                             |    formOptionsWithCalcPropertyObject
-                            |    formOptionsWithFormPropertyDraw
                             |    formOptionsOnEvents
+                            |    formOptionQuickFilter
+                            |    formOptionInsertType
                             |    ATTR
                             |    formInGroup
                             |    formExtID
@@ -1487,7 +1487,8 @@ formOptionForce ::= classViewType
 formOptionToDraw ::= DRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | IMAGE | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
-formOptionsWithFormPropertyDraw ::= (BEFORE | AFTER | QUICKFILTER) formPropertyDrawUsage {pin = 1}
+formOptionQuickFilter ::= QUICKFILTER formPropertyDrawUsage {pin = 1}
+formOptionInsertType ::= FIRST | (BEFORE | AFTER) formPropertyDrawUsage {pin = 1}
 formOptionsOnEvents ::= ON formEventType formActionPropertyObject
 {
     pin = 1

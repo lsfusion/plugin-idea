@@ -67,12 +67,12 @@ public class FormEntity {
                 LSFFormGroupObjectDeclaration formGroupObjectDeclaration = (LSFFormGroupObjectDeclaration) element;
                 LSFFormGroupObjectViewType viewType = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectViewTypeList());
                 LSFFormGroupObjectPageSize pageSize = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectPageSizeList());
-                LSFFormGroupObjectRelativePosition neighbour = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectRelativePositionList());
-                addGroupObject(formGroupObjectDeclaration.getFormGroupObject(), neighbour, viewType, pageSize);
+                LSFFormGroupObjectRelativePosition position = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectRelativePositionList());
+                addGroupObject(formGroupObjectDeclaration.getFormGroupObject(), position, viewType, pageSize);
             } else {
                 LSFFormTreeGroupObjectList treeGroupObjectDeclaration = (LSFFormTreeGroupObjectList) element;
-                LSFFormGroupObjectRelativePosition neighbour = BaseUtils.last(treeGroupObjectDeclaration.getFormTreeGroupObjectOptions().getFormGroupObjectRelativePositionList());
-                addTreeGroupObject(treeGroupObjectDeclaration, neighbour);
+                LSFFormGroupObjectRelativePosition position = BaseUtils.last(treeGroupObjectDeclaration.getFormTreeGroupObjectOptions().getFormGroupObjectRelativePositionList());
+                addTreeGroupObject(treeGroupObjectDeclaration, position);
             }
         }
 
@@ -87,23 +87,34 @@ public class FormEntity {
         }
     }
 
-    private GroupObjectEntity addGroupObject(LSFGroupObjectDeclaration gobjDecl, LSFFormGroupObjectRelativePosition neighbour, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
-        GroupObjectEntity neighbourGroupObject = getGroupObject(neighbour);
-        boolean isRight = neighbourGroupObject != null ? LSFPsiImplUtil.isRight(neighbour) : false;
-        return addGroupObject(gobjDecl, neighbourGroupObject, isRight, viewType, pageSize);
+    private GroupObjectEntity addGroupObject(LSFGroupObjectDeclaration gobjDecl, LSFFormGroupObjectRelativePosition position, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
+        Pair<InsertType, GroupObjectEntity> positionType = getPosition(position);
+        return addGroupObject(gobjDecl, positionType.second, positionType.first, viewType, pageSize);
     }
 
-    private GroupObjectEntity getGroupObject(@Nullable LSFFormGroupObjectRelativePosition neighbour) {
-        if(neighbour != null) {
-            GroupObjectEntity neighbourGroupObject = getGroupObject(neighbour.getGroupObjectUsage());
-            if(neighbourGroupObject != null && neighbourGroupObject.isInTree()) { // later check this in reference annotator (as an error) 
-                boolean isRight = LSFPsiImplUtil.isRight(neighbour);
-                if(isRight) {
-                    if(!neighbourGroupObject.equals(BaseUtils.last(neighbourGroupObject.treeGroup.groups)))
-                        return null;
-                } else {
-                    if(!neighbourGroupObject.equals(neighbourGroupObject.treeGroup.groups.get(0)))
-                        return null;
+    private Pair<InsertType, GroupObjectEntity> getPosition(LSFFormGroupObjectRelativePosition position) {
+        if (position == null) return new Pair<>(null, null);
+        
+        GroupObjectEntity neighbourGroupObject = getGroupObject(position);
+        InsertType type = null;
+        if (position.getText().startsWith("FIRST")) 
+            type = InsertType.FIRST;
+        else if (position.getText().startsWith("BEFORE"))
+            type = InsertType.BEFORE;
+        else if (position.getText().startsWith("AFTER"))
+            type = InsertType.AFTER;
+        return new Pair<>(type, neighbourGroupObject);
+    }
+    
+    private GroupObjectEntity getGroupObject(@Nullable LSFFormGroupObjectRelativePosition position) {
+        if (position != null) {
+            GroupObjectEntity neighbourGroupObject = getGroupObject(position.getGroupObjectUsage());
+            if (neighbourGroupObject != null && neighbourGroupObject.isInTree()) { // later check this in reference annotator (as an error) 
+                boolean isAfter = position.getText().startsWith("AFTER");
+                if (isAfter && !neighbourGroupObject.equals(BaseUtils.last(neighbourGroupObject.treeGroup.groups))) {
+                    return null;
+                } else if (!neighbourGroupObject.equals(neighbourGroupObject.treeGroup.groups.get(0))) {
+                    return null;
                 }
             }
             return neighbourGroupObject;
@@ -117,7 +128,7 @@ public class FormEntity {
         return null;
     }
 
-    private GroupObjectEntity addGroupObject(LSFGroupObjectDeclaration gobjDecl, GroupObjectEntity neighbour, boolean isRight, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
+    private GroupObjectEntity addGroupObject(LSFGroupObjectDeclaration gobjDecl, GroupObjectEntity neighbour, InsertType insertType, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
         GroupObjectEntity groupObject = new GroupObjectEntity(gobjDecl.getDeclName(), viewType, pageSize);
         Collection<LSFFormObjectDeclaration> objectDecarations = gobjDecl.findObjectDecarations();
         for (LSFFormObjectDeclaration objDecl : objectDecarations) {
@@ -127,9 +138,11 @@ public class FormEntity {
             }
         }
         if (!groupObject.objects.isEmpty()) {
-            if(neighbour != null) {
+            if (insertType == InsertType.FIRST) {
+                groups.add(0, groupObject);
+            } else if (neighbour != null) {
                 int neighbourIndex = groups.indexOf(neighbour);
-                if(isRight)
+                if (insertType == InsertType.AFTER)
                     neighbourIndex++;
                 groups.add(neighbourIndex, groupObject);
             } else {
@@ -204,9 +217,9 @@ public class FormEntity {
             if (commonOptions != null) {
                 LSFFormMappedPropertiesList propertyList = formProperties.getFormMappedPropertiesList();
                 if (propertyList != null) {
-                    Pair<Boolean, PropertyDrawEntity> relativeProsition = getRelativePosition(commonOptions);
+                    Pair<InsertType, PropertyDrawEntity> relativePosition = getRelativePosition(commonOptions);
                     List<LSFFormPropertyDrawMappedDecl> mappedDeclList = propertyList.getFormPropertyDrawMappedDeclList();
-                    boolean reverseFor = relativeProsition != null && !relativeProsition.first;
+                    boolean reverseFor = relativePosition != null && (relativePosition.first == InsertType.FIRST || relativePosition.first == InsertType.AFTER);
                     for (int i = reverseFor ? mappedDeclList.size() - 1 : 0; (reverseFor && i >= 0) || (!reverseFor && i < mappedDeclList.size()); i = i + (reverseFor ? -1 : 1)) {
                         LSFFormPropertyDrawMappedDecl prop = mappedDeclList.get(i);
                         String alias = prop.getSimpleName() != null ? prop.getSimpleName().getName() : null;
@@ -230,7 +243,7 @@ public class FormEntity {
                                 objectUsageList = new ArrayList<>(getObjects(prop.getFormActionDeclaration()));
                             }
                         }
-                        addPropertyWithOptions(alias, prop.getLocalizedStringLiteral(), formPropertyName, isAction, valueClass, commonOptions, prop.getFormPropertyOptionsList(), relativeProsition, objectUsageList);
+                        addPropertyWithOptions(alias, prop.getLocalizedStringLiteral(), formPropertyName, isAction, valueClass, commonOptions, prop.getFormPropertyOptionsList(), relativePosition, objectUsageList);
                     }
                 }
             } else {
@@ -239,12 +252,12 @@ public class FormEntity {
                     List<ObjectEntity> objectUsageList = getObjects(mappedProps.getObjectUsageList());
 
                     commonOptions = mappedProps.getFormPropertyOptionsList();
-                    Pair<Boolean, PropertyDrawEntity> relativePosition = getRelativePosition(commonOptions);
+                    Pair<InsertType, PropertyDrawEntity> relativePosition = getRelativePosition(commonOptions);
 
                     LSFFormPropertiesNamesDeclList formPropertiesNamesDeclList = mappedProps.getFormPropertiesNamesDeclList();
 
                     List<LSFFormPropertyDrawNameDecl> formPropertyDrawNameDeclList;
-                    boolean reverseFor = relativePosition != null && !relativePosition.first;
+                    boolean reverseFor = relativePosition != null && (relativePosition.first == InsertType.FIRST || relativePosition.first == InsertType.AFTER);
                     if (formPropertiesNamesDeclList != null) {
                         formPropertyDrawNameDeclList = formPropertiesNamesDeclList.getFormPropertyDrawNameDeclList();
                         for (int i = reverseFor ? formPropertyDrawNameDeclList.size() - 1 : 0; (reverseFor && i >= 0) || (!reverseFor && i < formPropertyDrawNameDeclList.size()); i = i + (reverseFor ? -1 : 1)) {
@@ -260,7 +273,7 @@ public class FormEntity {
     }
 
     private void addPropertyWithOptions(String alias, LSFLocalizedStringLiteral captionLiteral, LSFFormPropertyName formPropertyName, boolean isAction, LSFClassSet valueClass, LSFFormPropertyOptionsList commonOptions,
-                                        LSFFormPropertyOptionsList formPropertyOptions, Pair<Boolean, PropertyDrawEntity> relativeProsition, List<ObjectEntity> objects) {
+                                        LSFFormPropertyOptionsList formPropertyOptions, Pair<InsertType, PropertyDrawEntity> relativeProsition, List<ObjectEntity> objects) {
 
         String caption = captionLiteral != null ? captionLiteral.getValue() : null;
         
@@ -320,26 +333,30 @@ public class FormEntity {
         return objects;
     }
 
-    private Pair<Boolean, PropertyDrawEntity> getRelativePosition(LSFFormPropertyOptionsList options) {
+    private enum InsertType { FIRST, BEFORE, AFTER };
+    
+    private Pair<InsertType, PropertyDrawEntity> getRelativePosition(LSFFormPropertyOptionsList options) {
         if (options != null) {
-            List<LSFFormOptionsWithFormPropertyDraw> formOptionsWithFormPropertyDrawList = options.getFormOptionsWithFormPropertyDrawList();
-            if (!formOptionsWithFormPropertyDrawList.isEmpty()) {
-                LSFFormOptionsWithFormPropertyDraw beforeAfterOption = formOptionsWithFormPropertyDrawList.get(formOptionsWithFormPropertyDrawList.size() - 1);
-                LSFFormPropertyDrawUsage formPropertyDrawUsage = beforeAfterOption.getFormPropertyDrawUsage();
+            List<LSFFormOptionInsertType> formOptionInsertTypeList = options.getFormOptionInsertTypeList();
+            if (!formOptionInsertTypeList.isEmpty()) {
+                LSFFormOptionInsertType positionOption = formOptionInsertTypeList.get(formOptionInsertTypeList.size() - 1);
+                LSFFormPropertyDrawUsage formPropertyDrawUsage = positionOption.getFormPropertyDrawUsage();
                 if(formPropertyDrawUsage != null) {
                     String formPropertyName = FormView.getPropertyDrawName(formPropertyDrawUsage);
-                    if (beforeAfterOption.getText().startsWith("BEFORE")) {
-                        return new Pair<>(true, getPropertyDraw(formPropertyName));
-                    } else if (beforeAfterOption.getText().startsWith("AFTER")) {
-                        return new Pair<>(false, getPropertyDraw(formPropertyName));
+                    if (positionOption.getText().startsWith("BEFORE")) {
+                        return new Pair<>(InsertType.BEFORE, getPropertyDraw(formPropertyName));
+                    } else if (positionOption.getText().startsWith("AFTER")) {
+                        return new Pair<>(InsertType.AFTER, getPropertyDraw(formPropertyName));
                     }
+                } else if (positionOption.getText().startsWith("FIRST")) {
+                    return new Pair<>(InsertType.FIRST, null);
                 }
             }
         }
         return null;
     }
 
-    private void addTreeGroupObject(LSFFormTreeGroupObjectList tgobjDecl, LSFFormGroupObjectRelativePosition neighbour) {
+    private void addTreeGroupObject(LSFFormTreeGroupObjectList tgobjDecl, LSFFormGroupObjectRelativePosition position) {
         LSFTreeGroupDeclaration treeGroupDeclaration = tgobjDecl.getTreeGroupDeclaration();
         String sID = null;
         if (treeGroupDeclaration != null) {
@@ -348,12 +365,15 @@ public class FormEntity {
         TreeGroupEntity treeGroup = new TreeGroupEntity(sID);
         treeGroups.add(treeGroup);
 
-        GroupObjectEntity neighbourGroupObject = getGroupObject(neighbour);
-        boolean isRight = neighbourGroupObject != null ? LSFPsiImplUtil.isRight(neighbour) : false;
+        Pair<InsertType, GroupObjectEntity> positionType = getPosition(position);
+        
+        GroupObjectEntity neighbourGroupObject = positionType.second;
+        InsertType type = positionType.first;
+        boolean reverse = type == InsertType.FIRST || type == InsertType.BEFORE && neighbourGroupObject != null;
 
         List<LSFFormTreeGroupObjectDeclaration> gobjList = tgobjDecl.getFormTreeGroupObjectDeclarationList();
-        for (LSFFormTreeGroupObjectDeclaration treeGroupObjectDeclaration : (neighbourGroupObject != null && !isRight ? BaseUtils.reverse(gobjList) : gobjList)) {
-            GroupObjectEntity groupObjectEntity = addGroupObject(treeGroupObjectDeclaration.getFormGroupObject(), neighbourGroupObject, isRight, null, null);
+        for (LSFFormTreeGroupObjectDeclaration treeGroupObjectDeclaration : (reverse ? BaseUtils.reverse(gobjList) : gobjList)) {
+            GroupObjectEntity groupObjectEntity = addGroupObject(treeGroupObjectDeclaration.getFormGroupObject(), neighbourGroupObject, type, null, null);
             if(neighbourGroupObject != null)
                 neighbourGroupObject = groupObjectEntity;
             treeGroup.addGroupObject(groupObjectEntity);
@@ -371,10 +391,12 @@ public class FormEntity {
 
     }
 
-    private void addPropertyDraw(PropertyDrawEntity propertyDraw, Pair<Boolean, PropertyDrawEntity> relative) {
-        if (relative != null && propertyDraws.contains(relative.second)) {
+    private void addPropertyDraw(PropertyDrawEntity propertyDraw, Pair<InsertType, PropertyDrawEntity> relative) {
+        if (relative != null && relative.first == InsertType.FIRST) {
+            propertyDraws.add(0, propertyDraw);
+        } else if (relative != null && relative.second != null && propertyDraws.contains(relative.second)) {
             propertyDraws.remove(propertyDraw);
-            propertyDraws.add(propertyDraws.indexOf(relative.second) + (relative.first ? 0 : 1), propertyDraw);
+            propertyDraws.add(propertyDraws.indexOf(relative.second) + (relative.first == InsertType.BEFORE ? 0 : 1), propertyDraw);
         } else {
             propertyDraws.add(propertyDraw);
         }

@@ -4265,8 +4265,4 @@ public class LSFPsiImplUtil {
     private static boolean equalReferences(@NotNull LSFActionOrPropReference left, LSFActionOrPropReference right, int leftParams, PsiElement paramList) {
         return equalReferences(left, right) && equalParams(leftParams, paramList);
     }
-
-    public static boolean isRight(@NotNull LSFFormGroupObjectRelativePosition position) {
-        return position.getFormGroupObjectRelativePositionType().getText().equals("AFTER");
-    }
 }
