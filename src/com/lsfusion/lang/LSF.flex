@@ -229,6 +229,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "CONTAINERV"              			{ return CONTAINERV; }
   "COOKIES"             			    { return COOKIES; }
   "COOKIESTO"             			    { return COOKIESTO; }
+  "CUSTOM"                              { return CUSTOM; }
   "STRETCH"             			    { return STRETCH; }
   "CANONICALNAME"                  		{ return CANONICALNAME; }
   "CSV"                  			    { return CSV; }

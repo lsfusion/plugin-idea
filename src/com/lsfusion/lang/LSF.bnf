@@ -926,6 +926,7 @@ emailActionPropertyDefinitionBody ::=
 		(emailRecipientTypeLiteral propertyExpression)+
 		(BODY propertyExpression)?
 		(ATTACH propertyExpression (NAME propertyExpression)?)*
+        syncTypeLiteral?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1416,7 +1417,7 @@ formSubReport ::= SUBREPORT formCalcPropertyObject?
 
 classViewType ::= PANEL | GRID | TOOLBAR
 
-listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | MAP
+listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | MAP | (CUSTOM stringLiteral)
 
 pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS))*
 
