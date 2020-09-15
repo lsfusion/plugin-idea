@@ -24,7 +24,7 @@ import java.util.List;
 public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
-    public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
+    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
         if (element instanceof LeafPsiElement && element.getParent() instanceof LSFSimpleName) {
             LSFMetaCodeStatement metaReference = PsiTreeUtil.getParentOfType(element, LSFMetaCodeStatement.class);
             if (metaReference != null) {

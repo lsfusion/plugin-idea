@@ -35,7 +35,7 @@ import java.util.Set;
 public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
-    public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
+    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
         return null;
     }
 

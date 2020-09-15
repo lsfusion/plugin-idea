@@ -29,7 +29,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
 
     @Nullable
     @Override
-    public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement psi) {
+    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement psi) {
         LSFFormDeclaration decl = resolveFormDecl(psi);
         return decl == null ? null : createLineMarker(psi);
     }
