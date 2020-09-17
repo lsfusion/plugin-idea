@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.197</b><br>
+        <b>Version 1.0.198</b><br>
         <ul>
-            <li>renamed editOnSingleClick -> changeOnSingleClick</li>
-            <li>RICHTEXT completion fix</li>
-            <li>FIRST insertion type in form properties and form group objects</li>
+            <li>add 'CALENDAR' and 'CUSTOM' options to listViewType</li>
         </ul>
     ]]>
     </change-notes>

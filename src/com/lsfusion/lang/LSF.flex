@@ -199,6 +199,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "CASE"                    			{ return CASE; }
   "CC"                      			{ return CC; }
   "CATCH"                  			    { return CATCH; }
+  "CALENDAR"                            { return CALENDAR; }
   "CENTER"                  			{ return CENTER; }
   "CHANGE"                  			{ return CHANGE; }
   "CHANGECLASS"             			{ return CHANGECLASS; }
@@ -229,7 +230,6 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "CONTAINERV"              			{ return CONTAINERV; }
   "COOKIES"             			    { return COOKIES; }
   "COOKIESTO"             			    { return COOKIESTO; }
-  "CUSTOM"                              { return CUSTOM; }
   "STRETCH"             			    { return STRETCH; }
   "CANONICALNAME"                  		{ return CANONICALNAME; }
   "CSV"                  			    { return CSV; }

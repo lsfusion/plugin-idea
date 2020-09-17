@@ -1417,7 +1417,7 @@ formSubReport ::= SUBREPORT formCalcPropertyObject?
 
 classViewType ::= PANEL | GRID | TOOLBAR
 
-listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | MAP | (CUSTOM stringLiteral)
+listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | MAP | (CUSTOM stringLiteral) | CALENDAR
 
 pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS))*
 
