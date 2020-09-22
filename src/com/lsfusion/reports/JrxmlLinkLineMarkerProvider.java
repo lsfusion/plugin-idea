@@ -45,7 +45,7 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
         return null;
     }
 
-    private LineMarkerInfo createLineMarker(PsiElement psi) {
+    private LineMarkerInfo<?> createLineMarker(PsiElement psi) {
         return new LineMarkerInfo(
                 psi,
                 psi.getTextRange(),
@@ -58,7 +58,7 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
+    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
     }
 
     private static class TooltipProvider implements Function<PsiElement, String> {

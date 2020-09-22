@@ -34,7 +34,7 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
+    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
         if (!elements.isEmpty() && !ToggleComplexityAction.isComplexityEnabled(elements.iterator().next().getProject())) {
             return;
         }
@@ -63,7 +63,7 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
         }
     }
 
-    private LineMarkerInfo createLineMarker(LSFGlobalPropDeclaration property, PsiElement element) {
+    private LineMarkerInfo<?> createLineMarker(LSFGlobalPropDeclaration property, PsiElement element) {
         int complexity = PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching(property); 
         return new LineMarkerInfo(
                 element,

@@ -40,7 +40,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
+    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
         if (!elements.isEmpty() && !ToggleShowTableAction.isShowTableEnabled(elements.iterator().next().getProject())) {
             return;
         }
@@ -76,7 +76,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
         return null;
     }
 
-    private LineMarkerInfo createLineMarker(PsiElement psi) {
+    private LineMarkerInfo<?> createLineMarker(PsiElement psi) {
         return new LineMarkerInfo(
                 psi,
                 psi.getTextRange(),

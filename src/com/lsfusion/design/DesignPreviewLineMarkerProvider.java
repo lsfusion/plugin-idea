@@ -34,7 +34,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
         return decl == null ? null : createLineMarker(psi);
     }
 
-    private LineMarkerInfo createLineMarker(PsiElement psi) {
+    private LineMarkerInfo<?> createLineMarker(PsiElement psi) {
         return new LineMarkerInfo(
                 psi,
                 psi.getTextRange(),
@@ -47,7 +47,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {
+    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
     }
 
     public static LSFFormDeclaration resolveFormDecl(PsiElement psi) {
