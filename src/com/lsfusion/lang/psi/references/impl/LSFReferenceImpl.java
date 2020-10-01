@@ -15,7 +15,6 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.references.LSFReference;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -186,21 +185,8 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
         return this;
     }
 
-    public static PsiElement setName(LSFReference element, @NonNls @NotNull String name) throws IncorrectOperationException {
-        throw new IncorrectOperationException();
-    }
-
-    @Override
-    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
-        return setName(this, name);
-    }
-
-    public static String getName(LSFReference ref) {
-        return ref.getNameRef();
-    }
-
     @Override
     public String getName() {
-        return getName(this);
+        return getNameRef();
     }
 }

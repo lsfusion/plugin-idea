@@ -2,11 +2,8 @@ package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.PsiElement;
-import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.references.LSFGlobalReference;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,15 +40,5 @@ public abstract class LSFGlobalReferenceImpl<T extends LSFDeclaration> extends L
     @Override
     public ItemPresentation getPresentation() {
         return this;
-    }
-
-    @Override
-    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
-        return setName(this, name);
-    }
-
-    @Override
-    public String getName() {
-        return getName(this);
     }
 }

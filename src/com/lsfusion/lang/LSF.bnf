@@ -44,7 +44,7 @@ scriptStatement ::= statement
 simpleName ::= ID
 {
     mixin="com.lsfusion.lang.psi.LSFIdImpl"
-    implements="com.lsfusion.lang.psi.LSFId"
+    implements="com.lsfusion.lang.psi.LSFId,com.intellij.psi.PsiNamedElement"
 }
 
 moduleHeader ::= MODULE moduleName SEMI

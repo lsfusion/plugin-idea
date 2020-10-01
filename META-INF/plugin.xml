@@ -10,6 +10,7 @@
         <b>Version 1.0.198</b><br>
         <ul>
             <li>add 'CALENDAR' and 'CUSTOM' options to listViewType</li>
+            <li>fixed highlighting of elements in LSF file editor for Intellij IDEA 2020.2</li>
         </ul>
     ]]>
     </change-notes>
@@ -153,6 +154,8 @@
         <!-- Add your extensions here -->
         <fileTypeFactory implementation="com.lsfusion.lang.LSFFileTypeFactory"/>
         <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.lang.LSFParserDefinition"/>
+
+        <targetElementEvaluator language="Lsf" implementationClass="com.lsfusion.LSFTargetElementEvaluatorEx2"/>
 
         <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupingRuleProvider"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>
