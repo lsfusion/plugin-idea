@@ -7,10 +7,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.198</b><br>
+        <b>Version 1.0.199</b><br>
         <ul>
-            <li>add 'CALENDAR' and 'CUSTOM' options to listViewType</li>
-            <li>fixed highlighting of elements in LSF file editor for Intellij IDEA 2020.2</li>
+            <li>Rename property feature is fixed (issue #38)</li>
+            <li>Assertion when renaming property is fixed (issue #5)</li>
         </ul>
     ]]>
     </change-notes>

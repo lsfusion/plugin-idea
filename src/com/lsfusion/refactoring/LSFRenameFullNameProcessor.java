@@ -70,39 +70,25 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         this.migrationPolicy = migrationPolicy;
     }
 
+    @NotNull
     @Override
-    public RenameDialog createRenameDialog(Project project, PsiElement element, PsiElement nameSuggestionContext, Editor editor) {
+    public RenameDialog createRenameDialog(@NotNull Project project, @NotNull PsiElement element, PsiElement nameSuggestionContext, Editor editor) {
         return new LSFRenameDialog(project, element, nameSuggestionContext, editor, this);
     }
 
     @Override
-    public void prepareRenaming(PsiElement element, String newName, Map<PsiElement, String> allRenames) {
-        cascadePostRenames = new ArrayList<>(); // just in case
+    public void prepareRenaming(@NotNull PsiElement element, @NotNull String newName, @NotNull Map<PsiElement, String> allRenames) {
+        cascadePostRenames = new HashMap<>(); // just in case
 
         LSFPropertyDeclaration propDecl = PsiTreeUtil.getParentOfType(element, LSFPropertyDeclaration.class);
-        if (propDecl != null) {
-            //переименование свойства => нужно переименовать и соответствующие propertyDraw
-
-            GlobalSearchScope scope = GlobalSearchScope.projectScope(element.getProject());
-            Collection<PsiReference> refs = ReferencesSearch.search(element, scope, false).findAll();
-            for (PsiReference ref : refs) {
-                PsiElement refParent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFPropertyDrawDeclaration.class, LSFFormPropertyOptionsList.class);
-                if (refParent instanceof LSFPropertyDrawDeclaration) {
-                    LSFPropertyDrawDeclaration propDrawDecl = (LSFPropertyDrawDeclaration)refParent;
-                    //ищем propertyDraw без alias'а
-                    if (propDrawDecl.getSimpleName() == null) {
-                        LSFId propUsageId = getDeclPropName(propDrawDecl);
-                        if(propUsageId != null) {
-                            allRenames.put(propUsageId, newName);
-                            cascadePostRenames.add(getMigrationRunnable(propUsageId, newName, MigrationChangePolicy.USE_LAST_VERSION));
-                        }
-                    }
-                }
-            }
+        if (propDecl != null) { // [todo] we need additional check that element is not a parameter name to prevent unwanted ref search
+            allRenames.remove(element);
+            addPropertyDrawsToRenames(element, newName, allRenames);
+            allRenames.put(element, newName);
         } else {
             LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(element, LSFPropertyDrawDeclaration.class);
             if (propDrawDecl != null && propDrawDecl.getSimpleName() == null) {
-                //переименование propertyDraw без alias => нужно переименовать и соответствующее свойство
+                // when renaming form property without alias we need to rename property itself
                 LSFFormPropertyName formPropertyName = propDrawDecl.getFormPropertyName();
                 if(formPropertyName != null) {
                     LSFActionOrPropReference<?,?> propertyUsage = formPropertyName.getPropertyElseActionUsage();
@@ -110,21 +96,35 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
                         propertyUsage = formPropertyName.getActionUsage();
                     if (propertyUsage != null) {
                         LSFActionOrPropDeclaration decl = propertyUsage.resolveDecl();
-                        if (decl != null) {
-                            // Делаем так, чтобы в allRenames сначало добавилось само свойство, а только потом соответствующее
-                            // свойсnво на форме. Делается это для того, чтобы в миграционный скрипт эти переименования
-                            // записались в одну версию
-                            allRenames.remove(element);
+                        if (decl != null && decl.getNameIdentifier() != null) {
+                            addPropertyDrawsToRenames(decl.getNameIdentifier(), newName, allRenames);
                             allRenames.put(decl.getNameIdentifier(), newName);
-                            allRenames.put(element, newName);
-                            cascadePostRenames.add(getMigrationRunnable(element, newName, MigrationChangePolicy.USE_LAST_VERSION));
                         }
                     }
                 }
             }
         }
     }
-
+    
+    private void addPropertyDrawsToRenames(@NotNull PsiElement element, @NotNull String newName, @NotNull Map<PsiElement, String> allRenames) {
+        GlobalSearchScope scope = GlobalSearchScope.projectScope(element.getProject());
+        Collection<PsiReference> refs = ReferencesSearch.search(element, scope, false).findAll();
+        for (PsiReference ref : refs) {
+            PsiElement refParent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFPropertyDrawDeclaration.class, LSFFormPropertyOptionsList.class);
+            if (refParent instanceof LSFPropertyDrawDeclaration) {
+                LSFPropertyDrawDeclaration propDrawDecl = (LSFPropertyDrawDeclaration)refParent;
+                // we need only form properties without declared alias 
+                if (propDrawDecl.getSimpleName() == null) {
+                    LSFId propUsageId = getDeclPropName(propDrawDecl);
+                    if (propUsageId != null) {
+                        allRenames.put(propUsageId, newName);
+                        cascadePostRenames.put(propUsageId, getMigrationRunnable(propUsageId, newName, MigrationChangePolicy.USE_LAST_VERSION));
+                    }
+                }
+            }
+        }
+    }
+    
     public static LSFId getDeclPropName(LSFPropertyDrawDeclaration propDrawDecl) {
         LSFFormPropertyName formPropertyName = propDrawDecl.getFormPropertyName();
         if(formPropertyName == null)
@@ -141,7 +141,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     }
 
     @Override
-    public void renameElement(PsiElement element, String newName, UsageInfo[] usages, @Nullable RefactoringElementListener listener) throws IncorrectOperationException {
+    public void renameElement(@NotNull PsiElement element, @NotNull String newName, @NotNull UsageInfo[] usages, @Nullable RefactoringElementListener listener) throws IncorrectOperationException {
         LSFFullNameDeclaration decl = getFullNameDecl(element);
         if(decl != null) {
             List<Pair<LSFFullNameReference, LSFDeclaration>> possibleConflicts = new ArrayList<>();
@@ -156,7 +156,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
 //                    LSFDeclaration refDecl = reference.resolveDecl();
 //                    possibleConflicts.add(new Pair<LSFFullNameReference, LSFDeclaration>(reference, refDecl));
 //                } else
-                    possibleConflicts.add(new Pair<LSFFullNameReference, LSFDeclaration>((LSFFullNameReference) reference.handleElementRename(newName), decl));
+                    possibleConflicts.add(new Pair<>((LSFFullNameReference) reference.handleElementRename(newName), decl));
                 }
             }
 
@@ -179,25 +179,23 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         return null;
     }
     
-    // нужно заранее делать, потому как в getPostRenameCallback element'ы уже без контекста попадают
-    private List<Runnable> cascadePostRenames = new ArrayList<>();  
+    // We need this container to get all rename lines in one block of migration file 
+    private Map<PsiElement, Runnable> cascadePostRenames = new HashMap<>();  
 
     @Nullable
     @Override
-    public Runnable getPostRenameCallback(final PsiElement element, String newName, RefactoringElementListener elementListener) {
-        if (migrationPolicy != null) {
+    public Runnable getPostRenameCallback(@NotNull final PsiElement element, @NotNull String newName, @NotNull RefactoringElementListener elementListener) {
+        if (migrationPolicy != null && !cascadePostRenames.containsKey(element)) {
             final Runnable migrationRunnable = getMigrationRunnable(element, newName, migrationPolicy);
-            if(!cascadePostRenames.isEmpty()) {
-                final List<Runnable> fCascadePostRenames = cascadePostRenames;
-                cascadePostRenames = new ArrayList<>();
-                return new Runnable() {
-                    public void run() {
-                        if(migrationRunnable != null)
-                            migrationRunnable.run();
-                        
-                        for(Runnable cascade : fCascadePostRenames)
-                            cascade.run();
-                    }
+            if (!cascadePostRenames.isEmpty()) {
+                final Map<PsiElement, Runnable> fCascadePostRenames = cascadePostRenames;
+                cascadePostRenames = new HashMap<>();
+                return () -> {
+                    if (migrationRunnable != null)
+                        migrationRunnable.run();
+                    
+                    for (Runnable cascade : fCascadePostRenames.values())
+                        cascade.run();
                 };
             }
             return migrationRunnable;
@@ -207,15 +205,10 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
 
     public Runnable getMigrationRunnable(final PsiElement element, String newName, MigrationChangePolicy migrationPolicy) {
         final ElementMigration migration;
-        if((migration = getMigration(element, newName)) != null) {
+        if ((migration = getMigration(element, newName)) != null) {
             final GlobalSearchScope scope = LSFFileUtils.getModuleWithDependantsScope(element);
             final Project project = element.getProject();
-            return new Runnable() {
-                @Override
-                public void run() {
-                    ShortenNamesProcessor.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
-                }
-            };
+            return () -> ShortenNamesProcessor.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
         }
         return null;
     }
@@ -249,7 +242,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     }
     
     @Override
-    public void findExistingNameConflicts(PsiElement element, String newName, MultiMap<PsiElement, String> conflicts) {
+    public void findExistingNameConflicts(@NotNull PsiElement element, @NotNull String newName, @NotNull MultiMap<PsiElement, String> conflicts) {
         // todo: implement
     }
 }
