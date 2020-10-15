@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.199</b><br>
+        <b>Version 1.0.200</b><br>
         <ul>
-            <li>Rename property feature is fixed (issue #38)</li>
-            <li>Assertion when renaming property is fixed (issue #5)</li>
+            <li>Fixed enabling metacode if actual param count is less then need</li>
         </ul>
     ]]>
     </change-notes>

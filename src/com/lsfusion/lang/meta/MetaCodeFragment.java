@@ -71,7 +71,7 @@ public class MetaCodeFragment {
         int index = parameters.indexOf(token);
         if(index >= 0)
             transformed.setResult(true);
-        return index >= 0 ? actualParams.get(index).text : token;
+        return index >= 0 && actualParams.size() > index ? actualParams.get(index).text : token;
     }
     private String transformToken(List<MetaTransaction.InToken> actualParams, String token, boolean isMeta, Result<Boolean> transformed) {
         if(!isMeta) { // optimization;
