@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class GenerateFormAction extends AnAction {
 
     private Set<String> usedObjectIds = new HashSet<>();
+    private Set<String> usedObjectsIds = new HashSet<>();
     private Set<String> usedGroupIds = new HashSet<>();
     private Set<String> usedNamespacePrefixes = new HashSet<>();
 
@@ -28,9 +29,10 @@ public class GenerateFormAction extends AnAction {
             Object rootElement = getRootElement(e);
             if (rootElement != null) {
                 usedObjectIds = new HashSet<>();
+                usedObjectsIds = new HashSet<>();
                 usedGroupIds = new HashSet<>();
                 usedNamespacePrefixes = new HashSet<>();
-                ParseNode hierarchy = generateHierarchy(rootElement, null);
+                List<ParseNode> hierarchy = generateHierarchy(rootElement, null);
                 CodeBlock formCodeBlock = generateForm(hierarchy, null, null, null, null, null);
                 showFormScript(formCodeBlock);
             }
@@ -45,7 +47,7 @@ public class GenerateFormAction extends AnAction {
     }
 
     //need to implement
-    protected ParseNode generateHierarchy(Object element, String key) {
+    protected List<ParseNode> generateHierarchy(Object element, String key) {
         throw new NotImplementedException();
     }
 
@@ -99,7 +101,7 @@ public class GenerateFormAction extends AnAction {
 
     }
 
-    private CodeBlock generateForm(ParseNode element, ElementKey key, ParseNode parentElement, ElementKey parentKey, ElementKey parentInGroupKey, ElementKey lastGroupObjectParent) {
+    private CodeBlock generateForm(List<ParseNode> elements, ElementKey key, ParseNode parentElement, ElementKey parentKey, ElementKey parentInGroupKey, ElementKey lastGroupObjectParent) {
         String formName = null;
         Set<String> groupDeclarationScripts = new LinkedHashSet<>();
         Set<String> propertyDeclarationScripts = new LinkedHashSet<>();
@@ -109,57 +111,62 @@ public class GenerateFormAction extends AnAction {
         String filtersScript = null;
         List<CodeBlock> children = new ArrayList<>();
 
-        if(element instanceof GroupObjectParseNode) {
+        for(ParseNode element : elements) {
 
-            String filterProperty;
-            if(((GroupObjectParseNode) element).isIndex()) {
-                filterProperty = getFilterProperty(parentKey, key);
-                propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key, "INTEGER"));
-                objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentInGroupKey));
-                propertiesScript = getPropertiesScript(key, null, new LinkedHashSet<>(Collections.singletonList(new ElementProperty(new ElementKey("value", key.ID), ((GroupObjectParseNode) element).namespace, false))));
-            } else {
-                filterProperty = getFilterProperty(lastGroupObjectParent, key);
-                objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentKey));
+            if (element instanceof GroupObjectParseNode) {
 
-                for (ParseNode childElement : element.children) {
-                    children.add(generateForm(childElement, key, element, parentKey, parentElement instanceof PropertyGroupParseNode ? key : null, key));
-                }
-            }
+                String filterProperty;
+                if (((GroupObjectParseNode) element).isIndex()) {
+                    filterProperty = getFilterProperty(parentKey, key);
+                    propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key, "INTEGER"));
+                    objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentInGroupKey));
+                    propertiesScript = getPropertiesScript(key, null, new LinkedHashSet<>(Collections.singletonList(new ElementProperty(new ElementKey("value", key.ID), ((GroupObjectParseNode) element).namespace, false))));
+                } else {
+                    filterProperty = getFilterProperty(lastGroupObjectParent, key);
+                    objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentInGroupKey));
 
-            if(filterProperty != null) {
-                filtersScript = getFiltersScript(filterProperty, key, lastGroupObjectParent);
-                propertyDeclarationScripts.add(getIntegerPropertyDeclarationScript(filterProperty));
-            }
-
-        } else if(element instanceof PropertyGroupParseNode) {
-            formName = ((PropertyGroupParseNode) element).formName;
-
-            if(hasPropertyGroupParseNodeChildren(element)) {
-                if(lastGroupObjectParent != null) {
-                    objectsScripts.add(getObjectsScript(key, ((PropertyGroupParseNode) element).namespace, parentKey));
-                    if (parentKey != null) {
-                        groupDeclarationScripts.add(getGroupDeclarationScript(parentKey, ((PropertyGroupParseNode) element).namespace, null));
+                    for (ParseNode childElement : element.children) {
+                        children.add(generateForm(Collections.singletonList(childElement), key, element, parentKey, parentElement instanceof PropertyGroupParseNode ? key : null, key));
                     }
                 }
-            }
 
-            if(parentElement instanceof PropertyGroupParseNode) {
-                groupDeclarationScripts.add(getGroupDeclarationScript(key, ((PropertyGroupParseNode) element).namespace, parentInGroupKey));
-            }
-
-            for(ParseNode childElement : element.children) {
-                ElementKey childElementKey = new ElementKey(childElement.key);
-
-                if(childElement instanceof PropertyParseNode) {
-                    properties.add(new ElementProperty(childElementKey, ((PropertyGroupParseNode) element).namespace, ((PropertyParseNode) childElement).attr));
+                if (filterProperty != null) {
+                    filtersScript = getFiltersScript(filterProperty, key, lastGroupObjectParent);
+                    propertyDeclarationScripts.add(getIntegerPropertyDeclarationScript(filterProperty));
                 }
 
-                children.add(generateForm(childElement, childElementKey, element, key, parentElement instanceof PropertyGroupParseNode ? key : null, lastGroupObjectParent));
+            } else if (element instanceof PropertyGroupParseNode) {
+                formName = ((PropertyGroupParseNode) element).formName;
 
+                if (hasPropertyGroupParseNodeChildren(element)) {
+                    if (lastGroupObjectParent != null) {
+                        objectsScripts.add(getObjectsScript(key, ((PropertyGroupParseNode) element).namespace, parentInGroupKey));
+                        if (parentKey != null) {
+                            groupDeclarationScripts.add(getGroupDeclarationScript(parentKey, ((PropertyGroupParseNode) element).namespace, null));
+                        }
+                    }
+                }
+
+                if (parentElement instanceof PropertyGroupParseNode) {
+                    groupDeclarationScripts.add(getGroupDeclarationScript(key, ((PropertyGroupParseNode) element).namespace, parentInGroupKey));
+                }
+
+                for (ParseNode childElement : element.children) {
+                    ElementKey childElementKey = new ElementKey(childElement.key);
+
+                    if (childElement instanceof PropertyParseNode) {
+                        ElementNamespace namespace = ((PropertyParseNode) childElement).namespace != null ?
+                                ((PropertyParseNode) childElement).namespace : ((PropertyGroupParseNode) element).namespace;
+                        properties.add(new ElementProperty(childElementKey, namespace, ((PropertyParseNode) childElement).attr));
+                    }
+
+                    children.add(generateForm(Arrays.asList(childElement), childElementKey, element, key, parentElement instanceof PropertyGroupParseNode ? key : null, lastGroupObjectParent));
+
+                }
+
+            } else {
+                propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key, lastGroupObjectParent == null ? null : "INTEGER"));
             }
-
-        } else {
-            propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key, lastGroupObjectParent == null ? null : "INTEGER"));
         }
 
         propertiesScript = propertiesScript != null ? propertiesScript : getPropertiesScript(lastGroupObjectParent, parentElement instanceof PropertyGroupParseNode ? key : null, properties);
@@ -237,7 +244,8 @@ public class GenerateFormAction extends AnAction {
     }
 
     private String getObjectsScript(ElementKey elementKey, ElementNamespace namespace, ElementKey inGroupKey) {
-        if(elementKey != null) {
+        if(elementKey != null && !usedObjectsIds.contains(elementKey.ID)) {
+            usedObjectsIds.add(elementKey.ID);
             String extID = getExtIDScript(elementKey, namespace);
             String inGroup = (inGroupKey == null || inGroupKey.ID == null ? "" : (" IN " + inGroupKey.ID));
             return "\nOBJECTS " + elementKey.ID + " = INTEGER" + extID + inGroup;
@@ -376,9 +384,11 @@ public class GenerateFormAction extends AnAction {
     }
 
     class PropertyParseNode extends ParseNode {
+        ElementNamespace namespace;
         boolean attr;
-        PropertyParseNode(String key, boolean attr) {
+        PropertyParseNode(String key, ElementNamespace namespace, boolean attr) {
             super(key, new ArrayList<>());
+            this.namespace = namespace;
             this.attr = attr;
         }
     }

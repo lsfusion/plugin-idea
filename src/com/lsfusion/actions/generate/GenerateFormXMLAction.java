@@ -12,10 +12,7 @@ import org.jdom.input.SAXBuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GenerateFormXMLAction extends GenerateFormAction {
 
@@ -26,17 +23,21 @@ public class GenerateFormXMLAction extends GenerateFormAction {
     }
 
     @Override
-    protected ParseNode generateHierarchy(Object element, String key) {
+    protected List<ParseNode> generateHierarchy(Object element, String key) {
         return generateHierarchyXML((Element) element, key);
     }
 
-    private ParseNode generateHierarchyXML(Element element, String key) {
+    private List<ParseNode> generateHierarchyXML(Element element, String key) {
         List<ParseNode> children = new ArrayList<>();
 
-        boolean isPropertyParseNode = element.getChildren().isEmpty() && element.getAttributes().isEmpty();
+        ElementNamespace namespace = getElementNamespace(element);
+
+        boolean noChildren = element.getChildren().isEmpty();
+        boolean noAttributes = element.getAttributes().isEmpty();
+        boolean isPropertyParseNode = noChildren && noAttributes;
 
         if (isPropertyParseNode) {
-            return new PropertyParseNode(key, false);
+            return Collections.singletonList(new PropertyParseNode(key, namespace, false));
         } else {
 
             Map<String, List<Element>> childrenMap = getChildrenMap(element);
@@ -51,7 +52,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
 
                     List<ParseNode> localChildren = new ArrayList<>();
                     for (Element c : childrenList) {
-                        localChildren.add(generateHierarchyXML(c, childKey));
+                        localChildren.addAll(generateHierarchyXML(c, childKey));
                     }
 
                     ParseNode mergedChild = deepMerge(localChildren);
@@ -60,22 +61,27 @@ public class GenerateFormXMLAction extends GenerateFormAction {
                     List<ParseNode> nChildren = new ArrayList<>();
                     nChildren.add(mergedChild);
 
-                    children.add(new GroupObjectParseNode(childKey, nChildren, getElementNamespace(element), integrationKey));
+                    children.add(new GroupObjectParseNode(childKey, nChildren, namespace, integrationKey));
 
                 } else { //propertyGroupParseNode, childrenList.size() == 1
 
                     for (Element child : childrenList) {
-                        children.add(generateHierarchyXML(child, childKey));
+                        children.addAll(generateHierarchyXML(child, childKey));
                     }
                 }
             }
 
             for (Attribute attribute : element.getAttributes()) {
-                children.add(new PropertyParseNode(attribute.getName(), true));
+                children.add(new PropertyParseNode(attribute.getName(), namespace, true));
             }
-        }
 
-        return new PropertyGroupParseNode(key, children, getElementNamespace(element), key == null ? element.getName() : null);
+            List<ParseNode> result = new ArrayList<>();
+            if(noChildren) { //assert !noAttributes
+                result.add(new PropertyParseNode(key, namespace, false));
+            }
+            result.add(new PropertyGroupParseNode(key, children, namespace, key == null ? element.getName() : null));
+            return result;
+        }
     }
 
     private Map<String, List<Element>> getChildrenMap(Element element) {

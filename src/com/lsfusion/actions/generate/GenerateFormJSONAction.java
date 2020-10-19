@@ -13,9 +13,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class GenerateFormJSONAction extends GenerateFormAction {
 
@@ -36,12 +34,12 @@ public class GenerateFormJSONAction extends GenerateFormAction {
     }
 
     @Override
-    protected ParseNode generateHierarchy(Object element, String key) {
+    protected List<ParseNode> generateHierarchy(Object element, String key) {
         if (element instanceof JSONArray) {
 
             List<ParseNode> children = new ArrayList<>();
             for (Object obj : (JSONArray) element) {
-                children.add(generateHierarchy(obj, key));
+                children.addAll(generateHierarchy(obj, key));
             }
 
             ParseNode mergedChild = deepMerge(children);
@@ -52,7 +50,7 @@ public class GenerateFormJSONAction extends GenerateFormAction {
                 nChildren.add(mergedChild);
             }
 
-            return new GroupObjectParseNode(key, nChildren, null, integrationKey);
+            return Collections.singletonList(new GroupObjectParseNode(key, nChildren, null, integrationKey));
 
         } else if (element instanceof JSONObject) {
 
@@ -63,14 +61,14 @@ public class GenerateFormJSONAction extends GenerateFormAction {
                 String childElementKey = elementIterator.next();
                 Object childElementValue = ((JSONObject) element).get(childElementKey);
 
-                localChildren.add(generateHierarchy(childElementValue, childElementKey));
+                localChildren.addAll(generateHierarchy(childElementValue, childElementKey));
 
             }
 
-            return new PropertyGroupParseNode(key, localChildren, null, null);
+            return Collections.singletonList(new PropertyGroupParseNode(key, localChildren, null, null));
 
         } else {
-            return new PropertyParseNode(key, false);
+            return Collections.singletonList(new PropertyParseNode(key, null, false));
         }
 
 
