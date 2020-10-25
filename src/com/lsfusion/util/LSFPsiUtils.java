@@ -24,7 +24,6 @@ import com.lsfusion.lang.psi.context.ExtendParamContext;
 import com.lsfusion.lang.psi.context.LSFExpression;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.*;
-import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionStatement;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.indexes.*;
 import com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl;
@@ -255,20 +254,34 @@ public class LSFPsiUtils {
     }
 
     public static <T> Set<T> mapActionsApplicableToClass(LSFValueClass valueClass, Project project, GlobalSearchScope scope, ApplicableMapper<T> applicableMapper, boolean isLight, boolean isHeavy) {
-        Set<LSFInterfacePropStatement> resultStatements = newActionsOrPropertiesApplicableToClass(project, scope, isLight, isHeavy, ExplicitInterfaceActionIndex.getInstance(), valueClass, null);
+        Collection<LSFValueClass> classParents = CustomClassSet.getClassParentsRecursively(valueClass);
+        Set<LSFInterfacePropStatement> resultStatements = newActionsOrPropertiesWithClassesInSignature(project, scope, isLight, isHeavy, ExplicitInterfaceActionIndex.getInstance(), valueClass, classParents);
         return mapActionsOrPropertiesApplicableToClass(valueClass, resultStatements, applicableMapper);
     }
 
+    public static <T> Set<T> mapActionsWithClassInSignature(LSFValueClass valueClass, Project project, GlobalSearchScope scope, ApplicableMapper<T> applicableMapper, boolean isLight, boolean isHeavy) {
+        Set<LSFInterfacePropStatement> resultStatements = newActionsOrPropertiesWithClassesInSignature(project, scope, isLight, isHeavy, ExplicitInterfaceActionIndex.getInstance(), valueClass, Collections.singletonList(valueClass));
+        return mapActionsOrPropertiesApplicableToClass(valueClass, resultStatements, applicableMapper);
+    }
+    
     public static <T> Set<T> mapPropertiesApplicableToClass(LSFValueClass valueClass, Project project, GlobalSearchScope scope, ApplicableMapper<T> applicableMapper, boolean isLight, boolean isHeavy) {
+        Collection<LSFValueClass> classParents = CustomClassSet.getClassParentsRecursively(valueClass); 
+        return mapPropertiesWithClassesInSignature(valueClass, project, scope, applicableMapper, isLight, isHeavy, classParents);
+    }
 
-        Collection<LSFValueClass> classParents = CustomClassSet.getClassParentsRecursively(valueClass); // оптимизация
-        Set<LSFInterfacePropStatement> resultStatements = newActionsOrPropertiesApplicableToClass(project, scope, isLight, isHeavy, ExplicitInterfacePropIndex.getInstance(), valueClass, classParents);
+    public static <T> Set<T> mapPropertiesWithClassInSignature(LSFValueClass valueClass, Project project, GlobalSearchScope scope, ApplicableMapper<T> applicableMapper, boolean isLight, boolean isHeavy) {
+        mapPropertiesWithClassesInSignature(valueClass, project, scope, applicableMapper, isLight, isHeavy, Collections.singletonList(valueClass));
+        return mapPropertiesWithClassesInSignature(valueClass, project, scope, applicableMapper, isLight, isHeavy, Collections.singletonList(valueClass));
+    }
 
+    @NotNull
+    private static <T> Set<T> mapPropertiesWithClassesInSignature(LSFValueClass valueClass, Project project, GlobalSearchScope scope, ApplicableMapper<T> applicableMapper, boolean isLight, boolean isHeavy, Collection<LSFValueClass> classParents) {
+        Set<LSFInterfacePropStatement> resultStatements = newActionsOrPropertiesWithClassesInSignature(project, scope, isLight, isHeavy, ExplicitInterfacePropIndex.getInstance(), valueClass, classParents);
         if(isHeavy) {
-            List<LSFGlobalPropDeclaration> statementsWithClassAsResult = new ArrayList<>();
+            List<LSFGlobalPropDeclaration<?, ?>> statementsWithClassAsResult = new ArrayList<>();
             for (LSFValueClass clazz : classParents) {
                 Collection<LSFExplicitValueProp> evStatements = ExplicitValueIndex.getInstance().get(clazz.getName(), project, scope);
-                for (LSFExplicitValueProp evStatement : evStatements) {
+                for (LSFExplicitValueProp<?> evStatement : evStatements) {
                     statementsWithClassAsResult.add(evStatement.getDeclaration());
                 }
             }
@@ -276,9 +289,9 @@ public class LSFPsiUtils {
             Set<String> namesOfStatementsWithClassAsResult = new HashSet<>();
             int i = 0;
             LSFClassSet valueClassSet = valueClass.getUpSet();
-            Set<LSFGlobalPropDeclaration> skipStatemens = new HashSet<>();
+            Set<LSFGlobalPropDeclaration<?, ?>> skipStatemens = new HashSet<>();
             while (i < statementsWithClassAsResult.size()) {
-                LSFGlobalPropDeclaration statement = statementsWithClassAsResult.get(i);
+                LSFGlobalPropDeclaration<?, ?> statement = statementsWithClassAsResult.get(i);
                 String statementName = statement.getName();
 
                 if (!namesOfStatementsWithClassAsResult.contains(statementName) && !skipStatemens.contains(statement)) {
@@ -309,33 +322,26 @@ public class LSFPsiUtils {
     }
 
     // возвращает mutable set
-    public static <T extends LSFExplicitInterfaceProp> Set<LSFInterfacePropStatement> newActionsOrPropertiesApplicableToClass(Project project, GlobalSearchScope scope, boolean isLight, boolean isHeavy, ExplicitInterfaceActionOrPropIndex<T> index, LSFValueClass valueClass, Collection<LSFValueClass> classParents) {
+    public static <T extends LSFExplicitInterfaceProp<?>> Set<LSFInterfacePropStatement> newActionsOrPropertiesWithClassesInSignature(Project project, GlobalSearchScope scope, boolean isLight, boolean isHeavy, ExplicitInterfaceActionOrPropIndex<T> index, LSFValueClass valueClass, Collection<LSFValueClass> classes) {
         assert isLight || isHeavy;
 
         Set<LSFInterfacePropStatement> resultStatements = new HashSet<>();
 
-        if(classParents == null) //  оптимизация
-            classParents = CustomClassSet.getClassParentsRecursively(valueClass);
-        
-        for (LSFValueClass clazz : classParents) {
+        for (LSFValueClass clazz : classes) {
             Collection<T> eiStatements = index.get(clazz.getName(), project, scope);
             for (T statement : eiStatements) {
                 boolean explicit = statement.getExplicitParams() instanceof LSFExplicitSignature;
-                if(isLight) {
-                    if(isHeavy)
-                        resultStatements.add(statement.getDeclaration());
-                    else
-                        if(explicit)
-                            resultStatements.add(statement);
-                } else {
-                    assert isHeavy;
-                    if(!explicit)
-                        resultStatements.add(statement.getDeclaration());
+                if (isLight && isHeavy) {
+                    resultStatements.add(statement.getDeclaration());
+                } else if (isLight && explicit) {
+                    resultStatements.add(statement);
+                } else if (!isLight && !explicit) {
+                    resultStatements.add(statement.getDeclaration());
                 }
             }
         }
 
-        if(isLight && !isHeavy && resultStatements.size() < 50) {
+        if (isLight && !isHeavy && resultStatements.size() < 50) {
             Set<LSFInterfacePropStatement> transResultStatements = new HashSet<>();
             for(LSFInterfacePropStatement prop : resultStatements)
                 transResultStatements.add(((T)prop).getDeclaration());
@@ -353,7 +359,7 @@ public class LSFPsiUtils {
                 for (LSFClassSet paramClass : paramClasses) {
                     if (paramClass != null) {
                         if (paramClass.containsAll(valueClassSet, true)) {
-                            result.add((T) applicableMapper.map(statement, paramClass.getCommonClass()));
+                            result.add(applicableMapper.map(statement, paramClass.getCommonClass()));
                             break;
                         }
                     }

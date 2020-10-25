@@ -20,13 +20,11 @@ import com.intellij.util.containers.MultiMap;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.util.LSFFileUtils;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,27 +77,52 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     @Override
     public void prepareRenaming(@NotNull PsiElement element, @NotNull String newName, @NotNull Map<PsiElement, String> allRenames) {
         cascadePostRenames = new HashMap<>(); // just in case
-
-        LSFPropertyDeclaration propDecl = PsiTreeUtil.getParentOfType(element, LSFPropertyDeclaration.class);
-        if (propDecl != null) { // [todo] we need additional check that element is not a parameter name to prevent unwanted ref search
-            allRenames.remove(element);
-            addPropertyDrawsToRenames(element, newName, allRenames);
-            allRenames.put(element, newName);
-        } else {
-            LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(element, LSFPropertyDrawDeclaration.class);
-            if (propDrawDecl != null && propDrawDecl.getSimpleName() == null) {
-                // when renaming form property without alias we need to rename property itself
-                LSFFormPropertyName formPropertyName = propDrawDecl.getFormPropertyName();
-                if(formPropertyName != null) {
-                    LSFActionOrPropReference<?,?> propertyUsage = formPropertyName.getPropertyElseActionUsage();
-                    if(propertyUsage == null)
-                        propertyUsage = formPropertyName.getActionUsage();
-                    if (propertyUsage != null) {
-                        LSFActionOrPropDeclaration decl = propertyUsage.resolveDecl();
-                        if (decl != null && decl.getNameIdentifier() != null) {
-                            addPropertyDrawsToRenames(decl.getNameIdentifier(), newName, allRenames);
-                            allRenames.put(decl.getNameIdentifier(), newName);
-                        }
+        
+        if (PsiTreeUtil.getParentOfType(element, LSFClassDeclaration.class) != null) {
+            prepareRenamingClass(element);    
+        } else if (PsiTreeUtil.getParentOfType(element, LSFPropertyDeclaration.class) != null) {
+            // [todo] we need additional check that element is not a parameter name to prevent unwanted ref search
+            prepareRenamingProperty(element, newName, allRenames);    
+        } else if (PsiTreeUtil.getParentOfType(element, LSFPropertyDrawDeclaration.class) != null) {
+            prepareRenamingPropertyDraw(element, newName, allRenames);
+        }
+    }
+    
+    private void prepareRenamingClass(@NotNull PsiElement element) {
+        LSFClassDeclaration cls = PsiTreeUtil.getParentOfType(element, LSFClassDeclaration.class);
+        final ArrayList<LSFActionOrGlobalPropDeclaration<?, ?>> children = new ArrayList<>();
+        if (cls != null && cls.isValid()) {
+            GlobalSearchScope scope = GlobalSearchScope.allScope(cls.getProject());
+            children.addAll(LSFPsiUtils.mapPropertiesWithClassInSignature(cls, cls.getProject(), scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
+            children.addAll(LSFPsiUtils.mapActionsWithClassInSignature(cls, cls.getProject(), scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
+        }
+        children.sort(Comparator.comparing(LSFFullNameDeclaration::getCanonicalName));
+        
+        for (LSFActionOrGlobalPropDeclaration<?, ?> child : children) {
+            cascadePostRenames.put(child, getMigrationClassRunnable(child, child.getCanonicalName(), MigrationChangePolicy.USE_LAST_VERSION));
+        }
+    }
+    
+    private void prepareRenamingProperty(@NotNull PsiElement element, @NotNull String newName, @NotNull Map<PsiElement, String> allRenames) {
+        allRenames.remove(element);
+        addPropertyDrawsToRenames(element, newName, allRenames);
+        allRenames.put(element, newName);
+    }
+    
+    private void prepareRenamingPropertyDraw(@NotNull PsiElement element, @NotNull String newName, @NotNull Map<PsiElement, String> allRenames) {
+        LSFPropertyDrawDeclaration propDrawDecl = PsiTreeUtil.getParentOfType(element, LSFPropertyDrawDeclaration.class);
+        if (propDrawDecl != null && propDrawDecl.getSimpleName() == null) {
+            // when renaming form property without alias we need to rename property itself
+            LSFFormPropertyName formPropertyName = propDrawDecl.getFormPropertyName();
+            if (formPropertyName != null) {
+                LSFActionOrPropReference<?, ?> propertyUsage = formPropertyName.getPropertyElseActionUsage();
+                if (propertyUsage == null)
+                    propertyUsage = formPropertyName.getActionUsage();
+                if (propertyUsage != null) {
+                    LSFActionOrPropDeclaration decl = propertyUsage.resolveDecl();
+                    if (decl != null && decl.getNameIdentifier() != null) {
+                        addPropertyDrawsToRenames(decl.getNameIdentifier(), newName, allRenames);
+                        allRenames.put(decl.getNameIdentifier(), newName);
                     }
                 }
             }
@@ -173,9 +196,9 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     }
     
     public static ElementMigration getMigration(PsiElement element, String newName) {
-        LSFDeclaration propDecl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
-        if(propDecl != null)
-            return propDecl.getMigration(newName);
+        LSFDeclaration decl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
+        if(decl != null)
+            return decl.getMigration(newName);
         return null;
     }
     
@@ -204,13 +227,22 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     }
 
     public Runnable getMigrationRunnable(final PsiElement element, String newName, MigrationChangePolicy migrationPolicy) {
-        final ElementMigration migration;
-        if ((migration = getMigration(element, newName)) != null) {
+        final ElementMigration migration = getMigration(element, newName);
+        if (migration != null) {
             final GlobalSearchScope scope = LSFFileUtils.getModuleWithDependantsScope(element);
             final Project project = element.getProject();
             return () -> ShortenNamesProcessor.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
         }
         return null;
+    }
+
+    public Runnable getMigrationClassRunnable(final LSFActionOrGlobalPropDeclaration<?, ?> decl, String oldCanonicalName, MigrationChangePolicy migrationPolicy) {
+        final GlobalSearchScope scope = LSFFileUtils.getModuleWithDependantsScope(decl);
+        final Project project = decl.getProject();
+        return () -> {
+            PropertyMigration migration = PropertyMigration.createUsingCanonicalNames(decl, oldCanonicalName, decl.getCanonicalName());
+            ShortenNamesProcessor.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
+        };
     }
 
     private static void qualifyPossibleConflict(LSFFullNameReference ref, LSFDeclaration decl, MetaTransaction transaction) {

@@ -11,13 +11,16 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.cache.ParamClassesCache;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
 import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.refactoring.ElementMigration;
+import com.lsfusion.refactoring.PropertyCanonicalNameUtils;
 import com.lsfusion.refactoring.PropertyMigration;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFPsiUtils;
@@ -301,5 +304,10 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
         }
 
         return result;
+    }
+
+    @Override
+    public String getCanonicalName() {
+        return PropertyCanonicalNameUtils.createName(getNamespaceName(), getGlobalName(), resolveParamClasses());
     }
 }

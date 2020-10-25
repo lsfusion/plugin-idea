@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.200</b><br>
+        <b>Version 1.0.201</b><br>
         <ul>
-            <li>Fixed enabling metacode if actual param count is less then need</li>
-            <li>Fixed some problems in generate form from xml</li>
+            <li>Renaming of a class adds property migrations</li>
         </ul>
     ]]>
     </change-notes>

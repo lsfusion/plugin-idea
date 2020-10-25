@@ -1,9 +1,7 @@
 package com.lsfusion.refactoring;
 
 import com.intellij.openapi.vfs.VirtualFile;
-import com.lsfusion.lang.psi.LSFDataPropertyDefinition;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 
 public abstract class ElementMigration {
 

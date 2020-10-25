@@ -11,7 +11,7 @@ public class PropertyMigration extends ElementMigration {
     private final boolean isStored;
     private final boolean isAction;
     
-    public static PropertyMigration create(LSFActionOrGlobalPropDeclaration decl, String oldName, String newName) {
+    public static PropertyMigration create(LSFActionOrGlobalPropDeclaration<?, ?> decl, String oldName, String newName) {
         String namespace = decl.getNamespaceName();
         
         List<LSFClassSet> paramsClasses = decl.resolveParamClasses();
@@ -21,7 +21,7 @@ public class PropertyMigration extends ElementMigration {
         return new PropertyMigration(decl, oldFullName, newFullName);
     }
 
-    public static PropertyMigration create(LSFActionOrGlobalPropDeclaration decl, List<LSFClassSet> oldClasses, List<LSFClassSet> newClasses) {
+    public static PropertyMigration create(LSFActionOrGlobalPropDeclaration<?, ?> decl, List<LSFClassSet> oldClasses, List<LSFClassSet> newClasses) {
         String namespace = decl.getNamespaceName();
         
         String name = decl.getDeclName();
@@ -31,11 +31,15 @@ public class PropertyMigration extends ElementMigration {
         return new PropertyMigration(decl, oldFullName, newFullName);
     }
 
-    private PropertyMigration(LSFActionOrGlobalPropDeclaration decl, String oldName, String newName) {
-        super(decl, oldName, newName);
+    public static PropertyMigration createUsingCanonicalNames(LSFActionOrGlobalPropDeclaration<?, ?> decl, String oldCanonicalName, String newCanonicalName) {
+        return new PropertyMigration(decl, oldCanonicalName, newCanonicalName);    
+    }
+    
+    private PropertyMigration(LSFActionOrGlobalPropDeclaration<?, ?> decl, String oldCanonicalName, String newCanonicalName) {
+        super(decl, oldCanonicalName, newCanonicalName);
         
         this.isAction = decl.isAction(); 
-        this.isStored = decl instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration) decl).isStoredProperty();
+        this.isStored = decl instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration<?, ?>) decl).isStoredProperty();
     }
 
     @Override
