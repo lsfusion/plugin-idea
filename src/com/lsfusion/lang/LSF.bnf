@@ -489,7 +489,7 @@ noParamsActionUsage ::= actionUsage
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
 
-dataPropertyDefinition ::= DATA (dataPropertySessionModifier)? className (LBRAC classNameList RBRAC)
+dataPropertyDefinition ::= DATA (dataPropertySessionModifier)? className (LBRAC classNameList RBRAC)?
 {
     pin(".*") = 1;
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
@@ -505,7 +505,7 @@ nativePropertyDefinition ::= NATIVE className LBRAC classNameList RBRAC
 }
 
 abstractPropertyDefinition ::= ABSTRACT ((CASE | MULTI | VALUE) abstractExclusiveOverrideOption?)? 
-                               (FULL)? className LBRAC classNameList RBRAC
+                               (FULL)? className (LBRAC classNameList RBRAC)?
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
@@ -632,7 +632,7 @@ abstractActionPropertyDefinition ::= ABSTRACT
                                     |	(LIST abstractCaseAddOption?)
                                     )?
                                     (FULL)?
-                                    LBRAC classNameList RBRAC
+                                    (LBRAC classNameList RBRAC)?
 {
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]

@@ -25,6 +25,7 @@ import com.lsfusion.lang.psi.context.ExprsContextModifier;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
@@ -354,10 +355,20 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         LSFPropertyDeclParams propertyDeclParams = o.getPropertyDeclaration().getPropertyDeclParams();
         if(propertyDeclParams != null) {
             LSFPropertyCalcStatement propertyCalcStatement = o.getPropertyCalcStatement();
-            if (propertyCalcStatement != null) {
-                LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
-                if (expressionUnfriendlyPD != null) {
-                    List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
+            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
+            if (expressionUnfriendlyPD != null) {
+                List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
+
+                boolean skipCheckValueParamClasses  = false;
+                if(o instanceof LSFPropertyStatementImpl) {
+                    LSFDataPropertyDefinition dataProp = expressionUnfriendlyPD.getDataPropertyDefinition();
+                    LSFAbstractPropertyDefinition abstractProp = expressionUnfriendlyPD.getAbstractPropertyDefinition();
+                    skipCheckValueParamClasses = dataProp != null && dataProp.getClassNameList() == null
+                                             ||  abstractProp != null && abstractProp.getClassNameList() == null;
+                }
+
+                if(!skipCheckValueParamClasses) {
+
                     Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> incorrect = expressionUnfriendlyPD.checkValueParamClasses(declareParams);
 
                     for (LSFParamDeclaration incParam : incorrect.first) {
@@ -369,26 +380,24 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     for (Map.Entry<PsiElement, Pair<LSFClassSet, LSFClassSet>> incBy : incorrect.second.entrySet()) {
                         Annotation annotation;
                         if (incBy.getValue() != null)
-                            annotation = myHolder.createErrorAnnotation(incBy.getKey(),
-                                    String.format("Incorrect param implementation: required %s; found %s", incBy.getValue().second, incBy.getValue().first));
-                        else
-                            annotation = myHolder.createErrorAnnotation(incBy.getKey(), "No param for this implementation found");
+                            annotation = myHolder.createErrorAnnotation(incBy.getKey(), String.format("Incorrect param implementation: required %s; found %s", incBy.getValue().second, incBy.getValue().first));
+                        else annotation = myHolder.createErrorAnnotation(incBy.getKey(), "No param for this implementation found");
                         annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
                         addError(incBy.getKey(), annotation);
                     }
-                } else {
-                    LSFPropertyExpression propertyExpression = propertyCalcStatement.getPropertyExpression();
-                    List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
-                    Set<String> usedParameter = new ExprsContextModifier(propertyExpression).resolveAllParams();
-                    for(LSFParamDeclaration declareParam : declareParams)
-                        if(!usedParameter.contains(declareParam.getName())) {
-                            final Annotation annotation = myHolder.createWarningAnnotation(declareParam, "Parameter is not used");
-                            TextAttributes error = WARNING;
-                            if (isInMetaUsage(declareParam))
-                                error = TextAttributes.merge(error, META_USAGE);
-                            annotation.setEnforcedTextAttributes(error);
-                        }   
                 }
+            } else {
+                LSFPropertyExpression propertyExpression = propertyCalcStatement.getPropertyExpression();
+                List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
+                Set<String> usedParameter = new ExprsContextModifier(propertyExpression).resolveAllParams();
+                for(LSFParamDeclaration declareParam : declareParams)
+                    if(!usedParameter.contains(declareParam.getName())) {
+                        final Annotation annotation = myHolder.createWarningAnnotation(declareParam, "Parameter is not used");
+                        TextAttributes error = WARNING;
+                        if (isInMetaUsage(declareParam))
+                            error = TextAttributes.merge(error, META_USAGE);
+                        annotation.setEnforcedTextAttributes(error);
+                    }
             }
         }
     }

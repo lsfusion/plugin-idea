@@ -10,6 +10,7 @@
         <b>Version 1.0.201</b><br>
         <ul>
             <li>Renaming of a class adds property migrations</li>
+            <li>Declare params for data / abstract at the left part</li>
         </ul>
     ]]>
     </change-notes>
