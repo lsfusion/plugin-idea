@@ -2107,13 +2107,7 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement, List<LSFParamDeclaration> declareParams) {
-        LSFDataPropertyDefinition dataProp = sourceStatement.getDataPropertyDefinition();
-        LSFAbstractPropertyDefinition abstractProp = sourceStatement.getAbstractPropertyDefinition();
-        if((dataProp != null && dataProp.getClassNameList() == null) ||  (abstractProp != null && abstractProp.getClassNameList() == null)) {
-            return Pair.create(new ArrayList<>(), new HashMap<>());
-        } else {
-            return ((UnfriendlyPE) sourceStatement.getChildren()[0]).checkValueParamClasses(declareParams);
-        }
+        return ((UnfriendlyPE) sourceStatement.getChildren()[0]).checkValueParamClasses(declareParams);
     }
 
     @Nullable
@@ -2140,7 +2134,11 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
-        return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
+        if((sourceStatement.getClassNameList() == null)) {
+            return Pair.create(new ArrayList<>(), new HashMap<>());
+        } else {
+            return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
+        }
     }
 
     @Nullable
@@ -2160,7 +2158,11 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
-        return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
+        if((sourceStatement.getClassNameList() == null)) {
+            return Pair.create(new ArrayList<>(), new HashMap<>());
+        } else {
+            return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
+        }
     }
 
     @Nullable
