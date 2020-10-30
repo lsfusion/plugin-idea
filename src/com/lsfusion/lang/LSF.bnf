@@ -493,7 +493,7 @@ dataPropertyDefinition ::= DATA (dataPropertySessionModifier)? className (LBRAC 
 {
     pin(".*") = 1;
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
-    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getMigrationClassNames ]
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
 dataPropertySessionModifier ::= LOCAL nestedLocalModifier
 
