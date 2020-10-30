@@ -358,33 +358,23 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
             if (expressionUnfriendlyPD != null) {
                 List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
+                Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> incorrect = expressionUnfriendlyPD.checkValueParamClasses(declareParams);
 
-                boolean skipCheckValueParamClasses  = false;
-                if(o instanceof LSFPropertyStatementImpl) {
-                    LSFDataPropertyDefinition dataProp = expressionUnfriendlyPD.getDataPropertyDefinition();
-                    LSFAbstractPropertyDefinition abstractProp = expressionUnfriendlyPD.getAbstractPropertyDefinition();
-                    skipCheckValueParamClasses = dataProp != null && dataProp.getClassNameList() == null
-                                             ||  abstractProp != null && abstractProp.getClassNameList() == null;
+                for (LSFParamDeclaration incParam : incorrect.first) {
+                    Annotation annotation = myHolder.createErrorAnnotation(incParam, "Not used / No implementation found");
+                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                    addError(incParam, annotation);
                 }
 
-                if(!skipCheckValueParamClasses) {
-
-                    Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> incorrect = expressionUnfriendlyPD.checkValueParamClasses(declareParams);
-
-                    for (LSFParamDeclaration incParam : incorrect.first) {
-                        Annotation annotation = myHolder.createErrorAnnotation(incParam, "Not used / No implementation found");
-                        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                        addError(incParam, annotation);
-                    }
-
-                    for (Map.Entry<PsiElement, Pair<LSFClassSet, LSFClassSet>> incBy : incorrect.second.entrySet()) {
-                        Annotation annotation;
-                        if (incBy.getValue() != null)
-                            annotation = myHolder.createErrorAnnotation(incBy.getKey(), String.format("Incorrect param implementation: required %s; found %s", incBy.getValue().second, incBy.getValue().first));
-                        else annotation = myHolder.createErrorAnnotation(incBy.getKey(), "No param for this implementation found");
-                        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                        addError(incBy.getKey(), annotation);
-                    }
+                for (Map.Entry<PsiElement, Pair<LSFClassSet, LSFClassSet>> incBy : incorrect.second.entrySet()) {
+                    Annotation annotation;
+                    if (incBy.getValue() != null)
+                        annotation = myHolder.createErrorAnnotation(incBy.getKey(),
+                                String.format("Incorrect param implementation: required %s; found %s", incBy.getValue().second, incBy.getValue().first));
+                    else
+                        annotation = myHolder.createErrorAnnotation(incBy.getKey(), "No param for this implementation found");
+                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+                    addError(incBy.getKey(), annotation);
                 }
             } else {
                 LSFPropertyExpression propertyExpression = propertyCalcStatement.getPropertyExpression();

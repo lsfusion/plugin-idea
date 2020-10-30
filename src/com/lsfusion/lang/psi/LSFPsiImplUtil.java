@@ -15,10 +15,7 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
-import com.lsfusion.lang.psi.impl.LSFCollapseGroupObjectActionPropertyDefinitionBodyImpl;
-import com.lsfusion.lang.psi.impl.LSFExpandGroupObjectActionPropertyDefinitionBodyImpl;
-import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
-import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
+import com.lsfusion.lang.psi.impl.*;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl;
@@ -2137,7 +2134,11 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
-        return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
+        if((sourceStatement.getClassNameList() == null)) {
+            return Pair.create(new ArrayList<>(), new HashMap<>());
+        } else {
+            return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
+        }
     }
 
     @Nullable
@@ -2157,7 +2158,11 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
-        return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
+        if((sourceStatement.getClassNameList() == null)) {
+            return Pair.create(new ArrayList<>(), new HashMap<>());
+        } else {
+            return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
+        }
     }
 
     @Nullable
@@ -4053,79 +4058,6 @@ public class LSFPsiImplUtil {
             formUsage = collapseGroupObjectActionBody.getGroupObjectID().getFormUsage();
         }
         return resolveFormDecl(formUsage);
-    }
-
-    @NotNull
-    public static List<String> getMigrationClassNames(LSFDataPropertyDefinition dataPropertyDefinition) {
-        LSFClassNameList classNameList = dataPropertyDefinition.getClassNameList();
-
-        if (classNameList == null) {
-            return Collections.emptyList();
-        }
-        
-        LSFNonEmptyClassNameList ne = classNameList.getNonEmptyClassNameList();
-        if (ne == null) {
-            return Collections.emptyList();
-        }
-
-        List<String> result = new ArrayList<>();
-        for (LSFClassName className : ne.getClassNameList()) {
-            result.add(getMigrationClassName(className));
-        }
-        return result;
-    }
-
-    public static String getMigrationClassName(LSFClassName className) {
-        LSFBuiltInClassName builtIn = className.getBuiltInClassName();
-        if (builtIn != null) {
-            return getMigrationClassName(builtIn);
-        }
-        
-        LSFCustomClassUsage customClassUsage = className.getCustomClassUsage();
-        
-        assert customClassUsage != null;
-        
-        return getMigrationClassName(customClassUsage);
-    }
-
-    private static String getMigrationClassName(LSFCustomClassUsage customClassUsage) {
-        String nameRef = customClassUsage.getNameRef();
-        
-        String namespaceRef = customClassUsage.getFullNameRef();
-        if (namespaceRef != null) {
-            return namespaceRef + "." + nameRef;
-        }
-        
-        LSFClassDeclaration classDecl = customClassUsage.resolveDecl();
-        if (classDecl == null) {
-            //can't resolve -> just use the reference text
-            return nameRef;
-        }
-        
-        return classDecl.getNamespaceName() + "." + classDecl.getGlobalName();
-    }
-
-    public static String getMigrationClassName(LSFBuiltInClassName builtInClassName) {
-        String name = builtInClassName.getName();
-        if (name == null) {
-            //shouldn't happen
-            return "?";
-        }
-
-        if (name.startsWith("NUMERIC")) {
-            return "NUMERIC";
-        }
-
-        if (name.startsWith("BPSTRING") ||
-            name.startsWith("STRING") ||
-            name.startsWith("BPISTRING") ||
-            name.startsWith("ISTRING") ||
-            name.equals("TEXT") ||
-            name.equals("RICHTEXT")) {
-            return "STRING";
-        }
-
-        return name;
     }
 
     public static boolean checkOverrideValue(@NotNull LSFOverridePropertyStatement o, Result<LSFClassSet> required, Result<LSFClassSet> found) {
