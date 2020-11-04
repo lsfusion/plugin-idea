@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.201</b><br>
+        <b>Version 1.0.202</b><br>
         <ul>
-            <li>Renaming of a class adds property migrations</li>
-            <li>Declare params for data / abstract at the left part</li>
+            <li>OBJECTS BACKGROUND / FOREGROUND (background and foreground for row)</li>
         </ul>
     ]]>
     </change-notes>

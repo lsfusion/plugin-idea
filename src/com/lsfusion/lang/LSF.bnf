@@ -1395,6 +1395,8 @@ formGroupObjectOptions ::= (    formGroupObjectViewType
                            |    formGroupObjectPageSize
                            |    formGroupObjectUpdate
                            |    formGroupObjectRelativePosition
+                           |    formGroupObjectBackground
+                           |    formGroupObjectForeground
                            |    formInGroup
                            |    formExtID
                            )*
@@ -1426,6 +1428,9 @@ formGroupObjectPageSize ::= PAGESIZE intLiteral
 formGroupObjectUpdate ::= FIRST | LAST | PREV | NULL
 
 formGroupObjectRelativePosition ::= FIRST | (AFTER | BEFORE) groupObjectUsage {pin = 1}
+
+formGroupObjectBackground ::= BACKGROUND formCalcPropertyObject
+formGroupObjectForeground ::= FOREGROUND formCalcPropertyObject
 
 formSingleGroupObjectDeclaration ::= formObjectDeclaration
 
