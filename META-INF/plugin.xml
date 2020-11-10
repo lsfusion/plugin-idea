@@ -12,6 +12,7 @@
             <li>OBJECTS BACKGROUND / FOREGROUND (background and foreground for row)</li>
             <li>Add type assignment check in action body</li>
             <li>Static objects migration when renaming class</li>
+            <li>Implement ROUND as an operator</li>
         </ul>
     ]]>
     </change-notes>

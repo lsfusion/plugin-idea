@@ -1210,6 +1210,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFRoundPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+        return resolveInferredValueClass(sourceStatement.getPropertyExpressionList(), inferred, true);
+    }
+
+    @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFLiteral sourceStatement, @Nullable InferExResult inferred) {
         DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
         if (builtInClass != null) {
@@ -1723,6 +1728,10 @@ public class LSFPsiImplUtil {
         return singletonList(LogicalClass.instance.getName());
     }
 
+    public static List<String> getValueClassNames(@NotNull LSFRoundPropertyDefinition sourceStatement) {
+        return singletonList(LogicalClass.instance.getName());
+    }
+
     public static List<String> getValueClassNames(@NotNull LSFLiteral sourceStatement) {
         DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
         if (builtInClass != null) {
@@ -2048,6 +2057,10 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFActiveTabPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFRoundPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -3422,6 +3435,11 @@ public class LSFPsiImplUtil {
 
     public
     @NotNull static Inferred inferParamClasses(@NotNull LSFActiveTabPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+        return Inferred.EMPTY;
+    }
+
+    @NotNull
+    public static Inferred inferParamClasses(@NotNull LSFRoundPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return Inferred.EMPTY;
     }
 
