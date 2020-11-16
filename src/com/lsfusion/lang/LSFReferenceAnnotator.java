@@ -768,10 +768,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     if (!rightPropertyExpressionList.isEmpty()) {
                         LSFPropertyExpression rightPropertyExpression = rightPropertyExpressionList.get(0);
                         LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpression.resolveValueClass(false));
-                        if (leftClass != null && rightClass != null && leftClass.getCanonicalName().equals("BOOLEAN")) {
-                            if (!rightClass.getCanonicalName().equals("BOOLEAN")) {
+                        if (leftClass != null && rightClass != null) {
+                            if (!leftClass.isCompatible(rightClass)) {
                                 addTypeMismatchError(o, rightClass, leftClass);
-                            } else if (rightPropertyExpression.getText().equals("FALSE")) {
+                            } else if (leftClass.getCanonicalName().equals("BOOLEAN") && rightPropertyExpression.getText().equals("FALSE")) {
                                 addFalseToBooleanAssignError(o);
                             }
                         }
