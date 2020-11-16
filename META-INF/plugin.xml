@@ -10,6 +10,7 @@
         <b>Version 1.0.202</b><br>
         <ul>
             <li>OBJECTS BACKGROUND / FOREGROUND (background and foreground for row)</li>
+            <li>Add type assignment check in action body</li>
         </ul>
     ]]>
     </change-notes>
