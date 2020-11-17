@@ -25,7 +25,7 @@ import com.lsfusion.lang.psi.context.ExprsContextModifier;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
+import com.lsfusion.lang.psi.impl.LSFLocalPropertyDeclarationNameImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
@@ -762,6 +762,20 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                                 addTypeMismatchError(o, rightClass, leftClass);
                         }
                     }
+                } else if (declaration instanceof LSFLocalPropertyDeclarationNameImpl) {
+                    LSFClassSet leftClass = declaration.resolveValueClass();
+                    List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
+                    if (!rightPropertyExpressionList.isEmpty()) {
+                        LSFPropertyExpression rightPropertyExpression = rightPropertyExpressionList.get(0);
+                        LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpression.resolveValueClass(false));
+                        if (leftClass != null && rightClass != null) {
+                            if (!leftClass.isCompatible(rightClass)) {
+                                addTypeMismatchError(o, rightClass, leftClass);
+                            } else if (leftClass.getCanonicalName().equals("BOOLEAN") && rightPropertyExpression.getText().equals("FALSE")) {
+                                addFalseToBooleanAssignError(o);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -775,6 +789,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 return true;
         }
         return false;
+    }
+
+    private void addFalseToBooleanAssignError(LSFAssignActionPropertyDefinitionBody o) {
+        Annotation annotation = myHolder.createErrorAnnotation(o, "use NULL instead of FALSE");
+        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+        addError(o, annotation, LSFErrorLevel.ERROR);
     }
 
     private void addAssignError(LSFAssignActionPropertyDefinitionBody o) {
