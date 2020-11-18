@@ -5,38 +5,29 @@ import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
-import org.jetbrains.annotations.Nullable;
 
 public class PropertyDrawMigration extends ElementMigration {
-
-    @Nullable
-    public static PropertyDrawMigration create(LSFPropertyDrawDeclaration decl, String newName) {
-        String oldName;
+    public PropertyDrawMigration(LSFPropertyDrawDeclaration decl, String newName) {
+        super(decl, "", newName);
+        
         LSFSimpleName aliasName = decl.getSimpleName();
-        if(aliasName == null) { // значит внутри rename'ся, нужно добавить postfix
+        if (aliasName == null) { // значит внутри rename'ся, нужно добавить postfix
             LSFId nameDecl = LSFRenameFullNameProcessor.getDeclPropName(decl);
-            if(nameDecl == null)
-                return null;
-            
-            String objectsPostfix = LSFPsiImplUtil.getObjectUsageString(decl.getObjectUsageList());
-            oldName = nameDecl.getName() + objectsPostfix;
-            newName += objectsPostfix;
-        } else {
-            oldName = aliasName.getName();
-        }        
+            assert nameDecl != null;
 
-        LSFFormDeclaration formDecl = decl.resolveFormDecl();
-        if(formDecl != null) {
-            String formName = formDecl.getCanonicalName();
-            oldName = formName + "." + oldName;
-            newName = formName + "." + newName;
+            String objectsPostfix = LSFPsiImplUtil.getObjectUsageString(decl.getObjectUsageList());
+            this.oldName = nameDecl.getName() + objectsPostfix;
+            this.newName += objectsPostfix;
+        } else {
+            this.oldName = aliasName.getName();
         }
 
-        return new PropertyDrawMigration(decl, oldName, newName);
-    }
-
-    private PropertyDrawMigration(LSFPropertyDrawDeclaration decl, String oldName, String newName) {
-        super(decl, oldName, newName);
+        LSFFormDeclaration formDecl = decl.resolveFormDecl();
+        if (formDecl != null) {
+            String formName = formDecl.getCanonicalName();
+            this.oldName = formName + "." + this.oldName;
+            this.newName = formName + "." + this.newName;
+        }
     }
 
     @Override

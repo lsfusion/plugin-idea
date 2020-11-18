@@ -34,7 +34,7 @@ public abstract class LSFStaticObjectDeclarationImpl extends LSFDeclarationImpl 
 
     @Override
     public ElementMigration getMigration(String newName) {
-        return StaticObjectMigration.create(this, getClassNamespace(), getClassName(), getName(), newName);
+        return new StaticObjectMigration(this, getClassNamespace(), getClassName(), getName(), newName);
     }
     
     private String getClassName() {

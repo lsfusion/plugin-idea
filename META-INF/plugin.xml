@@ -11,6 +11,7 @@
         <ul>
             <li>OBJECTS BACKGROUND / FOREGROUND (background and foreground for row)</li>
             <li>Add type assignment check in action body</li>
+            <li>Static objects migration when renaming class</li>
         </ul>
     ]]>
     </change-notes>

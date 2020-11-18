@@ -75,6 +75,6 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
 
     @Override
     public ElementMigration getMigration(String newName) {
-        return PropertyDrawMigration.create(this, newName);
+        return new PropertyDrawMigration(this, newName);
     }
 }

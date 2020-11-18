@@ -17,14 +17,10 @@ import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.lsfusion.lang.typeinfer.TypeInferer;
-import com.lsfusion.refactoring.ElementMigration;
-import com.lsfusion.refactoring.MigrationChangePolicy;
-import com.lsfusion.refactoring.PropertyMigration;
-import com.lsfusion.refactoring.ShortenNamesProcessor;
+import com.lsfusion.refactoring.*;
 import com.lsfusion.references.LSFToJavaLanguageInjector;
 import org.jetbrains.annotations.NotNull;
 
@@ -90,9 +86,9 @@ public class ProjectTypeInferAction extends AnAction {
                             List<LSFClassSet> oldClasses = propertyDeclEntry.getValue();
                             List<LSFClassSet> newClasses = decl.resolveParamClasses();
                             if (newClasses != null && !newClasses.equals(oldClasses))
-                                migrations.add(PropertyMigration.create(decl, oldClasses, newClasses));
+                                migrations.add(new PropertyMigration(decl, oldClasses, newClasses));
                         }
-                        ShortenNamesProcessor.modifyMigrationScripts(migrations, MigrationChangePolicy.INCREMENT_VERSION, myProject, ProjectScope.getProjectScope(myProject));
+                        MigrationScriptUtils.modifyMigrationScripts(migrations, MigrationChangePolicy.INCREMENT_VERSION, myProject, ProjectScope.getProjectScope(myProject));
 
                         transaction.apply();
                     }

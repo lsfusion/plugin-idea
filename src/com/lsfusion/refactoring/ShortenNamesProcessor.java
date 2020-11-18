@@ -27,23 +27,14 @@ import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationI
 import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.psi.references.impl.LSFPropReferenceImpl;
-import com.lsfusion.migration.MigrationElementGenerator;
-import com.lsfusion.migration.lang.MigrationFileType;
-import com.lsfusion.migration.lang.psi.MigrationFile;
-import com.lsfusion.migration.lang.psi.MigrationStatement;
-import com.lsfusion.migration.lang.psi.MigrationVersionBlock;
-import com.lsfusion.migration.lang.psi.MigrationVersionBlockBody;
 import com.lsfusion.util.BaseUtils;
-import com.lsfusion.util.LSFFileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
 import static com.lsfusion.util.LSFPsiUtils.collectInjectedLSFFiles;
-import static com.lsfusion.util.LSFPsiUtils.getLastChildOfType;
 
 public class ShortenNamesProcessor {
-    private static final String INITIAL_MIGRATION_VERSION = "1.0.0";
 
     private static boolean isPredefinedWord(String s) {
         return s.equals("VAT") || s.equals("UOM");
@@ -222,103 +213,8 @@ public class ShortenNamesProcessor {
         transaction.apply();
         
         if (migrationChangePolicy != MigrationChangePolicy.DO_NOT_MODIFY) {
-            modifyMigrationScripts(migrations, migrationChangePolicy, project, ProjectScope.getProjectScope(project));
+            MigrationScriptUtils.modifyMigrationScripts(migrations, migrationChangePolicy, project, ProjectScope.getProjectScope(project));
         }
-    }
-
-    public static void modifyMigrationScripts(List<ElementMigration> migrations, MigrationChangePolicy migrationChangePolicy, Project project, GlobalSearchScope scope) {
-        Collection<VirtualFile> migrationFiles = FileTypeIndex.getFiles(MigrationFileType.INSTANCE, scope);
-        for (VirtualFile file : migrationFiles) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-            if (psiFile instanceof MigrationFile) {
-                boolean createNewVersionBlock = migrationChangePolicy == MigrationChangePolicy.INCREMENT_VERSION;
-                if (migrationChangePolicy == MigrationChangePolicy.INCREMENT_VERSION_IF_COMMITED) {
-                    createNewVersionBlock = LSFFileUtils.isFileCommited(project, file);
-                }
-
-                List<String> topModulesNames = LSFFileUtils.getPossibleTopModules(psiFile);
-                
-                GlobalSearchScope searchScope = GlobalSearchScope.EMPTY_SCOPE;
-                for (String topModuleName : topModulesNames) {
-                    GlobalSearchScope moduleScope = LSFFileUtils.getElementRequireScope(psiFile, topModuleName, true);
-                    searchScope = searchScope.union(moduleScope);
-                }
-                
-                MigrationFile migrationFile = (MigrationFile)psiFile;
-                
-                 String statements = filterMigrationsToString(migrations, searchScope);
-                if (statements.isEmpty()) {
-                    continue;
-                }
-
-                MigrationVersionBlock lastVersionBlock = getLastChildOfType(migrationFile, MigrationVersionBlock.class);
-                if (createNewVersionBlock || lastVersionBlock == null) {
-                    String newVersion = lastVersionBlock == null ? INITIAL_MIGRATION_VERSION : incrementedVersion(lastVersionBlock.getVersionLiteral().getText());
-
-                    String prefix = "";
-                    PsiElement lastChild = migrationFile.getLastChild();
-                    if (lastVersionBlock != null && lastChild != null && !lastChild.getText().endsWith("\n\n")) {
-                        prefix = "\n\n";
-                    }
-
-                    Pair<PsiElement, PsiElement> newElements = MigrationElementGenerator.createVersionBlock(project, prefix, newVersion, statements);
-                    migrationFile.addRange(newElements.first, newElements.second);
-                } else {
-
-                    Pair<PsiElement, PsiElement> newStatements = MigrationElementGenerator.createStatementsElements(project, statements);
-
-                    MigrationVersionBlockBody lastVersionBlockBody = lastVersionBlock.getVersionBlockBody();
-                    PsiElement anchor = getLastChildOfType(lastVersionBlockBody, MigrationStatement.class);
-                    if (anchor == null) {
-                        anchor = lastVersionBlockBody.getFirstChild();
-                    }
-                    
-                    lastVersionBlockBody.addRangeAfter(newStatements.first, newStatements.second, anchor);
-                }
-            }
-        }
-    }
-
-    private static String incrementedVersion(String currentVersionWithPrefix) {
-        String currenVersion = currentVersionWithPrefix.trim().substring(1);
-        
-        int dotIndex = currenVersion.lastIndexOf('.');
-        String lastPart;
-        String prefix;
-        if (dotIndex != -1) {
-            prefix = currenVersion.substring(0, dotIndex + 1);
-            lastPart = currenVersion.substring(dotIndex + 1).trim();
-        } else {
-            prefix = "";
-            lastPart = currenVersion.trim();
-        }
-
-        int lastPartInt;
-        try {
-            lastPartInt = Integer.parseInt(lastPart) + 1;
-        } catch (NumberFormatException nfe) {
-            lastPartInt = 1;
-        }
-        
-        return prefix + lastPartInt;
-    }
-
-    private static String filterMigrationsToString(List<ElementMigration> migrations, GlobalSearchScope moduleScope) {
-        StringBuilder result = new StringBuilder();
-        for (ElementMigration migration : migrations) {
-            VirtualFile declarationFile = migration.getDeclarationFile();
-            if (declarationFile != null && moduleScope.accept(declarationFile)) {
-                if (result.length() != 0) {
-                    result.append("\n");
-                }
-
-                result.append("    ");
-                result.append(migration.getPrefix());
-                result.append(" ");
-                result.append( migration.getMigrationString());
-            }
-        }
-        return result.toString();
     }
 
     public static void shortenAllPropNames(Collection<LSFFile> files, List<ElementMigration> migrations, MetaTransaction transaction) {
@@ -407,7 +303,7 @@ public class ShortenNamesProcessor {
             String oldName = decl.getDeclName();
             if (!oldName.equals(newName)) {
                 assert decl.getSimpleName() == null;
-                PropertyDrawMigration migration = PropertyDrawMigration.create(decl, newName);
+                PropertyDrawMigration migration = new PropertyDrawMigration(decl, newName);
                 assert migration != null;
                 migrations.add(migration);
             }
@@ -428,7 +324,7 @@ public class ShortenNamesProcessor {
                 LSFActionOrGlobalPropDeclaration globalDecl = (LSFActionOrGlobalPropDeclaration) decl;
                 String oldName = decl.getDeclName();
                 if (!oldName.equals(newName)) {
-                    migrations.add(PropertyMigration.create(globalDecl, oldName, newName));
+                    migrations.add(new PropertyMigration(globalDecl, oldName, newName));
                 }
             }
 

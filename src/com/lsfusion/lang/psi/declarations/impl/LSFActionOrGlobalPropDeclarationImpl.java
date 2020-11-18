@@ -261,7 +261,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
 
     @Override
     public ElementMigration getMigration(String newName) {
-        return PropertyMigration.create(this, getGlobalName(), newName);
+        return new PropertyMigration(this, getGlobalName(), newName);
     }
 
     public List<String> resolveParamNames() {

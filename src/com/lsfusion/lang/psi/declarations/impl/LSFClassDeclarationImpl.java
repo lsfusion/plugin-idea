@@ -110,7 +110,7 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
 
     @Override
     public ElementMigration getMigration(String newName) {
-        return ClassMigration.create(this, getName(), newName);
+        return new ClassMigration(this, getName(), newName);
     }
 
     @Override

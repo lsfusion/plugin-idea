@@ -75,6 +75,6 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
 
     @Override
     public ElementMigration getMigration(String newName) {
-        return NavigatorElementMigration.create(this, getName(), newName);
+        return new NavigatorElementMigration(this, getName(), newName);
     }
 }

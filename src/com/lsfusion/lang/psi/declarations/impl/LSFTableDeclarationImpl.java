@@ -102,6 +102,6 @@ public abstract class LSFTableDeclarationImpl extends LSFFullNameDeclarationImpl
 
     @Override
     public ElementMigration getMigration(String newName) {
-        return TableMigration.create(this, getName(), newName);
+        return new TableMigration(this, getName(), newName);
     }
 }

@@ -21,8 +21,10 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.LSFFileUtils;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +81,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         cascadePostRenames = new HashMap<>(); // just in case
         
         if (PsiTreeUtil.getParentOfType(element, LSFClassDeclaration.class) != null) {
-            prepareRenamingClass(element);    
+            prepareRenamingClass(element, newName);    
         } else if (PsiTreeUtil.getParentOfType(element, LSFPropertyDeclaration.class) != null) {
             // [todo] we need additional check that element is not a parameter name to prevent unwanted ref search
             prepareRenamingProperty(element, newName, allRenames);    
@@ -88,19 +90,26 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         }
     }
     
-    private void prepareRenamingClass(@NotNull PsiElement element) {
+    private void prepareRenamingClass(@NotNull PsiElement element, String newName) {
         LSFClassDeclaration cls = PsiTreeUtil.getParentOfType(element, LSFClassDeclaration.class);
-        final ArrayList<LSFActionOrGlobalPropDeclaration<?, ?>> children = new ArrayList<>();
         if (cls != null && cls.isValid()) {
+            final ArrayList<LSFActionOrGlobalPropDeclaration<?, ?>> children = new ArrayList<>();
             GlobalSearchScope scope = GlobalSearchScope.allScope(cls.getProject());
             children.addAll(LSFPsiUtils.mapPropertiesWithClassInSignature(cls, cls.getProject(), scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
             children.addAll(LSFPsiUtils.mapActionsWithClassInSignature(cls, cls.getProject(), scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
-        }
-        children.sort(Comparator.comparing(LSFFullNameDeclaration::getCanonicalName));
-        
-        for (LSFActionOrGlobalPropDeclaration<?, ?> child : children) {
-            cascadePostRenames.put(child, getMigrationClassRunnable(child, child.getCanonicalName(), MigrationChangePolicy.USE_LAST_VERSION));
-        }
+
+            children.sort(Comparator.comparing(LSFFullNameDeclaration::getCanonicalName));
+
+            for (LSFActionOrGlobalPropDeclaration<?, ?> child : children) {
+                cascadePostRenames.put(child, getMigrationClassRunnable(child, child.getCanonicalName(), MigrationChangePolicy.USE_LAST_VERSION));
+            }
+
+            for (LSFClassExtend extend : LSFGlobalResolver.findExtendElements(cls, LSFStubElementTypes.EXTENDCLASS, cls.getProject(), GlobalSearchScope.allScope(cls.getProject())).findAll()) {
+                for (LSFStaticObjectDeclaration staticDecl : extend.getStaticObjects()) {
+                    cascadePostRenames.put(staticDecl, getMigrationClassRunnable(staticDecl, cls.getNamespaceName(), cls.getName(), newName, MigrationChangePolicy.USE_LAST_VERSION));
+                }
+            }
+        }        
     }
     
     private void prepareRenamingProperty(@NotNull PsiElement element, @NotNull String newName, @NotNull Map<PsiElement, String> allRenames) {
@@ -231,7 +240,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         if (migration != null) {
             final GlobalSearchScope scope = LSFFileUtils.getModuleWithDependantsScope(element);
             final Project project = element.getProject();
-            return () -> ShortenNamesProcessor.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
+            return () -> MigrationScriptUtils.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
         }
         return null;
     }
@@ -240,11 +249,18 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         final GlobalSearchScope scope = LSFFileUtils.getModuleWithDependantsScope(decl);
         final Project project = decl.getProject();
         return () -> {
-            PropertyMigration migration = PropertyMigration.createUsingCanonicalNames(decl, oldCanonicalName, decl.getCanonicalName());
-            ShortenNamesProcessor.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
+            PropertyMigration migration = new PropertyMigration(decl, oldCanonicalName, decl.getCanonicalName(), true);
+            MigrationScriptUtils.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
         };
     }
 
+    public Runnable getMigrationClassRunnable(final LSFStaticObjectDeclaration decl, String namespace, String oldClassName, String newClassName, MigrationChangePolicy migrationPolicy) {
+        StaticObjectMigration migration = new StaticObjectMigration(decl, namespace, oldClassName, newClassName, decl.getName(), decl.getName());
+        final GlobalSearchScope scope = LSFFileUtils.getModuleWithDependantsScope(decl);
+        final Project project = decl.getProject();
+        return () -> MigrationScriptUtils.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
+    }
+    
     private static void qualifyPossibleConflict(LSFFullNameReference ref, LSFDeclaration decl, MetaTransaction transaction) {
         if(ref.resolveDecl() == decl)
             return;

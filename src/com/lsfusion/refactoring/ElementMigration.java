@@ -4,22 +4,23 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 
 public abstract class ElementMigration {
-
-    private final VirtualFile declarationFile;
-    private final String migrationString;
-
+    protected String oldName;
+    protected String newName;
+    protected final LSFDeclaration decl;
+    
     public ElementMigration(LSFDeclaration decl, String oldName, String newName) {
-        this.migrationString = oldName + " -> " + newName;
-        this.declarationFile = decl.getContainingFile().getVirtualFile();
+        this.oldName = oldName;
+        this.newName = newName;
+        this.decl = decl;
     }
 
     public VirtualFile getDeclarationFile() {
-        return declarationFile;
+        return decl.getContainingFile().getVirtualFile();
     }
 
     public String getMigrationString() {
-        return migrationString;
+        return getPrefix() + " " + oldName + " -> " + newName;
     }
 
-    public abstract String getPrefix();
+    protected abstract String getPrefix();
 }
