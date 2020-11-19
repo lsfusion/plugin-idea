@@ -78,7 +78,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
 
     @Override
     public void prepareRenaming(@NotNull PsiElement element, @NotNull String newName, @NotNull Map<PsiElement, String> allRenames) {
-        cascadePostRenames = new HashMap<>(); // just in case
+        cascadePostRenames = new LinkedHashMap<>(); // just in case
         
         if (PsiTreeUtil.getParentOfType(element, LSFClassDeclaration.class) != null) {
             prepareRenamingClass(element, newName);    
@@ -212,7 +212,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     }
     
     // We need this container to get all rename lines in one block of migration file 
-    private Map<PsiElement, Runnable> cascadePostRenames = new HashMap<>();  
+    private Map<PsiElement, Runnable> cascadePostRenames = new LinkedHashMap<>();  
 
     @Nullable
     @Override
@@ -221,7 +221,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
             final Runnable migrationRunnable = getMigrationRunnable(element, newName, migrationPolicy);
             if (!cascadePostRenames.isEmpty()) {
                 final Map<PsiElement, Runnable> fCascadePostRenames = cascadePostRenames;
-                cascadePostRenames = new HashMap<>();
+                cascadePostRenames = new LinkedHashMap<>();
                 return () -> {
                     if (migrationRunnable != null)
                         migrationRunnable.run();
