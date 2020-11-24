@@ -24,7 +24,9 @@ import static com.lsfusion.util.LSFPsiUtils.getLastChildOfType;
 public class MigrationScriptUtils {
     private static final String INITIAL_MIGRATION_VERSION = "1.0.0";
 
-    public static void modifyMigrationScripts(List<ElementMigration> migrations, MigrationChangePolicy migrationChangePolicy, Project project, GlobalSearchScope scope) {
+    public static void modifyMigrationScripts(List<ElementMigration> migrations, MigrationChangePolicy migrationChangePolicy, GlobalSearchScope scope) {
+        Project project = scope.getProject();
+        assert project != null;
         Collection<VirtualFile> migrationFiles = FileTypeIndex.getFiles(MigrationFileType.INSTANCE, scope);
         for (VirtualFile file : migrationFiles) {
             PsiFile psiFile = PsiManager.getInstance(project).findFile(file);

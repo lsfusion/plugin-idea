@@ -213,7 +213,7 @@ public class ShortenNamesProcessor {
         transaction.apply();
         
         if (migrationChangePolicy != MigrationChangePolicy.DO_NOT_MODIFY) {
-            MigrationScriptUtils.modifyMigrationScripts(migrations, migrationChangePolicy, project, ProjectScope.getProjectScope(project));
+            MigrationScriptUtils.modifyMigrationScripts(migrations, migrationChangePolicy, ProjectScope.getProjectScope(project));
         }
     }
 

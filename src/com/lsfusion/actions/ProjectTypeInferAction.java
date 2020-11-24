@@ -88,7 +88,7 @@ public class ProjectTypeInferAction extends AnAction {
                             if (newClasses != null && !newClasses.equals(oldClasses))
                                 migrations.add(new PropertyMigration(decl, oldClasses, newClasses));
                         }
-                        MigrationScriptUtils.modifyMigrationScripts(migrations, MigrationChangePolicy.INCREMENT_VERSION, myProject, ProjectScope.getProjectScope(myProject));
+                        MigrationScriptUtils.modifyMigrationScripts(migrations, MigrationChangePolicy.INCREMENT_VERSION, ProjectScope.getProjectScope(myProject));
 
                         transaction.apply();
                     }

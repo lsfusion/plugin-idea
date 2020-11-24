@@ -94,10 +94,11 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     private void prepareRenamingClass(@NotNull PsiElement element, String newName) {
         LSFClassDeclaration cls = PsiTreeUtil.getParentOfType(element, LSFClassDeclaration.class);
         if (cls != null && cls.isValid()) {
+            Project project = cls.getProject();
             final ArrayList<LSFActionOrGlobalPropDeclaration<?, ?>> children = new ArrayList<>();
-            GlobalSearchScope scope = GlobalSearchScope.allScope(cls.getProject());
-            children.addAll(LSFPsiUtils.mapPropertiesWithClassInSignature(cls, cls.getProject(), scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
-            children.addAll(LSFPsiUtils.mapActionsWithClassInSignature(cls, cls.getProject(), scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
+            GlobalSearchScope scope = GlobalSearchScope.allScope(project);
+            children.addAll(LSFPsiUtils.mapPropertiesWithClassInSignature(cls, project, scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
+            children.addAll(LSFPsiUtils.mapActionsWithClassInSignature(cls, project, scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
 
             children.sort(Comparator.comparing(LSFFullNameDeclaration::getCanonicalName));
             
@@ -114,10 +115,10 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
             }
 
             for (GlobalSearchScope gscope : groupMap.keySet()) {
-                cascadePostRenameActions.add(getMigrationClassRunnable(gscope, cls.getProject(), groupMap.get(gscope), oldCanonicalNames, MigrationChangePolicy.USE_LAST_VERSION));
+                cascadePostRenameActions.add(getMigrationClassRunnable(groupMap.get(gscope), oldCanonicalNames, MigrationChangePolicy.USE_LAST_VERSION, gscope));
             }
 
-            for (LSFClassExtend extend : LSFGlobalResolver.findExtendElements(cls, LSFStubElementTypes.EXTENDCLASS, cls.getProject(), GlobalSearchScope.allScope(cls.getProject())).findAll()) {
+            for (LSFClassExtend extend : LSFGlobalResolver.findExtendElements(cls, LSFStubElementTypes.EXTENDCLASS, project, GlobalSearchScope.allScope(project)).findAll()) {
                 for (LSFStaticObjectDeclaration staticDecl : extend.getStaticObjects()) {
                     cascadeRenameElements.add(staticDecl);
                     cascadePostRenameActions.add(getMigrationClassRunnable(staticDecl, cls.getNamespaceName(), cls.getName(), newName, MigrationChangePolicy.USE_LAST_VERSION));
@@ -256,28 +257,27 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
         final ElementMigration migration = getMigration(element, newName);
         if (migration != null) {
             final GlobalSearchScope scope = LSFFileUtils.getModuleWithDependantsScope(element);
-            final Project project = element.getProject();
-            return () -> MigrationScriptUtils.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
+            return () -> MigrationScriptUtils.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, scope);
         }
         return null;
     }
 
-    public Runnable getMigrationClassRunnable(GlobalSearchScope scope, Project project, final List<LSFActionOrGlobalPropDeclaration<?, ?>> decls, 
-                                              final Map<LSFActionOrGlobalPropDeclaration<?, ?>, String> oldCanonicalNames, MigrationChangePolicy migrationPolicy) {
+    public Runnable getMigrationClassRunnable(final List<LSFActionOrGlobalPropDeclaration<?, ?>> decls, 
+                                              final Map<LSFActionOrGlobalPropDeclaration<?, ?>, String> oldCanonicalNames, 
+                                              MigrationChangePolicy migrationPolicy, GlobalSearchScope scope) {
         return () -> {
             List<ElementMigration> migrations = new ArrayList<>();
             for (LSFActionOrGlobalPropDeclaration<?, ?> decl : decls) {
                 migrations.add(new PropertyMigration(decl, oldCanonicalNames.get(decl), decl.getCanonicalName(), true));                            
             }
-            MigrationScriptUtils.modifyMigrationScripts(migrations, migrationPolicy, project, scope);
+            MigrationScriptUtils.modifyMigrationScripts(migrations, migrationPolicy, scope);
         };
     }
 
     public Runnable getMigrationClassRunnable(final LSFStaticObjectDeclaration decl, String namespace, String oldClassName, String newClassName, MigrationChangePolicy migrationPolicy) {
         StaticObjectMigration migration = new StaticObjectMigration(decl, namespace, oldClassName, newClassName, decl.getName(), decl.getName());
         final GlobalSearchScope scope = LSFFileUtils.getModuleWithDependantsScope(decl);
-        final Project project = decl.getProject();
-        return () -> MigrationScriptUtils.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, project, scope);
+        return () -> MigrationScriptUtils.modifyMigrationScripts(Collections.singletonList(migration), migrationPolicy, scope);
     }
     
     private static void qualifyPossibleConflict(LSFFullNameReference ref, LSFDeclaration decl, MetaTransaction transaction) {
