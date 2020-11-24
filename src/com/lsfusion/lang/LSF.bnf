@@ -932,12 +932,18 @@ emailActionPropertyDefinitionBody ::=
 		(SUBJECT propertyExpression)?
 		(emailRecipientTypeLiteral propertyExpression)+
 		(BODY propertyExpression)?
-		(ATTACH propertyExpression (NAME propertyExpression)?)*
+		(ATTACH ((propertyExpression (NAME propertyExpression)?) | (LIST emailPropertyUsage (NAME emailPropertyUsage)?)))*
         syncTypeLiteral?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
+}
+
+emailPropertyUsage ::= propertyUsage
+{
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList]
 }
 
 confirmActionPropertyDefinitionBody ::= ASK propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody

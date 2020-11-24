@@ -2971,6 +2971,10 @@ public class LSFPsiImplUtil {
         return Collections.singletonList(IntegerClass.instance);
     }
 
+    public static List<LSFClassSet> resolveParamClasses(LSFEmailPropertyUsage sourceStatement) {
+        return Collections.singletonList(IntegerClass.instance);
+    }
+
     @Nullable
     public static PsiElement getParamList(@NotNull LSFHeadersPropertyUsage sourceStatement) {
         return null;
@@ -2978,6 +2982,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static PsiElement getParamList(@NotNull LSFImportPropertyUsage sourceStatement) {
+        return null;
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFEmailPropertyUsage sourceStatement) {
         return null;
     }
     

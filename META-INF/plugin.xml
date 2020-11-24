@@ -13,6 +13,7 @@
             <li>Add type assignment check in action body</li>
             <li>Static objects migration when renaming class</li>
             <li>Implement ROUND as an operator</li>
+            <li>Support LIST clause for ATTACH clause in EMAIL operator</li>
         </ul>
     ]]>
     </change-notes>
