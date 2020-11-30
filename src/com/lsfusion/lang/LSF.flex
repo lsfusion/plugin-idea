@@ -306,6 +306,7 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "HIDE"                    			{ return HIDE; }
   "HIDESCROLLBARS"          			{ return HIDESCROLLBARS; }
   "HIDETITLE"               			{ return HIDETITLE; }
+  "HINT"            			        { return HINT; }
   "HINTNOUPDATE"            			{ return HINTNOUPDATE; }
   "HINTTABLE"               			{ return HINTTABLE; }
   "HORIZONTAL"              			{ return HORIZONTAL; }

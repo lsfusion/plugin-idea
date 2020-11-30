@@ -575,7 +575,7 @@ private semiPropertyOption ::= IN groupUsage
                            |	persistentSetting
                            |    complexSetting
                            |    prereadSetting
-                           |   NOHINT
+                           |    hintSetting
                            |	TABLE tableUsage
                            |	asEditActionSetting
                            |	viewTypeSetting
@@ -605,6 +605,7 @@ nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI |
 viewTypeSetting ::= classViewType
 persistentSetting ::= MATERIALIZED
 complexSetting ::= COMPLEX | NOCOMPLEX
+hintSetting ::= HINT | NOHINT
 prereadSetting ::= PREREAD
 charWidthSetting ::= CHARWIDTH intLiteral
 flexCharWidthSetting ::= CHARWIDTH intLiteral (FLEX | NOFLEX)

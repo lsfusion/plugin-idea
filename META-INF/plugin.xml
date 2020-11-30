@@ -7,13 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.202</b><br>
+        <b>Version 1.0.203</b><br>
         <ul>
-            <li>OBJECTS BACKGROUND / FOREGROUND (background and foreground for row)</li>
-            <li>Add type assignment check in action body</li>
-            <li>Static objects migration when renaming class</li>
-            <li>Implement ROUND as an operator</li>
-            <li>Support LIST clause for ATTACH clause in EMAIL operator</li>
+            <li>Added HINT option support for property</li>
         </ul>
     ]]>
     </change-notes>
