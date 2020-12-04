@@ -232,8 +232,12 @@ public class GenerateFormAction extends AnAction {
 
     private String generateObjectId(String id) {
         id = Introspector.decapitalize(id);
-        if(id != null)
-            id = Junidecode.unidecode(id).replaceAll("[-.@']", "_");
+        if(id != null) {
+            if(id.matches("[^a-zA-Z].*")) {
+                id = "v" + id;
+            }
+            id = Junidecode.unidecode(id).replaceAll("[^a-zA-Z0-9_]", "_");
+        }
         int count = 0;
         while(usedObjectIds.contains(id + (count == 0 ? "" : count))) {
             count++;
