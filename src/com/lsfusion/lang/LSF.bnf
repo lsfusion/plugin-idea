@@ -1584,7 +1584,7 @@ formExprDeclaration ::= propertyExpression
 formActionDeclaration ::= topActionPropertyDefinitionBody
 filterSetDefault ::= DEFAULT
 
-formOrderByList ::= ORDERS formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
+formOrderByList ::= ORDERS FIRST? formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)* {pin(".*") = 1}
 
 formPivotOptionsDeclaration ::= PIVOT (
         (groupObjectUsage pivotOptions)

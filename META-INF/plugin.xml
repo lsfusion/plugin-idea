@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.203</b><br>
+        <b>Version 1.0.204</b><br>
         <ul>
-            <li>Added HINT option support for property</li>
-            <li>EXTERNAL HTTP BODYPARAMNAMES support</li>
+            <li>ORDERS FIRST support</li>
         </ul>
     ]]>
     </change-notes>
