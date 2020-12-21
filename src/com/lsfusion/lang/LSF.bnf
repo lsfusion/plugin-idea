@@ -900,7 +900,7 @@ externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyP
 
 private externalType ::=  SQL propertyExpression EXEC propertyExpression
               |   HTTP (CLIENT)? (DELETE| GET | POST | PUT)? propertyExpression (BODYURL propertyExpression)?
-                    (BODYPARAMNAMES stringLiteral (COMMA stringLiteral)*)
+                    (BODYPARAMNAMES stringLiteral (COMMA stringLiteral)*)?
                     (HEADERS headersPropertyUsage)? (COOKIES headersPropertyUsage)? (HEADERSTO headersPropertyUsage)? (COOKIESTO headersPropertyUsage)?
               |   DBF propertyExpression APPEND (CHARSET stringLiteral)?
               |   LSF propertyExpression (EXEC | (EVAL (ACTION)?)) propertyExpression
