@@ -1423,7 +1423,7 @@ formTreeGroupObjectOptions ::= (   formGroupObjectRelativePosition
 formTreeGroupObjectDeclaration ::= formGroupObject (treeGroupParentDeclaration)?
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
 
-treeGroupParentDeclaration ::= PARENT (formExprDeclaration | LBRAC formExprDeclaration (COMMA formExprDeclaration)* RBRAC) { pin = 1 }
+treeGroupParentDeclaration ::= (PARENT formExprDeclaration) | (LBRAC PARENT formExprDeclaration (COMMA formExprDeclaration)* RBRAC) { pin = 1 }
 
 formGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDeclaration
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFGroupObjectDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration"}
