@@ -381,7 +381,7 @@ public class ContainerView extends ComponentView {
 
     private static class TabbedPane extends JBTabbedPane {
         public TabbedPane() {
-            super(SwingConstants.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
+            super(SwingConstants.TOP);
         }
 
         @Override

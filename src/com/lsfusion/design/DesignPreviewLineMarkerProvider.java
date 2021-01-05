@@ -107,7 +107,6 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
             if (formDecl != null) {
                 ToolWindow toolWindow = ToolWindowManager.getInstance(formDecl.getProject()).getToolWindow("Design");
                 if (toolWindow instanceof ToolWindowImpl) {
-                    ((ToolWindowImpl) toolWindow).ensureContentInitialized();
                     toolWindow.activate(null);
                 }
 
