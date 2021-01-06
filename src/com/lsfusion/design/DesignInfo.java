@@ -185,7 +185,7 @@ public class DesignInfo {
             return null;
         }
         
-        if (valueStatement.getColorLiteral() != null) {
+        /*if (valueStatement.getColorLiteral() != null) {
             LSFColorLiteral colorLiteral = valueStatement.getColorLiteral();
             List<LSFUintLiteral> literalList = colorLiteral.getUintLiteralList();
             if (!literalList.isEmpty()) {
@@ -200,7 +200,7 @@ public class DesignInfo {
             return Integer.decode(valueStatement.getIntLiteral().getText());
         } else if (valueStatement.getDoubleLiteral() != null) {
             return Double.parseDouble(valueStatement.getDoubleLiteral().getText());
-        } else if (valueStatement.getDimensionLiteral() != null) {
+        } else */if (valueStatement.getDimensionLiteral() != null) {
             List<LSFIntLiteral> literalList = valueStatement.getDimensionLiteral().getIntLiteralList();
             return new Dimension(Integer.decode(literalList.get(0).getText()), Integer.decode(literalList.get(1).getText()));
         } else if (valueStatement.getBooleanLiteral() != null) {

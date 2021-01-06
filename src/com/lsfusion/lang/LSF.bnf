@@ -1997,11 +1997,12 @@ groupSelector ::= groupUsage
 
 setObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 2}
 
-componentPropertyValue ::=  colorLiteral
-                        |	localizedStringLiteral
-                        |	intLiteral
-                        |	doubleLiteral
-                        |	dimensionLiteral
+componentPropertyValue ::= //commented literals are in designCalcPropertyObject
+                        //colorLiteral
+                        //|	localizedStringLiteral
+                        //|	intLiteral
+                        //|	doubleLiteral
+                            dimensionLiteral
                         |	booleanLiteral
                         |	boundsIntLiteral
                         |	boundsDoubleLiteral
