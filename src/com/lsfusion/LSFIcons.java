@@ -27,6 +27,7 @@ public final class LSFIcons {
     public static final Icon GROUP_OBJECT = AllIcons.Actions.GroupByPrefix;
     public static final Icon INDEX = AllIcons.Graph.Layout;
     public static final Icon LOGGABLE = AllIcons.FileTypes.Archive;
+    public static final Icon MESSAGE = AllIcons.General.Information;
     public static final Icon META_DECLARATION = AllIcons.Nodes.AbstractMethod;
     public static final Icon META_REFERENCE = AllIcons.Nodes.Method;
     public static final Icon NAMESPACE = AllIcons.Nodes.ModuleGroup;

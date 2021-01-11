@@ -15,7 +15,10 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
-import com.lsfusion.lang.psi.impl.*;
+import com.lsfusion.lang.psi.impl.LSFCollapseGroupObjectActionPropertyDefinitionBodyImpl;
+import com.lsfusion.lang.psi.impl.LSFExpandGroupObjectActionPropertyDefinitionBodyImpl;
+import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
+import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl;
@@ -3984,6 +3987,10 @@ public class LSFPsiImplUtil {
         return LSFIcons.WINDOW;
     }
 
+    @Nullable
+    public static Icon getIcon(@NotNull LSFMessagePropertyExpression messagePropertyExpression, int flags) {
+        return LSFIcons.MESSAGE;
+    }
 
     //FormContext implementations
 
