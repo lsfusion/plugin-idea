@@ -3,6 +3,7 @@ package com.lsfusion.module;
 import com.intellij.facet.impl.ui.libraries.LibraryCompositionSettings;
 import com.intellij.framework.library.FrameworkLibraryVersionFilter;
 import com.intellij.ide.util.frameworkSupport.OldCustomLibraryDescription;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -311,7 +312,9 @@ public class LibraryOptionsPanel {
                             }
                         }
                     } catch (Exception e) {
-                        Messages.showErrorDialog(getProject(), getStackTrace(e), "Download lsFusion server failed");
+                        ApplicationManager.getApplication().invokeAndWait(() -> {
+                            Messages.showErrorDialog(getProject(), getStackTrace(e), "Download lsFusion server failed");
+                        });
                     }
                 }
             }
