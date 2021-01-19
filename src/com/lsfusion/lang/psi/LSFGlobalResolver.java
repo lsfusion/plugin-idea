@@ -15,7 +15,6 @@ import com.lsfusion.lang.psi.declarations.impl.LSFFormExtendElement;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex;
-import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
@@ -120,13 +119,14 @@ public class LSFGlobalResolver {
         return decls == null || decls.isEmpty() ? null : decls;
     }
     public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findElements(String name, String fqName, Collection<FullNameStubElementType> types, LSFFile file, Integer offset, Condition<T> condition, Finalizer<T> finalizer) {
-        Condition<TC> conditionC = BaseUtils.immutableCast(condition); Finalizer<TC> finalizerC = BaseUtils.immutableCast(finalizer);
-        return BaseUtils.<Collection<T>>immutableCast(LSFGlobalResolver.<SC, TC>findElements(name, fqName, types, file, offset, conditionC, finalizerC, new ArrayList<TC>()));
+        return findElements(name, fqName, types, file, offset, condition, finalizer, new ArrayList<>());
     }
-
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, String fqName, Collection<FullNameStubElementType> types, LSFFile file, Integer offset, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
-        Collection<FullNameStubElementType<S, T>> fullNameStubElementTypes = BaseUtils.<Collection<FullNameStubElementType<S, T>>>immutableCast(types);
-        return findElements(name, fqName, file, offset, fullNameStubElementTypes, condition, finalizer, virtDecls);
+    public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findElements(String name, String fqName, Collection<FullNameStubElementType> types, LSFFile file, Integer offset, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
+        Condition<TC> conditionC = BaseUtils.immutableCast(condition);
+        Finalizer<TC> finalizerC = BaseUtils.immutableCast(finalizer);
+        List<TC> virtDeclsC = BaseUtils.immutableCast((Object)virtDecls);
+        Collection<FullNameStubElementType<SC, TC>> fullNameStubElementTypes = BaseUtils.<Collection<FullNameStubElementType<SC, TC>>>immutableCast(types);
+        return BaseUtils.<Collection<T>>immutableCast(findElements(name, fqName, file, offset, fullNameStubElementTypes, conditionC, finalizerC, virtDeclsC));
     }
 
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition) {
@@ -199,9 +199,6 @@ public class LSFGlobalResolver {
         }
     }
 
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer) {
-        return findElements(name, file, offset, types, condition, finalizer, new ArrayList<>());
-    }
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
 
         GlobalSearchScope scope = file.getRequireScope();
