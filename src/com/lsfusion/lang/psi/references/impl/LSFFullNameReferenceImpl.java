@@ -27,7 +27,10 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     }
 
     public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findElements(LSFFullNameReference ref, Collection<FullNameStubElementType> types, Condition<T> condition, Finalizer<T> finalizer) {
-        return LSFGlobalResolver.findElements(ref.getNameRef(), ref.getFullNameRef(), types, ref.getLSFFile(), ref.getOffsetRef(), condition, finalizer);
+        return findElements(ref, types, condition, finalizer, new ArrayList<>());
+    }
+    public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findElements(LSFFullNameReference ref, Collection<FullNameStubElementType> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
+        return LSFGlobalResolver.findElements(ref.getNameRef(), ref.getFullNameRef(), types, ref.getLSFFile(), ref.getOffsetRef(), condition, finalizer, virtDecls);
     }
     public static <S extends FullNameStubElement, T extends LSFFullNameDeclaration, SC extends FullNameStubElement<SC, TC>, TC extends LSFFullNameDeclaration<TC, SC>> Collection<T> findElements(LSFFullNameReferenceImpl refImpl, Condition<T> condition, Finalizer<T> finalizer) {
         return findElements(refImpl, refImpl.getStubElementTypes(), condition, finalizer);
@@ -96,8 +99,8 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     }
     protected Collection<? extends T> resolveDeclarations() {
         List<G> virtDecls = getVirtDecls();
-        Collection decls = LSFGlobalResolver.<FullNameStubElement, G>findElements(getNameRef(), getFullNameRef(), getStubElementTypes(), getLSFFile(), getOffsetRef(), getCondition(), getFinalizer(), virtDecls);
-        return (Collection<? extends T>) decls;        
+        Collection decls = findElements(this, getStubElementTypes(), getCondition(), getFinalizer(), virtDecls);
+        return (Collection<? extends T>) decls;
     } 
 
     protected Collection<? extends T> resolveNoConditionDeclarations() {
