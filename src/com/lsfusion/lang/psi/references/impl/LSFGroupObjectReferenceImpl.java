@@ -18,11 +18,7 @@ public abstract class LSFGroupObjectReferenceImpl extends LSFFormElementReferenc
 
     @Override
     protected FormExtendProcessor<LSFGroupObjectDeclaration> getElementsCollector() {
-        return new FormExtendProcessor<LSFGroupObjectDeclaration>() {
-            public Collection<LSFGroupObjectDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getGroupObjectDecls();
-            }
-        };
+        return LSFFormExtend::getGroupObjectDecls;
     }
 
     @Nullable

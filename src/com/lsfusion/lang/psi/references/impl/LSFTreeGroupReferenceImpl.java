@@ -16,11 +16,7 @@ public abstract class LSFTreeGroupReferenceImpl extends LSFFormElementReferenceI
 
     @Override
     protected FormExtendProcessor<LSFTreeGroupDeclaration> getElementsCollector() {
-        return new FormExtendProcessor<LSFTreeGroupDeclaration>() {
-            public Collection<LSFTreeGroupDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getTreeGroupDecls();
-            }
-        };
+        return LSFFormExtend::getTreeGroupDecls;
     }
 }
 

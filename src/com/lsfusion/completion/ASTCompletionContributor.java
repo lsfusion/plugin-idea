@@ -41,6 +41,7 @@ import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.indexes.*;
+import com.lsfusion.lang.psi.references.impl.LSFDesignElementReferenceImpl;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -536,12 +537,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             return completeDesignContextObject(
                     componentCompleted,
                     COMPONENT_USAGE,
-                    new DesignProcessor<LSFComponentDeclaration>() {
-                        @Override
-                        public Collection<LSFComponentDeclaration> process(LSFDesign design) {
-                            return design.getComponentDecls();
-                        }
-                    }
+                    LSFDesign::getComponentDecls
             );
         }
 
@@ -576,14 +572,14 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
-        private <T extends LSFDeclaration> boolean completeDesignContextObject(BooleanValueHolder completed, IElementType frameType, DesignProcessor<T> designProcessor) {
+        private <T extends LSFDeclaration> boolean completeDesignContextObject(BooleanValueHolder completed, IElementType frameType, LSFDesignElementReferenceImpl.DesignProcessor<T> designProcessor) {
             Frame elementUsage = getLastFrameOfType(null, frameType);
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
                     FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
-                        Set<T> declaration = processDesignContext(psi, elementUsage.offset, designProcessor);
+                        Set<T> declaration = LSFDesignElementReferenceImpl.processDesignContext(psi, getOriginalFrameOffset(elementUsage), designProcessor);
                         for (T elementDecl : declaration) {
                             addLookupElement(createLookupElement(elementDecl, DESIGN_PRIORITY));
                         }

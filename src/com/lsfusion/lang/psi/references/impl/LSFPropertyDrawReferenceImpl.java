@@ -22,11 +22,7 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
 
     @Override
     protected FormExtendProcessor<LSFPropertyDrawDeclaration> getElementsCollector() {
-        return new FormExtendProcessor<LSFPropertyDrawDeclaration>() {
-            public Collection<LSFPropertyDrawDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getPropertyDrawDecls();
-            }
-        };
+        return LSFFormExtend::getPropertyDrawDecls;
     }
 
     @Override
