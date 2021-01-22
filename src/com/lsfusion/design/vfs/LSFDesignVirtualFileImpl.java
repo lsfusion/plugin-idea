@@ -1,5 +1,6 @@
 package com.lsfusion.design.vfs;
 
+import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.Query;
@@ -13,6 +14,7 @@ import com.lsfusion.lang.psi.indexes.FormIndex;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 
 public class LSFDesignVirtualFileImpl extends LightVirtualFile {
     public LSFModuleDeclaration module;
@@ -26,29 +28,23 @@ public class LSFDesignVirtualFileImpl extends LightVirtualFile {
     }
 
     public DesignInfo getDesignInfo() {
-        DesignInfo designInfo = null;
-
         try {
-            Collection<LSFFormDeclaration> declarations = FormIndex.getInstance().get(formName, module.getProject(), module.getLSFFile().getRequireScope());
-            if (!declarations.isEmpty()) {
-                LSFFormDeclaration formDeclaration = declarations.iterator().next();
-                Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, module.getLSFFile());
-
-                for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {
+            for(LSFFormDeclaration formDeclaration : LSFGlobalResolver.findElements(formName, null, module.getLSFFile(), null, Collections.singleton(LSFStubElementTypes.FORM), Conditions.alwaysTrue())) {
+                for (LSFFormExtend formExtend : LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, module.getLSFFile())) {
                     if (formExtend.getLSFFile().getModuleDeclaration() == module) {
-                        designInfo = new DesignInfo(formDeclaration, module.getLSFFile());
+                        DesignInfo designInfo = new DesignInfo(formDeclaration, module.getLSFFile());
                         try {
                             rename(null, designInfo.getFormCaption());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        break;
+                        return designInfo;
                     }
                 }
             }
         } catch (PsiInvalidElementAccessException ignored) {
         } // вылетает, если вообще проблемы с парсингом - игнорим
-        return designInfo;
+        return null;
     }
 
     public static LSFDesignVirtualFileImpl create(LSFModuleDeclaration module, String formName) {

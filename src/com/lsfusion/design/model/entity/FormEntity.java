@@ -1,6 +1,7 @@
 package com.lsfusion.design.model.entity;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -14,6 +15,8 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.indexes.ActionIndex;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.Nullable;
@@ -475,12 +478,9 @@ public class FormEntity {
     }
 
     private PropertyDrawEntity addFormButton(String sID) {
-        LSFActionDeclaration declaration = null;
-        Collection<LSFActionDeclaration> propDeclarations = ActionIndex.getInstance().get(sID, getProject(), file.getRequireScope());
-        if (!propDeclarations.isEmpty()) {
-            declaration = propDeclarations.iterator().next();
-        }
-        return new PropertyDrawEntity(null, sID, new ArrayList<ObjectEntity>(), declaration, true, null, null, null, null, this);
+        return new PropertyDrawEntity(null, sID, new ArrayList<>(),
+                LSFGlobalResolver.findSystemElement(sID, file, LSFStubElementTypes.ACTION),
+                true, null, null, null, null, this);
     }
 
     public boolean isModal() {

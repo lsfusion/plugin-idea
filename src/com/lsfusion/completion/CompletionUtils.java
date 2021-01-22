@@ -7,6 +7,8 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
@@ -96,34 +98,16 @@ public class CompletionUtils {
         return element;
     }
 
-    public static <G extends LSFDeclaration> List<LookupElement> getVariantsFromIndices(String namespace, LSFFile file, Collection<? extends StringStubIndexExtension> indices, double priority, @NotNull GlobalSearchScope scope) {
-        return getVariantsFromIndices(namespace, file.getProject(), indices, priority, scope);
-        
-    }
-    
-    public static <G extends LSFDeclaration> List<LookupElement> getVariantsFromIndices(String namespace, Project project, Collection<? extends StringStubIndexExtension> indices, double priority, @NotNull GlobalSearchScope scope) {
+    public static List<LookupElement> getVariantsFromIndices(String namespace, LSFFile file, Collection<? extends StringStubIndexExtension> indices, double priority, @NotNull GlobalSearchScope scope) {
+        Project project = file.getProject();
         List<LookupElement> result = new ArrayList<>();
 
         try {
             for (StringStubIndexExtension index : indices) {
-                Collection<String> allKeys = index.getAllKeys(project);
-                for (String variant : allKeys) {
-                    Collection<G> declarations = index.get(variant, project, scope);
-                    for (G declaration : declarations) {
-                        boolean add = true;
-                        if (declaration instanceof LSFFullNameDeclaration) {
-                            String declNamespace = ((LSFFullNameDeclaration) declaration).getNamespaceName();
-                            if (namespace != null && !namespace.equals(declNamespace)) {
-                                add = false;
-                            }
-                        }
-                        if (add) {
-                            LookupElement lookupElement = createLookupElement(declaration, priority);
-                            if (lookupElement != null) {
-                                result.add(lookupElement);
-                            }
-                        }
-                    }
+                for (LSFDeclaration declaration : getDeclarationsFromScope(project, scope, index, declaration -> namespace == null || !(declaration instanceof LSFFullNameDeclaration) || namespace.equals(((LSFFullNameDeclaration) declaration).getNamespaceName()))) {
+                    LookupElement lookupElement = createLookupElement(declaration, priority);
+                    if (lookupElement != null)
+                        result.add(lookupElement);
                 }
             }
         } catch (ProcessCanceledException pce) {
@@ -134,6 +118,9 @@ public class CompletionUtils {
     }
 
     public static <G extends LSFFullNameDeclaration> List<G> getDeclarationsFromScope(Project project, GlobalSearchScope scope, StringStubIndexExtension index) {
+        return getDeclarationsFromScope(project, scope, index, Conditions.alwaysTrue());
+    }
+    public static <G extends LSFDeclaration> List<G> getDeclarationsFromScope(Project project, GlobalSearchScope scope, StringStubIndexExtension index, Condition<G> condition) {
         List<G> result = new ArrayList<>();
 
         Collection<String> propKeys = index.getAllKeys(project);
@@ -141,7 +128,8 @@ public class CompletionUtils {
         for (String propKey : propKeys) {
             Collection<G> declarations = index.get(propKey, project, scope);
             for (G declaration : declarations) {
-                result.add(declaration);
+                if(condition.value(declaration))
+                    result.add(declaration);
             }
         }
 

@@ -20,6 +20,7 @@ import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.util.Processor;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.indexes.ModuleIndex;
@@ -245,7 +246,7 @@ public class LSFFileUtils {
         GlobalSearchScope projectScope = getModuleWithDependenciesScope(myElement);
 
         if (moduleName != null) {
-            Collection<LSFModuleDeclaration> modules = ModuleIndex.getInstance().get(moduleName, myElement.getProject(), projectScope);
+            Collection<LSFModuleDeclaration> modules = LSFGlobalResolver.findModules(moduleName, myElement.getProject(), projectScope);
             if (modules.isEmpty()) {
                 return GlobalSearchScope.EMPTY_SCOPE;
             }

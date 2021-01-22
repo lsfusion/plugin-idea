@@ -30,16 +30,8 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
     @Override
     public LSFResolveResult resolveNoCache() {
         String componentName = getSimpleName().getName();
-        LSFFormDeclaration formDeclaration = resolveForm(this, true);
 
-        Collection<LSFComponentStubDeclaration> stubDecls = ComponentIndex.getInstance().get(componentName, getProject(), getLSFFile().getRequireScope());
-        List<LSFDeclaration> declarations = new ArrayList<>();
-
-        for (LSFComponentStubDeclaration stubDecl : stubDecls) {
-            if (formDeclaration == resolveForm(stubDecl.getComponentDecl(), false)) {
-                declarations.add(stubDecl.getComponentDecl());
-            }
-        }
+        List<LSFDeclaration> declarations = findComponents(componentName, resolveForm(this, true), getLSFFile());
 
         LSFResolveResult.ErrorAnnotator errorAnnotator = null;
         if (declarations.size() > 1) {
@@ -51,7 +43,21 @@ public abstract class LSFComponentReferenceImpl extends LSFReferenceImpl<LSFDecl
         return new LSFResolveResult(declarations, errorAnnotator);
     }
 
-    private LSFFormDeclaration resolveForm(PsiElement element, boolean exRef) {
+    // it's hard to tell why components are resolved using index, but formElementReferences are resolved using processFormContext
+    // here LSFFormElementReferenceImpl.processDesignContext could / should be used (it is used in completeComponentUsage)
+    private static List<LSFDeclaration> findComponents(String componentName, LSFFormDeclaration formDeclaration, LSFFile file) {
+        Collection<LSFComponentStubDeclaration> stubDecls = ComponentIndex.getInstance().get(componentName, file.getProject(), file.getRequireScope());
+        List<LSFDeclaration> declarations = new ArrayList<>();
+
+        for (LSFComponentStubDeclaration stubDecl : stubDecls) {
+            if (formDeclaration == resolveForm(stubDecl.getComponentDecl(), false)) {
+                declarations.add(stubDecl.getComponentDecl());
+            }
+        }
+        return declarations;
+    }
+
+    private static LSFFormDeclaration resolveForm(PsiElement element, boolean exRef) {
         LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(element, LSFDesignStatement.class);
         if (designStatement != null) {
             return designStatement.resolveFormDecl();

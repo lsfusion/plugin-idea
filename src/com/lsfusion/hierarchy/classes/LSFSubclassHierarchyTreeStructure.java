@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.containers.ArrayListSet;
 import com.lsfusion.lang.psi.LSFClassStatement;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex;
@@ -22,25 +23,13 @@ public class LSFSubclassHierarchyTreeStructure extends HierarchyTreeStructure {
     @NotNull
     @Override
     protected Object[] buildChildren(@NotNull HierarchyNodeDescriptor descriptor) {
-        Set<LSFClassHierarchyNodeDescriptor> result = new ArrayListSet<>();
-
         LSFClassDeclaration classDecl = ((LSFClassHierarchyNodeDescriptor) descriptor).getClassDecl();
-        ClassExtendsClassIndex index = ClassExtendsClassIndex.getInstance();
         GlobalSearchScope useScope = (GlobalSearchScope) classDecl.getUseScope();
-        Collection<LSFClassExtend> classExtends = index.get(classDecl.getName(), myProject, useScope);
 
-        for (LSFClassExtend ext : classExtends) {
-            if (ext.resolveExtends().contains(classDecl)) {
-                LSFClassDeclaration decl = ((LSFClassStatement) ext).getClassDecl();
-                if (decl == null) {
-                    decl = ((LSFClassStatement) ext).getExtendingClassDeclaration().getCustomClassUsageWrapper().getCustomClassUsage().resolveDecl();
-                }
-                if (decl != null && !decl.equals(classDecl)) {
-                    result.add(new LSFClassHierarchyNodeDescriptor(myProject, descriptor, decl, false));
-                }
-            }
-        }
-
+        Set<LSFClassHierarchyNodeDescriptor> result = new ArrayListSet<>();
+        for(LSFClassDeclaration decl : LSFGlobalResolver.findClassExtends(classDecl, myProject, useScope))
+            if (!decl.equals(classDecl))
+                result.add(new LSFClassHierarchyNodeDescriptor(myProject, descriptor, decl, false));
         return result.toArray();
     }
 }

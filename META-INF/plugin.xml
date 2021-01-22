@@ -151,7 +151,6 @@
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
         <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
         <annotator language="Lsf" implementationClass="com.lsfusion.lang.LSFReferenceAnnotator"/>
-        <annotator language="JAVA" implementationClass="com.lsfusion.references.FromJavaReferenceAnnotator"/>
         <readWriteAccessDetector implementation="com.lsfusion.LSFReadWriteAccessDetector"/>
         <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="com.lsfusion.LSFGoToTargetRendererProvider"/>
