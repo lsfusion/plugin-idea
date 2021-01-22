@@ -13,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
 import com.lsfusion.actions.ToggleShowTableAction;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.declarations.LSFAggrParamGlobalPropDeclaration;
@@ -20,6 +21,8 @@ import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.declarations.impl.LSFTableDeclarationImpl;
 import com.lsfusion.lang.psi.indexes.TableIndex;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -139,12 +142,10 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
                     if (underscoreIndex != -1) {
                         String namespace = name.substring(0, underscoreIndex);
                         String tableName = name.substring(underscoreIndex + 1);
-                        Collection<LSFTableDeclaration> tableDeclarations = TableIndex.getInstance().get(tableName, psi.getProject(), LSFFileUtils.getModuleWithDependenciesScope(psi));
+                        Collection<LSFTableDeclaration> tableDeclarations = LSFGlobalResolver.findElements(tableName, namespace, psi.getProject(), LSFFileUtils.getModuleWithDependenciesScope(psi), LSFStubElementTypes.TABLE);
                         for (LSFTableDeclaration declaration : tableDeclarations) {
-                            if (declaration.getNamespaceName().equals(namespace)) {
-                                ((LSFTableDeclarationImpl) declaration).navigate(true);
-                                return;
-                            }
+                            ((LSFTableDeclarationImpl) declaration).navigate(true);
+                            return;
                         }
                     }
                 }

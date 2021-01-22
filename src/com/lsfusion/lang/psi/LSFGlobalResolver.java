@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -9,20 +10,26 @@ import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.*;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.cache.RequireModulesCache;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFFormExtendElement;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex;
+import com.lsfusion.lang.psi.indexes.ExplicitNamespaceIndex;
+import com.lsfusion.lang.psi.indexes.ModuleIndex;
+import com.lsfusion.lang.psi.indexes.TableClassesIndex;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
+import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFPsiUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -129,6 +136,13 @@ public class LSFGlobalResolver {
         return BaseUtils.<Collection<T>>immutableCast(findElements(name, fqName, file, offset, fullNameStubElementTypes, conditionC, finalizerC, virtDeclsC));
     }
 
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> T findSystemElement(String name, LSFFile file, FullNameStubElementType<S, T> type) {
+        Collection<T> system = findElements(name, "System", file, null, Collections.singleton(type), Conditions.alwaysTrue());
+        if(!system.isEmpty())
+            return system.iterator().next();
+        return null;
+    }
+
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition) {
         return findElements(name, fqName, file, offset, types, condition, new ArrayList<>());
     }
@@ -138,6 +152,16 @@ public class LSFGlobalResolver {
     }
 
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
+        return findElements(name, fqName, file.getProject(), file.getRequireScope(), file, offset, types, condition, finalizer, virtDecls);
+    }
+
+    // globalscope (without any particular lsf module, fqname should be provided)
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, Project project, GlobalSearchScope scope, FullNameStubElementType<S, T> types) {
+        assert fqName != null;
+        return findElements(name, fqName, project, scope, null, null, Collections.singleton(types), Conditions.alwaysTrue(), Finalizer.EMPTY, Collections.emptyList());
+    }
+
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, Project project, GlobalSearchScope scope, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
         if (fqName != null) {
             final Condition<T> fCondition = condition;
             condition = new Condition<T>() {
@@ -151,7 +175,39 @@ public class LSFGlobalResolver {
             if(moduleDeclaration != null)
                 finalizer = new NamespaceFinalizer<>(moduleDeclaration, finalizer);
         }
-        return findElements(name, file, offset, types, condition, finalizer, virtDecls);
+        return findElements(name, project, scope, file, offset, types, condition, finalizer, virtDecls);
+    }
+
+    public static <This extends LSFGlobalPropDeclaration<This,Stub>, Stub extends PropStubElement<Stub, This>> LSFTableDeclaration findAppropriateTable(@NotNull LSFValueClass[] currentSet, LSFFile file) {
+        String names[] = new String[currentSet.length];
+        for (int i = 0; i < currentSet.length; i++) {
+            names[i] = currentSet[i].getName();
+        }
+
+        String key = BaseUtils.toString(names);
+
+        Collection<LSFTableDeclaration> tables = TableClassesIndex.getInstance().get(key, file.getProject(), file.getRequireScope());
+        for (LSFTableDeclaration table : tables) {
+            LSFValueClass[] tableClasses = table.getClasses();
+
+            if (tableClasses.length != currentSet.length) {
+                continue;
+            }
+
+            boolean fit = true;
+            for (int i = 0; i < currentSet.length; ++i) {
+                if (tableClasses[i] != currentSet[i]) {
+                    fit = false;
+                    break;
+                }
+            }
+
+            if (fit) {
+                return table;
+            }
+        }
+
+        return null;
     }
 
     private static class NamespaceFinalizer<T extends LSFFullNameDeclaration> implements Finalizer<T> {
@@ -199,16 +255,13 @@ public class LSFGlobalResolver {
         }
     }
 
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
-
-        GlobalSearchScope scope = file.getRequireScope();
-
+    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, Project project, GlobalSearchScope scope, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
         Collection<T> decls = new ArrayList<>();
         Set<StringStubIndexExtension> usedIndices = new HashSet<>();
         for (FullNameStubElementType<S, T> type : types) {
             StringStubIndexExtension<T> index = type.getGlobalIndex();
             if(usedIndices.add(index))
-                decls.addAll(index.get(name, file.getProject(), scope));
+                decls.addAll(index.get(name, project, scope));
         }
         for (T virtDecl : virtDecls) {
             if (virtDecl != null && name != null && name.equals(virtDecl.getDeclName())) {
@@ -236,10 +289,12 @@ public class LSFGlobalResolver {
         return decl.getOffset() > offset; // later stubs should be added here together with all get*Decls
     }
 
+    public static Collection<LSFModuleDeclaration> findModules(String moduleName, Project project, GlobalSearchScope scope) {
+        return ModuleIndex.getInstance().get(moduleName, project, scope);
+    }
+
     public static Query<LSFModuleDeclaration> findModules(String name, GlobalSearchScope scope) {
-        StringStubIndexExtension<LSFModuleDeclaration> index = LSFStubElementTypes.MODULE.getGlobalIndex();
-        Collection<LSFModuleDeclaration> declarations = index.get(name, scope.getProject(), scope);
-        return new CollectionQuery<>(declarations);
+        return new CollectionQuery<>(findModules(name, scope.getProject(), scope));
     }
 
     public static Query<LSFNamespaceDeclaration> findNamespaces(String name, GlobalSearchScope scope) {
@@ -248,9 +303,7 @@ public class LSFGlobalResolver {
         if (modules.findFirst() != null)
             return modules;
 
-        // модуля нет, ищем namespace'ы
-        StringStubIndexExtension<LSFExplicitNamespaceDeclaration> explicitIndex = LSFStubElementTypes.EXPLICIT_NAMESPACE.getGlobalIndex();
-        Collection<LSFExplicitNamespaceDeclaration> explicitDeclarations = explicitIndex.get(name, scope.getProject(), scope);
+        Collection<LSFExplicitNamespaceDeclaration> explicitDeclarations = ExplicitNamespaceIndex.getInstance().get(name, scope.getProject(), scope);
         if (explicitDeclarations.size() == 0)
             return modules;
 
@@ -266,11 +319,6 @@ public class LSFGlobalResolver {
         return new MergeQuery<>(modules, new CollectionQuery<>(Collections.<LSFNamespaceDeclaration>singleton(minDeclaration)));
     }
 
-    // этот элемент и все "выше"
-    public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(T element) {
-        return findExtendElements(element.resolveDecl(), (ExtendStubElementType<T, E>) element.getElementType(), element.getLSFFile());
-    }
-
     public static <E extends ExtendStubElement<T, E>, T extends LSFExtend<T, E>> Query<T> findExtendElements(final LSFFullNameDeclaration decl, ExtendStubElementType<T, E> type, LSFFile file) {
         return findExtendElements(decl, type, file.getProject(), getRequireScope(file));
     }
@@ -279,37 +327,26 @@ public class LSFGlobalResolver {
         if (decl == null)
             return new EmptyQuery<>();
 
-        StringStubIndexExtension<T> index = type.getGlobalIndex();
-
         String name = decl.getGlobalName();
 
 //        int elementOffset = element.getTextOffset();
-        Collection<T> decls = index.get(name, project, scope);
+        Collection<T> decls = type.getGlobalIndex().get(name, project, scope);
 
-        return new FilteredQuery<>(new CollectionQuery<>(decls), new Condition<T>() {
-            public boolean value(T t) {
-                LSFFullNameDeclaration resolveDecl = t.resolveDecl();
-                return resolveDecl != null && resolveDecl.equals(decl); // проверяем что resolve'ся куда надо
-            }
+        return new FilteredQuery<>(new CollectionQuery<>(decls), t -> {
+            LSFFullNameDeclaration resolveDecl = t.resolveDecl();
+            return resolveDecl != null && resolveDecl.equals(decl); // проверяем что resolve'ся куда надо
         });
     }
 
     public static Collection<LSFClassDeclaration> findClassExtends(LSFClassDeclaration decl, Project project, GlobalSearchScope scope) {
-        ClassExtendsClassIndex index = ClassExtendsClassIndex.getInstance();
 
         String name = decl.getGlobalName();
 
-        Collection<LSFClassExtend> classExtends = index.get(name, project, scope);
+        Collection<LSFClassExtend> classExtends = ClassExtendsClassIndex.getInstance().get(name, project, scope);
 
         Collection<LSFClassDeclaration> result = new ArrayList<>();
         for (LSFClassExtend classExtend : classExtends) {
-            boolean found = false;
-            for (LSFClassDeclaration classExtendClass : classExtend.resolveExtends())
-                if (classExtendClass.equals(decl)) { // проверяем что resolve'ся куда надо
-                    found = true;
-                    break;
-                }
-            if (found) {
+            if (classExtend.resolveExtends().contains(decl)) {
                 LSFClassDeclaration thisDecl = (LSFClassDeclaration) classExtend.resolveDecl();
                 if (thisDecl != null)
                     result.add(thisDecl);

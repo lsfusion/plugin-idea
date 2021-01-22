@@ -3,6 +3,7 @@ package com.lsfusion;
 import com.intellij.navigation.ChooseByNameContributorEx;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.MinusculeMatcher;
 import com.intellij.psi.codeStyle.NameUtil;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -38,15 +39,19 @@ public abstract class LSFNameContributor implements ChooseByNameContributorEx {
     public void processElementsWithName(@NotNull String name, @NotNull Processor<? super NavigationItem> processor, @NotNull FindSymbolParameters parameters) {
 
         for (StringStubIndexExtension index : getIndices()) {
-            Collection<NavigationItem> navigationItems = getItemsFromIndex(index, name, parameters.getProject(), parameters.getSearchScope());
+            Collection<NavigationItem> navigationItems = getItemsWithParamsFromIndex(index, name, parameters.getProject(), parameters.getSearchScope());
             for (NavigationItem itemsFromIndex : navigationItems) {
                 processor.process(itemsFromIndex);
             }
         }
     }
 
-    protected Collection<NavigationItem> getItemsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {
+    protected <G extends PsiElement> Collection<G> getItemsFromIndex(StringStubIndexExtension<G> index, String name, Project project, GlobalSearchScope scope) {
         return index.get(name, project, scope);
+    }
+
+    protected Collection<NavigationItem> getItemsWithParamsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {
+        return getItemsFromIndex(index, name, project, scope);
     }
 
     protected boolean matches(String name, String pattern) {

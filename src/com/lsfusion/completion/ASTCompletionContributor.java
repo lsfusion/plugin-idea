@@ -479,8 +479,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     String namespace = namespaceAndClassName[0];
                     String className = namespaceAndClassName[1];
 
-                    Collection<LSFClassDeclaration> classDeclarations = LSFGlobalResolver.findElements(className, namespace, file, null, Collections.singleton(LSFStubElementTypes.CLASS), Conditions.alwaysTrue());
-                    for (LSFClassDeclaration classDecl : classDeclarations) {
+                    for (LSFClassDeclaration classDecl : LSFGlobalResolver.findElements(className, namespace, file, null, Collections.singleton(LSFStubElementTypes.CLASS), Conditions.alwaysTrue())) {
                         for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(classDecl, LSFStubElementTypes.EXTENDCLASS, project, getRequireScope())) {
                             for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {
                                 addLookupElement(createLookupElement(staticDecl, STATIC_PRIORITY));
@@ -677,12 +676,11 @@ public class ASTCompletionContributor extends CompletionContributor {
 
                     String namespaceName = extractNamespace();
 
-                    GlobalSearchScope scope = getRequireScope();
                     addLookupElements(
-                            getVariantsFromIndices(namespaceName, file, asList(FormIndex.getInstance()), FORM_PRIORITY, scope)
+                            getVariantsFromIndices(namespaceName, file, asList(FormIndex.getInstance()), FORM_PRIORITY, getRequireScope())
                     );
 
-                    Collection<LSFActionDeclaration> globalDeclarations = getDeclarationsFromScope(project, scope, ActionIndex.getInstance());
+                    Collection<LSFActionDeclaration> globalDeclarations = getDeclarationsFromScope(false);
                     addDeclarationsToLookup(new ArrayList<>(), null, namespaceName, globalDeclarations);
 
                     quickLog("Completed formElseNoParamsActionUsage");
@@ -858,19 +856,8 @@ public class ASTCompletionContributor extends CompletionContributor {
             return null;
         }
 
-        public <G extends LSFFullNameDeclaration> List<G> getDeclarationsFromScope(Project project, GlobalSearchScope scope, StringStubIndexExtension index) {
-            List<G> result = new ArrayList<>();
-
-            Collection<String> propKeys = index.getAllKeys(project);
-            quickLog("After getAllKeys: " + propKeys.size());
-            for (String propKey : propKeys) {
-                Collection<G> declarations = index.get(propKey, project, scope);
-                for (G declaration : declarations) {
-                    result.add(declaration);
-                }
-            }
-
-            return result;
+        public <G extends LSFFullNameDeclaration> List<G> getDeclarationsFromScope(boolean property) {
+            return CompletionUtils.getDeclarationsFromScope(project, getRequireScope(), property ? PropIndex.getInstance() : ActionIndex.getInstance());
         }
 
         private void completeProperties(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy) {
@@ -923,7 +910,7 @@ public class ASTCompletionContributor extends CompletionContributor {
 
             if ((!isBasicCompletion || forceAll) && !isLight) {
                 //search any other declarations
-                Collection<LSFPropertyStatement> globalDeclarations = getDeclarationsFromScope(project, getRequireScope(), PropIndex.getInstance());
+                Collection<LSFPropertyStatement> globalDeclarations = getDeclarationsFromScope(true);
                 addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, globalDeclarations);
             }
         }
@@ -949,7 +936,7 @@ public class ASTCompletionContributor extends CompletionContributor {
 
             if ((!isBasicCompletion || forceAll) && !isLight) {
                 //search any other declarations
-                Collection<LSFActionStatement> globalDeclarations = getDeclarationsFromScope(project, getRequireScope(), ActionIndex.getInstance());
+                Collection<LSFActionStatement> globalDeclarations = getDeclarationsFromScope(false);
                 addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, globalDeclarations);
             }
         }
@@ -977,8 +964,8 @@ public class ASTCompletionContributor extends CompletionContributor {
             if ((!isBasicCompletion || forceAll) && !isLight) {
                 //search any other declarations
                 Collection<LSFInterfacePropStatement> globalDeclarations = new ArrayList<>(); 
-                globalDeclarations.addAll(getDeclarationsFromScope(project, getRequireScope(), PropIndex.getInstance()));
-                globalDeclarations.addAll(getDeclarationsFromScope(project, getRequireScope(), ActionIndex.getInstance()));
+                globalDeclarations.addAll(getDeclarationsFromScope(true));
+                globalDeclarations.addAll(getDeclarationsFromScope(false));
                 addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, globalDeclarations);
             }
         }

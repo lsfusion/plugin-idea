@@ -111,13 +111,9 @@ public class FormDeclByReportNameResolver {
         String namespace = fileName.substring(0, underscoreInd);
         String formName = fileName.substring(underscoreInd + 1);
 
-        Collection<LSFFormDeclaration> decls = FormIndex.getInstance().get(formName, project, scope);
-        for (LSFFormDeclaration decl : decls) {
-            if (namespace.equals(decl.getNamespaceName())) {
-                return decl;
-            }
-
-        }
+        Collection<LSFFormDeclaration> decls = LSFGlobalResolver.findElements(formName, namespace, project, scope, LSFStubElementTypes.FORM);
+        for (LSFFormDeclaration decl : decls)
+            return decl;
         return null;
     }
 }

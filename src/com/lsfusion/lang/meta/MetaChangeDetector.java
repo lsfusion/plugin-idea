@@ -75,7 +75,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     public void run() {
 //                FileBasedIndex.getInstance().ensureUpToDate(StubUpdatingIndex.INDEX_ID, myProject, GlobalSearchScope.allScope(myProject));
                         if (!DumbService.isDumb(myProject))
-                            ModuleIndex.getInstance().get("dumb", myProject, GlobalSearchScope.allScope(myProject));
+                            LSFGlobalResolver.findModules("dumb", myProject, GlobalSearchScope.allScope(myProject));
                     }
                 });
 //                ApplicationManager.getApplication().runReadAction(new Runnable() {
@@ -894,7 +894,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
                             GlobalSearchScope modulesScope = getScope(modulesToInclude, myProject);
 
-                            Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, modulesScope);
+                            Collection<LSFModuleDeclaration> moduleDeclarations = LSFGlobalResolver.findModules(module, myProject, modulesScope);
                             for (LSFModuleDeclaration declaration : moduleDeclarations) {
                                 LSFFile file = declaration.getLSFFile();
                                 List<LSFMetaCodeStatement> metaStatements = reenable ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
@@ -1021,8 +1021,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     ApplicationManager.getApplication().runReadAction(() -> {
                         GlobalSearchScope modulesScope = getScope(modulesToInclude, myProject);
 
-                        Collection<LSFModuleDeclaration> moduleDeclarations = ModuleIndex.getInstance().get(module, myProject, modulesScope);
-                        for (LSFModuleDeclaration declaration : moduleDeclarations) {
+                        for (LSFModuleDeclaration declaration : LSFGlobalResolver.findModules(module, myProject, modulesScope)) {
                             LSFFile file = declaration.getLSFFile();
                             List<LSFMetaCodeStatement> metaStatements = reenable ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
 

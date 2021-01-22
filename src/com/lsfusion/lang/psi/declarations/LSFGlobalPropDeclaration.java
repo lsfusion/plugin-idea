@@ -10,11 +10,8 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.ColumnNameCache;
 import com.lsfusion.lang.psi.cache.DBNamingPolicyCache;
 import com.lsfusion.lang.psi.cache.TableNameCache;
-import com.lsfusion.lang.psi.indexes.TableClassesIndex;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.util.BaseUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -125,7 +122,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
             if (!useAuto) {
                 //перебираем возможные классы параметров
                 do {
-                    LSFTableDeclaration table = findAppropriateTable(currentSet);
+                    LSFTableDeclaration table = LSFGlobalResolver.findAppropriateTable(currentSet, getLSFFile());
                     if (table != null) {
                         return dbNamingPolicy.getTableName(table);
                     }
@@ -147,38 +144,6 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
             }
         }
         return dbNamingPolicy.createAutoTableDBName(classesList);
-    }
-
-    default LSFTableDeclaration findAppropriateTable(@NotNull LSFValueClass[] currentSet) {
-        String names[] = new String[currentSet.length];
-        for (int i = 0; i < currentSet.length; i++) {
-            names[i] = currentSet[i].getName();
-        }
-
-        String key = BaseUtils.toString(names);
-
-        Collection<LSFTableDeclaration> tables = TableClassesIndex.getInstance().get(key, getProject(), getLSFFile().getRequireScope());
-        for (LSFTableDeclaration table : tables) {
-            LSFValueClass[] tableClasses = table.getClasses();
-
-            if (tableClasses.length != currentSet.length) {
-                continue;
-            }
-
-            boolean fit = true;
-            for (int i = 0; i < currentSet.length; ++i) {
-                if (tableClasses[i] != currentSet[i]) {
-                    fit = false;
-                    break;
-                }
-            }
-
-            if (fit) {
-                return table;
-            }
-        }
-
-        return null;
     }
 
     @Nullable

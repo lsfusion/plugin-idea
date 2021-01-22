@@ -111,7 +111,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
         if (index instanceof ActionOrPropIndex) {
             return (Processor<String>) s -> {
                 if (pattern != null && matches(s, pattern)) {
-                    for (LSFActionOrGlobalPropDeclaration decl : ((ActionOrPropIndex<?>) index).get(s, scope.getProject(), GlobalSearchScope.allScope(scope.getProject()))) {
+                    for (LSFActionOrGlobalPropDeclaration decl : getItemsFromIndex((ActionOrPropIndex<?>) index, s, scope.getProject(), GlobalSearchScope.allScope(scope.getProject()))) {
                         List<LSFClassSet> paramClasses = decl.resolveParamClasses();
                         String paramsString = "";
                         if (paramClasses != null) {
@@ -135,14 +135,14 @@ public class LSFSymbolContributor extends LSFNameContributor {
     }
 
     @Override
-    protected Collection<NavigationItem> getItemsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {
+    protected Collection<NavigationItem> getItemsWithParamsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {
         if (index instanceof ActionOrPropIndex) {
             List<NavigationItem> decls = getPropertyDeclarationsMap(name, false);
             return decls != null
                     ? decls
-                    : super.getItemsFromIndex(index, name, project, scope);
+                    : super.getItemsWithParamsFromIndex(index, name, project, scope);
         } else {
-            return super.getItemsFromIndex(index, name, project, scope);
+            return super.getItemsWithParamsFromIndex(index, name, project, scope);
         }
     }
 }

@@ -35,6 +35,7 @@ import com.intellij.util.ThreeState;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.sun.jdi.Location;
@@ -86,7 +87,7 @@ public class LSFPositionManager extends PositionManagerEx {
                     return null;
                 }
 
-                Collection<LSFModuleDeclaration> some = DumbService.getInstance(project).runReadActionInSmartMode(() -> ModuleIndex.getInstance().get(moduleName, project, debugProcess.getSearchScope()));
+                Collection<LSFModuleDeclaration> some = DumbService.getInstance(project).runReadActionInSmartMode(() -> LSFGlobalResolver.findModules(moduleName, project, debugProcess.getSearchScope()));
                 if (some.isEmpty()) {
                     return null;
                 }

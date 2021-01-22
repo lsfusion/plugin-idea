@@ -35,7 +35,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclar
         final List<T> objects = new ArrayList<>();
         if (getSimpleName() != null) {
             Condition<T> filter = getResolvedDeclarationsFilter();
-            for (T decl : collectElementsFromContext()) {
+            for (T decl : processFormContext(this, getTextOffset(), getElementsCollector())) {
                 if (filter.value(decl)) {
                     objects.add(decl);
                 }
@@ -55,10 +55,6 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclar
                 return false;
             }
         };
-    }
-
-    private Set<T> collectElementsFromContext() {
-        return processFormContext(this, getTextOffset(), getElementsCollector());
     }
 
     protected abstract FormExtendProcessor<T> getElementsCollector();
