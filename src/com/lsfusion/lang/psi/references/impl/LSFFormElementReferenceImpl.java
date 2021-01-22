@@ -46,14 +46,12 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclar
 
     protected Condition<T> getResolvedDeclarationsFilter() {
         final String nameRef = getNameRef();
-        return new Condition<T>() {
-            public boolean value(T decl) {
-                String name = decl.getDeclName();
-                if (name != null) {
-                    return decl.getDeclName().equals(nameRef);
-                } 
-                return false;
+        return decl -> {
+            String name = decl.getDeclName();
+            if (name != null) {
+                return decl.getDeclName().equals(nameRef);
             }
+            return false;
         };
     }
 
@@ -89,57 +87,16 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclar
         if (extendForms != null) {
             final Set<T> finalResult = new HashSet<>();
             final PsiFile currentFile = current.getContainingFile();
-            extendForms.forEach(new com.intellij.util.Processor<LSFFormExtend>() {
-                public boolean process(LSFFormExtend formExtend) {
-                    boolean sameFile = currentFile == formExtend.getLSFFile();
-                    for(T element : processor.process(formExtend))
-                        if(ignoreUseBeforeDeclarationCheck || !(sameFile && LSFGlobalResolver.isAfter(offset, element)))
-                            finalResult.add(element);
-                    return true;
-                }
+            extendForms.forEach(formExtend -> {
+                boolean sameFile = currentFile == formExtend.getLSFFile();
+                for(T element : processor.process(formExtend))
+                    if(ignoreUseBeforeDeclarationCheck || !(sameFile && LSFGlobalResolver.isAfter(offset, element)))
+                        finalResult.add(element);
+                return true;
             });
             return finalResult;
         }
         return null;
     }
 
-    public interface DesignProcessor<T> {
-        Collection<T> process(LSFDesign design);
-    }
-
-    public static <T> Set<T> processDesignContext(PsiElement current, int offset, final DesignProcessor<T> processor) {
-        Set<T> processedContext = processDesignContext(current, processor, true);
-        if (processedContext != null) {
-            return processedContext;
-        }
-
-        PsiElement parent = current.getParent();
-        if (!(parent == null || parent instanceof LSFFile)) {
-            return processDesignContext(parent, offset, processor); // бежим выше
-        }
-
-        return new HashSet<>();
-    }
-
-    public static <T> Set<T> processDesignContext(PsiElement current, final DesignProcessor<T> processor, boolean objectRef) {
-        Query<LSFDesign> designs = null;
-        if (current instanceof FormContext && (objectRef || current instanceof LSFDesignStatement)) {
-            LSFFormDeclaration designDecl = ((FormContext) current).resolveFormDecl();
-            designs = designDecl == null
-                    ? new EmptyQuery<LSFDesign>()
-                    : LSFGlobalResolver.findExtendElements(designDecl, LSFStubElementTypes.DESIGN, (LSFFile) current.getContainingFile());
-        }
-
-        if (designs != null) {
-            final Set<T> finalResult = new HashSet<>();
-            designs.forEach(new com.intellij.util.Processor<LSFDesign>() {
-                public boolean process(LSFDesign design) {
-                    finalResult.addAll(processor.process(design));
-                    return true;
-                }
-            });
-            return finalResult;
-        }
-        return null;
-    }
 }

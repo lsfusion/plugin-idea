@@ -53,7 +53,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
         indices.add(TableIndex.getInstance());
         indices.add(WindowIndex.getInstance());
         indices.add(NavigatorElementIndex.getInstance());
-        indices.add(ComponentIndex.getInstance());
+//        indices.add(ComponentIndex.getInstance());
         return indices;
     }
 

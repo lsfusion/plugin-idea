@@ -15,10 +15,6 @@ public abstract class LSFFilterGroupReferenceImpl extends LSFFormElementReferenc
 
     @Override
     protected FormExtendProcessor<LSFFilterGroupDeclaration> getElementsCollector() {
-        return new FormExtendProcessor<LSFFilterGroupDeclaration>() {
-            public Collection<LSFFilterGroupDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getFilterGroupDecls();
-            }
-        };
+        return LSFFormExtend::getFilterGroupDecls;
     }
 }

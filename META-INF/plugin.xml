@@ -209,7 +209,7 @@
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.TableIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.WindowIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.NavigatorElementIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ComponentIndex"/>
+<!--        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ComponentIndex"/>-->
 
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.TableClassesIndex"/>
 
