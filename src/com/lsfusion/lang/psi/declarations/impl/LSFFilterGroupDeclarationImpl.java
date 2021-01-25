@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.Collection;
 
-public abstract class LSFFilterGroupDeclarationImpl extends LSFFormElementDeclarationImpl implements LSFFilterGroupDeclaration {
+public abstract class LSFFilterGroupDeclarationImpl extends LSFFormElementDeclarationImpl<LSFFilterGroupDeclaration> implements LSFFilterGroupDeclaration {
 
     protected LSFFilterGroupDeclarationImpl(@NotNull ASTNode node) {
         super(node);

@@ -503,6 +503,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitDesignStatement(@NotNull LSFDesignStatement o) {
+        super.visitDesignStatement(o);
+
+        java.util.Set<? extends LSFDeclaration> duplicates = o.resolveDuplicates();
+        for (LSFDeclaration decl : duplicates) {
+            addAlreadyDefinedError(decl);
+        }
+    }
+
+    @Override
     public void visitNonEmptyClassParamDeclareList(@NotNull LSFNonEmptyClassParamDeclareList o) {
         super.visitNonEmptyClassParamDeclareList(o);
 

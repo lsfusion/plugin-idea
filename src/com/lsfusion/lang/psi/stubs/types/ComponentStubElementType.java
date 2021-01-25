@@ -42,6 +42,6 @@ public class ComponentStubElementType extends LSFStubElementType<ComponentStubEl
 
     @Override
     public void indexStub(@NotNull ComponentStubElement stub, @NotNull IndexSink sink) {
-        sink.occurrence(LSFIndexKeys.COMPONENT, ((ComponentStubImpl) stub).name);
+//        sink.occurrence(LSFIndexKeys.COMPONENT, ((ComponentStubImpl) stub).name);
     }
 }

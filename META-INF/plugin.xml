@@ -10,6 +10,8 @@
         <b>Version 1.0.203</b><br>
         <ul>
             <li>Added HINT option support for property</li>
+            <li>Made component resolving respect offsets</li>
+            <li>Added component duplicates check</li>
         </ul>
     ]]>
     </change-notes>

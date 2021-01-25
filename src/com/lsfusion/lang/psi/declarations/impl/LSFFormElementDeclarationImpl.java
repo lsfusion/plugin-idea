@@ -8,12 +8,13 @@ import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormElementDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public abstract class LSFFormElementDeclarationImpl<T extends LSFDeclaration> extends LSFDeclarationImpl implements LSFFormElementDeclaration {
+public abstract class LSFFormElementDeclarationImpl<T extends LSFFormElementDeclaration<T>> extends LSFDeclarationImpl implements LSFFormElementDeclaration<T> {
 
     public interface Processor<T> {
         Collection<T> process(LSFFormExtend formExtend);
@@ -21,18 +22,6 @@ public abstract class LSFFormElementDeclarationImpl<T extends LSFDeclaration> ex
 
     protected LSFFormElementDeclarationImpl(@NotNull ASTNode node) {
         super(node);
-    }
-
-    public Condition<T> getDuplicateCondition() {
-        final String declName = getDeclName();
-        return declName == null
-               ? Conditions.alwaysFalse()
-               :
-               new Condition<T>() {
-                   public boolean value(T decl) {
-                       return declName.equals(decl.getDeclName());
-                   }
-               };
     }
 
     @Override

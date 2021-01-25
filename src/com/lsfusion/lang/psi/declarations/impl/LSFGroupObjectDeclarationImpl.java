@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class LSFGroupObjectDeclarationImpl extends LSFFormElementDeclarationImpl implements LSFGroupObjectDeclaration {
+public abstract class LSFGroupObjectDeclarationImpl extends LSFFormElementDeclarationImpl<LSFGroupObjectDeclaration> implements LSFGroupObjectDeclaration {
 
     public LSFGroupObjectDeclarationImpl(@NotNull ASTNode node) {
         super(node);
