@@ -12,6 +12,7 @@ import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFResolveResult;
 import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDesignElementDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormElementDeclaration;
 import com.lsfusion.lang.psi.extend.LSFDesign;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public abstract class LSFDesignElementReferenceImpl<T extends LSFDeclaration> extends LSFReferenceImpl<T> implements LSFDesignElementReference<T> {
+public abstract class LSFDesignElementReferenceImpl<T extends LSFDesignElementDeclaration<T>> extends LSFReferenceImpl<T> implements LSFDesignElementReference<T> {
 
     public LSFDesignElementReferenceImpl(@NotNull ASTNode node) {
         super(node);
@@ -59,7 +60,7 @@ public abstract class LSFDesignElementReferenceImpl<T extends LSFDeclaration> ex
         Collection<T> process(LSFDesign design);
     }
 
-    public static <T extends LSFDeclaration> Set<T> processDesignContext(PsiElement current, int offset, final DesignProcessor<T> processor) {
+    public static <T extends LSFDesignElementDeclaration<T>> Set<T> processDesignContext(PsiElement current, int offset, final DesignProcessor<T> processor) {
         Set<T> processedContext = processDesignContext(current, offset, processor, true);
         if (processedContext != null) {
             return processedContext;
@@ -73,7 +74,7 @@ public abstract class LSFDesignElementReferenceImpl<T extends LSFDeclaration> ex
         return new HashSet<>();
     }
 
-    public static <T extends LSFDeclaration> Set<T> processDesignContext(PsiElement current, int offset, final DesignProcessor<T> processor, boolean objectRef) {
+    public static <T extends LSFDesignElementDeclaration<T>> Set<T> processDesignContext(PsiElement current, int offset, final DesignProcessor<T> processor, boolean objectRef) {
         Query<LSFDesign> designs = null;
         if (current instanceof FormContext && (objectRef || current instanceof LSFDesignStatement)) {
             LSFFormDeclaration designDecl = ((FormContext) current).resolveFormDecl();

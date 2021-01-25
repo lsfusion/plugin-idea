@@ -10,6 +10,8 @@
         <b>Version 1.0.205</b><br>
         <ul>
             <li>Bug fixes</li>
+            <li>Made component resolving respect offsets</li>
+            <li>Added component duplicates check</li>
         </ul>
     ]]>
     </change-notes>

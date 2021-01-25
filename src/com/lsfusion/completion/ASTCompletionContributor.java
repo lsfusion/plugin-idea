@@ -572,7 +572,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
-        private <T extends LSFDeclaration> boolean completeDesignContextObject(BooleanValueHolder completed, IElementType frameType, LSFDesignElementReferenceImpl.DesignProcessor<T> designProcessor) {
+        private <T extends LSFDesignElementDeclaration<T>> boolean completeDesignContextObject(BooleanValueHolder completed, IElementType frameType, LSFDesignElementReferenceImpl.DesignProcessor<T> designProcessor) {
             Frame elementUsage = getLastFrameOfType(null, frameType);
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {

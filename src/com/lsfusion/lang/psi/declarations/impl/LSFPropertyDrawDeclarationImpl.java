@@ -15,7 +15,7 @@ import javax.swing.*;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDeclarationImpl implements LSFPropertyDrawDeclaration {
+public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDeclarationImpl<LSFPropertyDrawDeclaration> implements LSFPropertyDrawDeclaration {
 
     protected LSFPropertyDrawDeclarationImpl(@NotNull ASTNode node) {
         super(node);

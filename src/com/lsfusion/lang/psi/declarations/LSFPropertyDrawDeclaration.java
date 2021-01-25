@@ -6,7 +6,7 @@ import com.lsfusion.lang.psi.LSFSimpleName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface LSFPropertyDrawDeclaration extends LSFFormElementDeclaration {
+public interface LSFPropertyDrawDeclaration extends LSFFormElementDeclaration<LSFPropertyDrawDeclaration> {
     
     @Nullable
     LSFFormPropertyName getFormPropertyName();

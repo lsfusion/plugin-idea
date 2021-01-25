@@ -153,14 +153,14 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         return duplicates;
     }
 
-    private Set<LSFDeclaration> resolveDuplicates(List<? extends LSFDeclaration> localDecls, final LSFFormElementDeclarationImpl.Processor processor, Query<LSFFormExtend> extendForms) {
-        Set<LSFDeclaration> duplicates = new LinkedHashSet<>();
+    private <T extends LSFFormExtendElement<T>> Set<T> resolveDuplicates(List<T> localDecls, final LSFFormElementDeclarationImpl.Processor<T> processor, Query<LSFFormExtend> extendForms) {
+        Set<T> duplicates = new LinkedHashSet<>();
 
         for (int i = 0; i < localDecls.size(); i++) {
-            LSFDeclaration decl1 = localDecls.get(i);
-            Condition decl1Condition = ((LSFFormExtendElement) decl1).getDuplicateCondition();
+            T decl1 = localDecls.get(i);
+            Condition<T> decl1Condition = decl1.getDuplicateCondition();
             for (int j = i + 1; j < localDecls.size(); j++) {
-                LSFDeclaration decl2 = localDecls.get(j);
+                T decl2 = localDecls.get(j);
                 if (decl1Condition.value(decl2)) {
                     checkAndAddDuplicate(duplicates, decl1);
                     checkAndAddDuplicate(duplicates, decl2);
@@ -168,20 +168,18 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
             }
         }
 
-        final List<LSFDeclaration> otherDecls = new ArrayList<>();
+        final List<T> otherDecls = new ArrayList<>();
         if (extendForms != null) {
-            extendForms.forEach(new com.intellij.util.Processor<LSFFormExtend>() {
-                public boolean process(LSFFormExtend formExtend) {
-                    if (!LSFFormExtendImpl.this.equals(formExtend)) {
-                        otherDecls.addAll(processor.process(formExtend));
-                    }
-                    return true;
+            extendForms.forEach(formExtend -> {
+                if (!LSFFormExtendImpl.this.equals(formExtend)) {
+                    otherDecls.addAll(processor.process(formExtend));
                 }
+                return true;
             });
 
-            for (LSFDeclaration decl1 : localDecls) {
-                Condition decl1Condition = ((LSFFormExtendElement) decl1).getDuplicateCondition();
-                for (LSFDeclaration decl2 : otherDecls) {
+            for (T decl1 : localDecls) {
+                Condition<T> decl1Condition = decl1.getDuplicateCondition();
+                for (T decl2 : otherDecls) {
                     if (decl1Condition.value(decl2)) {
                         checkAndAddDuplicate(duplicates, decl1);
                     }
@@ -192,7 +190,7 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         return duplicates;
     }
 
-    private void checkAndAddDuplicate(Set<LSFDeclaration> duplicates, LSFDeclaration decl) {
+    private <T extends LSFFormExtendElement<T>> void checkAndAddDuplicate(Set<T> duplicates, T decl) {
         if (decl.getContainingFile().equals(getContainingFile()) &&
                 !(decl instanceof LSFObjectDeclaration && decl.getParent() instanceof LSFFormSingleGroupObjectDeclaration)) {// 
             duplicates.add(decl);

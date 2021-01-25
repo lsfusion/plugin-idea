@@ -4,7 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import org.jetbrains.annotations.NotNull;
@@ -50,16 +49,6 @@ public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationIm
         return new Processor<LSFObjectDeclaration>() {
             public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
                 return formExtend.getObjectDecls();
-            }
-        };
-    }
-
-    @Override
-    public Condition<? extends LSFDeclaration> getDuplicateCondition() {
-        return new Condition<LSFObjectDeclaration>() {
-            @Override
-            public boolean value(LSFObjectDeclaration lsfDeclaration) {
-                return getNameIdentifier().getText().equals(lsfDeclaration.getNameIdentifier().getText());
             }
         };
     }

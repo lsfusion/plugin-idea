@@ -288,8 +288,8 @@ public class LSFGlobalResolver {
     public static boolean isAfter(int offset, LSFFormExtendElement decl) { // should be also stubbed later
         return decl.getOffset() > offset; // later stubs should be added here together with all get*Decls
     }
-    public static boolean isAfter(int offset, LSFDeclaration decl) { // should be also stubbed later
-        return decl.getTextOffset() > offset; // later stubs should be added here together with all get*Decls
+    public static boolean isAfter(int offset, LSFDesignElementDeclaration decl) { // should be also stubbed later
+        return decl.getOffset() > offset; // later stubs should be added here together with all get*Decls
     }
 
     public static Collection<LSFModuleDeclaration> findModules(String moduleName, Project project, GlobalSearchScope scope) {
