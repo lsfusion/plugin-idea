@@ -10,7 +10,7 @@
         <b>Version 1.0.203</b><br>
         <ul>
             <li>Added HINT option support for property</li>
-            <li>Made component resolving respect offsets</li>
+            <li>Made component resolving respect order in file</li>
             <li>Added component duplicates check</li>
         </ul>
     ]]>
@@ -158,7 +158,6 @@
         <gotoTargetRendererProvider implementation="com.lsfusion.LSFGoToTargetRendererProvider"/>
         <structureViewBuilder factoryClass="com.lsfusion.structure.LSFInterfacesStructureViewBuilderFactory"/>
 
-        <fileEditorProvider implementation="com.lsfusion.design.LSFDesignEditorProvider"/>
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>
 

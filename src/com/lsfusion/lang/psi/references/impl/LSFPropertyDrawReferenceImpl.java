@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 import static com.lsfusion.lang.psi.declarations.impl.LSFPropertyDrawDeclarationImpl.resolveEquals;
 import static com.lsfusion.lang.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl.getNameIdentifier;
@@ -21,7 +22,7 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
     }
 
     @Override
-    protected FormExtendProcessor<LSFPropertyDrawDeclaration> getElementsCollector() {
+    protected Function<LSFFormExtend, Collection<LSFPropertyDrawDeclaration>> getElementsCollector() {
         return LSFFormExtend::getPropertyDrawDecls;
     }
 

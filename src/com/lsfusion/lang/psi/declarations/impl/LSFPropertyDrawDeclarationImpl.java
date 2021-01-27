@@ -27,14 +27,6 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
         return LSFIcons.PROPERTY_DRAW;
     }
 
-    public static Processor<LSFPropertyDrawDeclaration> getProcessor() {
-        return new Processor<LSFPropertyDrawDeclaration>() {
-            public Collection<LSFPropertyDrawDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getPropertyDrawDecls();
-            }
-        };
-    }
-
     @Override
     public Condition getDuplicateCondition() {
         final LSFObjectUsageList objectUsageList = getObjectUsageList();

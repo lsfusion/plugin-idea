@@ -16,7 +16,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,11 +53,16 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
     }
 
     public static LSFFormDeclaration resolveFormDecl(PsiElement psi) {
+        return resolveFormDecl(psi, null);
+    }
+    public static LSFFormDeclaration resolveFormDecl(PsiElement psi, Result<LSFExtend> extend) {
         if (psi instanceof LeafPsiElement && psi.getParent() instanceof LSFSimpleName) {
             LSFFormDeclaration formDeclaration = null;
             LSFId nameIdentifier = null;
             LSFFormStatementImpl formExtend = PsiTreeUtil.getParentOfType(psi, LSFFormStatementImpl.class);
             if (formExtend != null) {
+                if(extend != null)
+                    extend.setResult(formExtend);
                 formDeclaration = formExtend.resolveFormDecl();
                 if (formDeclaration != null) {
                     LSFFormDecl formDecl = formExtend.getFormDecl();
@@ -71,6 +78,8 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
             } else {
                 LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(psi, LSFDesignStatement.class);
                 if (designStatement != null) {
+                    if(extend != null)
+                        extend.setResult(designStatement);
                     formDeclaration = designStatement.resolveFormDecl();
                     if (formDeclaration != null) {
                         nameIdentifier = designStatement.getFormUsageNameIdentifier();
