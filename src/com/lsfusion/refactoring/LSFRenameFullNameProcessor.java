@@ -24,7 +24,6 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.LSFFileUtils;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -118,7 +117,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
                 cascadePostRenameActions.add(getMigrationClassRunnable(groupMap.get(gscope), oldCanonicalNames, MigrationChangePolicy.USE_LAST_VERSION, gscope));
             }
 
-            for (LSFClassExtend extend : LSFGlobalResolver.findExtendElements(cls, LSFStubElementTypes.EXTENDCLASS, project, GlobalSearchScope.allScope(project)).findAll()) {
+            for (LSFClassExtend extend : LSFGlobalResolver.findParentExtends(cls)) {
                 for (LSFStaticObjectDeclaration staticDecl : extend.getStaticObjects()) {
                     cascadeRenameElements.add(staticDecl);
                     cascadePostRenameActions.add(getMigrationClassRunnable(staticDecl, cls.getNamespaceName(), cls.getName(), newName, MigrationChangePolicy.USE_LAST_VERSION));

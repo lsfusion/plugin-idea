@@ -25,8 +25,8 @@ import com.lsfusion.lang.psi.context.LSFExpression;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
 import com.lsfusion.lang.psi.indexes.*;
-import com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -143,11 +143,7 @@ public class LSFPsiUtils {
     @NotNull
     public static Set<LSFExprParamDeclaration> getContextParams(PsiElement current, int offset, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
         // current instanceof FormContext || current instancof LSFFormStatement
-        Set<LSFObjectDeclaration> objects = LSFFormElementReferenceImpl.processFormContext(current, new LSFFormElementReferenceImpl.FormExtendProcessor<LSFObjectDeclaration>() {
-            public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getObjectDecls();
-            }
-        }, offset, objectRef, ignoreUseBeforeDeclarationCheck);
+        Set<LSFObjectDeclaration> objects = LSFFormExtendImpl.processFormContext(current, LSFFormExtend::getObjectDecls, offset, objectRef, ignoreUseBeforeDeclarationCheck);
         if (objects != null) {
             return BaseUtils.immutableCast(objects);
         }

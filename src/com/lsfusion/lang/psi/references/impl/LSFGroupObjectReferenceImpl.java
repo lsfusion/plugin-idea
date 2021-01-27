@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 public abstract class LSFGroupObjectReferenceImpl extends LSFFormElementReferenceImpl<LSFGroupObjectDeclaration> implements LSFGroupObjectReference {
     protected LSFGroupObjectReferenceImpl(@NotNull ASTNode node) {
@@ -17,7 +18,7 @@ public abstract class LSFGroupObjectReferenceImpl extends LSFFormElementReferenc
     }
 
     @Override
-    protected FormExtendProcessor<LSFGroupObjectDeclaration> getElementsCollector() {
+    protected Function<LSFFormExtend, Collection<LSFGroupObjectDeclaration>> getElementsCollector() {
         return LSFFormExtend::getGroupObjectDecls;
     }
 

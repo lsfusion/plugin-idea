@@ -2,21 +2,30 @@ package com.lsfusion.lang.psi.extend.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.util.EmptyQuery;
 import com.intellij.util.Query;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.*;
 import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.references.impl.LSFDesignElementReferenceImpl;
 import com.lsfusion.lang.psi.stubs.extend.DesignStubElement;
+import com.lsfusion.lang.psi.stubs.extend.types.DesignStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Function;
 
 public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubElement> implements LSFDesign {
 
@@ -55,8 +64,8 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
     
     @Nullable
     @Override
-    protected LSFFormDeclaration resolveExtendingDeclaration() {
-        return getDesignHeader().getFormUsage().resolveDecl();
+    public LSFFullNameReference getExtendingReference() {
+        return getDesignHeader().getFormUsage();
     }
 
     @Override
@@ -90,55 +99,26 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
         return result;
     }
 
+    private static DesignStubElementType getContextExtendType() {
+        return LSFStubElementTypes.DESIGN;
+    }
+
+    public static <T extends LSFDesignElementDeclaration<T>> Set<T> processDesignContext(PsiElement current, int offset, final Function<LSFDesign, Collection<T>> processor) {
+        return processContext(current, offset, processor, element -> element instanceof LSFDesignStatement ? (LSFDesignStatement)element : null, LSFDesignStatement::resolveFormDecl, getContextExtendType());
+    }
+
+    protected List<Function<LSFDesign, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {
+        List<Function<LSFDesign, Collection<? extends LSFDeclaration>>> processors = new ArrayList<>();
+        processors.add(LSFDesign::getComponentDecls);
+        return processors;
+    }
+
+    @Override
+    protected ExtendStubElementType<LSFDesign, DesignStubElement> getDuplicateExtendType() {
+        return getContextExtendType();
+    }
+
     public Set<LSFDeclaration> resolveDuplicates() {
-        Query<LSFDesign> designs = LSFGlobalResolver.findExtendElements(resolveDecl(), LSFStubElementTypes.DESIGN, getLSFFile());
-
-        Set<LSFDeclaration> duplicates = new LinkedHashSet<>();
-        duplicates.addAll(resolveDuplicates((List<LSFComponentDeclaration>) getComponentDecls(), LSFComponentDeclarationImpl.getProcessor(), designs));
-
-        return duplicates;
-    }
-
-    private <T extends LSFDesignElementDeclaration<T>> Set<T> resolveDuplicates(List<T> localDecls, final LSFDesignElementReferenceImpl.DesignProcessor<T> processor, Query<LSFDesign> designs) {
-        Set<T> duplicates = new LinkedHashSet<>();
-
-        for (int i = 0; i < localDecls.size(); i++) {
-            T decl1 = localDecls.get(i);
-            Condition<T> decl1Condition = decl1.getDuplicateCondition();
-            for (int j = i + 1; j < localDecls.size(); j++) {
-                T decl2 = localDecls.get(j);
-                if (decl1Condition.value(decl2)) {
-                    checkAndAddDuplicate(duplicates, decl1);
-                    checkAndAddDuplicate(duplicates, decl2);
-                }
-            }
-        }
-
-        final List<T> otherDecls = new ArrayList<>();
-        if (designs != null) {
-            designs.forEach(design -> {
-                if (!LSFDesignImpl.this.equals(design)) {
-                    otherDecls.addAll(processor.process(design));
-                }
-                return true;
-            });
-
-            for (T decl1 : localDecls) {
-                Condition<T> decl1Condition = decl1.getDuplicateCondition();
-                for (T decl2 : otherDecls) {
-                    if (decl1Condition.value(decl2)) {
-                        checkAndAddDuplicate(duplicates, decl1);
-                    }
-                }
-            }
-        }
-
-        return duplicates;
-    }
-
-    private <T extends LSFDesignElementDeclaration<T>> void checkAndAddDuplicate(Set<T> duplicates, T decl) {
-        if (decl.getContainingFile().equals(getContainingFile())) {
-            duplicates.add(decl);
-        }
+        return resolveDuplicates((Function<LSFDesignElementDeclaration, Condition<LSFDesignElementDeclaration>>) LSFDesignElementDeclaration::getDuplicateCondition, decl -> false);
     }
 }

@@ -36,9 +36,7 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
     public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement psi) {
-        LSFFormDeclaration decl = resolveFormDecl(psi);
-
-        if (decl != null && hasReportFiles(decl)) {
+        if (hasReportFiles(psi)) {
             return createLineMarker(psi);
         }
         
@@ -88,31 +86,27 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public void navigate(MouseEvent e, PsiElement psi) {
-            LSFFormDeclaration formDecl = resolveFormDecl(psi);
+            List<PsiFile> files = ReportUtils.findReportFiles(psi);
 
-            if (formDecl != null) {
-                List<PsiFile> files = ReportUtils.findReportFiles(formDecl);
+            try {
+                for (PsiFile file : files) {
+                    openFile(file);
+                }
+            } catch (Exception ex) {
+                if (files.size() < 1) {
+                    JBPopupFactory
+                            .getInstance()
+                            .createMessage("Can't find related report files")
+                            .show(new RelativePoint(e));
+                } else if (files.size() == 1) {
+                    files.get(0).navigate(true);
+                } else {
+                    Collections.sort(files, PsiFileByPathComparator.INSTANCE);
 
-                try {
-                    for (PsiFile file : files) {
-                        openFile(file);
-                    }
-                } catch (Exception ex) {
-                    if (files.size() < 1) {
-                        JBPopupFactory
-                                .getInstance()
-                                .createMessage("Can't find related report files")
-                                .show(new RelativePoint(e));
-                    } else if (files.size() == 1) {
-                        files.get(0).navigate(true);
-                    } else {
-                        Collections.sort(files, PsiFileByPathComparator.INSTANCE);
-
-                        JBPopupFactory
-                                .getInstance()
-                                .createListPopup(createListPopupStep(files))
-                                .show(new RelativePoint(e));
-                    }    
+                    JBPopupFactory
+                            .getInstance()
+                            .createListPopup(createListPopupStep(files))
+                            .show(new RelativePoint(e));
                 }
             }
         }

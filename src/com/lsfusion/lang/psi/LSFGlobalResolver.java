@@ -164,18 +164,36 @@ public class LSFGlobalResolver {
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, Project project, GlobalSearchScope scope, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
         if (fqName != null) {
             final Condition<T> fCondition = condition;
-            condition = new Condition<T>() {
-                public boolean value(T t) {
-                    String namespace = t.getNamespaceName();
-                    return namespace.equals(fqName) && fCondition.value(t);
-                }
-            };
+            condition = t -> t.getNamespaceName().equals(fqName) && fCondition.value(t);
         } else {
             LSFModuleDeclaration moduleDeclaration = file.getModuleDeclaration();
             if(moduleDeclaration != null)
                 finalizer = new NamespaceFinalizer<>(moduleDeclaration, finalizer);
         }
-        return findElements(name, project, scope, file, offset, types, condition, finalizer, virtDecls);
+
+        Collection<T> decls = new ArrayList<>();
+        Set<StringStubIndexExtension> usedIndices = new HashSet<>();
+        for (FullNameStubElementType<S, T> type : types) {
+            StringStubIndexExtension<T> index = type.getGlobalIndex();
+            if(usedIndices.add(index))
+                decls.addAll(index.get(name, project, scope));
+        }
+        for (T virtDecl : virtDecls) {
+            if (virtDecl != null && name != null && name.equals(virtDecl.getDeclName())) {
+                VirtualFile virtualFile = virtDecl.getLSFFile().getVirtualFile();
+                if (virtualFile == null || scope.contains(virtualFile)) {
+                    decls.add(virtDecl);
+                }
+            }
+        }
+
+        Collection<T> fitDecls = new ArrayList<>();
+        for (T decl : decls)
+            if (condition.value(decl))
+                if (offset == null || !isAfter(file, offset, decl))
+                    fitDecls.add(decl);
+
+        return finalizer.finalize(fitDecls);
     }
 
     public static <This extends LSFGlobalPropDeclaration<This,Stub>, Stub extends PropStubElement<Stub, This>> LSFTableDeclaration findAppropriateTable(@NotNull LSFValueClass[] currentSet, LSFFile file) {
@@ -255,41 +273,13 @@ public class LSFGlobalResolver {
         }
     }
 
-    public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, Project project, GlobalSearchScope scope, LSFFile file, Integer offset, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition, Finalizer<T> finalizer, List<T> virtDecls) {
-        Collection<T> decls = new ArrayList<>();
-        Set<StringStubIndexExtension> usedIndices = new HashSet<>();
-        for (FullNameStubElementType<S, T> type : types) {
-            StringStubIndexExtension<T> index = type.getGlobalIndex();
-            if(usedIndices.add(index))
-                decls.addAll(index.get(name, project, scope));
-        }
-        for (T virtDecl : virtDecls) {
-            if (virtDecl != null && name != null && name.equals(virtDecl.getDeclName())) {
-                VirtualFile virtualFile = virtDecl.getLSFFile().getVirtualFile();
-                if (virtualFile == null || scope.contains(virtualFile)) {
-                    decls.add(virtDecl);
-                }
-            }
-        }
-
-        Collection<T> fitDecls = new ArrayList<>();
-        for (T decl : decls)
-            if (condition.value(decl))
-                if (offset == null || !isAfter(file, offset, decl))
-                    fitDecls.add(decl);
-
-        return finalizer.finalize(fitDecls);
-    }
-    
     // classes now are parsed first
     public static boolean isAfter(LSFFile file, int offset, LSFFullNameDeclaration decl) {
         return !(decl instanceof LSFClassDeclaration) && file == decl.getLSFFile() && decl.getOffset() > offset;
     }
-    public static boolean isAfter(int offset, LSFFormExtendElement decl) { // should be also stubbed later
-        return decl.getOffset() > offset; // later stubs should be added here together with all get*Decls
-    }
-    public static boolean isAfter(int offset, LSFDesignElementDeclaration decl) { // should be also stubbed later
-        return decl.getOffset() > offset; // later stubs should be added here together with all get*Decls
+    // used only for LSFExtend, should be also stubbed later
+    public static boolean isAfter(int offset, LSFDeclaration decl) {
+        return decl.getTextOffset() > offset; // later stubs should be added here together with all get*Decls
     }
 
     public static Collection<LSFModuleDeclaration> findModules(String moduleName, Project project, GlobalSearchScope scope) {
@@ -341,7 +331,12 @@ public class LSFGlobalResolver {
         });
     }
 
-    public static Collection<LSFClassDeclaration> findClassExtends(LSFClassDeclaration decl, Project project, GlobalSearchScope scope) {
+    public static Query<LSFClassExtend> findParentExtends(LSFClassDeclaration decl) {
+        Project project = decl.getProject();
+        return findExtendElements(decl, LSFStubElementTypes.EXTENDCLASS, project, GlobalSearchScope.allScope(project));
+    }
+
+    public static Collection<LSFClassDeclaration> findChildrenExtends(LSFClassDeclaration decl, Project project, GlobalSearchScope scope) {
 
         String name = decl.getGlobalName();
 

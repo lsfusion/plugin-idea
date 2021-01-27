@@ -45,14 +45,6 @@ public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationIm
         return className.getCustomClassUsage().getSimpleName();
     }
 
-    public static Processor<LSFObjectDeclaration> getProcessor() {
-        return new Processor<LSFObjectDeclaration>() {
-            public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getObjectDecls();
-            }
-        };
-    }
-
     @Override
     public int getOffset() {
         return getTextOffset();

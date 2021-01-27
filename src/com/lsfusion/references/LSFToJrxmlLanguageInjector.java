@@ -46,8 +46,7 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
             return;
         }
 
-        GlobalSearchScope scope = LSFFileUtils.getModuleWithDependenciesScope(xmlDocument);
-        Pair<String, String> formNameAndRequires = resolveFormFullNameAndRequires(virtualFile, xmlDocument.getProject(), scope);
+        Pair<String, String> formNameAndRequires = resolveFormFullNameAndRequires(virtualFile, xmlDocument.getProject(), xmlDocument);
         if (formNameAndRequires == null) {
             return;
         }

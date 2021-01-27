@@ -2,16 +2,22 @@ package com.lsfusion.lang.psi.extend.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Query;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
+import com.lsfusion.lang.psi.stubs.extend.types.DesignStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendFormStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.*;
+import java.util.function.Function;
 
 public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, ExtendFormStubElement> implements LSFFormExtend {
 
@@ -60,10 +67,10 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
 
     @Nullable
     @Override
-    protected LSFFormDeclaration resolveExtendingDeclaration() {
+    public LSFFullNameReference getExtendingReference() {
         LSFExtendingFormDeclaration extendingFormDeclaration = getExtendingFormDeclaration();
         if (extendingFormDeclaration != null) {
-            return extendingFormDeclaration.getFormUsageWrapper().getFormUsage().resolveDecl();
+            return extendingFormDeclaration.getFormUsageWrapper().getFormUsage();
         }
 
         return null;
@@ -141,60 +148,43 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         return result;
     }
 
+    private static ExtendFormStubElementType getContextExtendType() {
+        return LSFStubElementTypes.EXTENDFORM;
+    }
+
+    public static List<PsiElement> processFormImplementationsSearch(LSFFormDeclaration decl) {
+        return processImplementationsSearch(decl, getContextExtendType());
+    }
+
+    private static Function<PsiElement, FormContext> getContext(boolean objectRef) {
+        return current -> current instanceof FormContext && (objectRef || current instanceof LSFFormStatement || current instanceof LSFDesignStatement) ? (FormContext)current : null;
+    }
+
+    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, int offset, final Function<LSFFormExtend, Collection<T>> processor) {
+        return processContext(current, offset, processor, getContext(true), FormContext::resolveFormDecl, getContextExtendType());
+    }
+
+    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, final Function<LSFFormExtend, Collection<T>> processor, final int offset, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
+        return processContext(current, processor, offset, ignoreUseBeforeDeclarationCheck, getContext(objectRef), FormContext::resolveFormDecl, getContextExtendType());
+    }
+
+    @Override
+    protected ExtendStubElementType<LSFFormExtend, ExtendFormStubElement> getDuplicateExtendType() {
+        return getContextExtendType();
+    }
+
+    protected List<Function<LSFFormExtend, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {
+        List<Function<LSFFormExtend, Collection<? extends LSFDeclaration>>> processors = new ArrayList<>();
+        processors.add(LSFFormExtend::getGroupObjectDecls);
+        processors.add(LSFFormExtend::getPropertyDrawDecls);
+        processors.add(LSFFormExtend::getObjectDecls);
+        processors.add(LSFFormExtend::getFilterGroupDecls);
+        return processors;
+    }
+
     public Set<LSFDeclaration> resolveDuplicates() {
-        Query<LSFFormExtend> extendForms = LSFGlobalResolver.findExtendElements(resolveDecl(), LSFStubElementTypes.EXTENDFORM, getLSFFile());
-
-        Set<LSFDeclaration> duplicates = new LinkedHashSet<>();
-        duplicates.addAll(resolveDuplicates((List<LSFGroupObjectDeclaration>) getGroupObjectDecls(), LSFGroupObjectDeclarationImpl.getProcessor(), extendForms));
-        duplicates.addAll(resolveDuplicates((List<LSFPropertyDrawDeclaration>) getPropertyDrawDecls(), LSFPropertyDrawDeclarationImpl.getProcessor(), extendForms));
-        duplicates.addAll(resolveDuplicates((List<LSFObjectDeclaration>) getObjectDecls(), LSFObjectDeclarationImpl.getProcessor(), extendForms));
-        duplicates.addAll(resolveDuplicates((List<LSFFilterGroupDeclaration>) getFilterGroupDecls(), LSFFilterGroupDeclarationImpl.getProcessor(), extendForms));
-
-        return duplicates;
-    }
-
-    private <T extends LSFFormExtendElement<T>> Set<T> resolveDuplicates(List<T> localDecls, final LSFFormElementDeclarationImpl.Processor<T> processor, Query<LSFFormExtend> extendForms) {
-        Set<T> duplicates = new LinkedHashSet<>();
-
-        for (int i = 0; i < localDecls.size(); i++) {
-            T decl1 = localDecls.get(i);
-            Condition<T> decl1Condition = decl1.getDuplicateCondition();
-            for (int j = i + 1; j < localDecls.size(); j++) {
-                T decl2 = localDecls.get(j);
-                if (decl1Condition.value(decl2)) {
-                    checkAndAddDuplicate(duplicates, decl1);
-                    checkAndAddDuplicate(duplicates, decl2);
-                }
-            }
-        }
-
-        final List<T> otherDecls = new ArrayList<>();
-        if (extendForms != null) {
-            extendForms.forEach(formExtend -> {
-                if (!LSFFormExtendImpl.this.equals(formExtend)) {
-                    otherDecls.addAll(processor.process(formExtend));
-                }
-                return true;
-            });
-
-            for (T decl1 : localDecls) {
-                Condition<T> decl1Condition = decl1.getDuplicateCondition();
-                for (T decl2 : otherDecls) {
-                    if (decl1Condition.value(decl2)) {
-                        checkAndAddDuplicate(duplicates, decl1);
-                    }
-                }
-            }
-        }
-
-        return duplicates;
-    }
-
-    private <T extends LSFFormExtendElement<T>> void checkAndAddDuplicate(Set<T> duplicates, T decl) {
-        if (decl.getContainingFile().equals(getContainingFile()) &&
-                !(decl instanceof LSFObjectDeclaration && decl.getParent() instanceof LSFFormSingleGroupObjectDeclaration)) {// 
-            duplicates.add(decl);
-        }
+        return resolveDuplicates((Function<LSFFormExtendElement, Condition<LSFFormExtendElement>>) LSFFormExtendElement::getDuplicateCondition,
+                decl -> decl instanceof LSFObjectDeclaration && decl.getParent() instanceof LSFFormSingleGroupObjectDeclaration); // we don't want to show duplicate for object in single group object since it will be shown for single group object itself
     }
 
     @Nullable

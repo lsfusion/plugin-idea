@@ -1,25 +1,31 @@
 package com.lsfusion.lang.psi.extend.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.Condition;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration;
+import com.lsfusion.lang.psi.context.FormContext;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.LSFDesign;
+import com.lsfusion.lang.psi.references.LSFClassReference;
+import com.lsfusion.lang.psi.references.LSFFullNameReference;
+import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendClassStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendFormStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 
 public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, ExtendClassStubElement> implements LSFClassExtend {
 
@@ -76,10 +82,10 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
 
     @Nullable
     @Override
-    protected LSFFullNameDeclaration resolveExtendingDeclaration() {
+    public LSFFullNameReference getExtendingReference() {
         LSFExtendingClassDeclaration extendingClassDeclaration = getExtendingClassDeclaration();
         if (extendingClassDeclaration != null) {
-            return extendingClassDeclaration.getCustomClassUsageWrapper().getCustomClassUsage().resolveDecl();
+            return extendingClassDeclaration.getCustomClassUsageWrapper().getCustomClassUsage();
         }
         return null;
     }
@@ -174,38 +180,31 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         return result;
     }
 
-    public Set<LSFStaticObjectDeclaration> resolveStaticObjectDuplicates() {
-        Set<LSFStaticObjectDeclaration> result = new HashSet<>();
+    private static ExtendClassStubElementType getContextExtendType() {
+        return LSFStubElementTypes.EXTENDCLASS;
+    }
 
-        List<LSFStaticObjectDeclaration> localDecls = getStaticObjects();
-        for (int i = 0; i < localDecls.size(); i++) {
-            LSFStaticObjectDeclaration decl1 = localDecls.get(i);
-            for (int j = 0; j < localDecls.size(); j++) {
-                if (i != j) {
-                    if (decl1.getNameIdentifier().getText().equals(localDecls.get(j).getNameIdentifier().getText())) {
-                        result.add(decl1);
-                        break;
-                    }
-                }
-            }
-        }
+    public static List<PsiElement> processClassImplementationsSearch(LSFClassDeclaration decl) {
+        return processImplementationsSearch(decl, getContextExtendType());
+    }
 
-        List<LSFStaticObjectDeclaration> parentObjects = new ArrayList<>();
-        for (LSFClassExtend extend : LSFGlobalResolver.findExtendElements(resolveDecl(), LSFStubElementTypes.EXTENDCLASS, getLSFFile()).findAll()) {
-            if (!this.equals(extend)) {
-                parentObjects.addAll(extend.getStaticObjects());
-            }
-        }
+    public static <T extends LSFDeclaration> Set<T> processClassContext(LSFClassDeclaration decl, LSFFile file, int offset, final Function<LSFClassExtend, Collection<T>> processor) {
+        // we don't want to respect offset, since static objects are parsed in separate step
+        return processContext(decl, file, getContextExtendType(), processor, null, false);
+    }
 
-        for (LSFStaticObjectDeclaration decl : localDecls) {
-            for (LSFStaticObjectDeclaration parentDecl : parentObjects) {
-                if (decl.getNameIdentifier().getText().equals(parentDecl.getNameIdentifier().getText())) {
-                    result.add(decl);
-                    break;
-                }
-            }
-        }
-        return result;
+    protected List<Function<LSFClassExtend, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {
+        List<Function<LSFClassExtend, Collection<? extends LSFDeclaration>>> processors = new ArrayList<>();
+        processors.add(LSFClassExtend::getStaticObjects);
+        return processors;
+    }
+
+    protected ExtendStubElementType<LSFClassExtend, ExtendClassStubElement> getDuplicateExtendType() {
+        return getContextExtendType();
+    }
+
+    public Set<LSFDeclaration> resolveDuplicates() {
+        return resolveDuplicates(LSFStaticObjectDeclaration::getDuplicateCondition, decl -> false);
     }
 
     @Nullable

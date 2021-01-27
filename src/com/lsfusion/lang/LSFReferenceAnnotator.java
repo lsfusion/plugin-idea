@@ -476,9 +476,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitClassExtend(@NotNull LSFClassExtend o) {
         super.visitClassExtend(o);
 
-        Set<LSFStaticObjectDeclaration> staticObjectDuplicates = o.resolveStaticObjectDuplicates();
-        for (LSFStaticObjectDeclaration so : staticObjectDuplicates) {
-            addAlreadyDefinedError(so);
+        Set<LSFDeclaration> duplicates = o.resolveDuplicates();
+        for (LSFDeclaration duplicate : duplicates) {
+            addAlreadyDefinedError(duplicate);
         }
     }
 

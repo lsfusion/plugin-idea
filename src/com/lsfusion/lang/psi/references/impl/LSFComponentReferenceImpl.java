@@ -1,23 +1,14 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.lsfusion.design.DefaultFormView;
-import com.lsfusion.design.FormView;
-import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFDesign;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.indexes.GroupIndex;
 import com.lsfusion.lang.psi.references.LSFComponentReference;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
-import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Function;
 
 public abstract class LSFComponentReferenceImpl extends LSFDesignElementReferenceImpl<LSFComponentDeclaration> implements LSFComponentReference {
     protected LSFComponentReferenceImpl(@NotNull ASTNode node) {
@@ -28,7 +19,7 @@ public abstract class LSFComponentReferenceImpl extends LSFDesignElementReferenc
     public abstract LSFId getSimpleName();
 
     @Override
-    protected DesignProcessor<LSFComponentDeclaration> getElementsCollector() {
+    protected Function<LSFDesign, Collection<LSFComponentDeclaration>> getElementsCollector() {
         return LSFDesign::getComponentDecls;
     }
 

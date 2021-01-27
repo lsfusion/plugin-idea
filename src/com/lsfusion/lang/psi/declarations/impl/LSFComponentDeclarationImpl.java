@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 public abstract class LSFComponentDeclarationImpl extends LSFDesignElementDeclarationImpl<LSFComponentDeclaration> implements LSFComponentDeclaration {
     protected LSFComponentDeclarationImpl(@NotNull ASTNode node) {
@@ -20,7 +21,7 @@ public abstract class LSFComponentDeclarationImpl extends LSFDesignElementDeclar
 
     protected abstract LSFSimpleName getSimpleName();
 
-    public static LSFDesignElementReferenceImpl.DesignProcessor<LSFComponentDeclaration> getProcessor() {
+    public static Function<LSFDesign, Collection<LSFComponentDeclaration>> getProcessor() {
         return LSFDesign::getComponentDecls;
     }
 

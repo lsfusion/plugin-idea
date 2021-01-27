@@ -40,8 +40,10 @@ import com.lsfusion.lang.psi.declarations.impl.LSFFormExtendElement;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.extend.impl.LSFClassExtendImpl;
+import com.lsfusion.lang.psi.extend.impl.LSFDesignImpl;
+import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
 import com.lsfusion.lang.psi.indexes.*;
-import com.lsfusion.lang.psi.references.impl.LSFDesignElementReferenceImpl;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -49,6 +51,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Function;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.psi.util.PsiTreeUtil.prevVisibleLeaf;
@@ -59,7 +62,6 @@ import static com.lsfusion.lang.LSFParserDefinition.NOT_KEYWORDS;
 import static com.lsfusion.lang.parser.GeneratedParserUtilBase.*;
 import static com.lsfusion.lang.psi.LSFTypes.*;
 import static com.lsfusion.lang.psi.LSFTypes.Factory.getPsiElementClassByType;
-import static com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl.*;
 import static com.lsfusion.util.LSFPsiUtils.getContextClasses;
 import static java.util.Arrays.asList;
 
@@ -481,10 +483,8 @@ public class ASTCompletionContributor extends CompletionContributor {
                     String className = namespaceAndClassName[1];
 
                     for (LSFClassDeclaration classDecl : LSFGlobalResolver.findElements(className, namespace, file, null, Collections.singleton(LSFStubElementTypes.CLASS), Conditions.alwaysTrue())) {
-                        for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(classDecl, LSFStubElementTypes.EXTENDCLASS, project, getRequireScope())) {
-                            for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {
-                                addLookupElement(createLookupElement(staticDecl, STATIC_PRIORITY));
-                            }
+                        for (LSFStaticObjectDeclaration staticDecl : LSFClassExtendImpl.processClassContext(classDecl, file, getOriginalFrameOffset(staticObjectId), LSFClassExtend::getStaticObjects)) {
+                            addLookupElement(createLookupElement(staticDecl, STATIC_PRIORITY));
                         }
                     }
                 }
@@ -498,12 +498,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             return completeFormContextObject(
                     objectCompleted,
                     OBJECT_USAGE,
-                    new FormExtendProcessor<LSFObjectDeclaration>() {
-                        @Override
-                        public Collection<LSFObjectDeclaration> process(LSFFormExtend formExtend) {
-                            return formExtend.getObjectDecls();
-                        }
-                    }
+                    LSFFormExtend::getObjectDecls
             );
         }
 
@@ -511,12 +506,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             return completeFormContextObject(
                     groupObjectCompleted,
                     GROUP_OBJECT_USAGE,
-                    new FormExtendProcessor<LSFGroupObjectDeclaration>() {
-                        @Override
-                        public Collection<LSFGroupObjectDeclaration> process(LSFFormExtend formExtend) {
-                            return formExtend.getGroupObjectDecls();
-                        }
-                    }
+                    LSFFormExtend::getGroupObjectDecls
             );
         }
 
@@ -524,12 +514,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             return completeFormContextObject(
                     filterGroupCompleted,
                     FILTER_GROUP_USAGE,
-                    new FormExtendProcessor<LSFFilterGroupDeclaration>() {
-                        @Override
-                        public Collection<LSFFilterGroupDeclaration> process(LSFFormExtend formExtend) {
-                            return formExtend.getFilterGroupDecls();
-                        }
-                    }
+                    LSFFormExtend::getFilterGroupDecls
             );
         }
 
@@ -545,23 +530,18 @@ public class ASTCompletionContributor extends CompletionContributor {
             return completeFormContextObject(
                     propertyDrawCompleted,
                     FORM_PROPERTY_DRAW_USAGE,
-                    new FormExtendProcessor<LSFPropertyDrawDeclaration>() {
-                        @Override
-                        public Collection<LSFPropertyDrawDeclaration> process(LSFFormExtend formExtend) {
-                            return formExtend.getPropertyDrawDecls();
-                        }
-                    }
+                    LSFFormExtend::getPropertyDrawDecls
             );
         }
 
-        private <T extends LSFFormExtendElement> boolean completeFormContextObject(BooleanValueHolder completed, IElementType frameType, FormExtendProcessor<T> formExtendProcessor) {
+        private <T extends LSFFormExtendElement> boolean completeFormContextObject(BooleanValueHolder completed, IElementType frameType, Function<LSFFormExtend, Collection<T>> formExtendProcessor) {
             Frame elementUsage = getLastFrameOfType(null, frameType);
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
                     FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
-                        Set<T> declaration = processFormContext(psi, getOriginalFrameOffset(elementUsage), formExtendProcessor);
+                        Set<T> declaration = LSFFormExtendImpl.processFormContext(psi, getOriginalFrameOffset(elementUsage), formExtendProcessor);
                         for (T elementDecl : declaration) {
                             addLookupElement(createLookupElement(elementDecl, FORM_OBJECT_PRIORITY));
                         }
@@ -572,14 +552,14 @@ public class ASTCompletionContributor extends CompletionContributor {
             return false;
         }
 
-        private <T extends LSFDesignElementDeclaration<T>> boolean completeDesignContextObject(BooleanValueHolder completed, IElementType frameType, LSFDesignElementReferenceImpl.DesignProcessor<T> designProcessor) {
+        private <T extends LSFDesignElementDeclaration<T>> boolean completeDesignContextObject(BooleanValueHolder completed, IElementType frameType, Function<LSFDesign, Collection<T>> designProcessor) {
             Frame elementUsage = getLastFrameOfType(null, frameType);
             if (elementUsage != null) {
                 if (type.isBase() && !completed.getValue()) {
                     completed.setValue(true);
                     FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
-                        Set<T> declaration = LSFDesignElementReferenceImpl.processDesignContext(psi, getOriginalFrameOffset(elementUsage), designProcessor);
+                        Set<T> declaration = LSFDesignImpl.processDesignContext(psi, getOriginalFrameOffset(elementUsage), designProcessor);
                         for (T elementDecl : declaration) {
                             addLookupElement(createLookupElement(elementDecl, DESIGN_PRIORITY));
                         }
