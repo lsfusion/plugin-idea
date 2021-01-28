@@ -362,7 +362,7 @@ public class LSFPsiImplUtil {
 
     public static ContextModifier getContextModifier(@NotNull LSFContextFiltersClause sourceStatement) {
         FormContext formContext = PsiTreeUtil.getParentOfType(sourceStatement, FormContext.class);
-        Set<LSFObjectDeclaration> objects = formContext != null ? LSFFormExtendImpl.processFormContext(formContext, formExtend -> formExtend.getObjectDecls(), formContext.getTextOffset(), true, false) : null;
+        Set<LSFObjectDeclaration> objects = formContext != null ? LSFFormExtendImpl.processFormContext(formContext, formExtend -> formExtend.getObjectDecls(), formContext.getTextOffset(), LSFLocalSearchScope.createFrom(sourceStatement), true, false) : null;
 
         return (offset, currentParams) -> objects != null ? new ArrayList<>(objects) : new ArrayList<>();
     }

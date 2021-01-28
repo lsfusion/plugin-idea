@@ -11,13 +11,11 @@ import com.intellij.util.Query;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
-import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +50,7 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
 
         //noinspection RedundantTypeArguments
         return LSFResolveUtil.<LSFFullNameDeclaration>singleResolve(
-                LSFGlobalResolver.findElements(getGlobalName(), namespace, getStubTypes(), lsfFile, null, Conditions.<LSFFullNameDeclaration>alwaysTrue(), Finalizer.EMPTY)
+                LSFGlobalResolver.findElements(getGlobalName(), namespace, getStubTypes(), lsfFile, null, LSFLocalSearchScope.createFrom(this), Conditions.<LSFFullNameDeclaration>alwaysTrue(), Finalizer.EMPTY)
         );
     }
 
@@ -77,33 +75,33 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
     protected abstract FullNameStubElementType getStubType();
 
     protected static <T extends LSFDeclaration, This extends LSFExtend<This, Stub>, Stub extends ExtendStubElement<This, Stub>, Context>
-                Set<T> processContext(PsiElement current, int offset, final Function<This, Collection<T>> processor,
+                Set<T> processContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<This, Collection<T>> processor,
                 Function<PsiElement, Context> getContext, Function<Context, LSFFullNameDeclaration> resolveContextDecl, ExtendStubElementType<This, Stub> type) {
-        Set<T> processedContext = processContext(current, processor, offset, false, getContext, resolveContextDecl, type);
+        Set<T> processedContext = processContext(current, processor, offset, localScope, false, getContext, resolveContextDecl, type);
         if (processedContext != null) {
             return processedContext;
         }
 
         PsiElement parent = current.getParent();
         if (!(parent == null || parent instanceof LSFFile)) {
-            return processContext(parent, offset, processor, getContext, resolveContextDecl, type);
+            return processContext(parent, offset, localScope, processor, getContext, resolveContextDecl, type);
         }
 
         return new HashSet<>();
     }
 
     protected static <T extends LSFDeclaration, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>, Context>
-                Set<T> processContext(PsiElement current, final Function<Extend, Collection<T>> processor, final int offset, boolean ignoreUseBeforeDeclarationCheck,
+                Set<T> processContext(PsiElement current, final Function<Extend, Collection<T>> processor, final int offset, LSFLocalSearchScope localScope, boolean ignoreUseBeforeDeclarationCheck,
                                       Function<PsiElement, Context> getContext, Function<Context, LSFFullNameDeclaration> resolveContextDecl, ExtendStubElementType<Extend, Stub> type) {
         Context context = getContext.apply(current);
         if (context != null)
-            return processContext(resolveContextDecl.apply(context), (LSFFile) current.getContainingFile(), type, processor, offset, ignoreUseBeforeDeclarationCheck);
+            return processContext(resolveContextDecl.apply(context), (LSFFile) current.getContainingFile(), type, processor, offset, localScope, ignoreUseBeforeDeclarationCheck);
         return null;
     }
 
     // used for resolving + completion + duplicates
-    private static <Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> Query<Extend> findElements(LSFFullNameDeclaration decl, LSFFile file, ExtendStubElementType<Extend, Stub> type) {
-        return LSFGlobalResolver.findExtendElements(decl, type, file);
+    private static <Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> Query<Extend> findElements(LSFFullNameDeclaration decl, LSFFile file, ExtendStubElementType<Extend, Stub> type, LSFLocalSearchScope localScope) {
+        return LSFGlobalResolver.findExtendElements(decl, type, file, localScope);
     }
 
     // used for implementations
@@ -111,7 +109,7 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
         List<PsiElement> names = new ArrayList<>();
 
         Project project = decl.getProject();
-        for (Extend extend : LSFGlobalResolver.findExtendElements(decl, type, project, GlobalSearchScope.allScope(project))) {
+        for (Extend extend : LSFGlobalResolver.findExtendElements(decl, type, project, GlobalSearchScope.allScope(project), LSFLocalSearchScope.createFrom(decl))) {
             LSFFullNameReference extendingReference = extend.getExtendingReference();
             if (extendingReference != null)
                 names.add(extendingReference);
@@ -119,9 +117,9 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
 
         return names;
     }
-    protected static <T extends LSFDeclaration, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> Set<T> processContext(LSFFullNameDeclaration decl, LSFFile file, ExtendStubElementType<Extend, Stub> type, Function<Extend, Collection<T>> processor, Integer offset, boolean ignoreUseBeforeDeclarationCheck) {
+    protected static <T extends LSFDeclaration, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> Set<T> processContext(LSFFullNameDeclaration decl, LSFFile file, ExtendStubElementType<Extend, Stub> type, Function<Extend, Collection<T>> processor, Integer offset, LSFLocalSearchScope localScope, boolean ignoreUseBeforeDeclarationCheck) {
         Set<T> finalResult = new HashSet<>();
-        for(Extend formExtend : findElements(decl, file, type)) {
+        for(Extend formExtend : findElements(decl, file, type, localScope)) {
             boolean sameFile = offset != null && file == formExtend.getLSFFile();
             for(T element : processor.apply(formExtend))
                 if(ignoreUseBeforeDeclarationCheck || !(sameFile && LSFGlobalResolver.isAfter(offset, element)))
@@ -135,7 +133,7 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
     protected abstract List<Function<This, Collection<? extends LSFDeclaration>>> getDuplicateProcessors();
 
     protected <T extends LSFDeclaration> Set<LSFDeclaration> resolveDuplicates(Function<T, Condition<T>> duplicateCondition, Predicate<T> ignoreDuplicate) {
-        Query<This> designs = findElements(resolveDecl(), getLSFFile(), getDuplicateExtendType());
+        Query<This> designs = findElements(resolveDecl(), getLSFFile(), getDuplicateExtendType(), LSFLocalSearchScope.createFrom(this));
 
         Set<LSFDeclaration> duplicates = new LinkedHashSet<>();
         for(Function<This, Collection<? extends LSFDeclaration>> duplicateProcessor : getDuplicateProcessors()) {

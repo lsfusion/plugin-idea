@@ -188,9 +188,9 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         return processImplementationsSearch(decl, getContextExtendType());
     }
 
-    public static <T extends LSFDeclaration> Set<T> processClassContext(LSFClassDeclaration decl, LSFFile file, int offset, final Function<LSFClassExtend, Collection<T>> processor) {
+    public static <T extends LSFDeclaration> Set<T> processClassContext(LSFClassDeclaration decl, LSFFile file, int offset, LSFLocalSearchScope localScope, final Function<LSFClassExtend, Collection<T>> processor) {
         // we don't want to respect offset, since static objects are parsed in separate step
-        return processContext(decl, file, getContextExtendType(), processor, null, false);
+        return processContext(decl, file, getContextExtendType(), processor, null, localScope, false);
     }
 
     protected List<Function<LSFClassExtend, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {

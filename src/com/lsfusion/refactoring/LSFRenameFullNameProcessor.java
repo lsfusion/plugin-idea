@@ -96,8 +96,9 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
             Project project = cls.getProject();
             final ArrayList<LSFActionOrGlobalPropDeclaration<?, ?>> children = new ArrayList<>();
             GlobalSearchScope scope = GlobalSearchScope.allScope(project);
-            children.addAll(LSFPsiUtils.mapPropertiesWithClassInSignature(cls, project, scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
-            children.addAll(LSFPsiUtils.mapActionsWithClassInSignature(cls, project, scope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
+            LSFLocalSearchScope localScope = LSFLocalSearchScope.GLOBAL;
+            children.addAll(LSFPsiUtils.mapPropertiesWithClassInSignature(cls, project, scope, localScope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
+            children.addAll(LSFPsiUtils.mapActionsWithClassInSignature(cls, project, scope, localScope, LSFPsiUtils.ApplicableMapper.STATEMENT, true, true));
 
             children.sort(Comparator.comparing(LSFFullNameDeclaration::getCanonicalName));
             

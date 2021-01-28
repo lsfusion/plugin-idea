@@ -103,8 +103,8 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
         return LSFStubElementTypes.DESIGN;
     }
 
-    public static <T extends LSFDesignElementDeclaration<T>> Set<T> processDesignContext(PsiElement current, int offset, final Function<LSFDesign, Collection<T>> processor) {
-        return processContext(current, offset, processor, element -> element instanceof LSFDesignStatement ? (LSFDesignStatement)element : null, LSFDesignStatement::resolveFormDecl, getContextExtendType());
+    public static <T extends LSFDesignElementDeclaration<T>> Set<T> processDesignContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<LSFDesign, Collection<T>> processor) {
+        return processContext(current, offset, localScope, processor, element -> element instanceof LSFDesignStatement ? (LSFDesignStatement)element : null, LSFDesignStatement::resolveFormDecl, getContextExtendType());
     }
 
     protected List<Function<LSFDesign, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {

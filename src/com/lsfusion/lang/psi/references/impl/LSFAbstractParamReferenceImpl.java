@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi.references.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.LSFResolveResult;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
@@ -34,7 +35,7 @@ public abstract class LSFAbstractParamReferenceImpl<T extends LSFExprParamDeclar
 
     private Set<LSFExprParamDeclaration> getContextParams() {
         PsiElement paramDecl = getParamDeclare();
-        return LSFPsiUtils.getContextParams(paramDecl, this instanceof LSFObjectReference, false);
+        return LSFPsiUtils.getContextParams(paramDecl, LSFLocalSearchScope.createFrom(this), this instanceof LSFObjectReference, false);
     }
 
     @Nullable

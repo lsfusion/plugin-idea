@@ -7,6 +7,7 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.CollectionQuery;
 import com.lsfusion.lang.psi.Finalizer;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
@@ -62,7 +63,7 @@ public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclara
 
     @Override
     public boolean resolveDuplicates() {
-        CollectionQuery<This> declarations = new CollectionQuery<>(LSFGlobalResolver.findElements(getDeclName(), null, getTypes(), getLSFFile(), null, getFindDuplicatesCondition(), Finalizer.EMPTY));
+        CollectionQuery<This> declarations = new CollectionQuery<>(LSFGlobalResolver.findElements(getDeclName(), null, getTypes(), getLSFFile(), null, LSFLocalSearchScope.createFrom(this), getFindDuplicatesCondition(), Finalizer.EMPTY));
         return declarations.findAll().size() > 1;
     }
 

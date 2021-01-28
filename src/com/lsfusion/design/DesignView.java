@@ -28,6 +28,7 @@ import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.ui.*;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
@@ -58,6 +59,7 @@ public class DesignView extends JPanel implements Disposable {
 
     private LSFModuleDeclaration module;
     private LSFFormDeclaration formDeclaration;
+    private LSFLocalSearchScope localScope;
 
     public String formTitle;
 
@@ -136,12 +138,15 @@ public class DesignView extends JPanel implements Disposable {
 
         if (targetElement != null) {
             LSFFormDeclaration formDeclaration = null;
+            LSFLocalSearchScope localScope = null;
             LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
             if (formExtend != null) {
+                localScope = LSFLocalSearchScope.createFrom(formExtend);
                 formDeclaration = DumbService.getInstance(project).runReadActionInSmartMode(((LSFFormStatementImpl) formExtend)::resolveFormDecl);
             } else {
                 LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
                 if (designStatement != null) {
+                    localScope = LSFLocalSearchScope.createFrom(designStatement);
                     formDeclaration = DumbService.getInstance(project).runReadActionInSmartMode(designStatement::resolveFormDecl);
                 }
             }
@@ -155,19 +160,19 @@ public class DesignView extends JPanel implements Disposable {
             }
 
             if (formName != null && module != null) {
-                if (formDeclaration != this.formDeclaration || module != this.module) {
-                    scheduleRebuild(module, formDeclaration);
+                if (formDeclaration != this.formDeclaration || module != this.module || !BaseUtils.nullEquals(localScope, this.localScope)) {
+                    scheduleRebuild(module, formDeclaration, localScope);
                 }
             }
         }
     }
 
-    public void scheduleRebuild(final LSFModuleDeclaration module, final LSFFormDeclaration formDeclaration) {
+    public void scheduleRebuild(final LSFModuleDeclaration module, final LSFFormDeclaration formDeclaration, LSFLocalSearchScope localScope) {
         myUpdateQueue.queue(new Update("rebuild") {
             @Override
             public void run() {
                 if (!project.isDisposed() && formDeclaration.isValid()) {
-                    update(module, formDeclaration);
+                    update(module, formDeclaration, localScope);
                 }
             }
         });
@@ -184,20 +189,21 @@ public class DesignView extends JPanel implements Disposable {
         });
     }
 
-    public void update(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration) {
+    public void update(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration, LSFLocalSearchScope localScope) {
         this.module = module;
         this.formDeclaration = formDeclaration;
+        this.localScope = localScope;
 
         Content content = toolWindow.getContentManager().getContent(this);
         if (content != null) {
             content.setDisplayName(formDeclaration.getDeclName());
         }
         
-        layoutDesign(module, formDeclaration);
+        layoutDesign(module, formDeclaration, localScope);
     }
 
-    private void layoutDesign(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration) {
-        DesignInfo designInfo = new DesignInfo(formDeclaration, module.getLSFFile());
+    private void layoutDesign(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration, LSFLocalSearchScope localScope) {
+        DesignInfo designInfo = new DesignInfo(formDeclaration, module.getLSFFile(), localScope);
 
         removeAll();
         rootComponent = designInfo.formView.mainContainer;
@@ -254,7 +260,7 @@ public class DesignView extends JPanel implements Disposable {
         actions.add(new AnAction(null, "Refresh", LSFIcons.Design.REFRESH) {
             @Override
             public void actionPerformed(AnActionEvent e) {
-                layoutDesign(module, formDeclaration);
+                layoutDesign(module, formDeclaration, localScope);
             }
         });
 

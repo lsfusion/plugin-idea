@@ -111,7 +111,8 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public void navigate(MouseEvent e, PsiElement psi) {
-            LSFFormDeclaration formDecl = resolveFormDecl(psi);
+            Result<LSFExtend> formExtend = new Result<>();
+            LSFFormDeclaration formDecl = resolveFormDecl(psi, formExtend);
 
             if (formDecl != null) {
                 ToolWindow toolWindow = ToolWindowManager.getInstance(formDecl.getProject()).getToolWindow("Design");
@@ -126,7 +127,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
                     editor.getCaretModel().moveToOffset(psi.getTextOffset());
                 }
 
-                DesignViewFactory.getInstance().updateView(((LSFFile) psi.getContainingFile()).getModuleDeclaration(), formDecl);
+                DesignViewFactory.getInstance().updateView(((LSFFile) psi.getContainingFile()).getModuleDeclaration(), formDecl, LSFLocalSearchScope.createFrom(formExtend.getResult()));
             }
         }
     }
