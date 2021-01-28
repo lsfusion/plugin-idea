@@ -322,6 +322,10 @@ public class ASTCompletionContributor extends CompletionContributor {
             return requireScope;
         }
 
+        public LSFLocalSearchScope getLocalScope() {
+            return null;//dfdf
+        }
+
         public void quickLog(String message) {
 //            System.out.println("--------------------------------------------------- : " + (System.nanoTime() - startTime) / 1000000000.0);
 //            System.out.println("   : " + message);
@@ -457,7 +461,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     completed.setValue(true);
                     String namespaceName = extractNamespace ? extractNamespace() : null;
                     addLookupElements(
-                            getVariantsFromIndices(namespaceName, file, indices, priority, useRequiredScope ? getRequireScope() : GlobalSearchScope.allScope(project))
+                            getVariantsFromIndices(namespaceName, file, indices, priority, useRequiredScope ? getRequireScope() : GlobalSearchScope.allScope(project), useRequiredScope ? getLocalScope() : LSFLocalSearchScope.GLOBAL)
                     );
                     
                     if (additionalDeclarations != null) {
@@ -482,8 +486,9 @@ public class ASTCompletionContributor extends CompletionContributor {
                     String namespace = namespaceAndClassName[0];
                     String className = namespaceAndClassName[1];
 
-                    for (LSFClassDeclaration classDecl : LSFGlobalResolver.findElements(className, namespace, file, null, Collections.singleton(LSFStubElementTypes.CLASS), Conditions.alwaysTrue())) {
-                        for (LSFStaticObjectDeclaration staticDecl : LSFClassExtendImpl.processClassContext(classDecl, file, getOriginalFrameOffset(staticObjectId), LSFClassExtend::getStaticObjects)) {
+                    LSFLocalSearchScope localScope = getLocalScope();
+                    for (LSFClassDeclaration classDecl : LSFGlobalResolver.findElements(className, namespace, file, null, localScope, Collections.singleton(LSFStubElementTypes.CLASS), Conditions.alwaysTrue())) {
+                        for (LSFStaticObjectDeclaration staticDecl : LSFClassExtendImpl.processClassContext(classDecl, file, getOriginalFrameOffset(staticObjectId), localScope, LSFClassExtend::getStaticObjects)) {
                             addLookupElement(createLookupElement(staticDecl, STATIC_PRIORITY));
                         }
                     }
@@ -541,7 +546,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     completed.setValue(true);
                     FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
-                        Set<T> declaration = LSFFormExtendImpl.processFormContext(psi, getOriginalFrameOffset(elementUsage), formExtendProcessor);
+                        Set<T> declaration = LSFFormExtendImpl.processFormContext(psi, getOriginalFrameOffset(elementUsage), getLocalScope(), formExtendProcessor);
                         for (T elementDecl : declaration) {
                             addLookupElement(createLookupElement(elementDecl, FORM_OBJECT_PRIORITY));
                         }
@@ -559,7 +564,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     completed.setValue(true);
                     FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
-                        Set<T> declaration = LSFDesignImpl.processDesignContext(psi, getOriginalFrameOffset(elementUsage), designProcessor);
+                        Set<T> declaration = LSFDesignImpl.processDesignContext(psi, getOriginalFrameOffset(elementUsage), getLocalScope(), designProcessor);
                         for (T elementDecl : declaration) {
                             addLookupElement(createLookupElement(elementDecl, DESIGN_PRIORITY));
                         }
@@ -653,7 +658,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     String namespaceName = extractNamespace();
 
                     addLookupElements(
-                            getVariantsFromIndices(namespaceName, file, asList(FormIndex.getInstance()), FORM_PRIORITY, getRequireScope())
+                            getVariantsFromIndices(namespaceName, file, asList(FormIndex.getInstance()), FORM_PRIORITY, getRequireScope(), getLocalScope())
                     );
 
                     Collection<LSFActionDeclaration> globalDeclarations = getDeclarationsFromScope(false);
@@ -721,7 +726,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         private boolean completeActionInModifyParamOrFormContext(Frame propUsage) {
             PsiElement psi = getLastPsiOfType(false, ModifyParamContext.class, LSFFormStatement.class, LSFDesignStatement.class);
             if (psi != null) {
-                completeActions(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
+                completeActions(getContextClasses(psi, getOriginalFrameOffset(propUsage), getLocalScope(), false), MAY_USE_ANY);
                 return true;
             }
             return false;
@@ -770,7 +775,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         private boolean completePropertyInModifyParamOrFormContext(Frame propUsage) {
             PsiElement psi = getLastPsiOfType(true, ModifyParamContext.class, LSFFormStatement.class, LSFDesignStatement.class);
             if (psi != null) {
-                completeProperties(getContextClasses(psi, getOriginalFrameOffset(propUsage), false), MAY_USE_ANY);
+                completeProperties(getContextClasses(psi, getOriginalFrameOffset(propUsage), getLocalScope(), false), MAY_USE_ANY);
                 return true;
             }
             return false;
@@ -782,7 +787,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (psi != null) {
                 LSFExprParamDeclaration currentParamDeclaration = getPsiOfTypeForFrame(paramDeclare, LSFExprParamDeclaration.class);
                 
-                Set<? extends LSFExprParamDeclaration> declarations = LSFPsiUtils.getContextParams(psi, getOriginalFrameOffset(paramDeclare), false);
+                Set<? extends LSFExprParamDeclaration> declarations = LSFPsiUtils.getContextParams(psi, getOriginalFrameOffset(paramDeclare), getLocalScope(), false);
                 for (LSFExprParamDeclaration paramDeclaration : declarations) {
                     if (paramDeclaration != currentParamDeclaration) {
                         addLookupElement(createLookupElement(paramDeclaration, PARAM_PRIORITY));
@@ -813,14 +818,14 @@ public class ASTCompletionContributor extends CompletionContributor {
         private void completeActionInContextOfFormStatement(Frame startFrom) {
             LSFFormStatement psiFormStatement = getFormStatementPSI(startFrom);
             if (psiFormStatement != null) {
-                completeActions(getContextClasses(psiFormStatement, true), MUST_USE_ANY);
+                completeActions(getContextClasses(psiFormStatement, getLocalScope(), true), MUST_USE_ANY);
             }
         }
 
         private void completePropertyElseActionInContextOfFormStatement(Frame startFrom) {
             LSFFormStatement psiFormStatement = getFormStatementPSI(startFrom);
             if (psiFormStatement != null) {
-                completePropertyElseActions(getContextClasses(psiFormStatement, true), MUST_USE_ANY);
+                completePropertyElseActions(getContextClasses(psiFormStatement, getLocalScope(), true), MUST_USE_ANY);
             }
         }
 
@@ -833,7 +838,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         public <G extends LSFFullNameDeclaration> List<G> getDeclarationsFromScope(boolean property) {
-            return CompletionUtils.getDeclarationsFromScope(project, getRequireScope(), property ? PropIndex.getInstance() : ActionIndex.getInstance());
+            return CompletionUtils.getDeclarationsFromScope(project, getRequireScope(), getLocalScope(), property ? PropIndex.getInstance() : ActionIndex.getInstance());
         }
 
         private void completeProperties(List<LSFClassSet> contextClasses, ClassUsagePolicy classUsagePolicy) {
@@ -858,7 +863,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (classSet != null) {
                     LSFValueClass valueClass = classSet.getCommonClass();
                     if (valueClass != null) {
-                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, getRequireScope(), isLight, isHeavy));
+                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, getRequireScope(), getLocalScope(), isLight, isHeavy));
                     }
                 }
             }
@@ -903,7 +908,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (classSet != null) {
                     LSFValueClass valueClass = classSet.getCommonClass();
                     if (valueClass != null) {
-                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getActionsApplicableToClass(valueClass, project, getRequireScope(), isLight, isHeavy));
+                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getActionsApplicableToClass(valueClass, project, getRequireScope(), getLocalScope(), isLight, isHeavy));
                     }
                 }
             }
@@ -929,8 +934,8 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (classSet != null) {
                     LSFValueClass valueClass = classSet.getCommonClass();
                     if (valueClass != null) {
-                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getActionsApplicableToClass(valueClass, project, getRequireScope(), isLight, isHeavy));
-                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, getRequireScope(), isLight, isHeavy));
+                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getActionsApplicableToClass(valueClass, project, getRequireScope(), getLocalScope(), isLight, isHeavy));
+                        addDeclarationsToLookup(contextClasses, classUsagePolicy, namespaceName, LSFPsiUtils.getPropertiesApplicableToClass(valueClass, project, getRequireScope(), getLocalScope(), isLight, isHeavy));
                     }
                 }
             }

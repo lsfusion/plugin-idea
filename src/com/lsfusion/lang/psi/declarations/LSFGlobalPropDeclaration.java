@@ -55,7 +55,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
     default boolean resolveDuplicateColumns() {
         CollectionQuery<LSFGlobalPropDeclaration> declarations = new CollectionQuery<LSFGlobalPropDeclaration>(
                 LSFGlobalResolver.findElements(
-                        getDeclName(), null, getTypes(), getLSFFile(), null, getFindDuplicateColumnsCondition(), Finalizer.EMPTY
+                        getDeclName(), null, getTypes(), getLSFFile(), null, LSFLocalSearchScope.createFrom(this), getFindDuplicateColumnsCondition(), Finalizer.EMPTY
                 )
         );
         return declarations.findAll().size() > 1;

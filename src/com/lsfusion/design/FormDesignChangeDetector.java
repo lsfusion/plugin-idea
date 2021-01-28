@@ -13,6 +13,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
@@ -104,6 +105,7 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
                         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
                         LSFFormDeclaration formDeclaration = null;
                         LSFModuleDeclaration module = null;
+                        LSFLocalSearchScope localScope = null;
 
                         if (editor != null) {
                             DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
@@ -112,10 +114,12 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
                             if (targetElement != null) {
                                 LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
                                 if (formExtend != null) {
+                                    localScope = LSFLocalSearchScope.createFrom(formExtend);
                                     formDeclaration = ((LSFFormStatementImpl) formExtend).resolveFormDecl();
                                 } else {
                                     LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
                                     if (designStatement != null) {
+                                        localScope = LSFLocalSearchScope.createFrom(designStatement);
                                         formDeclaration = designStatement.resolveFormDecl();
                                     }
                                 }
@@ -127,7 +131,7 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
                         }
 
                         if (module != null && formDeclaration != null) {
-                            DesignViewFactory.getInstance().updateView(module, formDeclaration);
+                            DesignViewFactory.getInstance().updateView(module, formDeclaration, localScope);
                         }
                     } catch (PsiInvalidElementAccessException ignored) {
                     }

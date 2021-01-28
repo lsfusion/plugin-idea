@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -21,7 +22,7 @@ public class FormDeclByReportNameResolver {
 
         if (formDeclaration != null) {
             final Set<String> requiredModules = new HashSet<>();
-            for(LSFFormExtend extend : LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, formDeclaration.getProject(), LSFFileUtils.getModuleWithDependenciesScope(source)))
+            for(LSFFormExtend extend : LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, formDeclaration.getProject(), LSFFileUtils.getModuleWithDependenciesScope(source), LSFLocalSearchScope.GLOBAL))
                 requiredModules.add(extend.getLSFFile().getModuleDeclaration().getGlobalName());
 
             String requires = "";

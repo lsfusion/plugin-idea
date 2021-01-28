@@ -11,6 +11,8 @@ import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.FindSymbolParameters;
 import com.intellij.util.indexing.IdFilter;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +49,7 @@ public abstract class LSFNameContributor implements ChooseByNameContributorEx {
     }
 
     protected <G extends PsiElement> Collection<G> getItemsFromIndex(StringStubIndexExtension<G> index, String name, Project project, GlobalSearchScope scope) {
-        return index.get(name, project, scope);
+        return LSFGlobalResolver.getItemsFromIndex(index, name, project, scope, LSFLocalSearchScope.GLOBAL);
     }
 
     protected Collection<NavigationItem> getItemsWithParamsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {

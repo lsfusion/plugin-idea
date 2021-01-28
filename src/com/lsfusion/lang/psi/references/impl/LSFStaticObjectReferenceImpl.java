@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi.references.impl;
 import com.intellij.lang.ASTNode;
 import com.lsfusion.lang.psi.LSFCustomClassUsage;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.LSFResolveResult;
 import com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
@@ -27,7 +28,7 @@ public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFS
         String nameRef = getNameRef();
 
         List<LSFStaticObjectDeclaration> decls = new ArrayList<>();
-        for(LSFStaticObjectDeclaration decl : LSFClassExtendImpl.processClassContext(getCustomClassUsage().resolveDecl(), getLSFFile(), getTextOffset(), LSFClassExtend::getStaticObjects))
+        for(LSFStaticObjectDeclaration decl : LSFClassExtendImpl.processClassContext(getCustomClassUsage().resolveDecl(), getLSFFile(), getTextOffset(), LSFLocalSearchScope.createFrom(this), LSFClassExtend::getStaticObjects))
             if (BaseUtils.nullEquals(nameRef, decl.getDeclName()))
                 decls.add(decl);
 

@@ -1,6 +1,5 @@
 package com.lsfusion.design;
 
-import com.google.common.base.Throwables;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Query;
@@ -26,12 +25,12 @@ public class DesignInfo {
 
     public FormView formView;
 
-    public DesignInfo(LSFFormDeclaration formDecl, LSFFile lsfFile) {
+    public DesignInfo(LSFFormDeclaration formDecl, LSFFile lsfFile, LSFLocalSearchScope localScope) {
         this.formDecl = formDecl;
 
         FormEntity formEntity = new FormEntity(lsfFile);
 
-        Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile);
+        Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile, localScope);
         
         Map<LSFElement, LSFModuleDeclaration> elementToModule = new HashMap<>();
         for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {

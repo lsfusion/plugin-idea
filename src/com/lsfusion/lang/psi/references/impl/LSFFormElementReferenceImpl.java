@@ -28,7 +28,7 @@ public abstract class LSFFormElementReferenceImpl<T extends LSFFormElementDeclar
         final List<T> objects = new ArrayList<>();
         if (getSimpleName() != null) {
             Condition<T> filter = getResolvedDeclarationsFilter();
-            for (T decl : LSFFormExtendImpl.processFormContext(this, getTextOffset(), getElementsCollector())) {
+            for (T decl : LSFFormExtendImpl.processFormContext(this, getTextOffset(), LSFLocalSearchScope.createFrom(this), getElementsCollector())) {
                 if (filter.value(decl)) {
                     objects.add(decl);
                 }

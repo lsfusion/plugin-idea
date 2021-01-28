@@ -160,12 +160,12 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         return current -> current instanceof FormContext && (objectRef || current instanceof LSFFormStatement || current instanceof LSFDesignStatement) ? (FormContext)current : null;
     }
 
-    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, int offset, final Function<LSFFormExtend, Collection<T>> processor) {
-        return processContext(current, offset, processor, getContext(true), FormContext::resolveFormDecl, getContextExtendType());
+    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<LSFFormExtend, Collection<T>> processor) {
+        return processContext(current, offset, localScope, processor, getContext(true), FormContext::resolveFormDecl, getContextExtendType());
     }
 
-    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, final Function<LSFFormExtend, Collection<T>> processor, final int offset, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
-        return processContext(current, processor, offset, ignoreUseBeforeDeclarationCheck, getContext(objectRef), FormContext::resolveFormDecl, getContextExtendType());
+    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, final Function<LSFFormExtend, Collection<T>> processor, final int offset, LSFLocalSearchScope localScope, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
+        return processContext(current, processor, offset, localScope, ignoreUseBeforeDeclarationCheck, getContext(objectRef), FormContext::resolveFormDecl, getContextExtendType());
     }
 
     @Override

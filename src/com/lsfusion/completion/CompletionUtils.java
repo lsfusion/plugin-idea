@@ -13,6 +13,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import org.jetbrains.annotations.NotNull;
@@ -98,13 +100,13 @@ public class CompletionUtils {
         return element;
     }
 
-    public static List<LookupElement> getVariantsFromIndices(String namespace, LSFFile file, Collection<? extends StringStubIndexExtension> indices, double priority, @NotNull GlobalSearchScope scope) {
+    public static List<LookupElement> getVariantsFromIndices(String namespace, LSFFile file, Collection<? extends StringStubIndexExtension> indices, double priority, @NotNull GlobalSearchScope scope, LSFLocalSearchScope localScope) {
         Project project = file.getProject();
         List<LookupElement> result = new ArrayList<>();
 
         try {
             for (StringStubIndexExtension index : indices) {
-                for (LSFDeclaration declaration : getDeclarationsFromScope(project, scope, index, declaration -> namespace == null || !(declaration instanceof LSFFullNameDeclaration) || namespace.equals(((LSFFullNameDeclaration) declaration).getNamespaceName()))) {
+                for (LSFDeclaration declaration : getDeclarationsFromScope(project, scope, localScope, index, declaration -> namespace == null || !(declaration instanceof LSFFullNameDeclaration) || namespace.equals(((LSFFullNameDeclaration) declaration).getNamespaceName()))) {
                     LookupElement lookupElement = createLookupElement(declaration, priority);
                     if (lookupElement != null)
                         result.add(lookupElement);
@@ -117,16 +119,16 @@ public class CompletionUtils {
         return result;
     }
 
-    public static <G extends LSFFullNameDeclaration> List<G> getDeclarationsFromScope(Project project, GlobalSearchScope scope, StringStubIndexExtension index) {
-        return getDeclarationsFromScope(project, scope, index, Conditions.alwaysTrue());
+    public static <G extends LSFFullNameDeclaration> List<G> getDeclarationsFromScope(Project project, GlobalSearchScope scope, LSFLocalSearchScope localScope, StringStubIndexExtension index) {
+        return getDeclarationsFromScope(project, scope, localScope, index, Conditions.alwaysTrue());
     }
-    public static <G extends LSFDeclaration> List<G> getDeclarationsFromScope(Project project, GlobalSearchScope scope, StringStubIndexExtension index, Condition<G> condition) {
+    public static <G extends LSFDeclaration> List<G> getDeclarationsFromScope(Project project, GlobalSearchScope scope, LSFLocalSearchScope localScope, StringStubIndexExtension index, Condition<G> condition) {
         List<G> result = new ArrayList<>();
 
         Collection<String> propKeys = index.getAllKeys(project);
 //        quickLog("After getAllKeys: " + propKeys.size());
         for (String propKey : propKeys) {
-            Collection<G> declarations = index.get(propKey, project, scope);
+            Collection<G> declarations = LSFGlobalResolver.getItemsFromIndex(index, propKey, project, scope, localScope);
             for (G declaration : declarations) {
                 if(condition.value(declaration))
                     result.add(declaration);

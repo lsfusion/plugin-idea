@@ -11,6 +11,7 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.lsfusion.design.DesignPreviewLineMarkerProvider;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
@@ -28,7 +29,7 @@ public class ReportUtils {
 
     public static boolean findReportFiles(PsiElement source, Processor<String> processor) {
         Result<LSFExtend> declExtend = new Result<>();
-        LSFFormDeclaration decl = DesignPreviewLineMarkerProvider.resolveFormDecl(source);
+        LSFFormDeclaration decl = DesignPreviewLineMarkerProvider.resolveFormDecl(source, declExtend);
         if(decl == null)
             return true;
 
@@ -42,7 +43,7 @@ public class ReportUtils {
         if(!processor.process("xls_" + reportName))
             return false;
 
-        for (LSFFormExtend extend : LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDFORM, (LSFFile) source.getContainingFile())) {
+        for (LSFFormExtend extend : LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDFORM, (LSFFile) source.getContainingFile(), LSFLocalSearchScope.createFrom(declExtend.getResult()))) {
             for (LSFGroupObjectDeclaration groupObjectDecl : extend.getGroupObjectDecls()) {
                 String groupName = groupObjectDecl.getDeclName();
                 if (groupName != null) {

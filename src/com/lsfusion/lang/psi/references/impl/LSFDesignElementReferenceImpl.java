@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.LSFResolveResult;
 import com.lsfusion.lang.psi.declarations.LSFDesignElementDeclaration;
 import com.lsfusion.lang.psi.extend.LSFDesign;
@@ -23,7 +24,7 @@ public abstract class LSFDesignElementReferenceImpl<T extends LSFDesignElementDe
         final List<T> objects = new ArrayList<>();
         if (getSimpleName() != null) {
             Condition<T> filter = getResolvedDeclarationsFilter();
-            for (T decl : LSFDesignImpl.processDesignContext(this, getTextOffset(), getElementsCollector())) {
+            for (T decl : LSFDesignImpl.processDesignContext(this, getTextOffset(), LSFLocalSearchScope.createFrom(this), getElementsCollector())) {
                 if (filter.value(decl)) {
                     objects.add(decl);
                 }

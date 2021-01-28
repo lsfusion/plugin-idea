@@ -159,7 +159,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public boolean isResolveToVirt(LSFMetaDeclaration virtDecl) {
-        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), getOffsetRef(), Collections.singleton(getStubElementType()), getCondition(), Collections.singletonList(virtDecl)).contains(virtDecl);
+        return LSFGlobalResolver.findElements(getNameRef(), getFullNameRef(), (LSFFile) getContainingFile(), getOffsetRef(), LSFLocalSearchScope.createFrom(this), Collections.singleton(getStubElementType()), getCondition(), Collections.singletonList(virtDecl)).contains(virtDecl);
     }
 
     @Override
