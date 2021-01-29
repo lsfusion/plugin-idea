@@ -1,8 +1,6 @@
 package com.lsfusion.lang.psi.indexes;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
-import com.lsfusion.lang.psi.LSFWindowStatement;
 import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import org.jetbrains.annotations.NotNull;
 

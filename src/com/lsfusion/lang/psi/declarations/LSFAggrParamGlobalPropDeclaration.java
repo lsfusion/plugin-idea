@@ -5,7 +5,7 @@ import com.lsfusion.lang.psi.stubs.AggrParamPropStubElement;
 
 import java.util.Set;
 
-public interface LSFAggrParamGlobalPropDeclaration extends LSFGlobalPropDeclaration<LSFAggrParamGlobalPropDeclaration, AggrParamPropStubElement>, LSFExplicitInterfaceProp<AggrParamPropStubElement>, LSFExplicitValueProp<AggrParamPropStubElement> {
+public interface LSFAggrParamGlobalPropDeclaration extends LSFGlobalPropDeclaration<LSFAggrParamGlobalPropDeclaration, AggrParamPropStubElement>, LSFExplicitInterfaceProp<LSFAggrParamGlobalPropDeclaration, AggrParamPropStubElement>, LSFExplicitValueProp<LSFAggrParamGlobalPropDeclaration, AggrParamPropStubElement> {
 
     Set<String> getExplicitValues();
 

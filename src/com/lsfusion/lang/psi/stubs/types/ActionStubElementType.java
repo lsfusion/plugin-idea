@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
@@ -8,6 +7,7 @@ import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
 import com.lsfusion.lang.psi.impl.LSFActionStatementImpl;
 import com.lsfusion.lang.psi.indexes.ActionIndex;
 import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.stubs.ActionStubElement;
 import com.lsfusion.lang.psi.stubs.impl.ActionStubImpl;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +21,7 @@ public class ActionStubElementType extends ActionOrPropStubElementType<ActionStu
     }
 
     @Override
-    public StringStubIndexExtension<LSFActionDeclaration> getGlobalIndex() {
+    public LSFStringStubIndex<LSFActionDeclaration> getGlobalIndex() {
         return ActionIndex.getInstance();
     }
 

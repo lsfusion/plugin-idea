@@ -44,8 +44,6 @@ public class LSFStubElementTypeFactory {
                 return LSFStubElementTypes.IMPLICIT_VALUE;
             case "IMPLICIT_INTERFACE_PROPERTY_STATEMENT":
                 return LSFStubElementTypes.IMPLICIT_INTERFACE;
-            case "COMPONENT_STUB_DECL":
-                return LSFStubElementTypes.COMPONENT;
             case "EXPLICIT_INTERFACE_ACT_STATEMENT":
                 return LSFStubElementTypes.EXPLICIT_INTERFACE_ACTION;
         }

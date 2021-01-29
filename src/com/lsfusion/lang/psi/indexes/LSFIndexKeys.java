@@ -9,7 +9,6 @@ import com.lsfusion.lang.psi.extend.LSFFormExtend;
 
 public class LSFIndexKeys {
     public static final StubIndexKey<String, LSFClassDeclaration> CLASS = StubIndexKey.createIndexKey("lsf.indices.class");
-    public static final StubIndexKey<String, LSFComponentStubDeclaration> COMPONENT = StubIndexKey.createIndexKey("lsf.indices.component");
     public static final StubIndexKey<String, LSFExplicitNamespaceDeclaration> EXPLICIT_NAMESPACE = StubIndexKey.createIndexKey("lsf.indices.explicit.namespace");
     public static final StubIndexKey<String, LSFFormDeclaration> FORM = StubIndexKey.createIndexKey("lsf.indices.form");
     public static final StubIndexKey<String, LSFGroupDeclaration> GROUP = StubIndexKey.createIndexKey("lsf.indices.group");

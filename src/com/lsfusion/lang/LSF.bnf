@@ -1937,7 +1937,7 @@ setupComponentStatement ::= componentSelector componentBody
     pin = 1
 }
 
-newComponentStatement ::= NEW componentStubDecl componentInsertPosition componentBody {pin = 2}
+newComponentStatement ::= NEW componentDecl componentInsertPosition componentBody {pin = 2}
 moveComponentStatement ::= MOVE componentSelector componentInsertPosition componentBody {pin = 1}
 
 componentInsertPosition ::= (   insertRelativePositionLiteral componentSelector
@@ -1967,14 +1967,6 @@ componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                     |	componentUsage
 {
     pin(".*") = 1
-}
-
-componentStubDecl ::= componentDecl
-{
-    implements="com.lsfusion.lang.psi.declarations.LSFComponentStubDeclaration"
-    mixin="com.lsfusion.lang.psi.declarations.impl.LSFComponentStubDeclarationImpl"
-    stubClass = "com.lsfusion.lang.psi.stubs.ComponentStubElement"
-    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
 componentDecl ::= simpleName

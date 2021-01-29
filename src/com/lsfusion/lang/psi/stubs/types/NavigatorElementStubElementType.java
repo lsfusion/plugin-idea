@@ -1,11 +1,11 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.declarations.LSFNavigatorElementDeclaration;
 import com.lsfusion.lang.psi.impl.LSFNewNavigatorElementStatementImpl;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.stubs.NavigatorElementStubElement;
 import com.lsfusion.lang.psi.stubs.impl.NavigatorElementStubImpl;
 import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
@@ -21,7 +21,7 @@ public class NavigatorElementStubElementType extends FullNameStubElementType<Nav
     }
 
     @Override
-    public StringStubIndexExtension<LSFNavigatorElementDeclaration> getGlobalIndex() {
+    public LSFStringStubIndex<LSFNavigatorElementDeclaration> getGlobalIndex() {
         return NavigatorElementIndex.getInstance();
     }
 

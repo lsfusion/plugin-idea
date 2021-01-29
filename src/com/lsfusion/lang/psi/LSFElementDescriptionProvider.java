@@ -41,7 +41,7 @@ public class LSFElementDescriptionProvider implements ElementDescriptionProvider
                 name = propertyStatement.getNameIdentifier().getText();
             }
         } else if (element instanceof LSFNewComponentStatement) {
-            LSFComponentDecl componentDecl = ((LSFNewComponentStatement) element).getComponentStubDecl().getComponentDecl();
+            LSFComponentDecl componentDecl = ((LSFNewComponentStatement) element).getComponentDecl();
             if (componentDecl != null) {
                 type = "component";
                 name = componentDecl.getNameIdentifier().getText();

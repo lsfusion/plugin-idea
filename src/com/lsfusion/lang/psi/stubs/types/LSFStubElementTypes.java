@@ -19,7 +19,6 @@ public interface LSFStubElementTypes {
     TableStubElementType TABLE = new TableStubElementType();
     WindowStubElementType WINDOW = new WindowStubElementType();
     NavigatorElementStubElementType NAVIGATORELEMENT = new NavigatorElementStubElementType();
-    ComponentStubElementType COMPONENT = new ComponentStubElementType();
 
     ExtendFormStubElementType EXTENDFORM = new ExtendFormStubElementType();
     ExtendClassStubElementType EXTENDCLASS = new ExtendClassStubElementType();

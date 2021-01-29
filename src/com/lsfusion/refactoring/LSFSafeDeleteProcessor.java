@@ -75,7 +75,7 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
         } else if (element instanceof LSFExplicitInterfaceActionOrPropStatement) {
             return ((LSFExplicitInterfaceActionOrPropStatement) element).getDeclaration().getNameIdentifier();
         } else if (element instanceof LSFNewComponentStatement) {
-            return ((LSFNewComponentStatement) element).getComponentStubDecl().getComponentDecl().getNameIdentifier();
+            return ((LSFNewComponentStatement) element).getComponentDecl().getNameIdentifier();
         } else if (element instanceof LSFFile) {
             LSFModuleDeclaration moduleDeclaration = ((LSFFile) element).getModuleDeclaration();
             return moduleDeclaration.getNameIdentifier();

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public interface LSFExplicitInterfacePropStatement extends LSFExplicitInterfaceActionOrPropStatement<ExplicitInterfacePropStubElement> {
+public interface LSFExplicitInterfacePropStatement extends LSFExplicitInterfaceActionOrPropStatement<LSFExplicitInterfacePropStatement, ExplicitInterfacePropStubElement> {
 
     Set<String> getExplicitValues();    
 }

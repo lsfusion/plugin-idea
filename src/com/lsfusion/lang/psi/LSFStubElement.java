@@ -1,8 +1,13 @@
 package com.lsfusion.lang.psi;
 
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubOutputStream;
 
-public interface LSFStubElement<T extends LSFElement> extends StubElement<T> {
+import java.io.IOException;
+
+public interface LSFStubElement<This extends LSFStubElement<This, Decl>, Decl extends LSFElement> extends StubElement<Decl> {
+
+    void serialize(StubOutputStream dataStream) throws IOException;
 
     boolean isCorrect();
 

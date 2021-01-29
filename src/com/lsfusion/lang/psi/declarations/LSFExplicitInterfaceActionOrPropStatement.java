@@ -8,5 +8,5 @@ import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfacePropStubElement;
 
 import java.util.Set;
 
-public interface LSFExplicitInterfaceActionOrPropStatement<Stub extends ExplicitInterfaceActionOrPropStubElement> extends LSFExplicitInterfaceProp<Stub> {
+public interface LSFExplicitInterfaceActionOrPropStatement<This extends LSFExplicitInterfaceActionOrPropStatement<This, Stub>, Stub extends ExplicitInterfaceActionOrPropStubElement<Stub, This>> extends LSFExplicitInterfaceProp<This, Stub> {
 }

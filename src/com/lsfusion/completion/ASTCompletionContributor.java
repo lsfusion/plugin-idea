@@ -21,7 +21,6 @@ import com.intellij.psi.impl.source.PostprocessReformattingAspect;
 import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.psi.scope.BaseScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.BooleanValueHolder;
@@ -440,20 +439,20 @@ public class ASTCompletionContributor extends CompletionContributor {
             return completeFullNameUsage(navigatorCompleted, NAVIGATOR_ELEMENT_USAGE, asList(FormIndex.getInstance(), NavigatorElementIndex.getInstance()), NAVIGATOR_PRIORITY);
         }
 
-        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, StringStubIndexExtension index, double priority) {
+        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, LSFStringStubIndex index, double priority) {
             return completeFullNameUsage(completed, frameType, asList(index), priority);
         }
 
-        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends StringStubIndexExtension> indices, double priority) {
+        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends LSFStringStubIndex> indices, double priority) {
             return completeFullNameUsage(completed, frameType, indices, priority, true, true);
         }
 
-        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends StringStubIndexExtension> indices,
+        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends LSFStringStubIndex> indices,
                                               double priority, boolean extractNamespace, boolean useRequiredScope) {
             return completeFullNameUsage(completed, frameType, indices, priority, extractNamespace, useRequiredScope, null);
         }
         
-        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends StringStubIndexExtension> indices,
+        private boolean completeFullNameUsage(BooleanValueHolder completed, IElementType frameType, Collection<? extends LSFStringStubIndex> indices,
                                               double priority, boolean extractNamespace, boolean useRequiredScope, Collection<? extends LSFFullNameDeclaration> additionalDeclarations) {
             Frame fullNameUsage = getLastFrameOfType(null, frameType);
             if (fullNameUsage != null) {
