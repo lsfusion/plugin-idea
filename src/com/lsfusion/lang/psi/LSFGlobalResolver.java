@@ -4,10 +4,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.*;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
@@ -16,10 +14,7 @@ import com.lsfusion.lang.psi.cache.RequireModulesCache;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
-import com.lsfusion.lang.psi.indexes.ClassExtendsClassIndex;
-import com.lsfusion.lang.psi.indexes.ExplicitNamespaceIndex;
-import com.lsfusion.lang.psi.indexes.ModuleIndex;
-import com.lsfusion.lang.psi.indexes.TableClassesIndex;
+import com.lsfusion.lang.psi.indexes.*;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
@@ -89,10 +84,6 @@ public class LSFGlobalResolver {
         return result;
     }
 
-    public static GlobalSearchScope getRequireScope(LSFElement lsfElement) {
-        return getRequireScope(lsfElement.getLSFFile());
-    }
-
     public static GlobalSearchScope getRequireScope(LSFFile lsfFile) {
         if (lsfFile instanceof LSFCodeFragment && lsfFile.getContext() != null) {
             PsiFile containingFile = lsfFile.getContext().getContainingFile();
@@ -143,7 +134,7 @@ public class LSFGlobalResolver {
         return null;
     }
 
-    public static <G extends PsiElement> Collection<G> getItemsFromIndex(StringStubIndexExtension<G> index, String name, Project project, GlobalSearchScope scope, LSFLocalSearchScope localScope) {
+    public static <G extends LSFStubbedElement> Collection<G> getItemsFromIndex(LSFStringStubIndex<G> index, String name, Project project, GlobalSearchScope scope, LSFLocalSearchScope localScope) {
         return index.get(name, project, scope);
     }
 
@@ -176,9 +167,9 @@ public class LSFGlobalResolver {
         }
 
         Collection<T> decls = new ArrayList<>();
-        Set<StringStubIndexExtension> usedIndices = new HashSet<>();
+        Set<LSFStringStubIndex<T>> usedIndices = new HashSet<>();
         for (FullNameStubElementType<S, T> type : types) {
-            StringStubIndexExtension<T> index = type.getGlobalIndex();
+            LSFStringStubIndex<T> index = type.getGlobalIndex();
             if(usedIndices.add(index))
                 decls.addAll(getItemsFromIndex(index, name, project, scope, localScope));
         }

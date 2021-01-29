@@ -5,7 +5,6 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.IdFilter;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -40,8 +39,8 @@ public class LSFSymbolContributor extends LSFNameContributor {
     }
 
     @Override
-    protected Collection<StringStubIndexExtension> getIndices() {
-        List<StringStubIndexExtension> indices = new ArrayList<>();
+    protected Collection<LSFStringStubIndex> getIndices() {
+        List<LSFStringStubIndex> indices = new ArrayList<>();
         indices.add(ClassIndex.getInstance());
         indices.add(ModuleIndex.getInstance());
         indices.add(ExplicitNamespaceIndex.getInstance());
@@ -102,7 +101,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
     }
 
     @Override
-    protected Processor<? super String> getProcessor(StringStubIndexExtension index,
+    protected Processor<? super String> getProcessor(LSFStringStubIndex index,
                                                      Processor<? super String> processor,
                                                      GlobalSearchScope scope) {
 
@@ -135,7 +134,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
     }
 
     @Override
-    protected Collection<NavigationItem> getItemsWithParamsFromIndex(StringStubIndexExtension index, String name, Project project, GlobalSearchScope scope) {
+    protected Collection<NavigationItem> getItemsWithParamsFromIndex(LSFStringStubIndex index, String name, Project project, GlobalSearchScope scope) {
         if (index instanceof ActionOrPropIndex) {
             List<NavigationItem> decls = getPropertyDeclarationsMap(name, false);
             return decls != null

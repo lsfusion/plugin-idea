@@ -26,32 +26,10 @@ public class ExplicitValueStubElementType extends LSFStubElementType<ExplicitVal
         super("EXPLICIT_VALUE_PROPERTY_STATEMENT");
     }
 
-    @Override
-    public void serialize(@NotNull ExplicitValueStubElement stub, @NotNull StubOutputStream dataStream) throws IOException {
-        List<String> classes = stub.getValueClasses();
-        if (classes != null) {
-            dataStream.writeInt(classes.size());
-            for (String aClass : classes) {
-                dataStream.writeName(aClass);
-            }
-        } else {
-            dataStream.writeInt(0);
-        }
-    }
-
     @NotNull
     @Override
     public ExplicitValueStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-        int classCount = dataStream.readInt();
-        List<String> classes = new ArrayList<>();
-        if (classCount != 0) {
-            for (int i = 0; i < classCount; i++) {
-                StringRef name = dataStream.readName();
-                classes.add(name != null ? name.getString() : null);
-            }
-        }
-
-        return new ExplicitValueStubImpl(parentStub, this, classes);
+        return new ExplicitValueStubImpl(dataStream, parentStub, this);
     }
 
     @Override
@@ -74,7 +52,7 @@ public class ExplicitValueStubElementType extends LSFStubElementType<ExplicitVal
 
     @Override
     public ExplicitValueStubElement createStub(@NotNull LSFExplicitValuePropStatement psi, StubElement parentStub) {
-        final ExplicitValueStubImpl stub = new ExplicitValueStubImpl(parentStub, psi.getElementType());
+        final ExplicitValueStubImpl stub = new ExplicitValueStubImpl(parentStub, psi);
 
         LSFPropertyStatement propertyStatement = psi.getPropertyStatement();
         List<String> classNames = LSFPsiImplUtil.getValueAPClassNames(propertyStatement.getPropertyCalcStatement());

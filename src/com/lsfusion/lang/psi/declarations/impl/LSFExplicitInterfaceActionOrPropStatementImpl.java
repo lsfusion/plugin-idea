@@ -6,10 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 import com.lsfusion.lang.classes.LSFClassSet;
-import com.lsfusion.lang.psi.LSFExplicitClasses;
-import com.lsfusion.lang.psi.LSFExplicitSignature;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFStringClassRef;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionOrPropStatement;
 import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceActionOrPropStubElement;
@@ -19,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.List;
 
-public abstract class LSFExplicitInterfaceActionOrPropStatementImpl<Stub extends ExplicitInterfaceActionOrPropStubElement> extends StubBasedPsiElementBase<Stub> implements LSFExplicitInterfaceActionOrPropStatement<Stub> {
+public abstract class LSFExplicitInterfaceActionOrPropStatementImpl<This extends LSFExplicitInterfaceActionOrPropStatement<This, Stub>, Stub extends ExplicitInterfaceActionOrPropStubElement<Stub, This>> extends LSFStubBasedPsiElement<This, Stub> implements LSFExplicitInterfaceActionOrPropStatement<This, Stub> {
 
     public LSFExplicitInterfaceActionOrPropStatementImpl(@NotNull Stub stub, @NotNull IStubElementType nodeType) {
         super(stub, nodeType);

@@ -4,12 +4,13 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.IElementType;
 import com.lsfusion.lang.psi.stubs.GlobalStubElement;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class LSFStubBasedPsiElement<This extends LSFGlobalElement<This, Stub>, Stub extends GlobalStubElement<Stub, This>>
+public abstract class LSFStubBasedPsiElement<This extends LSFStubbedElement<This, Stub>, Stub extends LSFStubElement<Stub, This>>
         extends StubBasedPsiElementBase<Stub>
-        implements LSFElement {
+        implements LSFStubbedElement<This, Stub> {
     
     protected LSFStubBasedPsiElement(@NotNull Stub stub, @NotNull IStubElementType nodeType) {
         super(stub, nodeType);
@@ -17,6 +18,10 @@ public abstract class LSFStubBasedPsiElement<This extends LSFGlobalElement<This,
 
     protected LSFStubBasedPsiElement(@NotNull ASTNode node) {
         super(node);
+    }
+
+    public LSFStubBasedPsiElement(Stub stub, IElementType nodeType, ASTNode node) {
+        super(stub, nodeType, node);
     }
 
     @Override
@@ -31,10 +36,5 @@ public abstract class LSFStubBasedPsiElement<This extends LSFGlobalElement<This,
     @Override
     public LSFFile getLSFFile() {
         return (LSFFile) getContainingFile();
-    }
-
-    @Override
-    public GlobalSearchScope getScope() {
-        return LSFElementImpl.getScope(this);
     }
 }

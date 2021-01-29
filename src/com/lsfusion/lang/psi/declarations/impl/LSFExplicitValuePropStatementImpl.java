@@ -4,6 +4,7 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.LSFStubBasedPsiElement;
 import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFImplicitValuePropStatement;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public abstract class LSFExplicitValuePropStatementImpl extends StubBasedPsiElementBase<ExplicitValueStubElement> implements LSFExplicitValuePropStatement {
+public abstract class LSFExplicitValuePropStatementImpl extends LSFStubBasedPsiElement<LSFExplicitValuePropStatement, ExplicitValueStubElement> implements LSFExplicitValuePropStatement {
     public LSFExplicitValuePropStatementImpl(@NotNull ExplicitValueStubElement stub, @NotNull IStubElementType nodeType) {
         super(stub, nodeType);
     }

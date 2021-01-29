@@ -5,10 +5,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndex;
+import com.lsfusion.lang.psi.LSFElement;
+import com.lsfusion.lang.psi.LSFStubElement;
+import com.lsfusion.lang.psi.LSFStubbedElement;
 
 import java.util.Collection;
 
-public abstract class LSFStringStubIndex<Psi extends PsiElement> extends StringStubIndexExtension<Psi> {
+public abstract class LSFStringStubIndex<Psi extends LSFStubbedElement> extends StringStubIndexExtension<Psi> {
     @Override
     public Collection<Psi> get(String s, Project project, GlobalSearchScope scope) {
         return StubIndex.getElements(getKey(), s, project, scope, getPsiClass());

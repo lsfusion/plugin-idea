@@ -91,7 +91,7 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
                     LSFNewComponentStatement newComponent = statement.getNewComponentStatement();
                     if(newComponent != null) {
                         result.addAll(findComponents(newComponent.getComponentBody()));
-                        result.add(newComponent.getComponentStubDecl().getComponentDecl());
+                        result.add(newComponent.getComponentDecl());
                     }
                 }
             }

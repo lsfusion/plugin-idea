@@ -1,11 +1,11 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.declarations.LSFExplicitNamespaceDeclaration;
 import com.lsfusion.lang.psi.impl.LSFNamespaceNameImpl;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.stubs.ExplicitNamespaceStubElement;
 import com.lsfusion.lang.psi.stubs.impl.ExplicitNamespaceStubImpl;
 import com.lsfusion.lang.psi.indexes.ExplicitNamespaceIndex;
@@ -21,7 +21,7 @@ public class ExplicitNamespaceStubElementType extends NamespaceStubElementType<E
     }
 
     @Override
-    public StringStubIndexExtension<LSFExplicitNamespaceDeclaration> getGlobalIndex() {
+    public LSFStringStubIndex<LSFExplicitNamespaceDeclaration> getGlobalIndex() {
         return ExplicitNamespaceIndex.getInstance();
     }
 

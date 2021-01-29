@@ -1,15 +1,12 @@
 package com.lsfusion.lang.psi.stubs.interfaces;
 
-import com.intellij.psi.stubs.StubElement;
 import com.lsfusion.lang.psi.LSFExplicitClasses;
+import com.lsfusion.lang.psi.LSFStubElement;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionOrPropStatement;
-import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
-
-public interface ExplicitInterfaceActionOrPropStubElement<T extends LSFExplicitInterfaceActionOrPropStatement> extends StubElement<T> {
+public interface ExplicitInterfaceActionOrPropStubElement<This extends ExplicitInterfaceActionOrPropStubElement<This, Decl>, Decl extends LSFExplicitInterfaceActionOrPropStatement<Decl, This>> extends LSFStubElement<This, Decl> {
 
     @NotNull
     String getDeclName();

@@ -8,45 +8,36 @@ import com.lsfusion.lang.psi.stubs.GlobalStubElement;
 import java.io.IOException;
 
 public abstract class GlobalStubImpl<This extends GlobalStubElement<This, Decl>, Decl extends LSFGlobalElement<Decl, This>>
-        extends StubBase<Decl>
+        extends ElementStubImpl<This, Decl>
         implements GlobalStubElement<This, Decl> {
 
     protected StringRef name;
-    protected boolean isCorrect;
 
     protected GlobalStubImpl(StubElement parent, Decl psi) {
-        super(parent, psi.getElementType());
+        super(parent, psi);
 
         name = StringRef.fromString(psi.getGlobalName());
-        isCorrect = psi.isCorrect();
     }
 
     public GlobalStubImpl(StubInputStream dataStream, StubElement parentStub, IStubElementType<This, Decl> type) throws IOException {
-        super(parentStub, type);
+        super(dataStream, parentStub, type);
 
         name = dataStream.readName();
-        isCorrect = dataStream.readBoolean();
     }
 
     protected GlobalStubImpl(StubElement parent, IStubElementType elementType, StringRef name) {
         super(parent, elementType);
         this.name = name;
-        this.isCorrect = true;
     }
 
     public void serialize(StubOutputStream dataStream) throws IOException {
-        dataStream.writeName(StringRef.toString(name));
+        super.serialize(dataStream);
 
-        dataStream.writeBoolean(isCorrect);
+        dataStream.writeName(StringRef.toString(name));
     }
 
     @Override
     public String getGlobalName() {
         return StringRef.toString(name);
-    }
-
-    @Override
-    public boolean isCorrect() {
-        return isCorrect;
     }
 }

@@ -4,6 +4,7 @@ import com.intellij.psi.stubs.*;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.impl.LSFTableStatementImpl;
 import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.indexes.TableIndex;
 import com.lsfusion.lang.psi.stubs.TableStubElement;
 import com.lsfusion.lang.psi.stubs.impl.TableStubImpl;
@@ -18,7 +19,7 @@ public class TableStubElementType extends FullNameStubElementType<TableStubEleme
     }
 
     @Override
-    public StringStubIndexExtension<LSFTableDeclaration> getGlobalIndex() {
+    public LSFStringStubIndex<LSFTableDeclaration> getGlobalIndex() {
         return TableIndex.getInstance();
     }
 
@@ -41,13 +42,6 @@ public class TableStubElementType extends FullNameStubElementType<TableStubEleme
     @Override
     public TableStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
         return new TableStubImpl(dataStream, parentStub, this);
-    }
-
-    @Override
-    public void serialize(@NotNull TableStubElement stub, @NotNull StubOutputStream dataStream) throws IOException {
-        super.serialize(stub, dataStream);
-        dataStream.writeUTFFast(stub.getClassNamesString());
-        dataStream.writeBoolean(stub.isExplicit());
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.stubs.impl;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.StubOutputStream;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.stubs.TableStubElement;
 import com.lsfusion.lang.psi.stubs.types.TableStubElementType;
@@ -22,6 +23,14 @@ public class TableStubImpl extends FullNameStubImpl<TableStubElement, LSFTableDe
         
         classNamesString = classNames.length == 0 ? "" : BaseUtils.toString(classNames);
         isExplicit = psi.isExplicit();
+    }
+
+    @Override
+    public void serialize(StubOutputStream dataStream) throws IOException {
+        super.serialize(dataStream);
+
+        dataStream.writeUTFFast(classNamesString);
+        dataStream.writeBoolean(isExplicit);
     }
 
     public TableStubImpl(StubInputStream dataStream, StubElement parentStub, TableStubElementType type) throws IOException {

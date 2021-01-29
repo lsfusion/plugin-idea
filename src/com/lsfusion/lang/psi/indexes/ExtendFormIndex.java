@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.indexes;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import org.jetbrains.annotations.NotNull;

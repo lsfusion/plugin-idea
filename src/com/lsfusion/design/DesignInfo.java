@@ -1,5 +1,6 @@
 package com.lsfusion.design;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Query;
@@ -32,7 +33,7 @@ public class DesignInfo {
 
         Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile, localScope);
         
-        Map<LSFElement, LSFModuleDeclaration> elementToModule = new HashMap<>();
+        Map<PsiElement, LSFModuleDeclaration> elementToModule = new HashMap<>();
         for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {
             LSFModuleDeclaration moduleDeclaration = formExtend.getLSFFile().getModuleDeclaration();
             if (moduleDeclaration != null) {
@@ -40,7 +41,7 @@ public class DesignInfo {
             }
         }
         
-        for (LSFElement formExtend : sortByModules(elementToModule)) {
+        for (PsiElement formExtend : sortByModules(elementToModule)) {
             formEntity.extendForm((LSFFormExtend) formExtend);
         }
 
@@ -61,7 +62,7 @@ public class DesignInfo {
             }
         }
         
-        for (LSFElement ref : sortByModules(elementToModule)) {
+        for (PsiElement ref : sortByModules(elementToModule)) {
             LSFDesignHeader designHeader = (LSFDesignHeader) ref.getParent();
             if (designHeader.getCustomFormDesignOption() != null) {
                 formView = FormView.create(formEntity);
@@ -71,11 +72,11 @@ public class DesignInfo {
         }
     }
     
-    private List<LSFElement> sortByModules(Map<LSFElement, LSFModuleDeclaration> elementToModule) {
+    private List<PsiElement> sortByModules(Map<PsiElement, LSFModuleDeclaration> elementToModule) {
         List<LSFModuleDeclaration> sortedModules = new ArrayList<>();
         processSorting(formDecl.getLSFFile().getModuleDeclaration(), new HashSet<>(elementToModule.values()), new HashSet<>(), sortedModules);
 
-        List<LSFElement> elementList = new ArrayList<>(elementToModule.keySet());
+        List<PsiElement> elementList = new ArrayList<>(elementToModule.keySet());
         elementList.sort((o1, o2) -> {
             assert o1 != null && o2 != null;
             LSFModuleDeclaration module1 = elementToModule.get(o1);
@@ -126,7 +127,7 @@ public class DesignInfo {
                 }
             } else if (componentStatement.getNewComponentStatement() != null) {
                 LSFNewComponentStatement statement = componentStatement.getNewComponentStatement();
-                String name = statement.getComponentStubDecl().getComponentDecl().getName();
+                String name = statement.getComponentDecl().getName();
                 ContainerView container = formView.createContainer(null, name);
 
                 LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
