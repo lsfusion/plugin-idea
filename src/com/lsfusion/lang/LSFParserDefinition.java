@@ -70,7 +70,6 @@ public class LSFParserDefinition implements ParserDefinition {
         RSQBR,
         ATSIGN,
         ATSIGN2,
-        FAKEMETAID,
         ID
     );
 

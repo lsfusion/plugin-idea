@@ -320,7 +320,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         }
         
-        LSFAnyTokens statements = o.getAnyTokens();
+        LSFMetaCodeDeclBody statements = o.getMetaCodeDeclBody();
         if (statements != null) {
             Annotation annotation = myHolder.createInfoAnnotation(statements.getTextRange(), "");
             annotation.setEnforcedTextAttributes(META_DECL);
@@ -591,7 +591,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private boolean checkReference(LSFReference reference) {
         Annotation errorAnnotation = reference.resolveErrorAnnotation(myHolder);
-        if (!isInMetaDecl(reference) && errorAnnotation != null) {
+        if (errorAnnotation != null) { // !isInMetaDecl(reference)
             addError(reference, errorAnnotation);
             return false;
         }

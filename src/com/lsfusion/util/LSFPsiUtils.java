@@ -44,6 +44,7 @@ public class LSFPsiUtils {
             //parent == scriptStatement OR metaCodeBody
             if (element.getParent() instanceof LSFFile
                     || element.getParent() instanceof LSFScriptStatement
+                    || element.getParent() instanceof LSFMetaCodeDeclBody
                     || element.getParent() instanceof LSFMetaCodeBody) {
                 break;
             }
@@ -105,7 +106,7 @@ public class LSFPsiUtils {
 
     public static boolean isLsfIdentifierPart(char ch) {
         // [a-zA-Z_0-9]
-        return (ch >= 'a' && ch <='z') || (ch >= 'A' && ch <='Z') || (ch >= '0' && ch <='9') || ch == '_';  
+        return (ch >= 'a' && ch <='z') || (ch >= 'A' && ch <='Z') || (ch >= '0' && ch <='9') || ch == '_' || ch == '#';
     }
 
     public static String getPresentableText(LSFGlobalPropDeclaration property) {

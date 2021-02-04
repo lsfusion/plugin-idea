@@ -1,5 +1,6 @@
 package com.lsfusion.lang.psi;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ReferenceRange;
@@ -37,9 +38,9 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
             result.add(id.getText());
         return result;
     }
-    public static Query<PsiReference> searchWordUsages(GlobalSearchScope scope, String compoundID) {
+    public static Query<PsiReference> searchWordUsages(Project project, String compoundID) {
         SearchRequestCollector request = new SearchRequestCollector(new SearchSession());
-        request.searchWord(compoundID, scope, UsageSearchContext.IN_CODE, true, new RequestResultProcessor() {
+        request.searchWord(compoundID, new LSFFilesSearchScope(project), UsageSearchContext.IN_CODE, true, new RequestResultProcessor() {
             @Override
             public boolean processTextOccurrence(@NotNull PsiElement element, int offsetInElement, @NotNull Processor consumer) {
                 for (PsiReference ref : element.getReferences())
@@ -49,7 +50,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
                 return true;
             }
         });
-        return new SearchRequestQuery(scope.getProject(), request);
+        return new SearchRequestQuery(project, request);
     }
 
     public static List<LSFMetaCodeStatement> findMetaUsages(LSFMetaDeclaration metaDecl) {
@@ -68,7 +69,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
             }
         };
         final List<LSFMetaCodeStatement> result = new ArrayList<>();
-        searchWordUsages(GlobalSearchScope.allScope(file.getProject()), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
+        searchWordUsages(file.getProject(), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
             public boolean process(PsiReference ref) {
                 if (ref instanceof LSFMetaReference && ((LSFMetaReference) ref).isResolveToVirt(virtDecl))
                     synchronized (result) {
@@ -82,7 +83,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
 
     public static List<LSFFullNameReference> findRenameConflicts(final String name, final LSFFullNameDeclaration decl) {
         final List<LSFFullNameReference> result = new ArrayList<>();
-        searchWordUsages(GlobalSearchScope.allScope(decl.getProject()), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
+        searchWordUsages(decl.getProject(), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
             public boolean process(PsiReference ref) {
                 if (ref instanceof LSFFullNameReference && ((LSFFullNameReference<LSFDeclaration, LSFFullNameDeclaration>) ref).getFullCondition().value(decl))
                     synchronized (result) {
