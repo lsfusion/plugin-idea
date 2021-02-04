@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,10 +20,9 @@ public class LSFStringValueLiteralImpl extends ASTWrapperPsiElement implements L
         if (visitor instanceof LSFVisitor) accept((LSFVisitor)visitor);
         else super.accept(visitor);
     }
-    
+
     @Override
     public String getValue() {
-        String text = getText();
-        return text.substring(1, text.lastIndexOf("'"));
+        return LSFLocalizedStringValueLiteralImpl.getValue(this, false);
     }
 }                                     

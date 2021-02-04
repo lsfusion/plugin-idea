@@ -5,8 +5,13 @@ import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.impl.source.tree.ForeignLeafPsiElement;
+import com.intellij.psi.impl.source.tree.LeafElement;
+import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.util.Consumer;
+import com.intellij.util.Processor;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.psi.*;
@@ -38,11 +43,11 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
     public abstract LSFMetaDeclIdList getMetaDeclIdList();
 
     @Nullable
-    public abstract LSFAnyTokens getAnyTokens();
+    public abstract LSFMetaCodeDeclBody getMetaCodeDeclBody();
 
     @Override
     public boolean isCorrect() {
-        return super.isCorrect() && getAnyTokens() != null;
+        return super.isCorrect() && getMetaCodeDeclBody() != null;
     }
 
     @Override
@@ -66,8 +71,8 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
         }
     }
 
-    public void setBody(LSFAnyTokens parsed) {
-        LSFAnyTokens body = getAnyTokens();
+    public void setBody(LSFMetaCodeDeclBody parsed) {
+        LSFMetaCodeDeclBody body = getMetaCodeDeclBody();
         if (body != null) {
             body.replace(parsed);
         }
@@ -77,25 +82,60 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
         recReadMetaWhiteSpaceOrComments(prev ? node.getTreePrev() : node.getTreeNext(), prev, tokens);
     }
 
+    private boolean iterateLeafTokensWithoutBody(ASTNode node, Processor<ASTNode> leafProcessor) {
+        if(node instanceof LeafElement)
+            return leafProcessor.process(node);
+        else {
+            if(node.getElementType() != LSFTypes.META_CODE_BODY) // ignoring inlined metacodes
+                for(ASTNode child : node.getChildren(null)) {
+                    if(!iterateLeafTokensWithoutBody(child, leafProcessor))
+                        return false;
+                }
+        }
+        return true;
+    }
+
+    // we need to do the same but ignore metaCodeBody
     public PsiElement findOffsetInCode(int offset) {
-        LSFAnyTokens anyTokens = getAnyTokens();
-        return anyTokens == null ? null : anyTokens.findElementAt(offset);
+        LSFMetaCodeDeclBody metaDeclBody = getMetaCodeDeclBody();
+        if(metaDeclBody == null)
+            return null;
+
+        final Result<Integer> rCurrentOffset = new Result<>(0);
+        final Result<ASTNode> rOffsetNode = new Result<>();
+        iterateLeafTokensWithoutBody(metaDeclBody.getNode(), astNode -> {
+            int current = rCurrentOffset.getResult() + astNode.getTextLength();
+            if(offset < current) {
+                rOffsetNode.setResult(astNode);
+                return false;
+            }
+            rCurrentOffset.setResult(current);
+            return true;
+        });
+        ASTNode offsetNode = rOffsetNode.getResult();
+        if(offsetNode == null)
+            return null;
+        return offsetNode.getPsi();
     }
 
     @Override
     public List<Pair<String, IElementType>> getMetaCode() {
-        LSFAnyTokens anyTokens = getAnyTokens();
-        if (anyTokens == null) {
+        LSFMetaCodeDeclBody metaBody = getMetaCodeDeclBody();
+        if (metaBody == null) {
             return Collections.emptyList();
         }
 
-        List<Pair<String, IElementType>> tokens = new ArrayList<>();
+        ASTNode node = metaBody.getNode();
 
-        ASTNode node = anyTokens.getNode();
+        final List<Pair<String, IElementType>> tokens = new ArrayList<>();
 
         readMetaWhiteSpaceOrComments(node, true, tokens);
-        for (ASTNode anyToken : node.getChildren(null))
-            tokens.add(Pair.create(anyToken.getText(), anyToken.getElementType()));
+
+        iterateLeafTokensWithoutBody(node, astNode -> {
+            tokens.add(Pair.create(astNode.getText(), astNode.getElementType()));
+            return true;
+        });
+
         readMetaWhiteSpaceOrComments(node, false, tokens);
         return tokens;
     }

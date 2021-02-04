@@ -111,16 +111,18 @@ public class LSFElementGenerator {
             return null;
         }
 
-        List<LSFMetaCodeStatement> recMetaStatements = body.getMetaCodeStatementList();
+        List<LSFMetaCodeStatement> recMetaStatements = new ArrayList<>();
+        for (LSFLazyMetaStatement metaDeclStatement : body.getLazyMetaStatementList())
+            recMetaStatements.addAll(metaDeclStatement.getMetaCodeStatementList());
 
         MetaChangeDetector.syncUsageProcessing(file, null, null, true, recMetaStatements);
 
         return body;
     }
 
-    public static LSFAnyTokens createMetaCodeFromText(final Project project, final String text) {
+    public static LSFMetaCodeDeclBody createMetaCodeFromText(final Project project, final String text) {
         final PsiFile dummyFile = createDummyFile(project, "MODULE " + genName + "; META dummy(dummy) " + text + " END");
-        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFAnyTokens.class).iterator().next();
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFMetaCodeDeclBody.class).iterator().next();
     }
 
     private static LSFExprParamDeclaration rowParamDecl = null;

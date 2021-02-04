@@ -100,14 +100,15 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         return new ArrayList<>();
     }
 
+    public static String getValue(PsiElement element, boolean needToBeLocalized) {
+        String text = element.getText();
+//        if(!needToBeLocalized)
+        return removeEscapeSymbolsAndQuotes(text);
+    }
+
     @Override
     public String getValue() {
-        String text = getText();
-        if (needToBeLocalized()) {
-            return text.substring(1, text.length() - 1);
-        } else {
-            return removeEscapeSymbols(text.substring(1, text.length() - 1));
-        }
+        return getValue(this, needToBeLocalized());
     }
 
     @Override
@@ -124,13 +125,13 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         return false;
     }
     
-    private static String removeEscapeSymbols(String s) {
+    private static String removeEscapeSymbolsAndQuotes(String s) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < s.length(); ++i) {
             char cur = s.charAt(i);
             if (cur == '\\' && i+1 < s.length()) {
                 char next = s.charAt(i+1);
-                if (next == '\\' || next == '{' || next == '}') {
+                if (next == '\\' || next == '{' || next == '}' || next == '\'') {
                     builder.append(next);
                     ++i;
                     continue;

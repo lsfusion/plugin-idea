@@ -1,5 +1,8 @@
 package com.lsfusion.lang.meta;
 
+import com.intellij.codeInsight.completion.CompletionPhase;
+import com.intellij.codeInsight.completion.CompletionPhaseListener;
+import com.intellij.codeInsight.completion.impl.CompletionServiceImpl;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
@@ -7,6 +10,8 @@ import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.*;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
@@ -15,6 +20,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
@@ -33,13 +39,14 @@ import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.intellij.codeInsight.completion.impl.CompletionServiceImpl.getCompletionPhase;
 import static com.lsfusion.util.LSFPsiUtils.findChildrenOfType;
 
 public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent { //, EditorFactoryListener
     private static final Logger LOG = Logger.getInstance("#" + MetaChangeDetector.class.getName());
     //    private final FileDocumentManager myDocumentManager;
     private final PsiManager myPsiManager;
-    //    private final FileEditorManager myFileEditorManager;
+    private final FileEditorManager myFileEditorManager;
     private final Project myProject;
     //    private final TemplateManager myTemplateManager;
     private final PsiDocumentManager myPsiDocumentManager;
@@ -48,14 +55,14 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             final PsiDocumentManager psiDocumentManager,
 //                                          final FileDocumentManager documentManager,
             final PsiManager psiManager,
-//                                          final FileEditorManager fileEditorManager,
+            final FileEditorManager fileEditorManager,
 //                                          final TemplateManager templateManager,
             final Project project
     ) {
 //        myDocumentManager = documentManager;
         myPsiDocumentManager = psiDocumentManager;
         myPsiManager = psiManager;
-//        myFileEditorManager = fileEditorManager;
+        myFileEditorManager = fileEditorManager;
         myProject = project;
 //        myTemplateManager = templateManager;
     }
@@ -117,7 +124,22 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     }
                 }
         );
+
+        myProject.getMessageBus().connect().subscribe(CompletionPhaseListener.TOPIC, isCompletionRunning -> {
+            checkCompletion();
+        });
     }
+
+    private void checkCompletion() {
+        CompletionPhase completionPhase = getCompletionPhase();
+        boolean newCompletionRunning = !(completionPhase == CompletionPhase.NoCompletion || completionPhase instanceof CompletionPhase.ZombiePhase);
+        if(newCompletionRunning || this.isCompletionRunning)
+            lastCompletionRunning = System.currentTimeMillis();
+        this.isCompletionRunning = newCompletionRunning;
+    }
+
+    private boolean isCompletionRunning;
+    private long lastCompletionRunning;
 
     @Override
     public void projectClosed() {
@@ -251,12 +273,12 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
         int actualOffset = offset;
 
-        for (PsiElement child : metaBody.getChildren()) {
-            if (child instanceof LSFMetaCodeStatement) {
+        for (LSFLazyMetaStatement lazyChild : metaBody.getLazyMetaStatementList()) {
+            for(LSFMetaCodeStatement child : lazyChild.getMetaCodeStatementList()) {
                 if (child.getStartOffsetInParent() >= actualOffset - 1) // -1 потому как скобка
                     break;
 
-                LSFMetaCodeBody innerBody = ((LSFMetaCodeStatement) child).getMetaCodeBody();
+                LSFMetaCodeBody innerBody = child.getMetaCodeBody();
                 if (innerBody != null) {
                     String text = innerBody.getText();
                     offset -= text.length();
@@ -593,10 +615,11 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
                                                     boolean prevEnabled = enabled;
                                                     enabled = false; // выключаем чтобы каскадно не вызывались события
-
-                                                    gen.usage.setInlinedBody(gen.toParse.parse(file, gen.usage.isInline()));
-                                                    
-                                                    enabled = prevEnabled;
+                                                    try {
+                                                        gen.usage.setInlinedBody(gen.toParse.parse(file, gen.usage.isInline()));
+                                                    } finally {
+                                                        enabled = prevEnabled;
+                                                    }
 
 //                                                    myPsiDocumentManager.commitDocument(document);
                                                 }
@@ -619,12 +642,50 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     }
                 };
 
-                ApplicationManager.getApplication().invokeLater(runGenUsage);
+                ApplicationManager.getApplication().invokeLater(new CompletionRunner(file) {
+                    @Override
+                    public void runNoCompletion() {
+                        runGenUsage.run();
+                    }
+                });
             }
 
             if (!usages.isEmpty())
                 inlinePostpone(this, false); // еще раз запустим, так как некоторые в Dumb выполнялись
         }
+    }
+
+    private abstract class CompletionRunner implements Runnable {
+
+        private final LSFFile file;
+
+        public CompletionRunner(LSFFile file) {
+            this.file = file;
+        }
+
+        public abstract void runNoCompletion();
+
+        @Override
+        public void run() {
+            // the problem here is that changing editing document stops completion (expires document), so if we see that there is a completion running, we postpone the inlining
+            if (isRunningCompletion(file))
+                inlinePostpone(this, true);
+            else
+                runNoCompletion();
+        }
+    }
+
+    private boolean isRunningCompletion(LSFFile file) {
+        checkCompletion();
+        // because completion can stop and start right away we add some delay
+        if(isCompletionRunning || System.currentTimeMillis() - lastCompletionRunning < 1000) {
+            FileEditor selectedEditor = myFileEditorManager.getSelectedEditor();
+            if(selectedEditor != null) {
+                VirtualFile editingFile = selectedEditor.getFile();
+                return editingFile != null && editingFile.equals(file.getVirtualFile());
+            }
+        }
+        return false;
     }
 
     private abstract class MetaPending<T, G> {
@@ -797,10 +858,16 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     private final MetaDeclPending declPending = new MetaDeclPending();
 
-    private void addDeclProcessing(LSFMetaDeclaration decl) {
+    private void addDeclProcessing(LSFMetaCodeDeclarationStatement decl) {
         assert ApplicationManager.getApplication().isWriteAccessAllowed();
 
         declPending.add(getLongLivingDecl(decl));
+
+        // since there is a problem with change detector we have to reprocess all meta usages inside the decl (overhead is not that huge right now)
+        LSFMetaCodeDeclBody metaCodeDeclBody = decl.getMetaCodeDeclBody();
+        if(metaCodeDeclBody != null)
+            for (LSFLazyMetaDeclStatement metaDeclStatement : metaCodeDeclBody.getLazyMetaDeclStatementList())
+                addUsageProcessing(metaDeclStatement.getMetaCodeStatementList());
     }
 
     private boolean reprocessing = false;
@@ -1077,17 +1144,20 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private void fireChanged(PsiElement element) {
+        // this whole thing doesn't actually work because of lazy elements (see comment in LSF.bnf)
         boolean inMetaBody = false;
+        boolean inMetaDeclBody = false;
         boolean inModuleHeader = false;
         while (element != null && !(element instanceof LSFFile)) {
             if (enabled) {
-                if (element instanceof LSFMetaCodeDeclarationStatement) {
+                if (element instanceof LSFMetaCodeDeclarationStatement && !inMetaBody) { // if we changed something in meta code body, it's not considered meta decl change
                     addDeclProcessing((LSFMetaCodeDeclarationStatement) element);
                 }
 
-                if (element instanceof LSFAnyTokens || element instanceof LSFMetaCodeBody) {
+                if (element instanceof LSFMetaCodeBody)
                     inMetaBody = true;
-                }
+                if (element instanceof LSFMetaCodeDeclBody)
+                    inMetaDeclBody = true;
             }
                 
             if (element instanceof LSFMetaCodeStatement && (enabled || ((LSFMetaCodeStatement) element).isInline())) {
@@ -1101,7 +1171,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             element = element.getParent();
         }
 
-        if (!inMetaBody) {
+        if (!(inMetaBody || inMetaDeclBody)) {
             fireChangedNotMetaBody();
         }
         if (inModuleHeader) {

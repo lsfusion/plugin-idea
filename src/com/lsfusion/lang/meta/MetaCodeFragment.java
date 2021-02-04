@@ -52,10 +52,9 @@ public class MetaCodeFragment {
         for (int i = 0; i < tokens.size(); i++) {
             String token = tokens.get(i);
             IElementType tokenType = types.get(i);
-            boolean isMeta = tokenType == LSFTypes.FAKEMETAID;
             Result<Boolean> transformed = new Result<>();
-            if(isMeta || tokenType == LSFTypes.ID) // ID also can be meta parameter
-                token = transformToken(params, tokens.get(i), isMeta, transformed);
+            if(tokenType == LSFTypes.LEX_STRING_LITERAL || tokenType == LSFTypes.ID)
+                token = transformToken(params, tokens.get(i), transformed);
             newTokens.add(token);
         }
         return newTokens;
@@ -73,11 +72,10 @@ public class MetaCodeFragment {
             transformed.setResult(true);
         return index >= 0 && actualParams.size() > index ? actualParams.get(index).text : token;
     }
-    private String transformToken(List<MetaTransaction.InToken> actualParams, String token, boolean isMeta, Result<Boolean> transformed) {
-        if(!isMeta) { // optimization;
-            assert !token.contains("##");
+    private String transformToken(List<MetaTransaction.InToken> actualParams, String token, Result<Boolean> transformed) {
+        if(!token.contains("##")) // optimization;
             return transformParamToken(actualParams, token, transformed);
-        }
+
         transformed.setResult(true);
         String[] parts = token.split("##");
         boolean isStringLiteral = false;

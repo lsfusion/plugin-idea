@@ -26,6 +26,7 @@ import com.lsfusion.lang.psi.context.ContextModifier;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -114,10 +115,15 @@ public class LSFFile extends PsiFileImpl implements ModifyParamContext {
         List<PsiElement> result = new SmartList<>();
         for (PsiElement child = getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof LSFLazyScriptStatement) {
-                for (PsiElement ch = child.getFirstChild(); ch != null; ch = ch.getNextSibling()) {
-                    if (ch instanceof LSFScriptStatement) {
-                        result.add(ch.getFirstChild());
-                    }
+                for (LSFScriptStatement scriptStatement : ((LSFLazyScriptStatement) child).getScriptStatementList()) {
+                    PsiElement scriptChild = scriptStatement.getFirstChild();
+                    if (scriptChild instanceof LSFMetaCodeDeclarationStatement) {
+                        LSFMetaCodeDeclBody metaBody = ((LSFMetaCodeDeclarationStatement) scriptChild).getMetaCodeDeclBody();
+                        if (metaBody != null)
+                            for (LSFLazyMetaDeclStatement metaDeclStatement : metaBody.getLazyMetaDeclStatementList())
+                                result.addAll(BaseUtils.toList(metaDeclStatement.getChildren()));
+                    } else
+                        result.add(scriptChild);
                 }
             }
         }

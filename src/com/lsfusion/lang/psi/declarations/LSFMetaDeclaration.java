@@ -3,7 +3,7 @@ package com.lsfusion.lang.psi.declarations;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import com.lsfusion.lang.psi.LSFAnyTokens;
+import com.lsfusion.lang.psi.LSFMetaCodeDeclBody;
 import com.lsfusion.lang.psi.stubs.MetaStubElement;
 
 import java.util.List;
@@ -17,5 +17,5 @@ public interface LSFMetaDeclaration extends LSFFullNameDeclaration<LSFMetaDeclar
 
     List<String> getDeclParams();
     
-    void setBody(LSFAnyTokens tokens);
+    void setBody(LSFMetaCodeDeclBody tokens);
 }
