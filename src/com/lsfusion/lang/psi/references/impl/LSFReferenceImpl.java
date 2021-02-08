@@ -1,7 +1,6 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Document;
@@ -10,7 +9,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.util.IncorrectOperationException;
-import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
@@ -111,18 +110,16 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     }
 
     @Override
-    public Annotation resolveErrorAnnotation(final AnnotationHolder holder) {
+    public LSFResolvingError resolveErrorAnnotation(final AnnotationHolder holder) {
         return multiResolveDecl(true).resolveErrorAnnotation(holder);
     }
 
-    public Annotation resolveAmbiguousErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> declarations) {
-        Annotation annotation = holder.createErrorAnnotation(getTextRange(), "Ambiguous reference");
-        annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-        return annotation;
+    public LSFResolvingError resolveAmbiguousErrorAnnotation(Collection<? extends LSFDeclaration> declarations) {
+        return new LSFResolvingError(this, "Ambiguous reference", true);
     }
 
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
-        return holder.createErrorAnnotation(getTextRange(), "Cannot resolve symbol '" + getNameRef() + "'" + (canBeDeclaredAfterAndNotChecked ? " or maybe it is declared later" : ""));
+    public LSFResolvingError resolveNotFoundErrorAnnotation(Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
+        return new LSFResolvingError(this, "Cannot resolve symbol '" + getNameRef() + "'" + (canBeDeclaredAfterAndNotChecked ? " or maybe it is declared later" : ""), false);
     }
 
     @NotNull

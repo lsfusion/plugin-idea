@@ -1,11 +1,9 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.annotation.Annotation;
-import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
 import com.intellij.util.CollectionQuery;
-import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.*;
@@ -68,7 +66,7 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
     }
 
     @Override
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
+    public LSFResolvingError resolveNotFoundErrorAnnotation(Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
         String errorText;
         boolean noSuchProperty = similarDeclarations.size() == 0;
         if (similarDeclarations.size() != 1) {
@@ -82,10 +80,6 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
                     getNameRef() + "()";
         }
 
-        Annotation annotation = holder.createErrorAnnotation(getTextRange(), errorText);
-        if (!noSuchProperty) {
-            annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-        }
-        return annotation;
+        return new LSFResolvingError(this, errorText, !noSuchProperty);
     }
 }

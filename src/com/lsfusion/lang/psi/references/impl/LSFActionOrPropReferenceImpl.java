@@ -1,15 +1,13 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.annotation.Annotation;
-import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.LSFElementGenerator;
-import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
@@ -218,7 +216,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
     }
 
     @Override
-    public Annotation resolveAmbiguousErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> declarations) {
+    public LSFResolvingError resolveAmbiguousErrorAnnotation(Collection<? extends LSFDeclaration> declarations) {
         String ambError = "Ambiguous reference";
 
         String description = "";
@@ -240,13 +238,13 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
             ambError += ": " + description + " match";
         }
 
-        return resolveErrorTarget(holder, ambError, false);
+        return resolveErrorTarget(ambError, false);
     }
     
     protected abstract String getErrorName();
 
     @Override
-    public Annotation resolveNotFoundErrorAnnotation(AnnotationHolder holder, Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
+    public LSFResolvingError resolveNotFoundErrorAnnotation(Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
         String errorText;
         boolean noSuchProperty = similarDeclarations.size() == 0;
         if (similarDeclarations.size() != 1) {
@@ -260,7 +258,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
                     getNameRef() + listClassesToString(getUsageContext());
         }
 
-        return resolveErrorTarget(holder, errorText, noSuchProperty);
+        return resolveErrorTarget(errorText, noSuchProperty);
     }
 
     private String listClassesToString(List<LSFClassSet> classes) {
@@ -275,19 +273,10 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         return result += ")";
     }
 
-    public Annotation resolveErrorTarget(AnnotationHolder holder, String errorText, boolean noSuchProperty) {
-        Annotation annotation;
+    public LSFResolvingError resolveErrorTarget(String errorText, boolean noSuchProperty) {
         PropertyUsageContext propertyUsageContext = getPropertyUsageContext();
         PsiElement paramList = propertyUsageContext == null ? null : propertyUsageContext.getParamList();
-        if (noSuchProperty || paramList == null) {
-            annotation = holder.createErrorAnnotation(getTextRange(), errorText);
-        } else {
-            annotation = holder.createErrorAnnotation(paramList, errorText);
-        }
-        if (!noSuchProperty) {
-            annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-        }
-        return annotation;
+        return new LSFResolvingError(noSuchProperty || paramList == null ? this : paramList, errorText, !noSuchProperty);
     }
 
     public boolean isDirect() {
