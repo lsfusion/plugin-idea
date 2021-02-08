@@ -61,7 +61,9 @@ public class GenerateFormXMLAction extends GenerateFormAction {
                     List<ParseNode> nChildren = new ArrayList<>();
                     nChildren.add(mergedChild);
 
-                    children.add(new GroupObjectParseNode(childKey, nChildren, namespace, integrationKey));
+                    //get namespace of first child, all children should be with equal namespace
+                    ElementNamespace childNamespace = getElementNamespace(childEntry.getValue().get(0));
+                    children.add(new GroupObjectParseNode(childKey, nChildren, childNamespace, integrationKey));
 
                 } else { //propertyGroupParseNode, childrenList.size() == 1
 

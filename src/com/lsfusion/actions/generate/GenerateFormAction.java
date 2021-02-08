@@ -155,9 +155,7 @@ public class GenerateFormAction extends AnAction {
                     ElementKey childElementKey = new ElementKey(childElement.key);
 
                     if (childElement instanceof PropertyParseNode) {
-                        ElementNamespace namespace = ((PropertyParseNode) childElement).namespace != null ?
-                                ((PropertyParseNode) childElement).namespace : ((PropertyGroupParseNode) element).namespace;
-                        properties.add(new ElementProperty(childElementKey, namespace, ((PropertyParseNode) childElement).attr));
+                        properties.add(new ElementProperty(childElementKey, ((PropertyParseNode) childElement).namespace, ((PropertyParseNode) childElement).attr));
                     }
 
                     children.add(generateForm(Arrays.asList(childElement), childElementKey, element, key, parentElement instanceof PropertyGroupParseNode ? key : null, lastGroupObjectParent));
