@@ -13,8 +13,8 @@ import java.util.List;
 public class ImplicitValueStubImpl extends ElementStubImpl<ImplicitValueStubElement, LSFImplicitValuePropStatement> implements ImplicitValueStubElement {
     private List<String> valueProperties;
 
-    public ImplicitValueStubImpl(StubElement parent, IStubElementType elementType) {
-        super(parent, elementType);
+    public ImplicitValueStubImpl(StubElement parent, LSFImplicitValuePropStatement psi) {
+        super(parent, psi);
     }
 
     public ImplicitValueStubImpl(StubInputStream dataStream, StubElement parentStub, IStubElementType<ImplicitValueStubElement, LSFImplicitValuePropStatement> type) throws IOException {

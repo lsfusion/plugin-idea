@@ -24,11 +24,13 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.ExprsContextModifier;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFLocalPropertyDeclarationNameImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
+import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -274,8 +276,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
     }
 
-    private static boolean isInMetaDecl(PsiElement o) {
-        return PsiTreeUtil.getParentOfType(o, LSFMetaCodeDeclarationStatement.class) != null;
+    public static LSFMetaCodeDeclarationStatement getMetaDecl(PsiElement o) {
+        return PsiTreeUtil.getParentOfType(o, LSFMetaCodeDeclarationStatement.class);
+    }
+
+    public static boolean isInMetaDecl(PsiElement o) {
+        return getMetaDecl(o) != null;
         //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
     }
 
@@ -351,24 +357,20 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitActionStatement(@NotNull LSFActionStatement o) {
         super.visitActionStatement(o);
 
-        if (o.resolveDuplicates()) {
-            addAlreadyDefinedError(o.getPropertyDeclaration(), o.getPresentableText());
-        } 
+        checkAlreadyDefined(o);
     }
     
     @Override
     public void visitPropertyStatement(@NotNull LSFPropertyStatement o) {
         super.visitPropertyStatement(o);
 
-        if (o.resolveDuplicates()) {
-            addAlreadyDefinedError(o.getPropertyDeclaration(), o.getPresentableText());
-        } else {
-            if (o.isStoredProperty()) {
-                if (o.resolveDuplicateColumns()) {
-                    addDuplicateColumnNameError(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
-                } else {
+        checkAlreadyDefined(o);
+
+        if (o.isStoredProperty()) {
+            if (o.resolveDuplicateColumns()) {
+                addDuplicateColumnNameError(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
+            } else {
 //                    addColumnInfo(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
-                }
             }
         }
 
@@ -488,8 +490,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitClassExtend(@NotNull LSFClassExtend o) {
         super.visitClassExtend(o);
 
-        Set<LSFDeclaration> duplicates = o.resolveDuplicates();
-        for (LSFDeclaration duplicate : duplicates) {
+        checkAlreadyDefined(o);
+    }
+
+    private void checkAlreadyDefined(@NotNull LSFExtend o) {
+        for (LSFDeclaration duplicate : (Set<LSFDeclaration>) o.resolveDuplicates()) {
             addAlreadyDefinedError(duplicate);
         }
     }
@@ -498,30 +503,21 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitFormDecl(@NotNull LSFFormDecl o) {
         super.visitFormDecl(o);
 
-        java.util.Set<? extends LSFDeclaration> duplicates = ((LSFFormExtend) o.getParent()).resolveDuplicates();
-        for (LSFDeclaration decl : duplicates) {
-            addAlreadyDefinedError(decl);
-        }
+        checkAlreadyDefined(((LSFFormExtend) o.getParent()));
     }
 
     @Override
     public void visitExtendingFormDeclaration(@NotNull LSFExtendingFormDeclaration o) {
         super.visitExtendingFormDeclaration(o);
 
-        java.util.Set<? extends LSFDeclaration> duplicates = ((LSFFormExtend) o.getParent()).resolveDuplicates();
-        for (LSFDeclaration decl : duplicates) {
-            addAlreadyDefinedError(decl);
-        }
+        checkAlreadyDefined((LSFFormExtend) o.getParent());
     }
 
     @Override
     public void visitDesignStatement(@NotNull LSFDesignStatement o) {
         super.visitDesignStatement(o);
 
-        java.util.Set<? extends LSFDeclaration> duplicates = o.resolveDuplicates();
-        for (LSFDeclaration decl : duplicates) {
-            addAlreadyDefinedError(decl);
-        }
+        checkAlreadyDefined(o);
     }
 
     @Override
@@ -530,13 +526,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
         java.util.List<LSFClassParamDeclare> params = o.getClassParamDeclareList();
         for (int i = 0; i < params.size(); i++) {
-            LSFId id1 = params.get(i).getParamDeclare().getNameIdentifier();
-            for (int j = 0; j < params.size(); j++) {
-                if (i != j) {
-                    if (id1.getText().equals(params.get(j).getParamDeclare().getNameIdentifier().getText())) {
-                        addAlreadyDefinedError(id1, id1.getText());
-                        break;
-                    }
+            LSFParamDeclare param1 = params.get(i).getParamDeclare();
+            for (int j = i+1; j < params.size(); j++) {
+                LSFParamDeclare param2 = params.get(j).getParamDeclare();
+                if (BaseUtils.nullEquals(param1.getDeclName(), param2.getDeclName())) {
+                    addAlreadyDefinedError(param2);
+                    break;
                 }
             }
         }
@@ -668,11 +663,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addAlreadyDefinedError(LSFDeclaration decl) {
-        addAlreadyDefinedError(decl.getNameIdentifier(), decl.getPresentableText());
+        addAlreadyDefinedError(decl.getDuplicateElement(), decl.getPresentableText());
     }
 
     private void addAlreadyDefinedError(PsiElement element, String elementPresentableText) {
-        addUnderscoredError(element, "'" + elementPresentableText + "' is already defined");
+        addUnderscoredErrorWithResolving(element, "'" + elementPresentableText + "' is already defined");
     }
 
     private void addHighlightErrorWithResolving(PsiElement element, String message) {
@@ -691,10 +686,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addError(element, new LSFResolvingError(element, message, true), false);
     }
     private void addError(PsiElement element, LSFResolvingError error, boolean hasResolving) {
-        if (errorsSearchMode) {
-            ShowErrorsAction.showErrorMessage(element, error.text, LSFErrorLevel.ERROR);
-        }
-
         boolean inMetaDecl = isInMetaDecl(element);
         Annotation annotation;
         TextAttributes errorAttributes;
@@ -705,6 +696,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 annotation = myHolder.createInfoAnnotation(error.element, error.text);
             errorAttributes = error.underscored ? WAVE_UNDERSCORED_META_ERROR : META_ERROR;
         } else {
+            if (errorsSearchMode) {
+                ShowErrorsAction.showErrorMessage(element, error.text, LSFErrorLevel.ERROR);
+            }
+
             if (error.range != null)
                 annotation = myHolder.createErrorAnnotation(error.range, error.text);
             else

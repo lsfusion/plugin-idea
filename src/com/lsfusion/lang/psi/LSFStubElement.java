@@ -11,4 +11,6 @@ public interface LSFStubElement<This extends LSFStubElement<This, Decl>, Decl ex
 
     boolean isCorrect();
 
+    boolean isInMetaDecl();
+
 }

@@ -35,6 +35,4 @@ public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubEl
     List<LSFFormFilterGroupDeclaration> getFormFilterGroupDeclarationList();
 
     List<LSFFormExtendFilterGroupDeclaration> getFormExtendFilterGroupDeclarationList();
-
-    Set<LSFDeclaration> resolveDuplicates();
 }

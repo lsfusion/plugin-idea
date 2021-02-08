@@ -32,7 +32,7 @@ public class ImplicitInterfaceStubElementType extends LSFStubElementType<Implici
 
     @Override
     public ImplicitInterfaceStubElement createStub(@NotNull final LSFImplicitInterfacePropStatement psi, StubElement parentStub) {
-        final ImplicitInterfaceStubImpl stub = new ImplicitInterfaceStubImpl(parentStub, psi.getElementType());
+        final ImplicitInterfaceStubImpl stub = new ImplicitInterfaceStubImpl(parentStub, psi);
 
         LSFPropertyStatement propertyStatement = psi.getPropertyStatement();
         LSFPropertyCalcStatement pCalcStatement = propertyStatement.getPropertyCalcStatement();

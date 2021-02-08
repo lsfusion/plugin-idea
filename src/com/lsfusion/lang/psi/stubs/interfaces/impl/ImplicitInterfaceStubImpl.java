@@ -14,8 +14,8 @@ import java.util.List;
 public class ImplicitInterfaceStubImpl extends ElementStubImpl<ImplicitInterfaceStubElement, LSFImplicitInterfacePropStatement> implements ImplicitInterfaceStubElement {
     private List<String> paramProperties;
 
-    public ImplicitInterfaceStubImpl(StubElement parent, IStubElementType elementType) {
-        super(parent, elementType);
+    public ImplicitInterfaceStubImpl(StubElement parent, LSFImplicitInterfacePropStatement psi) {
+        super(parent, psi);
     }
 
     public ImplicitInterfaceStubImpl(StubInputStream dataStream, StubElement parentStub, IStubElementType<ImplicitInterfaceStubElement, LSFImplicitInterfacePropStatement> type) throws IOException {

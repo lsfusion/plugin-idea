@@ -253,6 +253,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         private final boolean isBasicCompletion;
 
         private GlobalSearchScope requireScope;
+        private LSFLocalSearchScope localScope;
 
         private int framesCount;
         private List<Frame> frames;
@@ -322,7 +323,9 @@ public class ASTCompletionContributor extends CompletionContributor {
         }
 
         public LSFLocalSearchScope getLocalScope() {
-            return null;//dfdf
+            if (localScope == null)
+                localScope = new LSFLocalSearchScope(() -> file, () -> getLastPsiOfType(LSFMetaCodeDeclarationStatement.class));
+            return localScope;
         }
 
         public void quickLog(String message) {

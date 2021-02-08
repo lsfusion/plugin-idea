@@ -6,9 +6,11 @@ import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.*;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.cache.RequireModulesCache;
 import com.lsfusion.lang.psi.declarations.*;
@@ -16,6 +18,7 @@ import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.indexes.*;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
+import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
@@ -135,7 +138,32 @@ public class LSFGlobalResolver {
     }
 
     public static <G extends LSFStubbedElement> Collection<G> getItemsFromIndex(LSFStringStubIndex<G> index, String name, Project project, GlobalSearchScope scope, LSFLocalSearchScope localScope) {
-        return index.get(name, project, scope);
+        Collection<G> elements = index.get(name, project, scope);
+
+        Collection<G> filteredElements = new ArrayList<>();
+
+        boolean metaDeclFilled = false; boolean localFileFilled = false;
+        LSFMetaCodeDeclarationStatement metaDecl = null; LSFFile localFile = null;
+
+        for(G element : elements) {
+            if (element.isInMetaDecl()) {
+                if(!localFileFilled) { // optimization
+                    localFile = localScope.getLSFFile();
+                    localFileFilled = true;
+                }
+                // we want metas only from localscope meta
+                if (element.getLSFFile().equals(localFile)) { // to prevent early parsing in getMetaDecl
+                    if (!metaDeclFilled) { // optimization
+                        metaDecl = localScope.getMetaDecl();
+                        metaDeclFilled = true;
+                    }
+                    if (metaDecl != null && LSFReferenceAnnotator.getMetaDecl(element).equals(metaDecl))
+                        filteredElements.add(element);
+                }
+            } else
+                filteredElements.add(element);
+        }
+        return filteredElements;
     }
 
     public static <S extends FullNameStubElement<S, T>, T extends LSFFullNameDeclaration<T, S>> Collection<T> findElements(String name, final String fqName, LSFFile file, Integer offset, LSFLocalSearchScope localScope, Collection<? extends FullNameStubElementType<S, T>> types, Condition<T> condition) {
@@ -275,6 +303,9 @@ public class LSFGlobalResolver {
     // used only for LSFExtend, should be also stubbed later
     public static boolean isAfter(int offset, LSFDeclaration decl) {
         return decl.getTextOffset() > offset; // later stubs should be added here together with all get*Decls
+    }
+    public static boolean isAfter(int offset, LSFExtend extend) {
+        return extend.getTextOffset() >= offset; // later stubs should be added here together with all get*Decls
     }
 
     public static Collection<LSFModuleDeclaration> findModules(String moduleName, Project project, GlobalSearchScope scope) {

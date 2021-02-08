@@ -63,7 +63,7 @@ public abstract class LSFFullNameDeclarationImpl<This extends LSFFullNameDeclara
 
     @Override
     public boolean resolveDuplicates() {
-        CollectionQuery<This> declarations = new CollectionQuery<>(LSFGlobalResolver.findElements(getDeclName(), null, getTypes(), getLSFFile(), null, LSFLocalSearchScope.createFrom(this), getFindDuplicatesCondition(), Finalizer.EMPTY));
+        CollectionQuery<This> declarations = new CollectionQuery<>(LSFGlobalResolver.findElements(getDeclName(), null, getTypes(), getLSFFile(), getTextOffset(), LSFLocalSearchScope.createFrom(this), getFindDuplicatesCondition(), Finalizer.EMPTY));
         return declarations.findAll().size() > 1;
     }
 

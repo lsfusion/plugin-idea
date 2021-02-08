@@ -12,6 +12,4 @@ public interface LSFDesign extends LSFExtend<LSFDesign, DesignStubElement> {
     Collection<LSFComponentDeclaration> getComponentDecls();
     
     LSFId getFormUsageNameIdentifier();
-
-    Set<LSFDeclaration> resolveDuplicates();
 }

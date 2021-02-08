@@ -27,7 +27,7 @@ public class LSFProblemsVisitor {
     public static void analyze(@NotNull PsiFile file) {
         try {
             for (PsiElement element : CollectHighlightsUtil.getElementsInRange(file.getViewProvider().getPsi(LSFLanguage.INSTANCE), 0, file.getTextLength())) {
-                if (element instanceof LSFSimpleNameWithCaption && !LSFReferenceAnnotator.isInMetaUsage(element)) {
+                if (element instanceof LSFSimpleNameWithCaption && !LSFReferenceAnnotator.isInMetaUsage(element) && !LSFReferenceAnnotator.isInMetaDecl(element)) {
                     visitLSFSimpleNameWithCaption(null, (LSFSimpleNameWithCaption) element, true);
                 } else if (element instanceof LSFAssignActionPropertyDefinitionBody) {
                     visitLSFAssignActionPropertyDefinitionBody(null, (LSFAssignActionPropertyDefinitionBody) element, true);

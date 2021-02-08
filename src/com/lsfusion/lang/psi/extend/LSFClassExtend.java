@@ -18,6 +18,4 @@ public interface LSFClassExtend extends LSFExtend<LSFClassExtend, ExtendClassStu
     List<LSFStringClassRef> getExtends();
     
     List<LSFStaticObjectDeclaration> getStaticObjects();
-
-    Set<LSFDeclaration> resolveDuplicates();
 }

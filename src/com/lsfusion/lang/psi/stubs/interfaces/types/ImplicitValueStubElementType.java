@@ -52,7 +52,7 @@ public class ImplicitValueStubElementType extends LSFStubElementType<ImplicitVal
 
     @Override
     public ImplicitValueStubElement createStub(@NotNull LSFImplicitValuePropStatement psi, StubElement parentStub) {
-        final ImplicitValueStubImpl stub = new ImplicitValueStubImpl(parentStub, psi.getElementType());
+        final ImplicitValueStubImpl stub = new ImplicitValueStubImpl(parentStub, psi);
 
         LSFPropertyStatement propertyStatement = psi.getPropertyStatement();
         List<String> propNames = LSFPsiImplUtil.getValueAPPropertyNames(propertyStatement.getPropertyCalcStatement());

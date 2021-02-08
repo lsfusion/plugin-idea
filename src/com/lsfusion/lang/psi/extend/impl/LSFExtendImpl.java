@@ -7,6 +7,7 @@ import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.util.FilteredQuery;
 import com.intellij.util.Query;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
@@ -133,7 +134,10 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
     protected abstract List<Function<This, Collection<? extends LSFDeclaration>>> getDuplicateProcessors();
 
     protected <T extends LSFDeclaration> Set<LSFDeclaration> resolveDuplicates(Function<T, Condition<T>> duplicateCondition, Predicate<T> ignoreDuplicate) {
-        Query<This> designs = findElements(resolveDecl(), getLSFFile(), getDuplicateExtendType(), LSFLocalSearchScope.createFrom(this));
+        LSFFile file = getLSFFile();
+        int offset = getTextOffset(); // we respect offset to have consistent logics with resolving duplicates when declaration are in different files (plus it helps metacodes to ignore it's implementations)
+        Query<This> designs = new FilteredQuery<>(findElements(resolveDecl(), file, getDuplicateExtendType(), LSFLocalSearchScope.createFrom(this)),
+                element -> !(file == element.getLSFFile() && LSFGlobalResolver.isAfter(offset, element)));
 
         Set<LSFDeclaration> duplicates = new LinkedHashSet<>();
         for(Function<This, Collection<? extends LSFDeclaration>> duplicateProcessor : getDuplicateProcessors()) {
