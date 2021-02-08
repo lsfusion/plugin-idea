@@ -1,8 +1,7 @@
 package com.lsfusion.lang.psi;
 
-import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
-import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.references.impl.LSFReferenceImpl;
@@ -22,7 +21,7 @@ public class LSFResolveResult {
         this.errorAnnotator = errorAnnotator;
     }
     
-    public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+    public LSFResolvingError resolveErrorAnnotation(AnnotationHolder holder) {
         if (errorAnnotator != null) {
             return errorAnnotator.resolveErrorAnnotation(holder);
         } else {
@@ -42,7 +41,7 @@ public class LSFResolveResult {
             assert decls != null;
         }
 
-        public abstract Annotation resolveErrorAnnotation(AnnotationHolder holder);
+        public abstract LSFResolvingError resolveErrorAnnotation(AnnotationHolder holder);
     }
 
     public static class AmbigiousErrorAnnotator extends ErrorAnnotator {
@@ -51,8 +50,8 @@ public class LSFResolveResult {
             super(ref, decls);
         }
 
-        public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
-            return ref.resolveAmbiguousErrorAnnotation(holder, decls);
+        public LSFResolvingError resolveErrorAnnotation(AnnotationHolder holder) {
+            return ref.resolveAmbiguousErrorAnnotation(decls);
         }
     }
 
@@ -67,17 +66,15 @@ public class LSFResolveResult {
             this.canBeDeclaredAfterAndNotChecked = canBeDeclaredAfterAndNotChecked;
         }
 
-        public Annotation resolveErrorAnnotation(AnnotationHolder holder) {
+        public LSFResolvingError resolveErrorAnnotation(AnnotationHolder holder) {
             if(decls.size() == 1) {
                 LSFDeclaration singleDecl = decls.iterator().next();
                 if(singleDecl instanceof LSFFullNameDeclaration && LSFGlobalResolver.isAfter(ref.getLSFFile(), ref.getTextOffset(), (LSFFullNameDeclaration) singleDecl)) {
                     String errorText = "Symbol '" + ref.getNameRef() + "' is declared after it is used";
-                    Annotation error = holder.createErrorAnnotation(ref, errorText);
-                    error.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-                    return error;
+                    return new LSFResolvingError(ref, errorText, true);
                 }
             }
-            return ref.resolveNotFoundErrorAnnotation(holder, decls, canBeDeclaredAfterAndNotChecked);
+            return ref.resolveNotFoundErrorAnnotation(decls, canBeDeclaredAfterAndNotChecked);
         }
     }
 }

@@ -76,6 +76,13 @@ public class LSFParserImpl extends LSFParser {
                 break;
             }
 
+            if (braceCount == 0 && metaCount == 0) {
+                if(tokenType == tokenEnd)
+                    break;
+                if(containMeta && tokenType == META)
+                    break;
+            }
+
             if (tokenType == LBRACE) {
                 braceCount++;
             } else if (tokenType == RBRACE) {
@@ -84,7 +91,6 @@ public class LSFParserImpl extends LSFParser {
                 }
             } else if(containMeta) {
                 if (tokenType == META) {
-                    if (braceCount == 0 && metaCount == 0) break;
                     metaCount++;
                 } else if (tokenType == END) {
                     if (metaCount > 0) {
@@ -96,7 +102,6 @@ public class LSFParserImpl extends LSFParser {
             if (braceCount == 0 && metaCount == 0) {
                 if (tokenType == NAVIGATOR) break;
                 if (tokenType == ATSIGN) break;
-                if (tokenType == META) break;
                 if (tokenType == DESIGN) break;
                 if (tokenCount > 40) { // we don't want to have very small non-recursive lazy blocks 
                     if (tokenType == EXTEND && builder_.lookAhead(1) != FILTERGROUP) {
@@ -131,9 +136,6 @@ public class LSFParserImpl extends LSFParser {
                     builder_.advanceLexer(); // eat END
                     break;
                 }
-
-                if(tokenType == tokenEnd)
-                    break;
             }
 
             prevTokenType = tokenType;
