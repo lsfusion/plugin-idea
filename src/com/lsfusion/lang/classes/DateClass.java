@@ -44,4 +44,9 @@ public class DateClass extends FormatClass {
     public int getFullWidthString(String widthString, FontMetrics fontMetrics) {
         return super.getFullWidthString(widthString, fontMetrics) + 21;
     }
+
+    @Override
+    public ExtInt getCharLength() {
+        return new ExtInt(25);
+    }
 }

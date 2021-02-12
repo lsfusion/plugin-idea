@@ -24,4 +24,8 @@ public class ObjectClass extends DataClass {
     public int getDefaultHeight(FontMetrics fontMetrics, int charHeight) {
         return fontMetrics.getHeight() * charHeight + 1;
     }
+
+    public ExtInt getCharLength() {
+        return new ExtInt(10);
+    }
 }

@@ -77,4 +77,9 @@ public class NumericClass extends DoubleClass {
     public boolean isAssignable(LSFClassSet set) {
         return !(set instanceof NumericClass && !isUnlimited() && (((NumericClass) set).isUnlimited() || length.value < ((NumericClass) set).length.value || precision.value < ((NumericClass) set).precision.value)) && super.isAssignable(set);
     }
+
+    @Override
+    public ExtInt getCharLength() {
+        return precision;
+    }
 }

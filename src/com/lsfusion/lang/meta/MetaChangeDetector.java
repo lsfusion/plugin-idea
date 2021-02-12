@@ -2,7 +2,6 @@ package com.lsfusion.lang.meta;
 
 import com.intellij.codeInsight.completion.CompletionPhase;
 import com.intellij.codeInsight.completion.CompletionPhaseListener;
-import com.intellij.codeInsight.completion.impl.CompletionServiceImpl;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
@@ -26,6 +25,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
@@ -232,16 +232,16 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         return a > b ? b : a;
     }
 
-    private static String parseText(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls) {
-        return new MetaCodeFragment(decls, tokens).getCode(usages);
+    private static String parseText(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, Set<String> metaDecls) {
+        return new MetaCodeFragment(decls, metaDecls, tokens).getCode(usages);
     }
 
     public static List<String> getNewTokens(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, List<MetaTransaction.ExtToken> oldTokens) {
-        return new MetaCodeFragment(decls, tokens).getNewTokens(usages, oldTokens);
+        return new MetaCodeFragment(decls, null, tokens).getNewTokens(usages, oldTokens);
     }
 
-    private static int mapOffset(int offset, List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls) {
-        return new MetaCodeFragment(decls, tokens).mapOffset(offset, usages);
+    private static int mapOffset(int offset, List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, Set<String> metaDecls) {
+        return new MetaCodeFragment(decls, metaDecls, tokens).mapOffset(offset, usages);
     }
 
     public static PsiElement mapOffset(PsiElement element) {
@@ -286,7 +286,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             }
         }
 
-        return metaDecl.findOffsetInCode(mapOffset(offset, metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams()));
+        return metaDecl.findOffsetInCode(mapOffset(offset, metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), getMetaDecls(metaUsage)));
     }
 
     private static class LongLivingMeta {
@@ -320,18 +320,26 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         private final List<String> decls;
         public final long version;
 
-        private ToParse(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, long version) {
+        private final List<LSFMetaDeclaration> recursionGuard;
+        private final Set<String> metaDecls;
+
+        private ToParse(long version) {
+            this(null, null, null, null, null, version);
+        }
+        private ToParse(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, Set<String> metaDecls, List<LSFMetaDeclaration> recursionGuard, long version) {
             this.tokens = tokens;
             this.usages = usages;
             this.decls = decls;
             this.version = version;
+            this.metaDecls = metaDecls;
+            this.recursionGuard = recursionGuard;
         }
 
         public LSFMetaCodeBody parse(LSFFile file, boolean untab) {
             if (tokens == null)
                 return null;
             else {
-                String text = parseText(tokens, usages, decls);
+                String text = parseText(tokens, usages, decls, metaDecls);
                 if(untab) {
                     int nextLine = text.indexOf('\n');
                     if(nextLine >= 0) {
@@ -354,7 +362,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     }
 
                 }
-                return LSFElementGenerator.createMetaBodyFromText(file, text);
+                return LSFElementGenerator.createMetaBodyFromText(file, text, recursionGuard, metaDecls);
             }
         }
     }
@@ -381,7 +389,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     public interface InlineProcessor {
         void proceed(Runnable inline);        
     }  
-    public static void syncUsageProcessing(final LSFFile file, InlineProcessor inlineProcessor, ProgressIndicator indicator, boolean enabled, List<LSFMetaCodeStatement> usages) {
+    public static void syncUsageProcessing(final LSFFile file, InlineProcessor inlineProcessor, ProgressIndicator indicator, boolean enabled, List<LSFMetaCodeStatement> usages, List<LSFMetaDeclaration> recursionGuard, Set<String> recMetaDecls) {
         int i=0;
         for (final LSFMetaCodeStatement metaUsage : usages)
             if (metaUsage.isCorrect()) {
@@ -404,10 +412,11 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                         }
 
                         assert metaDecl == null || metaDecl.isValid();
-                        if (metaDecl == null || !metaDecl.isCorrect())
-                            toParse.setResult(new ToParse(null, null, null, version));
-                        else
-                            toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), version));
+                        if (metaDecl == null || !metaDecl.isCorrect() || recursionGuard.contains(metaDecl))
+                            toParse.setResult(new ToParse(version));
+                        else {
+                            toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), recMetaDecls == null ? getMetaDecls(metaUsage) : recMetaDecls, BaseUtils.add(recursionGuard, metaDecl), version));
+                        }
                     }
                 });
 
@@ -512,6 +521,14 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             inlineProceed(true, file, sync);
         return result;
     }
+
+    private static Set<String> getMetaDecls(LSFMetaReference metaCodeStatement) {
+        LSFMetaCodeDeclarationStatement metaDecl = LSFReferenceAnnotator.getMetaDecl(metaCodeStatement);
+        if(metaDecl != null)
+            return new HashSet<>(metaDecl.getDeclParams());
+
+        return Collections.emptySet();
+    }
     
     public class MetaUsageProcessing implements Runnable {
         private LSFFile file;
@@ -542,9 +559,9 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                 assert metaDecl == null || metaDecl.isValid();
                                 if (metaDecl == null || !declPending.processing.contains(getLongLivingDecl(metaDecl))) { // не обновляем, потому как все равно обновится при обработке metaDeclChanged
                                     if (metaDecl == null || !metaDecl.isCorrect())
-                                        toParse.setResult(new ToParse(null, null, null, version));
+                                        toParse.setResult(new ToParse(version));
                                     else
-                                        toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), version));
+                                        toParse.setResult(new ToParse(metaDecl.getMetaCode(), metaUsage.getUsageParams(), metaDecl.getDeclParams(), getMetaDecls(metaUsage), Collections.emptyList(), version));
                                 }
                             } else
                                 keep = true;
@@ -1092,7 +1109,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                             LSFFile file = declaration.getLSFFile();
                             List<LSFMetaCodeStatement> metaStatements = reenable ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
 
-                            syncUsageProcessing(file, inlineProcessor, indicator, enabled, metaStatements);
+                            syncUsageProcessing(file, inlineProcessor, indicator, enabled, metaStatements, Collections.emptyList(), null);
 
                             indicator.setText2("");
                         }

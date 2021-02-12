@@ -88,6 +88,9 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
                     LSFSetupComponentStatement setupComponent = statement.getSetupComponentStatement();
                     if (setupComponent != null)
                         result.addAll(findComponents(setupComponent.getComponentBody()));
+                    LSFMoveComponentStatement moveComponent = statement.getMoveComponentStatement();
+                    if (moveComponent != null)
+                        result.addAll(findComponents(moveComponent.getComponentBody()));
                     LSFNewComponentStatement newComponent = statement.getNewComponentStatement();
                     if(newComponent != null) {
                         result.addAll(findComponents(newComponent.getComponentBody()));
@@ -104,7 +107,9 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
     }
 
     public static <T extends LSFDesignElementDeclaration<T>> Set<T> processDesignContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<LSFDesign, Collection<T>> processor) {
-        return processContext(current, offset, localScope, processor, element -> element instanceof LSFDesignStatement ? (LSFDesignStatement)element : null, LSFDesignStatement::resolveFormDecl, getContextExtendType());
+        return processContext(current, offset, localScope, processor,
+                element -> element instanceof FormContext ? (FormContext)element : null,
+                FormContext::resolveFormDecl, getContextExtendType());
     }
 
     protected List<Function<LSFDesign, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {

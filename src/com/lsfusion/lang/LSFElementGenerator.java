@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class LSFElementGenerator {
     
@@ -95,7 +96,7 @@ public class LSFElementGenerator {
         return it == ' ' || it == '\t';
     }
 
-    public static LSFMetaCodeBody createMetaBodyFromText(final LSFFile file, final String text) {
+    public static LSFMetaCodeBody createMetaBodyFromText(final LSFFile file, final String text, List<LSFMetaDeclaration> recursionGuard, Set<String> metaDecls) {
         final StringBuilder tabbedText = new StringBuilder();
         tabbedText.append("MODULE " + genName + "; @dummy() {");
         for (char symbol : text.toCharArray()) {
@@ -115,7 +116,7 @@ public class LSFElementGenerator {
         for (LSFLazyMetaStatement metaDeclStatement : body.getLazyMetaStatementList())
             recMetaStatements.addAll(metaDeclStatement.getMetaCodeStatementList());
 
-        MetaChangeDetector.syncUsageProcessing(file, null, null, true, recMetaStatements);
+        MetaChangeDetector.syncUsageProcessing(file, null, null, true, recMetaStatements, recursionGuard, metaDecls);
 
         return body;
     }

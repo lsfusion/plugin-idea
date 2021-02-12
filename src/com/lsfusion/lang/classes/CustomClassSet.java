@@ -421,4 +421,8 @@ public class CustomClassSet implements LSFClassSet {
     public String getCanonicalName() {
         return ClassCanonicalNameUtils.createName(this);
     }
+
+    public ExtInt getCharLength() {
+        return new ExtInt(10);
+    }
 }

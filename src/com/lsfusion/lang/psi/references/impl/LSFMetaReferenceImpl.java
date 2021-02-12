@@ -156,6 +156,11 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     }
 
     @Override
+    public Integer getOffsetRef() {
+        return null; // metas doesn't respect offsets
+    }
+
+    @Override
     public void setInlinedBody(LSFMetaCodeBody parsed) {
         if(isInline()) {
             if(parsed != null && isCorrect()) {

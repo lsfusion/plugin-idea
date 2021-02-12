@@ -51,6 +51,15 @@ public class ExtInt {
         return getValue() < ext.getValue();
     }
 
+    public ExtInt sum(ExtInt ext) {
+        if(isUnlimited())
+            return this;
+        if(ext.isUnlimited())
+            return ext;
+
+        return new ExtInt(getValue() + ext.getValue());
+    }
+
     public boolean isUnlimited() {
         return value == -1;
     }

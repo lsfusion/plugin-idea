@@ -132,9 +132,8 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
                 if(isImplement && !decl.isAbstract())
                     return false;
 
-                List<LSFClassSet> declClasses = decl.resolveParamClasses();
-                assert declClasses != null; // потому как иначе direct бы подошел 
-                return declClasses.size() == usageClasses.size() && LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject()));
+                List<LSFClassSet> declClasses = decl.resolveParamClasses(); // can be null, since there is also offset check
+                return declClasses == null || (declClasses.size() == usageClasses.size() && LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject())));
             }
         };
     }

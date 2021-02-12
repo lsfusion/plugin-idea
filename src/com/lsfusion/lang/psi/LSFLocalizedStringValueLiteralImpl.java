@@ -129,7 +129,7 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < s.length(); ++i) {
             char cur = s.charAt(i);
-            if (cur == '\\' && i+1 < s.length()) {
+            if (cur == '\\' && i+1 < s.length()) { // removing escape
                 char next = s.charAt(i+1);
                 if (next == '\\' || next == '{' || next == '}' || next == '\'') {
                     builder.append(next);
@@ -137,7 +137,8 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
                     continue;
                 }
             }
-            builder.append(cur);
+            if(cur != '\'') // removing quote
+                builder.append(cur);
         }
         return builder.toString();
     }

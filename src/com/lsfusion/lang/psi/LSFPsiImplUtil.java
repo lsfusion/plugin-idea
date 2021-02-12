@@ -936,13 +936,10 @@ public class LSFPsiImplUtil {
                 LSFClassSet classSet = ex.classSet;
                 if (classSet instanceof StringClass)
                     hasString = true;
-                else if (hasString) {
-                    ex = new LSFExClassSet(new StringClass(false, false, new ExtInt(1)));
-                }
             }
             fixedClasses.add(ex);
         }
-        return orClasses(fixedClasses, true);
+        return orClasses(fixedClasses, hasString);
     }
 
     @Nullable
@@ -1214,7 +1211,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFRoundPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
-        return resolveInferredValueClass(sourceStatement.getPropertyExpressionList(), inferred, true);
+        return resolveInferredValueClass(sourceStatement.getPropertyExpressionList(), inferred, false);
     }
 
     @Nullable

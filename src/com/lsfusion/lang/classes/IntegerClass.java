@@ -37,4 +37,9 @@ public class IntegerClass extends IntClass {
     public String getCaption() {
         return "Integer";
     }
+
+    @Override
+    public ExtInt getCharLength() {
+        return new ExtInt(11);
+    }
 }

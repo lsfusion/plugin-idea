@@ -622,7 +622,7 @@ eventIdSetting ::= EVENTID stringLiteral
 
 hideEditKey ::= HIDE
 
-contextMenuEventType ::= CONTEXTMENU (localizedStringLiteral)? { pin = 1 }
+contextMenuEventType ::= CONTEXTMENU (<<noIDCheck>> localizedStringLiteral)? { pin = 1 } // there are a lot of rules that start from ID, so we'll ignore that cases
 keyPressedEventType ::= KEYPRESS stringLiteral  { pin = 1 }
 formEventType ::= CHANGE | GROUPCHANGE | CHANGEWYS | EDIT | contextMenuEventType | keyPressedEventType
 
@@ -1986,7 +1986,7 @@ setObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 2}
 
 componentPropertyValue ::= //commented literals are in designCalcPropertyObject
                         //colorLiteral
-                        //|	localizedStringLiteral
+                        //|	(<<noIDCheck>> localizedStringLiteral) // since there is a propertyExpression afterwards, first ID would be matched
                         //|	intLiteral
                         //|	doubleLiteral
                             dimensionLiteral
