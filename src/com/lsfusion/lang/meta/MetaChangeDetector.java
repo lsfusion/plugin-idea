@@ -441,6 +441,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                     displayRunning = true;
 
                     final BackgroundableProcessIndicator indicator = new BackgroundableProcessIndicator(myProject, "Inlining metacode", PerformInBackgroundOption.ALWAYS_BACKGROUND, "cancel", "stop", false);
+                    indicator.setIndeterminate(false);
                     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
                         public void run() {
                             ProgressManager.getInstance().runProcess(new Runnable() {

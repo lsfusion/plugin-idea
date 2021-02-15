@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.204</version>
+    <version>1.0.205</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -9,9 +9,10 @@
     <change-notes><![CDATA[
         <b>Version 1.0.205</b><br>
         <ul>
-            <li>Bug fixes</li>
+            <li>Made metacodes to be parsed</li>
             <li>Made component resolving respect order in file</li>
             <li>Added component duplicates check</li>
+            <li>Minor bug fixes and performance improvements</li>
         </ul>
     ]]>
     </change-notes>

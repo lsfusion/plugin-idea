@@ -8,13 +8,18 @@ import com.intellij.lang.properties.PropertiesFileType;
 import com.intellij.lang.properties.PropertiesReferenceManager;
 import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.lang.properties.references.PropertyReference;
-import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
@@ -146,11 +151,14 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
     @NotNull
     @Override 
     public PsiReference[] getReferences() {
-        String literal = getText();
-        List<PsiReference> refs = findAllRefs(literal);
-        return refs.toArray(new PsiReference[0]);
+        return CachedValuesManager.getCachedValue(this, () -> {
+            String literal = getText();
+            List<PsiReference> refs = findAllRefs(literal);
+            return CachedValueProvider.Result.create(refs.toArray(new PsiReference[0]),
+                    PsiModificationTracker.MODIFICATION_COUNT);
+        });
     }
-    
+
     public class PropertyFileItemMultiReference extends PsiPolyVariantReferenceBase {
         public PropertyFileItemMultiReference(PsiElement element, TextRange range) {
             super(element, range);
@@ -177,25 +185,29 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
                     if (virtualFile != null) {
                         Project project = containingFile.getProject();
                         PropertiesReferenceManager refManager = PropertiesReferenceManager.getInstance(project);
-                        return refManager.findPropertiesFiles(LSFFileUtils.getModuleWithDependenciesScope(getElement()), resourceBundleName, BundleNameEvaluator.DEFAULT);
+                        Module module = ModuleUtil.findModuleForPsiElement(getElement());
+                        if(module != null) // to cache result
+                            return refManager.findPropertiesFiles(module, resourceBundleName);
+                        return refManager.findPropertiesFiles(GlobalSearchScope.allScope(getProject()), resourceBundleName, BundleNameEvaluator.DEFAULT);
                     }
                 }
                 return Collections.emptyList();
             }
-        } 
-        
+        }
+
         @NotNull
         @Override
         public ResolveResult[] multiResolve(boolean incompleteCode) {
+            return ResolveCache.getInstance(getProject()).resolveWithCaching(PropertyFileItemMultiReference.this, PropertyFileItemMultiReference::resolveNoCache, true, incompleteCode);
+        }
+
+        private ResolveResult[] resolveNoCache(boolean incompleteCode) {
             Set<ResolveResult> results = new HashSet<>();
             String key = getReferenceId();
             for (VirtualFile file : propertyFiles) {
-                try {
-                    PropertyReference ref = new AllScopePropertyReference(key, LSFLocalizedStringValueLiteralImpl.this, file.getNameWithoutExtension(), true, getRangeInElement());
-                    ResolveResult[] result = ref.multiResolve(incompleteCode);
-                    Collections.addAll(results, result);
-                } catch (ProcessCanceledException ignored) {
-                } 
+                PropertyReference ref = new AllScopePropertyReference(key, LSFLocalizedStringValueLiteralImpl.this, file.getNameWithoutExtension(), true, getRangeInElement());
+                ResolveResult[] result = ref.multiResolve(incompleteCode);
+                Collections.addAll(results, result);
             }
             return results.toArray(new ResolveResult[0]);
         }

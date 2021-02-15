@@ -20,6 +20,7 @@ public abstract class LSFJavaClassStringReferenceImpl extends ASTWrapperPsiEleme
         super(node);
     }
 
+    // maybe it should be cached like LocalizedStringValue
     @NotNull
     @Override
     public PsiReference[] getReferences() {
