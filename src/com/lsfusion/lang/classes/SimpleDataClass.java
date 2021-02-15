@@ -41,4 +41,10 @@ public class SimpleDataClass extends DataClass {
     public String getCaption() {
         return null;
     }
+
+
+    @Override
+    public ExtInt getCharLength() {
+        return new ExtInt(25);
+    }
 }

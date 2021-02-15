@@ -22,6 +22,9 @@ public interface LSFDeclaration extends LSFElement, PsiNameIdentifierOwner, Item
     LSFId getNameIdentifier();
 
     boolean resolveDuplicates();
+    default PsiElement getDuplicateElement() {
+        return getNameIdentifier();
+    }
 
     PsiElement[] processImplementationsSearch();
 

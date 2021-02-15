@@ -48,4 +48,9 @@ public class TimeClass extends FormatClass {
             return DateUtils.timeFormat.format(obj);
         } else return "";
     }
+
+    @Override
+    public ExtInt getCharLength() {
+        return new ExtInt(25);
+    }
 }

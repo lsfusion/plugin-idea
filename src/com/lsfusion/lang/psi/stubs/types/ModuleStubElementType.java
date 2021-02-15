@@ -1,11 +1,11 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.impl.LSFModuleHeaderImpl;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.stubs.ModuleStubElement;
 import com.lsfusion.lang.psi.stubs.impl.ModuleStubImpl;
 import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
@@ -21,7 +21,7 @@ public class ModuleStubElementType extends NamespaceStubElementType<ModuleStubEl
     }
 
     @Override
-    public StringStubIndexExtension<LSFModuleDeclaration> getGlobalIndex() {
+    public LSFStringStubIndex<LSFModuleDeclaration> getGlobalIndex() {
         return ModuleIndex.getInstance();
     }
 

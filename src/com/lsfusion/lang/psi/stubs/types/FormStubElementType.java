@@ -1,10 +1,10 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.stubs.FormStubElement;
 import com.lsfusion.lang.psi.stubs.impl.FormStubImpl;
 import com.lsfusion.lang.psi.indexes.FormIndex;
@@ -20,7 +20,7 @@ public class FormStubElementType extends FullNameStubElementType<FormStubElement
     }
 
     @Override
-    public StringStubIndexExtension<LSFFormDeclaration> getGlobalIndex() {
+    public LSFStringStubIndex<LSFFormDeclaration> getGlobalIndex() {
         return FormIndex.getInstance();
     }
 

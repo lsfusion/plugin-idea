@@ -56,7 +56,6 @@ import java.util.HashMap;
     tokenDebugNames.put(RSQBR, "]");
     tokenDebugNames.put(ATSIGN, "@");
     tokenDebugNames.put(ATSIGN2, "@@");
-    tokenDebugNames.put(FAKEMETAID, "Meta id");
   }
     
   public static String getTokenDebugName(IElementType elementType) {
@@ -90,9 +89,12 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
 STRING_LITERAL = "'" {STR_LITERAL_CHAR}* "'"
 ID_LITERAL = {FIRST_ID_LETTER} {NEXT_ID_LETTER}*
 NEXTID_LITERAL = {NEXT_ID_LETTER}+
+
+ID_META_LITERAL = ({ID_LITERAL}? (("###" | "##") {NEXTID_LITERAL})+) | {ID_LITERAL}
+
 STRING_LITERAL_ID = {ID_LITERAL} | {STRING_LITERAL}
 STRING_LITERAL_NEXTID = {NEXTID_LITERAL} | {STRING_LITERAL}
-META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
+STRING_META_LITERAL = ({STRING_LITERAL_ID} ("###" | "##"))* {STRING_LITERAL} (("###" | "##") {STRING_LITERAL_NEXTID})*
 
 %%
 <YYINITIAL> {
@@ -112,10 +114,6 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   | "BOOLEAN"
   | "COLOR"                             { return PRIMITIVE_TYPE; }
 
-
-  {META_ID}                             { return FAKEMETAID;}
-
-  {STRING_LITERAL}                      { return LEX_STRING_LITERAL; }
 
   {DIGITS}                              { return LEX_UINT_LITERAL; }
   {DIGITS}[Ll]                          { return LEX_ULONG_LITERAL; }
@@ -497,7 +495,8 @@ META_ID =  {STRING_LITERAL_ID}? (("###" | "##") {STRING_LITERAL_NEXTID})+
   "YES"                     			{ return YES; }
   "YESNO"                     			{ return YESNO; }
 
-  {ID_LITERAL}   { return ID; } // used in isLsfIdentifierPart
+  {STRING_META_LITERAL}                      { return LEX_STRING_LITERAL; }
+  {ID_META_LITERAL}                     { return ID; } // used in isLsfIdentifierPart
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

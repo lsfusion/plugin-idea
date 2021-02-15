@@ -22,4 +22,9 @@ public class LogicalClass extends DataClass {
     public int getDefaultWidth(FontMetrics fontMetrics, PropertyDrawView propertyDraw) {
         return 25;
     }
+
+    @Override
+    public ExtInt getCharLength() {
+        return new ExtInt(1);
+    }
 }

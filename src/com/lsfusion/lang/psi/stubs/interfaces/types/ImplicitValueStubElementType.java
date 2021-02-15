@@ -26,32 +26,10 @@ public class ImplicitValueStubElementType extends LSFStubElementType<ImplicitVal
         super("IMPLICIT_VALUE_PROPERTY_STATEMENT");
     }
 
-    @Override
-    public void serialize(@NotNull ImplicitValueStubElement stub, @NotNull StubOutputStream dataStream) throws IOException {
-        List<String> props = stub.getValueProperties();
-        if (props != null) {
-            dataStream.writeInt(props.size());
-            for (String prop : props) {
-                dataStream.writeName(prop);
-            }
-        } else {
-            dataStream.writeInt(0);
-        }
-    }
-
     @NotNull
     @Override
     public ImplicitValueStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-        int propsCount = dataStream.readInt();
-        List<String> props = new ArrayList<>();
-        if (propsCount != 0) {
-            for (int i = 0; i < propsCount; i++) {
-                StringRef name = dataStream.readName();
-                props.add(name != null ? name.getString() : null);
-            }
-        }
-
-        return new ImplicitValueStubImpl(parentStub, this, props);
+        return new ImplicitValueStubImpl(dataStream, parentStub, this);
     }
 
     @Override
@@ -74,7 +52,7 @@ public class ImplicitValueStubElementType extends LSFStubElementType<ImplicitVal
 
     @Override
     public ImplicitValueStubElement createStub(@NotNull LSFImplicitValuePropStatement psi, StubElement parentStub) {
-        final ImplicitValueStubImpl stub = new ImplicitValueStubImpl(parentStub, psi.getElementType());
+        final ImplicitValueStubImpl stub = new ImplicitValueStubImpl(parentStub, psi);
 
         LSFPropertyStatement propertyStatement = psi.getPropertyStatement();
         List<String> propNames = LSFPsiImplUtil.getValueAPPropertyNames(propertyStatement.getPropertyCalcStatement());

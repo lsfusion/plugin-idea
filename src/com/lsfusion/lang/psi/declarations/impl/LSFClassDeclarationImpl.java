@@ -12,7 +12,6 @@ import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
-import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFClassExtendImpl;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.stubs.ClassStubElement;
@@ -72,13 +71,7 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
     public PsiElement[] processImplementationsSearch() {
         List<PsiElement> names = new ArrayList<>();
 
-        Collection<LSFClassExtend> extendClasses = LSFGlobalResolver.findExtendElements(this, LSFStubElementTypes.EXTENDCLASS, getProject(), GlobalSearchScope.allScope(getProject())).findAll();
-        for (LSFClassExtend classExtend : extendClasses) {
-            if (((LSFClassExtendImpl) classExtend).getClassDecl() == null) {
-                names.add(((LSFClassExtendImpl) classExtend).getExtendingClassDeclaration().getCustomClassUsageWrapper());
-            }
-        }
-
+        names.addAll(LSFClassExtendImpl.processClassImplementationsSearch(this));
         names.addAll(processChildrenSearch(this, getProject()));
 
         return names.toArray(new PsiElement[names.size()]);
@@ -86,7 +79,7 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
 
     public static Set<LSFClassDeclaration> processChildrenSearch(LSFClassDeclaration classDecl, Project project) {
         Set<LSFClassDeclaration> result = new ArrayListSet<>();
-        Collection<LSFClassDeclaration> classExtends = LSFGlobalResolver.findClassExtends(classDecl, project, GlobalSearchScope.allScope(project));
+        Collection<LSFClassDeclaration> classExtends = LSFGlobalResolver.findChildrenExtends(classDecl, project, GlobalSearchScope.allScope(project));
         for (LSFClassDeclaration lsfClassDeclaration : classExtends) {
             result.add(lsfClassDeclaration);
             result.addAll(processChildrenSearch(lsfClassDeclaration, project));

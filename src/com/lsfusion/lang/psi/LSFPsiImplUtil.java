@@ -15,13 +15,13 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
+import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
 import com.lsfusion.lang.psi.impl.LSFCollapseGroupObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.impl.LSFExpandGroupObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
 import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
-import com.lsfusion.lang.psi.references.impl.LSFFormElementReferenceImpl;
 import com.lsfusion.lang.typeinfer.*;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -365,7 +365,7 @@ public class LSFPsiImplUtil {
 
     public static ContextModifier getContextModifier(@NotNull LSFContextFiltersClause sourceStatement) {
         FormContext formContext = PsiTreeUtil.getParentOfType(sourceStatement, FormContext.class);
-        Set<LSFObjectDeclaration> objects = formContext != null ? LSFFormElementReferenceImpl.processFormContext(formContext, formExtend -> formExtend.getObjectDecls(), formContext.getTextOffset(), true, false) : null;
+        Set<LSFObjectDeclaration> objects = formContext != null ? LSFFormExtendImpl.processFormContext(formContext, formExtend -> formExtend.getObjectDecls(), formContext.getTextOffset(), LSFLocalSearchScope.createFrom(sourceStatement), true, false) : null;
 
         return (offset, currentParams) -> objects != null ? new ArrayList<>(objects) : new ArrayList<>();
     }
@@ -936,13 +936,10 @@ public class LSFPsiImplUtil {
                 LSFClassSet classSet = ex.classSet;
                 if (classSet instanceof StringClass)
                     hasString = true;
-                else if (hasString) {
-                    ex = new LSFExClassSet(new StringClass(false, false, new ExtInt(1)));
-                }
             }
             fixedClasses.add(ex);
         }
-        return orClasses(fixedClasses, true);
+        return orClasses(fixedClasses, hasString);
     }
 
     @Nullable
@@ -1214,7 +1211,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFRoundPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
-        return resolveInferredValueClass(sourceStatement.getPropertyExpressionList(), inferred, true);
+        return resolveInferredValueClass(sourceStatement.getPropertyExpressionList(), inferred, false);
     }
 
     @Nullable

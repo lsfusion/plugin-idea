@@ -24,11 +24,13 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.ExprsContextModifier;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFLocalPropertyDeclarationNameImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
+import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -44,8 +46,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final String ACTION_FQN = "lsfusion.server.logics.action.Action";
 
     public static final TextAttributes META_USAGE = new TextAttributes(null, new JBColor(Gray._239, Gray._61), null, null, Font.PLAIN);
-    public static final TextAttributes META_NESTING_USAGE = new TextAttributes(new JBColor(Gray._180, Gray._91), null, null, null, Font.PLAIN);
     public static final TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(37, 49, 37)), null, null, Font.PLAIN);
+
+    public static final TextAttributes META_DECL_USAGE = new TextAttributes(null, new JBColor(new Color(239, 239, 207), new Color(49, 55, 49)), null, null, Font.PLAIN);
+    public static final TextAttributes META_ERROR = new TextAttributes(new JBColor(new Color(255, 128, 0), new Color(112, 48, 48)), null, null, null, Font.PLAIN);
+    public static final TextAttributes WAVE_UNDERSCORED_META_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 128, 0), new Color(112, 48, 48)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
+
+    public static final TextAttributes META_NESTING_USAGE = new TextAttributes(new JBColor(Gray._180, Gray._91), null, null, null, Font.PLAIN);
     public static final TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), null, null, null, Font.PLAIN);
     public static final TextAttributes WAVE_UNDERSCORED_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
     public static final TextAttributes WARNING = new TextAttributes(new JBColor(Gray._211, new Color(100, 100, 255)), null, null, null, Font.PLAIN);
@@ -76,9 +83,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitElement(@NotNull PsiElement o) {
-        if (o instanceof LeafPsiElement && isInMetaUsage(o)) { // фокус в том что побеждает наибольший приоритет, но важно следить что у верхнего правила всегда приоритет выше, так как в противном случае annotator просто херится
-            Annotation annotation = myHolder.createInfoAnnotation(o.getTextRange(), null);
-            annotation.setEnforcedTextAttributes(META_USAGE);
+        if (o instanceof LeafPsiElement) { // фокус в том что побеждает наибольший приоритет, но важно следить что у верхнего правила всегда приоритет выше, так как в противном случае annotator просто херится
+            TextAttributes textAttributes = mergeMetaAttributes(o, null);
+            if(textAttributes != null) {
+                Annotation annotation = myHolder.createInfoAnnotation(o.getTextRange(), null);
+                annotation.setEnforcedTextAttributes(textAttributes);
+            }
         }
     }
 
@@ -183,9 +193,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             LSFExpressionUnfriendlyPD unfriend = propStatement.getExpressionUnfriendlyPD();
             if(unfriend != null) {
                 if(unfriend.getAggrPropertyDefinition() != null || unfriend.getDataPropertyDefinition() != null) {
-                    Annotation annotation = myHolder.createErrorAnnotation(o, "This operator cannot be used in [= ]");
-                    annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-                    addError(o, annotation);
+                    addUnderscoredError(o, "This operator cannot be used in []");
                 }                    
             }
         }
@@ -208,9 +216,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (className != null) {
             LSFExprParamReference parentRef = PsiTreeUtil.getParentOfType(o.resolveDecl(), LSFExprParamReference.class);
             if (parentRef == null || o != parentRef) {
-                Annotation annotation = myHolder.createErrorAnnotation(o, "Redefinition of reference '" + o.getNameRef() + "'");
-                annotation.setEnforcedTextAttributes(LSFReferenceAnnotator.WAVE_UNDERSCORED_ERROR);
-                addError(o, annotation);
+                addUnderscoredError(o, "Redefinition of reference '" + o.getNameRef() + "'");
             }
         } else {
             LSFPropertyExprObject pExprObject = PsiTreeUtil.getParentOfType(o, LSFPropertyExprObject.class);
@@ -225,8 +231,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void addOuterRef(LSFReference reference) {
         final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Outer param");
         TextAttributes error = OUTER_PARAM;
-        if (isInMetaUsage(reference))
-            error = TextAttributes.merge(error, META_USAGE);
+        error = mergeMetaAttributes(reference, error);
         annotation.setEnforcedTextAttributes(error);
     }
 
@@ -270,6 +275,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         return PsiTreeUtil.getParentOfType(o, LSFMetaCodeBody.class) != null;
         //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
     }
+
+    public static LSFMetaCodeDeclarationStatement getMetaDecl(PsiElement o) {
+        return PsiTreeUtil.getParentOfType(o, LSFMetaCodeDeclarationStatement.class);
+    }
+
+    public static boolean isInMetaDecl(PsiElement o) {
+        return getMetaDecl(o) != null;
+        //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
+    }
+
 /*
     @Override
     public void visitMetaDeclaration(@NotNull LSFMetaDeclaration o) {
@@ -279,31 +294,45 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         annotation.registerFix(new MetaTypeInferAction(o));
     }*/
 
-    private boolean isInMetaDecl(PsiElement o) {
-        return PsiTreeUtil.getParentOfType(o, LSFMetaCodeDeclarationStatement.class) != null;
-        //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
+    private void checkMetaNestingUsage(@NotNull PsiElement o) {
+        if (MetaNestingLineMarkerProvider.resolveNestingLevel(o) > 1) {
+            Annotation metaHeaderAnnotation = myHolder.createInfoAnnotation(o.getTextRange(), "");
+            metaHeaderAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
+        }
+    }
+
+    @Override
+    public void visitMetaCodeStatementHeader(@NotNull LSFMetaCodeStatementHeader o) {
+        super.visitMetaCodeStatementHeader(o);
+
+        checkMetaNestingUsage(o);
+    }
+
+    @Override
+    public void visitMetaCodeStatementSemi(@NotNull LSFMetaCodeStatementSemi o) {
+        super.visitMetaCodeStatementSemi(o);
+
+        checkMetaNestingUsage(o);
+    }
+
+    @Override
+    public void visitMetaCodeBodyLeftBrace(@NotNull LSFMetaCodeBodyLeftBrace o) {
+        super.visitMetaCodeBodyLeftBrace(o);
+
+        checkMetaNestingUsage(o);
+    }
+
+    @Override
+    public void visitMetaCodeBodyRightBrace(@NotNull LSFMetaCodeBodyRightBrace o) {
+        super.visitMetaCodeBodyRightBrace(o);
+
+        checkMetaNestingUsage(o);
     }
 
     @Override
     public void visitMetaCodeStatement(@NotNull LSFMetaCodeStatement o) {
         super.visitMetaCodeStatement(o);
 
-        if (MetaNestingLineMarkerProvider.resolveNestingLevel(o) > 0) {
-            Annotation metaHeaderAnnotation = myHolder.createInfoAnnotation(o.getMetaCodeStatementHeader().getTextRange(), "");
-            metaHeaderAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
-            LSFMetaCodeStatementSemi metaCodeStatementSemi = o.getMetaCodeStatementSemi();
-            if (metaCodeStatementSemi != null) {
-                Annotation metaSemiAnnotation = myHolder.createInfoAnnotation(metaCodeStatementSemi.getTextRange(), "");
-                metaSemiAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
-            }
-            LSFMetaCodeBody metaCodeBody = o.getMetaCodeBody();
-            if (metaCodeBody != null) {
-                Annotation metaLeftBraceAnnotation = myHolder.createInfoAnnotation(metaCodeBody.getMetaCodeBodyLeftBrace().getTextRange(), "");
-                metaLeftBraceAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
-                Annotation metaRightBraceAnnotation = myHolder.createInfoAnnotation(metaCodeBody.getMetaCodeBodyRightBrace().getTextRange(), "");
-                metaRightBraceAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
-            }
-        }
         checkReference(o);
     }
     
@@ -313,42 +342,35 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             int leftBrace = o.getText().indexOf('(');
             int rightBrace = o.getText().indexOf(')');
             if (rightBrace > leftBrace && leftBrace >= 0) {
-                TextRange bracesRange = new TextRange(o.getTextRange().getStartOffset() + leftBrace, o.getTextRange().getStartOffset() + rightBrace + 1);
-                Annotation annotation = myHolder.createInfoAnnotation(bracesRange, "Metacode should have at least one parameter");
-                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                addError(o, annotation);
+                addUnderscoredError(o, new TextRange(o.getTextRange().getStartOffset() + leftBrace, o.getTextRange().getStartOffset() + rightBrace + 1), "Metacode should have at least one parameter");
             }
         }
         
-        LSFAnyTokens statements = o.getAnyTokens();
-        if (statements != null) {
-            Annotation annotation = myHolder.createInfoAnnotation(statements.getTextRange(), "");
-            annotation.setEnforcedTextAttributes(META_DECL);
-        }
+//        LSFMetaCodeDeclBody statements = o.getMetaCodeDeclBody();
+//        if (statements != null) {
+//            Annotation annotation = myHolder.createInfoAnnotation(statements.getTextRange(), "");
+//            annotation.setEnforcedTextAttributes(META_DECL);
+//        }
     }
 
     @Override
     public void visitActionStatement(@NotNull LSFActionStatement o) {
         super.visitActionStatement(o);
 
-        if (o.resolveDuplicates()) {
-            addAlreadyDefinedError(o.getPropertyDeclaration(), o.getPresentableText());
-        } 
+        checkAlreadyDefined(o);
     }
     
     @Override
     public void visitPropertyStatement(@NotNull LSFPropertyStatement o) {
         super.visitPropertyStatement(o);
 
-        if (o.resolveDuplicates()) {
-            addAlreadyDefinedError(o.getPropertyDeclaration(), o.getPresentableText());
-        } else {
-            if (o.isStoredProperty()) {
-                if (o.resolveDuplicateColumns()) {
-                    addDuplicateColumnNameError(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
-                } else {
+        checkAlreadyDefined(o);
+
+        if (o.isStoredProperty()) {
+            if (o.resolveDuplicateColumns()) {
+                addDuplicateColumnNameError(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
+            } else {
 //                    addColumnInfo(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
-                }
             }
         }
 
@@ -361,20 +383,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> incorrect = expressionUnfriendlyPD.checkValueParamClasses(declareParams);
 
                 for (LSFParamDeclaration incParam : incorrect.first) {
-                    Annotation annotation = myHolder.createErrorAnnotation(incParam, "Not used / No implementation found");
-                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                    addError(incParam, annotation);
+                    addUnderscoredError(incParam, "Not used / No implementation found");
                 }
 
                 for (Map.Entry<PsiElement, Pair<LSFClassSet, LSFClassSet>> incBy : incorrect.second.entrySet()) {
-                    Annotation annotation;
-                    if (incBy.getValue() != null)
-                        annotation = myHolder.createErrorAnnotation(incBy.getKey(),
-                                String.format("Incorrect param implementation: required %s; found %s", incBy.getValue().second, incBy.getValue().first));
-                    else
-                        annotation = myHolder.createErrorAnnotation(incBy.getKey(), "No param for this implementation found");
-                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                    addError(incBy.getKey(), annotation);
+                    addUnderscoredError(incBy.getKey(), incBy.getValue() != null ?
+                            String.format("Incorrect param implementation: required %s; found %s", incBy.getValue().second, incBy.getValue().first) :
+                            "No param for this implementation found");
                 }
             } else {
                 LSFPropertyExpression propertyExpression = propertyCalcStatement.getPropertyExpression();
@@ -384,8 +399,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     if(!usedParameter.contains(declareParam.getName())) {
                         final Annotation annotation = myHolder.createWarningAnnotation(declareParam, "Parameter is not used");
                         TextAttributes error = WARNING;
-                        if (isInMetaUsage(declareParam))
-                            error = TextAttributes.merge(error, META_USAGE);
+                        error = mergeMetaAttributes(declareParam, error);
                         annotation.setEnforcedTextAttributes(error);
                     }
             }
@@ -476,9 +490,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitClassExtend(@NotNull LSFClassExtend o) {
         super.visitClassExtend(o);
 
-        Set<LSFStaticObjectDeclaration> staticObjectDuplicates = o.resolveStaticObjectDuplicates();
-        for (LSFStaticObjectDeclaration so : staticObjectDuplicates) {
-            addAlreadyDefinedError(so);
+        checkAlreadyDefined(o);
+    }
+
+    private void checkAlreadyDefined(@NotNull LSFExtend o) {
+        for (LSFDeclaration duplicate : (Set<LSFDeclaration>) o.resolveDuplicates()) {
+            addAlreadyDefinedError(duplicate);
         }
     }
 
@@ -486,20 +503,21 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitFormDecl(@NotNull LSFFormDecl o) {
         super.visitFormDecl(o);
 
-        java.util.Set<? extends LSFDeclaration> duplicates = ((LSFFormExtend) o.getParent()).resolveDuplicates();
-        for (LSFDeclaration decl : duplicates) {
-            addAlreadyDefinedError(decl);
-        }
+        checkAlreadyDefined(((LSFFormExtend) o.getParent()));
     }
 
     @Override
     public void visitExtendingFormDeclaration(@NotNull LSFExtendingFormDeclaration o) {
         super.visitExtendingFormDeclaration(o);
 
-        java.util.Set<? extends LSFDeclaration> duplicates = ((LSFFormExtend) o.getParent()).resolveDuplicates();
-        for (LSFDeclaration decl : duplicates) {
-            addAlreadyDefinedError(decl);
-        }
+        checkAlreadyDefined((LSFFormExtend) o.getParent());
+    }
+
+    @Override
+    public void visitDesignStatement(@NotNull LSFDesignStatement o) {
+        super.visitDesignStatement(o);
+
+        checkAlreadyDefined(o);
     }
 
     @Override
@@ -508,13 +526,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
         java.util.List<LSFClassParamDeclare> params = o.getClassParamDeclareList();
         for (int i = 0; i < params.size(); i++) {
-            LSFId id1 = params.get(i).getParamDeclare().getNameIdentifier();
-            for (int j = 0; j < params.size(); j++) {
-                if (i != j) {
-                    if (id1.getText().equals(params.get(j).getParamDeclare().getNameIdentifier().getText())) {
-                        addAlreadyDefinedError(id1, id1.getText());
-                        break;
-                    }
+            LSFParamDeclare param1 = params.get(i).getParamDeclare();
+            for (int j = i+1; j < params.size(); j++) {
+                LSFParamDeclare param2 = params.get(j).getParamDeclare();
+                if (BaseUtils.nullEquals(param1.getDeclName(), param2.getDeclName())) {
+                    addAlreadyDefinedError(param2);
+                    break;
                 }
             }
         }
@@ -568,10 +585,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             char curCh = text.charAt(i);
             if (curCh == '\\') {
                 if (i + 1 < text.length() && !escapedSymbols.contains(text.substring(i + 1, i + 2))) {
-                    TextRange textRange = TextRange.create(element.getTextRange().getStartOffset() + i, element.getTextRange().getStartOffset() + i + 2);
-                    Annotation annotation = myHolder.createErrorAnnotation(textRange, "Wrong escape sequence " + text.substring(i, i + 2));
-                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                    addError(element, annotation);
+                    addUnderscoredError(element, TextRange.create(element.getTextRange().getStartOffset() + i, element.getTextRange().getStartOffset() + i + 2), "Wrong escape sequence " + text.substring(i, i + 2));
                 } else {
                     ++i;
                 }
@@ -580,9 +594,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private boolean checkReference(LSFReference reference) {
-        Annotation errorAnnotation = reference.resolveErrorAnnotation(myHolder);
-        if (!isInMetaDecl(reference) && errorAnnotation != null) {
-            addError(reference, errorAnnotation);
+        LSFResolvingError errorAnnotation = reference.resolveErrorAnnotation(myHolder);
+        if (errorAnnotation != null) { // !isInMetaDecl(reference)
+            addErrorWithResolving(reference, errorAnnotation); // since in meta usage there can be total different resolved references
             return false;
         }
         return true;
@@ -594,9 +608,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             LSFClassSet class1 = getLSFClassSet(children.get(0));
             LSFClassSet class2 = getLSFClassSet(children.get(1));
             if (class1 != null && class2 != null && !class1.isCompatible(class2)) {
-                Annotation annotation = myHolder.createErrorAnnotation(relationalPE, String.format("Type mismatch: can't compare %s and %s", class1, class2));
-                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                addError(relationalPE, annotation);
+                addUnderscoredErrorWithResolving(relationalPE, String.format("Type mismatch: can't compare %s and %s", class1, class2)); // since in meta usage there can be total different resolved references
             }
         }
     }
@@ -622,9 +634,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             LSFClassSet class1 = getLSFClassSet(children.get(0));
             LSFClassSet class2 = getLSFClassSet(children.get(1));
             if (class1 != null && class2 != null && !class1.isCompatible(class2)) {
-                Annotation annotation = myHolder.createErrorAnnotation(equalityPE, String.format("Type mismatch: can't compare %s and %s", class1, class2));
-                annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                addError(equalityPE, annotation);
+                addUnderscoredErrorWithResolving(equalityPE, String.format("Type mismatch: can't compare %s and %s", class1, class2)); // since in meta usage there can be total different resolved references
             }
         }
     }
@@ -644,9 +654,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addDuplicateColumnNameError(PsiElement element, String tableName, String columnName) {
-        Annotation annotation = myHolder.createErrorAnnotation(element, "The property has duplicate column name. Table: " + tableName + ", column: " + columnName);
-        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-        addError(element, annotation);
+        addUnderscoredErrorWithResolving(element, "The property has duplicate column name. Table: " + tableName + ", column: " + columnName);
     }
 
     private void addColumnInfo(PsiElement element, String tableName, String columnName) {
@@ -655,50 +663,97 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addAlreadyDefinedError(LSFDeclaration decl) {
-        addAlreadyDefinedError(decl.getNameIdentifier(), decl.getPresentableText());
+        addAlreadyDefinedError(decl.getDuplicateElement(), decl.getPresentableText());
     }
 
     private void addAlreadyDefinedError(PsiElement element, String elementPresentableText) {
-        Annotation annotation = myHolder.createErrorAnnotation(element, "'" + elementPresentableText + "' is already defined");
-        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-        addError(element, annotation);
+        addUnderscoredErrorWithResolving(element, "'" + elementPresentableText + "' is already defined");
     }
 
-    private void addError(PsiElement element, Annotation annotation) {
-        addError(element, annotation, LSFErrorLevel.ERROR);
+    private void addHighlightErrorWithResolving(PsiElement element, String message) {
+        addErrorWithResolving(element, new LSFResolvingError(element, message, false));
     }
+    private void addUnderscoredErrorWithResolving(PsiElement element, String message) {
+        addErrorWithResolving(element, new LSFResolvingError(element, message, true));
+    }
+    private void addErrorWithResolving(PsiElement element, LSFResolvingError error) {
+        addError(element, error, true);
+    }
+    private void addUnderscoredError(PsiElement element, TextRange range, String message) {
+        addError(element, new LSFResolvingError(element, range, message, true), false);
+    }
+    private void addUnderscoredError(PsiElement element, String message) {
+        addError(element, new LSFResolvingError(element, message, true), false);
+    }
+    private void addError(PsiElement element, LSFResolvingError error, boolean hasResolving) {
+        boolean inMetaDecl = isInMetaDecl(element);
+        Annotation annotation;
+        TextAttributes errorAttributes;
+        if(inMetaDecl && hasResolving) {
+            if (error.range != null)
+                annotation = myHolder.createInfoAnnotation(error.range, error.text);
+            else
+                annotation = myHolder.createInfoAnnotation(error.element, error.text);
+            errorAttributes = error.underscored ? WAVE_UNDERSCORED_META_ERROR : META_ERROR;
+        } else {
+            if (errorsSearchMode) {
+                ShowErrorsAction.showErrorMessage(element, error.text, LSFErrorLevel.ERROR);
+            }
 
-    private void addError(PsiElement element, Annotation annotation, LSFErrorLevel errorLevel) {
-        if ((errorLevel == LSFErrorLevel.WARNING && warningsSearchMode) || (errorLevel == LSFErrorLevel.ERROR && errorsSearchMode)) {
-            ShowErrorsAction.showErrorMessage(element, annotation.getMessage(), errorLevel);
+            if (error.range != null)
+                annotation = myHolder.createErrorAnnotation(error.range, error.text);
+            else
+                annotation = myHolder.createErrorAnnotation(error.element, error.text);
+            errorAttributes = error.underscored ? WAVE_UNDERSCORED_ERROR : ERROR;
         }
-        TextAttributes error = annotation.getEnforcedTextAttributes() == null ? (errorLevel == LSFErrorLevel.ERROR ? ERROR : WARNING) : annotation.getEnforcedTextAttributes();
-        if (isInMetaUsage(element))
-            error = TextAttributes.merge(error, META_USAGE);
-        annotation.setEnforcedTextAttributes(error);
+
+        errorAttributes = mergeMetaAttributes(element, errorAttributes);
+        annotation.setEnforcedTextAttributes(errorAttributes);
+    }
+
+    private TextAttributes mergeMetaAttributes(PsiElement element, TextAttributes attributes) {
+        boolean inMetaUsage = isInMetaUsage(element);
+        boolean inMetaDecl = isInMetaDecl(element);
+        TextAttributes metaAttr;
+        if (inMetaUsage) {
+            if(inMetaDecl)
+                metaAttr = META_DECL_USAGE;
+            else
+                metaAttr = META_USAGE;
+        } else {
+            if (inMetaDecl)
+                metaAttr = META_DECL;
+            else
+                metaAttr = null;
+        }
+
+        if(metaAttr != null) {
+            if (attributes != null)
+                attributes = TextAttributes.merge(attributes, metaAttr);
+            else
+                attributes = metaAttr;
+        }
+        return attributes;
     }
 
     private void addIndirectProp(LSFActionOrPropReference reference) {
         final Annotation annotation = myHolder.createWeakWarningAnnotation(reference.getTextRange(), "Indirect usage");
         TextAttributes error = IMPLICIT_DECL;
-        if (isInMetaUsage(reference))
-            error = TextAttributes.merge(error, META_USAGE);
+        error = mergeMetaAttributes(reference, error);
         annotation.setEnforcedTextAttributes(error);
     }
 
     private void addImplicitDecl(LSFReference reference) {
         final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Implicit parameter declaration");
         TextAttributes error = IMPLICIT_DECL;
-        if (isInMetaUsage(reference))
-            error = TextAttributes.merge(error, META_USAGE);
+        error = mergeMetaAttributes(reference, error);
         annotation.setEnforcedTextAttributes(error);
     }
 
     private void addUntypedImplicitDecl(LSFReference reference) {
         final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Untyped implicit parameter declaration");
         TextAttributes error = UNTYPED_IMPLICIT_DECL;
-        if (isInMetaUsage(reference))
-            error = TextAttributes.merge(error, META_USAGE);
+        error = mergeMetaAttributes(reference, error);
         annotation.setEnforcedTextAttributes(error);
     }
 
@@ -709,23 +764,17 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (!LSFPsiImplUtil.checkOverrideValue(element, required, found)) {
             String requiredClass = required.getResult() instanceof LSFValueClass ? ((LSFValueClass) required.getResult()).getCaption() : required.getResult().getCanonicalName();
             String foundClass = found.getResult() instanceof LSFValueClass ? ((LSFValueClass) found.getResult()).getCaption() : found.getResult().getCanonicalName();
-            Annotation annotation = myHolder.createErrorAnnotation(element, "Wrong value class. Required : " + requiredClass + ", found : " + foundClass);
-            annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-            addError(element, annotation);
+            addUnderscoredErrorWithResolving(element, "Wrong value class. Required : " + requiredClass + ", found : " + foundClass);
         }
 
         if (!LSFPsiImplUtil.checkNonRecursiveOverride(element)) {
-            Annotation annotation = myHolder.createErrorAnnotation(element, "Recursive implement");
-            annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-            addError(element, annotation);
+            addUnderscoredErrorWithResolving(element, "Recursive implement");
         }
     }
     @Override
     public void visitOverrideActionStatement(@NotNull LSFOverrideActionStatement element) {
         if (!LSFPsiImplUtil.checkNonRecursiveOverride(element)) {
-            Annotation annotation = myHolder.createErrorAnnotation(element, "Recursive implement");
-            annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-            addError(element, annotation);
+            addUnderscoredErrorWithResolving(element, "Recursive implement");
         }
     }
 
@@ -792,21 +841,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addFalseToBooleanAssignError(LSFAssignActionPropertyDefinitionBody o) {
-        Annotation annotation = myHolder.createErrorAnnotation(o, "use NULL instead of FALSE");
-        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-        addError(o, annotation, LSFErrorLevel.ERROR);
+        addUnderscoredError(o, "use NULL instead of FALSE");
     }
 
     private void addAssignError(LSFAssignActionPropertyDefinitionBody o) {
-        Annotation annotation = myHolder.createErrorAnnotation(o, "ASSIGN is allowed only to DATA/MULTI/CASE property");
-        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-        addError(o, annotation);
+        addUnderscoredErrorWithResolving(o, "ASSIGN is allowed only to DATA/MULTI/CASE property"); // uses resolving
     }
 
     private void addTypeMismatchError(LSFAssignActionPropertyDefinitionBody o, LSFClassSet class1, LSFClassSet class2) {
-        Annotation annotation = myHolder.createErrorAnnotation(o, String.format("Type mismatch: can't cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName()));
-        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-        addError(o, annotation, LSFErrorLevel.ERROR);
+        addUnderscoredErrorWithResolving(o, String.format("Type mismatch: can't cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName())); // uses resolving
     }
 
     @Override
@@ -814,11 +857,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         String text = o.getText();
         if (text != null && text.contains("=")) {
             String property = text.substring(0, text.indexOf("=")).trim();
-            if (!ASTCompletionContributor.validDesignProperty(property)) {
-                Annotation annotation = myHolder.createErrorAnnotation(o, "Can't resolve property " + property);
-                annotation.setEnforcedTextAttributes(ERROR);
-                addError(o, annotation);
-            }
+            if (!ASTCompletionContributor.validDesignProperty(property))
+                addHighlightErrorWithResolving(o, "Can't resolve property " + property); // design property can be meta parameter
         }
     }
 
@@ -828,9 +868,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (child instanceof LSFUnaryMinusPE) {
                 LSFClassSet classSet = LSFExClassSet.fromEx(((LSFUnaryMinusPE) child).resolveInferredValueClass(null));
                 if (classSet != null && !(classSet instanceof IntegralClass)) {
-                    Annotation annotation = myHolder.createErrorAnnotation(child, "Can't multiply / divide " + classSet + " value");
-                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                    addError(child, annotation);
+                    addUnderscoredErrorWithResolving(child, "Can't multiply / divide " + classSet + " value"); // uses resolving
                 }
             }
         }
@@ -843,9 +881,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             for (LSFAdditivePE child : additivePEList) {
                 LSFClassSet classSet = LSFExClassSet.fromEx(child.resolveInferredValueClass(null));
                 if (classSet != null && !(classSet instanceof IntegralClass)) {
-                    Annotation annotation = myHolder.createErrorAnnotation(child, "Can't add / subtract " + classSet + " value");
-                    annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-                    addError(child, annotation);
+                    addUnderscoredErrorWithResolving(child, "Can't add / subtract " + classSet + " value"); // uses resolving
                 }
             }
         }
@@ -853,9 +889,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitModuleUsage(@NotNull LSFModuleUsage moduleUsage) {
-        if (moduleUsage.resolveDecl() == null) {
-            addError(moduleUsage, moduleUsage.resolveErrorAnnotation(myHolder));
-        }
+        checkReference(moduleUsage);
     }
 
     @Override
@@ -913,11 +947,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addTypeMismatchError(LSFJoinPropertyDefinition o, List<LSFClassSet> leftClassList, List<LSFClassSet> rightClassList) {
-        Annotation annotation = myHolder.createErrorAnnotation(o, "Type mismatch. Expected params: " +
+        addUnderscoredErrorWithResolving(o, "Type mismatch. Expected params: " +
                 leftClassList.stream().map(LSFClassSet::getCanonicalName).collect(Collectors.joining(", ")) + "; got: " +
-                rightClassList.stream().map(LSFClassSet::getCanonicalName).collect(Collectors.joining(", ")));
-        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-        addError(o, annotation);
+                rightClassList.stream().map(LSFClassSet::getCanonicalName).collect(Collectors.joining(", "))); // uses resolving
     }
 
     @Override

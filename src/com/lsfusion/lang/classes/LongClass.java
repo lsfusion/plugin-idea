@@ -30,4 +30,9 @@ public class LongClass extends IntClass {
     public String getCaption() {
         return "Long";
     }
+
+    @Override
+    public ExtInt getCharLength() {
+        return new ExtInt(20);
+    }
 }

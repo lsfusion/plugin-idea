@@ -106,6 +106,11 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
 
     public abstract LSFPropertyDeclaration getPropertyDeclaration();
 
+    @Override
+    public PsiElement getDuplicateElement() {
+        return getPropertyDeclaration();
+    }
+
     private LSFExplicitSignature getDeclExplicitParams() {
         List<LSFParamDeclaration> params = getPropertyDeclaration().resolveParamDecls();
         if(params != null)

@@ -95,20 +95,32 @@ public class LSFExClassSet {
     public LSFExClassSet op(LSFExClassSet exClassSet, boolean or) {
         return op(exClassSet, or, false);
     }
+
+    private LSFClassSet checkString(LSFClassSet classSet) {
+        if(classSet != null && !(classSet instanceof StringClass))
+            return new StringClass(false, false, classSet.getCharLength());
+        return classSet;
+    }
     @Nullable
     public LSFExClassSet op(LSFExClassSet exClassSet, boolean or, boolean string) {
+        LSFClassSet classSet1 = classSet;
+        LSFClassSet classSet2 = exClassSet.classSet;
+        if(string) {
+            classSet1 = checkString(classSet1);
+            classSet2 = checkString(classSet2);
+        }
         if(or) {
-            return LSFExClassSet.checkNull(classSet.op(exClassSet.classSet, true, string), orAny || exClassSet.orAny);
+            return LSFExClassSet.checkNull(classSet1.op(classSet2, true, string), orAny || exClassSet.orAny);
         } else {
             assert !string;
             if(orAny) {
                 if(exClassSet.orAny) // если оба orAny, то не and'м, а or'м
-                    return LSFExClassSet.checkNull(classSet.op(exClassSet.classSet, true, string), true);
+                    return LSFExClassSet.checkNull(classSet1.op(classSet2, true, string), true);
                 return exClassSet;
             }
             if(exClassSet.orAny)
                 return this;
-            return LSFExClassSet.checkNull(classSet.op(exClassSet.classSet, false, string), false);
+            return LSFExClassSet.checkNull(classSet1.op(classSet2, false, string), false);
         }
     }
     

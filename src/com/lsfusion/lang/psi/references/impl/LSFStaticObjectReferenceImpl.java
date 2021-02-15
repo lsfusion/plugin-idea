@@ -3,11 +3,14 @@ package com.lsfusion.lang.psi.references.impl;
 import com.intellij.lang.ASTNode;
 import com.lsfusion.lang.psi.LSFCustomClassUsage;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.LSFResolveResult;
 import com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
+import com.lsfusion.lang.psi.extend.impl.LSFClassExtendImpl;
 import com.lsfusion.lang.psi.references.LSFStaticObjectReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -22,14 +25,13 @@ public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFS
 
     @Override
     public LSFResolveResult resolveNoCache() {
+        String nameRef = getNameRef();
+
         List<LSFStaticObjectDeclaration> decls = new ArrayList<>();
-        for (LSFClassExtend classExtend : LSFGlobalResolver.findExtendElements(getCustomClassUsage().resolveDecl(), LSFStubElementTypes.EXTENDCLASS, getLSFFile())) {
-            for (LSFStaticObjectDeclaration staticDecl : classExtend.getStaticObjects()) {
-                if (getSimpleName().getName() != null && staticDecl != null && getSimpleName().getName().equals(staticDecl.getName())) {
-                    decls.add(staticDecl);
-                }
-            }
-        }
+        for(LSFStaticObjectDeclaration decl : LSFClassExtendImpl.processClassContext(getCustomClassUsage().resolveDecl(), getLSFFile(), getTextOffset(), LSFLocalSearchScope.createFrom(this), LSFClassExtend::getStaticObjects))
+            if (BaseUtils.nullEquals(nameRef, decl.getDeclName()))
+                decls.add(decl);
+
         return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls, false));
     }
 

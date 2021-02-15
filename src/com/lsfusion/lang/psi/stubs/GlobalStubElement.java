@@ -6,9 +6,7 @@ import com.lsfusion.lang.psi.LSFStubElement;
 
 import java.io.IOException;
 
-public interface GlobalStubElement<This extends GlobalStubElement<This, Decl>, Decl extends LSFGlobalElement<Decl, This>> extends LSFStubElement<Decl> {
-
-    void serialize(StubOutputStream dataStream) throws IOException;
+public interface GlobalStubElement<This extends GlobalStubElement<This, Decl>, Decl extends LSFGlobalElement<Decl, This>> extends LSFStubElement<This, Decl> {
 
     String getGlobalName();
 }

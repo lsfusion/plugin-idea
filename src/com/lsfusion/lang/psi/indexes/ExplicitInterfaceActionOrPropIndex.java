@@ -1,8 +1,6 @@
 package com.lsfusion.lang.psi.indexes;
 
-import com.intellij.psi.PsiElement;
-import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionOrPropStatement;
-import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionStatement;
+import com.lsfusion.lang.psi.LSFStubbedElement;
 
-public abstract class ExplicitInterfaceActionOrPropIndex<T extends PsiElement> extends LSFStringStubIndex<T> {
+public abstract class ExplicitInterfaceActionOrPropIndex<T extends LSFStubbedElement> extends LSFStringStubIndex<T> {
 }

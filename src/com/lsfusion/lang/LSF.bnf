@@ -22,24 +22,21 @@
   // additional tokens
   tokens = [
     COMMENTS='COMMENTS'
-    FAKEMETAID='META_ID'
   ]
 }
 
 script ::= << isExpressionParsing >> propertyExpression
         | << isActionParsing >> listActionStatement*
-        | moduleHeader (lazyScriptStatement*)
+        | moduleHeader lazyScriptStatement*
 
-lazyScriptStatement ::= scriptStatement*
-{
-    lazy = true
-    extends = "com.lsfusion.lang.psi.LSFLazyParsableElement"
-}
+// with META lazyness there is a problem, that psi change detector works for whole lazy statement, however this change detector has been being deprecated, so we'll have to fix it some other way
+lazyScriptStatement ::= scriptStatement* { lazy = true extends = "com.lsfusion.lang.psi.LSFLazyParsableElement" }
 
-scriptStatement ::= statement
-{
-    recoverWhile = "script_statement_recover"
-}
+private statement ::= metaCodeDeclarationStatement | innerStatement
+private statement_start ::= META | inner_statement_start
+
+private script_statement_recover ::= !statement_start // it's last rule, so recover only to the statement start
+scriptStatement ::= statement { recoverWhile = "script_statement_recover" }
 
 simpleName ::= ID
 {
@@ -72,7 +69,7 @@ namespaceName ::= NAMESPACE namespaceUsage SEMI
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-private statement ::=   constraintStatement
+private innerStatement ::=   constraintStatement
                     |	groupStatement
                     |	overrideActionStatement // starts with ID
                     |	overridePropertyStatement // starts with ID
@@ -93,7 +90,6 @@ private statement ::=   constraintStatement
                     |	windowStatement
                     |	navigatorStatement
                     |	metaCodeStatement // ?
-                    |	metaCodeDeclarationStatement // ?
                     |   internalStatement
                     |	emptyStatement
                     |   stubStatement
@@ -125,10 +121,9 @@ stubStatement ::=
     | WINDOW windowType ID
     {pin(".*") = 1}
 
-private script_statement_recover ::= !statement_start
 // Important ! after recover the rule should mandatory be pinned (matched)
-private statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT | INTERNAL
-                            | CLASS | ATSIGN | ATSIGN2 | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
+private inner_statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT | INTERNAL
+                            | CLASS | ATSIGN | ATSIGN2 | FORM | GROUP | DESIGN | TABLE | WINDOW | EXTEND | SEMI
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -627,7 +622,7 @@ eventIdSetting ::= EVENTID stringLiteral
 
 hideEditKey ::= HIDE
 
-contextMenuEventType ::= CONTEXTMENU (localizedStringLiteral)? { pin = 1 }
+contextMenuEventType ::= CONTEXTMENU (<<noIDCheck>> localizedStringLiteral)? { pin = 1 } // there are a lot of rules that start from ID, so we'll ignore that cases
 keyPressedEventType ::= KEYPRESS stringLiteral  { pin = 1 }
 formEventType ::= CHANGE | GROUPCHANGE | CHANGEWYS | EDIT | contextMenuEventType | keyPressedEventType
 
@@ -1937,7 +1932,7 @@ setupComponentStatement ::= componentSelector componentBody
     pin = 1
 }
 
-newComponentStatement ::= NEW componentStubDecl componentInsertPosition componentBody {pin = 2}
+newComponentStatement ::= NEW componentDecl componentInsertPosition componentBody {pin = 2}
 moveComponentStatement ::= MOVE componentSelector componentInsertPosition componentBody {pin = 1}
 
 componentInsertPosition ::= (   insertRelativePositionLiteral componentSelector
@@ -1969,14 +1964,6 @@ componentSelector ::=   PARENT LBRAC componentSelector RBRAC
     pin(".*") = 1
 }
 
-componentStubDecl ::= componentDecl
-{
-    implements="com.lsfusion.lang.psi.declarations.LSFComponentStubDeclaration"
-    mixin="com.lsfusion.lang.psi.declarations.impl.LSFComponentStubDeclarationImpl"
-    stubClass = "com.lsfusion.lang.psi.stubs.ComponentStubElement"
-    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
-}
-
 componentDecl ::= simpleName
 {
     implements="com.lsfusion.lang.psi.declarations.LSFComponentDeclaration"
@@ -1999,7 +1986,7 @@ setObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 2}
 
 componentPropertyValue ::= //commented literals are in designCalcPropertyObject
                         //colorLiteral
-                        //|	localizedStringLiteral
+                        //|	(<<noIDCheck>> localizedStringLiteral) // since there is a propertyExpression afterwards, first ID would be matched
                         //|	intLiteral
                         //|	doubleLiteral
                             dimensionLiteral
@@ -2014,7 +2001,15 @@ componentPropertyValue ::= //commented literals are in designCalcPropertyObject
 ////////////////////////////////// META STATEMENT //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList? RBRAC anyTokens END {
+// we'll try to make all upper innerStatement rules lazy
+
+lazyMetaDeclStatement ::= metaDeclStatement* { lazy = true extends = "com.lsfusion.lang.psi.LSFLazyParsableElement" }
+
+private meta_decl_statement_recover ::= !(inner_statement_start | END) // we need to recover till END to "close" the metaCodeDeclarationStatement
+private metaDeclStatement ::= innerStatement { recoverWhile = "meta_decl_statement_recover" }
+metaCodeDeclBody ::= lazyMetaDeclStatement*
+
+metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList? RBRAC metaCodeDeclBody END {
     pin=2
     mixin = "com.lsfusion.lang.psi.declarations.impl.LSFMetaDeclarationImpl"
     implements = "com.lsfusion.lang.psi.declarations.LSFMetaDeclaration"
@@ -2022,11 +2017,11 @@ metaCodeDeclarationStatement ::= META simpleName LBRAC metaDeclIdList? RBRAC any
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-anyTokens ::= (<< readAny >>)*
+lazyMetaStatement ::= metaStatement* { lazy = true extends = "com.lsfusion.lang.psi.LSFLazyParsableElement" }
 
-private metaStatement ::= statement { recoverWhile = "meta_statement_recover" }
-private meta_statement_recover ::= !(statement_start | RBRACE)
-metaCodeBody ::= metaCodeBodyLeftBrace (metaStatement*) metaCodeBodyRightBrace
+private meta_statement_recover ::= !(inner_statement_start | metaCodeBodyRightBrace) // we need to recover till END to "close" the metaCodeBody -> metaCodeStatement
+private metaStatement ::= innerStatement { recoverWhile = "meta_statement_recover" }
+metaCodeBody ::= metaCodeBodyLeftBrace (lazyMetaStatement*) metaCodeBodyRightBrace
 
 metaCodeBodyLeftBrace ::= LBRACE
 metaCodeBodyRightBrace ::= RBRACE
@@ -2091,7 +2086,7 @@ mappedPropertyExprParam ::= propertyUsage LBRAC exprParameterUsageList RBRAC // 
 }
 
 simpleNameWithCaption ::= simpleName (localizedStringLiteral)?
-private simpleNameOrWithCaption ::= localizedStringLiteral | (simpleName (localizedStringLiteral)?)
+private simpleNameOrWithCaption ::= (simpleName (localizedStringLiteral)?) | localizedStringLiteral
 
 // local
 
@@ -2130,7 +2125,7 @@ literal ::=
 	|	uintLiteral
 	|	udoubleLiteral
 	|	unumericLiteral
-	|	localizedStringLiteral
+	|	(<<noIDCheck>> localizedStringLiteral) // since there is a parameter afterwards we need to do lookahead (same as in staticObjectID)
 	|	booleanLiteral
 	|	dateTimeLiteral
 	|	dateLiteral
@@ -2254,13 +2249,15 @@ abstractExclusiveOverrideOption ::= (OVERRIDE abstractCaseAddOption? ) | EXCLUSI
 abstractCaseAddOption ::= FIRST | LAST
 
 colorLiteral ::= LEX_COLOR_LITERAL | (RGB LBRAC uintLiteral COMMA uintLiteral COMMA uintLiteral RBRAC)
-stringLiteral ::= LEX_STRING_LITERAL
+
+// it's tricky here, now with ID in stringLiteral / localizedStringLiteral it's important that this rules should be after "ID" rules
+stringLiteral ::= LEX_STRING_LITERAL | ID
 {
     mixin="com.lsfusion.lang.psi.LSFStringValueLiteralImpl"
     implements="com.lsfusion.lang.psi.LSFStringValueLiteral"
 }
 
-localizedStringLiteral ::= LEX_STRING_LITERAL 
+localizedStringLiteral ::= LEX_STRING_LITERAL | ID
 {
     mixin="com.lsfusion.lang.psi.LSFLocalizedStringValueLiteralImpl"
     implements="com.lsfusion.lang.psi.LSFLocalizedStringValueLiteral"

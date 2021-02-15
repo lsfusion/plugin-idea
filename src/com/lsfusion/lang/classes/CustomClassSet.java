@@ -1,11 +1,8 @@
 package com.lsfusion.lang.classes;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.Query;
 import com.lsfusion.design.model.PropertyDrawView;
-import com.lsfusion.lang.psi.Finalizer;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.cache.ChildrenCache;
 import com.lsfusion.lang.psi.cache.ParentsCache;
@@ -50,11 +47,6 @@ public class CustomClassSet implements LSFClassSet {
         }
     }
 
-    private static Query<LSFClassExtend> resolveExtendElements(LSFClassDeclaration decl) {
-        Project project = decl.getProject();
-        return LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDCLASS, project, GlobalSearchScope.allScope(project));
-    }
-
     public static Collection<LSFValueClass> getClassParentsRecursively(LSFValueClass valueClass) {
         Set<LSFValueClass> result = new LinkedHashSet<>();
         result.add(valueClass);
@@ -79,7 +71,7 @@ public class CustomClassSet implements LSFClassSet {
 
     public static Collection<LSFClassDeclaration> getParentsNoCache(LSFClassDeclaration decl) {
         Set<LSFClassDeclaration> result = new HashSet<>();
-        for (LSFClassExtend extDecl : resolveExtendElements(decl))
+        for (LSFClassExtend extDecl : LSFGlobalResolver.findParentExtends(decl))
             result.addAll(extDecl.resolveExtends());
         return result;
     }
@@ -88,7 +80,7 @@ public class CustomClassSet implements LSFClassSet {
         Project project = decl.getProject();
         if (scope != null && scope.equals(GlobalSearchScope.allScope(project)))
             return getChildrenAll(decl);
-        return LSFGlobalResolver.findClassExtends(decl, project, scope);
+        return LSFGlobalResolver.findChildrenExtends(decl, project, scope);
     }
 
     public static Collection<LSFClassDeclaration> getChildrenAll(LSFClassDeclaration decl) {
@@ -97,7 +89,7 @@ public class CustomClassSet implements LSFClassSet {
 
     public static Collection<LSFClassDeclaration> getChildrenAllNoCache(LSFClassDeclaration decl) {
         Project project = decl.getProject();
-        return LSFGlobalResolver.findClassExtends(decl, project, GlobalSearchScope.allScope(project));
+        return LSFGlobalResolver.findChildrenExtends(decl, project, GlobalSearchScope.allScope(project));
     }
 
     public LSFClassDeclaration getCommonChild(CustomClassSet set, GlobalSearchScope scope) {
@@ -310,8 +302,7 @@ public class CustomClassSet implements LSFClassSet {
 
     public static LSFClassDeclaration getBaseClass(Project project) {
         LSFModuleDeclaration systemModule = LSFGlobalResolver.findModules("System", GlobalSearchScope.allScope(project)).findFirst();
-        Collection<LSFClassDeclaration> objects = LSFGlobalResolver.findElements("Object", systemModule.getLSFFile(), null, Collections.singleton(LSFStubElementTypes.CLASS), Conditions.alwaysTrue(), Finalizer.EMPTY);
-        return objects.iterator().next();
+        return LSFGlobalResolver.findSystemElement("Object", systemModule.getLSFFile(), LSFStubElementTypes.CLASS);
     }
 
     @Override
@@ -429,5 +420,9 @@ public class CustomClassSet implements LSFClassSet {
     @Override
     public String getCanonicalName() {
         return ClassCanonicalNameUtils.createName(this);
+    }
+
+    public ExtInt getCharLength() {
+        return new ExtInt(10);
     }
 }

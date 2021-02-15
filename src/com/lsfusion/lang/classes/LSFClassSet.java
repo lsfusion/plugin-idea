@@ -28,4 +28,6 @@ public interface LSFClassSet {
     int getDefaultHeight(FontMetrics fontMetrics, int charHeight);
 
     String getCanonicalName();
+
+    ExtInt getCharLength();
 }

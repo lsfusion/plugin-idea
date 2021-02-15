@@ -90,12 +90,11 @@ public class InsertCompositionAction extends AnAction {
     }
 
     public void invoke(@NotNull final Project project, final Editor editor, final LSFFile file, DataContext dataContext) {
-        if (!(file instanceof LSFFile)) {
+        if (file == null) {
             return;
         }
         PsiDocumentManager.getInstance(project).commitAllDocuments();
 
-        final LSFFile lsfFile = (LSFFile) file;
         final FileEditor fileEditor = PlatformDataKeys.FILE_EDITOR.getData(dataContext);
         final SelectionModel selectionModel = editor.getSelectionModel();
         LSFExpression selectedExpression = null;
@@ -109,7 +108,7 @@ public class InsertCompositionAction extends AnAction {
             } else {
                 Pass<LSFExpression> selectionHandler = new Pass<LSFExpression>() {
                     public void pass(final LSFExpression selectedExpr) {
-                        invokeImpl(lsfFile, project, editor, fileEditor, selectedExpr);
+                        invokeImpl(file, project, editor, fileEditor, selectedExpr);
                     }
                 };
                 IntroduceTargetChooser.showChooser(editor, expressions, selectionHandler, ExpressionRenderer.get(), "Expression to wrap:", -1, ScopeHighlighter.NATURAL_RANGER);
@@ -125,7 +124,7 @@ public class InsertCompositionAction extends AnAction {
             return;
         }
 
-        invokeImpl(lsfFile, project, editor, fileEditor, selectedExpression);
+        invokeImpl(file, project, editor, fileEditor, selectedExpression);
     }
 
     protected void showErrorMessage(final Project project, Editor editor, String message) {

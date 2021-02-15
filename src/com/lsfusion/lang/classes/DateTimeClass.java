@@ -54,4 +54,9 @@ public class DateTimeClass extends FormatClass {
     protected SimpleDateFormat getEditFormat(Format format) {
         return DateUtils.createDateTimeEditFormat((DateFormat) format);
     }
+
+    @Override
+    public ExtInt getCharLength() {
+        return new ExtInt(25);
+    }
 }

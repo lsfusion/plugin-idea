@@ -135,4 +135,8 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
     public boolean isValid() {
         return true;
     }
+
+    public ExtInt getCharLength() {
+        return new ExtInt(8);
+    }
 }

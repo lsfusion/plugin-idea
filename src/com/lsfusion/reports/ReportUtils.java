@@ -1,93 +1,83 @@
 package com.lsfusion.reports;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.lsfusion.design.DesignPreviewLineMarkerProvider;
+import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
+import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
+import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.LSFFileUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static com.lsfusion.util.LSFFileUtils.findFilesWithShortName;
 
 public class ReportUtils {
-    public static boolean hasReportFiles(LSFFormDeclaration decl) {
-        String namespace = decl.getNamespaceName();
-        String name = decl.getDeclName();
 
-        String reportName = namespace + "_" + name;
-
-        if (hasCustomReportFiles(decl, reportName) ||
-            hasCustomReportFiles(decl, "xls_" + reportName)) {
+    public static boolean findReportFiles(PsiElement source, Processor<String> processor) {
+        Result<LSFExtend> declExtend = new Result<>();
+        LSFFormDeclaration decl = DesignPreviewLineMarkerProvider.resolveFormDecl(source, declExtend);
+        if(decl == null)
             return true;
-        }
 
-        Collection<LSFFormExtend> formExtends = LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDFORM, decl.getLSFFile()).findAll();
-        for (LSFFormExtend extend : formExtends) {
-            for (LSFGroupObjectDeclaration groupObjectDecl : extend.getGroupObjectDecls()) {
-                String groupName = groupObjectDecl.getDeclName();
-                if (groupName != null) {
-                    if (hasCustomReportFiles(decl, "table" + groupName + "_" + reportName) ||
-                        hasCustomReportFiles(decl, "xls_table" + groupName + "_" + reportName)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public static boolean hasCustomReportFiles(LSFFormDeclaration decl, String reportName) {
-        return LSFFileUtils.hasFilesWithShortNameInProject(decl, reportName + ".jrxml");
-    }
-
-    public static List<PsiFile> findReportFiles(LSFFormDeclaration decl) {
-        List<PsiFile> files = new ArrayList<>();
-        
         String namespace = decl.getNamespaceName();
         String name = decl.getDeclName();
 
         String reportName = namespace + "_" + name;
 
-        findRelatedReportFiles(decl, reportName, files);
-        findRelatedReportFiles(decl, "xls_" + reportName, files);
+        if(!processor.process(reportName))
+            return false;
+        if(!processor.process("xls_" + reportName))
+            return false;
 
-        Collection<LSFFormExtend> formExtends = LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDFORM, decl.getLSFFile()).findAll();
-        for (LSFFormExtend extend : formExtends) {
+        for (LSFFormExtend extend : LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDFORM, (LSFFile) source.getContainingFile(), LSFLocalSearchScope.createFrom(declExtend.getResult()))) {
             for (LSFGroupObjectDeclaration groupObjectDecl : extend.getGroupObjectDecls()) {
                 String groupName = groupObjectDecl.getDeclName();
                 if (groupName != null) {
-                    findRelatedReportFiles(decl, "table" + groupName + "_" + reportName, files);
-                    findRelatedReportFiles(decl, "xls_table" + groupName + "_" + reportName, files);
+                    if(!processor.process("table" + groupName + "_" + reportName))
+                        return false;
+                    if(!processor.process("xls_table" + groupName + "_" + reportName))
+                        return false;
                 }
             }
         }
-        return files;
+
+        return true;
     }
 
-    public static void findRelatedReportFiles(LSFFormDeclaration decl, final String reportName, final List<PsiFile> files) {
-        final Project project = decl.getProject();
-        final GlobalSearchScope scope = ProjectScope.getAllScope(project);
-        
-        FileBasedIndex.getInstance().processAllKeys(FilenameIndex.NAME, new Processor<String>() {
-            @Override
-            public boolean process(String fileName) {
+    public static boolean hasReportFiles(PsiElement psi) {
+        return !findReportFiles(psi, reportName -> !LSFFileUtils.hasFilesWithShortNameInProject(psi, reportName + ".jrxml"));
+    }
+
+    public static List<PsiFile> findReportFiles(PsiElement psi) {
+        List<PsiFile> files = new ArrayList<>();
+        findReportFiles(psi, reportName -> {
+            final Project project = psi.getProject();
+            final GlobalSearchScope scope = ProjectScope.getAllScope(project);
+
+            FileBasedIndex.getInstance().processAllKeys(FilenameIndex.NAME, fileName -> {
                 if (fileName.endsWith(".jrxml") && (fileName.startsWith(reportName + '.') || fileName.startsWith(reportName + '_'))) {
                     findFilesWithShortName(fileName, files, project, scope);
                 }
                 return true;
-            }
-        }, scope, null);
+            }, scope, null);
+
+            return true;
+        });
+        return files;
     }
+
 }

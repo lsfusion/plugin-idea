@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.List;
 
-public abstract class LSFExplicitInterfaceActionStatementImpl extends LSFExplicitInterfaceActionOrPropStatementImpl<ExplicitInterfaceActionStubElement> implements LSFExplicitInterfaceActionStatement {
+public abstract class LSFExplicitInterfaceActionStatementImpl extends LSFExplicitInterfaceActionOrPropStatementImpl<LSFExplicitInterfaceActionStatement, ExplicitInterfaceActionStubElement> implements LSFExplicitInterfaceActionStatement {
 
     public LSFExplicitInterfaceActionStatementImpl(@NotNull ExplicitInterfaceActionStubElement stub, @NotNull IStubElementType nodeType) {
         super(stub, nodeType);

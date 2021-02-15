@@ -12,21 +12,44 @@ public class LSFParserImpl extends LSFParser {
 
     @Override
     public boolean parse_root_(IElementType root_, PsiBuilder builder_) {
+        Boolean deepParse = parseLazyDeep(root_, builder_, 0);
+        if(deepParse != null)
+            return deepParse;
+
+        return super.parse_root_(root_, builder_);
+    }
+
+    private Boolean parseLazyDeep(IElementType root_, PsiBuilder builder_, int level_) {
         if (root_ == LAZY_SCRIPT_STATEMENT) {
-            return lazyScriptStatementDeep(builder_, 0);
-        } else {
-            return super.parse_root_(root_, builder_);
+            return lazyScriptStatementDeep(builder_, level_);
+        } else if (root_ == LAZY_META_DECL_STATEMENT) {
+            return lazyMetaDeclStatementDeep(builder_, level_);
+        } else if (root_ == LAZY_META_STATEMENT) {
+            return lazyMetaStatementDeep(builder_, level_);
         }
+        return null;
     }
 
     public boolean lazyScriptStatement(PsiBuilder builder_, int level_) {
+        return lazyStatement(builder_, true, null, LAZY_SCRIPT_STATEMENT, level_);
+    }
+    public boolean lazyMetaDeclStatement(PsiBuilder builder_, int level_) {
+        return lazyStatement(builder_, false, END, LAZY_META_DECL_STATEMENT, level_);
+    }
+    public boolean lazyMetaStatement(PsiBuilder builder_, int level_) {
+        return lazyStatement(builder_, false, RBRACE, LAZY_META_STATEMENT, level_);
+    }
+    public boolean lazyStatement(PsiBuilder builder_, boolean containMeta, IElementType tokenEnd, IElementType statementType, int level_) {
         ErrorState state = ErrorState.get(builder_);
         if (state.completionCallback != null) {
-            return lazyScriptStatementDeep(builder_, level_);
+            return parseLazyDeep(statementType, builder_, level_);
         }
 
         IElementType tokenType = builder_.getTokenType();
         if (tokenType == null) {
+            return false;
+        }
+        if (tokenType == tokenEnd) {
             return false;
         }
         //assert tokenType in script_statement_recover (recoverWhile in scriptStatement) {
@@ -39,7 +62,7 @@ public class LSFParserImpl extends LSFParser {
         Marker lazyStatement = builder_.mark();
         builder_.advanceLexer();
 
-        boolean isTopMetaDecl = tokenType == META;
+        boolean isTopMetaDecl = containMeta && tokenType == META;
         boolean isTopMetaUsage = tokenType == ATSIGN;
 
         int metaCount = isTopMetaDecl ? 1 : 0;
@@ -53,25 +76,32 @@ public class LSFParserImpl extends LSFParser {
                 break;
             }
 
+            if (braceCount == 0 && metaCount == 0) {
+                if(tokenType == tokenEnd)
+                    break;
+                if(containMeta && tokenType == META)
+                    break;
+            }
+
             if (tokenType == LBRACE) {
                 braceCount++;
             } else if (tokenType == RBRACE) {
                 if (braceCount > 0) {
                     braceCount--;
                 }
-            } else if (tokenType == META) {
-                if (braceCount == 0 && metaCount == 0) break;
-                metaCount++;
-            } else if (tokenType == END) {
-                if (metaCount > 0) {
-                    metaCount--;
+            } else if(containMeta) {
+                if (tokenType == META) {
+                    metaCount++;
+                } else if (tokenType == END) {
+                    if (metaCount > 0) {
+                        metaCount--;
+                    }
                 }
             }
 
             if (braceCount == 0 && metaCount == 0) {
                 if (tokenType == NAVIGATOR) break;
                 if (tokenType == ATSIGN) break;
-                if (tokenType == META) break;
                 if (tokenType == DESIGN) break;
                 if (tokenCount > 40) { // we don't want to have very small non-recursive lazy blocks 
                     if (tokenType == EXTEND && builder_.lookAhead(1) != FILTERGROUP) {
@@ -114,7 +144,7 @@ public class LSFParserImpl extends LSFParser {
             tokenCount++;
         }
 
-        lazyStatement.collapse(LAZY_SCRIPT_STATEMENT);
+        lazyStatement.collapse(statementType);
         if (greedyBlock) {
             lazyStatement.setCustomEdgeTokenBinders(null, GREEDY_WHITESPACE_AND_COMMENTS_PROCESSOR);
         }
@@ -123,5 +153,11 @@ public class LSFParserImpl extends LSFParser {
 
     public boolean lazyScriptStatementDeep(PsiBuilder builder_, int level_) {
         return super.lazyScriptStatement(builder_, level_);
+    }
+    public boolean lazyMetaDeclStatementDeep(PsiBuilder builder_, int level_) {
+        return super.lazyMetaDeclStatement(builder_, level_);
+    }
+    public boolean lazyMetaStatementDeep(PsiBuilder builder_, int level_) {
+        return super.lazyMetaStatement(builder_, level_);
     }
 }

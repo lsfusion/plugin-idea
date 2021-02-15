@@ -9,7 +9,7 @@ import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFInterfacePropStatement;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.util.LSFPsiUtils;
@@ -40,16 +40,17 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
 
         if (valueClass != null && valueClass.isValid() && getElement() != null) {
             GlobalSearchScope scope = LSFGlobalResolver.getRequireScope((LSFFile) getElement());
+            LSFLocalSearchScope localScope = LSFLocalSearchScope.GLOBAL;
 
             if(type.isProp())
-                children.addAll(LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFPropertyStatementTreeElement>() {
+                children.addAll(LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, localScope, new LSFPsiUtils.ApplicableMapper<LSFPropertyStatementTreeElement>() {
                     @Override
                     public LSFPropertyStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
                         return new LSFPropertyStatementTreeElement(valueClass, ((LSFGlobalPropDeclaration) statement), navigationHandler);
                     }
                 }, true, true));
             if(type.isAction())
-                children.addAll(LSFPsiUtils.mapActionsApplicableToClass(valueClass, getElement().getProject(), scope, new LSFPsiUtils.ApplicableMapper<LSFActionStatementTreeElement>() {
+                children.addAll(LSFPsiUtils.mapActionsApplicableToClass(valueClass, getElement().getProject(), scope, localScope, new LSFPsiUtils.ApplicableMapper<LSFActionStatementTreeElement>() {
                     @Override
                     public LSFActionStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
                         return new LSFActionStatementTreeElement(valueClass, ((LSFActionDeclaration) statement), navigationHandler);

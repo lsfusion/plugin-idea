@@ -148,4 +148,11 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
     public boolean isValid() {
         return true;
     }
+
+    public ExtInt getCharLength() {
+        ExtInt length = ExtInt.ZERO;
+        for(LSFClassSet type : sets)
+            length = length.sum(type.getCharLength());
+        return length;
+    }
 }

@@ -95,6 +95,10 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         return true;
     }
 
+    public static boolean noIDCheck(PsiBuilder builder_, int level_) {
+        return (builder_.getTokenType() != LSFTypes.ID);
+    }
+
     private static Key<Boolean> FULLCOMPOUND = Key.create("lsf.full.compound.param.declare");
 
     public static boolean fullCompoundParamDeclareStop(PsiBuilder builder_, int level_) {

@@ -93,4 +93,9 @@ public class StringClass extends DataClass {
             return this;
         return new StringClass(blankPadded, caseInsensitive, new ExtInt(BaseUtils.min(length.getValue() * times, 4000)));
     }
+
+    @Override
+    public ExtInt getCharLength() {
+        return length;
+    }
 }

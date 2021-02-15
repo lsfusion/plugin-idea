@@ -11,8 +11,9 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.Collection;
+import java.util.function.Function;
 
-public abstract class LSFFilterGroupDeclarationImpl extends LSFFormElementDeclarationImpl implements LSFFilterGroupDeclaration {
+public abstract class LSFFilterGroupDeclarationImpl extends LSFFormElementDeclarationImpl<LSFFilterGroupDeclaration> implements LSFFilterGroupDeclaration {
 
     protected LSFFilterGroupDeclarationImpl(@NotNull ASTNode node) {
         super(node);
@@ -33,11 +34,7 @@ public abstract class LSFFilterGroupDeclarationImpl extends LSFFormElementDeclar
         return getSimpleName();
     }
 
-    public static Processor<LSFFilterGroupDeclaration> getProcessor() {
-        return new Processor<LSFFilterGroupDeclaration>() {
-            public Collection<LSFFilterGroupDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getFilterGroupDecls();
-            }
-        };
+    public static Function<LSFFormExtend, Collection<LSFFilterGroupDeclaration>> getProcessor() {
+        return LSFFormExtend::getFilterGroupDecls;
     }
 }

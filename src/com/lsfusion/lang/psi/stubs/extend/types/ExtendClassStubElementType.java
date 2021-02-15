@@ -4,6 +4,7 @@ import com.intellij.psi.stubs.*;
 import com.lsfusion.lang.psi.LSFStringClassRef;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.impl.LSFClassStatementImpl;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
 import com.lsfusion.lang.psi.stubs.extend.impl.ExtendClassStubImpl;
 import com.lsfusion.lang.psi.indexes.ExtendClassIndex;
@@ -20,7 +21,7 @@ public class ExtendClassStubElementType extends ExtendStubElementType<LSFClassEx
         super("EXTEND_CLASS");
     }
 
-    public StringStubIndexExtension<LSFClassExtend> getGlobalIndex() {
+    public LSFStringStubIndex<LSFClassExtend> getGlobalIndex() {
         return ExtendClassIndex.getInstance();
     }
 

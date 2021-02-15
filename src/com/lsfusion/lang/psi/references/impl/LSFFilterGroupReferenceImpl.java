@@ -7,6 +7,7 @@ import com.lsfusion.lang.psi.references.LSFFilterGroupReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 public abstract class LSFFilterGroupReferenceImpl extends LSFFormElementReferenceImpl<LSFFilterGroupDeclaration> implements LSFFilterGroupReference {
     protected LSFFilterGroupReferenceImpl(@NotNull ASTNode node) {
@@ -14,11 +15,7 @@ public abstract class LSFFilterGroupReferenceImpl extends LSFFormElementReferenc
     }
 
     @Override
-    protected FormExtendProcessor<LSFFilterGroupDeclaration> getElementsCollector() {
-        return new FormExtendProcessor<LSFFilterGroupDeclaration>() {
-            public Collection<LSFFilterGroupDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getFilterGroupDecls();
-            }
-        };
+    protected Function<LSFFormExtend, Collection<LSFFilterGroupDeclaration>> getElementsCollector() {
+        return LSFFormExtend::getFilterGroupDecls;
     }
 }

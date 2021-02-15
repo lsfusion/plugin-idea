@@ -15,7 +15,7 @@ import javax.swing.*;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDeclarationImpl implements LSFPropertyDrawDeclaration {
+public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDeclarationImpl<LSFPropertyDrawDeclaration> implements LSFPropertyDrawDeclaration {
 
     protected LSFPropertyDrawDeclarationImpl(@NotNull ASTNode node) {
         super(node);
@@ -25,14 +25,6 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
     @Override
     public Icon getIcon(int flags) {
         return LSFIcons.PROPERTY_DRAW;
-    }
-
-    public static Processor<LSFPropertyDrawDeclaration> getProcessor() {
-        return new Processor<LSFPropertyDrawDeclaration>() {
-            public Collection<LSFPropertyDrawDeclaration> process(LSFFormExtend formExtend) {
-                return formExtend.getPropertyDrawDecls();
-            }
-        };
     }
 
     @Override

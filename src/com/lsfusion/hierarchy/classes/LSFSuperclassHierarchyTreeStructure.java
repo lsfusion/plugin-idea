@@ -3,7 +3,6 @@ package com.lsfusion.hierarchy.classes;
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor;
 import com.intellij.ide.hierarchy.HierarchyTreeStructure;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.containers.ArrayListSet;
 import com.lsfusion.lang.psi.LSFClassParentsList;
 import com.lsfusion.lang.psi.LSFClassStatement;
@@ -11,11 +10,9 @@ import com.lsfusion.lang.psi.LSFCustomClassUsage;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -30,10 +27,8 @@ public class LSFSuperclassHierarchyTreeStructure extends HierarchyTreeStructure 
         LSFClassHierarchyNodeDescriptor nodeDescriptor = (LSFClassHierarchyNodeDescriptor) descriptor;
         Set<LSFClassHierarchyNodeDescriptor> result = new ArrayListSet<>();
 
-        Collection<LSFClassExtend> classExtends = LSFGlobalResolver.findExtendElements(nodeDescriptor.getClassDecl(), LSFStubElementTypes.EXTENDCLASS, myProject, GlobalSearchScope.allScope(myProject)).findAll();
-        for (LSFClassExtend classExtend : classExtends) {
+        for (LSFClassExtend classExtend : LSFGlobalResolver.findParentExtends(nodeDescriptor.getClassDecl()))
             result.addAll(createNode(classExtend, descriptor));
-        }
 
         return result.toArray();
     }

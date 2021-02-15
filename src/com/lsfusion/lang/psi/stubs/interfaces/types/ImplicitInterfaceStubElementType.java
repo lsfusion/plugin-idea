@@ -32,7 +32,7 @@ public class ImplicitInterfaceStubElementType extends LSFStubElementType<Implici
 
     @Override
     public ImplicitInterfaceStubElement createStub(@NotNull final LSFImplicitInterfacePropStatement psi, StubElement parentStub) {
-        final ImplicitInterfaceStubImpl stub = new ImplicitInterfaceStubImpl(parentStub, psi.getElementType());
+        final ImplicitInterfaceStubImpl stub = new ImplicitInterfaceStubImpl(parentStub, psi);
 
         LSFPropertyStatement propertyStatement = psi.getPropertyStatement();
         LSFPropertyCalcStatement pCalcStatement = propertyStatement.getPropertyCalcStatement();
@@ -59,32 +59,10 @@ public class ImplicitInterfaceStubElementType extends LSFStubElementType<Implici
         return stub;
     }
 
-    @Override
-    public void serialize(@NotNull ImplicitInterfaceStubElement stub, @NotNull StubOutputStream dataStream) throws IOException {
-        List<String> params = stub.getParamProperties();
-        if (params != null) {
-            dataStream.writeInt(params.size());
-            for (String param : params) {
-                dataStream.writeName(param);
-            }
-        } else {
-            dataStream.writeInt(0);
-        }
-    }
-
     @NotNull
     @Override
     public ImplicitInterfaceStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-        int paramsCount = dataStream.readInt();
-        List<String> params = new ArrayList<>();
-        if (paramsCount != 0) {
-            for (int i = 0; i < paramsCount; i++) {
-                StringRef name = dataStream.readName();
-                params.add(name != null ? name.getString() : null);
-            }
-        }
-
-        return new ImplicitInterfaceStubImpl(parentStub, this, params);
+        return new ImplicitInterfaceStubImpl(dataStream, parentStub, this);
     }
 
     @Override

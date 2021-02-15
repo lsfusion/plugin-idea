@@ -3,33 +3,28 @@ package com.lsfusion.references;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.Processor;
-import com.intellij.util.Query;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.indexes.FormIndex;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.util.LSFFileUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class FormDeclByReportNameResolver {
-    public static Pair<String, String> resolveFormFullNameAndRequires(VirtualFile virtualFile, Project project, GlobalSearchScope scope) {
-        LSFFormDeclaration formDeclaration = resolveByVirtualFile(virtualFile, project, scope);
+    public static Pair<String, String> resolveFormFullNameAndRequires(VirtualFile virtualFile, Project project, PsiElement source) {
+        LSFFormDeclaration formDeclaration = resolveByVirtualFile(virtualFile, project, LSFFileUtils.getModuleWithDependenciesScope(source));
 
         if (formDeclaration != null) {
-            Query<LSFFormExtend> formExtends = LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, project, scope);
             final Set<String> requiredModules = new HashSet<>();
-            formExtends.forEach(new Processor<LSFFormExtend>() {
-                @Override
-                public boolean process(LSFFormExtend extend) {
-                    requiredModules.add(extend.getLSFFile().getModuleDeclaration().getGlobalName());
-                    return true;
-                }
-            });
+            for(LSFFormExtend extend : LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, formDeclaration.getProject(), LSFFileUtils.getModuleWithDependenciesScope(source), LSFLocalSearchScope.GLOBAL))
+                requiredModules.add(extend.getLSFFile().getModuleDeclaration().getGlobalName());
+
             String requires = "";
             for (String moduleName : requiredModules) {
                 if (requires.length() > 0) {
@@ -111,13 +106,9 @@ public class FormDeclByReportNameResolver {
         String namespace = fileName.substring(0, underscoreInd);
         String formName = fileName.substring(underscoreInd + 1);
 
-        Collection<LSFFormDeclaration> decls = FormIndex.getInstance().get(formName, project, scope);
-        for (LSFFormDeclaration decl : decls) {
-            if (namespace.equals(decl.getNamespaceName())) {
-                return decl;
-            }
-
-        }
+        Collection<LSFFormDeclaration> decls = LSFGlobalResolver.findElements(formName, namespace, project, scope, LSFStubElementTypes.FORM);
+        for (LSFFormDeclaration decl : decls)
+            return decl;
         return null;
     }
 }

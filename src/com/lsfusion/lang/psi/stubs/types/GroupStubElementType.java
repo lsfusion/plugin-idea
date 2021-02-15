@@ -1,11 +1,11 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.declarations.LSFGroupDeclaration;
 import com.lsfusion.lang.psi.impl.LSFGroupStatementImpl;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.stubs.GroupStubElement;
 import com.lsfusion.lang.psi.stubs.impl.GroupStubImpl;
 import com.lsfusion.lang.psi.indexes.GroupIndex;
@@ -21,7 +21,7 @@ public class GroupStubElementType extends FullNameStubElementType<GroupStubEleme
     }
 
     @Override
-    public StringStubIndexExtension<LSFGroupDeclaration> getGlobalIndex() {
+    public LSFStringStubIndex<LSFGroupDeclaration> getGlobalIndex() {
         return GroupIndex.getInstance();
     }
 

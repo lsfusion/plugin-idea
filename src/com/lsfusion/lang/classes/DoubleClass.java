@@ -46,4 +46,8 @@ public class DoubleClass extends IntegralClass {
     public String getCaption() {
         return "Double";
     }
+
+    public ExtInt getCharLength() {
+        return new ExtInt(20); // ? double has 15-16 precise digits + sign + dot
+    }
 }

@@ -10,4 +10,9 @@ public abstract class FileClass extends DataClass {
     public int getDefaultWidth(FontMetrics font, PropertyDrawView propertyDraw) {
         return 18;
     }
+
+    @Override
+    public ExtInt getCharLength() {
+        return ExtInt.UNLIMITED;
+    }
 }

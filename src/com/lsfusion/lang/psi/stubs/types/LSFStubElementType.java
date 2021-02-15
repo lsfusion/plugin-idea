@@ -3,11 +3,16 @@ package com.lsfusion.lang.psi.stubs.types;
 import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubOutputStream;
 import com.lsfusion.lang.LSFLanguage;
+import com.lsfusion.lang.psi.LSFStubElement;
+import com.lsfusion.lang.psi.LSFStubbedElement;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class LSFStubElementType<StubT extends StubElement<PsiT>, PsiT extends StubBasedPsiElement<StubT>> extends IStubElementType<StubT, PsiT> {
+import java.io.IOException;
+
+public abstract class LSFStubElementType<StubT extends LSFStubElement<StubT, PsiT>, PsiT extends LSFStubbedElement<PsiT, StubT>> extends IStubElementType<StubT, PsiT> {
 
     protected LSFStubElementType(@NotNull @NonNls String debugName) {
         super(debugName, LSFLanguage.INSTANCE);
@@ -17,5 +22,10 @@ public abstract class LSFStubElementType<StubT extends StubElement<PsiT>, PsiT e
     @Override
     public String getExternalId() {
         return "lsf.stub." + toString();
+    }
+
+    @Override
+    public void serialize(@NotNull StubT stub, @NotNull StubOutputStream dataStream) throws IOException {
+        stub.serialize(dataStream);
     }
 }

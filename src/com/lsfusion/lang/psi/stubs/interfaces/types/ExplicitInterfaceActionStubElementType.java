@@ -3,23 +3,14 @@ package com.lsfusion.lang.psi.stubs.interfaces.types;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.psi.stubs.StubInputStream;
-import com.intellij.psi.stubs.StubOutputStream;
-import com.lsfusion.lang.psi.LSFExplicitClasses;
-import com.lsfusion.lang.psi.LSFImplicitExplicitClasses;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionStatement;
-import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
-import com.lsfusion.lang.psi.declarations.impl.LSFExplicitInterfaceActionStatementImpl;
 import com.lsfusion.lang.psi.impl.LSFExplicitInterfaceActStatementImpl;
-import com.lsfusion.lang.psi.impl.LSFExplicitInterfacePropertyStatementImpl;
 import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceActionStubElement;
-import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfacePropStubElement;
 import com.lsfusion.lang.psi.stubs.interfaces.impl.ExplicitInterfaceActionStubImpl;
-import com.lsfusion.lang.psi.stubs.interfaces.impl.ExplicitInterfacePropStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Set;
 
 public class ExplicitInterfaceActionStubElementType extends ExplicitInterfaceActionOrPropStubElementType<ExplicitInterfaceActionStubElement, LSFExplicitInterfaceActionStatement> {
     public ExplicitInterfaceActionStubElementType() {
@@ -36,8 +27,9 @@ public class ExplicitInterfaceActionStubElementType extends ExplicitInterfaceAct
         return new ExplicitInterfaceActionStubImpl(parentStub, psi);
     }
 
-    protected ExplicitInterfaceActionStubElement deserialize(StubElement parentStub, String name, LSFExplicitClasses params, byte propType, @NotNull StubInputStream dataStream) throws IOException {
-        return new ExplicitInterfaceActionStubImpl(parentStub, this, name, params, propType);
+    @NotNull
+    public ExplicitInterfaceActionStubElement deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
+        return new ExplicitInterfaceActionStubImpl(dataStream, parentStub, this);
     }
 
     @Override

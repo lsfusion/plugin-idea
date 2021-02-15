@@ -1,9 +1,9 @@
 package com.lsfusion.lang.psi.references;
 
-import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiReference;
+import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFElement;
 import com.lsfusion.lang.psi.LSFId;
@@ -26,7 +26,7 @@ public interface LSFReference<T extends LSFDeclaration> extends LSFElement, PsiR
 
     LSFResolveResult resolveNoCache();
 
-    Annotation resolveErrorAnnotation(AnnotationHolder holder);
+    LSFResolvingError resolveErrorAnnotation(AnnotationHolder holder);
 
     void handleElementRename(String newElementName, MetaTransaction transaction);
 
