@@ -2,6 +2,10 @@ package com.lsfusion.actions.generate;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.lsfusion.util.BaseUtils;
 import net.gcardone.junidecode.Junidecode;
 import org.apache.commons.lang.NotImplementedException;
@@ -9,41 +13,126 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.beans.Introspector;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("ComponentNotRegistered")
-public class GenerateFormAction extends AnAction {
+public abstract class GenerateFormAction extends AnAction {
 
     private Set<String> usedObjectIds = new HashSet<>();
     private Set<String> usedObjectsIds = new HashSet<>();
     private Set<String> usedGroupIds = new HashSet<>();
     private Set<String> usedNamespacePrefixes = new HashSet<>();
 
+
+    abstract String getExtension();
+
+    abstract Object getRootElement(String file) throws Exception;
+
     @Override
     public void actionPerformed(final AnActionEvent e) {
-        try {
-            Object rootElement = getRootElement(e);
-            if (rootElement != null) {
-                usedObjectIds = new HashSet<>();
-                usedObjectsIds = new HashSet<>();
-                usedGroupIds = new HashSet<>();
-                usedNamespacePrefixes = new HashSet<>();
-                List<ParseNode> hierarchy = generateHierarchy(rootElement, null);
-                CodeBlock formCodeBlock = generateForm(hierarchy, null, null, null, null, null);
-                showFormScript(formCodeBlock);
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage(), "Generation failed", JOptionPane.ERROR_MESSAGE);
-        }
+        new GenerateFormDialog(e).setVisible(true);
     }
 
-    //need to implement
-    protected Object getRootElement(AnActionEvent e) throws Exception {
-        throw new NotImplementedException();
+    public class GenerateFormDialog extends JDialog {
+        JTextPane textPane;
+        JButton generateButton;
+
+        public GenerateFormDialog(AnActionEvent actionEvent) {
+            super(null, "Generate form", ModalityType.APPLICATION_MODAL);
+            setMinimumSize(new Dimension(600, 250));
+
+            setLocationRelativeTo(null);
+
+            textPane = new JTextPane();
+            textPane.setBackground(null);
+
+            JScrollPane scrollPane = new JScrollPane(textPane);
+
+            generateButton = new JButton("Generate");
+            generateButton.addActionListener(e -> onGenerate());
+            generateButton.setEnabled(false);
+
+            JButton loadFromFileButton = new JButton("Load from file");
+            loadFromFileButton.addActionListener(e -> onLoadFromFile(actionEvent));
+
+            JButton cancelButton = new JButton("Cancel");
+            cancelButton.addActionListener(e -> onCancel());
+
+            JPanel mainPanel = new JPanel();
+            mainPanel.setLayout(new BorderLayout());
+            mainPanel.add(scrollPane, BorderLayout.CENTER);
+            JPanel buttonsPanel = new JPanel();
+            buttonsPanel.add(generateButton, BorderLayout.EAST);
+            buttonsPanel.add(loadFromFileButton, BorderLayout.EAST);
+            buttonsPanel.add(cancelButton, BorderLayout.EAST);
+            mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+            textPane.getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    enableGenerateButton();
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    enableGenerateButton();
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    enableGenerateButton();
+                }
+            });
+
+            add(mainPanel, BorderLayout.CENTER);
+        }
+
+        private void onGenerate() {
+            try {
+                String text = textPane.getText();
+                if(!text.isEmpty()) {
+                    Object rootElement = getRootElement(text);
+                    if (rootElement != null) {
+                        usedObjectIds = new HashSet<>();
+                        usedObjectsIds = new HashSet<>();
+                        usedGroupIds = new HashSet<>();
+                        usedNamespacePrefixes = new HashSet<>();
+                        List<ParseNode> hierarchy = generateHierarchy(rootElement, null);
+                        CodeBlock formCodeBlock = generateForm(hierarchy, null, null, null, null, null);
+                        showFormScript(formCodeBlock);
+                    }
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Generation failed", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private void enableGenerateButton() {
+            generateButton.setEnabled(!textPane.getText().isEmpty());
+        }
+
+        private void onLoadFromFile(AnActionEvent actionEvent) {
+            try {
+                final FileChooserDescriptor fileChooser = FileChooserDescriptorFactory.createSingleFileDescriptor(getExtension());
+                VirtualFile file = FileChooser.chooseFile(fileChooser, actionEvent.getProject(), null);
+                String inputFile = file != null ? Files.readString(Paths.get(file.getPath())) : null;
+                textPane.setText(inputFile);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Read file failed", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private void onCancel() {
+            this.dispose();
+        }
     }
 
     //need to implement

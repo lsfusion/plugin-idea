@@ -1,25 +1,24 @@
 package com.lsfusion.actions.generate;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 
 public class GenerateFormXMLAction extends GenerateFormAction {
 
-    protected Object getRootElement(AnActionEvent e) throws JDOMException, IOException {
-        final FileChooserDescriptor fileChooser = FileChooserDescriptorFactory.createSingleFileDescriptor("xml");
-        VirtualFile file = FileChooser.chooseFile(fileChooser, e.getProject(), null);
-        return file != null ? new SAXBuilder().build(new File(file.getPath())).getRootElement() : null;
+    @Override
+    String getExtension() {
+        return "xml";
+    }
+
+    @Override
+    protected Object getRootElement(String file) throws JDOMException, IOException {
+        return file != null ? new SAXBuilder().build(new StringReader(file)).getRootElement() : null;
     }
 
     @Override
