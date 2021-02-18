@@ -5,8 +5,9 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class GenerateFormXMLAction extends GenerateFormAction {
@@ -18,7 +19,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
 
     @Override
     protected Object getRootElement(String file) throws JDOMException, IOException {
-        return file != null ? new SAXBuilder().build(new StringReader(file)).getRootElement() : null;
+        return file != null ? new SAXBuilder().build(new ByteArrayInputStream(file.getBytes(StandardCharsets.UTF_8))).getRootElement(): null;
     }
 
     @Override

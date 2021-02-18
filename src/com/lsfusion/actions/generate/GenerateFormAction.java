@@ -6,9 +6,9 @@ import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.util.BaseUtils;
 import net.gcardone.junidecode.Junidecode;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("ComponentNotRegistered")
 public abstract class GenerateFormAction extends AnAction {
 
     private Set<String> usedObjectIds = new HashSet<>();
@@ -36,46 +35,56 @@ public abstract class GenerateFormAction extends AnAction {
 
     abstract Object getRootElement(String file) throws Exception;
 
+    abstract List<ParseNode> generateHierarchy(Object element, String key);
+
     @Override
     public void actionPerformed(final AnActionEvent e) {
         new GenerateFormDialog(e).setVisible(true);
     }
 
     public class GenerateFormDialog extends JDialog {
-        JTextPane textPane;
-        JButton generateButton;
+        JTextPane sourceTextPane;
+        JTextPane targetTextPane;
+        JButton generateFromTextButton;
 
         public GenerateFormDialog(AnActionEvent actionEvent) {
             super(null, "Generate form", ModalityType.APPLICATION_MODAL);
-            setMinimumSize(new Dimension(600, 250));
+            setMinimumSize(new Dimension(600, 800));
 
             setLocationRelativeTo(null);
 
-            textPane = new JTextPane();
-            textPane.setBackground(null);
+            sourceTextPane = new JTextPane();
+            sourceTextPane.setBackground(null);
+            JBScrollPane sourceScrollPane = new JBScrollPane(sourceTextPane);
 
-            JScrollPane scrollPane = new JScrollPane(textPane);
+            generateFromTextButton = new JButton("Generate from text");
+            generateFromTextButton.addActionListener(e -> generate(sourceTextPane.getText()));
+            generateFromTextButton.setEnabled(false);
 
-            generateButton = new JButton("Generate");
-            generateButton.addActionListener(e -> onGenerate());
-            generateButton.setEnabled(false);
+            JButton generateFromFileButton = new JButton("Generate from file");
+            generateFromFileButton.addActionListener(e -> onGenerateFromFile(actionEvent));
 
-            JButton loadFromFileButton = new JButton("Load from file");
-            loadFromFileButton.addActionListener(e -> onLoadFromFile(actionEvent));
-
-            JButton cancelButton = new JButton("Cancel");
-            cancelButton.addActionListener(e -> onCancel());
+            targetTextPane = new JTextPane();
+            targetTextPane.setBackground(null);
+            targetTextPane.setEditable(false);
+            JBScrollPane targetScrollPane = new JBScrollPane(targetTextPane);
 
             JPanel mainPanel = new JPanel();
-            mainPanel.setLayout(new BorderLayout());
-            mainPanel.add(scrollPane, BorderLayout.CENTER);
+            mainPanel.setLayout(new GridBagLayout());
+            mainPanel.add(sourceScrollPane, getGridBagConstraints(0));
             JPanel buttonsPanel = new JPanel();
-            buttonsPanel.add(generateButton, BorderLayout.EAST);
-            buttonsPanel.add(loadFromFileButton, BorderLayout.EAST);
-            buttonsPanel.add(cancelButton, BorderLayout.EAST);
-            mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
+            buttonsPanel.add(generateFromTextButton, BorderLayout.EAST);
+            buttonsPanel.add(generateFromFileButton, BorderLayout.EAST);
+            buttonsPanel.setMinimumSize(new Dimension());
 
-            textPane.getDocument().addDocumentListener(new DocumentListener() {
+            JPanel bottomPanel = new JPanel();
+            bottomPanel.setLayout(new BorderLayout());
+            bottomPanel.add(buttonsPanel, BorderLayout.NORTH);
+            bottomPanel.add(targetScrollPane, BorderLayout.CENTER);
+
+            mainPanel.add(bottomPanel, getGridBagConstraints(1));
+
+            sourceTextPane.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent e) {
                     enableGenerateButton();
@@ -95,10 +104,18 @@ public abstract class GenerateFormAction extends AnAction {
             add(mainPanel, BorderLayout.CENTER);
         }
 
-        private void onGenerate() {
+        private GridBagConstraints getGridBagConstraints(int row) {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridy = row;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.weightx = 0.1;
+            gbc.weighty = 1.0;
+            return gbc;
+        }
+
+        private void generate(String text) {
             try {
-                String text = textPane.getText();
-                if(!text.isEmpty()) {
+                if(text != null && !text.isEmpty()) {
                     Object rootElement = getRootElement(text);
                     if (rootElement != null) {
                         usedObjectIds = new HashSet<>();
@@ -116,50 +133,31 @@ public abstract class GenerateFormAction extends AnAction {
         }
 
         private void enableGenerateButton() {
-            generateButton.setEnabled(!textPane.getText().isEmpty());
+            generateFromTextButton.setEnabled(!sourceTextPane.getText().isEmpty());
         }
 
-        private void onLoadFromFile(AnActionEvent actionEvent) {
+        private void onGenerateFromFile(AnActionEvent actionEvent) {
             try {
                 final FileChooserDescriptor fileChooser = FileChooserDescriptorFactory.createSingleFileDescriptor(getExtension());
                 VirtualFile file = FileChooser.chooseFile(fileChooser, actionEvent.getProject(), null);
                 String inputFile = file != null ? Files.readString(Paths.get(file.getPath())) : null;
-                textPane.setText(inputFile);
+                generate(inputFile);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Read file failed", JOptionPane.ERROR_MESSAGE);
             }
         }
 
-        private void onCancel() {
-            this.dispose();
+        private void showFormScript(CodeBlock formCodeBlock) {
+            Form form = generateFormFromCodeBlocks(formCodeBlock);
+            String formId = form.formName == null ? "generated" : Introspector.decapitalize(form.formName);
+            String formExtId = form.formName == null || formId.equals(form.formName) ? "" : (" FORMEXTID '" + form.formName + "'");
+
+            String formScript = (form.groupDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.groupDeclarationScripts, "\n") + "\n\n")) +
+                    (form.propertyDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.propertyDeclarationScripts, "\n") + "\n\n")) +
+                    "FORM " + formId + formExtId + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
+
+            targetTextPane.setText(formScript);
         }
-    }
-
-    //need to implement
-    protected List<ParseNode> generateHierarchy(Object element, String key) {
-        throw new NotImplementedException();
-    }
-
-    private void showFormScript(CodeBlock formCodeBlock) {
-        Form form = generateFormFromCodeBlocks(formCodeBlock);
-        String formId = form.formName == null ? "generated" : Introspector.decapitalize(form.formName);
-        String formExtId = form.formName == null || formId.equals(form.formName) ? "" : (" FORMEXTID '" + form.formName + "'");
-
-        String formScript = (form.groupDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.groupDeclarationScripts, "\n") + "\n\n")) +
-                (form.propertyDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.propertyDeclarationScripts, "\n") + "\n\n")) +
-                "FORM " + formId + formExtId + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
-
-        JTextPane textPane = new JTextPane();
-        textPane.setText(formScript);
-        textPane.setEditable(false);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = (int) (screenSize.getWidth() * 0.3);
-        textPane.setSize(new Dimension(width, 10));
-        int height = Math.min((int) (screenSize.getHeight() * 0.8), textPane.getPreferredSize().height);
-        textPane.setPreferredSize((new Dimension(width, height)));
-
-        textPane.setBackground(null);
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), new JScrollPane(textPane), "Generation result", JOptionPane.PLAIN_MESSAGE);
     }
 
     private Form generateFormFromCodeBlocks(CodeBlock codeBlock) {
@@ -358,7 +356,11 @@ public abstract class GenerateFormAction extends AnAction {
 
     private String getPropertiesScript(ElementKey object, ElementKey inGroup, Set<ElementProperty> properties) {
         if(!properties.isEmpty()) {
-            return "PROPERTIES(" + (object == null ? "" : object.ID) + ") " + (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) + properties.stream().map(ElementProperty::getScript).collect(Collectors.joining(", "));
+            return "PROPERTIES" +
+                    "(" + (object == null ? "" : object.ID) + ") " +
+                    (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) +
+                    properties.stream().map(ElementProperty::getScript).collect(Collectors.joining(", ")) +
+                    (object != null ? "\nFILTERS " + properties.iterator().next().key.ID + "(" + object.ID + ")" : "");
         } else return null;
     }
 
