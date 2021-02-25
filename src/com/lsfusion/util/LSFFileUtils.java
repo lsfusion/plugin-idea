@@ -224,6 +224,10 @@ public class LSFFileUtils {
         }
         return 63;
     }
+
+    public static String getLsfStrLiteralsLanguage(List<PsiFile> files) {
+        return getPropertyValue(files, "logics.lsfStrLiteralsLanguage");
+    }
     
     private static String getPropertyValue(PsiElement element, String propertyName) {
         List<PsiFile> files = findFilesByPath(element, "lsfusion.properties");

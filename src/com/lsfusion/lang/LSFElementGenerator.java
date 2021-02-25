@@ -46,7 +46,12 @@ public class LSFElementGenerator {
     public static LSFLocalizedStringValueLiteral createLocalizedStringValueLiteral(Project myProject, String text) {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; GROUP someDumbGroup " + text + ";");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFLocalizedStringValueLiteral.class).iterator().next();
-    } 
+    }
+
+    public static LSFLocalizedStringLiteral createLocalizedStringLiteral(Project myProject, String text) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; GROUP someDumbGroup " + text + ";");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFLocalizedStringLiteral.class).iterator().next();
+    }
     
     @Nullable
     public static LSFId createIdentifierFromText(Project myProject, String name) {

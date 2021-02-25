@@ -10,6 +10,7 @@
         <b>Version 1.0.206</b><br>
         <ul>
             <li>Generate form from json/xml now possible from clipboard</li>
+            <li>Change Locale of localizedStringLiterals action</li>
         </ul>
     ]]>
     </change-notes>
@@ -103,6 +104,10 @@
                 <action id="GenerateFormXML" class="com.lsfusion.actions.generate.GenerateFormXMLAction" text="From xml"
                         description="Generate FORM from xml"/>
             </group>
+
+            <action id="ChangeLocale" class="com.lsfusion.actions.ChangeLocaleAction" text="Change Locale"
+                    description="Change locale">
+            </action>
 
             <action id="InsertComposition" class="com.lsfusion.actions.InsertCompositionAction">
                 <keyboard-shortcut first-keystroke="control alt shift W" keymap="$default"/>
