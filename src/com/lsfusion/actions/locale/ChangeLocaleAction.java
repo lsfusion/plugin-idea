@@ -1,6 +1,6 @@
-package com.lsfusion.actions;
+package com.lsfusion.actions.locale;
 
-import com.intellij.lang.properties.PropertiesFileType;
+import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -22,7 +22,9 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.LSFFileType;
-import com.lsfusion.lang.psi.LSFLocalizedStringLiteral;
+import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.LSFResourceBundleUtils;
+import com.lsfusion.lang.psi.LSFLocalizedStringValueLiteral;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
@@ -31,18 +33,14 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
-import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.lsfusion.lang.LSFElementGenerator.createLocalizedStringLiteral;
-import static com.lsfusion.util.BaseUtils.nvl;
 
 public class ChangeLocaleAction extends AnAction {
     private Project project;
@@ -58,6 +56,7 @@ public class ChangeLocaleAction extends AnAction {
         Map<String, ResourceBundlesWithScope> resourceBundlesWithScopeMap;
         ComboBox<String> resourceBundlesBox;
         ComboBox<String> localesBox;
+        JCheckBox idModeCheckBox;
 
         ChangeLocaleDialog() {
             super(project);
@@ -77,33 +76,13 @@ public class ChangeLocaleAction extends AnAction {
             resourceBundlesWithScopeMap = new HashMap<>();
 
             for(Module module : new ModulesConfigurator(project).getModules()) {
-                Map<String, Map<String, String>> resourceBundlesMap = new HashMap<>();
-
-                GlobalSearchScope scope = module.getModuleScope();
-                List<PsiFile> propertiesFile = null;
-                String lsfStrLiteralsLanguage = null;
-
-                Pattern pattern = Pattern.compile("([^/]*ResourceBundle)(?:_(.*))?\\.properties");
-                for (VirtualFile file : FileTypeIndex.getFiles(PropertiesFileType.INSTANCE, scope)) {
-                    Matcher matcher = pattern.matcher(file.getName());
-                    if (matcher.matches()) {
-
-                        propertiesFile = LSFFileUtils.findFilesByPath(PsiManager.getInstance(project).findFile(file), "lsfusion.properties");
-                        lsfStrLiteralsLanguage = LSFFileUtils.getLsfStrLiteralsLanguage(propertiesFile);
-                        if(lsfStrLiteralsLanguage != null) {
-                            String name = matcher.group(1);
-                            String locale = nvl(matcher.group(2), "default");
-                            Map<String, String> resourceBundles = resourceBundlesMap.getOrDefault(name, new HashMap<>());
-                            resourceBundles.put(locale, file.getCanonicalPath());
-                            resourceBundlesMap.put(name, resourceBundles);
-                        }
+                String lsfStrLiteralsLanguage = LSFResourceBundleUtils.getLsfStrLiteralsLanguage(module, true);
+                if(lsfStrLiteralsLanguage != null) {
+                    LSFResourceBundleUtils.ScopeData scopeData = LSFResourceBundleUtils.getScopeData(module);
+                    for (Map.Entry<String, Map<String, PropertiesFile>> entry : scopeData.propertiesFiles.entrySet()) {
+                        resourceBundlesWithScopeMap.put(entry.getKey(), new ResourceBundlesWithScope(module.getModuleScope(), entry.getValue(), lsfStrLiteralsLanguage));
                     }
                 }
-
-                for (Map.Entry<String, Map<String, String>> entry : resourceBundlesMap.entrySet()) {
-                    resourceBundlesWithScopeMap.put(entry.getKey(), new ResourceBundlesWithScope(scope, propertiesFile, lsfStrLiteralsLanguage, entry.getValue()));
-                }
-
             }
 
             resourceBundlesBox = new ComboBox<>(resourceBundlesWithScopeMap.keySet().toArray(new String[]{}));
@@ -126,8 +105,11 @@ public class ChangeLocaleAction extends AnAction {
                 localesBox.setSelectedItem(selectedResourceBundle.lsfStrLiteralsLanguage);
             }
 
+            idModeCheckBox = new JCheckBox("Replace literals with IDs");
+            idModeCheckBox.addItemListener(e -> localesBox.setEnabled(e.getStateChange() != ItemEvent.SELECTED));
+
             JPanel topPanel = new JPanel();
-            topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+            topPanel.setLayout(new GridBagLayout());
 
             JPanel resourcePanel = new JPanel();
             resourcePanel.setLayout(new BoxLayout(resourcePanel, BoxLayout.Y_AXIS));
@@ -144,10 +126,26 @@ public class ChangeLocaleAction extends AnAction {
             localePanel.add(localeLabel);
             localePanel.add(localesBox);
 
-            topPanel.add(resourcePanel);
-            topPanel.add(localePanel);
+            topPanel.add(resourcePanel, getGridBagConstraints(1, 1));
+            topPanel.add(localePanel, getGridBagConstraints(1, 2));
+            topPanel.add(idModeCheckBox, getGridBagConstraints(2, 2));
 
             return topPanel;
+        }
+
+        private GridBagConstraints getGridBagConstraints(int row, int column) {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = column;
+            gbc.gridy = row;
+            gbc.gridwidth = 1;
+            gbc.gridheight = 1;
+
+            gbc.anchor = column == 0 ? GridBagConstraints.WEST : GridBagConstraints.EAST;
+            gbc.fill = column == 0 ? GridBagConstraints.BOTH : GridBagConstraints.HORIZONTAL;
+
+            gbc.weightx = column == 0 ? 0.1 : 1.0;
+            gbc.weighty = 1.0;
+            return gbc;
         }
 
         @Override
@@ -156,40 +154,58 @@ public class ChangeLocaleAction extends AnAction {
                 ResourceBundlesWithScope resourceBundle = getSelectedResourceBundle();
 
                 String oldLocale = resourceBundle.lsfStrLiteralsLanguage;
-                String newLocale = localesBox.getItem();
-                if(oldLocale.equals(newLocale)) {
-                    JOptionPane.showMessageDialog(getContentPane(), "Selected locale is equal to current locale", "Change Locale", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    ResourceBundle oldResourceBundle = new PropertyResourceBundle(new FileInputStream(resourceBundle.resourceBundles.getOrDefault(oldLocale, "default")));
-                    ResourceBundle newResourceBundle = new PropertyResourceBundle(new FileInputStream(resourceBundle.resourceBundles.getOrDefault(newLocale, "default")));
+                VirtualFile oldPropertiesFile = resourceBundle.propertiesFiles.get(oldLocale).getVirtualFile();
+                Map<String, String> oldOrdinaryMap = LSFResourceBundleUtils.getOrdinaryMap(oldPropertiesFile.getPath());
+
+                if (idModeCheckBox.isSelected()) {
 
                     Map<String, String> literalsMap = new HashMap<>();
-                    for (String key : oldResourceBundle.keySet()) {
-                        String value = oldResourceBundle.getString(key);
-                        if(literalsMap.containsKey(value)) {
-                            literalsMap.put(value, "'{" + key + "}'"); //put key if multiple values found
-                        } else {
-                            literalsMap.put(value, "'" + newResourceBundle.getString(key) + "'");
-                        }
+                    for (Map.Entry<String, String> oldEntry : oldOrdinaryMap.entrySet()) {
+                        literalsMap.put(oldEntry.getValue(), "'{" + oldEntry.getKey() + "}'");
                     }
 
                     changeLocale(literalsMap, resourceBundle.scope);
 
-                    for(PsiFile propertiesFile : resourceBundle.propertiesFiles) {
-                        Path filePath = Paths.get(propertiesFile.getVirtualFile().getPath());
-                        List<String> newLines = new ArrayList<>();
-                        for (String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
-                            if (line.matches("logics\\.lsfStrLiteralsLanguage(\\s)*=.*")) {
-                                newLines.add("logics.lsfStrLiteralsLanguage = " + newLocale);
-                            } else {
-                                newLines.add(line);
+                } else {
+
+                    String newLocale = localesBox.getItem();
+                    if(oldLocale.equals(newLocale)) {
+                        JOptionPane.showMessageDialog(getContentPane(), "Selected locale is equal to current locale", "Change Locale", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        Map<String, String> newOrdinaryMap = LSFResourceBundleUtils.getOrdinaryMap(resourceBundle.propertiesFiles.get(newLocale).getVirtualFile().getPath());
+
+                        Map<String, String> literalsMap = new HashMap<>();
+                        for (Map.Entry<String, String> oldEntry : oldOrdinaryMap.entrySet()) {
+                            String key = oldEntry.getKey();
+                            String oldValue = oldEntry.getValue();
+                            String newValue = newOrdinaryMap.get(key);
+                            if (newValue != null) {
+                                if (literalsMap.containsKey(oldValue)) {
+                                    literalsMap.put(oldValue, "'{" + key + "}'"); //put key if multiple values found
+                                } else {
+                                    literalsMap.put(oldValue, "'" + newValue + "'");
+                                }
                             }
                         }
-                        Files.write(filePath, String.join("\n", newLines).getBytes(StandardCharsets.UTF_8));
 
+                        changeLocale(literalsMap, resourceBundle.scope);
+
+                        for(PsiFile propertiesFile : LSFFileUtils.findFilesByPath(PsiManager.getInstance(project).findFile(oldPropertiesFile), "lsfusion.properties")) {
+                            Path filePath = Paths.get(propertiesFile.getVirtualFile().getPath());
+                            List<String> newLines = new ArrayList<>();
+                            for (String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
+                                if (line.matches("logics\\.lsfStrLiteralsLanguage(\\s)*=.*")) {
+                                    newLines.add("logics.lsfStrLiteralsLanguage = " + newLocale);
+                                } else {
+                                    newLines.add(line);
+                                }
+                            }
+                            Files.write(filePath, String.join("\n", newLines).getBytes(StandardCharsets.UTF_8));
+                        }
+                        LSFResourceBundleUtils.setLsfStrLiteralsLanguage(resourceBundle.scope, newLocale);
+                        dispose();
                     }
 
-                    dispose();
                 }
 
             } catch (Throwable t) {
@@ -198,7 +214,7 @@ public class ChangeLocaleAction extends AnAction {
         }
 
         private DefaultComboBoxModel<String> getComboBoxModel(ResourceBundlesWithScope selectedResourceBundle) {
-            String[] locales = selectedResourceBundle.resourceBundles.keySet().toArray(new String[]{});
+            String[] locales = selectedResourceBundle.propertiesFiles.keySet().toArray(new String[]{});
             Arrays.sort(locales, (s1, s2) -> s1.equals("default") ? 1 : s2.equals("default") ? -1 : s1.compareTo(s2));
             return new DefaultComboBoxModel<>(locales);
         }
@@ -210,6 +226,7 @@ public class ChangeLocaleAction extends AnAction {
 
     public void changeLocale(Map<String, String> literalsMap, GlobalSearchScope scope) {
         final Progressive run = indicator -> {
+            indicator.setIndeterminate(false);
             ReprocessInlineProcessor inlineProcessor = new ReprocessInlineProcessor(indicator);
             ApplicationManager.getApplication().runReadAction(() -> {
                 int i = 0;
@@ -217,13 +234,15 @@ public class ChangeLocaleAction extends AnAction {
                 for(VirtualFile vfile : files) {
                     indicator.setText("Processing : " + vfile.getName());
                     PsiFile psiFile = PsiManager.getInstance(project).findFile(vfile);
-                    Collection<LSFLocalizedStringLiteral> localizedStringLiterals = PsiTreeUtil.findChildrenOfType(psiFile, LSFLocalizedStringLiteral.class);
+                    Collection<LSFLocalizedStringValueLiteral> localizedStringLiterals = PsiTreeUtil.findChildrenOfType(psiFile, LSFLocalizedStringValueLiteral.class);
 
-                    for (final LSFLocalizedStringLiteral localizedStringLiteral : localizedStringLiterals) {
+                    for (final LSFLocalizedStringValueLiteral localizedStringLiteral : localizedStringLiterals) {
                         Runnable inlineRun = () -> {
-                            String value = literalsMap.get(localizedStringLiteral.getValue());
-                            if (value != null) {
-                                localizedStringLiteral.replace(createLocalizedStringLiteral(localizedStringLiteral.getProject(), value));
+                            if(!localizedStringLiteral.needToBeLocalized() && !LSFReferenceAnnotator.isInMetaUsage(localizedStringLiteral)) {
+                                String value = literalsMap.get(localizedStringLiteral.getValue());
+                                if (value != null) {
+                                    localizedStringLiteral.replace(createLocalizedStringLiteral(localizedStringLiteral.getProject(), value));
+                                }
                             }
                         };
                         inlineProcessor.proceed(inlineRun);
@@ -286,15 +305,13 @@ public class ChangeLocaleAction extends AnAction {
 
     private static class ResourceBundlesWithScope {
         GlobalSearchScope scope;
-        List<PsiFile> propertiesFiles;
+        Map<String, PropertiesFile> propertiesFiles;
         String lsfStrLiteralsLanguage;
-        Map<String, String> resourceBundles;
 
-        public ResourceBundlesWithScope(GlobalSearchScope scope, List<PsiFile> propertiesFiles, String lsfStrLiteralsLanguage, Map<String, String> resourceBundles) {
+        public ResourceBundlesWithScope(GlobalSearchScope scope, Map<String, PropertiesFile> propertiesFiles, String lsfStrLiteralsLanguage) {
             this.scope = scope;
             this.propertiesFiles = propertiesFiles;
             this.lsfStrLiteralsLanguage = lsfStrLiteralsLanguage;
-            this.resourceBundles = resourceBundles;
         }
     }
 }

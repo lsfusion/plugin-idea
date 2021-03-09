@@ -4,7 +4,6 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.lang.properties.BundleNameEvaluator;
-import com.intellij.lang.properties.PropertiesFileType;
 import com.intellij.lang.properties.PropertiesReferenceManager;
 import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.lang.properties.references.PropertyReference;
@@ -15,25 +14,22 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.util.IncorrectOperationException;
-import com.lsfusion.util.LSFFileUtils;
+import com.lsfusion.lang.LSFResourceBundleUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 import static com.lsfusion.lang.LSFElementGenerator.createLocalizedStringValueLiteral;
 
 public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement implements LSFLocalizedStringValueLiteral {
     public LSFLocalizedStringValueLiteralImpl(@NotNull ASTNode node) {
         super(node);
-        initPropertyFiles();
     }
 
     public void accept(@NotNull LSFVisitor visitor) {
@@ -45,21 +41,6 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         if (visitor instanceof LSFVisitor) accept((LSFVisitor)visitor);
         else super.accept(visitor);
     }
-
-    private synchronized void initPropertyFiles() {
-        if (propertyFiles == null) {
-            propertyFiles = new HashSet<>();
-            Pattern pattern = Pattern.compile("[^/]*ResourceBundle\\.properties");
-            GlobalSearchScope scope = LSFFileUtils.getModuleWithDependenciesScope(this);
-            for (VirtualFile file : FileTypeIndex.getFiles(PropertiesFileType.INSTANCE, scope)) {
-                if (pattern.matcher(file.getName()).matches()) {
-                    propertyFiles.add(file);
-                }
-            }
-        }
-    }
-    
-    private static Set<VirtualFile> propertyFiles = null;
     
     @Override
     public PsiReference getReference() {
@@ -204,10 +185,14 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         private ResolveResult[] resolveNoCache(boolean incompleteCode) {
             Set<ResolveResult> results = new HashSet<>();
             String key = getReferenceId();
-            for (VirtualFile file : propertyFiles) {
-                PropertyReference ref = new AllScopePropertyReference(key, LSFLocalizedStringValueLiteralImpl.this, file.getNameWithoutExtension(), true, getRangeInElement());
-                ResolveResult[] result = ref.multiResolve(incompleteCode);
-                Collections.addAll(results, result);
+
+            Module module = ModuleUtil.findModuleForPsiElement(LSFLocalizedStringValueLiteralImpl.this);
+            if (module != null) {
+                for (VirtualFile file : LSFResourceBundleUtils.getScopeData(module).resourceBundleFiles) {
+                    PropertyReference ref = new AllScopePropertyReference(key, LSFLocalizedStringValueLiteralImpl.this, file.getNameWithoutExtension(), true, getRangeInElement());
+                    ResolveResult[] result = ref.multiResolve(incompleteCode);
+                    Collections.addAll(results, result);
+                }
             }
             return results.toArray(new ResolveResult[0]);
         }
