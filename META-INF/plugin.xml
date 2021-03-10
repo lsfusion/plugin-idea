@@ -11,6 +11,7 @@
         <ul>
             <li>Generate form from json/xml now possible from clipboard</li>
             <li>Change Locale of localizedStringLiterals action</li>
+            <li>LocalizedStringLiterals warnings</li>
         </ul>
     ]]>
     </change-notes>
@@ -105,7 +106,7 @@
                         description="Generate FORM from xml"/>
             </group>
 
-            <action id="ChangeLocale" class="com.lsfusion.actions.ChangeLocaleAction" text="Change Locale"
+            <action id="ChangeLocale" class="com.lsfusion.actions.locale.ChangeLocaleAction" text="Change Locale"
                     description="Change locale">
             </action>
 
@@ -310,5 +311,8 @@
 
         <!--пробуем убрать этот хак, т.к. в данный момент визуально из-за него больше проблем (stepping в ultimate, ...), но надо понаблюдать-->
         <!--<xdebugger.debuggerSupport implementation="com.lsfusion.debug.LSFDumbDebuggerSupport" order="first"/>-->
+
+        <applicationConfigurable instance="com.lsfusion.actions.locale.LSFSettingsConfigurable"
+                             id="org.company.ApplicationSettingsConfigurable" displayName="LSF Settings"/>
     </extensions>
 </idea-plugin>

@@ -1,19 +1,34 @@
 package com.lsfusion.lang;
 
+import com.intellij.codeInsight.FileModificationService;
+import com.intellij.codeInsight.intention.IntentionAction;
+import com.intellij.codeInspection.util.IntentionFamilyName;
+import com.intellij.codeInspection.util.IntentionName;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
+import com.intellij.lang.properties.psi.PropertiesFile;
+import com.intellij.lang.properties.references.I18nUtil;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.undo.UndoUtil;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
+import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
 import com.lsfusion.lang.classes.IntegralClass;
@@ -34,10 +49,8 @@ import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
@@ -577,6 +590,109 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitLocalizedStringValueLiteral(@NotNull LSFLocalizedStringValueLiteral o) {
         super.visitLocalizedStringValueLiteral(o);
         checkEscapeSequences(o, "nrt'\\{}");
+
+        if (!o.needToBeLocalized()) {
+            Module module = ModuleUtil.findModuleForPsiElement(o);
+
+            LSFResourceBundleUtils.ScopeData scopeData = LSFResourceBundleUtils.getScopeData(module);
+            if(scopeData != null) {
+                Map<String, Map<String, PropertiesFile>> propertiesFilesMap = scopeData.propertiesFiles;
+                String currentLang = LSFResourceBundleUtils.getLsfStrLiteralsLanguage(module, false);
+                if (currentLang != null) {
+
+                    List<IntentionAction> fixes = new ArrayList<>();
+
+                    for (Map.Entry<String, Map<String, PropertiesFile>> resourceBundleEntry : propertiesFilesMap.entrySet()) {
+
+                        String resourceBundleName = resourceBundleEntry.getKey();
+                        Map<String, PropertiesFile> propertiesFiles = resourceBundleEntry.getValue();
+
+                        PropertiesFile currentPropertiesFile = propertiesFiles.get(currentLang);
+                        String currentKey = currentPropertiesFile != null ? LSFResourceBundleUtils.getReverseMapValue(currentPropertiesFile.getVirtualFile().getPath(), o.getValue()) : null;
+
+                        List<PropertiesFile> allPropertiesFiles = new ArrayList<>(propertiesFiles.values());
+                        List<PropertiesFile> existingPropertiesFiles = new ArrayList<>();
+
+                        //search current key in each properties file
+                        for (PropertiesFile propFile : propertiesFiles.values()) {
+                            boolean contains = LSFResourceBundleUtils.getOrdinaryMapValue(propFile.getVirtualFile().getPath(), currentKey) != null;
+                            if (contains) {
+                                existingPropertiesFiles.add(propFile);
+                            }
+                        }
+
+                        if (existingPropertiesFiles.isEmpty()) {
+                            fixes.add(getCreatePropertyFix(currentLang, resourceBundleName, allPropertiesFiles, LSFResourceBundleUtils.getDefaultBundleKey(o.getValue()), o));
+                        } else if (existingPropertiesFiles.size() < propertiesFiles.size()) {
+                            fixes.clear();
+                            fixes.add(getCreatePropertyFix(currentLang, resourceBundleName, allPropertiesFiles.stream().filter(f -> !existingPropertiesFiles.contains(f)).collect(Collectors.toList()), currentKey, o));
+                            break;
+                        } else {
+                            fixes.clear();
+                            break;
+                        }
+                    }
+
+                    if (!fixes.isEmpty()) {
+
+                        Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Missing " + o.getText() + " in resource bundle");
+                        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_WARNING);
+
+                        for (IntentionAction fix : fixes) {
+                            annotation.registerFix(fix);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private IntentionAction getCreatePropertyFix(String currentLang, String resourceBundleName, List<PropertiesFile> propertiesFiles, String defaultKey, LSFLocalizedStringValueLiteral o) {
+        return new IntentionAction() {
+            @Override
+            public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
+                String defaultValue = o.getValue();
+                CreatePropertyFixDialog dialog = new CreatePropertyFixDialog(project, currentLang, propertiesFiles, defaultKey, defaultValue);
+                if (dialog.showAndGet()) {
+                    Collection<PropertiesFile> selectedPropertiesFiles = Collections.singletonList(dialog.getPropertiesFilesField());
+                    String key = dialog.getKey();
+                    String value = dialog.getValue();
+
+                    for (PropertiesFile selectedFile : selectedPropertiesFiles) {
+                        if (!FileModificationService.getInstance().prepareFileForWrite(selectedFile.getContainingFile()))
+                            return;
+                    }
+                    UndoUtil.markPsiFileForUndo(file);
+
+                    ApplicationManager.getApplication().runWriteAction(() -> CommandProcessor.getInstance().executeCommand(project, () -> I18nUtil.createProperty(project, selectedPropertiesFiles, key, value), "I18n", project));
+
+                    visitLocalizedStringValueLiteral(o);
+                }
+            }
+
+            @Override
+            public @IntentionName
+            @NotNull
+            String getText() {
+                return "Create property for " + o.getText() + " in " + resourceBundleName;
+            }
+
+            @Override
+            public @NotNull
+            @IntentionFamilyName String getFamilyName() {
+                return getText();
+            }
+
+            @Override
+            public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile file) {
+                return true;
+            }
+
+            @Override
+            public boolean startInWriteAction() {
+                return false;
+            }
+        };
     }
 
     private void checkEscapeSequences(PsiElement element, final String escapedSymbols) {
