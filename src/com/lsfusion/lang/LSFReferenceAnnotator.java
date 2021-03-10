@@ -665,6 +665,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     UndoUtil.markPsiFileForUndo(file);
 
                     ApplicationManager.getApplication().runWriteAction(() -> CommandProcessor.getInstance().executeCommand(project, () -> I18nUtil.createProperty(project, selectedPropertiesFiles, key, value), "I18n", project));
+
+                    visitLocalizedStringValueLiteral(o);
                 }
             }
 

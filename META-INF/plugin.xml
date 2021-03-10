@@ -11,6 +11,7 @@
         <ul>
             <li>Generate form from json/xml now possible from clipboard</li>
             <li>Change Locale of localizedStringLiterals action</li>
+            <li>LocalizedStringLiterals warnings</li>
         </ul>
     ]]>
     </change-notes>
