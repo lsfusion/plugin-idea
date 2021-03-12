@@ -127,7 +127,7 @@ public class MetaCodeFragment {
         return result.toArray(new String[result.size()]);
     }
 
-    private void transformTokenPartString(StringBuilder resultString, String[] parts, int from, int to, boolean capitalizeFirstToken) {
+    private void transformTokenPartString(StringBuilder resultString, String[] parts, int from, int to, boolean capitalizeFirstToken, boolean isColor) {
         if(to > from) {
             boolean isStringLiteral = false;
             String result = "";
@@ -135,7 +135,7 @@ public class MetaCodeFragment {
                 String part = parts[i];
 
                 boolean capitalize = false;
-                if (part.startsWith("#")) {
+                if (part.startsWith("#") && !isColor) {
                     capitalize = i > 0 || capitalizeFirstToken; // when there is ###param, forcing its capitalization
                     part = part.substring(1);
                 }
@@ -176,18 +176,18 @@ public class MetaCodeFragment {
             String part = parts[i];
             String actualPart = part.startsWith("#") ? part.substring(1) : part;
             if(metaParameters.contains(actualPart)) {
-                transformTokenPartString(result, parts, from, i, capitalizeFirstToken.getResult());
+                transformTokenPartString(result, parts, from, i, capitalizeFirstToken.getResult(), isColorToken.getResult()); // transforming all parts till this parameter
                 if(i == 0) {
                     if(capitalizeFirstToken.getResult()) // forcing ### at the start
                         result.append("#");
-                    if(!isColorToken.getResult())
-                        part = actualPart;
+//                    if(!isColorToken.getResult()) // not sure that this check is needed (since color tokens, are not capitalized, prefixed, etc.), so if this is a meta parameter it will have no # prefixes
+                    part = actualPart;
                 }
                 addPart(result, part);
                 from = i + 1;
             }
         }
-        transformTokenPartString(result, parts, from, parts.length, capitalizeFirstToken.getResult());
+        transformTokenPartString(result, parts, from, parts.length, capitalizeFirstToken.getResult(), isColorToken.getResult()); // transforming all parts till this parameter
         return result.toString();
     }
 
