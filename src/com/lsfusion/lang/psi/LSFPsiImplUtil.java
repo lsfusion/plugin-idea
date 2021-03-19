@@ -621,6 +621,16 @@ public class LSFPsiImplUtil {
             return new StringClass(false, false, ExtInt.UNLIMITED);
         } else if (name.equals("ISTRING")) {
             return new StringClass(false, true, ExtInt.UNLIMITED);
+        } else if (name.startsWith("INTERVAL[")) {
+            String type = name.substring("INTERVAL[".length(), name.indexOf("]"));
+            switch (type) {
+                case "DATE" :
+                    return DateIntervalClass.instance;
+                case "TIME" :
+                    return TimeIntervalClass.instance;
+                case "DATETIME" :
+                    return DateTimeIntervalClass.instance;
+            }
         }
 
         switch (name) {

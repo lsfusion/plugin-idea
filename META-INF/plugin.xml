@@ -10,6 +10,7 @@
         <b>Version 1.0.207</b><br>
         <ul>
             <li>Bugfix of incorrect meta generation with color literals</li>
+            <li>Support Interval[DATE] / Interval[DATETIME] / Interval[TIME] literals</li>
         </ul>
     ]]>
     </change-notes>

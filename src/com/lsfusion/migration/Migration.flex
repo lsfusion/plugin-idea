@@ -36,7 +36,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
     "//" [^\n\r]*                         { return COMMENTS; }
     
     "INTEGER" | "DOUBLE" | "LONG" | "BOOLEAN"
-    | "DATETIME" | "DATE" | "YEAR" | "TIME" | "ZDATETIME"
+    | "DATETIME" | "DATE" | "YEAR" | "TIME" | "ZDATETIME" | "INTERVAL"
     | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "RAWFILE" | "FILE" | "EXCELFILE" | "TEXTFILE" | "CSVFILE" | "HTMLFILE" | "JSONFILE" | "XMLFILE" | "TABLEFILE"
     | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "RAWLINK" | "LINK" | "EXCELLINK" | "TEXTLINK" | "CSVLINK" | "HTMLLINK" | "JSONLINK" | "XMLLINK" | "TABLELINK"
     | "STRING" | "NUMERIC" | "COLOR"      { return PRIMITIVE_TYPE; }
