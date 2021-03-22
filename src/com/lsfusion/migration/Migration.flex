@@ -29,6 +29,7 @@ LINE_WS = [ \t\f]
 DIGITS = [0-9]+
 FIRST_ID_LETTER	= [a-zA-Z_]
 NEXT_ID_LETTER = [a-zA-Z_0-9]
+INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME"
 
 %%
 <YYINITIAL> {
@@ -36,7 +37,7 @@ NEXT_ID_LETTER = [a-zA-Z_0-9]
     "//" [^\n\r]*                         { return COMMENTS; }
     
     "INTEGER" | "DOUBLE" | "LONG" | "BOOLEAN"
-    | "DATETIME" | "DATE" | "YEAR" | "TIME" | "ZDATETIME" | "INTERVAL"
+    | "DATETIME" | "DATE" | "YEAR" | "TIME" | "ZDATETIME" | "INTERVAL" ("["{INTERVAL_TYPE}"]")
     | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "RAWFILE" | "FILE" | "EXCELFILE" | "TEXTFILE" | "CSVFILE" | "HTMLFILE" | "JSONFILE" | "XMLFILE" | "TABLEFILE"
     | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "RAWLINK" | "LINK" | "EXCELLINK" | "TEXTLINK" | "CSVLINK" | "HTMLLINK" | "JSONLINK" | "XMLLINK" | "TABLELINK"
     | "STRING" | "NUMERIC" | "COLOR"      { return PRIMITIVE_TYPE; }
