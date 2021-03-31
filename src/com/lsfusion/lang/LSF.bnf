@@ -574,6 +574,7 @@ private semiPropertyOption ::= IN groupUsage
                            |	TABLE tableUsage
                            |	asEditActionSetting
                            |	viewTypeSetting
+                           |	customViewSetting
                            |	flexCharWidthSetting
                            |	charWidthSetting
                            |	imageSetting
@@ -598,6 +599,7 @@ private nonSemiPropertyOption ::= onEditEventSetting
 nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI | (semiPropertyOption* nonSemiPropertyOption)+)
 
 viewTypeSetting ::= classViewType
+customViewSetting ::= propertyCustomView
 persistentSetting ::= MATERIALIZED
 complexSetting ::= COMPLEX | NOCOMPLEX
 hintSetting ::= HINT | NOHINT
@@ -1430,6 +1432,8 @@ formSubReport ::= SUBREPORT formCalcPropertyObject?
 
 classViewType ::= PANEL | GRID | TOOLBAR
 
+propertyCustomView ::= CUSTOM stringLiteral
+
 listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | MAP | (CUSTOM stringLiteral) | CALENDAR
 
 pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS))*
@@ -1481,6 +1485,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    HINTTABLE
                             |    OPTIMISTICASYNC
                             |    formOptionForce
+                            |    formOptionCustomView
                             |    formOptionToDraw
                             |    formOptionEventId
                             |    formOptionColumns
@@ -1501,6 +1506,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
 formOptionSession ::= NEWSESSION | NESTEDSESSION;
 formOptionColumns ::= COLUMNS (stringLiteral)? LBRAC nonEmptyGroupObjectUsageList RBRAC {pin = 1}
 formOptionForce ::= classViewType
+formOptionCustomView ::= propertyCustomView
 formOptionToDraw ::= DRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | IMAGE | HEADER | FOOTER) formCalcPropertyObject {pin = 1}

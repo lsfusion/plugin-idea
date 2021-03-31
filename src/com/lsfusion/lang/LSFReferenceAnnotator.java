@@ -49,8 +49,8 @@ import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
@@ -555,6 +555,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitLocalPropDeclaration(o);
 
         checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitPropertyCustomView(@NotNull LSFPropertyCustomView customView) {
+        super.visitPropertyCustomView(customView);
+        String pattern = "[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:[a-zA-Z]+\\w*";
+        LSFStringLiteral stringLiteral = customView.getStringLiteral();
+        if (!stringLiteral.getValue().matches(pattern)) {
+            Annotation annotation = myHolder.createErrorAnnotation(stringLiteral,
+                    "Wrong render functions definition: '<render_function_name>:<set_value_function_name>:<clear_function_name>' expected");
+            annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
+            addError(stringLiteral, annotation);    
+        }
     }
 
     @Override
