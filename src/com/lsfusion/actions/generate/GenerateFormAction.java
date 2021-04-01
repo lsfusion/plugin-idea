@@ -149,12 +149,10 @@ public abstract class GenerateFormAction extends AnAction {
 
         private void showFormScript(CodeBlock formCodeBlock) {
             Form form = generateFormFromCodeBlocks(formCodeBlock);
-            String formId = form.formName == null ? "generated" : Introspector.decapitalize(form.formName);
-            String formExtId = form.formName == null || formId.equals(form.formName) ? "" : (" FORMEXTID '" + form.formName + "'");
 
             String formScript = (form.groupDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.groupDeclarationScripts, "\n") + "\n\n")) +
                     (form.propertyDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.propertyDeclarationScripts, "\n") + "\n\n")) +
-                    "FORM " + formId + formExtId + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
+                    form.formNameScript + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
 
             targetTextPane.setText(formScript);
         }
@@ -165,6 +163,9 @@ public abstract class GenerateFormAction extends AnAction {
         Set<String> propertyDeclarationScripts = new LinkedHashSet<>(codeBlock.propertyDeclarationScripts);
         List<String> formScripts = new ArrayList<>(codeBlock.objectsScripts);
 
+        if(codeBlock.namespacePropertiesScript != null) {
+            formScripts.add(codeBlock.namespacePropertiesScript);
+        }
         if(codeBlock.propertiesScript != null) {
             formScripts.add(codeBlock.propertiesScript);
         }
@@ -184,15 +185,16 @@ public abstract class GenerateFormAction extends AnAction {
                 }
             }
         }
-        return new Form(codeBlock.formName, groupDeclarationScripts, propertyDeclarationScripts, formScripts);
+        return new Form(codeBlock.formNameScript, groupDeclarationScripts, propertyDeclarationScripts, formScripts);
 
     }
 
     private CodeBlock generateForm(List<ParseNode> elements, ElementKey key, ParseNode parentElement, ElementKey parentKey, ElementKey parentInGroupKey, ElementKey lastGroupObjectParent) {
-        String formName = null;
+        String formNameScript = null;
         Set<String> groupDeclarationScripts = new LinkedHashSet<>();
         Set<String> propertyDeclarationScripts = new LinkedHashSet<>();
         Set<String> objectsScripts = new LinkedHashSet<>();
+        List<ElementNamespace> namespaces = new ArrayList<>();
         Set<ElementProperty> properties = new LinkedHashSet<>();
         String propertiesScript = null;
         String filtersScript = null;
@@ -223,30 +225,34 @@ public abstract class GenerateFormAction extends AnAction {
                 }
 
             } else if (element instanceof PropertyGroupParseNode) {
-                formName = ((PropertyGroupParseNode) element).formName;
+                PropertyGroupParseNode propertyGroupElement = ((PropertyGroupParseNode) element);
+                formNameScript = parentElement == null ? getFormNameScript(propertyGroupElement.formName, propertyGroupElement.namespace) : null;
 
                 if (hasPropertyGroupParseNodeChildren(element)) {
                     if (lastGroupObjectParent != null) {
-                        objectsScripts.add(getObjectsScript(key, ((PropertyGroupParseNode) element).namespace, parentInGroupKey));
+                        objectsScripts.add(getObjectsScript(key, propertyGroupElement.namespace, parentInGroupKey));
                         if (parentKey != null) {
-                            groupDeclarationScripts.add(getGroupDeclarationScript(parentKey, ((PropertyGroupParseNode) element).namespace, null));
+                            groupDeclarationScripts.add(getGroupDeclarationScript(parentKey, propertyGroupElement.namespace, null));
                         }
                     }
                 }
 
                 if (parentElement instanceof PropertyGroupParseNode) {
-                    groupDeclarationScripts.add(getGroupDeclarationScript(key, ((PropertyGroupParseNode) element).namespace, parentInGroupKey));
+                    groupDeclarationScripts.add(getGroupDeclarationScript(key, propertyGroupElement.namespace, parentInGroupKey));
                 }
 
                 for (ParseNode childElement : element.children) {
                     ElementKey childElementKey = new ElementKey(childElement.key);
 
-                    if (childElement instanceof PropertyParseNode) {
-                        properties.add(new ElementProperty(childElementKey, ((PropertyParseNode) childElement).namespace, ((PropertyParseNode) childElement).attr));
+                    if(childElement instanceof NamespaceParseNode) {
+                        namespaces.add(((NamespaceParseNode) childElement).namespace);
+                    } else {
+                        if (childElement instanceof PropertyParseNode) {
+                            properties.add(new ElementProperty(childElementKey, ((PropertyParseNode) childElement).namespace, ((PropertyParseNode) childElement).attr));
+                        }
+
+                        children.add(generateForm(Collections.singletonList(childElement), childElementKey, element, key, parentElement instanceof PropertyGroupParseNode ? key : null, lastGroupObjectParent));
                     }
-
-                    children.add(generateForm(Arrays.asList(childElement), childElementKey, element, key, parentElement instanceof PropertyGroupParseNode ? key : null, lastGroupObjectParent));
-
                 }
 
             } else {
@@ -254,8 +260,9 @@ public abstract class GenerateFormAction extends AnAction {
             }
         }
 
+        String namespacePropertiesScript = getNamespacePropertiesScript(parentElement instanceof PropertyGroupParseNode ? key : null, namespaces);
         propertiesScript = propertiesScript != null ? propertiesScript : getPropertiesScript(lastGroupObjectParent, parentElement instanceof PropertyGroupParseNode ? key : null, properties);
-        return new CodeBlock(formName, groupDeclarationScripts, propertyDeclarationScripts, objectsScripts, propertiesScript, filtersScript, children);
+        return new CodeBlock(formNameScript, groupDeclarationScripts, propertyDeclarationScripts, objectsScripts, namespacePropertiesScript, propertiesScript, filtersScript, children);
     }
 
     private boolean hasPropertyGroupParseNodeChildren(ParseNode element) {
@@ -342,16 +349,27 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getExtIDScript(ElementKey key, ElementNamespace namespace) {
+        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + (namespace != null ? (namespace.prefix + ":") : "") + key.extID + "'") : "";
+    }
+
+    private String getFormNameScript(String formName, ElementNamespace formNamespace) {
+        String formId = formName == null ? "generated" : Introspector.decapitalize(formName);
+        String formExtId = formId.equals(formName) && formNamespace == null ? "" : (" FORMEXTID '" + getNamespaceScript(formNamespace) + formName + "'");
+        return "FORM " + formId + formExtId;
+    }
+
+    private String getNamespaceScript(ElementNamespace namespace) {
         String namespaceScript = "";
         if (namespace != null) {
-            if (!usedNamespacePrefixes.contains(namespace.prefix)) {
-                usedNamespacePrefixes.add(namespace.prefix);
+            String prefixOrUri = namespace.prefix.isEmpty() ? namespace.uri : namespace.prefix;
+            if (!usedNamespacePrefixes.contains(prefixOrUri)) {
+                usedNamespacePrefixes.add(prefixOrUri);
                 namespaceScript = namespace.prefix + "=" + namespace.uri + ":";
             } else {
                 namespaceScript = namespace.prefix + ":";
             }
         }
-        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + namespaceScript + key.extID + "'") : "";
+        return namespaceScript;
     }
 
     private String getPropertiesScript(ElementKey object, ElementKey inGroup, Set<ElementProperty> properties) {
@@ -360,7 +378,17 @@ public abstract class GenerateFormAction extends AnAction {
                     "(" + (object == null ? "" : object.ID) + ") " +
                     (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) +
                     properties.stream().map(ElementProperty::getScript).collect(Collectors.joining(", ")) +
-                    (object != null ? "\nFILTERS " + properties.iterator().next().key.ID + "(" + object.ID + ")" : "");
+                    (object != null ? "\nFILTERS " + "imported(" + object.ID + ")" : "");
+        } else return null;
+    }
+
+    private String getNamespacePropertiesScript(ElementKey inGroup, List<ElementNamespace> namespaces) {
+        if(!namespaces.isEmpty()) {
+            return "PROPERTIES ATTR " + (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) +
+                    namespaces.stream().filter(ns -> {
+                        String prefixOrUri = ns.prefix.isEmpty() ? ns.uri : ns.prefix;
+                        return usedNamespacePrefixes.add(prefixOrUri); //true if didn't already contain
+                    }).map(ns -> "='" + ns.uri + "' EXTID 'xmlns:" + ns.prefix + "'").collect(Collectors.joining(", "));
         } else return null;
     }
 
@@ -390,21 +418,24 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private class CodeBlock {
-        String formName;
+        String formNameScript;
         Set<String> groupDeclarationScripts;
         Set<String> propertyDeclarationScripts;
         Set<String> objectsScripts;
+        String namespacePropertiesScript;
         String propertiesScript;
         String filtersScript;
 
         List<CodeBlock> children;
 
-        CodeBlock(String formName, Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts,
-                  Set<String> objectsScripts, String propertiesScript, String filtersScript, List<CodeBlock> children) {
-            this.formName = formName;
+        CodeBlock(String formNameScript, Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts,
+                  Set<String> objectsScripts, String namespacePropertiesScript, String propertiesScript, String filtersScript,
+                  List<CodeBlock> children) {
+            this.formNameScript = formNameScript;
             this.groupDeclarationScripts = groupDeclarationScripts;
             this.propertyDeclarationScripts = propertyDeclarationScripts;
             this.objectsScripts = objectsScripts;
+            this.namespacePropertiesScript = namespacePropertiesScript;
             this.propertiesScript = propertiesScript;
             this.filtersScript = filtersScript;
             this.children = children;
@@ -412,13 +443,13 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private class Form {
-        String formName;
+        String formNameScript;
         Set<String> groupDeclarationScripts;
         Set<String> propertyDeclarationScripts;
         List<String> formScripts;
 
-        Form(String formName, Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts, List<String> formScripts) {
-            this.formName = formName;
+        Form(String formNameScript, Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts, List<String> formScripts) {
+            this.formNameScript = formNameScript;
             this.groupDeclarationScripts = groupDeclarationScripts;
             this.propertyDeclarationScripts = propertyDeclarationScripts;
             this.formScripts = formScripts;
@@ -486,6 +517,14 @@ public abstract class GenerateFormAction extends AnAction {
         }
     }
 
+    class NamespaceParseNode extends ParseNode {
+        ElementNamespace namespace;
+        NamespaceParseNode(ElementNamespace namespace) {
+            super(null, new ArrayList<>());
+            this.namespace = namespace;
+        }
+    }
+
     class ElementProperty {
         ElementKey key;
         ElementNamespace namespace;
@@ -498,7 +537,8 @@ public abstract class GenerateFormAction extends AnAction {
         }
 
         public String getScript() {
-            return key.ID + getExtIDScript(key, namespace) + (attr ? " ATTR" : "");
+            //attr don't need namespace
+            return key.ID + getExtIDScript(key, attr ? null : namespace) + (attr ? " ATTR" : "");
         }
     }
 
