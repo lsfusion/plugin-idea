@@ -3,6 +3,7 @@ package com.lsfusion.actions.generate;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 
 import java.io.ByteArrayInputStream;
@@ -90,6 +91,11 @@ public class GenerateFormXMLAction extends GenerateFormAction {
                 children.add(new PropertyParseNode(attribute.getName(), namespace, true));
             }
 
+            //declared in this node namespaces
+            for(Namespace ns : element.getNamespacesIntroduced()) {
+                children.add(new NamespaceParseNode(new ElementNamespace(ns.getPrefix(), ns.getURI())));
+            }
+
             List<ParseNode> result = new ArrayList<>();
             if(noChildren) { //assert !noAttributes
                 result.add(new PropertyParseNode(key, namespace, false));
@@ -114,6 +120,6 @@ public class GenerateFormXMLAction extends GenerateFormAction {
     private ElementNamespace getElementNamespace(Element element) {
         String prefix = element.getNamespacePrefix();
         String uri = element.getNamespaceURI();
-        return !prefix.isEmpty() ? new ElementNamespace(prefix, uri) : null;
+        return /*!prefix.isEmpty() ? */new ElementNamespace(prefix, uri)/* : null*/;
     }
 }

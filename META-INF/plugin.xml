@@ -10,6 +10,7 @@
         <b>Version 1.0.207</b><br>
         <ul>
             <li>Bugfix of incorrect meta generation with color literals</li>
+            <li>Generate form from xml: namespaces fixes</li>
             <li>Add custom property render / edit support</li>
         </ul>
     ]]>
