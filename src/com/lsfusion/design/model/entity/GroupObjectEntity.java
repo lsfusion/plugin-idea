@@ -32,7 +32,7 @@ public class GroupObjectEntity {
         this.sID = sID;
 
         if (viewType != null) {
-            ClassViewType type = valueOf(viewType.getClassViewType().getText());
+            ClassViewType type = viewType.getClassViewType() == null ? initClassView : valueOf(viewType.getClassViewType().getText());
             String mode = viewType.getFirstChild().getText();
             if (!"INIT".equals(mode)) {
                 for (ClassViewType t : values()) {
