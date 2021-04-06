@@ -233,8 +233,6 @@ STRING_META_LITERAL = ({STRING_LITERAL_ID} ("###" | "##"))* {STRING_LITERAL} (("
   "CANONICALNAME"                  		{ return CANONICALNAME; }
   "CSV"                  			    { return CSV; }
   "CUSTOM"                  			{ return CUSTOM; }
-  "RENDER"                  			{ return RENDER; }
-  "REPLACE"                  			{ return REPLACE; }
   "CYCLES"                  			{ return CYCLES; }
   "DATA"                    			{ return DATA; }
   "DBF"                    			    { return DBF; }
@@ -422,7 +420,8 @@ STRING_META_LITERAL = ({STRING_LITERAL_ID} ("###" | "##"))* {STRING_LITERAL} (("
   "REFLECTION"                  		{ return REFLECTION; }
   "REGEXP"                  			{ return REGEXP; }
   "REMOVE"                  			{ return REMOVE; }
-  "SUBREPORT"              			    { return SUBREPORT; }
+  "RENDER"                  			{ return RENDER; }
+  "REPLACE"                  			{ return REPLACE; }
   "REPORT"              			    { return REPORT; }
   "REPORTFILES"              			{ return REPORTFILES; }
   "REQUEST"                 			{ return REQUEST; }
@@ -459,6 +458,7 @@ STRING_META_LITERAL = ({STRING_LITERAL_ID} ("###" | "##"))* {STRING_LITERAL} (("
   "STRICT"                  			{ return STRICT; }
   "STRUCT"                  			{ return STRUCT; }
   "SUBJECT"                 			{ return SUBJECT; }
+  "SUBREPORT"              			    { return SUBREPORT; }
   "SUM"                     			{ return SUM; }
   "TAB"                   		        { return TAB; }
   "TABBED"                  			{ return TABBED; }
