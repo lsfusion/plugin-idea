@@ -596,11 +596,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             nextSibling = nextSibling.getNextSibling();
         }
 
-        if (stringLiteral != null && message != null) {
-            Annotation annotation = myHolder.createErrorAnnotation(stringLiteral, message);
-            annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_ERROR);
-            addError(stringLiteral, annotation);
-        }
+        if (stringLiteral != null && message != null)
+            addUnderscoredError(customView, message);
     }
 
     @Override
