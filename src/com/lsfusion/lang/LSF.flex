@@ -421,7 +421,8 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME"
   "REFLECTION"                  		{ return REFLECTION; }
   "REGEXP"                  			{ return REGEXP; }
   "REMOVE"                  			{ return REMOVE; }
-  "SUBREPORT"              			    { return SUBREPORT; }
+  "RENDER"                  			{ return RENDER; }
+  "REPLACE"                  			{ return REPLACE; }
   "REPORT"              			    { return REPORT; }
   "REPORTFILES"              			{ return REPORTFILES; }
   "REQUEST"                 			{ return REQUEST; }
@@ -458,6 +459,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME"
   "STRICT"                  			{ return STRICT; }
   "STRUCT"                  			{ return STRUCT; }
   "SUBJECT"                 			{ return SUBJECT; }
+  "SUBREPORT"              			    { return SUBREPORT; }
   "SUM"                     			{ return SUM; }
   "TAB"                   		        { return TAB; }
   "TABBED"                  			{ return TABBED; }

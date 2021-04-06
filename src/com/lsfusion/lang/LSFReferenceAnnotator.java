@@ -49,8 +49,8 @@ import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
@@ -555,6 +555,49 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitLocalPropDeclaration(o);
 
         checkAlreadyDefined(o);
+    }
+
+    @Override
+    public void visitPropertyCustomView(@NotNull LSFPropertyCustomView customView) {
+        super.visitPropertyCustomView(customView);
+        String renderPattern = "[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:[a-zA-Z]+\\w*";
+        String editPattern = "[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:([a-zA-Z]+\\w*)?";
+        String textEditPattern = "[a-zA-Z]+\\w*:[a-zA-Z]+\\w*";
+        String replaceEditPattern = "[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:([a-zA-Z]+\\w*)?";
+
+        LSFStringLiteral stringLiteral = null;
+        String message = null;
+        int literalIndex = 0;
+
+        PsiElement firstChild = customView.getFirstChild();
+        PsiElement nextSibling = firstChild.getNextSibling();
+        while (nextSibling != null){
+            if (nextSibling.getText().equals("RENDER")) {
+                stringLiteral = customView.getStringLiteralList().get(literalIndex);
+                literalIndex++;
+                if (!stringLiteral.getValue().matches(renderPattern))
+                    message = "Wrong render functions definition: '<render_function_name>:<set_value_function_name>:<clear_function_name>' expected";
+            } else if (nextSibling.getText().equals("EDIT") && !(customView.getText().contains("TEXT")) && !(customView.getText().contains("REPLACE"))) {
+                stringLiteral = customView.getStringLiteralList().get(literalIndex);
+                literalIndex++;
+                if (!stringLiteral.getValue().matches(editPattern))
+                    message = "Wrong edit functions definition: '<start_editing_function_name>:<commit_editing_function_name>:<on_browser_event_function_name>' expected";
+            } else if (nextSibling.getText().equals("TEXT")) {
+                stringLiteral = customView.getStringLiteralList().get(literalIndex);
+                literalIndex++;
+                if (!stringLiteral.getValue().matches(textEditPattern))
+                    message = "Wrong text edit functions definition: '<render_function_name>:<clear_render_function_name>' expected";
+            } else if (nextSibling.getText().equals("REPLACE")) {
+                stringLiteral = customView.getStringLiteralList().get(literalIndex);
+                literalIndex++;
+                if (!stringLiteral.getValue().matches(replaceEditPattern))
+                    message = "Wrong replace edit functions definition: '<render_function_name>:<start_editing_function_name>:<commit_editing_function_name>:<clear_render_function_name>:<on_browser_event_function_name>' expected";
+            }
+            nextSibling = nextSibling.getNextSibling();
+        }
+
+        if (stringLiteral != null && message != null)
+            addUnderscoredError(customView, message);
     }
 
     @Override
