@@ -1432,7 +1432,7 @@ formSubReport ::= SUBREPORT formCalcPropertyObject?
 
 classViewType ::= PANEL | GRID | TOOLBAR
 
-propertyCustomView ::= CUSTOM stringLiteral
+propertyCustomView ::= CUSTOM (RENDER stringLiteral)? (EDIT (PRIMITIVE_TYPE | REPLACE)? stringLiteral)?
 
 listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | MAP | (CUSTOM stringLiteral) | CALENDAR
 

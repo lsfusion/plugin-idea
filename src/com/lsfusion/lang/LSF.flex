@@ -233,6 +233,8 @@ STRING_META_LITERAL = ({STRING_LITERAL_ID} ("###" | "##"))* {STRING_LITERAL} (("
   "CANONICALNAME"                  		{ return CANONICALNAME; }
   "CSV"                  			    { return CSV; }
   "CUSTOM"                  			{ return CUSTOM; }
+  "RENDER"                  			{ return RENDER; }
+  "REPLACE"                  			{ return REPLACE; }
   "CYCLES"                  			{ return CYCLES; }
   "DATA"                    			{ return DATA; }
   "DBF"                    			    { return DBF; }
