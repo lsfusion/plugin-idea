@@ -68,7 +68,11 @@ public class LSFResourceBundleUtils {
                         propFiles.put(language.isEmpty() ? "default" : language, propertiesFile);
                         propertiesFilesMap.put(resourceBundleName, propFiles);
 
-                        updateResourceBundleMaps(propertiesFile.getVirtualFile());
+                        try {
+                            updateResourceBundleMaps(propertiesFile.getVirtualFile());
+                        } catch (IOException e) {
+                            throw new RuntimeException("Failed to read ResourceBundle", e);
+                        }
                     }
                 }
                 scopeData = new ScopeData(resourceBundleFiles, propertiesFilesMap);
@@ -92,7 +96,7 @@ public class LSFResourceBundleUtils {
         lsfStrLiteralsLanguageMap.put(scope, value);
     }
 
-    public static void updateResourceBundleMaps(VirtualFile file) {
+    public static void updateResourceBundleMaps(VirtualFile file) throws IOException {
         String path = file.getPath();
         ResourceBundle resourceBundle = readResourceBundle(path);
 
@@ -117,7 +121,10 @@ public class LSFResourceBundleUtils {
                 }
             }
         } else if (isResourceBundle(file.getName())) {
-            updateResourceBundleMaps(file);
+            try {
+                updateResourceBundleMaps(file);
+            } catch (IOException ignored) {
+            }
         }
     }
 
@@ -129,12 +136,8 @@ public class LSFResourceBundleUtils {
         return fileName.matches("([^/]*ResourceBundle)(?:_(.*))?\\.properties");
     }
 
-    private static ResourceBundle readResourceBundle(String path) {
-        try {
-            return new PropertyResourceBundle(new FileInputStream(path));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read ResourceBundle", e);
-        }
+    private static ResourceBundle readResourceBundle(String path) throws IOException {
+        return new PropertyResourceBundle(new FileInputStream(path));
     }
 
     public static Map<String, String> getOrdinaryMap(String path) {
