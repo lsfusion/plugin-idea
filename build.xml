@@ -59,11 +59,11 @@
     </path>
 
     <!-- Register Custom Compiler Taskdefs -->
-    <property name="javac2.home" value="${idea.home}/lib"/>
+    <property name="javac2.home" value="${idea.home}/plugins/java/lib"/>
     <path id="javac2.classpath">
         <pathelement location="${javac2.home}/javac2.jar"/>
-        <pathelement location="${javac2.home}/jdom.jar"/>
-        <pathelement location="${javac2.home}/asm-all-9.1.jar"/>
+        <pathelement location="${idea.home}/lib/jdom.jar"/>
+        <pathelement location="${idea.home}/lib/asm-all-9.1.jar"/>
     </path>
     <target name="register.custom.compilers">
         <!--suppress AntResolveInspection : used in Linux -->
