@@ -1378,6 +1378,7 @@ groupObjectReportPath ::= (TOP | groupObjectUsage) formCalcPropertyObject
 formDecl ::= FORM simpleNameWithCaption
 		            (   IMAGE stringLiteral
 		            |   AUTOREFRESH intLiteral
+		            |   LOCALASYNC
 		            )*
 {
     pin = 2

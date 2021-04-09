@@ -334,6 +334,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME"
   "LIMIT"                   			{ return LIMIT; }
   "LIST"                    			{ return LIST; }
   "LOCAL"                   			{ return LOCAL; }
+  "LOCALASYNC"                   		{ return LOCALASYNC; }
   "LOGGABLE"                			{ return LOGGABLE; }
   "LSF"                    			    { return LSF; }
   "MANAGESESSION"           			{ return MANAGESESSION; }
