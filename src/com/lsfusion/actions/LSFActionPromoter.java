@@ -24,7 +24,7 @@ public class LSFActionPromoter implements ActionPromoter {
     };
 
     @Override
-    public List<AnAction> promote(List<AnAction> actions, DataContext context) {
+    public List<AnAction> promote(List<? extends AnAction> actions, DataContext context) {
         ArrayList<AnAction> result = new ArrayList<>(actions);
         result.sort(ACTIONS_COMPARATOR);
         return result;

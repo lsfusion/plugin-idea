@@ -63,7 +63,7 @@
     <path id="javac2.classpath">
         <pathelement location="${javac2.home}/javac2.jar"/>
         <pathelement location="${javac2.home}/jdom.jar"/>
-        <pathelement location="${javac2.home}/asm-all-9.0.jar"/>
+        <pathelement location="${javac2.home}/asm-all-9.1.jar"/>
     </path>
     <target name="register.custom.compilers">
         <!--suppress AntResolveInspection : used in Linux -->
@@ -115,12 +115,12 @@
         <pathelement location="${buildLib}/grammar-kit.jar"/>
         <file name="${basedir}/lib/psiImplUtils.jar"/>
         <fileset dir="${idea.home}/lib">
-            <include name="asm-all-9.0.jar"/>
+            <include name="asm-all-9.1.jar"/>
             <include name="automaton-1.12-1.jar"/>
             <include name="extensions.jar"/>
             <include name="guava-29.0-jre.jar"/>
             <include name="idea.jar"/>
-            <include name="intellij-deps-fastutil-8.4.1-4.jar"/>
+            <include name="intellij-deps-fastutil-8.5.2-6.jar"/>
             <include name="jdom.jar"/>
             <include name="platform-api.jar"/>
             <include name="platform-concurrency.jar"/>

@@ -36,7 +36,7 @@ public class GeneratedParserUtilBase {
 
     public static final WhitespacesAndCommentsBinder GREEDY_WHITESPACE_AND_COMMENTS_PROCESSOR = new WhitespacesAndCommentsBinder() {
         @Override
-        public int getEdgePosition(final List<IElementType> tokens, final boolean atStreamEdge, final TokenTextGetter getter) {
+        public int getEdgePosition(final List<? extends IElementType> tokens, final boolean atStreamEdge, final TokenTextGetter getter) {
             return tokens.size();
         }
     };
