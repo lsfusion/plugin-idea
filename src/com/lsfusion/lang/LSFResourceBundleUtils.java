@@ -112,19 +112,19 @@ public class LSFResourceBundleUtils {
     }
 
     public static void updateFile(Project project, VirtualFile file) {
-        if (isLsfusionProperties(file.getName())) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-            if(psiFile != null) {
-                Module module = ModuleUtil.findModuleForPsiElement(psiFile);
-                if (module != null) {
-                    getLsfStrLiteralsLanguage(module, true);
+        try {
+            if (isLsfusionProperties(file.getName())) {
+                PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+                if (psiFile != null) {
+                    Module module = ModuleUtil.findModuleForPsiElement(psiFile);
+                    if (module != null) {
+                        getLsfStrLiteralsLanguage(module, true);
+                    }
                 }
-            }
-        } else if (isResourceBundle(file.getName())) {
-            try {
+            } else if (isResourceBundle(file.getName())) {
                 updateResourceBundleMaps(file);
-            } catch (IOException ignored) {
             }
+        } catch (IOException ignored) {
         }
     }
 
