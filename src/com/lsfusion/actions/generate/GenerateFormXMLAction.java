@@ -28,12 +28,14 @@ public class GenerateFormXMLAction extends GenerateFormAction {
 
     private Charset getCharset(String file) {
         try {
-            Pattern p = Pattern.compile("<\\?xml version=\".*\" encoding=\"(.*)\".*");
+            Pattern p = Pattern.compile("<\\?xml version=\".*\" encoding=\"(.*)\"\\?.*");
             Matcher m = p.matcher(file.substring(0, Math.max(file.indexOf("\n"), file.length())));
-            return m.matches() ? Charset.forName(m.group(1)) : StandardCharsets.UTF_8;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse charset", e);
+            if (m.matches()) {
+                return Charset.forName(m.group(1));
+            }
+        } catch (Exception ignored) {
         }
+        return StandardCharsets.UTF_8;
     }
 
     @Override

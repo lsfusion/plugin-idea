@@ -7,7 +7,7 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.208</b><br>
+        <b>Version 1.0.209</b><br>
         <ul>
             <li>Generate form from xml charset fix</li>
         </ul>
