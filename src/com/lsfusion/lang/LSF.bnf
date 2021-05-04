@@ -1602,6 +1602,7 @@ formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 predefinedAddPropertyName ::=  NEW | NEWEDIT | EDIT
 
 predefinedFormPropertyName ::= VALUE
+                           |    INTERVAL
                            |    predefinedAddPropertyName (LSQBR explicitPropClass RSQBR)?
                            |    DELETE
 {

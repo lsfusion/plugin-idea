@@ -323,6 +323,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME"
   "INLINE"                  			{ return INLINE; }
   "INPUT"                   			{ return INPUT; }
   "INTERNAL"                            { return INTERNAL; }
+  "INTERVAL"                            { return INTERVAL; }
   "IS"                      			{ return IS; }
   "JAVA"                  			    { return JAVA; }
   "JOIN"                    			{ return JOIN; }
