@@ -1435,9 +1435,11 @@ classViewType ::= PANEL | GRID | TOOLBAR
 
 propertyCustomView ::= CUSTOM (RENDER stringLiteral)? (EDIT (PRIMITIVE_TYPE | REPLACE)? stringLiteral)?
 
-listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | MAP | (CUSTOM stringLiteral) | CALENDAR
+listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral) | CALENDAR
 
 pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS))*
+
+mapOptions ::= stringLiteral
 
 formGroupObjectPageSize ::= PAGESIZE intLiteral
 

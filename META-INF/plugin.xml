@@ -10,6 +10,7 @@
         <b>Version 1.0.210</b><br>
         <ul>
             <li>support INTERVAL operator in form</li>
+            <li>support MAP options in form</li>
         </ul>
     ]]>
     </change-notes>

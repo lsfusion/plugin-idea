@@ -1133,4 +1133,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         }
     }
+
+    @Override
+    public void visitMapOptions(@NotNull LSFMapOptions o) {
+        super.visitMapOptions(o);
+        String option = o.getFirstChild().getText();
+        if (!option.equals("'google'") && !option.equals("'yandex'")) {
+            addUnderscoredError(o, "Wrong map option definition: 'google' or 'yandex' expected");
+        }
+    }
 }
