@@ -374,6 +374,33 @@ public class LSFPsiImplUtil {
         return new ExprsContextInferrer(sourceStatement.getPropertyExpressionList());
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFObjectListInputProps sourceStatement) {
+        LSFFormActionObjectUsage formActionObject = PsiTreeUtil.getParentOfType(sourceStatement, LSFFormActionObjectUsage.class);
+        return (offset, currentParams) -> Collections.singletonList(formActionObject);
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFObjectListInputProps sourceStatement) {
+        return new ExprsContextInferrer(sourceStatement.getPropertyExpression());
+    }
+
+    public static ContextModifier getContextModifier(@NotNull LSFListWhereInputProps sourceStatement) {
+        LSFInputActionPropertyDefinitionBody inputAction = PsiTreeUtil.getParentOfType(sourceStatement, LSFInputActionPropertyDefinitionBody.class);
+        LSFClassSet resolveClass = inputAction.resolveClass();
+        if(resolveClass instanceof DataClass)
+            return new ExprsContextModifier(sourceStatement.getPropertyExpressionList());
+        else {
+            LSFParamDeclare paramDeclare = inputAction.getParamDeclare();
+            if(paramDeclare == null)
+                return ContextModifier.EMPTY;
+
+            return (offset, currentParams) -> Collections.singletonList(inputAction.getParamDeclare());
+        }
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFListWhereInputProps sourceStatement) {
+        return ContextInferrer.EMPTY;
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFDoMainBody sourceStatement) {
         ExtendDoParamContext context = PsiTreeUtil.getParentOfType(sourceStatement, ExtendDoParamContext.class);
         return context == null ? null : context.getDoContextModifier();
@@ -816,11 +843,13 @@ public class LSFPsiImplUtil {
         if(builtInClassName != null)
             return resolve(builtInClassName);
 
-        List<LSFPropertyExpression> list = sourceStatement.getPropertyExpressionList();
-        if(!list.isEmpty()) {
-            LSFPropertyExpression pe = list.get(0);
-            if (pe != null)
-                return LSFExClassSet.fromEx(pe.resolveValueClass(false));
+        LSFClassOrExpression list = sourceStatement.getClassOrExpression();
+        if(list != null) {
+            LSFCustomClassUsage customClassUsage = list.getCustomClassUsage();
+            if(customClassUsage != null)
+                return resolveClass(customClassUsage);
+            else
+                return LSFExClassSet.fromEx(list.getPropertyExpression().resolveValueClass(false));
         }
         
         return null;
@@ -3649,7 +3678,7 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFInputActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        Inferred inputInferred = new ExprsContextInferrer(body.getPropertyExpressionList()).inferClasses(params);
+        Inferred inputInferred = new ExprsContextInferrer(body.getPropertyExpression()).inferClasses(params);
         return inferDoInputBody(body.getDoInputBody(), inputInferred, params);
     }
 

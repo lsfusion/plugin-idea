@@ -11,6 +11,8 @@
         <ul>
             <li>support INTERVAL operator in form</li>
             <li>support MAP options in form</li>
+            <li>Object type support in INPUT operator</li>
+            <li>LIST option support in INPUT / DIALOG operators</li>
         </ul>
     ]]>
     </change-notes>

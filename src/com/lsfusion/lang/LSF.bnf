@@ -711,7 +711,14 @@ formSingleActionObject ::= formActionObjectProps
 constraintFilter ::= (CONSTRAINTFILTER (EQUALS propertyExpression)?)
 objectInProps ::= EQUALS propertyExpression NULL? { pin = 1 }
 changeInput ::= (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?) { pin = 1 }
-objectInputProps ::= (INPUT | changeInput) simpleName? NULL? constraintFilter? { pin = 1 } // inputDestination?  
+objectListInputProps ::= LIST propertyExpression
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer ]
+}
+objectInputProps ::= (INPUT | changeInput) simpleName? NULL? constraintFilter? objectListInputProps? { pin = 1 } // inputDestination?
+
 private formActionObjectProps ::= objectInProps? objectInputProps? 
 formActionObjectUsage ::= objectUsage formActionObjectProps {
     pin = 1
@@ -967,9 +974,11 @@ asyncUpdateActionPropertyDefinitionBody ::= ASYNCUPDATE propertyExpression
     methods = [inferActionParamClasses]
 }
 
+objectExpr ::= objectUsage EQUALS propertyExpression
+
 seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST | NULL)? 
                                             (   (objectID EQUALS propertyExpression) 
-                                            |   (groupObjectID (OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)*)?) 
+                                            |   (groupObjectID (OBJECTS objectExpr (COMMA objectExpr)*)?)
                                             )
 {                        
     pin = 1
@@ -978,7 +987,7 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST | NULL)?
 }
 
 expandGroupObjectActionPropertyDefinitionBody ::= EXPAND (DOWN | UP | ALL (TOP)?)?
-                                            groupObjectID (OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)*)?
+                                            groupObjectID (OBJECTS objectExpr (COMMA objectExpr)*)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
@@ -986,7 +995,7 @@ expandGroupObjectActionPropertyDefinitionBody ::= EXPAND (DOWN | UP | ALL (TOP)?
 }
 
 collapseGroupObjectActionPropertyDefinitionBody ::= COLLAPSE (DOWN | ALL (TOP)?)?
-                                            groupObjectID (OBJECTS formActionObjectUsage (COMMA formActionObjectUsage)*)?
+                                            groupObjectID (OBJECTS objectExpr (COMMA objectExpr)*)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
@@ -995,7 +1004,7 @@ collapseGroupObjectActionPropertyDefinitionBody ::= COLLAPSE (DOWN | ALL (TOP)?)
 
 // the same trick as with formPropertyDrawMappedDecl
 parameterOrExpression ::=
-        (<<checParameterOrExpression>> &((exprParameterUsage <<matchedSingleParameter>>)?) propertyExpression <<matchedParameterOrExpression>>) | 
+        (<<checkParameterOrExpression>> &((exprParameterUsage <<matchedSingleParameter>>)?) propertyExpression <<matchedParameterOrExpression>>) |
         exprParameterUsage
 nonEmptyParameterOrExpressionList ::= parameterOrExpression (COMMA parameterOrExpression)* { pin(".*") = 1}
 parameterOrExpressionList ::= (nonEmptyParameterOrExpressionList)?
@@ -1135,7 +1144,18 @@ requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO 
     methods = [inferActionParamClasses]
 }
 
-inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS propertyExpression)) (CHANGE (EQUALS propertyExpression)?)? doInputBody // inputDestination? 
+// the same trick as with formPropertyDrawMappedDecl
+classOrExpression ::=
+        (<<checkClassOrExpression>> &((customClassUsage <<matchedClass>>)?) propertyExpression <<matchedClassOrExpression>>) |
+        customClassUsage
+private listInputProp ::= LIST propertyExpression {pin = 1}
+private whereInputProp ::= WHERE propertyExpression {pin = 1}
+listWhereInputProps ::= listInputProp? whereInputProp?
+{
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer ]
+}
+inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? listWhereInputProps doInputBody // inputDestination?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
@@ -1652,7 +1672,7 @@ formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage 
 
 overrideActionStatement ::= mappedActionClassParamDeclare PLUS
 		                (WHEN propertyExpression THEN)?
-		                topActionPropertyDefinitionBody		                
+		                topActionPropertyDefinitionBody OPTIMISTICASYNC?
 {
 //    pin = 2;
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
