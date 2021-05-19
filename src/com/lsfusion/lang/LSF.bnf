@@ -1155,7 +1155,7 @@ listWhereInputProps ::= listInputProp? whereInputProp?
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer ]
 }
-inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? listWhereInputProps doInputBody // inputDestination?
+inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? listWhereInputProps formSessionScopeClause? doInputBody // inputDestination?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
