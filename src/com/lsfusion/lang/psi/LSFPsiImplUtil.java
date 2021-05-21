@@ -657,6 +657,8 @@ public class LSFPsiImplUtil {
                     return TimeIntervalClass.instance;
                 case "DATETIME" :
                     return DateTimeIntervalClass.instance;
+                case "ZDATETIME" :
+                    return ZDateTimeIntervalClass.instance;
             }
         }
 

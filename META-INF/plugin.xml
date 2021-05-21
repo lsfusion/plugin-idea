@@ -13,6 +13,7 @@
             <li>support MAP options in form</li>
             <li>Object type support in INPUT operator</li>
             <li>LIST option support in INPUT / DIALOG operators</li>
+            <li>support INTERVAL[ZDATETIME] literal</li>
         </ul>
     ]]>
     </change-notes>
