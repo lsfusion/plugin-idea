@@ -31,6 +31,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
+import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.IntegralClass;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
@@ -504,12 +505,37 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitClassExtend(o);
 
         checkAlreadyDefined(o);
+        checkRecursiveExtend(o);
     }
 
     private void checkAlreadyDefined(@NotNull LSFExtend o) {
         for (LSFDeclaration duplicate : (Set<LSFDeclaration>) o.resolveDuplicates()) {
             addAlreadyDefinedError(duplicate);
         }
+    }
+
+    private void checkRecursiveExtend(@NotNull LSFExtend o) {
+        LSFFullNameDeclaration decl = o.resolveDecl();
+        if(decl instanceof LSFClassDeclaration) {
+
+            Set<LSFValueClass> classes = new HashSet<>();
+
+            if(checkRecursiveExtend((LSFClassDeclaration) decl, classes)) {
+                addUnderscoredError(o, "Recursive EXTEND CLASS");
+            }
+        }
+    }
+
+    private boolean checkRecursiveExtend(LSFClassDeclaration decl, Set<LSFValueClass> classes) {
+        for (LSFClassDeclaration parent : CustomClassSet.getParents(decl)) {
+            if (!classes.contains(parent)) {
+                classes.add(parent);
+                return checkRecursiveExtend(parent, classes);
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
