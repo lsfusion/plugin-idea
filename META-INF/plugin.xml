@@ -14,7 +14,7 @@
             <li>Object type support in INPUT operator</li>
             <li>LIST option support in INPUT / DIALOG operators</li>
             <li>support INTERVAL[ZDATETIME] literal</li>
-            <li>EXTEND CLASS recursion guard & check</li>
+            <li>EXTEND CLASS recursion guard and check</li>
         </ul>
     ]]>
     </change-notes>
