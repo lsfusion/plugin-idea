@@ -58,8 +58,7 @@ public class CustomClassSet implements LSFClassSet {
 
     public static void getParentsRecursively(LSFClassDeclaration decl, Set<LSFValueClass> result) {
         for (LSFClassDeclaration parent : getParents(decl)) {
-            if (!result.contains(parent)) {
-                result.add(parent);
+            if (result.add(parent)) {
                 getParentsRecursively(parent, result);
             }
         }
