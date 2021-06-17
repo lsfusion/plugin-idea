@@ -141,6 +141,7 @@
 
         <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupingRuleProvider"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>
+        <lang.documentationProvider language="Lsf" implementationClass="com.lsfusion.documentation.LSFDocumentationProvider" order="first"/>
         <usageTypeProvider implementation="com.lsfusion.usage.LSFUsageTypeProvider"/>
         <usageFilteringRuleProvider implementation="com.lsfusion.usage.LSFUsageFilteringRuleProvider"/>
         <findUsagesHandlerFactory implementation="com.lsfusion.usage.LSFFindUsagesHandlerFactory"/>
