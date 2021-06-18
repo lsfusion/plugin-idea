@@ -17,7 +17,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.beans.Introspector;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
@@ -140,11 +143,34 @@ public abstract class GenerateFormAction extends AnAction {
             try {
                 final FileChooserDescriptor fileChooser = FileChooserDescriptorFactory.createSingleFileDescriptor(getExtension());
                 VirtualFile file = FileChooser.chooseFile(fileChooser, actionEvent.getProject(), null);
-                String inputFile = file != null ? Files.readString(Paths.get(file.getPath())) : null;
-                generate(inputFile);
+                if(file != null) {
+                    String inputFile = readFile(Paths.get(file.getPath()));
+                    if(inputFile != null) {
+                        generate(inputFile);
+                    } else {
+                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Unknown charset", "Read file failed", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Read file failed", JOptionPane.ERROR_MESSAGE);
             }
+        }
+
+        String[] extraCharsets = new String[]{"cp1251"};
+        private String readFile(Path file) {
+            String result = null;
+            try {
+                result = Files.readString(file);
+            } catch (IOException e) {
+                for (String charset : extraCharsets) {
+                    try {
+                        result = Files.readString(file, Charset.forName(charset));
+                        break;
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+            return result;
         }
 
         private void showFormScript(CodeBlock formCodeBlock) {
