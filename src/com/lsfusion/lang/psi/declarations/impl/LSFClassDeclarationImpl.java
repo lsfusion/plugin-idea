@@ -39,7 +39,7 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
 
     @Override
     public LSFId getNameIdentifier() {
-        return getSimpleNameWithCaption().getSimpleName();
+        return getSimpleNameWithCaption() != null ? getSimpleNameWithCaption().getSimpleName() : null;
     }
 
     @Override

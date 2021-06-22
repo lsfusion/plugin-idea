@@ -134,6 +134,7 @@ private inner_statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE 
 classDecl ::= CLASS (ABSTRACT | NATIVE)? COMPLEX? simpleNameWithCaption
                 <<setDocumentation "classDecl" "CLASS_statement">>
 {
+     pin = 1
      mixin = "com.lsfusion.lang.psi.declarations.impl.LSFClassDeclarationImpl"
      implements = "com.lsfusion.lang.psi.declarations.LSFClassDeclaration"
      stubClass = "com.lsfusion.lang.psi.stubs.ClassStubElement"
@@ -142,11 +143,11 @@ classDecl ::= CLASS (ABSTRACT | NATIVE)? COMPLEX? simpleNameWithCaption
 
 extendingClassDeclaration ::= EXTEND CLASS customClassUsageWrapper
             <<setDocumentation "extendingClassDeclaration" "EXTEND_CLASS_statement">>
+            {pin = 2}
 
 customClassUsageWrapper ::= customClassUsage // for usages search filter
 
 classStatement ::= (classDecl | extendingClassDeclaration) classInstancesAndParents
-            <<setDocumentation "classStatement" "CLASS_statement">>
 {
     pin = 1
     mixin="com.lsfusion.lang.psi.extend.impl.LSFClassExtendImpl"
@@ -317,22 +318,28 @@ notPE ::= (NOT notPE) | equalityPE
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 equalityPE ::= relationalPE ((EQ_OPERAND | EQUALS) relationalPE)?
+            <<setDocumentation "equalityPE" "Comparison_operators_=_etc">>
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 relationalPE ::= likePE ((LESS | GREATER | LESS_EQUALS | GREATER_EQUALS) likePE)?
+            <<setDocumentation "relationalPE" "Comparison_operators_=_etc">>
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 likePE ::= additiveORPE (LIKE additiveORPE)?
+            <<setDocumentation "likePE" "Arithmetic_operators_+_-_etc">>
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 additiveORPE ::= additivePE (ADDOR_OPERAND additivePE)*
+            <<setDocumentation "additiveORPE" "Arithmetic_operators_+_-_etc">>
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 additivePE ::= multiplicativePE ((PLUS | MINUS) multiplicativePE)*
+            <<setDocumentation "additivePE" "Arithmetic_operators_+_-_etc">>
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 typeMult ::= MULT | DIV
 multiplicativePE ::= unaryMinusPE (typeMult unaryMinusPE)*
+            <<setDocumentation "multiplicativePE" "Arithmetic_operators_+_-_etc">>
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]}
 
 unaryMinusPE ::= (MINUS unaryMinusPE) | postfixUnaryPE
@@ -399,9 +406,12 @@ joinPropertyDefinition ::= JOIN? (joinUsagePropertyDefinition | joinExprObjectPr
     methods = [ resolveInferredValueClass resolveParamClasses inferParamClasses getParamList getValueClassNames getValuePropertyNames ]
 }
 
-overridePropertyDefinition ::= (OVERRIDE | EXCLUSIVE) nonEmptyPropertyExpressionList
-            <<setDocumentation "overridePropertyDefinition" "OVERRIDE_operator">>
-{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+overrideOperator ::= OVERRIDE
+            <<setDocumentation "overrideOperator" "OVERRIDE_operator">>
+exclusiveOperator ::= EXCLUSIVE
+            <<setDocumentation "exclusiveOperator" "EXCLUSIVE_operator">>
+overridePropertyDefinition ::= (overrideOperator | exclusiveOperator) nonEmptyPropertyExpressionList
+{pin = 1 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 ifElsePropertyDefinition ::= IF propertyExpression
                                     THEN propertyExpression
@@ -480,12 +490,12 @@ castPropertyDefinition ::= builtInClassName LBRAC propertyExpression RBRAC
 
 concatPropertyDefinition ::= CONCAT stringLiteral COMMA nonEmptyPropertyExpressionList
             <<setDocumentation "concatPropertyDefinition" "CONCAT_operator">>
-{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{pin = 1 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 sessionPropertyType ::= PREV | CHANGED | SET | DROPPED | SETCHANGED | DROPCHANGED | SETDROPPED
 sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
             <<setDocumentation "sessionPropertyDefinition" "Change_operators_SET_CHANGED_etc">>
-{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+{pin = 1 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
@@ -493,6 +503,7 @@ signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
 activeTabPropertyDefinition ::= ACTIVE TAB componentID
             <<setDocumentation "activeTabPropertyDefinition" "ACTIVE_TAB_operator">>
 {
+    pin = 1
     implements = "com.lsfusion.lang.psi.context.LSFExpression" 
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames]
 }
@@ -538,6 +549,7 @@ abstractPropertyDefinition ::= ABSTRACT ((CASE | MULTI | VALUE) abstractExclusiv
                                (FULL)? className (LBRAC classNameList RBRAC)?
                                <<setDocumentation "abstractPropertyDefinition" "ABSTRACT_operator">>
 {
+    pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
@@ -582,8 +594,9 @@ groupExprPropertyDefinition ::= GROUP groupPropertyBody
 }		                    
 
 filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID
-            <<setDocumentation "filterPropertyDefinition" "Filter_FILTER">>
+            <<setDocumentation "filterPropertyDefinition" "Object_group_operator">>
 {
+    pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
@@ -676,6 +689,7 @@ abstractActionPropertyDefinition ::= ABSTRACT
                                     (LBRAC classNameList RBRAC)?
                                     <<setDocumentation "abstractActionPropertyDefinition" "ABSTRACT_action_operator">>
 {
+    pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames ]
 }
@@ -810,6 +824,7 @@ dialogActionPropertyDefinitionBody ::=
 		doInputBody
 		<<setDocumentation "dialogActionPropertyDefinitionBody" "DIALOG_operator">>
 {
+    pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
     methods = [inferActionParamClasses resolveFormDecl getDoContextModifier getDoContextInferrer]
 }
@@ -972,7 +987,8 @@ javaClassStringUsage ::= stringLiteral
 private newWhereToClause ::= TO mappedPropertyExprParam { pin = 1 }
 private newWhereClause ::= WHERE propertyExpression newWhereToClause? { pin = 1 }
 
-newWhereActionPropertyDefinitionBody ::= NEW customClassUsage newWhereClause                                                                 
+newWhereActionPropertyDefinitionBody ::= NEW customClassUsage newWhereClause
+            <<setDocumentation "newWhereActionPropertyDefinitionBody" "NEW_operator">>
 {
     pin = 3
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
@@ -1001,7 +1017,7 @@ emailPropertyUsage ::= propertyUsage
 }
 
 confirmActionPropertyDefinitionBody ::= ASK propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody
-            <<setDocumentation "confirmActionPropertyDefinitionBody" "Show_message_MESSAGE_ASK">>
+            <<setDocumentation "confirmActionPropertyDefinitionBody" "ASK_operator">>
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression,com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
@@ -1062,7 +1078,7 @@ parameterOrExpressionList ::= (nonEmptyParameterOrExpressionList)?
 changeClassWhere ::= WHERE propertyExpression
 
 changeClassActionPropertyDefinitionBody ::= CHANGECLASS parameterOrExpression TO customClassUsage changeClassWhere?
-            <<setDocumentation "changeClassActionPropertyDefinitionBody" "Class_change_CHANGECLASS_DELETE">>
+            <<setDocumentation "changeClassActionPropertyDefinitionBody" "CHANGECLASS_operator">>
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
@@ -1070,7 +1086,7 @@ changeClassActionPropertyDefinitionBody ::= CHANGECLASS parameterOrExpression TO
 }
 
 deleteActionPropertyDefinitionBody ::= DELETE parameterOrExpression changeClassWhere?
-            <<setDocumentation "deleteActionPropertyDefinitionBody" "Class_change_CHANGECLASS_DELETE">>
+            <<setDocumentation "deleteActionPropertyDefinitionBody" "DELETE_operator">>
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
@@ -1131,6 +1147,7 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
     (importFormPlainActionSourceType FROM groupObjectUsage EQUALS propertyExpression (COMMA groupObjectUsage EQUALS propertyExpression)*)
     |
     (importFormHierarchicalActionSourceType? (FROM (propertyExpression))?))
+    <<setDocumentation "importFormActionPropertyDefinitionBody" "IMPORT_operator">>
 {
     pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
@@ -1173,12 +1190,15 @@ newExecutorActionPropertyDefinitionBody ::= NEWEXECUTOR actionPropertyDefinition
     methods = [inferActionParamClasses]
 }
 
-newSessionActionPropertyDefinitionBody ::= (    NEWSESSION (NEWSQL)? nestedPropertiesSelector? 
-                                           |    NESTEDSESSION
+newSessionOperator ::= NEWSESSION
+            <<setDocumentation "newSessionOperator" "NEWSESSION_operator">>
+nestedSessionOperator ::= NESTEDSESSION
+            <<setDocumentation "nestedSessionOperator" "NESTEDSESSION_operator">>
+newSessionActionPropertyDefinitionBody ::= (    newSessionOperator (NEWSQL)? nestedPropertiesSelector?
+                                           |    nestedSessionOperator
                                            )
                                            (SINGLE)?
                                            actionPropertyDefinitionBody
-                                           <<setDocumentation "newSessionActionPropertyDefinitionBody" "New_session_NEWSESSION_NESTEDSESSION">>
 {
     pin(".*") = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
@@ -1247,6 +1267,7 @@ activateActionPropertyDefinitionBody ::= ACTIVATE (  FORM formUsage
 listActionPropertyDefinitionBody ::=    LBRACE
 			                            listActionStatement*
 		                                RBRACE
+		                                <<setDocumentation "listActionPropertyDefinitionBody" "Braces_operator">>
 {
     pin = 1
     mixin="com.lsfusion.lang.psi.LSFListActionImpl"
@@ -1499,6 +1520,7 @@ formDecl ::= FORM simpleNameWithCaption
 
 extendingFormDeclaration ::= EXTEND FORM formUsageWrapper
             <<setDocumentation "extendingFormDeclaration" "EXTEND_FORM_statement">>
+            {pin = 2}
 
 formUsageWrapper ::= formUsage // for usages search filter
 
@@ -1827,6 +1849,7 @@ messagePropertyExpression ::= propertyExpression
 followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS baseEvent
                      propertyExpression (RESOLVE LEFT? RIGHT?)?		             
 		             SEMI
+		             <<setDocumentation "followsStatement" "=gt_statement">>
 {
     pin = 2
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
@@ -2373,7 +2396,7 @@ navigatorElementUsage ::= compoundID
 {mixin="com.lsfusion.lang.psi.references.impl.LSFNavigatorElementReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFNavigatorElementReference"}
 
 metacodeUsage ::= compoundID
-            <<setDocumentation "metacodeUsage" "META_statement">>
+            <<setDocumentation "metacodeUsage" "commat_statement">>
 
 typeId ::= PRIMITIVE_TYPE | OBJECT
 
@@ -2448,6 +2471,7 @@ codeLiteral ::= LEX_CODE_LITERAL
 nullOption ::= NONULL
 
 equalsSign ::= EQUALS
+            <<setDocumentation "equalsSign" "=_statement">>
 
 dimensionLiteral ::= LBRAC intLiteral COMMA intLiteral RBRAC
 boundsIntLiteral ::= LBRAC intLiteral COMMA intLiteral COMMA intLiteral COMMA intLiteral RBRAC

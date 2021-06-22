@@ -68,7 +68,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
         return "https://docs.lsfusion.org/" +
                 documentationLanguageMap.getOrDefault(getDocumentationLanguage(), "") + // default language is en
                 documentationVersionMap.getOrDefault(getDocumentationVersion(), "") + // default version is current
-                documentation.get(parentElement.getClass().getSimpleName()) + "/";
+                documentation.get(parentElement.getClass().getSimpleName());
     }
 
     @Override
@@ -83,18 +83,30 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
             article.select("button").remove(); //remove "copy" buttons under code-blocks
             article.select("a[class=hash-link]").remove(); //remove all "#" hash-links in headers
             article.select("img").remove(); //remove all images
+            article.select("footer").remove(); //remove "Edit this page" link
 
             // wrap code-blocks
-            Color backgroundColor = JBUI.CurrentTheme.EditorTabs.underlinedTabBackground();
-            Color color = JBUI.CurrentTheme.EditorTabs.underlinedTabForeground();
+            Color backgroundColor = JBUI.CurrentTheme.BigPopup.searchFieldBackground();
+            Color color = JBUI.CurrentTheme.BigPopup.selectedTabTextColor();
             String cssColor = "color:rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ")";
             String cssBackgroundColor = "background-color:rgb(" + backgroundColor.getRed() + "," + backgroundColor.getGreen() + "," + backgroundColor.getBlue() + ")";
+
+            //for docosaurus version 2.0.0-beta.1
+            article.select("div[class~=codeBlockContainer]").attr("style", cssBackgroundColor);
+            Elements codeElements = article.select("span[class=token-line]");
+
+            //for docosaurus version 2.0.0-beta.0
             article.select("div[class~=codeBlockLines]").attr("style", cssBackgroundColor);
-            Elements styles = article.select("div[class=token-line]").attr("style", cssColor);
+            Elements oldCodeElements = article.select("div[class=token-line]");
+
+            Elements styles = codeElements.size() == 0 ? oldCodeElements : codeElements;
+            styles.attr("style", cssColor);
+
             for (Element style : styles) {
                 Element div = new Element("code");
                 div.html(style.html());
                 style.html(div.outerHtml());
+                style.appendElement("br");
             }
 
             //wrap headers with built in class
@@ -107,14 +119,16 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
             }
 
             return Jsoup.clean(article.html(), "https://docs.lsfusion.org/",
-                    Whitelist.relaxed().addAttributes("div", "class", "style"));
+                    Whitelist.relaxed()
+                            .addAttributes("div", "class", "style")
+                            .addAttributes("span", "style"));
         } catch (IOException e) {
             return null;
         }
     }
 
     @Override
-    public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement, int targetOffset) {
+    public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement) {
         String elementText = contextElement != null ? contextElement.getText() : null;
         return (elementText != null && elementText.contains("\n")) || contextElement instanceof PsiComment
                 ? null

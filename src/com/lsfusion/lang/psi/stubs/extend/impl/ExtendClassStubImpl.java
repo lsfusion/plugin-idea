@@ -49,11 +49,12 @@ public class ExtendClassStubImpl extends ExtendStubImpl<LSFClassExtend, ExtendCl
     @Override
     public void serialize(StubOutputStream dataStream) throws IOException {
         super.serialize(dataStream);
-
-        thisElement.serialize(dataStream);
-        dataStream.writeInt(myExtends.size());
-        for (LSFStringClassRef shortExtend : myExtends) {
-            shortExtend.serialize(dataStream);
+        if (thisElement != null) {
+            thisElement.serialize(dataStream);
+            dataStream.writeInt(myExtends.size());
+            for (LSFStringClassRef shortExtend : myExtends) {
+                shortExtend.serialize(dataStream);
+            }
         }
     }
 }
