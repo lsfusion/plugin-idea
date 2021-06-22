@@ -1,20 +1,15 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.210</version>
+    <version>1.0.211</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.210</b><br>
+        <b>Version 1.0.211</b><br>
         <ul>
-            <li>support INTERVAL operator in form</li>
-            <li>support MAP options in form</li>
-            <li>Object type support in INPUT operator</li>
-            <li>LIST option support in INPUT / DIALOG operators</li>
-            <li>support INTERVAL[ZDATETIME] literal</li>
-            <li>EXTEND CLASS recursion guard and check</li>
+            <li>add lsf-language quick-doqumentation</li>
         </ul>
     ]]>
     </change-notes>
