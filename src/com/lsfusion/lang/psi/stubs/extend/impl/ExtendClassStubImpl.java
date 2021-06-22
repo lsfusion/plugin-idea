@@ -39,7 +39,8 @@ public class ExtendClassStubImpl extends ExtendStubImpl<LSFClassExtend, ExtendCl
     public ExtendClassStubImpl(StubInputStream dataStream, StubElement parentStub, ExtendClassStubElementType type) throws IOException {
         super(dataStream, parentStub, type);
 
-        thisElement = LSFStringClassRef.deserialize(dataStream);
+        boolean isElementDeserialisable = dataStream.readBoolean();
+        thisElement = isElementDeserialisable ? LSFStringClassRef.deserialize(dataStream) : null;
         myExtends = new ArrayList<>();
         for (int i = 0, size = dataStream.readInt(); i < size; i++) {
             myExtends.add(LSFStringClassRef.deserialize(dataStream));
@@ -50,7 +51,11 @@ public class ExtendClassStubImpl extends ExtendStubImpl<LSFClassExtend, ExtendCl
     public void serialize(StubOutputStream dataStream) throws IOException {
         super.serialize(dataStream);
 
-        thisElement.serialize(dataStream);
+        boolean isElementSerialisable = thisElement != null;
+        dataStream.writeBoolean(isElementSerialisable);
+        if (isElementSerialisable)
+            thisElement.serialize(dataStream);
+
         dataStream.writeInt(myExtends.size());
         for (LSFStringClassRef shortExtend : myExtends) {
             shortExtend.serialize(dataStream);

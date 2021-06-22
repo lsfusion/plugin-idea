@@ -1,26 +1,21 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.210</version>
+    <version>1.0.211</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.210</b><br>
+        <b>Version 1.0.211</b><br>
         <ul>
-            <li>support INTERVAL operator in form</li>
-            <li>support MAP options in form</li>
-            <li>Object type support in INPUT operator</li>
-            <li>LIST option support in INPUT / DIALOG operators</li>
-            <li>support INTERVAL[ZDATETIME] literal</li>
-            <li>EXTEND CLASS recursion guard and check</li>
+            <li>add lsf-language quick-doqumentation</li>
         </ul>
     ]]>
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="171.3780.107"/>
+    <idea-version since-build="183.2635.13"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -142,6 +137,7 @@
 
         <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupingRuleProvider"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>
+        <lang.documentationProvider language="Lsf" implementationClass="com.lsfusion.documentation.LSFDocumentationProvider" order="first"/>
         <usageTypeProvider implementation="com.lsfusion.usage.LSFUsageTypeProvider"/>
         <usageFilteringRuleProvider implementation="com.lsfusion.usage.LSFUsageFilteringRuleProvider"/>
         <findUsagesHandlerFactory implementation="com.lsfusion.usage.LSFFindUsagesHandlerFactory"/>

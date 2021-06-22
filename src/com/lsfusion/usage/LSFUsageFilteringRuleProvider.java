@@ -55,6 +55,7 @@ public class LSFUsageFilteringRuleProvider implements UsageFilteringRuleProvider
                 statement instanceof LSFFormStatement && ((LSFFormStatement) statement).getExtendingFormDeclaration() != null &&
                         ((LSFFormStatement) statement).getExtendingFormDeclaration().getFormUsageWrapper().getFormUsage().equals(element) ||
                 statement instanceof LSFClassStatement && ((LSFClassStatement) statement).getExtendingClassDeclaration() != null &&
+                        ((LSFClassStatement) statement).getExtendingClassDeclaration().getCustomClassUsageWrapper() != null &&
                         ((LSFClassStatement) statement).getExtendingClassDeclaration().getCustomClassUsageWrapper().getCustomClassUsage().equals(element)) {
             return true;
         }

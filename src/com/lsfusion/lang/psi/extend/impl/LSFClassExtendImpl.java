@@ -54,7 +54,7 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
             return stub.getGlobalName();
 
         LSFExtendingClassDeclaration extend = getExtendingClassDeclaration();
-        if (extend != null)
+        if (extend != null && extend.getCustomClassUsageWrapper() != null)
             return extend.getCustomClassUsageWrapper().getCustomClassUsage().getNameRef();
 
         return getClassDecl().getGlobalName();
@@ -71,7 +71,9 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         if (classDecl != null)
             return classDecl;
 
-        return getExtendingClassDeclaration().getCustomClassUsageWrapper().getCustomClassUsage().resolveDecl();
+        return getExtendingClassDeclaration().getCustomClassUsageWrapper() != null ?
+                getExtendingClassDeclaration().getCustomClassUsageWrapper().getCustomClassUsage().resolveDecl() :
+                null;
     }
 
     @Nullable
@@ -84,7 +86,7 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
     @Override
     public LSFFullNameReference getExtendingReference() {
         LSFExtendingClassDeclaration extendingClassDeclaration = getExtendingClassDeclaration();
-        if (extendingClassDeclaration != null) {
+        if (extendingClassDeclaration != null && extendingClassDeclaration.getCustomClassUsageWrapper() != null) {
             return extendingClassDeclaration.getCustomClassUsageWrapper().getCustomClassUsage();
         }
         return null;
@@ -135,10 +137,12 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
             return stub.getThis();
 
         LSFClassDecl classDecl = getClassDecl();
-        if (classDecl != null)
+        if (classDecl != null && classDecl.getSimpleNameWithCaption() != null)
             return new LSFStringClassRef(null, false, classDecl.getSimpleNameWithCaption().getSimpleName().getText());
 
-        return LSFPsiImplUtil.getClassNameRef(getExtendingClassDeclaration().getCustomClassUsageWrapper().getCustomClassUsage());
+        return getExtendingClassDeclaration() != null && getExtendingClassDeclaration().getCustomClassUsageWrapper() != null ?
+                LSFPsiImplUtil.getClassNameRef(getExtendingClassDeclaration().getCustomClassUsageWrapper().getCustomClassUsage()) :
+                null;
     }
 
     public List<LSFStringClassRef> getExtends() {
@@ -227,7 +231,7 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         LSFClassDecl decl = getClassDecl();
         if (decl == null) {
             LSFExtendingClassDeclaration extend = getExtendingClassDeclaration();
-            if (extend != null) {
+            if (extend != null && extend.getCustomClassUsageWrapper() != null) {
                 LSFCustomClassUsage classUsage = extend.getCustomClassUsageWrapper().getCustomClassUsage();
                 return (LSFClassDecl) classUsage.resolveDecl();
             }
