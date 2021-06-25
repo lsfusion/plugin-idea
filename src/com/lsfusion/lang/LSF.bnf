@@ -282,7 +282,6 @@ aggrParamPropDeclare ::= className paramDeclare
 untypedParamDeclare ::= paramDeclare
 
 classParamDeclare ::= aggrParamPropDeclare | untypedParamDeclare
-            <<setDocumentation "classParamDeclare" "User_classes">>
 {
     implements="com.lsfusion.lang.psi.context.ClassParamDeclareContext"
     methods = [ resolveClass ensureClass getClassName getParamDeclare ]
@@ -399,7 +398,6 @@ private joinUsagePropertyDefinition ::= propertyUsage LBRAC propertyExpressionLi
 private joinExprObjectPropertyDefinition ::= propertyExprObject LBRAC propertyExpressionList RBRAC { pin = 1 }
 
 joinPropertyDefinition ::= JOIN? (joinUsagePropertyDefinition | joinExprObjectPropertyDefinition)
-            <<setDocumentation "joinPropertyDefinition" "Composition_JOIN">>
 {
     pin = 3
     implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.PropertyUsageContext"
@@ -575,6 +573,7 @@ groupPropertyBody ::= groupingType
                       nonEmptyPropertyExpressionList
                       (orderPropertyBy)?
                       (WHERE propertyExpression)?
+                      <<setDocumentation "groupPropertyBody" "GROUP_operator">>
   
 private groupByBefore ::= GROUP groupPropertyBody groupPropertyBy
 //private groupByAfter ::= GROUP groupPropertyBody groupPropertyBy;
@@ -2347,7 +2346,6 @@ exprParameterUsage ::= (DOLLAR)? exprParameterNameUsage
 // global
 
 customClassUsage ::= compoundID
-            <<setDocumentation "customClassUsage" "CLASS_statement">>
 {mixin="com.lsfusion.lang.psi.references.impl.LSFClassReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFClassReference"}
 
 moduleUsage ::= simpleName
@@ -2362,37 +2360,30 @@ nonEmptyExplicitPropClassList ::= explicitPropClass (COMMA explicitPropClass)*
 emptyExplicitPropClassList ::= nonEmptyExplicitPropClassList?
 explicitPropClassUsage ::= LSQBR emptyExplicitPropClassList RSQBR
 propertyUsage ::= compoundID explicitPropClassUsage?
-            <<setDocumentation "propertyUsage" "Properties">>
 {mixin="com.lsfusion.lang.psi.references.impl.LSFPropReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFPropReference"}
 
 actionUsage ::= compoundID explicitPropClassUsage?
-            <<setDocumentation "actionUsage" "Actions">>
 {mixin="com.lsfusion.lang.psi.references.impl.LSFActionReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFActionReference"}
 
 propertyElseActionUsage ::= compoundID explicitPropClassUsage?
 {mixin="com.lsfusion.lang.psi.references.impl.LSFPropElseActionReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFPropElseActionReference"}
 
 tableUsage ::= compoundID
-            <<setDocumentation "tableUsage" "TABLE_statement">>
 {mixin="com.lsfusion.lang.psi.references.impl.LSFTableReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFTableReference"}
 
 groupUsage ::= compoundID
-            <<setDocumentation "groupUsage" "GROUP_statement">>
 {mixin="com.lsfusion.lang.psi.references.impl.LSFGroupReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFGroupReference"}
 
 formUsage ::= compoundID
-            <<setDocumentation "formUsage" "FORM_statement">>
 {mixin="com.lsfusion.lang.psi.references.impl.LSFFormReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFFormReference"}
 
 formElseNoParamsActionUsage ::= compoundID
 {mixin="com.lsfusion.lang.psi.references.impl.LSFFormElseNoParamsActionReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFFormElseNoParamsActionReference"}
 
 windowUsage ::= compoundID
-            <<setDocumentation "windowUsage" "WINDOW_statement">>
 {mixin="com.lsfusion.lang.psi.references.impl.LSFWindowReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFWindowReference"}
 
 navigatorElementUsage ::= compoundID
-            <<setDocumentation "navigatorElementUsage" "NAVIGATOR_statement">>
 {mixin="com.lsfusion.lang.psi.references.impl.LSFNavigatorElementReferenceImpl" implements="com.lsfusion.lang.psi.references.LSFNavigatorElementReference"}
 
 metacodeUsage ::= compoundID

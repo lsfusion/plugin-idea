@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.context.LSFExpression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jsoup.Jsoup;
@@ -29,7 +30,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     private static final String documentationVersionPropertyKey = "documentationVersion";
     private static final String documentationLanguagePropertyKey = "documentationLanguage";
 
-    static  {
+    static {
         documentationVersionMap.put("Version 4", "");
         documentationVersionMap.put("Master", "next/");
 
@@ -63,6 +64,21 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
             elementContainsDocumentation = documentation.containsKey(parentElement.getClass().getSimpleName());
 
             parentElement = !elementContainsDocumentation ? parentElement.getParent() : parentElement;
+
+            //match propertyExpression
+            if (elementContainsDocumentation && parentElement instanceof LSFExpression) {
+                boolean matched = false;
+                PsiElement q = parentElement;
+                while (!matched) {
+                    if ((!(parentElement instanceof LSFExpression) || (parentElement.getChildren().length > 1 && !parentElement.getFirstChild().equals(q))) &&
+                            documentation.containsKey(parentElement.getClass().getSimpleName()))
+                        matched = true;
+                    else
+                        q = q.getParent();
+
+                    parentElement = q;
+                }
+            }
         }
 
         return "https://docs.lsfusion.org/" +
@@ -126,6 +142,13 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
             return null;
         }
     }
+
+    //disable popup on mouse hover. Available only since 193.5233.102
+    //To disable manually: (Idea 211) Go to Settings -> Editor -> Code Editing and uncheck 'Show quick documentation on mouse move'
+//    @Override
+//    public @Nullable String generateHoverDoc(@NotNull PsiElement element, @Nullable PsiElement originalElement) {
+//        return null;
+//    }
 
     @Override
     public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement) {

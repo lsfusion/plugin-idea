@@ -83,14 +83,16 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
 
     public static List<LSFFullNameReference> findRenameConflicts(final String name, final LSFFullNameDeclaration decl) {
         final List<LSFFullNameReference> result = new ArrayList<>();
-        searchWordUsages(decl.getProject(), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
-            public boolean process(PsiReference ref) {
-                if (ref instanceof LSFFullNameReference && ((LSFFullNameReference<LSFDeclaration, LSFFullNameDeclaration>) ref).getFullCondition().value(decl))
+        searchWordUsages(decl.getProject(), name).forEach(ref -> { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
+            if (ref instanceof LSFFullNameReference) {
+                LSFFullNameReference<LSFDeclaration, LSFFullNameDeclaration> reference = (LSFFullNameReference<LSFDeclaration, LSFFullNameDeclaration>) ref;
+                LSFDeclaration declaration = reference.resolveDecl();
+                if ((declaration == null || declaration.getClass().equals(decl.getClass())) && reference.getFullCondition().value(decl))
                     synchronized (result) {
                         result.add((LSFFullNameReference) ref);
                     }
-                return true;
             }
+            return true;
         });
         return result;
     }
