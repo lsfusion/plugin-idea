@@ -122,6 +122,6 @@ public class GenerateFormXMLAction extends GenerateFormAction {
     private ElementNamespace getElementNamespace(Element element) {
         String prefix = element.getNamespacePrefix();
         String uri = element.getNamespaceURI();
-        return /*!prefix.isEmpty() ? */new ElementNamespace(prefix, uri)/* : null*/;
+        return prefix.isEmpty() && uri.isEmpty() ? null : new ElementNamespace(prefix, uri);
     }
 }

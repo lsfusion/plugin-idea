@@ -32,7 +32,33 @@ public abstract class GenerateFormAction extends AnAction {
     private Set<String> usedObjectsIds = new HashSet<>();
     private Set<String> usedGroupIds = new HashSet<>();
     private Set<String> usedNamespacePrefixes = new HashSet<>();
+    private Set<String> usedFilterProperties = new HashSet<>();
 
+    private Set<String> keywords = new HashSet<>(Arrays.asList("TRUE", "FALSE", "INTEGER", "LONG", "NUMERIC", "DOUBLE", "DATE", "DATETIME", "TIME", "YEAR", "ZDATETIME", "INTERVAL",
+            "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT", "RICHTEXT", "WORDFILE", "IMAGEFILE", "PDFFILE", "RAWFILE", "FILE", "EXCELFILE", "TEXTFILE", "CSVFILE", "HTMLFILE",
+            "JSONFILE", "XMLFILE", "TABLEFILE", "WORDLINK", "IMAGELINK", "PDFLINK", "RAWLINK", "LINK", "EXCELLINK", "TEXTLINK", "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK",
+            "TABLELINK", "BOOLEAN", "COLOR", "ABSTRACT", "ACTIVATE", "ACTIVE", "ATTR", "ASK", "NATIVE", "ACTION", "AFTER", "GOAFTER", "AGGR", "NAGGR", "ALL", "AND", "APPEND",
+            "APPLY", "AS", "ASON", "ASYNCUPDATE", "ATTACH", "AUTOREFRESH", "AUTOSET", "BACKGROUND", "BCC", "BEFORE", "BODY", "BODYPARAMNAMES", "BODYURL", "BOTTOM", "BOX", "BREAK",
+            "BY", "CANCEL", "CASE", "CC", "CATCH", "CALENDAR", "CENTER", "CHANGE", "CHANGECLASS", "CHANGEABLE", "CHANGEKEY", "CHANGED", "CHANGEMOUSE", "CHANGEWYS", "CHARSET",
+            "CHARWIDTH", "CHECK", "CHECKED", "CLASS", "CLASSCHOOSER", "CLIENT", "CLOSE", "COLUMN", "COLUMNS", "COMPLEX", "CONNECTION", "CONTEXTMENU", "NOHINT", "COLLAPSE",
+            "CONCAT", "CONFIRM", "CONSTRAINT", "CONTAINERH", "CONTAINERV", "COOKIES", "COOKIESTO", "STRETCH", "CANONICALNAME", "CSV", "CUSTOM", "CYCLES", "DATA", "DBF", "DEFAULT",
+            "DEFAULTCOMPARE", "DELAY", "DELETE", "DESC", "DESIGN", "DIALOG", "DO", "DOC", "DOCKED", "DOCX", "DOWN", "DRAWROOT", "DRILLDOWN", "DROP", "DROPCHANGED", "DROPPED",
+            "ECHO", "EDIT", "ELSE", "EMAIL", "END", "ESCAPE", "EVAL", "EVENTID", "EVENTS", "EXCEPTLAST", "EXCLUSIVE", "EXEC", "EXPAND", "EXTERNAL", "NEWEXECUTOR", "EXPORT",
+            "EXTEND", "EXTID", "FIELDS", "FILTER", "FILTERGROUP", "FILTERGROUPS", "FILTERS", "FINALLY", "FIRST", "FIXED", "FLEX", "FLOAT", "FOLDER", "FOOTER", "FOR", "FOREGROUND",
+            "FORM", "FORMEXTID", "FORMS", "FORMULA", "FROM", "FULL", "GET", "GLOBAL", "GRID", "GRIDBOX", "GROUP", "GROUPCHANGE", "EQUAL", "HALIGN", "HEADER", "HEADERS",
+            "HEADERSTO", "HIDE", "HIDESCROLLBARS", "HIDETITLE", "HINT", "HINTNOUPDATE", "HINTTABLE", "HORIZONTAL", "HTML", "HTTP", "IF", "IMAGE", "IMPORT", "IMPOSSIBLE", "IN",
+            "INDEX", "INDEXED", "INIT", "INLINE", "INPUT", "INTERNAL", "IS", "JAVA", "JOIN", "JSON", "KEYPRESS", "LAST", "LEFT", "LIKE", "LIMIT", "LIST", "LOCAL",
+            "LOCALASYNC", "LOGGABLE", "LSF", "MANAGESESSION", "NOMANAGESESSION", "MAP", "MAX", "MATERIALIZED", "MEASURE", "MEASURES", "MENU", "MEMO", "MESSAGE", "META", "MIN",
+            "MODULE", "MOVE", "MS", "MULTI", "NAME", "NAMESPACE", "NAVIGATOR", "NESTED", "NESTEDSESSION", "NEW", "NEWEDIT", "NEWSESSION", "NEWSQL", "NEWTHREAD", "NO", "NOCANCEL",
+            "NOCOMPLEX", "NODEFAULT", "NOESCAPE", "NOFLEX", "NOCHANGE", "NOCONSTRAINTFILTER", "NOINLINE", "NOHEADER", "NOSETTINGS", "NOT", "WAIT", "NOWAIT", "NULL", "NONULL",
+            "OBJECT", "OBJECTS", "CONSTRAINTFILTER", "OK", "ON", "OPTIMISTICASYNC", "OR", "ORDER", "ORDERS", "OVERRIDE", "PAGESIZE", "PANEL", "PARENT", "PARTITION", "PASSWORD",
+            "PDF", "PERIOD", "PIVOT", "PG", "POSITION", "POST", "PREREAD", "PREV", "PREVIEW", "NOPREVIEW", "PARAMS", "PRINT", "PRIORITY", "PROPERTIES", "PROPERTY", "PROPERTYDRAW",
+            "PROPORTION", "PUT", "QUERYCLOSE", "QUICKFILTER", "READ", "READONLY", "READONLYIF", "RECALCULATE", "RECURSION", "REFLECTION", "REGEXP", "REMOVE", "RENDER", "REPLACE",
+            "REPORT", "REPORTFILES", "REQUEST", "REQUIRE", "RESOLVE", "RETURN", "RGB", "RIGHT", "ROUND", "ROOT", "ROW", "ROWS", "RTF", "SCROLL", "SEEK", "SELECTOR", "SERIALIZABLE",
+            "SET", "SETCHANGED", "SETDROPPED", "SETTINGS", "SCHEDULE", "SHOW", "SHOWDEP", "SHOWIF", "SHOWTYPE", "SINGLE", "SHEET", "SPLITH", "SPLITV", "SQL", "START", "STEP",
+            "STRICT", "STRUCT", "SUBJECT", "SUBREPORT", "SUM", "TAB", "TABBED", "TABLE", "TAG", "TEXTHALIGN", "TEXTVALIGN", "THEN", "THREADS", "TO", "DRAW", "TOOLBAR",
+            "TOOLBARBOX", "TOOLBARLEFT", "TOOLBARRIGHT", "TOOLBARSYSTEM", "TOP", "TREE", "TRY", "UNGROUP", "UP", "USERFILTER", "VALIGN", "VALUE", "VERTICAL", "VIEW", "WHEN",
+            "WHERE", "WHILE", "WRITE", "WINDOW", "XLS", "XLSX", "XML", "XOR", "YES", "YESNO"));
 
     abstract String getExtension();
 
@@ -233,7 +259,7 @@ public abstract class GenerateFormAction extends AnAction {
                 String filterProperty;
                 if (((GroupObjectParseNode) element).isIndex()) {
                     filterProperty = getFilterProperty(parentKey, key);
-                    propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key, "INTEGER"));
+                    propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key));
                     objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentInGroupKey));
                     propertiesScript = getPropertiesScript(key, null, new LinkedHashSet<>(Collections.singletonList(new ElementProperty(new ElementKey("value", key.ID), ((GroupObjectParseNode) element).namespace, false))));
                 } else {
@@ -282,7 +308,8 @@ public abstract class GenerateFormAction extends AnAction {
                 }
 
             } else {
-                propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key, lastGroupObjectParent == null ? null : "INTEGER"));
+                assert element instanceof PropertyParseNode;
+                propertyDeclarationScripts.add(getPropertyDeclarationScript(key, ((PropertyParseNode) element).type, lastGroupObjectParent == null ? null : "INTEGER"));
             }
         }
 
@@ -334,8 +361,12 @@ public abstract class GenerateFormAction extends AnAction {
         } else return null;
     }
 
-    private String getStringPropertyDeclarationScript(ElementKey propertyKey, String parameter) {
-        return getPropertyDeclarationScript(propertyKey.ID, "STRING", parameter);
+    private String getPropertyDeclarationScript(ElementKey propertyKey, String propertyType, String parameter) {
+        return getPropertyDeclarationScript(propertyKey.ID, propertyType, parameter);
+    }
+
+    private String getStringPropertyDeclarationScript(ElementKey propertyKey) {
+        return getPropertyDeclarationScript(propertyKey.ID, "STRING", "INTEGER");
     }
 
     private String getIntegerPropertyDeclarationScript(String property) {
@@ -357,12 +388,17 @@ public abstract class GenerateFormAction extends AnAction {
             id = Junidecode.unidecode(id).replaceAll("[^a-zA-Z0-9_]", "_");
         }
         int count = 0;
-        while(usedObjectIds.contains(id + (count == 0 ? "" : count))) {
+        while(notUniqueId(id, count)) {
             count++;
         }
         id = id + (count == 0 ? "" : count);
         usedObjectIds.add(id);
         return id;
+    }
+
+    private boolean notUniqueId(String id, int count) {
+        String newId = id + (count == 0 ? "" : count);
+        return keywords.contains(newId) || usedObjectIds.contains(newId);
     }
 
     private String getObjectsScript(ElementKey elementKey, ElementNamespace namespace, ElementKey inGroupKey) {
@@ -375,12 +411,13 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getExtIDScript(ElementKey key, ElementNamespace namespace) {
-        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + (namespace != null ? (namespace.prefix + ":") : "") + key.extID + "'") : "";
+        String namespaceScript = namespace != null ? namespace.prefix.isEmpty() ? ("=" + namespace.uri + ":") : (namespace.prefix + ":") : "";
+        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + namespaceScript + key.extID + "'") : "";
     }
 
     private String getFormNameScript(String formName, ElementNamespace formNamespace) {
         String formId = formName == null ? "generated" : Introspector.decapitalize(formName);
-        String formExtId = formId.equals(formName) && formNamespace == null ? "" : (" FORMEXTID '" + getNamespaceScript(formNamespace) + formName + "'");
+        String formExtId = (formName == null || formId.equals(formName)) && formNamespace == null ? "" : (" FORMEXTID '" + getNamespaceScript(formNamespace) + formName + "'");
         return "FORM " + formId + formExtId;
     }
 
@@ -400,22 +437,27 @@ public abstract class GenerateFormAction extends AnAction {
 
     private String getPropertiesScript(ElementKey object, ElementKey inGroup, Set<ElementProperty> properties) {
         if(!properties.isEmpty()) {
+            String filtersScript = (object != null ? "\nFILTERS " + "imported(" + object.ID + ")" : "");
             return "PROPERTIES" +
                     "(" + (object == null ? "" : object.ID) + ") " +
                     (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) +
                     properties.stream().map(ElementProperty::getScript).collect(Collectors.joining(", ")) +
-                    (object != null ? "\nFILTERS " + "imported(" + object.ID + ")" : "");
+                    (usedFilterProperties.add(filtersScript) ? filtersScript : "");
         } else return null;
     }
 
     private String getNamespacePropertiesScript(ElementKey inGroup, List<ElementNamespace> namespaces) {
-        if(!namespaces.isEmpty()) {
-            return "PROPERTIES ATTR " + (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) +
-                    namespaces.stream().filter(ns -> {
-                        String prefixOrUri = ns.prefix.isEmpty() ? ns.uri : ns.prefix;
-                        return usedNamespacePrefixes.add(prefixOrUri); //true if didn't already contain
-                    }).map(ns -> "='" + ns.uri + "' EXTID 'xmlns:" + ns.prefix + "'").collect(Collectors.joining(", "));
-        } else return null;
+        if (!namespaces.isEmpty()) {
+            String namespacesScript = namespaces.stream().filter(ns -> {
+                String prefixOrUri = ns.prefix.isEmpty() ? ns.uri : ns.prefix;
+                return usedNamespacePrefixes.add(prefixOrUri); //true if didn't already contain
+            }).map(ns -> "='" + ns.uri + "' EXTID 'xmlns:" + ns.prefix + "'").collect(Collectors.joining(", "));
+
+            if (!namespacesScript.isEmpty()) {
+                return "PROPERTIES ATTR " + (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) + namespacesScript;
+            }
+        }
+        return null;
     }
 
     private String getFiltersScript(String name, ElementKey parameterKey, ElementKey parentKey) {
@@ -535,10 +577,16 @@ public abstract class GenerateFormAction extends AnAction {
 
     class PropertyParseNode extends ParseNode {
         ElementNamespace namespace;
+        String type;
         boolean attr;
         PropertyParseNode(String key, ElementNamespace namespace, boolean attr) {
+            this(key, namespace, "STRING", attr);
+        }
+
+        PropertyParseNode(String key, ElementNamespace namespace, String type, boolean attr) {
             super(key, new ArrayList<>());
             this.namespace = namespace;
+            this.type = type;
             this.attr = attr;
         }
     }

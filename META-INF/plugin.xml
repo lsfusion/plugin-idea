@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.211</b><br>
+        <b>Version 1.0.212</b><br>
         <ul>
-            <li>add lsf-language quick-doqumentation</li>
+            <li>Generate form improvements: keywords, namespaces, properties, filters, types</li>
         </ul>
     ]]>
     </change-notes>
