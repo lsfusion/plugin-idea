@@ -573,7 +573,6 @@ groupPropertyBody ::= groupingType
                       nonEmptyPropertyExpressionList
                       (orderPropertyBy)?
                       (WHERE propertyExpression)?
-                      <<setDocumentation "groupPropertyBody" "GROUP_operator">>
   
 private groupByBefore ::= GROUP groupPropertyBody groupPropertyBy
 //private groupByAfter ::= GROUP groupPropertyBody groupPropertyBy;

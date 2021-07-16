@@ -85,9 +85,11 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
         final List<LSFFullNameReference> result = new ArrayList<>();
         searchWordUsages(decl.getProject(), name).forEach(ref -> { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
             if (ref instanceof LSFFullNameReference) {
+                //Fix a bug when renaming forms by shift+F6: when renaming uses the name of the property declared on the form, we get a ClassCastException.
+                //We need to check only the relevant classes
                 LSFFullNameReference<LSFDeclaration, LSFFullNameDeclaration> reference = (LSFFullNameReference<LSFDeclaration, LSFFullNameDeclaration>) ref;
                 LSFDeclaration declaration = reference.resolveDecl();
-                if ((declaration == null || declaration.getClass().equals(decl.getClass())) && reference.getFullCondition().value(decl))
+                if (declaration != null && declaration.getClass().equals(decl.getClass()) && reference.getFullCondition().value(decl))
                     synchronized (result) {
                         result.add((LSFFullNameReference) ref);
                     }
