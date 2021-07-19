@@ -481,6 +481,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "TOP"                     			{ return TOP; }
   "TREE"                    			{ return TREE; }
   "TRY"                                 { return TRY; }
+  "UDP"                 			    { return UDP; }
   "UNGROUP"                 			{ return UNGROUP; }
   "UP"                 			        { return UP; }
   "USERFILTER"                 			{ return USERFILTER; }

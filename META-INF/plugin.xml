@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.212</b><br>
+        <b>Version 1.0.213</b><br>
         <ul>
-            <li>Generate form improvements: keywords, namespaces, properties, filters, types</li>
+            <li>EXTERNAL UDP</li>
         </ul>
     ]]>
     </change-notes>
