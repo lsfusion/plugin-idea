@@ -6,10 +6,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.context.LSFExpression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jsoup.Jsoup;
@@ -58,18 +56,24 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     }
 
     private String getDocumentationURL(PsiElement element) {
-        PsiElement parentElement = PsiTreeUtil.getParentOfType(element, LSFDocumentation.class);
+        String documentation;
+        PsiElement docElement = element;
 
-        if (parentElement instanceof LSFExpression && parentElement != PsiTreeUtil.getParentOfType(element, LSFExpression.class)) {
-            do {
-                parentElement = parentElement.getParent();
-            } while (!(parentElement.getChildren().length > 1 && !(parentElement instanceof LSFFile) && parentElement instanceof LSFDocumentation));
+        while (true) {
+            PsiElement parentElement = docElement.getParent();
+
+            documentation = parentElement instanceof LSFDocumentation ? ((LSFDocumentation) parentElement).getDocumentation(docElement) : null;
+
+            if (documentation != null || parentElement instanceof LSFFile)
+                break;
+
+            docElement = parentElement;
         }
 
-        return parentElement != null ? "https://docs.lsfusion.org/" +
+        return documentation != null ? "https://docs.lsfusion.org/" +
                 documentationLanguageMap.getOrDefault(getDocumentationLanguage(), "") + // default language is en
                 documentationVersionMap.getOrDefault(getDocumentationVersion(), "") + // default version is current
-                ((LSFDocumentation) parentElement).getDocumentation() : null;
+                documentation : null;
     }
 
     @Override
