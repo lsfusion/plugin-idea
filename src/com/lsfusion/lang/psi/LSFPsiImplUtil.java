@@ -4302,7 +4302,7 @@ public class LSFPsiImplUtil {
     }
 
     //use only with LSFExpression instances
-    private static String getDocumentation(PsiElement parent, PsiElement child, String documentation) {
+    private static String getDocumentation(LSFExpression parent, PsiElement child, String documentation) {
         return parent.getChildren().length > 1 && parent.getChildren()[0] != child ? documentation : null;
     }
 

@@ -10,6 +10,7 @@ import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.util.JavaParametersUtil;
 import com.intellij.execution.util.ProgramParametersUtil;
+import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.PathMacroManager;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.module.Module;
@@ -27,8 +28,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.lsfusion.debug.LSFDebuggerRunner.LIGHT_START_PROPERTY;
-import static com.lsfusion.debug.LSFDebuggerRunner.PLUGIN_ENABLED_PROPERTY;
+import static com.lsfusion.debug.LSFDebuggerRunner.*;
 import static com.lsfusion.module.LSFusionModuleBuilder.BOOTSTRAP_CLASS_NAME;
 
 public class LSFusionRunConfiguration extends AbstractRunConfiguration implements CommonJavaRunConfigurationParameters {//}, RunConfigurationWithSuppressedDefaultDebugAction {
@@ -214,6 +214,7 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
             JavaParametersUtil.configureConfiguration(params, myConfiguration);
             params.getVMParametersList().addProperty(LIGHT_START_PROPERTY, String.valueOf(lightStart));
 
+            params.getVMParametersList().addProperty(IDEA_BIN_PATH, PathManager.getBinPath());
             if (!params.getVMParametersList().hasProperty(PLUGIN_ENABLED_PROPERTY)) {
                 params.getVMParametersList().addProperty(PLUGIN_ENABLED_PROPERTY, "true");
             }
