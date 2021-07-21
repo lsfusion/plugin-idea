@@ -5,9 +5,7 @@ import com.intellij.lang.impl.PsiBuilderAdapter;
 import com.intellij.lang.impl.PsiBuilderImpl;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.tree.IElementType;
-import com.lsfusion.documentation.LSFDocumentationProvider;
 import com.lsfusion.lang.psi.LSFTypes;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("StringEquality")
@@ -205,11 +203,5 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
     public static boolean isActionParsing(PsiBuilder builder_, int level) {
         Integer value = builder_.getUserData(PARSING_MODE_KEY);
         return value != null && value == MODE_ACTION;
-    }
-
-    public static boolean setDocumentation(PsiBuilder builder, int level, String key, String documentationEndpoint) {
-        LSFDocumentationProvider.documentation.put("LSF" + StringUtils.capitalize(key) + "Impl", documentationEndpoint);
-
-        return true;
     }
 }

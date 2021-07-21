@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.context.LSFExpression;
@@ -57,39 +58,24 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     }
 
     private String getDocumentationURL(PsiElement element) {
-        PsiElement parentElement = element;
+        PsiElement parentElement = PsiTreeUtil.getParentOfType(element, LSFDocumentation.class);
 
-        boolean elementContainsDocumentation = false;
-        while (!elementContainsDocumentation && !(parentElement instanceof LSFFile)) { // search documentation only in current file elements
-            elementContainsDocumentation = documentation.containsKey(parentElement.getClass().getSimpleName());
-
-            parentElement = !elementContainsDocumentation ? parentElement.getParent() : parentElement;
-
-            //match propertyExpression
-            if (elementContainsDocumentation && parentElement instanceof LSFExpression) {
-                boolean matched = false;
-                PsiElement q = parentElement;
-                while (!matched) {
-                    if ((!(parentElement instanceof LSFExpression) || (parentElement.getChildren().length > 1 && !parentElement.getFirstChild().equals(q))) &&
-                            documentation.containsKey(parentElement.getClass().getSimpleName()))
-                        matched = true;
-                    else
-                        q = q.getParent();
-
-                    parentElement = q;
-                }
-            }
+        if (parentElement instanceof LSFExpression && parentElement != PsiTreeUtil.getParentOfType(element, LSFExpression.class)) {
+            do {
+                parentElement = parentElement.getParent();
+            } while (!(parentElement.getChildren().length > 1 && !(parentElement instanceof LSFFile) && parentElement instanceof LSFDocumentation));
         }
 
-        return "https://docs.lsfusion.org/" +
+        return parentElement != null ? "https://docs.lsfusion.org/" +
                 documentationLanguageMap.getOrDefault(getDocumentationLanguage(), "") + // default language is en
                 documentationVersionMap.getOrDefault(getDocumentationVersion(), "") + // default version is current
-                documentation.get(parentElement.getClass().getSimpleName());
+                ((LSFDocumentation) parentElement).getDocumentation() : null;
     }
 
     @Override
     public @Nullable String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
-        return readExternalDocumentation(getDocumentationURL(element));
+        String documentationURL = getDocumentationURL(element);
+        return documentationURL != null ? readExternalDocumentation(documentationURL) : null;
     }
 
     private String readExternalDocumentation(String documentationURL) {

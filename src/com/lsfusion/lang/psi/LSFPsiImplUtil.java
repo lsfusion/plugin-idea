@@ -4269,4 +4269,495 @@ public class LSFPsiImplUtil {
     private static boolean equalReferences(@NotNull LSFActionOrPropReference left, LSFActionOrPropReference right, int leftParams, PsiElement paramList) {
         return equalReferences(left, right) && equalParams(leftParams, paramList);
     }
+
+    // Documentation
+
+    public static String getDocumentation(LSFModuleHeader moduleHeader) {
+        return "Module_header";
+    }
+
+    public static String getDocumentation(LSFClassDecl lsfClassDecl) {
+        return "CLASS_statement";
+    }
+
+    public static String getDocumentation(LSFExtendingClassDeclaration lsfExtendingClassDeclaration) {
+        return "EXTEND_CLASS_statement";
+    }
+
+    public static String getDocumentation(LSFClassStatement lsfClassStatement) {
+        return "CLASS_statement";
+    }
+
+    public static String getDocumentation(LSFGroupStatement lsfGroupStatement) {
+        return "GROUP_statement";
+    }
+
+
+    public static String getDocumentation(LSFPropertyStatement lsfPropertyStatement) {
+        return "Properties";
+    }
+
+    public static String getDocumentation(LSFActionStatement lsfActionStatement) {
+        return "ACTION_statement";
+    }
+
+    public static String getDocumentation(LSFIfPE lsfIfPE) {
+        return "IF_operator";
+    }
+
+    public static String getDocumentation(LSFOrPE lsfOrPE) {
+        return "AND_OR_NOT_XOR_operators";
+    }
+
+    public static String getDocumentation(LSFXorPE lsfXorPE) {
+        return "AND_OR_NOT_XOR_operators";
+    }
+
+    public static String getDocumentation(LSFAndPE lsfAndPE) {
+        return "AND_OR_NOT_XOR_operators";
+    }
+
+    public static String getDocumentation(LSFNotPE lsfNotPE) {
+        return "AND_OR_NOT_XOR_operators";
+    }
+
+    public static String getDocumentation(LSFEqualityPE lsfEqualityPE) {
+        return "Comparison_operators_=_etc";
+    }
+
+    public static String getDocumentation(LSFRelationalPE lsfRelationalPE) {
+        return "Comparison_operators_=_etc";
+    }
+
+    public static String getDocumentation(LSFLikePE lsfLikePE) {
+        return "Arithmetic_operators_+_-_etc";
+    }
+
+    public static String getDocumentation(LSFAdditiveORPE lsfAdditiveORPE) {
+        return "Arithmetic_operators_+_-_etc";
+    }
+
+    public static String getDocumentation(LSFAdditivePE lsfAdditivePE) {
+        return "Arithmetic_operators_+_-_etc";
+    }
+
+    public static String getDocumentation(LSFMultiplicativePE lsfMultiplicativePE) {
+        return "Arithmetic_operators_+_-_etc";
+    }
+
+    public static String getDocumentation(LSFAggrPropertyDefinition lsfAggrPropertyDefinition) {
+        return "AGGR_operator";
+    }
+
+    public static String getDocumentation(LSFOverrideOperator lsfOverrideOperator) {
+        return "OVERRIDE_operator";
+    }
+
+    public static String getDocumentation(LSFExclusiveOperator lsfExclusiveOperator) {
+        return "EXCLUSIVE_operator";
+    }
+
+    public static String getDocumentation(LSFIfElsePropertyDefinition lsfIfElsePropertyDefinition) {
+        return "IF_..._THEN_operator";
+    }
+
+    public static String getDocumentation(LSFMaxPropertyDefinition lsfMaxPropertyDefinition) {
+        return "Extremum_MAX_MIN";
+    }
+
+    public static String getDocumentation(LSFCasePropertyDefinition lsfCasePropertyDefinition) {
+        return "CASE_operator";
+    }
+
+    public static String getDocumentation(LSFMultiPropertyDefinition lsfMultiPropertyDefinition) {
+        return "MULTI_operator";
+    }
+
+    public static String getDocumentation(LSFPartitionPropertyDefinition lsfPartitionPropertyDefinition) {
+        return "PARTITION_operator";
+    }
+
+    public static String getDocumentation(LSFRecursivePropertyDefinition lsfRecursivePropertyDefinition) {
+        return "RECURSION_operator";
+    }
+
+    public static String getDocumentation(LSFStructCreationPropertyDefinition lsfStructCreationPropertyDefinition) {
+        return "STRUCT_operator";
+    }
+
+    public static String getDocumentation(LSFConcatPropertyDefinition lsfConcatPropertyDefinition) {
+        return "CONCAT_operator";
+    }
+
+    public static String getDocumentation(LSFSessionPropertyDefinition lsfSessionPropertyDefinition) {
+        return "Change_operators_SET_CHANGED_etc";
+    }
+
+    public static String getDocumentation(LSFActiveTabPropertyDefinition lsfActiveTabPropertyDefinition) {
+        return "ACTIVE_TAB_operator";
+    }
+
+    public static String getDocumentation(LSFDataPropertyDefinition lsfDataPropertyDefinition) {
+        return "DATA_operator";
+    }
+
+    public static String getDocumentation(LSFAbstractPropertyDefinition lsfAbstractPropertyDefinition) {
+        return "ABSTRACT_operator";
+    }
+
+    public static String getDocumentation(LSFFormulaPropertyDefinition lsfFormulaPropertyDefinition) {
+        return "FORMULA_operator";
+    }
+
+    public static String getDocumentation(LSFGroupPropertyDefinition lsfGroupPropertyDefinition) {
+        return "GROUP_operator";
+    }
+
+    public static String getDocumentation(LSFGroupExprPropertyDefinition lsfGroupExprPropertyDefinition) {
+        return "GROUP_operator";
+    }
+
+    public static String getDocumentation(LSFFilterPropertyDefinition lsfFilterPropertyDefinition) {
+        return "Object_group_operator";
+    }
+
+    public static String getDocumentation(LSFTypePropertyDefinition lsfTypePropertyDefinition) {
+        return "IS_AS_operators";
+    }
+
+    public static String getDocumentation(LSFNonEmptyPropertyOptions lsfNonEmptyPropertyOptions) {
+        return "Property_options";
+    }
+
+    public static String getDocumentation(LSFAbstractActionPropertyDefinition lsfAbstractActionPropertyDefinition) {
+        return "ABSTRACT_action_operator";
+    }
+
+    public static String getDocumentation(LSFObjectInputProps lsfObjectInputProps) {
+        return "INPUT_operator";
+    }
+
+    public static String getDocumentation(LSFFormActionPropertyDefinitionBody lsfFormActionPropertyDefinitionBody) {
+        return "SHOW_operator";
+    }
+
+    public static String getDocumentation(LSFDialogActionPropertyDefinitionBody lsfDialogActionPropertyDefinitionBody) {
+        return "DIALOG_operator";
+    }
+
+    public static String getDocumentation(LSFPrintActionPropertyDefinitionBody lsfPrintActionPropertyDefinitionBody) {
+        return "PRINT_operator";
+    }
+
+    public static String getDocumentation(LSFExportActionPropertyDefinitionBody lsfExportActionPropertyDefinitionBody) {
+        return "EXPORT_operator";
+    }
+
+    public static String getDocumentation(LSFExportDataActionPropertyDefinitionBody lsfExportDataActionPropertyDefinitionBody) {
+        return "Data_export_EXPORT";
+    }
+
+    public static String getDocumentation(LSFCustomActionPropertyDefinitionBody lsfCustomActionPropertyDefinitionBody) {
+        return "INTERNAL_operator";
+    }
+
+    public static String getDocumentation(LSFExternalActionPropertyDefinitionBody lsfExternalActionPropertyDefinitionBody) {
+        return "EXTERNAL_operator";
+    }
+
+    public static String getDocumentation(LSFNewWhereActionPropertyDefinitionBody lsfNewWhereActionPropertyDefinitionBody) {
+        return "NEW_operator";
+    }
+
+    public static String getDocumentation(LSFEmailActionPropertyDefinitionBody lsfEmailActionPropertyDefinitionBody) {
+        return "EMAIL_operator";
+    }
+
+    public static String getDocumentation(LSFConfirmActionPropertyDefinitionBody lsfConfirmActionPropertyDefinitionBody) {
+        return "ASK_operator";
+    }
+
+    public static String getDocumentation(LSFMessageActionPropertyDefinitionBody lsfMessageActionPropertyDefinitionBody) {
+        return "MESSAGE_operator";
+    }
+
+    public static String getDocumentation(LSFSeekObjectActionPropertyDefinitionBody lsfSeekObjectActionPropertyDefinitionBody) {
+        return "SEEK_operator";
+    }
+
+    public static String getDocumentation(LSFChangeClassActionPropertyDefinitionBody lsfChangeClassActionPropertyDefinitionBody) {
+        return "CHANGECLASS_operator";
+    }
+
+    public static String getDocumentation(LSFDeleteActionPropertyDefinitionBody lsfDeleteActionPropertyDefinitionBody) {
+        return "DELETE_operator";
+    }
+
+    public static String getDocumentation(LSFEvalActionPropertyDefinitionBody lsfEvalActionPropertyDefinitionBody) {
+        return "EVAL_operator";
+    }
+
+    public static String getDocumentation(LSFReadActionPropertyDefinitionBody lsfReadActionPropertyDefinitionBody) {
+        return "READ_operator";
+    }
+
+    public static String getDocumentation(LSFWriteActionPropertyDefinitionBody lsfWriteActionPropertyDefinitionBody) {
+        return "WRITE_operator";
+    }
+
+    public static String getDocumentation(LSFImportActionPropertyDefinitionBody lsfImportActionPropertyDefinitionBody) {
+        return "IMPORT_operator";
+    }
+
+    public static String getDocumentation(LSFImportFormActionPropertyDefinitionBody lsfImportFormActionPropertyDefinitionBody) {
+        return "IMPORT_operator";
+    }
+
+    public static String getDocumentation(LSFNewThreadActionPropertyDefinitionBody lsfNewThreadActionPropertyDefinitionBody) {
+        return "NEWTHREAD_operator";
+    }
+
+    public static String getDocumentation(LSFNewExecutorActionPropertyDefinitionBody lsfNewExecutorActionPropertyDefinitionBody) {
+        return "NEWEXECUTOR_operator";
+    }
+
+    public static String getDocumentation(LSFNewSessionOperator lsfNewSessionOperator) {
+        return "NEWSESSION_operator";
+    }
+
+    public static String getDocumentation(LSFNestedSessionOperator lsfNestedSessionOperator) {
+        return "NESTEDSESSION_operator";
+    }
+
+    public static String getDocumentation(LSFRequestActionPropertyDefinitionBody lsfRequestActionPropertyDefinitionBody) {
+        return "REQUEST_operator";
+    }
+
+    public static String getDocumentation(LSFInputActionPropertyDefinitionBody lsfInputActionPropertyDefinitionBody) {
+        return "INPUT_operator";
+    }
+
+    public static String getDocumentation(LSFActiveFormActionPropertyDefinitionBody lsfActiveFormActionPropertyDefinitionBody) {
+        return "ACTIVE_FORM_operator";
+    }
+
+    public static String getDocumentation(LSFActivateActionPropertyDefinitionBody lsfActivateActionPropertyDefinitionBody) {
+        return "ACTIVATE_operator";
+    }
+
+    public static String getDocumentation(LSFListActionPropertyDefinitionBody lsfListActionPropertyDefinitionBody) {
+        return "Braces_operator";
+    }
+
+    public static String getDocumentation(LSFLocalDataPropertyDefinition lsfLocalDataPropertyDefinition) {
+        return "DATA_operator";
+    }
+
+    public static String getDocumentation(LSFNestedLocalModifier lsfNestedLocalModifier) {
+        return "DATA_operator";
+    }
+
+    public static String getDocumentation(LSFExecActionPropertyDefinitionBody lsfExecActionPropertyDefinitionBody) {
+        return "EXEC_operator";
+    }
+
+    public static String getDocumentation(LSFAssignActionPropertyDefinitionBody lsfAssignActionPropertyDefinitionBody) {
+        return "CHANGE_operator";
+    }
+
+    public static String getDocumentation(LSFTryActionPropertyDefinitionBody lsfTryActionPropertyDefinitionBody) {
+        return "TRY_operator";
+    }
+
+    public static String getDocumentation(LSFIfActionPropertyDefinitionBody lsfIfActionPropertyDefinitionBody) {
+        return "IF_..._THEN_operator";
+    }
+
+    public static String getDocumentation(LSFCaseActionPropertyDefinitionBody lsfCaseActionPropertyDefinitionBody) {
+        return "CASE_action_operator";
+    }
+
+    public static String getDocumentation(LSFMultiActionPropertyDefinitionBody lsfMultiActionPropertyDefinitionBody) {
+        return "MULTI_action_operator";
+    }
+
+    public static String getDocumentation(LSFApplyActionPropertyDefinitionBody lsfApplyActionPropertyDefinitionBody) {
+        return "APPLY_operator";
+    }
+
+    public static String getDocumentation(LSFCancelActionPropertyDefinitionBody lsfCancelActionPropertyDefinitionBody) {
+        return "CANCEL_operator";
+    }
+
+    public static String getDocumentation(LSFNewActionPropertyDefinitionBody lsfNewActionPropertyDefinitionBody) {
+        return "NEW_operator";
+    }
+
+    public static String getDocumentation(LSFForActionPropertyMainBody lsfForActionPropertyMainBody) {
+        return "FOR_operator";
+    }
+
+    public static String getDocumentation(LSFWhileActionPropertyDefinitionBody lsfWhileActionPropertyDefinitionBody) {
+        return "WHILE_operator";
+    }
+
+    public static String getDocumentation(LSFBreakActionOperator lsfBreakActionOperator) {
+        return "BREAK_operator";
+    }
+
+    public static String getDocumentation(LSFReturnActionOperator lsfReturnActionOperator) {
+        return "RETURN_operator";
+    }
+
+    public static String getDocumentation(LSFListFormDeclaration listFormDeclaration) {
+        return "Properties_and_actions_block";
+    }
+
+    public static String getDocumentation(LSFEditFormDeclaration lsfEditFormDeclaration) {
+        return "Properties_and_actions_block";
+    }
+
+    public static String getDocumentation(LSFReportSetting lsfReportSetting) {
+        return "FORM_statement";
+    }
+
+    public static String getDocumentation(LSFFormExtIDSetting lsfFormExtIDSetting) {
+        return "FORM_statement";
+    }
+
+    public static String getDocumentation(LSFFormDecl lsfFormDecl) {
+        return "FORM_statement";
+    }
+
+    public static String getDocumentation(LSFExtendingFormDeclaration lsfExtendingFormDeclaration) {
+        return "EXTEND_FORM_statement";
+    }
+
+    public static String getDocumentation(LSFFormGroupObjectsList lsfFormGroupObjectsList) {
+        return "Object_blocks";
+    }
+
+    public static String getDocumentation(LSFFormTreeGroupObjectList lsfFormTreeGroupObjectList) {
+        return "Object_blocks";
+    }
+
+    public static String getDocumentation(LSFFormGroupObjectOptions lsfFormGroupObjectOptions) {
+        return "Object_blocks";
+    }
+
+    public static String getDocumentation(LSFFormPropertiesList lsfFormPropertiesList) {
+        return "Properties_and_actions_block";
+    }
+
+    public static String getDocumentation(LSFFormOptionsOnEvents lsfFormOptionsOnEvents) {
+        return "Form_events";
+    }
+
+    public static String getDocumentation(LSFFormFiltersList lsfFormFiltersList) {
+        return "Filters_and_sortings_block";
+    }
+
+    public static String getDocumentation(LSFFormEventsList lsfFormEventsList) {
+        return "Event_block";
+    }
+
+    public static String getDocumentation(LSFFormFilterGroupDeclaration lsfFormFilterGroupDeclaration) {
+        return "Filters_and_sortings_block";
+    }
+
+    public static String getDocumentation(LSFFormExtendFilterGroupDeclaration lsfFormExtendFilterGroupDeclaration) {
+        return "Filters_and_sortings_block";
+    }
+
+    public static String getDocumentation(LSFFormOrderByList lsfFormOrderByList) {
+        return "Filters_and_sortings_block";
+    }
+
+    public static String getDocumentation(LSFFormPivotOptionsDeclaration lsfFormPivotOptionsDeclaration) {
+        return "Properties_and_actions_block";
+    }
+
+    public static String getDocumentation(LSFOverrideActionStatement lsfOverrideActionStatement) {
+        return "ACTION+_statement";
+    }
+
+    public static String getDocumentation(LSFOverridePropertyStatement lsfOverridePropertyStatement) {
+        return "+=_statement";
+    }
+
+    public static String getDocumentation(LSFConstraintStatement lsfConstraintStatement) {
+        return "CONSTRAINT_statement";
+    }
+
+    public static String getDocumentation(LSFFollowsStatement lsfFollowsStatement) {
+        return "=gt_statement";
+    }
+
+    public static String getDocumentation(LSFWriteWhenStatement lsfWriteWhenStatement) {
+        return "lt-_WHEN_statement";
+    }
+
+    public static String getDocumentation(LSFEventStatement lsfEventStatement) {
+        return "WHEN_statement";
+    }
+
+    public static String getDocumentation(LSFGlobalEventStatement lsfGlobalEventStatement) {
+        return "ON_statement";
+    }
+
+    public static String getDocumentation(LSFAspectBefore lsfAspectBefore) {
+        return "BEFORE_statement";
+    }
+
+    public static String getDocumentation(LSFAspectAfter lsfAspectAfter) {
+        return "AFTER_statement";
+    }
+
+    public static String getDocumentation(LSFTableStatement lsfTableStatement) {
+        return "TABLE_statement";
+    }
+
+    public static String getDocumentation(LSFIndexStatement lsfIndexStatement) {
+        return "INDEX_statement";
+    }
+
+    public static String getDocumentation(LSFWindowCreateStatement lsfWindowCreateStatement) {
+        return "WINDOW_statement";
+    }
+
+    public static String getDocumentation(LSFNavigatorStatement lsfNavigatorStatement) {
+        return "NAVIGATOR_statement";
+    }
+
+    public static String getDocumentation(LSFDesignStatement lsfDesignStatement) {
+        return "DESIGN_statement";
+    }
+
+    public static String getDocumentation(LSFMetaCodeDeclarationStatement lsfMetaCodeDeclarationStatement) {
+        return "META_statement";
+    }
+
+    public static String getDocumentation(LSFLiteral lsfLiteral) {
+        return "Literals";
+    }
+
+    public static String getDocumentation(LSFBuiltInClassName lsfBuiltInClassName) {
+        return "Built-in_classes";
+    }
+
+    public static String getDocumentation(LSFMetacodeUsage lsfMetacodeUsage) {
+        return "commat_statement";
+    }
+
+    public static String getDocumentation(LSFExclusiveOverrideOption lsfExclusiveOverrideOption) {
+        return "Selection_CASE_IF_MULTI_OVERRIDE_EXCLUSIVE";
+    }
+
+    public static String getDocumentation(LSFAbstractExclusiveOverrideOption lsfAbstractExclusiveOverrideOption) {
+        return "Selection_CASE_IF_MULTI_OVERRIDE_EXCLUSIVE";
+    }
+
+    public static String getDocumentation(LSFEqualsSign lsfEqualsSign) {
+        return "=_statement";
+    }
 }
