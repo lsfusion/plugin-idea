@@ -944,6 +944,7 @@ externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyP
 }
 
 private externalType ::=  SQL propertyExpression EXEC propertyExpression
+              |   UDP (CLIENT)? propertyExpression
               |   HTTP (CLIENT)? (DELETE| GET | POST | PUT)? propertyExpression (BODYURL propertyExpression)?
                     (BODYPARAMNAMES stringLiteral (COMMA stringLiteral)*)?
                     (HEADERS headersPropertyUsage)? (COOKIES headersPropertyUsage)? (HEADERSTO headersPropertyUsage)? (COOKIESTO headersPropertyUsage)?
