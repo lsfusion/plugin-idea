@@ -29,7 +29,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     private static final String documentationVersionPropertyKey = "documentationVersion";
     private static final String documentationLanguagePropertyKey = "documentationLanguage";
 
-    static  {
+    static {
         documentationVersionMap.put("Version 4", "");
         documentationVersionMap.put("Master", "next/");
 
@@ -56,24 +56,30 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     }
 
     private String getDocumentationURL(PsiElement element) {
-        PsiElement parentElement = element;
+        String documentation;
+        PsiElement docElement = element;
 
-        boolean elementContainsDocumentation = false;
-        while (!elementContainsDocumentation && !(parentElement instanceof LSFFile)) { // search documentation only in current file elements
-            elementContainsDocumentation = documentation.containsKey(parentElement.getClass().getSimpleName());
+        while (true) {
+            PsiElement parentElement = docElement.getParent();
 
-            parentElement = !elementContainsDocumentation ? parentElement.getParent() : parentElement;
+            documentation = parentElement instanceof LSFDocumentation ? ((LSFDocumentation) parentElement).getDocumentation(docElement) : null;
+
+            if (documentation != null || parentElement instanceof LSFFile)
+                break;
+
+            docElement = parentElement;
         }
 
-        return "https://docs.lsfusion.org/" +
+        return documentation != null ? "https://docs.lsfusion.org/" +
                 documentationLanguageMap.getOrDefault(getDocumentationLanguage(), "") + // default language is en
                 documentationVersionMap.getOrDefault(getDocumentationVersion(), "") + // default version is current
-                documentation.get(parentElement.getClass().getSimpleName());
+                documentation : null;
     }
 
     @Override
     public @Nullable String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
-        return readExternalDocumentation(getDocumentationURL(element));
+        String documentationURL = getDocumentationURL(element);
+        return documentationURL != null ? readExternalDocumentation(documentationURL) : null;
     }
 
     private String readExternalDocumentation(String documentationURL) {
@@ -126,6 +132,13 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
             return null;
         }
     }
+
+    //disable popup on mouse hover. Available only since 193.5233.102
+    //To disable manually: (Idea 211) Go to Settings -> Editor -> Code Editing and uncheck 'Show quick documentation on mouse move'
+//    @Override
+//    public @Nullable String generateHoverDoc(@NotNull PsiElement element, @Nullable PsiElement originalElement) {
+//        return null;
+//    }
 
     @Override
     public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement) {

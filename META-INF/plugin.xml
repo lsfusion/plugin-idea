@@ -10,6 +10,8 @@
         <b>Version 1.0.213</b><br>
         <ul>
             <li>EXTERNAL UDP</li>
+            <li>Fixes in quick-documentation</li>
+            <li>Fix renaming forms with "shift + F6"</li>
         </ul>
     ]]>
     </change-notes>

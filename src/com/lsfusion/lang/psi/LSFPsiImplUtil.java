@@ -4269,4 +4269,500 @@ public class LSFPsiImplUtil {
     private static boolean equalReferences(@NotNull LSFActionOrPropReference left, LSFActionOrPropReference right, int leftParams, PsiElement paramList) {
         return equalReferences(left, right) && equalParams(leftParams, paramList);
     }
+
+    // Documentation
+
+    public static String getDocumentation(LSFModuleHeader moduleHeader, PsiElement child) {
+        return "Module_header";
+    }
+
+    public static String getDocumentation(LSFClassDecl lsfClassDecl, PsiElement child) {
+        return "CLASS_statement";
+    }
+
+    public static String getDocumentation(LSFExtendingClassDeclaration lsfExtendingClassDeclaration, PsiElement child) {
+        return "EXTEND_CLASS_statement";
+    }
+
+    public static String getDocumentation(LSFClassStatement lsfClassStatement, PsiElement child) {
+        return "CLASS_statement";
+    }
+
+    public static String getDocumentation(LSFGroupStatement lsfGroupStatement, PsiElement child) {
+        return "GROUP_statement";
+    }
+
+
+    public static String getDocumentation(LSFPropertyStatement lsfPropertyStatement, PsiElement child) {
+        return "Properties";
+    }
+
+    public static String getDocumentation(LSFActionStatement lsfActionStatement, PsiElement child) {
+        return "ACTION_statement";
+    }
+
+    //use only with LSFExpression instances
+    private static String getDocumentation(LSFExpression parent, PsiElement child, String documentation) {
+        return parent.getChildren().length > 1 && parent.getChildren()[0] != child ? documentation : null;
+    }
+
+    public static String getDocumentation(LSFIfPE lsfIfPE, PsiElement child) {
+        return getDocumentation(lsfIfPE, child, "IF_operator");
+    }
+
+    public static String getDocumentation(LSFOrPE lsfOrPE, PsiElement child) {
+        return getDocumentation(lsfOrPE, child, "AND_OR_NOT_XOR_operators");
+    }
+
+    public static String getDocumentation(LSFXorPE lsfXorPE, PsiElement child) {
+        return getDocumentation(lsfXorPE, child, "AND_OR_NOT_XOR_operators");
+    }
+
+    public static String getDocumentation(LSFAndPE lsfAndPE, PsiElement child) {
+        return getDocumentation(lsfAndPE, child, "AND_OR_NOT_XOR_operators");
+    }
+
+    public static String getDocumentation(LSFNotPE lsfNotPE, PsiElement child) {
+        return getDocumentation(lsfNotPE, child, "AND_OR_NOT_XOR_operators");
+    }
+
+    public static String getDocumentation(LSFEqualityPE lsfEqualityPE, PsiElement child) {
+        return getDocumentation(lsfEqualityPE, child, "Comparison_operators_=_etc");
+    }
+
+    public static String getDocumentation(LSFRelationalPE lsfRelationalPE, PsiElement child) {
+        return getDocumentation(lsfRelationalPE, child, "Comparison_operators_=_etc");
+    }
+
+    public static String getDocumentation(LSFLikePE lsfLikePE, PsiElement child) {
+        return getDocumentation(lsfLikePE, child, "Arithmetic_operators_+_-_etc");
+    }
+
+    public static String getDocumentation(LSFAdditiveORPE lsfAdditiveORPE, PsiElement child) {
+        return getDocumentation(lsfAdditiveORPE, child, "Arithmetic_operators_+_-_etc");
+    }
+
+    public static String getDocumentation(LSFAdditivePE lsfAdditivePE, PsiElement child) {
+        return getDocumentation(lsfAdditivePE, child, "Arithmetic_operators_+_-_etc");
+    }
+
+    public static String getDocumentation(LSFMultiplicativePE lsfMultiplicativePE, PsiElement child) {
+        return getDocumentation(lsfMultiplicativePE, child, "Arithmetic_operators_+_-_etc");
+    }
+
+    public static String getDocumentation(LSFAggrPropertyDefinition lsfAggrPropertyDefinition, PsiElement child) {
+        return "AGGR_operator";
+    }
+
+    public static String getDocumentation(LSFOverrideOperator lsfOverrideOperator, PsiElement child) {
+        return "OVERRIDE_operator";
+    }
+
+    public static String getDocumentation(LSFExclusiveOperator lsfExclusiveOperator, PsiElement child) {
+        return "EXCLUSIVE_operator";
+    }
+
+    public static String getDocumentation(LSFIfElsePropertyDefinition lsfIfElsePropertyDefinition, PsiElement child) {
+        return "IF_..._THEN_operator";
+    }
+
+    public static String getDocumentation(LSFMaxPropertyDefinition lsfMaxPropertyDefinition, PsiElement child) {
+        return "Extremum_MAX_MIN";
+    }
+
+    public static String getDocumentation(LSFCasePropertyDefinition lsfCasePropertyDefinition, PsiElement child) {
+        return "CASE_operator";
+    }
+
+    public static String getDocumentation(LSFMultiPropertyDefinition lsfMultiPropertyDefinition, PsiElement child) {
+        return "MULTI_operator";
+    }
+
+    public static String getDocumentation(LSFPartitionPropertyDefinition lsfPartitionPropertyDefinition, PsiElement child) {
+        return "PARTITION_operator";
+    }
+
+    public static String getDocumentation(LSFRecursivePropertyDefinition lsfRecursivePropertyDefinition, PsiElement child) {
+        return "RECURSION_operator";
+    }
+
+    public static String getDocumentation(LSFStructCreationPropertyDefinition lsfStructCreationPropertyDefinition, PsiElement child) {
+        return "STRUCT_operator";
+    }
+
+    public static String getDocumentation(LSFConcatPropertyDefinition lsfConcatPropertyDefinition, PsiElement child) {
+        return "CONCAT_operator";
+    }
+
+    public static String getDocumentation(LSFSessionPropertyDefinition lsfSessionPropertyDefinition, PsiElement child) {
+        return "Change_operators_SET_CHANGED_etc";
+    }
+
+    public static String getDocumentation(LSFActiveTabPropertyDefinition lsfActiveTabPropertyDefinition, PsiElement child) {
+        return "ACTIVE_TAB_operator";
+    }
+
+    public static String getDocumentation(LSFDataPropertyDefinition lsfDataPropertyDefinition, PsiElement child) {
+        return "DATA_operator";
+    }
+
+    public static String getDocumentation(LSFAbstractPropertyDefinition lsfAbstractPropertyDefinition, PsiElement child) {
+        return "ABSTRACT_operator";
+    }
+
+    public static String getDocumentation(LSFFormulaPropertyDefinition lsfFormulaPropertyDefinition, PsiElement child) {
+        return "FORMULA_operator";
+    }
+
+    public static String getDocumentation(LSFGroupPropertyDefinition lsfGroupPropertyDefinition, PsiElement child) {
+        return "GROUP_operator";
+    }
+
+    public static String getDocumentation(LSFGroupExprPropertyDefinition lsfGroupExprPropertyDefinition, PsiElement child) {
+        return "GROUP_operator";
+    }
+
+    public static String getDocumentation(LSFFilterPropertyDefinition lsfFilterPropertyDefinition, PsiElement child) {
+        return "Object_group_operator";
+    }
+
+    public static String getDocumentation(LSFTypePropertyDefinition lsfTypePropertyDefinition, PsiElement child) {
+        return "IS_AS_operators";
+    }
+
+    public static String getDocumentation(LSFNonEmptyPropertyOptions lsfNonEmptyPropertyOptions, PsiElement child) {
+        return "Property_options";
+    }
+
+    public static String getDocumentation(LSFAbstractActionPropertyDefinition lsfAbstractActionPropertyDefinition, PsiElement child) {
+        return "ABSTRACT_action_operator";
+    }
+
+    public static String getDocumentation(LSFObjectInputProps lsfObjectInputProps, PsiElement child) {
+        return "INPUT_operator";
+    }
+
+    public static String getDocumentation(LSFFormActionPropertyDefinitionBody lsfFormActionPropertyDefinitionBody, PsiElement child) {
+        return "SHOW_operator";
+    }
+
+    public static String getDocumentation(LSFDialogActionPropertyDefinitionBody lsfDialogActionPropertyDefinitionBody, PsiElement child) {
+        return "DIALOG_operator";
+    }
+
+    public static String getDocumentation(LSFPrintActionPropertyDefinitionBody lsfPrintActionPropertyDefinitionBody, PsiElement child) {
+        return "PRINT_operator";
+    }
+
+    public static String getDocumentation(LSFExportActionPropertyDefinitionBody lsfExportActionPropertyDefinitionBody, PsiElement child) {
+        return "EXPORT_operator";
+    }
+
+    public static String getDocumentation(LSFExportDataActionPropertyDefinitionBody lsfExportDataActionPropertyDefinitionBody, PsiElement child) {
+        return "Data_export_EXPORT";
+    }
+
+    public static String getDocumentation(LSFCustomActionPropertyDefinitionBody lsfCustomActionPropertyDefinitionBody, PsiElement child) {
+        return "INTERNAL_operator";
+    }
+
+    public static String getDocumentation(LSFExternalActionPropertyDefinitionBody lsfExternalActionPropertyDefinitionBody, PsiElement child) {
+        return "EXTERNAL_operator";
+    }
+
+    public static String getDocumentation(LSFNewWhereActionPropertyDefinitionBody lsfNewWhereActionPropertyDefinitionBody, PsiElement child) {
+        return "NEW_operator";
+    }
+
+    public static String getDocumentation(LSFEmailActionPropertyDefinitionBody lsfEmailActionPropertyDefinitionBody, PsiElement child) {
+        return "EMAIL_operator";
+    }
+
+    public static String getDocumentation(LSFConfirmActionPropertyDefinitionBody lsfConfirmActionPropertyDefinitionBody, PsiElement child) {
+        return "ASK_operator";
+    }
+
+    public static String getDocumentation(LSFMessageActionPropertyDefinitionBody lsfMessageActionPropertyDefinitionBody, PsiElement child) {
+        return "MESSAGE_operator";
+    }
+
+    public static String getDocumentation(LSFSeekObjectActionPropertyDefinitionBody lsfSeekObjectActionPropertyDefinitionBody, PsiElement child) {
+        return "SEEK_operator";
+    }
+
+    public static String getDocumentation(LSFChangeClassActionPropertyDefinitionBody lsfChangeClassActionPropertyDefinitionBody, PsiElement child) {
+        return "CHANGECLASS_operator";
+    }
+
+    public static String getDocumentation(LSFDeleteActionPropertyDefinitionBody lsfDeleteActionPropertyDefinitionBody, PsiElement child) {
+        return "DELETE_operator";
+    }
+
+    public static String getDocumentation(LSFEvalActionPropertyDefinitionBody lsfEvalActionPropertyDefinitionBody, PsiElement child) {
+        return "EVAL_operator";
+    }
+
+    public static String getDocumentation(LSFReadActionPropertyDefinitionBody lsfReadActionPropertyDefinitionBody, PsiElement child) {
+        return "READ_operator";
+    }
+
+    public static String getDocumentation(LSFWriteActionPropertyDefinitionBody lsfWriteActionPropertyDefinitionBody, PsiElement child) {
+        return "WRITE_operator";
+    }
+
+    public static String getDocumentation(LSFImportActionPropertyDefinitionBody lsfImportActionPropertyDefinitionBody, PsiElement child) {
+        return "IMPORT_operator";
+    }
+
+    public static String getDocumentation(LSFImportFormActionPropertyDefinitionBody lsfImportFormActionPropertyDefinitionBody, PsiElement child) {
+        return "IMPORT_operator";
+    }
+
+    public static String getDocumentation(LSFNewThreadActionPropertyDefinitionBody lsfNewThreadActionPropertyDefinitionBody, PsiElement child) {
+        return "NEWTHREAD_operator";
+    }
+
+    public static String getDocumentation(LSFNewExecutorActionPropertyDefinitionBody lsfNewExecutorActionPropertyDefinitionBody, PsiElement child) {
+        return "NEWEXECUTOR_operator";
+    }
+
+    public static String getDocumentation(LSFNewSessionOperator lsfNewSessionOperator, PsiElement child) {
+        return "NEWSESSION_operator";
+    }
+
+    public static String getDocumentation(LSFNestedSessionOperator lsfNestedSessionOperator, PsiElement child) {
+        return "NESTEDSESSION_operator";
+    }
+
+    public static String getDocumentation(LSFRequestActionPropertyDefinitionBody lsfRequestActionPropertyDefinitionBody, PsiElement child) {
+        return "REQUEST_operator";
+    }
+
+    public static String getDocumentation(LSFInputActionPropertyDefinitionBody lsfInputActionPropertyDefinitionBody, PsiElement child) {
+        return "INPUT_operator";
+    }
+
+    public static String getDocumentation(LSFActiveFormActionPropertyDefinitionBody lsfActiveFormActionPropertyDefinitionBody, PsiElement child) {
+        return "ACTIVE_FORM_operator";
+    }
+
+    public static String getDocumentation(LSFActivateActionPropertyDefinitionBody lsfActivateActionPropertyDefinitionBody, PsiElement child) {
+        return "ACTIVATE_operator";
+    }
+
+    public static String getDocumentation(LSFListActionPropertyDefinitionBody lsfListActionPropertyDefinitionBody, PsiElement child) {
+        return "Braces_operator";
+    }
+
+    public static String getDocumentation(LSFLocalDataPropertyDefinition lsfLocalDataPropertyDefinition, PsiElement child) {
+        return "DATA_operator";
+    }
+
+    public static String getDocumentation(LSFNestedLocalModifier lsfNestedLocalModifier, PsiElement child) {
+        return "DATA_operator";
+    }
+
+    public static String getDocumentation(LSFExecActionPropertyDefinitionBody lsfExecActionPropertyDefinitionBody, PsiElement child) {
+        return "EXEC_operator";
+    }
+
+    public static String getDocumentation(LSFAssignActionPropertyDefinitionBody lsfAssignActionPropertyDefinitionBody, PsiElement child) {
+        return "CHANGE_operator";
+    }
+
+    public static String getDocumentation(LSFTryActionPropertyDefinitionBody lsfTryActionPropertyDefinitionBody, PsiElement child) {
+        return "TRY_operator";
+    }
+
+    public static String getDocumentation(LSFIfActionPropertyDefinitionBody lsfIfActionPropertyDefinitionBody, PsiElement child) {
+        return "IF_..._THEN_operator";
+    }
+
+    public static String getDocumentation(LSFCaseActionPropertyDefinitionBody lsfCaseActionPropertyDefinitionBody, PsiElement child) {
+        return "CASE_action_operator";
+    }
+
+    public static String getDocumentation(LSFMultiActionPropertyDefinitionBody lsfMultiActionPropertyDefinitionBody, PsiElement child) {
+        return "MULTI_action_operator";
+    }
+
+    public static String getDocumentation(LSFApplyActionPropertyDefinitionBody lsfApplyActionPropertyDefinitionBody, PsiElement child) {
+        return "APPLY_operator";
+    }
+
+    public static String getDocumentation(LSFCancelActionPropertyDefinitionBody lsfCancelActionPropertyDefinitionBody, PsiElement child) {
+        return "CANCEL_operator";
+    }
+
+    public static String getDocumentation(LSFNewActionPropertyDefinitionBody lsfNewActionPropertyDefinitionBody, PsiElement child) {
+        return "NEW_operator";
+    }
+
+    public static String getDocumentation(LSFForActionPropertyMainBody lsfForActionPropertyMainBody, PsiElement child) {
+        return "FOR_operator";
+    }
+
+    public static String getDocumentation(LSFWhileActionPropertyDefinitionBody lsfWhileActionPropertyDefinitionBody, PsiElement child) {
+        return "WHILE_operator";
+    }
+
+    public static String getDocumentation(LSFBreakActionOperator lsfBreakActionOperator, PsiElement child) {
+        return "BREAK_operator";
+    }
+
+    public static String getDocumentation(LSFReturnActionOperator lsfReturnActionOperator, PsiElement child) {
+        return "RETURN_operator";
+    }
+
+    public static String getDocumentation(LSFListFormDeclaration listFormDeclaration, PsiElement child) {
+        return "Properties_and_actions_block";
+    }
+
+    public static String getDocumentation(LSFEditFormDeclaration lsfEditFormDeclaration, PsiElement child) {
+        return "Properties_and_actions_block";
+    }
+
+    public static String getDocumentation(LSFReportSetting lsfReportSetting, PsiElement child) {
+        return "FORM_statement";
+    }
+
+    public static String getDocumentation(LSFFormExtIDSetting lsfFormExtIDSetting, PsiElement child) {
+        return "FORM_statement";
+    }
+
+    public static String getDocumentation(LSFFormDecl lsfFormDecl, PsiElement child) {
+        return "FORM_statement";
+    }
+
+    public static String getDocumentation(LSFExtendingFormDeclaration lsfExtendingFormDeclaration, PsiElement child) {
+        return "EXTEND_FORM_statement";
+    }
+
+    public static String getDocumentation(LSFFormGroupObjectsList lsfFormGroupObjectsList, PsiElement child) {
+        return "Object_blocks";
+    }
+
+    public static String getDocumentation(LSFFormTreeGroupObjectList lsfFormTreeGroupObjectList, PsiElement child) {
+        return "Object_blocks";
+    }
+
+    public static String getDocumentation(LSFFormGroupObjectOptions lsfFormGroupObjectOptions, PsiElement child) {
+        return "Object_blocks";
+    }
+
+    public static String getDocumentation(LSFFormPropertiesList lsfFormPropertiesList, PsiElement child) {
+        return "Properties_and_actions_block";
+    }
+
+    public static String getDocumentation(LSFFormOptionsOnEvents lsfFormOptionsOnEvents, PsiElement child) {
+        return "Form_events";
+    }
+
+    public static String getDocumentation(LSFFormFiltersList lsfFormFiltersList, PsiElement child) {
+        return "Filters_and_sortings_block";
+    }
+
+    public static String getDocumentation(LSFFormEventsList lsfFormEventsList, PsiElement child) {
+        return "Event_block";
+    }
+
+    public static String getDocumentation(LSFFormFilterGroupDeclaration lsfFormFilterGroupDeclaration, PsiElement child) {
+        return "Filters_and_sortings_block";
+    }
+
+    public static String getDocumentation(LSFFormExtendFilterGroupDeclaration lsfFormExtendFilterGroupDeclaration, PsiElement child) {
+        return "Filters_and_sortings_block";
+    }
+
+    public static String getDocumentation(LSFFormOrderByList lsfFormOrderByList, PsiElement child) {
+        return "Filters_and_sortings_block";
+    }
+
+    public static String getDocumentation(LSFFormPivotOptionsDeclaration lsfFormPivotOptionsDeclaration, PsiElement child) {
+        return "Properties_and_actions_block";
+    }
+
+    public static String getDocumentation(LSFOverrideActionStatement lsfOverrideActionStatement, PsiElement child) {
+        return "ACTION+_statement";
+    }
+
+    public static String getDocumentation(LSFOverridePropertyStatement lsfOverridePropertyStatement, PsiElement child) {
+        return "+=_statement";
+    }
+
+    public static String getDocumentation(LSFConstraintStatement lsfConstraintStatement, PsiElement child) {
+        return "CONSTRAINT_statement";
+    }
+
+    public static String getDocumentation(LSFFollowsStatement lsfFollowsStatement, PsiElement child) {
+        return "=gt_statement";
+    }
+
+    public static String getDocumentation(LSFWriteWhenStatement lsfWriteWhenStatement, PsiElement child) {
+        return "lt-_WHEN_statement";
+    }
+
+    public static String getDocumentation(LSFEventStatement lsfEventStatement, PsiElement child) {
+        return "WHEN_statement";
+    }
+
+    public static String getDocumentation(LSFGlobalEventStatement lsfGlobalEventStatement, PsiElement child) {
+        return "ON_statement";
+    }
+
+    public static String getDocumentation(LSFAspectBefore lsfAspectBefore, PsiElement child) {
+        return "BEFORE_statement";
+    }
+
+    public static String getDocumentation(LSFAspectAfter lsfAspectAfter, PsiElement child) {
+        return "AFTER_statement";
+    }
+
+    public static String getDocumentation(LSFTableStatement lsfTableStatement, PsiElement child) {
+        return "TABLE_statement";
+    }
+
+    public static String getDocumentation(LSFIndexStatement lsfIndexStatement, PsiElement child) {
+        return "INDEX_statement";
+    }
+
+    public static String getDocumentation(LSFWindowCreateStatement lsfWindowCreateStatement, PsiElement child) {
+        return "WINDOW_statement";
+    }
+
+    public static String getDocumentation(LSFNavigatorStatement lsfNavigatorStatement, PsiElement child) {
+        return "NAVIGATOR_statement";
+    }
+
+    public static String getDocumentation(LSFDesignStatement lsfDesignStatement, PsiElement child) {
+        return "DESIGN_statement";
+    }
+
+    public static String getDocumentation(LSFMetaCodeDeclarationStatement lsfMetaCodeDeclarationStatement, PsiElement child) {
+        return "META_statement";
+    }
+
+    public static String getDocumentation(LSFLiteral lsfLiteral, PsiElement child) {
+        return "Literals";
+    }
+
+    public static String getDocumentation(LSFBuiltInClassName lsfBuiltInClassName, PsiElement child) {
+        return "Built-in_classes";
+    }
+
+    public static String getDocumentation(LSFMetacodeUsage lsfMetacodeUsage, PsiElement child) {
+        return "commat_statement";
+    }
+
+    public static String getDocumentation(LSFExclusiveOverrideOption lsfExclusiveOverrideOption, PsiElement child) {
+        return "Selection_CASE_IF_MULTI_OVERRIDE_EXCLUSIVE";
+    }
+
+    public static String getDocumentation(LSFAbstractExclusiveOverrideOption lsfAbstractExclusiveOverrideOption, PsiElement child) {
+        return "Selection_CASE_IF_MULTI_OVERRIDE_EXCLUSIVE";
+    }
+
+    public static String getDocumentation(LSFEqualsSign lsfEqualsSign, PsiElement child) {
+        return "=_statement";
+    }
 }
