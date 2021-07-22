@@ -12,6 +12,7 @@
             <li>EXTERNAL UDP</li>
             <li>Fixes in quick-documentation</li>
             <li>Fix renaming forms with "shift + F6"</li>
+            <li>EXTERNAL HTTP BODYPARAMHEADERS option</li>
         </ul>
     ]]>
     </change-notes>

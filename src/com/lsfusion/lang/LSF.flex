@@ -189,6 +189,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "BCC"                     			{ return BCC; }
   "BEFORE"                  			{ return BEFORE; }
   "BODY"                  			    { return BODY; }
+  "BODYPARAMHEADERS"                    { return BODYPARAMHEADERS; }
   "BODYPARAMNAMES"                      { return BODYPARAMNAMES; }
   "BODYURL"                  			{ return BODYURL; }
   "BOTTOM"                  			{ return BOTTOM; }
