@@ -4,6 +4,8 @@ import com.intellij.psi.PsiElement;
 
 public interface LSFDocumentation extends PsiElement {
 
-    String getDocumentation(PsiElement child);
+    default String getDocumentation(PsiElement child) {
+        return null;
+    }
 
 }

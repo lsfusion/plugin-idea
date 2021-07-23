@@ -1,5 +1,6 @@
 package com.lsfusion.lang.psi.extend;
 
+import com.lsfusion.documentation.LSFDocumentation;
 import com.lsfusion.lang.psi.LSFStringClassRef;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
@@ -9,7 +10,7 @@ import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
 import java.util.List;
 import java.util.Set;
 
-public interface LSFClassExtend extends LSFExtend<LSFClassExtend, ExtendClassStubElement> {
+public interface LSFClassExtend extends LSFExtend<LSFClassExtend, ExtendClassStubElement>, LSFDocumentation {
     
     List<LSFClassDeclaration> resolveExtends();
 

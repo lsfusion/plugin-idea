@@ -4302,52 +4302,52 @@ public class LSFPsiImplUtil {
     }
 
     //use only with LSFExpression instances
-    private static String getDocumentation(LSFExpression parent, PsiElement child, String documentation) {
+    private static String getLSFExpressionDocumentation(LSFExpression parent, PsiElement child, String documentation) {
         return parent.getChildren().length > 1 && parent.getChildren()[0] != child ? documentation : null;
     }
 
     public static String getDocumentation(LSFIfPE lsfIfPE, PsiElement child) {
-        return getDocumentation(lsfIfPE, child, "IF_operator");
+        return getLSFExpressionDocumentation(lsfIfPE, child, "IF_operator");
     }
 
     public static String getDocumentation(LSFOrPE lsfOrPE, PsiElement child) {
-        return getDocumentation(lsfOrPE, child, "AND_OR_NOT_XOR_operators");
+        return getLSFExpressionDocumentation(lsfOrPE, child, "AND_OR_NOT_XOR_operators");
     }
 
     public static String getDocumentation(LSFXorPE lsfXorPE, PsiElement child) {
-        return getDocumentation(lsfXorPE, child, "AND_OR_NOT_XOR_operators");
+        return getLSFExpressionDocumentation(lsfXorPE, child, "AND_OR_NOT_XOR_operators");
     }
 
     public static String getDocumentation(LSFAndPE lsfAndPE, PsiElement child) {
-        return getDocumentation(lsfAndPE, child, "AND_OR_NOT_XOR_operators");
+        return getLSFExpressionDocumentation(lsfAndPE, child, "AND_OR_NOT_XOR_operators");
     }
 
     public static String getDocumentation(LSFNotPE lsfNotPE, PsiElement child) {
-        return getDocumentation(lsfNotPE, child, "AND_OR_NOT_XOR_operators");
+        return getLSFExpressionDocumentation(lsfNotPE, child, "AND_OR_NOT_XOR_operators");
     }
 
     public static String getDocumentation(LSFEqualityPE lsfEqualityPE, PsiElement child) {
-        return getDocumentation(lsfEqualityPE, child, "Comparison_operators_=_etc");
+        return getLSFExpressionDocumentation(lsfEqualityPE, child, "Comparison_operators_=_etc");
     }
 
     public static String getDocumentation(LSFRelationalPE lsfRelationalPE, PsiElement child) {
-        return getDocumentation(lsfRelationalPE, child, "Comparison_operators_=_etc");
+        return getLSFExpressionDocumentation(lsfRelationalPE, child, "Comparison_operators_=_etc");
     }
 
     public static String getDocumentation(LSFLikePE lsfLikePE, PsiElement child) {
-        return getDocumentation(lsfLikePE, child, "Arithmetic_operators_+_-_etc");
+        return getLSFExpressionDocumentation(lsfLikePE, child, "Arithmetic_operators_+_-_etc");
     }
 
     public static String getDocumentation(LSFAdditiveORPE lsfAdditiveORPE, PsiElement child) {
-        return getDocumentation(lsfAdditiveORPE, child, "Arithmetic_operators_+_-_etc");
+        return getLSFExpressionDocumentation(lsfAdditiveORPE, child, "Arithmetic_operators_+_-_etc");
     }
 
     public static String getDocumentation(LSFAdditivePE lsfAdditivePE, PsiElement child) {
-        return getDocumentation(lsfAdditivePE, child, "Arithmetic_operators_+_-_etc");
+        return getLSFExpressionDocumentation(lsfAdditivePE, child, "Arithmetic_operators_+_-_etc");
     }
 
     public static String getDocumentation(LSFMultiplicativePE lsfMultiplicativePE, PsiElement child) {
-        return getDocumentation(lsfMultiplicativePE, child, "Arithmetic_operators_+_-_etc");
+        return getLSFExpressionDocumentation(lsfMultiplicativePE, child, "Arithmetic_operators_+_-_etc");
     }
 
     public static String getDocumentation(LSFAggrPropertyDefinition lsfAggrPropertyDefinition, PsiElement child) {

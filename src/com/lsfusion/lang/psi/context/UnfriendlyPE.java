@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.context;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
+import com.lsfusion.documentation.LSFDocumentation;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFExplicitClasses;
 import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
@@ -10,7 +11,7 @@ import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import java.util.List;
 import java.util.Map;
 
-public interface UnfriendlyPE extends PsiElement {
+public interface UnfriendlyPE extends PsiElement, LSFDocumentation {
 
     // только у property
     LSFExClassSet resolveUnfriendValueClass(boolean infer);

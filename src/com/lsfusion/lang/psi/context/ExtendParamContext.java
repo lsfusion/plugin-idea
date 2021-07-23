@@ -1,4 +1,6 @@
 package com.lsfusion.lang.psi.context;
 
-public interface ExtendParamContext extends ModifyParamContext {
+import com.lsfusion.documentation.LSFDocumentation;
+
+public interface ExtendParamContext extends ModifyParamContext, LSFDocumentation {
 }

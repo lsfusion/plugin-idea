@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.context;
 
 import com.intellij.psi.PsiElement;
+import com.lsfusion.documentation.LSFDocumentation;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFStringClassRef;
 import com.lsfusion.lang.typeinfer.InferExResult;
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface LSFExpression extends PsiElement {
+public interface LSFExpression extends PsiElement, LSFDocumentation {
 
     LSFExClassSet resolveInferredValueClass(@Nullable InferExResult inferred);
 
