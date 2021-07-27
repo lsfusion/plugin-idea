@@ -669,6 +669,8 @@ public class LSFPsiImplUtil {
                 return ImageClass.instance;
             case "PDFFILE":
                 return PDFClass.instance;
+            case "DBFFILE":
+                return DBFClass.instance;
             case "RAWFILE":
                 return RawClass.instance;
             case "FILE":
@@ -693,6 +695,8 @@ public class LSFPsiImplUtil {
                 return ImageLinkClass.instance;
             case "PDFLINK":
                 return PDFLinkClass.instance;
+            case "DBFLINK":
+                return DBFLinkClass.instance;
             case "RAWLINK":
                 return RawLinkClass.instance;
             case "LINK":
