@@ -68,6 +68,10 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
     public void setPanelCaptionVertical(boolean panelCaptionVertical) {
         target.panelCaptionVertical = panelCaptionVertical;
     }
+    
+    public void setPanelCaptionAlignment(FlexAlignment panelCaptionAlignment) {
+        target.panelCaptionAlignment = panelCaptionAlignment;
+    }
 
     public void setCaption(String caption) {
         target.caption = caption;

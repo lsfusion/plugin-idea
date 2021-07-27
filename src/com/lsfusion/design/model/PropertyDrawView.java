@@ -46,6 +46,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("showChangeKey").setExpert(),
             new ReflectionProperty("focusable"),
             new ReflectionProperty("panelCaptionVertical"),
+            new ReflectionProperty("panelCaptionAlignment"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("clearText").setExpert(),
             new ReflectionProperty("notSelectAll").setExpert(),
@@ -80,6 +81,7 @@ public class PropertyDrawView extends ComponentView {
     public Boolean focusable;
 
     public boolean panelCaptionVertical = false;
+    public FlexAlignment panelCaptionAlignment;
 
     public boolean panelColumnVertical;
 
@@ -330,6 +332,10 @@ public class PropertyDrawView extends ComponentView {
         this.panelCaptionVertical = panelCaptionVertical;
     }
 
+    public void setPanelCaptionAlignment(FlexAlignment panelCaptionAlignment) {
+        this.panelCaptionAlignment = panelCaptionAlignment;
+    }
+
     public void setCaption(String caption) {
         this.caption = caption;
     }
@@ -428,6 +434,14 @@ public class PropertyDrawView extends ComponentView {
 
     public boolean isPanelCaptionVertical() {
         return panelCaptionVertical;
+    }
+
+    public FlexAlignment getPanelCaptionAlignment() {
+        return panelCaptionAlignment;
+    }
+
+    public FlexAlignment getNotNullPanelCaptionAlignment() {
+        return panelCaptionAlignment != null ? panelCaptionAlignment : FlexAlignment.CENTER;
     }
 
     public boolean isClearText() {

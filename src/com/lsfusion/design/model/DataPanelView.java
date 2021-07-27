@@ -19,8 +19,6 @@ public class DataPanelView extends JBPanel {
 
         setLayout(new FlexLayout(this, property.panelCaptionVertical, Alignment.CENTER));
 
-        
-
         JBLabel label = new JBLabel(property.getEditCaption());
         if (!property.panelCaptionVertical) {
             label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
@@ -33,7 +31,7 @@ public class DataPanelView extends JBPanel {
             table.setFont(property.font.deriveFrom(table));
         }
 
-        add(label, new FlexConstraints(FlexAlignment.CENTER, 0));
+        add(label, new FlexConstraints(property.getNotNullPanelCaptionAlignment(), 0));
         add(table, new FlexConstraints(FlexAlignment.STRETCH, 1));
 
         label.setToolTipText(property.getTooltipText(property.getCaption()));
