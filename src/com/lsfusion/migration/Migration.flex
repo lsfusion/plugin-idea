@@ -36,7 +36,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
     ({LINE_WS} | {EOL})+                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
     "//" [^\n\r]*                         { return COMMENTS; }
     
-    "INTEGER" | "DOUBLE" | "LONG" | "BOOLEAN"
+    "INTEGER" | "DOUBLE" | "LONG" | "BOOLEAN" | "TBOOLEAN"
     | "DATETIME" | "DATE" | "YEAR" | "TIME" | "ZDATETIME" | "INTERVAL" ("["{INTERVAL_TYPE}"]")
     | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "DBFFILE" | "RAWFILE" | "FILE" | "EXCELFILE" | "TEXTFILE" | "CSVFILE" | "HTMLFILE" | "JSONFILE" | "XMLFILE" | "TABLEFILE"
     | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "DBFLINK" | "RAWLINK" | "LINK" | "EXCELLINK" | "TEXTLINK" | "CSVLINK" | "HTMLLINK" | "JSONLINK" | "XMLLINK" | "TABLELINK"

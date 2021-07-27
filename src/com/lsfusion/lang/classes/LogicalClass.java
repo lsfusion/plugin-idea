@@ -6,16 +6,29 @@ import java.awt.*;
 
 public class LogicalClass extends DataClass {
 
-    public final static LogicalClass instance = new LogicalClass();
+    public final static LogicalClass instance = new LogicalClass(false);
+
+    public final static LogicalClass threeStateInstance = new LogicalClass(true);
+
+    boolean threeState;
+
+    public LogicalClass(boolean threeState) {
+        this.threeState = threeState;
+    }
+
+    @Override
+    public DataClass op(DataClass compClass, boolean or, boolean string) {
+        return compClass instanceof LogicalClass ? this : null;
+    }
 
     @Override
     public String getName() {
-        return "BOOLEAN";
+        return threeState ? "TBOOLEAN" : "BOOLEAN";
     }
 
     @Override
     public String getCaption() {
-        return "Boolean";
+        return threeState ? "TBoolean" : "Boolean";
     }
 
     @Override

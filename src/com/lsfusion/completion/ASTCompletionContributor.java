@@ -77,7 +77,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "TEXTFILE", "CSVFILE", "HTMLFILE", "JSONFILE", "XMLFILE", "TABLEFILE",
                                                                  "WORDLINK", "IMAGELINK", "PDFLINK", "DBFLINK", "RAWLINK", "LINK", "EXCELLINK",
                                                                  "TEXTLINK", "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK", "TABLELINK",
-                                                                 "BOOLEAN", "COLOR"};
+                                                                 "BOOLEAN", "TBOOLEAN", "COLOR"};
     
     private static final Set<String> DESIGN_PROPERTIES = new LinkedHashSet<String>() {
     {

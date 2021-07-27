@@ -717,6 +717,8 @@ public class LSFPsiImplUtil {
                 return TableLinkClass.instance;
             case "BOOLEAN":
                 return LogicalClass.instance;
+            case "TBOOLEAN":
+                return LogicalClass.threeStateInstance;
             case "DATE":
                 return DateClass.instance;
             case "TIME":
