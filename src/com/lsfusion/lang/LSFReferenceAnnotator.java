@@ -972,44 +972,38 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (declaration != null) {
                 if (declaration instanceof LSFPropertyStatement) {
                     LSFPropertyCalcStatement propertyStatement = ((LSFPropertyStatement) declaration).getPropertyCalcStatement();
-                    if (propertyStatement == null) {
+                    LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
+                    if (expression != null && !assignAllowed(expression)) {
                         addAssignError(o);
                     } else {
-                        LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
-                        if (expression != null && !assignAllowed(expression)) {
-                            addAssignError(o);
-                        } else {
-                            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
-                            if (expressionUnfriendlyPD != null) {
-                                LSFGroupPropertyDefinition groupPD = expressionUnfriendlyPD.getGroupPropertyDefinition();
-                                if (groupPD != null)
-                                    addAssignError(o);
-                            }
+                        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
+                        if (expressionUnfriendlyPD != null) {
+                            LSFGroupPropertyDefinition groupPD = expressionUnfriendlyPD.getGroupPropertyDefinition();
+                            if (groupPD != null)
+                                addAssignError(o);
                         }
                     }
-                    LSFClassSet leftClass = declaration.resolveValueClass();
-                    List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
-                    if (!rightPropertyExpressionList.isEmpty()) {
-                        LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
-                        if (leftClass != null && rightClass != null) {
-                            if (!leftClass.isCompatible(rightClass))
-                                addTypeMismatchError(o, rightClass, leftClass);
-                        }
-                    }
+
+                    checkTypeMismatch(o, declaration);
+
                 } else if (declaration instanceof LSFLocalPropertyDeclarationNameImpl) {
-                    LSFClassSet leftClass = declaration.resolveValueClass();
-                    List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
-                    if (!rightPropertyExpressionList.isEmpty()) {
-                        LSFPropertyExpression rightPropertyExpression = rightPropertyExpressionList.get(0);
-                        LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpression.resolveValueClass(false));
-                        if (leftClass != null && rightClass != null) {
-                            if (!leftClass.isCompatible(rightClass)) {
-                                addTypeMismatchError(o, rightClass, leftClass);
-                            } else if (leftClass.getCanonicalName().equals("BOOLEAN") && rightPropertyExpression.getText().equals("FALSE")) {
-                                addFalseToBooleanAssignError(o);
-                            }
-                        }
-                    }
+                    checkTypeMismatch(o, declaration);
+                }
+            }
+        }
+    }
+
+    private void checkTypeMismatch(LSFAssignActionPropertyDefinitionBody o, LSFPropDeclaration declaration) {
+        LSFClassSet leftClass = declaration.resolveValueClass();
+        List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
+        if (!rightPropertyExpressionList.isEmpty()) {
+            LSFPropertyExpression rightPropertyExpression = rightPropertyExpressionList.get(0);
+            LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpression.resolveValueClass(false));
+            if (leftClass != null && rightClass != null) {
+                if (!leftClass.isCompatible(rightClass)) {
+                    addTypeMismatchError(o, rightClass, leftClass);
+                } else if (leftClass.getCanonicalName().equals("BOOLEAN") && rightPropertyExpression.getText().equals("FALSE")) {
+                    addFalseToBooleanAssignError(o);
                 }
             }
         }

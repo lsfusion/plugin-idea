@@ -2185,6 +2185,7 @@ componentPropertyValue ::= //commented literals are in designCalcPropertyObject
                         //|	doubleLiteral
                             dimensionLiteral
                         |	booleanLiteral
+                        |	tbooleanLiteral
                         |	boundsIntLiteral
                         |	boundsDoubleLiteral
                         |   containerTypeLiteral
@@ -2247,6 +2248,7 @@ metaCodeLiteral ::= LEX_STRING_LITERAL
                 |	LEX_UDOUBLE_LITERAL
                 |	LEX_ULONG_LITERAL
                 |	LEX_LOGICAL_LITERAL
+                |	LEX_T_LOGICAL_LITERAL
                 |	LEX_DATE_LITERAL
                 |	LEX_DATETIME_LITERAL
                 |	LEX_TIME_LITERAL
@@ -2323,6 +2325,7 @@ literal ::=
 	|	unumericLiteral
 	|	(<<noIDCheck>> localizedStringLiteral) // since there is a parameter afterwards we need to do lookahead (same as in staticObjectID)
 	|	booleanLiteral
+	|	tbooleanLiteral
 	|	dateTimeLiteral
 	|	dateLiteral
 	|	timeLiteral
@@ -2477,6 +2480,7 @@ dateLiteral ::= LEX_DATE_LITERAL
 dateTimeLiteral ::= LEX_DATETIME_LITERAL
 timeLiteral ::= LEX_TIME_LITERAL
 booleanLiteral ::= LEX_LOGICAL_LITERAL
+tbooleanLiteral ::= LEX_T_LOGICAL_LITERAL
 udoubleLiteral ::= LEX_UDOUBLE_LITERAL
 unumericLiteral ::= LEX_UNUMERIC_LITERAL
 uintLiteral ::= LEX_UINT_LITERAL

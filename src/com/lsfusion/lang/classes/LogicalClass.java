@@ -18,7 +18,7 @@ public class LogicalClass extends DataClass {
 
     @Override
     public DataClass op(DataClass compClass, boolean or, boolean string) {
-        return compClass instanceof LogicalClass ? this : null;
+        return compClass instanceof LogicalClass && threeState == ((LogicalClass) compClass).threeState ? this : null;
     }
 
     @Override

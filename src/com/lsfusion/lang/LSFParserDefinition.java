@@ -31,6 +31,7 @@ public class LSFParserDefinition implements ParserDefinition {
     public static final TokenSet NOT_KEYWORDS = TokenSet.create(
         LSFTypes.COMMENTS,
         LEX_LOGICAL_LITERAL,
+        LEX_T_LOGICAL_LITERAL,
         PRIMITIVE_TYPE,
         LEX_STRING_LITERAL,
         LEX_UINT_LITERAL,

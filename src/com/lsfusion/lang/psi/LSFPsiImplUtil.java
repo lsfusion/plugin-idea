@@ -1277,6 +1277,8 @@ public class LSFPsiImplUtil {
     public static DataClass resolveBuiltInValueClass(@NotNull LSFLiteral sourceStatement) {
         if (sourceStatement.getBooleanLiteral() != null)
             return LogicalClass.instance;
+        if (sourceStatement.getTbooleanLiteral() != null)
+            return LogicalClass.threeStateInstance;
         if (sourceStatement.getUlongLiteral() != null)
             return LongClass.instance;
         if (sourceStatement.getUintLiteral() != null)

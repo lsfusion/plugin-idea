@@ -68,6 +68,7 @@ public class ASTCompletionContributor extends CompletionContributor {
     public static final Logger LOGGER = Logger.getInstance("com.lsfusion.completion.ASTCompletionContributor");
 
     private static final String[] LOGICAL_LITERALS = new String[]{"TRUE", "FALSE"};
+    private static final String[] T_LOGICAL_LITERALS = new String[]{"TTRUE", "TFALSE"};
     private static final String[] PRIMITIVE_TYPES = new String[]{"INTEGER", "LONG", "NUMERIC", "NUMERIC[,]", "DOUBLE",
                                                                  "DATE", "DATETIME", "TIME", "YEAR", "ZDATETIME",
                                                                  "INTERVAL[DATE]", "INTERVAL[TIME]", "INTERVAL[DATETIME]", "INTERVAL[ZDATETIME]",
@@ -339,6 +340,8 @@ public class ASTCompletionContributor extends CompletionContributor {
 
             if (elementType == LEX_LOGICAL_LITERAL) {
                 addKeywordVariants(LOGICAL_LITERALS);
+            } else if (elementType == LEX_T_LOGICAL_LITERAL) {
+                addKeywordVariants(T_LOGICAL_LITERALS);
             } else if (elementType == PRIMITIVE_TYPE) {
                 addKeywordVariants(PRIMITIVE_TYPES);
             } else if (elementType == ID) {

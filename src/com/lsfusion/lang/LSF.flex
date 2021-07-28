@@ -17,6 +17,7 @@ import java.util.HashMap;
     tokenDebugNames.put(com.intellij.psi.TokenType.WHITE_SPACE, "White Space");
     tokenDebugNames.put(COMMENTS, "Comment");
     tokenDebugNames.put(LEX_LOGICAL_LITERAL, "Logical");
+    tokenDebugNames.put(LEX_T_LOGICAL_LITERAL, "TLogical");
     tokenDebugNames.put(PRIMITIVE_TYPE, "Primitive Type");
     tokenDebugNames.put(LEX_STRING_LITERAL, "String");
     tokenDebugNames.put(LEX_UINT_LITERAL, "Integer");
@@ -104,6 +105,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
 
 
   ("TRUE" | "FALSE")                    { return LEX_LOGICAL_LITERAL; }
+  ("TTRUE" | "TFALSE")                    { return LEX_T_LOGICAL_LITERAL; }
 
     "INTEGER" | "LONG" | "NUMERIC" ("[" {DIGITS} "," {DIGITS} "]")? | "DOUBLE"
   | "DATE" | "DATETIME" | "TIME" | "YEAR" | "ZDATETIME" | "INTERVAL" ("["{INTERVAL_TYPE}"]")
