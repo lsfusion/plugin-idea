@@ -59,7 +59,6 @@ public class PropertyDrawView extends ComponentView {
 
     public PropertyDrawEntity entity;
 
-    public boolean panelCaptionAfter;
     public boolean changeOnSingleClick;
     public boolean hide;
     public String regexp;
@@ -81,6 +80,7 @@ public class PropertyDrawView extends ComponentView {
     public Boolean focusable;
 
     public boolean panelCaptionVertical = false;
+    public Boolean panelCaptionLast;
     public FlexAlignment panelCaptionAlignment;
 
     public boolean panelColumnVertical;
@@ -144,10 +144,6 @@ public class PropertyDrawView extends ComponentView {
         return showChangeKey && changeKey != null
                 ? caption + " (" + getKeyStrokeCaption(changeKey) + ")"
                 : caption;
-    }
-
-    public void setPanelCaptionAfter(boolean panelCaptionAfter) {
-        this.panelCaptionAfter = panelCaptionAfter;
     }
 
     public void setChangeOnSingleClick(boolean changeOnSingleClick) {
@@ -332,6 +328,10 @@ public class PropertyDrawView extends ComponentView {
         this.panelCaptionVertical = panelCaptionVertical;
     }
 
+    public void setPanelCaptionLast(boolean panelCaptionLast) {
+        this.panelCaptionLast = panelCaptionLast;
+    }
+
     public void setPanelCaptionAlignment(FlexAlignment panelCaptionAlignment) {
         this.panelCaptionAlignment = panelCaptionAlignment;
     }
@@ -374,10 +374,6 @@ public class PropertyDrawView extends ComponentView {
 
     public void setToolTip(String toolTip) {
         this.toolTip = toolTip;
-    }
-
-    public boolean isPanelCaptionAfter() {
-        return panelCaptionAfter;
     }
 
     public boolean isChangeOnSingleClick() {
@@ -435,13 +431,21 @@ public class PropertyDrawView extends ComponentView {
     public boolean isPanelCaptionVertical() {
         return panelCaptionVertical;
     }
+    
+    public boolean isPanelCaptionLast() {
+        return panelCaptionLast;
+    }
+    
+    public boolean getNotNullPanelCaptionLast() {
+        return panelCaptionLast != null ? panelCaptionLast : entity.baseClass instanceof LogicalClass;
+    }
 
     public FlexAlignment getPanelCaptionAlignment() {
         return panelCaptionAlignment;
     }
 
     public FlexAlignment getNotNullPanelCaptionAlignment() {
-        return panelCaptionAlignment != null ? panelCaptionAlignment : FlexAlignment.CENTER;
+        return (panelCaptionAlignment != null && panelCaptionAlignment != FlexAlignment.STRETCH) ? panelCaptionAlignment : FlexAlignment.CENTER;
     }
 
     public boolean isClearText() {
