@@ -117,6 +117,10 @@
             <action id="FastInsertComposition" class="com.lsfusion.actions.FastInsertCompositionAction">
                 <keyboard-shortcut first-keystroke="control alt W" keymap="$default"/>
             </action>
+
+            <separator/>
+            <action id="RegisterCustomProtocolAction" class="com.lsfusion.actions.RegisterCustomProtocolAction"
+                    text="Register Custom Protocol" description="Register custom protocol"/>
         </group>
         
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">

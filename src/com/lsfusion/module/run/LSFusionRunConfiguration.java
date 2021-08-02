@@ -20,10 +20,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.DefaultJDOMExternalizer;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import org.apache.commons.lang.SystemUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -214,7 +217,14 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
             JavaParametersUtil.configureConfiguration(params, myConfiguration);
             params.getVMParametersList().addProperty(LIGHT_START_PROPERTY, String.valueOf(lightStart));
 
-            params.getVMParametersList().addProperty(IDEA_BIN_PATH, PathManager.getBinPath());
+            String ideaBinPath = PathManager.getBinPath();
+            String ideaExecutable = null;
+            if (SystemUtils.IS_OS_LINUX)
+                ideaExecutable = ideaBinPath + "/idea.sh";
+            else if (SystemUtils.IS_OS_WINDOWS)
+                ideaExecutable = ideaBinPath + (Files.exists(Paths.get(ideaBinPath, "idea64.exe")) ? "/idea64.exe" : "/idea.exe");
+
+            params.getVMParametersList().addProperty(IDEA_EXEC_PATH, ideaExecutable);
             if (!params.getVMParametersList().hasProperty(PLUGIN_ENABLED_PROPERTY)) {
                 params.getVMParametersList().addProperty(PLUGIN_ENABLED_PROPERTY, "true");
             }
