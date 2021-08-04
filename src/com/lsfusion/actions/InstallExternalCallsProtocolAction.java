@@ -2,6 +2,7 @@ package com.lsfusion.actions;
 
 import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SystemUtils;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.nio.file.*;
 
-public class RegisterCustomProtocolAction extends AnAction {
+public class InstallExternalCallsProtocolAction extends AnAction {
 
     //scheduled for removal in version 2021.3
     private static final NotificationGroup NOTIFICATION_GROUP =
@@ -20,28 +21,35 @@ public class RegisterCustomProtocolAction extends AnAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         Project project = anActionEvent.getProject();
         if (project != null) {
-            String basePath = project.getBasePath();
+            String customProtocolPath = Paths.get(PathManager.getPluginsPath(), "lsfusion-idea-plugin", "custom-protocol").toString();
             try {
                 int exitCode = -1;
                 //linux
                 if (SystemUtils.IS_OS_LINUX) {
                     //copy .sh file to project root
-                    copyFile(basePath, "linux-exec.sh");
-                    String linuxScriptPath = new File(basePath, "linux-exec.sh").getPath();
-                    exitCode = Runtime.getRuntime().exec("chmod +x " + linuxScriptPath).waitFor(); //make file executable
+                    File linuxExecFile = new File(customProtocolPath, "linux-exec.sh");
+                    copyFile(linuxExecFile);
+
+                    String linuxExecPath = linuxExecFile.getPath();
+                    exitCode = Runtime.getRuntime().exec("chmod +x " + linuxExecPath).waitFor(); //make file executable
 
                     if (exitCode == 0)
-                        exitCode = registerLinuxProtocol(linuxScriptPath);
+                        exitCode = registerLinuxProtocol(linuxExecPath);
                 } else if (SystemUtils.IS_OS_WINDOWS) {
                     //windows
-                    copyFile(basePath, "windows-exec.bat");
-                    String windowsExecPath = new File(basePath, "windows-exec.bat").getPath();
+                    File windowsExecFile = new File(customProtocolPath, "windows-exec.bat");
+                    File windowsSetupFile = new File(customProtocolPath, "windows-setup.reg");
+                    copyFile(windowsExecFile);
+                    copyFile(windowsSetupFile);
 
-                    copyFile(basePath, "windows-setup.bat");
-                    exitCode = Runtime.getRuntime().exec("cmd /c " + "\"\"" + basePath + "/windows-setup.bat" + "\" " + "\"" + windowsExecPath + "\"\"").waitFor();
+                    Path windowsSetupFilePath = windowsSetupFile.toPath();
+                    String windowsExecPath = windowsExecFile.getPath().replaceAll("\\\\", "\\\\\\\\");
+                    Files.write(windowsSetupFilePath, Files.readString(windowsSetupFilePath)
+                            .replace("$1$", "\"\\\"" + windowsExecPath + "\\\" \\\"%1\\\"\"").getBytes());
+                    exitCode = Runtime.getRuntime().exec("cmd /c " + windowsSetupFilePath).waitFor();
                 }
 
-                sendNotification(project, exitCode, "Successfully registred lsfusion-protocol");
+                sendNotification(project, exitCode, exitCode == 0 ? "Successfully installed lsfusion-protocol" : "Error code " + exitCode);
             } catch (IOException | InterruptedException e) {
                 sendNotification(project, -1, e.getMessage());
             }
@@ -75,8 +83,7 @@ public class RegisterCustomProtocolAction extends AnAction {
         return Runtime.getRuntime().exec("update-desktop-database " + applicationsPath).waitFor();
     }
 
-    private void copyFile(String basePath, String fileName) throws IOException {
-        InputStream initialStream = getClass().getClassLoader().getResourceAsStream("custom-protocol/" + fileName);
-        FileUtils.copyInputStreamToFile(initialStream, new File(basePath, fileName));
+    private void copyFile(File file) throws IOException {
+        FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("custom-protocol/" + file.getName()), file);
     }
 }

@@ -119,8 +119,8 @@
             </action>
 
             <separator/>
-            <action id="RegisterCustomProtocolAction" class="com.lsfusion.actions.RegisterCustomProtocolAction"
-                    text="Register Custom Protocol" description="Register custom protocol"/>
+            <action id="InstallExternalCallsProtocolAction" class="com.lsfusion.actions.InstallExternalCallsProtocolAction"
+                    text="Install Protocol for External Calls"/>
         </group>
         
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">

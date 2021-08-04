@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\lsfusion-protocol]
+"URL Protocol"=""
+@="LSFusion custom protocol"
+
+[HKEY_CLASSES_ROOT\lsfusion-protocol\shell]
+
+[HKEY_CLASSES_ROOT\lsfusion-protocol\shell\open]
+
+[HKEY_CLASSES_ROOT\lsfusion-protocol\shell\open\command]
+@=$1$
