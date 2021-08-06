@@ -337,6 +337,12 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private ParseNode deepMerge(ParseNode source, ParseNode target) throws JSONException {
+        //swap source and target - GroupParseNode has more priority
+        if(source instanceof PropertyParseNode && target instanceof GroupParseNode) {
+            ParseNode buffer = target;
+            target = source;
+            source = buffer;
+        }
         for (ParseNode targetChild : target.children) {
             ParseNode sourceChild = source.getChild(targetChild);
             if (sourceChild == null) {
