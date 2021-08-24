@@ -453,7 +453,6 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "SHOW"                    			{ return SHOW; }
   "SHOWDEP"                 			{ return SHOWDEP; }
   "SHOWIF"                  			{ return SHOWIF; }
-  "SHOWTYPE"                  			{ return SHOWTYPE; }
   "SINGLE"                  			{ return SINGLE; }
   "SHEET"                  			    { return SHEET; }
   "SPLITH"                  			{ return SPLITH; }
