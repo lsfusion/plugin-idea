@@ -12,6 +12,8 @@
             <li>DBFFILE/DBFLINK classes</li>
             <li>TBOOLEAN class (three-state boolean)</li>
             <li>TTRUE / TFALSE for TBOOLEAN class</li>
+            <li>Fix quick documentation (LOCAL operator in action body)</li>
+            <li>Change CUSTOM view grammar to "CUSTOM [RENDER 'renderFunction'] [EDIT [TEXT / REPLACE] 'editFunctions']"</li>
         </ul>
     ]]>
     </change-notes>
