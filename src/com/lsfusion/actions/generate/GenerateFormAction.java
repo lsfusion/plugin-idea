@@ -473,6 +473,18 @@ public abstract class GenerateFormAction extends AnAction {
         } else return null;
     }
 
+    protected String getPropertyType(Object element) {
+        if (element instanceof Number) {
+            return "NUMERIC";
+        } else if (element instanceof String) {
+            String dateType = DateConverter.smartParse((String) element);
+            if (dateType != null) {
+                return dateType;
+            }
+        }
+        return "STRING";
+    }
+
     private class ElementKey {
         String extID;
         String ID;
@@ -586,9 +598,6 @@ public abstract class GenerateFormAction extends AnAction {
         ElementNamespace namespace;
         String type;
         boolean attr;
-        PropertyParseNode(String key, ElementNamespace namespace, boolean attr) {
-            this(key, namespace, "STRING", attr);
-        }
 
         PropertyParseNode(String key, ElementNamespace namespace, String type, boolean attr) {
             super(key, new ArrayList<>());

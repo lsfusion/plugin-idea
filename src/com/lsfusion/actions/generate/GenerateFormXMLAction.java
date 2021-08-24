@@ -53,7 +53,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
         boolean isPropertyParseNode = noChildren && noAttributes;
 
         if (isPropertyParseNode) {
-            return Collections.singletonList(new PropertyParseNode(key, namespace, false));
+            return Collections.singletonList(new PropertyParseNode(key, namespace, getPropertyType(element.getValue()), false));
         } else {
 
             Map<String, List<Element>> childrenMap = getChildrenMap(element);
@@ -90,7 +90,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
             }
 
             for (Attribute attribute : element.getAttributes()) {
-                children.add(new PropertyParseNode(attribute.getName(), namespace, true));
+                children.add(new PropertyParseNode(attribute.getName(), namespace, getPropertyType(attribute.getValue()), true));
             }
 
             //declared in this node namespaces
@@ -100,7 +100,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
 
             List<ParseNode> result = new ArrayList<>();
             if(noChildren) { //assert !noAttributes
-                result.add(new PropertyParseNode(key, namespace, false));
+                result.add(new PropertyParseNode(key, namespace, getPropertyType(element.getValue()), false));
             }
             result.add(new PropertyGroupParseNode(key, children, namespace, key == null ? element.getName() : null));
             return result;
