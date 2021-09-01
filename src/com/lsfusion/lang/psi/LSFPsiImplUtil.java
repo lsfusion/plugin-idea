@@ -4563,11 +4563,7 @@ public class LSFPsiImplUtil {
     }
 
     public static String getDocumentation(LSFLocalDataPropertyDefinition lsfLocalDataPropertyDefinition, PsiElement child) {
-        return "DATA_operator";
-    }
-
-    public static String getDocumentation(LSFNestedLocalModifier lsfNestedLocalModifier, PsiElement child) {
-        return "DATA_operator";
+        return "Braces_operator";
     }
 
     public static String getDocumentation(LSFExecActionPropertyDefinitionBody lsfExecActionPropertyDefinitionBody, PsiElement child) {

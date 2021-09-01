@@ -1277,7 +1277,6 @@ localDataPropertyDefinition ::= LOCAL nestedLocalModifier nonEmptyLocalPropertyD
 nestedLocalModifier ::= (NESTED manageSessionClause?)?
 {
     implements = "com.lsfusion.documentation.LSFDocumentation"
-    methods = [getDocumentation]
 }
 
 nonEmptyLocalPropertyDeclarationNameList ::= localPropertyDeclarationName (COMMA localPropertyDeclarationName)*
@@ -1435,6 +1434,7 @@ formStatement ::=	(	formDecl
                     |	formEventsList
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
+                    |   userFiltersDeclaration
                     |	formOrderByList
                     |	formPivotOptionsDeclaration
                     |	listFormDeclaration
@@ -1562,11 +1562,13 @@ formSubReport ::= SUBREPORT formCalcPropertyObject?
 
 classViewType ::= PANEL | GRID | TOOLBAR
 
-propertyCustomView ::= CUSTOM (RENDER stringLiteral)? (EDIT (PRIMITIVE_TYPE | REPLACE)? stringLiteral)?
+renderPropertyCustomView ::= RENDER stringLiteral
+editPropertyCustomView ::= EDIT (PRIMITIVE_TYPE | REPLACE)? stringLiteral
+propertyCustomView ::= CUSTOM ((renderPropertyCustomView editPropertyCustomView) | renderPropertyCustomView | editPropertyCustomView)
 
 listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral) | CALENDAR
 
-pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS))*
+pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS) | (CONFIG stringLiteral))*
 
 mapOptions ::= stringLiteral
 
@@ -1729,6 +1731,8 @@ formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage regular
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
+
+userFiltersDeclaration ::= USERFILTERS formPropertyDrawUsage 
 
 filterGroupUsage ::= simpleName
 {
@@ -2137,7 +2141,7 @@ removeComponentStatement ::= REMOVE componentSelector SEMI {pin = 1}
 
 // GROUPOBJECT + TREE
 private componentSingleSelectorType ::=  BOX | OBJECTS | PANEL | TOOLBARBOX | TOOLBARLEFT | TOOLBARRIGHT | TOOLBAR
-groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID | SHOWTYPE
+groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID
 globalSingleSelectorType ::= componentSingleSelectorType 
 
 private groupObjectTreeSelector ::= TREE treeGroupSelector | groupObjectSelector { pin(".*") = 1 }

@@ -11,7 +11,6 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
     public GroupObjectEntity entity;
 
     public GridView grid;
-    public ShowTypeView showType;
     public ToolbarView toolbarSystem;
     public FilterView userFilter = new FilterView();
 
@@ -24,7 +23,6 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
 
         grid = new GridView(this);
         toolbarSystem = new ToolbarView(false);
-        showType = new ShowTypeView(this);
     }
 
     public String getCaption() {

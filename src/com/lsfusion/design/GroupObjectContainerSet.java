@@ -8,6 +8,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 
 public class GroupObjectContainerSet {
     public static final String BOX_CONTAINER = "BOX";
+        public static final String USERFILTER_COMPONENT = "USERFILTER"; // COMPONENT
         public static final String GRIDBOX_CONTAINER = "GRIDBOX";
             public static final String CLASSCHOOSER_COMPONENT = "CLASSCHOOSER"; // COMPONENT
             public static final String GRID_COMPONENT = "GRID"; // COMPONENT
@@ -18,8 +19,6 @@ public class GroupObjectContainerSet {
                 public static final String FILTERGROUPS_CONTAINER = "FILTERGROUPS";
                     public static final String FILTERGROUP_COMPONENT = "FILTERGROUP"; // COMPONENT
                 public static final String TOOLBAR_CONTAINER = "TOOLBAR";
-                public static final String SHOWTYPE_COMPONENT = "SHOWTYPE"; // COMPONENT
-        public static final String USERFILTER_COMPONENT = "USERFILTER"; // COMPONENT
         public static final String PANEL_CONTAINER = "PANEL";
             public static final String GROUP_CONTAINER = "GROUP";
 
@@ -111,9 +110,9 @@ public class GroupObjectContainerSet {
         set.boxContainer.setChildrenAlignment(Alignment.START);
         set.boxContainer.setAlignment(FlexAlignment.STRETCH);
         set.boxContainer.setFlex(1);
+        set.boxContainer.add(group.userFilter);
         set.boxContainer.add(set.gridBoxContainer);
         set.boxContainer.add(set.toolbarBoxContainer);
-        set.boxContainer.add(group.userFilter);
         set.boxContainer.add(set.panelContainer);
 
         set.gridBoxContainer.setType(ContainerType.SPLITH);
@@ -138,7 +137,6 @@ public class GroupObjectContainerSet {
         set.toolbarRightContainer.setFlex(1);
         set.toolbarRightContainer.add(set.filterGroupsContainer);
         set.toolbarRightContainer.add(set.toolbarContainer);
-//        set.toolbarRightContainer.add(group.showType);
 
         set.filterGroupsContainer.setType(ContainerType.CONTAINERH);
         set.filterGroupsContainer.setAlignment(FlexAlignment.CENTER);
@@ -158,9 +156,6 @@ public class GroupObjectContainerSet {
         group.userFilter.setAlignment(FlexAlignment.STRETCH);
         group.toolbarSystem.setAlignment(FlexAlignment.CENTER);
         group.toolbarSystem.setMargin(2);
-        
-        group.showType.setAlignment(FlexAlignment.CENTER);
-        group.showType.setMargin(2);
 
         return set;
     }

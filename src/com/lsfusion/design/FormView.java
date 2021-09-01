@@ -123,7 +123,6 @@ public class FormView {
         groupObjects.add(groupObjectView);
 
         setComponentSID(groupObjectView.grid, getGridSID(groupObjectView));
-        setComponentSID(groupObjectView.showType, getShowTypeSID(groupObjectView));
         setComponentSID(groupObjectView.toolbarSystem, getToolbarSystemSID(groupObjectView));
         setComponentSID(groupObjectView.userFilter, getUserFilterSID(groupObjectView));
 
@@ -308,14 +307,6 @@ public class FormView {
 
     public static String getUserFilterSID(String sID) {
         return GroupObjectContainerSet.USERFILTER_COMPONENT + "(" + sID + ")";
-    }
-
-    public static String getShowTypeSID(PropertyGroupContainerView containerView) {
-        return getShowTypeSID(containerView.getPropertyGroupContainerSID());
-    }
-    
-    public static String getShowTypeSID(String sID) {
-        return GroupObjectContainerSet.SHOWTYPE_COMPONENT + "(" + sID + ")";
     }
 
     private static String getClassChooserSID(ObjectView component) {

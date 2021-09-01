@@ -97,9 +97,9 @@ public class TreeGroupContainerSet {
         set.boxContainer.setChildrenAlignment(Alignment.START);
         set.boxContainer.setAlignment(FlexAlignment.STRETCH);
         set.boxContainer.setFlex(1);
+        set.boxContainer.add(treeGroup.userFilter);
         set.boxContainer.add(set.gridBoxContainer);
         set.boxContainer.add(set.toolbarBoxContainer);
-        set.boxContainer.add(treeGroup.userFilter);
         set.boxContainer.add(set.panelContainer);
 
         set.gridBoxContainer.setType(ContainerType.SPLITH);

@@ -227,6 +227,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NOHINT"                 			    { return NOHINT; }
   "COLLAPSE"                  			{ return COLLAPSE; }
   "CONCAT"                  			{ return CONCAT; }
+  "CONFIG"                 			    { return CONFIG; }
   "CONFIRM"                 			{ return CONFIRM; }
   "CONSTRAINT"              			{ return CONSTRAINT; }
   "CONTAINERH"              			{ return CONTAINERH; }
@@ -453,7 +454,6 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "SHOW"                    			{ return SHOW; }
   "SHOWDEP"                 			{ return SHOWDEP; }
   "SHOWIF"                  			{ return SHOWIF; }
-  "SHOWTYPE"                  			{ return SHOWTYPE; }
   "SINGLE"                  			{ return SINGLE; }
   "SHEET"                  			    { return SHEET; }
   "SPLITH"                  			{ return SPLITH; }
@@ -488,6 +488,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "UNGROUP"                 			{ return UNGROUP; }
   "UP"                 			        { return UP; }
   "USERFILTER"                 			{ return USERFILTER; }
+  "USERFILTERS"                 		{ return USERFILTERS; }
   "VALIGN"                  			{ return VALIGN; }
   "VALUE"                               { return VALUE; }
   "VERTICAL"                			{ return VERTICAL; }
