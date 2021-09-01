@@ -10,6 +10,7 @@
         <b>Version 1.0.217</b><br>
         <ul>
             <li>USERFILTERS support</li>
+            <li>panelCaptionAlignment/panelCaptionLast support</li>
         </ul>
     ]]>
     </change-notes>
