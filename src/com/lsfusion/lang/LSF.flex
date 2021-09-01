@@ -227,6 +227,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NOHINT"                 			    { return NOHINT; }
   "COLLAPSE"                  			{ return COLLAPSE; }
   "CONCAT"                  			{ return CONCAT; }
+  "CONFIG"                 			    { return CONFIG; }
   "CONFIRM"                 			{ return CONFIRM; }
   "CONSTRAINT"              			{ return CONSTRAINT; }
   "CONTAINERH"              			{ return CONTAINERH; }

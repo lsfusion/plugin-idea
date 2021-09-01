@@ -10,6 +10,7 @@
         <b>Version 1.0.216</b><br>
         <ul>
             <li>Generate form: DATE, TIME, DATETIME, ZDATETIME properties declaration</li>
+            <li>PIVOT CONFIG support</li>
         </ul>
     ]]>
     </change-notes>
