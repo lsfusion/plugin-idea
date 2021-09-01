@@ -488,6 +488,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "UNGROUP"                 			{ return UNGROUP; }
   "UP"                 			        { return UP; }
   "USERFILTER"                 			{ return USERFILTER; }
+  "USERFILTERS"                 		{ return USERFILTERS; }
   "VALIGN"                  			{ return VALIGN; }
   "VALUE"                               { return VALUE; }
   "VERTICAL"                			{ return VERTICAL; }

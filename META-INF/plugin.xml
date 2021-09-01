@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.216</b><br>
+        <b>Version 1.0.217</b><br>
         <ul>
-            <li>Generate form: DATE, TIME, DATETIME, ZDATETIME properties declaration</li>
-            <li>PIVOT CONFIG support</li>
+            <li>USERFILTERS support</li>
         </ul>
     ]]>
     </change-notes>

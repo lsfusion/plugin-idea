@@ -1434,6 +1434,7 @@ formStatement ::=	(	formDecl
                     |	formEventsList
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
+                    |   userFiltersDeclaration
                     |	formOrderByList
                     |	formPivotOptionsDeclaration
                     |	listFormDeclaration
@@ -1730,6 +1731,8 @@ formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage regular
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
+
+userFiltersDeclaration ::= USERFILTERS formPropertyDrawUsage 
 
 filterGroupUsage ::= simpleName
 {
