@@ -3,17 +3,25 @@ package com.lsfusion.actions;
 import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.PathManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InstallExternalCallsProtocolAction extends AnAction {
 
     //scheduled for removal in version 2021.3
+    @SuppressWarnings({"deprecation","UnstableApiUsage"})
     private static final NotificationGroup NOTIFICATION_GROUP =
             new NotificationGroup("Custom protocol Group", NotificationDisplayType.BALLOON, true);
 
@@ -21,14 +29,24 @@ public class InstallExternalCallsProtocolAction extends AnAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         Project project = anActionEvent.getProject();
         if (project != null) {
+            List<String> modulesPaths = new ArrayList<>();
+            for (Module module : ModuleManager.getInstance(project).getModules()) {
+                VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+                for (VirtualFile contentRoot : contentRoots) {
+                    Path path = Paths.get(contentRoot.getPath(), "src/main/lsfusion");
+                    if (Files.exists(path))
+                        modulesPaths.add("\"" + path + "\"");
+                }
+            }
+
             String customProtocolPath = Paths.get(PathManager.getPluginsPath(), "lsfusion-idea-plugin", "custom-protocol").toString();
             try {
                 int exitCode = -1;
-                //linux
                 if (SystemUtils.IS_OS_LINUX) {
                     //copy .sh file to project root
                     File linuxExecFile = new File(customProtocolPath, "linux-exec.sh");
                     copyFile(linuxExecFile);
+                    fillExecFile(linuxExecFile.toPath(), modulesPaths, true);
 
                     String linuxExecPath = linuxExecFile.getPath();
                     exitCode = Runtime.getRuntime().exec("chmod +x " + linuxExecPath).waitFor(); //make file executable
@@ -36,12 +54,12 @@ public class InstallExternalCallsProtocolAction extends AnAction {
                     if (exitCode == 0)
                         exitCode = registerLinuxProtocol(linuxExecPath);
                 } else if (SystemUtils.IS_OS_WINDOWS) {
-                    //windows
                     File windowsExecFile = new File(customProtocolPath, "windows-exec.bat");
-                    File windowsSetupFile = new File(customProtocolPath, "windows-setup.reg");
                     copyFile(windowsExecFile);
-                    copyFile(windowsSetupFile);
+                    fillExecFile(windowsExecFile.toPath(), modulesPaths, false);
 
+                    File windowsSetupFile = new File(customProtocolPath, "windows-setup.reg");
+                    copyFile(windowsSetupFile);
                     Path windowsSetupFilePath = windowsSetupFile.toPath();
                     String windowsExecPath = windowsExecFile.getPath().replaceAll("\\\\", "\\\\\\\\");
                     Files.write(windowsSetupFilePath, Files.readString(windowsSetupFilePath)
@@ -85,5 +103,22 @@ public class InstallExternalCallsProtocolAction extends AnAction {
 
     private void copyFile(File file) throws IOException {
         FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("custom-protocol/" + file.getName()), file);
+    }
+
+    private void fillExecFile(Path filePath, List<String> modulesPaths, boolean isOsLinux) throws IOException {
+        String fileContent = Files.readString(filePath);
+        String ideaBinPath = PathManager.getBinPath();
+
+        String ideaRunnableReplacement = isOsLinux ?
+                ideaBinPath + "/idea.sh" :
+                "\"" + ideaBinPath.replaceAll("\\\\", "/") + ((Files.exists(Paths.get(ideaBinPath, "idea64.exe")) ? "/idea64.exe" : "/idea.exe")) + "\"";
+
+        String projectModulesReplacement = isOsLinux ?
+                "(" + StringUtils.join(modulesPaths, " ") + ")" :
+                StringUtils.join(modulesPaths, " ").replaceAll("\\\\", "/");
+
+        fileContent = fileContent.replaceAll("IDEA_RUNNABLE=.*", "IDEA_RUNNABLE=" + ideaRunnableReplacement);
+        fileContent = fileContent.replaceAll("PROJECT_MODULES=.*", "PROJECT_MODULES=" + projectModulesReplacement);
+        Files.write(filePath, fileContent.getBytes());
     }
 }

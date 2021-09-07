@@ -120,7 +120,7 @@
 
             <separator/>
             <action id="InstallExternalCallsProtocolAction" class="com.lsfusion.actions.InstallExternalCallsProtocolAction"
-                    text="Install Debug Protocol For Web-Client"/>
+                    text="Install Debug Protocol"/>
         </group>
         
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
