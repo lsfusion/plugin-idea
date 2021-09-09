@@ -265,9 +265,7 @@ public class DesignInfo {
                         return FormView.getClassChooserSID(groupName);
                     case "GRID" : 
                         return FormView.getGridSID(groupName);
-                    case "SHOWTYPE" : 
-                        return FormView.getShowTypeSID(groupName);
-                    case "BOX" : 
+                    case "BOX" :
                         return DefaultFormView.getBoxContainerSID(groupName);
                     case "PANEL" : 
                         return DefaultFormView.getPanelContainerSID(groupName);

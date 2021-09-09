@@ -34,12 +34,12 @@ public abstract class GenerateFormAction extends AnAction {
     private Set<String> usedNamespacePrefixes = new HashSet<>();
     private Set<String> usedFilterProperties = new HashSet<>();
 
-    private Set<String> keywords = new HashSet<>(Arrays.asList("TRUE", "FALSE", "INTEGER", "LONG", "NUMERIC", "DOUBLE", "DATE", "DATETIME", "TIME", "YEAR", "ZDATETIME", "INTERVAL",
-            "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT", "RICHTEXT", "WORDFILE", "IMAGEFILE", "PDFFILE", "RAWFILE", "FILE", "EXCELFILE", "TEXTFILE", "CSVFILE", "HTMLFILE",
-            "JSONFILE", "XMLFILE", "TABLEFILE", "WORDLINK", "IMAGELINK", "PDFLINK", "RAWLINK", "LINK", "EXCELLINK", "TEXTLINK", "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK",
-            "TABLELINK", "BOOLEAN", "COLOR", "ABSTRACT", "ACTIVATE", "ACTIVE", "ATTR", "ASK", "NATIVE", "ACTION", "AFTER", "GOAFTER", "AGGR", "NAGGR", "ALL", "AND", "APPEND",
-            "APPLY", "AS", "ASON", "ASYNCUPDATE", "ATTACH", "AUTOREFRESH", "AUTOSET", "BACKGROUND", "BCC", "BEFORE", "BODY", "BODYPARAMNAMES", "BODYPARAMHEADERS", "BODYURL",
-            "BOTTOM", "BOX", "BREAK",
+    private Set<String> keywords = new HashSet<>(Arrays.asList("TRUE", "FALSE", "TTRUE", "TFALSE", "INTEGER", "LONG", "NUMERIC", "DOUBLE", "DATE", "DATETIME", "TIME", "YEAR",
+            "ZDATETIME", "INTERVAL", "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT", "RICHTEXT", "WORDFILE", "IMAGEFILE", "PDFFILE", "DBFFILE", "RAWFILE", "FILE",
+            "EXCELFILE", "TEXTFILE", "CSVFILE", "HTMLFILE", "JSONFILE", "XMLFILE", "TABLEFILE", "WORDLINK", "IMAGELINK", "PDFLINK", "DBFLINK", "RAWLINK", "LINK", "EXCELLINK",
+            "TEXTLINK", "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK", "TABLELINK", "BOOLEAN", "TBOOLEAN", "COLOR", "ABSTRACT", "ACTIVATE", "ACTIVE", "ATTR", "ASK", "NATIVE",
+            "ACTION", "AFTER", "GOAFTER", "AGGR", "NAGGR", "ALL", "AND",  "APPEND", "APPLY", "AS", "ASON", "ASYNCUPDATE", "ATTACH", "AUTOREFRESH", "AUTOSET", "BACKGROUND",
+            "BCC", "BEFORE", "BODY", "BODYPARAMNAMES", "BODYPARAMHEADERS", "BODYURL", "BOTTOM", "BOX", "BREAK",
             "BY", "CANCEL", "CASE", "CC", "CATCH", "CALENDAR", "CENTER", "CHANGE", "CHANGECLASS", "CHANGEABLE", "CHANGEKEY", "CHANGED", "CHANGEMOUSE", "CHANGEWYS", "CHARSET",
             "CHARWIDTH", "CHECK", "CHECKED", "CLASS", "CLASSCHOOSER", "CLIENT", "CLOSE", "COLUMN", "COLUMNS", "COMPLEX", "CONNECTION", "CONTEXTMENU", "NOHINT", "COLLAPSE",
             "CONCAT", "CONFIRM", "CONSTRAINT", "CONTAINERH", "CONTAINERV", "COOKIES", "COOKIESTO", "STRETCH", "CANONICALNAME", "CSV", "CUSTOM", "CYCLES", "DATA", "DBF", "DEFAULT",
@@ -56,9 +56,9 @@ public abstract class GenerateFormAction extends AnAction {
             "PDF", "PERIOD", "PIVOT", "PG", "POSITION", "POST", "PREREAD", "PREV", "PREVIEW", "NOPREVIEW", "PARAMS", "PRINT", "PRIORITY", "PROPERTIES", "PROPERTY", "PROPERTYDRAW",
             "PROPORTION", "PUT", "QUERYCLOSE", "QUICKFILTER", "READ", "READONLY", "READONLYIF", "RECALCULATE", "RECURSION", "REFLECTION", "REGEXP", "REMOVE", "RENDER", "REPLACE",
             "REPORT", "REPORTFILES", "REQUEST", "REQUIRE", "RESOLVE", "RETURN", "RGB", "RIGHT", "ROUND", "ROOT", "ROW", "ROWS", "RTF", "SCROLL", "SEEK", "SELECTOR", "SERIALIZABLE",
-            "SET", "SETCHANGED", "SETDROPPED", "SETTINGS", "SCHEDULE", "SHOW", "SHOWDEP", "SHOWIF", "SHOWTYPE", "SINGLE", "SHEET", "SPLITH", "SPLITV", "SQL", "START", "STEP",
+            "SET", "SETCHANGED", "SETDROPPED", "SETTINGS", "SCHEDULE", "SHOW", "SHOWDEP", "SHOWIF", "SINGLE", "SHEET", "SPLITH", "SPLITV", "SQL", "START", "STEP",
             "STRICT", "STRUCT", "SUBJECT", "SUBREPORT", "SUM", "TAB", "TABBED", "TABLE", "TAG", "TEXTHALIGN", "TEXTVALIGN", "THEN", "THREADS", "TO", "DRAW", "TOOLBAR",
-            "TOOLBARBOX", "TOOLBARLEFT", "TOOLBARRIGHT", "TOOLBARSYSTEM", "TOP", "TREE", "TRY", "UDP", "UNGROUP", "UP", "USERFILTER", "VALIGN", "VALUE", "VERTICAL", "VIEW", "WHEN",
+            "TOOLBARBOX", "TOOLBARLEFT", "TOOLBARRIGHT", "TOOLBARSYSTEM", "TOP", "TREE", "TRY", "UDP", "UNGROUP", "UP", "USERFILTER", "USERFILTERS", "VALIGN", "VALUE", "VERTICAL", "VIEW", "WHEN",
             "WHERE", "WHILE", "WRITE", "WINDOW", "XLS", "XLSX", "XML", "XOR", "YES", "YESNO"));
 
     abstract String getExtension();
@@ -337,6 +337,12 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private ParseNode deepMerge(ParseNode source, ParseNode target) throws JSONException {
+        //swap source and target - GroupParseNode has more priority
+        if(source instanceof PropertyParseNode && target instanceof GroupParseNode) {
+            ParseNode buffer = target;
+            target = source;
+            source = buffer;
+        }
         for (ParseNode targetChild : target.children) {
             ParseNode sourceChild = source.getChild(targetChild);
             if (sourceChild == null) {
@@ -467,6 +473,18 @@ public abstract class GenerateFormAction extends AnAction {
         } else return null;
     }
 
+    protected String getPropertyType(Object element) {
+        if (element instanceof Number) {
+            return "NUMERIC";
+        } else if (element instanceof String) {
+            String dateType = DateConverter.smartParse((String) element);
+            if (dateType != null) {
+                return dateType;
+            }
+        }
+        return "STRING";
+    }
+
     private class ElementKey {
         String extID;
         String ID;
@@ -580,9 +598,6 @@ public abstract class GenerateFormAction extends AnAction {
         ElementNamespace namespace;
         String type;
         boolean attr;
-        PropertyParseNode(String key, ElementNamespace namespace, boolean attr) {
-            this(key, namespace, "STRING", attr);
-        }
 
         PropertyParseNode(String key, ElementNamespace namespace, String type, boolean attr) {
             super(key, new ArrayList<>());

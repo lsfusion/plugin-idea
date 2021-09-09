@@ -17,6 +17,7 @@ import java.util.HashMap;
     tokenDebugNames.put(com.intellij.psi.TokenType.WHITE_SPACE, "White Space");
     tokenDebugNames.put(COMMENTS, "Comment");
     tokenDebugNames.put(LEX_LOGICAL_LITERAL, "Logical");
+    tokenDebugNames.put(LEX_T_LOGICAL_LITERAL, "TLogical");
     tokenDebugNames.put(PRIMITIVE_TYPE, "Primitive Type");
     tokenDebugNames.put(LEX_STRING_LITERAL, "String");
     tokenDebugNames.put(LEX_UINT_LITERAL, "Integer");
@@ -104,15 +105,16 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
 
 
   ("TRUE" | "FALSE")                    { return LEX_LOGICAL_LITERAL; }
+  ("TTRUE" | "TFALSE")                    { return LEX_T_LOGICAL_LITERAL; }
 
     "INTEGER" | "LONG" | "NUMERIC" ("[" {DIGITS} "," {DIGITS} "]")? | "DOUBLE"
   | "DATE" | "DATETIME" | "TIME" | "YEAR" | "ZDATETIME" | "INTERVAL" ("["{INTERVAL_TYPE}"]")
   | "BPSTRING" | "BPISTRING" | "STRING" | "ISTRING"
   | "BPSTRING[" {DIGITS} "]" | "BPISTRING[" {DIGITS} "]" | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]"
   | "TEXT" | "RICHTEXT"
-  | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "RAWFILE" | "FILE" | "EXCELFILE" | "TEXTFILE" | "CSVFILE" | "HTMLFILE" | "JSONFILE" | "XMLFILE" | "TABLEFILE"
-  | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "RAWLINK" | "LINK" | "EXCELLINK" | "TEXTLINK" | "CSVLINK" | "HTMLLINK" | "JSONLINK" | "XMLLINK" | "TABLELINK"
-  | "BOOLEAN"
+  | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "DBFFILE" | "RAWFILE" | "FILE" | "EXCELFILE" | "TEXTFILE" | "CSVFILE" | "HTMLFILE" | "JSONFILE" | "XMLFILE" | "TABLEFILE"
+  | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "DBFLINK" | "RAWLINK" | "LINK" | "EXCELLINK" | "TEXTLINK" | "CSVLINK" | "HTMLLINK" | "JSONLINK" | "XMLLINK" | "TABLELINK"
+  | "BOOLEAN" | "TBOOLEAN"
   | "COLOR"                             { return PRIMITIVE_TYPE; }
 
 
@@ -225,6 +227,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NOHINT"                 			    { return NOHINT; }
   "COLLAPSE"                  			{ return COLLAPSE; }
   "CONCAT"                  			{ return CONCAT; }
+  "CONFIG"                 			    { return CONFIG; }
   "CONFIRM"                 			{ return CONFIRM; }
   "CONSTRAINT"              			{ return CONSTRAINT; }
   "CONTAINERH"              			{ return CONTAINERH; }
@@ -451,7 +454,6 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "SHOW"                    			{ return SHOW; }
   "SHOWDEP"                 			{ return SHOWDEP; }
   "SHOWIF"                  			{ return SHOWIF; }
-  "SHOWTYPE"                  			{ return SHOWTYPE; }
   "SINGLE"                  			{ return SINGLE; }
   "SHEET"                  			    { return SHEET; }
   "SPLITH"                  			{ return SPLITH; }
@@ -486,6 +488,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "UNGROUP"                 			{ return UNGROUP; }
   "UP"                 			        { return UP; }
   "USERFILTER"                 			{ return USERFILTER; }
+  "USERFILTERS"                 		{ return USERFILTERS; }
   "VALIGN"                  			{ return VALIGN; }
   "VALUE"                               { return VALUE; }
   "VERTICAL"                			{ return VERTICAL; }

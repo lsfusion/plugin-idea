@@ -1,18 +1,17 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.213</version>
+    <version>1.0.217</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.213</b><br>
+        <b>Version 1.0.217</b><br>
         <ul>
-            <li>EXTERNAL UDP</li>
-            <li>Fixes in quick-documentation</li>
-            <li>Fix renaming forms with "shift + F6"</li>
-            <li>EXTERNAL HTTP BODYPARAMHEADERS option</li>
+            <li>USERFILTERS support</li>
+            <li>panelCaptionAlignment/panelCaptionLast support</li>
+            <li>Aggregate form from extends</li>
         </ul>
     ]]>
     </change-notes>
@@ -132,6 +131,11 @@
         </action>
         <action id="PreFastFindUsagesAction" class="com.lsfusion.actions.PreFindUsagesAction">
             <keyboard-shortcut first-keystroke="alt F7" keymap="$default"/>
+        </action>
+
+        <action id="com.lsfusion.actions.AggregateFormAction" class="com.lsfusion.actions.AggregateFormAction"
+                text="Aggregate Form" icon="/images/lsf_logo.png">
+            <add-to-group group-id="EditorPopupMenu1.FindRefactor" anchor="first"/>
         </action>
     </actions>
 

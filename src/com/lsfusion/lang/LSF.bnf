@@ -1277,7 +1277,6 @@ localDataPropertyDefinition ::= LOCAL nestedLocalModifier nonEmptyLocalPropertyD
 nestedLocalModifier ::= (NESTED manageSessionClause?)?
 {
     implements = "com.lsfusion.documentation.LSFDocumentation"
-    methods = [getDocumentation]
 }
 
 nonEmptyLocalPropertyDeclarationNameList ::= localPropertyDeclarationName (COMMA localPropertyDeclarationName)*
@@ -1435,6 +1434,7 @@ formStatement ::=	(	formDecl
                     |	formEventsList
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
+                    |   userFiltersDeclaration
                     |	formOrderByList
                     |	formPivotOptionsDeclaration
                     |	listFormDeclaration
@@ -1562,11 +1562,13 @@ formSubReport ::= SUBREPORT formCalcPropertyObject?
 
 classViewType ::= PANEL | GRID | TOOLBAR
 
-propertyCustomView ::= CUSTOM (RENDER stringLiteral)? (EDIT (PRIMITIVE_TYPE | REPLACE)? stringLiteral)?
+renderPropertyCustomView ::= RENDER stringLiteral
+editPropertyCustomView ::= EDIT (PRIMITIVE_TYPE | REPLACE)? stringLiteral
+propertyCustomView ::= CUSTOM ((renderPropertyCustomView editPropertyCustomView) | renderPropertyCustomView | editPropertyCustomView)
 
 listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral) | CALENDAR
 
-pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS))*
+pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS) | (CONFIG stringLiteral))*
 
 mapOptions ::= stringLiteral
 
@@ -1729,6 +1731,8 @@ formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage regular
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
+
+userFiltersDeclaration ::= USERFILTERS formPropertyDrawUsage 
 
 filterGroupUsage ::= simpleName
 {
@@ -2137,7 +2141,7 @@ removeComponentStatement ::= REMOVE componentSelector SEMI {pin = 1}
 
 // GROUPOBJECT + TREE
 private componentSingleSelectorType ::=  BOX | OBJECTS | PANEL | TOOLBARBOX | TOOLBARLEFT | TOOLBARRIGHT | TOOLBAR
-groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID | SHOWTYPE
+groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID
 globalSingleSelectorType ::= componentSingleSelectorType 
 
 private groupObjectTreeSelector ::= TREE treeGroupSelector | groupObjectSelector { pin(".*") = 1 }
@@ -2185,6 +2189,7 @@ componentPropertyValue ::= //commented literals are in designCalcPropertyObject
                         //|	doubleLiteral
                             dimensionLiteral
                         |	booleanLiteral
+                        |	tbooleanLiteral
                         |	boundsIntLiteral
                         |	boundsDoubleLiteral
                         |   containerTypeLiteral
@@ -2247,6 +2252,7 @@ metaCodeLiteral ::= LEX_STRING_LITERAL
                 |	LEX_UDOUBLE_LITERAL
                 |	LEX_ULONG_LITERAL
                 |	LEX_LOGICAL_LITERAL
+                |	LEX_T_LOGICAL_LITERAL
                 |	LEX_DATE_LITERAL
                 |	LEX_DATETIME_LITERAL
                 |	LEX_TIME_LITERAL
@@ -2323,6 +2329,7 @@ literal ::=
 	|	unumericLiteral
 	|	(<<noIDCheck>> localizedStringLiteral) // since there is a parameter afterwards we need to do lookahead (same as in staticObjectID)
 	|	booleanLiteral
+	|	tbooleanLiteral
 	|	dateTimeLiteral
 	|	dateLiteral
 	|	timeLiteral
@@ -2477,6 +2484,7 @@ dateLiteral ::= LEX_DATE_LITERAL
 dateTimeLiteral ::= LEX_DATETIME_LITERAL
 timeLiteral ::= LEX_TIME_LITERAL
 booleanLiteral ::= LEX_LOGICAL_LITERAL
+tbooleanLiteral ::= LEX_T_LOGICAL_LITERAL
 udoubleLiteral ::= LEX_UDOUBLE_LITERAL
 unumericLiteral ::= LEX_UNUMERIC_LITERAL
 uintLiteral ::= LEX_UINT_LITERAL

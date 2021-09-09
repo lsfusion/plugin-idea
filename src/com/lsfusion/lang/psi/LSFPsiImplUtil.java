@@ -669,6 +669,8 @@ public class LSFPsiImplUtil {
                 return ImageClass.instance;
             case "PDFFILE":
                 return PDFClass.instance;
+            case "DBFFILE":
+                return DBFClass.instance;
             case "RAWFILE":
                 return RawClass.instance;
             case "FILE":
@@ -693,6 +695,8 @@ public class LSFPsiImplUtil {
                 return ImageLinkClass.instance;
             case "PDFLINK":
                 return PDFLinkClass.instance;
+            case "DBFLINK":
+                return DBFLinkClass.instance;
             case "RAWLINK":
                 return RawLinkClass.instance;
             case "LINK":
@@ -713,6 +717,8 @@ public class LSFPsiImplUtil {
                 return TableLinkClass.instance;
             case "BOOLEAN":
                 return LogicalClass.instance;
+            case "TBOOLEAN":
+                return LogicalClass.threeStateInstance;
             case "DATE":
                 return DateClass.instance;
             case "TIME":
@@ -1271,6 +1277,8 @@ public class LSFPsiImplUtil {
     public static DataClass resolveBuiltInValueClass(@NotNull LSFLiteral sourceStatement) {
         if (sourceStatement.getBooleanLiteral() != null)
             return LogicalClass.instance;
+        if (sourceStatement.getTbooleanLiteral() != null)
+            return LogicalClass.threeStateInstance;
         if (sourceStatement.getUlongLiteral() != null)
             return LongClass.instance;
         if (sourceStatement.getUintLiteral() != null)
@@ -4555,11 +4563,7 @@ public class LSFPsiImplUtil {
     }
 
     public static String getDocumentation(LSFLocalDataPropertyDefinition lsfLocalDataPropertyDefinition, PsiElement child) {
-        return "DATA_operator";
-    }
-
-    public static String getDocumentation(LSFNestedLocalModifier lsfNestedLocalModifier, PsiElement child) {
-        return "DATA_operator";
+        return "Braces_operator";
     }
 
     public static String getDocumentation(LSFExecActionPropertyDefinitionBody lsfExecActionPropertyDefinitionBody, PsiElement child) {

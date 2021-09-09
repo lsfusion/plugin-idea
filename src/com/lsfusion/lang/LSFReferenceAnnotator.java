@@ -584,46 +584,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
-    public void visitPropertyCustomView(@NotNull LSFPropertyCustomView customView) {
-        super.visitPropertyCustomView(customView);
-        String renderPattern = "[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:[a-zA-Z]+\\w*";
-        String editPattern = "[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:([a-zA-Z]+\\w*)?";
-        String textEditPattern = "[a-zA-Z]+\\w*:[a-zA-Z]+\\w*";
-        String replaceEditPattern = "[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:[a-zA-Z]+\\w*:([a-zA-Z]+\\w*)?";
+    public void visitRenderPropertyCustomView(@NotNull LSFRenderPropertyCustomView renderPropertyCustomView) {
+        super.visitRenderPropertyCustomView(renderPropertyCustomView);
+        if (renderPropertyCustomView.getStringLiteral().getValue().isEmpty())
+            addUnderscoredError(renderPropertyCustomView, "Wrong custom render function definition. 'renderFunction' can't be empty. Expected: CUSTOM RENDER 'renderFunction'");
+    }
 
-        LSFStringLiteral stringLiteral = null;
-        String message = null;
-        int literalIndex = 0;
+    @Override
+    public void visitEditPropertyCustomView(@NotNull LSFEditPropertyCustomView editPropertyCustomView) {
+        super.visitEditPropertyCustomView(editPropertyCustomView);
 
-        PsiElement firstChild = customView.getFirstChild();
-        PsiElement nextSibling = firstChild.getNextSibling();
-        while (nextSibling != null){
-            if (nextSibling.getText().equals("RENDER")) {
-                stringLiteral = customView.getStringLiteralList().get(literalIndex);
-                literalIndex++;
-                if (!stringLiteral.getValue().matches(renderPattern))
-                    message = "Wrong render functions definition: '<render_function_name>:<set_value_function_name>:<clear_function_name>' expected";
-            } else if (nextSibling.getText().equals("EDIT") && !(customView.getText().contains("TEXT")) && !(customView.getText().contains("REPLACE"))) {
-                stringLiteral = customView.getStringLiteralList().get(literalIndex);
-                literalIndex++;
-                if (!stringLiteral.getValue().matches(editPattern))
-                    message = "Wrong edit functions definition: '<start_editing_function_name>:<commit_editing_function_name>:<on_browser_event_function_name>' expected";
-            } else if (nextSibling.getText().equals("TEXT")) {
-                stringLiteral = customView.getStringLiteralList().get(literalIndex);
-                literalIndex++;
-                if (!stringLiteral.getValue().matches(textEditPattern))
-                    message = "Wrong text edit functions definition: '<render_function_name>:<clear_render_function_name>' expected";
-            } else if (nextSibling.getText().equals("REPLACE")) {
-                stringLiteral = customView.getStringLiteralList().get(literalIndex);
-                literalIndex++;
-                if (!stringLiteral.getValue().matches(replaceEditPattern))
-                    message = "Wrong replace edit functions definition: '<render_function_name>:<start_editing_function_name>:<commit_editing_function_name>:<clear_render_function_name>:<on_browser_event_function_name>' expected";
-            }
-            nextSibling = nextSibling.getNextSibling();
-        }
-
-        if (stringLiteral != null && message != null)
-            addUnderscoredError(customView, message);
+        if (editPropertyCustomView.getStringLiteral().getValue().isEmpty())
+            addUnderscoredError(editPropertyCustomView, "Wrong custom edit function definition. 'editFunction' can't be empty. Expected:" +
+                    (editPropertyCustomView.getParent().getChildren().length > 1 ? "" : "CUSTOM ") + "EDIT [TEXT / REPLACE] 'editFunction'");
     }
 
     @Override
@@ -972,44 +945,38 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (declaration != null) {
                 if (declaration instanceof LSFPropertyStatement) {
                     LSFPropertyCalcStatement propertyStatement = ((LSFPropertyStatement) declaration).getPropertyCalcStatement();
-                    if (propertyStatement == null) {
+                    LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
+                    if (expression != null && !assignAllowed(expression)) {
                         addAssignError(o);
                     } else {
-                        LSFPropertyExpression expression = propertyStatement.getPropertyExpression();
-                        if (expression != null && !assignAllowed(expression)) {
-                            addAssignError(o);
-                        } else {
-                            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
-                            if (expressionUnfriendlyPD != null) {
-                                LSFGroupPropertyDefinition groupPD = expressionUnfriendlyPD.getGroupPropertyDefinition();
-                                if (groupPD != null)
-                                    addAssignError(o);
-                            }
+                        LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyStatement.getExpressionUnfriendlyPD();
+                        if (expressionUnfriendlyPD != null) {
+                            LSFGroupPropertyDefinition groupPD = expressionUnfriendlyPD.getGroupPropertyDefinition();
+                            if (groupPD != null)
+                                addAssignError(o);
                         }
                     }
-                    LSFClassSet leftClass = declaration.resolveValueClass();
-                    List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
-                    if (!rightPropertyExpressionList.isEmpty()) {
-                        LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpressionList.get(0).resolveValueClass(false));
-                        if (leftClass != null && rightClass != null) {
-                            if (!leftClass.isCompatible(rightClass))
-                                addTypeMismatchError(o, rightClass, leftClass);
-                        }
-                    }
+
+                    checkTypeMismatch(o, declaration);
+
                 } else if (declaration instanceof LSFLocalPropertyDeclarationNameImpl) {
-                    LSFClassSet leftClass = declaration.resolveValueClass();
-                    List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
-                    if (!rightPropertyExpressionList.isEmpty()) {
-                        LSFPropertyExpression rightPropertyExpression = rightPropertyExpressionList.get(0);
-                        LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpression.resolveValueClass(false));
-                        if (leftClass != null && rightClass != null) {
-                            if (!leftClass.isCompatible(rightClass)) {
-                                addTypeMismatchError(o, rightClass, leftClass);
-                            } else if (leftClass.getCanonicalName().equals("BOOLEAN") && rightPropertyExpression.getText().equals("FALSE")) {
-                                addFalseToBooleanAssignError(o);
-                            }
-                        }
-                    }
+                    checkTypeMismatch(o, declaration);
+                }
+            }
+        }
+    }
+
+    private void checkTypeMismatch(LSFAssignActionPropertyDefinitionBody o, LSFPropDeclaration declaration) {
+        LSFClassSet leftClass = declaration.resolveValueClass();
+        List<LSFPropertyExpression> rightPropertyExpressionList = o.getPropertyExpressionList();
+        if (!rightPropertyExpressionList.isEmpty()) {
+            LSFPropertyExpression rightPropertyExpression = rightPropertyExpressionList.get(0);
+            LSFClassSet rightClass = LSFExClassSet.fromEx(rightPropertyExpression.resolveValueClass(false));
+            if (leftClass != null && rightClass != null) {
+                if (!leftClass.isCompatible(rightClass)) {
+                    addTypeMismatchError(o, rightClass, leftClass);
+                } else if (leftClass.getCanonicalName().equals("BOOLEAN") && rightPropertyExpression.getText().equals("FALSE")) {
+                    addFalseToBooleanAssignError(o);
                 }
             }
         }

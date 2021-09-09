@@ -13,10 +13,6 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         super(target);
     }
 
-    public void setPanelCaptionAfter(boolean panelCaptionAfter) {
-        target.panelCaptionAfter = panelCaptionAfter;
-    }
-
     public void setChangeOnSingleClick(boolean changeOnSingleClick) {
         target.changeOnSingleClick = changeOnSingleClick;
     }
@@ -67,6 +63,14 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
 
     public void setPanelCaptionVertical(boolean panelCaptionVertical) {
         target.panelCaptionVertical = panelCaptionVertical;
+    }
+    
+    public void setPanelCaptionLast(boolean panelCaptionLast) {
+        target.panelCaptionLast = panelCaptionLast;
+    }
+    
+    public void setPanelCaptionAlignment(FlexAlignment panelCaptionAlignment) {
+        target.panelCaptionAlignment = panelCaptionAlignment;
     }
 
     public void setCaption(String caption) {
