@@ -11,6 +11,7 @@
         <ul>
             <li>USERFILTERS support</li>
             <li>panelCaptionAlignment/panelCaptionLast support</li>
+            <li>Aggregate form from extends</li>
         </ul>
     ]]>
     </change-notes>
@@ -126,6 +127,11 @@
         </action>
         <action id="PreFastFindUsagesAction" class="com.lsfusion.actions.PreFindUsagesAction">
             <keyboard-shortcut first-keystroke="alt F7" keymap="$default"/>
+        </action>
+
+        <action id="com.lsfusion.actions.AggregateFormAction" class="com.lsfusion.actions.AggregateFormAction"
+                text="Aggregate Form" icon="/images/lsf_logo.png">
+            <add-to-group group-id="EditorPopupMenu1.FindRefactor" anchor="first"/>
         </action>
     </actions>
 
