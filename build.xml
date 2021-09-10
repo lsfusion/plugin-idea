@@ -39,6 +39,9 @@
         <include name="**/?*.tld"/>
         <include name="**/?*.ftl"/>
         <include name="**/?*.ft"/>
+        <include name="**/?*.bat" />
+        <include name="**/?*.sh" />
+        <include name="**/?*.reg" />
     </patternset>
 
     <!-- JDK definitions -->
