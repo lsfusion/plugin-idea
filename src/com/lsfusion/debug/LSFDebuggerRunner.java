@@ -28,7 +28,6 @@ public class LSFDebuggerRunner extends GenericDebuggerRunner {
     public static final String PLUGIN_ENABLED_PROPERTY = "lsfusion.server.plugin.enabled";
     public static final String DEBUG_ACTIONS_PROPERTY = "lsfusion.server.debug.actions";
     public static final String LIGHT_START_PROPERTY = "lsfusion.server.lightstart";
-    public static final String IDEA_BIN_PATH = "idea.bin.path"; //uses in tooltip links
     public static final Key<Integer> DEBUGGER_PROPERTY_KEY = new Key<>("lsfusion.debuggerPort");
     
     @Override

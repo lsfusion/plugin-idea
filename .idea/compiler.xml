@@ -15,6 +15,9 @@
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
       <entry name="?*.ft" />
+      <entry name="?*.bat" />
+      <entry name="?*.sh" />
+      <entry name="?*.reg" />
     </wildcardResourcePatterns>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="false">

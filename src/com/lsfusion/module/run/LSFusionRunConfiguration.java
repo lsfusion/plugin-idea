@@ -10,7 +10,6 @@ import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.util.JavaParametersUtil;
 import com.intellij.execution.util.ProgramParametersUtil;
-import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.PathMacroManager;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.module.Module;
@@ -214,7 +213,6 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
             JavaParametersUtil.configureConfiguration(params, myConfiguration);
             params.getVMParametersList().addProperty(LIGHT_START_PROPERTY, String.valueOf(lightStart));
 
-            params.getVMParametersList().addProperty(IDEA_BIN_PATH, PathManager.getBinPath());
             if (!params.getVMParametersList().hasProperty(PLUGIN_ENABLED_PROPERTY)) {
                 params.getVMParametersList().addProperty(PLUGIN_ENABLED_PROPERTY, "true");
             }

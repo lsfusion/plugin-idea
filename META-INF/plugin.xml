@@ -7,11 +7,12 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.217</b><br>
+        <b>Version 1.0.218</b><br>
         <ul>
             <li>USERFILTERS support</li>
             <li>panelCaptionAlignment/panelCaptionLast support</li>
             <li>Aggregate form from extends</li>
+            <li>Added setting debug protocol for open file in editor from tooltip</li>
         </ul>
     ]]>
     </change-notes>
@@ -116,6 +117,10 @@
             <action id="FastInsertComposition" class="com.lsfusion.actions.FastInsertCompositionAction">
                 <keyboard-shortcut first-keystroke="control alt W" keymap="$default"/>
             </action>
+
+            <separator/>
+            <action id="InstallExternalCallsProtocolAction" class="com.lsfusion.actions.InstallExternalCallsProtocolAction"
+                    text="Install Debug Protocol"/>
         </group>
         
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
