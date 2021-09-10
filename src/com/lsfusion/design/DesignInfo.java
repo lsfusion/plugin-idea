@@ -16,6 +16,7 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.util.DesignUtils;
 
 import java.awt.*;
 import java.util.*;
@@ -41,7 +42,7 @@ public class DesignInfo {
             }
         }
         
-        for (PsiElement formExtend : sortByModules(elementToModule)) {
+        for (PsiElement formExtend : DesignUtils.sortByModules(formDecl, elementToModule)) {
             formEntity.extendForm((LSFFormExtend) formExtend);
         }
 
@@ -62,7 +63,7 @@ public class DesignInfo {
             }
         }
         
-        for (PsiElement ref : sortByModules(elementToModule)) {
+        for (PsiElement ref : DesignUtils.sortByModules(formDecl, elementToModule)) {
             LSFDesignHeader designHeader = (LSFDesignHeader) ref.getParent();
             if (designHeader.getCustomFormDesignOption() != null) {
                 formView = FormView.create(formEntity);
@@ -70,35 +71,6 @@ public class DesignInfo {
             LSFDesignStatement designStatement = (LSFDesignStatement) designHeader.getParent();
             processComponentBody(formView.getMainContainer(), designStatement.getComponentBody());
         }
-    }
-    
-    private List<PsiElement> sortByModules(Map<PsiElement, LSFModuleDeclaration> elementToModule) {
-        List<LSFModuleDeclaration> sortedModules = new ArrayList<>();
-        processSorting(formDecl.getLSFFile().getModuleDeclaration(), new HashSet<>(elementToModule.values()), new HashSet<>(), sortedModules);
-
-        List<PsiElement> elementList = new ArrayList<>(elementToModule.keySet());
-        elementList.sort((o1, o2) -> {
-            assert o1 != null && o2 != null;
-            LSFModuleDeclaration module1 = elementToModule.get(o1);
-            LSFModuleDeclaration module2 = elementToModule.get(o2);
-            if (module1 != module2) {
-                return sortedModules.indexOf(module2) - sortedModules.indexOf(module1);
-            }
-            return o1.getTextOffset() - o2.getTextOffset();
-        });
-        return elementList;
-    }
-    
-    private void processSorting(LSFModuleDeclaration currentModule, Set<LSFModuleDeclaration> all, Set<LSFModuleDeclaration> visited, List<LSFModuleDeclaration> sorted) {
-        visited.add(currentModule);
-        for (LSFModuleDeclaration moduleDecl : all) {
-            if (!visited.contains(moduleDecl)) {
-                if (moduleDecl.requires(currentModule)) {
-                    processSorting(moduleDecl, all, visited, sorted);
-                }
-            }
-        }
-        sorted.add(currentModule);
     }
 
     public String getFormCaption() {

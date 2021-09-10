@@ -9,10 +9,8 @@
     <change-notes><![CDATA[
         <b>Version 1.0.218</b><br>
         <ul>
-            <li>USERFILTERS support</li>
-            <li>panelCaptionAlignment/panelCaptionLast support</li>
-            <li>Aggregate form from extends</li>
             <li>Added setting debug protocol for open file in editor from tooltip</li>
+            <li>Aggregate form from extends with local scope</li>
         </ul>
     ]]>
     </change-notes>
