@@ -76,7 +76,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
     }
 
     @Override
-    protected void createTrees(@NotNull Map<String, JTree> trees) {
+    protected void createTrees(@NotNull Map<? super String, ? super JTree> trees) {
         trees.put(CALLER_TYPE, createTree(false));
     }
 

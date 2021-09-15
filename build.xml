@@ -116,6 +116,7 @@
         <pathelement location="${buildLib}/grammar-kit.jar"/>
         <file name="${basedir}/lib/psiImplUtils.jar"/>
         <fileset dir="${idea.home}/lib">
+            <include name="3rd-party.jar"/>
             <include name="asm-all-9.1.jar"/>
             <include name="automaton-1.12-1.jar"/>
             <include name="extensions.jar"/>

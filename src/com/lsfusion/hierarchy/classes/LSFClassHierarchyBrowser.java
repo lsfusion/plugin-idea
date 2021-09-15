@@ -66,7 +66,7 @@ public class LSFClassHierarchyBrowser extends TypeHierarchyBrowserBase {
     }
 
     @Override
-    protected void createTrees(@NotNull Map<String, JTree> trees) {
+    protected void createTrees(@NotNull Map<? super String, ? super JTree> trees) {
         trees.put(TypeHierarchyBrowserBase.SUBTYPES_HIERARCHY_TYPE, createTree(false));
         trees.put(TypeHierarchyBrowserBase.SUPERTYPES_HIERARCHY_TYPE, createTree(false));
     }
