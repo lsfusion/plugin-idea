@@ -37,7 +37,18 @@ if not x%ATTR_STRING:lsfusion-protocol://=%==x%ATTR_STRING% (
 if not x%TARGET_PATH:use_default_path=%==x%TARGET_PATH% (
     goto USE_DEFAULT_PATH
 ) else (
-    goto :CALL_IDEA
+    @REM check if file exist
+    if not exist %TARGET_PATH% (
+        @REM if file doesnt exist run the search mechanism in all project modules as with the "use_default_path" option
+        if not x%TARGET_PATH:/src/main/lsfusion=%==x%TARGET_PATH% (
+            SET TARGET_PATH=%TARGET_PATH:*/src/main/lsfusion=use_default_path%
+            goto USE_DEFAULT_PATH
+        ) else (
+            goto :eof
+        )
+    ) else (
+        goto :CALL_IDEA
+    )
 )
 
 :USE_DEFAULT_PATH
