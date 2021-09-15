@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.219</b><br>
+        <b>Version 1.0.220</b><br>
         <ul>
-            <li>Added setting debug protocol for open file in editor from tooltip</li>
-            <li>Aggregate form from extends with local scope</li>
+            <li>Aggregate form namespace support</li>
         </ul>
     ]]>
     </change-notes>

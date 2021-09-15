@@ -1443,7 +1443,7 @@ formStatement ::=	(	formDecl
                     |   reportSetting
                     |   formExtIDSetting
                     )*
-                    SEMI
+                    emptyStatement
 {
     pin=1
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"

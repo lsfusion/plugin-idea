@@ -19,11 +19,14 @@ import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.Query;
+import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.DesignUtils;
 import org.apache.commons.lang.StringUtils;
@@ -31,8 +34,11 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 
 public class AggregateFormAction extends AnAction {
 
@@ -150,6 +156,8 @@ public class AggregateFormAction extends AnAction {
 
             add(sourceScrollPane, BorderLayout.CENTER);
             add(buttonsPanel, BorderLayout.SOUTH);
+
+            rootPane.registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         }
     }
 
@@ -161,21 +169,54 @@ public class AggregateFormAction extends AnAction {
         if (document != null && range != null) {
             int lineNumber = document.getLineNumber(range.getStartOffset()) + 1;
             int linePosition = range.getStartOffset() - document.getLineStartOffset(lineNumber - 1) + 1;
-            String text = element.getText();
-
-            if(element instanceof LSFFormStatement) {
-                LSFExtendingFormDeclaration extendForm = ((LSFFormStatement) element).getExtendingFormDeclaration();
-                if(extendForm != null) {
-                    text = text.replaceFirst(extendForm.getText() + "(\n)?", "");
-                }
-                if(text.endsWith(";")) {
-                    text = text.substring(0, text.length() - 1);
-                }
-            }
-
-            return String.format("//%s (%s:%s)\n %s", file.getName(), lineNumber, linePosition, text);
+            return String.format("//%s (%s:%s)\n%s", file.getName(), lineNumber, linePosition, getAggregatedText(element));
         }
         return null;
+    }
+
+    private String getAggregatedText(PsiElement element) {
+        Project project = element.getProject();
+
+        //read source elements offsets
+        Map<Integer, String> offsetSourceMap = new HashMap<>();
+        for (LSFReference<?> customClassUsage : PsiTreeUtil.findChildrenOfAnyType(element, LSFCustomClassUsage.class, LSFPropertyUsage.class, LSFActionUsage.class, LSFPropertyElseActionUsage.class)) {
+            LSFDeclaration declaration = customClassUsage.resolveDecl();
+            if (declaration != null) {
+                offsetSourceMap.put(customClassUsage.getTextOffset() - element.getTextOffset(), declaration.getLSFFile().getModuleDeclaration().getNamespace() + "." + customClassUsage.getText());
+            }
+        }
+
+        //copy element
+        PsiElement copyElement = LSFElementGenerator.createFormFromText(project, element.getText(), element.getClass());
+
+        //create elements with namespaces
+        Map<PsiElement, LSFCompoundID> replacementMap = new HashMap<>();
+        for (PsiElement sourceElement : PsiTreeUtil.findChildrenOfAnyType(copyElement, LSFCustomClassUsage.class, LSFPropertyUsage.class, LSFActionUsage.class, LSFPropertyElseActionUsage.class)) {
+            if (PsiTreeUtil.findChildrenOfType(sourceElement, LSFNamespaceUsage.class).isEmpty()) {
+                replacementMap.put(sourceElement, LSFElementGenerator.createCompoundIDFromText(project, offsetSourceMap.get(sourceElement.getTextOffset() - copyElement.getTextOffset())));
+            }
+        }
+
+        //replace elements
+        for (Map.Entry<PsiElement, LSFCompoundID> replacement : replacementMap.entrySet()) {
+            replacement.getKey().replace(replacement.getValue());
+        }
+
+        //delete EXTEND FORM
+        for (LSFExtendingFormDeclaration extendForm : PsiTreeUtil.findChildrenOfType(copyElement, LSFExtendingFormDeclaration.class)) {
+            extendForm.delete();
+        }
+
+        //remove semicolon
+        if (copyElement instanceof LSFFormStatement) {
+            LSFEmptyStatement semicolon = ((LSFFormStatement) copyElement).getEmptyStatement();
+            if (semicolon != null) {
+                semicolon.delete();
+            }
+        }
+
+        //replace new lines from the start of the text
+        return copyElement.getText().replaceAll("^[\n\r]*", "");
     }
 
     public PsiElement findSourceElement(Project project, Editor editor, int offset) {

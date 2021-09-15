@@ -43,6 +43,11 @@ public class LSFElementGenerator {
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFStringLiteral.class).iterator().next();
     }
 
+    public static PsiElement createFormFromText(Project myProject, String text, Class cls) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; " + text + ";");
+        return (PsiElement) PsiTreeUtil.findChildrenOfType(dummyFile, cls).iterator().next();
+    }
+
     public static LSFLocalizedStringValueLiteral createLocalizedStringValueLiteral(Project myProject, String text) {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; GROUP someDumbGroup " + text + ";");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFLocalizedStringValueLiteral.class).iterator().next();
