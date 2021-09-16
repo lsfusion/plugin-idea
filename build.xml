@@ -65,6 +65,7 @@
     <property name="javac2.home" value="${idea.home}/plugins/java/lib"/>
     <path id="javac2.classpath">
         <pathelement location="${javac2.home}/javac2.jar"/>
+        <pathelement location="${idea.home}/lib/3rd-party.jar"/>
         <pathelement location="${idea.home}/lib/jdom.jar"/>
         <pathelement location="${idea.home}/lib/asm-all-9.1.jar"/>
         <pathelement location="${idea.home}/lib/forms_rt.jar"/>
