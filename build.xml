@@ -69,6 +69,7 @@
         <pathelement location="${idea.home}/lib/jdom.jar"/>
         <pathelement location="${idea.home}/lib/asm-all-9.1.jar"/>
         <pathelement location="${idea.home}/lib/forms_rt.jar"/>
+        <pathelement location="${idea.home}/lib/util.jar"/>
     </path>
     <target name="register.custom.compilers">
         <!--suppress AntResolveInspection : used in Linux -->
