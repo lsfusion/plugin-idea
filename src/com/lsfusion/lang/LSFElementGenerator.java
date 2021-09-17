@@ -4,10 +4,7 @@ import com.intellij.formatting.FormatTextRanges;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.impl.source.codeStyle.CodeFormatterFacade;
@@ -67,6 +64,11 @@ public class LSFElementGenerator {
     public static LSFCompoundID createCompoundIDFromText(Project myProject, String name) {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=" + name + "();");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFCompoundID.class).iterator().next();
+    }
+
+    public static PsiComment createPsiCommentFromText(Project myProject, String text) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; //" + text + ";");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, PsiComment.class).iterator().next();
     }
 
     @NotNull

@@ -207,8 +207,20 @@ public class AggregateFormAction extends AnAction {
             extendForm.delete();
         }
 
-        //remove semicolon
+
         if (copyElement instanceof LSFFormStatement) {
+
+            //remove editFormDeclaration
+            for(LSFEditFormDeclaration editForm : ((LSFFormStatement) copyElement).getEditFormDeclarationList()) {
+                editForm.replace(LSFElementGenerator.createPsiCommentFromText(project, editForm.getText() + " // Unable to call EDIT in interpreter"));
+            }
+
+            //remove listFormDeclaration
+            for(LSFListFormDeclaration listForm : ((LSFFormStatement) copyElement).getListFormDeclarationList()) {
+                listForm.replace(LSFElementGenerator.createPsiCommentFromText(project, listForm.getText() + " // Unable to call LIST in interpreter"));
+            }
+
+            //remove semicolon
             LSFEmptyStatement semicolon = ((LSFFormStatement) copyElement).getEmptyStatement();
             if (semicolon != null) {
                 semicolon.delete();
