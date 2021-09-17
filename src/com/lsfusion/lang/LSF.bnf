@@ -1562,8 +1562,8 @@ formSubReport ::= SUBREPORT formCalcPropertyObject?
 
 classViewType ::= PANEL | GRID | TOOLBAR
 
-renderPropertyCustomView ::= RENDER stringLiteral
-editPropertyCustomView ::= EDIT (PRIMITIVE_TYPE | REPLACE)? stringLiteral
+renderPropertyCustomView ::= stringLiteral
+editPropertyCustomView ::= CHANGE stringLiteral?
 propertyCustomView ::= CUSTOM ((renderPropertyCustomView editPropertyCustomView) | renderPropertyCustomView | editPropertyCustomView)
 
 listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral) | CALENDAR
@@ -1732,7 +1732,7 @@ formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage regular
     methods = [getDocumentation]
 }
 
-userFiltersDeclaration ::= USERFILTERS formPropertyDrawUsage 
+userFiltersDeclaration ::= USERFILTERS formPropertyDrawUsage
 
 filterGroupUsage ::= simpleName
 {
