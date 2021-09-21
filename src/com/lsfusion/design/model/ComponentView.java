@@ -244,7 +244,7 @@ public abstract class ComponentView extends PropertiesContainer {
     public double getDefaultFlex(FormEntity formEntity) {
         ContainerView container = getContainer();
         if (container != null)
-            if (container.isTabbedPane()) {
+            if (container.isTabbed()) {
                 return 1;
             }
         return getBaseDefaultFlex(formEntity);
@@ -259,7 +259,7 @@ public abstract class ComponentView extends PropertiesContainer {
         }
 
         ContainerView container = getContainer();
-        if (container != null && container.isTabbedPane())
+        if (container != null && container.isTabbed())
             return FlexAlignment.STRETCH;
         return getBaseDefaultAlignment(container);
     }

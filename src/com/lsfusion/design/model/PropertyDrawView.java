@@ -189,7 +189,7 @@ public class PropertyDrawView extends ComponentView {
 
     @Override
     public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
-        if (container.isVertical() && isHorizontalValueFlex())
+        if (!container.isHorizontal() && isHorizontalValueFlex())
             return FlexAlignment.STRETCH;
         return super.getBaseDefaultAlignment(container);
     }

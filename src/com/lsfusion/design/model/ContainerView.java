@@ -27,6 +27,8 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("columns"), //backward compatibility
             new ReflectionProperty("lines"),
             new ReflectionProperty("type"),
+            new ReflectionProperty("horizontal"),
+            new ReflectionProperty("tabbed"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("description"),
             new ReflectionProperty("showIf").setExpert()
@@ -40,6 +42,8 @@ public class ContainerView extends ComponentView {
     public ContainerType type = ContainerType.CONTAINERV;
     public Alignment childrenAlignment = Alignment.START;
     public int lines = 1;
+    public boolean horizontal;
+    public boolean tabbed;
     public String showIf;
 
     public ContainerView() {
@@ -77,6 +81,14 @@ public class ContainerView extends ComponentView {
 
     public void setLines(int lines) {
         this.lines = lines;
+    }
+
+    public void setHorizontal(boolean horizontal) {
+        this.horizontal = horizontal;
+    }
+
+    public void setTabbed(boolean tabbed) {
+        this.tabbed = tabbed;
     }
 
     public void setShowIf(String showIf) {
@@ -158,9 +170,9 @@ public class ContainerView extends ComponentView {
     @Override
     protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
 
-        JComponentPanel widget = null;
+        JComponentPanel widget;
 
-        if (isTabbedPane()) {
+        if (isTabbed()) {
             if (oldWidget != null) {
                 ContainerType oldType = (ContainerType) oldWidget.getClientProperty("containerType");
                 if (oldType != type) {
@@ -169,16 +181,14 @@ public class ContainerView extends ComponentView {
             }
             widget = createTabbedPanel(project, formEntity, selection, componentToWidget, oldWidget, recursionGuard);
         } else {
-            if (isLinear() || isScroll() || isColumns() || isSplit()) {
-                widget = createLinearPanel(project, formEntity, selection, componentToWidget, recursionGuard);
-            }
+            widget = createLinearPanel(project, formEntity, selection, componentToWidget, recursionGuard);
         }
 
         if (widget == null) {
             return null;
         }
 
-        if (caption != null && container != null && !isTabbedPane() && !container.isTabbedPane()) {
+        if (caption != null && container != null && !isTabbed() && !container.isTabbed()) {
             widget.setBorder(BorderFactory.createTitledBorder(caption));
         }
 
@@ -190,7 +200,7 @@ public class ContainerView extends ComponentView {
     private JComponentPanel createLinearPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, HashSet<ComponentView> recursionGuard) {
         FlexPanel flexPanel;
         if(isSimple()) {
-            flexPanel = new FlexPanel(isVertical(), childrenAlignment);
+            flexPanel = new FlexPanel(!isHorizontal(), childrenAlignment);
             for (ComponentView child : children) {
                 if (!recursionGuard.contains(child)) {
                     recursionGuard.add(child);
@@ -231,7 +241,7 @@ public class ContainerView extends ComponentView {
     }
 
     public boolean isAlignCaptions() {
-        if(!isVertical()) // later maybe it makes sense to support align captions for horizontal containers, but with no-wrap it doesn't make much sense
+        if(horizontal) // later maybe it makes sense to support align captions for horizontal containers, but with no-wrap it doesn't make much sense
             return false;
 
         int notActions = 0;
@@ -292,48 +302,12 @@ public class ContainerView extends ComponentView {
         return null;
     }
 
-    public boolean isTabbedPane() {
-        return type == TABBED;
-    }
-
-    public boolean isColumns() {
-        return type == COLUMNS;
-    }
-
-    public boolean isScroll() {
-        return type == SCROLL;
-    }
-
-    public boolean isSplitVertical() {
-        return type == SPLITV;
-    }
-
-    public boolean isSplitHorizontal() {
-        return type == SPLITH;
-    }
-    
-    public boolean isSplit() {
-        return isSplitHorizontal() || isSplitVertical();
-    }
-
-    public boolean isLinearVertical() {
-        return type == CONTAINERV;
-    }
-
-    public boolean isLinearHorizontal() {
-        return type == CONTAINERH;
-    }
-
-    public boolean isLinear() {
-        return isLinearVertical() || isLinearHorizontal();
-    }
-
-    public boolean isVertical() {
-        return isLinearVertical() || isSplitVertical() || isColumns() || isScroll() || isTabbedPane();
+    public boolean isTabbed() {
+        return type == TABBED || tabbed;
     }
 
     public boolean isHorizontal() {
-        return isLinearHorizontal() || isSplitHorizontal();
+        return type == CONTAINERH || type == SPLITH || horizontal;
     }
 
     private static class TabbedPane extends JBTabbedPane {

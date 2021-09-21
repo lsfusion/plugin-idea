@@ -11,7 +11,8 @@
         <ul>
             <li>Aggregate Form: remove editFormDeclaration, listFormDeclaration</li>
             <li>Custom property renderers: new CUSTOM clause syntax</li>
-            <li>rename columns -> lines in container design version 5 (with backward compatibility)</li>
+            <li>Rename columns -> lines in container design version 5 (with backward compatibility)</li>
+            <li>DESIGN containers: added 'horizontal' and 'tabbed' options</li>
         </ul>
     ]]>
     </change-notes>
