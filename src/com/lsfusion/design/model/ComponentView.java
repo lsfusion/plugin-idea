@@ -224,11 +224,6 @@ public abstract class ComponentView extends PropertiesContainer {
 
 
     public Dimension getSize() {
-        if (size == null) {
-            if (container != null && container.isScroll()) {
-                return new Dimension(-1, 1);
-            }
-        }
         return size;
     }
 
@@ -240,16 +235,10 @@ public abstract class ComponentView extends PropertiesContainer {
         return getFlex(null);
     }
     public double getFlex(FormEntity formEntity) {
-        ContainerView container = getContainer();
-        if (container != null)
-            if (container.isScroll() || container.isSplit()) {
-                return flex != -1 && flex != 0 ? flex : 1;
-            }
-            
         if (flex >= 0) {
             return flex;
         }
-        return getDefaultFlex(formEntity); // тут в верхней 
+        return getDefaultFlex(formEntity); // тут в верхней
     }
 
     public double getDefaultFlex(FormEntity formEntity) {
@@ -270,10 +259,8 @@ public abstract class ComponentView extends PropertiesContainer {
         }
 
         ContainerView container = getContainer();
-        if (container != null)
-            if ((container.isScroll() || container.isSplit() || container.isTabbedPane())) {
-                return FlexAlignment.STRETCH;
-            }
+        if (container != null && container.isTabbedPane())
+            return FlexAlignment.STRETCH;
         return getBaseDefaultAlignment(container);
     }
 

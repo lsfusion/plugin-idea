@@ -2,7 +2,6 @@ package com.lsfusion.design.model;
 
 import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.lsfusion.LSFIcons;
@@ -39,7 +38,7 @@ public class ContainerView extends ComponentView {
     @NotNull
     public ContainerType type = ContainerType.CONTAINERV;
     public Alignment childrenAlignment = Alignment.START;
-    public int columns = 4;
+    public int columns = 1;
     public String showIf;
 
     public ContainerView() {
@@ -83,16 +82,8 @@ public class ContainerView extends ComponentView {
         this.showIf = showIf;
     }
 
-    public Alignment getChildrenAlignment() {
-        return childrenAlignment;
-    }
-
     public int getColumns() {
         return columns;
-    }
-
-    public ContainerType getType() {
-        return type;
     }
 
     @Override
@@ -168,26 +159,17 @@ public class ContainerView extends ComponentView {
 
         JComponentPanel widget = null;
 
-        if (isTabbedPane() || isSplit()) {
+        if (isTabbedPane()) {
             if (oldWidget != null) {
                 ContainerType oldType = (ContainerType) oldWidget.getClientProperty("containerType");
                 if (oldType != type) {
                     oldWidget = null;
                 }
             }
-
-            if (isTabbedPane()) {
-                widget = createTabbedPanel(project, formEntity, selection, componentToWidget, oldWidget, recursionGuard);
-            } else if (isSplit()) {
-                widget = createSplitPanel(project, formEntity, selection, componentToWidget, oldWidget, recursionGuard);
-            }
+            widget = createTabbedPanel(project, formEntity, selection, componentToWidget, oldWidget, recursionGuard);
         } else {
-            if (isLinear()) {
+            if (isLinear() || isScroll() || isColumns() || isSplit()) {
                 widget = createLinearPanel(project, formEntity, selection, componentToWidget, recursionGuard);
-            } else if (isScroll()) {
-                widget = createScrollPanel(project, formEntity, selection, componentToWidget, recursionGuard);
-            } else if (isColumns()) {
-                widget = createColumnsPanel(project, formEntity, selection, componentToWidget, recursionGuard);
             }
         }
 
@@ -205,75 +187,66 @@ public class ContainerView extends ComponentView {
     }
 
     private JComponentPanel createLinearPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, HashSet<ComponentView> recursionGuard) {
-        FlexPanel flexPanel = new FlexPanel(isLinearVertical(), childrenAlignment);
-        boolean hasChildren = false;
-        for (ComponentView child : children) {
-            if (!recursionGuard.contains(child)) {
-                recursionGuard.add(child);
-                JComponentPanel childWidget = child.createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
-                if (childWidget != null) {
-                    hasChildren = true;
-                    flexPanel.add(childWidget, child.getFlex(formEntity), child.getAlignment());
-                    setSizes(childWidget, child);
+        FlexPanel flexPanel;
+        if(isSimple()) {
+            flexPanel = new FlexPanel(isVertical(), childrenAlignment);
+            for (ComponentView child : children) {
+                if (!recursionGuard.contains(child)) {
+                    recursionGuard.add(child);
+                    JComponentPanel childWidget = child.createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
+                    if (childWidget != null) {
+                        flexPanel.add(childWidget, child.getFlex(formEntity), child.getAlignment());
+                        setSizes(childWidget, child);
+                    }
                 }
             }
+        } else {
+            List<Component> childrenWidgets = new ArrayList<>();
+            boolean hasChildren = false;
+            for (ComponentView child : children) {
+                if (!recursionGuard.contains(child)) {
+                    recursionGuard.add(child);
+                    Component childWidget = child.createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
+                    childrenWidgets.add(childWidget);
+                    if (childWidget != null) {
+                        hasChildren = true;
+                    }
+                }
+            }
+            flexPanel = hasChildren ? new ColumnsPanel(this, formEntity, childrenWidgets) : null;
         }
-        return hasChildren ? flexPanel : null;
+
+        if (flexPanel != null && flexPanel.getComponentCount() > 0) {
+            JBScrollPane scrollPane = new JBScrollPane();
+            scrollPane.setViewportView(flexPanel);
+            return new JComponentPanel(new JComponentPanel(scrollPane));
+        } else {
+            return null;
+        }
     }
 
-    private JComponentPanel createScrollPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, HashSet<ComponentView> recursionGuard) {
-        JBScrollPane scrollPane = new JBScrollPane();
-        boolean hasChildren = false;
-        JComponentPanel componentPanel = null;
-        
-        for (ComponentView child : children) {
-            if (!recursionGuard.contains(child)) {
-                recursionGuard.add(child);
-                JComponent childWidget = child.createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
-                if (childWidget != null) {
-                    hasChildren = true;
-                    scrollPane.setViewportView(childWidget);
-                }
-                componentPanel = new JComponentPanel(scrollPane);
-                setSizes(componentPanel, child);
-            }
-        }
-        JComponentPanel scrollPanel = null;
-        if (hasChildren) {
-            scrollPanel = new JComponentPanel(componentPanel);
-        }
-
-        return scrollPanel;
+    private boolean isSimple() {
+        return columns == 1 && !isAlignCaptions();
     }
 
-    private JComponentPanel createSplitPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
-        JBSplitter splitPane = new JBSplitter(isSplitVertical());
-        boolean hasChildren = false;
-        if (children.size() > 0) {
-            JComponentPanel childWidget = children.get(0).createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
-            if (childWidget != null) {
-                hasChildren = true;
-                splitPane.setFirstComponent(childWidget);
-                setSizes(childWidget, children.get(0));
-            }
-        }
-        if (children.size() > 1) {
-            JComponentPanel childWidget = children.get(1).createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
-            if (childWidget != null) {
-                hasChildren = true;
-                splitPane.setSecondComponent(childWidget);
-                setSizes(childWidget, children.get(1));
+    public boolean isAlignCaptions() {
+        if(!isVertical()) // later maybe it makes sense to support align captions for horizontal containers, but with no-wrap it doesn't make much sense
+            return false;
 
-                double flex1 = children.get(0).getFlex(formEntity);
-                double flex2 = children.get(1).getFlex(formEntity);
-                if (flex1 == 0 && flex2 == 0) {
-                    flex1 = 1;
-                    flex2 = 1;
-                }
-                splitPane.setProportion((float) (flex1 / (flex1 + flex2)));
-            }
+        int notActions = 0;
+        // only simple property draws
+        for(ComponentView child : children) {
+            if(!(child instanceof PropertyDrawView) || /*((PropertyDrawView) child).hasColumnGroupObjects() || */(child.autoSize/* && ((PropertyDrawView) child).isAutoDynamicHeight()*/) || child.flex > 0 || ((PropertyDrawView) child).panelCaptionVertical)
+                return false;
+
+            if(!((PropertyDrawView)child).entity.isAction)
+                notActions++;
         }
-        return hasChildren ? new JComponentPanel(splitPane) : null;
+
+        if(notActions <= 1)
+            return false;
+
+        return true;
     }
 
     private JComponentPanel createTabbedPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
@@ -316,23 +289,6 @@ public class ContainerView extends ComponentView {
             return new JComponentPanel(tabbedPane);
         }
         return null;
-    }
-
-    private JComponentPanel createColumnsPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, HashSet<ComponentView> recursionGuard) {
-        List<Component> childrenWidgets = new ArrayList<>();
-        boolean hasChildren = false;
-        for (ComponentView child : children) {
-            if (!recursionGuard.contains(child)) {
-                recursionGuard.add(child);
-                Component childWidget = child.createWidget(project, formEntity, selection, componentToWidget, recursionGuard);
-                childrenWidgets.add(childWidget);
-                if (childWidget != null) {
-                    hasChildren = true;
-                }
-            }
-        }
-
-        return hasChildren ? new ColumnsPanel(this, formEntity, childrenWidgets) : null;
     }
 
     public boolean isTabbedPane() {
