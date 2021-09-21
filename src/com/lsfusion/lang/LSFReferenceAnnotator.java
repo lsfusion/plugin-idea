@@ -74,6 +74,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
     public static final TextAttributes OUTER_PARAM = new TextAttributes(new JBColor(new Color(102, 14, 122), new Color(152, 118, 170)), null, null, null, Font.PLAIN);
     public static final TextAttributes UNTYPED_IMPLICIT_DECL = new TextAttributes(new JBColor(new Color(56, 96, 255), new Color(100, 100, 255)), null, null, null, Font.PLAIN);
+    public static final TextAttributes DEPRECATED_WARNING = new TextAttributes(null, null, JBColor.BLACK, EffectType.STRIKEOUT, Font.PLAIN);
 
     private AnnotationHolder myHolder;
     public boolean errorsSearchMode = false;
@@ -1009,8 +1010,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         String text = o.getText();
         if (text != null && text.contains("=")) {
             String property = text.substring(0, text.indexOf("=")).trim();
-            if (!ASTCompletionContributor.validDesignProperty(property))
+            if (!ASTCompletionContributor.validDesignProperty(property)) {
                 addHighlightErrorWithResolving(o, "Can't resolve property " + property); // design property can be meta parameter
+            } else if (property.equals("columns")) {
+                Annotation annotation = myHolder.createWarningAnnotation(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
+                annotation.setEnforcedTextAttributes(DEPRECATED_WARNING);
+            }
         }
     }
 

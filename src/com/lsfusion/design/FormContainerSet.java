@@ -86,7 +86,7 @@ public class FormContainerSet {
         set.panelContainer.add(set.groupContainer);
 
         set.groupContainer.setType(ContainerType.COLUMNS);
-        set.groupContainer.setColumns(2);
+        set.groupContainer.setLines(2);
 
         set.toolbarContainer = contFactory.createContainer(); // контейнер тулбара
 //        set.toolbarContainer.setDescription(LocalizedString.create("{form.layout.toolbar.props.container}"));

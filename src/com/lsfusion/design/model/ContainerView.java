@@ -24,7 +24,8 @@ public class ContainerView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
             new ReflectionProperty("childrenAlignment"),
-            new ReflectionProperty("columns"),
+            new ReflectionProperty("columns"), //backward compatibility
+            new ReflectionProperty("lines"),
             new ReflectionProperty("type"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("description"),
@@ -38,7 +39,7 @@ public class ContainerView extends ComponentView {
     @NotNull
     public ContainerType type = ContainerType.CONTAINERV;
     public Alignment childrenAlignment = Alignment.START;
-    public int columns = 1;
+    public int lines = 1;
     public String showIf;
 
     public ContainerView() {
@@ -74,16 +75,16 @@ public class ContainerView extends ComponentView {
         this.childrenAlignment = childrenAlignment;
     }
 
-    public void setColumns(int columns) {
-        this.columns = columns;
+    public void setLines(int lines) {
+        this.lines = lines;
     }
 
     public void setShowIf(String showIf) {
         this.showIf = showIf;
     }
 
-    public int getColumns() {
-        return columns;
+    public int getLines() {
+        return lines;
     }
 
     @Override
@@ -213,7 +214,7 @@ public class ContainerView extends ComponentView {
                     }
                 }
             }
-            flexPanel = hasChildren ? new ColumnsPanel(this, formEntity, childrenWidgets) : null;
+            flexPanel = hasChildren ? new LinesPanel(this, formEntity, childrenWidgets) : null;
         }
 
         if (flexPanel != null && flexPanel.getComponentCount() > 0) {
@@ -226,7 +227,7 @@ public class ContainerView extends ComponentView {
     }
 
     private boolean isSimple() {
-        return columns == 1 && !isAlignCaptions();
+        return lines == 1 && !isAlignCaptions();
     }
 
     public boolean isAlignCaptions() {

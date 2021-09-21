@@ -151,7 +151,7 @@ public class GroupObjectContainerSet {
         set.panelContainer.add(set.groupContainer);
 
         set.groupContainer.setType(ContainerType.COLUMNS);
-        set.groupContainer.setColumns(4);
+        set.groupContainer.setLines(4);
 
         group.userFilter.setAlignment(FlexAlignment.STRETCH);
         group.toolbarSystem.setAlignment(FlexAlignment.CENTER);

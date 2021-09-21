@@ -139,7 +139,7 @@ public class TreeGroupContainerSet {
         set.panelContainer.add(set.groupContainer);
 
         set.groupContainer.setType(ContainerType.COLUMNS);
-        set.groupContainer.setColumns(4);
+        set.groupContainer.setLines(4);
 
         treeGroup.userFilter.setAlignment(FlexAlignment.STRETCH);        
         treeGroup.toolbarSystem.setAlignment(FlexAlignment.CENTER);
