@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DateTimeException;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public abstract class GenerateFormAction extends AnAction {
             "BCC", "BEFORE", "BODY", "BODYPARAMNAMES", "BODYPARAMHEADERS", "BODYURL", "BOTTOM", "BOX", "BREAK",
             "BY", "CANCEL", "CASE", "CC", "CATCH", "CALENDAR", "CENTER", "CHANGE", "CHANGECLASS", "CHANGEABLE", "CHANGEKEY", "CHANGED", "CHANGEMOUSE", "CHANGEWYS", "CHARSET",
             "CHARWIDTH", "CHECK", "CHECKED", "CLASS", "CLASSCHOOSER", "CLIENT", "CLOSE", "COLUMN", "COLUMNS", "COMPLEX", "CONNECTION", "CONTEXTMENU", "NOHINT", "COLLAPSE",
-            "CONCAT", "CONFIRM", "CONSTRAINT", "CONTAINERH", "CONTAINERV", "COOKIES", "COOKIESTO", "STRETCH", "CANONICALNAME", "CSV", "CUSTOM", "CYCLES", "DATA", "DBF", "DEFAULT",
+            "CONCAT", "CONFIG", "CONFIRM", "CONSTRAINT", "CONTAINERH", "CONTAINERV", "COOKIES", "COOKIESTO", "STRETCH", "CANONICALNAME", "CSV", "CUSTOM", "CYCLES", "DATA", "DBF", "DEFAULT",
             "DEFAULTCOMPARE", "DELAY", "DELETE", "DESC", "DESIGN", "DIALOG", "DO", "DOC", "DOCKED", "DOCX", "DOWN", "DRAWROOT", "DRILLDOWN", "DROP", "DROPCHANGED", "DROPPED",
             "ECHO", "EDIT", "ELSE", "EMAIL", "END", "ESCAPE", "EVAL", "EVENTID", "EVENTS", "EXCEPTLAST", "EXCLUSIVE", "EXEC", "EXPAND", "EXTERNAL", "NEWEXECUTOR", "EXPORT",
             "EXTEND", "EXTID", "FIELDS", "FILTER", "FILTERGROUP", "FILTERGROUPS", "FILTERS", "FINALLY", "FIRST", "FIXED", "FLEX", "FLOAT", "FOLDER", "FOOTER", "FOR", "FOREGROUND",
@@ -54,7 +55,7 @@ public abstract class GenerateFormAction extends AnAction {
             "NOCOMPLEX", "NODEFAULT", "NOESCAPE", "NOFLEX", "NOCHANGE", "NOCONSTRAINTFILTER", "NOINLINE", "NOHEADER", "NOSETTINGS", "NOT", "WAIT", "NOWAIT", "NULL", "NONULL",
             "OBJECT", "OBJECTS", "CONSTRAINTFILTER", "OK", "ON", "OPTIMISTICASYNC", "OR", "ORDER", "ORDERS", "OVERRIDE", "PAGESIZE", "PANEL", "PARENT", "PARTITION", "PASSWORD",
             "PDF", "PERIOD", "PIVOT", "PG", "POSITION", "POST", "PREREAD", "PREV", "PREVIEW", "NOPREVIEW", "PARAMS", "PRINT", "PRIORITY", "PROPERTIES", "PROPERTY", "PROPERTYDRAW",
-            "PROPORTION", "PUT", "QUERYCLOSE", "QUICKFILTER", "READ", "READONLY", "READONLYIF", "RECALCULATE", "RECURSION", "REFLECTION", "REGEXP", "REMOVE", "RENDER", "REPLACE",
+            "PROPORTION", "PUT", "QUERYCLOSE", "QUICKFILTER", "READ", "READONLY", "READONLYIF", "RECALCULATE", "RECURSION", "REFLECTION", "REGEXP", "REMOVE",
             "REPORT", "REPORTFILES", "REQUEST", "REQUIRE", "RESOLVE", "RETURN", "RGB", "RIGHT", "ROUND", "ROOT", "ROW", "ROWS", "RTF", "SCROLL", "SEEK", "SELECTOR", "SERIALIZABLE",
             "SET", "SETCHANGED", "SETDROPPED", "SETTINGS", "SCHEDULE", "SHOW", "SHOWDEP", "SHOWIF", "SINGLE", "SHEET", "SPLITH", "SPLITV", "SQL", "START", "STEP",
             "STRICT", "STRUCT", "SUBJECT", "SUBREPORT", "SUM", "TAB", "TABBED", "TABLE", "TAG", "TEXTHALIGN", "TEXTVALIGN", "THEN", "THREADS", "TO", "DRAW", "TOOLBAR",
@@ -477,9 +478,12 @@ public abstract class GenerateFormAction extends AnAction {
         if (element instanceof Number) {
             return "NUMERIC";
         } else if (element instanceof String) {
-            String dateType = DateConverter.smartParse((String) element);
-            if (dateType != null) {
-                return dateType;
+            try {
+                String dateType = DateConverter.smartParse((String) element);
+                if (dateType != null) {
+                    return dateType;
+                }
+            } catch (DateTimeException ignored) {
             }
         }
         return "STRING";
