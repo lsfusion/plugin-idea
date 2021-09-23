@@ -51,6 +51,14 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.lines = lines;
     }
 
+    public void setHorizontal(boolean horizontal) {
+        target.horizontal = horizontal;
+    }
+
+    public void setTabbed(boolean tabbed) {
+        target.tabbed = tabbed;
+    }
+
     public void setShowIf(String showIf) {
         target.showIf = showIf;
     }
