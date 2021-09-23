@@ -73,51 +73,50 @@ public class AggregateFormAction extends AnAction {
 
                 final LSFExtend lsfExtend = PsiTreeUtil.getParentOfType(sourceElement, LSFExtend.class);
                 if (lsfExtend != null) {
-                    ApplicationManager.getApplication().runReadAction(() -> {
-                        LSFFormDeclaration formDecl = (LSFFormDeclaration) lsfExtend.resolveDecl();
-                        LSFFile lsfFile = lsfExtend.getLSFFile();
+                    LSFFormDeclaration formDecl = (LSFFormDeclaration) lsfExtend.resolveDecl();
+                    LSFFile lsfFile = lsfExtend.getLSFFile();
 
-                        Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile, LSFLocalSearchScope.createFrom(lsfExtend));
+                    Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile, LSFLocalSearchScope.createFrom(lsfExtend));
 
-                        //FORM
-                        Map<PsiElement, LSFModuleDeclaration> elementToModule = new HashMap<>();
-                        for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {
-                            LSFModuleDeclaration moduleDeclaration = formExtend.getLSFFile().getModuleDeclaration();
-                            if (moduleDeclaration != null) {
-                                elementToModule.put(formExtend, moduleDeclaration);
-                            }
+                    //FORM
+                    Map<PsiElement, LSFModuleDeclaration> elementToModule = new HashMap<>();
+                    for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {
+                        LSFModuleDeclaration moduleDeclaration = formExtend.getLSFFile().getModuleDeclaration();
+                        if (moduleDeclaration != null) {
+                            elementToModule.put(formExtend, moduleDeclaration);
                         }
-                        for (PsiElement formExtend : DesignUtils.sortByModules(formDecl, elementToModule)) {
-                            result.add(getCodeBlock(formExtend));
-                        }
-                        int last = result.size() - 1;
-                        if(last > -1)
-                            result.set(last, result.get(last) + ";");
+                    }
+                    for (PsiElement formExtend : DesignUtils.sortByModules(formDecl, elementToModule)) {
+                        result.add(getCodeBlock(formExtend));
+                    }
+                    int last = result.size() - 1;
+                    if(last > -1)
+                        result.set(last, result.get(last) + ";");
 
-                        //DESIGN
-                        LSFId formName = formDecl.getNameIdentifier();
-                        if(formName != null) {
-                            elementToModule = new HashMap<>();
-                            for (PsiReference ref : ReferencesSearch.search(formName, lsfFile.getRequireScope()).findAll()) {
-                                if (ref instanceof LSFFormUsage) {
-                                    LSFFormUsage formUsage = (LSFFormUsage) ref;
-                                    if (formUsage.getParent() instanceof LSFDesignHeader) {
-                                        LSFModuleDeclaration moduleDeclaration = formUsage.getLSFFile().getModuleDeclaration();
-                                        if (moduleDeclaration != null) {
-                                            elementToModule.put(formUsage, moduleDeclaration);
-                                        }
+                    //DESIGN
+                    LSFId formName = formDecl.getNameIdentifier();
+                    if(formName != null) {
+                        elementToModule = new HashMap<>();
+                        for (PsiReference ref : ReferencesSearch.search(formName, lsfFile.getRequireScope()).findAll()) {
+                            if (ref instanceof LSFFormUsage) {
+                                LSFFormUsage formUsage = (LSFFormUsage) ref;
+                                if (formUsage.getParent() instanceof LSFDesignHeader) {
+                                    LSFModuleDeclaration moduleDeclaration = formUsage.getLSFFile().getModuleDeclaration();
+                                    if (moduleDeclaration != null) {
+                                        elementToModule.put(formUsage, moduleDeclaration);
                                     }
                                 }
                             }
-                            for (PsiElement ref : DesignUtils.sortByModules(formDecl, elementToModule)) {
-                                LSFDesignHeader designHeader = (LSFDesignHeader) ref.getParent();
-                                LSFDesignStatement designStatement = (LSFDesignStatement) designHeader.getParent();
-                                result.add(getCodeBlock(designStatement));
-                            }
                         }
+                        for (PsiElement ref : DesignUtils.sortByModules(formDecl, elementToModule)) {
+                            LSFDesignHeader designHeader = (LSFDesignHeader) ref.getParent();
+                            LSFDesignStatement designStatement = (LSFDesignStatement) designHeader.getParent();
+                            result.add(getCodeBlock(designStatement));
+                        }
+                    }
 
-                        codeBlocks.addAll(result);
-                    });
+                    codeBlocks.addAll(result);
+
                 }
             }
         });
