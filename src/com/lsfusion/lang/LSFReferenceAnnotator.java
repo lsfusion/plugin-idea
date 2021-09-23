@@ -1015,6 +1015,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             } else if (property.equals("columns")) {
                 Annotation annotation = myHolder.createWarningAnnotation(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
                 annotation.setEnforcedTextAttributes(DEPRECATED_WARNING);
+            } else if (property.equals("type")) {
+                Annotation annotation = myHolder.createWarningAnnotation(o, "Deprecated since version 5, use 'horizontal', 'tabbed', 'lines' instead. Earlier versions: ignore this warning");
+                annotation.setEnforcedTextAttributes(DEPRECATED_WARNING);
             }
         }
     }

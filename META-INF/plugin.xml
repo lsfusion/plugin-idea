@@ -13,6 +13,7 @@
             <li>Custom property renderers: new CUSTOM clause syntax</li>
             <li>Rename columns -> lines in container design version 5 (with backward compatibility)</li>
             <li>DESIGN containers: added 'horizontal' and 'tabbed' options</li>
+            <li>Deprecated 'type' in container design in version 5</li>
         </ul>
     ]]>
     </change-notes>
