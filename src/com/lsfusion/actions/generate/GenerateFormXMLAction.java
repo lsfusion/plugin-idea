@@ -29,7 +29,8 @@ public class GenerateFormXMLAction extends GenerateFormAction {
     private Charset getCharset(String file) {
         try {
             Pattern p = Pattern.compile("<\\?xml version=\".*\" encoding=\"(.*)\"\\?.*");
-            Matcher m = p.matcher(file.substring(0, Math.min(Math.min(file.indexOf("\r"), file.indexOf("\n")), file.length())));
+            int newLine = Math.min(file.indexOf("\r"), file.indexOf("\n"));
+            Matcher m = p.matcher(file.substring(0, newLine > 0 ? Math.min(newLine, file.length()) : file.length()));
             if (m.matches()) {
                 return Charset.forName(m.group(1));
             }
