@@ -274,10 +274,9 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         int actualOffset = offset;
 
         for (LSFLazyMetaStatement lazyChild : metaBody.getLazyMetaStatementList()) {
+            if (lazyChild.getStartOffsetInParent() >= actualOffset - 1) // -1 because of parenthesis
+                break;
             for(LSFMetaCodeStatement child : lazyChild.getMetaCodeStatementList()) {
-                if (child.getStartOffsetInParent() >= actualOffset - 1) // -1 потому как скобка
-                    break;
-
                 LSFMetaCodeBody innerBody = child.getMetaCodeBody();
                 if (innerBody != null) {
                     String text = innerBody.getText();
