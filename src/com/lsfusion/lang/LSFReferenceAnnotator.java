@@ -1108,8 +1108,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void addTypeMismatchError(LSFJoinPropertyDefinition o, List<LSFClassSet> leftClassList, List<LSFClassSet> rightClassList) {
         addUnderscoredErrorWithResolving(o, "Type mismatch. Expected params: " +
-                leftClassList.stream().map(LSFClassSet::getCanonicalName).collect(Collectors.joining(", ")) + "; got: " +
-                rightClassList.stream().map(LSFClassSet::getCanonicalName).collect(Collectors.joining(", "))); // uses resolving
+                leftClassList.stream().map(lsfClassSet -> lsfClassSet != null ? lsfClassSet.getCanonicalName() : null).collect(Collectors.joining(", ")) + "; got: " +
+                rightClassList.stream().map(lsfClassSet -> lsfClassSet != null ? lsfClassSet.getCanonicalName() : null).collect(Collectors.joining(", "))); // uses resolving
     }
 
     @Override
