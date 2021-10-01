@@ -14,6 +14,7 @@
             <li>Rename columns -> lines in container design version 5 (with backward compatibility)</li>
             <li>DESIGN containers: added 'horizontal' and 'tabbed' options</li>
             <li>Deprecated 'type' in container design in version 5</li>
+            <li>EXTERNAL TCP support</li>
         </ul>
     ]]>
     </change-notes>

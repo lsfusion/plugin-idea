@@ -468,6 +468,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "TABBED"                  			{ return TABBED; }
   "TABLE"                   			{ return TABLE; }
   "TAG"                   			    { return TAG; }
+  "TCP"                   			    { return TCP; }
   "TEXTHALIGN"              			{ return TEXTHALIGN; }
   "TEXTVALIGN"              			{ return TEXTVALIGN; }
   "THEN"                    			{ return THEN; }
