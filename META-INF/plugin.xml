@@ -15,6 +15,7 @@
             <li>DESIGN containers: added 'horizontal' and 'tabbed' options</li>
             <li>Deprecated 'type' in container design in version 5</li>
             <li>EXTERNAL TCP support</li>
+            <li>GROUP LAST/CONCAT: ORDER is required</li>
         </ul>
     ]]>
     </change-notes>

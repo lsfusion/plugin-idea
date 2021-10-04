@@ -550,13 +550,12 @@ formulaPropertySyntax ::= formulaPropertySyntaxType stringLiteral
 
 formulaPropertySyntaxType ::= (PG | MS)?
 
-groupingType ::= SUM | MAX | MIN | CONCAT | AGGR | EQUAL | LAST | NAGGR
+groupingType ::= SUM | MAX | MIN | AGGR | NAGGR | EQUAL
+groupingTypeOrder ::= CONCAT | LAST
 groupPropertyBy ::= BY nonEmptyPropertyExpressionList { pin = 1 }
 orderPropertyBy ::= ORDER (DESC)? nonEmptyPropertyExpressionList
-groupPropertyBody ::= groupingType
-                      nonEmptyPropertyExpressionList
-                      (orderPropertyBy)?
-                      (WHERE propertyExpression)?
+groupPropertyBody ::= ((groupingType nonEmptyPropertyExpressionList) | (groupingTypeOrder nonEmptyPropertyExpressionList orderPropertyBy))
+                        (WHERE propertyExpression)?
   
 private groupByBefore ::= GROUP groupPropertyBody groupPropertyBy
 //private groupByAfter ::= GROUP groupPropertyBody groupPropertyBy;
