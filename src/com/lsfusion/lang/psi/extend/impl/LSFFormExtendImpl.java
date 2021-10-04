@@ -50,8 +50,12 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
             return stub.getGlobalName();
 
         LSFExtendingFormDeclaration extend = getExtendingFormDeclaration();
-        if (extend != null)
-            return extend.getFormUsageWrapper().getFormUsage().getNameRef();
+        if (extend != null) {
+            LSFFormUsageWrapper wrapper = extend.getFormUsageWrapper();
+            if(wrapper != null) {
+                return wrapper.getFormUsage().getNameRef();
+            }
+        }
 
         LSFFormDecl formDecl = getFormDecl();
 
