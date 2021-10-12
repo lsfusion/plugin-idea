@@ -345,6 +345,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "NOMANAGESESSION"                     { return NOMANAGESESSION; }
   "MAP"                     			{ return MAP; }
+  "MATCH"                     			{ return MATCH; }
   "MAX"                     			{ return MAX; }
   "MATERIALIZED"            			{ return MATERIALIZED; }
   "MEASURE"                    			{ return MEASURE; }

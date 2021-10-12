@@ -648,7 +648,7 @@ confirmSetting ::= CONFIRM
 regexpSetting ::= REGEXP stringLiteral (stringLiteral)?
 loggableSetting ::= LOGGABLE
 echoSymbolsSetting ::= ECHO
-indexSetting ::= INDEXED
+indexSetting ::= INDEXED (LIKE | MATCH)?
 aggrSetting ::= AGGR
 notNullSetting ::= nullOption (DELETE)? baseEvent
 onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти

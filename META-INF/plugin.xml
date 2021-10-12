@@ -7,15 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.222</b><br>
+        <b>Version 1.0.223</b><br>
         <ul>
-            <li>Aggregate Form: remove editFormDeclaration, listFormDeclaration</li>
-            <li>Custom property renderers: new CUSTOM clause syntax</li>
-            <li>Rename columns -> lines in container design version 5 (with backward compatibility)</li>
-            <li>DESIGN containers: added 'horizontal' and 'tabbed' options</li>
-            <li>Deprecated 'type' in container design in version 5</li>
-            <li>EXTERNAL TCP support</li>
-            <li>GROUP LAST/CONCAT: ORDER is required</li>
+            <li>INDEXED LIKE/MATCH support</li>
         </ul>
     ]]>
     </change-notes>
