@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.223</b><br>
+        <b>Version 1.0.224</b><br>
         <ul>
-            <li>INDEXED LIKE/MATCH support</li>
+            <li>STICKY properties support</li>
         </ul>
     ]]>
     </change-notes>

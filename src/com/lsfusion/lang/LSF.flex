@@ -460,6 +460,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "SQL"                       			{ return SQL; }
   "START"             			        { return START; }
   "STEP"                    			{ return STEP; }
+  "STICKY"                    			{ return STICKY; }
   "STRICT"                  			{ return STRICT; }
   "STRUCT"                  			{ return STRUCT; }
   "SUBJECT"                 			{ return SUBJECT; }
