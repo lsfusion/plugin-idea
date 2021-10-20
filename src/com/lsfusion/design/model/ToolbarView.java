@@ -18,22 +18,18 @@ public class ToolbarView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
             new ReflectionProperty("visible"),
-            new ReflectionProperty("showGroupChange"),
             new ReflectionProperty("showCountRows"),
             new ReflectionProperty("showCalculateSum"),
             new ReflectionProperty("showGroupReport"),
-            new ReflectionProperty("showPrint"),
             new ReflectionProperty("showXls"),
             new ReflectionProperty("showSettings")
     );
 
     public boolean visible = false;
 
-    public boolean showGroupChange = true;
     public boolean showCountRows = true;
     public boolean showCalculateSum = true;
     public boolean showGroupReport = true;
-    public boolean showPrint = true;
     public boolean showXls = true;
     public boolean showSettings = true;
 
@@ -62,10 +58,6 @@ public class ToolbarView extends ComponentView {
         this.visible = visible;
     }
 
-    public void setShowGroupChange(boolean showGroupChange) {
-        this.showGroupChange = showGroupChange;
-    }
-
     public void setShowCountQuantity(boolean showCountQuantity) {
         this.showCountRows = showCountQuantity;
     }
@@ -76,10 +68,6 @@ public class ToolbarView extends ComponentView {
 
     public void setShowGroup(boolean showGroup) {
         this.showGroupReport = showGroup;
-    }
-
-    public void setShowPrintGroup(boolean showPrintGroupButton) {
-        this.showPrint = showPrintGroupButton;
     }
 
     public void setShowPrintGroupXls(boolean showPrintGroupXls) {
@@ -94,10 +82,6 @@ public class ToolbarView extends ComponentView {
         return visible;
     }
 
-    public boolean isShowGroupChange() {
-        return showGroupChange;
-    }
-
     public boolean isShowCountRows() {
         return showCountRows;
     }
@@ -108,10 +92,6 @@ public class ToolbarView extends ComponentView {
 
     public boolean isShowGroupReport() {
         return showGroupReport;
-    }
-
-    public boolean isShowPrint() {
-        return showPrint;
     }
 
     public boolean isShowXls() {
@@ -136,37 +116,38 @@ public class ToolbarView extends ComponentView {
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        panel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_ADD));
-        if (!isTreeToolbar) {
-            if (isShowGroupChange() || isShowCountRows() || isShowCalculateSum() || isShowGroupChange()) {
-                panel.add(Box.createHorizontalStrut(5));
+
+        if (isTreeToolbar) {
+            panel.add(new ToolbarGridButton(LSFIcons.Design.FILTER));
+        } else {
+            if (isShowGroupReport()) {
+                panel.add(new ToolbarGridButton(LSFIcons.Design.PIVOT));
+                addSeparator(panel);
             }
-            if (isShowGroupChange()) {
-                panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP_CHANGE));
+            panel.add(new ToolbarGridButton(LSFIcons.Design.FILTER));
+            if (isShowSettings()) {
+                panel.add(new ToolbarGridButton(LSFIcons.Design.PREFERENCES));
             }
-            if (isShowCountRows()) {
-                panel.add(new ToolbarGridButton(LSFIcons.Design.QUANTITY));
-            }
-            if (isShowCalculateSum()) {
-                panel.add(new ToolbarGridButton(LSFIcons.Design.SUM));
-            }
-            if (isShowGroupChange()) {
-                panel.add(new ToolbarGridButton(LSFIcons.Design.GROUP));
-            }
-            if (isShowPrint() || isShowXls()) {
-                panel.add(Box.createHorizontalStrut(5));
-            }
-            if (isShowPrint()) {
-                panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_GROUP));
+            if (isShowCountRows() || isShowCalculateSum()) {
+                addSeparator(panel);
+                if (isShowCountRows()) {
+                    panel.add(new ToolbarGridButton(LSFIcons.Design.QUANTITY));
+                }
+                if (isShowCalculateSum()) {
+                    panel.add(new ToolbarGridButton(LSFIcons.Design.SUM));
+                }
             }
             if (isShowXls()) {
+                addSeparator(panel);
                 panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_XLS));
-            }
-            if (isShowSettings()) {
-                panel.add(Box.createHorizontalStrut(5));
-                panel.add(new ToolbarGridButton(LSFIcons.Design.PREFERENCES));
             }
         }
         return panel;
+    }
+
+    public void addSeparator(JComponentPanel panel) {
+        panel.add(Box.createHorizontalStrut(2));
+        panel.add(new JSeparator(SwingConstants.VERTICAL));
+        panel.add(Box.createHorizontalStrut(2));
     }
 }

@@ -71,16 +71,10 @@ public final class LSFIcons {
         public static final Icon HIGHLIGHT = AllIcons.General.Locate;
         public static final Icon REFRESH = AllIcons.Actions.Refresh;
 
-        public static final Icon VIEW_GRID = IconLoader.getIcon("/images/design/view_grid.png");
-        public static final Icon VIEW_HIDE = IconLoader.getIcon("/images/design/view_hide.png");
-        public static final Icon VIEW_PANEL = IconLoader.getIcon("/images/design/view_panel.png");
-
-        public static final ImageIcon PRINT_XLS = new ImageIcon(FilterView.class.getResource("/images/design/excelbw.png"));
-        public static final ImageIcon PRINT_GROUP = new ImageIcon(FilterView.class.getResource("/images/design/reportbw.png"));
-        public static final ImageIcon GROUP_CHANGE = new ImageIcon(FilterView.class.getResource("/images/design/groupchange.png"));
-        public static final ImageIcon QUANTITY = new ImageIcon(FilterView.class.getResource("/images/design/quantity.png"));
-        public static final ImageIcon SUM = new ImageIcon(FilterView.class.getResource("/images/design/sum.png"));
-        public static final ImageIcon GROUP = new ImageIcon(FilterView.class.getResource("/images/design/group.png"));
-        public static final ImageIcon PREFERENCES = new ImageIcon(FilterView.class.getResource("/images/design/userPreferences.png"));
+        public static final Icon PIVOT = IconLoader.getIcon("/images/design/pivot.png");
+        public static final Icon PREFERENCES = IconLoader.getIcon("/images/design/userPreferences.png");
+        public static final Icon QUANTITY = IconLoader.getIcon("/images/design/quantity.png");
+        public static final Icon SUM = IconLoader.getIcon("/images/design/sum.png");
+        public static final Icon PRINT_XLS = IconLoader.getIcon("/images/design/excelbw.png");
     }
 }
