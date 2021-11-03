@@ -1241,8 +1241,12 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFSessionPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         LSFSessionPropertyType type = sourceStatement.getSessionPropertyType();
-        if (type.getText().equals("PREV"))
-            return resolveInferredValueClass(sourceStatement.getPropertyExpression(), inferred);
+        if (type.getText().equals("PREV")) {
+            LSFPropertyExpression sourcePropertyExpression = sourceStatement.getPropertyExpression();
+            if(sourcePropertyExpression != null) {
+                return resolveInferredValueClass(sourcePropertyExpression, inferred);
+            }
+        }
         return LSFExClassSet.logical;
     }
 
