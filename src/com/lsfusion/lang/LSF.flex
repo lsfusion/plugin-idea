@@ -380,6 +380,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NOINLINE"                			{ return NOINLINE; }
   "NOHEADER"                			{ return NOHEADER; }
   "NOSETTINGS"                     	    { return NOSETTINGS; }
+  "NOSTICKY"                     	    { return NOSTICKY; }
   "NOT"                     			{ return NOT; }
   "WAIT"                                { return WAIT; }
   "NOWAIT"                              { return NOWAIT; }

@@ -9,7 +9,7 @@
     <change-notes><![CDATA[
         <b>Version 1.0.224</b><br>
         <ul>
-            <li>STICKY properties support</li>
+            <li>STICKY/NOSTICKY properties support</li>
         </ul>
     ]]>
     </change-notes>

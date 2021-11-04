@@ -619,7 +619,7 @@ private semiPropertyOption ::= IN groupUsage
                            |    aggrSetting
                            |	notNullSetting
                            |	eventIdSetting
-                           |    stickySetting
+                           |    stickyOption
                            |   ATSIGN2 simpleName
 private nonSemiPropertyOption ::= onEditEventSetting
 
@@ -655,7 +655,8 @@ notNullSetting ::= nullOption (DELETE)? baseEvent
 onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти
 asEditActionSetting ::= ASON formEventType noContextActionOrPropertyUsage {pin = 1}
 eventIdSetting ::= EVENTID stringLiteral
-stickySetting ::= STICKY
+
+stickyOption ::= STICKY | NOSTICKY
 
 hideEditKey ::= HIDE
 
@@ -1642,7 +1643,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    COLUMN
                             |    ROW
                             |    MEASURE
-                            |    STICKY
+                            |    stickyOption
                             )*
 
 formOptionSession ::= NEWSESSION | NESTEDSESSION;
