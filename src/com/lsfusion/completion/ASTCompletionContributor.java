@@ -73,7 +73,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "DATE", "DATETIME", "TIME", "YEAR", "ZDATETIME",
                                                                  "INTERVAL[DATE]", "INTERVAL[TIME]", "INTERVAL[DATETIME]", "INTERVAL[ZDATETIME]",
                                                                  "BPSTRING[]", "BPISTRING[]", "STRING[]", "ISTRING[]",
-                                                                 "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT", "RICHTEXT",
+                                                                 "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT", "RICHTEXT", "HTMLTEXT",
                                                                  "WORDFILE", "IMAGEFILE", "PDFFILE", "DBFFILE", "RAWFILE", "FILE", "EXCELFILE",
                                                                  "TEXTFILE", "CSVFILE", "HTMLFILE", "JSONFILE", "XMLFILE", "TABLEFILE",
                                                                  "WORDLINK", "IMAGELINK", "PDFLINK", "DBFLINK", "RAWLINK", "LINK", "EXCELLINK",

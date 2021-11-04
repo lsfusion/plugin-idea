@@ -10,6 +10,7 @@
         <b>Version 1.0.224</b><br>
         <ul>
             <li>STICKY/NOSTICKY properties support</li>
+            <li>HTMLTEXT class support</li>
         </ul>
     ]]>
     </change-notes>

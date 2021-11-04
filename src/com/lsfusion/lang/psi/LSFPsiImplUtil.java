@@ -637,9 +637,11 @@ public class LSFPsiImplUtil {
         } else if (name.equals("NUMERIC")) {
             return new NumericClass(ExtInt.UNLIMITED, ExtInt.UNLIMITED);
         } else if (name.equals("TEXT")) {
-            return TextClass.instance;
+            return new TextClass();
         } else if (name.equals("RICHTEXT")) {
-            return TextClass.richInstance;
+            return new RichTextClass();
+        } else if (name.equals("HTMLTEXT")) {
+            return new HTMLTextClass();
         } else if (name.equals("BPSTRING")) {
             return new StringClass(true, false, ExtInt.UNLIMITED);
         } else if (name.equals("BPISTRING")) {

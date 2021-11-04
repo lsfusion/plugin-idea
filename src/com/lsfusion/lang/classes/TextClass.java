@@ -1,35 +1,31 @@
 package com.lsfusion.lang.classes;
 
-import com.lsfusion.util.BaseUtils;
-
 import java.awt.*;
 
 public class TextClass extends StringClass {
 
-    public static final TextClass instance = new TextClass(false);
-    public static final TextClass richInstance = new TextClass(true);
+    private final String type;
 
-    public final boolean rich;
+    public TextClass() {
+        this(null);
+    }
 
-    public TextClass(boolean rich) {
+    public TextClass(String type) {
         super(false, false, ExtInt.UNLIMITED);
-        this.rich = rich;
+        this.type = type;
     }
 
     public DataClass op(DataClass compClass, boolean or, boolean string) {
-        if(compClass instanceof StringClass)
-            return BaseUtils.cmp(rich, compClass instanceof TextClass && ((TextClass) compClass).rich, or) ? richInstance : instance;
-
-        return super.op(compClass, or, string);
+        return compClass instanceof StringClass ? this : super.op(compClass, or, string);
     }
 
     public String getName() {
-        return rich ? "RICHTEXT" : "TEXT";
+        return "TEXT";
     }
 
     @Override
     public String getCaption() {
-        return "Text" + (rich ? " (rich)" : "");
+        return "Text" + (type != null ? " (" + type + ")" : "");
     }
 
     @Override
