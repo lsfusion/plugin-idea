@@ -229,6 +229,7 @@ public class ContainerView extends ComponentView {
 
         if (flexPanel != null && flexPanel.getComponentCount() > 0) {
             JBScrollPane scrollPane = new JBScrollPane();
+            scrollPane.setBorder(null);
             scrollPane.setViewportView(flexPanel);
             return new JComponentPanel(new JComponentPanel(scrollPane));
         } else {
