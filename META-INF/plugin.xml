@@ -280,7 +280,9 @@
         <toolWindow id="Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
                     anchor="right" icon="/images/lsf_logo.png"/>
 
-        <toolWindow id="Dependencies" factoryClass="com.lsfusion.dependencies.DependenciesViewToolWindowFactory"
+        <!-- Bundled (in Ultimate) Maven Extension plugin already has tool window "Dependencies". 
+        For now Idea prohibits using two windows with the same name (id). -->
+        <toolWindow id="LSF Dependencies" factoryClass="com.lsfusion.dependencies.DependenciesViewToolWindowFactory"
                     anchor="right" icon="/images/lsf_logo.png"/>
 
         <codeInsight.lineMarkerProvider language="Lsf"
