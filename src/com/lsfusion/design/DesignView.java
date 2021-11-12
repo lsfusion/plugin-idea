@@ -23,7 +23,10 @@ import com.intellij.ui.content.Content;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.design.model.*;
+import com.lsfusion.design.model.ClassChooserView;
+import com.lsfusion.design.model.ComponentView;
+import com.lsfusion.design.model.ContainerView;
+import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.ui.*;
 import com.lsfusion.lang.psi.LSFDesignStatement;
@@ -46,8 +49,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.*;
-
-import static javax.swing.BorderFactory.*;
 
 public class DesignView extends JPanel implements Disposable {
     @NotNull
@@ -320,7 +321,9 @@ public class DesignView extends JPanel implements Disposable {
 
         formPanel = new JPanel(new BorderLayout());
 
-        formLayer = new JLayer(new JBScrollPane(formPanel), new SelectingLayerUI());
+        JBScrollPane scrollPane = new JBScrollPane(formPanel);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new JBColor(new Color(69, 160, 255), new Color(95, 123, 141))));
+        formLayer = new JLayer(scrollPane, new SelectingLayerUI());
 
         JBSplitter formSplitter = new JBSplitter(false, 0.25f);
         formSplitter.setFirstComponent(leftPanel);
@@ -370,9 +373,7 @@ public class DesignView extends JPanel implements Disposable {
     }
 
     private boolean defaultSelection(ComponentView component) {
-        if (component instanceof FilterView) {
-            return false;
-        } else if (component instanceof ClassChooserView) {
+        if (component instanceof ClassChooserView) {
             return false;
         } else if (component instanceof PropertyDrawView) {
             PropertyDrawView property = (PropertyDrawView) component;
@@ -391,9 +392,6 @@ public class DesignView extends JPanel implements Disposable {
         BaseUtils.reverse(componentToWidget, widgetToComponent);
 
         if (rootWidget != null) {
-            rootWidget.setBorder(
-                    createCompoundBorder(createEmptyBorder(5, 5, 5, 5), createLineBorder(new JBColor(new Color(69, 160, 255), new Color(95, 123, 141)), 1))
-            );
             formPanel.add(rootWidget);
         }
         revalidate();

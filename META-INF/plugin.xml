@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.224</b><br>
+        <b>Version 1.0.225</b><br>
         <ul>
-            <li>STICKY/NOSTICKY properties support</li>
-            <li>HTMLTEXT class support</li>
+            <li>FILTERS container, FILTER component support</li>
         </ul>
     ]]>
     </change-notes>

@@ -1,7 +1,6 @@
 package com.lsfusion.design.model.entity;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -11,11 +10,12 @@ import com.lsfusion.design.model.property.*;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.ObjectClass;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFilterGroupDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.indexes.ActionIndex;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
@@ -31,6 +31,7 @@ public class FormEntity {
     public List<TreeGroupEntity> treeGroups = new ArrayList<>();
     public List<PropertyDrawEntity> propertyDraws = new ArrayList<>();
     public List<RegularFilterGroupEntity> regularFilterGroups = new ArrayList<>();
+    public Set<PropertyDrawEntity> filterProperties = new LinkedHashSet<>();
 
     public PropertyDrawEntity editActionPropertyDraw;
     public PropertyDrawEntity dropActionPropertyDraw;
@@ -87,6 +88,13 @@ public class FormEntity {
 
         for (LSFFormExtendFilterGroupDeclaration lsfFormExtendFilterGroupDeclaration : formExtend.getFormExtendFilterGroupDeclarationList()) {
             extendRegularFilterGroup(lsfFormExtendFilterGroupDeclaration);
+        }
+        
+        for (LSFUserFiltersDeclaration lsfUserFiltersDeclaration : formExtend.getUserFiltersDeclarationList()) {
+            for (LSFFormPropertyDrawUsage formPropertyDrawUsage : lsfUserFiltersDeclaration.getFormPropertyDrawUsageList()) {
+                String formPropertyName = FormView.getPropertyDrawName(formPropertyDrawUsage);
+                filterProperties.add(getPropertyDraw(formPropertyName));
+            }
         }
     }
 

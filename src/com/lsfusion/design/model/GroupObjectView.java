@@ -3,6 +3,7 @@ package com.lsfusion.design.model;
 import com.lsfusion.design.model.entity.GroupObjectEntity;
 import com.lsfusion.design.model.entity.ObjectEntity;
 import com.lsfusion.design.ui.ClassViewType;
+import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.util.BaseUtils;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
 
     public GridView grid;
     public ToolbarView toolbarSystem;
-    public FilterView userFilter = new FilterView();
+    public ContainerView filtersContainer;
 
     public GroupObjectView(GroupObjectEntity entity) {
         this.entity = entity;
@@ -23,6 +24,11 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
 
         grid = new GridView(this);
         toolbarSystem = new ToolbarView(false);
+
+        filtersContainer = new ContainerView();
+        filtersContainer.setType(ContainerType.CONTAINERH);
+        filtersContainer.setAlignment(FlexAlignment.STRETCH);
+        filtersContainer.setCaption("Filters");
     }
 
     public String getCaption() {
@@ -46,5 +52,14 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
     @Override
     public String getPropertyGroupContainerSID() {
         return getSID();
+    }
+
+    @Override
+    public ContainerView getFiltersContainer() {
+        return filtersContainer;
+    }
+
+    public void addFilter(FilterView filter) {
+        filtersContainer.add(filter);
     }
 }

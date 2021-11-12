@@ -2,33 +2,26 @@ package com.lsfusion.design.model;
 
 import com.intellij.designer.model.Property;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBLabel;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.model.entity.FormEntity;
-import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.*;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 public class FilterView extends ComponentView {
-    public static final List<Property> PROPERTIES = addToList(
-            ComponentView.PROPERTIES,
-            new ReflectionProperty("visible")
-    );
+    public static final List<Property> PROPERTIES = Collections.emptyList();
 
-    public boolean visible = true;
+    private PropertyDrawView property;
 
-    public FilterView() {
-        this("");
-    }
-
-    public FilterView(String sID) {
-        super(sID);
-        setAlignment(FlexAlignment.STRETCH);
+    public FilterView(PropertyDrawView property) {
+        this.property = property;
+        setAlignment(FlexAlignment.START);
     }
 
     @Override
@@ -41,14 +34,6 @@ public class FilterView extends ComponentView {
         return "Filter";
     }
 
-    public boolean isVisible() {
-        return visible;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
     @Override
     public Icon getIcon() {
         return LSFIcons.Design.FILTER;
@@ -56,27 +41,23 @@ public class FilterView extends ComponentView {
 
     @Override
     protected JComponentPanel createWidgetImpl(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
-        FlexPanel topPanel = new FlexPanel(false);
-        topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER));
-        topPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_ADD));
+        JComponentPanel panel = new JComponentPanel();
+        panel.setLayout(new FlexLayout(panel, false, Alignment.START));
+        
+        JBLabel propertyLabel = new JBLabel(property.getEditCaption());
+        propertyLabel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
+        propertyLabel.setToolTipText(property.getCaption());
+        
+        JBLabel compareLabel = new JBLabel("=");
+        compareLabel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
 
-        FlexPanel bottomPanel = new FlexPanel(false);
-        bottomPanel.add(createComboBox(220, "someproperty(id)", "otherprop(id)", "..."), 0, FlexAlignment.CENTER);
-        bottomPanel.add(new JBCheckBox("NOT"), 0, FlexAlignment.CENTER);
-        bottomPanel.add(createComboBox(40, "=", "!=", "..."), 0, FlexAlignment.CENTER);
-        bottomPanel.add(createComboBox(70, "Value", "Object", "..."), 0, FlexAlignment.CENTER);
-        bottomPanel.add(Box.createHorizontalStrut(5), 0, FlexAlignment.CENTER);
-        bottomPanel.add(new SingleCellTable(), 0, FlexAlignment.CENTER);
-        bottomPanel.add(new ToolbarGridButton(LSFIcons.Design.FILTER_DEL), 0, FlexAlignment.CENTER);
-
-        FlexPanel panel = new FlexPanel(true);
-        panel.add(topPanel, 0, FlexAlignment.START);
-        panel.add(bottomPanel, 0, FlexAlignment.START);
+        SingleCellTable table = new SingleCellTable();
+        table.setPreferredSize(new Dimension(property.getValueWidth(table), property.getValueHeight(table)));
+        
+        panel.add(propertyLabel, new FlexConstraints(FlexAlignment.CENTER, 0));
+        panel.add(compareLabel, new FlexConstraints(FlexAlignment.CENTER, 0));
+        panel.add(table, new FlexConstraints(FlexAlignment.CENTER, 0));
 
         return panel;
-    }
-
-    private ComboBox createComboBox(int width, String... variants) {
-        return new ComboBox(variants, width);
     }
 }

@@ -8,7 +8,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 
 public class GroupObjectContainerSet {
     public static final String BOX_CONTAINER = "BOX";
-        public static final String USERFILTER_COMPONENT = "USERFILTER"; // COMPONENT
+        public static final String FILTERS_CONTAINER = "FILTERS";
         public static final String GRIDBOX_CONTAINER = "GRIDBOX";
             public static final String CLASSCHOOSER_COMPONENT = "CLASSCHOOSER"; // COMPONENT
             public static final String GRID_COMPONENT = "GRID"; // COMPONENT
@@ -110,7 +110,7 @@ public class GroupObjectContainerSet {
         set.boxContainer.setChildrenAlignment(Alignment.START);
         set.boxContainer.setAlignment(FlexAlignment.STRETCH);
         set.boxContainer.setFlex(1);
-        set.boxContainer.add(group.userFilter);
+        set.boxContainer.add(group.filtersContainer);
         set.boxContainer.add(set.gridBoxContainer);
         set.boxContainer.add(set.toolbarBoxContainer);
         set.boxContainer.add(set.panelContainer);
@@ -153,7 +153,6 @@ public class GroupObjectContainerSet {
         set.groupContainer.setType(ContainerType.COLUMNS);
         set.groupContainer.setLines(4);
 
-        group.userFilter.setAlignment(FlexAlignment.STRETCH);
         group.toolbarSystem.setAlignment(FlexAlignment.CENTER);
         group.toolbarSystem.setMargin(2);
 

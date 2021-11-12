@@ -97,7 +97,7 @@ public class TreeGroupContainerSet {
         set.boxContainer.setChildrenAlignment(Alignment.START);
         set.boxContainer.setAlignment(FlexAlignment.STRETCH);
         set.boxContainer.setFlex(1);
-        set.boxContainer.add(treeGroup.userFilter);
+        set.boxContainer.add(treeGroup.filtersContainer);
         set.boxContainer.add(set.gridBoxContainer);
         set.boxContainer.add(set.toolbarBoxContainer);
         set.boxContainer.add(set.panelContainer);
@@ -141,12 +141,8 @@ public class TreeGroupContainerSet {
         set.groupContainer.setType(ContainerType.COLUMNS);
         set.groupContainer.setLines(4);
 
-        treeGroup.userFilter.setAlignment(FlexAlignment.STRETCH);        
         treeGroup.toolbarSystem.setAlignment(FlexAlignment.CENTER);
         treeGroup.toolbarSystem.setMargin(2);
-        
-        
-        
 
         return set;
     }

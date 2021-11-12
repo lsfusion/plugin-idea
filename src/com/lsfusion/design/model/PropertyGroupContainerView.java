@@ -4,4 +4,6 @@ public interface PropertyGroupContainerView {
     String getSID();
 
     String getPropertyGroupContainerSID();
+    
+    ContainerView getFiltersContainer();
 }

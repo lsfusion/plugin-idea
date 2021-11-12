@@ -1,13 +1,15 @@
 package com.lsfusion.lang.psi.extend;
 
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFFilterGroupDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFObjectDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubElement> {
 
@@ -35,4 +37,6 @@ public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubEl
     List<LSFFormFilterGroupDeclaration> getFormFilterGroupDeclarationList();
 
     List<LSFFormExtendFilterGroupDeclaration> getFormExtendFilterGroupDeclarationList();
+    
+    List<LSFUserFiltersDeclaration> getUserFiltersDeclarationList();
 }

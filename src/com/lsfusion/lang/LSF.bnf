@@ -1736,7 +1736,7 @@ formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage regular
     methods = [getDocumentation]
 }
 
-userFiltersDeclaration ::= USERFILTERS formPropertyDrawUsage
+userFiltersDeclaration ::= USERFILTERS formPropertyDrawUsage (COMMA formPropertyDrawUsage)*
 
 filterGroupUsage ::= simpleName
 {
@@ -2145,7 +2145,7 @@ removeComponentStatement ::= REMOVE componentSelector SEMI {pin = 1}
 
 // GROUPOBJECT + TREE
 private componentSingleSelectorType ::=  BOX | OBJECTS | PANEL | TOOLBARBOX | TOOLBARLEFT | TOOLBARRIGHT | TOOLBAR
-groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID
+groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID | FILTERS
 globalSingleSelectorType ::= componentSingleSelectorType 
 
 private groupObjectTreeSelector ::= TREE treeGroupSelector | groupObjectSelector { pin(".*") = 1 }
@@ -2157,6 +2157,7 @@ private pinnedGroupObjectTreeSelector ::= groupObjectTreeSingleSelectorType LBRA
 // should match component_statement_recover
 componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                 	|	PROPERTY LBRAC propertySelector RBRAC
+                	|	FILTER LBRAC filterPropertySelector RBRAC
                 	|   FILTERGROUP LBRAC filterGroupSelector RBRAC
                 	|   groupSingleSelectorType LBRAC groupComponentSelector RBRAC
                 	|   pinnedGroupObjectTreeSelector // pinned для нижнего правила
@@ -2179,6 +2180,7 @@ componentUsage ::= simpleName
 }
 
 propertySelector ::= formPropertyDrawUsage
+filterPropertySelector ::= propertySelector
 groupObjectSelector ::= groupObjectUsage 
 treeGroupSelector ::= treeGroupUsage
 filterGroupSelector ::= filterGroupUsage 

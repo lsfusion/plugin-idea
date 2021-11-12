@@ -19,8 +19,10 @@ import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.DesignUtils;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DesignInfo {
     public final LSFFormDeclaration formDecl;
@@ -41,8 +43,9 @@ public class DesignInfo {
                 elementToModule.put(formExtend, moduleDeclaration);
             }
         }
-        
-        for (PsiElement formExtend : DesignUtils.sortByModules(formDecl, elementToModule)) {
+
+        List<PsiElement> sortedFormDecls = DesignUtils.sortByModules(formDecl, elementToModule);
+        for (PsiElement formExtend : sortedFormDecls) {
             formEntity.extendForm((LSFFormExtend) formExtend);
         }
 
@@ -217,6 +220,8 @@ public class DesignInfo {
             return componentView.getContainer().getSID();
         } else if (componentSelector.getPropertySelector() != null) {
             return FormView.getPropertyDrawSID(FormView.getPropertyDrawName(componentSelector.getPropertySelector().getFormPropertyDrawUsage()));
+        } else if (componentSelector.getFilterPropertySelector() != null) {
+            return FormView.getFilterSID(FormView.getPropertyDrawName(componentSelector.getFilterPropertySelector().getPropertySelector().getFormPropertyDrawUsage()));
         } else if (componentSelector.getFilterGroupSelector() != null) {
             String name = componentSelector.getFilterGroupSelector().getFilterGroupUsage().getName();
             return FormView.getFilterGroupSID(name);
@@ -229,8 +234,9 @@ public class DesignInfo {
                         return FormView.getToolbarSystemSID(groupName);
                     case "FILTERGROUPS" : 
                         return DefaultFormView.getFilterGroupsContainerSID(groupName);
-                    case "USERFILTER" : 
-                        return FormView.getUserFilterSID(groupName);
+                    case "FILTERS" :
+                    case "USERFILTER" : // backward compatibility
+                        return FormView.getFiltersContainerSID(groupName);
                     case "GRIDBOX" : 
                         return DefaultFormView.getGridBoxContainerSID(groupName);
                     case "CLASSCHOOSER" : 

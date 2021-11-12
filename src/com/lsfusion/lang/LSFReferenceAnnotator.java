@@ -50,8 +50,8 @@ import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
@@ -265,6 +265,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             return true;
 
         return false;
+    }
+
+    public void visitGroupObjectTreeSingleSelectorType(@NotNull LSFGroupObjectTreeSingleSelectorType o) {
+        super.visitGroupObjectTreeSingleSelectorType(o);
+        String text = o.getText();
+        if (text != null && text.equals("USERFILTER")) {
+            addDeprecatedWarning(o, "Deprecated since version 5, use FILTERS container instead. Earlier versions: ignore this warning");
+        }
     }
 
     @Override
@@ -869,6 +877,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         errorAttributes = mergeMetaAttributes(element, errorAttributes);
         annotation.setEnforcedTextAttributes(errorAttributes);
     }
+    
+    private void addDeprecatedWarning(PsiElement element, String text) {
+        Annotation annotation = myHolder.createWarningAnnotation(element, text);
+        annotation.setEnforcedTextAttributes(DEPRECATED_WARNING);
+    }
 
     private TextAttributes mergeMetaAttributes(PsiElement element, TextAttributes attributes) {
         boolean inMetaUsage = isInMetaUsage(element);
@@ -1013,11 +1026,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (!ASTCompletionContributor.validDesignProperty(property)) {
                 addHighlightErrorWithResolving(o, "Can't resolve property " + property); // design property can be meta parameter
             } else if (property.equals("columns")) {
-                Annotation annotation = myHolder.createWarningAnnotation(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
-                annotation.setEnforcedTextAttributes(DEPRECATED_WARNING);
+                addDeprecatedWarning(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
             } else if (property.equals("type")) {
-                Annotation annotation = myHolder.createWarningAnnotation(o, "Deprecated since version 5, use 'horizontal', 'tabbed', 'lines' instead. Earlier versions: ignore this warning");
-                annotation.setEnforcedTextAttributes(DEPRECATED_WARNING);
+                addDeprecatedWarning(o, "Deprecated since version 5, use 'horizontal', 'tabbed', 'lines' instead. Earlier versions: ignore this warning");
             }
         }
     }

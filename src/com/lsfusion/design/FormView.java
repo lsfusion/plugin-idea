@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.lsfusion.design.GroupObjectContainerSet.FILTERS_CONTAINER;
+
 public class FormView {
     public String caption = "";
 
@@ -37,6 +39,7 @@ public class FormView {
     public List<GroupObjectView> groupObjects = new ArrayList<>();
     public List<PropertyDrawView> properties = new ArrayList<>();
     public List<RegularFilterGroupView> regularFilters = new ArrayList<>();
+    public List<FilterView> filters = new ArrayList<>();
 
     protected Map<TreeGroupEntity, TreeGroupView> mtreeGroups = new HashMap<>();
 
@@ -100,6 +103,10 @@ public class FormView {
                 addFilterGroupBase(filterGroup);
             }
         }
+        
+        for (PropertyDrawEntity property : entity.filterProperties) {
+            addFilterBase(property);
+        }
     }
 
     private void initProperties() {
@@ -124,7 +131,7 @@ public class FormView {
 
         setComponentSID(groupObjectView.grid, getGridSID(groupObjectView));
         setComponentSID(groupObjectView.toolbarSystem, getToolbarSystemSID(groupObjectView));
-        setComponentSID(groupObjectView.userFilter, getUserFilterSID(groupObjectView));
+        setComponentSID(groupObjectView.getFiltersContainer(), getFiltersContainerSID(groupObjectView));
 
         for (ObjectView object : groupObjectView) {
             setComponentSID(object.classChooser, getClassChooserSID(object));
@@ -141,7 +148,7 @@ public class FormView {
 
         setComponentSID(treeGroupView, getGridSID(treeGroupView));
         setComponentSID(treeGroupView.toolbarSystem, getToolbarSystemSID(treeGroupView));
-        setComponentSID(treeGroupView.userFilter, getUserFilterSID(treeGroupView));
+        setComponentSID(treeGroupView.getFiltersContainer(), getFiltersContainerSID(treeGroupView));
         mtreeGroups.put(treeGroupEntity, treeGroupView);
     }
 
@@ -157,6 +164,17 @@ public class FormView {
         mfilters.put(filterGroupView.entity, filterGroupView);
         setComponentSID(filterGroupView, getFilterGroupSID(filterGroupView));
         return filterGroupView;
+    }
+
+    private void addFilterBase(PropertyDrawEntity propertyDraw) {
+        FilterView filterView = new FilterView(get(propertyDraw));
+        setComponentSID(filterView, getFilterSID(propertyDraw.sID));
+        filters.add(filterView);
+        if (propertyDraw.toDraw.isInTree()) {
+            get(propertyDraw.toDraw.treeGroup).addFilter(filterView);
+        } else {
+            get(propertyDraw.toDraw).addFilter(filterView);
+        }
     }
 
     private PropertyDrawView addPropertyDrawBase(PropertyDrawEntity propertyDrawEntity/*, Pair<Boolean, PropertyDrawView> relative*/) {
@@ -297,16 +315,20 @@ public class FormView {
         return getToolbarSystemSID(containerView.getPropertyGroupContainerSID());
     }
 
+    public static String getFiltersContainerSID(PropertyGroupContainerView containerView) {
+        return getFiltersContainerSID(containerView.getPropertyGroupContainerSID());
+    }
+
+    public static String getFiltersContainerSID(String sID) {
+        return FILTERS_CONTAINER + "(" + sID + ")";
+    }
+
+    public static String getFilterSID(String name) {
+        return "FILTER(" + name + ")";
+    }
+
     public static String getToolbarSystemSID(String sID) {
         return GroupObjectContainerSet.TOOLBAR_SYSTEM_COMPONENT + "(" + sID + ")";
-    }
-
-    public static String getUserFilterSID(PropertyGroupContainerView containerView) {
-        return getUserFilterSID(containerView.getPropertyGroupContainerSID());
-    }
-
-    public static String getUserFilterSID(String sID) {
-        return GroupObjectContainerSet.USERFILTER_COMPONENT + "(" + sID + ")";
     }
 
     private static String getClassChooserSID(ObjectView component) {
