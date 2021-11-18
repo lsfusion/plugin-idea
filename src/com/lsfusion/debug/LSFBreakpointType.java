@@ -98,6 +98,8 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
         return PsiTreeUtil.getParentOfType(psiElement, LSFClassStatement.class) != null;
     }
 
+    //createJavaBreakpoint in interface is @NotNull, but this implementation can return null, and it's ok and nothing fails.
+    @SuppressWarnings("NullableProblems")
     @Override
     public Breakpoint createJavaBreakpoint(Project project, XBreakpoint breakpoint) {
         return LineBreakpoint.create(project, breakpoint);
