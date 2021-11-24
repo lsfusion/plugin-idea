@@ -10,6 +10,7 @@
         <b>Version 1.0.225</b><br>
         <ul>
             <li>FILTERS container, FILTER component support</li>
+            <li>INPUT ACTIONS support</li>
         </ul>
     ]]>
     </change-notes>

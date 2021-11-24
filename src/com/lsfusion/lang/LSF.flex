@@ -173,6 +173,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "ASK"                			        { return ASK; }
   "NATIVE"                			    { return NATIVE; }
   "ACTION"                  			{ return ACTION; }
+  "ACTIONS"                  			{ return ACTIONS; }
   "AFTER"                   			{ return AFTER; }
   "GOAFTER"                   			{ return GOAFTER; }
   "AGGR"                    			{ return AGGR; }

@@ -383,6 +383,19 @@ public class LSFPsiImplUtil {
         return new ExprsContextInferrer(sourceStatement.getPropertyExpression());
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFContextActions sourceStatement) {
+        LSFInputActionPropertyDefinitionBody inputAction = PsiTreeUtil.getParentOfType(sourceStatement, LSFInputActionPropertyDefinitionBody.class);
+        LSFParamDeclare paramDeclare = inputAction.getParamDeclare();
+        if (paramDeclare == null)
+            return ContextModifier.EMPTY;
+
+        return (offset, currentParams) -> Collections.singletonList(inputAction.getParamDeclare());
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFContextActions sourceStatement) {
+        return ContextInferrer.EMPTY;
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFListWhereInputProps sourceStatement) {
         LSFInputActionPropertyDefinitionBody inputAction = PsiTreeUtil.getParentOfType(sourceStatement, LSFInputActionPropertyDefinitionBody.class);
         LSFClassSet resolveClass = inputAction.resolveClass();
