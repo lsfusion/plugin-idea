@@ -44,6 +44,8 @@ public class LSFPsiUtils {
             //parent == scriptStatement OR metaCodeBody
             if (element.getParent() instanceof LSFFile
                     || element.getParent() instanceof LSFScriptStatement
+                    || element.getParent() instanceof LSFLazyMetaStatement
+                    || element.getParent() instanceof LSFLazyMetaDeclStatement
                     || element.getParent() instanceof LSFMetaCodeDeclBody
                     || element.getParent() instanceof LSFMetaCodeBody) {
                 break;
