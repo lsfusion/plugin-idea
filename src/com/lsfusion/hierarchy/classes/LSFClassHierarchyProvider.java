@@ -28,6 +28,6 @@ public class LSFClassHierarchyProvider implements HierarchyProvider {
 
     @Override
     public void browserActivated(@NotNull HierarchyBrowser hierarchyBrowser) {
-        ((LSFClassHierarchyBrowser) hierarchyBrowser).changeView(TypeHierarchyBrowserBase.SUBTYPES_HIERARCHY_TYPE);
+        ((LSFClassHierarchyBrowser) hierarchyBrowser).changeView(TypeHierarchyBrowserBase.getSubtypesHierarchyType());
     }
 }

@@ -67,8 +67,8 @@ public class LSFClassHierarchyBrowser extends TypeHierarchyBrowserBase {
 
     @Override
     protected void createTrees(@NotNull Map<? super String, ? super JTree> trees) {
-        trees.put(TypeHierarchyBrowserBase.SUBTYPES_HIERARCHY_TYPE, createTree(false));
-        trees.put(TypeHierarchyBrowserBase.SUPERTYPES_HIERARCHY_TYPE, createTree(false));
+        trees.put(TypeHierarchyBrowserBase.getSubtypesHierarchyType(), createTree(false));
+        trees.put(TypeHierarchyBrowserBase.getSupertypesHierarchyType(), createTree(false));
     }
 
     @Nullable
@@ -95,9 +95,9 @@ public class LSFClassHierarchyBrowser extends TypeHierarchyBrowserBase {
     @Nullable
     @Override
     protected HierarchyTreeStructure createHierarchyTreeStructure(@NotNull String type, @NotNull PsiElement psiElement) {
-        if (TypeHierarchyBrowserBase.SUPERTYPES_HIERARCHY_TYPE.equals(type)) {
+        if (TypeHierarchyBrowserBase.getSupertypesHierarchyType().equals(type)) {
             return new LSFSuperclassHierarchyTreeStructure(myProject, findClassDecl(psiElement));
-        } else if (TypeHierarchyBrowserBase.SUBTYPES_HIERARCHY_TYPE.equals(type)) {
+        } else if (TypeHierarchyBrowserBase.getSubtypesHierarchyType().equals(type)) {
             return new LSFSubclassHierarchyTreeStructure(myProject, findClassDecl(psiElement));
         } else {
             LOG.error("unexpected type: " + type);
