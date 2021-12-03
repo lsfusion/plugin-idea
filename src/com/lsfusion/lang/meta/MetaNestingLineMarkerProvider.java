@@ -1,6 +1,5 @@
 package com.lsfusion.lang.meta;
 
-import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
@@ -10,6 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
+import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.lang.psi.LSFMetaCodeStatement;
 import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
@@ -31,13 +31,13 @@ public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
                 if (metaReference.getMetaCodeStatementHeader().getMetacodeUsage().getCompoundID().getSimpleName().getFirstChild() == element) {
                     int level = resolveNestingLevel(metaReference);
                     if (level > 0) {
-                        return new LineMarkerInfo(element,
+                        return LSFLineMarkerInfo.create(element,
                                 element.getTextRange(),
                                 createIcon(level),
-                                Pass.LINE_MARKERS,
                                 MetaNestingLevelTooltipProvider.INSTANCE,
                                 null,
-                                GutterIconRenderer.Alignment.RIGHT);
+                                GutterIconRenderer.Alignment.RIGHT
+                        );
                     }
                 }
             }

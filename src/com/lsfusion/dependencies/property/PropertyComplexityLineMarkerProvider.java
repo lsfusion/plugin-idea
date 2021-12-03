@@ -1,6 +1,5 @@
 package com.lsfusion.dependencies.property;
 
-import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.Document;
@@ -11,6 +10,7 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
+import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.actions.ToggleComplexityAction;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFSimpleName;
@@ -64,12 +64,10 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
     }
 
     private LineMarkerInfo<?> createLineMarker(LSFGlobalPropDeclaration property, PsiElement element) {
-        int complexity = PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching(property); 
-        return new LineMarkerInfo(
-                element,
+        int complexity = PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching(property);
+        return LSFLineMarkerInfo.create(element,
                 element.getTextRange(),
                 createIcon(complexity),
-                Pass.LINE_MARKERS,
                 PropertyComplexityTooltipProvider.INSTANCE,
                 null,
                 GutterIconRenderer.Alignment.RIGHT

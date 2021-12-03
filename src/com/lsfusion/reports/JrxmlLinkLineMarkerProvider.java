@@ -1,6 +1,5 @@
 package com.lsfusion.reports;
 
-import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
@@ -14,6 +13,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,11 +44,9 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
     }
 
     private LineMarkerInfo<?> createLineMarker(PsiElement psi) {
-        return new LineMarkerInfo(
-                psi,
+        return LSFLineMarkerInfo.create(psi,
                 psi.getTextRange(),
                 LSFIcons.PRINT,
-                Pass.LINE_MARKERS,
                 TooltipProvider.INSTANCE,
                 GotoJrxmlFileNavigationHandler.INSTANCE,
                 GutterIconRenderer.Alignment.RIGHT

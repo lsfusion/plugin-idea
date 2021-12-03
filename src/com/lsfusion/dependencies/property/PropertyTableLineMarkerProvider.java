@@ -1,6 +1,5 @@
 package com.lsfusion.dependencies.property;
 
-import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
@@ -12,6 +11,7 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
+import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.actions.ToggleShowTableAction;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFId;
@@ -20,8 +20,6 @@ import com.lsfusion.lang.psi.declarations.LSFAggrParamGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFTableDeclaration;
 import com.lsfusion.lang.psi.declarations.impl.LSFTableDeclarationImpl;
-import com.lsfusion.lang.psi.indexes.TableIndex;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
@@ -80,11 +78,9 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
     }
 
     private LineMarkerInfo<?> createLineMarker(PsiElement psi) {
-        return new LineMarkerInfo(
-                psi,
+        return LSFLineMarkerInfo.create(psi,
                 psi.getTextRange(),
                 createIcon(),
-                Pass.LINE_MARKERS,
                 PropertyShowTableTooltipProvider.INSTANCE,
                 ShowTableNavigationProvider.INSTANCE,
                 GutterIconRenderer.Alignment.RIGHT

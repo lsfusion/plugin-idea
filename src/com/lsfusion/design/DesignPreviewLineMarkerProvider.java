@@ -1,6 +1,5 @@
 package com.lsfusion.design;
 
-import com.intellij.codeHighlighting.Pass;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
@@ -15,8 +14,8 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
@@ -37,11 +36,9 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
     }
 
     private LineMarkerInfo<?> createLineMarker(PsiElement psi) {
-        return new LineMarkerInfo(
-                psi,
+        return LSFLineMarkerInfo.create(psi,
                 psi.getTextRange(),
                 LSFIcons.Design.DESIGN,
-                Pass.LINE_MARKERS,
                 GetFormNameTooltipProvider.INSTANCE,
                 OpenDesignPreviewNavigationHandler.INSTANCE,
                 GutterIconRenderer.Alignment.RIGHT
