@@ -435,4 +435,18 @@ public class LSFPsiUtils {
         return file.getName() + "(" + lineNumber + ":" + linePosition + ")";
     }
 
+    public static PsiElement getFindUsagesIdentifyingElement(PsiElement element) {
+        if (element instanceof LSFPropertyStatement) {
+            return ((LSFPropertyStatement) element).getIdentifyingElement();
+        } else if (element instanceof LSFFormDecl) {
+            return ((LSFFormDecl) element).getIdentifyingElement();
+        } else if (element instanceof LSFFormObjectDeclaration) {
+            return ((LSFFormObjectDeclaration) element).getIdentifyingElement();
+        } else if (element instanceof LSFFormUsage) {
+            return ((LSFFormUsage) element).getFormUsageNameIdentifier();
+        } else {
+            return element;
+        }
+    }
+
 }

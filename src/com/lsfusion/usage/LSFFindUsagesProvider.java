@@ -15,6 +15,8 @@ import com.lsfusion.lang.psi.declarations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.lsfusion.util.LSFPsiUtils.getFindUsagesIdentifyingElement;
+
 public class LSFFindUsagesProvider implements FindUsagesProvider {
     private static final DefaultWordsScanner WORDS_SCANNER =
             new DefaultWordsScanner(
@@ -31,7 +33,7 @@ public class LSFFindUsagesProvider implements FindUsagesProvider {
 
     @Override
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-        return psiElement instanceof LSFId;
+        return getFindUsagesIdentifyingElement(psiElement) instanceof LSFId;
     }
 
     @Nullable

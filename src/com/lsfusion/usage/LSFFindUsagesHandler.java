@@ -12,15 +12,13 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageInfo;
 import com.intellij.util.Processor;
 import com.lsfusion.ImplementationsSearch;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFFormObjectDeclaration;
-import com.lsfusion.lang.psi.LSFId;
-import com.lsfusion.lang.psi.LSFNewNavigatorElementStatement;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.lsfusion.actions.UsagesSearchAction.*;
+import static com.lsfusion.util.LSFPsiUtils.getFindUsagesIdentifyingElement;
 
 public class LSFFindUsagesHandler extends FindUsagesHandler {
     private final LSFFindUsagesOptions options;
@@ -49,6 +47,7 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
     @Override
     public boolean processElementUsages(@NotNull PsiElement element, @NotNull Processor<? super UsageInfo> processor, @NotNull FindUsagesOptions options) {
         if (options.isUsages) {
+            element = getFindUsagesIdentifyingElement(element);
             LSFDeclaration decl = getParentDeclaration(element, LSFDeclaration.class);
             if (decl instanceof LSFActionOrPropDeclaration && PROPERTY_DRAW_USAGES.equals(propertyUsagesSearchMode)) {
                 LSFPropertyDrawDeclaration propDrawDecl = getParentDeclaration(sourceElement, LSFPropertyDrawDeclaration.class);
