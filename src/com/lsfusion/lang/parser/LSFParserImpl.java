@@ -92,7 +92,7 @@ public class LSFParserImpl extends LSFParser {
             } else if(containMeta) {
                 if (tokenType == META) {
                     metaCount++;
-                } else if (tokenType == END) {
+                } else if (checEndTokenType(tokenType, prevTokenType)) {
                     if (metaCount > 0) {
                         metaCount--;
                     }
@@ -132,7 +132,7 @@ public class LSFParserImpl extends LSFParser {
                     break;
                 }
                 if(isTopMetaDecl) { // META END
-                    assert tokenType == END;
+                    assert checEndTokenType(tokenType, prevTokenType);
                     builder_.advanceLexer(); // eat END
                     break;
                 }
@@ -149,6 +149,11 @@ public class LSFParserImpl extends LSFParser {
             lazyStatement.setCustomEdgeTokenBinders(null, GREEDY_WHITESPACE_AND_COMMENTS_PROCESSOR);
         }
         return true;
+    }
+
+    private boolean checEndTokenType(IElementType tokenType, IElementType prevTokenType) {
+        //check prevTokenType because it may be alignmentLiteral / flexAlignmentLiteral ('align = END')
+        return tokenType == END && prevTokenType != EQUALS;
     }
 
     public boolean lazyScriptStatementDeep(PsiBuilder builder_, int level_) {
