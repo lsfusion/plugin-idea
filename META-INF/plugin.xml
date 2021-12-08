@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.225</b><br>
+        <b>Version 1.0.226</b><br>
         <ul>
-            <li>FILTERS container, FILTER component support</li>
-            <li>INPUT ACTIONS support</li>
+            <li>IntelliJ IDEA 2021.3 fixes</li>
         </ul>
     ]]>
     </change-notes>
@@ -325,5 +324,9 @@
 
         <applicationConfigurable instance="com.lsfusion.actions.locale.LSFSettingsConfigurable"
                              id="org.company.ApplicationSettingsConfigurable" displayName="LSF Settings"/>
+
+        <!-- To use old PreCachedDataContext instead of new PreCachedDataContext2 (in 2021.3),
+        which broke find element usages when cursor is on element usage-->
+        <registryKey defaultValue="false" description="." key="actionSystem.update.actions.async.data-context2"/>
     </extensions>
 </idea-plugin>
