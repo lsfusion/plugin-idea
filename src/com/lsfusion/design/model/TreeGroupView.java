@@ -20,7 +20,9 @@ import java.util.Map;
 public class TreeGroupView extends ComponentView implements PropertyGroupContainerView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
-            new ReflectionProperty("expandOnClick")
+            new ReflectionProperty("expandOnClick"),
+            new ReflectionProperty("lineWidth").setExpert(),
+            new ReflectionProperty("lineHeight").setExpert()
     );
     
     public TreeGroupEntity entity;
@@ -30,6 +32,9 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
 
     private TreeGroupTableModel model = new TreeGroupTableModel();
     public boolean expandOnClick;
+
+    public int lineWidth = 0;
+    public int lineHeight = 0;
 
     public TreeGroupView(TreeGroupEntity entity) {
         super(entity.sID);
@@ -99,6 +104,22 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     
     public boolean getExpandOnClick() {
         return expandOnClick;
+    }
+
+    public int getLineWidth() {
+        return lineWidth;
+    }
+
+    public void setLineWidth(int lineWidth) {
+        this.lineWidth = lineWidth;
+    }
+
+    public int getLineHeight() {
+        return lineHeight;
+    }
+
+    public void setLineHeight(int lineHeight) {
+        this.lineHeight = lineHeight;
     }
 
     @Override

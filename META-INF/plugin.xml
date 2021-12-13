@@ -10,6 +10,9 @@
         <b>Version 1.0.226</b><br>
         <ul>
             <li>IntelliJ IDEA 2021.3 fixes</li>
+            <li>ctrl+alt+f7, alt+f7 fixes</li>
+            <li>align = END inside of metacode support</li>
+            <li>lineWidth/lineHeight support</li>
         </ul>
     ]]>
     </change-notes>

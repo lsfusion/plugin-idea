@@ -21,7 +21,9 @@ public class GridView extends ComponentView {
             new ReflectionProperty("tabVertical").setExpert(),
             new ReflectionProperty("autoHide").setExpert(),
             new ReflectionProperty("quickSearch").setExpert(),
-            new ReflectionProperty("headerHeight").setExpert()
+            new ReflectionProperty("headerHeight").setExpert(),
+            new ReflectionProperty("lineWidth").setExpert(),
+            new ReflectionProperty("lineHeight").setExpert()
     );
 
     GridTableModel model = new GridTableModel();
@@ -31,6 +33,8 @@ public class GridView extends ComponentView {
     public boolean quickSearch = false;
 
     public int headerHeight = 0;
+    public int lineWidth = 0;
+    public int lineHeight = 0;
 
     private GroupObjectView groupObject;
 
@@ -81,6 +85,14 @@ public class GridView extends ComponentView {
         this.headerHeight = headerHeight;
     }
 
+    public void setLineWidth(int lineWidth) {
+        this.lineWidth = lineWidth;
+    }
+
+    public void setLineHeight(int lineHeight) {
+        this.lineHeight = lineHeight;
+    }
+
     public boolean isTabVertical() {
         return tabVertical;
     }
@@ -96,6 +108,15 @@ public class GridView extends ComponentView {
     public int getHeaderHeight() {
         return headerHeight;
     }
+
+    public int getLineWidth() {
+        return lineWidth;
+    }
+
+    public int getLineHeight() {
+        return lineHeight;
+    }
+
 
     @Override
     public Icon getIcon() {
