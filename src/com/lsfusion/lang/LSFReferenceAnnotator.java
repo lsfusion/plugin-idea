@@ -270,8 +270,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitGroupObjectTreeSingleSelectorType(@NotNull LSFGroupObjectTreeSingleSelectorType o) {
         super.visitGroupObjectTreeSingleSelectorType(o);
         String text = o.getText();
-        if (text != null && text.equals("USERFILTER")) {
-            addDeprecatedWarning(o, "Deprecated since version 5, use FILTERS container instead. Earlier versions: ignore this warning");
+        if (text != null) {
+            if (text.equals("USERFILTER")) {
+                addDeprecatedWarning(o, "Deprecated since version 5, use FILTERS container instead. Earlier versions: ignore this warning");
+            } else if (text.equals("GRIDBOX")) {
+                addDeprecatedWarning(o, "Deprecated since version 5, use GRID container instead. Earlier versions: ignore this warning");
+            }
         }
     }
 

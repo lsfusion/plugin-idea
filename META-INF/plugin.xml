@@ -7,12 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.226</b><br>
+        <b>Version 1.0.227</b><br>
         <ul>
-            <li>IntelliJ IDEA 2021.3 fixes</li>
-            <li>ctrl+alt+f7, alt+f7 fixes</li>
-            <li>align = END inside of metacode support</li>
-            <li>lineWidth/lineHeight support</li>
+            <li>GRIDBOX deprecated</li>
         </ul>
     ]]>
     </change-notes>
