@@ -754,12 +754,12 @@ objectListInputProps ::= LIST propertyExpression
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer ]
 }
-objectInputProps ::= (INPUT | changeInput) simpleName? NULL? constraintFilter? objectListInputProps?
+objectInputProps ::= (INPUT | changeInput) simpleName? NULL? staticDestination? constraintFilter? objectListInputProps?
 {
     pin = 1
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
-} // inputDestination?
+}
 
 private formActionObjectProps ::= objectInProps? objectInputProps? 
 formActionObjectUsage ::= objectUsage formActionObjectProps {
@@ -824,8 +824,6 @@ doMainBody ::= DO actionPropertyDefinitionBody
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer ]
 }
-
-//inputDestination ::= TO propertyUsage
 
 syncTypeLiteral ::= WAIT | NOWAIT
 windowTypeLiteral ::= FLOAT | DOCKED
@@ -1216,7 +1214,7 @@ contextActions ::= ACTIONS stringLiteral listActionPropertyDefinitionBody (COMMA
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer ]
 }
-inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? listWhereInputProps contextActions? formSessionScopeClause? doInputBody // inputDestination?
+inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? listWhereInputProps contextActions? formSessionScopeClause? staticDestination? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
@@ -2186,7 +2184,7 @@ componentUsage ::= simpleName
 
 propertySelector ::= formPropertyDrawUsage
 filterPropertySelector ::= propertySelector
-groupObjectSelector ::= groupObjectUsage 
+groupObjectSelector ::= groupObjectUsage
 treeGroupSelector ::= treeGroupUsage
 filterGroupSelector ::= filterGroupUsage 
 groupSelector ::= groupUsage

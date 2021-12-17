@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.226</version>
+    <version>1.0.227</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -10,6 +10,7 @@
         <b>Version 1.0.227</b><br>
         <ul>
             <li>GRIDBOX deprecated</li>
+            <li>TO clause support in INPUT operators</li>
         </ul>
     ]]>
     </change-notes>
