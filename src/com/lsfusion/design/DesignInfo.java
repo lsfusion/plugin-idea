@@ -237,11 +237,10 @@ public class DesignInfo {
                     case "FILTERS" :
                     case "USERFILTER" : // backward compatibility
                         return FormView.getFiltersContainerSID(groupName);
-                    case "GRIDBOX" : 
-                        return DefaultFormView.getGridBoxContainerSID(groupName);
                     case "CLASSCHOOSER" : 
                         return FormView.getClassChooserSID(groupName);
-                    case "GRID" : 
+                    case "GRID" :
+                    case "GRIDBOX": // backward compatibility
                         return FormView.getGridSID(groupName);
                     case "BOX" :
                         return DefaultFormView.getBoxContainerSID(groupName);

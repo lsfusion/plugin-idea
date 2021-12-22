@@ -134,7 +134,6 @@ public class FormView {
         setComponentSID(groupObjectView.getFiltersContainer(), getFiltersContainerSID(groupObjectView));
 
         for (ObjectView object : groupObjectView) {
-            setComponentSID(object.classChooser, getClassChooserSID(object));
             mobjects.put(object.entity, object);
         }
 
@@ -329,10 +328,6 @@ public class FormView {
 
     public static String getToolbarSystemSID(String sID) {
         return GroupObjectContainerSet.TOOLBAR_SYSTEM_COMPONENT + "(" + sID + ")";
-    }
-
-    private static String getClassChooserSID(ObjectView component) {
-        return getClassChooserSID(component.getSID());
     }
 
     public static String getClassChooserSID(String sID) {

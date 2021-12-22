@@ -95,10 +95,6 @@ public class DefaultFormView extends FormView {
         return GroupObjectContainerSet.FILTERGROUPS_CONTAINER + "(" + goName + ")";
     }
 
-    public static String getGridBoxContainerSID(String goName) {
-        return GroupObjectContainerSet.GRIDBOX_CONTAINER + "(" + goName + ")";
-    }
-
     public static String getBoxContainerSID(String goName) {
         return GroupObjectContainerSet.BOX_CONTAINER + "(" + goName + ")";
     }
@@ -186,7 +182,6 @@ public class DefaultFormView extends FormView {
     }
 
     protected Map<PropertyGroupContainerView, ContainerView> boxContainers = new HashMap<>();
-    protected Map<PropertyGroupContainerView, ContainerView> gridBoxContainers = new HashMap<>();
     
     protected Map<PropertyGroupContainerView, ContainerView> filtersContainers = new HashMap<>(); 
 
@@ -244,7 +239,6 @@ public class DefaultFormView extends FormView {
 
         registerComponent(set.getBoxContainer(), boxContainers, goView);
         registerComponent(goView.getFiltersContainer(), filtersContainers, goView);
-        registerComponent(set.getGridBoxContainer(), gridBoxContainers, goView);
         registerComponent(set.getPanelContainer(), panelContainers, goView);
         registerComponent(set.getGroupContainer(), groupContainers, goView);
         registerComponent(set.getToolbarBoxContainer(), toolbarBoxContainers, goView);
@@ -270,7 +264,6 @@ public class DefaultFormView extends FormView {
 
         registerComponent(treeSet.getBoxContainer(), boxContainers, treeGroup);
         registerComponent(treeGroup.getFiltersContainer(), filtersContainers, treeGroup);
-        registerComponent(treeSet.getGridBoxContainer(), gridBoxContainers, treeGroup);
         registerComponent(treeSet.getPanelContainer(), panelContainers, treeGroup);
         registerComponent(treeSet.getGroupContainer(), groupContainers, treeGroup);
         registerComponent(treeSet.getToolbarBoxContainer(), toolbarBoxContainers, treeGroup);

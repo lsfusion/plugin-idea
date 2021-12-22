@@ -9,9 +9,8 @@ import com.lsfusion.design.ui.FlexAlignment;
 public class GroupObjectContainerSet {
     public static final String BOX_CONTAINER = "BOX";
         public static final String FILTERS_CONTAINER = "FILTERS";
-        public static final String GRIDBOX_CONTAINER = "GRIDBOX";
-            public static final String CLASSCHOOSER_COMPONENT = "CLASSCHOOSER"; // COMPONENT
-            public static final String GRID_COMPONENT = "GRID"; // COMPONENT
+        public static final String CLASSCHOOSER_COMPONENT = "CLASSCHOOSER"; // COMPONENT
+        public static final String GRID_COMPONENT = "GRID"; // COMPONENT
         public static final String TOOLBARBOX_CONTAINER = "TOOLBARBOX";
             public static final String TOOLBARLEFT_CONTAINER = "TOOLBARLEFT";
                 public static final String TOOLBAR_SYSTEM_COMPONENT = "TOOLBARSYSTEM"; // COMPONENT
@@ -23,7 +22,6 @@ public class GroupObjectContainerSet {
             public static final String GROUP_CONTAINER = "GROUP";
 
     private ContainerView boxContainer;
-    private ContainerView gridBoxContainer;
     private ContainerView panelContainer;
     private ContainerView groupContainer;
     private ContainerView toolbarBoxContainer;
@@ -34,10 +32,6 @@ public class GroupObjectContainerSet {
 
     public ContainerView getBoxContainer() {
         return boxContainer;
-    }
-
-    public ContainerView getGridBoxContainer() {
-        return gridBoxContainer;
     }
 
     public ContainerView getPanelContainer() {
@@ -77,10 +71,6 @@ public class GroupObjectContainerSet {
 //        set.groupContainer.setDescription(getString("form.layout.group.objects"));
         set.boxContainer.setSID(DefaultFormView.getBoxContainerSID(sid));
 
-        set.gridBoxContainer = factory.createContainer();
-//        set.gridContainer.setDescription(getString("form.layout.grid.part"));
-        set.gridBoxContainer.setSID(DefaultFormView.getGridBoxContainerSID(sid));
-
         set.panelContainer = factory.createContainer();
 //        set.panelContainer.setDescription(getString("form.layout.panel"));
         set.panelContainer.setSID(DefaultFormView.getPanelContainerSID(sid));
@@ -111,14 +101,9 @@ public class GroupObjectContainerSet {
         set.boxContainer.setAlignment(FlexAlignment.STRETCH);
         set.boxContainer.setFlex(1);
         set.boxContainer.add(group.filtersContainer);
-        set.boxContainer.add(set.gridBoxContainer);
+        set.boxContainer.add(group.grid);
         set.boxContainer.add(set.toolbarBoxContainer);
         set.boxContainer.add(set.panelContainer);
-
-        set.gridBoxContainer.setType(ContainerType.SPLITH);
-        set.gridBoxContainer.setAlignment(FlexAlignment.STRETCH);
-        set.gridBoxContainer.setFlex(1);
-        set.gridBoxContainer.add(group.grid);
 
         set.toolbarBoxContainer.setType(ContainerType.CONTAINERH);
         set.toolbarBoxContainer.setAlignment(FlexAlignment.STRETCH);

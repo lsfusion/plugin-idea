@@ -10,7 +10,6 @@ public class TreeGroupContainerSet {
     public static final String TREE_PREFIX = "TREE";
 
     private ContainerView boxContainer;
-    private ContainerView gridBoxContainer;
     private ContainerView panelContainer;
     private ContainerView groupContainer;
     private ContainerView toolbarBoxContainer;
@@ -21,10 +20,6 @@ public class TreeGroupContainerSet {
 
     public ContainerView getBoxContainer() {
         return boxContainer;
-    }
-
-    public ContainerView getGridBoxContainer() {
-        return gridBoxContainer;
     }
 
     public ContainerView getPanelContainer() {
@@ -64,10 +59,6 @@ public class TreeGroupContainerSet {
 //        set.treeContainer.setDescription(getString("form.layout.tree"));
         set.boxContainer.setSID(DefaultFormView.getBoxContainerSID(sid));
 
-        set.gridBoxContainer = factory.createContainer();
-//        set.gridContainer.setDescription(getString("form.layout.grid.part"));
-        set.gridBoxContainer.setSID(DefaultFormView.getGridBoxContainerSID(sid));
-
         set.panelContainer = factory.createContainer();
 //        set.panelContainer.setDescription(getString("form.layout.panel"));
         set.panelContainer.setSID(DefaultFormView.getPanelContainerSID(sid));
@@ -98,14 +89,9 @@ public class TreeGroupContainerSet {
         set.boxContainer.setAlignment(FlexAlignment.STRETCH);
         set.boxContainer.setFlex(1);
         set.boxContainer.add(treeGroup.filtersContainer);
-        set.boxContainer.add(set.gridBoxContainer);
+        set.boxContainer.add(treeGroup);
         set.boxContainer.add(set.toolbarBoxContainer);
         set.boxContainer.add(set.panelContainer);
-
-        set.gridBoxContainer.setType(ContainerType.SPLITH);
-        set.gridBoxContainer.setAlignment(FlexAlignment.STRETCH);
-        set.gridBoxContainer.setFlex(1);
-        set.gridBoxContainer.add(treeGroup);
 
         set.toolbarBoxContainer.setType(ContainerType.CONTAINERH);
         set.toolbarBoxContainer.setAlignment(FlexAlignment.STRETCH);
