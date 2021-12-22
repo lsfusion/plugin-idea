@@ -63,40 +63,53 @@ public class ContainerView extends ComponentView {
         return PROPERTIES;
     }
 
-    public void setCaption(String caption) {
-        this.caption = caption;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setType(ContainerType type) {
-        this.type = type;
+    public Alignment getChildrenAlignment() {
+        return childrenAlignment;
     }
 
     public void setChildrenAlignment(Alignment childrenAlignment) {
         this.childrenAlignment = childrenAlignment;
     }
 
+    public int getColumns() {
+        return lines;
+    }
+
+    public void setColumns(int lines) {
+        this.lines = lines;
+    }
+
+    public int getLines() {
+        return lines;
+    }
+
     public void setLines(int lines) {
         this.lines = lines;
+    }
+
+    @NotNull
+    public ContainerType getType() {
+        return type;
+    }
+
+    public void setType(ContainerType type) {
+        this.type = type;
+    }
+
+    public boolean isHorizontal() {
+        return type == CONTAINERH || type == SPLITH || horizontal;
     }
 
     public void setHorizontal(boolean horizontal) {
         this.horizontal = horizontal;
     }
 
+    public boolean isTabbed() {
+        return type == TABBED || tabbed;
+    }
+
     public void setTabbed(boolean tabbed) {
         this.tabbed = tabbed;
-    }
-
-    public void setShowIf(String showIf) {
-        this.showIf = showIf;
-    }
-
-    public int getLines() {
-        return lines;
     }
 
     @Override
@@ -104,17 +117,29 @@ public class ContainerView extends ComponentView {
         return caption;
     }
 
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getShowIf() {
+        return showIf;
+    }
+
+    public void setShowIf(String showIf) {
+        this.showIf = showIf;
     }
 
     @Override
     public Icon getIcon() {
         return LSFIcons.Design.CONTAINER;
-    }
-    
-    public String getShowIf() {
-        return showIf;
     }
 
     public void add(ComponentView comp) {
@@ -301,14 +326,6 @@ public class ContainerView extends ComponentView {
             return new JComponentPanel(tabbedPane);
         }
         return null;
-    }
-
-    public boolean isTabbed() {
-        return type == TABBED || tabbed;
-    }
-
-    public boolean isHorizontal() {
-        return type == CONTAINERH || type == SPLITH || horizontal;
     }
 
     private static class TabbedPane extends JBTabbedPane {
