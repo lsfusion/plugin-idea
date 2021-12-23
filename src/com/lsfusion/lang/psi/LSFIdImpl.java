@@ -43,7 +43,6 @@ public class LSFIdImpl extends ASTWrapperPsiElement implements LSFId {
 
     @Override
     public ItemPresentation getPresentation() {
-        LSFDeclaration parentDecl = PsiTreeUtil.getParentOfType(this, LSFDeclaration.class);
-        return parentDecl == null ? null : parentDecl;
+        return PsiTreeUtil.getParentOfType(this, LSFDeclaration.class);
     }
 }

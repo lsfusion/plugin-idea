@@ -30,8 +30,8 @@ public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
         final Set<LSFUsageHierarchyNodeDescriptor> result = new ArrayListSet<>();
         final PsiElement element = ((LSFUsageHierarchyNodeDescriptor) descriptor).getElementId();
 
-        if (element != null && element instanceof LSFId) {
-            ReferencesSearch.search(element, GlobalSearchScope.allScope(myProject)).forEach(new Processor<PsiReference>() {
+        if (element instanceof LSFId) {
+            ReferencesSearch.search(element, GlobalSearchScope.allScope(myProject)).forEach(new Processor<>() {
                 @Override
                 public boolean process(PsiReference ref) {
                     PsiElement el = LSFPsiUtils.getStatementParent(ref.getElement());

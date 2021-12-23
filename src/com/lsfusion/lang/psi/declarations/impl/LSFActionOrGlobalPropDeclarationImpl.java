@@ -176,7 +176,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
 
     @Override
     protected Condition<Decl> getFindDuplicatesCondition() {
-        return new Condition<Decl>() {
+        return new Condition<>() {
             @Override
             public boolean value(Decl decl) {
                 LSFId nameIdentifier = getNameIdentifier();
@@ -303,7 +303,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
 
         for (LSFActionOrPropReference<?, ?> propReference : propReferences) {
             LSFActionOrPropDeclaration propDeclaration = propReference.resolveDecl();
-            if (propDeclaration != null && propDeclaration instanceof LSFActionOrGlobalPropDeclaration) {
+            if (propDeclaration instanceof LSFActionOrGlobalPropDeclaration) {
                 result.add((LSFActionOrGlobalPropDeclaration) propDeclaration);
             }
         }

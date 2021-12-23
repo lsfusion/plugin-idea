@@ -2,12 +2,12 @@ package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFLocalizedStringLiteral;
+import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
 import com.lsfusion.lang.psi.stubs.FormStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -16,8 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<LSFFormDeclaration, FormStubElement> implements LSFFormDeclaration {

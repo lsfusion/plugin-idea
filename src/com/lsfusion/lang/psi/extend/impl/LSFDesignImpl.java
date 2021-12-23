@@ -3,28 +3,27 @@ package com.lsfusion.lang.psi.extend.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.util.EmptyQuery;
-import com.intellij.util.Query;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.FormContext;
-import com.lsfusion.lang.psi.declarations.*;
-import com.lsfusion.lang.psi.declarations.impl.*;
+import com.lsfusion.lang.psi.declarations.LSFComponentDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDesignElementDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFDesign;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
-import com.lsfusion.lang.psi.references.impl.LSFDesignElementReferenceImpl;
 import com.lsfusion.lang.psi.stubs.extend.DesignStubElement;
 import com.lsfusion.lang.psi.stubs.extend.types.DesignStubElementType;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubElement> implements LSFDesign {

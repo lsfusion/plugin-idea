@@ -285,11 +285,11 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         dataModel = new GraphDataModel();
 
         if (showRequired) {
-            createDependencyNode(currentElement, new HashSet<PsiElement>());
+            createDependencyNode(currentElement, new HashSet<>());
         }
 
         if (showRequiring) {
-            createDependentNode(currentElement, new HashSet<PsiElement>());
+            createDependentNode(currentElement, new HashSet<>());
         }
 
         g = new ListenableDirectedGraph(DefaultEdge.class);

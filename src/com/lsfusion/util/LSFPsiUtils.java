@@ -373,7 +373,7 @@ public class LSFPsiUtils {
             return ContainerUtil.emptyList();
         }
 
-        PsiElementProcessor.CollectElements<PsiElement> processor = new PsiElementProcessor.CollectElements<PsiElement>() {
+        PsiElementProcessor.CollectElements<PsiElement> processor = new PsiElementProcessor.CollectElements<>() {
             @Override
             public boolean execute(@NotNull PsiElement each) {
                 if (each == element) return true;

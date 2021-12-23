@@ -1,7 +1,6 @@
 package com.lsfusion.lang.psi.indexes;
 
 import com.intellij.psi.stubs.StubIndexKey;
-import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
 import com.lsfusion.lang.psi.declarations.LSFExplicitValueProp;
 import org.jetbrains.annotations.NotNull;
 

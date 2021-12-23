@@ -6,7 +6,6 @@ import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

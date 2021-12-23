@@ -5,7 +5,6 @@ import com.lsfusion.dependencies.GraphNode;
 import com.lsfusion.lang.psi.cache.PropertyComplexityCache;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 
 public class PropertyGraphNode implements GraphNode {
     private String name;

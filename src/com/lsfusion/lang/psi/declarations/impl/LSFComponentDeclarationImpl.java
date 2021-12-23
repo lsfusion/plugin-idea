@@ -4,10 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.declarations.LSFComponentDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.extend.LSFDesign;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.references.impl.LSFDesignElementReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

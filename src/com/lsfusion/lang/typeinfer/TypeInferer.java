@@ -5,12 +5,10 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFMetaCodeStatement;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.LSFResolver;
 import com.lsfusion.lang.psi.context.ContextModifier;
 import com.lsfusion.lang.psi.context.ExtendParamContext;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
-import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
@@ -50,7 +48,7 @@ public class TypeInferer {
 
     public static void typeInfer(PsiElement modifyContext, MetaTransaction metaTrans) {
         assert !(modifyContext instanceof ExtendParamContext);
-        recTypeInfer(modifyContext, new HashSet<LSFExprParamDeclaration>(), metaTrans, true);
+        recTypeInfer(modifyContext, new HashSet<>(), metaTrans, true);
     }
 
     public static void metaTypeInfer(LSFMetaDeclaration metaDecl, MetaTransaction transaction) {
@@ -101,7 +99,7 @@ public class TypeInferer {
     }
 
     public static void findNotInferred(LSFFile file) {
-        recFindNotInferred(file, new HashSet<LSFExprParamDeclaration>(), null);
+        recFindNotInferred(file, new HashSet<>(), null);
     }
 
 }

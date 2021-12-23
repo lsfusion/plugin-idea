@@ -73,7 +73,7 @@ public class LSFStackFrame extends XStackFrame {
 
     @Override
     public void customizePresentation(@NotNull ColoredTextContainer component) {
-        String currentActionName = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
+        String currentActionName = ApplicationManager.getApplication().runReadAction(new Computable<>() {
             @Override
             public String compute() {
                 return getCurrentActionName();

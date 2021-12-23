@@ -5,7 +5,6 @@ import com.intellij.ide.util.DeleteTypeDescriptionLocation;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.ElementDescriptionProvider;
 import com.intellij.psi.PsiElement;
-import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -23,7 +23,6 @@ import com.intellij.util.Processor;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,7 +56,7 @@ public class LSFFileUtils {
     private static boolean hasFilesWithShortName(String fileName, Project project, GlobalSearchScope scope) {
         final Result<Boolean> hasFiles = new Result<>(false);
         FilenameIndex.processFilesByName(
-                fileName, false, new Processor<PsiFileSystemItem>() {
+                fileName, false, new Processor<>() {
                     @Override
                     public boolean process(PsiFileSystemItem file) {
                         if (!file.isDirectory() && file instanceof PsiFile) {
@@ -76,7 +75,7 @@ public class LSFFileUtils {
 
     public static void findFilesWithShortName(String fileName, final List<PsiFile> files, Project project, GlobalSearchScope scope) {
         FilenameIndex.processFilesByName(
-                fileName, false, new Processor<PsiFileSystemItem>() {
+                fileName, false, new Processor<>() {
                     @Override
                     public boolean process(PsiFileSystemItem file) {
                         if (!file.isDirectory() && file instanceof PsiFile) {
@@ -105,7 +104,7 @@ public class LSFFileUtils {
             final OrderEnumerator orderEnumerator = ModuleRootManager.getInstance(module).orderEntries();
 
             proceedModuleRoots(module, path, result, psiManager);
-            orderEnumerator.forEachModule(new Processor<Module>() {
+            orderEnumerator.forEachModule(new Processor<>() {
                 @Override
                 public boolean process(Module module) {
                     proceedModuleRoots(module, path, result, psiManager);
@@ -219,7 +218,7 @@ public class LSFFileUtils {
         if (!isRedundantString(value)) {
             try {
                 return Integer.parseInt(value);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
             }
         }
         return 63;

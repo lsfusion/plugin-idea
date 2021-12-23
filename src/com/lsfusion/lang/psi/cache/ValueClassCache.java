@@ -4,13 +4,12 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
-import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
 
 public class ValueClassCache extends PsiDependentCache<LSFPropDeclaration, LSFExClassSet> {
-    public static final PsiResolver<LSFPropDeclaration, LSFExClassSet> INFER_RESOLVER = new PsiResolver<LSFPropDeclaration, LSFExClassSet>() {
+    public static final PsiResolver<LSFPropDeclaration, LSFExClassSet> INFER_RESOLVER = new PsiResolver<>() {
         @Override
         public LSFExClassSet resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.resolveExValueClassNoCache(true);
@@ -22,7 +21,7 @@ public class ValueClassCache extends PsiDependentCache<LSFPropDeclaration, LSFEx
         }
     };
     
-    public static final PsiResolver<LSFPropDeclaration, LSFExClassSet> NO_INFER_RESOLVER = new PsiResolver<LSFPropDeclaration, LSFExClassSet>() {
+    public static final PsiResolver<LSFPropDeclaration, LSFExClassSet> NO_INFER_RESOLVER = new PsiResolver<>() {
         @Override
         public LSFExClassSet resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.resolveExValueClassNoCache(false);

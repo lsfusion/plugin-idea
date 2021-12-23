@@ -1,14 +1,13 @@
 package com.lsfusion.lang.psi.stubs.interfaces.types;
 
-import com.intellij.psi.stubs.*;
-import com.intellij.util.io.StringRef;
+import com.intellij.psi.stubs.IndexSink;
+import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.LSFExplicitClasses;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionOrPropStatement;
 import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfaceActionOrPropStubElement;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 

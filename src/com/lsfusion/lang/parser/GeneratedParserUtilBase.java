@@ -551,7 +551,7 @@ public class GeneratedParserUtilBase {
         public MyList<Variant> variants = new MyList<>(INITIAL_VARIANTS_SIZE);
         public MyList<Variant> unexpected = new MyList<>(INITIAL_VARIANTS_SIZE / 10);
 
-        final LimitedPool<Variant> VARIANTS = new LimitedPool<>(VARIANTS_POOL_SIZE, new LimitedPool.ObjectFactory<Variant>() {
+        final LimitedPool<Variant> VARIANTS = new LimitedPool<>(VARIANTS_POOL_SIZE, new LimitedPool.ObjectFactory<>() {
             @Override
             public Variant create() {
                 return new Variant();
@@ -561,7 +561,7 @@ public class GeneratedParserUtilBase {
             public void cleanup(final Variant o) {
             }
         });
-        final LimitedPool<Frame> FRAMES = new LimitedPool<>(FRAMES_POOL_SIZE, new LimitedPool.ObjectFactory<Frame>() {
+        final LimitedPool<Frame> FRAMES = new LimitedPool<>(FRAMES_POOL_SIZE, new LimitedPool.ObjectFactory<>() {
             @Override
             public Frame create() {
                 return new Frame();

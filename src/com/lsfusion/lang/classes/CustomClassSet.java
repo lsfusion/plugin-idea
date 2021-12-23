@@ -137,7 +137,7 @@ public class CustomClassSet implements LSFClassSet {
             if (isObject(declClass))
                 return true;
 
-        return recContainsAll(decl, new HashSet<LSFClassDeclaration>());
+        return recContainsAll(decl, new HashSet<>());
     }
 
     public boolean recContainsAll(LSFClassDeclaration decl, Set<LSFClassDeclaration> recursionGuard) {
@@ -344,7 +344,7 @@ public class CustomClassSet implements LSFClassSet {
         }
 
         List<LSFClassDeclaration> sortFirstFulls = new ArrayList<>(firstFulls);
-        Collections.sort(sortFirstFulls, new Comparator<LSFClassDeclaration>() {
+        sortFirstFulls.sort(new Comparator<>() {
             public int compare(LSFClassDeclaration o1, LSFClassDeclaration o2) {
                 int cnt1 = pathCounts.get(o1);
                 int cnt2 = pathCounts.get(o2);

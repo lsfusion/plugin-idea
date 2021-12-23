@@ -31,7 +31,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
         synchronized (propertyDeclarationsMap) {
             List<NavigationItem> decls = propertyDeclarationsMap.get(withParams);
             if (putIfIsEmpty && decls == null) {
-                decls = Collections.synchronizedList(new ArrayList<NavigationItem>());
+                decls = Collections.synchronizedList(new ArrayList<>());
                 propertyDeclarationsMap.put(withParams, decls);
             }
             return decls;

@@ -9,7 +9,6 @@ import com.intellij.openapi.module.JavaModuleType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainer;
 import com.intellij.openapi.roots.ui.configuration.projectRoot.LibrariesContainerFactory;
 import com.intellij.openapi.util.io.FileUtil;
@@ -40,7 +39,7 @@ public class LSFusionLibraryProjectTypeStep extends ModuleWizardStep {
             @Override
             public void update(@NotNull Module module, @NotNull ModifiableRootModel rootModel) {
                 if (libraryCompositionSettings != null) {
-                    libraryCompositionSettings.addLibraries(rootModel, new ArrayList<Library>(), librariesContainer);
+                    libraryCompositionSettings.addLibraries(rootModel, new ArrayList<>(), librariesContainer);
                 }
             }
         });

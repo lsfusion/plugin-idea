@@ -8,7 +8,6 @@ import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Set;
 
 public interface LSFActionOrPropDeclaration extends LSFDeclaration, LSFInterfacePropStatement {
 

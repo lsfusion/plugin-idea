@@ -3,7 +3,6 @@ package com.lsfusion.lang.psi.references;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.typeinfer.InferExResult;
-import com.lsfusion.lang.typeinfer.InferResult;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.Nullable;
 

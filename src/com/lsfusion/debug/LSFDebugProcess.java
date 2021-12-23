@@ -109,7 +109,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         if (scheduleRemoteMethod) {
             getJavaDebugProcess().getManagerThread().schedule(new SuspendContextCommandImpl(suspendContext) {
                 @Override
-                public void contextAction(@NotNull SuspendContextImpl suspendContext) throws Exception {
+                public void contextAction(@NotNull SuspendContextImpl suspendContext) {
                     invokeRemoteMethod(false, suspendContext);
                 }
             });
@@ -611,7 +611,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         private boolean enabled = false;
 
         @Override
-        public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) throws EventProcessingException {
+        public boolean processLocatableEvent(SuspendContextCommandImpl action, LocatableEvent event) {
             disable();
 
             SuspendContextImpl suspendContext = action.getSuspendContext();

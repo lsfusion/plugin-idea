@@ -7,13 +7,11 @@ import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFElementImpl;
 import com.lsfusion.lang.psi.LSFId;
-import com.lsfusion.lang.psi.LSFInterfacePropStatement;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.refactoring.ElementMigration;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 

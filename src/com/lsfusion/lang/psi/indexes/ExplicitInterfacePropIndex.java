@@ -1,9 +1,7 @@
 package com.lsfusion.lang.psi.indexes;
 
 import com.intellij.psi.stubs.StubIndexKey;
-import com.lsfusion.lang.psi.LSFInterfacePropStatement;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceProp;
-import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
 import org.jetbrains.annotations.NotNull;
 
 public class ExplicitInterfacePropIndex extends ExplicitInterfaceActionOrPropIndex<LSFExplicitInterfaceProp> {

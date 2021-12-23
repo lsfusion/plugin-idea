@@ -312,9 +312,7 @@ public class LibraryOptionsPanel {
                             }
                         }
                     } catch (Exception e) {
-                        ApplicationManager.getApplication().invokeAndWait(() -> {
-                            Messages.showErrorDialog(getProject(), getStackTrace(e), "Download lsFusion server failed");
-                        });
+                        ApplicationManager.getApplication().invokeAndWait(() -> Messages.showErrorDialog(getProject(), getStackTrace(e), "Download lsFusion server failed"));
                     }
                 }
             }

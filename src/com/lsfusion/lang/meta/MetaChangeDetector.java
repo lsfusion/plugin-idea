@@ -961,7 +961,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             public void run(final @NotNull ProgressIndicator indicator) {
                 reprocessing = true;
 
-                final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction(new Computable<Collection<String>>() {
+                final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction(new Computable<>() {
                     public Collection<String> compute() {
                         return ModuleIndex.getInstance().getAllKeys(myProject);
                     }
@@ -1090,7 +1090,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             public void run(final @NotNull ProgressIndicator indicator) {
                 reprocessing = true;
 
-                final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction(new Computable<Collection<String>>() {
+                final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction(new Computable<>() {
                     public Collection<String> compute() {
                         return ModuleIndex.getInstance().getAllKeys(myProject);
                     }

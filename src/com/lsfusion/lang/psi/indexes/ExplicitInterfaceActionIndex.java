@@ -2,7 +2,6 @@ package com.lsfusion.lang.psi.indexes;
 
 import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionStatement;
-import com.lsfusion.lang.psi.declarations.LSFImplicitInterfacePropStatement;
 import org.jetbrains.annotations.NotNull;
 
 public class ExplicitInterfaceActionIndex extends ExplicitInterfaceActionOrPropIndex<LSFExplicitInterfaceActionStatement> {

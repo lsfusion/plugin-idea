@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.lang.psi.LSFStubBasedPsiElement;

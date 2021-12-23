@@ -69,7 +69,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
             }
         };
         final List<LSFMetaCodeStatement> result = new ArrayList<>();
-        searchWordUsages(file.getProject(), name).forEach(new Processor<PsiReference>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
+        searchWordUsages(file.getProject(), name).forEach(new Processor<>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
             public boolean process(PsiReference ref) {
                 if (ref instanceof LSFMetaReference && ((LSFMetaReference) ref).isResolveToVirt(virtDecl))
                     synchronized (result) {

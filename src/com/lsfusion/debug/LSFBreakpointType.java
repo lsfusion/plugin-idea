@@ -35,7 +35,7 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
     
     private static final String NAME = "lsFusion Line Breakpoint";
 
-    private static Condition<PsiElement> inListAction = new Condition<PsiElement>() {
+    private static Condition<PsiElement> inListAction = new Condition<>() {
         @Override
         public boolean value(PsiElement psiElement) {
             return true;
@@ -69,7 +69,7 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
         final Document document = FileDocumentManager.getInstance().getDocument(file);
         if (document != null) {
             final Ref<Boolean> stoppable = Ref.create(false);
-            XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<PsiElement>() {
+            XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<>() {
                 @Override
                 public boolean process(PsiElement psiElement) {
                     if (psiElement instanceof PsiWhiteSpace || hasPropertyBreakpoint(psiElement) || hasClassBreakpoint(psiElement)) {

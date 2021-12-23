@@ -2,7 +2,6 @@ package com.lsfusion.lang.psi.indexes;
 
 import com.intellij.psi.stubs.StubIndexKey;
 import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 public class ActionIndex extends ActionOrPropIndex<LSFActionDeclaration> {

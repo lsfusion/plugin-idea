@@ -5,7 +5,6 @@ import com.intellij.execution.ui.CommonJavaParametersPanel;
 import com.intellij.execution.ui.ConfigurationModuleSelector;
 import com.intellij.execution.ui.DefaultJreSelector;
 import com.intellij.execution.ui.JrePathEditor;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LabeledComponent;
@@ -38,7 +37,7 @@ public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunCo
     }
 
     @Override
-    protected void applyEditorTo(LSFusionRunConfiguration configuration) throws ConfigurationException {
+    protected void applyEditorTo(LSFusionRunConfiguration configuration) {
         myCommonProgramParameters.applyTo(configuration);
         myModuleSelector.applyTo(configuration);
         configuration.ALTERNATIVE_JRE_PATH = myJREPanel.getJrePathOrName();

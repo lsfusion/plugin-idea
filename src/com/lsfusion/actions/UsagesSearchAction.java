@@ -148,7 +148,7 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
     }
 
     private ListPopupStep createListPopupStep(final PsiElement source, final AnActionEvent e, final Component component, List<String> alternatives) {
-        return new BaseListPopupStep<String>("Choose element type", alternatives.toArray(new String[0])) {
+        return new BaseListPopupStep<>("Choose element type", alternatives.toArray(new String[0])) {
             @NotNull
             @Override
             public String getTextFor(String item) {

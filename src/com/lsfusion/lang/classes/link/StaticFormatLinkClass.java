@@ -1,8 +1,6 @@
 package com.lsfusion.lang.classes.link;
 
 import com.lsfusion.lang.classes.DataClass;
-import com.lsfusion.lang.classes.RawClass;
-import com.lsfusion.lang.classes.StaticFormatFileClass;
 
 public abstract class StaticFormatLinkClass extends LinkClass {
 

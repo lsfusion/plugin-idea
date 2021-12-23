@@ -9,7 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class LSFActionPromoter implements ActionPromoter {
-    private static final Comparator<AnAction> ACTIONS_COMPARATOR = new Comparator<AnAction>() {
+    private static final Comparator<AnAction> ACTIONS_COMPARATOR = new Comparator<>() {
         @Override
         public int compare(AnAction o1, AnAction o2) {
             // UsagesSearchAction should be invoked before ShowUsagesAction and FindUsagesAction

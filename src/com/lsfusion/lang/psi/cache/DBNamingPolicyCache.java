@@ -8,7 +8,7 @@ import com.lsfusion.lang.psi.LSFFile;
 import org.jetbrains.annotations.NotNull;
 
 public class DBNamingPolicyCache extends PsiDependentCache<LSFFile, DBNamingPolicy> {
-    public static final PsiResolver<LSFFile, DBNamingPolicy> RESOLVER = new PsiResolver<LSFFile, DBNamingPolicy>() {
+    public static final PsiResolver<LSFFile, DBNamingPolicy> RESOLVER = new PsiResolver<>() {
         @Override
         public DBNamingPolicy resolve(@NotNull LSFFile declaration, boolean incompleteCode) {
             return DBNamingPolicy.getInstance(declaration);

@@ -1,7 +1,8 @@
 package com.lsfusion.lang.psi.stubs.interfaces.types;
 
-import com.intellij.psi.stubs.*;
-import com.lsfusion.lang.psi.LSFImplicitExplicitClasses;
+import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubIndexKey;
+import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
 import com.lsfusion.lang.psi.impl.LSFExplicitInterfacePropertyStatementImpl;
 import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
@@ -10,7 +11,6 @@ import com.lsfusion.lang.psi.stubs.interfaces.impl.ExplicitInterfacePropStubImpl
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Set;
 
 
 public class ExplicitInterfacePropStubElementType extends ExplicitInterfaceActionOrPropStubElementType<ExplicitInterfacePropStubElement, LSFExplicitInterfacePropStatement> {

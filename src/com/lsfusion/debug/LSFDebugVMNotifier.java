@@ -41,7 +41,6 @@ public class LSFDebugVMNotifier {
                         timerTask.cancel();
                     }
                 } catch (Throwable ignored) {
-                    ignored = ignored;
                 }
             }
         }, 0, 1000);
@@ -102,7 +101,6 @@ public class LSFDebugVMNotifier {
                         debuggerService.unregisterBreakpoint(module, line);
                     }
                 } catch (Throwable ignored) {
-                    ignored = ignored;
                 }
             }
         });

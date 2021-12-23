@@ -8,7 +8,7 @@ import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 public class TableNameCache extends PsiDependentCache<LSFGlobalPropDeclaration, String> {
-    public static final PsiResolver<LSFGlobalPropDeclaration, String> RESOLVER = new PsiResolver<LSFGlobalPropDeclaration, String>() {
+    public static final PsiResolver<LSFGlobalPropDeclaration, String> RESOLVER = new PsiResolver<>() {
         @Override
         public String resolve(@NotNull LSFGlobalPropDeclaration globalProp, boolean incompleteCode) {
             return globalProp.getTableNameNoCache();

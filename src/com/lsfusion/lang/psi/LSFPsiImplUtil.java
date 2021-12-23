@@ -15,6 +15,7 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
+import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
 import com.lsfusion.lang.psi.impl.LSFCollapseGroupObjectActionPropertyDefinitionBodyImpl;
 import com.lsfusion.lang.psi.impl.LSFExpandGroupObjectActionPropertyDefinitionBodyImpl;
@@ -365,7 +366,7 @@ public class LSFPsiImplUtil {
 
     public static ContextModifier getContextModifier(@NotNull LSFContextFiltersClause sourceStatement) {
         FormContext formContext = PsiTreeUtil.getParentOfType(sourceStatement, FormContext.class);
-        Set<LSFObjectDeclaration> objects = formContext != null ? LSFFormExtendImpl.processFormContext(formContext, formExtend -> formExtend.getObjectDecls(), formContext.getTextOffset(), LSFLocalSearchScope.createFrom(sourceStatement), true, false) : null;
+        Set<LSFObjectDeclaration> objects = formContext != null ? LSFFormExtendImpl.processFormContext(formContext, LSFFormExtend::getObjectDecls, formContext.getTextOffset(), LSFLocalSearchScope.createFrom(sourceStatement), true, false) : null;
 
         return (offset, currentParams) -> objects != null ? new ArrayList<>(objects) : new ArrayList<>();
     }
@@ -1056,7 +1057,7 @@ public class LSFPsiImplUtil {
         if (uintLiteral != null) {
             LSFClassSet classSet = LSFExClassSet.fromEx(valueClass);
             if (classSet instanceof ConcatenateClassSet)
-                return LSFExClassSet.checkNull(((ConcatenateClassSet) classSet).getSet(Integer.valueOf(uintLiteral.getText()) - 1), valueClass.orAny);
+                return LSFExClassSet.checkNull(((ConcatenateClassSet) classSet).getSet(Integer.parseInt(uintLiteral.getText()) - 1), valueClass.orAny);
             return null;
         }
         
@@ -2413,7 +2414,7 @@ public class LSFPsiImplUtil {
                     Matcher matcher = pattern.matcher(code);
                     while (matcher.find()) {
                         String group = matcher.group();
-                        int paramIndex = Integer.valueOf(group.substring(1));
+                        int paramIndex = Integer.parseInt(group.substring(1));
                         params.get(literal).add(paramIndex);
                     }
                 }
@@ -2611,7 +2612,7 @@ public class LSFPsiImplUtil {
     // по идее должен вызываться если подразумевается отсутствие внешнего контекста
     @NotNull
     public static List<LSFExprParamDeclaration> resolveParams(@NotNull LSFPropertyExpression sourceStatement) {
-        return new ExprsContextModifier(sourceStatement).resolveParams(Integer.MAX_VALUE, new HashSet<LSFExprParamDeclaration>());
+        return new ExprsContextModifier(sourceStatement).resolveParams(Integer.MAX_VALUE, new HashSet<>());
     }
 
     @NotNull
@@ -3196,7 +3197,7 @@ public class LSFPsiImplUtil {
         LSFUintLiteral uintLiteral = sourceStatement.getUintLiteral();
         if (uintLiteral != null) {
             if (valueClass != null && valueClass.classSet instanceof ConcatenateClassSet)
-                valueClass = LSFExClassSet.checkNull(((ConcatenateClassSet) valueClass.classSet).getSet(Integer.valueOf(uintLiteral.getText()) - 1), valueClass.orAny);
+                valueClass = LSFExClassSet.checkNull(((ConcatenateClassSet) valueClass.classSet).getSet(Integer.parseInt(uintLiteral.getText()) - 1), valueClass.orAny);
             else
                 valueClass = null;
         }

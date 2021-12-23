@@ -5,14 +5,12 @@ import com.intellij.openapi.util.Condition;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.refactoring.ElementMigration;
 import com.lsfusion.refactoring.PropertyDrawMigration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Collection;
 import java.util.List;
 
 public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDeclarationImpl<LSFPropertyDrawDeclaration> implements LSFPropertyDrawDeclaration {

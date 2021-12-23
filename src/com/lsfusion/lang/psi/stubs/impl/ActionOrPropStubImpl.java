@@ -4,10 +4,8 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
-import com.intellij.util.io.StringRef;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
-import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 
 import java.io.IOException;
 

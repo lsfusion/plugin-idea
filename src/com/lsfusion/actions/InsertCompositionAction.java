@@ -106,7 +106,7 @@ public class InsertCompositionAction extends AnAction {
             } else if (isFastAction() || expressions.size() == 1) {
                 selectedExpression = expressions.get(0);
             } else {
-                Pass<LSFExpression> selectionHandler = new Pass<LSFExpression>() {
+                Pass<LSFExpression> selectionHandler = new Pass<>() {
                     public void pass(final LSFExpression selectedExpr) {
                         invokeImpl(file, project, editor, fileEditor, selectedExpr);
                     }

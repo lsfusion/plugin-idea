@@ -3,7 +3,6 @@ package com.lsfusion.design.model.entity;
 import com.lsfusion.design.KeyStrokes;
 
 import javax.swing.*;
-import java.util.List;
 import java.util.Set;
 
 public class RegularFilterEntity {

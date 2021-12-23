@@ -203,7 +203,7 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
     }
 
     public static Integer getPropComplexity(LSFPropDeclaration prop) {
-        return getPropComplexity(prop, new HashSet<LSFPropDeclaration>());
+        return getPropComplexity(prop, new HashSet<>());
     }
     
     private static Integer getPropComplexity(LSFPropDeclaration prop, Set<LSFPropDeclaration> processed) {

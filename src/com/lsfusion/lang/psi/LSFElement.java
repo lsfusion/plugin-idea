@@ -1,7 +1,6 @@
 package com.lsfusion.lang.psi;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
 
 public interface LSFElement extends PsiElement {
 

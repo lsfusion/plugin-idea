@@ -128,7 +128,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
     private class UsageTypeComparator implements Comparator<NodeDescriptor<?>> {
         private boolean withAlpha;
 
-        private final List<Class> classOrder = new ArrayList<Class>(Arrays.asList(LSFClassDeclaration.class, LSFExplicitInterfacePropertyStatement.class, LSFExplicitInterfaceActionStatement.class,
+        private final List<Class> classOrder = new ArrayList<>(Arrays.asList(LSFClassDeclaration.class, LSFExplicitInterfacePropertyStatement.class, LSFExplicitInterfaceActionStatement.class,
                 LSFOverridePropertyStatement.class, LSFOverrideActionStatement.class, LSFEventStatement.class, LSFGlobalEventStatement.class, LSFFollowsStatement.class,
                 LSFWriteWhenStatement.class, LSFAspectStatement.class, LSFShowDepStatement.class, LSFConstraintStatement.class,
                 LSFFormStatement.class, LSFDesignStatement.class, LSFNavigatorStatement.class, LSFTableStatement.class,

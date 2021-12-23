@@ -99,7 +99,7 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
                 } else if (files.size() == 1) {
                     files.get(0).navigate(true);
                 } else {
-                    Collections.sort(files, PsiFileByPathComparator.INSTANCE);
+                    files.sort(PsiFileByPathComparator.INSTANCE);
 
                     JBPopupFactory
                             .getInstance()
@@ -116,7 +116,7 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
         }
 
         private ListPopupStep createListPopupStep(final List<PsiFile> files) {
-            return new BaseListPopupStep<PsiFile>("Choose .jrxml file to navigate to...", files) {
+            return new BaseListPopupStep<>("Choose .jrxml file to navigate to...", files) {
                 @NotNull
                 @Override
                 public String getTextFor(PsiFile file) {

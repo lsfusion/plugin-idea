@@ -34,7 +34,7 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
         final LSFSimpleName alias = aliasUsage == null ? null : aliasUsage.getSimpleName();
         
         //usage через mapping
-        return new Condition<LSFPropertyDrawDeclaration>() {
+        return new Condition<>() {
             public boolean value(LSFPropertyDrawDeclaration decl) {
                 LSFSimpleName declAlias = decl.getSimpleName();
                 if (alias != null || declAlias != null) {
@@ -56,7 +56,7 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
                 if(objectUsageList == null)
                     return false;
 
-                return refName != null && declName != null && refName.equals(declName) &&
+                return refName != null && refName.equals(declName) &&
                        resolveEquals(getObjectUsageList(), objectUsageList);
             }
         };

@@ -52,7 +52,7 @@ public class LSFDebuggerEditorsProvider extends JavaDebuggerEditorsProvider {
 
         PsiDocumentManager.getInstance(project).commitDocument(document);
         PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
-        if (psiFile != null && psiFile instanceof LSFFile) {
+        if (psiFile instanceof LSFFile) {
             return new XExpressionImpl(psiFile.getText(), language, ((JavaCodeFragment)psiFile).importsToString(), mode);
         }
         return XDebuggerUtil.getInstance().createExpression(document.getText(), language, null, mode);

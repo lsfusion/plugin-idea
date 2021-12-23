@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MetaSubstitutor {
-    public final static MetaSubstitutor EMPTY = new MetaSubstitutor(new ArrayList<String>(), new ArrayList<String>());
+    public final static MetaSubstitutor EMPTY = new MetaSubstitutor(new ArrayList<>(), new ArrayList<>());
 
     private final Map<String, String> map = new HashMap<>();
     public MetaSubstitutor(List<String> from, List<String> to) {

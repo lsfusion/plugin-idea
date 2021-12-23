@@ -1,8 +1,6 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.psi.LSFStubElement;

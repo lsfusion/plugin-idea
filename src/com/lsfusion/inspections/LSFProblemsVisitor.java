@@ -14,12 +14,15 @@ import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.*;
-import com.lsfusion.lang.psi.impl.*;
+import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.psi.impl.LSFLocalDataPropertyDefinitionImpl;
+import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
+import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LSFProblemsVisitor {
@@ -58,7 +61,7 @@ public class LSFProblemsVisitor {
     }
 
     private static boolean hasShortCut(LSFDeclaration objectDecl) {
-        if(objectDecl != null && objectDecl instanceof LSFPropertyStatementImpl) {
+        if(objectDecl instanceof LSFPropertyStatementImpl) {
             LSFNonEmptyPropertyOptions propertyOptions = ((LSFPropertyStatementImpl) objectDecl).getNonEmptyPropertyOptions();
             if(propertyOptions != null) {
                 for(LSFAsEditActionSetting editAction : propertyOptions.getAsEditActionSettingList()) {

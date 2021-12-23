@@ -2,13 +2,9 @@ package com.lsfusion.lang.psi.stubs.types;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFStatementGlobalPropDeclaration;
-import com.lsfusion.lang.psi.impl.LSFAggrParamPropDeclareImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
-import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.StatementPropStubElement;
-import com.lsfusion.lang.psi.stubs.impl.PropStubImpl;
 import com.lsfusion.lang.psi.stubs.impl.StatementPropStubImpl;
 import org.jetbrains.annotations.NotNull;
 

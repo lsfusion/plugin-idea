@@ -31,7 +31,7 @@ public class LSFClassChangeBreakpointType extends XLineBreakpointTypeBase implem
 
     private static final String NAME = "lsFusion Class Change Breakpoint";
 
-    private static Condition<PsiElement> isInClassDeclaration = new Condition<PsiElement>() {
+    private static Condition<PsiElement> isInClassDeclaration = new Condition<>() {
         @Override
         public boolean value(PsiElement psiElement) {
             return psiElement instanceof LSFClassDeclaration;
@@ -54,7 +54,7 @@ public class LSFClassChangeBreakpointType extends XLineBreakpointTypeBase implem
             final Document document = FileDocumentManager.getInstance().getDocument(file);
             if (document != null) {
                 final Ref<Boolean> stoppable = Ref.create(false);
-                XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<PsiElement>() {
+                XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<>() {
                     @Override
                     public boolean process(PsiElement psiElement) {
                         if (psiElement instanceof PsiWhiteSpace) {

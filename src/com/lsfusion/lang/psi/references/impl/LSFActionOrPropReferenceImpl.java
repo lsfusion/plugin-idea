@@ -29,7 +29,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
     }
 
     protected Finalizer<T> getNoConditionFinalizer(List<LSFClassSet> usageClasses) {
-        return new Finalizer<T>() {
+        return new Finalizer<>() {
             public Collection<T> finalize(Collection<T> decls) {
                 Map<T, Integer> declMap = new HashMap<>();
 
@@ -111,7 +111,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
 
         final List<LSFClassSet> fDirectClasses = directClasses;
         final boolean isImplement = isImplement();
-        return new Condition<T>() {
+        return new Condition<>() {
             public boolean value(T decl) {
                 if(isImplement && !decl.isAbstract())
                     return false;
@@ -127,7 +127,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         assert canBeUsedInDirect(); // потому как иначе direct бы подошел  
         final boolean isImplement = isImplement();
 
-        return new Condition<T>() {
+        return new Condition<>() {
             public boolean value(T decl) {
                 if(isImplement && !decl.isAbstract())
                     return false;
@@ -150,7 +150,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         final boolean isNotEquals = onlyNotEquals || (isImplement() && explicitClasses == null);
 
         final List<LSFClassSet> fDirectClasses = directClasses;
-        return new Finalizer<T>() {
+        return new Finalizer<>() {
             public Collection<T> finalize(Collection<T> decls) {
 
                 Map<T, List<LSFClassSet>> mapClasses = new HashMap<>();
@@ -184,8 +184,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
                                     break;
                                 }
                             }
-                        if (!found)
-                            result.add(decl);
+                        if (!found) result.add(decl);
                     }
 
                     return result;
@@ -330,7 +329,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         ASTNode node = getExplicitPropClassUsage().getNode();
 
         if(transaction != null)
-            transaction.regChange(new ArrayList<ASTNode>(), node, MetaTransaction.Type.REPLACE);
+            transaction.regChange(new ArrayList<>(), node, MetaTransaction.Type.REPLACE);
 
         deleteChildInternal(node);
     }
@@ -340,7 +339,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         if(transaction!=null) {
             assert getFullNameRef() != null;
             ASTNode namespaceNode = getCompoundID().getNamespaceUsage().getNode();
-            transaction.regChange(new ArrayList<ASTNode>(), namespaceNode, 1, MetaTransaction.Type.REPLACE);
+            transaction.regChange(new ArrayList<>(), namespaceNode, 1, MetaTransaction.Type.REPLACE);
         }
         LSFCompoundID compoundIDFromText = LSFElementGenerator.createCompoundIDFromText(getProject(), getNameRef());
         getCompoundID().replace(compoundIDFromText);

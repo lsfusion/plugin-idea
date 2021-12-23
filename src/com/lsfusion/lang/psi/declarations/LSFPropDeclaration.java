@@ -2,7 +2,6 @@ package com.lsfusion.lang.psi.declarations;
 
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.cache.ValueClassCache;
-import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
 import com.lsfusion.lang.psi.declarations.impl.LSFStatementGlobalPropDeclarationImpl;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.Nullable;

@@ -34,7 +34,7 @@ public class LSFPropertyBreakpointType  extends XLineBreakpointTypeBase implemen
 
     private static final String NAME = "lsFusion Property Breakpoint";
 
-    private static Condition<PsiElement> isInPropDeclaration = new Condition<PsiElement>() {
+    private static Condition<PsiElement> isInPropDeclaration = new Condition<>() {
         @Override
         public boolean value(PsiElement psiElement) {
             return psiElement instanceof LSFLocalDataPropertyDefinition || psiElement instanceof LSFDataPropertyDefinition;
@@ -95,7 +95,7 @@ public class LSFPropertyBreakpointType  extends XLineBreakpointTypeBase implemen
         final Document document = FileDocumentManager.getInstance().getDocument(file);
         if (document != null) {
             final Ref<Boolean> stoppable = Ref.create(false);
-            XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<PsiElement>() {
+            XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<>() {
                 @Override
                 public boolean process(PsiElement psiElement) {
                     if (psiElement instanceof PsiWhiteSpace) {

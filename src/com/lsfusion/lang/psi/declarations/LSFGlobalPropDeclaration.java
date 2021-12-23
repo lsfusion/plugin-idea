@@ -34,7 +34,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
     Collection<FullNameStubElementType> getTypes();
     
     default Condition<LSFGlobalPropDeclaration> getFindDuplicateColumnsCondition() {
-        return new Condition<LSFGlobalPropDeclaration>() {
+        return new Condition<>() {
             @Override
             public boolean value(LSFGlobalPropDeclaration decl) {
                 String tableName = getTableName();

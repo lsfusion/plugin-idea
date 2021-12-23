@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi;
 
-import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;

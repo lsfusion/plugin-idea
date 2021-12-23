@@ -58,7 +58,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
 
         LSFValueClass currentClass = valueClass;
         if (currentClass == null && editor != null) {
-            PsiElement targetElement = DumbService.getInstance(editor.getProject()).runReadActionInSmartMode(new Computable<PsiElement>() {
+            PsiElement targetElement = DumbService.getInstance(editor.getProject()).runReadActionInSmartMode(new Computable<>() {
                 @Override
                 public PsiElement compute() {
                     return TargetElementUtil.findTargetElement(editor, ImplementationSearcher.getFlags());

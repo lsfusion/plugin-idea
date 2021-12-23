@@ -96,8 +96,7 @@ public class BaseUtils {
 
     public static <K> List<K> toList(K... els) {
         List<K> result = new ArrayList<>();
-        for(K el : els)
-            result.add(el);
+        Collections.addAll(result, els);
         return result;
     }
 
@@ -292,6 +291,6 @@ public class BaseUtils {
     public static boolean nullEquals(Object obj1, Object obj2) {
         if (obj1 == null)
             return obj2 == null;
-        return obj2 != null && obj1.equals(obj2);
+        return obj1.equals(obj2);
     }
 }

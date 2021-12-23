@@ -8,11 +8,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.XmlElementVisitor;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.xml.*;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFLanguage;
-import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

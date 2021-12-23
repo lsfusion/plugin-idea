@@ -37,7 +37,6 @@ import com.intellij.xdebugger.impl.XSourcePositionImpl;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.sun.jdi.Location;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.request.ClassPrepareRequest;
@@ -131,7 +130,7 @@ public class LSFPositionManager extends PositionManagerEx {
     public List<ReferenceType> getAllClasses(@NotNull SourcePosition position) throws NoDataException {
         final PsiFile psiFile = position.getFile();
         if (psiFile instanceof LSFFile) {
-            return ApplicationManager.getApplication().runReadAction(new Computable<List<ReferenceType>>() {
+            return ApplicationManager.getApplication().runReadAction(new Computable<>() {
                 @Override
                 public List<ReferenceType> compute() {
                     LSFFile lsfFile = (LSFFile) psiFile;
@@ -148,7 +147,7 @@ public class LSFPositionManager extends PositionManagerEx {
     public ClassPrepareRequest createPrepareRequest(@NotNull final ClassPrepareRequestor requestor, @NotNull SourcePosition position) throws NoDataException {
         final PsiFile psiFile = position.getFile();
         if (psiFile instanceof LSFFile) {
-            return ApplicationManager.getApplication().runReadAction(new Computable<ClassPrepareRequest>() {
+            return ApplicationManager.getApplication().runReadAction(new Computable<>() {
                 @Override
                 public ClassPrepareRequest compute() {
                     LSFFile lsfFile = (LSFFile) psiFile;
@@ -163,7 +162,7 @@ public class LSFPositionManager extends PositionManagerEx {
     @Nullable
     @Override
     public XStackFrame createStackFrame(@NotNull StackFrameProxyImpl frame, @NotNull DebugProcessImpl debugProcess, @NotNull final Location location) {
-        final SourcePosition position = ApplicationManager.getApplication().runReadAction(new Computable<SourcePosition>() {
+        final SourcePosition position = ApplicationManager.getApplication().runReadAction(new Computable<>() {
             @Override
             public SourcePosition compute() {
                 try {
@@ -175,7 +174,7 @@ public class LSFPositionManager extends PositionManagerEx {
         });
         
         if (position != null) {
-            XSourcePositionImpl xpos = ApplicationManager.getApplication().runReadAction(new Computable<XSourcePositionImpl>() {
+            XSourcePositionImpl xpos = ApplicationManager.getApplication().runReadAction(new Computable<>() {
                 @Override
                 public XSourcePositionImpl compute() {
                     return XSourcePositionImpl.createByOffset(position.getFile().getVirtualFile(), position.getOffset());

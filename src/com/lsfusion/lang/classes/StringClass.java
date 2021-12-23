@@ -2,8 +2,6 @@ package com.lsfusion.lang.classes;
 
 import com.lsfusion.util.BaseUtils;
 
-import java.awt.*;
-
 import static java.lang.Math.pow;
 import static java.lang.Math.round;
 

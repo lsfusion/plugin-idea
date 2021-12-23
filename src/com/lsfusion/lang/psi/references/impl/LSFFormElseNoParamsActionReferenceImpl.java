@@ -31,7 +31,7 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
 
     protected Condition<LSFActionDeclaration> getActionCondition() {
         final List<LSFClassSet> fDirectClasses = new ArrayList<>();
-        return new Condition<LSFActionDeclaration>() {
+        return new Condition<>() {
             public boolean value(LSFActionDeclaration decl) {
                 List<LSFClassSet> declClasses = decl.resolveParamClasses();
                 return declClasses == null || (declClasses.size() == fDirectClasses.size() && LSFPsiImplUtil.containsAll(declClasses, fDirectClasses, false));

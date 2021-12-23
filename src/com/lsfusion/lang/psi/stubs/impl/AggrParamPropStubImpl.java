@@ -8,7 +8,6 @@ import com.lsfusion.lang.psi.LSFExplicitClasses;
 import com.lsfusion.lang.psi.LSFImplicitExplicitClasses;
 import com.lsfusion.lang.psi.declarations.LSFAggrParamGlobalPropDeclaration;
 import com.lsfusion.lang.psi.stubs.AggrParamPropStubElement;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;

@@ -24,7 +24,7 @@ public class ModuleDependentsCache extends PsiDependentCache<LSFModuleDeclaratio
         return ServiceManager.getService(project, ModuleDependentsCache.class);
     }
 
-    public static final PsiResolver<LSFModuleDeclaration, Set<LSFModuleDeclaration>> RESOLVER = new PsiResolver<LSFModuleDeclaration, Set<LSFModuleDeclaration>>() {
+    public static final PsiResolver<LSFModuleDeclaration, Set<LSFModuleDeclaration>> RESOLVER = new PsiResolver<>() {
         @Override
         public Set<LSFModuleDeclaration> resolve(@NotNull LSFModuleDeclaration declaration, boolean incompleteCode) {
             LSFId nameIdentifier = declaration.getNameIdentifier();

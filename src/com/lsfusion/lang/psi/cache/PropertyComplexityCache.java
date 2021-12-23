@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PropertyComplexityCache extends PsiDependentCache<LSFPropDeclaration, Integer> {
-    public static final PsiResolver<LSFPropDeclaration, Integer> RESOLVER = new PsiResolver<LSFPropDeclaration, Integer>() {
+    public static final PsiResolver<LSFPropDeclaration, Integer> RESOLVER = new PsiResolver<>() {
         @Override
         public Integer resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.getComplexity();

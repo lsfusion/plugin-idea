@@ -13,9 +13,7 @@ import com.lsfusion.lang.psi.cache.PropertyDependenciesCache;
 import com.lsfusion.lang.psi.cache.PropertyDependentsCache;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
-import com.lsfusion.lang.psi.references.LSFPropReference;
 
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;

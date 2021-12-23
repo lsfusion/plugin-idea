@@ -1,7 +1,6 @@
 package com.lsfusion.lang.typeinfer;
 
 import com.intellij.codeInsight.intention.IntentionAction;
-import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;

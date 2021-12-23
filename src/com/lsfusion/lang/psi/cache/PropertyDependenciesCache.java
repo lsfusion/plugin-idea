@@ -5,15 +5,13 @@ import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
 public class PropertyDependenciesCache extends PsiDependentCache<LSFActionOrGlobalPropDeclaration, Set<LSFActionOrGlobalPropDeclaration>> {
-    public static final PsiResolver<LSFActionOrGlobalPropDeclaration, Set<LSFActionOrGlobalPropDeclaration>> RESOLVER = new PsiResolver<LSFActionOrGlobalPropDeclaration, Set<LSFActionOrGlobalPropDeclaration>>() {
+    public static final PsiResolver<LSFActionOrGlobalPropDeclaration, Set<LSFActionOrGlobalPropDeclaration>> RESOLVER = new PsiResolver<>() {
         @Override
         public Set<LSFActionOrGlobalPropDeclaration> resolve(@NotNull LSFActionOrGlobalPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.getDependencies();

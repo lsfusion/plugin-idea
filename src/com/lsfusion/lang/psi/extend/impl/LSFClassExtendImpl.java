@@ -1,22 +1,19 @@
 package com.lsfusion.lang.psi.extend.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.context.FormContext;
-import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
-import com.lsfusion.lang.psi.extend.LSFDesign;
-import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
-import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendClassStubElementType;
-import com.lsfusion.lang.psi.stubs.extend.types.ExtendFormStubElementType;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -24,7 +21,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, ExtendClassStubElement> implements LSFClassExtend {
@@ -177,9 +177,7 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         LSFStaticObjectDeclList listDecl = getStaticObjectDeclList();
         List<LSFStaticObjectDeclaration> result = new ArrayList<>();
         if (listDecl != null && listDecl.getNonEmptyStaticObjectDeclList() != null) {
-            for (LSFStaticObjectDecl decl : listDecl.getNonEmptyStaticObjectDeclList().getStaticObjectDeclList()) {
-                result.add(decl);
-            }
+            result.addAll(listDecl.getNonEmptyStaticObjectDeclList().getStaticObjectDeclList());
         }
         return result;
     }

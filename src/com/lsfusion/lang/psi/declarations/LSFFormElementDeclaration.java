@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.declarations;
 
-import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.declarations.impl.LSFFormExtendElement;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import org.jetbrains.annotations.NotNull;

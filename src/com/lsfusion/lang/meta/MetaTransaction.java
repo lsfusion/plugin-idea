@@ -480,7 +480,7 @@ public class MetaTransaction {
                         List<String> newTokenTexts = MetaChangeDetector.getNewTokens(texts, usageParams, declParams, oldTokens);
                         List<InToken> newTokens = new ArrayList<>();
                         for(String newtTokenText : newTokenTexts)
-                            newTokens.add(new InToken(newtTokenText, 1));                            
+                            newTokens.add(new InToken(newtTokenText, 1));
 
                         List<Collection<List<ExtToken>>> oldColTokens = new ArrayList<>();
                         for(ExtToken oldToken : oldTokens)

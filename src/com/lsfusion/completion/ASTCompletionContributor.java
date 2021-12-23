@@ -79,18 +79,18 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "WORDLINK", "IMAGELINK", "PDFLINK", "DBFLINK", "RAWLINK", "LINK", "EXCELLINK",
                                                                  "TEXTLINK", "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK", "TABLELINK",
                                                                  "BOOLEAN", "TBOOLEAN", "COLOR"};
-    
-    private static final Set<String> DESIGN_PROPERTIES = new LinkedHashSet<String>() {
-    {
-        for (Class<? extends ViewProxy> aClass : ViewProxyFactory.PROXY_CLASSES.values()) {
-            for (Method method : aClass.getDeclaredMethods()) {
-                if (method.getName().startsWith("set")) {
-                    add(Character.toLowerCase(method.getName().charAt(3)) + method.getName().substring(4));
+
+    private static final Set<String> DESIGN_PROPERTIES = new LinkedHashSet<>() {
+        {
+            for (Class<? extends ViewProxy> aClass : ViewProxyFactory.PROXY_CLASSES.values()) {
+                for (Method method : aClass.getDeclaredMethods()) {
+                    if (method.getName().startsWith("set")) {
+                        add(Character.toLowerCase(method.getName().charAt(3)) + method.getName().substring(4));
+                    }
                 }
             }
-        }   
-    }
-};
+        }
+    };
 
     public static boolean validDesignProperty(String designProperty) {
         return DESIGN_PROPERTIES.contains(designProperty);
@@ -117,7 +117,7 @@ public class ASTCompletionContributor extends CompletionContributor {
     }
 
     private void addCompletionProvider(final CompletionType completionType) {
-        extend(completionType, psiElement().inFile(PlatformPatterns.instanceOf(LSFFile.class)), new CompletionProvider<CompletionParameters>() {
+        extend(completionType, psiElement().inFile(PlatformPatterns.instanceOf(LSFFile.class)), new CompletionProvider<>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
                 if (CompletionUtils.isCompletionEnabled(parameters.getOriginalFile().getProject()) && 

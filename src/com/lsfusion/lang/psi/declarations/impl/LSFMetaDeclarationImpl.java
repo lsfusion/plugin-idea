@@ -5,12 +5,9 @@ import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.impl.source.tree.ForeignLeafPsiElement;
 import com.intellij.psi.impl.source.tree.LeafElement;
-import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.util.Consumer;
 import com.intellij.util.Processor;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFParserDefinition;
@@ -180,7 +177,7 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
             return Conditions.alwaysFalse();
         }
         final int paramCount = metaDeclIdList.getMetaDeclIdList().size();
-        return new Condition<LSFMetaDeclaration>() {
+        return new Condition<>() {
             public boolean value(LSFMetaDeclaration decl) {
                 return decl.getParamCount() == paramCount;
             }

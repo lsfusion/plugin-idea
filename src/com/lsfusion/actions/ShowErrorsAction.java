@@ -249,7 +249,7 @@ public class ShowErrorsAction extends AnAction {
                     includeLSFFiles = includeLSFFilesBox.isSelected();
                 }
             });
-            includeLSFFiles = Boolean.valueOf(propertiesComponent.getValue(INCLUDE_LSF_FILES));
+            includeLSFFiles = Boolean.parseBoolean(propertiesComponent.getValue(INCLUDE_LSF_FILES));
             includeLSFFilesBox.setSelected(includeLSFFiles);
             boxesPanel.add(includeLSFFilesBox);
 
@@ -260,7 +260,7 @@ public class ShowErrorsAction extends AnAction {
                     includeJavaFiles = includeJavaFilesBox.isSelected();
                 }
             });
-            includeJavaFiles = Boolean.valueOf(propertiesComponent.getValue(INCLUDE_JAVA_FILES));
+            includeJavaFiles = Boolean.parseBoolean(propertiesComponent.getValue(INCLUDE_JAVA_FILES));
             includeJavaFilesBox.setSelected(includeJavaFiles);
             boxesPanel.add(includeJavaFilesBox);
 
@@ -271,7 +271,7 @@ public class ShowErrorsAction extends AnAction {
                     includeJrxmlFiles = includeJrxmlFilesBox.isSelected();
                 }
             });
-            includeJrxmlFiles = Boolean.valueOf(propertiesComponent.getValue(INCLUDE_JRXML_FILES));
+            includeJrxmlFiles = Boolean.parseBoolean(propertiesComponent.getValue(INCLUDE_JRXML_FILES));
             includeJrxmlFilesBox.setSelected(includeJrxmlFiles);
             boxesPanel.add(includeJrxmlFilesBox);
 

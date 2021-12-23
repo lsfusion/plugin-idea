@@ -57,7 +57,7 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
                     }
                 }, true, true));
         }
-        Collections.sort(children, Sorter.ALPHA_SORTER.getComparator());
+        children.sort(Sorter.ALPHA_SORTER.getComparator());
         return children;
     }
 

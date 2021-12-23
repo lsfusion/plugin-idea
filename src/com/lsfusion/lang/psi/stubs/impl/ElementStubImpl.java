@@ -1,10 +1,8 @@
 package com.lsfusion.lang.psi.stubs.impl;
 
 import com.intellij.psi.stubs.*;
-import com.intellij.util.io.StringRef;
-import com.lsfusion.lang.LSFReferenceAnnotator;
-import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.stubs.GlobalStubElement;
+import com.lsfusion.lang.psi.LSFStubElement;
+import com.lsfusion.lang.psi.LSFStubbedElement;
 
 import java.io.IOException;
 

@@ -2,12 +2,9 @@ package com.lsfusion.lang.psi.indexes;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndex;
-import com.lsfusion.lang.psi.LSFElement;
-import com.lsfusion.lang.psi.LSFStubElement;
 import com.lsfusion.lang.psi.LSFStubbedElement;
 
 import java.util.Collection;

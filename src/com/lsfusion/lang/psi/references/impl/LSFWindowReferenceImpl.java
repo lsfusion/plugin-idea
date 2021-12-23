@@ -2,8 +2,6 @@ package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.lsfusion.lang.LSFElementGenerator;
-import com.lsfusion.lang.psi.LSFGlobalResolver;
-import com.lsfusion.lang.psi.LSFResolveResult;
 import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import com.lsfusion.lang.psi.references.LSFWindowReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -12,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class LSFWindowReferenceImpl extends LSFFullNameReferenceImpl<LSFWindowDeclaration, LSFWindowDeclaration> implements LSFWindowReference {

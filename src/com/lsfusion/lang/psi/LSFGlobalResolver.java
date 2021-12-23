@@ -6,7 +6,6 @@ import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.*;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
@@ -18,7 +17,6 @@ import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.indexes.*;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
-import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
@@ -38,7 +36,7 @@ public class LSFGlobalResolver {
     // пока попробуем автоматический
     public static Set<VirtualFile> getRequireModules(LSFModuleDeclaration declaration) {
 //        return getCachedRequireModules(declaration);
-        return getManualCachedRequireModules(declaration, new HashSet<VirtualFile>());
+        return getManualCachedRequireModules(declaration, new HashSet<>());
     }
     private static Set<VirtualFile> getCachedRequireModules(LSFModuleDeclaration declaration) {
         String name = declaration.getGlobalName();

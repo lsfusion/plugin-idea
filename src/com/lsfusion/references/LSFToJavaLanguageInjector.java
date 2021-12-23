@@ -541,7 +541,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
             final List<PsiClass> result = new ArrayList<>();
             result.add(clazz);
-            ClassImplementationsSearch.processImplementations(clazz, new Processor<PsiElement>() {
+            ClassImplementationsSearch.processImplementations(clazz, new Processor<>() {
                 public boolean process(PsiElement psiElement) {
                     if (psiElement instanceof PsiClass)
                         result.add((PsiClass) psiElement);

@@ -1,27 +1,21 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.cache.ValueClassCache;
 import com.lsfusion.lang.psi.context.ModifyParamContext;
-import com.lsfusion.lang.psi.declarations.*;
-import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFAggrParamGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.stubs.AggrParamPropStubElement;
-import com.lsfusion.lang.psi.stubs.PropStubElement;
-import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfacePropStubElement;
-import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;

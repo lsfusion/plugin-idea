@@ -1,26 +1,19 @@
 package com.lsfusion.dependencies;
 
 
-import java.awt.Color;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.net.URL;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
-
+import com.jgraph.io.svg.SVGGraphWriter;
+import com.jgraph.io.svg.SVGVertexRenderer;
 import org.jgraph.JGraph;
 import org.jgraph.graph.CellView;
 import org.jgraph.graph.VertexRenderer;
 import org.jgraph.graph.VertexView;
 
-import com.jgraph.io.svg.SVGGraphWriter;
-import com.jgraph.io.svg.SVGVertexRenderer;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 public class SVGExporter {
 

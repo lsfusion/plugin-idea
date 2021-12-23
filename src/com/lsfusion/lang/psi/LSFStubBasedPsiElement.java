@@ -2,11 +2,9 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
-import com.lsfusion.lang.psi.stubs.GlobalStubElement;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class LSFStubBasedPsiElement<This extends LSFStubbedElement<This, Stub>, Stub extends LSFStubElement<Stub, This>>

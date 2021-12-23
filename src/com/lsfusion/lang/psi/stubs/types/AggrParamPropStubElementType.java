@@ -7,21 +7,14 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.lsfusion.lang.psi.LSFExplicitClasses;
 import com.lsfusion.lang.psi.declarations.LSFAggrParamGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
-import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.impl.LSFAggrParamGlobalPropDeclarationImpl;
 import com.lsfusion.lang.psi.impl.LSFAggrParamPropDeclareImpl;
 import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
 import com.lsfusion.lang.psi.stubs.AggrParamPropStubElement;
-import com.lsfusion.lang.psi.stubs.PropStubElement;
 import com.lsfusion.lang.psi.stubs.impl.AggrParamPropStubImpl;
-import com.lsfusion.lang.psi.stubs.impl.PropStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class AggrParamPropStubElementType extends PropStubElementType<AggrParamPropStubElement, LSFAggrParamGlobalPropDeclaration> {

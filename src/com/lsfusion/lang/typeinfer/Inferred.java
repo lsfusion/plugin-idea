@@ -97,11 +97,11 @@ public class Inferred {
     }
 
     public Inferred(Map<LSFExprParamDeclaration, LSFExClassSet> params) {
-        this(params, new HashSet<Compared>());
+        this(params, new HashSet<>());
     }
 
     public Inferred(Map<LSFExprParamDeclaration, LSFExClassSet> params, Set<Compared> compared) {
-        this(params, compared, new HashMap<LSFExprParamDeclaration, LSFExClassSet>(), new HashSet<Compared>());
+        this(params, compared, new HashMap<>(), new HashSet<>());
     }
 
     public Inferred(Map<LSFExprParamDeclaration, LSFExClassSet> params, Set<Compared> compared, Map<LSFExprParamDeclaration, LSFExClassSet> notParams, Set<Compared> notCompared) {
@@ -117,11 +117,11 @@ public class Inferred {
     }
 
     private Inferred() {
-        this(new HashMap<LSFExprParamDeclaration, LSFExClassSet>());
+        this(new HashMap<>());
     }
 
     private Inferred(Compared compared) {
-        this(new HashMap<LSFExprParamDeclaration, LSFExClassSet>(), Collections.singleton(compared));
+        this(new HashMap<>(), Collections.singleton(compared));
     }
     
     public static Inferred create(Compared compare) {
