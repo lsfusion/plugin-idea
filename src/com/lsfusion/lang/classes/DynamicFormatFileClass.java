@@ -1,6 +1,6 @@
 package com.lsfusion.lang.classes;
 
-public class DynamicFormatFileClass extends FileClass {
+public class DynamicFormatFileClass extends AbstractDynamicFormatFileClass {
 
     public final static DynamicFormatFileClass instance = new DynamicFormatFileClass();
 

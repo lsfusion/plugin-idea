@@ -11,6 +11,7 @@
         <ul>
             <li>GRIDBOX deprecated</li>
             <li>TO clause support in INPUT operators</li>
+            <li>NAMEDFILE support</li>
         </ul>
     ]]>
     </change-notes>

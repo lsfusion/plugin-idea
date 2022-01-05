@@ -705,6 +705,8 @@ public class LSFPsiImplUtil {
                 return XMLClass.instance;
             case "TABLEFILE":
                 return TableClass.instance;
+            case "NAMEDFILE":
+                return NamedFileClass.instance;
             case "WORDLINK":
                 return WordLinkClass.instance;
             case "IMAGELINK":
