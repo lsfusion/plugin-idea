@@ -344,7 +344,7 @@ public class FormEntity {
         return objects;
     }
 
-    private enum InsertType { FIRST, BEFORE, AFTER };
+    private enum InsertType { FIRST, BEFORE, AFTER }
     
     private Pair<InsertType, PropertyDrawEntity> getRelativePosition(LSFFormPropertyOptionsList options) {
         if (options != null) {

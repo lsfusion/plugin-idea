@@ -29,6 +29,7 @@ import org.jetbrains.jps.model.java.JavaResourceRootType;
 
 import javax.swing.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Properties;
 
@@ -217,7 +218,7 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
             String content = FileTemplateManager.getInstance(project).getInternalTemplate(templateName).getText(properties);
 
 
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(templateFile), "UTF-8"));
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(templateFile), StandardCharsets.UTF_8));
             writer.print(content);
             writer.close();
 

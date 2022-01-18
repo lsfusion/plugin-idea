@@ -19,7 +19,7 @@ public abstract class LSFStubElementType<StubT extends LSFStubElement<StubT, Psi
     @NotNull
     @Override
     public String getExternalId() {
-        return "lsf.stub." + toString();
+        return "lsf.stub." + this;
     }
 
     @Override

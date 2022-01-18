@@ -282,7 +282,7 @@ public class ShowErrorsAction extends AnAction {
                     warningsSearchMode = warningsSearchModeBox.isSelected();
                 }
             });
-            warningsSearchMode = Boolean.valueOf(propertiesComponent.getValue(WARNINGS_SEARCH_MODE));
+            warningsSearchMode = Boolean.parseBoolean(propertiesComponent.getValue(WARNINGS_SEARCH_MODE));
             warningsSearchModeBox.setSelected(warningsSearchMode);
             boxesPanel.add(warningsSearchModeBox);
 

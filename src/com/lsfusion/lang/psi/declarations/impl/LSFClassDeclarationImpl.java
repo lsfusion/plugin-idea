@@ -74,7 +74,7 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
         names.addAll(LSFClassExtendImpl.processClassImplementationsSearch(this));
         names.addAll(processChildrenSearch(this, getProject()));
 
-        return names.toArray(new PsiElement[names.size()]);
+        return names.toArray(new PsiElement[0]);
     }
 
     public static Set<LSFClassDeclaration> processChildrenSearch(LSFClassDeclaration classDecl, Project project) {

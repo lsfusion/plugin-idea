@@ -202,7 +202,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
         List<PsiElement> result = new ArrayList<>();
         for(LSFActionOrPropReference impl : findImplementations(nameIdentifier))
             result.add(impl.getWrapper());         
-        return result.toArray(new PsiElement[result.size()]);
+        return result.toArray(new PsiElement[0]);
     }
 
     protected List<LSFActionOrPropReference> findImplementations(LSFId nameIdentifier) {

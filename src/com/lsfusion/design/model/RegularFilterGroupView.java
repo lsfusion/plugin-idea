@@ -76,7 +76,7 @@ public class RegularFilterGroupView extends ComponentView {
                 }
                 items.add(filterItem);
             }
-            ComboBox comboBox = new ComboBox(items.toArray(new Object[items.size()]), -1);
+            ComboBox comboBox = new ComboBox(items.toArray(new Object[0]), -1);
             comboBox.setSelectedItem(defaultItem);
             return new JComponentPanel(comboBox);
         }

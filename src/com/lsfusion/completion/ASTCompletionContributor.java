@@ -488,7 +488,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             if (staticObjectId != null) {
                 if (type.isBase() && !staticObjectCompleted) {
                     staticObjectCompleted = true;
-                    String namespaceAndClassName[] = extractClassNameAndNamespaceForStaticObjectId();
+                    String[] namespaceAndClassName = extractClassNameAndNamespaceForStaticObjectId();
                     String namespace = namespaceAndClassName[0];
                     String className = namespaceAndClassName[1];
 

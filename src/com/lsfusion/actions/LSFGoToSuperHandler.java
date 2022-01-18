@@ -70,7 +70,7 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
             if (targets.size() == 1) {
                 ((Navigatable) targets.get(0)).navigate(true);
             } else if (!targets.isEmpty()) {
-                NavigationUtil.getPsiElementPopup(targets.toArray(new PsiElement[targets.size()]), new GoToSuperElementRenderer(mapped), "Choose Element").showInBestPositionFor(editor);
+                NavigationUtil.getPsiElementPopup(targets.toArray(new PsiElement[0]), new GoToSuperElementRenderer(mapped), "Choose Element").showInBestPositionFor(editor);
             }
         }
     }

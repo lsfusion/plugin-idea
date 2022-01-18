@@ -26,7 +26,7 @@ public class LSFUsageFilteringRuleProvider implements UsageFilteringRuleProvider
         List<UsageFilteringRule> rules = new ArrayList<>();
         rules.add(new TypeUsageFilteringRule());
 
-        return rules.toArray(new UsageFilteringRule[rules.size()]);
+        return rules.toArray(new UsageFilteringRule[0]);
     }
 
     @NotNull

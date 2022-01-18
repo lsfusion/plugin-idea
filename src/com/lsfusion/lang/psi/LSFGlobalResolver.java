@@ -218,7 +218,7 @@ public class LSFGlobalResolver {
     }
 
     public static <This extends LSFGlobalPropDeclaration<This,Stub>, Stub extends PropStubElement<Stub, This>> LSFTableDeclaration findAppropriateTable(@NotNull LSFValueClass[] currentSet, LSFFile file) {
-        String names[] = new String[currentSet.length];
+        String[] names = new String[currentSet.length];
         for (int i = 0; i < currentSet.length; i++) {
             names[i] = currentSet[i].getName();
         }

@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,8 +86,8 @@ public class ReportFileldsChanger {
     private void changeReportFile(File input, File output, Map<String, String> formRenames, String formName) throws IOException {
         FileInputStream stream = new FileInputStream(input);
         FileOutputStream ostream = new FileOutputStream(output);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "UTF8"));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(ostream, "UTF8"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(ostream, StandardCharsets.UTF_8));
         String fieldNameExpr = "(\\w+)(\\.header|\\.footer)?";
         String str;
 

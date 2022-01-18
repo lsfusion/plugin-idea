@@ -2316,8 +2316,6 @@ nonEmptyNamespaceUsageList ::= namespaceUsage (COMMA namespaceUsage)*  { pin(".*
 classNameList ::= (nonEmptyClassNameList)?
 nonEmptyClassNameList ::= className (COMMA className)* { pin(".*") = 1}
 
-nonEmptyPropertyUsageList ::= propertyUsage (COMMA propertyUsage)*  { pin(".*") = 1}
-
 nonEmptyNoParamsPropertyUsageList ::= noParamsPropertyUsage (COMMA noParamsPropertyUsage)*  { pin(".*") = 1}
 nonEmptyNoContextPropertyUsageList ::= noContextPropertyUsage (COMMA noContextPropertyUsage)*  { pin(".*") = 1}
 nonEmptyNoContextActionUsageList ::= noContextActionUsage (COMMA noContextActionUsage)*  { pin(".*") = 1}
@@ -2424,8 +2422,6 @@ metacodeUsage ::= compoundID
     methods = [getDocumentation]
 }
 
-typeId ::= PRIMITIVE_TYPE | OBJECT
-
 compoundID ::= (<<innerIDStop>> namespaceUsage POINT simpleName) | simpleName
 
 staticObjectID ::= <<fullCompoundParamDeclareStop>> <<innerIDCheck>> customClassUsage POINT simpleName
@@ -2528,6 +2524,4 @@ alignmentLiteral ::= START | CENTER | END
 flexAlignmentLiteral ::= START | CENTER | END | STRETCH
 
 emailRecipientTypeLiteral ::= TO | CC | BCC
-
-emailAttachFormat ::= PDF | DOCX | HTML | RTF | XLSX
 

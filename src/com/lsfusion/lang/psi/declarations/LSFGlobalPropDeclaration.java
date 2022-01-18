@@ -93,9 +93,9 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
 
         boolean useAuto = paramCount == 0;
         if (!useAuto) {
-            LSFValueClass classes[][] = new LSFValueClass[paramCount][];
-            int currentInd[] = new int[paramCount];
-            LSFValueClass currentSet[] = new LSFValueClass[paramCount];
+            LSFValueClass[][] classes = new LSFValueClass[paramCount][];
+            int[] currentInd = new int[paramCount];
+            LSFValueClass[] currentSet = new LSFValueClass[paramCount];
             for (int i = 0; i < paramCount; i++) {
                 LSFClassSet classSet = classesList.get(i);
                 if (classSet == null) {

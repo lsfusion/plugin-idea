@@ -303,7 +303,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         new DependencySpeedSearch(jgraph) {
             @Override
             protected GraphNode[] getNodes() {
-                return getAllNodes().toArray(new GraphNode[getAllNodes().size()]);
+                return getAllNodes().toArray(new GraphNode[0]);
             }
 
             @Override

@@ -511,7 +511,7 @@ public class DesignView extends JPanel implements Disposable {
             if (!parent.contains(x, y)) {
                 return null;
             }
-            Component components[] = parent.getComponents();
+            Component[] components = parent.getComponents();
             for (Component comp : components) {
                 if (comp != null && comp.isVisible() && comp instanceof JComponent) {
                     Point loc = comp.getLocation();

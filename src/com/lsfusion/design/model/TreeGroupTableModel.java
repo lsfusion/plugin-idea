@@ -36,7 +36,7 @@ public class TreeGroupTableModel extends DefaultTreeModel implements TreeTableMo
     }
 
     public void addPropertyDraw(GroupObjectView groupObject, PropertyDrawView property, List<PropertyDrawView> formProperties) {
-        if (properties.indexOf(property) == -1) {
+        if (!properties.contains(property)) {
             int ins = BaseUtils.relativePosition(property, formProperties, properties);
             properties.add(ins, property);
 

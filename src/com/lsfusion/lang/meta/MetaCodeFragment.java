@@ -124,7 +124,7 @@ public class MetaCodeFragment {
             }
         }
         rCapitalizeFirstToken.setResult(capitalizeFirstToken);
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     private void transformTokenPartString(StringBuilder resultString, String[] parts, int from, int to, boolean capitalizeFirstToken, boolean isColor) {

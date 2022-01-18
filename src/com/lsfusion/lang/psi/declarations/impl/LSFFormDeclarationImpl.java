@@ -56,6 +56,6 @@ public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<
     @Override
     public PsiElement[] processImplementationsSearch() {
         List<PsiElement> names = LSFFormExtendImpl.processFormImplementationsSearch(this);
-        return names.toArray(new PsiElement[names.size()]);
+        return names.toArray(new PsiElement[0]);
     }
 }

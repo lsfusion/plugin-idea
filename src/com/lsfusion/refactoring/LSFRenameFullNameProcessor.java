@@ -230,7 +230,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
     // We need this container to get all rename lines in one block of migration file 
     private List<Runnable> cascadePostRenameActions = new ArrayList<>();
     private Set<PsiElement> cascadeRenameElements = new HashSet<>();
-;
+
     @Nullable
     @Override
     public Runnable getPostRenameCallback(@NotNull final PsiElement element, @NotNull String newName, @NotNull RefactoringElementListener elementListener) {

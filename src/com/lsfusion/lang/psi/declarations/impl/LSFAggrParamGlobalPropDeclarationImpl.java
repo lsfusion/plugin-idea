@@ -131,7 +131,7 @@ public abstract class LSFAggrParamGlobalPropDeclarationImpl extends LSFFullNameD
             LSFCustomClassUsage customClassUsage = aggrProp.getCustomClassUsage();
             if(customClassUsage != null)
                 return new LSFExplicitSignature(Collections.singletonList(LSFPsiImplUtil.getClassNameRef(customClassUsage)));
-        };
+        }
         return null;
     }
 
