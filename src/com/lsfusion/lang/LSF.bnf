@@ -1641,6 +1641,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    ATTR
                             |    formInGroup
                             |    formExtID
+                            |    EXTNULL
                             |    ORDER (DESC)?
                             |    FILTER
                             |    COLUMN

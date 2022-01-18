@@ -277,6 +277,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "EXPORT"                    			{ return EXPORT; }
   "EXTEND"                  			{ return EXTEND; }
   "EXTID"                  			    { return EXTID; }
+  "EXTNULL"                  			{ return EXTNULL; }
   "FIELDS"                  			{ return FIELDS; }
   "FILTER"                  			{ return FILTER; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
