@@ -263,7 +263,7 @@ public abstract class GenerateFormAction extends AnAction {
                     filterProperty = getFilterProperty(parentKey, key);
                     propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key));
                     objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentInGroupKey));
-                    propertiesScript = getPropertiesScript(key, null, new LinkedHashSet<>(Collections.singletonList(new ElementProperty(new ElementKey("value", key.ID), ((GroupObjectParseNode) element).namespace, false))));
+                    propertiesScript = getPropertiesScript(key, null, new LinkedHashSet<>(Collections.singletonList(new ElementProperty(new ElementKey("value", key.ID), null, false))));
                 } else {
                     filterProperty = getFilterProperty(lastGroupObjectParent, key);
                     objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentInGroupKey));
