@@ -20,6 +20,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.Query;
 import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
@@ -227,7 +228,12 @@ public class AggregateFormAction extends AnAction {
         }
 
         //replace new lines from the start of the text
-        return copyElement.getText().replaceAll("^[\n\r]*", "");
+        String text = copyElement.getText().replaceAll("^[\n\r]*", "");
+        if(LSFReferenceAnnotator.isInMetaDecl(element)) {
+            return "//this code is inside of meta declaration\n//" + text.replace("\n", "\n//");
+        } else {
+            return text;
+        }
     }
 
     public PsiElement findSourceElement(Project project, Editor editor, int offset) {
