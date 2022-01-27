@@ -700,7 +700,7 @@ public class LSFPsiImplUtil {
             case "HTMLFILE":
                 return HTMLClass.instance;
             case "JSONFILE":
-                return JSONClass.instance;
+                return JSONFileClass.instance;
             case "XMLFILE":
                 return XMLClass.instance;
             case "TABLEFILE":

@@ -1,8 +1,8 @@
 package com.lsfusion.lang.classes;
 
-public class JSONClass extends StaticFormatFileClass {
+public class JSONFileClass extends StaticFormatFileClass {
 
-    public final static JSONClass instance = new JSONClass();
+    public final static JSONFileClass instance = new JSONFileClass();
 
     @Override
     public String getCaption() {
