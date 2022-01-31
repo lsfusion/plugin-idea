@@ -68,4 +68,9 @@ public class LSFDebuggerEditorsProvider extends JavaDebuggerEditorsProvider {
             return super.createExpressionCodeFragment(project, expression, context, isPhysical);
         }
     }
+
+    // disabled debugger expression evaluation field, which caused idea crashing when stopped on breakpoint
+    public boolean isEvaluateExpressionFieldEnabled() {
+        return false;
+    }
 }

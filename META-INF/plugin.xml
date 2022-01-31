@@ -7,12 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.228</b><br>
+        <b>Version 1.0.229</b><br>
         <ul>
-            <li>GRIDBOX deprecated</li>
-            <li>TO clause support in INPUT operators</li>
-            <li>NAMEDFILE support</li>
-            <li>EXTNULL option to export NULL values in JSON / XML</li>
+            <li>Idea 2021.3 debugger fix</li>
         </ul>
     ]]>
     </change-notes>
