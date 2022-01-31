@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.228</version>
+    <version>1.0.229</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -10,6 +10,7 @@
         <b>Version 1.0.229</b><br>
         <ul>
             <li>Idea 2021.3 debugger fix</li>
+            <li>Bug fixes</li>
         </ul>
     ]]>
     </change-notes>
