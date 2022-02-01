@@ -4198,13 +4198,13 @@ public class LSFPsiImplUtil {
 
         Collection<LSFJoinPropertyDefinition> joinProps = PsiTreeUtil.findChildrenOfType(override, LSFJoinPropertyDefinition.class);
         for (LSFJoinPropertyDefinition joinProp : joinProps) {
-            if(!checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinProp.getPropertyUsage(), joinProp.getParamList()))
+            if(!checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinProp.getPropertyUsage(), joinProp.getParamList(), new HashSet<>()))
                 return false;
         }
         return true;
     }
 
-    private static boolean checkNonRecursiveOverrideRecursively(LSFPropertyUsage leftUsage, int leftParams, LSFPropertyUsage rightUsage, PsiElement rightParamList) {
+    private static boolean checkNonRecursiveOverrideRecursively(LSFPropertyUsage leftUsage, int leftParams, LSFPropertyUsage rightUsage, PsiElement rightParamList, Set<LSFJoinPropertyDefinition> checkedProps) {
         if (equalReferences(leftUsage, rightUsage, leftParams, rightParamList)) {
             return false;
         }
@@ -4212,9 +4212,11 @@ public class LSFPsiImplUtil {
         if(rightUsage != null) {
             Collection<LSFJoinPropertyDefinition> joinProps = PsiTreeUtil.findChildrenOfType(rightUsage.resolveDecl(), LSFJoinPropertyDefinition.class);
             for (LSFJoinPropertyDefinition joinProp : joinProps) {
-                LSFPropertyUsage joinPropUsage = joinProp.getPropertyUsage();
-                if (!equalReferences(rightUsage, joinPropUsage) && !checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinPropUsage, joinProp.getParamList())) {
-                    return false;
+                if(checkedProps.add(joinProp)) { //protect from stackoverflow
+                    LSFPropertyUsage joinPropUsage = joinProp.getPropertyUsage();
+                    if (!equalReferences(rightUsage, joinPropUsage) && !checkNonRecursiveOverrideRecursively(leftUsage, leftParams, joinPropUsage, joinProp.getParamList(), checkedProps)) {
+                        return false;
+                    }
                 }
             }
         }
