@@ -75,7 +75,10 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     public LSFFullNameReference getExtendingReference() {
         LSFExtendingFormDeclaration extendingFormDeclaration = getExtendingFormDeclaration();
         if (extendingFormDeclaration != null) {
-            return extendingFormDeclaration.getFormUsageWrapper().getFormUsage();
+            LSFFormUsageWrapper formUsageWrapper = extendingFormDeclaration.getFormUsageWrapper();
+            if(formUsageWrapper != null) {
+                return formUsageWrapper.getFormUsage();
+            }
         }
 
         return null;
