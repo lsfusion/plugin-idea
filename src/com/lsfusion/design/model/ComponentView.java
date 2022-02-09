@@ -29,6 +29,7 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("marginLeft").setExpert(),
             new ReflectionProperty("marginRight").setExpert(),
             new ReflectionProperty("defaultComponent").setExpert(),
+            new ReflectionProperty("activated").setExpert(),
             new ReflectionProperty("font").setExpert(),
             new ReflectionProperty("captionFont").setExpert(),
             new ReflectionProperty("background"),
@@ -51,6 +52,8 @@ public abstract class ComponentView extends PropertiesContainer {
     public int marginRight;
 
     public boolean defaultComponent = false;
+    
+    public boolean activated; 
 
     public FontInfo font;
 
@@ -127,6 +130,10 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public void setDefaultComponent(boolean defaultComponent) {
         this.defaultComponent = defaultComponent;
+    }
+    
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 
     /* ========= constraints properties ========= */
@@ -286,6 +293,10 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public boolean isDefaultComponent() {
         return defaultComponent;
+    }
+    
+    public boolean isActivated() {
+        return activated;
     }
 
     public FontInfo getFont() {

@@ -231,6 +231,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "CONFIG"                 			    { return CONFIG; }
   "CONFIRM"                 			{ return CONFIRM; }
   "CONSTRAINT"              			{ return CONSTRAINT; }
+  "CONTAINER"              			    { return CONTAINER; }
   "CONTAINERH"              			{ return CONTAINERH; }
   "CONTAINERV"              			{ return CONTAINERV; }
   "COOKIES"             			    { return COOKIES; }

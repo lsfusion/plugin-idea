@@ -739,6 +739,7 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    importFormActionPropertyDefinitionBody
                                       	|	    activeFormActionPropertyDefinitionBody
                                       	|	    activateActionPropertyDefinitionBody
+                                      	|       expandCollapseActionPropertyDefinitionBody
                                       	|       externalActionPropertyDefinitionBody
 
 private mappedForm ::= ((   (LIST | EDIT) customClassUsage formSingleActionObject)
@@ -1033,7 +1034,7 @@ seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST | NULL)?
 expandGroupObjectActionPropertyDefinitionBody ::= EXPAND (DOWN | UP | ALL (TOP)?)?
                                             groupObjectID (OBJECTS objectExpr (COMMA objectExpr)*)?
 {
-    pin = 1
+    pin = 3
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl]
 }
@@ -1041,7 +1042,7 @@ expandGroupObjectActionPropertyDefinitionBody ::= EXPAND (DOWN | UP | ALL (TOP)?
 collapseGroupObjectActionPropertyDefinitionBody ::= COLLAPSE (DOWN | ALL (TOP)?)?
                                             groupObjectID (OBJECTS objectExpr (COMMA objectExpr)*)?
 {
-    pin = 1
+    pin = 3
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl]
 }
@@ -1240,6 +1241,13 @@ activateActionPropertyDefinitionBody ::= ACTIVATE (  FORM formUsage
     methods = [inferActionParamClasses getDocumentation]
 }
 
+expandCollapseActionPropertyDefinitionBody ::= (COLLAPSE | EXPAND) CONTAINER componentID
+{
+    pin = 3
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}                                         
+
 listActionPropertyDefinitionBody ::=    LBRACE
 			                            listActionStatement*
 		                                RBRACE
@@ -1266,6 +1274,7 @@ private list_action_statement_recover ::= !(ACTIVATE | NEW | NEWEDIT | APPLY | C
                                             | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FOR | SHOW | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
                                             | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE | RECALCULATE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
+                                            | COLLAPSE | EXPAND
                                             | EXTERNAL
                                             | ID // pinned with execActionPropertyDefinitionBody
                                             | SEMI

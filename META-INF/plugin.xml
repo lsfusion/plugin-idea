@@ -7,10 +7,11 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.229</b><br>
+        <b>Version 1.0.230</b><br>
         <ul>
-            <li>Idea 2021.3 debugger fix</li>
-            <li>Bug fixes</li>
+            <li>'collapsible', 'collapsed' options for container support</li>
+            <li>COLLAPSE/EXPAND CONTAINER actions support</li>
+            <li>'activated' option for component support</li>
         </ul>
     ]]>
     </change-notes>

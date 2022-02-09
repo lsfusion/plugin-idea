@@ -19,6 +19,14 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
     public void setDescription(String description) {
         target.description = description;
     }
+    
+    public void setCollapsible(boolean collapsible) {
+        target.setCollapsible(collapsible);
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        target.setCollapsed(collapsed);
+    }
 
     public void setType(ContainerType type) {
         target.setType(type);

@@ -3722,6 +3722,10 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
+    public static Inferred inferActionParamClasses(LSFExpandCollapseActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
     public static Inferred inferActionParamClasses(LSFExecActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         LSFActionUsage actionUsage = body.getActionUsage();
         if (actionUsage == null) {

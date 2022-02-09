@@ -31,6 +31,8 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("tabbed"),
             new ReflectionProperty("caption"),
             new ReflectionProperty("description"),
+            new ReflectionProperty("collapsible"),
+            new ReflectionProperty("collapsed"),
             new ReflectionProperty("showIf").setExpert()
     );
 
@@ -38,6 +40,8 @@ public class ContainerView extends ComponentView {
 
     public String caption;
     public String description;
+    public Boolean collapsible;
+    public boolean collapsed;
     @NotNull
     public ContainerType type = ContainerType.CONTAINERV;
     public Alignment childrenAlignment = Alignment.START;
@@ -91,6 +95,14 @@ public class ContainerView extends ComponentView {
     public ContainerType getType() {
         return type;
     }
+    
+    public void setCollapsible(boolean collapsible) {
+        this.collapsible = collapsible;
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        this.collapsed = collapsed;
+    }
 
     public void setType(ContainerType type) {
         this.type = type;
@@ -123,6 +135,14 @@ public class ContainerView extends ComponentView {
 
     public String getDescription() {
         return description;
+    }
+    
+    public boolean isCollapsible() {
+        return collapsible != null ? collapsible : caption != null;
+    }
+
+    public boolean isCollapsed() {
+        return collapsed;
     }
 
     public void setDescription(String description) {
