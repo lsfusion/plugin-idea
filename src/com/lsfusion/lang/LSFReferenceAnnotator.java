@@ -600,7 +600,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitRenderPropertyCustomView(@NotNull LSFRenderPropertyCustomView renderPropertyCustomView) {
         super.visitRenderPropertyCustomView(renderPropertyCustomView);
         if (renderPropertyCustomView.getStringLiteral().getValue().isEmpty())
-            addUnderscoredError(renderPropertyCustomView, "Wrong custom render function definition. 'renderFunction' can't be empty. Expected: CUSTOM RENDER 'renderFunction'");
+            addUnderscoredError(renderPropertyCustomView, "Wrong custom render function definition. 'renderFunction' can't be empty. Expected: CUSTOM 'renderFunction'");
     }
 
     @Override
@@ -608,8 +608,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitEditPropertyCustomView(editPropertyCustomView);
 
         if (editPropertyCustomView.getStringLiteral().getValue().isEmpty())
-            addUnderscoredError(editPropertyCustomView, "Wrong custom edit function definition. 'editFunction' can't be empty. Expected:" +
-                    (editPropertyCustomView.getParent().getChildren().length > 1 ? "" : "CUSTOM ") + "EDIT [TEXT / REPLACE] 'editFunction'");
+            addUnderscoredError(editPropertyCustomView, "Wrong CUSTOM edit function definition. 'editFunction' can't be empty. Expected: CUSTOM 'editFunction'");
     }
 
     @Override

@@ -1215,7 +1215,8 @@ contextActions ::= ACTIONS stringLiteral listActionPropertyDefinitionBody (COMMA
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer ]
 }
-inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? listWhereInputProps contextActions? formSessionScopeClause? staticDestination? doInputBody
+editPropertyCustomView ::= CUSTOM stringLiteral?
+inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? editPropertyCustomView? listWhereInputProps contextActions? formSessionScopeClause? staticDestination? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
@@ -1578,8 +1579,7 @@ formSubReport ::= SUBREPORT formCalcPropertyObject?
 classViewType ::= PANEL | GRID | TOOLBAR
 
 renderPropertyCustomView ::= stringLiteral
-editPropertyCustomView ::= CHANGE stringLiteral?
-propertyCustomView ::= CUSTOM ((renderPropertyCustomView editPropertyCustomView) | renderPropertyCustomView | editPropertyCustomView)
+propertyCustomView ::= CUSTOM renderPropertyCustomView
 
 listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral) | CALENDAR
 
