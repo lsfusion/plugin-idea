@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.229</version>
+    <version>1.0.230</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -12,6 +12,7 @@
             <li>'collapsible', 'collapsed' options for container support</li>
             <li>COLLAPSE/EXPAND CONTAINER actions support</li>
             <li>'activated' option for component support</li>
+            <li>move CUSTOM EDIT to INPUT</li>
         </ul>
     ]]>
     </change-notes>
