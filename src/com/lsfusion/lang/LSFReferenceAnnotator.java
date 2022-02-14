@@ -597,27 +597,27 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
-    public void visitEditInputPropertyCustomView(@NotNull LSFEditInputPropertyCustomView editInputPropertyCustomView) {
-        super.visitEditInputPropertyCustomView(editInputPropertyCustomView);
+    public void visitChangeInputPropertyCustomView(@NotNull LSFChangeInputPropertyCustomView changeInputPropertyCustomView) {
+        super.visitChangeInputPropertyCustomView(changeInputPropertyCustomView);
 
-        if (editInputPropertyCustomView.getStringLiteral().getValue().isEmpty())
-            addUnderscoredError(editInputPropertyCustomView, "Wrong custom CHANGE function definition. 'changeFunction' can't be empty.");
+        if (changeInputPropertyCustomView.getStringLiteral().getValue().isEmpty())
+            addUnderscoredError(changeInputPropertyCustomView, "Wrong custom CHANGE function definition. 'changeFunction' can't be empty.");
     }
 
     @Override
     public void visitRenderPropertyCustomView(@NotNull LSFRenderPropertyCustomView renderPropertyCustomView) {
         super.visitRenderPropertyCustomView(renderPropertyCustomView);
         if (renderPropertyCustomView.getStringLiteral().getValue().isEmpty())
-            addUnderscoredError(renderPropertyCustomView, "Wrong custom render function definition. 'renderFunction' can't be empty. Expected: CUSTOM RENDER 'renderFunction'");
+            addUnderscoredError(renderPropertyCustomView, "Wrong custom render function definition. 'renderFunction' can't be empty. Expected: CUSTOM 'renderFunction'");
     }
 
     @Override
-    public void visitEditPropertyCustomView(@NotNull LSFEditPropertyCustomView editPropertyCustomView) {
-        super.visitEditPropertyCustomView(editPropertyCustomView);
+    public void visitChangePropertyCustomView(@NotNull LSFChangePropertyCustomView changePropertyCustomView) {
+        super.visitChangePropertyCustomView(changePropertyCustomView);
 
-        if (editPropertyCustomView.getStringLiteral().getValue().isEmpty())
-            addUnderscoredError(editPropertyCustomView, "Wrong custom edit function definition. 'editFunction' can't be empty. Expected:" +
-                    (editPropertyCustomView.getParent().getChildren().length > 1 ? "" : "CUSTOM ") + "EDIT [TEXT / REPLACE] 'editFunction'");
+        if (changePropertyCustomView.getStringLiteral().getValue().isEmpty())
+            addUnderscoredError(changePropertyCustomView, "Wrong custom change function definition. 'changeFunction' can't be empty. Expected:" +
+                    (changePropertyCustomView.getParent().getChildren().length > 1 ? "" : "CUSTOM ") + "CHANGE 'changeFunction'");
     }
 
     @Override
