@@ -7,12 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.230</b><br>
+        <b>Version 1.0.231</b><br>
         <ul>
-            <li>'collapsible', 'collapsed' options for container support</li>
-            <li>COLLAPSE/EXPAND CONTAINER actions support</li>
-            <li>'activated' option for component support</li>
-            <li>move CUSTOM EDIT to INPUT</li>
+            <li>CUSTOM EDIT function support in input action body and in FORM PROPERTIES</li>
         </ul>
     ]]>
     </change-notes>

@@ -597,10 +597,18 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitEditInputPropertyCustomView(@NotNull LSFEditInputPropertyCustomView editInputPropertyCustomView) {
+        super.visitEditInputPropertyCustomView(editInputPropertyCustomView);
+
+        if (editInputPropertyCustomView.getStringLiteral().getValue().isEmpty())
+            addUnderscoredError(editInputPropertyCustomView, "Wrong custom CHANGE function definition. 'changeFunction' can't be empty.");
+    }
+
+    @Override
     public void visitRenderPropertyCustomView(@NotNull LSFRenderPropertyCustomView renderPropertyCustomView) {
         super.visitRenderPropertyCustomView(renderPropertyCustomView);
         if (renderPropertyCustomView.getStringLiteral().getValue().isEmpty())
-            addUnderscoredError(renderPropertyCustomView, "Wrong custom render function definition. 'renderFunction' can't be empty. Expected: CUSTOM 'renderFunction'");
+            addUnderscoredError(renderPropertyCustomView, "Wrong custom render function definition. 'renderFunction' can't be empty. Expected: CUSTOM RENDER 'renderFunction'");
     }
 
     @Override
@@ -608,7 +616,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitEditPropertyCustomView(editPropertyCustomView);
 
         if (editPropertyCustomView.getStringLiteral().getValue().isEmpty())
-            addUnderscoredError(editPropertyCustomView, "Wrong CUSTOM edit function definition. 'editFunction' can't be empty. Expected: CUSTOM 'editFunction'");
+            addUnderscoredError(editPropertyCustomView, "Wrong custom edit function definition. 'editFunction' can't be empty. Expected:" +
+                    (editPropertyCustomView.getParent().getChildren().length > 1 ? "" : "CUSTOM ") + "EDIT [TEXT / REPLACE] 'editFunction'");
     }
 
     @Override
