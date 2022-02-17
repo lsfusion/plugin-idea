@@ -83,13 +83,17 @@ public class LSFResourceBundleUtils {
     }
 
     public static String getLsfStrLiteralsLanguage(Module module, boolean noCache) {
-        GlobalSearchScope scope = module.getModuleScope();
-        String lsfStrLiteralsLanguage = noCache ? null : lsfStrLiteralsLanguageMap.get(scope);
-        if (lsfStrLiteralsLanguage == null) {
-            lsfStrLiteralsLanguage = LSFFileUtils.getLsfStrLiteralsLanguage(LSFFileUtils.findFilesByPath(module, "lsfusion.properties"));
-            lsfStrLiteralsLanguageMap.put(scope, lsfStrLiteralsLanguage);
+        try {
+            GlobalSearchScope scope = module.getModuleScope();
+            String lsfStrLiteralsLanguage = noCache ? null : lsfStrLiteralsLanguageMap.get(scope);
+            if (lsfStrLiteralsLanguage == null) {
+                lsfStrLiteralsLanguage = LSFFileUtils.getLsfStrLiteralsLanguage(LSFFileUtils.findFilesByPath(module, "lsfusion.properties"));
+                lsfStrLiteralsLanguageMap.put(scope, lsfStrLiteralsLanguage);
+            }
+            return lsfStrLiteralsLanguage;
+        } catch (Throwable t) {
+            return null;
         }
-        return lsfStrLiteralsLanguage;
     }
 
     public static void setLsfStrLiteralsLanguage(GlobalSearchScope scope, String value) {
