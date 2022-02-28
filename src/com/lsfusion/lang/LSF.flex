@@ -264,6 +264,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "EDIT"                    			{ return EDIT; }
   "ELSE"                    			{ return ELSE; }
   "EMAIL"                   			{ return EMAIL; }
+  "EMBEDDED"                   			{ return EMBEDDED; }
   "END"                     			{ return END; }
   "ESCAPE"                			    { return ESCAPE; }
   "EVAL"                    			{ return EVAL; }
@@ -408,6 +409,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "PERIOD"                              { return PERIOD; }
   "PIVOT"                               { return PIVOT; }
   "PG"                                  { return PG; }    
+  "POPUP"                			    { return POPUP; }
   "POSITION"                			{ return POSITION; }
   "POST"                			    { return POST; }
   "PREREAD"                			    { return PREREAD; }

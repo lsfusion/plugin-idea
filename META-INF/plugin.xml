@@ -10,6 +10,7 @@
         <b>Version 1.0.231</b><br>
         <ul>
             <li>CUSTOM EDIT function support in input action body and in FORM PROPERTIES</li>
+            <li>EMBEDDED and POPUP support in DIALOG operator</li>
         </ul>
     ]]>
     </change-notes>
