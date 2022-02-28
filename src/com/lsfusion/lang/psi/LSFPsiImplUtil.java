@@ -487,6 +487,27 @@ public class LSFPsiImplUtil {
         return new ExprsContextInferrer(getContextExprs(sourceStatement));
     }
 
+    private static List<LSFPropertyExpression> getContextExprs(@NotNull LSFJsonPropertyDefinition sourceStatement) {
+        List<LSFPropertyExpression> result = new ArrayList<>();
+        LSFNonEmptyAliasedPropertyExpressionList neList = sourceStatement.getNonEmptyAliasedPropertyExpressionList();
+        if(neList != null)
+            for(LSFAliasedPropertyExpression ape : neList.getAliasedPropertyExpressionList())
+                result.add(ape.getPropertyExpression());
+        LSFWherePropertyExpression whereProperty = sourceStatement.getWherePropertyExpression();
+        if(whereProperty != null) {
+            result.add(whereProperty.getPropertyExpression());
+        }
+        return result;
+    }
+
+    public static ContextModifier getContextModifier(@NotNull LSFJsonPropertyDefinition sourceStatement) {
+        return new ExprsContextModifier(getContextExprs(sourceStatement));
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFJsonPropertyDefinition sourceStatement) {
+        return new ExprsContextInferrer(getContextExprs(sourceStatement));
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFChangeClassActionPropertyDefinitionBody sourceStatement) {
         return getContextModifier(sourceStatement.getParameterOrExpression());
     }
@@ -1177,6 +1198,30 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    private static LSFExClassSet resolveAliasedInferredValueClass(List<LSFAliasedPropertyExpression> list, @Nullable InferExResult inferred, boolean string) {
+        if (list.size() == 0)
+            return null;
+
+        LSFExClassSet result = null;
+        for (int i = 0; i < list.size(); i++) {
+            LSFExClassSet valueClass = list.get(i).getPropertyExpression().resolveInferredValueClass(inferred);
+            if (i == 0)
+                result = valueClass;
+            else
+                result = or(result, valueClass, string);
+        }
+        return result;
+    }
+
+    @Nullable
+    private static LSFExClassSet resolveInferredValueClass(@Nullable LSFNonEmptyAliasedPropertyExpressionList list, @Nullable InferExResult inferred, boolean string) {
+        if (list == null) {
+            return null;
+        }
+        return resolveAliasedInferredValueClass(list.getAliasedPropertyExpressionList(), inferred, string);
+    }
+
+    @Nullable
     private static LSFExClassSet resolveInferredValueClass(@Nullable LSFNonEmptyPropertyExpressionList list, @Nullable InferExResult inferred) {
         return resolveInferredValueClass(list, inferred, false);
     }
@@ -1254,6 +1299,16 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFConcatPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), inferred, true);
+    }
+
+    @Nullable
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFJsonFormPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+        return LSFExClassSet.logical;
+    }
+
+    @Nullable
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFJsonPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+        return resolveInferredValueClass(sourceStatement.getNonEmptyAliasedPropertyExpressionList(), inferred, true);
     }
 
     @Nullable
@@ -1437,6 +1492,10 @@ public class LSFPsiImplUtil {
 
     public static List<String> getValueClassNames(@NotNull LSFPropertyExpression sourceStatement) {
         return getValueClassNames(sourceStatement.getIfPE());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFAliasedPropertyExpression sourceStatement) {
+        return getValueClassNames(sourceStatement.getPropertyExpression());
     }
 
     public static List<String> getValueClassNames(@NotNull LSFIfPE sourceStatement) {
@@ -1728,6 +1787,31 @@ public class LSFPsiImplUtil {
         return getValueClassNames(list.getPropertyExpressionList());
     }
 
+    @Nullable
+    private static List<String> getAliasedValueClassNames(List<LSFAliasedPropertyExpression> list) {
+        if (list.size() == 0) {
+            return Collections.EMPTY_LIST;
+        }
+
+        List<String> result = null;
+        for (int i = 0; i < list.size(); i++) {
+            List<String> valueClass = getValueClassNames(list.get(i));
+            if (i == 0) {
+                result = valueClass;
+            } else {
+                result.addAll(valueClass);
+            }
+        }
+        return result;
+    }
+
+    private static List<String> getValueClassNames(@Nullable LSFNonEmptyAliasedPropertyExpressionList list) {
+        if (list == null) {
+            return Collections.emptyList();
+        }
+        return getAliasedValueClassNames(list.getAliasedPropertyExpressionList());
+    }
+
     public static List<String> getValueClassNames(@NotNull LSFMultiPropertyDefinition sourceStatement) {
         return getValueClassNames(sourceStatement.getNonEmptyPropertyExpressionList());
     }
@@ -1779,6 +1863,14 @@ public class LSFPsiImplUtil {
         return getValueClassNames(sourceStatement.getNonEmptyPropertyExpressionList());
     }
 
+    public static List<String> getValueClassNames(@NotNull LSFJsonPropertyDefinition sourceStatement) {
+        return getValueClassNames(sourceStatement.getNonEmptyAliasedPropertyExpressionList());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFJsonFormPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
     public static List<String> getValueClassNames(@NotNull LSFCastPropertyDefinition sourceStatement) {
         return singletonList(sourceStatement.getBuiltInClassName().getName());
     }
@@ -1824,6 +1916,10 @@ public class LSFPsiImplUtil {
 
     public static List<String> getValuePropertyNames(@NotNull LSFPropertyExpression sourceStatement) {
         return getValuePropertyNames(sourceStatement.getIfPE());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFAliasedPropertyExpression sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getPropertyExpression());
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFIfPE sourceStatement) {
@@ -2060,6 +2156,29 @@ public class LSFPsiImplUtil {
         return getValuePropertyNames(list.getPropertyExpressionList());
     }
 
+    private static List<String> getAliasedValuePropertyNames(List<LSFAliasedPropertyExpression> list) {
+        if (list.size() == 0)
+            return Collections.EMPTY_LIST;
+
+        List<String> result = null;
+        for (int i = 0; i < list.size(); i++) {
+            List<String> valueProperty = getValuePropertyNames(list.get(i));
+            if (i == 0) {
+                result = valueProperty;
+            } else {
+                result.addAll(valueProperty);
+            }
+        }
+        return result;
+    }
+
+    private static List<String> getValuePropertyNames(@Nullable LSFNonEmptyAliasedPropertyExpressionList list) {
+        if (list == null) {
+            return Collections.emptyList();
+        }
+        return getAliasedValuePropertyNames(list.getAliasedPropertyExpressionList());
+    }
+
     public static List<String> getValuePropertyNames(@NotNull LSFMultiPropertyDefinition sourceStatement) {
         return getValuePropertyNames(sourceStatement.getNonEmptyPropertyExpressionList());
     }
@@ -2109,6 +2228,14 @@ public class LSFPsiImplUtil {
 
     public static List<String> getValuePropertyNames(@NotNull LSFConcatPropertyDefinition sourceStatement) {
         return getValuePropertyNames(sourceStatement.getNonEmptyPropertyExpressionList());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFJsonPropertyDefinition sourceStatement) {
+        return getValuePropertyNames(sourceStatement.getNonEmptyAliasedPropertyExpressionList());
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFJsonFormPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFCastPropertyDefinition sourceStatement) {
@@ -3074,6 +3201,11 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
+    public static Inferred inferParamClasses(@NotNull LSFAliasedPropertyExpression sourceStatement, @Nullable LSFExClassSet valueClass) {
+        return inferParamClasses(sourceStatement.getPropertyExpression(), valueClass);
+    }
+
+    @NotNull
     public static Inferred inferParamClasses(@NotNull LSFIfPE sourceStatement, @Nullable LSFExClassSet valueClass) {
         List<LSFOrPE> peList = sourceStatement.getOrPEList();
 
@@ -3371,6 +3503,24 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
+    private static Inferred inferAliasedParamClasses(List<LSFAliasedPropertyExpression> list, @Nullable LSFExClassSet valueClass) {
+        if (list.size() == 0)
+            return Inferred.EMPTY;
+
+        List<Inferred> classes = new ArrayList<>();
+        for (LSFAliasedPropertyExpression expr : list)
+            classes.add(inferParamClasses(expr, valueClass));
+        return Inferred.orClasses(classes);
+    }
+
+    private static Inferred inferParamClasses(@Nullable LSFNonEmptyAliasedPropertyExpressionList list, @Nullable LSFExClassSet valueClass) {
+        if (list == null) {
+            return Inferred.EMPTY;
+        }
+        return inferAliasedParamClasses(list.getAliasedPropertyExpressionList(), valueClass);
+    }
+
+    @NotNull
     public static Inferred inferParamClasses(@NotNull LSFMultiPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getNonEmptyPropertyExpressionList(), valueClass);
     }
@@ -3501,6 +3651,16 @@ public class LSFPsiImplUtil {
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFConcatPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return inferParamClasses(sourceStatement.getNonEmptyPropertyExpressionList(), valueClass);
+    }
+
+    @NotNull
+    public static Inferred inferParamClasses(@NotNull LSFJsonPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+        return inferParamClasses(sourceStatement.getNonEmptyAliasedPropertyExpressionList(), valueClass);
+    }
+
+    @NotNull
+    public static Inferred inferParamClasses(@NotNull LSFJsonFormPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+        return Inferred.EMPTY;
     }
 
     @NotNull
@@ -4092,6 +4252,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFJsonFormPropertyDefinition formActionBody) {
+        return resolveFormDecl(formActionBody.getFormUsage());
+    }
+
+    @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFImportFormActionPropertyDefinitionBody formActionBody) {
         return resolveFormDecl(formActionBody.getFormUsage());
     }
@@ -4496,6 +4661,14 @@ public class LSFPsiImplUtil {
 
     public static String getDocumentation(LSFExportDataActionPropertyDefinitionBody lsfExportDataActionPropertyDefinitionBody, PsiElement child) {
         return "Data_export_EXPORT";
+    }
+
+    public static String getDocumentation(LSFJsonFormPropertyDefinition lsfJsonFormPropertyDefinitionBody, PsiElement child) {
+        return "JSON_operator";
+    }
+
+    public static String getDocumentation(LSFJsonPropertyDefinition lsfJsonPropertyDefinition, PsiElement child) {
+        return "JSON_operator";
     }
 
     public static String getDocumentation(LSFCustomActionPropertyDefinitionBody lsfCustomActionPropertyDefinitionBody, PsiElement child) {

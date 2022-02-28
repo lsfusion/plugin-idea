@@ -355,6 +355,8 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	recursivePropertyDefinition
 	    |	structCreationPropertyDefinition
 	    |	concatPropertyDefinition
+	    |	jsonPropertyDefinition
+	    |	jsonFormPropertyDefinition
 	    |	castPropertyDefinition
 	    |	sessionPropertyDefinition
 	    |	signaturePropertyDefinition
@@ -478,6 +480,20 @@ castPropertyDefinition ::= builtInClassName LBRAC propertyExpression RBRAC
 
 concatPropertyDefinition ::= CONCAT stringLiteral COMMA nonEmptyPropertyExpressionList
 {pin = 1 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
+
+jsonPropertyDefinition ::= JSON LBRAC FROM nonEmptyAliasedPropertyExpressionList wherePropertyExpression? (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)? RBRAC
+{
+    pin = 3
+    implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getContextModifier getContextInferrer getDocumentation]
+}
+
+jsonFormPropertyDefinition ::= JSON LBRAC mappedForm contextFiltersClause? RBRAC
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames resolveFormDecl getDocumentation]
+}
 
 sessionPropertyType ::= PREV | CHANGED | SET | DROPPED | SETCHANGED | DROPCHANGED | SETDROPPED
 sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC

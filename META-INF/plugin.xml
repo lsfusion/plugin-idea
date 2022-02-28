@@ -11,6 +11,7 @@
         <ul>
             <li>CUSTOM EDIT function support in input action body and in FORM PROPERTIES</li>
             <li>EMBEDDED and POPUP support in DIALOG operator</li>
+            <li>JSON operators support</li>
         </ul>
     ]]>
     </change-notes>
