@@ -2388,17 +2388,18 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement, List<LSFParamDeclaration> declareParams) {
-        LSFClassNameList classNameList = sourceStatement.getClassNameList();
-        if (classNameList != null)
-            return LSFExClassSet.toEx(resolveClasses(classNameList));
+        LSFBracketedClassNameList bracketedClassNameList = sourceStatement.getBracketedClassNameList();
+        if (bracketedClassNameList != null)
+            return LSFExClassSet.toEx(resolveClasses(bracketedClassNameList.getClassNameList()));
+
         return null;
     }
 
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement, List<LSFParamDeclaration> declareParams) {
-        LSFClassNameList classNameList = sourceStatement.getClassNameList();
-        if (classNameList != null)
-            return checkValueParamClasses(sourceStatement, classNameList, declareParams);
+        LSFBracketedClassNameList bracketedClassNameList = sourceStatement.getBracketedClassNameList();
+        if (bracketedClassNameList != null)
+            return checkValueParamClasses(sourceStatement, bracketedClassNameList.getClassNameList(), declareParams);
         return new Pair<>(Collections.emptyList(), Collections.emptyMap());
     }
 
@@ -2618,9 +2619,9 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement) {
-        LSFClassNameList classNameList = sourceStatement.getClassNameList();
-        if(classNameList != null)
-            return getClassNameRefs(classNameList);
+        LSFBracketedClassNameList bracketedClassNameList = sourceStatement.getBracketedClassNameList();
+        if (bracketedClassNameList != null)
+            return getClassNameRefs(bracketedClassNameList.getClassNameList());
         return null;
     }
 

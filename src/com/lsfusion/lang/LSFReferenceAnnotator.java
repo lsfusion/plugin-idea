@@ -1166,4 +1166,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             addUnderscoredError(o, "Wrong map option definition: 'google' or 'yandex' expected");
         }
     }
+
+    @Override
+    public void visitJsStringUsage(@NotNull LSFJsStringUsage o) {
+        if (o.getParent().getChildren().length > 1) {
+            String text = o.getFirstChild().getText();
+            PsiElement lastChild = o.getParent().getLastChild();
+            if (lastChild.getText().length() > 2 && (text.contains(".js") || text.contains(".css")))
+                addUnderscoredError(lastChild, "Calling '.js' or '.css' file should not have arguments");
+        }
+        super.visitJsStringUsage(o);
+    }
 }
