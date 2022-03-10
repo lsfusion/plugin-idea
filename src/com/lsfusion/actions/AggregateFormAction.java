@@ -72,6 +72,8 @@ public class AggregateFormAction extends AnAction {
                 EditorImpl editor = ((EditorComponentImpl) editorComponent).getEditor();
                 PsiElement sourceElement = findSourceElement(e.getProject(), editor, editor.getCaretModel().getOffset());
 
+                List<LSFModuleDeclaration> requiredModules = DesignUtils.getRequiredModules(((LSFFile) sourceElement.getContainingFile()).getModuleDeclaration());
+
                 final LSFExtend lsfExtend = PsiTreeUtil.getParentOfType(sourceElement, LSFExtend.class);
                 if (lsfExtend != null) {
                     LSFFormDeclaration formDecl = (LSFFormDeclaration) lsfExtend.resolveDecl();
@@ -87,7 +89,7 @@ public class AggregateFormAction extends AnAction {
                             elementToModule.put(formExtend, moduleDeclaration);
                         }
                     }
-                    for (PsiElement formExtend : DesignUtils.sortByModules(formDecl, elementToModule)) {
+                    for (PsiElement formExtend : DesignUtils.sortByModules(requiredModules, elementToModule)) {
                         result.add(getCodeBlock(formExtend));
                     }
                     int last = result.size() - 1;
@@ -109,7 +111,7 @@ public class AggregateFormAction extends AnAction {
                                 }
                             }
                         }
-                        for (PsiElement ref : DesignUtils.sortByModules(formDecl, elementToModule)) {
+                        for (PsiElement ref : DesignUtils.sortByModules(requiredModules, elementToModule)) {
                             LSFDesignHeader designHeader = (LSFDesignHeader) ref.getParent();
                             LSFDesignStatement designStatement = (LSFDesignStatement) designHeader.getParent();
                             result.add(getCodeBlock(designStatement));

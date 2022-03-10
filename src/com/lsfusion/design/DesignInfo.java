@@ -34,6 +34,8 @@ public class DesignInfo {
 
         FormEntity formEntity = new FormEntity(lsfFile);
 
+        List<LSFModuleDeclaration> requiredModules = DesignUtils.getRequiredModules(((LSFFile) formDecl.getContainingFile()).getModuleDeclaration());
+
         Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile, localScope);
         
         Map<PsiElement, LSFModuleDeclaration> elementToModule = new HashMap<>();
@@ -44,7 +46,7 @@ public class DesignInfo {
             }
         }
 
-        List<PsiElement> sortedFormDecls = DesignUtils.sortByModules(formDecl, elementToModule);
+        List<PsiElement> sortedFormDecls = DesignUtils.sortByModules(requiredModules, elementToModule);
         for (PsiElement formExtend : sortedFormDecls) {
             formEntity.extendForm((LSFFormExtend) formExtend);
         }
@@ -66,7 +68,7 @@ public class DesignInfo {
             }
         }
         
-        for (PsiElement ref : DesignUtils.sortByModules(formDecl, elementToModule)) {
+        for (PsiElement ref : DesignUtils.sortByModules(requiredModules, elementToModule)) {
             LSFDesignHeader designHeader = (LSFDesignHeader) ref.getParent();
             if (designHeader.getCustomFormDesignOption() != null) {
                 formView = FormView.create(formEntity);
