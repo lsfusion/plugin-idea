@@ -13,6 +13,7 @@
             <li>EMBEDDED and POPUP support in DIALOG operator</li>
             <li>JSON operators support</li>
             <li>INTERNAL CLIENT operators support</li>
+            <li>MESSAGE LOG support</li>
         </ul>
     ]]>
     </change-notes>

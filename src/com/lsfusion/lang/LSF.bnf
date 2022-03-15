@@ -1023,7 +1023,7 @@ confirmActionPropertyDefinitionBody ::= ASK propertyExpression ((paramDeclare EQ
     methods = [inferActionParamClasses resolveClass ensureClass getDoContextModifier getDoContextInferrer getDocumentation]
 }
 
-messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression syncTypeLiteral?
+messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression (syncTypeLiteral | LOG)*
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
