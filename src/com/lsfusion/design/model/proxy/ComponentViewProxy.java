@@ -116,6 +116,10 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         target.setImagePath(imagePath);
     }
 
+    public void setCustom(String custom) {
+        target.custom = custom;
+    }
+
     public void setSize(Dimension size) {
         target.setSize(size);
     }
