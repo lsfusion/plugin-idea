@@ -15,6 +15,7 @@
             <li>INTERNAL CLIENT operators support</li>
             <li>MESSAGE LOG support</li>
             <li>Support "custom" property in container design</li>
+            <li>WAIT/NOWAIT for propertyDraw</li>
         </ul>
     ]]>
     </change-notes>

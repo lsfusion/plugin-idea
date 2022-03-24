@@ -636,6 +636,7 @@ private semiPropertyOption ::= IN groupUsage
                            |	notNullSetting
                            |	eventIdSetting
                            |    stickyOption
+                           |    syncTypeLiteral
                            |   ATSIGN2 simpleName
 private nonSemiPropertyOption ::= onEditEventSetting
 
@@ -1676,6 +1677,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    ROW
                             |    MEASURE
                             |    stickyOption
+                            |    syncTypeLiteral
                             )*
 
 formOptionSession ::= NEWSESSION | NESTEDSESSION;
