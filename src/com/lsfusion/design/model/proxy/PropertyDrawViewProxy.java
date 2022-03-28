@@ -124,4 +124,8 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
     public void setValueAlignment(FlexAlignment valueAlignment) {
         this.setValueAlignment(valueAlignment);
     }
+
+    public void setBoxed(boolean boxed) {
+        target.boxed = boxed;
+    }
 }

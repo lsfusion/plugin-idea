@@ -54,7 +54,9 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("askConfirm"),
             new ReflectionProperty("askConfirmMessage"),
             new ReflectionProperty("panelColumnVertical"),
-            new ReflectionProperty("defaultCompare")
+            new ReflectionProperty("defaultCompare"),
+            new ReflectionProperty("boxed")
+
     );
 
     public PropertyDrawEntity entity;
@@ -97,6 +99,8 @@ public class PropertyDrawView extends ComponentView {
     public boolean noSort;
     public boolean notNull;
     public String defaultCompare;
+
+    public boolean boxed;
 
     public PropertyDrawView() {
         this("");
@@ -558,5 +562,13 @@ public class PropertyDrawView extends ComponentView {
             
             return String.format(TOOL_TIP_FORMAT + DETAILED_TOOL_TIP_FORMAT, propCaption, editKeyText, entity.canonicalName/*, tableName*/, ifaceObjects, ifaceClasses, returnClass, script, scriptPath, entity.sID);
         }
+    }
+
+    public boolean isBoxed() {
+        return boxed;
+    }
+
+    public void setBoxed(boolean boxed) {
+        this.boxed = boxed;
     }
 }

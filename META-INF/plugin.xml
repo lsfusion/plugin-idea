@@ -16,6 +16,7 @@
             <li>MESSAGE LOG support</li>
             <li>Support "custom" property in container design</li>
             <li>WAIT/NOWAIT for propertyDraw</li>
+            <li>Support 'boxed' property option</li>
         </ul>
     ]]>
     </change-notes>
