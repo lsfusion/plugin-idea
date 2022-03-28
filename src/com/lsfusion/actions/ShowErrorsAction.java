@@ -160,7 +160,7 @@ public class ShowErrorsAction extends AnAction {
     }
 
     private void findLSFErrors(PsiElement element) {
-        ANNOTATOR.annotate(element, new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile())), true);
+        ANNOTATOR.annotate(element, new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile()), false), true);
 
         for (PsiElement child : element.getChildren()) {
             findLSFErrors(child);
