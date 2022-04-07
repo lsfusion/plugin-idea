@@ -7,16 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.231</b><br>
+        <b>Version 1.0.232</b><br>
         <ul>
-            <li>CUSTOM EDIT function support in input action body and in FORM PROPERTIES</li>
-            <li>EMBEDDED and POPUP support in DIALOG operator</li>
-            <li>JSON operators support</li>
-            <li>INTERNAL CLIENT operators support</li>
-            <li>MESSAGE LOG support</li>
-            <li>Support "custom" property in container design</li>
-            <li>WAIT/NOWAIT for propertyDraw</li>
-            <li>Support 'boxed' property option</li>
+            <li>>Update PRINT-operator syntax</li>
         </ul>
     ]]>
     </change-notes>

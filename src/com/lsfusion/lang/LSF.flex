@@ -452,6 +452,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "SEEK"                    			{ return SEEK; }
   "SELECTOR"                			{ return SELECTOR; }
   "SERIALIZABLE"                        { return SERIALIZABLE; }
+  "SERVER"                              { return SERVER; }
   "SET"                     			{ return SET; }
   "SETCHANGED"              			{ return SETCHANGED; }
   "SETDROPPED"                 			{ return SETDROPPED; }

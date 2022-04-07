@@ -850,31 +850,31 @@ staticDestination ::= TO noParamsPropertyUsage
 groupObjectDestination ::= TO groupObjectUsage EQUALS propertyUsage (COMMA groupObjectUsage EQUALS propertyUsage)*
 
 printActionPropertyDefinitionBody ::=
-	    PRINT mappedForm contextFiltersClause?
-		(   (
-		    (   XLSX (SHEET propertyExpression)? (PASSWORD propertyExpression)?
-		    |   XLS (SHEET propertyExpression)? (PASSWORD propertyExpression)?
-		    |   PDF 
-		    |   DOC 
-		    |   DOCX
-		    |   RTF
-		    |   HTML
-		    ) 
-		    staticDestination?
-		    ) 
-		|
+	    PRINT (CLIENT | SERVER)? mappedForm contextFiltersClause?
+	    (
 		    (
 		        MESSAGE
 		        syncTypeLiteral?
 		        (TOP intLiteral)?
 		    )
-		|
+		    |
 		    (
-            (PREVIEW | NOPREVIEW)?
-		    syncTypeLiteral?
-		    (TO propertyExpression)?
+                (
+                    (   XLSX (SHEET propertyExpression)? (PASSWORD propertyExpression)?
+                    |   XLS (SHEET propertyExpression)? (PASSWORD propertyExpression)?
+                    |   PDF
+                    |   DOC
+                    |   DOCX
+                    |   RTF
+                    |   HTML
+                    )
+                    staticDestination?
+                )?
+                (PREVIEW | NOPREVIEW)?
+                syncTypeLiteral?
+                (TO propertyExpression)?
 		    )
-        )
+	    )
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
