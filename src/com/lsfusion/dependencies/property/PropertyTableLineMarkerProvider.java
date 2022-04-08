@@ -60,12 +60,11 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
                     if (nameIdentifier != null && nameIdentifier.getFirstChild() == element) {
                         if(!(propDeclaration instanceof LSFAggrParamGlobalPropDeclaration && ((LSFAggrParamGlobalPropDeclaration) propDeclaration).getAggrPropertyDefinition() == null)) {
                             if (propDeclaration.isCorrect() && (propDeclaration.isDataStoredProperty() || propDeclaration.isPersistentProperty())) {
-                                try {
-                                    result.add(createLineMarker(element));
-                                } catch(Exception ignored) {
-                                    //remove after discontinuation of Idea 2020.2 support (see comment LSFLineMarkerInfo:23)
+                                LineMarkerInfo<?> marker = createLineMarker(element);
+                                if (marker != null) {
+                                    result.add(marker);
+                                    usedLines.add(lineNumber);
                                 }
-                                usedLines.add(lineNumber);
                             }
                         }
                     }

@@ -22,20 +22,24 @@ public class LSFLineMarkerInfo {
                                         @NotNull GutterIconRenderer.Alignment alignment) {
         // added reflection access in order not to lose Idea 2020.2- compatibility
         // todo: make direct constructor calls after discontinuation of Idea 2020.2 support 
-        return ReflectionUtils.createByPrivateConstructor(LineMarkerInfo.class,
-                new Class[]{PsiElement.class,
-                        TextRange.class,
-                        Icon.class,
-                        Supplier.class,
-                        Function.class,
-                        GutterIconNavigationHandler.class,
-                        GutterIconRenderer.Alignment.class},
-                element,
-                range,
-                icon,
-                null,
-                tooltipProvider,
-                navHandler,
-                alignment);
+        try {
+            return ReflectionUtils.createByPrivateConstructor(LineMarkerInfo.class,
+                    new Class[]{PsiElement.class,
+                            TextRange.class,
+                            Icon.class,
+                            Supplier.class,
+                            Function.class,
+                            GutterIconNavigationHandler.class,
+                            GutterIconRenderer.Alignment.class},
+                    element,
+                    range,
+                    icon,
+                    null,
+                    tooltipProvider,
+                    navHandler,
+                    alignment);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

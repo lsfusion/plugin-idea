@@ -25,16 +25,18 @@ import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.text.StringTokenizer;
+import com.lsfusion.inspections.LSFProblemsVisitor;
 import com.lsfusion.lang.LSFErrorLevel;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.inspections.LSFProblemsVisitor;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -149,7 +151,15 @@ public class ShowErrorsAction extends AnAction {
 
         ProgressManager.getInstance().run(task);
 
-        EventLog.getEventLog(project).activate(null);
+        // todo: Notifications tool window was created in 2021.3. 
+        //  ID should be replaced with NotificationsToolWindowFactory.ID as soon as supported versions range will allow to.
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Notifications");
+        if (toolWindow == null) {
+            toolWindow = EventLog.getEventLog(project);
+        }
+        if (toolWindow != null && !toolWindow.isVisible()) {
+            toolWindow.activate(null);
+        }
         
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override

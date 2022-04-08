@@ -12,10 +12,10 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
+import com.intellij.util.ui.tree.TreeModelAdapter;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
-import org.apache.log4j.lf5.viewer.categoryexplorer.TreeModelAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

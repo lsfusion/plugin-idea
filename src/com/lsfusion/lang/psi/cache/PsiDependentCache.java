@@ -30,7 +30,7 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
 
     public PsiDependentCache(@NotNull MessageBus messageBus) {
         for (int i = 0; i < myMaps.length; i++) {
-            myMaps[i] = ContainerUtil.createConcurrentWeakMap(100, 0.75f, Runtime.getRuntime().availableProcessors(), ContainerUtil.<Psi>canonicalStrategy());
+            myMaps[i] = ContainerUtil.createConcurrentWeakMap();
         }
         messageBus.connect().subscribe(PsiManagerImpl.ANY_PSI_CHANGE_TOPIC, new AnyPsiChangeListener() {
             @Override

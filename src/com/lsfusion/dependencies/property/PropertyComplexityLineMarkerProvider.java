@@ -53,8 +53,11 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
                         LSFId nameIdentifier = propDeclaration.getNameIdentifier();
                         if (nameIdentifier != null && nameIdentifier.getFirstChild() == element) {
                             if (propDeclaration.isCorrect() && !propDeclaration.isStoredProperty()) {
-                                result.add(createLineMarker(propDeclaration, element));
-                                usedLines.add(lineNumber);
+                                LineMarkerInfo<?> marker = createLineMarker(propDeclaration, element);
+                                if (marker != null) {
+                                    result.add(marker);
+                                    usedLines.add(lineNumber);
+                                }
                             }
                         }
                     }
