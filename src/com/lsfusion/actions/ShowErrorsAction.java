@@ -42,7 +42,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -170,7 +169,10 @@ public class ShowErrorsAction extends AnAction {
     }
 
     private void findLSFErrors(PsiElement element) {
-        ANNOTATOR.annotate(element, new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile()), false), true);
+        AnnotationHolderImpl annotationHolder = new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile()), false);
+        ANNOTATOR.errorsSearchMode = true;
+        annotationHolder.runAnnotatorWithContext(element, ANNOTATOR);
+        ANNOTATOR.errorsSearchMode = false;
 
         for (PsiElement child : element.getChildren()) {
             findLSFErrors(child);
@@ -203,15 +205,18 @@ public class ShowErrorsAction extends AnAction {
 
         Module module = ModuleUtilCore.findModuleForPsiElement(element);
         if (module != null) {
-            String moduleName = module.getName();
-            String linkToTheElement = "<a href=\"\">(" + moduleName + ") " + file.getName() + "(" + lineNumber + ":" + linePosition + ")</a>";
-            Notifications.Bus.notify(new Notification(errorLevel == LSFErrorLevel.ERROR ? "LSF errors" : "LSF warnings", linkToTheElement, errorMessage,
-                    errorLevel == LSFErrorLevel.ERROR ? NotificationType.ERROR : NotificationType.WARNING, new NotificationListener.Adapter() {
-                @Override
-                protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
-                    ((NavigationItem) element).navigate(true);
-                }
-            }));
+            Notifications.Bus.notify(new Notification(
+                            errorLevel == LSFErrorLevel.ERROR ? "LSF errors" : "LSF warnings",
+                            "Error in " + module.getName() + " module:",
+                            errorMessage,
+                            errorLevel == LSFErrorLevel.ERROR ? NotificationType.ERROR : NotificationType.WARNING
+                    ).addAction(
+                            NotificationAction.create(
+                                    file.getName() + "(" + lineNumber + ":" + linePosition + ")",
+                                    (event, inotification) -> ((NavigationItem) element).navigate(true)
+                            )
+                    )
+            );
         }
     }
 

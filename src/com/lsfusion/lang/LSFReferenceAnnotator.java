@@ -4,9 +4,10 @@ import com.intellij.codeInsight.FileModificationService;
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
-import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationBuilder;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
+import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.lang.properties.references.I18nUtil;
 import com.intellij.openapi.application.ApplicationManager;
@@ -100,9 +101,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitElement(@NotNull PsiElement o) {
         if (o instanceof LeafPsiElement) { // фокус в том что побеждает наибольший приоритет, но важно следить что у верхнего правила всегда приоритет выше, так как в противном случае annotator просто херится
             TextAttributes textAttributes = mergeMetaAttributes(o, null);
-            if(textAttributes != null) {
-                Annotation annotation = myHolder.createInfoAnnotation(o.getTextRange(), null);
-                annotation.setEnforcedTextAttributes(textAttributes);
+            if (textAttributes != null) {
+                myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "")
+                        .range(o.getTextRange())
+                        .enforcedTextAttributes(textAttributes)
+                        .create();
             }
         }
     }
@@ -244,10 +247,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addOuterRef(LSFReference reference) {
-        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Outer param");
-        TextAttributes error = OUTER_PARAM;
-        error = mergeMetaAttributes(reference, error);
-        annotation.setEnforcedTextAttributes(error);
+        myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Outer param")
+                .range(reference.getTextRange())
+                .enforcedTextAttributes(mergeMetaAttributes(reference, OUTER_PARAM))
+                .create();
     }
 
     public static boolean isOuter(LSFExprParamDeclaration decl, LSFPropertyExprObject pExprObject) {
@@ -323,8 +326,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void checkMetaNestingUsage(@NotNull PsiElement o) {
         if (MetaNestingLineMarkerProvider.resolveNestingLevel(o) > 1) {
-            Annotation metaHeaderAnnotation = myHolder.createInfoAnnotation(o.getTextRange(), "");
-            metaHeaderAnnotation.setEnforcedTextAttributes(META_NESTING_USAGE);
+            myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "")
+                    .range(o.getTextRange())
+                    .enforcedTextAttributes(META_NESTING_USAGE)
+                    .create();
         }
     }
 
@@ -424,10 +429,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 Set<String> usedParameter = new ExprsContextModifier(propertyExpression).resolveAllParams();
                 for(LSFParamDeclaration declareParam : declareParams)
                     if(!usedParameter.contains(declareParam.getName())) {
-                        final Annotation annotation = myHolder.createWarningAnnotation(declareParam, "Parameter is not used");
-                        TextAttributes error = WARNING;
-                        error = mergeMetaAttributes(declareParam, error);
-                        annotation.setEnforcedTextAttributes(error);
+                        myHolder.newAnnotation(HighlightSeverity.WARNING, "Parameter is not used")
+                                .range(declareParam)
+                                .enforcedTextAttributes(mergeMetaAttributes(declareParam, WARNING))
+                                .create();
                     }
             }
         }
@@ -632,14 +637,18 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             TextRange refRange = reference.getRangeInElement();
             TextRange refFileRange = TextRange.from(elementRange.getStartOffset() + refRange.getStartOffset(), refRange.getLength());
             if (resolved == null) {
-                Annotation annotation = myHolder.createErrorAnnotation(refFileRange, "Can't resolve " + refRange.substring(elementText));
-                annotation.setEnforcedTextAttributes(ERROR);
+                myHolder.newAnnotation(HighlightSeverity.ERROR, "Can't resolve " + refRange.substring(elementText))
+                        .range(refFileRange)
+                        .enforcedTextAttributes(ERROR)
+                        .create();
             } else if (refRange.getEndOffset() == elementRange.getLength() - 1) {
                 //последний компонент должен быть ActionProperty
                 boolean correctClass = resolved instanceof PsiClass && hasSuperClass((PsiClass) resolved, ACTION_FQN);
                 if (!correctClass) {
-                    Annotation annotation = myHolder.createErrorAnnotation(refFileRange, "Class " + elementText + " should extend Action");
-                    annotation.setEnforcedTextAttributes(ERROR);
+                    myHolder.newAnnotation(HighlightSeverity.ERROR, "Class " + elementText + " should extend Action")
+                            .range(refFileRange)
+                            .enforcedTextAttributes(ERROR)
+                            .create();
                 }
             }
         }
@@ -697,13 +706,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     }
 
                     if (!fixes.isEmpty()) {
-
-                        Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Missing " + o.getText() + " in resource bundle");
-                        annotation.setEnforcedTextAttributes(WAVE_UNDERSCORED_WARNING);
+                        AnnotationBuilder annotationBuilder = myHolder.newAnnotation(HighlightSeverity.WARNING, "Missing " + o.getText() + " in resource bundle")
+                                .range(o.getTextRange())
+                                .enforcedTextAttributes(WAVE_UNDERSCORED_WARNING);
 
                         for (IntentionAction fix : fixes) {
-                            annotation.registerFix(fix);
+                            annotationBuilder = annotationBuilder.withFix(fix);
                         }
+                        
+                        annotationBuilder.create();
                     }
                 }
             }
@@ -798,7 +809,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             LSFClassSet class1 = getLSFClassSet(relationalPE.getSimplePE());
             LSFClassSet class2 = LSFPsiImplUtil.resolveClass(type.getClassName());
             if (class1 != null && class2 != null && !class1.haveCommonChildren(class2, null)) {
-                myHolder.createWarningAnnotation(relationalPE, String.format("Type mismatch: can't cast %s to %s", class1, class2));
+                myHolder.newAnnotation(HighlightSeverity.WARNING, String.format("Type mismatch: can't cast %s to %s", class1, class2))
+                        .range(relationalPE)
+                        .create();
             }
         }
     }
@@ -837,8 +850,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addColumnInfo(PsiElement element, String tableName, String columnName) {
-        final Annotation annotation = myHolder.createInfoAnnotation(element.getTextRange(), "Table: " + tableName + "; columnName: " + columnName);
-        annotation.setEnforcedTextAttributes(IMPLICIT_DECL);
+         myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Table: " + tableName + "; columnName: " + columnName)
+                 .range(element.getTextRange())
+                 .enforcedTextAttributes(IMPLICIT_DECL)
+                 .create();
     }
 
     private void addAlreadyDefinedError(LSFDeclaration decl) {
@@ -866,33 +881,33 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
     private void addError(PsiElement element, LSFResolvingError error, boolean hasResolving) {
         boolean inMetaDecl = isInMetaDecl(element);
-        Annotation annotation;
+        AnnotationBuilder annotationBuilder;
         TextAttributes errorAttributes;
         if(inMetaDecl && hasResolving) {
-            if (error.range != null)
-                annotation = myHolder.createInfoAnnotation(error.range, error.text);
-            else
-                annotation = myHolder.createInfoAnnotation(error.element, error.text);
+            annotationBuilder = myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, error.text);
             errorAttributes = error.underscored ? WAVE_UNDERSCORED_META_ERROR : META_ERROR;
         } else {
             if (errorsSearchMode) {
                 ShowErrorsAction.showErrorMessage(element, error.text, LSFErrorLevel.ERROR);
             }
 
-            if (error.range != null)
-                annotation = myHolder.createErrorAnnotation(error.range, error.text);
-            else
-                annotation = myHolder.createErrorAnnotation(error.element, error.text);
+            annotationBuilder = myHolder.newAnnotation(HighlightSeverity.ERROR, error.text);
             errorAttributes = error.underscored ? WAVE_UNDERSCORED_ERROR : ERROR;
         }
 
-        errorAttributes = mergeMetaAttributes(element, errorAttributes);
-        annotation.setEnforcedTextAttributes(errorAttributes);
+        if (error.range != null) {
+            annotationBuilder = annotationBuilder.range(error.range);
+        }
+
+        annotationBuilder.enforcedTextAttributes(mergeMetaAttributes(element, errorAttributes))
+                .create();
     }
     
     private void addDeprecatedWarning(PsiElement element, String text) {
-        Annotation annotation = myHolder.createWarningAnnotation(element, text);
-        annotation.setEnforcedTextAttributes(DEPRECATED_WARNING);
+        myHolder.newAnnotation(HighlightSeverity.WARNING, text)
+                .range(element)
+                .enforcedTextAttributes(DEPRECATED_WARNING)
+                .create();
     }
 
     private TextAttributes mergeMetaAttributes(PsiElement element, TextAttributes attributes) {
@@ -921,24 +936,24 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addIndirectProp(LSFActionOrPropReference reference) {
-        final Annotation annotation = myHolder.createWeakWarningAnnotation(reference.getTextRange(), "Indirect usage");
-        TextAttributes error = IMPLICIT_DECL;
-        error = mergeMetaAttributes(reference, error);
-        annotation.setEnforcedTextAttributes(error);
+        myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Indirect usage")
+                .range(reference.getTextRange())
+                .enforcedTextAttributes(mergeMetaAttributes(reference, IMPLICIT_DECL))
+                .create();
     }
 
     private void addImplicitDecl(LSFReference reference) {
-        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Implicit parameter declaration");
-        TextAttributes error = IMPLICIT_DECL;
-        error = mergeMetaAttributes(reference, error);
-        annotation.setEnforcedTextAttributes(error);
+        myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Implicit parameter declaration")
+                .range(reference.getTextRange())
+                .enforcedTextAttributes(mergeMetaAttributes(reference, IMPLICIT_DECL))
+                .create();
     }
 
     private void addUntypedImplicitDecl(LSFReference reference) {
-        final Annotation annotation = myHolder.createInfoAnnotation(reference.getTextRange(), "Untyped implicit parameter declaration");
-        TextAttributes error = UNTYPED_IMPLICIT_DECL;
-        error = mergeMetaAttributes(reference, error);
-        annotation.setEnforcedTextAttributes(error);
+        myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Untyped implicit parameter declaration")
+                .range(reference.getTextRange())
+                .enforcedTextAttributes(mergeMetaAttributes(reference, UNTYPED_IMPLICIT_DECL))
+                .create();
     }
 
     @Override
@@ -1152,7 +1167,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 LSFClassSet leftClass = LSFPsiImplUtil.resolveClass(customClassUsage);
                 LSFClassSet rightClass = objectUsageDecl.resolveClass();
                 if (leftClass != null && rightClass != null && !leftClass.haveCommonChildren(rightClass, null)) {
-                    myHolder.createWarningAnnotation(o, String.format("Type mismatch: can't cast %s to %s", leftClass, rightClass));
+                    myHolder.newAnnotation(HighlightSeverity.WARNING, String.format("Type mismatch: can't cast %s to %s", leftClass, rightClass))
+                            .range(o)
+                            .create();
                 }
             }
         }
