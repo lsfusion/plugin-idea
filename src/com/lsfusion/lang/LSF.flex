@@ -290,6 +290,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "FIXED"                   			{ return FIXED; }
   "FLEX"                   			    { return FLEX; }
   "FLOAT"                     			{ return FLOAT; }
+  "FOCUSED"                             { return FOCUSED; }
   "FOLDER"                              { return FOLDER; }
   "FOOTER"                  			{ return FOOTER; }
   "FOR"                     			{ return FOR; }
@@ -318,6 +319,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "HINTNOUPDATE"            			{ return HINTNOUPDATE; }
   "HINTTABLE"               			{ return HINTTABLE; }
   "HORIZONTAL"              			{ return HORIZONTAL; }
+  "HOVER"              			        { return HOVER; }
   "HTML"                    			{ return HTML; }
   "HTTP"                    			{ return HTTP; }
   "IF"                      			{ return IF; }
@@ -450,6 +452,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "RTF"                     			{ return RTF; }
   "SCROLL"                              { return SCROLL; }
   "SEEK"                    			{ return SEEK; }
+  "SELECTED"                			{ return SELECTED; }
   "SELECTOR"                			{ return SELECTOR; }
   "SERIALIZABLE"                        { return SERIALIZABLE; }
   "SERVER"                              { return SERVER; }

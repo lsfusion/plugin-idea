@@ -1229,7 +1229,12 @@ listWhereInputProps ::= listInputProp? whereInputProp?
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer ]
 }
-contextActions ::= ACTIONS stringLiteral listActionPropertyDefinitionBody (COMMA stringLiteral listActionPropertyDefinitionBody)*
+contextActions ::= ACTIONS contextAction (COMMA contextAction)*
+{
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer ]
+}
+contextAction ::= stringLiteral (KEYPRESS stringLiteral)? (TOOLBAR ((ALL | SELECTED | FOCUSED) HOVER?)*)? listActionPropertyDefinitionBody
 {
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer ]
