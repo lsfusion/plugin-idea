@@ -43,6 +43,7 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.impl.LSFFormDeclImpl;
 import com.lsfusion.lang.psi.impl.LSFLocalPropertyDeclarationNameImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.*;
@@ -499,6 +500,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitFormDeclaration(o);
 
         checkAlreadyDefined(o);
+        checkAutorefresh(o);
+    }
+
+    private void checkAutorefresh(LSFFormDeclaration o) {
+        for(LSFAutorefreshLiteral autorefresh : ((LSFFormDeclImpl) o).getAutorefreshLiteralList()) {
+            addDeprecatedWarning(autorefresh, "Deprecated since version 5, use FORM SCHEDULE instead. Earlier versions: ignore this warning");
+        }
     }
 
     @Override

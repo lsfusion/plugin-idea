@@ -1472,6 +1472,7 @@ formStatement ::=	(	formDecl
                     |	formPropertiesList
                     |	formHintsList
                     |	formEventsList
+                    |	formScheduleDeclaration
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
                     |   userFiltersDeclaration
@@ -1526,7 +1527,7 @@ groupObjectReportPath ::= (TOP | groupObjectUsage) formCalcPropertyObject
 
 formDecl ::= FORM simpleNameWithCaption
 		            (   IMAGE stringLiteral
-		            |   AUTOREFRESH intLiteral
+		            |   autorefreshLiteral
 		            |   LOCALASYNC
 		            )*
 {
@@ -1537,6 +1538,8 @@ formDecl ::= FORM simpleNameWithCaption
     stubClass = "com.lsfusion.lang.psi.stubs.FormStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
+
+autorefreshLiteral ::= AUTOREFRESH intLiteral
 
 extendingFormDeclaration ::= EXTEND FORM formUsageWrapper
 {
@@ -1734,6 +1737,13 @@ formFiltersList ::= FILTERS formExprDeclaration (COMMA formExprDeclaration)*
 formHintsList ::= (HINTNOUPDATE | HINTTABLE) LIST nonEmptyNoContextPropertyUsageList {pin = 1}
 
 formEventsList ::= EVENTS formEventDeclaration (COMMA formEventDeclaration)*
+{
+    pin = 1
+    implements = "com.lsfusion.documentation.LSFDocumentation"
+    methods = [getDocumentation]
+}
+
+formScheduleDeclaration ::= SCHEDULE PERIOD intLiteral FIXED? formActionObject
 {
     pin = 1
     implements = "com.lsfusion.documentation.LSFDocumentation"
