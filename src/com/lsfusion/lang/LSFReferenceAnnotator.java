@@ -4,10 +4,7 @@ import com.intellij.codeInsight.FileModificationService;
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
-import com.intellij.lang.annotation.AnnotationBuilder;
-import com.intellij.lang.annotation.AnnotationHolder;
-import com.intellij.lang.annotation.Annotator;
-import com.intellij.lang.annotation.HighlightSeverity;
+import com.intellij.lang.annotation.*;
 import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.lang.properties.references.I18nUtil;
 import com.intellij.openapi.application.ApplicationManager;
@@ -103,7 +100,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (o instanceof LeafPsiElement) { // фокус в том что побеждает наибольший приоритет, но важно следить что у верхнего правила всегда приоритет выше, так как в противном случае annotator просто херится
             TextAttributes textAttributes = mergeMetaAttributes(o, null);
             if (textAttributes != null) {
-                myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "")
+                myHolder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                         .range(o.getTextRange())
                         .enforcedTextAttributes(textAttributes)
                         .create();
@@ -327,7 +324,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void checkMetaNestingUsage(@NotNull PsiElement o) {
         if (MetaNestingLineMarkerProvider.resolveNestingLevel(o) > 1) {
-            myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "")
+            myHolder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                     .range(o.getTextRange())
                     .enforcedTextAttributes(META_NESTING_USAGE)
                     .create();
@@ -402,8 +399,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (o.isStoredProperty()) {
             if (o.resolveDuplicateColumns()) {
                 addDuplicateColumnNameError(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
-            } else {
-//                    addColumnInfo(o.getNameIdentifier(), o.getTableName(), o.getColumnName());
             }
         }
 
@@ -857,13 +852,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addUnderscoredErrorWithResolving(element, "The property has duplicate column name. Table: " + tableName + ", column: " + columnName);
     }
 
-    private void addColumnInfo(PsiElement element, String tableName, String columnName) {
-         myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Table: " + tableName + "; columnName: " + columnName)
-                 .range(element.getTextRange())
-                 .enforcedTextAttributes(IMPLICIT_DECL)
-                 .create();
-    }
-
     private void addAlreadyDefinedError(LSFDeclaration decl) {
         addAlreadyDefinedError(decl.getDuplicateElement(), decl.getPresentableText());
     }
@@ -892,7 +880,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         AnnotationBuilder annotationBuilder;
         TextAttributes errorAttributes;
         if(inMetaDecl && hasResolving) {
-            annotationBuilder = myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, error.text);
+            annotationBuilder = myHolder.newAnnotation(HighlightSeverity.INFORMATION, error.text);
             errorAttributes = error.underscored ? WAVE_UNDERSCORED_META_ERROR : META_ERROR;
         } else {
             if (errorsSearchMode) {
@@ -944,21 +932,21 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addIndirectProp(LSFActionOrPropReference reference) {
-        myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Indirect usage")
+        myHolder.newAnnotation(HighlightSeverity.INFORMATION, "Indirect usage")
                 .range(reference.getTextRange())
                 .enforcedTextAttributes(mergeMetaAttributes(reference, IMPLICIT_DECL))
                 .create();
     }
 
     private void addImplicitDecl(LSFReference reference) {
-        myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Implicit parameter declaration")
+        myHolder.newAnnotation(HighlightSeverity.INFORMATION, "Implicit parameter declaration")
                 .range(reference.getTextRange())
                 .enforcedTextAttributes(mergeMetaAttributes(reference, IMPLICIT_DECL))
                 .create();
     }
 
     private void addUntypedImplicitDecl(LSFReference reference) {
-        myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Untyped implicit parameter declaration")
+        myHolder.newAnnotation(HighlightSeverity.INFORMATION, "Untyped implicit parameter declaration")
                 .range(reference.getTextRange())
                 .enforcedTextAttributes(mergeMetaAttributes(reference, UNTYPED_IMPLICIT_DECL))
                 .create();
