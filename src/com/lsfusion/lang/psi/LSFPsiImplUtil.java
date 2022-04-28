@@ -4926,10 +4926,6 @@ public class LSFPsiImplUtil {
         return "Event_block";
     }
 
-    public static String getDocumentation(LSFFormScheduleDeclaration lsfFormScheduleDeclaration, PsiElement child) {
-        return "Schedule_block";
-    }
-
     public static String getDocumentation(LSFFormFilterGroupDeclaration lsfFormFilterGroupDeclaration, PsiElement child) {
         return "Filters_and_sortings_block";
     }

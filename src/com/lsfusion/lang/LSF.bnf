@@ -1472,7 +1472,6 @@ formStatement ::=	(	formDecl
                     |	formPropertiesList
                     |	formHintsList
                     |	formEventsList
-                    |	formScheduleDeclaration
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
                     |   userFiltersDeclaration
@@ -1743,13 +1742,6 @@ formEventsList ::= EVENTS formEventDeclaration (COMMA formEventDeclaration)*
     methods = [getDocumentation]
 }
 
-formScheduleDeclaration ::= SCHEDULE PERIOD intLiteral FIXED? formActionObject
-{
-    pin = 1
-    implements = "com.lsfusion.documentation.LSFDocumentation"
-    methods = [getDocumentation]
-}
-
 formEventDeclaration ::= ON
                         (    OK (BEFORE | AFTER)?
                         |    APPLY (BEFORE | AFTER)?
@@ -1759,6 +1751,7 @@ formEventDeclaration ::= ON
                         |    DROP
                         |    QUERYCLOSE
                         |    CHANGE ID
+                        |    SCHEDULE PERIOD intLiteral FIXED?
                         )
                         formActionPropertyObject
 {
