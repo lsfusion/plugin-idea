@@ -10,6 +10,7 @@
         <b>Version 1.0.233</b><br>
         <ul>
             <li>EVENTS ON SCHEDULE support, AUTOREFRESH deprecated</li>
+            <li>Result class of GROUP CONCAT now is TEXT</li>
         </ul>
     ]]>
     </change-notes>

@@ -1498,9 +1498,9 @@ public class LSFPsiImplUtil {
         LSFExClassSet lsfExClassSet = null;
         if(body != null) {
             lsfExClassSet = resolveInferredValueClass(body.getNonEmptyPropertyExpressionList(), inferred);
-            LSFGroupingType groupingType = body.getGroupingType();
+            LSFGroupingTypeOrder groupingType = body.getGroupingTypeOrder();
             if (lsfExClassSet != null && groupingType != null && groupingType.getText().equals("CONCAT"))
-                lsfExClassSet = lsfExClassSet.extend(10);
+                lsfExClassSet = new LSFExClassSet(new TextClass());
         }
         return lsfExClassSet;
     }
