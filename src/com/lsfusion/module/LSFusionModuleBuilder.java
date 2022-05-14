@@ -5,11 +5,12 @@ import com.intellij.execution.RunManager;
 import com.intellij.execution.RunManagerEx;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
+import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.SettingsStep;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
@@ -23,6 +24,7 @@ import com.lsfusion.LSFBundle;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.module.run.LSFusionRunConfiguration;
 import com.lsfusion.module.run.LSFusionRunConfigurationType;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaResourceRootType;
@@ -30,13 +32,14 @@ import org.jetbrains.jps.model.java.JavaResourceRootType;
 import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_MODULE;
 import static com.lsfusion.module.LSFusionTemplates.TEMPLATE_LSFUSION_SETTINGS;
 
-public class LSFusionModuleBuilder extends JavaModuleBuilder {
+public class LSFusionModuleBuilder extends ModuleBuilder {
     public static final String BOOTSTRAP_CLASS_NAME = "lsfusion.server.logics.BusinessLogicsBootstrap";
 
     public static final String BUILDER_ID = "lsfusion";
@@ -213,6 +216,20 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
         }
     }
 
+    @Override
+    public ModuleType<?> getModuleType() {
+        return LSFModuleType.INSTANCE;
+    }
+
+    // c/p from JavaModuleBuilder
+    public List<Pair<String,String>> getSourcePaths() {
+        final List<Pair<String, String>> paths = new ArrayList<>();
+        @NonNls final String path = getContentEntryPath() + File.separator + "src";
+        new File(path).mkdirs();
+        paths.add(Pair.create(path, ""));
+        return paths;
+    }
+    
     private void createFromTemplateAndOpen(final Project project, String templateName, final File templateFile, Properties properties) {
         try {
             String content = FileTemplateManager.getInstance(project).getInternalTemplate(templateName).getText(properties);
