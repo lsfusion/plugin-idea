@@ -1500,7 +1500,7 @@ public class LSFPsiImplUtil {
             lsfExClassSet = resolveInferredValueClass(body.getNonEmptyPropertyExpressionList(), inferred);
             LSFGroupingTypeOrder groupingType = body.getGroupingTypeOrder();
             if (lsfExClassSet != null && groupingType != null && groupingType.getText().equals("CONCAT"))
-                lsfExClassSet = new LSFExClassSet(new TextClass());
+                lsfExClassSet = LSFExClassSet.text;
         }
         return lsfExClassSet;
     }

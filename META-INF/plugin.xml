@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.233</b><br>
+        <b>Version 1.0.234</b><br>
         <ul>
-            <li>EVENTS ON SCHEDULE support, AUTOREFRESH deprecated</li>
-            <li>Result class of GROUP CONCAT now is TEXT</li>
-            <li>New lsFusion project wizard fix</li>
+            <li>Result class of GROUP CONCAT now is unlimited STRING</li>
         </ul>
     ]]>
     </change-notes>
