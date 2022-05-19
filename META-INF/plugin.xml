@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.234</b><br>
+        <b>Version 1.0.235</b><br>
         <ul>
-            <li>Result class of GROUP CONCAT now is unlimited STRING</li>
+            <li>INTERNAL DB/CLIENT support</li>
         </ul>
     ]]>
     </change-notes>

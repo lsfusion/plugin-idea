@@ -4133,6 +4133,22 @@ public class LSFPsiImplUtil {
         return Inferred.orClasses(list);
     }
 
+    public static Inferred inferActionParamClasses(LSFInternalActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        List<Inferred> list = new ArrayList<>();
+
+        LSFPropertyExpression propertyExpression = body.getPropertyExpression();
+        if(propertyExpression != null) {
+            list.add(inferParamClasses(propertyExpression, LSFExClassSet.text).filter(params));
+        }
+
+        LSFNonEmptyPropertyExpressionList exParams = body.getNonEmptyPropertyExpressionList();
+        if(exParams != null)
+            for(LSFPropertyExpression pe : exParams.getPropertyExpressionList())
+                list.add(inferParamClasses(pe, LSFExClassSet.text).filter(params));
+
+        return Inferred.orClasses(list);
+    }
+
     public static Inferred inferActionParamClasses(LSFExternalActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         List<Inferred> list = new ArrayList<>();
         
@@ -4727,6 +4743,10 @@ public class LSFPsiImplUtil {
     }
 
     public static String getDocumentation(LSFCustomActionPropertyDefinitionBody lsfCustomActionPropertyDefinitionBody, PsiElement child) {
+        return "INTERNAL_operator";
+    }
+
+    public static String getDocumentation(LSFInternalActionPropertyDefinitionBody lsfExternalActionPropertyDefinitionBody, PsiElement child) {
         return "INTERNAL_operator";
     }
 

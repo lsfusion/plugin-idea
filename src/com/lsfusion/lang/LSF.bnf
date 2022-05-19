@@ -757,6 +757,7 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    activeFormActionPropertyDefinitionBody
                                       	|	    activateActionPropertyDefinitionBody
                                       	|       expandCollapseActionPropertyDefinitionBody
+                                      	|       internalActionPropertyDefinitionBody
                                       	|       externalActionPropertyDefinitionBody
 
 private mappedForm ::= ((   (LIST | EDIT) customClassUsage formSingleActionObject)
@@ -952,6 +953,13 @@ customActionPropertyDefinitionBody ::= INTERNAL ((CLIENT jsStringUsage bracketed
     pin = 1
     implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getDocumentation]
+}
+
+internalActionPropertyDefinitionBody ::= INTERNAL (DB | (CLIENT syncTypeLiteral?)) propertyExpression (PARAMS nonEmptyPropertyExpressionList)? (TO nonEmptyNoParamsPropertyUsageList)?
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses getDocumentation]
 }
 
 externalActionPropertyDefinitionBody ::= EXTERNAL externalType (PARAMS nonEmptyPropertyExpressionList)? (TO nonEmptyNoParamsPropertyUsageList)?

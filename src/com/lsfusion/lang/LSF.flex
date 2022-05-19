@@ -242,6 +242,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "CUSTOM"                  			{ return CUSTOM; }
   "CYCLES"                  			{ return CYCLES; }
   "DATA"                    			{ return DATA; }
+  "DB"                    			    { return DB; }
   "DBF"                    			    { return DBF; }
   "DEFAULT"                 			{ return DEFAULT; }
   "DEFAULTCOMPARE"                 	    { return DEFAULTCOMPARE; }
