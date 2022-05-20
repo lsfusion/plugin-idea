@@ -574,6 +574,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitExternalActionPropertyDefinitionBody(@NotNull LSFExternalActionPropertyDefinitionBody o) {
+        super.visitExternalActionPropertyDefinitionBody(o);
+
+        if(o.getText().startsWith("EXTERNAL SQL 'LOCAL'")) {
+            addDeprecatedWarning(o, "EXTERNAL SQL 'LOCAL' EXEC is deprecated since version 5, use INTERNAL DB instead. Earlier versions: ignore this warning");
+        }
+    }
+
+    @Override
     public void visitDesignStatement(@NotNull LSFDesignStatement o) {
         super.visitDesignStatement(o);
 
