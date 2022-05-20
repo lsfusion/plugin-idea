@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.234</version>
+    <version>1.0.235</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -11,6 +11,7 @@
         <ul>
             <li>INTERNAL DB/CLIENT support</li>
             <li>LSFStatementUpDownMover: ctrl+shift+up/down arrow support for meta</li>
+            <li>EXTERNAL SQL 'LOCAL' deprecated</li>
         </ul>
     ]]>
     </change-notes>
