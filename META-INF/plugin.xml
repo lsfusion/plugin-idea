@@ -10,6 +10,7 @@
         <b>Version 1.0.235</b><br>
         <ul>
             <li>INTERNAL DB/CLIENT support</li>
+            <li>LSFStatementUpDownMover: ctrl+shift+up/down arrow support for meta</li>
         </ul>
     ]]>
     </change-notes>
@@ -187,6 +188,8 @@
         <elementDescriptionProvider implementation="com.lsfusion.lang.psi.LSFElementDescriptionProvider"/>
 
         <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
+
+        <statementUpDownMover implementation="com.lsfusion.LSFStatementUpDownMover"/>
 
         <localInspection groupPath="Lsf" language="Lsf" shortName="LSFUnused" displayName="LSF Unused element"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="false" level="WARNING"
