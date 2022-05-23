@@ -10,6 +10,7 @@
         <b>Version 1.0.236</b><br>
         <ul>
             <li>JSON FROM: syntax without parenthesises</li>
+            <li>LSFStatementUpDownMover: support moving metacode headers</li>
         </ul>
     ]]>
     </change-notes>
