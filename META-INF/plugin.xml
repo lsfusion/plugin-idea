@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.235</b><br>
+        <b>Version 1.0.236</b><br>
         <ul>
-            <li>INTERNAL DB/CLIENT support</li>
-            <li>LSFStatementUpDownMover: ctrl+shift+up/down arrow support for meta</li>
-            <li>EXTERNAL SQL 'LOCAL' deprecated</li>
+            <li>JSON FROM: syntax without parenthesises</li>
         </ul>
     ]]>
     </change-notes>
