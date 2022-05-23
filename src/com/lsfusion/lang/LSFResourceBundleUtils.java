@@ -4,6 +4,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.lang.properties.PropertiesFileType;
 import com.intellij.lang.properties.PropertiesReferenceManager;
 import com.intellij.lang.properties.psi.PropertiesFile;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -122,7 +123,7 @@ public class LSFResourceBundleUtils {
                 if (psiFile != null) {
                     Module module = ModuleUtil.findModuleForPsiElement(psiFile);
                     if (module != null) {
-                        getLsfStrLiteralsLanguage(module, true);
+                        ApplicationManager.getApplication().invokeLater(() -> getLsfStrLiteralsLanguage(module, true));
                     }
                 }
             } else if (isResourceBundle(file.getName())) {
