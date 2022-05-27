@@ -115,7 +115,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "DBFFILE" | "RAWFILE" | "FILE" | "EXCELFILE" | "TEXTFILE" | "CSVFILE" | "HTMLFILE" | "JSONFILE" | "XMLFILE" | "TABLEFILE" | "NAMEDFILE"
   | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "DBFLINK" | "RAWLINK" | "LINK" | "EXCELLINK" | "TEXTLINK" | "CSVLINK" | "HTMLLINK" | "JSONLINK" | "XMLLINK" | "TABLELINK"
   | "BOOLEAN" | "TBOOLEAN"
-  | "COLOR" | "JSON"                    { return PRIMITIVE_TYPE; }
+  | "COLOR"                             { return PRIMITIVE_TYPE; }
 
 
   {DIGITS}                              { return LEX_UINT_LITERAL; }

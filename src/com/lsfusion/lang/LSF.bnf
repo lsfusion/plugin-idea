@@ -2392,7 +2392,7 @@ literal ::=
 	|	colorLiteral
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
-builtInClassName ::= PRIMITIVE_TYPE
+builtInClassName ::= PRIMITIVE_TYPE | JSON
 {
     mixin="com.lsfusion.lang.psi.LSFIdImpl"
     implements="com.lsfusion.lang.psi.LSFId"

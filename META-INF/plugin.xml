@@ -11,6 +11,7 @@
         <ul>
             <li>EXTERNAL SQL 'LOCAL' deprecated: show warning only for 'LOCAL'</li>
             <li>'Already defined' error range fix</li>
+            <li>JSON PRIMITIVE_TYPE fix</li>
         </ul>
     ]]>
     </change-notes>
