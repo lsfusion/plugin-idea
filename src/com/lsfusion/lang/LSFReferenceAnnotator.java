@@ -578,7 +578,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitExternalActionPropertyDefinitionBody(o);
 
         if(o.getText().startsWith("EXTERNAL SQL 'LOCAL'")) {
-            addDeprecatedWarning(o, "EXTERNAL SQL 'LOCAL' EXEC is deprecated since version 5, use INTERNAL DB instead. Earlier versions: ignore this warning");
+            addDeprecatedWarning(o.getPropertyExpressionList().get(0), "EXTERNAL SQL 'LOCAL' EXEC is deprecated since version 5, use INTERNAL DB instead. Earlier versions: ignore this warning");
         }
     }
 
