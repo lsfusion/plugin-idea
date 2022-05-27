@@ -862,15 +862,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addAlreadyDefinedError(LSFDeclaration decl) {
-        addAlreadyDefinedError(decl.getDuplicateElement(), decl.getPresentableText());
-    }
-
-    private void addAlreadyDefinedError(PsiElement element, String elementPresentableText) {
-        addUnderscoredErrorWithResolving(element, "'" + elementPresentableText + "' is already defined");
+        PsiElement element = decl.getDuplicateElement();
+        addUnderscoredErrorWithResolving(element, element.getTextRange(), "'" + decl.getPresentableText() + "' is already defined");
     }
 
     private void addHighlightErrorWithResolving(PsiElement element, String message) {
         addErrorWithResolving(element, new LSFResolvingError(element, message, false));
+    }
+    private void addUnderscoredErrorWithResolving(PsiElement element, TextRange range, String message) {
+        addErrorWithResolving(element, new LSFResolvingError(element, range, message, true));
     }
     private void addUnderscoredErrorWithResolving(PsiElement element, String message) {
         addErrorWithResolving(element, new LSFResolvingError(element, message, true));

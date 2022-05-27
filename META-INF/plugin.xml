@@ -10,6 +10,7 @@
         <b>Version 1.0.237</b><br>
         <ul>
             <li>EXTERNAL SQL 'LOCAL' deprecated: show warning only for 'LOCAL'</li>
+            <li>'Already defined' error range fix</li>
         </ul>
     ]]>
     </change-notes>
