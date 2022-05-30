@@ -781,6 +781,8 @@ public class LSFPsiImplUtil {
                 return ZDateTimeClass.instance;
             case "COLOR":
                 return ColorClass.instance;
+            case "JSON":
+                return JSONClass.instance;
         }
 
         return new SimpleDataClass(name);
@@ -1362,7 +1364,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFJsonPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
-        return resolveInferredValueClass(sourceStatement.getNonEmptyAliasedPropertyExpressionList(), inferred, true);
+        return LSFExClassSet.json;
     }
 
     @Nullable

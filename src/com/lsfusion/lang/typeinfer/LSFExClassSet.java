@@ -1,9 +1,6 @@
 package com.lsfusion.lang.typeinfer;
 
-import com.lsfusion.lang.classes.ExtInt;
-import com.lsfusion.lang.classes.LSFClassSet;
-import com.lsfusion.lang.classes.LogicalClass;
-import com.lsfusion.lang.classes.StringClass;
+import com.lsfusion.lang.classes.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -31,6 +28,7 @@ public class LSFExClassSet {
     
     public final static LSFExClassSet logical = new LSFExClassSet(LogicalClass.instance);
     public final static LSFExClassSet text = new LSFExClassSet(new StringClass(false, false, ExtInt.UNLIMITED));
+    public final static LSFExClassSet json = new LSFExClassSet(JSONClass.instance);
 
     public LSFExClassSet(LSFClassSet classSet, boolean orAny) {
         assert classSet!=null; 
