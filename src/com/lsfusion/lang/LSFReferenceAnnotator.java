@@ -560,17 +560,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
-    public void visitFormDecl(@NotNull LSFFormDecl o) {
-        super.visitFormDecl(o);
+    public void visitFormStatement(@NotNull LSFFormStatement o) {
+        super.visitFormStatement(o);
 
-        checkAlreadyDefined(((LSFFormExtend) o.getParent()));
-    }
-
-    @Override
-    public void visitExtendingFormDeclaration(@NotNull LSFExtendingFormDeclaration o) {
-        super.visitExtendingFormDeclaration(o);
-
-        checkAlreadyDefined((LSFFormExtend) o.getParent());
+        checkAlreadyDefined(o);
     }
 
     @Override
