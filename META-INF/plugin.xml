@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.237</b><br>
+        <b>Version 1.0.238</b><br>
         <ul>
-            <li>EXTERNAL SQL 'LOCAL' deprecated: show warning only for 'LOCAL'</li>
-            <li>'Already defined' error range fix</li>
-            <li>JSON PRIMITIVE_TYPE fix</li>
+            <li>'Enable meta' and 'Show errors' dialogs refactoring</li>
         </ul>
     ]]>
     </change-notes>

@@ -3,27 +3,35 @@ package com.lsfusion.actions;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.util.text.StringTokenizer;
+import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.meta.MetaChangeDetector;
+import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MetaCodeEnableAction extends AnAction {
-    private final String INCLUDED_MODULES = "INCLUDED_MODULES_META_CODE";
+    private static final String INCLUDED_MODULES = "INCLUDED_MODULES_META_CODE";
     private Project project;
+    PropertiesComponent propertiesComponent;
 
     @Override
-    public void actionPerformed(AnActionEvent e) {
+    public void actionPerformed(@NotNull AnActionEvent e) {
         project = getEventProject(e);
-        boolean enabled = MetaChangeDetector.getInstance(project).getMetaEnabled();
-        IncludeModulesDialog dialog = new IncludeModulesDialog(enabled);
-        dialog.show();
+        if(project != null) {
+            propertiesComponent = PropertiesComponent.getInstance(project);
+            MetaCodeEnableDialog dialog = new MetaCodeEnableDialog(new ModulesConfigurator(project).getModules(), MetaChangeDetector.getInstance(project).getMetaEnabled());
+            dialog.show();
+        }
     }
 
     @Override
@@ -33,12 +41,14 @@ public class MetaCodeEnableAction extends AnAction {
         }
     }
 
-    private class IncludeModulesDialog extends DialogWrapper {
+    private class MetaCodeEnableDialog extends DialogWrapper {
+        Module[] modules;
         boolean enabled;
-        private JTextField modulesToInclude;
+        CheckBoxGroup modulesCheckBoxGroup;
 
-        IncludeModulesDialog(boolean enabled) {
+        MetaCodeEnableDialog(Module[] modules, boolean enabled) {
             super(project);
+            this.modules = modules;
             this.enabled = enabled;
             init();
             setTitle((enabled ? "Disable" : "Enable") + " Meta Action");
@@ -46,28 +56,17 @@ public class MetaCodeEnableAction extends AnAction {
 
         @Nullable
         @Override
-        public JComponent getPreferredFocusedComponent() {
-            return modulesToInclude;
-        }
-
-        @Nullable
-        @Override
         protected JComponent createCenterPanel() {
             JPanel container = new JPanel(new BorderLayout());
-
-            PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(project);
 
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
             JLabel confirmLabel = new JLabel(String.format("Are you sure you want to %s meta code?", enabled ? "disable" : "enable"));
-            confirmLabel.setBorder(new EmptyBorder(0, 0, 10,0));
-            JLabel label = new JLabel(String.format("%s in modules: ", enabled ? "Disable" : "Enable"));
+            confirmLabel.setBorder(JBUI.Borders.emptyBottom(10));
 
-            modulesToInclude = new JTextField(propertiesComponent.getValue(INCLUDED_MODULES));
-            modulesToInclude.setColumns(30);
-            panel.add(label);
-            panel.add(modulesToInclude);
+            modulesCheckBoxGroup = new CheckBoxGroup(modules, getIncludedModules());
+            panel.add(modulesCheckBoxGroup);
             container.add(panel);
 
             container.add(confirmLabel, BorderLayout.NORTH);
@@ -76,16 +75,20 @@ public class MetaCodeEnableAction extends AnAction {
 
         @Override
         protected void doOKAction() {
-            PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(project);
-            propertiesComponent.setValue(INCLUDED_MODULES, modulesToInclude.getText());
+            List<String> includedModules = modulesCheckBoxGroup.getIncludedModules();
+            setIncludedModules(includedModules);
 
-            StringTokenizer tokenizer = new StringTokenizer(modulesToInclude.getText(), ",;");
-            final java.util.List<String> modules = new ArrayList<>();
-            while (tokenizer.hasMoreElements()) {
-                modules.add(tokenizer.nextToken().trim());
-            }
             super.doOKAction();
-            MetaChangeDetector.getInstance(project).toggleMetaEnabled(modules);
+            MetaChangeDetector.getInstance(project).toggleMetaEnabled(includedModules.size() == modules.length ? new ArrayList<>() : includedModules);
+        }
+
+        private List<String> getIncludedModules() {
+            String includedModules = propertiesComponent.getValue(INCLUDED_MODULES);
+            return includedModules != null && !includedModules.isEmpty() ? Arrays.asList(includedModules.split(",")) : new ArrayList<>();
+        }
+
+        private void setIncludedModules(List<String> includedModules) {
+            propertiesComponent.setValue(INCLUDED_MODULES, StringUtils.join(includedModules, ","));
         }
     }
 }

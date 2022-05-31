@@ -1086,54 +1086,37 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
     // copy paste для того чтобы избавиться от асинхронности, но при этом сильно ускорить процесс, за счет другого workflow и лучшего использования кэшей
     public void reprocessSyncAllDocuments(List<String> modulesToInclude, final boolean reenable) {
-        final Progressive run = new Progressive() {
-            public void run(final @NotNull ProgressIndicator indicator) {
-                reprocessing = true;
+        final Progressive run = indicator -> {
+            reprocessing = true;
 
-                final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction(new Computable<>() {
-                    public Collection<String> compute() {
-                        return ModuleIndex.getInstance().getAllKeys(myProject);
+            final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction((Computable<Collection<String>>) () -> ModuleIndex.getInstance().getAllKeys(myProject));
+            GlobalSearchScope searchScope = getScope(modulesToInclude, myProject);
+
+            ReprocessInlineProcessor inlineProcessor = new ReprocessInlineProcessor(indicator);
+
+            int i = 0;
+            for (final String module : allKeys) {
+                indicator.setText("Processing : " + module);
+
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    for (LSFModuleDeclaration declaration : LSFGlobalResolver.findModules(module, myProject, searchScope)) {
+                        LSFFile file = declaration.getLSFFile();
+                        List<LSFMetaCodeStatement> metaStatements = reenable ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
+
+                        syncUsageProcessing(file, inlineProcessor, indicator, enabled, metaStatements, Collections.emptyList(), null);
+
+                        indicator.setText2("");
                     }
                 });
 
-                ReprocessInlineProcessor inlineProcessor = new ReprocessInlineProcessor(indicator);
+                inlineProcessor.checkAndFlushPostponed();
 
-                int i = 0;
-                for (final String module : allKeys) {
-                    indicator.setText("Processing : " + module);
-
-                    ApplicationManager.getApplication().runReadAction(() -> {
-                        GlobalSearchScope modulesScope = getScope(modulesToInclude, myProject);
-
-                        for (LSFModuleDeclaration declaration : LSFGlobalResolver.findModules(module, myProject, modulesScope)) {
-                            LSFFile file = declaration.getLSFFile();
-                            List<LSFMetaCodeStatement> metaStatements = reenable ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
-
-                            syncUsageProcessing(file, inlineProcessor, indicator, enabled, metaStatements, Collections.emptyList(), null);
-
-                            indicator.setText2("");
-                        }
-                    });
-                    
-                    inlineProcessor.checkAndFlushPostponed();
-
-                    indicator.setFraction(((double) i++) / allKeys.size());
-                }
-                        
-                inlineProcessor.flushPostponed();
-
-                reprocessing = false;
-
-//                    while (!finishedReprocessing) {
-//                        try {
-//                            Thread.sleep(200);
-//                        } catch (InterruptedException ignored) {
-//                        }
-//
-//                        indicator.setFraction((inlinePending == 0 ? 1.0d : (double) inlineProceeded / (double) inlinePending) * coeff + coeff);
-//                        indicator.setText((lastProceeded != null ? "Last inlined : " + lastProceeded : "") + " " + inlineProceeded + "/" + inlinePending);
-//                    }
+                indicator.setFraction(((double) i++) / allKeys.size());
             }
+
+            inlineProcessor.flushPostponed();
+
+            reprocessing = false;
         };
 
         Task task = new Task.Modal(myProject, "Updating metacode", true) {
