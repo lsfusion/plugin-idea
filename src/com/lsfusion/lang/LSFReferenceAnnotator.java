@@ -39,7 +39,6 @@ import com.lsfusion.lang.psi.context.ExprsContextModifier;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormDeclImpl;
 import com.lsfusion.lang.psi.impl.LSFLocalPropertyDeclarationNameImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
@@ -80,19 +79,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public boolean warningsSearchMode = false;
 
     @Override
-    public synchronized void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder holder) {
+    public synchronized void annotate(@NotNull PsiElement psiElement, AnnotationHolder holder) {
         myHolder = holder;
         try {
             psiElement.accept(this);
         } finally {
             myHolder = null;
-            errorsSearchMode = false;
         }
-    }
-
-    public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder holder, boolean errorsSearchMode) {
-        this.errorsSearchMode = errorsSearchMode;
-        annotate(psiElement, holder);
     }
 
     @Override
@@ -100,10 +93,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (o instanceof LeafPsiElement) { // фокус в том что побеждает наибольший приоритет, но важно следить что у верхнего правила всегда приоритет выше, так как в противном случае annotator просто херится
             TextAttributes textAttributes = mergeMetaAttributes(o, null);
             if (textAttributes != null) {
-                myHolder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-                        .range(o.getTextRange())
-                        .enforcedTextAttributes(textAttributes)
-                        .create();
+                addSilentInfoAnnotation(o, textAttributes);
             }
         }
     }
@@ -176,16 +166,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         checkReference(o);
     }
 
-    /*    @Override
-        public void visitModifyParamContext(@NotNull ModifyParamContext o) {
-            super.visitModifyParamContext(o);
-            
-            if(!(o instanceof ExtendParamContext) && PsiTreeUtil.getParentOfType(o, ModifyParamContext.class) == null) {
-                Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Infer type");
-                annotation.registerFix(new TypeInferAction(o));
-            }
-        }
-    */
     @Override
     public void visitWindowUsage(@NotNull LSFWindowUsage o) {
         super.visitWindowUsage(o);
@@ -244,11 +224,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private void addOuterRef(LSFReference reference) {
-        myHolder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Outer param")
-                .range(reference.getTextRange())
-                .enforcedTextAttributes(mergeMetaAttributes(reference, OUTER_PARAM))
-                .create();
+    private void addOuterRef(PsiElement element) {
+        addWarningAnnotation(element, "Outer param", mergeMetaAttributes(element, OUTER_PARAM), null);
     }
 
     public static boolean isOuter(LSFExprParamDeclaration decl, LSFPropertyExprObject pExprObject) {
@@ -273,9 +250,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         String text = o.getText();
         if (text != null) {
             if (text.equals("USERFILTER")) {
-                addDeprecatedWarning(o, "Deprecated since version 5, use FILTERS container instead. Earlier versions: ignore this warning");
+                addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use FILTERS container instead. Earlier versions: ignore this warning");
             } else if (text.equals("GRIDBOX")) {
-                addDeprecatedWarning(o, "Deprecated since version 5, use GRID container instead. Earlier versions: ignore this warning");
+                addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use GRID container instead. Earlier versions: ignore this warning");
             }
         }
     }
@@ -313,21 +290,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
     }
 
-/*
-    @Override
-    public void visitMetaDeclaration(@NotNull LSFMetaDeclaration o) {
-        super.visitMetaDeclaration(o);
-
-        Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Infer type");
-        annotation.registerFix(new MetaTypeInferAction(o));
-    }*/
-
     private void checkMetaNestingUsage(@NotNull PsiElement o) {
         if (MetaNestingLineMarkerProvider.resolveNestingLevel(o) > 1) {
-            myHolder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-                    .range(o.getTextRange())
-                    .enforcedTextAttributes(META_NESTING_USAGE)
-                    .create();
+            addSilentInfoAnnotation(o, META_NESTING_USAGE);
         }
     }
 
@@ -375,12 +340,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 addUnderscoredError(o, new TextRange(o.getTextRange().getStartOffset() + leftBrace, o.getTextRange().getStartOffset() + rightBrace + 1), "Metacode should have at least one parameter");
             }
         }
-        
-//        LSFMetaCodeDeclBody statements = o.getMetaCodeDeclBody();
-//        if (statements != null) {
-//            Annotation annotation = myHolder.createInfoAnnotation(statements.getTextRange(), "");
-//            annotation.setEnforcedTextAttributes(META_DECL);
-//        }
     }
 
     @Override
@@ -425,10 +384,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 Set<String> usedParameter = new ExprsContextModifier(propertyExpression).resolveAllParams();
                 for(LSFParamDeclaration declareParam : declareParams)
                     if(!usedParameter.contains(declareParam.getName())) {
-                        myHolder.newAnnotation(HighlightSeverity.WARNING, "Parameter is not used")
-                                .range(declareParam)
-                                .enforcedTextAttributes(mergeMetaAttributes(declareParam, WARNING))
-                                .create();
+                        addWarningAnnotation(declareParam, "Parameter is not used");
                     }
             }
         }
@@ -500,7 +456,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void checkAutorefresh(LSFFormDeclaration o) {
         for(LSFAutorefreshLiteral autorefresh : ((LSFFormDeclImpl) o).getAutorefreshLiteralList()) {
-            addDeprecatedWarning(autorefresh, "Deprecated since version 5, use EVENTS ON SCHEDULE instead. Earlier versions: ignore this warning");
+            addDeprecatedWarningAnnotation(autorefresh, "Deprecated since version 5, use EVENTS ON SCHEDULE instead. Earlier versions: ignore this warning");
         }
     }
 
@@ -516,9 +472,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitMetaDeclaration(o);
 
         checkAlreadyDefined(o);
-/*
-        Annotation annotation = myHolder.createWarningAnnotation(o.getTextRange(), "Infer type");
-        annotation.registerFix(new MetaTypeInferAction(o));*/
     }
 
     @Override
@@ -571,7 +524,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitExternalActionPropertyDefinitionBody(o);
 
         if(o.getText().startsWith("EXTERNAL SQL 'LOCAL'")) {
-            addDeprecatedWarning(o.getPropertyExpressionList().get(0), "EXTERNAL SQL 'LOCAL' EXEC is deprecated since version 5, use INTERNAL DB instead. Earlier versions: ignore this warning");
+            addDeprecatedWarningAnnotation(o.getPropertyExpressionList().get(0), "EXTERNAL SQL 'LOCAL' EXEC is deprecated since version 5, use INTERNAL DB instead. Earlier versions: ignore this warning");
         }
     }
 
@@ -634,26 +587,22 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitJavaClassStringUsage(@NotNull LSFJavaClassStringUsage o) {
         super.visitJavaClassStringUsage(o);
 
-        String elementText = o.getText();
-        TextRange elementRange = o.getTextRange();
+        if(!isInMetaDecl(o)) {
+            String elementText = o.getText();
+            TextRange elementRange = o.getTextRange();
 
-        for (PsiReference reference : o.getReferences()) {
-            PsiElement resolved = reference.resolve();
-            TextRange refRange = reference.getRangeInElement();
-            TextRange refFileRange = TextRange.from(elementRange.getStartOffset() + refRange.getStartOffset(), refRange.getLength());
-            if (resolved == null) {
-                myHolder.newAnnotation(HighlightSeverity.ERROR, "Can't resolve " + refRange.substring(elementText))
-                        .range(refFileRange)
-                        .enforcedTextAttributes(ERROR)
-                        .create();
-            } else if (refRange.getEndOffset() == elementRange.getLength() - 1) {
-                //последний компонент должен быть ActionProperty
-                boolean correctClass = resolved instanceof PsiClass && hasSuperClass((PsiClass) resolved, ACTION_FQN);
-                if (!correctClass) {
-                    myHolder.newAnnotation(HighlightSeverity.ERROR, "Class " + elementText + " should extend Action")
-                            .range(refFileRange)
-                            .enforcedTextAttributes(ERROR)
-                            .create();
+            for (PsiReference reference : o.getReferences()) {
+                PsiElement resolved = reference.resolve();
+                TextRange refRange = reference.getRangeInElement();
+                TextRange refFileRange = TextRange.from(elementRange.getStartOffset() + refRange.getStartOffset(), refRange.getLength());
+                if (resolved == null) {
+                    addErrorAnnotation(o, refFileRange, "Can't resolve " + refRange.substring(elementText));
+                } else if (refRange.getEndOffset() == elementRange.getLength() - 1) {
+                    //последний компонент должен быть ActionProperty
+                    boolean correctClass = resolved instanceof PsiClass && hasSuperClass((PsiClass) resolved, ACTION_FQN);
+                    if (!correctClass) {
+                        addErrorAnnotation(o, refFileRange, "Class " + elementText + " should extend Action");
+                    }
                 }
             }
         }
@@ -711,15 +660,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     }
 
                     if (!fixes.isEmpty()) {
-                        AnnotationBuilder annotationBuilder = myHolder.newAnnotation(HighlightSeverity.WARNING, "Missing " + o.getText() + " in resource bundle")
-                                .range(o.getTextRange())
-                                .enforcedTextAttributes(WAVE_UNDERSCORED_WARNING);
-
-                        for (IntentionAction fix : fixes) {
-                            annotationBuilder = annotationBuilder.withFix(fix);
-                        }
-                        
-                        annotationBuilder.create();
+                        addWarningResourceBundleAnnotation(o, fixes);
                     }
                 }
             }
@@ -814,9 +755,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             LSFClassSet class1 = getLSFClassSet(relationalPE.getSimplePE());
             LSFClassSet class2 = LSFPsiImplUtil.resolveClass(type.getClassName());
             if (class1 != null && class2 != null && !class1.haveCommonChildren(class2, null)) {
-                myHolder.newAnnotation(HighlightSeverity.WARNING, String.format("Type mismatch: can't cast %s to %s", class1, class2))
-                        .range(relationalPE)
-                        .create();
+                addWarningAnnotation(relationalPE, String.format("Type mismatch: can't cast %s to %s", class1, class2));
             }
         }
     }
@@ -854,6 +793,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addUnderscoredErrorWithResolving(element, "The property has duplicate column name. Table: " + tableName + ", column: " + columnName);
     }
 
+    //error annotations
+
     private void addAlreadyDefinedError(LSFDeclaration decl) {
         PsiElement element = decl.getDuplicateElement();
         addUnderscoredErrorWithResolving(element, element.getTextRange(), "'" + decl.getPresentableText() + "' is already defined");
@@ -878,34 +819,88 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addError(element, new LSFResolvingError(element, message, true), false);
     }
     private void addError(PsiElement element, LSFResolvingError error, boolean hasResolving) {
-        boolean inMetaDecl = isInMetaDecl(element);
-        AnnotationBuilder annotationBuilder;
-        TextAttributes errorAttributes;
-        if(inMetaDecl && hasResolving) {
-            annotationBuilder = myHolder.newAnnotation(HighlightSeverity.INFORMATION, error.text);
-            errorAttributes = error.underscored ? WAVE_UNDERSCORED_META_ERROR : META_ERROR;
+        if (isInMetaDecl(element) && hasResolving) {
+            addInfoAnnotation(element, error.range, error.text, error.underscored ? WAVE_UNDERSCORED_META_ERROR : META_ERROR);
         } else {
-            if (errorsSearchMode) {
-                ShowErrorsAction.showErrorMessage(element, error.text, LSFErrorLevel.ERROR);
-            }
-
-            annotationBuilder = myHolder.newAnnotation(HighlightSeverity.ERROR, error.text);
-            errorAttributes = error.underscored ? WAVE_UNDERSCORED_ERROR : ERROR;
+            addErrorAnnotation(element, error.range, error.text, error.underscored ? WAVE_UNDERSCORED_ERROR : ERROR);
         }
-
-        if (error.range != null) {
-            annotationBuilder = annotationBuilder.range(error.range);
-        }
-
-        annotationBuilder.enforcedTextAttributes(mergeMetaAttributes(element, errorAttributes))
-                .create();
     }
-    
-    private void addDeprecatedWarning(PsiElement element, String text) {
-        myHolder.newAnnotation(HighlightSeverity.WARNING, text)
-                .range(element)
-                .enforcedTextAttributes(DEPRECATED_WARNING)
-                .create();
+
+    private void addErrorAnnotation(PsiElement element, TextRange range, String text) {
+        addErrorAnnotation(element, range, text, ERROR);
+    }
+
+    private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes) {
+        if (errorsSearchMode) {
+            ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.ERROR);
+        } else {
+            AnnotationBuilder annotationBuilder = myHolder.newAnnotation(HighlightSeverity.ERROR, text);
+            if (range != null) {
+                annotationBuilder = annotationBuilder.range(range);
+            }
+            annotationBuilder.enforcedTextAttributes(mergeMetaAttributes(element, textAttributes))
+                    .create();
+        }
+    }
+
+    //warning annotations
+
+    private void addWarningResourceBundleAnnotation(PsiElement element, List<IntentionAction> fixes) {
+        addWarningAnnotation(element, "Missing " + element.getText() + " in resource bundle", WAVE_UNDERSCORED_WARNING, fixes);
+    }
+
+    private void addDeprecatedWarningAnnotation(PsiElement element, String text) {
+        addWarningAnnotation(element, text, DEPRECATED_WARNING);
+    }
+
+    private void addWarningAnnotation(PsiElement element, String text) {
+        addWarningAnnotation(element, text, null);
+    }
+
+    private void addWarningAnnotation(PsiElement element, String text, TextAttributes textAttributes) {
+        addWarningAnnotation(element, text, textAttributes, null);
+    }
+
+    private void addWarningAnnotation(PsiElement element, String text, TextAttributes textAttributes, List<IntentionAction> fixes) {
+        if(warningsSearchMode) {
+            ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.WARNING);
+        } else if(!errorsSearchMode) {
+            AnnotationBuilder builder = myHolder.newAnnotation(HighlightSeverity.WARNING, text).range(element);
+            if(textAttributes != null) {
+                builder = builder.enforcedTextAttributes(textAttributes);
+            }
+            if(fixes != null) {
+                for (IntentionAction fix : fixes) {
+                    builder = builder.withFix(fix);
+                }
+            }
+            builder.create();
+        }
+    }
+
+    //info annotations
+
+    private void addInfoAnnotation(PsiElement element, String text, TextAttributes textAttributes) {
+        addInfoAnnotation(element, element.getTextRange(), text, textAttributes);
+    }
+
+    private void addInfoAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes) {
+        if(!errorsSearchMode) {
+            AnnotationBuilder builder = myHolder.newAnnotation(HighlightSeverity.INFORMATION, text);
+            if(range != null) {
+                builder = builder.range(range);
+            }
+            builder.enforcedTextAttributes(mergeMetaAttributes(element, textAttributes)).create();
+        }
+    }
+
+    private void addSilentInfoAnnotation(PsiElement element, TextAttributes textAttributes) {
+        if(!errorsSearchMode) {
+            myHolder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                    .range(element.getTextRange())
+                    .enforcedTextAttributes(textAttributes)
+                    .create();
+        }
     }
 
     private TextAttributes mergeMetaAttributes(PsiElement element, TextAttributes attributes) {
@@ -933,25 +928,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         return attributes;
     }
 
-    private void addIndirectProp(LSFActionOrPropReference reference) {
-        myHolder.newAnnotation(HighlightSeverity.INFORMATION, "Indirect usage")
-                .range(reference.getTextRange())
-                .enforcedTextAttributes(mergeMetaAttributes(reference, IMPLICIT_DECL))
-                .create();
+    private void addIndirectProp(PsiElement element) {
+        addInfoAnnotation(element, "Indirect usage", IMPLICIT_DECL);
     }
 
-    private void addImplicitDecl(LSFReference reference) {
-        myHolder.newAnnotation(HighlightSeverity.INFORMATION, "Implicit parameter declaration")
-                .range(reference.getTextRange())
-                .enforcedTextAttributes(mergeMetaAttributes(reference, IMPLICIT_DECL))
-                .create();
+    private void addImplicitDecl(PsiElement element) {
+        addInfoAnnotation(element, "Implicit parameter declaration", IMPLICIT_DECL);
     }
 
-    private void addUntypedImplicitDecl(LSFReference reference) {
-        myHolder.newAnnotation(HighlightSeverity.INFORMATION, "Untyped implicit parameter declaration")
-                .range(reference.getTextRange())
-                .enforcedTextAttributes(mergeMetaAttributes(reference, UNTYPED_IMPLICIT_DECL))
-                .create();
+    private void addUntypedImplicitDecl(PsiElement element) {
+        addInfoAnnotation(element, "Untyped implicit parameter declaration", UNTYPED_IMPLICIT_DECL);
     }
 
     @Override
@@ -1051,9 +1037,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (!ASTCompletionContributor.validDesignProperty(property)) {
                 addHighlightErrorWithResolving(o, "Can't resolve property " + property); // design property can be meta parameter
             } else if (property.equals("columns")) {
-                addDeprecatedWarning(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
+                addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
             } else if (property.equals("type")) {
-                addDeprecatedWarning(o, "Deprecated since version 5, use 'horizontal', 'tabbed', 'lines' instead. Earlier versions: ignore this warning");
+                addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'horizontal', 'tabbed', 'lines' instead. Earlier versions: ignore this warning");
             }
         }
     }
@@ -1165,9 +1151,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 LSFClassSet leftClass = LSFPsiImplUtil.resolveClass(customClassUsage);
                 LSFClassSet rightClass = objectUsageDecl.resolveClass();
                 if (leftClass != null && rightClass != null && !leftClass.haveCommonChildren(rightClass, null)) {
-                    myHolder.newAnnotation(HighlightSeverity.WARNING, String.format("Type mismatch: can't cast %s to %s", leftClass, rightClass))
-                            .range(o)
-                            .create();
+                    addWarningAnnotation(o, String.format("Type mismatch: can't cast %s to %s", leftClass, rightClass));
                 }
             }
         }

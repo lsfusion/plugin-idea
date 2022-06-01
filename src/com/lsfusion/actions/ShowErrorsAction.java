@@ -69,7 +69,7 @@ public class ShowErrorsAction extends AnAction {
             boolean enabledMeta = MetaChangeDetector.getInstance(project).getMetaEnabled();
             if (!enabledMeta) {
                 if(JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
-                        "Meta code is disabled. You must enable meta before Do you want to enable meta before showing errors", "Errors search",
+                        "Meta code is disabled. You must enable meta before showing errors", "Errors search",
                         JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                     new MetaCodeEnableAction().actionPerformed(e);
                     enabledMeta = MetaChangeDetector.getInstance(project).getMetaEnabled();
@@ -107,6 +107,7 @@ public class ShowErrorsAction extends AnAction {
                     }
                 }
             }
+            ANNOTATOR.errorsSearchMode = true;
             ANNOTATOR.warningsSearchMode = warningsSearchMode;
 
             int index = 0;
@@ -163,7 +164,7 @@ public class ShowErrorsAction extends AnAction {
                 Module logics = modulesConfigurator.getModule(moduleToInclude);
                 if (logics != null) {
                     GlobalSearchScope moduleScope = logics.getModuleWithDependenciesScope();
-                    modulesScope = modulesScope == null ? moduleScope : moduleScope.uniteWith(moduleScope);
+                    modulesScope = modulesScope == null ? moduleScope : modulesScope.uniteWith(moduleScope);
                 }
             }
         } else
@@ -172,10 +173,7 @@ public class ShowErrorsAction extends AnAction {
     }
 
     private void findLSFErrors(PsiElement element) {
-        AnnotationHolderImpl annotationHolder = new AnnotationHolderImpl(new AnnotationSession(element.getContainingFile()), false);
-        ANNOTATOR.errorsSearchMode = true;
-        annotationHolder.runAnnotatorWithContext(element, ANNOTATOR);
-        ANNOTATOR.errorsSearchMode = false;
+        ANNOTATOR.annotate(element, null);
 
         for (PsiElement child : element.getChildren()) {
             findLSFErrors(child);

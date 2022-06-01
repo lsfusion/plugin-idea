@@ -1135,7 +1135,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 Module logics = modulesConfigurator.getModule(moduleToInclude);
                 if (logics != null) {
                     GlobalSearchScope moduleScope = logics.getModuleWithDependenciesScope();
-                    modulesScope = modulesScope == null ? moduleScope : moduleScope.uniteWith(moduleScope);
+                    modulesScope = modulesScope == null ? moduleScope : modulesScope.uniteWith(moduleScope);
                 }
             }
         } else
