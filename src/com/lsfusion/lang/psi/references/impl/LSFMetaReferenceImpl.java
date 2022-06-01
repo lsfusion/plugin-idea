@@ -165,7 +165,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
         if(isInline()) {
             if(parsed != null && isCorrect()) {
                 PsiElement parent = getParent();
-                if(parent instanceof LSFScriptStatement) {
+                if(parent instanceof LSFScriptStatement || parent instanceof LSFLazyMetaDeclStatement) {
                     ASTNode scriptNode = parent.getNode();
                     ASTNode metaNode = getNode();
                     List<ASTNode> inlineNodes = new ArrayList<>();
@@ -188,34 +188,36 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
                         }                            
                     }
 
-                    // вырезаем последнюю { и перевод строки
+                    // вырезаем последнюю } и перевод строки
                     ASTNode lastNode = null;
                     ASTNode to = parsed.getNode().getLastChildNode();
-                    while(to.getElementType() != LSFTypes.META_CODE_BODY_RIGHT_BRACE)
+                    if (from != to) { //empty meta code check
+                        while(to.getElementType() != LSFTypes.META_CODE_BODY_RIGHT_BRACE)
+                            to = to.getTreePrev();
                         to = to.getTreePrev();
-                    to = to.getTreePrev();
-                    while(LSFParserDefinition.isWhiteSpace(to.getElementType())) {
-                        String text = to.getText();
-                        to = to.getTreePrev();
-                        int nextLine = text.indexOf('\n');
-                        if(nextLine >= 0) {
-                            text = text.substring(0, nextLine);
-                            if(!text.isEmpty())
-                                lastNode = ASTFactory.whitespace(text);
-                            break;
+                        while(LSFParserDefinition.isWhiteSpace(to.getElementType())) {
+                            String text = to.getText();
+                            to = to.getTreePrev();
+                            int nextLine = text.indexOf('\n');
+                            if(nextLine >= 0) {
+                                text = text.substring(0, nextLine);
+                                if(!text.isEmpty())
+                                    lastNode = ASTFactory.whitespace(text);
+                                break;
+                            }
                         }
-                    }
 
-                    ASTNode child = from;
-                    while (true) {
-                        inlineNodes.add(child);
-                        
-                        if(child.equals(to))
-                            break;
-                        child = child.getTreeNext();
+                        ASTNode child = from;
+                        while (true) {
+                            inlineNodes.add(child);
+
+                            if(child.equals(to))
+                                break;
+                            child = child.getTreeNext();
+                        }
+                        if(lastNode != null)
+                            inlineNodes.add(lastNode);
                     }
-                    if(lastNode != null)
-                        inlineNodes.add(lastNode);
 
                     ASTNode nextNode = metaNode.getTreeNext();
                     for(ASTNode inlineNode : inlineNodes)

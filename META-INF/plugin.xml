@@ -10,6 +10,7 @@
         <b>Version 1.0.238</b><br>
         <ul>
             <li>'Enable meta' and 'Show errors' dialogs refactoring</li>
+            <li>Metacode inline virtual operator (@@): fix meta inside of another meta</li>
         </ul>
     ]]>
     </change-notes>
