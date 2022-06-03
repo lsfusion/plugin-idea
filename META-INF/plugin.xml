@@ -10,6 +10,8 @@
         <b>Version 1.0.239</b><br>
         <ul>
             <li>New lsFusion project fix</li>
+            <li>'Enable meta' and 'Show errors' dialogs redesign</li>
+            <li>LSFStatementUpDownMover: support moving FORM and DESIGN headers</li>
         </ul>
     ]]>
     </change-notes>
