@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.238</b><br>
+        <b>Version 1.0.239</b><br>
         <ul>
-            <li>'Enable meta' and 'Show errors' dialogs refactoring</li>
-            <li>Metacode inline virtual operator (@@): fix meta inside of another meta</li>
+            <li>New lsFusion project fix</li>
         </ul>
     ]]>
     </change-notes>
