@@ -1,10 +1,8 @@
 package com.lsfusion.actions;
 
-import com.intellij.codeInsight.daemon.impl.AnnotationHolderImpl;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.lang.annotation.AnnotationSession;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationsConfigurationImpl;
@@ -89,7 +87,7 @@ public class ShowErrorsAction extends AnAction {
         final Progressive progress = indicator -> ApplicationManager.getApplication().runReadAction(() -> {
             Notifications.Bus.notify(new Notification("", "", "Searching for errors started", NotificationType.INFORMATION));
 
-            GlobalSearchScope searchScope = getScope(includedModules, project);
+            GlobalSearchScope searchScope = MetaChangeDetector.getScope(includedModules, project);
 
             final List<VirtualFile> files = new ArrayList<>();
 
@@ -154,22 +152,6 @@ public class ShowErrorsAction extends AnAction {
         }
         
         ApplicationManager.getApplication().invokeLater(() -> NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = showBalloonsState);
-    }
-
-    public static GlobalSearchScope getScope(List<String> modulesToInclude, Project myProject) {
-        GlobalSearchScope modulesScope = null;
-        if (modulesToInclude != null && !modulesToInclude.isEmpty()) {
-            ModulesConfigurator modulesConfigurator = new ModulesConfigurator(myProject);
-            for (String moduleToInclude : modulesToInclude) {
-                Module logics = modulesConfigurator.getModule(moduleToInclude);
-                if (logics != null) {
-                    GlobalSearchScope moduleScope = logics.getModuleWithDependenciesScope();
-                    modulesScope = modulesScope == null ? moduleScope : modulesScope.uniteWith(moduleScope);
-                }
-            }
-        } else
-            modulesScope = GlobalSearchScope.allScope(myProject);
-        return modulesScope;
     }
 
     private void findLSFErrors(PsiElement element) {
@@ -265,8 +247,10 @@ public class ShowErrorsAction extends AnAction {
 
             container.add(boxesPanel);
 
-            modulesCheckBoxGroup = new CheckBoxGroup(modules, getIncludedModules());
-            panel.add(modulesCheckBoxGroup);
+            if(modules.length > 1) {
+                modulesCheckBoxGroup = new CheckBoxGroup(modules, getIncludedModules());
+                panel.add(modulesCheckBoxGroup);
+            }
             container.add(panel, BorderLayout.SOUTH);
 
             return container;
@@ -274,7 +258,7 @@ public class ShowErrorsAction extends AnAction {
 
         @Override
         protected void doOKAction() {
-            List<String> includedModules = modulesCheckBoxGroup.getIncludedModules();
+            List<String> includedModules = modulesCheckBoxGroup != null ? modulesCheckBoxGroup.getIncludedModules() : new ArrayList<>();
             setIncludedModules(includedModules);
 
             propertiesComponent.setValue(INCLUDE_LSF_FILES, String.valueOf(includeLSFFiles));
@@ -283,7 +267,7 @@ public class ShowErrorsAction extends AnAction {
             propertiesComponent.setValue(WARNINGS_SEARCH_MODE, String.valueOf(warningsSearchMode));
 
             super.doOKAction();
-            executeSearchTask(includedModules);
+            executeSearchTask(includedModules.size() == modules.length ? new ArrayList<>() : includedModules);
         }
 
         private List<String> getIncludedModules() {

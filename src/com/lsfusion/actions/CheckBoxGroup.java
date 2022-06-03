@@ -1,6 +1,8 @@
 package com.lsfusion.actions;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.ui.components.JBScrollPane;
+import org.jdesktop.swingx.VerticalLayout;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,13 +41,7 @@ public class CheckBoxGroup extends JPanel {
 
         add(header, BorderLayout.NORTH);
 
-        JPanel content = new ScrollablePane(new GridBagLayout());
-        content.setBackground(UIManager.getColor("List.background"));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.weightx = 1;
+        JPanel content = new JPanel(new VerticalLayout());
 
         for (String moduleName : moduleNames) {
             JCheckBox cb = new JCheckBox(moduleName);
@@ -54,58 +50,15 @@ public class CheckBoxGroup extends JPanel {
             if (includedModules.isEmpty() || includedModules.contains(moduleName)) {
                 cb.setSelected(true);
             }
-            content.add(cb, gbc);
+            content.add(cb);
         }
 
-        add(new JScrollPane(content));
+        JBScrollPane scrollPane = new JBScrollPane(content);
+        scrollPane.setPreferredSize(new Dimension(100, 200));
+        add(scrollPane);
     }
 
     public List<String> getIncludedModules() {
         return checkBoxes.stream().filter(AbstractButton::isSelected).map(AbstractButton::getText).collect(Collectors.toList());
-    }
-
-    private static class ScrollablePane extends JPanel implements Scrollable {
-
-        public ScrollablePane(LayoutManager layout) {
-            super(layout);
-        }
-
-        @Override
-        public Dimension getPreferredScrollableViewportSize() {
-            return new Dimension(100, 200);
-        }
-
-        @Override
-        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return 32;
-        }
-
-        @Override
-        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return 32;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportWidth() {
-            boolean track = false;
-            Container parent = getParent();
-            if (parent instanceof JViewport) {
-                JViewport vp = (JViewport) parent;
-                track = vp.getWidth() > getPreferredSize().width;
-            }
-            return track;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportHeight() {
-            boolean track = false;
-            Container parent = getParent();
-            if (parent instanceof JViewport) {
-                JViewport vp = (JViewport) parent;
-                track = vp.getHeight() > getPreferredSize().height;
-            }
-            return track;
-        }
-
     }
 }

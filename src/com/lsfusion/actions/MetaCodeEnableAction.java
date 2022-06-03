@@ -65,8 +65,10 @@ public class MetaCodeEnableAction extends AnAction {
             JLabel confirmLabel = new JLabel(String.format("Are you sure you want to %s meta code?", enabled ? "disable" : "enable"));
             confirmLabel.setBorder(JBUI.Borders.emptyBottom(10));
 
-            modulesCheckBoxGroup = new CheckBoxGroup(modules, getIncludedModules());
-            panel.add(modulesCheckBoxGroup);
+            if(modules.length > 1) {
+                modulesCheckBoxGroup = new CheckBoxGroup(modules, getIncludedModules());
+                panel.add(modulesCheckBoxGroup);
+            }
             container.add(panel);
 
             container.add(confirmLabel, BorderLayout.NORTH);
@@ -75,7 +77,7 @@ public class MetaCodeEnableAction extends AnAction {
 
         @Override
         protected void doOKAction() {
-            List<String> includedModules = modulesCheckBoxGroup.getIncludedModules();
+            List<String> includedModules = modulesCheckBoxGroup != null ? modulesCheckBoxGroup.getIncludedModules() : new ArrayList<>();
             setIncludedModules(includedModules);
 
             super.doOKAction();
