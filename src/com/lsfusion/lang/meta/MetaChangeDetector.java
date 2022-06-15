@@ -227,8 +227,15 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     //if we open more than one project with metacodes, each of them catch inlining metacode events for all opened projects
     private boolean checkProject(PsiElement element) {
         String projectPath = myProject.getBasePath();
-        String filePath = element.getContainingFile().getVirtualFile().getPath();
-        return projectPath != null && filePath.contains(projectPath);
+        PsiFile file = element.getContainingFile();
+        if(file != null) {
+            VirtualFile virtualFile = file.getVirtualFile();
+            if(virtualFile != null) {
+                String filePath = virtualFile.getPath();
+                return projectPath != null && filePath.contains(projectPath);
+            }
+        };
+        return false;
     }
 
     @Override
