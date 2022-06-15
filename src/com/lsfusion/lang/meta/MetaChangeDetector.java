@@ -12,24 +12,31 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.progress.*;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Progressive;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vcs.FileStatus;
+import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiFileImpl;
+import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.indexes.ModuleIndex;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -167,50 +174,61 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     @Override
     public void beforeChildRemoval(@NotNull PsiTreeChangeEvent event) {
-//        final PsiElement child = event.getChild();
-//        if (child instanceof PsiFile) {
-//            final PsiFile psiFile = (PsiFile)child;
-//            final VirtualFile virtualFile = psiFile.getVirtualFile();
-//            if (virtualFile != null && myListenerMap.containsKey(virtualFile)) {
-//                final Document document = myDocumentManager.getDocument(virtualFile);
-//                if (document != null) {
-//                    removeDocListener(document, virtualFile);
-//                } else {
-//                    myListenerMap.remove(virtualFile);
-//                }
-//            }
-//        }
-//        System.out.print("CHILD REMOVED PARENT : " + event.getParent().getText() + " CHILD " + event.getChild().getText());
-        fireChanged(event.getParent());
-        fireRemoved(event.getChild());
+        PsiElement element = event.getParent();
+        if (checkProject(element)) {
+            fireChanged(element);
+            fireRemoved(event.getChild());
+        }
     }
 
     @Override
     public void childRemoved(@NotNull PsiTreeChangeEvent event) {
-        fireChanged(event.getParent());
+        PsiElement element = event.getParent();
+        if (checkProject(element)) {
+            fireChanged(event.getParent());
+        }
     }
 
     @Override
     public void beforeChildReplacement(@NotNull PsiTreeChangeEvent event) {
-        fireChanged(event.getParent());
-        fireRemoved(event.getOldChild());
+        PsiElement element = event.getParent();
+        if (checkProject(element)) {
+            fireChanged(element);
+            fireRemoved(event.getOldChild());
+        }
     }
 
     @Override
     public void childReplaced(@NotNull PsiTreeChangeEvent event) {
-        fireChanged(event.getParent());
-        fireAdded(event.getNewChild());
+        PsiElement element = event.getParent();
+        if (checkProject(element)) {
+            fireChanged(element);
+            fireAdded(event.getNewChild());
+        }
     }
 
     @Override
     public void beforeChildAddition(@NotNull PsiTreeChangeEvent event) {
-        fireChanged(event.getParent());
+        PsiElement element = event.getParent();
+        if (checkProject(element)) {
+            fireChanged(element);
+        }
     }
 
     @Override
     public void childAdded(@NotNull PsiTreeChangeEvent event) {
-        fireChanged(event.getParent());
-        fireAdded(event.getChild());
+        PsiElement element = event.getParent();
+        if (checkProject(element)) {
+            fireChanged(element);
+            fireAdded(event.getChild());
+        }
+    }
+
+    //if we open more than one project with metacodes, each of them catch inlining metacode events for all opened projects
+    private boolean checkProject(PsiElement element) {
+        String projectPath = myProject.getBasePath();
+        String filePath = element.getContainingFile().getVirtualFile().getPath();
+        return projectPath != null && filePath.contains(projectPath);
     }
 
     @Override
@@ -439,7 +457,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 if (!sync && !displayRunning) {
                     displayRunning = true;
 
-                    final BackgroundableProcessIndicator indicator = new BackgroundableProcessIndicator(myProject, "Inlining metacode", PerformInBackgroundOption.ALWAYS_BACKGROUND, "cancel", "stop", false);
+                    final BackgroundableProcessIndicator indicator = new BackgroundableProcessIndicator(myProject, "Inlining metacode", "cancel", "stop", false);
                     indicator.setIndeterminate(false);
                     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
                         public void run() {
@@ -953,76 +971,38 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     public void reprocessAllDocuments(List<String> modulesToInclude, final boolean sync, final boolean reenable) {
-        if(sync) {
+        if (sync) {
             reprocessSyncAllDocuments(modulesToInclude, reenable);
             return;
         }
-        final Progressive run = new Progressive() {
-            public void run(final @NotNull ProgressIndicator indicator) {
-                reprocessing = true;
+        final Progressive run = indicator -> {
+            reprocessing = true;
 
-                final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction(new Computable<>() {
-                    public Collection<String> compute() {
-                        return ModuleIndex.getInstance().getAllKeys(myProject);
-                    }
+            GlobalSearchScope searchScope = getScope(modulesToInclude, myProject);
+            List<LSFFile> lsfFiles = getLsfFiles(searchScope);
+
+            int i = 0;
+            for (LSFFile lsfFile : lsfFiles) {
+                indicator.setText("Processing : " + lsfFile);
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    List<LSFMetaCodeStatement> metaStatements = reenable ? lsfFile.getDisabledMetaCodeStatementList() : lsfFile.getMetaCodeStatementList();
+                    indicator.setText2("Statements : " + metaStatements.size());
+                    addForcedUsageProcessing(lsfFile, metaStatements, sync, null);
+                    indicator.setText2("");
                 });
-
-                double coeff = sync ? 0.5d : 1.0d;
-
-                int i = 0;
-                for (final String module : allKeys) {
-                    indicator.setText("Processing : " + module);
-                    ApplicationManager.getApplication().runReadAction(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            GlobalSearchScope modulesScope = getScope(modulesToInclude, myProject);
-
-                            Collection<LSFModuleDeclaration> moduleDeclarations = LSFGlobalResolver.findModules(module, myProject, modulesScope);
-                            for (LSFModuleDeclaration declaration : moduleDeclarations) {
-                                LSFFile file = declaration.getLSFFile();
-                                List<LSFMetaCodeStatement> metaStatements = reenable ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
-                                indicator.setText2("Statements : " + metaStatements.size());
-
-                                addForcedUsageProcessing(file, metaStatements, sync, null);
-
-                                indicator.setText2("");
-                            }
-                        }
-                    });
-                    indicator.setFraction(((double) i++) * coeff / allKeys.size());
-                }
-
-                reprocessing = false;
-
-                if (sync) {
-                    while (!finishedReprocessing) {
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException ignored) {
-                        }
-
-                        indicator.setFraction((inlinePending == 0 ? 1.0d : (double) inlineProceeded / (double) inlinePending) * coeff + coeff);
-                        indicator.setText((lastProceeded != null ? "Last inlined : " + lastProceeded : "") + " " + inlineProceeded + "/" + inlinePending);
-                    }
-                }
+                indicator.setFraction(((double) i++) / lsfFiles.size());
             }
+
+            reprocessing = false;
+
         };
 
         Task task;
-        if (sync) {
-            task = new Task.Modal(myProject, "Updating metacode", true) {
-                public void run(final @NotNull ProgressIndicator indicator) {
-                    run.run(indicator);
-                }
-            };
-        } else {
-            task = new Task.Backgroundable(myProject, "Marking metacode") {
-                public void run(final @NotNull ProgressIndicator indicator) {
-                    run.run(indicator);
-                }
-            };
-        }
+        task = new Task.Backgroundable(myProject, "Marking metacode") {
+            public void run(final @NotNull ProgressIndicator indicator) {
+                run.run(indicator);
+            }
+        };
         ProgressManager.getInstance().run(task);
     }
     
@@ -1089,29 +1069,25 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         final Progressive run = indicator -> {
             reprocessing = true;
 
-            final Collection<String> allKeys = ApplicationManager.getApplication().runReadAction((Computable<Collection<String>>) () -> ModuleIndex.getInstance().getAllKeys(myProject));
             GlobalSearchScope searchScope = getScope(modulesToInclude, myProject);
+
+            List<LSFFile> lsfFiles = ApplicationManager.getApplication().runReadAction((Computable<List<LSFFile>>) () -> getLsfFiles(searchScope));
 
             ReprocessInlineProcessor inlineProcessor = new ReprocessInlineProcessor(indicator);
 
             int i = 0;
-            for (final String module : allKeys) {
-                indicator.setText("Processing : " + module);
+            for (LSFFile lsfFile : lsfFiles) {
+                indicator.setText("Processing : " + lsfFile.getName());
 
                 ApplicationManager.getApplication().runReadAction(() -> {
-                    for (LSFModuleDeclaration declaration : LSFGlobalResolver.findModules(module, myProject, searchScope)) {
-                        LSFFile file = declaration.getLSFFile();
-                        List<LSFMetaCodeStatement> metaStatements = reenable ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
-
-                        syncUsageProcessing(file, inlineProcessor, indicator, enabled, metaStatements, Collections.emptyList(), null);
-
-                        indicator.setText2("");
-                    }
+                    List<LSFMetaCodeStatement> metaStatements = reenable ? lsfFile.getDisabledMetaCodeStatementList() : lsfFile.getMetaCodeStatementList();
+                    syncUsageProcessing(lsfFile, inlineProcessor, indicator, enabled, metaStatements, Collections.emptyList(), null);
+                    indicator.setText2("");
                 });
 
                 inlineProcessor.checkAndFlushPostponed();
 
-                indicator.setFraction(((double) i++) / allKeys.size());
+                indicator.setFraction(((double) i++) / lsfFiles.size());
             }
 
             inlineProcessor.flushPostponed();
@@ -1125,6 +1101,19 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             }
         };
         ProgressManager.getInstance().run(task);
+    }
+
+    private List<LSFFile> getLsfFiles(GlobalSearchScope searchScope) {
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope);
+        List<LSFFile> lsfFiles = new ArrayList<>();
+        for(VirtualFile virtualFile : virtualFiles) {
+            if(FileStatusManager.getInstance(myProject).getStatus(virtualFile) != FileStatus.IGNORED) {
+                PsiFile psiFile = PsiUtilBase.getPsiFile(myProject, virtualFile);
+                if(psiFile instanceof LSFFile)
+                    lsfFiles.add((LSFFile) psiFile);
+            }
+        }
+        return lsfFiles;
     }
 
     public static GlobalSearchScope getScope(List<String> modulesToInclude, Project myProject) {
