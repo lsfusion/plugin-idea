@@ -7,12 +7,13 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.240</b><br>
+        <b>Version 1.0.241</b><br>
         <ul>
             <li>New lsFusion project fix</li>
             <li>'Enable meta' and 'Show errors' dialogs redesign</li>
             <li>LSFStatementUpDownMover: support moving FORM and DESIGN headers</li>
             <li>MetaChangeDetector: fix for multiple opened projects</li>
+            <li>backward compatibility with idea 2020</li>
         </ul>
     ]]>
     </change-notes>

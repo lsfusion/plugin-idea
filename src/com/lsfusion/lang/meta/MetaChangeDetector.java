@@ -12,10 +12,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Progressive;
-import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.progress.*;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -464,7 +461,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 if (!sync && !displayRunning) {
                     displayRunning = true;
 
-                    final BackgroundableProcessIndicator indicator = new BackgroundableProcessIndicator(myProject, "Inlining metacode", "cancel", "stop", false);
+                    final BackgroundableProcessIndicator indicator = new BackgroundableProcessIndicator(myProject, "Inlining metacode", PerformInBackgroundOption.ALWAYS_BACKGROUND,  "cancel", "stop", false);
                     indicator.setIndeterminate(false);
                     ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
                         public void run() {
