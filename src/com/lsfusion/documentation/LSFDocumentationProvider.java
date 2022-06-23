@@ -3,9 +3,7 @@ package com.lsfusion.documentation;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.psi.PsiComment;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
+import com.intellij.psi.*;
 import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.psi.LSFFile;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +17,7 @@ import org.jsoup.select.Elements;
 import java.awt.*;
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LSFDocumentationProvider extends AbstractDocumentationProvider {
@@ -140,8 +139,21 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
 //        return null;
 //    }
 
+    //adds link with external resource to the end of documentation
     @Override
-    public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement) {
+    public @Nullable List<String> getUrlFor(PsiElement element, PsiElement originalElement) {
+        String documentationURL = getDocumentationURL(element);
+        return documentationURL != null ? List.of(documentationURL) : null;
+    }
+
+    @Override
+    public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement, int targetOffset) {
+        if (contextElement instanceof PsiWhiteSpace) {
+            PsiElement prevSibling = contextElement.getPrevSibling();
+            PsiElement firstChild = prevSibling.getFirstChild();
+            if (firstChild instanceof LSFDocumentation)
+                return firstChild.getFirstChild();
+        }
         String elementText = contextElement != null ? contextElement.getText() : null;
         return (elementText != null && elementText.contains("\n")) || contextElement instanceof PsiComment
                 ? null
