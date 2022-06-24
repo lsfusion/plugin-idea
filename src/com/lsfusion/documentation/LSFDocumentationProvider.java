@@ -5,6 +5,7 @@ import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.*;
 import com.intellij.util.ui.JBUI;
+import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.psi.LSFFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -148,15 +149,15 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
 
     @Override
     public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement, int targetOffset) {
-        if (contextElement instanceof PsiWhiteSpace) {
-            PsiElement prevSibling = contextElement.getPrevSibling();
-            PsiElement firstChild = prevSibling.getFirstChild();
-            if (firstChild instanceof LSFDocumentation)
-                return firstChild.getFirstChild();
+        if (contextElement != null) {
+            if (LSFParserDefinition.isWhiteSpace(contextElement.getNode().getElementType())) {
+                PsiElement prevSibling = contextElement.getPrevSibling();
+                PsiElement firstChild = prevSibling.getFirstChild();
+                return firstChild instanceof LSFDocumentation ? firstChild.getFirstChild() : prevSibling;
+            }
+
+            return LSFParserDefinition.isComment(contextElement.getNode().getElementType()) ? null : contextElement;
         }
-        String elementText = contextElement != null ? contextElement.getText() : null;
-        return (elementText != null && elementText.contains("\n")) || contextElement instanceof PsiComment
-                ? null
-                : contextElement; //documentation for all elements without line breaks and comments
+        return null;
     }
 }
