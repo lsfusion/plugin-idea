@@ -1,9 +1,11 @@
 package com.lsfusion.documentation;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.psi.LSFFile;
@@ -151,9 +153,8 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement, int targetOffset) {
         if (contextElement != null) {
             if (LSFParserDefinition.isWhiteSpace(contextElement.getNode().getElementType())) {
-                PsiElement prevSibling = contextElement.getPrevSibling();
-                PsiElement firstChild = prevSibling.getFirstChild();
-                return firstChild instanceof LSFDocumentation ? firstChild.getFirstChild() : prevSibling;
+                ASTNode astNode = TreeUtil.prevLeaf(contextElement.getNode());
+                return astNode != null && !LSFParserDefinition.isComment(astNode.getElementType()) ? astNode.getPsi() : null;
             }
 
             return LSFParserDefinition.isComment(contextElement.getNode().getElementType()) ? null : contextElement;
