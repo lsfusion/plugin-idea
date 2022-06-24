@@ -1,12 +1,13 @@
 package com.lsfusion.documentation;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.psi.PsiComment;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.util.ui.JBUI;
+import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.psi.LSFFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +20,7 @@ import org.jsoup.select.Elements;
 import java.awt.*;
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LSFDocumentationProvider extends AbstractDocumentationProvider {
@@ -140,11 +142,23 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
 //        return null;
 //    }
 
+    //adds link with external resource to the end of documentation
     @Override
-    public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement) {
-        String elementText = contextElement != null ? contextElement.getText() : null;
-        return (elementText != null && elementText.contains("\n")) || contextElement instanceof PsiComment
-                ? null
-                : contextElement; //documentation for all elements without line breaks and comments
+    public @Nullable List<String> getUrlFor(PsiElement element, PsiElement originalElement) {
+        String documentationURL = getDocumentationURL(element);
+        return documentationURL != null ? List.of(documentationURL) : null;
+    }
+
+    @Override
+    public @Nullable PsiElement getCustomDocumentationElement(@NotNull Editor editor, @NotNull PsiFile file, @Nullable PsiElement contextElement, int targetOffset) {
+        if (contextElement != null) {
+            if (LSFParserDefinition.isWhiteSpace(contextElement.getNode().getElementType())) {
+                ASTNode astNode = TreeUtil.prevLeaf(contextElement.getNode());
+                return astNode != null && !LSFParserDefinition.isComment(astNode.getElementType()) ? astNode.getPsi() : null;
+            }
+
+            return LSFParserDefinition.isComment(contextElement.getNode().getElementType()) ? null : contextElement;
+        }
+        return null;
     }
 }
