@@ -36,6 +36,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
 import com.lsfusion.util.BaseUtils;
+import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.ActionEvent;
@@ -982,7 +983,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         final Progressive run = indicator -> {
             reprocessing = true;
 
-            GlobalSearchScope searchScope = getScope(modulesToInclude, myProject);
+            GlobalSearchScope searchScope = LSFFileUtils.getScope(modulesToInclude, myProject);
             List<LSFFile> lsfFiles = getLsfFiles(searchScope);
 
             int i = 0;
@@ -1073,7 +1074,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         final Progressive run = indicator -> {
             reprocessing = true;
 
-            GlobalSearchScope searchScope = getScope(modulesToInclude, myProject);
+            GlobalSearchScope searchScope = LSFFileUtils.getScope(modulesToInclude, myProject);
 
             List<LSFFile> lsfFiles = ApplicationManager.getApplication().runReadAction((Computable<List<LSFFile>>) () -> getLsfFiles(searchScope));
 
@@ -1118,22 +1119,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             }
         }
         return lsfFiles;
-    }
-
-    public static GlobalSearchScope getScope(List<String> modulesToInclude, Project myProject) {
-        GlobalSearchScope modulesScope = null;
-        if (modulesToInclude != null && !modulesToInclude.isEmpty()) {
-            ModulesConfigurator modulesConfigurator = new ModulesConfigurator(myProject);
-            for (String moduleToInclude : modulesToInclude) {
-                Module logics = modulesConfigurator.getModule(moduleToInclude);
-                if (logics != null) {
-                    GlobalSearchScope moduleScope = logics.getModuleWithDependenciesScope();
-                    modulesScope = modulesScope == null ? moduleScope : modulesScope.uniteWith(moduleScope);
-                }
-            }
-        } else
-            modulesScope = GlobalSearchScope.allScope(myProject);
-        return modulesScope;
     }
 
     private void fireChanged(PsiElement element) {

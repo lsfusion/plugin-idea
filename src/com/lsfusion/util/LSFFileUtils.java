@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEnumerator;
 import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -271,5 +272,25 @@ public class LSFFileUtils {
         }
 
         return projectScope;
+    }
+
+    public static Module[] getModules(Project project) {
+        return new ModulesConfigurator(project).getModules();
+    }
+
+    public static GlobalSearchScope getScope(List<String> modulesToInclude, Project project) {
+        GlobalSearchScope modulesScope = null;
+        if (modulesToInclude != null && !modulesToInclude.isEmpty()) {
+            ModulesConfigurator modulesConfigurator = new ModulesConfigurator(project);
+            for (String moduleToInclude : modulesToInclude) {
+                Module logics = modulesConfigurator.getModule(moduleToInclude);
+                if (logics != null) {
+                    GlobalSearchScope moduleScope = logics.getModuleWithDependenciesScope();
+                    modulesScope = modulesScope == null ? moduleScope : modulesScope.uniteWith(moduleScope);
+                }
+            }
+        } else
+            modulesScope = GlobalSearchScope.allScope(project);
+        return modulesScope;
     }
 }

@@ -12,7 +12,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Progressive;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -75,7 +74,7 @@ public class ChangeLocaleAction extends AnAction {
         protected JComponent createCenterPanel() {
             resourceBundlesWithScopeMap = new HashMap<>();
 
-            for(Module module : new ModulesConfigurator(project).getModules()) {
+            for(Module module : LSFFileUtils.getModules(project)) {
                 String lsfStrLiteralsLanguage = LSFResourceBundleUtils.getLsfStrLiteralsLanguage(module, true);
                 if(lsfStrLiteralsLanguage != null) {
                     LSFResourceBundleUtils.ScopeData scopeData = LSFResourceBundleUtils.getScopeData(module);

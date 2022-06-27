@@ -5,10 +5,10 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.meta.MetaChangeDetector;
+import com.lsfusion.util.LSFFileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ public class MetaCodeEnableAction extends AnAction {
         project = getEventProject(e);
         if(project != null) {
             propertiesComponent = PropertiesComponent.getInstance(project);
-            MetaCodeEnableDialog dialog = new MetaCodeEnableDialog(new ModulesConfigurator(project).getModules(), MetaChangeDetector.getInstance(project).getMetaEnabled());
+            MetaCodeEnableDialog dialog = new MetaCodeEnableDialog(LSFFileUtils.getModules(project), MetaChangeDetector.getInstance(project).getMetaEnabled());
             dialog.show();
         }
     }

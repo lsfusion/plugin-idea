@@ -34,6 +34,7 @@ import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.util.LSFFileUtils;
 import com.lsfusion.util.LSFPsiUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -74,7 +75,7 @@ public class ShowErrorsAction extends AnAction {
                 }
             }
             if(enabledMeta) {
-                ShowErrorsDialog dialog = new ShowErrorsDialog(new ModulesConfigurator(project).getModules());
+                ShowErrorsDialog dialog = new ShowErrorsDialog(LSFFileUtils.getModules(project));
                 dialog.show();
             }
         }
@@ -87,7 +88,7 @@ public class ShowErrorsAction extends AnAction {
         final Progressive progress = indicator -> ApplicationManager.getApplication().runReadAction(() -> {
             Notifications.Bus.notify(new Notification("", "", "Searching for errors started", NotificationType.INFORMATION));
 
-            GlobalSearchScope searchScope = MetaChangeDetector.getScope(includedModules, project);
+            GlobalSearchScope searchScope = LSFFileUtils.getScope(includedModules, project);
 
             final List<VirtualFile> files = new ArrayList<>();
 
