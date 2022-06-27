@@ -3,6 +3,7 @@ package com.lsfusion.dependencies.property;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
@@ -46,20 +47,20 @@ public class PropertyDependenciesView extends DependenciesView {
     }
 
     @Override
-    public void createDependentNode(PsiElement element, Set<PsiElement> proceeded) {
+    public void createDependentNode(GlobalSearchScope scope, PsiElement element, Set<PsiElement> proceeded) {
         LSFActionOrGlobalPropDeclaration<?, ?> targetProperty = (LSFActionOrGlobalPropDeclaration<?, ?>) element;
 
         if (targetProperty != null) {
             Set<LSFActionOrGlobalPropDeclaration<?, ?>> sourceProperties = PropertyDependentsCache.getInstance(project).resolveWithCaching(targetProperty);
             if (sourceProperties != null) {
                 for (LSFActionOrGlobalPropDeclaration<?, ?> sourceProperty : sourceProperties) {
-                    if (sourceProperty != null && !sourceProperty.isAction()) {
+                    if (sourceProperty != null && !sourceProperty.isAction() && (scope == null || scope.accept(sourceProperty.getLSFFile().getVirtualFile()))) {
                         if (allEdges || !dataModel.containsNode(targetProperty.getPresentableText()) || !dataModel.containsNode(sourceProperty.getPresentableText())) {
                             addModelEdge(sourceProperty, targetProperty, false);
                         }
 
                         if (proceeded.add(sourceProperty)) {
-                            createDependentNode(sourceProperty, proceeded);
+                            createDependentNode(scope, sourceProperty, proceeded);
                         }
                     }
                 }

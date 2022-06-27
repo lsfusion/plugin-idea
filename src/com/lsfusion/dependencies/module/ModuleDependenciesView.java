@@ -3,6 +3,7 @@ package com.lsfusion.dependencies.module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.dependencies.DependenciesView;
 import com.lsfusion.dependencies.GraphNode;
@@ -65,6 +66,7 @@ public class ModuleDependenciesView extends DependenciesView {
         return null;
     }
 
+    @Override
     public void createDependencyNode(PsiElement element, Set<PsiElement> proceeded) {
         LSFModuleDeclaration module = (LSFModuleDeclaration) element;
         
@@ -83,21 +85,24 @@ public class ModuleDependenciesView extends DependenciesView {
         }
     }
 
-    public void createDependentNode(PsiElement element, Set<PsiElement> proceeded) {
+    @Override
+    public void createDependentNode(GlobalSearchScope scope, PsiElement element, Set<PsiElement> proceeded) {
         LSFModuleDeclaration module = (LSFModuleDeclaration) element;
-        
+
         Set<LSFModuleDeclaration> refModules = ModuleDependentsCache.getInstance(project).resolveWithCaching(module);
         if (refModules != null) {
             for (LSFModuleDeclaration decl : refModules) {
                 assert decl != null;
-                String sourceDeclName = decl.getDeclName();
-                String targetDeclName = module.getDeclName();
-                if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
-                    addModelEdge(decl, module, false);
-                }
+                if (scope == null || scope.accept(decl.getLSFFile().getVirtualFile())) {
+                    String sourceDeclName = decl.getDeclName();
+                    String targetDeclName = module.getDeclName();
+                    if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
+                        addModelEdge(decl, module, false);
+                    }
 
-                if (proceeded.add(decl)) {
-                    createDependentNode(decl, proceeded);
+                    if (proceeded.add(decl)) {
+                        createDependentNode(scope, decl, proceeded);
+                    }
                 }
             }
         }

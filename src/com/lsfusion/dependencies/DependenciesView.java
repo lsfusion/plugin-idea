@@ -9,12 +9,14 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.DarculaColors;
 import com.intellij.ui.JBColor;
@@ -32,6 +34,7 @@ import com.jgraph.layout.tree.JGraphRadialTreeLayout;
 import com.jgraph.layout.tree.JGraphTreeLayout;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.dependencies.module.DependencySpeedSearch;
+import com.lsfusion.util.LSFFileUtils;
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;
 import org.jgraph.graph.DefaultGraphCell;
@@ -45,8 +48,10 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 import java.util.Timer;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.lsfusion.dependencies.GraphLayoutComboAction.*;
 
@@ -73,6 +78,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     protected JBScrollPane scrollPane;
     
     protected GraphNode selectedInSearch;
+
+    ModuleComboAction moduleAction;
 
     protected CheckboxAction showRequiredAction;
     protected CheckboxAction showRequiringAction;
@@ -119,19 +126,20 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         toolbar.updateActionsImmediately();
 
         add(toolbar.getComponent(), BorderLayout.NORTH);
-
-        redraw();
     }
 
     private ActionToolbar createToolbar() {
         SimpleActionGroup actions = new SimpleActionGroup();
 
-        actions.add(new AnAction(null, "Refresh", LSFIcons.Design.REFRESH) {
+        actions.add(new AnAction("Refresh / Apply", "Refresh", LSFIcons.Design.REFRESH) {
             @Override
             public void actionPerformed(AnActionEvent e) {
                 redrawCurrent();
             }
         });
+
+        moduleAction = new ModuleComboAction("Module:", Arrays.stream(LSFFileUtils.getModules(project)).collect(Collectors.toMap(Module::getName, Function.identity())));
+        actions.add(moduleAction);
 
         showRequiringAction = new CheckboxAction(getDependentTitle()) {
             @Override
@@ -144,8 +152,6 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 showRequiring = state;
                 if (!showRequired && !showRequiring) {
                     showRequiredAction.setSelected(e, true);
-                } else {
-                    redrawCurrent();
                 }
             }
         };
@@ -161,8 +167,6 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 showRequired = state;
                 if (!showRequired && !showRequiring) {
                     showRequiringAction.setSelected(e, true);
-                } else {
-                    redrawCurrent();
                 }
             }
         };
@@ -179,7 +183,6 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             @Override
             public void setSelected(AnActionEvent e, boolean state) {
                 allEdges = state;
-                redrawCurrent();
             }
         });
 
@@ -268,7 +271,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         }
     }
 
-    private void redraw() {
+    public void redraw() {
         PsiElement newCurrentElement = getSelectedElement();
         if (newCurrentElement != null && newCurrentElement != currentElement) {
             currentElement = newCurrentElement;
@@ -289,7 +292,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         }
 
         if (showRequiring) {
-            createDependentNode(currentElement, new HashSet<>());
+            createDependentNode(moduleAction.getCurrentModuleScope(), currentElement, new HashSet<>());
         }
 
         g = new ListenableDirectedGraph(DefaultEdge.class);
@@ -697,7 +700,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     public abstract void createDependencyNode(PsiElement element, Set<PsiElement> proceeded);
 
-    public abstract void createDependentNode(PsiElement element, Set<PsiElement> proceeded);
+    public abstract void createDependentNode(GlobalSearchScope scope, PsiElement element, Set<PsiElement> proceeded);
 
     public abstract boolean showPathToElement();
     
