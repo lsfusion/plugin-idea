@@ -4,6 +4,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.LSFExplicitClasses;
+import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFInterfacePropStatement;
 import com.lsfusion.lang.psi.LSFNonEmptyPropertyOptions;
 import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
@@ -24,17 +25,20 @@ public interface LSFActionOrGlobalPropDeclaration<This extends LSFActionOrGlobal
 
     String getCaption();
 
-    Set<LSFActionOrGlobalPropDeclaration> getDependencies();
+    Set<LSFActionOrGlobalPropDeclaration<?, ?>> getDependencies();
 
-    default Set<LSFActionOrGlobalPropDeclaration> getDependents() {
-        Set<LSFActionOrGlobalPropDeclaration> result = new HashSet<>();
+    default Set<LSFActionOrGlobalPropDeclaration<?, ?>> getDependents() {
+        Set<LSFActionOrGlobalPropDeclaration<?, ?>> result = new HashSet<>();
 
-        Set<PsiReference> refs = new HashSet<>(ReferencesSearch.search(getNameIdentifier(), getUseScope()).findAll());
+        LSFId nameIdentifier = getNameIdentifier();
+        if(nameIdentifier != null) {
+            Set<PsiReference> refs = new HashSet<>(ReferencesSearch.search(nameIdentifier, getUseScope()).findAll());
 
-        for (PsiReference ref : refs) {
-            LSFActionOrGlobalPropDeclaration dependent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFActionOrGlobalPropDeclaration.class);
-            if (dependent != null) {
-                result.add(dependent);
+            for (PsiReference ref : refs) {
+                LSFActionOrGlobalPropDeclaration<?, ?> dependent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFActionOrGlobalPropDeclaration.class);
+                if (dependent != null) {
+                    result.add(dependent);
+                }
             }
         }
 

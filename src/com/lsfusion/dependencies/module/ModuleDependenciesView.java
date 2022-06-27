@@ -54,7 +54,7 @@ public class ModuleDependenciesView extends DependenciesView {
         PsiElement targetElement = getTargetEditorPsiElement();
 
         if (targetElement != null && targetElement.getContainingFile() instanceof LSFFile) {
-            LSFReference ref = PsiTreeUtil.getParentOfType(targetElement, LSFReference.class);
+            LSFReference<?> ref = PsiTreeUtil.getParentOfType(targetElement, LSFReference.class);
             if (ref != null) {
                 LSFDeclaration decl = ref.resolveDecl();
                 if (decl != null) {

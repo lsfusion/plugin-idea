@@ -136,7 +136,7 @@ public abstract class LSFAggrParamGlobalPropDeclarationImpl extends LSFFullNameD
     }
 
     @Override
-    public Set<LSFActionOrGlobalPropDeclaration> getDependencies() {
+    public Set<LSFActionOrGlobalPropDeclaration<?, ?>> getDependencies() {
         return Collections.EMPTY_SET;
     }
     

@@ -210,10 +210,12 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
         Integer complexity = 1;
         if (!processed.contains(prop)) {
             processed.add(prop);
-            if (prop instanceof LSFGlobalPropDeclaration && !((LSFGlobalPropDeclaration) prop).isPersistentProperty()) {
-                Set<LSFActionOrGlobalPropDeclaration> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching((LSFGlobalPropDeclaration)prop);
-                for (LSFActionOrGlobalPropDeclaration dependency : dependencies) {
-                    complexity += getPropComplexity((LSFGlobalPropDeclaration)dependency, processed);
+            if (prop instanceof LSFGlobalPropDeclaration && !((LSFGlobalPropDeclaration<?, ?>) prop).isPersistentProperty()) {
+                Set<LSFActionOrGlobalPropDeclaration<?, ?>> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching((LSFGlobalPropDeclaration<?, ?>) prop);
+                if(dependencies != null) {
+                    for (LSFActionOrGlobalPropDeclaration<?, ?> dependency : dependencies) {
+                        complexity += getPropComplexity((LSFGlobalPropDeclaration<?, ?>) dependency, processed);
+                    }
                 }
             }
         }
@@ -238,10 +240,12 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
     }
 
     @Override
-    protected void fillImplementationDependencies(LSFActionOrPropReference impRef, Collection<LSFActionOrPropReference> references) {
+    protected void fillImplementationDependencies(LSFActionOrPropReference<?, ?> impRef, Collection<LSFActionOrPropReference> references) {
         LSFOverridePropertyStatement overrideStatement = PsiTreeUtil.getParentOfType(impRef, LSFOverridePropertyStatement.class);
-        for (LSFPropertyExpression propertyExpression : overrideStatement.getPropertyExpressionList()) {
-            references.addAll(PsiTreeUtil.findChildrenOfType(propertyExpression, LSFPropReference.class));
+        if(overrideStatement != null) {
+            for (LSFPropertyExpression propertyExpression : overrideStatement.getPropertyExpressionList()) {
+                references.addAll(PsiTreeUtil.findChildrenOfType(propertyExpression, LSFPropReference.class));
+            }
         }
     }
 }

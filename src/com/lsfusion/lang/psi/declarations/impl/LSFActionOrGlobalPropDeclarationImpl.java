@@ -200,24 +200,24 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
             return PsiElement.EMPTY_ARRAY;
         }
         List<PsiElement> result = new ArrayList<>();
-        for(LSFActionOrPropReference impl : findImplementations(nameIdentifier))
-            result.add(impl.getWrapper());         
+        for (LSFActionOrPropReference<?, ?> impl : findImplementations(nameIdentifier))
+            result.add(impl.getWrapper());
         return result.toArray(new PsiElement[0]);
     }
 
-    protected List<LSFActionOrPropReference> findImplementations(LSFId nameIdentifier) {
+    protected List<LSFActionOrPropReference<?, ?>> findImplementations(LSFId nameIdentifier) {
         Collection<PsiReference> refs = ReferencesSearch.search(nameIdentifier, GlobalSearchScope.allScope(getProject())).findAll();
 
-        List<LSFActionOrPropReference> impls = new ArrayList<>();
+        List<LSFActionOrPropReference<?, ?>> impls = new ArrayList<>();
         for (PsiReference ref : refs) {
-            LSFActionOrPropReference impl = getImplementation(ref);
+            LSFActionOrPropReference<?, ?> impl = getImplementation(ref);
             if(impl != null)
                 impls.add(impl);
         }
         return impls;
     }
 
-    protected abstract LSFActionOrPropReference getImplementation(PsiReference ref);
+    protected abstract LSFActionOrPropReference<?, ?> getImplementation(PsiReference ref);
 
     @Override
     public String getCaption() {
@@ -285,16 +285,16 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
     }
     
     protected abstract PsiElement getDependenciesBody();
-    protected abstract void fillImplementationDependencies(LSFActionOrPropReference impRef, Collection<LSFActionOrPropReference> references);
+    protected abstract void fillImplementationDependencies(LSFActionOrPropReference<?, ?> impRef, Collection<LSFActionOrPropReference> references);
     @Override
-    public Set<LSFActionOrGlobalPropDeclaration> getDependencies() {
-        Set<LSFActionOrGlobalPropDeclaration> result = new HashSet<>();
+    public Set<LSFActionOrGlobalPropDeclaration<?, ?>> getDependencies() {
+        Set<LSFActionOrGlobalPropDeclaration<?, ?>> result = new HashSet<>();
 
         Collection<LSFActionOrPropReference> propReferences;
 
         if (isAbstract()) {
             propReferences = new ArrayList<>();
-            for (LSFActionOrPropReference reference : findImplementations(getNameIdentifier())) {
+            for (LSFActionOrPropReference<?, ?> reference : findImplementations(getNameIdentifier())) {
                 fillImplementationDependencies(reference, propReferences);
             }
         } else {
@@ -304,7 +304,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
         for (LSFActionOrPropReference<?, ?> propReference : propReferences) {
             LSFActionOrPropDeclaration propDeclaration = propReference.resolveDecl();
             if (propDeclaration instanceof LSFActionOrGlobalPropDeclaration) {
-                result.add((LSFActionOrGlobalPropDeclaration) propDeclaration);
+                result.add((LSFActionOrGlobalPropDeclaration<?, ?>) propDeclaration);
             }
         }
 

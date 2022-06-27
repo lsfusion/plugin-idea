@@ -109,7 +109,7 @@ public abstract class LSFActionDeclarationImpl extends LSFActionOrGlobalPropDecl
     }
 
     @Override
-    protected void fillImplementationDependencies(LSFActionOrPropReference impRef, Collection<LSFActionOrPropReference> references) {
+    protected void fillImplementationDependencies(LSFActionOrPropReference<?, ?> impRef, Collection<LSFActionOrPropReference> references) {
         LSFOverrideActionStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) impRef, LSFOverrideActionStatement.class);
         LSFPropertyExpression pe = overrideStatement.getPropertyExpression();
         if(pe != null)

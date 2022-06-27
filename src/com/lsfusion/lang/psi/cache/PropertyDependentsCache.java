@@ -10,10 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-public class PropertyDependentsCache extends PsiDependentCache<LSFActionOrGlobalPropDeclaration, Set<LSFActionOrGlobalPropDeclaration>> {
-    public static final PsiResolver<LSFActionOrGlobalPropDeclaration, Set<LSFActionOrGlobalPropDeclaration>> RESOLVER = new PsiResolver<>() {
+public class PropertyDependentsCache extends PsiDependentCache<LSFActionOrGlobalPropDeclaration<?, ?>, Set<LSFActionOrGlobalPropDeclaration<?, ?>>> {
+    public static final PsiResolver<LSFActionOrGlobalPropDeclaration<?, ?>, Set<LSFActionOrGlobalPropDeclaration<?, ?>>> RESOLVER = new PsiResolver<>() {
         @Override
-        public Set<LSFActionOrGlobalPropDeclaration> resolve(@NotNull LSFActionOrGlobalPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
+        public Set<LSFActionOrGlobalPropDeclaration<?, ?>> resolve(@NotNull LSFActionOrGlobalPropDeclaration<?, ?> lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.getDependents();
         }
 
@@ -39,7 +39,7 @@ public class PropertyDependentsCache extends PsiDependentCache<LSFActionOrGlobal
     }
 
     @Nullable
-    public Set<LSFActionOrGlobalPropDeclaration> resolveWithCaching(@NotNull LSFActionOrGlobalPropDeclaration element) {
+    public Set<LSFActionOrGlobalPropDeclaration<?, ?>> resolveWithCaching(@NotNull LSFActionOrGlobalPropDeclaration<?, ?> element) {
         return super.resolveWithCaching(element, RESOLVER, false, false);
     }
 }

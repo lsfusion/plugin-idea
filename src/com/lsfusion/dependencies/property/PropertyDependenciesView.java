@@ -27,16 +27,19 @@ public class PropertyDependenciesView extends DependenciesView {
 
     @Override
     public void createDependencyNode(PsiElement element, Set<PsiElement> proceeded) {
-        LSFActionOrGlobalPropDeclaration sourceProperty = (LSFActionOrGlobalPropDeclaration) element;
+        LSFActionOrGlobalPropDeclaration<?, ?> sourceProperty = (LSFActionOrGlobalPropDeclaration<?, ?>) element;
 
         if (sourceProperty != null && !sourceProperty.isAction()) {
-            for (LSFActionOrGlobalPropDeclaration targetProperty : PropertyDependenciesCache.getInstance(project).resolveWithCaching(sourceProperty)) {
-                if (allEdges || (!dataModel.containsNode(sourceProperty.getPresentableText()) || !dataModel.containsNode(targetProperty.getPresentableText()))) {
-                    addModelEdge(sourceProperty, targetProperty, true);
-                }
+            Set<LSFActionOrGlobalPropDeclaration<?, ?>> targetProperties = PropertyDependenciesCache.getInstance(project).resolveWithCaching(sourceProperty);
+            if (targetProperties != null) {
+                for (LSFActionOrGlobalPropDeclaration<?, ?> targetProperty : targetProperties) {
+                    if (allEdges || (!dataModel.containsNode(sourceProperty.getPresentableText()) || !dataModel.containsNode(targetProperty.getPresentableText()))) {
+                        addModelEdge(sourceProperty, targetProperty, true);
+                    }
 
-                if (proceeded.add(targetProperty)) {
-                    createDependencyNode(targetProperty, proceeded);
+                    if (proceeded.add(targetProperty)) {
+                        createDependencyNode(targetProperty, proceeded);
+                    }
                 }
             }
         }
@@ -44,24 +47,27 @@ public class PropertyDependenciesView extends DependenciesView {
 
     @Override
     public void createDependentNode(PsiElement element, Set<PsiElement> proceeded) {
-        LSFActionOrGlobalPropDeclaration targetProperty = (LSFActionOrGlobalPropDeclaration) element;
+        LSFActionOrGlobalPropDeclaration<?, ?> targetProperty = (LSFActionOrGlobalPropDeclaration<?, ?>) element;
 
         if (targetProperty != null) {
-            for (LSFActionOrGlobalPropDeclaration sourceProperty : PropertyDependentsCache.getInstance(project).resolveWithCaching(targetProperty)) {
-                if (sourceProperty != null && !sourceProperty.isAction()) {
-                    if (allEdges || !dataModel.containsNode(targetProperty.getPresentableText()) || !dataModel.containsNode(sourceProperty.getPresentableText())) {
-                        addModelEdge(sourceProperty, targetProperty, false);
-                    }
+            Set<LSFActionOrGlobalPropDeclaration<?, ?>> sourceProperties = PropertyDependentsCache.getInstance(project).resolveWithCaching(targetProperty);
+            if (sourceProperties != null) {
+                for (LSFActionOrGlobalPropDeclaration<?, ?> sourceProperty : sourceProperties) {
+                    if (sourceProperty != null && !sourceProperty.isAction()) {
+                        if (allEdges || !dataModel.containsNode(targetProperty.getPresentableText()) || !dataModel.containsNode(sourceProperty.getPresentableText())) {
+                            addModelEdge(sourceProperty, targetProperty, false);
+                        }
 
-                    if (proceeded.add(sourceProperty)) {
-                        createDependentNode(sourceProperty, proceeded);
+                        if (proceeded.add(sourceProperty)) {
+                            createDependentNode(sourceProperty, proceeded);
+                        }
                     }
                 }
             }
         }
     }
 
-    private void addModelEdge(LSFActionOrGlobalPropDeclaration sourceProperty, LSFActionOrGlobalPropDeclaration targetProperty, boolean dependency) {
+    private void addModelEdge(LSFActionOrGlobalPropDeclaration<?, ?> sourceProperty, LSFActionOrGlobalPropDeclaration<?, ?> targetProperty, boolean dependency) {
         GraphNode sourceNode = dataModel.getNode(sourceProperty.getPresentableText());
         if (sourceNode == null) {
             sourceNode = new PropertyGraphNode(sourceProperty, dependency);
@@ -81,7 +87,7 @@ public class PropertyDependenciesView extends DependenciesView {
             PsiElement parent = PsiTreeUtil.getParentOfType(targetElement, LSFActionOrPropReference.class, LSFActionOrGlobalPropDeclaration.class);
             if (parent != null) {
                 if (parent instanceof LSFActionOrPropReference) {
-                    return ((LSFActionOrPropReference) parent).resolveDecl();   
+                    return ((LSFActionOrPropReference<?, ?>) parent).resolveDecl();
                 } else {
                     return parent;
                 }
@@ -118,9 +124,9 @@ public class PropertyDependenciesView extends DependenciesView {
     }
     
     private Color getSpecificNodeColor(GraphNode node) {
-        LSFActionOrGlobalPropDeclaration prop = ((PropertyGraphNode) node).property;
+        LSFActionOrGlobalPropDeclaration<?, ?> prop = ((PropertyGraphNode) node).property;
         if (prop instanceof LSFGlobalPropDeclaration) {
-            LSFGlobalPropDeclaration property = (LSFGlobalPropDeclaration) prop;
+            LSFGlobalPropDeclaration<?, ?> property = (LSFGlobalPropDeclaration<?, ?>) prop;
             if (property.isAbstract()) {
                 return new JBColor(Gray._139, Gray._139);
             } else if (property.isDataProperty()) {
@@ -132,8 +138,8 @@ public class PropertyDependenciesView extends DependenciesView {
 
     @Override
     public Border getNodeBorder(GraphNode node) {
-        LSFActionOrGlobalPropDeclaration prop = ((PropertyGraphNode) node).property;
-        if (prop instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration) prop).isPersistentProperty()) {
+        LSFActionOrGlobalPropDeclaration<?, ?> prop = ((PropertyGraphNode) node).property;
+        if (prop instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration<?, ?>) prop).isPersistentProperty()) {
             return new LineBorder(new JBColor(new Color(156, 121, 255), new Color(156, 121, 255)), 2);
         }
         return super.getNodeBorder(node);
