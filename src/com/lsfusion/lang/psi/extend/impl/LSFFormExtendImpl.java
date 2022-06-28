@@ -59,10 +59,7 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         }
 
         LSFFormDecl formDecl = getFormDecl();
-
-        assert formDecl != null;
-
-        return formDecl.getGlobalName();
+        return formDecl != null ? formDecl.getGlobalName() : null;
     }
 
     @Override
