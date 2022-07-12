@@ -57,6 +57,10 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.showChangeKey = showEditKey;
     }
 
+    public void setChangeMouse(String changeMouse) {
+        target.changeMouse = changeMouse;
+    }
+
     public void setFocusable(Boolean focusable) {
         target.focusable = focusable;
     }

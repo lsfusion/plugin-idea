@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.242</b><br>
+        <b>Version 1.0.243</b><br>
         <ul>
-            <li>LSF Dependencies: module chooser</li>
+            <li>'changeMouse' in DESIGN support</li>
         </ul>
     ]]>
     </change-notes>

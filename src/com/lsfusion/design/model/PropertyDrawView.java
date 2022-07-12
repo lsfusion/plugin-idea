@@ -44,6 +44,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("valueAlignment"),
             new ReflectionProperty("changeKey"),
             new ReflectionProperty("showChangeKey").setExpert(),
+            new ReflectionProperty("changeMouse"),
             new ReflectionProperty("focusable"),
             new ReflectionProperty("panelCaptionVertical"),
             new ReflectionProperty("panelCaptionAlignment"),
@@ -78,6 +79,7 @@ public class PropertyDrawView extends ComponentView {
 
     public KeyStroke changeKey;
     public boolean showChangeKey;
+    public String changeMouse;
 
     public Boolean focusable;
 
@@ -324,6 +326,10 @@ public class PropertyDrawView extends ComponentView {
         this.showChangeKey = showEditKey;
     }
 
+    public void setChangeMouse(String changeMouse) {
+        this.changeMouse = changeMouse;
+    }
+
     public void setFocusable(Boolean focusable) {
         this.focusable = focusable;
     }
@@ -426,6 +432,10 @@ public class PropertyDrawView extends ComponentView {
 
     public boolean isShowChangeKey() {
         return showChangeKey;
+    }
+
+    public String getChangeMouse() {
+        return changeMouse;
     }
 
     public Boolean getFocusable() {
