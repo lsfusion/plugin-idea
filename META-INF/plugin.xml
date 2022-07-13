@@ -11,6 +11,7 @@
         <ul>
             <li>'changeMouse' in DESIGN support</li>
             <li>Show form inside of container in another form</li>
+            <li>Added possibility to specify numbers of milliseconds digits after seconds in TIME, DATETIME, ZDATETIME classes</li>
         </ul>
     ]]>
     </change-notes>

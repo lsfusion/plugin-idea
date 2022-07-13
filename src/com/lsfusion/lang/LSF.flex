@@ -108,7 +108,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   ("TTRUE" | "TFALSE")                    { return LEX_T_LOGICAL_LITERAL; }
 
     "INTEGER" | "LONG" | "NUMERIC" ("[" {DIGITS} "," {DIGITS} "]")? | "DOUBLE"
-  | "DATE" | "DATETIME" | "TIME" | "YEAR" | "ZDATETIME" | "INTERVAL" ("["{INTERVAL_TYPE}"]")
+  | "DATE" | "DATETIME" | "DATETIME[" [0-6] "]" | "TIME" | "TIME[" [0-6] "]" | "YEAR" | "ZDATETIME" | "ZDATETIME[" [0-6] "]" | "INTERVAL" ("["{INTERVAL_TYPE}"]")
   | "BPSTRING" | "BPISTRING" | "STRING" | "ISTRING"
   | "BPSTRING[" {DIGITS} "]" | "BPISTRING[" {DIGITS} "]" | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]"
   | "TEXT" | "RICHTEXT" | "HTMLTEXT"

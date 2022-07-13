@@ -710,6 +710,12 @@ public class LSFPsiImplUtil {
                 case "ZDATETIME" :
                     return ZDateTimeIntervalClass.instance;
             }
+        } else if (name.startsWith("DATETIME[")) {
+            return DateTimeClass.instance;
+        } else if (name.startsWith("ZDATETIME[")) {
+            return ZDateTimeClass.instance;
+        } else if (name.startsWith("TIME[")) {
+            return TimeClass.instance;
         }
 
         switch (name) {
