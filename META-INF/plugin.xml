@@ -10,6 +10,7 @@
         <b>Version 1.0.243</b><br>
         <ul>
             <li>'changeMouse' in DESIGN support</li>
+            <li>Show form inside of container in another form</li>
         </ul>
     ]]>
     </change-notes>

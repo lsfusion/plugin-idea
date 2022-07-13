@@ -845,7 +845,7 @@ doMainBody ::= DO actionPropertyDefinitionBody
 }
 
 syncTypeLiteral ::= WAIT | NOWAIT
-windowTypeLiteral ::= FLOAT | DOCKED | EMBEDDED | POPUP
+windowTypeLiteral ::= FLOAT | DOCKED | EMBEDDED | POPUP | (IN componentID)
 
 staticDestination ::= TO noParamsPropertyUsage
 groupObjectDestination ::= TO groupObjectUsage EQUALS propertyUsage (COMMA groupObjectUsage EQUALS propertyUsage)*
