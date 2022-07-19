@@ -35,6 +35,7 @@ import com.jgraph.layout.tree.JGraphTreeLayout;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.dependencies.module.DependencySpeedSearch;
 import com.lsfusion.util.LSFFileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;
 import org.jgraph.graph.DefaultGraphCell;
@@ -102,7 +103,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
             @Override
             public void run() {
-                if (toolWindow.isVisible()) {
+                if (toolWindow.isVisible() && isVisible()) {
                     checkUpdate();
                     if (showPathToElement() && showDeclPath) {
                         findAndColorPath();
@@ -123,7 +124,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         ActionToolbar toolbar = createToolbar();
 
-        toolbar.updateActionsImmediately();
+        toolbar.setTargetComponent(toolbar.getComponent());
 
         add(toolbar.getComponent(), BorderLayout.NORTH);
     }
@@ -133,8 +134,13 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         actions.add(new AnAction("Refresh / Apply", "Refresh", LSFIcons.Design.REFRESH) {
             @Override
-            public void actionPerformed(AnActionEvent e) {
+            public void actionPerformed(@NotNull AnActionEvent e) {
                 redrawCurrent();
+
+                //hack to fix small height after refresh
+                String currentLayout = layoutAction.getCurrentLayout();
+                changeLayout(TREE_LAYOUT, false);
+                changeLayout(currentLayout, false);
             }
         });
 
@@ -143,12 +149,12 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         showRequiringAction = new CheckboxAction(getDependentTitle()) {
             @Override
-            public boolean isSelected(AnActionEvent e) {
+            public boolean isSelected(@NotNull AnActionEvent e) {
                 return showRequiring;
             }
 
             @Override
-            public void setSelected(AnActionEvent e, boolean state) {
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 showRequiring = state;
                 if (!showRequired && !showRequiring) {
                     showRequiredAction.setSelected(e, true);
@@ -158,12 +164,12 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         showRequiredAction = new CheckboxAction(getDependencyTitle()) {
             @Override
-            public boolean isSelected(AnActionEvent e) {
+            public boolean isSelected(@NotNull AnActionEvent e) {
                 return showRequired;
             }
 
             @Override
-            public void setSelected(AnActionEvent e, boolean state) {
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 showRequired = state;
                 if (!showRequired && !showRequiring) {
                     showRequiringAction.setSelected(e, true);
@@ -176,12 +182,12 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         actions.add(new CheckboxAction("All edges") {
             @Override
-            public boolean isSelected(AnActionEvent e) {
+            public boolean isSelected(@NotNull AnActionEvent e) {
                 return allEdges;
             }
 
             @Override
-            public void setSelected(AnActionEvent e, boolean state) {
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 allEdges = state;
             }
         });
@@ -197,12 +203,12 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         if (showPathToElement()) {
             actions.add(new CheckboxAction("Path to element") {
                 @Override
-                public boolean isSelected(AnActionEvent e) {
+                public boolean isSelected(@NotNull AnActionEvent e) {
                     return showDeclPath;
                 }
 
                 @Override
-                public void setSelected(AnActionEvent e, boolean state) {
+                public void setSelected(@NotNull AnActionEvent e, boolean state) {
                     showDeclPath = state;
                     if (!showDeclPath) {
                         latestTargetElementInPath = null;
@@ -217,35 +223,35 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         actions.add(new AnAction(LSFIcons.DEPENDENCY_ZOOM_OUT) {
             @Override
-            public void actionPerformed(AnActionEvent e) {
+            public void actionPerformed(@NotNull AnActionEvent e) {
                 zoom(1);
             }
         });
         
         actions.add(new AnAction(LSFIcons.DEPENDENCY_ACTUAL_ZOOM) {
             @Override
-            public void actionPerformed(AnActionEvent e) {
+            public void actionPerformed(@NotNull AnActionEvent e) {
                 zoom(0);
             }
         });
 
         actions.add(new AnAction(LSFIcons.DEPENDENCY_ZOOM_IN) {
             @Override
-            public void actionPerformed(AnActionEvent e) {
+            public void actionPerformed(@NotNull AnActionEvent e) {
                 zoom(-1);
             }
         });
 
         actions.add(new AnAction(LSFIcons.GRAPH_EXPORT) {
             @Override
-            public void actionPerformed(AnActionEvent e) {
+            public void actionPerformed(@NotNull AnActionEvent e) {
                 if (jgraph != null) {
                     new SVGExporter().exportSVG(jgraph);
                 }
             }
         });
 
-        return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
+        return ActionManager.getInstance().createActionToolbar(title, actions, true);
     }
     
     public Collection<GraphNode> getAllNodes() {
@@ -372,18 +378,15 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         jgraph.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (e.getModifiers() == InputEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_0) {
+                if (e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK && e.getKeyCode() == KeyEvent.VK_0) {
                     zoom(0);
                 }
             }
         });
 
-        jgraph.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                if (e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK) {
-                    zoom(e.getWheelRotation());
-                }
+        jgraph.addMouseWheelListener(e -> {
+            if (e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK) {
+                zoom(e.getWheelRotation());
             }
         });
 
@@ -421,13 +424,17 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     private boolean changeLayout(boolean update) {
+        return changeLayout(layoutAction.getCurrentLayout(), update);
+    }
+
+    private boolean changeLayout(String currentLayout, boolean update) {
         if (update && (jgraph == null || jgraph.getParent() == null)) {
             redrawCurrent();
             return true;
         }
 
         JGraphLayout hir = null;
-        switch (layoutAction.getCurrentLayout()) {
+        switch (currentLayout) {
             case HIERARCHICAL_LAYOUT:
                 hir = new JGraphHierarchicalLayout();
                 ((JGraphHierarchicalLayout) hir).setOrientation(SwingConstants.WEST);
@@ -472,12 +479,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             jgraph.getGraphLayoutCache().edit(nestedMap);
             jgraph.getGraphLayoutCache().reload();
 
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    scrollToNode(dataModel.rootNode);
-                }
-            });
+            ApplicationManager.getApplication().invokeLater(() -> scrollToNode(dataModel.rootNode));
 
         } catch (IllegalArgumentException e) {
             unableToDrawGraph();
@@ -673,12 +675,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     private void unableToDrawGraph() {
         jgraph = null;
         
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(DependenciesView.this, "Unable to apply current layout", title, JOptionPane.WARNING_MESSAGE);
-            }
-        });
+        ApplicationManager.getApplication().invokeLater(() -> JOptionPane.showMessageDialog(DependenciesView.this, "Unable to apply current layout", title, JOptionPane.WARNING_MESSAGE));
     }
     
     public PsiElement getTargetEditorPsiElement() {

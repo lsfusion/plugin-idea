@@ -68,17 +68,18 @@ public class ModuleDependenciesView extends DependenciesView {
 
     @Override
     public void createDependencyNode(PsiElement element, Set<PsiElement> proceeded) {
-        LSFModuleDeclaration module = (LSFModuleDeclaration) element;
-        
-        for (LSFModuleDeclaration moduleDeclaration : module.getRequireModules()) {
-            if (moduleDeclaration != null && moduleDeclaration != module) {
-                String sourceDeclName = module.getDeclName();
-                String targetDeclName = moduleDeclaration.getDeclName();
-                if (allEdges || (!dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName))) {
-                    addModelEdge(module, moduleDeclaration, true);
+        if(element != null) {
+            LSFModuleDeclaration module = (LSFModuleDeclaration) element;
+            for (LSFModuleDeclaration moduleDeclaration : module.getRequireModules()) {
+                if (moduleDeclaration != null && moduleDeclaration != module) {
+                    String sourceDeclName = module.getDeclName();
+                    String targetDeclName = moduleDeclaration.getDeclName();
+                    if (allEdges || (!dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName))) {
+                        addModelEdge(module, moduleDeclaration, true);
 
-                    if (proceeded.add(moduleDeclaration)) {
-                        createDependencyNode(moduleDeclaration, proceeded);
+                        if (proceeded.add(moduleDeclaration)) {
+                            createDependencyNode(moduleDeclaration, proceeded);
+                        }
                     }
                 }
             }
@@ -87,21 +88,22 @@ public class ModuleDependenciesView extends DependenciesView {
 
     @Override
     public void createDependentNode(GlobalSearchScope scope, PsiElement element, Set<PsiElement> proceeded) {
-        LSFModuleDeclaration module = (LSFModuleDeclaration) element;
+        if(element != null) {
+            LSFModuleDeclaration module = (LSFModuleDeclaration) element;
+            Set<LSFModuleDeclaration> refModules = ModuleDependentsCache.getInstance(project).resolveWithCaching(module);
+            if (refModules != null) {
+                for (LSFModuleDeclaration decl : refModules) {
+                    assert decl != null;
+                    if (scope == null || scope.accept(decl.getLSFFile().getVirtualFile())) {
+                        String sourceDeclName = decl.getDeclName();
+                        String targetDeclName = module.getDeclName();
+                        if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
+                            addModelEdge(decl, module, false);
+                        }
 
-        Set<LSFModuleDeclaration> refModules = ModuleDependentsCache.getInstance(project).resolveWithCaching(module);
-        if (refModules != null) {
-            for (LSFModuleDeclaration decl : refModules) {
-                assert decl != null;
-                if (scope == null || scope.accept(decl.getLSFFile().getVirtualFile())) {
-                    String sourceDeclName = decl.getDeclName();
-                    String targetDeclName = module.getDeclName();
-                    if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
-                        addModelEdge(decl, module, false);
-                    }
-
-                    if (proceeded.add(decl)) {
-                        createDependentNode(scope, decl, proceeded);
+                        if (proceeded.add(decl)) {
+                            createDependentNode(scope, decl, proceeded);
+                        }
                     }
                 }
             }

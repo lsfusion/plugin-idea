@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.declarations;
 
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.LSFExplicitClasses;
@@ -32,14 +31,12 @@ public interface LSFActionOrGlobalPropDeclaration<This extends LSFActionOrGlobal
 
         LSFId nameIdentifier = getNameIdentifier();
         if(nameIdentifier != null) {
-            Set<PsiReference> refs = new HashSet<>(ReferencesSearch.search(nameIdentifier, getUseScope()).findAll());
-
-            for (PsiReference ref : refs) {
-                LSFActionOrGlobalPropDeclaration<?, ?> dependent = PsiTreeUtil.getParentOfType(ref.getElement(), LSFActionOrGlobalPropDeclaration.class);
+            ReferencesSearch.search(nameIdentifier, getUseScope()).forEach(reference -> {
+                LSFActionOrGlobalPropDeclaration<?, ?> dependent = PsiTreeUtil.getParentOfType(reference.getElement(), LSFActionOrGlobalPropDeclaration.class);
                 if (dependent != null) {
                     result.add(dependent);
                 }
-            }
+            });
         }
 
         return result;

@@ -4,7 +4,6 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.messages.MessageBus;
@@ -27,17 +26,17 @@ public class ModuleDependentsCache extends PsiDependentCache<LSFModuleDeclaratio
     public static final PsiResolver<LSFModuleDeclaration, Set<LSFModuleDeclaration>> RESOLVER = new PsiResolver<>() {
         @Override
         public Set<LSFModuleDeclaration> resolve(@NotNull LSFModuleDeclaration declaration, boolean incompleteCode) {
-            LSFId nameIdentifier = declaration.getNameIdentifier();
-            HashSet<PsiReference> references = new HashSet<>(ReferencesSearch.search(nameIdentifier, declaration.getUseScope()).findAll());
-            
             Set<LSFModuleDeclaration> result = new HashSet<>();
-            for (PsiReference reference : references) {
-                if (reference instanceof LSFModuleUsage && PsiTreeUtil.getParentOfType((PsiElement) reference, LSFRequireList.class) != null) {
-                    LSFModuleDeclaration decl = PsiTreeUtil.getParentOfType((PsiElement) reference, LSFModuleDeclaration.class);
-                    if (decl != null) {
-                        result.add(decl);
+            LSFId nameIdentifier = declaration.getNameIdentifier();
+            if (nameIdentifier != null) {
+                ReferencesSearch.search(nameIdentifier, declaration.getUseScope()).forEach(reference -> {
+                    if (reference instanceof LSFModuleUsage && PsiTreeUtil.getParentOfType((PsiElement) reference, LSFRequireList.class) != null) {
+                        LSFModuleDeclaration decl = PsiTreeUtil.getParentOfType((PsiElement) reference, LSFModuleDeclaration.class);
+                        if (decl != null) {
+                            result.add(decl);
+                        }
                     }
-                }
+                });
             }
             return result;
         }
