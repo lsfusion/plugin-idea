@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.242</version>
+    <version>1.0.243</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -12,6 +12,8 @@
             <li>'changeMouse' in DESIGN support</li>
             <li>Show form inside of container in another form</li>
             <li>Added possibility to specify numbers of milliseconds digits after seconds in TIME, DATETIME, ZDATETIME classes</li>
+            <li>LSF dependencies optimisations</li>
+            <li>New Project wizard fix</li>
         </ul>
     ]]>
     </change-notes>
