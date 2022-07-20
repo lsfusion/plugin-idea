@@ -129,7 +129,7 @@ public class LSFResourceBundleUtils {
             } else if (isResourceBundle(file.getName())) {
                 updateResourceBundleMaps(file);
             }
-        } catch (IOException ignored) {
+        } catch (Throwable ignored) {
         }
     }
 
