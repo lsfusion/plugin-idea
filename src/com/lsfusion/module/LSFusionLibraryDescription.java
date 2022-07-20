@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class LSFusionLibraryDescription extends CustomLibraryDescription {
 
-    private static final String LSFUSION_SERVER_LIBRARY_PATTERN = ".*server.*\\.jar";
+    private static final String LSFUSION_SERVER_LIBRARY_PATTERN = ".*lsfusion.*\\.jar";
 
 
     @NotNull
