@@ -7,13 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.243</b><br>
+        <b>Version 1.0.244</b><br>
         <ul>
-            <li>'changeMouse' in DESIGN support</li>
-            <li>Show form inside of container in another form</li>
-            <li>Added possibility to specify numbers of milliseconds digits after seconds in TIME, DATETIME, ZDATETIME classes</li>
-            <li>LSF dependencies optimisations</li>
-            <li>New Project wizard fix</li>
+            <li>EXPORT XLS SHEET support</li>
         </ul>
     ]]>
     </change-notes>
