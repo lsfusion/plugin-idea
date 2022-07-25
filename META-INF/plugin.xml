@@ -69,8 +69,6 @@
                     description="Hide meta code for current file">
                 <keyboard-shortcut first-keystroke="control alt shift K" keymap="$default"/>
             </action>
-            <action id="MetaCode.SyncMode" class="com.lsfusion.actions.MetaSyncModeAction" text="Meta sync mode"
-                    description="Toggle meta code sync mode"/>
             
             <separator/>
             <action id="ToggleLSFCompletion" class="com.lsfusion.actions.ToggleCompletionAction"

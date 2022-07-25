@@ -6,24 +6,20 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.*;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
@@ -47,85 +43,40 @@ import java.util.concurrent.ConcurrentMap;
 import static com.intellij.codeInsight.completion.impl.CompletionServiceImpl.getCompletionPhase;
 import static com.lsfusion.util.LSFPsiUtils.findChildrenOfType;
 
-public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent { //, EditorFactoryListener
-    private static final Logger LOG = Logger.getInstance("#" + MetaChangeDetector.class.getName());
-    //    private final FileDocumentManager myDocumentManager;
+public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent {
     private final PsiManager myPsiManager;
     private final FileEditorManager myFileEditorManager;
     private final Project myProject;
-    //    private final TemplateManager myTemplateManager;
     private final PsiDocumentManager myPsiDocumentManager;
 
     public MetaChangeDetector(
             final PsiDocumentManager psiDocumentManager,
-//                                          final FileDocumentManager documentManager,
             final PsiManager psiManager,
             final FileEditorManager fileEditorManager,
-//                                          final TemplateManager templateManager,
             final Project project
     ) {
-//        myDocumentManager = documentManager;
         myPsiDocumentManager = psiDocumentManager;
         myPsiManager = psiManager;
         myFileEditorManager = fileEditorManager;
         myProject = project;
-//        myTemplateManager = templateManager;
     }
 
     public static MetaChangeDetector getInstance(Project project) {
         return project.getComponent(MetaChangeDetector.class);
     }
 
-//    private final Map<VirtualFile, MyDocumentChangeAdapter> myListenerMap = new HashMap<VirtualFile, MyDocumentChangeAdapter>();
-
-    private final TimerTask indexUpdater = new TimerTask() {
-        @Override
-        public void run() {
-            if (enabled && !reprocessing && finishedReprocessing) {
-                ApplicationManager.getApplication().runReadAction(new Runnable() {
-                    @Override
-                    public void run() {
-//                FileBasedIndex.getInstance().ensureUpToDate(StubUpdatingIndex.INDEX_ID, myProject, GlobalSearchScope.allScope(myProject));
-                        if (!DumbService.isDumb(myProject))
-                            LSFGlobalResolver.findModules("dumb", myProject, GlobalSearchScope.allScope(myProject));
-                    }
-                });
-//                ApplicationManager.getApplication().runReadAction(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        FileBasedIndex.getInstance().ensureUpToDate(IdIndex.NAME, myProject, GlobalSearchScope.allScope(myProject));
-//                    }
-//                });
-            }
-        }
-    };
-
     private Timer timer;
     private final static String ENABLED_META = "ENABLED_META";
-    private final static String META_SYNC_MODE = "META_SYNC_MODE";
 
     @Override
     public void projectOpened() {
         myPsiManager.addPsiTreeChangeListener(this);
- /*       EditorFactory.getInstance().addEditorFactoryListener(this, myProject);
-        Disposer.register(myProject, new Disposable() {
-            @Override
-            public void dispose() {
-                myPsiManager.removePsiTreeChangeListener(MetaChangeDetector.this);
-                LOG.assertTrue(myListenerMap.isEmpty(), myListenerMap);
-            }
-        });*/
 
         DumbService.getInstance(myProject).smartInvokeLater(
                 new Runnable() {
                     public void run() {
                         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(myProject);
-                        setMetaSyncMode(propertiesComponent.getBoolean(META_SYNC_MODE, true));
                         setMetaEnabled(propertiesComponent.getBoolean(ENABLED_META, false), false);
-
-//                        смысла особого нет так как любой highlight'инг приведет к соответствующему эффекту, а так после reprocess'а метакодов долгий лок висит 
-//                        timer = new Timer();
-//                        timer.schedule(indexUpdater, 10, 30);
                     }
                 }
         );
@@ -232,27 +183,12 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 String filePath = virtualFile.getPath();
                 return projectPath != null && filePath.contains(projectPath);
             }
-        };
+        }
         return false;
     }
 
     @Override
     public void childMoved(@NotNull PsiTreeChangeEvent event) {
-//        System.out.print("CHILD MOVED FROM PARENT : " + event.getOldParent().getText() + " TO " + event.getNewParent().getText() + " CHILD " + event.getChild().getText());
-    }
-
-    private static <K> K pop(Set<K> set) {
-        Iterator<K> iterator = set.iterator();
-        if (iterator.hasNext()) { // тут synchronize'ить не надо, потому как удаление может быть только в этом потоке (и собственно в этом методе)
-            K element = iterator.next();
-            set.remove(element);
-            return element;
-        }
-        return null;
-    }
-
-    private static int min(int a, int b) {
-        return a > b ? b : a;
     }
 
     private static String parseText(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, Set<String> metaDecls) {
@@ -270,8 +206,8 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     public static PsiElement mapOffset(PsiElement element) {
 
         PsiElement current = element;
-        LSFMetaCodeBody metaBody = null;
-        LSFMetaReference metaUsage = null;
+        LSFMetaCodeBody metaBody;
+        LSFMetaReference metaUsage;
         int offset = 0;
         while (true) {
             if (current == null || current instanceof LSFFile)
@@ -378,7 +314,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                     break;
                             }
                         }
-                        text = text.substring(i, text.length());
+                        text = text.substring(i);
                         if(!shiftString.isEmpty())
                             text = text.replace("\n" + shiftString, "\n");
                     }
@@ -456,7 +392,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     private LinkedHashMap<Document, Long> changedDocs = new LinkedHashMap<>(16, 0.75f, true);
     private int inlinePending = 0;
 
-    private void inlinePend(LSFFile file, boolean sync) {
+    private void inlinePend(boolean sync) {
         synchronized (displaySync) {
             if (inlinePending == inlineProceeded) {
                 if (!sync && !displayRunning) {
@@ -500,7 +436,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     private int inlineProceeded = 0;
     private String lastProceeded;
 
-    private void inlineProceed(boolean easy, LSFFile file, boolean sync) {
+    private void inlineProceed(boolean easy, LSFFile file) {
         synchronized (displaySync) {
             if (easy)
                 inlinePending--;
@@ -512,8 +448,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             if (inlinePending == inlineProceeded) {
                 inlinePending = 0;
                 inlineProceeded = 0;
-
-                finishedReprocessing = true;
             }
         }
     }
@@ -538,10 +472,10 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         return gen.version >= gen.usage.getVersion() && !usagesPending.processing.contains(gen.usage);
     }
 
-    private boolean actualize(GenParse gen, LSFFile file, boolean sync) {
+    private boolean actualize(GenParse gen, LSFFile file) {
         boolean result = actual(gen);
         if (!result)
-            inlineProceed(true, file, sync);
+            inlineProceed(true, file);
         return result;
     }
 
@@ -608,12 +542,12 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 final Result<Runnable> runMetaText = new Result<>();
                 runMetaText.setResult(new Runnable() {
                     public void run() {
-                        if (!actualize(gen, file, sync)) // оптимизация
+                        if (!actualize(gen, file)) // оптимизация
                             return;
 
                         myPsiDocumentManager.performForCommittedDocument(document, new Runnable() { // без perform for commited постоянно рассинхронизируется дерево с текстом
                             public void run() {
-                                if (!actualize(gen, file, sync)) // оптимизация
+                                if (!actualize(gen, file)) // оптимизация
                                     return;
 
                                 if (reprocessing) {
@@ -624,35 +558,27 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                 if (!sync) { // в синхронном режиме не нужны задержки
                                     long current = System.currentTimeMillis();
 
-                                    long lastTime = 0;
+                                    long lastTime;
                                     if (!(changedDocs.size() < 2 || changedDocs.containsKey(document))) {
                                         Map.Entry<Document, Long> lastChanged = changedDocs.entrySet().iterator().next();
                                         lastTime = lastChanged.getValue();
                                         long timeElapsed = current - lastTime;
                                         if (timeElapsed <= 200) {
-                                            //                                System.out.println("postponed " + file.getName() + " " + lastTime + " " + current);
                                             inlinePostpone(runMetaText.getResult(), true);
                                             return;
                                         }
                                         changedDocs.remove(lastChanged.getKey());
                                     }
-
-                                    //                                String docs = "";
-                                    //                                for(Document d : changedDocs.keySet())
-                                    //                                    docs += "," + myPsiDocumentManager.getPsiFile(d).getVirtualFile().getName();
-                                    //                                System.out.println("proceeded " + file.getName() + " " + lastTime + " " + current + " " + docs);
                                     changedDocs.put(document, current);
                                 }
 
-                                inlineProceed(false, file, sync);
+                                inlineProceed(false, file);
 
                                 CommandProcessor.getInstance().runUndoTransparentAction(new Runnable() {
                                     public void run() {
                                         ApplicationManager.getApplication().runWriteAction(new Runnable() {
                                             public void run() {
                                                 if (gen.usage.isValid() && gen.usage.isCorrect() && actual(gen)) { // can become not valid
-//                                                    myPsiDocumentManager.commitDocument(document);
-
                                                     boolean prevEnabled = enabled;
                                                     enabled = false; // выключаем чтобы каскадно не вызывались события
                                                     try {
@@ -660,8 +586,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                                                     } finally {
                                                         enabled = prevEnabled;
                                                     }
-
-//                                                    myPsiDocumentManager.commitDocument(document);
                                                 }
                                             }
                                         });
@@ -677,7 +601,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                         if (!actual(gen)) // оптимизация
                             return;
 
-                        inlinePend(file, sync);
+                        inlinePend(sync);
                         runMetaText.getResult().run();
                     }
                 };
@@ -740,7 +664,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
         private void flushAll() {
             for (Map.Entry<G, Set<T>> group : pending.entrySet()) {
-//                System.out.println("flushed" + group.getValue().size() + " " + System.currentTimeMillis() + (group.getKey() instanceof LSFFile? ((LSFFile)group.getKey()).getName() : "" ));
                 processing.addAll(group.getValue());
                 ApplicationManager.getApplication().executeOnPooledThread(createAction(group.getKey(), group.getValue()));
             }
@@ -749,19 +672,12 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
         private void flushGroup(G group) {
             Set<T> flush = pending.remove(group);
-//            System.out.println("flushed group" + flush.size() + " " + System.currentTimeMillis() + (group instanceof LSFFile? ((LSFFile)group).getName() : "" ));
             processing.addAll(flush);
             ApplicationManager.getApplication().executeOnPooledThread(createAction(group, flush));
         }
 
         private final Runnable flush = new Runnable() {
             public void run() {
-/*                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }*/
-
                 synchronized (this) {
                     assert flushing;
                     flushAll();
@@ -828,11 +744,9 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         usagesPending.add(used);
     }
 
-    private void addForcedUsageProcessing(LSFFile file, List<LSFMetaCodeStatement> used, boolean sync, Boolean forcedEnabled) { // в синхронном режиме может вызываться должен быть достаточно быстрым
+    private void addForcedUsageProcessing(LSFFile file, List<LSFMetaCodeStatement> used, Boolean forcedEnabled) { // в синхронном режиме может вызываться должен быть достаточно быстрым
         usagesPending.processing.addAll(used);
-        if (used.size() > 0)
-            finishedReprocessing = false;
-        new MetaUsageProcessing(file, new HashSet<>(used), sync, forcedEnabled).run();
+        new MetaUsageProcessing(file, new HashSet<>(used), true, forcedEnabled).run();
     }
 
     private void addUsageProcessing(LSFMetaCodeStatement statement) { // в синхронном режиме может вызываться должен быть достаточно быстрым
@@ -911,7 +825,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private boolean reprocessing = false;
-    private boolean finishedReprocessing = true;
 
     private boolean enabled = false;
 
@@ -927,88 +840,24 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         this.enabled = enabled;
         PropertiesComponent.getInstance(myProject).setValue(ENABLED_META, Boolean.toString(enabled));
 
-/*        final ProjectLevelVcsManager vcsManager = ProjectLevelVcsManager.getInstance(myProject);
-        if(enabled)
-            vcsManager.startBackgroundVcsOperation();
-        else {
-            if(this.enabled) {
-                ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-                    public void run() {
-                        vcsManager.stopBackgroundVcsOperation();                
-                    }
-                });
-            }
-        }*/
-
         if (reprocess)
-            reprocessAllDocuments(modulesToInclude, syncMode, false);
+            reprocessAllDocuments(modulesToInclude, false);
     }
 
     public boolean getMetaEnabled() {
         return enabled;
     }
 
-    public void toggleMetaSyncMode() {
-        setMetaSyncMode(!syncMode);
-    }
-
-    private boolean syncMode;
-
-    public void setMetaSyncMode(boolean syncMode) {
-        this.syncMode = syncMode;
-        PropertiesComponent.getInstance(myProject).setValue(META_SYNC_MODE, Boolean.toString(syncMode));
-    }
-
-    public boolean getMetaSyncMode() {
-        return syncMode;
-    }
-
     public void reprocessFile(LSFFile file, boolean enabled) {
-        addForcedUsageProcessing(file, file.getMetaCodeStatementList(), getMetaSyncMode(), enabled);
+        addForcedUsageProcessing(file, file.getMetaCodeStatementList(), enabled);
     }
 
     public void reprocessAllDocuments() {
-        reprocessAllDocuments(null, getMetaSyncMode(), false);
+        reprocessAllDocuments(null, false);
     }
     
     public void reenableAllMetaCodes() {
-        reprocessAllDocuments(null, getMetaSyncMode(), true);
-    }
-
-    public void reprocessAllDocuments(List<String> modulesToInclude, final boolean sync, final boolean reenable) {
-        if (sync) {
-            reprocessSyncAllDocuments(modulesToInclude, reenable);
-            return;
-        }
-        final Progressive run = indicator -> {
-            reprocessing = true;
-
-            GlobalSearchScope searchScope = LSFFileUtils.getScope(modulesToInclude, myProject);
-            List<LSFFile> lsfFiles = getLsfFiles(searchScope);
-
-            int i = 0;
-            for (LSFFile lsfFile : lsfFiles) {
-                indicator.setText("Processing : " + lsfFile);
-                ApplicationManager.getApplication().runReadAction(() -> {
-                    List<LSFMetaCodeStatement> metaStatements = reenable ? lsfFile.getDisabledMetaCodeStatementList() : lsfFile.getMetaCodeStatementList();
-                    indicator.setText2("Statements : " + metaStatements.size());
-                    addForcedUsageProcessing(lsfFile, metaStatements, sync, null);
-                    indicator.setText2("");
-                });
-                indicator.setFraction(((double) i++) / lsfFiles.size());
-            }
-
-            reprocessing = false;
-
-        };
-
-        Task task;
-        task = new Task.Backgroundable(myProject, "Marking metacode") {
-            public void run(final @NotNull ProgressIndicator indicator) {
-                run.run(indicator);
-            }
-        };
-        ProgressManager.getInstance().run(task);
+        reprocessAllDocuments(null, true);
     }
     
     private class ReprocessInlineProcessor implements InlineProcessor {
@@ -1044,12 +893,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             boolean prevEnabled = enabled;
             enabled = false;
             try {
-//                runEDTWriteUndo(() -> {
-//                    for (Runnable run : postponed) {
-//                        run.run();
-//                    }
-//                    FileDocumentManager.getInstance().saveAllDocuments();
-//                });
                 int blockSize = 500;
                 int blocks = (postponed.size() - 1) / blockSize + 1;
                 for(int i=0;i<blocks;i++) {
@@ -1069,8 +912,8 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             postponed.clear();
         }
     }
-    // copy paste для того чтобы избавиться от асинхронности, но при этом сильно ускорить процесс, за счет другого workflow и лучшего использования кэшей
-    public void reprocessSyncAllDocuments(List<String> modulesToInclude, final boolean reenable) {
+
+    public void reprocessAllDocuments(List<String> modulesToInclude, final boolean reenable) {
         final Progressive run = indicator -> {
             reprocessing = true;
 
@@ -1158,17 +1001,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
     }
 
     private void fireAdded(PsiElement element) {
-//        if (!enabled) {
-/*            assert !(element instanceof LSFStatements);
-            if(element instanceof LSFMetaCodeBody) // нужно перегенерировать тело использования
-                for(PsiElement child : ((LSFMetaCodeBody)element).getStatements().getChildren())
-                    if(child instanceof LSFMetaCodeStatement) // нужно перегенерировать тело использования
-                        addUsageProcessing((LSFMetaCodeStatement)child);
-*/
-//            return;
-//        }
-
-
         Collection<PsiElement> children = findChildrenOfType(element, LSFMetaCodeStatement.class, LSFMetaCodeDeclarationStatement.class);
         for (PsiElement child : children) {
             if (child instanceof LSFMetaCodeStatement && (enabled || ((LSFMetaCodeStatement) child).isInline())) {
@@ -1193,75 +1025,4 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
             }
         }
     }
-
-/*    @Override
-    public void editorCreated(@NotNull EditorFactoryEvent event) {
-        final Editor editor = event.getEditor();
-        if (editor.getProject() != myProject) return;
-        addDocListener(editor.getDocument());
-    }
-
-    public void addDocListener(Document document) {
-        if (document == null) return;
-        final VirtualFile file = myDocumentManager.getFile(document);
-        if (file != null && file.isValid() && !myListenerMap.containsKey(file)) {
-            final PsiFile psiFile = myPsiManager.findFile(file);
-            if (psiFile == null || !psiFile.isPhysical()) return;
-            final MyDocumentChangeAdapter adapter = new MyDocumentChangeAdapter();
-            document.addDocumentListener(adapter);
-            myListenerMap.put(file, adapter);
-        }
-    }
-
-    @Override
-    public void editorReleased(@NotNull EditorFactoryEvent event) {
-        final EditorEx editor = (EditorEx)event.getEditor();
-        final Document document = editor.getDocument();
-
-        VirtualFile file = myDocumentManager.getFile(document);
-        if (file == null) {
-            file = editor.getVirtualFile();
-        }
-        if (file != null && file.isValid()) {
-            if (myFileEditorManager.isFileOpen(file)) {
-                return;
-            }
-        }
-        removeDocListener(document, file);
-    }
-
-    public void removeDocListener(Document document, VirtualFile file) {
-        final MyDocumentChangeAdapter adapter = myListenerMap.remove(file);
-        if (adapter != null) {
-            document.removeDocumentListener(adapter);
-        }
-    }*/
-
-/*    private class MyDocumentChangeAdapter extends DocumentAdapter {
-        private final @NonNls
-        String PASTE_COMMAND_NAME = EditorBundle.message("paste.command.name");
-        private final @NonNls String TYPING_COMMAND_NAME = EditorBundle.message("typing.in.editor.command.name");
-
-        public MyDocumentChangeAdapter() {
-        }
-
-        @Override
-        public void beforeDocumentChange(DocumentEvent e) {
-            if (DumbService.isDumb(myProject)) return;
-
-            final Document document = e.getDocument();
-            final PsiDocumentManager documentManager = myPsiDocumentManager;
-
-            if (!documentManager.isUncommited(document)) {
-                final PsiFile file = documentManager.getPsiFile(document);
-                if (file != null) {
-                    final PsiElement element = file.findElementAt(e.getOffset());
-                    if (element != null) {
-                        System.out.println("DOCUMENT CHANGED : element " + element.getText() + " offs " + e.getOffset() + " oldText " + e.getOldFragment() + " newText " + e.getNewFragment());
-                    } else
-                        System.out.println("SOMEWHERE : " + " offs " + e.getOffset() + " oldText " + e.getOldFragment() + " newText " + e.getNewFragment());
-                }
-            }
-        }
-    }*/
 }
