@@ -10,6 +10,7 @@
         <b>Version 1.0.244</b><br>
         <ul>
             <li>EXPORT XLS SHEET support</li>
+            <li>CLOSE FORM by ID support</li>
         </ul>
     ]]>
     </change-notes>
