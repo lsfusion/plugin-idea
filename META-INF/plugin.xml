@@ -116,6 +116,10 @@
             <separator/>
             <action id="InstallExternalCallsProtocolAction" class="com.lsfusion.actions.InstallExternalCallsProtocolAction"
                     text="Install Debug Protocol"/>
+
+            <separator/>
+            <action id="liveFormDesignEditing" class="com.lsfusion.actions.EnableLiveFormDesignEditing"
+                    text="Enable Live Form Design Editing" description="Enable live form design editing"/>
         </group>
         
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">

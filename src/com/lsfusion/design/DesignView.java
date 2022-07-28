@@ -313,7 +313,7 @@ public class DesignView extends JPanel implements Disposable {
         treeAndTable.setFirstComponent(createComponentTree());
         treeAndTable.setSecondComponent(createComponentPropertyTable());
 
-        toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
+        toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true); //ActionPlaces.TOOLBAR for suppress warning in log "Please do not use ActionPlaces.UNKNOWN or the empty place. Any string unique enough to deduce the toolbar location will do."
 
         FlexPanel leftPanel = new FlexPanel(true);
         leftPanel.add(toolbar.getComponent());
@@ -332,6 +332,7 @@ public class DesignView extends JPanel implements Disposable {
         redrawForm();
 
         setLayout(new BorderLayout());
+        toolbar.setTargetComponent(formSplitter); // for suppressing error in log as there is a check "targetComponent == null", there will be an error "toolbar by default uses any focused component to update its actions. Toolbar actions that need local UI context would be incorrectly disabled. Please call toolbar.setTargetComponent() explicitly"
         add(formSplitter);
     }
 
