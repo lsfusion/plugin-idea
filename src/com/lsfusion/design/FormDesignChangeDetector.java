@@ -5,7 +5,6 @@ import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -18,18 +17,19 @@ import com.lsfusion.actions.EnableLiveFormDesignEditing;
 import com.lsfusion.debug.LSFDebuggerRunner;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
+import com.lsfusion.util.Pair;
 import lsfusion.server.physics.dev.debug.DebuggerService;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
 public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent {
@@ -111,40 +111,52 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
         }
     }
 
+    private static Pair<String, String> getFormWithName(final Project project, @NotNull PsiFile file) {
+        Document document = PsiDocumentManager.getInstance(project).getDocument(file);
+        Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+        if (selectedTextEditor != null && document != null) {
+            PsiElement element = file.findElementAt(TargetElementUtil.adjustOffset(file, document, selectedTextEditor.getCaretModel().getOffset()));
+            LSFExtend parentOfType = PsiTreeUtil.getParentOfType(element, LSFExtend.class);
+            if (parentOfType != null && element.getContainingFile() instanceof LSFFile)
+                return new Pair<>(parentOfType.getGlobalName(), StringUtils.join(AggregateFormAction.getFormText(element, true), "\n\n"));
+        }
+        return null;
+    }
+
+    private static DebuggerService getDebuggerService() throws RemoteException, NotBoundException {
+        Integer userData = debugProcess.getUserData(LSFDebuggerRunner.DEBUGGER_PROPERTY_KEY);
+        return userData != null ? (DebuggerService) LocateRegistry.getRegistry("localhost", userData).lookup("lsfDebuggerService") : null;
+    }
+
+    private static void eval(DebuggerService debuggerService, String formName, String currentForm) throws RemoteException {
+        if (oldForm == null || !oldForm.equals(currentForm)) {
+            oldForm = currentForm;
+            if (index != null)
+                debuggerService.eval("run() { CLOSE FORM 'debug_" + index + "';}");
+
+            index = System.currentTimeMillis();
+            debuggerService.eval(currentForm + "\nrun() {SHOW 'debug_" + index + "' = " + formName + " NOWAIT;}");
+        }
+    }
+
     public static DebugProcessImpl debugProcess;
     private static String oldForm = null;
+    private static Long index;
     public static void showLiveDesign(final Project project, PsiElement element, PsiFile file) {
-        DumbService.getInstance(project).smartInvokeLater(() -> {
-            if (debugProcess != null && element != null && file != null) { //until there is a client debugProcess will be null
-                Document document = PsiDocumentManager.getInstance(project).getDocument(file);
-                Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-                if (selectedTextEditor != null && document != null) {
-                    PsiElement elementAt = file.findElementAt(TargetElementUtil.adjustOffset(file, document, selectedTextEditor.getCaretModel().getOffset()));
-                    if (elementAt != null && elementAt.getContainingFile() instanceof LSFFile) { //because in AggregateFormAction.getFormText is cast to the LSFFile
-                        try {
-                            Logger.getInstance(FormDesignChangeDetector.class).setLevel(Level.OFF); //turn off the logger because AggregateFormAction.getFormText periodically throws errors which are not caught
-                            Integer userData = debugProcess.getUserData(LSFDebuggerRunner.DEBUGGER_PROPERTY_KEY);
-                            LSFExtend parentOfType = PsiTreeUtil.getParentOfType(elementAt, LSFExtend.class);
-                            if (userData != null && parentOfType != null) {
-                                DebuggerService debuggerService = (DebuggerService) LocateRegistry.getRegistry("localhost", userData).lookup("lsfDebuggerService");
-                                LSFId nameIdentifier = parentOfType.resolveDecl().getNameIdentifier();
-                                if (debuggerService != null && nameIdentifier != null) {
-                                    String currentForm = StringUtils.join(AggregateFormAction.getFormText(elementAt, true), "\n\n");
-                                    if (oldForm == null || !oldForm.equals(currentForm)) {
-                                        oldForm = currentForm;
-                                        debuggerService.showFormDesign(currentForm, nameIdentifier.getName());
-                                    }
-                                }
-                            }
-                        } catch (Throwable ignored) {
-                        } finally {
-                            Logger.getInstance(FormDesignChangeDetector.class).setLevel(Level.ERROR); //turn on the logger
-                            alreadyPending = false;
-                        }
-                    }
+        if (debugProcess != null && element != null && file != null) { //until there is a client debugProcess will be null
+            DumbService.getInstance(project).smartInvokeLater(() -> {
+                try {
+                    DebuggerService debuggerService = getDebuggerService();
+                    Pair<String, String> formWithName = getFormWithName(project, file);
+                    if (debuggerService != null && formWithName != null)
+                        eval(getDebuggerService(), formWithName.first, formWithName.second);
+
+                } catch (Throwable ignored) {
+                } finally {
+                    alreadyPending = false;
                 }
-            }
-        });
+            });
+        }
     }
 
     private void showDefaultDesign(PsiElement element, PsiFile file) {

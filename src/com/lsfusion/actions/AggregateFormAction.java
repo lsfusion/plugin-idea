@@ -21,11 +21,10 @@ import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
-import com.lsfusion.lang.psi.references.LSFReference;
+import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.DesignUtils;
 import org.apache.commons.lang.StringUtils;
@@ -153,21 +152,14 @@ public class AggregateFormAction extends AnAction {
         Project project = element.getProject();
 
         //read source elements offsets
-        Map<Integer, String> offsetSourceMap = new HashMap<>();
-        for (LSFReference<?> customClassUsage : PsiTreeUtil.findChildrenOfAnyType(element, LSFCustomClassUsage.class, LSFPropertyUsage.class, LSFActionUsage.class, LSFPropertyElseActionUsage.class)) {
-            LSFDeclaration declaration = customClassUsage.resolveDecl();
-            if (declaration != null)
-                offsetSourceMap.put(customClassUsage.getTextOffset() - element.getTextOffset(), declaration.getLSFFile().getModuleDeclaration().getNamespace() + "." + customClassUsage.getText());
-        }
-
+        Map<PsiElement, LSFCompoundID> replacementMap = new HashMap<>();
         //copy element
         PsiElement copyElement = LSFElementGenerator.createFormFromText(project, element.getText(), element.getClass());
-
-        //create elements with namespaces
-        Map<PsiElement, LSFCompoundID> replacementMap = new HashMap<>();
-        for (PsiElement sourceElement : PsiTreeUtil.findChildrenOfAnyType(copyElement, LSFCustomClassUsage.class, LSFPropertyUsage.class, LSFActionUsage.class, LSFPropertyElseActionUsage.class)) {
-            if (PsiTreeUtil.findChildrenOfType(sourceElement, LSFNamespaceUsage.class).isEmpty())
-                replacementMap.put(sourceElement, LSFElementGenerator.createCompoundIDFromText(project, offsetSourceMap.get(sourceElement.getTextOffset() - copyElement.getTextOffset())));
+        for (LSFFullNameReference children : PsiTreeUtil.findChildrenOfAnyType(copyElement, LSFFullNameReference.class)) {
+            if (children.getFullNameRef() == null && !(children instanceof LSFFormUsage))
+                replacementMap.put(children, LSFElementGenerator.createCompoundIDFromText(project, ((LSFFile)element.getContainingFile()).getModuleDeclaration().getNamespace() + "." + children.getText()));
+            else if (children instanceof LSFFormUsage)
+                replacementMap.put(children, LSFElementGenerator.removeCompoundIDFromFormUsage(project, (LSFFormUsage) children));
         }
 
         //replace elements

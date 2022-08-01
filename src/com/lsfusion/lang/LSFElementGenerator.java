@@ -66,6 +66,12 @@ public class LSFElementGenerator {
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFCompoundID.class).iterator().next();
     }
 
+    public static LSFCompoundID removeCompoundIDFromFormUsage(Project myProject, LSFFormUsage formUsage) {
+        String name = formUsage.getCompoundID().getText().replace(formUsage.getFullNameRef() + ".", "");
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; f()=" + name + "();");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFCompoundID.class).iterator().next();
+    }
+
     public static PsiComment createPsiCommentFromText(Project myProject, String text) {
         final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; //" + text + ";");
         return PsiTreeUtil.findChildrenOfType(dummyFile, PsiComment.class).iterator().next();
