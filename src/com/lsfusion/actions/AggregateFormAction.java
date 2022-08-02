@@ -25,6 +25,7 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
+import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.DesignUtils;
 import org.apache.commons.lang.StringUtils;
@@ -35,6 +36,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AggregateFormAction extends AnAction {
 
@@ -155,11 +157,19 @@ public class AggregateFormAction extends AnAction {
         Map<PsiElement, LSFCompoundID> replacementMap = new HashMap<>();
         //copy element
         PsiElement copyElement = LSFElementGenerator.createFormFromText(project, element.getText(), element.getClass());
-        for (LSFFullNameReference children : PsiTreeUtil.findChildrenOfAnyType(copyElement, LSFFullNameReference.class)) {
-            if (children.getFullNameRef() == null && !(children instanceof LSFFormUsage))
-                replacementMap.put(children, LSFElementGenerator.createCompoundIDFromText(project, ((LSFFile)element.getContainingFile()).getModuleDeclaration().getNamespace() + "." + children.getText()));
-            else if (children instanceof LSFFormUsage)
-                replacementMap.put(children, LSFElementGenerator.removeCompoundIDFromFormUsage(project, (LSFFormUsage) children));
+        for (LSFFullNameReference child : PsiTreeUtil.findChildrenOfAnyType(copyElement, LSFFullNameReference.class)) {
+            if (child.getFullNameRef() == null && !(child instanceof LSFFormUsage)) {
+                List<LSFFile> collect = PsiTreeUtil.findChildrenOfType(element, child.getClass()).stream()
+                        .filter(c -> c.getName().equals(child.getName()))
+                        .map(LSFReference::resolveDecl)
+                        .filter(Objects::nonNull)
+                        .map(LSFElement::getLSFFile)
+                        .filter(lsfFile -> !lsfFile.getModuleDeclaration().getNamespace().equals(((LSFFormStatement) element).resolveDecl().getLSFFile().getModuleDeclaration().getNamespace())).collect(Collectors.toList());
+
+                replacementMap.put(child, LSFElementGenerator.createCompoundIDFromText(project, (collect.isEmpty() ? (LSFFile)element.getContainingFile() : collect.get(0)).getModuleDeclaration().getNamespace() + "." + child.getText()));
+            } else {
+                replacementMap.put(child, LSFElementGenerator.removeCompoundIDFromFormUsage(project, (LSFFormUsage) child));
+            }
         }
 
         //replace elements
