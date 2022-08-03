@@ -21,11 +21,11 @@ import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
-import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.DesignUtils;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +36,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class AggregateFormAction extends AnAction {
 
@@ -103,7 +102,7 @@ public class AggregateFormAction extends AnAction {
                         });
 
             DesignUtils.sortByModules(requiredModules, elementToModule).forEach(formExtend -> result.add(formExtend.getParent() instanceof LSFDesignHeader ?
-                    getCodeBlock(formExtend.getParent().getParent(), skipCreatingNotes) : getCodeBlock(formExtend, skipCreatingNotes) + "\n;"));
+                    getCodeBlock(formExtend.getParent().getParent(), skipCreatingNotes, formDecl) : getCodeBlock(formExtend, skipCreatingNotes, formDecl) + "\n;"));
         }
         return result;
     }
@@ -134,9 +133,9 @@ public class AggregateFormAction extends AnAction {
         }
     }
 
-    private static String getCodeBlock(PsiElement element, boolean skipCreatingNotes) {
+    private static String getCodeBlock(PsiElement element, boolean skipCreatingNotes, LSFFormDeclaration formDecl) {
         if (skipCreatingNotes)
-            return getAggregatedText(element);
+            return getAggregatedText(element, formDecl);
 
         final PsiFile file = element.getContainingFile();
         final Document document = PsiDocumentManager.getInstance(element.getProject()).getDocument(file);
@@ -145,30 +144,32 @@ public class AggregateFormAction extends AnAction {
         if (document != null && range != null) {
             int lineNumber = document.getLineNumber(range.getStartOffset()) + 1;
             int linePosition = range.getStartOffset() - document.getLineStartOffset(lineNumber - 1) + 1;
-            return String.format("//%s (%s:%s)\n%s", file.getName(), lineNumber, linePosition, getAggregatedText(element));
+            return String.format("//%s (%s:%s)\n%s", file.getName(), lineNumber, linePosition, getAggregatedText(element, formDecl));
         }
         return null;
     }
 
-    private static String getAggregatedText(PsiElement element) {
+    private static String getAggregatedText(PsiElement element, LSFFormDeclaration formDecl) {
         Project project = element.getProject();
 
         //read source elements offsets
+        Map<Integer, String> offsetSourceMap = new HashMap<>();
+        for (LSFFullNameReference child : PsiTreeUtil.findChildrenOfAnyType(element, LSFFullNameReference.class)) {
+            LSFDeclaration declaration = child.resolveDecl();
+            if (declaration != null)
+                offsetSourceMap.put(child.getTextOffset() - element.getTextOffset(),
+                        (child.getFullNameRef() == null && !declaration.equals(formDecl)) ? declaration.getLSFFile().getModuleDeclaration().getNamespace() + "." + child.getName() : child.getName());
+        }
+
         Map<PsiElement, LSFCompoundID> replacementMap = new HashMap<>();
         //copy element
         PsiElement copyElement = LSFElementGenerator.createFormFromText(project, element.getText(), element.getClass());
-        for (LSFFullNameReference child : PsiTreeUtil.findChildrenOfAnyType(copyElement, LSFFullNameReference.class)) {
-            if (child.getFullNameRef() == null && !(child instanceof LSFFormUsage)) {
-                List<LSFFile> collect = PsiTreeUtil.findChildrenOfType(element, child.getClass()).stream()
-                        .filter(c -> c.getName().equals(child.getName()))
-                        .map(LSFReference::resolveDecl)
-                        .filter(Objects::nonNull)
-                        .map(LSFElement::getLSFFile)
-                        .filter(lsfFile -> !lsfFile.getModuleDeclaration().getNamespace().equals(((LSFFormStatement) element).resolveDecl().getLSFFile().getModuleDeclaration().getNamespace())).collect(Collectors.toList());
 
-                replacementMap.put(child, LSFElementGenerator.createCompoundIDFromText(project, (collect.isEmpty() ? (LSFFile)element.getContainingFile() : collect.get(0)).getModuleDeclaration().getNamespace() + "." + child.getText()));
-            } else {
-                replacementMap.put(child, LSFElementGenerator.removeCompoundIDFromFormUsage(project, (LSFFormUsage) child));
+        //create elements with namespaces
+        for (LSFFullNameReference sourceElement : PsiTreeUtil.findChildrenOfAnyType(copyElement, LSFFullNameReference.class)) {
+            if (sourceElement.getFullNameRef() == null || (sourceElement instanceof LSFFormUsage && sourceElement.getName().equals(formDecl.getName()))) {
+                LSFCompoundID id = LSFElementGenerator.createCompoundIDFromText(project, offsetSourceMap.get(sourceElement.getTextOffset() - copyElement.getTextOffset()));
+                replacementMap.put(sourceElement, id.getSimpleName().getName().equals("null") ? PsiTreeUtil.findChildrenOfType(sourceElement, LSFCompoundID.class).iterator().next() : id);
             }
         }
 
