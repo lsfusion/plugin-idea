@@ -414,7 +414,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                 rightExprs.add(lmVar.getInitializer());
 
             GlobalSearchScope fileScope = fileScope(lmVar.getContainingFile());
-            Collection<PsiReference> refs = ReferencesSearch.search(lmVar, fileScope, false).findAll();
+            Collection<PsiReference> refs = searchRefs(lmVar, fileScope);
             for (PsiReference ref : refs) {
                 PsiElement refElement = ref.getElement();
                 PsiAssignmentExpression assignmentExpression = PsiTreeUtil.getParentOfType(refElement, PsiAssignmentExpression.class);
@@ -472,6 +472,15 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
                     return moduleName.getResult();
             }
             return null;
+        }
+
+        private Collection<PsiReference> searchRefs(PsiVariable lmVar, GlobalSearchScope fileScope) {
+            try {
+                return ReferencesSearch.search(lmVar, fileScope, false).findAll();
+            } catch (Throwable t) {
+                //ignore java.lang.Throwable: Must be executed under progress indicator
+                return new ArrayList<>();
+            }
         }
 
         private void getModulesFromType(PsiType varType, Set<String> modules) {
