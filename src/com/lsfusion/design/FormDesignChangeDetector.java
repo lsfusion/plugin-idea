@@ -135,8 +135,13 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
                 debuggerService.eval("run() { CLOSE FORM 'debug_" + index + "';}", null);
 
             index = System.currentTimeMillis();
-            debuggerService.eval(currentForm + "\nrun() {SHOW 'debug_" + index + "' = " + formName + " NOWAIT;}",
-                    "run() { SHOW 'debug_" + index + "' = evalError NOWAIT; }");
+            debuggerService.eval("run(STRING form) {" +
+                    "TRY {" +
+                    "EVAL form + \'run() \\{ SHOW \\'debug_" + index + "\\' = " + formName + " NOWAIT; \\}\';" +
+                    "} CATCH { " +
+                    "SHOW \'debug_" + index + "\' = evalError NOWAIT;" +
+                    "}" +
+                    "}", currentForm);
         }
     }
 

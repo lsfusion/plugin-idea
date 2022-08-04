@@ -156,9 +156,11 @@ public class AggregateFormAction extends AnAction {
         Map<Integer, String> offsetSourceMap = new HashMap<>();
         for (LSFFullNameReference child : PsiTreeUtil.findChildrenOfAnyType(element, LSFFullNameReference.class)) {
             LSFDeclaration declaration = child.resolveDecl();
-            if (declaration != null)
-                offsetSourceMap.put(child.getTextOffset() - element.getTextOffset(),
-                        (child.getFullNameRef() == null && !declaration.equals(formDecl)) ? declaration.getLSFFile().getModuleDeclaration().getNamespace() + "." + child.getName() : child.getName());
+            if (declaration != null) {
+                boolean needAddNamespace = child.getFullNameRef() == null;
+                if (needAddNamespace == !declaration.equals(formDecl))
+                    offsetSourceMap.put(child.getTextOffset() - element.getTextOffset(), needAddNamespace ? declaration.getLSFFile().getModuleDeclaration().getNamespace() + "." + child.getName() : child.getName());
+            }
         }
 
         Map<PsiElement, LSFCompoundID> replacementMap = new HashMap<>();
@@ -167,10 +169,9 @@ public class AggregateFormAction extends AnAction {
 
         //create elements with namespaces
         for (LSFFullNameReference sourceElement : PsiTreeUtil.findChildrenOfAnyType(copyElement, LSFFullNameReference.class)) {
-            if (sourceElement.getFullNameRef() == null || (sourceElement instanceof LSFFormUsage && sourceElement.getName().equals(formDecl.getName()))) {
-                LSFCompoundID id = LSFElementGenerator.createCompoundIDFromText(project, offsetSourceMap.get(sourceElement.getTextOffset() - copyElement.getTextOffset()));
-                replacementMap.put(sourceElement, id.getSimpleName().getName().equals("null") ? PsiTreeUtil.findChildrenOfType(sourceElement, LSFCompoundID.class).iterator().next() : id);
-            }
+            String replace = offsetSourceMap.get(sourceElement.getTextOffset() - copyElement.getTextOffset());
+            if (replace != null)
+                replacementMap.put(sourceElement, LSFElementGenerator.createCompoundIDFromText(project, replace));
         }
 
         //replace elements
