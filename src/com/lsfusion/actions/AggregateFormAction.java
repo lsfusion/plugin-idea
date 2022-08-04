@@ -157,9 +157,10 @@ public class AggregateFormAction extends AnAction {
         for (LSFFullNameReference child : PsiTreeUtil.findChildrenOfAnyType(element, LSFFullNameReference.class)) {
             LSFDeclaration declaration = child.resolveDecl();
             if (declaration != null) {
-                boolean needAddNamespace = child.getFullNameRef() == null;
-                if (needAddNamespace == !declaration.equals(formDecl))
-                    offsetSourceMap.put(child.getTextOffset() - element.getTextOffset(), needAddNamespace ? declaration.getLSFFile().getModuleDeclaration().getNamespace() + "." + child.getName() : child.getName());
+                boolean hasNamespace = child.getFullNameRef() != null;
+                boolean needNamespace = !declaration.equals(formDecl);
+                if (hasNamespace != needNamespace)
+                    offsetSourceMap.put(child.getTextOffset() - element.getTextOffset(), needNamespace ? declaration.getLSFFile().getModuleDeclaration().getNamespace() + "." + child.getName() : child.getName());
             }
         }
 
