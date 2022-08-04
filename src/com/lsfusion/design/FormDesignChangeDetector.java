@@ -1,8 +1,9 @@
 package com.lsfusion.design;
 
+import com.intellij.codeInsight.TargetElementUtil;
+import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -11,19 +12,30 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.lsfusion.actions.AggregateFormAction;
+import com.lsfusion.actions.EnableLiveFormDesignEditing;
+import com.lsfusion.debug.LSFDebuggerRunner;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
+import com.lsfusion.util.Pair;
+import lsfusion.server.physics.dev.debug.DebuggerService;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+
 public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent {
-    private PsiDocumentManager psiDocumentManager;
+    private final PsiDocumentManager psiDocumentManager;
     private final PsiManager psiManager;
-    private Project project = null;
+    private final Project project;
 
     public FormDesignChangeDetector(final PsiDocumentManager psiDocumentManager, final PsiManager psiManager, final Project project) {
         this.psiDocumentManager = psiDocumentManager;
@@ -56,89 +68,142 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
 
     @Override
     public void childAdded(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild(), event.getFile());
+        fireChildChanged(event);
     }
 
     @Override
     public void childRemoved(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild(), event.getFile());
+        fireChildChanged(event);
     }
 
     @Override
     public void childReplaced(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild(), event.getFile());
+        fireChildChanged(event);
     }
 
     @Override
     public void childMoved(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild(), event.getFile());
+        fireChildChanged(event);
     }
 
     @Override
     public void childrenChanged(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild(), event.getFile());
+        fireChildChanged(event);
     }
 
     @Override
     public void propertyChanged(@NotNull PsiTreeChangeEvent event) {
-        fireChildChanged(event.getChild(), event.getFile());
+        fireChildChanged(event);
     }
-    
-    private boolean alreadyPending; // не синхронизируем, так как все в edt
 
-    private void fireChildChanged(PsiElement element, PsiFile file) {
-        if (element == null || file == null || !DesignViewFactory.getInstance().windowIsVisible()) {
-            return;
-        }
+    public static boolean alreadyPending; // do not synchronise, as everything is in edt
 
-        final Document document = psiDocumentManager.getDocument(file);
-        if (document == null || DumbService.isDumb(project)) {
-            return;
-        }
-        
-        if(!alreadyPending) {
+    private void fireChildChanged(PsiTreeChangeEvent event) {
+        PsiElement element = event.getChild();
+        PsiFile file = event.getFile();
+
+        if (!alreadyPending) {
             alreadyPending = true;
-            DumbService.getInstance(project).smartInvokeLater(new Runnable() { // так как это событие вызывается до commitTransaction, modificationStamp'ы и unsavedDocument'ы не обновились, а значит к индексам обращаться нельзя
-                @Override
-                public void run() {
-                    try {
-                        Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-                        LSFFormDeclaration formDeclaration = null;
-                        LSFModuleDeclaration module = null;
-                        LSFLocalSearchScope localScope = null;
+            if (EnableLiveFormDesignEditing.isEnableFormDesignEditingEnabled(project))
+                showLiveDesign(project, element, file);
+            else
+                showDefaultDesign(element, file);
+        }
+    }
 
-                        if (editor != null) {
-                            DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
-                            PsiElement targetElement = ConfigurationContext.getFromContext(dataContext).getPsiLocation();
+    private static Pair<String, String> getFormWithName(final Project project, @NotNull PsiFile file) {
+        Document document = PsiDocumentManager.getInstance(project).getDocument(file);
+        Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+        if (selectedTextEditor != null && document != null) {
+            PsiElement element = file.findElementAt(TargetElementUtil.adjustOffset(file, document, selectedTextEditor.getCaretModel().getOffset()));
+            LSFExtend parentOfType = PsiTreeUtil.getParentOfType(element, LSFExtend.class);
+            if (parentOfType != null && element.getContainingFile() instanceof LSFFile)
+                return new Pair<>(parentOfType.getGlobalName(), StringUtils.join(AggregateFormAction.getFormText(element, true), "\n\n"));
+        }
+        return null;
+    }
 
-                            if (targetElement != null) {
-                                LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
-                                if (formExtend != null) {
-                                    localScope = LSFLocalSearchScope.createFrom(formExtend);
-                                    formDeclaration = ((LSFFormStatementImpl) formExtend).resolveFormDecl();
-                                } else {
-                                    LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
-                                    if (designStatement != null) {
-                                        localScope = LSFLocalSearchScope.createFrom(designStatement);
-                                        formDeclaration = designStatement.resolveFormDecl();
-                                    }
-                                }
+    private static DebuggerService getDebuggerService() throws RemoteException, NotBoundException {
+        Integer userData = debugProcess.getUserData(LSFDebuggerRunner.DEBUGGER_PROPERTY_KEY);
+        return userData != null ? (DebuggerService) LocateRegistry.getRegistry("localhost", userData).lookup("lsfDebuggerService") : null;
+    }
 
-                                if (targetElement.getContainingFile() instanceof LSFFile) {
-                                    module = ((LSFFile) targetElement.getContainingFile()).getModuleDeclaration();
-                                }
-                            }
-                        }
+    private static void eval(DebuggerService debuggerService, String formName, String currentForm) throws RemoteException {
+        if (oldForm == null || !oldForm.equals(currentForm)) {
+            oldForm = currentForm;
+            if (index != null)
+                debuggerService.eval("run() { CLOSE FORM 'debug_" + index + "';}", null);
 
-                        if (module != null && formDeclaration != null) {
-                            DesignViewFactory.getInstance().updateView(module, formDeclaration, localScope);
-                        }
-                    } catch (PsiInvalidElementAccessException ignored) {
-                    }
-                    
+            index = System.currentTimeMillis();
+            debuggerService.eval("run(STRING form) {" +
+                    "TRY {" +
+                    "EVAL form + \'run() \\{ SHOW \\'debug_" + index + "\\' = " + formName + " NOWAIT; \\}\';" +
+                    "} CATCH { " +
+                    "SHOW \'debug_" + index + "\' = evalError NOWAIT;" +
+                    "}" +
+                    "}", currentForm);
+        }
+    }
+
+    public static DebugProcessImpl debugProcess;
+    private static String oldForm = null;
+    private static Long index;
+    public static void showLiveDesign(final Project project, PsiElement element, PsiFile file) {
+        if (debugProcess != null && element != null && file != null) { //until there is a client debugProcess will be null
+            DumbService.getInstance(project).smartInvokeLater(() -> {
+                try {
+                    DebuggerService debuggerService = getDebuggerService();
+                    Pair<String, String> formWithName = getFormWithName(project, file);
+                    if (debuggerService != null && formWithName != null)
+                        eval(getDebuggerService(), formWithName.first, formWithName.second);
+
+                } catch (Throwable ignored) {
+                } finally {
                     alreadyPending = false;
                 }
             });
         }
+    }
+
+    private void showDefaultDesign(PsiElement element, PsiFile file) {
+        if (element == null || file == null || !DesignViewFactory.getInstance().windowIsVisible() || psiDocumentManager.getDocument(file) == null || DumbService.isDumb(project))
+            return;
+
+        // as this event is called before commitTransaction, modificationStamp and unsavedDocument have not been updated, so the indexes cannot be accessed
+        DumbService.getInstance(project).smartInvokeLater(() -> {
+            try {
+                Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+                LSFFormDeclaration formDeclaration = null;
+                LSFModuleDeclaration module = null;
+                LSFLocalSearchScope localScope = null;
+
+                if (editor != null) {
+                    PsiElement targetElement = ConfigurationContext.getFromContext(DataManager.getInstance().getDataContext(editor.getComponent())).getPsiLocation();
+                    if (targetElement != null) {
+                        LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
+                        if (formExtend != null) {
+                            localScope = LSFLocalSearchScope.createFrom(formExtend);
+                            formDeclaration = ((LSFFormStatementImpl) formExtend).resolveFormDecl();
+                        } else {
+                            LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
+                            if (designStatement != null) {
+                                localScope = LSFLocalSearchScope.createFrom(designStatement);
+                                formDeclaration = designStatement.resolveFormDecl();
+                            }
+                        }
+
+                        if (targetElement.getContainingFile() instanceof LSFFile)
+                            module = ((LSFFile) targetElement.getContainingFile()).getModuleDeclaration();
+                    }
+                }
+
+                if (module != null && formDeclaration != null)
+                    DesignViewFactory.getInstance().updateView(module, formDeclaration, localScope);
+
+            } catch (PsiInvalidElementAccessException ignored) {
+            } finally {
+                alreadyPending = false;
+            }
+        });
     }
 }

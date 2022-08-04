@@ -29,6 +29,7 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.lsfusion.debug.classchange.LSFClassChangeBreakpointHandler;
 import com.lsfusion.debug.property.LSFPropertyBreakpointHandler;
+import com.lsfusion.design.FormDesignChangeDetector;
 import com.lsfusion.util.ReflectionUtils;
 import com.sun.jdi.*;
 import com.sun.jdi.event.LocatableEvent;
@@ -155,7 +156,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         super(session, javaSession);
 
         LSFDebugVMNotifier vmNotifier = new LSFDebugVMNotifier(getJavaDebugProcess());
-        
+        FormDesignChangeDetector.debugProcess = getJavaDebugProcess();
         breakpointHandler = new LSFActionBreakpointHandler(getJavaDebugProcess(), vmNotifier);
         propertyBreakpointHandler = new LSFPropertyBreakpointHandler(getJavaDebugProcess(), vmNotifier);
         classChangeBreakpointHandler = new LSFClassChangeBreakpointHandler(getJavaDebugProcess(), vmNotifier);

@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.243</version>
+    <version>1.0.244</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -11,6 +11,7 @@
         <ul>
             <li>EXPORT XLS SHEET support</li>
             <li>CLOSE FORM by ID support</li>
+            <li>Live form design support</li>
         </ul>
     ]]>
     </change-notes>
@@ -117,6 +118,10 @@
             <separator/>
             <action id="InstallExternalCallsProtocolAction" class="com.lsfusion.actions.InstallExternalCallsProtocolAction"
                     text="Install Debug Protocol"/>
+
+            <separator/>
+            <action id="liveFormDesignEditing" class="com.lsfusion.actions.EnableLiveFormDesignEditing"
+                    text="Enable Live Form Design Editing" description="Enable live form design editing"/>
         </group>
         
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
