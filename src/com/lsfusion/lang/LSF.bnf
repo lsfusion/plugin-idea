@@ -756,6 +756,7 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    importFormActionPropertyDefinitionBody
                                       	|	    activeFormActionPropertyDefinitionBody
                                       	|	    activateActionPropertyDefinitionBody
+                                      	|	    closeFormActionPropertyDefinitionBody
                                       	|       expandCollapseActionPropertyDefinitionBody
                                       	|       internalActionPropertyDefinitionBody
                                       	|       externalActionPropertyDefinitionBody
@@ -788,7 +789,7 @@ formActionObjectUsage ::= objectUsage formActionObjectProps {
     methods = [ resolveClass ensureClass ]
 }
 formActionPropertyDefinitionBody ::=
-	    SHOW
+	    SHOW (stringLiteral equalsSign)?
 	     mappedForm
 		(
 		    contextFiltersClause
@@ -1275,6 +1276,15 @@ activateActionPropertyDefinitionBody ::= ACTIVATE (  FORM formUsage
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses getDocumentation]
 }
+
+//todo: add getDocumentation
+closeFormActionPropertyDefinitionBody ::= CLOSE FORM stringLiteral
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
+
 
 expandCollapseActionPropertyDefinitionBody ::= (COLLAPSE | EXPAND) CONTAINER componentID
 {
