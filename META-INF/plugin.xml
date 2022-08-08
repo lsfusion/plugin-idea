@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.244</b><br>
+        <b>Version 1.0.245</b><br>
         <ul>
-            <li>EXPORT XLS SHEET support</li>
-            <li>CLOSE FORM by ID support</li>
-            <li>Live form design support</li>
+            <li>ValueFlex attribute support in the DESIGN statement</li>
         </ul>
     ]]>
     </change-notes>

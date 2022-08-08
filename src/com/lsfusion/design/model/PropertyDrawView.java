@@ -42,6 +42,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("charWidth").setExpert(),
             new ReflectionProperty("valueSize").setExpert(),
             new ReflectionProperty("valueAlignment"),
+            new ReflectionProperty("valueFlex"),
             new ReflectionProperty("changeKey"),
             new ReflectionProperty("showChangeKey").setExpert(),
             new ReflectionProperty("changeMouse"),
@@ -198,6 +199,10 @@ public class PropertyDrawView extends ComponentView {
         if (!container.isHorizontal() && isHorizontalValueFlex())
             return FlexAlignment.STRETCH;
         return super.getBaseDefaultAlignment(container);
+    }
+
+    public void setValueFlex(Boolean valueFlex) {
+        this.valueFlex = valueFlex;
     }
 
     public Format getFormat() {

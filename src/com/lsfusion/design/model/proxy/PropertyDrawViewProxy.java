@@ -124,7 +124,11 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
     public void setCharWidth(int charWidth) {
         target.setCharWidth(charWidth);
     }
-    
+
+    public void setValueFlex(boolean valueFlex) {
+        target.setValueFlex(valueFlex);
+    }
+
     public void setValueAlignment(FlexAlignment valueAlignment) {
         this.setValueAlignment(valueAlignment);
     }
