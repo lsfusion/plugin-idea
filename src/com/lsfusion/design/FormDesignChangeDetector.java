@@ -28,6 +28,7 @@ import lsfusion.server.physics.dev.debug.DebuggerService;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -131,15 +132,15 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
     private static void eval(DebuggerService debuggerService, String formName, String currentForm) throws RemoteException {
         if (oldForm == null || !oldForm.equals(currentForm)) {
             oldForm = currentForm;
-            if (index != null)
-                debuggerService.eval("run() { CLOSE FORM 'debug_" + index + "';}", null);
+            if (formIndexName != null)
+                debuggerService.eval("run() { CLOSE FORM '" + formIndexName + "';}", null);
 
-            index = System.currentTimeMillis();
+            formIndexName = "debug_" + System.currentTimeMillis();
             debuggerService.eval("run(STRING form) {" +
                     "TRY {" +
-                    "EVAL form + \'run() \\{ SHOW \\'debug_" + index + "\\' = " + formName + " NOWAIT; \\}\';" +
+                    "EVAL form + \'run() \\{ SHOW \\'" + formIndexName + "\\' = " + formName + " NOWAIT; \\}\';" +
                     "} CATCH { " +
-                    "SHOW \'debug_" + index + "\' = evalError NOWAIT;" +
+                    "SHOW \'" + formIndexName + "\' = evalError NOWAIT;" +
                     "}" +
                     "}", currentForm);
         }
@@ -147,22 +148,37 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
 
     public static DebugProcessImpl debugProcess;
     private static String oldForm = null;
-    private static Long index;
-    public static void showLiveDesign(final Project project, PsiElement element, PsiFile file) {
-        if (debugProcess != null && element != null && file != null) { //until there is a client debugProcess will be null
-            DumbService.getInstance(project).smartInvokeLater(() -> {
-                try {
-                    DebuggerService debuggerService = getDebuggerService();
-                    Pair<String, String> formWithName = getFormWithName(project, file);
-                    if (debuggerService != null && formWithName != null)
-                        eval(getDebuggerService(), formWithName.first, formWithName.second);
-
-                } catch (Throwable ignored) {
-                } finally {
-                    alreadyPending = false;
-                }
-            });
+    private static String formIndexName;
+    private static Runnable showForm;
+    private static final Timer timer = new Timer(500, (e) -> {if (showForm != null) showForm.run();}) {
+        @Override
+        public boolean isRepeats() {
+            return false;
         }
+    };
+
+    public static void showLiveDesign(final Project project, PsiElement element, PsiFile file) {
+        if (timer.isRunning())
+            timer.stop();
+
+        showForm = () -> {
+            if (debugProcess != null && element != null && file != null) { //until there is a client debugProcess will be null
+                DumbService.getInstance(project).smartInvokeLater(() -> {
+                    try {
+                        DebuggerService debuggerService = getDebuggerService();
+                        Pair<String, String> formWithName = getFormWithName(project, file);
+                        if (debuggerService != null && formWithName != null)
+                            eval(getDebuggerService(), formWithName.first, formWithName.second);
+
+                    } catch (Throwable ignored) {
+                    } finally {
+                        alreadyPending = false;
+                    }
+                });
+            }
+        };
+
+        timer.start();
     }
 
     private void showDefaultDesign(PsiElement element, PsiFile file) {

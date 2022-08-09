@@ -24,10 +24,6 @@ public class EnableLiveFormDesignEditing extends ToggleAction {
 
     @Override
     public void setSelected(@NotNull AnActionEvent anActionEvent, boolean selected) {
-        final Project project = getEventProject(anActionEvent);
-        if (project != null)
-            PropertiesComponent.getInstance(project).setValue(LSF_PROPERTY_LIVE_FORM_DESIG_EDITING_ON, Boolean.toString(selected));
-
         setToolwindow(anActionEvent, selected);
     }
 
@@ -59,6 +55,7 @@ public class EnableLiveFormDesignEditing extends ToggleAction {
 
                 ActionManager.getInstance().addTimerListener(500, timerListener);
             }
+            PropertiesComponent.getInstance(eventProject).setValue(LSF_PROPERTY_LIVE_FORM_DESIG_EDITING_ON, Boolean.toString(selected));
         }
     }
 

@@ -13,10 +13,7 @@ import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.ResolveState;
+import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PostprocessReformattingAspect;
 import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.psi.scope.BaseScopeProcessor;
@@ -120,7 +117,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         extend(completionType, psiElement().inFile(PlatformPatterns.instanceOf(LSFFile.class)), new CompletionProvider<>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-                if (CompletionUtils.isCompletionEnabled(parameters.getOriginalFile().getProject()) && 
+                if (!(parameters.getPosition() instanceof PsiComment) && CompletionUtils.isCompletionEnabled(parameters.getOriginalFile().getProject()) &&
                         parameters.getPosition().getContainingFile() instanceof LSFFile &&
                         parameters.getOriginalFile() instanceof LSFFile) {
                     result = result.withPrefixMatcher(new CamelHumpMatcher(result.getPrefixMatcher().getPrefix(), false));
