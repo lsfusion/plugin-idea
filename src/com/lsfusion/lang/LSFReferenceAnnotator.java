@@ -616,6 +616,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitLocalizedStringValueLiteral(@NotNull LSFLocalizedStringValueLiteral o) {
         super.visitLocalizedStringValueLiteral(o);
         checkEscapeSequences(o, "nrt'\\{}");
+        checkBracesConsistency(o);
 
         if (!o.needToBeLocalized()) {
             Module module = ModuleUtil.findModuleForPsiElement(o);
@@ -721,12 +722,39 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             char curCh = text.charAt(i);
             if (curCh == '\\') {
                 if (i + 1 < text.length() && !escapedSymbols.contains(text.substring(i + 1, i + 2))) {
-                    addUnderscoredError(element, TextRange.create(element.getTextRange().getStartOffset() + i, element.getTextRange().getStartOffset() + i + 2), "Wrong escape sequence " + text.substring(i, i + 2));
+                    addUnderscoredError(element, createRange(element, i, 2), "Wrong escape sequence " + text.substring(i, i + 2));
                 } else {
                     ++i;
                 }
             }
         }
+    }
+
+    private void checkBracesConsistency(PsiElement element) {
+        String str = element.getText();
+        Stack<Integer> opened = new Stack<>();
+        for (int i = 0; i < str.length(); ++i) {
+            char ch = str.charAt(i);
+            if (ch == '\\') {
+                ++i;
+            } else if (ch == '{') {
+                opened.push(i);
+            } else if (ch == '}') {
+                if (opened.empty()) {
+                    addUnderscoredError(element, createRange(element, i, 1), "'{' is missing");
+                } else {
+                    opened.pop();
+                }
+            }
+        }
+        if (!opened.empty()) {
+            addUnderscoredError(element, createRange(element, opened.peek(), 1), "'}' is missing");
+        }
+    }
+
+    private TextRange createRange(PsiElement element, int pos, int len) {
+        int start = element.getTextRange().getStartOffset();
+        return TextRange.create(start + pos, start + pos + len);
     }
 
     private boolean checkReference(LSFReference reference) {
