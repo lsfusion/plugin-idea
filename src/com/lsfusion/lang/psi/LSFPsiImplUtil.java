@@ -1401,7 +1401,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFLiteral sourceStatement, @Nullable InferExResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFExpressionLiteral sourceStatement, @Nullable InferExResult inferred) {
         DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
         if (builtInClass != null) {
             return LSFExClassSet.toEx(builtInClass);
@@ -1413,7 +1413,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static DataClass resolveBuiltInValueClass(@NotNull LSFLiteral sourceStatement) {
+    public static DataClass resolveBuiltInValueClass(@NotNull LSFExpressionLiteral sourceStatement) {
         if (sourceStatement.getBooleanLiteral() != null)
             return LogicalClass.instance;
         if (sourceStatement.getTbooleanLiteral() != null)
@@ -1434,7 +1434,7 @@ public class LSFPsiImplUtil {
                 return null;
             }
         }
-        LSFLocalizedStringValueLiteral stringLiteral = sourceStatement.getLocalizedStringLiteral();
+        LSFLocalizedStringValueLiteral stringLiteral = sourceStatement.getExpressionStringLiteral();
         if (stringLiteral != null) {
             if (stringLiteral.needToBeLocalized()) {
                 return new StringClass(false, false, ExtInt.UNLIMITED);
@@ -1957,7 +1957,7 @@ public class LSFPsiImplUtil {
         return singletonList(LogicalClass.instance.getName());
     }
 
-    public static List<String> getValueClassNames(@NotNull LSFLiteral sourceStatement) {
+    public static List<String> getValueClassNames(@NotNull LSFExpressionLiteral sourceStatement) {
         DataClass builtInClass = resolveBuiltInValueClass(sourceStatement);
         if (builtInClass != null) {
             return singletonList(builtInClass.getName());
@@ -2324,7 +2324,7 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
-    public static List<String> getValuePropertyNames(@NotNull LSFLiteral sourceStatement) {
+    public static List<String> getValuePropertyNames(@NotNull LSFExpressionLiteral sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -3749,7 +3749,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Inferred inferParamClasses(@NotNull LSFLiteral sourceStatement, @Nullable LSFExClassSet valueClass) {
+    public static Inferred inferParamClasses(@NotNull LSFExpressionLiteral sourceStatement, @Nullable LSFExClassSet valueClass) {
         return Inferred.EMPTY;
     }
 
