@@ -400,6 +400,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "OK"                      			{ return OK; }
   "ON"                      			{ return ON; }
   "OPTIMISTICASYNC"                     { return OPTIMISTICASYNC; }
+  "OPTIONS"                             { return OPTIONS; }
   "OR"                      			{ return OR; }
   "ORDER"                   			{ return ORDER; }
   "ORDERS"                   			{ return ORDERS; }

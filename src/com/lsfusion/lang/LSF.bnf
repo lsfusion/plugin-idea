@@ -1628,7 +1628,7 @@ renderPropertyCustomView ::= stringLiteral
 changePropertyCustomView ::= CHANGE stringLiteral?
 propertyCustomView ::= CUSTOM ((renderPropertyCustomView changePropertyCustomView) | renderPropertyCustomView | changePropertyCustomView)
 
-listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral) | CALENDAR
+listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral (OPTIONS propertyExpression)?) | CALENDAR
 
 pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS) | (CONFIG stringLiteral))*
 

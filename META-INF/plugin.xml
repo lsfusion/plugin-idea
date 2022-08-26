@@ -7,12 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.245</b><br>
+        <b>Version 1.0.246</b><br>
         <ul>
-            <li>ValueFlex attribute support in the DESIGN statement</li>
-            <li>Live form design now disable by default</li>
-            <li>Added "Show form" button for live design with "Alt + D" shortcut</li>
-            <li>CLOSE FORM may not be on the first line in action</li>
+            <li>CUSTOM OPTIONS support</li>
         </ul>
     ]]>
     </change-notes>
