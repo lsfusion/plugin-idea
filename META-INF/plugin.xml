@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.244</version>
+    <version>1.0.245</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -10,6 +10,9 @@
         <b>Version 1.0.245</b><br>
         <ul>
             <li>ValueFlex attribute support in the DESIGN statement</li>
+            <li>Live form design now disable by default</li>
+            <li>Added "Show form" button for live design with "Alt + D" shortcut</li>
+            <li>CLOSE FORM may not be on the first line in action</li>
         </ul>
     ]]>
     </change-notes>
@@ -118,8 +121,6 @@
                     text="Install Debug Protocol"/>
 
             <separator/>
-            <action id="liveFormDesignEditing" class="com.lsfusion.actions.EnableLiveFormDesignEditing"
-                    text="Enable Live Form Design Editing" description="Enable live form design editing"/>
         </group>
         
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">

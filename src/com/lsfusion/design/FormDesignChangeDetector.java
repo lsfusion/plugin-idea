@@ -13,7 +13,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.actions.AggregateFormAction;
-import com.lsfusion.actions.EnableLiveFormDesignEditing;
 import com.lsfusion.debug.LSFDebuggerRunner;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
@@ -105,7 +104,7 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
 
         if (!alreadyPending) {
             alreadyPending = true;
-            if (EnableLiveFormDesignEditing.isEnableFormDesignEditingEnabled(project))
+            if (DesignView.isLiveFormDesignEditingEnable(project))
                 showLiveDesign(project, element, file);
             else
                 showDefaultDesign(element, file);
@@ -129,28 +128,43 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
         return userData != null ? (DebuggerService) LocateRegistry.getRegistry("localhost", userData).lookup("lsfDebuggerService") : null;
     }
 
-    private static void eval(DebuggerService debuggerService, String formName, String currentForm) throws RemoteException {
-        if (oldForm == null || !oldForm.equals(currentForm)) {
+    private static void eval(DebuggerService debuggerService, String formName, String currentForm, Project project) throws RemoteException {
+        if (oldForm == null || !oldForm.equals(currentForm) || !DesignView.isLiveFormDesignEditingEnable(project)) {
             oldForm = currentForm;
-            if (formIndexName != null)
-                debuggerService.eval("run() { CLOSE FORM '" + formIndexName + "';}", null);
+            String currentFormIndexName = "debug_" + System.currentTimeMillis();
 
-            formIndexName = "debug_" + System.currentTimeMillis();
-            debuggerService.eval("run(STRING form) {" +
-                    "TRY {" +
-                    "EVAL form + \'run() \\{ SHOW \\'" + formIndexName + "\\' = " + formName + " NOWAIT; \\}\';" +
-                    "} CATCH { " +
-                    "SHOW \'" + formIndexName + "\' = evalError NOWAIT;" +
-                    "}" +
-                    "}", currentForm);
+            debuggerService.eval(
+                    "run(STRING form) { \n" +
+                    "   showError() <- NULL;\n" +
+                    "   TRY {\n" +
+                    "       EVAL form + \'run() \\{ SHOW \\'" + currentFormIndexName + "\\' = " + formName + " NOWAIT; \\}\';\n" +
+                    "       IF openedFormId() THEN { \n" +
+                    "           EVAL \'run() \\{ CLOSE FORM \\'\' + openedFormId() + \'\\';\\}\';\n" +
+                    "       }\n" +
+                    "       APPLY {\n" +
+                    "           openedFormId() <- '" + currentFormIndexName + "';\n" +
+                    "       }\n" +
+                    "   } CATCH { \n" +
+                    "       showError() <- TRUE;\n" +
+                    "   }\n" +
+                    "}", currentForm + "\n" +
+                    "EXTEND FORM " + formName + "\n" +
+                    "   PROPERTIES() messageCaughtException SHOWIF showError(); \n" +
+                    "DESIGN "+ formName + "{\n" +
+                    "    MOVE PROPERTY(messageCaughtException()) FIRST {\n" +
+                    "        background = RGB(245,0,0);\n" +
+                    "        caption = '';\n" +
+                    "        height = 70;\n" +
+                    "        valueAlignment = CENTER;\n" +
+                    "    }\n" +
+                    "}");
         }
     }
 
     public static DebugProcessImpl debugProcess;
     private static String oldForm = null;
-    private static String formIndexName;
     private static Runnable showForm;
-    private static final Timer timer = new Timer(500, (e) -> {if (showForm != null) showForm.run();}) {
+    private static final Timer timer = new Timer(1000, e -> {if (showForm != null) showForm.run();}) {
         @Override
         public boolean isRepeats() {
             return false;
@@ -168,7 +182,7 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
                         DebuggerService debuggerService = getDebuggerService();
                         Pair<String, String> formWithName = getFormWithName(project, file);
                         if (debuggerService != null && formWithName != null)
-                            eval(getDebuggerService(), formWithName.first, formWithName.second);
+                            eval(getDebuggerService(), formWithName.first, formWithName.second, project);
 
                     } catch (Throwable ignored) {
                     } finally {

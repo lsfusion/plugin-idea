@@ -3,14 +3,18 @@ package com.lsfusion.design;
 import com.intellij.designer.propertyTable.PropertyTable;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -308,6 +312,69 @@ public class DesignView extends JPanel implements Disposable {
         });
     }
 
+    private static final String LSF_PROPERTY_LIVE_FORM_DESIG_EDITING_ON = "lsfusion.property.live.form.design.editing.on";
+    private TimerListener timerListener;
+    private FlexPanel liveFormDesignViewPanel;
+    public static boolean isLiveFormDesignEditingEnable(Project project) {
+        return project != null && PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_LIVE_FORM_DESIG_EDITING_ON, false);
+    }
+
+    private FlexPanel createLiveFormDesignViewPanel() {
+        JButton showForm = new JButton("Show form");
+        showForm.setMnemonic('D');
+        showForm.setToolTipText("Click or press Alt+D");
+        showForm.addActionListener(e -> {
+            Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+            if (selectedTextEditor != null) {
+                PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(selectedTextEditor.getDocument());
+                if (file != null) {
+                    PsiElement element = file.findElementAt(selectedTextEditor.getCaretModel().getOffset());
+                    if (element != null)
+                        FormDesignChangeDetector.showLiveDesign(project, element, file);
+                }
+            }
+        });
+
+        JCheckBox enableLiveFormDesignEditing = new JCheckBox("Enable live form design editing", isLiveFormDesignEditingEnable(project));
+        enableLiveFormDesignEditing.addActionListener(e -> {
+            boolean liveFormDesignEditingEnable = isLiveFormDesignEditingEnable(project);
+            if (liveFormDesignEditingEnable) {
+                if (timerListener != null) {
+                    ActionManager.getInstance().removeTimerListener(timerListener);
+                    timerListener = null;
+                }
+                showForm.setEnabled(true);
+            } else if (timerListener == null) {
+                timerListener = new TimerListener() {
+                    @Override
+                    public ModalityState getModalityState() {
+                        return ModalityState.defaultModalityState();
+                    }
+
+                    @Override
+                    public void run() {
+                        PsiElement element = ConfigurationContext.getFromContext(DataManager.getInstance()
+                                .getDataContext(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner())).getPsiLocation();
+
+                        if (element != null)
+                            FormDesignChangeDetector.showLiveDesign(project, element, element.getContainingFile());
+                    }
+                };
+
+                ActionManager.getInstance().addTimerListener(500, timerListener);
+                showForm.setEnabled(false);
+            }
+            PropertiesComponent.getInstance(project).setValue(LSF_PROPERTY_LIVE_FORM_DESIG_EDITING_ON, Boolean.toString(!liveFormDesignEditingEnable));
+        });
+
+        FlexPanel flexPanel = new FlexPanel(false);
+        flexPanel.add(enableLiveFormDesignEditing, FlexAlignment.CENTER);
+        flexPanel.add(showForm);
+        flexPanel.setBorder(BorderFactory.createLineBorder(new JBColor(new Color(69, 160, 255), new Color(95, 123, 141))));
+
+        return flexPanel;
+    }
+
     private void createLayout() {
         JBSplitter treeAndTable = new JBSplitter(true);
         treeAndTable.setFirstComponent(createComponentTree());
@@ -316,6 +383,11 @@ public class DesignView extends JPanel implements Disposable {
         toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true); //ActionPlaces.TOOLBAR for suppress warning in log "Please do not use ActionPlaces.UNKNOWN or the empty place. Any string unique enough to deduce the toolbar location will do."
 
         FlexPanel leftPanel = new FlexPanel(true);
+
+        if(liveFormDesignViewPanel == null)
+            liveFormDesignViewPanel = createLiveFormDesignViewPanel();
+
+        leftPanel.add(liveFormDesignViewPanel);
         leftPanel.add(toolbar.getComponent());
         leftPanel.add(treeAndTable, 1, FlexAlignment.STRETCH);
 
