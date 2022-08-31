@@ -156,7 +156,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         super(session, javaSession);
 
         LSFDebugVMNotifier vmNotifier = new LSFDebugVMNotifier(getJavaDebugProcess());
-        FormDesignChangeDetector.debugProcess = getJavaDebugProcess();
+        DebugUtils.debugProcess = getJavaDebugProcess();
         breakpointHandler = new LSFActionBreakpointHandler(getJavaDebugProcess(), vmNotifier);
         propertyBreakpointHandler = new LSFPropertyBreakpointHandler(getJavaDebugProcess(), vmNotifier);
         classChangeBreakpointHandler = new LSFClassChangeBreakpointHandler(getJavaDebugProcess(), vmNotifier);

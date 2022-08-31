@@ -11,6 +11,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
@@ -40,7 +41,9 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
+import com.lsfusion.reports.ReportUtils;
 import com.lsfusion.util.BaseUtils;
+import lsfusion.server.physics.dev.debug.DebuggerService;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -51,8 +54,15 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.*;
+
+import static com.lsfusion.debug.DebugUtils.debugProcess;
+import static com.lsfusion.debug.DebugUtils.getDebuggerService;
 
 public class DesignView extends JPanel implements Disposable {
     @NotNull
@@ -67,6 +77,7 @@ public class DesignView extends JPanel implements Disposable {
     private LSFLocalSearchScope localScope;
 
     public String formTitle;
+    public String formCanonicalName;
 
     private SimpleActionGroup actions = new SimpleActionGroup();
 
@@ -214,6 +225,7 @@ public class DesignView extends JPanel implements Disposable {
         rootComponent = designInfo.formView.mainContainer;
         formEntity = designInfo.formView.entity;
         formTitle = designInfo.getFormCaption();
+        formCanonicalName = formDeclaration.getCanonicalName();
         createLayout();
 
         if (firstDraw) {
@@ -265,13 +277,17 @@ public class DesignView extends JPanel implements Disposable {
         actions.add(new AnAction(null, "Refresh", LSFIcons.Design.REFRESH) {
             @Override
             public void actionPerformed(AnActionEvent e) {
-                layoutDesign(module, formDeclaration, localScope);
+                refresh();
             }
         });
 
         toolbar.updateActionsImmediately();
 
         initListeners();
+    }
+
+    private void refresh() {
+        layoutDesign(module, formDeclaration, localScope);
     }
 
     private void initListeners() {
@@ -375,6 +391,96 @@ public class DesignView extends JPanel implements Disposable {
         return flexPanel;
     }
 
+    private FlexPanel createAutoReportPanel() {
+        boolean hasReportFiles = ReportUtils.hasReportFiles(formDeclaration);
+
+        JButton createReportButton = new JButton(hasReportFiles ? "Re-create" : "Create", LSFIcons.EDIT_AUTO_REPORT);
+        createReportButton.setToolTipText("Create Default Report Design");
+        createReportButton.addActionListener(e -> {
+            if(debugProcess != null) {
+                try {
+                    createReports(hasReportFiles);
+                    refresh();
+                } catch (Exception ex) {
+                    JBPopupFactory.getInstance().createMessage("Can't create report files: " + ex.getMessage()).show(createReportButton);
+                }
+            } else {
+                JBPopupFactory.getInstance().createHtmlTextBalloonBuilder("Start server to create reports", MessageType.ERROR, null).createBalloon().showInCenterOf(createReportButton);
+            }
+        });
+
+        JButton editReportButton = new JButton("Edit", LSFIcons.EDIT_REPORT);
+        editReportButton.setToolTipText("Edit Report Design");
+        editReportButton.addActionListener(e -> {
+            try {
+                editReports();
+            } catch (Exception ex) {
+                JBPopupFactory.getInstance().createMessage("Can't open report files: " + ex.getMessage()).show(editReportButton);
+            }
+        });
+        if (!hasReportFiles) {
+            editReportButton.setEnabled(false);
+        }
+
+        JButton deleteReportButton = new JButton("Delete", LSFIcons.DELETE_REPORT);
+        deleteReportButton.setToolTipText("Delete Report Design");
+        deleteReportButton.addActionListener(e -> {
+            deleteReports();
+            refresh();
+        });
+        if (!hasReportFiles) {
+            deleteReportButton.setEnabled(false);
+        }
+
+        FlexPanel flexPanel = new FlexPanel(true);
+        flexPanel.add(new JLabel("Jasper Reports"));
+
+        FlexPanel buttonsPanel = new FlexPanel(false);
+        buttonsPanel.add(createReportButton);
+        buttonsPanel.add(editReportButton);
+        buttonsPanel.add(deleteReportButton);
+        flexPanel.add(buttonsPanel);
+
+        return flexPanel;
+    }
+
+    private void createReports(boolean hasReportFiles) throws NotBoundException, IOException {
+        if (hasReportFiles) {
+            deleteReports();
+        }
+
+        DebuggerService debuggerService = getDebuggerService();
+        if (debuggerService != null) {
+            String reportFiles = (String) debuggerService.evalServer("run() {createAutoReport('" + formCanonicalName + "');}");
+            if (reportFiles != null) {
+                for (String file : reportFiles.split(";")) {
+                    Desktop.getDesktop().open(new File(file));
+                }
+            }
+        }
+    }
+
+    private void editReports() throws IOException {
+        for (PsiFile file : ReportUtils.findReportFiles(formDeclaration)) {
+            String path = file.getVirtualFile().getCanonicalPath();
+            if(path != null) {
+                Desktop.getDesktop().open(new File(path));
+            }
+        }
+    }
+
+    private void deleteReports() {
+        if (JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
+                "Are you sure you want to delete existing report design?", "Jasper reports", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            for (PsiFile file : ReportUtils.findReportFiles(formDeclaration)) {
+                String path = file.getVirtualFile().getCanonicalPath();
+                if(path != null) {
+                    new File(path).delete();
+                }
+            }
+        }
+    }
+
     private void createLayout() {
         JBSplitter treeAndTable = new JBSplitter(true);
         treeAndTable.setFirstComponent(createComponentTree());
@@ -388,6 +494,9 @@ public class DesignView extends JPanel implements Disposable {
             liveFormDesignViewPanel = createLiveFormDesignViewPanel();
 
         leftPanel.add(liveFormDesignViewPanel);
+
+        leftPanel.add(createAutoReportPanel());
+
         leftPanel.add(toolbar.getComponent());
         leftPanel.add(treeAndTable, 1, FlexAlignment.STRETCH);
 

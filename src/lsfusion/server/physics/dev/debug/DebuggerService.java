@@ -13,5 +13,7 @@ public interface DebuggerService extends Remote {
     
     void unregisterStepping() throws RemoteException;
 
-    void eval(String evalCode, String params) throws RemoteException;
+    Object evalServer(String evalCode) throws RemoteException;
+
+    void evalClient(String evalCode, String params) throws RemoteException;
 }

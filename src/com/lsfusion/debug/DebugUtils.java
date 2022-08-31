@@ -1,10 +1,15 @@
 package com.lsfusion.debug;
 
+import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.debugger.jdi.VirtualMachineProxyImpl;
 import com.sun.jdi.Location;
 import com.sun.jdi.Method;
 import com.sun.jdi.ReferenceType;
+import lsfusion.server.physics.dev.debug.DebuggerService;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.util.List;
 
 public class DebugUtils {
@@ -34,5 +39,11 @@ public class DebugUtils {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static DebugProcessImpl debugProcess;
+    public static DebuggerService getDebuggerService() throws RemoteException, NotBoundException {
+        Integer userData = debugProcess.getUserData(LSFDebuggerRunner.DEBUGGER_PROPERTY_KEY);
+        return userData != null ? (DebuggerService) LocateRegistry.getRegistry("localhost", userData).lookup("lsfDebuggerService") : null;
     }
 }

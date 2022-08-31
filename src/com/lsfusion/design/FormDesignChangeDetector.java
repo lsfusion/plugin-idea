@@ -1,7 +1,7 @@
 package com.lsfusion.design;
 
+import com.google.common.base.Throwables;
 import com.intellij.codeInsight.TargetElementUtil;
-import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.components.ProjectComponent;
@@ -13,7 +13,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.actions.AggregateFormAction;
-import com.lsfusion.debug.LSFDebuggerRunner;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFLocalSearchScope;
@@ -28,9 +27,10 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
+import java.util.concurrent.*;
+
+import static com.lsfusion.debug.DebugUtils.*;
 
 public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent {
     private final PsiDocumentManager psiDocumentManager;
@@ -123,17 +123,12 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
         return null;
     }
 
-    private static DebuggerService getDebuggerService() throws RemoteException, NotBoundException {
-        Integer userData = debugProcess.getUserData(LSFDebuggerRunner.DEBUGGER_PROPERTY_KEY);
-        return userData != null ? (DebuggerService) LocateRegistry.getRegistry("localhost", userData).lookup("lsfDebuggerService") : null;
-    }
-
-    private static void eval(DebuggerService debuggerService, String formName, String currentForm, Project project) throws RemoteException {
+    private static void evalClient(DebuggerService debuggerService, String formName, String currentForm, Project project) throws RemoteException {
         if (oldForm == null || !oldForm.equals(currentForm) || !DesignView.isLiveFormDesignEditingEnable(project)) {
             oldForm = currentForm;
             String currentFormIndexName = "debug_" + System.currentTimeMillis();
 
-            debuggerService.eval(
+            debuggerService.evalClient(
                     "run(STRING form) { \n" +
                     "   showError() <- NULL;\n" +
                     "   TRY {\n" +
@@ -161,7 +156,6 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
         }
     }
 
-    public static DebugProcessImpl debugProcess;
     private static String oldForm = null;
     private static Runnable showForm;
     private static final Timer timer = new Timer(1000, e -> {if (showForm != null) showForm.run();}) {
@@ -181,8 +175,9 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
                     try {
                         DebuggerService debuggerService = getDebuggerService();
                         Pair<String, String> formWithName = getFormWithName(project, file);
-                        if (debuggerService != null && formWithName != null)
-                            eval(getDebuggerService(), formWithName.first, formWithName.second, project);
+                        if (debuggerService != null && formWithName != null) {
+                            evalClient(debuggerService, formWithName.first, formWithName.second, project);
+                        }
 
                     } catch (Throwable ignored) {
                     } finally {

@@ -37,6 +37,9 @@ public final class LSFIcons {
     public static final Icon LOCAL_PROPERTY = AllIcons.Nodes.Variable;
     public static final Icon STATIC_OBJECT = AllIcons.Nodes.Static;
     public static final Icon PRINT = IconLoader.getIcon("/images/print.png");
+    public static final Icon EDIT_REPORT = IconLoader.getIcon("/images/editReport.png");
+    public static final Icon EDIT_AUTO_REPORT = IconLoader.getIcon("/images/editAutoReport.png");
+    public static final Icon DELETE_REPORT = IconLoader.getIcon("/images/deleteReport.png");
     public static final Icon PROPERTY = AllIcons.Nodes.Property;
     public static final Icon PROPERTY_DRAW = AllIcons.Nodes.PropertyRead;
     public static final Icon SHOW_DEP = AllIcons.Nodes.DataTables;
