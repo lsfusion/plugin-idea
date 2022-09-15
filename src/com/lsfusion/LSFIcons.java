@@ -59,6 +59,11 @@ public final class LSFIcons {
         public static final Icon CONTAINER = AllIcons.RunConfigurations.Applet; //todo:
         public static final Icon CLASS_CHOOSER = GROUP_BY_CLASS;
         public static final Icon FILTER = IconLoader.getIcon("/images/design/filt.png");
+        public static final Icon FILTER_ADD = IconLoader.getIcon("/images/design/filtadd.png");
+        public static final Icon FILTER_APPLY = IconLoader.getIcon("/images/design/ok.png");
+        public static final Icon FILTER_RESET = IconLoader.getIcon("/images/design/filtreset.png");
+        
+        
         public static final Icon FILTER_GROUP = AllIcons.General.Filter; //todo:
         public static final Icon SHOW_TYPE = AllIcons.Graph.SnapToGrid; //todo:
         public static final Icon TREE_GROUP = AllIcons.Actions.ShowAsTree; //todo:

@@ -98,7 +98,11 @@ public class DefaultFormView extends FormView {
     public static String getBoxContainerSID(String goName) {
         return GroupObjectContainerSet.BOX_CONTAINER + "(" + goName + ")";
     }
-
+    
+    public static String getFilterBoxContainerSID(String goName) {
+        return GroupObjectContainerSet.FILTERBOX_CONTAINER + "(" + goName + ")";
+    }
+    
     public static String getPanelContainerSID(String goName) {
         return GroupObjectContainerSet.PANEL_CONTAINER + "(" + goName + ")";
     }
@@ -184,6 +188,7 @@ public class DefaultFormView extends FormView {
     protected Map<PropertyGroupContainerView, ContainerView> boxContainers = new HashMap<>();
     
     protected Map<PropertyGroupContainerView, ContainerView> filtersContainers = new HashMap<>(); 
+    protected Map<PropertyGroupContainerView, ContainerView> filterBoxContainers = new HashMap<>(); 
 
     protected Map<PropertyGroupContainerView, ContainerView> panelContainers = new HashMap<>();
 
@@ -238,6 +243,7 @@ public class DefaultFormView extends FormView {
         objectsContainer.add(set.getBoxContainer());
 
         registerComponent(set.getBoxContainer(), boxContainers, goView);
+        registerComponent(set.getFilterBoxContainer(), filterBoxContainers, goView);
         registerComponent(goView.getFiltersContainer(), filtersContainers, goView);
         registerComponent(set.getPanelContainer(), panelContainers, goView);
         registerComponent(set.getGroupContainer(), groupContainers, goView);
@@ -263,6 +269,7 @@ public class DefaultFormView extends FormView {
         TreeGroupContainerSet treeSet = TreeGroupContainerSet.create(treeGroup, containerFactory);
 
         registerComponent(treeSet.getBoxContainer(), boxContainers, treeGroup);
+        registerComponent(treeSet.getFilterBoxContainer(), filterBoxContainers, treeGroup);
         registerComponent(treeGroup.getFiltersContainer(), filtersContainers, treeGroup);
         registerComponent(treeSet.getPanelContainer(), panelContainers, treeGroup);
         registerComponent(treeSet.getGroupContainer(), groupContainers, treeGroup);

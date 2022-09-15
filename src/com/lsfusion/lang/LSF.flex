@@ -283,6 +283,8 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "EXTNULL"                  			{ return EXTNULL; }
   "FIELDS"                  			{ return FIELDS; }
   "FILTER"                  			{ return FILTER; }
+  "FILTERBOX"                  			{ return FILTERBOX; }
+  "FILTERCONTROLS"                  	{ return FILTERCONTROLS; }
   "FILTERGROUP"             			{ return FILTERGROUP; }
   "FILTERGROUPS"             			{ return FILTERGROUPS; }
   "FILTERS"                 			{ return FILTERS; }

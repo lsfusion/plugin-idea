@@ -29,6 +29,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
 
     public ToolbarView toolbarSystem;
     public ContainerView filtersContainer;
+    public ComponentView filterControls;
 
     private TreeGroupTableModel model = new TreeGroupTableModel();
     public boolean expandOnClick;
@@ -46,6 +47,9 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
         filtersContainer.setType(ContainerType.CONTAINERH);
         filtersContainer.setAlignment(FlexAlignment.STRETCH);
         filtersContainer.setCaption("Filters");
+
+        filterControls = new FilterControlsView();
+        filterControls.setAlignment(FlexAlignment.STRETCH);
     }
 
     @Override
@@ -130,6 +134,11 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     @Override
     public ContainerView getFiltersContainer() {
         return filtersContainer;
+    }
+
+    @Override
+    public ComponentView getFilterControlsComponent() {
+        return filterControls;
     }
 
     public void addFilter(FilterView filter) {

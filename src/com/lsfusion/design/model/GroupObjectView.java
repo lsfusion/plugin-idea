@@ -14,6 +14,7 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
     public GridView grid;
     public ToolbarView toolbarSystem;
     public ContainerView filtersContainer;
+    public ComponentView filterControls;
 
     public GroupObjectView(GroupObjectEntity entity) {
         this.entity = entity;
@@ -29,6 +30,9 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
         filtersContainer.setType(ContainerType.CONTAINERH);
         filtersContainer.setAlignment(FlexAlignment.STRETCH);
         filtersContainer.setCaption("Filters");
+        
+        filterControls = new FilterControlsView();
+        filterControls.setAlignment(FlexAlignment.STRETCH);
     }
 
     public String getCaption() {
@@ -57,6 +61,11 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
     @Override
     public ContainerView getFiltersContainer() {
         return filtersContainer;
+    }
+
+    @Override
+    public ComponentView getFilterControlsComponent() {
+        return filterControls;
     }
 
     public void addFilter(FilterView filter) {

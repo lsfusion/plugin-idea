@@ -6,4 +6,5 @@ public interface PropertyGroupContainerView {
     String getPropertyGroupContainerSID();
     
     ContainerView getFiltersContainer();
+    ComponentView getFilterControlsComponent();
 }

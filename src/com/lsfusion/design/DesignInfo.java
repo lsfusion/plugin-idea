@@ -234,6 +234,10 @@ public class DesignInfo {
                 switch (gos.getText()) {
                     case "TOOLBARSYSTEM" : 
                         return FormView.getToolbarSystemSID(groupName);
+                    case "FILTERBOX": 
+                        return DefaultFormView.getFilterBoxContainerSID(groupName);
+                    case "FILTERCONTROLS": 
+                        return FormView.getFilterControlsComponentSID(groupName);
                     case "FILTERGROUPS" : 
                         return DefaultFormView.getFilterGroupsContainerSID(groupName);
                     case "FILTERS" :

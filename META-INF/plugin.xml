@@ -10,6 +10,7 @@
         <b>Version 1.0.247</b><br>
         <ul>
             <li>Show COLOR in line markers</li>
+            <li>FILTERBOX container, FILTERCONTROLS component</li>
         </ul>
     ]]>
     </change-notes>

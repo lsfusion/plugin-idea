@@ -28,10 +28,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.design.model.ClassChooserView;
-import com.lsfusion.design.model.ComponentView;
-import com.lsfusion.design.model.ContainerView;
-import com.lsfusion.design.model.PropertyDrawView;
+import com.lsfusion.design.model.*;
 import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.ui.*;
 import com.lsfusion.lang.psi.LSFDesignStatement;
@@ -57,7 +54,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.*;
 
@@ -555,7 +551,7 @@ public class DesignView extends JPanel implements Disposable {
     }
 
     private boolean defaultSelection(ComponentView component) {
-        if (component instanceof ClassChooserView) {
+        if (component instanceof ClassChooserView || component instanceof FilterControlsView) {
             return false;
         } else if (component instanceof PropertyDrawView) {
             PropertyDrawView property = (PropertyDrawView) component;

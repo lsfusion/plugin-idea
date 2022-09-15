@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.lsfusion.design.GroupObjectContainerSet.FILTERCONTROLS_COMPONENT;
 import static com.lsfusion.design.GroupObjectContainerSet.FILTERS_CONTAINER;
 
 public class FormView {
@@ -132,6 +133,7 @@ public class FormView {
         setComponentSID(groupObjectView.grid, getGridSID(groupObjectView));
         setComponentSID(groupObjectView.toolbarSystem, getToolbarSystemSID(groupObjectView));
         setComponentSID(groupObjectView.getFiltersContainer(), getFiltersContainerSID(groupObjectView));
+        setComponentSID(groupObjectView.getFilterControlsComponent(), getFilterControlsComponentSID(groupObjectView));
 
         for (ObjectView object : groupObjectView) {
             mobjects.put(object.entity, object);
@@ -320,6 +322,14 @@ public class FormView {
 
     public static String getFiltersContainerSID(String sID) {
         return FILTERS_CONTAINER + "(" + sID + ")";
+    }
+
+    public static String getFilterControlsComponentSID(PropertyGroupContainerView containerView) {
+        return getFilterControlsComponentSID(containerView.getPropertyGroupContainerSID());
+    }
+
+    public static String getFilterControlsComponentSID(String sID) {
+        return FILTERCONTROLS_COMPONENT + "(" + sID + ")";
     }
 
     public static String getFilterSID(String name) {
