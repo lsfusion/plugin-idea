@@ -13,6 +13,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.vcs.ui.SearchFieldAction;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
@@ -35,6 +36,7 @@ import com.jgraph.layout.tree.JGraphTreeLayout;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.dependencies.module.DependencySpeedSearch;
 import com.lsfusion.util.LSFFileUtils;
+import org.jdesktop.swingx.VerticalLayout;
 import org.jetbrains.annotations.NotNull;
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;
@@ -51,6 +53,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Timer;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,6 +64,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     protected final Project project;
     protected ToolWindowEx toolWindow;
+    private boolean showTargetField;
 
     protected PsiElement currentElement;
 
@@ -80,7 +84,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     
     protected GraphNode selectedInSearch;
 
-    ModuleComboAction moduleAction;
+    private ModuleComboAction moduleAction;
+    private SearchFieldAction target;
 
     protected CheckboxAction showRequiredAction;
     protected CheckboxAction showRequiringAction;
@@ -88,10 +93,11 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     
     protected double latestScale = 1;
 
-    public DependenciesView(String title, Project project, final ToolWindowEx toolWindow) {
+    public DependenciesView(String title, Project project, final ToolWindowEx toolWindow, boolean showTargetField) {
         this.title = title;
         this.project = project;
         this.toolWindow = toolWindow;
+        this.showTargetField = showTargetField;
 
         setLayout(new BorderLayout());
 
@@ -122,14 +128,14 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
         }, 0, 5 * 60 * 1000);
 
-        ActionToolbar toolbar = createToolbar();
+        JPanel toolbar = new JPanel(new VerticalLayout());
+        toolbar.add(createFirstToolbar().getComponent());
+        toolbar.add(createSecondToolbar().getComponent());
 
-        toolbar.setTargetComponent(toolbar.getComponent());
-
-        add(toolbar.getComponent(), BorderLayout.NORTH);
+        add(toolbar, BorderLayout.NORTH);
     }
 
-    private ActionToolbar createToolbar() {
+    private ActionToolbar createFirstToolbar() {
         SimpleActionGroup actions = new SimpleActionGroup();
 
         actions.add(new AnAction("Refresh / Apply", "Refresh", LSFIcons.Design.REFRESH) {
@@ -143,9 +149,6 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 changeLayout(currentLayout, false);
             }
         });
-
-        moduleAction = new ModuleComboAction("Module:", Arrays.stream(LSFFileUtils.getModules(project)).collect(Collectors.toMap(Module::getName, Function.identity())));
-        actions.add(moduleAction);
 
         showRequiringAction = new CheckboxAction(getDependentTitle()) {
             @Override
@@ -253,6 +256,25 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         return ActionManager.getInstance().createActionToolbar(title, actions, true);
     }
+
+    private ActionToolbar createSecondToolbar() {
+        SimpleActionGroup actions = new SimpleActionGroup();
+
+        moduleAction = new ModuleComboAction("Logics Module:", Arrays.stream(LSFFileUtils.getModules(project)).collect(Collectors.toMap(Module::getName, Function.identity())));
+        actions.add(moduleAction);
+
+        if(showTargetField) {
+            target = new SearchFieldAction("Target LSF:") {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                    redrawCurrent();
+                }
+            };
+            actions.add(target);
+        }
+
+        return ActionManager.getInstance().createActionToolbar(title, actions, true);
+    }
     
     public Collection<GraphNode> getAllNodes() {
         return dataModel.getNodes();
@@ -301,9 +323,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             createDependentNode(moduleAction.getCurrentModuleScope(), currentElement, new HashSet<>());
         }
 
-        g = new ListenableDirectedGraph(DefaultEdge.class);
+        g = new ListenableDirectedGraph<>(DefaultEdge.class);
 
-        fillGraph();
+        fillGraph(target != null ? target.getText() : null);
 
         m_jgAdapter = new JGraphModelAdapter(g);
 
@@ -514,7 +536,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         }
     }
 
-    public void fillGraph() {
+    public void fillGraph(String target) {
         for (GraphNode node : dataModel.getNodes()) {
             g.addVertex(node);
         }
@@ -522,6 +544,26 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         for (Pair<GraphNode, GraphNode> e : dataModel.getEdges()) {
             GraphEdge edge = new GraphEdge(e.first, e.second);
             g.addEdge(e.first, e.second, edge);
+        }
+
+        if(target != null && !target.isEmpty()) {
+            Set<GraphNode> shortestPathNodes = new HashSet<>();
+            dataModel.getPath(g, target).forEach((Consumer<GraphEdge>) o -> {
+                shortestPathNodes.add(o.getSource());
+                shortestPathNodes.add(o.getTarget());
+            });
+
+            for (GraphNode node : dataModel.getNodes()) {
+                if(!shortestPathNodes.contains(node)) {
+                    g.removeVertex(node);
+                }
+            }
+
+            for (Pair<GraphNode, GraphNode> e : dataModel.getEdges()) {
+                if(!shortestPathNodes.contains(e.first) || !shortestPathNodes.contains(e.second)) {
+                    g.removeEdge(e.first, e.second);
+                }
+            }
         }
     }
 

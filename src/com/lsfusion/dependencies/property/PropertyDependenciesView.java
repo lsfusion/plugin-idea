@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class PropertyDependenciesView extends DependenciesView {
     public PropertyDependenciesView(Project project, ToolWindowEx toolWindow) {
-        super("Property dependencies", project, toolWindow);
+        super("Property dependencies", project, toolWindow, false);
     }
 
     @Override

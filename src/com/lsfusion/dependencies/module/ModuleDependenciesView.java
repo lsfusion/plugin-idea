@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class ModuleDependenciesView extends DependenciesView {
     public ModuleDependenciesView(Project project, ToolWindowEx toolWindow) {
-        super("Module dependencies", project, toolWindow);
+        super("Module dependencies", project, toolWindow, true);
     }
 
     @Override

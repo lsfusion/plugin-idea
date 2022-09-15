@@ -11,6 +11,7 @@
         <ul>
             <li>Show COLOR in line markers</li>
             <li>FILTERBOX container, FILTERCONTROLS component</li>
+            <li>Search target module in LSF Dependencies</li>
         </ul>
     ]]>
     </change-notes>
