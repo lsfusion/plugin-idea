@@ -70,7 +70,7 @@ public class PropertyColorLineMarkerProvider implements LineMarkerProvider {
                         if (!rgb.isEmpty()) {
                             replaceText = "RGB(" + newColor.getRed() + ", " + newColor.getGreen() + ", " + newColor.getBlue() + ")";
                         } else {
-                            replaceText = newColor.toString();
+                            replaceText = String.format("#%02x%02x%02x", newColor.getRed(), newColor.getGreen(), newColor.getBlue());
                         }
                         ApplicationManager.getApplication().runWriteAction(() -> {
                             element.replace(LSFElementGenerator.createColorLiteralFromText(element.getProject(), replaceText));
