@@ -95,6 +95,11 @@ public class LSFElementGenerator {
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFPropertyDeclParams.class).iterator().next();
     }
 
+    public static LSFColorLiteral createColorLiteralFromText(Project myProject, String text) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; someProperty = " + text + ";");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFColorLiteral.class).iterator().next();
+    }
+
     public static PsiFile createDummyFile(Project myProject, String text) {
         final PsiFileFactory factory = PsiFileFactory.getInstance(myProject);
         final String name = "internal." + LSFFileType.INSTANCE.getDefaultExtension();

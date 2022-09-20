@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.247</b><br>
+        <b>Version 1.0.248</b><br>
         <ul>
-            <li>Show COLOR in line markers</li>
-            <li>FILTERBOX container, FILTERCONTROLS component</li>
-            <li>Search target module in LSF Dependencies</li>
+            <li>COLOR in line markers now has dialog</li>
         </ul>
     ]]>
     </change-notes>
