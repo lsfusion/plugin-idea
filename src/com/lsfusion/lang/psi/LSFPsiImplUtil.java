@@ -1436,7 +1436,7 @@ public class LSFPsiImplUtil {
         }
         LSFLocalizedStringValueLiteral stringLiteral = sourceStatement.getExpressionStringLiteral();
         if (stringLiteral != null) {
-            if (stringLiteral.needToBeLocalized()) {
+            if (stringLiteral.isVariable()) {
                 return new StringClass(false, false, ExtInt.UNLIMITED);
             } else {
                 return new StringClass(false, false, new ExtInt(stringLiteral.getValue().length()));

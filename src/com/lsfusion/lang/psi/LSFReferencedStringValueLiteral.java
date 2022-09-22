@@ -39,7 +39,7 @@ public abstract class LSFReferencedStringValueLiteral extends ASTWrapperPsiEleme
     }
 
     private List<PsiReference> findAllRefs(String literal) {
-        final String escapedCharacters = "\\'nrt{}";
+        final String escapedCharacters = "\\'nrt{}$";
         boolean insideKey = false;
         int startPos = 0;
         if (literal != null) {

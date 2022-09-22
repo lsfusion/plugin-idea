@@ -7,6 +7,7 @@ import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import static com.lsfusion.lang.LSFElementGenerator.createLocalizedStringValueLiteral;
+import static com.lsfusion.util.LSFStringUtils.unquote;
 
 public class LSFLocalizedStringValueLiteralImpl extends LSFReferencedStringValueLiteral implements LSFLocalizedStringValueLiteral {
     public LSFLocalizedStringValueLiteralImpl(@NotNull ASTNode node) {
@@ -25,26 +26,22 @@ public class LSFLocalizedStringValueLiteralImpl extends LSFReferencedStringValue
 
     @Override
     public String getValue() {
-        return LSFStringUtils.getSimpleLiteralValue(getText(), "\\'{}");
+        return LSFStringUtils.getSimpleLiteralValue(getText(), "\\'{}$");
     }
 
     @Override
     public String getPropertiesFileValue() {
-        return LSFStringUtils.getSimpleLiteralPropertiesFileValue(getText(), "\\'{}");
+        return LSFStringUtils.getSimpleLiteralPropertiesFileValue(getText(), "\\'{}$");
     }
 
     @Override
     public boolean needToBeLocalized() {
-        String text = getText();
-        for (int i = 1; i + 1 < text.length(); ++i) {
-            char ch = text.charAt(i);
-            if (ch == '{' || ch == '}') {
-                return true;
-            } else if (ch == '\\') {
-                ++i;
-            }
-        }
-        return false;
+        return LSFStringUtils.hasLocalizationBlock(unquote(getText()), false);
+    }
+
+    @Override
+    public boolean isVariable() {
+        return needToBeLocalized();
     }
 
     // do we need to override?

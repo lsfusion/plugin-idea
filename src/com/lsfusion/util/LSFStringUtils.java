@@ -2,9 +2,18 @@ package com.lsfusion.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.lsfusion.util.LSFStringUtils.StringSpecialBlockType.LOCALIZATION;
+
 public class LSFStringUtils {
     private static final String specialEscapeCharacters = "nrt";
     private static final char QUOTE = '\'';
+
+    public static final char INTERP_CH = '$';
+    public static final char INLINE_CH = 'I';
+    public static final char RESOURCE_CH = 'R';
 
     // removes quotes, removes escaping, transforms special \n \r \t sequences to special characters
     public static String getSimpleLiteralValue(String literal, String unescapeCharacters) {
@@ -70,5 +79,90 @@ public class LSFStringUtils {
 
     public static String escapeQuote(@NotNull String s) {
         return s.replace(String.valueOf(QUOTE), "\\" + QUOTE);
+    }
+
+    public enum StringSpecialBlockType { NONE, LOCALIZATION, INTERPOLATION, INLINE, RESOURCE }
+
+    public static class SpecialBlock {
+        public int start, end;
+        public StringSpecialBlockType type;
+
+        public SpecialBlock(int start, int end, StringSpecialBlockType type) {
+            this.start = start;
+            this.end = end;
+            this.type = type;
+        }
+    }
+
+    public static List<SpecialBlock> specialBlockList(@NotNull String s, boolean isExpressionString) {
+        List<SpecialBlock> blocks = new ArrayList<>();
+        int pos = 0;
+        int nestingDepth = 0;
+        int blockStartPos = 0;
+        StringSpecialBlockType state = StringSpecialBlockType.NONE;
+        while (pos < s.length()) {
+            char c = s.charAt(pos);
+            if (c == '\\') {
+                ++pos;
+            } else if (nestingDepth > 0) {
+                if (c == '{') {
+                    ++nestingDepth;
+                } else if (c == '}') {
+                    --nestingDepth;
+                    if (nestingDepth == 0) {
+                        blocks.add(new SpecialBlock(blockStartPos, pos, state));
+                        state = StringSpecialBlockType.NONE;
+                    }
+                }
+            } else {
+                StringSpecialBlockType type = positionType(s, pos, isExpressionString);
+                if (type != StringSpecialBlockType.NONE) {
+                    nestingDepth = 1;
+                    blockStartPos = pos;
+                    pos += additionalShift(type);
+                    state = type;
+                }
+            }
+            ++pos;
+        }
+        return blocks;
+    }
+
+    private static StringSpecialBlockType positionType(String s, int pos, boolean isExpressionString) {
+        if (compareChar(s, pos, '{')) return LOCALIZATION;
+        if (compareChar(s, pos, INTERP_CH) && isExpressionString) {
+            if (compareChar(s, pos + 1, '{')) return StringSpecialBlockType.INTERPOLATION;
+            if (compareChar(s, pos + 1, INLINE_CH) && compareChar(s, pos + 2, '{'))
+                return StringSpecialBlockType.INLINE;
+            if (compareChar(s, pos + 1, RESOURCE_CH) && compareChar(s, pos + 2, '{'))
+                return StringSpecialBlockType.RESOURCE;
+        }
+        return StringSpecialBlockType.NONE;
+    }
+
+    private static int additionalShift(StringSpecialBlockType type) {
+        switch (type) {
+            case NONE:
+            case LOCALIZATION:
+                return 0;
+            case INTERPOLATION:
+                return 1;
+            case INLINE:
+            case RESOURCE:
+                return 2;
+        }
+        return 0;
+    }
+
+    private static boolean compareChar(String source, int pos, char cmp) {
+        return pos < source.length() && source.charAt(pos) == cmp;
+    }
+
+    public static boolean hasSpecialBlock(@NotNull String s, boolean isExpressionString) {
+        return !specialBlockList(s, isExpressionString).isEmpty();
+    }
+
+    public static boolean hasLocalizationBlock(@NotNull String s, boolean isExpressionString) {
+        return specialBlockList(s, isExpressionString).stream().anyMatch(block -> block.type == LOCALIZATION);
     }
 }
