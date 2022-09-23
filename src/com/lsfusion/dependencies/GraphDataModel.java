@@ -46,12 +46,12 @@ public class GraphDataModel {
         return true;
     }
 
-    public List getPath(Graph g, String targetElement) {
-        List result = new ArrayList();
+    public List<GraphEdge> getPath(Graph g, String targetElement, boolean reverse) {
+        List<GraphEdge> result = new ArrayList<>();
 
         GraphNode targetNode = nodes.get(targetElement);
         if (targetNode != null) {
-            DijkstraShortestPath p = new DijkstraShortestPath(g, rootNode, targetNode);
+            DijkstraShortestPath p = reverse ? new DijkstraShortestPath(g, targetNode, rootNode) : new DijkstraShortestPath(g, rootNode, targetNode);
             result = p.getPathEdgeList();
         }
 

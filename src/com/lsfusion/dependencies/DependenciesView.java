@@ -51,9 +51,9 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import java.util.Timer;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -548,10 +548,24 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         if(target != null && !target.isEmpty()) {
             Set<GraphNode> shortestPathNodes = new HashSet<>();
-            dataModel.getPath(g, target).forEach((Consumer<GraphEdge>) o -> {
-                shortestPathNodes.add(o.getSource());
-                shortestPathNodes.add(o.getTarget());
-            });
+            if (showRequired) {
+                List<GraphEdge> directPath = dataModel.getPath(g, target, false);
+                if (directPath != null) {
+                    directPath.forEach(graphEdge -> {
+                        shortestPathNodes.add(graphEdge.getSource());
+                        shortestPathNodes.add(graphEdge.getTarget());
+                    });
+                }
+            }
+            if (showRequiring) {
+                List<GraphEdge> reversePath = dataModel.getPath(g, target, true);
+                if (reversePath != null) {
+                    reversePath.forEach(graphEdge -> {
+                        shortestPathNodes.add(graphEdge.getSource());
+                        shortestPathNodes.add(graphEdge.getTarget());
+                    });
+                }
+            }
 
             for (GraphNode node : dataModel.getNodes()) {
                 if(!shortestPathNodes.contains(node)) {
@@ -607,18 +621,18 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     public void recolorGraph(String targetElement, boolean redraw) {
-        java.util.List path = null;
+        List<GraphEdge> path = null;
         if (targetElement != null) {
-            path = dataModel.getPath(g, targetElement);
+            path = dataModel.getPath(g, targetElement, false);
         }
 
-        Map cellAttr = new HashMap();
+        Map<DefaultGraphCell, AttributeMap> cellAttr = new HashMap<>();
         for (GraphNode node : dataModel.getNodes()) {
             DefaultGraphCell cell = m_jgAdapter.getVertexCell(node);
             if (cell != null) {
-                Map attr = cell.getAttributes();
+                AttributeMap attr = cell.getAttributes();
 
-                Map newAttr = new AttributeMap(attr);
+                AttributeMap newAttr = new AttributeMap(attr);
                 Color background;
 
                 if (node == selectedInSearch) {
@@ -650,9 +664,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         for (Object gEdge : g.edgeSet()) {
             DefaultGraphCell cell = m_jgAdapter.getEdgeCell(gEdge);
             if (cell != null) {
-                Map attr = cell.getAttributes();
+                AttributeMap attr = cell.getAttributes();
 
-                Map newAttr = new AttributeMap(attr);
+                AttributeMap newAttr = new AttributeMap(attr);
                 GraphEdge edge = (GraphEdge) gEdge;
                 if (path != null && path.contains(edge)) {
                     GraphConstants.setLineColor(newAttr, getPathEdgeColor());

@@ -10,6 +10,7 @@
         <b>Version 1.0.248</b><br>
         <ul>
             <li>COLOR in line markers now has dialog</li>
+            <li>Target module in LSF Dependencies: fix for requiring</li>
         </ul>
     ]]>
     </change-notes>
