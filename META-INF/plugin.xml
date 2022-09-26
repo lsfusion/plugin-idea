@@ -11,6 +11,7 @@
         <ul>
             <li>COLOR in line markers now has dialog</li>
             <li>Target module in LSF Dependencies: fix for requiring</li>
+            <li>NOHEADER option for EXPORT XML</li>
         </ul>
     ]]>
     </change-notes>

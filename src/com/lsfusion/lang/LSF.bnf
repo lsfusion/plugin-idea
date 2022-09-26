@@ -886,10 +886,10 @@ exportActionPropertyDefinitionBody ::=
 	    EXPORT mappedForm contextFiltersClause?
         (
             (
-                (   CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
+                (   CSV (stringLiteral)? hasHeaderOption? noEscapeOption? (CHARSET stringLiteral)?
                 |   DBF (CHARSET stringLiteral)?
-                |   XLS sheetExpression? (HEADER|NOHEADER)?
-                |   XLSX sheetExpression? (HEADER|NOHEADER)?
+                |   XLS sheetExpression? hasHeaderOption?
+                |   XLSX sheetExpression? hasHeaderOption?
                 |   TABLE
                 )
                 (TOP intLiteral)?
@@ -898,7 +898,7 @@ exportActionPropertyDefinitionBody ::=
         |
             (
                 (   JSON (CHARSET stringLiteral)?
-                |   XML (CHARSET stringLiteral)?
+                |   XML hasHeaderOption? (CHARSET stringLiteral)?
                 )?
                 (TOP intLiteral)?
                 staticDestination?
@@ -922,12 +922,12 @@ propertyExpressionWithOrder ::= propertyExpression (DESC)?
 
 exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
-        (   CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
+        (   CSV (stringLiteral)? hasHeaderOption? noEscapeOption? (CHARSET stringLiteral)?
         |   DBF (CHARSET stringLiteral)?
-        |   XLS sheetExpression? (HEADER|NOHEADER)?
-        |   XLSX sheetExpression? (HEADER|NOHEADER)?
+        |   XLS sheetExpression? hasHeaderOption?
+        |   XLSX sheetExpression? hasHeaderOption?
         |   JSON (CHARSET stringLiteral)?
-        |   XML (ROOT propertyExpression)? (TAG propertyExpression)? ATTR? (CHARSET stringLiteral)?
+        |   XML hasHeaderOption? (ROOT propertyExpression)? (TAG propertyExpression)? ATTR? (CHARSET stringLiteral)?
         |   TABLE
         )?
         (TOP intLiteral)?
@@ -940,6 +940,10 @@ exportDataActionPropertyDefinitionBody ::=
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses getDocumentation]
 }
+
+hasHeaderOption ::= HEADER | NOHEADER
+
+noEscapeOption ::= ESCAPE | NOESCAPE
 
 wherePropertyExpression ::= WHERE propertyExpression
 
