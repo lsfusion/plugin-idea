@@ -238,7 +238,7 @@ public class ChangeLocaleAction extends AnAction {
                     for (final LSFLocalizedStringValueLiteral localizedStringLiteral : localizedStringLiterals) {
                         Runnable inlineRun = () -> {
                             if(!localizedStringLiteral.needToBeLocalized() && !LSFReferenceAnnotator.isInMetaUsage(localizedStringLiteral)) {
-                                String value = literalsMap.get(localizedStringLiteral.getValue());
+                                String value = literalsMap.get(localizedStringLiteral.getPropertiesFileValue());
                                 if (value != null) {
                                     localizedStringLiteral.replace(createLocalizedStringLiteral(localizedStringLiteral.getProject(), value));
                                 }

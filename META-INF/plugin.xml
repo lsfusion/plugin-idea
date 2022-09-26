@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.248</b><br>
+        <b>Version 1.0.249</b><br>
         <ul>
-            <li>COLOR in line markers now has dialog</li>
-            <li>Target module in LSF Dependencies: fix for requiring</li>
-            <li>NOHEADER option for EXPORT XML</li>
+            <li>Fixes issue #69</li>
         </ul>
     ]]>
     </change-notes>

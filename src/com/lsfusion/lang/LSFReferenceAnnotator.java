@@ -635,7 +635,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                         Map<String, PropertiesFile> propertiesFiles = resourceBundleEntry.getValue();
 
                         PropertiesFile currentPropertiesFile = propertiesFiles.get(currentLang);
-                        String currentKey = currentPropertiesFile != null ? LSFResourceBundleUtils.getReverseMapValue(currentPropertiesFile.getVirtualFile().getPath(), o.getValue()) : null;
+                        String currentKey = currentPropertiesFile != null ? LSFResourceBundleUtils.getReverseMapValue(currentPropertiesFile.getVirtualFile().getPath(), o.getPropertiesFileValue()) : null;
 
                         List<PropertiesFile> allPropertiesFiles = new ArrayList<>(propertiesFiles.values());
                         List<PropertiesFile> existingPropertiesFiles = new ArrayList<>();
@@ -649,7 +649,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                         }
 
                         if (existingPropertiesFiles.isEmpty()) {
-                            fixes.add(getCreatePropertyFix(currentLang, resourceBundleName, allPropertiesFiles, LSFResourceBundleUtils.getDefaultBundleKey(o.getValue()), o));
+                            fixes.add(getCreatePropertyFix(currentLang, resourceBundleName, allPropertiesFiles, LSFResourceBundleUtils.getDefaultBundleKey(o.getPropertiesFileValue()), o));
                         } else if (existingPropertiesFiles.size() < propertiesFiles.size()) {
                             fixes.clear();
                             fixes.add(getCreatePropertyFix(currentLang, resourceBundleName, allPropertiesFiles.stream().filter(f -> !existingPropertiesFiles.contains(f)).collect(Collectors.toList()), currentKey, o));
@@ -672,7 +672,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         return new IntentionAction() {
             @Override
             public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
-                String defaultValue = o.getValue();
+                String defaultValue = o.getPropertiesFileValue();
                 CreatePropertyFixDialog dialog = new CreatePropertyFixDialog(project, currentLang, propertiesFiles, defaultKey, defaultValue);
                 if (dialog.showAndGet()) {
                     Collection<PropertiesFile> selectedPropertiesFiles = Collections.singletonList(dialog.getPropertiesFilesField());

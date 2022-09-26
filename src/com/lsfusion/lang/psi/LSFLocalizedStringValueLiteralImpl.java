@@ -20,6 +20,7 @@ import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.lang.LSFResourceBundleUtils;
+import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,15 +87,15 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         return new ArrayList<>();
     }
 
-    public static String getValue(PsiElement element, boolean needToBeLocalized) {
-        String text = element.getText();
-//        if(!needToBeLocalized)
-        return removeEscapeSymbolsAndQuotes(text);
-    }
 
     @Override
     public String getValue() {
-        return getValue(this, needToBeLocalized());
+        return LSFStringUtils.getSimpleLiteralValue(getText(), "\\'{}"); // а что возвращать, если у нас не simple???
+    }
+
+    @Override
+    public String getPropertiesFileValue() {
+        return LSFStringUtils.getSimpleLiteralPropertiesFileValue(getText(), "\\'{}");
     }
 
     @Override
@@ -110,25 +111,7 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
         }
         return false;
     }
-    
-    private static String removeEscapeSymbolsAndQuotes(String s) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < s.length(); ++i) {
-            char cur = s.charAt(i);
-            if (cur == '\\' && i+1 < s.length()) { // removing escape
-                char next = s.charAt(i+1);
-                if (next == '\\' || next == '{' || next == '}' || next == '\'') {
-                    builder.append(next);
-                    ++i;
-                    continue;
-                }
-            }
-            if(cur != '\'') // removing quote
-                builder.append(cur);
-        }
-        return builder.toString();
-    }
-    
+
     @NotNull
     @Override 
     public PsiReference[] getReferences() {

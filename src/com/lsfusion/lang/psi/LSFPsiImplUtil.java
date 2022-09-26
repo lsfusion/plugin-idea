@@ -2560,9 +2560,10 @@ public class LSFPsiImplUtil {
             return null;
         }
 
-        String text = stringLiteral.getValue();
+        String text = stringLiteral.getText();
         int i = 0;
         List<LSFExClassSet> result = new ArrayList<>();
+        // todo [dale]: '$' could be escaped in newest versions and simple text search could be wrong in some cases ('\$1')
         while (text.contains("$" + (i + 1))) {
             i++;
             result.add(null);
@@ -2600,8 +2601,9 @@ public class LSFPsiImplUtil {
             for (LSFFormulaPropertySyntax syntax : definition.getFormulaPropertySyntaxList().getFormulaPropertySyntaxList()) {
                 LSFStringLiteral literal = syntax.getStringLiteral();
                 params.put(literal, new HashSet<>());
-                String code = syntax.getStringLiteral().getValue();
+                String code = syntax.getStringLiteral().getText();
                 if (code != null) {
+                    // todo [dale]: '$' could be escaped in newest versions and this simple regex could be wrong in some cases ('\$1')
                     Pattern pattern = Pattern.compile("\\$\\d+");
                     Matcher matcher = pattern.matcher(code);
                     while (matcher.find()) {

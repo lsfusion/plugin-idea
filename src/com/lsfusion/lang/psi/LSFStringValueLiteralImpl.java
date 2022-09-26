@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class LSFStringValueLiteralImpl extends ASTWrapperPsiElement implements LSFStringValueLiteral {
@@ -22,6 +23,6 @@ public class LSFStringValueLiteralImpl extends ASTWrapperPsiElement implements L
 
     @Override
     public String getValue() {
-        return LSFLocalizedStringValueLiteralImpl.getValue(this, false);
+        return LSFStringUtils.getSimpleLiteralValue(getText(), "\\'");
     }
 }                                     
