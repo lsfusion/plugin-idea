@@ -10,6 +10,7 @@
         <b>Version 1.0.249</b><br>
         <ul>
             <li>Fixes issue #69</li>
+            <li>Added resizeOverflow attribute support</li>
         </ul>
     ]]>
     </change-notes>

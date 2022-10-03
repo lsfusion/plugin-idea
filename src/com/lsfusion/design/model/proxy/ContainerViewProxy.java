@@ -32,6 +32,10 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.setType(type);
     }
 
+    public void setResizeOverflow(boolean resizeOverflow) {
+        target.resizeOverflow = resizeOverflow;
+    }
+
     public void setChildrenAlignment(FlexAlignment falign) {
         Alignment align;
         switch (falign) {

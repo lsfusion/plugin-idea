@@ -21,6 +21,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
             new ReflectionProperty("expandOnClick"),
+            new ReflectionProperty("resizeOverflow").setExpert(),
             new ReflectionProperty("lineWidth").setExpert(),
             new ReflectionProperty("lineHeight").setExpert()
     );
@@ -33,6 +34,8 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
 
     private TreeGroupTableModel model = new TreeGroupTableModel();
     public boolean expandOnClick;
+
+    public Boolean resizeOverflow;
 
     public int lineWidth = 0;
     public int lineHeight = 0;

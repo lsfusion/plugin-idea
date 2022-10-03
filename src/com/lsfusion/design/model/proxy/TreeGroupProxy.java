@@ -11,4 +11,8 @@ public class TreeGroupProxy extends ViewProxy<TreeGroupView> {
     public void setExpandOnClick(boolean expandOnClick) {
         target.expandOnClick = expandOnClick;
     }
+
+    public void setResizeOverflow(boolean resizeOverflow) {
+        target.resizeOverflow = resizeOverflow;
+    }
 }

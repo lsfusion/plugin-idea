@@ -33,6 +33,7 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("description"),
             new ReflectionProperty("collapsible"),
             new ReflectionProperty("collapsed"),
+            new ReflectionProperty("resizeOverflow"),
             new ReflectionProperty("showIf").setExpert()
     );
 
@@ -49,6 +50,8 @@ public class ContainerView extends ComponentView {
     public boolean horizontal;
     public boolean tabbed;
     public String showIf;
+
+    public Boolean resizeOverflow;
 
     public ContainerView() {
         this("");

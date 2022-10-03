@@ -22,6 +22,7 @@ public class GridView extends ComponentView {
             new ReflectionProperty("autoHide").setExpert(),
             new ReflectionProperty("quickSearch").setExpert(),
             new ReflectionProperty("headerHeight").setExpert(),
+            new ReflectionProperty("resizeOverflow").setExpert(),
             new ReflectionProperty("lineWidth").setExpert(),
             new ReflectionProperty("lineHeight").setExpert()
     );
@@ -31,6 +32,8 @@ public class GridView extends ComponentView {
     public boolean tabVertical = false;
     public boolean autoHide = false;
     public boolean quickSearch = false;
+
+    public Boolean resizeOverflow;
 
     public int headerHeight = 0;
     public int lineWidth = 0;
