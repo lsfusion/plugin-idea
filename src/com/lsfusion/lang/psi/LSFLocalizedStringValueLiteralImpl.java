@@ -90,7 +90,7 @@ public class LSFLocalizedStringValueLiteralImpl extends ASTWrapperPsiElement imp
 
     @Override
     public String getValue() {
-        return LSFStringUtils.getSimpleLiteralValue(getText(), "\\'{}"); // а что возвращать, если у нас не simple???
+        return LSFStringUtils.getSimpleLiteralValue(getText(), "\\'{}");
     }
 
     @Override
