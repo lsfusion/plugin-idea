@@ -12,6 +12,7 @@
             <li>Fixes issue #69</li>
             <li>Added resizeOverflow attribute support</li>
             <li>NOEXTID support</li>
+            <li>LSFStatementUpDownMover fix</li>
         </ul>
     ]]>
     </change-notes>

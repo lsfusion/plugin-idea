@@ -41,7 +41,8 @@ public class LSFStatementUpDownMover extends StatementUpDownMover {
                         PsiElement targetElement = getTargetElement(element, sourceElement);
                         if (targetElement != element) {
                             moveInfo.toMove2 = new LineRange(document.getLineNumber(targetElement.getTextOffset()), document.getLineNumber(targetElement.getTextOffset() + targetElement.getTextLength()) + 1);
-                            move = true;
+                            //check move is correct: if lsf contains errors, toMove and toMove2 can intersect, we should ignore these moves
+                            move = moveInfo.toMove.startLine != moveInfo.toMove2.startLine && moveInfo.toMove.endLine != moveInfo.toMove2.endLine;
                         }
                     }
                 }
