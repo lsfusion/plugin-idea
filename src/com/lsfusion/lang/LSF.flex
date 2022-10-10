@@ -383,6 +383,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NOCANCEL"                			{ return NOCANCEL; }
   "NOCOMPLEX"                 			{ return NOCOMPLEX; }
   "NODEFAULT"                			{ return NODEFAULT; }
+  "NOEXTID"                			    { return NOEXTID; }
   "NOESCAPE"                			{ return NOESCAPE; }
   "NOFLEX"                			    { return NOFLEX; }
   "NOCHANGE"                			{ return NOCHANGE; }

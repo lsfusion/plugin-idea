@@ -1700,7 +1700,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    formOptionInsertType
                             |    ATTR
                             |    formInGroup
-                            |    formExtID
+                            |    formExtID | NOEXTID
                             |    EXTNULL
                             |    ORDER (DESC)?
                             |    FILTER

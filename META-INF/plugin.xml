@@ -11,6 +11,7 @@
         <ul>
             <li>Fixes issue #69</li>
             <li>Added resizeOverflow attribute support</li>
+            <li>NOEXTID support</li>
         </ul>
     ]]>
     </change-notes>
