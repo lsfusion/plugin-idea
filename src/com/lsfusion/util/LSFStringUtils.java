@@ -1,7 +1,10 @@
 package com.lsfusion.util;
 
+import org.jetbrains.annotations.NotNull;
+
 public class LSFStringUtils {
-    private static String specialEscapeCharacters = "nrt";
+    private static final String specialEscapeCharacters = "nrt";
+    private static final char QUOTE = '\'';
 
     // removes quotes, removes escaping, transforms special \n \r \t sequences to special characters
     public static String getSimpleLiteralValue(String literal, String unescapeCharacters) {
@@ -26,7 +29,7 @@ public class LSFStringUtils {
         return builder.toString();
     }
 
-    // removes quotes, removes escaping and DON'T transform special \n \r \t sequences to special characters
+    // removes quotes, removes escaping and DO NOT transform special \n \r \t sequences to special characters
     public static String getSimpleLiteralPropertiesFileValue(String literal, String unescapeCharacters) {
         StringBuilder builder = new StringBuilder();
         for (int i = 1; i+1 < literal.length(); ++i) {
@@ -48,5 +51,24 @@ public class LSFStringUtils {
             case 't': return '\t';
         }
         return ch;
+    }
+
+    public static String quote(@NotNull String s) {
+        return QUOTE + s + QUOTE;
+    }
+
+    public static String unquote(@NotNull String s) {
+        if (isQuoted(s)) {
+            return s.substring(1, s.length() - 1);
+        }
+        return s;
+    }
+
+    public static boolean isQuoted(@NotNull String s) {
+        return s.length() > 1 && s.charAt(0) == QUOTE && s.charAt(s.length() - 1) == QUOTE;
+    }
+
+    public static String escapeQuote(@NotNull String s) {
+        return s.replace(String.valueOf(QUOTE), "\\" + QUOTE);
     }
 }

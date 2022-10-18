@@ -2318,7 +2318,7 @@ metaCodeIdList ::= (metaCodeId (COMMA metaCodeId)*)?
 
 metaCodeId ::= (PRIMITIVE_TYPE | compoundID | metaCodeLiteral)?
 
-metaCodeLiteral ::= LEX_STRING_LITERAL
+metaCodeLiteral ::= metaCodeStringLiteral
                 | 	LEX_UINT_LITERAL
                 |	LEX_UNUMERIC_LITERAL
                 |	LEX_UDOUBLE_LITERAL
@@ -2330,6 +2330,12 @@ metaCodeLiteral ::= LEX_STRING_LITERAL
                 |	LEX_TIME_LITERAL
                 |	LEX_COLOR_LITERAL
                 |	NULL
+
+metaCodeStringLiteral ::= LEX_STRING_LITERAL
+{
+    mixin="com.lsfusion.lang.psi.LSFMetacodeStringValueLiteralImpl"
+    implements="com.lsfusion.lang.psi.LSFMetacodeStringValueLiteral"
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////// COMMON /////////////////////////////////

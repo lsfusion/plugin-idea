@@ -50,9 +50,9 @@ public class LSFElementGenerator {
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFLocalizedStringValueLiteral.class).iterator().next();
     }
 
-    public static LSFLocalizedStringLiteral createLocalizedStringLiteral(Project myProject, String text) {
-        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; GROUP someDumbGroup " + text + ";");
-        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFLocalizedStringLiteral.class).iterator().next();
+    public static LSFMetacodeStringValueLiteral createMetacodeStringValueLiteral(Project myProject, String text) {
+        final PsiFile dummyFile = createDummyFile(myProject, "MODULE " + genName + "; META someMetaName(a) END; @someMetaName(" + text + ");");
+        return PsiTreeUtil.findChildrenOfType(dummyFile, LSFMetacodeStringValueLiteral.class).iterator().next();
     }
     
     @Nullable

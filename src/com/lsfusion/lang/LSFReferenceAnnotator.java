@@ -619,56 +619,64 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         checkBracesConsistency(o);
 
         if (!o.needToBeLocalized()) {
-            Module module = ModuleUtil.findModuleForPsiElement(o);
+            addLocalizationWarnings(o, o);
+        }
+    }
 
-            LSFResourceBundleUtils.ScopeData scopeData = LSFResourceBundleUtils.getScopeData(module);
-            if(scopeData != null) {
-                Map<String, Map<String, PropertiesFile>> propertiesFilesMap = scopeData.propertiesFiles;
-                String currentLang = LSFResourceBundleUtils.getLsfStrLiteralsLanguage(module, false);
-                if (currentLang != null) {
+    public void visitMetacodeStringValueLiteral(@NotNull LSFMetacodeStringValueLiteral o) {
+        visitStringValueLiteral(o);
+        addLocalizationWarnings(o, o);
+    }
 
-                    List<IntentionAction> fixes = new ArrayList<>();
+    private void addLocalizationWarnings(PsiElement element, LSFPropertiesFileValueGetter o) {
+        Module module = ModuleUtil.findModuleForPsiElement(element);
+        LSFResourceBundleUtils.ScopeData scopeData = LSFResourceBundleUtils.getScopeData(module);
+        if(scopeData != null) {
+            Map<String, Map<String, PropertiesFile>> propertiesFilesMap = scopeData.propertiesFiles;
+            String currentLang = LSFResourceBundleUtils.getLsfStrLiteralsLanguage(module, false);
+            if (currentLang != null) {
 
-                    for (Map.Entry<String, Map<String, PropertiesFile>> resourceBundleEntry : propertiesFilesMap.entrySet()) {
+                List<IntentionAction> fixes = new ArrayList<>();
 
-                        String resourceBundleName = resourceBundleEntry.getKey();
-                        Map<String, PropertiesFile> propertiesFiles = resourceBundleEntry.getValue();
+                for (Map.Entry<String, Map<String, PropertiesFile>> resourceBundleEntry : propertiesFilesMap.entrySet()) {
 
-                        PropertiesFile currentPropertiesFile = propertiesFiles.get(currentLang);
-                        String currentKey = currentPropertiesFile != null ? LSFResourceBundleUtils.getReverseMapValue(currentPropertiesFile.getVirtualFile().getPath(), o.getPropertiesFileValue()) : null;
+                    String resourceBundleName = resourceBundleEntry.getKey();
+                    Map<String, PropertiesFile> propertiesFiles = resourceBundleEntry.getValue();
 
-                        List<PropertiesFile> allPropertiesFiles = new ArrayList<>(propertiesFiles.values());
-                        List<PropertiesFile> existingPropertiesFiles = new ArrayList<>();
+                    PropertiesFile currentPropertiesFile = propertiesFiles.get(currentLang);
+                    String currentKey = currentPropertiesFile != null ? LSFResourceBundleUtils.getReverseMapValue(currentPropertiesFile.getVirtualFile().getPath(), o.getPropertiesFileValue()) : null;
 
-                        //search current key in each properties file
-                        for (PropertiesFile propFile : propertiesFiles.values()) {
-                            boolean contains = LSFResourceBundleUtils.getOrdinaryMapValue(propFile.getVirtualFile().getPath(), currentKey) != null;
-                            if (contains) {
-                                existingPropertiesFiles.add(propFile);
-                            }
-                        }
+                    List<PropertiesFile> allPropertiesFiles = new ArrayList<>(propertiesFiles.values());
+                    List<PropertiesFile> existingPropertiesFiles = new ArrayList<>();
 
-                        if (existingPropertiesFiles.isEmpty()) {
-                            fixes.add(getCreatePropertyFix(currentLang, resourceBundleName, allPropertiesFiles, LSFResourceBundleUtils.getDefaultBundleKey(o.getPropertiesFileValue()), o));
-                        } else if (existingPropertiesFiles.size() < propertiesFiles.size()) {
-                            fixes.clear();
-                            fixes.add(getCreatePropertyFix(currentLang, resourceBundleName, allPropertiesFiles.stream().filter(f -> !existingPropertiesFiles.contains(f)).collect(Collectors.toList()), currentKey, o));
-                            break;
-                        } else {
-                            fixes.clear();
-                            break;
+                    //search current key in each properties file
+                    for (PropertiesFile propFile : propertiesFiles.values()) {
+                        boolean contains = LSFResourceBundleUtils.getOrdinaryMapValue(propFile.getVirtualFile().getPath(), currentKey) != null;
+                        if (contains) {
+                            existingPropertiesFiles.add(propFile);
                         }
                     }
 
-                    if (!fixes.isEmpty()) {
-                        addWarningResourceBundleAnnotation(o, fixes);
+                    if (existingPropertiesFiles.isEmpty()) {
+                        fixes.add(getCreatePropertyFix(currentLang, resourceBundleName, allPropertiesFiles, LSFResourceBundleUtils.getDefaultBundleKey(o.getPropertiesFileValue()), element, o));
+                    } else if (existingPropertiesFiles.size() < propertiesFiles.size()) {
+                        fixes.clear();
+                        fixes.add(getCreatePropertyFix(currentLang, resourceBundleName, allPropertiesFiles.stream().filter(f -> !existingPropertiesFiles.contains(f)).collect(Collectors.toList()), currentKey, element, o));
+                        break;
+                    } else {
+                        fixes.clear();
+                        break;
                     }
+                }
+
+                if (!fixes.isEmpty()) {
+                    addWarningResourceBundleAnnotation(element, fixes);
                 }
             }
         }
     }
 
-    private IntentionAction getCreatePropertyFix(String currentLang, String resourceBundleName, List<PropertiesFile> propertiesFiles, String defaultKey, LSFLocalizedStringValueLiteral o) {
+    private IntentionAction getCreatePropertyFix(String currentLang, String resourceBundleName, List<PropertiesFile> propertiesFiles, String defaultKey, PsiElement element, LSFPropertiesFileValueGetter o) {
         return new IntentionAction() {
             @Override
             public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
@@ -687,7 +695,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
                     ApplicationManager.getApplication().runWriteAction(() -> CommandProcessor.getInstance().executeCommand(project, () -> I18nUtil.createProperty(project, selectedPropertiesFiles, key, value), "I18n", project));
 
-                    visitLocalizedStringValueLiteral(o);
+                    element.accept(LSFReferenceAnnotator.this);
                 }
             }
 
@@ -695,7 +703,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             public @IntentionName
             @NotNull
             String getText() {
-                return "Create property for " + o.getText() + " in " + resourceBundleName;
+                return "Create property for " + element.getText() + " in " + resourceBundleName;
             }
 
             @Override

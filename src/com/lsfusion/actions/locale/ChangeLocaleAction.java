@@ -24,6 +24,7 @@ import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.LSFResourceBundleUtils;
 import com.lsfusion.lang.psi.LSFLocalizedStringValueLiteral;
+import com.lsfusion.lang.psi.LSFMetacodeStringValueLiteral;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFFileUtils;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 
-import static com.lsfusion.lang.LSFElementGenerator.createLocalizedStringLiteral;
+import static com.lsfusion.lang.LSFElementGenerator.*;
+import static com.lsfusion.util.LSFStringUtils.*;
 
 public class ChangeLocaleAction extends AnAction {
     private Project project;
@@ -182,7 +184,7 @@ public class ChangeLocaleAction extends AnAction {
                                 if (literalsMap.containsKey(oldValue)) {
                                     literalsMap.put(oldValue, "'{" + key + "}'"); //put key if multiple values found
                                 } else {
-                                    literalsMap.put(oldValue, "'" + newValue + "'");
+                                    literalsMap.put(oldValue, "'" + escapeQuote(newValue) + "'");
                                 }
                             }
                         }
@@ -202,11 +204,9 @@ public class ChangeLocaleAction extends AnAction {
                             Files.write(filePath, String.join("\n", newLines).getBytes(StandardCharsets.UTF_8));
                         }
                         LSFResourceBundleUtils.setLsfStrLiteralsLanguage(resourceBundle.scope, newLocale);
-                        dispose();
                     }
-
                 }
-
+                dispose();
             } catch (Throwable t) {
                 throw new RuntimeException("Change Locale failed", t);
             }
@@ -235,12 +235,26 @@ public class ChangeLocaleAction extends AnAction {
                     PsiFile psiFile = PsiManager.getInstance(project).findFile(vfile);
                     Collection<LSFLocalizedStringValueLiteral> localizedStringLiterals = PsiTreeUtil.findChildrenOfType(psiFile, LSFLocalizedStringValueLiteral.class);
 
-                    for (final LSFLocalizedStringValueLiteral localizedStringLiteral : localizedStringLiterals) {
+                    for (final LSFLocalizedStringValueLiteral literal : localizedStringLiterals) {
                         Runnable inlineRun = () -> {
-                            if(!localizedStringLiteral.needToBeLocalized() && !LSFReferenceAnnotator.isInMetaUsage(localizedStringLiteral)) {
-                                String value = literalsMap.get(localizedStringLiteral.getPropertiesFileValue());
+                            if (!literal.needToBeLocalized() && !LSFReferenceAnnotator.isInMetaUsage(literal) && isQuoted(literal.getText())) {
+                                String value = mapKeepingSpaces(literal.getPropertiesFileValue(), literalsMap);
                                 if (value != null) {
-                                    localizedStringLiteral.replace(createLocalizedStringLiteral(localizedStringLiteral.getProject(), value));
+                                    literal.replace(createLocalizedStringValueLiteral(literal.getProject(), value));
+                                }
+                            }
+                        };
+                        inlineProcessor.proceed(inlineRun);
+                    }
+
+                    Collection<LSFMetacodeStringValueLiteral> metacodeStringLiterals = PsiTreeUtil.findChildrenOfType(psiFile, LSFMetacodeStringValueLiteral.class);
+
+                    for (final LSFMetacodeStringValueLiteral literal : metacodeStringLiterals) {
+                        Runnable inlineRun = () -> {
+                            if (!LSFReferenceAnnotator.isInMetaUsage(literal) && isQuoted(literal.getText())) {
+                                String value = mapKeepingSpaces(literal.getPropertiesFileValue(), literalsMap);
+                                if (value != null) {
+                                    literal.replace(createMetacodeStringValueLiteral(literal.getProject(), value));
                                 }
                             }
                         };
@@ -260,6 +274,24 @@ public class ChangeLocaleAction extends AnAction {
                 run.run(indicator);
             }
         });
+    }
+
+    private static String mapKeepingSpaces(@NotNull String value, Map<String, String> literalsMap) {
+        if (value.isBlank()) return null;
+
+        int i = 0;
+        while (value.charAt(i) == ' ') ++i;
+        int prefixSpaces = i;
+
+        i = value.length() - 1;
+        while (value.charAt(i) == ' ') --i;
+        int postfixSpaces = value.length() - i - 1;
+
+        String result = literalsMap.get(value.trim());
+        if (result != null) {
+            result = quote(value.substring(0, prefixSpaces) + unquote(result) + value.substring(value.length() - postfixSpaces));
+        }
+        return result;
     }
 
     private static class ReprocessInlineProcessor {
