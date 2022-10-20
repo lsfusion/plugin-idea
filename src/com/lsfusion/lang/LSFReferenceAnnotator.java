@@ -644,7 +644,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     Map<String, PropertiesFile> propertiesFiles = resourceBundleEntry.getValue();
 
                     PropertiesFile currentPropertiesFile = propertiesFiles.get(currentLang);
-                    String currentKey = currentPropertiesFile != null ? LSFResourceBundleUtils.getReverseMapValue(currentPropertiesFile.getVirtualFile().getPath(), o.getPropertiesFileValue()) : null;
+                    String currentKey = currentPropertiesFile != null ? LSFResourceBundleUtils.getReverseMapValue(currentPropertiesFile.getVirtualFile().getPath(), o.getPropertiesFileValue().trim()) : null;
 
                     List<PropertiesFile> allPropertiesFiles = new ArrayList<>(propertiesFiles.values());
                     List<PropertiesFile> existingPropertiesFiles = new ArrayList<>();
