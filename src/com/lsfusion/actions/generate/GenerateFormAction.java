@@ -427,7 +427,7 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getFormNameScript(String formName, ElementNamespace formNamespace) {
-        String formId = formName == null ? "generated" : Introspector.decapitalize(formName);
+        String formId = formName == null ? "generated" : generateObjectId(formName);
         String formExtId = (formName == null || formId.equals(formName)) && formNamespace == null ? "" : (" FORMEXTID '" + getNamespaceScript(formNamespace) + formName + "'");
         return "FORM " + formId + formExtId;
     }

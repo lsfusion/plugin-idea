@@ -7,13 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.249</b><br>
+        <b>Version 1.0.250</b><br>
         <ul>
-            <li>Fixes issue #69</li>
-            <li>Added resizeOverflow attribute support</li>
-            <li>NOEXTID support</li>
-            <li>LSFStatementUpDownMover fix</li>
-            <li>Improves inverse localization functionality</li>
+            <li>Generate form: form name fix</li>
         </ul>
     ]]>
     </change-notes>
