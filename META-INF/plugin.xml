@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.249</version>
+    <version>1.0.250</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -53,7 +53,7 @@
     <actions>
         <group id="LSFGroup" popup="true" text="_LSF">
             <add-to-group group-id="MainMenu" anchor="after" relative-to-action="CodeMenu"/>
-        
+
             <action id="MetaCode.Enable" class="com.lsfusion.actions.MetaCodeEnableAction" text="Toggle _meta"
                     description="Toggle meta code mode">
                 <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
@@ -70,7 +70,7 @@
                     description="Hide meta code for current file">
                 <keyboard-shortcut first-keystroke="control alt shift K" keymap="$default"/>
             </action>
-            
+
             <separator/>
             <action id="ToggleLSFCompletion" class="com.lsfusion.actions.ToggleCompletionAction"
                     text="lsFusion completion support"
@@ -79,7 +79,7 @@
                     text="Show property complexity" description="Toggle property complexity"/>
             <action id="ToggleLSFShowTable" class="com.lsfusion.actions.ToggleShowTableAction"
                     text="Show property table" description="Toggle showing property table"/>
-            
+
             <group id="propertyFolding" popup="true" text="Property classes">
                 <action id="AllPropertyFolding" class="com.lsfusion.actions.folding.ShowAllPropertyFoldingAction"
                         text="All" description="Show classes for all properties"/>
@@ -88,7 +88,7 @@
                 <action id="ImplicitPropertyFolding" class="com.lsfusion.actions.folding.ShowImplicitPropertyFoldingAction"
                         text="Implicit" description="Show implicit classes only"/>
             </group>
-            
+
             <action id="Errors" class="com.lsfusion.actions.ShowErrorsAction" text="Show errors"
                     description="Show all current errors in all files">
                 <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
@@ -120,11 +120,11 @@
 
             <separator/>
         </group>
-        
+
         <action id="NewLsfFile" class="com.lsfusion.module.NewLsfFileAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
-        
+
         <action id="PreFindUsagesAction" class="com.lsfusion.actions.PreShowUsagesAction">
             <keyboard-shortcut first-keystroke="ctrl alt F7" keymap="$default"/>
         </action>
@@ -184,7 +184,7 @@
         <renamePsiElementProcessor implementation="com.lsfusion.refactoring.LSFRenameFullNameProcessor"/>
 
         <refactoring.safeDeleteProcessor implementation="com.lsfusion.refactoring.LSFSafeDeleteProcessor"/>
-        
+
         <elementDescriptionProvider implementation="com.lsfusion.lang.psi.LSFElementDescriptionProvider"/>
 
         <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
@@ -239,7 +239,7 @@
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExplicitValueIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ImplicitValueIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ImplicitInterfacePropIndex"/>
-        
+
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExplicitInterfaceActionIndex"/>
 
         <!-- caches -->
