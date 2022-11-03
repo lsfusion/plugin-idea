@@ -10,6 +10,7 @@
         <b>Version 1.0.250</b><br>
         <ul>
             <li>Generate form: form name fix</li>
+            <li>LSF Formatter</li>
         </ul>
     ]]>
     </change-notes>
@@ -332,5 +333,9 @@
         <!-- To use old PreCachedDataContext instead of new PreCachedDataContext2 (in 2021.3),
         which broke find element usages when cursor is on element usage-->
         <registryKey defaultValue="false" description="." key="actionSystem.update.actions.async.data-context2"/>
+
+        <codeStyleSettingsProvider implementation="com.lsfusion.formatter.LSFLanguageCodeStyleSettingsProvider"/>
+        <lang.formatter language="Lsf" implementationClass="com.lsfusion.formatter.LSFFormattingModelBuilder"/>
+
     </extensions>
 </idea-plugin>
