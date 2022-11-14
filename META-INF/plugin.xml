@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.250</b><br>
+        <b>Version 1.0.251</b><br>
         <ul>
-            <li>Generate form: form name fix</li>
-            <li>LSF Formatter</li>
+            <li>LSF formatter improvements</li>
         </ul>
     ]]>
     </change-notes>

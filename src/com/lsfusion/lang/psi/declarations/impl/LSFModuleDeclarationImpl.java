@@ -30,7 +30,7 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
     }
 
     @NotNull
-    protected abstract LSFModuleName getModuleName();
+    protected abstract LSFModuleNameStatement getModuleNameStatement();
 
     @Nullable
     protected abstract LSFRequireList getRequireList();
@@ -119,7 +119,7 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
     
     @Override
     public LSFSimpleName getNameIdentifier() {
-        return getModuleName().getSimpleName();
+        return getModuleNameStatement().getModuleName().getSimpleName();
     }
 
     @Nullable

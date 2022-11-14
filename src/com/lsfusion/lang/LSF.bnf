@@ -44,7 +44,7 @@ simpleName ::= ID
     implements="com.lsfusion.lang.psi.LSFId,com.intellij.psi.PsiNamedElement"
 }
 
-moduleHeader ::= MODULE moduleName SEMI
+moduleHeader ::= moduleNameStatement
                  requireList?
                  priorityList?
                  namespaceName?
@@ -59,6 +59,7 @@ moduleHeader ::= MODULE moduleName SEMI
 }
 
 moduleName ::= simpleName;
+moduleNameStatement ::= MODULE moduleName SEMI;
 requireList ::= REQUIRE nonEmptyModuleUsageList SEMI {pin = 1};
 priorityList ::= PRIORITY nonEmptyNamespaceUsageList SEMI {pin = 1};
 namespaceName ::= NAMESPACE namespaceUsage SEMI
