@@ -20,6 +20,7 @@ import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.lang.LSFResourceBundleUtils;
+import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,41 +40,18 @@ public abstract class LSFReferencedStringValueLiteral extends ASTWrapperPsiEleme
     }
 
     private List<PsiReference> findAllRefs(String literal) {
-        final String escapedCharacters = "\\'nrt{}$";
-        boolean insideKey = false;
-        int startPos = 0;
-        if (literal != null) {
-            List<PsiReference> refs = new ArrayList<>();
-            for (int i = 1; i+1 < literal.length(); ++i) {
-                if (literal.charAt(i) == '\\') {
-                    if (i+2 == literal.length()) {
-                        break;
-                    }
-
-                    char nextCh = literal.charAt(i+1);
-                    if (escapedCharacters.indexOf(nextCh) == -1 || insideKey && (nextCh == '\r' || nextCh == '\n' || nextCh == '\t')) {
-                        break;
-                    }
-                    ++i;
-                } else if (literal.charAt(i) == '{') {
-                    if (insideKey) {
-                        break;
-                    } else {
-                        insideKey = true;
-                        startPos = i;
-                    }
-                } else if (literal.charAt(i) == '}') {
-                    if (!insideKey || i - startPos == 1) {
-                        break;
-                    } else {
-                        refs.add(new PropertyFileItemMultiReference(this, new TextRange(startPos, i+1)));
-                        insideKey = false;
-                    }
-                } else if (insideKey && literal.charAt(i) == ' ') break;
+        List<LSFStringUtils.SpecialBlock> specialBlocks = getSpecialBlockList(literal);
+        List<PsiReference> refs = new ArrayList<>();
+        for (LSFStringUtils.SpecialBlock block : specialBlocks) {
+            if (block.type == LSFStringUtils.StringSpecialBlockType.LOCALIZATION) {
+                refs.add(new PropertyFileItemMultiReference(this, new TextRange(block.start, block.end+1)));
             }
-            return refs;
         }
-        return new ArrayList<>();
+        return refs;
+    }
+
+    protected List<LSFStringUtils.SpecialBlock> getSpecialBlockList(String literal) {
+        return LSFStringUtils.specialBlockList(literal, false);
     }
 
     @NotNull

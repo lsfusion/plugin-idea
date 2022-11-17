@@ -5,6 +5,8 @@ import com.intellij.psi.PsiElementVisitor;
 import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 import static com.lsfusion.util.LSFStringUtils.unquote;
 
 public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValueLiteralImpl implements LSFExpressionStringValueLiteral {
@@ -30,5 +32,9 @@ public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValue
     @Override
     public boolean needToBeLocalized() {
         return LSFStringUtils.hasLocalizationBlock(unquote(getText()), true);
+    }
+
+    protected List<LSFStringUtils.SpecialBlock> getSpecialBlockList(String literal) {
+        return LSFStringUtils.specialBlockList(literal, true);
     }
 }
