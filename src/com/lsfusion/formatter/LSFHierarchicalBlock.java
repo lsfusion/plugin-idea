@@ -4,8 +4,11 @@ import com.intellij.formatting.Block;
 import com.intellij.formatting.Indent;
 import com.intellij.formatting.Spacing;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.editor.Document;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,8 +46,13 @@ public class LSFHierarchicalBlock extends LSFAbstractBlock {
                     return getNoneIndent();
                 }
                 break;
-            case IF:
-                if (first || isThenElse(psi)) {
+            case IFACT:
+                if ((first || isThenElse(psi))) {
+                    return getNoneIndent();
+                }
+                break;
+            case IFPROP:
+                if ((first || isThenElse(psi)) && notSameLineAsParentIfProp(psi)) {
                     return getNoneIndent();
                 }
                 break;
@@ -58,8 +66,23 @@ public class LSFHierarchicalBlock extends LSFAbstractBlock {
                     return getNoneIndent();
                 }
                 break;
+            case NEPELIST:
+                if(notSameLineAsParentPEList(psi)) {
+                    return getNoneIndent();
+                }
         }
         return getNormalIndent();
+    }
+
+    private boolean notSameLineAsParentPEList(PsiElement element) {
+        final Document document = PsiDocumentManager.getInstance(element.getProject()).getDocument(element.getContainingFile());
+        return document != null && document.getLineNumber(myNode.getPsi().getParent().getTextOffset()) != document.getLineNumber(myNode.getPsi().getTextOffset());
+    }
+
+    private boolean notSameLineAsParentIfProp(PsiElement element) {
+        final Document document = PsiDocumentManager.getInstance(element.getProject()).getDocument(element.getContainingFile());
+        LSFPropertyStatement propertyStatement = PsiTreeUtil.getParentOfType(myNode.getPsi(), LSFPropertyStatement.class);
+        return document != null && propertyStatement != null && document.getLineNumber(propertyStatement.getTextOffset()) != document.getLineNumber(myNode.getPsi().getTextOffset());
     }
 
     private boolean isLBrace(PsiElement element) {
@@ -78,9 +101,8 @@ public class LSFHierarchicalBlock extends LSFAbstractBlock {
         return ((LSFAbstractBlock) block1).type == BlockType.LINEFEEDED ? LINE_SPACING : super.getSpacing(block, block1);
     }
 
-
     @Override
     protected @Nullable Indent getChildIndent() {
-        return getNormalIndent();
+        return type == BlockType.HASBEGIN ? getNormalChildIndent() : getNormalIndent();
     }
 }

@@ -4,10 +4,6 @@ import com.intellij.formatting.Block;
 import com.intellij.formatting.Indent;
 import com.intellij.formatting.Spacing;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.lsfusion.lang.psi.LSFNonEmptyImportPropertyUsageListWithIds;
-import com.lsfusion.lang.psi.LSFNonEmptyModuleUsageList;
-import com.lsfusion.lang.psi.LSFNonEmptyPropertyOptions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +13,7 @@ import java.util.List;
 public class LSFPlainBlock extends LSFAbstractBlock {
 
     public LSFPlainBlock(ASTNode node) {
-        this(node, getNoneIndent(), BlockType.SIMPLE);
+        this(node, getNoneIndent(), BlockType.DEFAULT);
     }
 
     public LSFPlainBlock(ASTNode node, Indent indent, BlockType type) {
