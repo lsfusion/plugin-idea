@@ -139,10 +139,7 @@ public abstract class LSFReferencedStringValueLiteral extends ASTWrapperPsiEleme
         @Override
         public PsiElement handleElementRename(@NotNull String newElementName) throws IncorrectOperationException {
             String newText = getText().substring(0, getRangeInElement().getStartOffset() + 1) + newElementName + getText().substring(getRangeInElement().getEndOffset() - 1);
-            LSFReferencedStringValueLiteral.this.handleElementRename(newText);
-            LSFLocalizedStringValueLiteral newLiteral = createLocalizedStringValueLiteral(getProject(), newText);
-            LSFReferencedStringValueLiteral.this.replace(newLiteral);
-            return null;
+            return LSFReferencedStringValueLiteral.this.handleElementRename(newText);
         }
 
         @NotNull

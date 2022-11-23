@@ -1,16 +1,15 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.250</version>
+    <version>1.0.251</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.250</b><br>
+        <b>Version 1.0.252</b><br>
         <ul>
-            <li>Generate form: form name fix</li>
-            <li>LSF Formatter</li>
+            <li>LSF formatter extra improvements</li>
         </ul>
     ]]>
     </change-notes>
