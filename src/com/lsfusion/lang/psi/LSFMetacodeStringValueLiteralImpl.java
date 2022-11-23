@@ -33,6 +33,6 @@ public class LSFMetacodeStringValueLiteralImpl extends LSFReferencedStringValueL
     public PsiElement handleElementRename(@NotNull String newText) throws IncorrectOperationException {
         LSFMetacodeStringValueLiteral newLiteral = createMetacodeStringValueLiteral(getProject(), newText);
         replace(newLiteral);
-        return null;
+        return this;
     }
 }

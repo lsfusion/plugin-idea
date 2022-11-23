@@ -52,6 +52,6 @@ public class LSFLocalizedStringValueLiteralImpl extends LSFReferencedStringValue
     public PsiElement handleElementRename(@NotNull String newText) throws IncorrectOperationException {
         LSFLocalizedStringValueLiteral newLiteral = createLocalizedStringValueLiteral(getProject(), newText);
         replace(newLiteral);
-        return null;
+        return this;
     }
 }
