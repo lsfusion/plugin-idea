@@ -1,20 +1,21 @@
 package com.lsfusion.lang.psi.stubs.impl;
 
+import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
+import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
 import com.lsfusion.lang.psi.stubs.ActionStubElement;
-import com.lsfusion.lang.psi.stubs.types.ActionStubElementType;
 
 import java.io.IOException;
 
-public class ActionStubImpl extends ActionOrPropStubImpl<ActionStubElement, LSFActionDeclaration> implements ActionStubElement {
+public abstract class ActionStubImpl<This extends ActionOrPropStubElement<This, Decl>, Decl extends LSFActionOrGlobalPropDeclaration<Decl, This>> extends ActionOrPropStubImpl<This, Decl> implements ActionStubElement<This, Decl> {
 
-    public ActionStubImpl(StubElement parent, LSFActionDeclaration psi) {
+    public ActionStubImpl(StubElement parent, Decl psi) {
         super(parent, psi);
     }
 
-    public ActionStubImpl(StubInputStream dataStream, StubElement parentStub, ActionStubElementType type) throws IOException {
+    public ActionStubImpl(StubInputStream dataStream, StubElement parentStub, IStubElementType<This, Decl> type) throws IOException {
         super(dataStream, parentStub, type);
     }
 }

@@ -10,6 +10,7 @@
         <b>Version 1.0.252</b><br>
         <ul>
             <li>LSF formatter extra improvements</li>
+            <li>Named events support</li>
         </ul>
     ]]>
     </change-notes>

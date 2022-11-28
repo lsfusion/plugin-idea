@@ -15,6 +15,7 @@ import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,8 +25,13 @@ public abstract class LSFActionReferenceImpl extends LSFActionOrPropReferenceImp
         super(node);
     }
 
-    protected FullNameStubElementType<?, LSFActionDeclaration> getStubElementType() {
-        return LSFStubElementTypes.ACTION;
+    @Override
+    protected Collection<FullNameStubElementType> getStubElementTypes() {
+        return Arrays.asList(LSFStubElementTypes.STATEMENTACTION, LSFStubElementTypes.BASEEVENTACTION);
+    }
+
+    protected FullNameStubElementType getStubElementType() {
+        throw new UnsupportedOperationException();
     }
 
     public boolean isNoContext(PropertyUsageContext usageContext) {
