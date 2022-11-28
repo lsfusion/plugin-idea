@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-//тут LSFStatementActionDeclaration нужен, всё по аналогии с StatementPropStubElementType
 public class StatementActionStubElementType extends ActionStubElementType<StatementActionStubElement, LSFStatementActionDeclaration> {
 
     public StatementActionStubElementType() {

@@ -1988,7 +1988,13 @@ baseEventPE ::= baseEvent (paramDeclare EQUALS)?
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 
-baseEventNotPE ::= (ID)? baseEvent
+baseEventNotPE ::= (paramDeclare)? baseEvent
+{
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFBaseEventActionDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFBaseEventActionDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.BaseEventActionStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
+}
 
 inlineOption ::=   (NOINLINE (LBRAC exprParameterUsageList RBRAC)? )? (INLINE)?
 

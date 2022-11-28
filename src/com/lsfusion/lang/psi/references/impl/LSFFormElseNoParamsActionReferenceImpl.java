@@ -28,7 +28,6 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
         return LSFStubElementTypes.FORM; // по умолчанию ищем свойства
     }
 
-//вроде, тут нужен именно LSFStatementActionDeclaration
     protected Condition<LSFStatementActionDeclaration> getActionCondition() {
         final List<LSFClassSet> fDirectClasses = new ArrayList<>();
         return new Condition<>() {

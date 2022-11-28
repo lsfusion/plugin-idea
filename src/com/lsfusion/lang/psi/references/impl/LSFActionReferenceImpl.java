@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-//по аналогии с LSFPropReferenceImpl
 public abstract class LSFActionReferenceImpl extends LSFActionOrPropReferenceImpl<LSFActionDeclaration, LSFActionDeclaration> implements LSFActionReference {
 
     public LSFActionReferenceImpl(@NotNull ASTNode node) {

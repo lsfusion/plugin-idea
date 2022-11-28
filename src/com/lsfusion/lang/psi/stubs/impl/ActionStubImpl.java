@@ -9,7 +9,6 @@ import com.lsfusion.lang.psi.stubs.ActionStubElement;
 
 import java.io.IOException;
 
-//по аналогии с PropStubImpl
 public abstract class ActionStubImpl<This extends ActionOrPropStubElement<This, Decl>, Decl extends LSFActionOrGlobalPropDeclaration<Decl, This>> extends ActionOrPropStubImpl<This, Decl> implements ActionStubElement<This, Decl> {
 
     public ActionStubImpl(StubElement parent, Decl psi) {

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-//тут LSFStatementActionDeclaration нужен, по аналогии с LSFStatementGlobalPropDeclarationImpl
+
 public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGlobalPropDeclarationImpl<LSFStatementActionDeclaration, StatementActionStubElement> implements LSFStatementActionDeclaration {
     public LSFStatementActionDeclarationImpl(@NotNull ASTNode node) {
         super(node);
@@ -49,10 +49,6 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
     @Nullable
     protected List<LSFExClassSet> resolveValueParamClasses(List<LSFParamDeclaration> declareParams) {
         return LSFPsiImplUtil.resolveValueParamClasses(getActionUnfriendlyPD(), getListActionPropertyDefinitionBody(), declareParams);
-    }
-
-    public byte getPropType() {
-        return 3;
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
 import com.lsfusion.util.BaseUtils;
 
-//по аналогии с PropStubElementStype
 public abstract class ActionStubElementType<StubT extends ActionOrPropStubElement<StubT, PsiT>, PsiT extends LSFActionOrGlobalPropDeclaration<PsiT, StubT>> extends ActionOrPropStubElementType<StubT, PsiT> {
 
     public ActionStubElementType(String debugName) {

@@ -8,7 +8,6 @@ import com.lsfusion.lang.psi.stubs.BaseEventActionStubElement;
 
 import java.io.IOException;
 
-//по аналогии с AggrParamPropStubImpl
 public class BaseEventActionStubImpl extends ActionStubImpl<BaseEventActionStubElement, LSFBaseEventActionDeclaration> implements BaseEventActionStubElement {
 
     public BaseEventActionStubImpl(StubElement parent, LSFBaseEventActionDeclaration psi) {

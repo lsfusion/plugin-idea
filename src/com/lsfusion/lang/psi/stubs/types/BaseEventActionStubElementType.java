@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-//по аналогии с AggrParamPropStubElementType
 public class BaseEventActionStubElementType extends ActionStubElementType<BaseEventActionStubElement, LSFBaseEventActionDeclaration> {
 
     public BaseEventActionStubElementType() {
