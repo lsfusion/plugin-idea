@@ -11,7 +11,7 @@
         <ul>
             <li>LSF formatter extra improvements</li>
             <li>Named events support</li>
-            <li>GOAFTER / AFTER support action without params<li>
+            <li>GOAFTER / AFTER support action without params</li>
         </ul>
     ]]>
     </change-notes>
