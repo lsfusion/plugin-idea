@@ -1978,7 +1978,7 @@ globalEventStatement ::= ON baseEventNotPE (SINGLE)? (SHOWDEP noContextActionOrP
     methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
 }
 
-baseEvent ::= (GLOBAL | LOCAL)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmptyNoContextPropertyUsageList)?
+baseEvent ::= (GLOBAL | LOCAL)? (FORMS nonEmptyFormUsageList)? ((GOAFTER | AFTER) nonEmptyNoContextActionOrPropertyUsageList)?
 
 baseEventPE ::= baseEvent (paramDeclare EQUALS)?
 {
@@ -2408,6 +2408,7 @@ nonEmptyClassNameList ::= className (COMMA className)* { pin(".*") = 1}
 nonEmptyNoParamsPropertyUsageList ::= noParamsPropertyUsage (COMMA noParamsPropertyUsage)*  { pin(".*") = 1}
 nonEmptyNoContextPropertyUsageList ::= noContextPropertyUsage (COMMA noContextPropertyUsage)*  { pin(".*") = 1}
 nonEmptyNoContextActionUsageList ::= noContextActionUsage (COMMA noContextActionUsage)*  { pin(".*") = 1}
+nonEmptyNoContextActionOrPropertyUsageList ::= noContextActionOrPropertyUsage (COMMA noContextActionOrPropertyUsage)*  { pin(".*") = 1}
 
 nonEmptyFormUsageList ::= formUsage (COMMA formUsage)*  { pin(".*") = 1}
 
