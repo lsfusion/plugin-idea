@@ -1982,9 +1982,9 @@ baseEvent ::= (GLOBAL | LOCAL)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmpty
 
 baseEventPE ::= baseEvent (paramDeclare EQUALS)?
 {
-    mixin="com.lsfusion.lang.psi.declarations.impl.LSFBaseEventParamGlobalPropDeclarationImpl"
-    implements="com.lsfusion.lang.psi.declarations.LSFBaseEventParamGlobalPropDeclaration"
-    stubClass = "com.lsfusion.lang.psi.stubs.BaseEventParamPropStubElement"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFBaseEventActionDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFBaseEventActionDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.BaseEventActionStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
 

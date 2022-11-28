@@ -8,7 +8,7 @@ import com.lsfusion.lang.psi.stubs.types.ActionStubElementType;
 
 import java.io.IOException;
 
-public class ActionStubImpl extends ActionOrPropStubImpl<ActionStubElement, LSFActionDeclaration> implements ActionStubElement {
+public class ActionStubImpl extends ActStubImpl<ActionStubElement, LSFActionDeclaration> implements ActionStubElement {
 
     public ActionStubImpl(StubElement parent, LSFActionDeclaration psi) {
         super(parent, psi);
