@@ -379,7 +379,10 @@ expressionUnfriendlyPD ::= dataPropertyDefinition
                            |   reflectionPropertyDefinition
 {methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses]}
 
-aggrPropertyDefinition ::= AGGR customClassUsage WHERE propertyExpression
+aggrPropertyDefinition ::= AGGR baseEventPE customClassUsage
+                           WHERE propertyExpression
+                           (NEW baseEventNotPE)?
+                           (DELETE baseEventNotPE)?
 {
     pin = 1;
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
@@ -669,7 +672,7 @@ loggableSetting ::= LOGGABLE
 echoSymbolsSetting ::= ECHO
 indexSetting ::= INDEXED (LIKE | MATCH)?
 aggrSetting ::= AGGR
-notNullSetting ::= nullOption (DELETE)? baseEvent
+notNullSetting ::= nullOption (DELETE)? baseEventNotPE
 onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти
 asEditActionSetting ::= ASON formEventType noContextActionOrPropertyUsage {pin = 1}
 eventIdSetting ::= EVENTID stringLiteral
@@ -1910,7 +1913,7 @@ overridePropertyStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 //////////////////////////////// CONSTRAINT STATEMENT //////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-constraintStatement ::= CONSTRAINT baseEvent propertyExpression
+constraintStatement ::= CONSTRAINT baseEventPE propertyExpression
 		                (CHECKED (BY nonEmptyNoContextPropertyUsageList)? )?
 		                MESSAGE messagePropertyExpression
 		                (PROPERTIES nonEmptyPropertyExpressionList)?
@@ -1932,7 +1935,7 @@ messagePropertyExpression ::= propertyExpression
 ///////////////////////////////// FOLLOWS STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS baseEvent
+followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS baseEventPE
                      propertyExpression (RESOLVE LEFT? RIGHT?)?		             
 		             SEMI
 {
@@ -1956,7 +1959,7 @@ writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression 
 ////////////////////////////////// EVENT STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-eventStatement ::= WHEN baseEvent propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)?
+eventStatement ::= WHEN baseEventPE propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)?
 		                inlineOption DO actionPropertyDefinitionBody
 {
     pin = 1
@@ -1968,7 +1971,7 @@ eventStatement ::= WHEN baseEvent propertyExpression (ORDER (DESC)? nonEmptyProp
 //////////////////////////// GLOBAL EVENT STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP noContextActionOrPropertyUsage)? actionPropertyDefinitionBody
+globalEventStatement ::= ON baseEventNotPE (SINGLE)? (SHOWDEP noContextActionOrPropertyUsage)? actionPropertyDefinitionBody
 {
     pin=1
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
@@ -1976,6 +1979,16 @@ globalEventStatement ::= ON baseEvent (SINGLE)? (SHOWDEP noContextActionOrProper
 }
 
 baseEvent ::= (GLOBAL | LOCAL)? (FORMS nonEmptyFormUsageList)? (GOAFTER nonEmptyNoContextPropertyUsageList)?
+
+baseEventPE ::= baseEvent (paramDeclare EQUALS)?
+{
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFBaseEventParamGlobalPropDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFBaseEventParamGlobalPropDeclaration"
+    stubClass = "com.lsfusion.lang.psi.stubs.BaseEventParamPropStubElement"
+    elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
+}
+
+baseEventNotPE ::= (ID)? baseEvent
 
 inlineOption ::=   (NOINLINE (LBRAC exprParameterUsageList RBRAC)? )? (INLINE)?
 

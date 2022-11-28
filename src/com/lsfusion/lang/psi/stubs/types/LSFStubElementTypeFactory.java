@@ -16,6 +16,8 @@ public class LSFStubElementTypeFactory {
                 return LSFStubElementTypes.STATEMENTPROP;
             case "AGGR_PARAM_PROP_DECLARE":
                 return LSFStubElementTypes.AGGRPARAMPROP;
+            case "BASE_EVENT_PE":
+                return LSFStubElementTypes.BASEEVENTPE;
             case "ACTION_STATEMENT":
                 return LSFStubElementTypes.ACTION;
             case "META_CODE_DECLARATION_STATEMENT":
