@@ -19,19 +19,20 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+//по аналогии с LSFPropReferenceImpl
 public abstract class LSFActionReferenceImpl extends LSFActionOrPropReferenceImpl<LSFActionDeclaration, LSFActionDeclaration> implements LSFActionReference {
 
     public LSFActionReferenceImpl(@NotNull ASTNode node) {
         super(node);
     }
 
-    protected FullNameStubElementType<?, LSFActionDeclaration> getStubElementType() {
-        return LSFStubElementTypes.ACTION;
-    }
-
     @Override
     protected Collection<FullNameStubElementType> getStubElementTypes() {
-        return Arrays.asList(LSFStubElementTypes.ACTION, LSFStubElementTypes.BASEEVENTPE);
+        return Arrays.asList(LSFStubElementTypes.STATEMENTACTION, LSFStubElementTypes.BASEEVENTACTION);
+    }
+
+    protected FullNameStubElementType getStubElementType() {
+        throw new UnsupportedOperationException();
     }
 
     public boolean isNoContext(PropertyUsageContext usageContext) {

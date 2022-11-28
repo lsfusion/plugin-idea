@@ -247,9 +247,9 @@ actionStatement ::= propertyDeclaration
                         )
 {
     pin(".*") = 1
-    mixin="com.lsfusion.lang.psi.declarations.impl.LSFActionDeclarationImpl"
-    implements="com.lsfusion.lang.psi.declarations.LSFActionDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.LSFInterfacePropStatement"
-    stubClass = "com.lsfusion.lang.psi.stubs.ActionStubElement"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFStatementActionDeclarationImpl"
+    implements="com.lsfusion.lang.psi.declarations.LSFStatementActionDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.LSFInterfacePropStatement"
+    stubClass = "com.lsfusion.lang.psi.stubs.StatementActionStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
     methods = [ getContextModifier getContextInferrer getDocumentation]
 }

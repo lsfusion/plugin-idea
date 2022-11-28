@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class BaseEventActionStubElementType extends ActStubElementType<BaseEventActionStubElement, LSFBaseEventActionDeclaration> {
+//по аналогии с AggrParamPropStubElementType
+public class BaseEventActionStubElementType extends ActionStubElementType<BaseEventActionStubElement, LSFBaseEventActionDeclaration> {
 
     public BaseEventActionStubElementType() {
         super("BASEEVENTACTION");

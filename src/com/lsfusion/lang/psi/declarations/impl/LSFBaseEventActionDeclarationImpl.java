@@ -2,15 +2,11 @@ package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.context.ModifyParamContext;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFBaseEventActionDeclaration;
 import com.lsfusion.lang.psi.stubs.BaseEventActionStubElement;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +14,6 @@ import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
 // здесь не надо городить огород со стабами так как тут все явно и можно использовать одну реализацию как для heavy так и для light
 public abstract class LSFBaseEventActionDeclarationImpl extends LSFFullNameDeclarationImpl<LSFBaseEventActionDeclaration, BaseEventActionStubElement> implements LSFBaseEventActionDeclaration {
 
@@ -43,34 +38,10 @@ public abstract class LSFBaseEventActionDeclarationImpl extends LSFFullNameDecla
         return false;
     }
 
-    public Set<String> getExplicitValues() {
-        return Collections.emptySet();
-    }
-
     @Override
     public String getValuePresentableText() {
-        Set<String> paramExplicitValues = getExplicitValues();
-        String valueText = "?";
-        if(paramExplicitValues != null) {
-            valueText = StringUtils.join(paramExplicitValues,",");
-        }
-        return ": " + valueText;
+        return getParamDeclare().getText();
     }
-
-    @Override
-    public String getPresentableText() {
-        return getDeclName() + getParamPresentableText();
-    }
-
-    @Override
-    public String getParamPresentableText() {
-        LSFExplicitClasses paramExplicitClasses = getExplicitParams();
-        if(paramExplicitClasses instanceof LSFExplicitSignature)
-            return LSFStringClassRef.getParamPresentableText(((LSFExplicitSignature)paramExplicitClasses).signature);
-
-        // super
-        return LSFActionOrGlobalPropDeclarationImpl.getParamPresentableText(resolveParamClasses());    
-    }        
 
     @Override
     public boolean isAction() {
@@ -94,41 +65,18 @@ public abstract class LSFBaseEventActionDeclarationImpl extends LSFFullNameDecla
 
     @Override
     public Set<LSFActionOrGlobalPropDeclaration<?, ?>> getDependencies() {
-        return Collections.EMPTY_SET;
-    }
-    
-    public LSFAggrPropertyDefinition getAggrPropertyDefinition() {
-        ModifyParamContext paramContext = PsiTreeUtil.getParentOfType(this, ModifyParamContext.class);
-        if(paramContext instanceof LSFPropertyStatement) {
-            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = ((LSFPropertyStatement)paramContext).getPropertyCalcStatement().getExpressionUnfriendlyPD();
-            if(expressionUnfriendlyPD != null)
-                return expressionUnfriendlyPD.getAggrPropertyDefinition();
-        }
-        return null;
-    }
-
-    @Override
-    public List<LSFClassSet> resolveParamClasses() {
-        LSFExplicitClasses explicitParams = getExplicitParams();
-        if(explicitParams instanceof LSFExplicitSignature) {
-            return LSFStringClassRef.resolve(((LSFExplicitSignature)explicitParams).signature, getLSFFile());
-        }
-
-        return LSFExClassSet.fromEx(resolveExParamClasses());
+        return Collections.emptySet();
     }
 
     @Override
     public List<LSFExClassSet> resolveExParamClassesNoCache() {
-        LSFAggrPropertyDefinition aggrProp = getAggrPropertyDefinition();
-        if(aggrProp != null)
-            return Collections.singletonList(LSFExClassSet.toEx(LSFPsiImplUtil.resolveClass(aggrProp.getCustomClassUsage())));
-        return null;
+        return Collections.emptyList();
     }
     
     @Nullable
     @Override
     public List<LSFExClassSet> inferParamClasses(LSFExClassSet valueClass) {
-        return resolveExParamClasses();
+        return Collections.emptyList();
     }
 
     @Override

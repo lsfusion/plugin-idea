@@ -1,34 +1,27 @@
 package com.lsfusion.lang.psi.stubs.types;
 
-import com.intellij.psi.stubs.StubElement;
-import com.intellij.psi.stubs.StubInputStream;
-import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
-import com.lsfusion.lang.psi.impl.LSFActionStatementImpl;
-import com.lsfusion.lang.psi.stubs.ActionStubElement;
-import com.lsfusion.lang.psi.stubs.impl.ActionStubImpl;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.stubs.StubIndexKey;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
+import com.lsfusion.lang.psi.indexes.ActionIndex;
+import com.lsfusion.lang.psi.indexes.LSFIndexKeys;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
+import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
+import com.lsfusion.util.BaseUtils;
 
-import java.io.IOException;
+//по аналогии с PropStubElementStype
+public abstract class ActionStubElementType<StubT extends ActionOrPropStubElement<StubT, PsiT>, PsiT extends LSFActionOrGlobalPropDeclaration<PsiT, StubT>> extends ActionOrPropStubElementType<StubT, PsiT> {
 
-public class ActionStubElementType extends ActStubElementType<ActionStubElement, LSFActionDeclaration> {
-
-    public ActionStubElementType() {
-        super("ACTION");
+    public ActionStubElementType(String debugName) {
+        super(debugName);
     }
 
     @Override
-    public LSFActionDeclaration createPsi(@NotNull ActionStubElement stub) {
-        return new LSFActionStatementImpl(stub, this);
+    public LSFStringStubIndex<PsiT> getGlobalIndex() {
+        return BaseUtils.immutableCast(ActionIndex.getInstance());
     }
 
     @Override
-    public ActionStubElement createStub(@NotNull LSFActionDeclaration psi, StubElement parentStub) {
-        return new ActionStubImpl(parentStub, psi);
+    public StubIndexKey<String, PsiT> getGlobalIndexKey() {
+        return BaseUtils.immutableCast(LSFIndexKeys.ACTION);
     }
-
-    @Override
-    public ActionStubElement deserialize(StubInputStream dataStream, StubElement parentStub) throws IOException {
-        return new ActionStubImpl(dataStream, parentStub, this);
-    }
-
 }

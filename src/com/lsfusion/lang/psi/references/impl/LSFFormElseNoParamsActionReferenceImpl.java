@@ -28,11 +28,11 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
         return LSFStubElementTypes.FORM; // по умолчанию ищем свойства
     }
 
-
-    protected Condition<LSFActionDeclaration> getActionCondition() {
+//вроде, тут нужен именно LSFStatementActionDeclaration
+    protected Condition<LSFStatementActionDeclaration> getActionCondition() {
         final List<LSFClassSet> fDirectClasses = new ArrayList<>();
         return new Condition<>() {
-            public boolean value(LSFActionDeclaration decl) {
+            public boolean value(LSFStatementActionDeclaration decl) {
                 List<LSFClassSet> declClasses = decl.resolveParamClasses();
                 return declClasses == null || (declClasses.size() == fDirectClasses.size() && LSFPsiImplUtil.containsAll(declClasses, fDirectClasses, false));
             }
@@ -49,7 +49,7 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
 
         // ищем действия
         if(declarations.isEmpty()) {
-            declarations = LSFFullNameReferenceImpl.findElements(this, Collections.singletonList(LSFStubElementTypes.ACTION), getActionCondition(), BaseUtils.immutableCast(getFinalizer()));
+            declarations = LSFFullNameReferenceImpl.findElements(this, Collections.singletonList(LSFStubElementTypes.STATEMENTACTION), getActionCondition(), BaseUtils.immutableCast(getFinalizer()));
         }
 
         return declarations;
@@ -60,7 +60,7 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
         Collection<? extends LSFFormOrActionDeclaration> declarations = BaseUtils.emptyList();
 
         if(declarations.isEmpty())
-            declarations = new CollectionQuery<LSFActionDeclaration>(LSFFullNameReferenceImpl.findNoConditionElements(this, Collections.singletonList(LSFStubElementTypes.ACTION), BaseUtils.immutableCast(getFinalizer()))).findAll();
+            declarations = new CollectionQuery<LSFStatementActionDeclaration>(LSFFullNameReferenceImpl.findNoConditionElements(this, Collections.singletonList(LSFStubElementTypes.STATEMENTACTION), BaseUtils.immutableCast(getFinalizer()))).findAll();
 
         return declarations;
     }

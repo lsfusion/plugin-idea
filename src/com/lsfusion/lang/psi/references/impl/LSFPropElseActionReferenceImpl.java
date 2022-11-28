@@ -6,19 +6,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.CollectionQuery;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.Finalizer;
-import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFNoContextActionOrPropertyUsage;
-import com.lsfusion.lang.psi.LSFNoContextPropertyUsage;
 import com.lsfusion.lang.psi.context.PropertyUsageContext;
 import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.references.LSFPropElseActionReference;
-import com.lsfusion.lang.psi.stubs.ActionStubElement;
-import com.lsfusion.lang.psi.stubs.types.ActionStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -65,12 +60,12 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
 
         // ищем действия
         if(declarations.isEmpty()) {
-            declarations = LSFFullNameReferenceImpl.findElements(this, Collections.singletonList(LSFStubElementTypes.ACTION), BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getDirectCondition()), BaseUtils.immutableCast(getFinalizer()));
+            declarations = LSFFullNameReferenceImpl.findElements(this, Collections.singletonList(LSFStubElementTypes.STATEMENTACTION), BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getDirectCondition()), BaseUtils.immutableCast(getFinalizer()));
         }
 
         if(declarations.isEmpty()) {
             if (canBeUsedInDirect()) {
-                declarations = LSFFullNameReferenceImpl.findElements(this, Collections.singletonList(LSFStubElementTypes.ACTION), BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
+                declarations = LSFFullNameReferenceImpl.findElements(this, Collections.singletonList(LSFStubElementTypes.STATEMENTACTION), BaseUtils.<Condition<LSFActionDeclaration>>immutableCast(getInDirectCondition()), Finalizer.EMPTY);
             }
         }
 

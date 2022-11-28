@@ -487,7 +487,7 @@ public class FormEntity {
 
     private PropertyDrawEntity addFormButton(String sID) {
         return new PropertyDrawEntity(null, sID, new ArrayList<>(),
-                LSFGlobalResolver.findSystemElement(sID, file, LSFStubElementTypes.ACTION),
+                LSFGlobalResolver.findSystemElement(sID, file, LSFStubElementTypes.STATEMENTACTION),
                 true, null, null, null, null, this);
     }
 
