@@ -855,13 +855,16 @@ windowTypeLiteral ::= FLOAT | DOCKED | EMBEDDED | POPUP | (IN componentID)
 staticDestination ::= TO noParamsPropertyUsage
 groupObjectDestination ::= TO groupObjectUsage EQUALS propertyUsage (COMMA groupObjectUsage EQUALS propertyUsage)*
 
+selectTop ::= TOP intLiteral
+selectTops ::= TOP ((groupObjectUsage EQUALS intLiteral (COMMA groupObjectUsage EQUALS intLiteral)*) | intLiteral)
+
 printActionPropertyDefinitionBody ::=
 	    PRINT (CLIENT | SERVER)? mappedForm contextFiltersClause?
 	    (
 		    (
 		        MESSAGE
 		        syncTypeLiteral?
-		        (TOP intLiteral)?
+		        selectTop?
 		    )
 		    |
 		    (
@@ -896,7 +899,7 @@ exportActionPropertyDefinitionBody ::=
                 |   XLSX sheetExpression? hasHeaderOption?
                 |   TABLE
                 )
-                (TOP intLiteral)?
+                selectTops?
                 groupObjectDestination
             )
         |
@@ -904,7 +907,7 @@ exportActionPropertyDefinitionBody ::=
                 (   JSON (CHARSET stringLiteral)?
                 |   XML hasHeaderOption? (CHARSET stringLiteral)?
                 )?
-                (TOP intLiteral)?
+                selectTops?
                 staticDestination?
             )
         )
@@ -934,7 +937,7 @@ exportDataActionPropertyDefinitionBody ::=
         |   XML hasHeaderOption? (ROOT propertyExpression)? (TAG propertyExpression)? ATTR? (CHARSET stringLiteral)?
         |   TABLE
         )?
-        (TOP intLiteral)?
+        selectTop?
         FROM nonEmptyAliasedPropertyExpressionList
         wherePropertyExpression?
         (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)?

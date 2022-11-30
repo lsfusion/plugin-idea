@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.252</b><br>
+        <b>Version 1.0.253</b><br>
         <ul>
-            <li>LSF formatter extra improvements</li>
-            <li>Named events support</li>
-            <li>GOAFTER / AFTER support action without params</li>
+            <li>EXPORT 'TOP' option for groupObject</li>
         </ul>
     ]]>
     </change-notes>
