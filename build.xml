@@ -65,9 +65,9 @@
     <property name="javac2.home" value="${idea.home}/plugins/java/lib"/>
     <path id="javac2.classpath">
         <pathelement location="${javac2.home}/javac2.jar"/>
-        <pathelement location="${idea.home}/lib/3rd-party.jar"/>
+        <pathelement location="${idea.home}/lib/3rd-party-rt.jar"/>
         <pathelement location="${idea.home}/lib/jdom.jar"/>
-        <pathelement location="${idea.home}/lib/asm-all-9.1.jar"/>
+        <pathelement location="${idea.home}/lib/asm-9.2.jar"/>
         <pathelement location="${idea.home}/lib/forms_rt.jar"/>
         <pathelement location="${idea.home}/lib/util.jar"/>
     </path>
@@ -118,8 +118,9 @@
         <pathelement location="${buildLib}/grammar-kit.jar"/>
         <file name="${basedir}/lib/psiImplUtils.jar"/>
         <fileset dir="${idea.home}/lib">
-            <include name="3rd-party.jar"/>
-            <include name="asm-all-9.1.jar"/>
+            <include name="3rd-party-rt.jar"/>
+            <include name="app.jar"/>
+            <include name="asm-9.2.jar"/>
             <include name="automaton-1.12-1.jar"/>
             <include name="extensions.jar"/>
             <include name="guava-29.0-jre.jar"/>
@@ -132,6 +133,7 @@
             <include name="testFramework.jar"/>
             <include name="trove4j.jar"/>
             <include name="util.jar"/>
+            <include name="util_rt.jar"/>
         </fileset>
     </path>
 
