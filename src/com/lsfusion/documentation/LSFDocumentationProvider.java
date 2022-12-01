@@ -4,7 +4,8 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.LSFParserDefinition;
@@ -14,11 +15,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.jsoup.select.Elements;
 
 import java.awt.*;
-import java.io.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +128,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
             }
 
             return Jsoup.clean(article.html(), "https://docs.lsfusion.org/",
-                    Whitelist.relaxed()
+                    Safelist.relaxed()
                             .addAttributes("div", "class", "style")
                             .addAttributes("span", "style"));
         } catch (IOException e) {
