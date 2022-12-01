@@ -10,6 +10,7 @@
         <b>Version 1.0.253</b><br>
         <ul>
             <li>EXPORT 'TOP' option for groupObject</li>
+            <li>NEWSESSION FORMS support</li>
         </ul>
     ]]>
     </change-notes>

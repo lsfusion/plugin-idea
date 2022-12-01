@@ -1211,7 +1211,7 @@ nestedSessionOperator ::= NESTEDSESSION
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
-newSessionActionPropertyDefinitionBody ::= (    newSessionOperator (NEWSQL)? nestedPropertiesSelector?
+newSessionActionPropertyDefinitionBody ::= (    newSessionOperator (NEWSQL)? (FORMS nonEmptyFormUsageList)? nestedPropertiesSelector?
                                            |    nestedSessionOperator
                                            )
                                            (SINGLE)?
