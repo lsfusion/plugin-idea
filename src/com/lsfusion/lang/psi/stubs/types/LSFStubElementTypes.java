@@ -13,7 +13,8 @@ public interface LSFStubElementTypes {
     MetaStubElementType META = new MetaStubElementType();
     StatementPropStubElementType STATEMENTPROP = new StatementPropStubElementType();
     AggrParamPropStubElementType AGGRPARAMPROP = new AggrParamPropStubElementType();
-    ActionStubElementType ACTION = new ActionStubElementType();
+    StatementActionStubElementType STATEMENTACTION = new StatementActionStubElementType();
+    BaseEventActionStubElementType BASEEVENTACTION = new BaseEventActionStubElementType();
     FormStubElementType FORM = new FormStubElementType();
     GroupStubElementType GROUP = new GroupStubElementType();
     TableStubElementType TABLE = new TableStubElementType();

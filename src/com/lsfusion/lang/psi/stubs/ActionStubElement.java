@@ -1,6 +1,6 @@
 package com.lsfusion.lang.psi.stubs;
 
-import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 
-public interface ActionStubElement extends ActionOrPropStubElement<ActionStubElement, LSFActionDeclaration>, FormOrActionStubElement<ActionStubElement, LSFActionDeclaration> {
+public interface ActionStubElement<This extends ActionOrPropStubElement<This, Decl>, Decl extends LSFActionOrGlobalPropDeclaration<Decl, This>> extends ActionOrPropStubElement<This, Decl> {
 }
