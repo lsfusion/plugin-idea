@@ -26,8 +26,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.lsfusion.lang.LSFElementGenerator.createLocalizedStringValueLiteral;
-
 public abstract class LSFReferencedStringValueLiteral extends ASTWrapperPsiElement implements LSFPropertiesFileValueGetter {
     public LSFReferencedStringValueLiteral(@NotNull ASTNode node) {
         super(node);

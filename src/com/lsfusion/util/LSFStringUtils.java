@@ -4,7 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.lsfusion.util.LSFStringUtils.StringSpecialBlockType.INTERPOLATION;
 import static com.lsfusion.util.LSFStringUtils.StringSpecialBlockType.LOCALIZATION;
 
 public class LSFStringUtils {
@@ -94,14 +96,17 @@ public class LSFStringUtils {
         }
     }
 
-    public static List<SpecialBlock> specialBlockList(@NotNull String s, boolean isExpressionString) {
+    /**
+     * @param literal   literal with quotes
+     */
+    public static List<SpecialBlock> specialBlockList(@NotNull String literal, boolean isExpressionString) {
         List<SpecialBlock> blocks = new ArrayList<>();
         int pos = 0;
         int nestingDepth = 0;
         int blockStartPos = 0;
         StringSpecialBlockType state = StringSpecialBlockType.NONE;
-        while (pos < s.length()) {
-            char c = s.charAt(pos);
+        while (pos < literal.length()) {
+            char c = literal.charAt(pos);
             if (c == '\\') {
                 ++pos;
             } else if (nestingDepth > 0) {
@@ -115,7 +120,7 @@ public class LSFStringUtils {
                     }
                 }
             } else {
-                StringSpecialBlockType type = positionType(s, pos, isExpressionString);
+                StringSpecialBlockType type = positionType(literal, pos, isExpressionString);
                 if (type != StringSpecialBlockType.NONE) {
                     nestingDepth = 1;
                     blockStartPos = pos;
@@ -158,11 +163,30 @@ public class LSFStringUtils {
         return pos < source.length() && source.charAt(pos) == cmp;
     }
 
-    public static boolean hasSpecialBlock(@NotNull String s, boolean isExpressionString) {
-        return !specialBlockList(s, isExpressionString).isEmpty();
+    public static List<SpecialBlock> specialBlockList(@NotNull String literal, boolean isExpressionString, StringSpecialBlockType type) {
+        return specialBlockList(literal, isExpressionString)
+                .stream()
+                .filter(block -> block.type == type)
+                .collect(Collectors.toList());
     }
 
-    public static boolean hasLocalizationBlock(@NotNull String s, boolean isExpressionString) {
-        return specialBlockList(s, isExpressionString).stream().anyMatch(block -> block.type == LOCALIZATION);
+    public static List<SpecialBlock> getInterpolationBlockList(@NotNull String literal, boolean isExpressionString) {
+        return specialBlockList(literal, isExpressionString, INTERPOLATION);
+    }
+
+    public static boolean hasSpecialBlock(@NotNull String literal, boolean isExpressionString) {
+        return !specialBlockList(literal, isExpressionString).isEmpty();
+    }
+
+    public static boolean hasLocalizationBlock(@NotNull String literal, boolean isExpressionString) {
+        return hasBlock(literal, isExpressionString, LOCALIZATION);
+    }
+
+    public static boolean hasInterpolationBlock(@NotNull String literal, boolean isExpressionString) {
+        return hasBlock(literal, isExpressionString, INTERPOLATION);
+    }
+
+    private static boolean hasBlock(@NotNull String literal, boolean isExpressionString, final StringSpecialBlockType type) {
+        return specialBlockList(literal, isExpressionString).stream().anyMatch(block -> block.type == type);
     }
 }

@@ -7,7 +7,6 @@ import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import static com.lsfusion.lang.LSFElementGenerator.createLocalizedStringValueLiteral;
-import static com.lsfusion.util.LSFStringUtils.unquote;
 
 public class LSFLocalizedStringValueLiteralImpl extends LSFReferencedStringValueLiteral implements LSFLocalizedStringValueLiteral {
     public LSFLocalizedStringValueLiteralImpl(@NotNull ASTNode node) {
@@ -36,7 +35,7 @@ public class LSFLocalizedStringValueLiteralImpl extends LSFReferencedStringValue
 
     @Override
     public boolean needToBeLocalized() {
-        return LSFStringUtils.hasLocalizationBlock(unquote(getText()), false);
+        return LSFStringUtils.hasLocalizationBlock(getText(), false);
     }
 
     @Override
@@ -44,7 +43,6 @@ public class LSFLocalizedStringValueLiteralImpl extends LSFReferencedStringValue
         return needToBeLocalized();
     }
 
-    // do we need to override?
     @Override
     public PsiElement handleElementRename(@NotNull String newText) throws IncorrectOperationException {
         LSFLocalizedStringValueLiteral newLiteral = createLocalizedStringValueLiteral(getProject(), newText);
