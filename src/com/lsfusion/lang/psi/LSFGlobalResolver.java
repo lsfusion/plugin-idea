@@ -361,17 +361,21 @@ public class LSFGlobalResolver {
     }
 
     public static Collection<LSFClassDeclaration> findChildrenExtends(LSFClassDeclaration decl, Project project, GlobalSearchScope scope) {
+        return findChildrenExtendsMap(decl, project, scope).values();
+    }
+
+    public static Map<LSFClassExtend, LSFClassDeclaration> findChildrenExtendsMap(LSFClassDeclaration decl, Project project, GlobalSearchScope scope) {
 
         String name = decl.getGlobalName();
 
         Collection<LSFClassExtend> classExtends = getItemsFromIndex(ClassExtendsClassIndex.getInstance(), name, project, scope, LSFLocalSearchScope.GLOBAL);
 
-        Collection<LSFClassDeclaration> result = new ArrayList<>();
+        Map<LSFClassExtend, LSFClassDeclaration> result = new HashMap<>();
         for (LSFClassExtend classExtend : classExtends) {
             if (classExtend.resolveExtends().contains(decl)) {
                 LSFClassDeclaration thisDecl = (LSFClassDeclaration) classExtend.resolveDecl();
                 if (thisDecl != null)
-                    result.add(thisDecl);
+                    result.put(classExtend, thisDecl);
             }
         }
         return result;

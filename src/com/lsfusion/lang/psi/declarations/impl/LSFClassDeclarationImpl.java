@@ -12,6 +12,7 @@ import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
+import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFClassExtendImpl;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.stubs.ClassStubElement;
@@ -77,12 +78,12 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
         return names.toArray(new PsiElement[0]);
     }
 
-    public static Set<LSFClassDeclaration> processChildrenSearch(LSFClassDeclaration classDecl, Project project) {
-        Set<LSFClassDeclaration> result = new ArrayListSet<>();
-        Collection<LSFClassDeclaration> classExtends = LSFGlobalResolver.findChildrenExtends(classDecl, project, GlobalSearchScope.allScope(project));
-        for (LSFClassDeclaration lsfClassDeclaration : classExtends) {
-            result.add(lsfClassDeclaration);
-            result.addAll(processChildrenSearch(lsfClassDeclaration, project));
+    public static Set<LSFClassExtend> processChildrenSearch(LSFClassDeclaration classDecl, Project project) {
+        Set<LSFClassExtend> result = new ArrayListSet<>();
+        Map<LSFClassExtend, LSFClassDeclaration> classExtends = LSFGlobalResolver.findChildrenExtendsMap(classDecl, project, GlobalSearchScope.allScope(project));
+        for (Map.Entry<LSFClassExtend, LSFClassDeclaration> entry : classExtends.entrySet()) {
+            result.add(entry.getKey());
+            result.addAll(processChildrenSearch(entry.getValue(), project));
         }
         return result;
     }
