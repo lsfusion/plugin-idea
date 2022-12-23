@@ -85,11 +85,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     @Override
     public Condition<LSFMetaDeclaration> getCondition() {
         final int paramCount = getParamCount();
-        return new Condition<>() {
-            public boolean value(LSFMetaDeclaration decl) {
-                return decl.getParamCount() == paramCount;
-            }
-        };
+        return decl -> decl.getParamCount() == paramCount;
     }
 
     @Override

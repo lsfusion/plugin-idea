@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class LSFResolveUtil {
 
@@ -19,12 +20,7 @@ public class LSFResolveUtil {
         if (elements == null) {
             return ResolveResult.EMPTY_ARRAY;
         }
-        elements = ContainerUtil.filter(elements, new Condition<PsiElement>() {
-            @Override
-            public boolean value(PsiElement element) {
-                return element != null;
-            }
-        });
+        elements = ContainerUtil.filter(elements, (Condition<PsiElement>) Objects::nonNull);
         final ResolveResult[] result = new ResolveResult[elements.size()];
         for (int i = 0, size = elements.size(); i < size; i++) {
             result[i] = new PsiElementResolveResult(elements.get(i));
@@ -37,12 +33,7 @@ public class LSFResolveUtil {
             return null;
         }
 
-        declarations = ContainerUtil.filter(declarations, new Condition<LSFDeclaration>() {
-            @Override
-            public boolean value(LSFDeclaration lsfDeclaration) {
-                return lsfDeclaration != null;
-            }
-        });
+        declarations = ContainerUtil.filter(declarations, (Condition<LSFDeclaration>) Objects::nonNull);
         return (T) (declarations.size() != 1 ? null : declarations.iterator().next());
     }
 }

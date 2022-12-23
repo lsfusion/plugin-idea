@@ -177,10 +177,6 @@ public abstract class LSFMetaDeclarationImpl extends LSFFullNameDeclarationImpl<
             return Conditions.alwaysFalse();
         }
         final int paramCount = metaDeclIdList.getMetaDeclIdList().size();
-        return new Condition<>() {
-            public boolean value(LSFMetaDeclaration decl) {
-                return decl.getParamCount() == paramCount;
-            }
-        };
+        return decl -> decl.getParamCount() == paramCount;
     }
 }

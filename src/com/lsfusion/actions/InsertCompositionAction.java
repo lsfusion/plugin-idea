@@ -26,7 +26,6 @@ import com.lsfusion.lang.classes.ConcatenateClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
 import com.lsfusion.lang.psi.context.LSFExpression;
 import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.typeinfer.InferExResult;
@@ -156,54 +155,51 @@ public class InsertCompositionAction extends AnAction {
     }
 
     private <T extends LSFActionOrPropDeclaration> void insertComposition(final Editor editor, final LSFExpression expr, final LSFValueClass valueClass, final T composition) {
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-            @Override
-            public void run() {
-                Document document = editor.getDocument();
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            Document document = editor.getDocument();
 
-                RangeMarker rangeMarker = document.createRangeMarker(expr.getTextRange());
-                rangeMarker.setGreedyToLeft(false);
-                rangeMarker.setGreedyToRight(false);
+            RangeMarker rangeMarker = document.createRangeMarker(expr.getTextRange());
+            rangeMarker.setGreedyToLeft(false);
+            rangeMarker.setGreedyToRight(false);
 
-                List<LSFClassSet> paramClasses = composition.resolveParamClasses();
-                int newCaretPosition;
-                if (paramClasses == null || paramClasses.size() == 1) {
-                    String newText = composition.getDeclName() + "(" + expr.getText() + ")";
-                    document.replaceString(rangeMarker.getStartOffset(), rangeMarker.getEndOffset(), newText);
-                    newCaretPosition = rangeMarker.getEndOffset();
-                } else {
-                    int exprIndex = -1;
-                    String commaPrefix = "";
-                    String commaPostfix = "";
-                    for (int i = 0; i < paramClasses.size(); i++) {
-                        LSFValueClass paramClass = paramClasses.get(i).getCommonClass();
-                        if (valueClass.equals(paramClass)) {
-                            exprIndex = i;
-                        } else {
-                            if (exprIndex == -1) {
-                                //доп. проверка, если почему-то не нашли параметра с соотв. классом
-                                if (i <= paramClasses.size() - 1) {
-                                    commaPrefix += ", ";
-                                }
-                            } else {
-                                commaPostfix += ", ";
-                            }
-                        }
-                    }
-
-                    document.insertString(rangeMarker.getStartOffset(), composition.getDeclName() + "(" + commaPrefix);
-                    document.insertString(rangeMarker.getEndOffset(), commaPostfix + ")");
-
-                    if (exprIndex != 0) {
-                        newCaretPosition = rangeMarker.getStartOffset() - commaPrefix.length();
+            List<LSFClassSet> paramClasses = composition.resolveParamClasses();
+            int newCaretPosition;
+            if (paramClasses == null || paramClasses.size() == 1) {
+                String newText = composition.getDeclName() + "(" + expr.getText() + ")";
+                document.replaceString(rangeMarker.getStartOffset(), rangeMarker.getEndOffset(), newText);
+                newCaretPosition = rangeMarker.getEndOffset();
+            } else {
+                int exprIndex = -1;
+                String commaPrefix = "";
+                String commaPostfix = "";
+                for (int i = 0; i < paramClasses.size(); i++) {
+                    LSFValueClass paramClass = paramClasses.get(i).getCommonClass();
+                    if (valueClass.equals(paramClass)) {
+                        exprIndex = i;
                     } else {
-                        newCaretPosition = rangeMarker.getEndOffset() + 2; // i.e. + ", ".length
+                        if (exprIndex == -1) {
+                            //доп. проверка, если почему-то не нашли параметра с соотв. классом
+                            if (i <= paramClasses.size() - 1) {
+                                commaPrefix += ", ";
+                            }
+                        } else {
+                            commaPostfix += ", ";
+                        }
                     }
                 }
 
-                editor.getCaretModel().moveToOffset(newCaretPosition);
-                rangeMarker.dispose();
+                document.insertString(rangeMarker.getStartOffset(), composition.getDeclName() + "(" + commaPrefix);
+                document.insertString(rangeMarker.getEndOffset(), commaPostfix + ")");
+
+                if (exprIndex != 0) {
+                    newCaretPosition = rangeMarker.getStartOffset() - commaPrefix.length();
+                } else {
+                    newCaretPosition = rangeMarker.getEndOffset() + 2; // i.e. + ", ".length
+                }
             }
+
+            editor.getCaretModel().moveToOffset(newCaretPosition);
+            rangeMarker.dispose();
         });
     }
 

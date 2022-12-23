@@ -32,12 +32,6 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
          return reference.resolveNoCache();
     }
 
-    public static List<String> getIDs(LSFMetaDeclIdList idList) {
-        List<String> result = new ArrayList();
-        for(LSFMetaDeclId id : idList.getMetaDeclIdList())
-            result.add(id.getText());
-        return result;
-    }
     public static Query<PsiReference> searchWordUsages(Project project, String compoundID) {
         SearchRequestCollector request = new SearchRequestCollector(new SearchSession());
         request.searchWord(compoundID, new LSFFilesSearchScope(project), UsageSearchContext.IN_CODE, true, new RequestResultProcessor() {
@@ -69,14 +63,13 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
             }
         };
         final List<LSFMetaCodeStatement> result = new ArrayList<>();
-        searchWordUsages(file.getProject(), name).forEach(new Processor<>() { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
-            public boolean process(PsiReference ref) {
-                if (ref instanceof LSFMetaReference && ((LSFMetaReference) ref).isResolveToVirt(virtDecl))
-                    synchronized (result) {
-                        result.add((LSFMetaCodeStatement) ref);
-                    }
-                return true;
-            }
+        // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
+        searchWordUsages(file.getProject(), name).forEach(ref -> {
+            if (ref instanceof LSFMetaReference && ((LSFMetaReference) ref).isResolveToVirt(virtDecl))
+                synchronized (result) {
+                    result.add((LSFMetaCodeStatement) ref);
+                }
+            return true;
         });
         return result;
     }

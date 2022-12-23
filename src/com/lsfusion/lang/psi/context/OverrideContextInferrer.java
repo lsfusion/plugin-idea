@@ -11,10 +11,6 @@ public class OverrideContextInferrer<T extends ContextInferrer> implements Conte
 
     protected final List<? extends T> modifiers;
 
-    public OverrideContextInferrer(List<? extends T> modifiers) {
-        this.modifiers = modifiers;
-    }
-
     public OverrideContextInferrer(T modifier1, T modifier2) {
         List<T> modifiers = new ArrayList<>();
         modifiers.add(modifier1);

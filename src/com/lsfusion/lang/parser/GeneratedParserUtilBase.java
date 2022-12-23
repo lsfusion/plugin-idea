@@ -34,12 +34,7 @@ public class GeneratedParserUtilBase {
 
     private static final Logger LOG = Logger.getInstance("com.lsfusion.lang.parser.GeneratedParserUtilBase");
 
-    public static final WhitespacesAndCommentsBinder GREEDY_WHITESPACE_AND_COMMENTS_PROCESSOR = new WhitespacesAndCommentsBinder() {
-        @Override
-        public int getEdgePosition(final List<? extends IElementType> tokens, final boolean atStreamEdge, final TokenTextGetter getter) {
-            return tokens.size();
-        }
-    };
+    public static final WhitespacesAndCommentsBinder GREEDY_WHITESPACE_AND_COMMENTS_PROCESSOR = (tokens, atStreamEdge, getter) -> tokens.size();
 
     private static final int MAX_RECURSION_LEVEL = 1000;
     private static final int MAX_VARIANTS_SIZE = 10000;
@@ -55,21 +50,13 @@ public class GeneratedParserUtilBase {
         boolean parse(PsiBuilder builder, int level);
     }
 
-    public static final Parser TOKEN_ADVANCER = new Parser() {
-        @Override
-        public boolean parse(PsiBuilder builder, int level) {
-            if (builder.eof()) return false;
-            builder.advanceLexer();
-            return true;
-        }
+    public static final Parser TOKEN_ADVANCER = (builder, level) -> {
+        if (builder.eof()) return false;
+        builder.advanceLexer();
+        return true;
     };
 
-    public static final Parser TRUE_CONDITION = new Parser() {
-        @Override
-        public boolean parse(PsiBuilder builder, int level) {
-            return true;
-        }
-    };
+    public static final Parser TRUE_CONDITION = (builder, level) -> true;
 
     public static boolean eof(PsiBuilder builder_, int level_) {
         return builder_.eof();
@@ -762,28 +749,25 @@ public class GeneratedParserUtilBase {
         final LinkedList<Pair<PsiBuilder.Marker, Integer>> siblingList = new LinkedList<>();
         PsiBuilder.Marker marker = null;
 
-        final Runnable checkSiblingsRunnable = new Runnable() {
-            @Override
-            public void run() {
-                main:
-                while (!siblingList.isEmpty()) {
-                    final Pair<PsiBuilder.Marker, PsiBuilder.Marker> parenPair = parenList.peek();
-                    final int rating = siblingList.getFirst().second;
-                    int count = 0;
-                    for (Pair<PsiBuilder.Marker, Integer> pair : siblingList) {
-                        if (pair.second != rating || parenPair != null && pair.first == parenPair.second) break main;
-                        if (++count >= MAX_CHILDREN_IN_TREE) {
-                            final PsiBuilder.Marker parentMarker = pair.first.precede();
-                            while (count-- > 0) {
-                                siblingList.removeFirst();
-                            }
-                            parentMarker.done(chunkType);
-                            siblingList.addFirst(Pair.create(parentMarker, rating + 1));
-                            continue main;
+        final Runnable checkSiblingsRunnable = () -> {
+            main:
+            while (!siblingList.isEmpty()) {
+                final Pair<PsiBuilder.Marker, PsiBuilder.Marker> parenPair = parenList.peek();
+                final int rating = siblingList.getFirst().second;
+                int count = 0;
+                for (Pair<PsiBuilder.Marker, Integer> pair : siblingList) {
+                    if (pair.second != rating || parenPair != null && pair.first == parenPair.second) break main;
+                    if (++count >= MAX_CHILDREN_IN_TREE) {
+                        final PsiBuilder.Marker parentMarker = pair.first.precede();
+                        while (count-- > 0) {
+                            siblingList.removeFirst();
                         }
+                        parentMarker.done(chunkType);
+                        siblingList.addFirst(Pair.create(parentMarker, rating + 1));
+                        continue main;
                     }
-                    break;
                 }
+                break;
             }
         };
         boolean checkParens = state.braces != null && checkBraces;

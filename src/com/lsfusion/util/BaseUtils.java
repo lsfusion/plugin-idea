@@ -59,12 +59,6 @@ public class BaseUtils {
         return result;
     }
 
-    public static <K, V> Map<K, V> override(Map<K, V> map, Map<K, V> override) {
-        Map<K, V> result = new HashMap<>(map);
-        result.putAll(override);
-        return result;
-    }
-
     public static <K> K nvl(K el1, K el2) {
         return el1 != null ? el1 : el2;
     }
@@ -87,13 +81,6 @@ public class BaseUtils {
         return result;
     }
 
-    public static <K> List<K> add(K element, List<K> set) {
-        List<K> result = new ArrayList<>();
-        result.add(element);
-        result.addAll(set);
-        return result;
-    }
-
     public static <K> List<K> toList(K... els) {
         List<K> result = new ArrayList<>();
         Collections.addAll(result, els);
@@ -104,26 +91,9 @@ public class BaseUtils {
         return reverseThis(new ArrayList<>(col));
     }
 
-    public static <K> List<K> toList(Iterable<K> col) {
-        List<K> result = new ArrayList<>();
-        for (K element : col)
-            result.add(element);
-        return result;
-    }
-
-    public static <K> List<K> reverse(Iterable<K> col) {
-        return reverse(toList(col));
-    }
-
     public static <K> List<K> reverseThis(List<K> col) {
         Collections.reverse(col);
         return col;
-    }
-
-    public static <K> Set<K> remove(Set<? extends K> set, K remove) {
-        Set<K> result = new HashSet<>(set);
-        result.remove(remove);
-        return result;
     }
 
     public static <K, V> Map<K, V> filterNotKeys(Map<K, V> map, Set<K> set) {
@@ -256,12 +226,6 @@ public class BaseUtils {
             }
         }
         return null;
-    }
-
-    public static <K, V> Map<V, K> reverse(Map<K, V> fromMap) {
-        HashMap<V, K> reverseMap = new HashMap<>();
-        reverse(fromMap, reverseMap);
-        return reverseMap;
     }
 
     public static <K, V> void reverse(Map<K, V> fromMap, Map<V, K> toMap) {

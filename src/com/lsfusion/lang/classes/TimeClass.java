@@ -4,7 +4,6 @@ import com.lsfusion.util.DateUtils;
 
 import java.text.DateFormat;
 import java.text.Format;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import static com.lsfusion.util.DateUtils.wideFormattableDateTime;
@@ -41,12 +40,6 @@ public class TimeClass extends FormatClass {
     @Override
     public Format getDefaultFormat() {
         return DateUtils.timeFormat;
-    }
-
-    public String formatString(Object obj) throws ParseException {
-        if (obj != null) {
-            return DateUtils.timeFormat.format(obj);
-        } else return "";
     }
 
     @Override

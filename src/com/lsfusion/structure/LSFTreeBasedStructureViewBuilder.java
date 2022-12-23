@@ -10,7 +10,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ui.tree.TreeModelAdapter;
 import com.intellij.util.ui.tree.TreeUtil;
@@ -58,12 +57,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
 
         LSFValueClass currentClass = valueClass;
         if (currentClass == null && editor != null) {
-            PsiElement targetElement = DumbService.getInstance(editor.getProject()).runReadActionInSmartMode(new Computable<>() {
-                @Override
-                public PsiElement compute() {
-                    return TargetElementUtil.findTargetElement(editor, ImplementationSearcher.getFlags());
-                }
-            });
+            PsiElement targetElement = DumbService.getInstance(editor.getProject()).runReadActionInSmartMode(() -> TargetElementUtil.findTargetElement(editor, ImplementationSearcher.getFlags()));
             
             if (targetElement instanceof LSFId) {
                 PsiElement parent = targetElement;
@@ -94,13 +88,10 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
         tree.getModel().addTreeModelListener(new TreeModelAdapter() {
             @Override
             public void treeStructureChanged(TreeModelEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (needTotalExpansion) {
-                            TreeUtil.expandAll(tree);
-                            needTotalExpansion = false;
-                        }
+                SwingUtilities.invokeLater(() -> {
+                    if (needTotalExpansion) {
+                        TreeUtil.expandAll(tree);
+                        needTotalExpansion = false;
                     }
                 });
             }

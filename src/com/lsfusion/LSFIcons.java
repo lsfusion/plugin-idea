@@ -14,7 +14,6 @@ public final class LSFIcons {
     public static final Icon EVENT = AllIcons.Actions.Execute;
     public static final Icon FILE = IconLoader.getIcon("/images/lsf_logo.png");
     public static final Icon MODULE = IconLoader.getIcon("/images/lsf_logo.png");
-    public static final Icon MODULE_2X = IconLoader.getIcon("/images/lsf_logo_2x.png");
     public static final Icon LIBRARY = IconLoader.getIcon("/images/lsf_logo.png");
     public static final Icon RUN = IconLoader.getIcon("/images/lsf_logo.png");
     public static final Icon FOLLOWS = AllIcons.Duplicates.SendToTheRight;

@@ -24,7 +24,6 @@ import com.intellij.xdebugger.frame.XStackFrame;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.psi.LSFActionStatement;
 import com.lsfusion.lang.psi.LSFPropertyDeclaration;
-import com.lsfusion.lang.psi.LSFPropertyStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,12 +72,7 @@ public class LSFStackFrame extends XStackFrame {
 
     @Override
     public void customizePresentation(@NotNull ColoredTextContainer component) {
-        String currentActionName = ApplicationManager.getApplication().runReadAction(new Computable<>() {
-            @Override
-            public String compute() {
-                return getCurrentActionName();
-            }
-        });
+        String currentActionName = ApplicationManager.getApplication().runReadAction((Computable<String>) this::getCurrentActionName);
         component.append("LSF: " + currentActionName + "()", SimpleTextAttributes.REGULAR_ATTRIBUTES);
         component.append(":" + (position.getLine() + 1), SimpleTextAttributes.REGULAR_ATTRIBUTES);
         component.append(", " + position.getFile().getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);

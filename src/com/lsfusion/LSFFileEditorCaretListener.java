@@ -43,19 +43,11 @@ public class LSFFileEditorCaretListener implements CaretListener {
 
         @Override
         public void run() {
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    Editor editor = e.getEditor();
-                    editor.putUserData(Key.findKeyByName("code folding"), null); // reset cache
-                    LSFPropertyParamsFoldingManager.updateFoldRegions(editor);
-                }
-            }, new Condition() {
-                @Override
-                public boolean value(Object o) {
-                    return expired;
-                }
-            });
+            ApplicationManager.getApplication().invokeLater(() -> {
+                Editor editor = e.getEditor();
+                editor.putUserData(Key.findKeyByName("code folding"), null); // reset cache
+                LSFPropertyParamsFoldingManager.updateFoldRegions(editor);
+            }, (Condition) o -> expired);
         }
     }
 }

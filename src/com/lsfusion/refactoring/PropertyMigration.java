@@ -15,10 +15,6 @@ public class PropertyMigration extends ElementMigration {
         this(decl, decl.resolveParamClasses(), decl.resolveParamClasses(), oldName, newName);
     }
 
-    public PropertyMigration(LSFActionOrGlobalPropDeclaration<?, ?> decl, List<LSFClassSet> oldClasses, List<LSFClassSet> newClasses) {
-        this(decl, oldClasses, newClasses, decl.getDeclName(), decl.getDeclName());
-    }
-
     private PropertyMigration(LSFActionOrGlobalPropDeclaration<?, ?> decl, List<LSFClassSet> oldClasses, List<LSFClassSet> newClasses, String oldName, String newName) {
         this(decl, PropertyCanonicalNameUtils.createName(decl.getNamespaceName(), oldName, oldClasses),
                     PropertyCanonicalNameUtils.createName(decl.getNamespaceName(), newName, newClasses), true);

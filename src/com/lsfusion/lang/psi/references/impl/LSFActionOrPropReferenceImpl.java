@@ -29,35 +29,33 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
     }
 
     protected Finalizer<T> getNoConditionFinalizer(List<LSFClassSet> usageClasses) {
-        return new Finalizer<>() {
-            public Collection<T> finalize(Collection<T> decls) {
-                Map<T, Integer> declMap = new HashMap<>();
+        return decls -> {
+            Map<T, Integer> declMap = new HashMap<>();
 
-                GlobalSearchScope scope = GlobalSearchScope.allScope(getProject());
+            GlobalSearchScope scope = GlobalSearchScope.allScope(getProject());
 
-                for (T decl : decls) {
-                    List<LSFClassSet> declClasses = decl.resolveParamClasses();
-                    if (declClasses == null) {
-                        declMap.put(decl, 0);
-                        continue;
-                    }
-
-                    declMap.put(decl, LSFPsiImplUtil.getCommonChildrenCount(declClasses, usageClasses, scope));
+            for (T decl : decls) {
+                List<LSFClassSet> declClasses = decl.resolveParamClasses();
+                if (declClasses == null) {
+                    declMap.put(decl, 0);
+                    continue;
                 }
 
-                int commonClasses = 0;
-                List<T> result = new ArrayList<>();
-                for (Map.Entry<T, Integer> entry : declMap.entrySet()) {
-                    if (entry.getValue() > commonClasses) {
-                        commonClasses = entry.getValue();
-                        result = new ArrayList<>();
-                        result.add(entry.getKey());
-                    } else if (entry.getValue() == commonClasses) {
-                        result.add(entry.getKey());
-                    }
-                }
-                return result;
+                declMap.put(decl, LSFPsiImplUtil.getCommonChildrenCount(declClasses, usageClasses, scope));
             }
+
+            int commonClasses = 0;
+            List<T> result = new ArrayList<>();
+            for (Map.Entry<T, Integer> entry : declMap.entrySet()) {
+                if (entry.getValue() > commonClasses) {
+                    commonClasses = entry.getValue();
+                    result = new ArrayList<>();
+                    result.add(entry.getKey());
+                } else if (entry.getValue() == commonClasses) {
+                    result.add(entry.getKey());
+                }
+            }
+            return result;
         };
     }
 
@@ -111,14 +109,12 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
 
         final List<LSFClassSet> fDirectClasses = directClasses;
         final boolean isImplement = isImplement();
-        return new Condition<>() {
-            public boolean value(T decl) {
-                if(isImplement && !decl.isAbstract())
-                    return false;
+        return decl -> {
+            if(isImplement && !decl.isAbstract())
+                return false;
 
-                List<LSFClassSet> declClasses = decl.resolveParamClasses();
-                return declClasses == null || (declClasses.size() == fDirectClasses.size() && LSFPsiImplUtil.containsAll(declClasses, fDirectClasses, false));
-            }
+            List<LSFClassSet> declClasses = decl.resolveParamClasses();
+            return declClasses == null || (declClasses.size() == fDirectClasses.size() && LSFPsiImplUtil.containsAll(declClasses, fDirectClasses, false));
         };
     }
 
@@ -127,14 +123,12 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         assert canBeUsedInDirect(); // потому как иначе direct бы подошел  
         final boolean isImplement = isImplement();
 
-        return new Condition<>() {
-            public boolean value(T decl) {
-                if(isImplement && !decl.isAbstract())
-                    return false;
+        return decl -> {
+            if(isImplement && !decl.isAbstract())
+                return false;
 
-                List<LSFClassSet> declClasses = decl.resolveParamClasses(); // can be null, since there is also offset check
-                return declClasses == null || (declClasses.size() == usageClasses.size() && LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject())));
-            }
+            List<LSFClassSet> declClasses = decl.resolveParamClasses(); // can be null, since there is also offset check
+            return declClasses == null || (declClasses.size() == usageClasses.size() && LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject())));
         };
     }
 
@@ -150,48 +144,46 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         final boolean isNotEquals = onlyNotEquals || (isImplement() && explicitClasses == null);
 
         final List<LSFClassSet> fDirectClasses = directClasses;
-        return new Finalizer<>() {
-            public Collection<T> finalize(Collection<T> decls) {
+        return decls -> {
 
-                Map<T, List<LSFClassSet>> mapClasses = new HashMap<>();
-                Set<T> equals = isNotEquals ? new HashSet<>() : null;
-                for (T decl : decls) {
-                    List<LSFClassSet> declClasses = decl.resolveParamClasses();
-                    if(declClasses != null && declClasses.size() == fDirectClasses.size()) { // double check, так как из-за recursion guard'а decl.resolvePC может внутри проверки condition возвращать null и соотвественно подходить, а в finalizer'е классы resolve'ся и уже не подходит (можно было бы и containsAll проверять но это серьезный overhead будет)
-                        assert declClasses.size() == fDirectClasses.size();
-                        if(isNotEquals && declClasses.equals(fDirectClasses))
-                            equals.add(decl);
-                        mapClasses.put(decl, declClasses);
-                    }
+            Map<T, List<LSFClassSet>> mapClasses = new HashMap<>();
+            Set<T> equals = isNotEquals ? new HashSet<>() : null;
+            for (T decl : decls) {
+                List<LSFClassSet> declClasses = decl.resolveParamClasses();
+                if(declClasses != null && declClasses.size() == fDirectClasses.size()) { // double check, так как из-за recursion guard'а decl.resolvePC может внутри проверки condition возвращать null и соотвественно подходить, а в finalizer'е классы resolve'ся и уже не подходит (можно было бы и containsAll проверять но это серьезный overhead будет)
+                    assert declClasses.size() == fDirectClasses.size();
+                    if(isNotEquals && declClasses.equals(fDirectClasses))
+                        equals.add(decl);
+                    mapClasses.put(decl, declClasses);
                 }
-
-                if (!mapClasses.isEmpty()) { // есть прямые наследования
-                    Collection<T> result = new ArrayList<>();
-
-                    if((isNotEquals && equals.size() < mapClasses.size()) || onlyNotEquals) // оставим только не равные 
-                        mapClasses = BaseUtils.filterNotKeys(mapClasses, equals);
-
-                    List<T> listMapClasses = new ArrayList<>(mapClasses.keySet());
-                    for (int i = 0, size = listMapClasses.size(); i < size; i++) {
-                        T decl = listMapClasses.get(i);
-                        List<LSFClassSet> classesI = mapClasses.get(decl);
-                        boolean found = false;
-                        for (int j = 0; j < size; j++)
-                            if (i != j) {
-                                List<LSFClassSet> classesJ = mapClasses.get(listMapClasses.get(j));
-                                if (LSFPsiImplUtil.containsAll(classesI, classesJ, true) && !LSFPsiImplUtil.containsAll(classesJ, classesI, true)) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        if (!found) result.add(decl);
-                    }
-
-                    return result;
-                }
-
-                return decls;
             }
+
+            if (!mapClasses.isEmpty()) { // есть прямые наследования
+                Collection<T> result = new ArrayList<>();
+
+                if((isNotEquals && equals.size() < mapClasses.size()) || onlyNotEquals) // оставим только не равные
+                    mapClasses = BaseUtils.filterNotKeys(mapClasses, equals);
+
+                List<T> listMapClasses = new ArrayList<>(mapClasses.keySet());
+                for (int i = 0, size = listMapClasses.size(); i < size; i++) {
+                    T decl = listMapClasses.get(i);
+                    List<LSFClassSet> classesI = mapClasses.get(decl);
+                    boolean found = false;
+                    for (int j = 0; j < size; j++)
+                        if (i != j) {
+                            List<LSFClassSet> classesJ = mapClasses.get(listMapClasses.get(j));
+                            if (LSFPsiImplUtil.containsAll(classesI, classesJ, true) && !LSFPsiImplUtil.containsAll(classesJ, classesI, true)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    if (!found) result.add(decl);
+                }
+
+                return result;
+            }
+
+            return decls;
         };
     }
 

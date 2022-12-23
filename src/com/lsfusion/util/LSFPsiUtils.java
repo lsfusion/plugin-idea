@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageManagerImpl;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -194,15 +193,6 @@ public class LSFPsiUtils {
     @NotNull
     public static List<LSFClassSet> getContextClasses(PsiElement psiElement, int offset, LSFLocalSearchScope localScope, boolean objectRef) {
         return LSFPsiImplUtil.resolveParamDeclClasses(getContextParams(psiElement, offset, localScope, objectRef));
-    }
-
-    public static Set<LSFFile> collectInjectedLSFFiles(VirtualFile file, Project project) {
-        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-        if (psiFile == null) {
-            return Collections.EMPTY_SET;
-        }
-
-        return collectInjectedLSFFiles(psiFile, project);
     }
 
     public static Set<LSFFile> collectInjectedLSFFiles(PsiElement root, Project project) {

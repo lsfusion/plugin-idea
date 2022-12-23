@@ -130,13 +130,10 @@ public class LSFPositionManager extends PositionManagerEx {
     public List<ReferenceType> getAllClasses(@NotNull SourcePosition position) throws NoDataException {
         final PsiFile psiFile = position.getFile();
         if (psiFile instanceof LSFFile) {
-            return ApplicationManager.getApplication().runReadAction(new Computable<>() {
-                @Override
-                public List<ReferenceType> compute() {
-                    LSFFile lsfFile = (LSFFile) psiFile;
-                    String moduleName = lsfFile.getModuleDeclaration().getGlobalName();
-                    return debugProcess.getVirtualMachineProxy().classesByName(DELEGATES_HOLDER_CLASS_FQN_PREFIX + moduleName);
-                }
+            return ApplicationManager.getApplication().runReadAction((Computable<List<ReferenceType>>) () -> {
+                LSFFile lsfFile = (LSFFile) psiFile;
+                String moduleName = lsfFile.getModuleDeclaration().getGlobalName();
+                return debugProcess.getVirtualMachineProxy().classesByName(DELEGATES_HOLDER_CLASS_FQN_PREFIX + moduleName);
             });
         }
         throw NoDataException.INSTANCE;
@@ -147,13 +144,10 @@ public class LSFPositionManager extends PositionManagerEx {
     public ClassPrepareRequest createPrepareRequest(@NotNull final ClassPrepareRequestor requestor, @NotNull SourcePosition position) throws NoDataException {
         final PsiFile psiFile = position.getFile();
         if (psiFile instanceof LSFFile) {
-            return ApplicationManager.getApplication().runReadAction(new Computable<>() {
-                @Override
-                public ClassPrepareRequest compute() {
-                    LSFFile lsfFile = (LSFFile) psiFile;
-                    String moduleName = lsfFile.getModuleDeclaration().getGlobalName();
-                    return debugProcess.getRequestsManager().createClassPrepareRequest(requestor, DELEGATES_HOLDER_CLASS_FQN_PREFIX + moduleName);
-                }
+            return ApplicationManager.getApplication().runReadAction((Computable<ClassPrepareRequest>) () -> {
+                LSFFile lsfFile = (LSFFile) psiFile;
+                String moduleName = lsfFile.getModuleDeclaration().getGlobalName();
+                return debugProcess.getRequestsManager().createClassPrepareRequest(requestor, DELEGATES_HOLDER_CLASS_FQN_PREFIX + moduleName);
             });
         }
         throw NoDataException.INSTANCE;
@@ -162,24 +156,17 @@ public class LSFPositionManager extends PositionManagerEx {
     @Nullable
     @Override
     public XStackFrame createStackFrame(@NotNull StackFrameProxyImpl frame, @NotNull DebugProcessImpl debugProcess, @NotNull final Location location) {
-        final SourcePosition position = ApplicationManager.getApplication().runReadAction(new Computable<>() {
-            @Override
-            public SourcePosition compute() {
-                try {
-                    return getSourcePosition(location);
-                } catch (NoDataException e) {
-                    return null;
-                }
+        final SourcePosition position = ApplicationManager.getApplication().runReadAction((Computable<SourcePosition>) () -> {
+            try {
+                return getSourcePosition(location);
+            } catch (NoDataException e) {
+                return null;
             }
         });
         
         if (position != null) {
-            XSourcePositionImpl xpos = ApplicationManager.getApplication().runReadAction(new Computable<>() {
-                @Override
-                public XSourcePositionImpl compute() {
-                    return XSourcePositionImpl.createByOffset(position.getFile().getVirtualFile(), position.getOffset());
-                }
-            });
+            XSourcePositionImpl xpos = ApplicationManager.getApplication().runReadAction(
+                    (Computable<XSourcePositionImpl>) () -> XSourcePositionImpl.createByOffset(position.getFile().getVirtualFile(), position.getOffset()));
             if (xpos != null) {
                 return new LSFStackFrame(debugProcess.getProject(), frame, debugProcess, xpos);
             }

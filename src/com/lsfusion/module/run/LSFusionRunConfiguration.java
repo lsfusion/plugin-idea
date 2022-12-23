@@ -60,7 +60,7 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
         return (JavaRunConfigurationModule) super.getConfigurationModule();
     }
 
-    public RunProfileState getState(@NotNull final Executor executor, @NotNull final ExecutionEnvironment env) throws ExecutionException {
+    public RunProfileState getState(@NotNull final Executor executor, @NotNull final ExecutionEnvironment env) {
         final JavaCommandLineState state = new LSFServerCommandLineState(this, env, LIGHT_START);
         JavaRunConfigurationModule module = getConfigurationModule();
         state.setConsoleBuilder(TextConsoleBuilderFactory.getInstance().createBuilder(getProject(), module.getSearchScope()));

@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-@SuppressWarnings("MagicConstant")
 public class KeyStrokes {
 
     public static KeyStroke getEnter(int modifiers) {
@@ -36,25 +35,12 @@ public class KeyStrokes {
         return getEnter(InputEvent.CTRL_DOWN_MASK);
     }
 
-    public static KeyStroke getPrintKeyStroke() {
-        return KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
-    }
-
     public static KeyStroke getRefreshKeyStroke() {
         return KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK);
     }
 
-    public static KeyStroke getXlsKeyStroke() {
-        return KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK);
-    }
-    //----
-
     public static KeyStroke getEscape(int modifier) {
         return KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, modifier);
-    }
-
-    public static KeyStroke getSelectionFilterKeyStroke() {
-        return KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK);
     }
 
     public static KeyStroke getAddActionPropertyKeyStroke() {

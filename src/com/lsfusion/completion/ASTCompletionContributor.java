@@ -159,11 +159,8 @@ public class ASTCompletionContributor extends CompletionContributor {
         int completionOffset = StringUtil.isEmptyOrSpaces(prefixText) ? 0 : prefixText.length();
         String text = completionOffset == 0 ? "" : prefixText;
 
-        completeScript(new ScriptCreator() {
-            public PsiFile create(String text, Project project) {
-                return PsiFileFactory.getInstance(project).createFileFromText("a.lsf", LSFLanguage.INSTANCE, text, true, false);
-            }
-        }, parameters, result, originalOffsetShift, file.getProject(), completionOffset, text);
+        completeScript((text1, project) -> PsiFileFactory.getInstance(project).createFileFromText("a.lsf", LSFLanguage.INSTANCE, text1, true, false),
+                parameters, result, originalOffsetShift, file.getProject(), completionOffset, text);
     }
 
     private static void completeInFragment(CompletionParameters parameters, CompletionResultSet result) {
@@ -175,11 +172,8 @@ public class ASTCompletionContributor extends CompletionContributor {
 
         String text = file.getText().substring(0, position.getTextRange().getStartOffset());
 
-        completeScript(new ScriptCreator() {
-            public PsiFile create(String text, Project project) {
-                return new LSFCodeFragment(file.isExpression(), project, file.getContext(), text);
-            }
-        }, parameters, result, 0, position.getProject(), text.length(), text);
+        completeScript((text1, project) -> new LSFCodeFragment(file.isExpression(), project, file.getContext(), text1),
+                parameters, result, 0, position.getProject(), text.length(), text);
     }
 
     private interface ScriptCreator {
@@ -221,25 +215,22 @@ public class ASTCompletionContributor extends CompletionContributor {
         TreeUtil.ensureParsed(tempFile.getNode());
     }
 
-    public static final InsertHandler keywordInsertHandler = new InsertHandler() {
-        @Override
-        public void handleInsert(InsertionContext context, LookupElement item) {
-            Editor editor = context.getEditor();
-            int tailOffset = context.getTailOffset();
-            String lookupString = item.getLookupString();
+    public static final InsertHandler keywordInsertHandler = (context, item) -> {
+        Editor editor = context.getEditor();
+        int tailOffset = context.getTailOffset();
+        String lookupString = item.getLookupString();
 
-            int brIndex = lookupString.lastIndexOf("[");
-            if (brIndex != -1) {
-                int tailLength = lookupString.length() - brIndex - 1;
-                final CaretModel model = editor.getCaretModel();
-                if (model.getOffset() == tailOffset) {
-                    model.moveToOffset(tailOffset - tailLength);
-                }
-            } else {
-                // c/p from com.intellij.codeInsight.lookup.TailTypeDecorator
-                PostprocessReformattingAspect.getInstance(context.getProject()).doPostponedFormatting();
-                TailType.insertChar(editor, tailOffset, ' ', true);
+        int brIndex = lookupString.lastIndexOf("[");
+        if (brIndex != -1) {
+            int tailLength = lookupString.length() - brIndex - 1;
+            final CaretModel model = editor.getCaretModel();
+            if (model.getOffset() == tailOffset) {
+                model.moveToOffset(tailOffset - tailLength);
             }
+        } else {
+            // c/p from com.intellij.codeInsight.lookup.TailTypeDecorator
+            PostprocessReformattingAspect.getInstance(context.getProject()).doPostponedFormatting();
+            TailType.insertChar(editor, tailOffset, ' ', true);
         }
     };
 
@@ -661,10 +652,10 @@ public class ASTCompletionContributor extends CompletionContributor {
                     String namespaceName = extractNamespace();
 
                     addLookupElements(
-                            getVariantsFromIndices(namespaceName, file, asList(FormIndex.getInstance()), FORM_PRIORITY, getRequireScope(), getLocalScope())
+                            getVariantsFromIndices(namespaceName, file, Collections.singletonList(FormIndex.getInstance()), FORM_PRIORITY, getRequireScope(), getLocalScope())
                     );
 
-                    Collection<LSFActionDeclaration> globalDeclarations = getDeclarationsFromScope(false);
+                    Collection<LSFActionDeclaration<?,?>> globalDeclarations = getDeclarationsFromScope(false);
                     addDeclarationsToLookup(new ArrayList<>(), null, namespaceName, globalDeclarations);
 
                     quickLog("Completed formElseNoParamsActionUsage");
@@ -840,7 +831,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             return null;
         }
 
-        public <G extends LSFFullNameDeclaration> List<G> getDeclarationsFromScope(boolean property) {
+        public <G extends LSFFullNameDeclaration<?,?>> List<G> getDeclarationsFromScope(boolean property) {
             return CompletionUtils.getDeclarationsFromScope(project, getRequireScope(), getLocalScope(), property ? PropIndex.getInstance() : ActionIndex.getInstance());
         }
 

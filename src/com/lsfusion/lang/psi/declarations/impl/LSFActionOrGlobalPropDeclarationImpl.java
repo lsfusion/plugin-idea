@@ -176,15 +176,12 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
 
     @Override
     protected Condition<Decl> getFindDuplicatesCondition() {
-        return new Condition<>() {
-            @Override
-            public boolean value(Decl decl) {
-                LSFId nameIdentifier = getNameIdentifier();
-                LSFId otherNameIdentifier = decl.getNameIdentifier();
-                return nameIdentifier != null && otherNameIdentifier != null &&
-                        nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
-                        resolveEquals(resolveParamClasses(), decl.resolveParamClasses());
-            }
+        return decl -> {
+            LSFId nameIdentifier = getNameIdentifier();
+            LSFId otherNameIdentifier = decl.getNameIdentifier();
+            return nameIdentifier != null && otherNameIdentifier != null &&
+                    nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
+                    resolveEquals(resolveParamClasses(), decl.resolveParamClasses());
         };
     }
 

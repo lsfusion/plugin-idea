@@ -8,15 +8,9 @@ import java.util.Map;
 
 public abstract class CachableLayout<C> implements LayoutManager2, Serializable {
 
-    public static final ComponentSizeGetter minSizeGetter = new ComponentSizeGetter() {
-        @Override
-        public Dimension get(Component child) { return child.getMinimumSize(); }
-    };
+    public static final ComponentSizeGetter minSizeGetter = Component::getMinimumSize;
 
-    public static final ComponentSizeGetter prefSizeGetter = new ComponentSizeGetter() {
-        @Override
-        public Dimension get(Component child) { return child.getPreferredSize(); }
-    };
+    public static final ComponentSizeGetter prefSizeGetter = Component::getPreferredSize;
 
     protected final Container target;
     protected final boolean hasConstraints;
@@ -147,10 +141,6 @@ public abstract class CachableLayout<C> implements LayoutManager2, Serializable 
 
     public static int limitedSum(int a, int b, int c) {
         return (int) Math.min((long)a + (long)b + (long)c, Integer.MAX_VALUE);
-    }
-
-    public static int limitedSum(int a, int b, int c, int d) {
-        return (int) Math.min((long)a + (long)b + (long)c + (long)d, Integer.MAX_VALUE);
     }
 
     @Override

@@ -28,10 +28,6 @@ public class ConcatenateClassSet implements LSFClassSet, LSFValueClass {
         return sets;
     }
 
-    public int getSetSize() {
-        return sets.length;
-    }
-
     public LSFClassSet op(LSFClassSet set, boolean or, boolean string) {
         if (!(set instanceof ConcatenateClassSet))
             return null;

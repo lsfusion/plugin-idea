@@ -73,10 +73,6 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
         return BUILDER_DESCRIPTION;
     }
 
-    public Icon getBigIcon() {
-        return LSFIcons.MODULE_2X;
-    }
-
     @Override
     public Icon getNodeIcon() {
         return LSFIcons.MODULE;
@@ -227,13 +223,10 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
             writer.print(content);
             writer.close();
 
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(templateFile);
-                    if (file != null) {
-                        FileEditorManager.getInstance(project).openFile(file, true);
-                    }
+            ApplicationManager.getApplication().invokeLater(() -> {
+                VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(templateFile);
+                if (file != null) {
+                    FileEditorManager.getInstance(project).openFile(file, true);
                 }
             });
 

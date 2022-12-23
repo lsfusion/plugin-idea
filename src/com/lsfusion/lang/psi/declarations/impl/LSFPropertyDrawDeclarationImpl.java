@@ -33,20 +33,18 @@ public abstract class LSFPropertyDrawDeclarationImpl extends LSFFormElementDecla
         
         final LSFSimpleName alias = getSimpleName();
 
-        return new Condition<LSFPropertyDrawDeclaration>() {
-            public boolean value(LSFPropertyDrawDeclaration decl) {
-                LSFSimpleName otherAlias = decl.getSimpleName();
-                if (alias != null || otherAlias != null) {
-                    return alias != null && otherAlias != null && alias.getText().equals(otherAlias.getText());
-                }
-                
-                LSFId nameIdentifier = getNameIdentifier();
-                LSFId otherNameIdentifier = decl.getNameIdentifier();
-
-                return nameIdentifier != null && otherNameIdentifier != null &&
-                       nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
-                       resolveEquals(objectUsageList, decl.getObjectUsageList());
+        return (Condition<LSFPropertyDrawDeclaration>) decl -> {
+            LSFSimpleName otherAlias = decl.getSimpleName();
+            if (alias != null || otherAlias != null) {
+                return alias != null && otherAlias != null && alias.getText().equals(otherAlias.getText());
             }
+
+            LSFId nameIdentifier = getNameIdentifier();
+            LSFId otherNameIdentifier = decl.getNameIdentifier();
+
+            return nameIdentifier != null && otherNameIdentifier != null &&
+                   nameIdentifier.getText().equals(otherNameIdentifier.getText()) &&
+                   resolveEquals(objectUsageList, decl.getObjectUsageList());
         };
     }
 

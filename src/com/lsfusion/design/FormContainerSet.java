@@ -22,10 +22,6 @@ public class FormContainerSet {
     private ContainerView groupContainer;
     private ContainerView toolbarContainer;
 
-    public ContainerView getMainContainer() {
-        return mainContainer;
-    }
-    
     public ContainerView getObjectsContainer() {
         return objectsContainer;
     }

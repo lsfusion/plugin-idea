@@ -12,7 +12,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.Processor;
 import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
@@ -34,12 +33,7 @@ public class LSFPropertyBreakpointType  extends XLineBreakpointTypeBase implemen
 
     private static final String NAME = "lsFusion Property Breakpoint";
 
-    private static Condition<PsiElement> isInPropDeclaration = new Condition<>() {
-        @Override
-        public boolean value(PsiElement psiElement) {
-            return psiElement instanceof LSFLocalDataPropertyDefinition || psiElement instanceof LSFDataPropertyDefinition;
-        }
-    };
+    private static Condition<PsiElement> isInPropDeclaration = psiElement -> psiElement instanceof LSFLocalDataPropertyDefinition || psiElement instanceof LSFDataPropertyDefinition;
     
     protected LSFPropertyBreakpointType() {
         super(ID, NAME, null);
@@ -95,19 +89,16 @@ public class LSFPropertyBreakpointType  extends XLineBreakpointTypeBase implemen
         final Document document = FileDocumentManager.getInstance().getDocument(file);
         if (document != null) {
             final Ref<Boolean> stoppable = Ref.create(false);
-            XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<>() {
-                @Override
-                public boolean process(PsiElement psiElement) {
-                    if (psiElement instanceof PsiWhiteSpace) {
-                        return true;
-                    }
-
-                    if (PsiTreeUtil.findFirstParent(psiElement, true, isInPropDeclaration) != null) {
-                        stoppable.set(true);
-                        return false;
-                    }
+            XDebuggerUtil.getInstance().iterateLine(project, document, line, psiElement -> {
+                if (psiElement instanceof PsiWhiteSpace) {
                     return true;
                 }
+
+                if (PsiTreeUtil.findFirstParent(psiElement, true, isInPropDeclaration) != null) {
+                    stoppable.set(true);
+                    return false;
+                }
+                return true;
             });
 
             return stoppable.get();
@@ -128,13 +119,13 @@ public class LSFPropertyBreakpointType  extends XLineBreakpointTypeBase implemen
     
     @Nullable
     @Override
-    public XBreakpointProperties createProperties() {
+    public XBreakpointProperties<?> createProperties() {
         return new JavaLineBreakpointProperties();
     }
 
     @Nullable
     @Override
-    public XBreakpointProperties createBreakpointProperties(@NotNull VirtualFile file, int line) {
+    public XBreakpointProperties<?> createBreakpointProperties(@NotNull VirtualFile file, int line) {
         return new JavaLineBreakpointProperties();
     }
 }

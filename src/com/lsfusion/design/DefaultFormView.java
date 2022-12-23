@@ -204,14 +204,6 @@ public class DefaultFormView extends FormView {
 
     protected transient Map<PropertyGroupContainerView, ContainerView> toolbarBoxContainers = new HashMap<>();
 
-    public ContainerView getControlsContainer(GroupObjectView groupObject) {
-        return toolbarBoxContainers.get(groupObject);
-    }
-
-    public ContainerView getControlsContainer(TreeGroupView treeGroup) {
-        return toolbarBoxContainers.get(treeGroup);
-    }
-
     protected final Map<PropertyGroupContainerView, ContainerView> toolbarContainers = new HashMap<>();
 
     public ContainerView getToolbarPropsContainer(PropertyDrawView propertyDraw) {
@@ -220,14 +212,6 @@ public class DefaultFormView extends FormView {
 
     protected transient Map<PropertyGroupContainerView, ContainerView> toolbarLeftContainers = new HashMap<>();
     protected transient Map<PropertyGroupContainerView, ContainerView> toolbarRightContainers = new HashMap<>();
-
-    public ContainerView getRightControlsContainer(GroupObjectView groupObject) {
-        return toolbarRightContainers.get(groupObject);
-    }
-
-    public ContainerView getRightControlsContainer(TreeGroupView treeGroup) {
-        return toolbarRightContainers.get(treeGroup);
-    }
 
     protected final Map<PropertyGroupContainerView, ContainerView> filterGroupsContainers = new HashMap<>();
 

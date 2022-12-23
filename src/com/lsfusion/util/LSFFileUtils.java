@@ -15,12 +15,10 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
-import com.intellij.util.Processor;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
@@ -57,15 +55,12 @@ public class LSFFileUtils {
     private static boolean hasFilesWithShortName(String fileName, Project project, GlobalSearchScope scope) {
         final Result<Boolean> hasFiles = new Result<>(false);
         FilenameIndex.processFilesByName(
-                fileName, false, new Processor<>() {
-                    @Override
-                    public boolean process(PsiFileSystemItem file) {
-                        if (!file.isDirectory() && file instanceof PsiFile) {
-                            hasFiles.setResult(true);
-                            return false;
-                        }
-                        return true;
+                fileName, false, file -> {
+                    if (!file.isDirectory() && file instanceof PsiFile) {
+                        hasFiles.setResult(true);
+                        return false;
                     }
+                    return true;
                 },
                 scope,
                 project,
@@ -76,14 +71,11 @@ public class LSFFileUtils {
 
     public static void findFilesWithShortName(String fileName, final List<PsiFile> files, Project project, GlobalSearchScope scope) {
         FilenameIndex.processFilesByName(
-                fileName, false, new Processor<>() {
-                    @Override
-                    public boolean process(PsiFileSystemItem file) {
-                        if (!file.isDirectory() && file instanceof PsiFile) {
-                            files.add((PsiFile) file);
-                        }
-                        return true;
+                fileName, false, file -> {
+                    if (!file.isDirectory() && file instanceof PsiFile) {
+                        files.add((PsiFile) file);
                     }
+                    return true;
                 },
                 scope,
                 project,
@@ -105,12 +97,9 @@ public class LSFFileUtils {
             final OrderEnumerator orderEnumerator = ModuleRootManager.getInstance(module).orderEntries();
 
             proceedModuleRoots(module, path, result, psiManager);
-            orderEnumerator.forEachModule(new Processor<>() {
-                @Override
-                public boolean process(Module module) {
-                    proceedModuleRoots(module, path, result, psiManager);
-                    return true;
-                }
+            orderEnumerator.forEachModule(module1 -> {
+                proceedModuleRoots(module1, path, result, psiManager);
+                return true;
             });
 
             if (result.isEmpty()) {

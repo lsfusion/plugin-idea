@@ -20,7 +20,7 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
         this.entity = entity;
 
         for (ObjectEntity obj : entity.objects) {
-            add(new ObjectView(obj, this));
+            add(new ObjectView(obj));
         }
 
         grid = new GridView(this);

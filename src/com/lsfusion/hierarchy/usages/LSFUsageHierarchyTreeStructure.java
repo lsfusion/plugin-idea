@@ -4,10 +4,8 @@ import com.intellij.ide.hierarchy.HierarchyNodeDescriptor;
 import com.intellij.ide.hierarchy.HierarchyTreeStructure;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
-import com.intellij.util.Processor;
 import com.intellij.util.containers.ArrayListSet;
 import com.lsfusion.lang.psi.LSFClassStatement;
 import com.lsfusion.lang.psi.LSFDesignStatement;
@@ -31,18 +29,15 @@ public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
         final PsiElement element = ((LSFUsageHierarchyNodeDescriptor) descriptor).getElementId();
 
         if (element instanceof LSFId) {
-            ReferencesSearch.search(element, GlobalSearchScope.allScope(myProject)).forEach(new Processor<>() {
-                @Override
-                public boolean process(PsiReference ref) {
-                    PsiElement el = LSFPsiUtils.getStatementParent(ref.getElement());
-                    if (el != null) {
-                        PsiElement nodeElement = descriptor.getPsiElement();
-                        if (!ignore(nodeElement, el, ref.getElement())) {
-                            result.add(new LSFUsageHierarchyNodeDescriptor(myProject, descriptor, el, false));
-                        }
+            ReferencesSearch.search(element, GlobalSearchScope.allScope(myProject)).forEach(ref -> {
+                PsiElement el = LSFPsiUtils.getStatementParent(ref.getElement());
+                if (el != null) {
+                    PsiElement nodeElement = descriptor.getPsiElement();
+                    if (!ignore(nodeElement, el, ref.getElement())) {
+                        result.add(new LSFUsageHierarchyNodeDescriptor(myProject, descriptor, el, false));
                     }
-                    return true;
                 }
+                return true;
             });
         }
 

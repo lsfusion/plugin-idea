@@ -10,8 +10,6 @@ import com.intellij.ui.NonFocusableCheckBox;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import static com.lsfusion.refactoring.MigrationChangePolicy.*;
 
@@ -40,12 +38,7 @@ class LSFRenameDialog extends RenameDialog {
 
             cbChangeMigrationFile = new NonFocusableCheckBox("Change migration file");
             cbChangeMigrationFile.setSelected(true);
-            cbChangeMigrationFile.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cbVersionChangePolicy.setEnabled(cbChangeMigrationFile.isSelected());
-                }
-            });
+            cbChangeMigrationFile.addActionListener(e -> cbVersionChangePolicy.setEnabled(cbChangeMigrationFile.isSelected()));
             panel.add(cbChangeMigrationFile, gbConstraints);
 
             cbVersionChangePolicy = new PolicyComboBox();

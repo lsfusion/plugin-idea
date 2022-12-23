@@ -9,7 +9,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.Processor;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFLanguage;
@@ -30,7 +29,6 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
     public static final String LSF_LOGICS_PARSER_FQN = "lsfusion.server.language.LsfLogicsParser";
     public static final String LSF_LOGICS_LEXER_FQN = "lsfusion.server.language.LsfLogicsLexer";
     public static final String INTERNAL_ACTION_FQN = "lsfusion.server.physics.dev.integration.internal.to.InternalAction";
-    public static final String LOGICS_MODULE_FQN = "lsfusion.server.logics.LogicsModule";
     public static final String SCRIPTING_LOGICS_MODULE_FQN = "lsfusion.server.language.ScriptingLogicsModule";
 
     public static final String SCRIPTING_ACTION_PROPERTY_LM_FIELD = "LM";
@@ -93,8 +91,7 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
         if(hosts.size() > 0) {
             InjectProcessor processor = new InjectProcessor();
             for (final PsiLanguageInjectionHost host : hosts) {
-                processor.getLanguagesToInject(host, new InjectedLanguagePlaces() {
-                    public void addStatementUsage(TextRange rangeInsideHost, String moduleName, String prefix) {
+                processor.getLanguagesToInject(host, (rangeInsideHost, moduleName, prefix) -> {
 //                        Map<String, List<Injection>> injections = injectionsByModules.get(moduleName);
 //                        if(injections == null) {
 //                            injections = new HashMap<String, List<Injection>>();
@@ -107,14 +104,13 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 //                        }
 //                        prefixInjections.add(new Injection(host, rangeInsideHost));
 
-                        List<Injection> injections = injectionsByModules.get(moduleName);
-                        if (injections == null) {
-                            injections = new ArrayList<>();
-                            injectionsByModules.put(moduleName, injections);
-                        }
-                        injections.add(new Injection(prefix, host, rangeInsideHost));
-                        count.setResult(count.getResult() + 1);
+                    List<Injection> injections = injectionsByModules.get(moduleName);
+                    if (injections == null) {
+                        injections = new ArrayList<>();
+                        injectionsByModules.put(moduleName, injections);
                     }
+                    injections.add(new Injection(prefix, host, rangeInsideHost));
+                    count.setResult(count.getResult() + 1);
                 });
             }
 //            for(Map.Entry<String, Map<String, List<Injection>>> injectionByModule : injectionsByModules.entrySet()) {
@@ -455,18 +451,15 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
                 //  someLM = some.long().qualifiers(var).Line.getModule("Some")
                 final Result<String> moduleName = new Result<>();
-                PsiTreeUtil.processElements(rightExpr, new PsiElementProcessor() {
-                    @Override
-                    public boolean execute(@NotNull PsiElement element) {
-                        if (element instanceof PsiMethodCallExpression) {
-                            String name = extractModuleNameFromPossibleGetModuleCall((PsiMethodCallExpression) element);
-                            if (name != null) {
-                                moduleName.setResult(name);
-                                return false;
-                            }
+                PsiTreeUtil.processElements(rightExpr, (PsiElementProcessor) element -> {
+                    if (element instanceof PsiMethodCallExpression) {
+                        String name = extractModuleNameFromPossibleGetModuleCall((PsiMethodCallExpression) element);
+                        if (name != null) {
+                            moduleName.setResult(name);
+                            return false;
                         }
-                        return true;
                     }
+                    return true;
                 });
                 if (moduleName.getResult() != null)
                     return moduleName.getResult();
@@ -550,12 +543,10 @@ public class LSFToJavaLanguageInjector implements MultiHostInjector {
 
             final List<PsiClass> result = new ArrayList<>();
             result.add(clazz);
-            ClassImplementationsSearch.processImplementations(clazz, new Processor<>() {
-                public boolean process(PsiElement psiElement) {
-                    if (psiElement instanceof PsiClass)
-                        result.add((PsiClass) psiElement);
-                    return true;
-                }
+            ClassImplementationsSearch.processImplementations(clazz, psiElement -> {
+                if (psiElement instanceof PsiClass)
+                    result.add((PsiClass) psiElement);
+                return true;
             }, scope);
             Set<String> moduleNames = new HashSet<>();
             for (PsiClass iclazz : result) {

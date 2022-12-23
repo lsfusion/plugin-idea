@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.*;
 
 public abstract class ComponentView extends PropertiesContainer {
-    public static final List<Property> PROPERTIES = Arrays.<Property>asList(
+    public static final List<Property> PROPERTIES = Arrays.asList(
             new ReflectionProperty("size"),
             new ReflectionProperty("autoSize"),
             new ReflectionProperty("flex"),

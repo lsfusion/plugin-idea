@@ -12,7 +12,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.Processor;
 import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
@@ -35,14 +34,11 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
     
     private static final String NAME = "lsFusion Line Breakpoint";
 
-    private static Condition<PsiElement> inListAction = new Condition<>() {
-        @Override
-        public boolean value(PsiElement psiElement) {
-            return true;
-            // in theory we can pre-check rules that are debuggable, but there are a lot of them, and in that case we need to keep it consistent with DebugInfo, and for example java does not do that, so i don't see any reason why we should 
+    private static Condition<PsiElement> inListAction = psiElement -> {
+        return true;
+        // in theory we can pre-check rules that are debuggable, but there are a lot of them, and in that case we need to keep it consistent with DebugInfo, and for example java does not do that, so i don't see any reason why we should
 //            return !(psiElement instanceof LSFListActionPropertyDefinitionBody)
 //                   && psiElement.getParent() instanceof LSFActionPropertyDefinitionBody;
-        }
     };
 
     @Override
@@ -69,19 +65,16 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
         final Document document = FileDocumentManager.getInstance().getDocument(file);
         if (document != null) {
             final Ref<Boolean> stoppable = Ref.create(false);
-            XDebuggerUtil.getInstance().iterateLine(project, document, line, new Processor<>() {
-                @Override
-                public boolean process(PsiElement psiElement) {
-                    if (psiElement instanceof PsiWhiteSpace || hasPropertyBreakpoint(psiElement) || hasClassBreakpoint(psiElement)) {
-                        return true;
-                    }
-                    
-                    if (PsiTreeUtil.findFirstParent(psiElement, true, inListAction) != null) {
-                        stoppable.set(true);
-                        return false;
-                    }
+            XDebuggerUtil.getInstance().iterateLine(project, document, line, psiElement -> {
+                if (psiElement instanceof PsiWhiteSpace || hasPropertyBreakpoint(psiElement) || hasClassBreakpoint(psiElement)) {
                     return true;
                 }
+
+                if (PsiTreeUtil.findFirstParent(psiElement, true, inListAction) != null) {
+                    stoppable.set(true);
+                    return false;
+                }
+                return true;
             });
             
             return stoppable.get();
@@ -107,13 +100,13 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
 
     @Nullable
     @Override
-    public JavaBreakpointProperties createProperties() {
+    public JavaBreakpointProperties<?> createProperties() {
         return new JavaLineBreakpointProperties();
     }
 
     @Nullable
     @Override
-    public JavaBreakpointProperties createBreakpointProperties(@NotNull VirtualFile file, int line) {
+    public JavaBreakpointProperties<?> createBreakpointProperties(@NotNull VirtualFile file, int line) {
         return new JavaLineBreakpointProperties();
     }
 }

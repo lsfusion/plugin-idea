@@ -34,31 +34,29 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
         final LSFSimpleName alias = aliasUsage == null ? null : aliasUsage.getSimpleName();
         
         //usage через mapping
-        return new Condition<>() {
-            public boolean value(LSFPropertyDrawDeclaration decl) {
-                LSFSimpleName declAlias = decl.getSimpleName();
-                if (alias != null || declAlias != null) {
-                    //сравниваем алиасы
-                    //если алиаса нет у usage или decl, то этот decl не подходит
-                    return alias != null && declAlias != null 
-                           && alias.getText().equals(declAlias.getText());
-                }
-
-                assert propertyDrawName != null;
-                
-                String refName = propertyDrawName.getSimpleName().getText();
-                LSFFormPropertyName formPropertyName = decl.getFormPropertyName();
-                if(formPropertyName == null)
-                    return false;                
-                String declName = getNameIdentifier(formPropertyName).getText();
-
-                LSFObjectUsageList objectUsageList = decl.getObjectUsageList();
-                if(objectUsageList == null)
-                    return false;
-
-                return refName != null && refName.equals(declName) &&
-                       resolveEquals(getObjectUsageList(), objectUsageList);
+        return decl -> {
+            LSFSimpleName declAlias = decl.getSimpleName();
+            if (alias != null || declAlias != null) {
+                //сравниваем алиасы
+                //если алиаса нет у usage или decl, то этот decl не подходит
+                return alias != null && declAlias != null
+                       && alias.getText().equals(declAlias.getText());
             }
+
+            assert propertyDrawName != null;
+
+            String refName = propertyDrawName.getSimpleName().getText();
+            LSFFormPropertyName formPropertyName = decl.getFormPropertyName();
+            if(formPropertyName == null)
+                return false;
+            String declName = getNameIdentifier(formPropertyName).getText();
+
+            LSFObjectUsageList objectUsageList = decl.getObjectUsageList();
+            if(objectUsageList == null)
+                return false;
+
+            return refName != null && refName.equals(declName) &&
+                   resolveEquals(getObjectUsageList(), objectUsageList);
         };
     }
 

@@ -69,12 +69,6 @@ public class ExtInt {
         return value;
     }
 
-    public int getAprValue() {
-        if(isUnlimited())
-            return 50;
-        return getValue();
-    }
-
     public void serialize(DataOutputStream outStream) throws IOException {
         outStream.writeInt(value);
     }

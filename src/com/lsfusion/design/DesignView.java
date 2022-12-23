@@ -44,8 +44,6 @@ import lsfusion.server.physics.dev.debug.DebuggerService;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.LayerUI;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -77,7 +75,7 @@ public class DesignView extends JPanel implements Disposable {
 
     private SimpleActionGroup actions = new SimpleActionGroup();
 
-    private JLayer formLayer;
+    private JLayer<?> formLayer;
     private JPanel formPanel;
     private ActionToolbar toolbar;
     private ComponentTree componentTree;
@@ -287,26 +285,23 @@ public class DesignView extends JPanel implements Disposable {
     }
 
     private void initListeners() {
-        componentTree.addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
-                List<ComponentView> selectedComps = new ArrayList<>();
-                selectedComponents.clear();
-                
-                for (ComponentTreeNode node : componentTree.getSelectedNodes(ComponentTreeNode.class, null)) {
-                    ComponentView component = node.getComponent();
-                    selectedComps.add(component);
-                    
-                    JComponent comp = componentToWidget.get(component);
-                    if (node.isChecked() && comp != null && comp.isShowing()) {
-                        selectedComponents.add(comp);
-                    }
+        componentTree.addTreeSelectionListener(e -> {
+            List<ComponentView> selectedComps = new ArrayList<>();
+            selectedComponents.clear();
+
+            for (ComponentTreeNode node : componentTree.getSelectedNodes(ComponentTreeNode.class, null)) {
+                ComponentView component = node.getComponent();
+                selectedComps.add(component);
+
+                JComponent comp = componentToWidget.get(component);
+                if (node.isChecked() && comp != null && comp.isShowing()) {
+                    selectedComponents.add(comp);
                 }
-                
-                propertyTable.update(selectedComps, propertyTable.getSelectionProperty());
-                if (highlighting) {
-                    repaint();
-                }
+            }
+
+            propertyTable.update(selectedComps, propertyTable.getSelectionProperty());
+            if (highlighting) {
+                repaint();
             }
         });
 
@@ -515,7 +510,7 @@ public class DesignView extends JPanel implements Disposable {
 
     private JComponent createComponentPropertyTable() {
         propertyTable = new ComponentPropertyTable();
-        propertyTable.update(Arrays.asList(rootComponent), null);
+        propertyTable.update(Collections.singletonList(rootComponent), null);
         return new JBScrollPane(propertyTable);
     }
 

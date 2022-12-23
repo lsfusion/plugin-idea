@@ -344,16 +344,14 @@ public class CustomClassSet implements LSFClassSet {
         }
 
         List<LSFClassDeclaration> sortFirstFulls = new ArrayList<>(firstFulls);
-        sortFirstFulls.sort(new Comparator<>() {
-            public int compare(LSFClassDeclaration o1, LSFClassDeclaration o2) {
-                int cnt1 = pathCounts.get(o1);
-                int cnt2 = pathCounts.get(o2);
-                if (cnt1 > cnt2)
-                    return 1;
-                if (cnt1 < cnt2)
-                    return -1;
-                return o1.getGlobalName().compareTo(o2.getGlobalName());
-            }
+        sortFirstFulls.sort((o1, o2) -> {
+            int cnt1 = pathCounts.get(o1);
+            int cnt2 = pathCounts.get(o2);
+            if (cnt1 > cnt2)
+                return 1;
+            if (cnt1 < cnt2)
+                return -1;
+            return o1.getGlobalName().compareTo(o2.getGlobalName());
         });
         return sortFirstFulls.iterator().next();
     }

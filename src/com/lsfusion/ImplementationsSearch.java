@@ -17,12 +17,9 @@ public class ImplementationsSearch extends QueryExecutorBase<PsiElement, PsiElem
             final LSFDeclaration declParent = PsiTreeUtil.getParentOfType(sourceElement, LSFDeclaration.class);
 
             if (declParent != null) {
-                ApplicationManager.getApplication().runReadAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (PsiElement element : declParent.processImplementationsSearch()) {
-                            consumer.process(element);
-                        }
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    for (PsiElement element : declParent.processImplementationsSearch()) {
+                        consumer.process(element);
                     }
                 });
             }

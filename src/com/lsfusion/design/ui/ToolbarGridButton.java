@@ -20,10 +20,6 @@ public class ToolbarGridButton extends JButton {
 
     public final static Dimension DEFAULT_SIZE = new Dimension(20, 20);
 
-    public ToolbarGridButton(String iconPath, String toolTipText) {
-        this(new ImageIcon(ToolbarGridButton.class.getResource(iconPath)), toolTipText);
-    }
-
     public ToolbarGridButton(Icon icon) {
         this(icon, null);
     }

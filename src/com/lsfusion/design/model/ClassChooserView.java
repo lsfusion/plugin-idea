@@ -3,7 +3,6 @@ package com.lsfusion.design.model;
 import com.intellij.designer.model.Property;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.properties.ReflectionProperty;
-import com.lsfusion.design.ui.FlexAlignment;
 
 import javax.swing.*;
 import java.util.List;
@@ -15,20 +14,8 @@ public class ClassChooserView extends ComponentView {
     );
 
     public boolean visible = true;
-    private ObjectView objectView;
 
     public ClassChooserView() {
-        this("");
-    }
-
-    public ClassChooserView(String sID) {
-        super(sID);
-        setFlex(0.2);
-        setAlignment(FlexAlignment.STRETCH);
-    }
-
-    public ClassChooserView(ObjectView objectView) {
-        this.objectView = objectView;
     }
 
     @Override
@@ -43,10 +30,6 @@ public class ClassChooserView extends ComponentView {
 
     public boolean isVisible() {
         return visible;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
     }
 
     @Override

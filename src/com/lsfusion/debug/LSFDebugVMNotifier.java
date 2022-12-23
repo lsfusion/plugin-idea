@@ -52,7 +52,7 @@ public class LSFDebugVMNotifier {
         }
     }
 
-    private String getModuleName(XBreakpoint breakpoint) {
+    private String getModuleName(XBreakpoint<?> breakpoint) {
         XSourcePosition position = breakpoint.getSourcePosition();
         if (position != null) {
             PsiFileSystemItem systemItem = FileReferenceHelper.getPsiFileSystemItem(PsiManager.getInstance(myProcess.getProject()), position.getFile());
@@ -63,7 +63,7 @@ public class LSFDebugVMNotifier {
         return null;
     }
 
-    public void executeMethod(boolean register, XBreakpoint breakpoint) {
+    public void executeMethod(boolean register, XBreakpoint<?> breakpoint) {
         XSourcePosition position = breakpoint.getSourcePosition();
         String module = getModuleName(breakpoint);
         if (position == null || module == null) {
@@ -82,26 +82,18 @@ public class LSFDebugVMNotifier {
     }
 
     private void scheduleRemoteInvocation(final boolean register, final String module, final Integer line) {
-        remoteEvents.add(new Runnable() {
-            @Override
-            public void run() {
-                invokeRemoteMethod(register, module, line);
-            }
-        });
+        remoteEvents.add(() -> invokeRemoteMethod(register, module, line));
     }
 
     public void invokeRemoteMethod(final boolean register, final String module, final Integer line) {
-        ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (register) {
-                        debuggerService.registerBreakpoint(module, line);
-                    } else {
-                        debuggerService.unregisterBreakpoint(module, line);
-                    }
-                } catch (Throwable ignored) {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            try {
+                if (register) {
+                    debuggerService.registerBreakpoint(module, line);
+                } else {
+                    debuggerService.unregisterBreakpoint(module, line);
                 }
+            } catch (Throwable ignored) {
             }
         });
     }

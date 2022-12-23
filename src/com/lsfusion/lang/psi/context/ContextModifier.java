@@ -8,11 +8,7 @@ import java.util.Set;
 
 public interface ContextModifier {
     
-    ContextModifier EMPTY = new ContextModifier() {
-        public List<LSFExprParamDeclaration> resolveParams(int offset, Set<LSFExprParamDeclaration> currentParams) {
-            return Collections.emptyList();
-        }
-    };
+    ContextModifier EMPTY = (offset, currentParams) -> Collections.emptyList();
 
     List<LSFExprParamDeclaration> resolveParams(int offset, Set<LSFExprParamDeclaration> currentParams);
 }

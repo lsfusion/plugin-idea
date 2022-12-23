@@ -29,7 +29,6 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.lsfusion.debug.classchange.LSFClassChangeBreakpointHandler;
 import com.lsfusion.debug.property.LSFPropertyBreakpointHandler;
-import com.lsfusion.design.FormDesignChangeDetector;
 import com.lsfusion.util.ReflectionUtils;
 import com.sun.jdi.*;
 import com.sun.jdi.event.LocatableEvent;
@@ -182,22 +181,19 @@ public class LSFDebugProcess extends JavaDebugProcess {
             }
         });
 
-        ApplicationManager.getApplication().runReadAction(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    JavaCodeFragmentFactory codeFragmentFactory = JavaCodeFragmentFactory.getInstance(getProject());
-                    
-                    String evalString = ACTION_DEBUGGER_FQN + ".getInstance().registerStepping()";
-                    final JavaCodeFragment codeFragment = codeFragmentFactory.createCodeBlockCodeFragment(evalString, null, true);
-                    registerSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(codeFragment, null);
+        ApplicationManager.getApplication().runReadAction(() -> {
+            try {
+                JavaCodeFragmentFactory codeFragmentFactory = JavaCodeFragmentFactory.getInstance(getProject());
 
-                    String unEvalString = ACTION_DEBUGGER_FQN + ".getInstance().unregisterStepping()";
-                    final JavaCodeFragment unregisterCodeFragment = codeFragmentFactory.createCodeBlockCodeFragment(unEvalString, null, true);
-                    unregisterSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(unregisterCodeFragment, null);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                String evalString = ACTION_DEBUGGER_FQN + ".getInstance().registerStepping()";
+                final JavaCodeFragment codeFragment = codeFragmentFactory.createCodeBlockCodeFragment(evalString, null, true);
+                registerSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(codeFragment, null);
+
+                String unEvalString = ACTION_DEBUGGER_FQN + ".getInstance().unregisterStepping()";
+                final JavaCodeFragment unregisterCodeFragment = codeFragmentFactory.createCodeBlockCodeFragment(unEvalString, null, true);
+                unregisterSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(unregisterCodeFragment, null);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         
@@ -629,19 +625,6 @@ public class LSFDebugProcess extends JavaDebugProcess {
         protected abstract RequestHint getRequestHint(SuspendContextImpl suspendContext, ThreadReferenceProxyImpl thread);
 
         protected abstract Location getLocation();
-
-        public boolean disableIfSmallStack(SuspendContextImpl context) {
-            try {
-                //при высоте стэка меньше ~7 перестают генериться ивенты для STEP_OUT
-                //и JVM просто резумается, поэтому удаляем BP чуть раньше
-                if (context.getThread().frameCount() < 10) {
-                    disable();
-                    return true;
-                }
-            } catch (EvaluateException ignore) {
-            }
-            return false;
-        }
         
         public void disable() {
             if (enabled) {

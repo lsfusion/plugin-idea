@@ -11,8 +11,6 @@ import com.intellij.openapi.ui.LabeledComponent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunConfiguration> {
     private JPanel myWholePanel;
@@ -26,11 +24,7 @@ public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunCo
     public LSFusionRunConfigurationEditor(Project project) {
         myModuleSelector = new ConfigurationModuleSelector(project, myModule.getComponent());
         myCommonProgramParameters.setModuleContext(myModuleSelector.getModule());
-        myModule.getComponent().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                myCommonProgramParameters.setModuleContext(myModuleSelector.getModule());
-            }
-        });
+        myModule.getComponent().addActionListener(e -> myCommonProgramParameters.setModuleContext(myModuleSelector.getModule()));
 
         DefaultJreSelector defaultJreSelector = DefaultJreSelector.fromModuleDependencies(myModule.getComponent(), false);
         myJREPanel.setDefaultJreSelector(defaultJreSelector);

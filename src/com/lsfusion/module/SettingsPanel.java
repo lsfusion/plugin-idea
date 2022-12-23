@@ -3,8 +3,6 @@ package com.lsfusion.module;
 import com.intellij.ui.DocumentAdapter;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 
 public class SettingsPanel {
@@ -30,12 +28,7 @@ public class SettingsPanel {
         setDbUser(dbUser);
         setDbPass(dbPass);
 
-        cbCreateSettingsFile.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                propertiesPanel.setVisible(cbCreateSettingsFile.isSelected());
-            }
-        });
+        cbCreateSettingsFile.addChangeListener(e -> propertiesPanel.setVisible(cbCreateSettingsFile.isSelected()));
         if (moduleNameField != null) {
             moduleNameField.getDocument().addDocumentListener(new DocumentAdapter() {
                 @Override

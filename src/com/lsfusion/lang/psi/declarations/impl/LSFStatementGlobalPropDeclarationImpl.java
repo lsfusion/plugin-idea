@@ -87,10 +87,6 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
         }
         return null;
     }
-
-    public static LSFClassSet finishValueClass(LSFPropDeclaration decl) {
-        return LSFExClassSet.fromEx(decl.resolveExValueClass(false));
-    }
     
     public InferExResult inferExParamClasses(LSFExClassSet valueClass, List<LSFExClassSet> resultClasses, Result<List<LSFExprParamDeclaration>> rParams) {
         InferExResult inferredClasses = null;
