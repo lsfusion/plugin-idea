@@ -2086,8 +2086,11 @@ windowHideStatement ::= HIDE WINDOW windowUsage SEMI {pin=2}
 
 windowType ::= MENU | PANEL | TOOLBAR | TREE
 
+//deprecated, removed in version 6
+drawRoot ::= DRAWROOT
+
 windowOptions ::=   (	HIDETITLE
-                    |	DRAWROOT
+                    |	drawRoot
                     |	HIDESCROLLBARS
                     |	orientation
                     |	dockPosition
@@ -2163,9 +2166,10 @@ setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLite
     pin = 1
 }
 
-navigatorElementOptions ::= (	WINDOW windowUsage
+navigatorElementOptions ::= (	(WINDOW windowUsage PARENT?)
                             |	navigatorElementInsertPosition 
-                            |	IMAGE stringLiteral
+                            |	IMAGE (propertyExpression | stringLiteral)
+                            |	HEADER propertyExpression
                             )*
 
 navigatorElementInsertPosition ::=	(   insertRelativePositionLiteral navigatorElementSelector

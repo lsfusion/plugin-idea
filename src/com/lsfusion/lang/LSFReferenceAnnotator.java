@@ -536,6 +536,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitDrawRoot(@NotNull LSFDrawRoot o) {
+        addDeprecatedWarningAnnotation(o, "DRAWROOT is deprecated, will be removed in version 6. Earlier versions: ignore this warning");
+    }
+
+    @Override
     public void visitNonEmptyClassParamDeclareList(@NotNull LSFNonEmptyClassParamDeclareList o) {
         super.visitNonEmptyClassParamDeclareList(o);
 
