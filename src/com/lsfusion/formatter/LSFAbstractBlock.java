@@ -23,6 +23,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.intellij.psi.TokenType.BAD_CHARACTER;
+
 public abstract class LSFAbstractBlock extends AbstractBlock {
 
     protected enum BlockType {
@@ -46,7 +48,7 @@ public abstract class LSFAbstractBlock extends AbstractBlock {
 
     protected void processChild(List<Block> result, ASTNode child, Indent indent) {
         PsiElement psi = child.getPsi();
-        if (psi.getLanguage() == LSFFileType.INSTANCE.getLanguage() && !containsWhiteSpacesOnly(child)) {
+        if ((psi.getLanguage() == LSFFileType.INSTANCE.getLanguage() || isBadCharacter(psi)) && !containsWhiteSpacesOnly(child)) {
             BlockType childType = getBlockType(psi);
             if (childType.isPlain()) {
                 result.add(new LSFPlainBlock(child, indent, childType));
@@ -54,6 +56,10 @@ public abstract class LSFAbstractBlock extends AbstractBlock {
                 result.add(new LSFHierarchicalBlock(child, indent, childType));
             }
         }
+    }
+
+    private boolean isBadCharacter(PsiElement element) {
+        return element instanceof LeafPsiElement && ((LeafPsiElement) element).getElementType() == BAD_CHARACTER;
     }
 
     private BlockType getBlockType(PsiElement element) {
