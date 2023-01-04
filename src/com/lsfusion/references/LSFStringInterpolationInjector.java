@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 
+import static com.lsfusion.util.LSFStringUtils.INTERPOLATION_PREFIX;
+
 public class LSFStringInterpolationInjector implements MultiHostInjector {
     @Override
     public void getLanguagesToInject(@NotNull MultiHostRegistrar registrar, @NotNull PsiElement context) {
@@ -29,7 +31,7 @@ public class LSFStringInterpolationInjector implements MultiHostInjector {
 
             int lastIndex = 1; // do not take starting quote
             boolean isFirst = true;
-            String fileSuffix = fileText.substring(literal.getTextOffset() + literal.getText().length());
+            String fileSuffix = ")" + fileText.substring(literal.getTextOffset() + literal.getText().length());
 
             for (LSFStringUtils.SpecialBlock block : blocks) {
                 if (isFirst) {
@@ -37,10 +39,12 @@ public class LSFStringInterpolationInjector implements MultiHostInjector {
                 } else {
                     filePrefix.append(" + ");
                 }
-                filePrefix.append("'").append(literal.getText(), lastIndex, block.start).append("'").append(" + ");
+                filePrefix.append("'").append(literal.getText(), lastIndex, block.start).append("'");
+                // wrapping in STRING cast is expected by ElementsContextModifier.resolveParamsInsideStringInterpolations
+                filePrefix.append(" + STRING(");
 
-                registrar.addPlace(filePrefix.toString(), fileSuffix, literal, new TextRange(block.start + 2, block.end));
-                filePrefix.append("STRING(").append(literal.getText(), block.start + 2, block.end).append(")");
+                registrar.addPlace(filePrefix.toString(), fileSuffix, literal, new TextRange(block.start + INTERPOLATION_PREFIX.length(), block.end));
+                filePrefix.append(literal.getText(), block.start + INTERPOLATION_PREFIX.length(), block.end).append(")");
                 lastIndex = block.end + 1;
             }
             registrar.doneInjecting();

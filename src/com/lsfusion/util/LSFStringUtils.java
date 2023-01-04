@@ -17,6 +17,8 @@ public class LSFStringUtils {
     public static final char INLINE_CH = 'I';
     public static final char RESOURCE_CH = 'R';
 
+    public static final String INTERPOLATION_PREFIX = "${";
+
     // removes quotes, removes escaping, transforms special \n \r \t sequences to special characters
     public static String getSimpleLiteralValue(String literal, String unescapeCharacters) {
         StringBuilder builder = new StringBuilder();
