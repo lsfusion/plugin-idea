@@ -12,6 +12,7 @@
             <li>EXPORT 'TOP' option for groupObject</li>
             <li>NEWSESSION FORMS support</li>
             <li>ctrl+alt+b search implementations of abstract class fix</li>
+            <li>string literal v5 support</li>
         </ul>
     ]]>
     </change-notes>
