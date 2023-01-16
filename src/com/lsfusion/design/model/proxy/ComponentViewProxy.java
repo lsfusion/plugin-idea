@@ -120,6 +120,10 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         target.custom = custom;
     }
 
+    public void setAlignCaption(Boolean alignCaption) {
+        target.alignCaption = alignCaption;
+    }
+
     public void setSize(Dimension size) {
         target.setSize(size);
     }

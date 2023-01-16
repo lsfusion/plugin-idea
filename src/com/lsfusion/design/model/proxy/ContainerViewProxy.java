@@ -36,6 +36,10 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.resizeOverflow = resizeOverflow;
     }
 
+    public void setAlignCaptions(boolean alignCaptions) {
+        target.alignCaptions = alignCaptions;
+    }
+
     public void setChildrenAlignment(FlexAlignment falign) {
         Alignment align;
         switch (falign) {

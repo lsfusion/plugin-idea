@@ -35,7 +35,8 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("background"),
             new ReflectionProperty("foreground"),
             new ReflectionProperty("imagePath").setExpert(),
-            new ReflectionProperty("custom")
+            new ReflectionProperty("custom"),
+            new ReflectionProperty("alignCaption")
     );
     
     private String sID;
@@ -66,6 +67,8 @@ public abstract class ComponentView extends PropertiesContainer {
     public String imagePath;
 
     public String custom;
+
+    public boolean alignCaption;
 
     public ContainerView container;
 
@@ -236,6 +239,10 @@ public abstract class ComponentView extends PropertiesContainer {
         this.custom = custom;
     }
 
+    public void setAlignCaption(Boolean alignCaption) {
+        this.alignCaption = alignCaption;
+    }
+
     public Dimension getSize() {
         return size;
     }
@@ -327,6 +334,10 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public String getCustom() {
         return custom;
+    }
+
+    public Boolean getAlignCaption() {
+        return alignCaption;
     }
 
     public void decorateTreeRenderer(SimpleColoredComponent renderer) {
