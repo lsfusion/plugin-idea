@@ -61,18 +61,52 @@ public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValue
         return new LiteralTextEscaper<PsiLanguageInjectionHost>(LSFExpressionStringValueLiteralImpl.this) {
             @Override
             public boolean decode(@NotNull TextRange rangeInsideHost, @NotNull StringBuilder outChars) {
-                outChars.append(rangeInsideHost.substring(myHost.getText()));
+                unescapeQuotes(rangeInsideHost, outChars);
                 return true;
             }
 
             @Override
             public int getOffsetInHost(int offsetInDecoded, @NotNull TextRange rangeInsideHost) {
-                return rangeInsideHost.getStartOffset() + offsetInDecoded;
+                if (offsetInDecoded < 0 || offsetInDecoded > rangeInsideHost.getLength()) {
+                    return -1;
+                }
+
+                String blockText = rangeInsideHost.substring(myHost.getText());
+                int pos = 0;
+                int escapedQuotes = 0;
+                while (pos < blockText.length()) {
+                    if (blockText.charAt(pos) == '\\' && pos+1 < blockText.length()) {
+                        if (blockText.charAt(pos + 1) == '\'') {
+                            ++escapedQuotes;
+                        } else if (pos - escapedQuotes == offsetInDecoded) {
+                            break;
+                        }
+                        ++pos;
+                    }
+                    if (pos - escapedQuotes == offsetInDecoded) {
+                        break;
+                    }
+                    ++pos;
+                }
+                return rangeInsideHost.getStartOffset() + pos;
             }
 
             @Override
             public boolean isOneLine() {
                 return false;
+            }
+
+            private void unescapeQuotes(@NotNull TextRange rangeInsideHost, @NotNull StringBuilder outChars) {
+                String substring = rangeInsideHost.substring(myHost.getText());
+                for (int i = 0; i < substring.length(); ++i) {
+                    if (substring.charAt(i) == '\\' && i+1 < substring.length()) {
+                        if (substring.charAt(i+1) != '\'') {
+                            outChars.append('\\');
+                        }
+                        ++i;
+                    }
+                    outChars.append(substring.charAt(i));
+                }
             }
         };
     }
