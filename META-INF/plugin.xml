@@ -161,6 +161,7 @@
 
         <multiHostInjector implementation="com.lsfusion.references.LSFToJavaLanguageInjector"/>
         <multiHostInjector implementation="com.lsfusion.references.LSFToJrxmlLanguageInjector"/>
+        <multiHostInjector implementation="com.lsfusion.references.LSFStringInterpolationInjector"/>
         <lang.syntaxHighlighterFactory language="Lsf"
                                        implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>

@@ -363,7 +363,7 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	signaturePropertyDefinition
 	    |   activeTabPropertyDefinition
 	    |   roundPropertyDefinition
-	    |	literal
+	    |	expressionLiteral
 {
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
@@ -2426,12 +2426,17 @@ nonEmptyActionPDBList ::= actionPropertyDefinitionBody (COMMA actionPropertyDefi
 propertyExpressionList ::= (nonEmptyPropertyExpressionList)?
 nonEmptyPropertyExpressionList ::= propertyExpression (COMMA propertyExpression)* { pin(".*") = 1}
 
-literal ::=
+literal ::= commonLiteral |	(<<noIDCheck>> localizedStringLiteral) // since there is a parameter afterwards we need to do lookahead (same as in staticObjectID)
+{implements = "com.lsfusion.documentation.LSFDocumentation" methods = [getDocumentation]}
+
+expressionLiteral ::= commonLiteral | (<<noIDCheck>> expressionStringLiteral)
+{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
+
+private commonLiteral ::=
         ulongLiteral
 	|	uintLiteral
 	|	udoubleLiteral
 	|	unumericLiteral
-	|	(<<noIDCheck>> localizedStringLiteral) // since there is a parameter afterwards we need to do lookahead (same as in staticObjectID)
 	|	booleanLiteral
 	|	tbooleanLiteral
 	|	dateTimeLiteral
@@ -2440,7 +2445,6 @@ literal ::=
 	|	nullLiteral
 	|	staticObjectID
 	|	colorLiteral
-{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
 builtInClassName ::= PRIMITIVE_TYPE | JSON
 {
@@ -2580,6 +2584,13 @@ localizedStringLiteral ::= LEX_STRING_LITERAL | ID
     mixin="com.lsfusion.lang.psi.LSFLocalizedStringValueLiteralImpl"
     implements="com.lsfusion.lang.psi.LSFLocalizedStringValueLiteral"
 }
+
+expressionStringLiteral ::= LEX_STRING_LITERAL | ID
+{
+    mixin="com.lsfusion.lang.psi.LSFExpressionStringValueLiteralImpl"
+    implements="com.lsfusion.lang.psi.LSFExpressionStringValueLiteral"
+}
+
 intLiteral ::= (MINUS)? uintLiteral
 doubleLiteral ::= (MINUS)? unumericLiteral
 dateLiteral ::= LEX_DATE_LITERAL

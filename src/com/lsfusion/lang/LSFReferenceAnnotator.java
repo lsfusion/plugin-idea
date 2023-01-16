@@ -620,7 +620,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     public void visitLocalizedStringValueLiteral(@NotNull LSFLocalizedStringValueLiteral o) {
         super.visitLocalizedStringValueLiteral(o);
-        checkEscapeSequences(o, "nrt'\\{}");
+        checkEscapeSequences(o, "nrt'\\{}$");
         checkBracesConsistency(o);
 
         if (!o.needToBeLocalized()) {
@@ -679,6 +679,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 }
             }
         }
+    }
+
+    public void visitExpressionStringValueLiteral(@NotNull LSFExpressionStringValueLiteral o) {
+        super.visitExpressionStringValueLiteral(o);
+        visitLocalizedStringValueLiteral(o);
     }
 
     private IntentionAction getCreatePropertyFix(String currentLang, String resourceBundleName, List<PropertiesFile> propertiesFiles, String defaultKey, PsiElement element, LSFPropertiesFileValueGetter o) {
