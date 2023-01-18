@@ -1,13 +1,13 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.253</version>
+    <version>1.0.254</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.253</b><br>
+        <b>Version 1.0.254</b><br>
         <ul>
             <li>EXPORT 'TOP' option for groupObject</li>
             <li>NEWSESSION FORMS support</li>
