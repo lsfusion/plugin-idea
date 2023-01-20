@@ -989,7 +989,7 @@ private externalType ::=  SQL propertyExpression EXEC propertyExpression
               |   TCP (CLIENT)? propertyExpression
               |   UDP (CLIENT)? propertyExpression
               |   HTTP (CLIENT)? (DELETE| GET | POST | PUT)? propertyExpression (BODYURL propertyExpression)?
-                    (BODYPARAMNAMES stringLiteral (COMMA stringLiteral)*)?
+                    (BODYPARAMNAMES propertyExpression (COMMA propertyExpression)*)?
                     (BODYPARAMHEADERS headersPropertyUsage (COMMA headersPropertyUsage)*)?
                     (HEADERS headersPropertyUsage)? (COOKIES headersPropertyUsage)? (HEADERSTO headersPropertyUsage)? (COOKIESTO headersPropertyUsage)?
               |   DBF propertyExpression APPEND (CHARSET stringLiteral)?
