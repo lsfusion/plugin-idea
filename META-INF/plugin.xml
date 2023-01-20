@@ -7,13 +7,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.254</b><br>
+        <b>Version 1.0.255</b><br>
         <ul>
-            <li>EXPORT 'TOP' option for groupObject</li>
-            <li>NEWSESSION FORMS support</li>
-            <li>ctrl+alt+b search implementations of abstract class fix</li>
-            <li>string literal v5 support</li>
-            <li>alignCaptions for Container, alignCaption for Component support</li>
+            <li>ImplementationsSearch fix</li>
+            <li>BODYPARAMNAMES now propertyExpression</li>
         </ul>
     ]]>
     </change-notes>
