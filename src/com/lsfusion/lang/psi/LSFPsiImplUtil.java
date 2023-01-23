@@ -5040,6 +5040,10 @@ public class LSFPsiImplUtil {
         return "Literals";
     }
 
+    public static String getDocumentation(LSFExpressionLiteral literal, PsiElement child) {
+        return "Literals";
+    }
+
     public static String getDocumentation(LSFBuiltInClassName lsfBuiltInClassName, PsiElement child) {
         return "Built-in_classes";
     }
