@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.255</b><br>
+        <b>Version 1.0.256</b><br>
         <ul>
-            <li>ImplementationsSearch fix</li>
-            <li>BODYPARAMNAMES now propertyExpression</li>
+            <li>Refactored navigator elements / components / group objects / properties positioning mechanism to the single one Supported LAST / DEFAULT options</li>
         </ul>
     ]]>
     </change-notes>

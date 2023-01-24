@@ -1649,7 +1649,9 @@ formGroupObjectPageSize ::= PAGESIZE intLiteral
 
 formGroupObjectUpdate ::= FIRST | LAST | PREV | NULL
 
-formGroupObjectRelativePosition ::= FIRST | (AFTER | BEFORE) groupObjectUsage {pin = 1}
+staticRelativePosition::= FIRST | LAST | DEFAULT
+
+formGroupObjectRelativePosition ::= staticRelativePosition | (AFTER | BEFORE) groupObjectUsage {pin = 1}
 
 formGroupObjectBackground ::= BACKGROUND formCalcPropertyObject
 formGroupObjectForeground ::= FOREGROUND formCalcPropertyObject
@@ -1726,7 +1728,7 @@ formOptionToDraw ::= DRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | IMAGE | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
 formOptionQuickFilter ::= QUICKFILTER formPropertyDrawUsage {pin = 1}
-formOptionInsertType ::= FIRST | (BEFORE | AFTER) formPropertyDrawUsage {pin = 1}
+formOptionInsertType ::= staticRelativePosition | (BEFORE | AFTER) formPropertyDrawUsage {pin = 1}
 formOptionsOnEvents ::= ON formEventType formActionPropertyObject
 {
     pin = 1
@@ -2173,7 +2175,7 @@ navigatorElementOptions ::= (	(WINDOW windowUsage PARENT?)
                             )*
 
 navigatorElementInsertPosition ::=	(   insertRelativePositionLiteral navigatorElementSelector
-                                    |	FIRST
+                                    |	staticRelativePosition
                                     )
 
 navigatorElementSelector ::= navigatorElementUsage
@@ -2231,7 +2233,7 @@ newComponentStatement ::= NEW componentDecl componentInsertPosition componentBod
 moveComponentStatement ::= MOVE componentSelector componentInsertPosition componentBody {pin = 1}
 
 componentInsertPosition ::= (   insertRelativePositionLiteral componentSelector
-                            |	FIRST
+                            |	staticRelativePosition
                             )?
                             
 removeComponentStatement ::= REMOVE componentSelector SEMI {pin = 1}
