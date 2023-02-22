@@ -3,6 +3,7 @@ package com.lsfusion.design.model.proxy;
 import com.lsfusion.design.model.ComponentView;
 import com.lsfusion.design.model.FontInfo;
 import com.lsfusion.design.ui.FlexAlignment;
+import com.lsfusion.util.LSFStringUtils;
 
 import java.awt.*;
 
@@ -80,6 +81,7 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
     }
 
     public void setFontStyle(String fontStyle) {
+        fontStyle = LSFStringUtils.unquote(fontStyle);
         boolean bold;
         boolean italic;
         //чтобы не заморачиваться с лишним типом для стиля просто перечисляем все варианты...

@@ -10,6 +10,7 @@ import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.JComponentPanel;
+import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -200,6 +201,7 @@ public abstract class ComponentView extends PropertiesContainer {
     }
 
     public void setFontStyle(String fontStyle) {
+        fontStyle = LSFStringUtils.unquote(fontStyle);
         boolean bold;
         boolean italic;
         //чтобы не заморачиваться с лишним типом для стиля просто перечисляем все варианты...
