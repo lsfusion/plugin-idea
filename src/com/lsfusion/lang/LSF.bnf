@@ -661,7 +661,7 @@ hintSetting ::= HINT | NOHINT
 prereadSetting ::= PREREAD
 charWidthSetting ::= CHARWIDTH intLiteral
 flexCharWidthSetting ::= CHARWIDTH intLiteral (FLEX | NOFLEX)
-imageSetting ::= IMAGE stringLiteral
+imageSetting ::= IMAGE stringLiteral?
 defaultCompareSetting ::= DEFAULTCOMPARE stringLiteral
 changeKeySetting ::= CHANGEKEY stringLiteral (SHOW | hideEditKey)?
 changeMouseSetting ::= CHANGEMOUSE stringLiteral (SHOW | hideEditKey)?
@@ -1556,7 +1556,7 @@ formExtIDSetting ::= FORMEXTID stringLiteral
 groupObjectReportPath ::= (TOP | groupObjectUsage) formCalcPropertyObject
 
 formDecl ::= FORM simpleNameWithCaption
-		            (   IMAGE stringLiteral
+		            (   IMAGE stringLiteral?
 		            |   autorefreshLiteral
 		            |   LOCALASYNC
 		            )*
@@ -1704,6 +1704,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
                             |    formOptionEventId
                             |    formOptionColumns
                             |    formOptionsWithCalcPropertyObject
+                            |    formOptionsWithOptionalCalcPropertyObject
                             |    formOptionsOnEvents
                             |    formOptionQuickFilter
                             |    formOptionInsertType
@@ -1726,7 +1727,8 @@ formOptionForce ::= classViewType
 formOptionCustomView ::= propertyCustomView
 formOptionToDraw ::= DRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
-formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | IMAGE | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
+formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
+formOptionsWithOptionalCalcPropertyObject ::= IMAGE formCalcPropertyObject? {pin = 1}
 formOptionQuickFilter ::= QUICKFILTER formPropertyDrawUsage {pin = 1}
 formOptionInsertType ::= staticRelativePosition | (BEFORE | AFTER) formPropertyDrawUsage {pin = 1}
 formOptionsOnEvents ::= ON formEventType formActionPropertyObject
@@ -2170,7 +2172,7 @@ setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLite
 
 navigatorElementOptions ::= (	(WINDOW windowUsage PARENT?)
                             |	navigatorElementInsertPosition 
-                            |	IMAGE (propertyExpression | stringLiteral)
+                            |	IMAGE (propertyExpression | stringLiteral)?
                             |	HEADER propertyExpression
                             )*
 

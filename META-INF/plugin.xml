@@ -12,6 +12,7 @@
             <li>Refactored navigator elements / components / group objects / properties positioning mechanism to the single one Supported LAST / DEFAULT options</li>
             <li>Changes generated canonical names of FILE/LINK classes in migration scripts</li>
             <li>Fixes handling of fontStyle component property constants</li>
+            <li>Made IMAGE clause 'auto' by default</li>
         </ul>
     ]]>
     </change-notes>
