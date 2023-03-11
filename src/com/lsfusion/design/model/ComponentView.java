@@ -37,7 +37,8 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("foreground"),
             new ReflectionProperty("imagePath").setExpert(),
             new ReflectionProperty("custom"),
-            new ReflectionProperty("alignCaption")
+            new ReflectionProperty("alignCaption"),
+            new ReflectionProperty("class")
     );
     
     private String sID;

@@ -185,6 +185,22 @@ public class LSFPsiImplUtil {
         return ContextInferrer.EMPTY;
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFNavigatorStatement sourceStatement) {
+        return ContextModifier.EMPTY;
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFNavigatorStatement sourceStatement) {
+        return ContextInferrer.EMPTY;
+    }
+
+    public static ContextModifier getContextModifier(@NotNull LSFWindowCreateStatement sourceStatement) {
+        return ContextModifier.EMPTY;
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFWindowCreateStatement sourceStatement) {
+        return ContextInferrer.EMPTY;
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFWriteWhenStatement sourceStatement) {
         return new ExplicitContextModifier(sourceStatement.getMappedPropertyClassParamDeclare());
     }

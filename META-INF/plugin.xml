@@ -13,6 +13,7 @@
             <li>Changes generated canonical names of FILE/LINK classes in migration scripts</li>
             <li>Fixes handling of fontStyle component property constants</li>
             <li>Made IMAGE clause 'auto' by default</li>
+            <li>CLASS clause / class attribute support for properties / containers</li>
         </ul>
     ]]>
     </change-notes>

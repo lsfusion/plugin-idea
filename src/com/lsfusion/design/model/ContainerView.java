@@ -30,6 +30,7 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("horizontal"),
             new ReflectionProperty("tabbed"),
             new ReflectionProperty("caption"),
+            new ReflectionProperty("image"),
             new ReflectionProperty("description"),
             new ReflectionProperty("collapsible"),
             new ReflectionProperty("collapsed"),

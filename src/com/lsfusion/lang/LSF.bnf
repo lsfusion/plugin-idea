@@ -503,8 +503,8 @@ sessionPropertyType ::= PREV | CHANGED | SET | DROPPED | SETCHANGED | DROPCHANGE
 sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 {pin = 1 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
-signaturePropertyDefinition ::= (CLASS) LBRAC propertyExpression RBRAC
-{implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
+signaturePropertyDefinition ::= IS CLASS LBRAC propertyExpression RBRAC
+{pin = 2 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 activeTabPropertyDefinition ::= ACTIVE TAB componentID
 {
@@ -1727,7 +1727,7 @@ formOptionForce ::= classViewType
 formOptionCustomView ::= propertyCustomView
 formOptionToDraw ::= DRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
-formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
+formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | CLASS | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
 formOptionsWithOptionalCalcPropertyObject ::= IMAGE formCalcPropertyObject? {pin = 1}
 formOptionQuickFilter ::= QUICKFILTER formPropertyDrawUsage {pin = 1}
 formOptionInsertType ::= staticRelativePosition | (BEFORE | AFTER) formPropertyDrawUsage {pin = 1}
@@ -2079,8 +2079,8 @@ windowStatement ::= windowCreateStatement | windowHideStatement {methods = [ get
 windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType windowOptions SEMI
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFWindowDeclarationImpl"
-    implements="com.lsfusion.lang.psi.declarations.LSFWindowDeclaration"
-    methods = [getDocumentation]
+    implements="com.lsfusion.lang.psi.declarations.LSFWindowDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getDocumentation]
     stubClass = "com.lsfusion.lang.psi.stubs.WindowStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
     pin = 2
@@ -2103,6 +2103,7 @@ windowOptions ::=   (	HIDETITLE
                     |	VALIGN LBRAC alignmentLiteral RBRAC
                     |	TEXTHALIGN LBRAC alignmentLiteral RBRAC
                     |	TEXTVALIGN LBRAC alignmentLiteral RBRAC
+                    |   CLASS propertyExpression
                     )*
 
 borderPosition ::= LEFT	| RIGHT | TOP | BOTTOM
@@ -2116,8 +2117,8 @@ dockPosition ::= POSITION LBRAC intLiteral COMMA intLiteral COMMA intLiteral COM
 navigatorStatement ::= NAVIGATOR navigatorElementStatementBody
 {
     pin=1
-    implements = "com.lsfusion.documentation.LSFDocumentation"
-    methods = [ getIcon getDocumentation]
+    implements = "com.lsfusion.documentation.LSFDocumentation,com.lsfusion.lang.psi.context.ModifyParamContext"
+    methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
 }
 
 navigatorElementStatementBody ::=   (   LBRACE
@@ -2173,6 +2174,7 @@ setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLite
 navigatorElementOptions ::= (	(WINDOW windowUsage PARENT?)
                             |	navigatorElementInsertPosition 
                             |	IMAGE (propertyExpression | stringLiteral)?
+                            |   CLASS propertyExpression
                             |	HEADER propertyExpression
                             )*
 
