@@ -2079,7 +2079,7 @@ windowStatement ::= windowCreateStatement | windowHideStatement {methods = [ get
 windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType windowOptions SEMI
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFWindowDeclarationImpl"
-    implements="com.lsfusion.lang.psi.declarations.LSFWindowDeclaration,com.lsfusion.lang.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.declarations.LSFWindowDeclaration"
     methods = [ getContextModifier getContextInferrer getDocumentation]
     stubClass = "com.lsfusion.lang.psi.stubs.WindowStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
