@@ -320,7 +320,7 @@ equalityPE ::= relationalPE ((EQ_OPERAND | EQUALS) relationalPE)?
 relationalPE ::= likePE ((LESS | GREATER | LESS_EQUALS | GREATER_EQUALS) likePE)?
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
-likePE ::= additiveORPE (LIKE additiveORPE)?
+likePE ::= additiveORPE ((LIKE | MATCH) additiveORPE)?
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
 additiveORPE ::= additivePE (ADDOR_OPERAND additivePE)*

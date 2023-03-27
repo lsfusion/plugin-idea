@@ -7,13 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.256</b><br>
+        <b>Version 1.0.257</b><br>
         <ul>
-            <li>Refactored navigator elements / components / group objects / properties positioning mechanism to the single one Supported LAST / DEFAULT options</li>
-            <li>Changes generated canonical names of FILE/LINK classes in migration scripts</li>
-            <li>Fixes handling of fontStyle component property constants</li>
-            <li>Made IMAGE clause 'auto' by default</li>
-            <li>CLASS clause / class attribute support for properties / containers</li>
+            <li>MATCH operator support</li>
         </ul>
     ]]>
     </change-notes>
