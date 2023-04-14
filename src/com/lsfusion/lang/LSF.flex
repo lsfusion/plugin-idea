@@ -111,10 +111,11 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   | "DATE" | "DATETIME" | "DATETIME[" [0-6] "]" | "TIME" | "TIME[" [0-6] "]" | "YEAR" | "ZDATETIME" | "ZDATETIME[" [0-6] "]" | "INTERVAL" ("["{INTERVAL_TYPE}"]")
   | "BPSTRING" | "BPISTRING" | "STRING" | "ISTRING"
   | "BPSTRING[" {DIGITS} "]" | "BPISTRING[" {DIGITS} "]" | "STRING[" {DIGITS} "]" | "ISTRING[" {DIGITS} "]"
-  | "TEXT" | "RICHTEXT" | "HTMLTEXT"
+  | "TEXT" | "RICHTEXT" | "HTMLTEXT" | "HTML"
   | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "DBFFILE" | "RAWFILE" | "FILE" | "EXCELFILE" | "TEXTFILE" | "CSVFILE" | "HTMLFILE" | "JSONFILE" | "XMLFILE" | "TABLEFILE" | "NAMEDFILE"
   | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "DBFLINK" | "RAWLINK" | "LINK" | "EXCELLINK" | "TEXTLINK" | "CSVLINK" | "HTMLLINK" | "JSONLINK" | "XMLLINK" | "TABLELINK"
   | "BOOLEAN" | "TBOOLEAN"
+  | "TSQUERY" | "TSVECTOR"
   | "COLOR"                             { return PRIMITIVE_TYPE; }
 
 
@@ -501,6 +502,8 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "TOP"                     			{ return TOP; }
   "TREE"                    			{ return TREE; }
   "TRY"                                 { return TRY; }
+  "TSQUERY"                             { return TSQUERY; }
+  "TSVECTOR"                            { return TSVECTOR; }
   "UDP"                 			    { return UDP; }
   "UNGROUP"                 			{ return UNGROUP; }
   "UP"                 			        { return UP; }

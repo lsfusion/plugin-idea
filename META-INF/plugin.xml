@@ -10,6 +10,11 @@
         <b>Version 1.0.257</b><br>
         <ul>
             <li>MATCH operator support</li>
+            <li>NATIVE WINDOW operator support</li>
+            <li>Static objects IMAGE operator support</li>
+            <li>TSQUERY class support</li>
+            <li>TSVECTOR class support</li>
+            <li>HTML class support</li>
         </ul>
     ]]>
     </change-notes>

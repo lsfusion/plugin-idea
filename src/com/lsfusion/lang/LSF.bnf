@@ -132,7 +132,7 @@ private inner_statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE 
 ////////////////////////////////// CLASS STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-classDecl ::= CLASS (ABSTRACT | NATIVE)? COMPLEX? simpleNameWithCaption
+classDecl ::= CLASS (ABSTRACT | NATIVE)? COMPLEX? simpleNameWithCaption staticObjectImage?
 {
      pin = 1
      mixin = "com.lsfusion.lang.psi.declarations.impl.LSFClassDeclarationImpl"
@@ -167,7 +167,7 @@ classParentsList ::= COLON nonEmptyCustomClassUsageList {pin = 1}
 
 staticObjectDeclList ::= (nonEmptyStaticObjectDeclList)?
 
-nonEmptyStaticObjectDeclList ::= staticObjectDecl (COMMA staticObjectDecl)*
+nonEmptyStaticObjectDeclList ::= staticObjectDecl staticObjectImage? (COMMA staticObjectDecl staticObjectImage?)*
 
 staticObjectDecl ::= simpleNameWithCaption
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFStaticObjectDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration"}
@@ -662,6 +662,7 @@ prereadSetting ::= PREREAD
 charWidthSetting ::= CHARWIDTH intLiteral
 flexCharWidthSetting ::= CHARWIDTH intLiteral (FLEX | NOFLEX)
 imageSetting ::= IMAGE stringLiteral?
+staticObjectImage ::= IMAGE stringLiteral
 defaultCompareSetting ::= DEFAULTCOMPARE stringLiteral
 changeKeySetting ::= CHANGEKEY stringLiteral (SHOW | hideEditKey)?
 changeMouseSetting ::= CHANGEMOUSE stringLiteral (SHOW | hideEditKey)?
@@ -1556,7 +1557,7 @@ formExtIDSetting ::= FORMEXTID stringLiteral
 groupObjectReportPath ::= (TOP | groupObjectUsage) formCalcPropertyObject
 
 formDecl ::= FORM simpleNameWithCaption
-		            (   IMAGE stringLiteral?
+		            (   imageSetting
 		            |   autorefreshLiteral
 		            |   LOCALASYNC
 		            )*
@@ -2088,7 +2089,7 @@ windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType
 
 windowHideStatement ::= HIDE WINDOW windowUsage SEMI {pin=2}
 
-windowType ::= MENU | PANEL | TOOLBAR | TREE
+windowType ::= MENU | PANEL | TOOLBAR | TREE | NATIVE
 
 //deprecated, removed in version 6
 drawRoot ::= DRAWROOT

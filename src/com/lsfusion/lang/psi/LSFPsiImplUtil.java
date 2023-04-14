@@ -706,6 +706,8 @@ public class LSFPsiImplUtil {
             return new RichTextClass();
         } else if (name.equals("HTMLTEXT")) {
             return new HTMLTextClass();
+        } else if (name.equals("HTML")) {
+            return new HTMLStringClass();
         } else if (name.equals("BPSTRING")) {
             return new StringClass(true, false, ExtInt.UNLIMITED);
         } else if (name.equals("BPISTRING")) {
@@ -805,6 +807,10 @@ public class LSFPsiImplUtil {
                 return ColorClass.instance;
             case "JSON":
                 return JSONClass.instance;
+            case "TSVECTOR":
+                return TSVectorClass.instance;
+            case "TSQUERY":
+                return TSQueryClass.instance;
         }
 
         return new SimpleDataClass(name);
