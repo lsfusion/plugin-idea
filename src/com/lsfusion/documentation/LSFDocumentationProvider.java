@@ -33,8 +33,8 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     private static final String documentationLanguagePropertyKey = "documentationLanguage";
 
     static {
-        documentationVersionMap.put("Version 4", "");
-        documentationVersionMap.put("Master", "next/");
+        documentationVersionMap.put("Version 4", "v4/");
+        documentationVersionMap.put("Version 5", "");
 
         documentationLanguageMap.put("en", "");
         documentationLanguageMap.put("ru", "ru/");
