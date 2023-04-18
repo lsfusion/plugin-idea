@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.256</version>
+    <version>1.0.257</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -15,6 +15,7 @@
             <li>TSQUERY class support</li>
             <li>TSVECTOR class support</li>
             <li>HTML class support</li>
+            <li>Fixed quick-documentation for platform version 5</li>
         </ul>
     ]]>
     </change-notes>
