@@ -17,4 +17,9 @@ public class TSQueryClass extends DataClass {
     public DataClass op(DataClass compClass, boolean or, boolean string) {
         return compClass instanceof TSQueryClass ? this : null;
     }
+
+    @Override
+    protected int getDefaultCharWidth() {
+        return 15;
+    }
 }
