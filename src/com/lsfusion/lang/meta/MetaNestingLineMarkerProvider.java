@@ -9,7 +9,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
-import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.lang.psi.LSFMetaCodeStatement;
 import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
@@ -31,12 +30,13 @@ public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
                 if (metaReference.getMetaCodeStatementHeader().getMetacodeUsage().getCompoundID().getSimpleName().getFirstChild() == element) {
                     int level = resolveNestingLevel(metaReference);
                     if (level > 0) {
-                        return LSFLineMarkerInfo.create(element,
+                        return new LineMarkerInfo<>(element,
                                 element.getTextRange(),
                                 createIcon(level),
                                 MetaNestingLevelTooltipProvider.INSTANCE,
                                 null,
-                                GutterIconRenderer.Alignment.RIGHT
+                                GutterIconRenderer.Alignment.RIGHT,
+                                () -> ""
                         );
                     }
                 }

@@ -11,7 +11,6 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
-import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.actions.ToggleShowTableAction;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFId;
@@ -81,12 +80,13 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
     }
 
     private LineMarkerInfo<?> createLineMarker(PsiElement psi) {
-        return LSFLineMarkerInfo.create(psi,
+        return new LineMarkerInfo<PsiElement>(psi,
                 psi.getTextRange(),
                 createIcon(),
                 PropertyShowTableTooltipProvider.INSTANCE,
                 ShowTableNavigationProvider.INSTANCE,
-                GutterIconRenderer.Alignment.RIGHT
+                GutterIconRenderer.Alignment.RIGHT,
+                () -> ""
         );
     }
 

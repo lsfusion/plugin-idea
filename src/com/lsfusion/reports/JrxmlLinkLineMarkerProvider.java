@@ -13,7 +13,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +22,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -44,12 +42,13 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
     }
 
     private LineMarkerInfo<?> createLineMarker(PsiElement psi) {
-        return LSFLineMarkerInfo.create(psi,
+        return new LineMarkerInfo<PsiElement>(psi,
                 psi.getTextRange(),
                 LSFIcons.PRINT,
                 TooltipProvider.INSTANCE,
                 GotoJrxmlFileNavigationHandler.INSTANCE,
-                GutterIconRenderer.Alignment.RIGHT
+                GutterIconRenderer.Alignment.RIGHT,
+                () -> ""
         );
     }
 
