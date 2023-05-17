@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.lsfusion.migration.lang.psi.MigrationTypes.*;
 
 public class MigrationParserDefinition implements ParserDefinition {
-    public static final IStubFileElementType FILE = new IStubFileElementType(Language.findInstance(MigrationLanguage.class));
+    public static final IStubFileElementType FILE = new IStubFileElementType("MigrationLanguageStub", Language.findInstance(MigrationLanguage.class));
 
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(MigrationTypes.COMMENTS);

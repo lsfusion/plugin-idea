@@ -1,15 +1,14 @@
 package com.lsfusion.design;
 
-import com.google.common.base.Throwables;
 import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
-import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.actions.AggregateFormAction;
@@ -28,42 +27,16 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
-import java.util.concurrent.*;
 
 import static com.lsfusion.debug.DebugUtils.*;
 
-public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent {
-    private final PsiDocumentManager psiDocumentManager;
-    private final PsiManager psiManager;
-    private final Project project;
+public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements ProjectManagerListener {
+    private Project project;
 
-    public FormDesignChangeDetector(final PsiDocumentManager psiDocumentManager, final PsiManager psiManager, final Project project) {
-        this.psiDocumentManager = psiDocumentManager;
-        this.psiManager = psiManager;
+    @Override
+    public void projectOpened(@NotNull Project project) {
         this.project = project;
-    }
-
-    @Override
-    public void projectOpened() {
-        psiManager.addPsiTreeChangeListener(this);
-    }
-
-    @Override
-    public void projectClosed() {
-    }
-
-    @Override
-    public void initComponent() {
-    }
-
-    @Override
-    public void disposeComponent() {
-    }
-
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return "FormDesignChangeDetector";
+        PsiManager.getInstance(project).addPsiTreeChangeListener(this, () -> {});
     }
 
     @Override
@@ -191,7 +164,7 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements Pr
     }
 
     private void showDefaultDesign(PsiElement element, PsiFile file) {
-        if (element == null || file == null || !DesignViewFactory.getInstance().windowIsVisible() || psiDocumentManager.getDocument(file) == null || DumbService.isDumb(project))
+        if (element == null || file == null || !DesignViewFactory.getInstance().windowIsVisible() || PsiDocumentManager.getInstance(project).getDocument(file) == null || DumbService.isDumb(project))
             return;
 
         // as this event is called before commitTransaction, modificationStamp and unsavedDocument have not been updated, so the indexes cannot be accessed

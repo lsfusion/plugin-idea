@@ -5,7 +5,7 @@ import com.intellij.codeInsight.completion.CompletionPhaseListener;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -14,6 +14,7 @@ import com.intellij.openapi.progress.*;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.FileStatus;
@@ -41,41 +42,31 @@ import java.util.concurrent.ConcurrentMap;
 import static com.intellij.codeInsight.completion.impl.CompletionServiceImpl.getCompletionPhase;
 import static com.lsfusion.util.LSFPsiUtils.findChildrenOfType;
 
-public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectComponent {
-    private final PsiManager myPsiManager;
-    private final FileEditorManager myFileEditorManager;
-    private final Project myProject;
-    private final PsiDocumentManager myPsiDocumentManager;
+@Service(Service.Level.PROJECT)
+public final class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectManagerListener {
 
-    public MetaChangeDetector(
-            final PsiDocumentManager psiDocumentManager,
-            final PsiManager psiManager,
-            final FileEditorManager fileEditorManager,
-            final Project project
-    ) {
-        myPsiDocumentManager = psiDocumentManager;
-        myPsiManager = psiManager;
-        myFileEditorManager = fileEditorManager;
+    private final Project myProject;
+    private MetaChangeDetector(final Project project) {
         myProject = project;
     }
 
     public static MetaChangeDetector getInstance(Project project) {
-        return project.getComponent(MetaChangeDetector.class);
+        return project.getService(MetaChangeDetector.class);
     }
 
-    private Timer timer;
     private final static String ENABLED_META = "ENABLED_META";
 
     @Override
-    public void projectOpened() {
-        myPsiManager.addPsiTreeChangeListener(this);
+    public void projectOpened(@NotNull Project project) {
+        MetaChangeDetector metaChangeDetector = new MetaChangeDetector(project);
+        PsiManager.getInstance(project).addPsiTreeChangeListener(metaChangeDetector, () -> {});
 
-        DumbService.getInstance(myProject).smartInvokeLater(() -> {
-            PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(myProject);
-            setMetaEnabled(propertiesComponent.getBoolean(ENABLED_META, false), false);
+        DumbService.getInstance(project).smartInvokeLater(() -> {
+            PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(project);
+            setMetaEnabled(propertiesComponent.getBoolean(MetaChangeDetector.ENABLED_META, false), false);
         });
 
-        myProject.getMessageBus().connect().subscribe(CompletionPhaseListener.TOPIC, isCompletionRunning -> {
+        project.getMessageBus().connect().subscribe(CompletionPhaseListener.TOPIC, isCompletionRunning -> {
             checkCompletion();
         });
     }
@@ -90,28 +81,6 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
 
     private boolean isCompletionRunning;
     private long lastCompletionRunning;
-
-    @Override
-    public void projectClosed() {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-    }
-
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return "MetaChangeDetector";
-    }
-
-    @Override
-    public void initComponent() {
-    }
-
-    @Override
-    public void disposeComponent() {
-    }
 
     // fireChanged - чтобы отслеживать изменение сигнатуры в metacode declaration
 
@@ -521,7 +490,8 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                 if (toParse.getResult() != null)
                     genUsages.add(new GenParse(metaUsage, toParse.getResult(), toParse.getResult().version));
             }
-            final Document document = myPsiDocumentManager.getDocument(file);
+            PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(myProject);
+            final Document document = psiDocumentManager.getDocument(file);
             for (final GenParse gen : genUsages) {
                 final Result<Runnable> runMetaText = new Result<>();
                 runMetaText.setResult(() -> {
@@ -529,7 +499,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
                         return;
 
                     // без perform for commited постоянно рассинхронизируется дерево с текстом
-                    myPsiDocumentManager.performForCommittedDocument(document, () -> {
+                    psiDocumentManager.performForCommittedDocument(document, () -> {
                         if (!actualize(gen, file)) // оптимизация
                             return;
 
@@ -616,7 +586,7 @@ public class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectC
         checkCompletion();
         // because completion can stop and start right away we add some delay
         if(isCompletionRunning || System.currentTimeMillis() - lastCompletionRunning < 1000) {
-            FileEditor selectedEditor = myFileEditorManager.getSelectedEditor();
+            FileEditor selectedEditor = FileEditorManager.getInstance(myProject).getSelectedEditor();
             if(selectedEditor != null) {
                 VirtualFile editingFile = selectedEditor.getFile();
                 return editingFile != null && editingFile.equals(file.getVirtualFile());
