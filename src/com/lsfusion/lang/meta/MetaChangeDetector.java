@@ -58,12 +58,11 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Pr
 
     @Override
     public void projectOpened(@NotNull Project project) {
-        MetaChangeDetector metaChangeDetector = new MetaChangeDetector(project);
-        PsiManager.getInstance(project).addPsiTreeChangeListener(metaChangeDetector, () -> {});
+        PsiManager.getInstance(project).addPsiTreeChangeListener(this, () -> {});
 
         DumbService.getInstance(project).smartInvokeLater(() -> {
             PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(project);
-            setMetaEnabled(propertiesComponent.getBoolean(MetaChangeDetector.ENABLED_META, false), false);
+            setMetaEnabled(propertiesComponent.getBoolean(ENABLED_META, false), false);
         });
 
         project.getMessageBus().connect().subscribe(CompletionPhaseListener.TOPIC, isCompletionRunning -> {
