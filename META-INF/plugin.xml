@@ -40,7 +40,7 @@
         <listener class="com.lsfusion.design.FormDesignChangeDetector"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
 
-        <listener class="com.lsfusion.lang.meta.MetaChangeDetector"
+        <listener class="com.lsfusion.lang.meta.MetaChangeDetector$MetaChangeListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </projectListeners>
 

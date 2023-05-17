@@ -43,10 +43,10 @@ import static com.intellij.codeInsight.completion.impl.CompletionServiceImpl.get
 import static com.lsfusion.util.LSFPsiUtils.findChildrenOfType;
 
 @Service(Service.Level.PROJECT)
-public final class MetaChangeDetector extends PsiTreeChangeAdapter implements ProjectManagerListener {
+public final class MetaChangeDetector extends PsiTreeChangeAdapter {
 
     private final Project myProject;
-    private MetaChangeDetector(final Project project) {
+    public MetaChangeDetector(final Project project) {
         myProject = project;
     }
 
@@ -56,18 +56,27 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Pr
 
     private final static String ENABLED_META = "ENABLED_META";
 
-    @Override
-    public void projectOpened(@NotNull Project project) {
-        PsiManager.getInstance(project).addPsiTreeChangeListener(this, () -> {});
+    public void init() {
+        PsiManager.getInstance(myProject).addPsiTreeChangeListener(this, () -> {});
 
-        DumbService.getInstance(project).smartInvokeLater(() -> {
-            PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(project);
+        DumbService.getInstance(myProject).smartInvokeLater(() -> {
+            PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(myProject);
             setMetaEnabled(propertiesComponent.getBoolean(ENABLED_META, false), false);
         });
 
-        project.getMessageBus().connect().subscribe(CompletionPhaseListener.TOPIC, isCompletionRunning -> {
+        myProject.getMessageBus().connect().subscribe(CompletionPhaseListener.TOPIC, isCompletionRunning -> {
             checkCompletion();
         });
+    }
+
+    // By the new idea rules, we can`t implement ProjectComponent anymore.
+    // Instead, we will use ProjectManagerListener and @Service annotation (the listener is needed to initialize the service when the project is opened, and the class with @Service annotation will do all the work).
+    // But if we do this on a single class(Implementation and annotation at the same time), multiple instances of that class will be created, and we need only one instance.
+    public static class MetaChangeListener implements ProjectManagerListener {
+        @Override
+        public void projectOpened(@NotNull Project project) {
+            project.getService(MetaChangeDetector.class).init();
+        }
     }
 
     private void checkCompletion() {
