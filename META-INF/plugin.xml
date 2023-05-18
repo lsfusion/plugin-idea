@@ -1,21 +1,17 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.257</version>
+    <version>1.0.258</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.257</b><br>
+        <b>Version 1.0.258</b><br>
         <ul>
-            <li>MATCH operator support</li>
-            <li>NATIVE WINDOW operator support</li>
-            <li>Static objects IMAGE operator support</li>
-            <li>TSQUERY class support</li>
-            <li>TSVECTOR class support</li>
-            <li>HTML class support</li>
-            <li>Fixed quick-documentation for platform version 5</li>
+            <li>Fixed performance errors in idea 2023</li>
+            <li>Increase "since-build" to 203.5981.155</li>
+            <li>Removed Idea 2020.2- compatibility hack</li>
         </ul>
     ]]>
     </change-notes>
