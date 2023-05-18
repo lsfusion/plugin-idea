@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.lsfusion.lang.psi.LSFTypes.*;
 
 public class LSFParserDefinition implements ParserDefinition {
-    public static final IStubFileElementType LSF_FILE = new IStubFileElementType(Language.findInstance(LSFLanguage.class));
+    public static final IStubFileElementType LSF_FILE = new IStubFileElementType("LSFLanguageStub", Language.findInstance(LSFLanguage.class));
 
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(LSFTypes.COMMENTS);

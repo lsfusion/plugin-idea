@@ -1,27 +1,23 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.257</version>
+    <version>1.0.258</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.257</b><br>
+        <b>Version 1.0.258</b><br>
         <ul>
-            <li>MATCH operator support</li>
-            <li>NATIVE WINDOW operator support</li>
-            <li>Static objects IMAGE operator support</li>
-            <li>TSQUERY class support</li>
-            <li>TSVECTOR class support</li>
-            <li>HTML class support</li>
-            <li>Fixed quick-documentation for platform version 5</li>
+            <li>Fixed performance errors in idea 2023</li>
+            <li>Increase "since-build" to 203.5981.155</li>
+            <li>Removed Idea 2020.2- compatibility hack</li>
         </ul>
     ]]>
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="202.6397.94"/>
+    <idea-version since-build="203.5981.155"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -36,24 +32,13 @@
         </component>
     </application-components>
 
-    <project-components>
-        <!-- Add your project components here -->
-        <component>
-            <implementation-class>com.lsfusion.lang.meta.MetaChangeDetector</implementation-class>
-            <skipForDefaultProject/>
-        </component>
+    <projectListeners>
+        <listener class="com.lsfusion.design.FormDesignChangeDetector"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
 
-        <component>
-            <implementation-class>com.lsfusion.design.FormDesignChangeDetector</implementation-class>
-            <skipForDefaultProject/>
-        </component>
-
-        <component>
-            <implementation-class>com.lsfusion.LSFBaseProjectComponent</implementation-class>
-            <skipForDefaultProject/>
-        </component>
-
-    </project-components>
+        <listener class="com.lsfusion.lang.meta.MetaChangeDetector$MetaChangeListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </projectListeners>
 
     <actions>
         <group id="LSFGroup" popup="true" text="_LSF">
@@ -149,6 +134,7 @@
         <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.lang.LSFParserDefinition"/>
 
         <targetElementEvaluator language="Lsf" implementationClass="com.lsfusion.LSFTargetElementEvaluatorEx2"/>
+        <postStartupActivity implementation="com.lsfusion.LSFBaseStartupActivity"/>
 
         <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupingRuleProvider"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>

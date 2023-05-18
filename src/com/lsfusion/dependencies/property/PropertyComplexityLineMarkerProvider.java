@@ -10,7 +10,6 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
-import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.actions.ToggleComplexityAction;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFSimpleName;
@@ -68,12 +67,13 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
 
     private LineMarkerInfo<?> createLineMarker(LSFGlobalPropDeclaration property, PsiElement element) {
         int complexity = PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching(property);
-        return LSFLineMarkerInfo.create(element,
+        return new LineMarkerInfo<>(element,
                 element.getTextRange(),
                 createIcon(complexity),
                 PropertyComplexityTooltipProvider.INSTANCE,
                 null,
-                GutterIconRenderer.Alignment.RIGHT
+                GutterIconRenderer.Alignment.RIGHT,
+                () -> ""
         );
     }
 

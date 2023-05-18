@@ -14,7 +14,6 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
@@ -36,12 +35,13 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
     }
 
     private LineMarkerInfo<?> createLineMarker(PsiElement psi) {
-        return LSFLineMarkerInfo.create(psi,
+        return new LineMarkerInfo<PsiElement>(psi,
                 psi.getTextRange(),
                 LSFIcons.Design.DESIGN,
                 GetFormNameTooltipProvider.INSTANCE,
                 OpenDesignPreviewNavigationHandler.INSTANCE,
-                GutterIconRenderer.Alignment.RIGHT
+                GutterIconRenderer.Alignment.RIGHT,
+                () -> ""
         );
     }
 

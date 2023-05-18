@@ -7,7 +7,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
-import com.lsfusion.LSFLineMarkerInfo;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.LSFColorLiteral;
 import com.lsfusion.lang.psi.LSFUintLiteral;
@@ -32,7 +31,14 @@ public class PropertyColorLineMarkerProvider implements LineMarkerProvider {
     }
 
     private LineMarkerInfo<?> createLineMarker(PsiElement psi, Color color) {
-        return LSFLineMarkerInfo.create(psi, psi.getTextRange(), createIcon(color), null, ShowTableNavigationProvider.INSTANCE, GutterIconRenderer.Alignment.LEFT);
+        return new LineMarkerInfo<>(psi,
+                psi.getTextRange(),
+                createIcon(color),
+                null,
+                ShowTableNavigationProvider.INSTANCE,
+                GutterIconRenderer.Alignment.LEFT,
+                () -> ""
+        );
     }
 
     private static Icon createIcon(Color color) {
