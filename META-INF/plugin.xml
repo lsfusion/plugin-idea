@@ -12,6 +12,7 @@
             <li>Fixed performance errors in idea 2023</li>
             <li>Increase "since-build" to 203.5981.155</li>
             <li>Removed Idea 2020.2- compatibility hack</li>
+            <li>Added support for explicit database names of properties, indexes and tables</li>
         </ul>
     ]]>
     </change-notes>

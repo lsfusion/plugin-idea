@@ -655,7 +655,7 @@ nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI |
 
 viewTypeSetting ::= classViewType
 customViewSetting ::= propertyCustomView
-persistentSetting ::= MATERIALIZED
+persistentSetting ::= MATERIALIZED stringLiteral?
 complexSetting ::= COMPLEX | NOCOMPLEX
 hintSetting ::= HINT | NOHINT
 prereadSetting ::= PREREAD
@@ -671,7 +671,7 @@ confirmSetting ::= CONFIRM
 regexpSetting ::= REGEXP stringLiteral (stringLiteral)?
 loggableSetting ::= LOGGABLE
 echoSymbolsSetting ::= ECHO
-indexSetting ::= INDEXED (LIKE | MATCH)?
+indexSetting ::= INDEXED stringLiteral? (LIKE | MATCH)?
 aggrSetting ::= AGGR
 notNullSetting ::= nullOption (DELETE)? baseEventNotPE
 onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти
@@ -2040,7 +2040,7 @@ aspectStatement ::= (aspectBefore | aspectAfter) mappedActionClassParamDeclare D
 
 noDefault ::= NODEFAULT 
 
-tableStatement ::= TABLE simpleName LBRAC classNameList RBRAC (FULL | noDefault)? SEMI
+tableStatement ::= TABLE simpleName stringLiteral? LBRAC classNameList RBRAC (FULL | noDefault)? SEMI
 {
     pin = 2
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFTableDeclarationImpl"
@@ -2064,7 +2064,7 @@ loggableStatement ::= LOGGABLE nonEmptyNoContextPropertyUsageList SEMI {pin=1 me
 mappedPropertyOrSimpleExprParam ::= mappedPropertyExprParam | exprParameterUsage; // exprParam
 nonEmptyMappedPropertyOrSimpleExprParamList ::= mappedPropertyOrSimpleExprParam (COMMA mappedPropertyOrSimpleExprParam)*  { pin(".*") = 1}
 
-indexStatement ::= INDEX nonEmptyMappedPropertyOrSimpleExprParamList SEMI
+indexStatement ::= INDEX stringLiteral? nonEmptyMappedPropertyOrSimpleExprParamList SEMI
 {
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getDocumentation]
