@@ -2064,7 +2064,7 @@ loggableStatement ::= LOGGABLE nonEmptyNoContextPropertyUsageList SEMI {pin=1 me
 mappedPropertyOrSimpleExprParam ::= mappedPropertyExprParam | exprParameterUsage; // exprParam
 nonEmptyMappedPropertyOrSimpleExprParamList ::= mappedPropertyOrSimpleExprParam (COMMA mappedPropertyOrSimpleExprParam)*  { pin(".*") = 1}
 
-indexStatement ::= INDEX stringLiteral? nonEmptyMappedPropertyOrSimpleExprParamList SEMI
+indexStatement ::= INDEX stringLiteral? (LIKE | MATCH)? nonEmptyMappedPropertyOrSimpleExprParamList SEMI
 {
     implements="com.lsfusion.lang.psi.context.ModifyParamContext"
     methods = [ getContextModifier getContextInferrer getDocumentation]

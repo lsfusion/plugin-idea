@@ -13,6 +13,7 @@
             <li>Increase "since-build" to 203.5981.155</li>
             <li>Removed Idea 2020.2- compatibility hack</li>
             <li>Added support for explicit database names of properties, indexes and tables</li>
+            <li>Added LIKE/MATCH index types to INDEX statement</li>
         </ul>
     ]]>
     </change-notes>
