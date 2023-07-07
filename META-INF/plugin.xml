@@ -7,13 +7,11 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.258</b><br>
+        <b>Version 1.0.259</b><br>
         <ul>
-            <li>Fixed performance errors in idea 2023</li>
-            <li>Increase "since-build" to 203.5981.155</li>
-            <li>Removed Idea 2020.2- compatibility hack</li>
             <li>Added support for explicit database names of properties, indexes and tables</li>
             <li>Added LIKE/MATCH index types to INDEX statement</li>
+            <li>Fixed error when using HTML print format</li>
         </ul>
     ]]>
     </change-notes>
