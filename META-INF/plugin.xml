@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.259</b><br>
+        <b>Version 1.0.260</b><br>
         <ul>
-            <li>Added support for explicit database names of properties, indexes and tables</li>
-            <li>Added LIKE/MATCH index types to INDEX statement</li>
-            <li>Fixed error when using HTML print format</li>
+            <li>Fixed INDEX statement grammar</li>
         </ul>
     ]]>
     </change-notes>
