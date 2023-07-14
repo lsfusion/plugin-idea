@@ -28,7 +28,6 @@ import static com.lsfusion.util.BaseUtils.isRedundantString;
 public class PropertyDrawView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
-            new ReflectionProperty("panelCaptionAfter").setExpert(),
             new ReflectionProperty("changeOnSingleClick").setExpert(),
             new ReflectionProperty("hide").setExpert(),
             new ReflectionProperty("regexp"),
@@ -43,7 +42,6 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("valueSize").setExpert(),
             new ReflectionProperty("valueAlignment"),
             new ReflectionProperty("valueFlex"),
-            new ReflectionProperty("valueClass"),
             new ReflectionProperty("changeKey"),
             new ReflectionProperty("showChangeKey").setExpert(),
             new ReflectionProperty("changeMouse"),
