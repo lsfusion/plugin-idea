@@ -136,4 +136,32 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
     public void setBoxed(boolean boxed) {
         target.boxed = boxed;
     }
+
+    public void setCaptionClass(String captionClass) {
+        target.captionClass = captionClass;
+    }
+
+    public void setComment(String comment) {
+        target.comment = comment;
+    }
+
+    public void setCommentClass(String commentClass) {
+        target.commentClass = commentClass;
+    }
+
+    public void setPanelCommentVertical(boolean panelCommentVertical) {
+        target.panelCommentVertical = panelCommentVertical;
+    }
+
+    public void setPanelCommentFirst(boolean panelCommentFirst) {
+        target.panelCommentFirst = panelCommentFirst;
+    }
+
+    public void setPanelCommentAlignment(FlexAlignment panelCommentAlignment) {
+        target.panelCommentAlignment = panelCommentAlignment;
+    }
+
+    public void setPlaceholder(String placeholder) {
+        target.placeholder = placeholder;
+    }
 }

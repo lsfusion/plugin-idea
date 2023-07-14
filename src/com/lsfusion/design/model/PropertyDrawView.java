@@ -107,6 +107,16 @@ public class PropertyDrawView extends ComponentView {
 
     public boolean boxed;
 
+    public String captionClass;
+
+    public String comment;
+    public String commentClass;
+    public boolean panelCommentVertical;
+    public Boolean panelCommentFirst;
+    public FlexAlignment panelCommentAlignment;
+
+    public String placeholder;
+
     public PropertyDrawView() {
         this("");
     }
