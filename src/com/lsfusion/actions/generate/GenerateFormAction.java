@@ -422,8 +422,7 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getExtIDScript(ElementKey key, ElementNamespace namespace) {
-        String namespaceScript = namespace != null ? namespace.prefix.isEmpty() ? ("=" + namespace.uri + ":") : (namespace.prefix + ":") : "";
-        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + namespaceScript + key.extID + "'") : "";
+        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + getNamespaceScript(namespace) + key.extID + "'") : "";
     }
 
     private String getFormNameScript(String formName, ElementNamespace formNamespace) {
