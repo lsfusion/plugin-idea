@@ -10,6 +10,7 @@
         <b>Version 1.0.262</b><br>
         <ul>
             <li>Generate form: namespace declaration fix</li>
+            <li>Added NOCUSTOM clause</li>
         </ul>
     ]]>
     </change-notes>

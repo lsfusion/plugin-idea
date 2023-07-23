@@ -1638,7 +1638,7 @@ classViewType ::= PANEL | GRID | TOOLBAR
 
 renderPropertyCustomView ::= stringLiteral
 changePropertyCustomView ::= CHANGE stringLiteral?
-propertyCustomView ::= CUSTOM ((renderPropertyCustomView changePropertyCustomView) | renderPropertyCustomView | changePropertyCustomView)
+propertyCustomView ::= (CUSTOM ((renderPropertyCustomView changePropertyCustomView) | renderPropertyCustomView | changePropertyCustomView)) | (NOCUSTOM changePropertyCustomView?)
 
 listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral (OPTIONS propertyExpression)?) | CALENDAR
 
