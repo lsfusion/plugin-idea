@@ -1602,7 +1602,8 @@ treeGroupDeclaration ::= simpleName
 }
 
 formGroupObjectDeclaration ::= formGroupObject formGroupObjectOptions
-formGroupObjectOptions ::= (    formGroupObjectViewType 
+formGroupObjectOptions ::= (    formGroupObjectViewType
+                           |    formExtKey
                            |    formSubReport 
                            |    formGroupObjectInitViewType
                            |    formGroupObjectPageSize
@@ -1631,6 +1632,8 @@ formGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDecla
 
 formGroupObjectViewType ::= classViewType | listViewType
 formGroupObjectInitViewType ::= INIT | FIXED
+
+formExtKey ::= EXTKEY
 
 formSubReport ::= SUBREPORT formCalcPropertyObject?
 

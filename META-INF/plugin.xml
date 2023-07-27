@@ -11,6 +11,7 @@
         <ul>
             <li>Generate form: namespace declaration fix</li>
             <li>Added NOCUSTOM clause</li>
+            <li>EXTKEY keyword support</li>
         </ul>
     ]]>
     </change-notes>
