@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.262</b><br>
+        <b>Version 1.0.263</b><br>
         <ul>
-            <li>Generate form: namespace declaration fix</li>
-            <li>Added NOCUSTOM clause</li>
-            <li>EXTKEY keyword support</li>
+            <li>SELECT clause support</li>
         </ul>
     ]]>
     </change-notes>

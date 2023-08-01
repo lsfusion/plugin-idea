@@ -1641,7 +1641,9 @@ classViewType ::= PANEL | GRID | TOOLBAR
 
 renderPropertyCustomView ::= stringLiteral
 changePropertyCustomView ::= CHANGE stringLiteral?
-propertyCustomView ::= (CUSTOM ((renderPropertyCustomView changePropertyCustomView) | renderPropertyCustomView | changePropertyCustomView)) | (NOCUSTOM changePropertyCustomView?)
+propertyCustomView ::= (CUSTOM ((renderPropertyCustomView changePropertyCustomView) | renderPropertyCustomView | changePropertyCustomView))
+                        | (SELECT (AUTO | (<<noIDCheck>> stringLiteral))?)
+                        | NOSELECT
 
 listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral (OPTIONS propertyExpression)?) | CALENDAR
 
@@ -1732,7 +1734,7 @@ formOptionCustomView ::= propertyCustomView
 formOptionToDraw ::= DRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | CLASS | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
-formOptionsWithOptionalCalcPropertyObject ::= IMAGE formCalcPropertyObject? {pin = 1}
+formOptionsWithOptionalCalcPropertyObject ::= IMAGE (AUTO | formCalcPropertyObject)? {pin = 1}
 formOptionQuickFilter ::= QUICKFILTER formPropertyDrawUsage {pin = 1}
 formOptionInsertType ::= staticRelativePosition | (BEFORE | AFTER) formPropertyDrawUsage {pin = 1}
 formOptionsOnEvents ::= ON formEventType formActionPropertyObject

@@ -187,6 +187,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "ASON"                      			{ return ASON; }
   "ASYNCUPDATE"             			{ return ASYNCUPDATE; }
   "ATTACH"                  			{ return ATTACH; }
+  "AUTO"                                { return AUTO; }
   "AUTOREFRESH"                         { return AUTOREFRESH; }
   "AUTOSET"                 			{ return AUTOSET; }
   "BACKGROUND"              			{ return BACKGROUND; }
