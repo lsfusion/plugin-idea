@@ -393,6 +393,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NOCONSTRAINTFILTER"                  { return NOCONSTRAINTFILTER; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOHEADER"                			{ return NOHEADER; }
+  "NOSELECT"                			{ return NOSELECT; }
   "NOSETTINGS"                     	    { return NOSETTINGS; }
   "NOSTICKY"                     	    { return NOSTICKY; }
   "NOT"                     			{ return NOT; }
@@ -460,6 +461,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "RTF"                     			{ return RTF; }
   "SCROLL"                              { return SCROLL; }
   "SEEK"                    			{ return SEEK; }
+  "SELECT"                			    { return SELECT; }
   "SELECTED"                			{ return SELECTED; }
   "SELECTOR"                			{ return SELECTOR; }
   "SERIALIZABLE"                        { return SERIALIZABLE; }
