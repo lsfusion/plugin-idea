@@ -10,6 +10,7 @@
         <b>Version 1.0.263</b><br>
         <ul>
             <li>SELECT clause support</li>
+            <li>NOIMAGE support</li>
         </ul>
     ]]>
     </change-notes>

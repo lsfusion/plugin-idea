@@ -661,8 +661,8 @@ hintSetting ::= HINT | NOHINT
 prereadSetting ::= PREREAD
 charWidthSetting ::= CHARWIDTH intLiteral
 flexCharWidthSetting ::= CHARWIDTH intLiteral (FLEX | NOFLEX)
-imageSetting ::= IMAGE stringLiteral?
-staticObjectImage ::= IMAGE stringLiteral
+imageSetting ::= (IMAGE stringLiteral?) | NOIMAGE
+staticObjectImage ::= (IMAGE stringLiteral) | NOIMAGE
 defaultCompareSetting ::= DEFAULTCOMPARE stringLiteral
 changeKeySetting ::= CHANGEKEY stringLiteral (SHOW | hideEditKey)?
 changeMouseSetting ::= CHANGEMOUSE stringLiteral (SHOW | hideEditKey)?
@@ -1734,7 +1734,7 @@ formOptionCustomView ::= propertyCustomView
 formOptionToDraw ::= DRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
 formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | CLASS | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
-formOptionsWithOptionalCalcPropertyObject ::= IMAGE (AUTO | formCalcPropertyObject)? {pin = 1}
+formOptionsWithOptionalCalcPropertyObject ::= (IMAGE (AUTO | formCalcPropertyObject)?) | NOIMAGE {pin = 1}
 formOptionQuickFilter ::= QUICKFILTER formPropertyDrawUsage {pin = 1}
 formOptionInsertType ::= staticRelativePosition | (BEFORE | AFTER) formPropertyDrawUsage {pin = 1}
 formOptionsOnEvents ::= ON formEventType formActionPropertyObject
@@ -2183,7 +2183,7 @@ setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLite
 
 navigatorElementOptions ::= (	(WINDOW windowUsage PARENT?)
                             |	navigatorElementInsertPosition 
-                            |	IMAGE (propertyExpression | stringLiteral)?
+                            |	((IMAGE (propertyExpression | stringLiteral)?) | NOIMAGE)
                             |   CLASS propertyExpression
                             |	HEADER propertyExpression
                             )*
