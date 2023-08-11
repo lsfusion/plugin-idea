@@ -13,14 +13,14 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         super(target);
     }
 
-    public void setAutoSize(boolean autoSize) {
-        target.autoSize = autoSize;
+    public void setSpan(int span) {
+        target.span = span;
     }
 
     public void setDefaultComponent(boolean defaultComponent) {
         target.defaultComponent = defaultComponent;
     }
-    
+
     public void setActivated(boolean activated) {
         target.activated = activated;
     }
@@ -32,8 +32,36 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         setAlignment(fill == 0 ? FlexAlignment.START : FlexAlignment.STRETCH);
     }
 
+    public void setSize(Dimension size) {
+        target.size = size;
+    }
+
+    public void setHeight(int height) {
+        if (target.size == null) {
+            target.size = new Dimension(-1, height);
+        } else {
+            target.size.height = height;
+        }
+    }
+
+    public void setWidth(int prefWidth) {
+        if (target.size == null) {
+            target.size = new Dimension(prefWidth, -1);
+        } else {
+            target.size.width = prefWidth;
+        }
+    }
+
     public void setFlex(double flex) {
         target.setFlex(flex);
+    }
+
+    public void setShrink(boolean shrink) {
+        target.shrink = shrink;
+    }
+
+    public void setAlignShrink(boolean alignShrink) {
+        target.alignShrink = alignShrink;
     }
 
     public void setAlign(FlexAlignment alignment) {
@@ -42,6 +70,10 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
 
     public void setAlignment(FlexAlignment alignment) {
         target.setAlignment(alignment);
+    }
+
+    public void setAlignCaption(Boolean alignCaption) {
+        target.alignCaption = alignCaption;
     }
 
     public void setMarginTop(int marginTop) {
@@ -67,17 +99,16 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
     /* ========= design properties ========= */
 
     public void setCaptionFont(FontInfo captionFont) {
-        target.setCaptionFont(captionFont);
+        target.captionFont = captionFont;
     }
 
     public void setFont(FontInfo font) {
-        target.setFont(font);
+        target.font = font;
     }
 
     public void setFontSize(int fontSize) {
         FontInfo font = target.font != null ? target.font.derive(fontSize) : new FontInfo(fontSize);
-
-        target.setFont(font);
+        setFont(font);
     }
 
     public void setFontStyle(String fontStyle) {
@@ -102,8 +133,7 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         }
 
         FontInfo font = target.font != null ? target.font.derive(bold, italic) : new FontInfo(bold, italic);
-
-        target.setFont(font);
+        setFont(font);
     }
 
     public void setBackground(Color background) {
@@ -118,21 +148,7 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         target.setImagePath(imagePath);
     }
 
-    public void setCustom(String custom) {
-        target.custom = custom;
-    }
-
-    public void setAlignCaption(Boolean alignCaption) {
-        target.alignCaption = alignCaption;
-    }
-
-    public void setSize(Dimension size) {
-        target.setSize(size);
-    }
-    public void setHeight(int prefHeight) {
-        target.setHeight(prefHeight);
-    }
-    public void setWidth(int prefWidth) {
-        target.setWidth(prefWidth);
+    public void setShowIf(String showIf) {
+        target.showIf = showIf;
     }
 }

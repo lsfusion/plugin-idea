@@ -15,33 +15,42 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+/*adding new property:
+1. add to PROPERTIES
+2. create field
+3. create setter in Proxy*/
+
 public class GridView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
-            new ReflectionProperty("tabVertical").setExpert(),
-            new ReflectionProperty("autoHide").setExpert(),
-            new ReflectionProperty("quickSearch").setExpert(),
-            new ReflectionProperty("headerHeight").setExpert(),
-            new ReflectionProperty("resizeOverflow").setExpert(),
-            new ReflectionProperty("lineWidth").setExpert(),
-            new ReflectionProperty("lineHeight").setExpert()
+            new ReflectionProperty("autoSize"),
+            new ReflectionProperty("boxed"),
+            new ReflectionProperty("tabVertical"),
+            new ReflectionProperty("quickSearch"),
+            new ReflectionProperty("headerHeight"),
+            new ReflectionProperty("resizeOverflow"),
+            new ReflectionProperty("lineWidth"),
+            new ReflectionProperty("lineHeight")
     );
 
-    GridTableModel model = new GridTableModel();
+    @Override
+    public List<Property> getProperties() {
+        return PROPERTIES;
+    }
 
-    public boolean tabVertical = false;
-    public boolean autoHide = false;
-    public boolean quickSearch = false;
+    public boolean autoSize;
 
-    public Boolean resizeOverflow;
+    public boolean boxed;
 
-    public int headerHeight = 0;
+    public boolean tabVertical;
+    public boolean quickSearch;
+
+    public int headerHeight;
+
+    public boolean resizeOverflow;
+
     public int lineWidth = 0;
     public int lineHeight = 0;
-
-    private GroupObjectView groupObject;
-
-    private JComponentPanel component;
 
     public GridView(GroupObjectView groupObject) {
         this("");
@@ -51,6 +60,12 @@ public class GridView extends ComponentView {
     public GridView(String sID) {
         super(sID);
     }
+
+    GridTableModel model = new GridTableModel();
+
+    private GroupObjectView groupObject;
+
+    private JComponentPanel component;
 
     @Override
     public double getBaseDefaultFlex(FormEntity formEntity) {
@@ -66,60 +81,6 @@ public class GridView extends ComponentView {
     public String getCaption() {
         return "Grid";
     }
-
-    @Override
-    public List<Property> getProperties() {
-        return PROPERTIES;
-    }
-
-    public void setTabVertical(boolean tabVertical) {
-        this.tabVertical = tabVertical;
-    }
-
-    public void setAutoHide(boolean autoHide) {
-        this.autoHide = autoHide;
-    }
-
-    public void setQuickSearch(boolean quickSearch) {
-        this.quickSearch = quickSearch;
-    }
-    
-    public void setHeaderHeight(int headerHeight) {
-        this.headerHeight = headerHeight;
-    }
-
-    public void setLineWidth(int lineWidth) {
-        this.lineWidth = lineWidth;
-    }
-
-    public void setLineHeight(int lineHeight) {
-        this.lineHeight = lineHeight;
-    }
-
-    public boolean isTabVertical() {
-        return tabVertical;
-    }
-
-    public boolean isAutoHide() {
-        return autoHide;
-    }
-
-    public boolean isQuickSearch() {
-        return quickSearch;
-    }
-    
-    public int getHeaderHeight() {
-        return headerHeight;
-    }
-
-    public int getLineWidth() {
-        return lineWidth;
-    }
-
-    public int getLineHeight() {
-        return lineHeight;
-    }
-
 
     @Override
     public Icon getIcon() {

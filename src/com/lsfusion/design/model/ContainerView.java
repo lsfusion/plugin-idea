@@ -8,54 +8,89 @@ import com.lsfusion.LSFIcons;
 import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.*;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.lsfusion.design.model.ContainerType.*;
 import static java.lang.Math.max;
 
+/*adding new property:
+1. add to PROPERTIES
+2. create field
+3. create setter in Proxy*/
+
 public class ContainerView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
-            new ReflectionProperty("childrenAlignment"),
-            new ReflectionProperty("columns"), //backward compatibility
-            new ReflectionProperty("lines"),
+            new ReflectionProperty("caption"),
+            new ReflectionProperty("image"),
+            new ReflectionProperty("collapsible"),
+            new ReflectionProperty("border"),
+            new ReflectionProperty("collapsed"),
             new ReflectionProperty("type"),
             new ReflectionProperty("horizontal"),
             new ReflectionProperty("tabbed"),
-            new ReflectionProperty("caption"),
-            new ReflectionProperty("image"),
-            new ReflectionProperty("description"),
-            new ReflectionProperty("collapsible"),
-            new ReflectionProperty("collapsed"),
-            new ReflectionProperty("resizeOverflow"),
+            new ReflectionProperty("childrenAlignment"),
             new ReflectionProperty("alignCaptions"),
-            new ReflectionProperty("showIf").setExpert()
+            new ReflectionProperty("grid"),
+            new ReflectionProperty("wrap"),
+            new ReflectionProperty("resizeOverflow"),
+            new ReflectionProperty("custom"),
+            new ReflectionProperty("columns"), //backward compatibility
+            new ReflectionProperty("lines"),
+            new ReflectionProperty("lineSize"),
+            new ReflectionProperty("captionLineSize"),
+            new ReflectionProperty("visible") //backward compatibility
     );
+
+    @Override
+    public List<Property> getProperties() {
+        return PROPERTIES;
+    }
 
     private final List<ComponentView> children = new ArrayList<>();
 
     public String caption;
-    public String description;
-    public Boolean collapsible;
+
+    public String image;
+
+    public boolean collapsible;
+
+    public boolean border;
+
     public boolean collapsed;
-    @NotNull
+
     public ContainerType type = ContainerType.CONTAINERV;
-    public Alignment childrenAlignment = Alignment.START;
-    public int lines = 1;
+
     public boolean horizontal;
+
     public boolean tabbed;
-    public String showIf;
 
-    public Boolean resizeOverflow;
+    public Alignment childrenAlignment = Alignment.START;
 
-    public Boolean alignCaptions;
+    public boolean alignCaptions;
+
+    public boolean grid;
+
+    public boolean wrap;
+
+    public boolean resizeOverflow;
+
+    public String custom;
+
+    public int lines = 1;
+
+    public int lineSize;
+
+    public int captionLineSize;
+
+    public String description;
+
+    public boolean visible;
+
 
     public ContainerView() {
         this("");
@@ -70,45 +105,12 @@ public class ContainerView extends ComponentView {
     }
 
     @Override
-    public List<Property> getProperties() {
-        return PROPERTIES;
+    public String getCaption() {
+        return caption;
     }
 
-    public Alignment getChildrenAlignment() {
-        return childrenAlignment;
-    }
-
-    public void setChildrenAlignment(Alignment childrenAlignment) {
-        this.childrenAlignment = childrenAlignment;
-    }
-
-    public int getColumns() {
-        return lines;
-    }
-
-    public void setColumns(int lines) {
-        this.lines = lines;
-    }
-
-    public int getLines() {
-        return lines;
-    }
-
-    public void setLines(int lines) {
-        this.lines = lines;
-    }
-
-    @NotNull
-    public ContainerType getType() {
-        return type;
-    }
-    
-    public void setCollapsible(boolean collapsible) {
-        this.collapsible = collapsible;
-    }
-
-    public void setCollapsed(boolean collapsed) {
-        this.collapsed = collapsed;
+    public void setCaption(String caption) {
+        this.caption = caption;
     }
 
     public void setType(ContainerType type) {
@@ -119,49 +121,20 @@ public class ContainerView extends ComponentView {
         return type == CONTAINERH || type == SPLITH || horizontal;
     }
 
-    public void setHorizontal(boolean horizontal) {
-        this.horizontal = horizontal;
-    }
-
     public boolean isTabbed() {
         return type == TABBED || tabbed;
     }
 
-    public void setTabbed(boolean tabbed) {
-        this.tabbed = tabbed;
+    public void setChildrenAlignment(Alignment childrenAlignment) {
+        this.childrenAlignment = childrenAlignment;
     }
 
-    @Override
-    public String getCaption() {
-        return caption;
+    public void setColumns(int columns) {
+        setLines(columns);
     }
 
-    public void setCaption(String caption) {
-        this.caption = caption;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-    
-    public boolean isCollapsible() {
-        return collapsible != null ? collapsible : caption != null;
-    }
-
-    public boolean isCollapsed() {
-        return collapsed;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getShowIf() {
-        return showIf;
-    }
-
-    public void setShowIf(String showIf) {
-        this.showIf = showIf;
+    public void setLines(int lines) {
+        this.lines = lines;
     }
 
     @Override
@@ -300,7 +273,10 @@ public class ContainerView extends ComponentView {
         int notActions = 0;
         // only simple property draws
         for(ComponentView child : children) {
-            if(!(child instanceof PropertyDrawView) || /*((PropertyDrawView) child).hasColumnGroupObjects() || */(child.autoSize/* && ((PropertyDrawView) child).isAutoDynamicHeight()*/) || child.flex > 0 || ((PropertyDrawView) child).panelCaptionVertical)
+            /*((PropertyDrawView) child).hasColumnGroupObjects() || */
+            /* && ((PropertyDrawView) child).isAutoDynamicHeight()*/
+            /* && ((PropertyDrawView) child).isAutoDynamicHeight()*/
+            if(!(child instanceof PropertyDrawView) || ((PropertyDrawView) child).autoSize || child.flex > 0 || ((PropertyDrawView) child).panelCaptionVertical)
                 return false;
 
             if(!((PropertyDrawView)child).entity.isAction)

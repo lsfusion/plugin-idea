@@ -8,16 +8,20 @@ public class GridViewProxy extends ComponentViewProxy<GridView> {
         super(target);
     }
 
+    public void setAutoSize(boolean autoSize) {
+        target.autoSize = autoSize;
+    }
+
+    public void setBoxed(boolean boxed) {
+        target.boxed = boxed;
+    }
+
     public void setTabVertical(boolean tabVertical) {
         target.tabVertical = tabVertical;
     }
 
-    public void setAutoHide(boolean autoHide) {
-        target.autoHide = autoHide;
-    }
-
     public void setQuickSearch(boolean quickSearch) {
-        target.setQuickSearch(quickSearch);
+        target.quickSearch = quickSearch;
     }
 
     public void setHeaderHeight(int headerHeight) {

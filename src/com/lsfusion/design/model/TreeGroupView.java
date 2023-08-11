@@ -17,14 +17,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+/*adding new property:
+1. add to PROPERTIES
+2. create field
+3. create setter in Proxy*/
+
 public class TreeGroupView extends ComponentView implements PropertyGroupContainerView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
+            new ReflectionProperty("autoSize"),
+            new ReflectionProperty("boxed"),
             new ReflectionProperty("expandOnClick"),
-            new ReflectionProperty("resizeOverflow").setExpert(),
-            new ReflectionProperty("lineWidth").setExpert(),
-            new ReflectionProperty("lineHeight").setExpert()
+            new ReflectionProperty("headerHeight"),
+            new ReflectionProperty("resizeOverflow"),
+            new ReflectionProperty("lineHeight"),
+            new ReflectionProperty("lineWidth")
     );
+
+    @Override
+    public List<Property> getProperties() {
+        return PROPERTIES;
+    }
     
     public TreeGroupEntity entity;
 
@@ -33,12 +46,19 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     public ComponentView filterControls;
 
     private TreeGroupTableModel model = new TreeGroupTableModel();
+
+    public boolean autoSize;
+
+    public boolean boxed;
+
     public boolean expandOnClick;
 
-    public Boolean resizeOverflow;
+    public int headerHeight;
 
-    public int lineWidth = 0;
-    public int lineHeight = 0;
+    public boolean resizeOverflow;
+
+    public int lineHeight;
+    public int lineWidth;
 
     public TreeGroupView(TreeGroupEntity entity) {
         super(entity.sID);
@@ -63,11 +83,6 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     @Override
     public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
         return FlexAlignment.STRETCH;
-    }
-
-    @Override
-    public List<Property> getProperties() {
-        return PROPERTIES;
     }
 
     @Override
@@ -103,30 +118,6 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
             size += groupObject.isParent ? 35 * 4 : 35;
         }
         return size;
-    }
-    
-    public void setExpandOnClick(boolean expandOnClick) {
-        this.expandOnClick = expandOnClick;
-    }
-    
-    public boolean getExpandOnClick() {
-        return expandOnClick;
-    }
-
-    public int getLineWidth() {
-        return lineWidth;
-    }
-
-    public void setLineWidth(int lineWidth) {
-        this.lineWidth = lineWidth;
-    }
-
-    public int getLineHeight() {
-        return lineHeight;
-    }
-
-    public void setLineHeight(int lineHeight) {
-        this.lineHeight = lineHeight;
     }
 
     @Override

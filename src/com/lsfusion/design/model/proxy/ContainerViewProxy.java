@@ -13,31 +13,35 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
     }
 
     public void setCaption(String caption) {
-        target.caption = caption;
+        target.setCaption(caption);
     }
 
-    public void setDescription(String description) {
-        target.description = description;
+    public void setImage(String image) {
+        target.image = image;
     }
-    
+
     public void setCollapsible(boolean collapsible) {
-        target.setCollapsible(collapsible);
+        target.collapsible = collapsible;
+    }
+
+    public void setBorder(boolean border) {
+        target.border = border;
     }
 
     public void setCollapsed(boolean collapsed) {
-        target.setCollapsed(collapsed);
+        target.collapsed = collapsed;
     }
 
     public void setType(ContainerType type) {
         target.setType(type);
     }
 
-    public void setResizeOverflow(boolean resizeOverflow) {
-        target.resizeOverflow = resizeOverflow;
+    public void setHorizontal(boolean horizontal) {
+        target.horizontal = horizontal;
     }
 
-    public void setAlignCaptions(boolean alignCaptions) {
-        target.alignCaptions = alignCaptions;
+    public void setTabbed(boolean tabbed) {
+        target.tabbed = tabbed;
     }
 
     public void setChildrenAlignment(FlexAlignment falign) {
@@ -58,24 +62,43 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.setChildrenAlignment(align);
     }
 
-    //backward compatibility
+    public void setAlignCaptions(boolean alignCaptions) {
+        target.alignCaptions = alignCaptions;
+    }
+
+    public void setGrid(boolean grid) {
+        target.grid = grid;
+    }
+
+    public void setWrap(boolean wrap) {
+        target.wrap = wrap;
+    }
+
+    public void setResizeOverflow(boolean resizeOverflow) {
+        target.resizeOverflow = resizeOverflow;
+    }
+
+    public void setCustom(String custom) {
+        target.custom = custom;
+    }
+
     public void setColumns(int columns) {
-        target.lines = columns;
+        setLines(columns);
     }
 
     public void setLines(int lines) {
-        target.lines = lines;
+        target.setLines(lines);
     }
 
-    public void setHorizontal(boolean horizontal) {
-        target.horizontal = horizontal;
+    public void setLineSize(int lineSize) {
+        target.lineSize = lineSize;
     }
 
-    public void setTabbed(boolean tabbed) {
-        target.tabbed = tabbed;
+    public void setCaptionLineSize(int captionLineSize) {
+        target.captionLineSize = captionLineSize;
     }
 
-    public void setShowIf(String showIf) {
-        target.showIf = showIf;
+    public void setVisible(boolean visible) {
+        target.visible = visible;
     }
 }

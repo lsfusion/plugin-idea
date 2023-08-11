@@ -25,43 +25,79 @@ import java.util.Map;
 import static com.lsfusion.util.BaseUtils.getKeyStrokeCaption;
 import static com.lsfusion.util.BaseUtils.isRedundantString;
 
+/*adding new property:
+1. add to PROPERTIES
+2. create field
+3. create setter in Proxy*/
+
 public class PropertyDrawView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
-            new ReflectionProperty("changeOnSingleClick").setExpert(),
-            new ReflectionProperty("hide").setExpert(),
+            new ReflectionProperty("autoSize"),
+            new ReflectionProperty("boxed"),
+            new ReflectionProperty("panelCaptionVertical"),
+            new ReflectionProperty("panelCaptionLast"),
+            new ReflectionProperty("panelCaptionAlignment"),
+            new ReflectionProperty("editOnSingleClick"), //backward compatibility
+            new ReflectionProperty("changeOnSingleClick"),
+            new ReflectionProperty("hide"),
             new ReflectionProperty("regexp"),
             new ReflectionProperty("regexpMessage"),
             new ReflectionProperty("pattern"),
             new ReflectionProperty("maxValue"),
             new ReflectionProperty("echoSymbols"),
-            new ReflectionProperty("noSort").setExpert(),
-            new ReflectionProperty("notNull"),
-            new ReflectionProperty("charHeight").setExpert(),
-            new ReflectionProperty("charWidth").setExpert(),
-            new ReflectionProperty("valueSize").setExpert(),
-            new ReflectionProperty("valueAlignment"),
+            new ReflectionProperty("noSort"),
+            new ReflectionProperty("defaultCompare"),
+            new ReflectionProperty("valueSize"),
+            new ReflectionProperty("valueHeight"),
+            new ReflectionProperty("valueWidth"),
+            new ReflectionProperty("captionHeight"),
+            new ReflectionProperty("captionWidth"),
+            new ReflectionProperty("charHeight"),
+            new ReflectionProperty("charWidth"),
             new ReflectionProperty("valueFlex"),
             new ReflectionProperty("changeKey"),
-            new ReflectionProperty("showChangeKey").setExpert(),
+            new ReflectionProperty("changeKeyPriority"),
             new ReflectionProperty("changeMouse"),
+            new ReflectionProperty("changeMousePriority"),
+            new ReflectionProperty("showChangeKey"),
             new ReflectionProperty("focusable"),
-            new ReflectionProperty("panelCaptionVertical"),
-            new ReflectionProperty("panelCaptionAlignment"),
+            new ReflectionProperty("panelColumnVertical"),
+            new ReflectionProperty("valueClass"),
+            new ReflectionProperty("captionClass"),
             new ReflectionProperty("caption"),
+            new ReflectionProperty("imagePath"), //backward compatibility
             new ReflectionProperty("image"),
-            new ReflectionProperty("clearText").setExpert(),
-            new ReflectionProperty("notSelectAll").setExpert(),
-            new ReflectionProperty("toolTip"),
+            new ReflectionProperty("comment"),
+            new ReflectionProperty("commentClass"),
+            new ReflectionProperty("panelCommentVertical"),
+            new ReflectionProperty("panelCommentFirst"),
+            new ReflectionProperty("panelCommentAlignment"),
+            new ReflectionProperty("placeholder"),
+            new ReflectionProperty("valueAlignment"),
+            new ReflectionProperty("clearText"),
+            new ReflectionProperty("notSelectAll"),
             new ReflectionProperty("askConfirm"),
             new ReflectionProperty("askConfirmMessage"),
-            new ReflectionProperty("panelColumnVertical"),
-            new ReflectionProperty("defaultCompare"),
-            new ReflectionProperty("boxed")
-
+            new ReflectionProperty("toolTip"),
+            new ReflectionProperty("toolbar"),
+            new ReflectionProperty("notNull")
     );
 
+    @Override
+    public List<Property> getProperties() {
+        return PROPERTIES;
+    }
+
     public PropertyDrawEntity entity;
+
+    public boolean autoSize;
+
+    public boolean boxed;
+
+    public boolean panelCaptionVertical;
+    public Boolean panelCaptionLast;
+    public FlexAlignment panelCaptionAlignment;
 
     public boolean changeOnSingleClick;
     public boolean hide;
@@ -71,41 +107,34 @@ public class PropertyDrawView extends ComponentView {
     public Long maxValue;
     public boolean echoSymbols;
 
+    public boolean noSort;
+    public String defaultCompare;
+
+    public Dimension valueSize;
+
+    public int captionHeight;
+    public int captionWidth;
+
     public int charHeight;
     public int charWidth;
-    public Dimension valueSize;
-    private Boolean valueFlex;
-    
-    public FlexAlignment valueAlignment;
+
+    public Boolean valueFlex;
 
     public KeyStroke changeKey;
-    public boolean showChangeKey;
+    public int changeKeyPriority;
     public String changeMouse;
+    public int changeMousePriority;
+    public boolean showChangeKey;
 
-    public Boolean focusable;
-
-    public boolean panelCaptionVertical = false;
-    public Boolean panelCaptionLast;
-    public FlexAlignment panelCaptionAlignment;
+    public boolean focusable;
 
     public boolean panelColumnVertical;
 
-    public String caption;
-    public boolean showCaption = true;
-    public boolean clearText;
-    public boolean notSelectAll;
-    public String toolTip;
-
-    public boolean askConfirm;
-    public String askConfirmMessage;
-    
-    public boolean noSort;
-    public boolean notNull;
-    public String defaultCompare;
-
-    public boolean boxed;
-
+    public String valueClass;
     public String captionClass;
+    public String caption;
+
+    public String image;
 
     public String comment;
     public String commentClass;
@@ -114,6 +143,22 @@ public class PropertyDrawView extends ComponentView {
     public FlexAlignment panelCommentAlignment;
 
     public String placeholder;
+
+    public FlexAlignment valueAlignment;
+    public boolean clearText;
+    public boolean notSelectAll;
+
+    public boolean askConfirm;
+    public String askConfirmMessage;
+
+    public String toolTip;
+
+    public boolean toolbar;
+
+    public boolean notNull;
+
+    public boolean showCaption = true;
+
 
     public PropertyDrawView() {
         this("");
@@ -136,21 +181,23 @@ public class PropertyDrawView extends ComponentView {
         setMargin(2);
     }
 
-    @Override
-    public List<Property> getProperties() {
-        return PROPERTIES;
+    public void setCharWidth(int charWidth) {
+        this.charWidth = charWidth;
     }
 
-    @Override
-    public String getDisplaySID() {
-        return entity.propertyName != null ? entity.propertyName : getSID();
+    public void setChangeKey(KeyStroke changeKey) {
+        this.changeKey = changeKey;
+    }
+
+    public void setShowChangeKey(boolean showChangeKey) {
+        this.showChangeKey = showChangeKey;
     }
 
     @Override
     public String getCaption() {
         if (caption == null) {
             String entityCaption = this.entity.getCaption();
-            return entityCaption != null ? entityCaption : getDisplaySID();
+            return entityCaption != null ? entityCaption : getSID();
         } else {
             return caption;
         }
@@ -161,34 +208,6 @@ public class PropertyDrawView extends ComponentView {
         return showChangeKey && changeKey != null
                 ? caption + " (" + getKeyStrokeCaption(changeKey) + ")"
                 : caption;
-    }
-
-    public void setChangeOnSingleClick(boolean changeOnSingleClick) {
-        this.changeOnSingleClick = changeOnSingleClick;
-    }
-
-    public void setHide(boolean hide) {
-        this.hide = hide;
-    }
-
-    public void setRegexp(String regexp) {
-        this.regexp = regexp;
-    }
-
-    public void setRegexpMessage(String regexpMessage) {
-        this.regexpMessage = regexpMessage;
-    }
-    
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
-    }
-
-    public void setMaxValue(long maxValue) {
-        this.maxValue = maxValue;
-    }
-
-    public void setEchoSymbols(boolean echoSymbols) {
-        this.echoSymbols = echoSymbols;
     }
 
     public boolean isHorizontalValueFlex() {
@@ -209,10 +228,6 @@ public class PropertyDrawView extends ComponentView {
         if (!container.isHorizontal() && isHorizontalValueFlex())
             return FlexAlignment.STRETCH;
         return super.getBaseDefaultAlignment(container);
-    }
-
-    public void setValueFlex(Boolean valueFlex) {
-        this.valueFlex = valueFlex;
     }
 
     public Format getFormat() {
@@ -241,7 +256,7 @@ public class PropertyDrawView extends ComponentView {
         LSFClassSet baseClass = entity.baseClass;
         if(baseClass != null) {
             String widthString = null;
-            if(widthString == null && charWidth != 0)
+            if(charWidth != 0)
                 widthString = BaseUtils.replicate('0', charWidth);
             if(widthString != null)
                 return baseClass.getFullWidthString(widthString, fontMetrics);
@@ -266,38 +281,10 @@ public class PropertyDrawView extends ComponentView {
         return height;
     }
 
-    public void setCharHeight(int charHeight) {
-        this.charHeight = charHeight;
-    }
-
-    public void setCharWidth(int charWidth) {
-        this.charWidth = charWidth;
-    }
-
     public void setFixedCharWidth(int charWidth) {
         setCharWidth(charWidth);
         if(charWidth > 0)
             valueFlex = false;
-    }
-
-    public void setValueSize(Dimension minimumSize) {
-        this.valueSize = minimumSize;
-    }
-
-    public void setValueHeight(int minHeight) {
-        if (this.valueSize == null) {
-            this.valueSize = new Dimension(-1, minHeight);
-        } else {
-            this.valueSize.height = minHeight;
-        }
-    }
-
-    public void setValueWidth(int minWidth) {
-        if (this.valueSize == null) {
-            this.valueSize = new Dimension(minWidth, -1);
-        } else {
-            this.valueSize.width = minWidth;
-        }
     }
 
     private int getDefaultWidth(int minCharWidth, FontMetrics fontMetrics) {
@@ -325,192 +312,12 @@ public class PropertyDrawView extends ComponentView {
         return cFont;
     }
     
-    public FlexAlignment getValueAlignment() {
-        return valueAlignment;
-    }
-    
-    public void setValueAlignment(FlexAlignment valueAlignment) {
-        this.valueAlignment = valueAlignment;
-    } 
-
-    public void setChangeKey(KeyStroke editKey) {
-        this.changeKey = editKey;
-    }
-
-    public void setShowChangeKey(boolean showEditKey) {
-        this.showChangeKey = showEditKey;
-    }
-
-    public void setChangeMouse(String changeMouse) {
-        this.changeMouse = changeMouse;
-    }
-
-    public void setFocusable(Boolean focusable) {
-        this.focusable = focusable;
-    }
-
-    public void setPanelCaptionVertical(boolean panelCaptionVertical) {
-        this.panelCaptionVertical = panelCaptionVertical;
-    }
-
-    public void setPanelCaptionLast(boolean panelCaptionLast) {
-        this.panelCaptionLast = panelCaptionLast;
-    }
-
-    public void setPanelCaptionAlignment(FlexAlignment panelCaptionAlignment) {
-        this.panelCaptionAlignment = panelCaptionAlignment;
-    }
-
-    public void setCaption(String caption) {
-        this.caption = caption;
-    }
-
-    public void setClearText(boolean clearText) {
-        this.clearText = clearText;
-    }
-
-    public void setNotSelectAll(boolean notSelectAll) {
-        this.notSelectAll = notSelectAll;
-    }
-
-    public void setAskConfirm(boolean askConfirm) {
-        this.askConfirm = askConfirm;
-    }
-
-    public void setAskConfirmMessage(String askConfirmMessage) {
-        this.askConfirmMessage = askConfirmMessage;
-    }
-
-    public void setPanelColumnVertical(boolean panelColumnVertical) {
-        this.panelColumnVertical = panelColumnVertical;
-    }
-
-    public void setNoSort(boolean noSort) {
-        this.noSort = noSort;
-    }
-
-    public void setDefaultCompare(String defaultCompare) {
-        this.defaultCompare = defaultCompare;
-    }
-    
-    public void setNotNull(boolean notNull) {
-        this.notNull = notNull;
-    }
-
-    public void setToolTip(String toolTip) {
-        this.toolTip = toolTip;
-    }
-
-    public boolean isChangeOnSingleClick() {
-        return changeOnSingleClick;
-    }
-
-    public boolean isHide() {
-        return hide;
-    }
-
-    public String getRegexp() {
-        return regexp;
-    }
-
-    public String getRegexpMessage() {
-        return regexpMessage;
-    }
-    
-    public String getPattern() {
-        return pattern;
-    }
-
-    public Long getMaxValue() {
-        return maxValue;
-    }
-
-    public boolean isEchoSymbols() {
-        return echoSymbols;
-    }
-
-    public int getCharHeight() {
-        return charHeight;
-    }
-
-    public int getCharWidth() {
-        return charWidth;
-    }
-    
-    public Dimension getValueSize() {
-        return valueSize;
-    }
-
-    public KeyStroke getChangeKey() {
-        return changeKey;
-    }
-
-    public boolean isShowChangeKey() {
-        return showChangeKey;
-    }
-
-    public String getChangeMouse() {
-        return changeMouse;
-    }
-
-    public Boolean getFocusable() {
-        return focusable;
-    }
-
-    public boolean isPanelCaptionVertical() {
-        return panelCaptionVertical;
-    }
-    
-    public boolean isPanelCaptionLast() {
-        return panelCaptionLast;
-    }
-    
     public boolean getNotNullPanelCaptionLast() {
         return panelCaptionLast != null ? panelCaptionLast : entity.baseClass instanceof LogicalClass;
     }
 
-    public FlexAlignment getPanelCaptionAlignment() {
-        return panelCaptionAlignment;
-    }
-
     public FlexAlignment getNotNullPanelCaptionAlignment() {
         return (panelCaptionAlignment != null && panelCaptionAlignment != FlexAlignment.STRETCH) ? panelCaptionAlignment : FlexAlignment.CENTER;
-    }
-
-    public boolean isClearText() {
-        return clearText;
-    }
-
-    public boolean isNotSelectAll() {
-        return notSelectAll;
-    }
-
-    public String getToolTip() {
-        return toolTip;
-    }
-
-    public boolean isAskConfirm() {
-        return askConfirm;
-    }
-
-    public String getAskConfirmMessage() {
-        return askConfirmMessage;
-    }
-
-    public boolean getPanelColumnVertical() {
-        return panelColumnVertical;
-    }
-
-    public boolean getNoSort() {
-        return noSort;
-    }
-
-    public String getDefaultCompare() {
-        return defaultCompare;
-    }
-
-    public boolean getNotNull() {
-        return notNull;
     }
 
     @Override
@@ -587,13 +394,5 @@ public class PropertyDrawView extends ComponentView {
             
             return String.format(TOOL_TIP_FORMAT + DETAILED_TOOL_TIP_FORMAT, propCaption, editKeyText, entity.canonicalName/*, tableName*/, ifaceObjects, ifaceClasses, returnClass, script, scriptPath, entity.sID);
         }
-    }
-
-    public boolean isBoxed() {
-        return boxed;
-    }
-
-    public void setBoxed(boolean boxed) {
-        this.boxed = boxed;
     }
 }

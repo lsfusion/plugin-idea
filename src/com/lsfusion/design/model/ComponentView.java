@@ -10,7 +10,6 @@ import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.properties.ReflectionProperty;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.JComponentPanel;
-import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -19,62 +18,78 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+/*adding new property:
+1. add to PROPERTIES
+2. create field
+3. create setter in Proxy*/
+
 public abstract class ComponentView extends PropertiesContainer {
     public static final List<Property> PROPERTIES = Arrays.asList(
+            new ReflectionProperty("span"),
+            new ReflectionProperty("defaultComponent"),
+            new ReflectionProperty("activated"),
+            new ReflectionProperty("fill"),
             new ReflectionProperty("size"),
-            new ReflectionProperty("autoSize"),
+            new ReflectionProperty("height"),
+            new ReflectionProperty("width"),
             new ReflectionProperty("flex"),
+            new ReflectionProperty("shrink"),
+            new ReflectionProperty("alignShrink"),
+            new ReflectionProperty("align"),
             new ReflectionProperty("alignment"),
-            new ReflectionProperty("marginTop").setExpert(),
-            new ReflectionProperty("marginBottom").setExpert(),
-            new ReflectionProperty("marginLeft").setExpert(),
-            new ReflectionProperty("marginRight").setExpert(),
-            new ReflectionProperty("defaultComponent").setExpert(),
-            new ReflectionProperty("activated").setExpert(),
-            new ReflectionProperty("font").setExpert(),
-            new ReflectionProperty("captionFont").setExpert(),
+            new ReflectionProperty("alignCaption"),
+            new ReflectionProperty("marginTop"),
+            new ReflectionProperty("marginBottom"),
+            new ReflectionProperty("marginLeft"),
+            new ReflectionProperty("marginRight"),
+            new ReflectionProperty("margin"),
+            new ReflectionProperty("captionFont"),
+            new ReflectionProperty("font"),
+            new ReflectionProperty("fontSize"),
+            new ReflectionProperty("fontStyle"),
             new ReflectionProperty("background"),
             new ReflectionProperty("foreground"),
-            new ReflectionProperty("imagePath").setExpert(),
-            new ReflectionProperty("custom"),
-            new ReflectionProperty("alignCaption"),
-            new ReflectionProperty("class")
+            new ReflectionProperty("imagePath"), //removed in v6
+            new ReflectionProperty("showIf")
     );
-    
-    private String sID;
+
+    @Override
+    public List<Property> getProperties() {
+        return PROPERTIES;
+    }
+
+    public int span;
+
+    public boolean defaultComponent;
+
+    public boolean activated;
 
     public Dimension size;
 
-    public boolean autoSize = false;
+    public double flex = -1;
 
-    protected double flex = -1;
-    protected FlexAlignment alignment;
+    public boolean shrink;
+
+    public boolean alignShrink;
+
+    public FlexAlignment alignment;
+
+    public boolean alignCaption;
 
     public int marginTop;
     public int marginBottom;
     public int marginLeft;
     public int marginRight;
 
-    public boolean defaultComponent = false;
-    
-    public boolean activated; 
-
-    public FontInfo font;
-
     public FontInfo captionFont;
+    public FontInfo font;
 
     public Color background;
     public Color foreground;
 
     public String imagePath;
 
-    public String custom;
-
-    public boolean alignCaption;
-
-    public ContainerView container;
-
-    public boolean forceHide = false;
+    public String showIf;
 
     public ComponentView() {
         this("");
@@ -84,90 +99,51 @@ public abstract class ComponentView extends PropertiesContainer {
         this.sID = sID;
     }
 
-    public String getDisplaySID() {
-        return getSID();
+    public Dimension getSize() {
+        return size;
     }
 
-    public String getSID() {
-        return sID;
-    }
-
-    public void setSID(String sID) {
-        this.sID = sID;
-    }
-
-    public ContainerView getContainer() {
-        return container;
-    }
-
-    public void setContainer(ContainerView container) {
-        this.container = container;
-    }
-
-    public boolean removeFromParent() {
-        return container != null && container.remove(this);
-    }
-
-    public List<Property> getProperties() {
-        return PROPERTIES;
-    }
-
-    public void setSize(Dimension size) {
-        this.size = size;
-    }
-
-    public void setHeight(int prefHeight) {
-        if (this.size == null) {
-            this.size = new Dimension(-1, prefHeight);
-        } else {
-            this.size.height = prefHeight;
+    public double getFlex(FormEntity formEntity) {
+        if (flex >= 0) {
+            return flex;
         }
+        return getDefaultFlex(formEntity); // тут в верхней
     }
 
-    public void setWidth(int prefWidth) {
-        if (this.size == null) {
-            this.size = new Dimension(prefWidth, -1);
-        } else {
-            this.size.width = prefWidth;
-        }
+    public double getDefaultFlex(FormEntity formEntity) {
+        ContainerView container = getContainer();
+        if (container != null)
+            if (container.isTabbed()) {
+                return 1;
+            }
+        return getBaseDefaultFlex(formEntity);
     }
 
-    public void setAutoSize(boolean autoSize) {
-        this.autoSize = autoSize;
-    }
-
-    public void setDefaultComponent(boolean defaultComponent) {
-        this.defaultComponent = defaultComponent;
-    }
-    
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
-
-    /* ========= constraints properties ========= */
-
-    public void setFill(double fill) {
-        setFlex(fill);
-        setAlignment(fill == 0 ? FlexAlignment.START : FlexAlignment.STRETCH);
+    public double getBaseDefaultFlex(FormEntity formEntity) {
+        return 0;
     }
 
     public void setFlex(double flex) {
         this.flex = flex;
     }
 
-    public void setAlign(FlexAlignment alignment) {
-        setAlignment(alignment);
+    public FlexAlignment getAlignment() {
+        if (alignment != null) {
+            return alignment;
+        }
+
+        ContainerView container = getContainer();
+        if (container != null && container.isTabbed())
+            return FlexAlignment.STRETCH;
+        return getBaseDefaultAlignment(container);
+    }
+
+    public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
+        return FlexAlignment.START;
     }
 
     public void setAlignment(FlexAlignment alignment) {
         this.alignment = alignment;
-    }
-
-    public void setMargin(int margin) {
-        setMarginTop(margin);
-        setMarginBottom(margin);
-        setMarginLeft(margin);
-        setMarginRight(margin);
     }
 
     public void setMarginTop(int marginTop) {
@@ -186,161 +162,21 @@ public abstract class ComponentView extends PropertiesContainer {
         this.marginRight = marginRight;
     }
 
-    /* ========= design properties ========= */
-
-    public void setCaptionFont(FontInfo captionFont) {
-        this.captionFont = captionFont;
-    }
-
-    public void setFont(FontInfo font) {
-        this.font = font;
-    }
-
-    public void setFontSize(int fontSize) {
-        FontInfo font = this.font != null ? this.font.derive(fontSize) : new FontInfo(fontSize);
-        setFont(font);
-    }
-
-    public void setFontStyle(String fontStyle) {
-        fontStyle = LSFStringUtils.unquote(fontStyle);
-        boolean bold;
-        boolean italic;
-        //чтобы не заморачиваться с лишним типом для стиля просто перечисляем все варианты...
-        if ("bold".equals(fontStyle)) {
-            bold = true;
-            italic = false;
-        } else if ("italic".equals(fontStyle)) {
-            bold = false;
-            italic = true;
-        } else if ("bold italic".equals(fontStyle) || "italic bold".equals(fontStyle)) {
-            bold = true;
-            italic = true;
-        } else if ("".equals(fontStyle)) {
-            bold = false;
-            italic = false;
-        } else {
-            throw new IllegalArgumentException("fontStyle value must be a combination of strings bold and italic");
-        }
-
-        FontInfo font = this.font != null ? this.font.derive(bold, italic) : new FontInfo(bold, italic);
-        setFont(font);
-    }
-
-    public void setBackground(Color background) {
-        this.background = background;
-    }
-
-    public void setForeground(Color foreground) {
-        this.foreground = foreground;
+    public void setMargin(int margin) {
+        setMarginTop(margin);
+        setMarginBottom(margin);
+        setMarginLeft(margin);
+        setMarginRight(margin);
     }
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
 
-    public void setCustom(String custom) {
-        this.custom = custom;
-    }
-
-    public void setAlignCaption(Boolean alignCaption) {
-        this.alignCaption = alignCaption;
-    }
-
-    public Dimension getSize() {
-        return size;
-    }
-
-    public boolean isAutoSize() {
-        return autoSize;
-    }
-    
-    public double getFlex() { // нужно для проставления в Design в блоке свойства (используется через reflection)
-        return getFlex(null);
-    }
-    public double getFlex(FormEntity formEntity) {
-        if (flex >= 0) {
-            return flex;
-        }
-        return getDefaultFlex(formEntity); // тут в верхней
-    }
-
-    public double getDefaultFlex(FormEntity formEntity) {
-        ContainerView container = getContainer();
-        if (container != null)
-            if (container.isTabbed()) {
-                return 1;
-            }
-        return getBaseDefaultFlex(formEntity);
-    }
-    public double getBaseDefaultFlex(FormEntity formEntity) {
-        return 0;
-    }
-
-    public FlexAlignment getAlignment() {
-        if (alignment != null) {
-            return alignment;
-        }
-
-        ContainerView container = getContainer();
-        if (container != null && container.isTabbed())
-            return FlexAlignment.STRETCH;
-        return getBaseDefaultAlignment(container);
-    }
-
-    public FlexAlignment getBaseDefaultAlignment(ContainerView container) {
-        return FlexAlignment.START;
-    }
-
-    public int getMarginTop() {
-        return marginTop;
-    }
-
-    public int getMarginBottom() {
-        return marginBottom;
-    }
-
-    public int getMarginLeft() {
-        return marginLeft;
-    }
-
-    public int getMarginRight() {
-        return marginRight;
-    }
-
-    public boolean isDefaultComponent() {
-        return defaultComponent;
-    }
-    
-    public boolean isActivated() {
-        return activated;
-    }
-
-    public FontInfo getFont() {
-        return font;
-    }
-
-    public FontInfo getCaptionFont() {
-        return captionFont;
-    }
-
-    public Color getBackground() {
-        return background;
-    }
-
-    public Color getForeground() {
-        return foreground;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public String getCustom() {
-        return custom;
-    }
-
-    public Boolean getAlignCaption() {
-        return alignCaption;
+    protected static <T> List<T> addToList(@NotNull List<T> list, T... rest) {
+        List<T> merged = new ArrayList<>(list);
+        Collections.addAll(merged, rest);
+        return merged;
     }
 
     public void decorateTreeRenderer(SimpleColoredComponent renderer) {
@@ -358,7 +194,7 @@ public abstract class ComponentView extends PropertiesContainer {
     public abstract Icon getIcon();
 
     public JComponentPanel createWidget(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, HashSet<ComponentView> recursionGuard) {
-        if (forceHide || !selection.get(this)) {
+        if (!selection.get(this)) {
             return null;
         }
 
@@ -384,9 +220,28 @@ public abstract class ComponentView extends PropertiesContainer {
         return panel;
     }
 
-    public static <T> List<T> addToList(@NotNull List<T> list, T... rest) {
-        List<T> merged = new ArrayList<>(list);
-        Collections.addAll(merged, rest);
-        return merged;
+    private String sID;
+    public ContainerView container;
+
+    public String getSID() {
+        return sID;
+    }
+
+    public void setSID(String sID) {
+        this.sID = sID;
+    }
+
+    public ContainerView getContainer() {
+        return container;
+    }
+
+    public void setContainer(ContainerView container) {
+        this.container = container;
+    }
+
+    public void removeFromParent() {
+        if(container != null) {
+            container.remove(this);
+        }
     }
 }

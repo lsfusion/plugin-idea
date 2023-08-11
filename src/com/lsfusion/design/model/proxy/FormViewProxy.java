@@ -73,8 +73,4 @@ public class FormViewProxy extends ViewProxy<FormView> {
     public void setType(ContainerType type) {
         mainContainerProxy.setType(type);
     }
-
-    public void setDescription(String description) {
-        mainContainerProxy.setDescription(description);
-    }
 }

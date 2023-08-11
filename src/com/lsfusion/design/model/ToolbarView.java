@@ -14,23 +14,33 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+/*adding new property:
+1. add to PROPERTIES
+2. create field
+3. create setter in Proxy*/
+
 public class ToolbarView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
             new ReflectionProperty("visible"),
-            new ReflectionProperty("showCountRows"),
+            new ReflectionProperty("showCountQuantity"),
             new ReflectionProperty("showCalculateSum"),
-            new ReflectionProperty("showGroupReport"),
-            new ReflectionProperty("showXls"),
+            new ReflectionProperty("showGroup"),
+            new ReflectionProperty("showPrintGroupXls"),
             new ReflectionProperty("showSettings")
     );
 
-    public boolean visible = false;
+    @Override
+    public List<Property> getProperties() {
+        return PROPERTIES;
+    }
 
-    public boolean showCountRows = true;
+    public boolean visible;
+
+    public boolean showCountQuantity = true;
     public boolean showCalculateSum = true;
-    public boolean showGroupReport = true;
-    public boolean showXls = true;
+    public boolean showGroup = true;
+    public boolean showPrintGroupXls = true;
     public boolean showSettings = true;
 
     public boolean isTreeToolbar = false;
@@ -44,62 +54,29 @@ public class ToolbarView extends ComponentView {
         super(sID);
     }
 
-    @Override
-    public List<Property> getProperties() {
-        return PROPERTIES;
-    }
-
-    @Override
-    public String getCaption() {
-        return "Toolbar";
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    public void setShowCountQuantity(boolean showCountQuantity) {
-        this.showCountRows = showCountQuantity;
-    }
-
-    public void setShowCalculateSum(boolean showCalculateSum) {
-        this.showCalculateSum = showCalculateSum;
-    }
-
-    public void setShowGroup(boolean showGroup) {
-        this.showGroupReport = showGroup;
-    }
-
-    public void setShowPrintGroupXls(boolean showPrintGroupXls) {
-        this.showXls = showPrintGroupXls;
-    }
-
-    public void setShowSettings(boolean showSettings) {
-        this.showSettings = showSettings;
-    }
-
-    public boolean isVisible() {
-        return visible;
-    }
-
-    public boolean isShowCountRows() {
-        return showCountRows;
+    public boolean isShowCountQuantity() {
+        return showCountQuantity;
     }
 
     public boolean isShowCalculateSum() {
         return showCalculateSum;
     }
 
-    public boolean isShowGroupReport() {
-        return showGroupReport;
+    public boolean isShowGroup() {
+        return showGroup;
     }
 
-    public boolean isShowXls() {
-        return showXls;
+    public boolean isShowPrintGroupXls() {
+        return showPrintGroupXls;
     }
 
     public boolean isShowSettings() {
         return showSettings;
+    }
+
+    @Override
+    public String getCaption() {
+        return "Toolbar";
     }
 
     @Override
@@ -120,7 +97,7 @@ public class ToolbarView extends ComponentView {
         if (isTreeToolbar) {
             panel.add(new ToolbarGridButton(LSFIcons.Design.FILTER));
         } else {
-            if (isShowGroupReport()) {
+            if (isShowGroup()) {
                 panel.add(new ToolbarGridButton(LSFIcons.Design.PIVOT));
                 addSeparator(panel);
             }
@@ -128,16 +105,16 @@ public class ToolbarView extends ComponentView {
             if (isShowSettings()) {
                 panel.add(new ToolbarGridButton(LSFIcons.Design.PREFERENCES));
             }
-            if (isShowCountRows() || isShowCalculateSum()) {
+            if (isShowCountQuantity() || isShowCalculateSum()) {
                 addSeparator(panel);
-                if (isShowCountRows()) {
+                if (isShowCountQuantity()) {
                     panel.add(new ToolbarGridButton(LSFIcons.Design.QUANTITY));
                 }
                 if (isShowCalculateSum()) {
                     panel.add(new ToolbarGridButton(LSFIcons.Design.SUM));
                 }
             }
-            if (isShowXls()) {
+            if (isShowPrintGroupXls()) {
                 addSeparator(panel);
                 panel.add(new ToolbarGridButton(LSFIcons.Design.PRINT_XLS));
             }

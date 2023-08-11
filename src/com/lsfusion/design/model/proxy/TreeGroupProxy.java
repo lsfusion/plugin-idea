@@ -8,11 +8,31 @@ public class TreeGroupProxy extends ViewProxy<TreeGroupView> {
         super(target);
     }
 
+    public void setAutoSize(boolean autoSize) {
+        target.autoSize = autoSize;
+    }
+
+    public void setBoxed(boolean boxed) {
+        target.boxed = boxed;
+    }
+
     public void setExpandOnClick(boolean expandOnClick) {
         target.expandOnClick = expandOnClick;
     }
 
+    public void setHeaderHeight(int headerHeight) {
+        target.headerHeight = headerHeight;
+    }
+
     public void setResizeOverflow(boolean resizeOverflow) {
         target.resizeOverflow = resizeOverflow;
+    }
+
+    public void setLineHeight(int lineHeight) {
+        target.lineHeight = lineHeight;
+    }
+
+    public void setLineWidth(int lineWidth) {
+        target.lineWidth = lineWidth;
     }
 }
