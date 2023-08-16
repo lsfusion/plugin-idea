@@ -10,6 +10,7 @@
         <b>Version 1.0.264</b><br>
         <ul>
             <li>All design properties support and refactoring</li>
+            <li>Design properties check type</li>
         </ul>
     ]]>
     </change-notes>

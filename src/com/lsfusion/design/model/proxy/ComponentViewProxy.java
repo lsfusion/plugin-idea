@@ -148,7 +148,7 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         target.setImagePath(imagePath);
     }
 
-    public void setShowIf(String showIf) {
+    public void setShowIf(boolean showIf) {
         target.showIf = showIf;
     }
 }

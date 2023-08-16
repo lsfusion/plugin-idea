@@ -22,8 +22,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.BooleanValueHolder;
 import com.intellij.util.ProcessingContext;
-import com.lsfusion.design.model.proxy.ViewProxy;
-import com.lsfusion.design.model.proxy.ViewProxyFactory;
+import com.lsfusion.design.model.proxy.*;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -77,21 +76,18 @@ public class ASTCompletionContributor extends CompletionContributor {
                                                                  "TEXTLINK", "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK", "TABLELINK",
                                                                  "BOOLEAN", "TBOOLEAN", "COLOR", "JSON", "TSQUERY", "TSVECTOR"};
 
-    private static final Set<String> DESIGN_PROPERTIES = new LinkedHashSet<>() {
+    public static final Map<String, Class> DESIGN_PROPERTIES = new LinkedHashMap<>() {
         {
             for (Class<? extends ViewProxy> aClass : ViewProxyFactory.PROXY_CLASSES.values()) {
                 for (Method method : aClass.getDeclaredMethods()) {
                     if (method.getName().startsWith("set")) {
-                        add(Character.toLowerCase(method.getName().charAt(3)) + method.getName().substring(4));
+                        put(Character.toLowerCase(method.getName().charAt(3)) + method.getName().substring(4),
+                                method.getParameterTypes()[0]);
                     }
                 }
             }
         }
     };
-
-    public static boolean validDesignProperty(String designProperty) {
-        return DESIGN_PROPERTIES.contains(designProperty);
-    }
 
     enum ClassUsagePolicy {
         /**
@@ -669,7 +665,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         private boolean completeDesignProperties() {
             Frame frame = getLastFrameOfType(null, DESIGN_STATEMENT);
             if (frame != null) {
-                for (String designProperty : DESIGN_PROPERTIES) {
+                for (String designProperty : DESIGN_PROPERTIES.keySet()) {
                     addLookupElement(createLookupElement(designProperty, DESIGN_PRIORITY, true, null));
                 }
                 return true;

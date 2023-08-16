@@ -29,10 +29,10 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
-import com.lsfusion.lang.classes.CustomClassSet;
-import com.lsfusion.lang.classes.IntegralClass;
-import com.lsfusion.lang.classes.LSFClassSet;
-import com.lsfusion.lang.classes.LSFValueClass;
+import com.lsfusion.design.model.ContainerType;
+import com.lsfusion.design.model.FontInfo;
+import com.lsfusion.design.ui.FlexAlignment;
+import com.lsfusion.lang.classes.*;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.ExprsContextModifier;
@@ -47,6 +47,7 @@ import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
@@ -1080,9 +1081,60 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         String text = o.getText();
         if (text != null && text.contains("=")) {
             String property = text.substring(0, text.indexOf("=")).trim();
-            if (!ASTCompletionContributor.validDesignProperty(property)) {
-                addHighlightErrorWithResolving(o, "Can't resolve property " + property); // design property can be meta parameter
-            } else if (property.equals("columns")) {
+
+            LSFComponentPropertyValue element = o.getComponentPropertyValue();
+            Object valueClass = null;
+            if (element != null && !isInMetaDecl(element)) {
+                if (element.getBooleanLiteral() != null) {
+                    valueClass = LogicalClass.instance;
+                } else if (element.getContainerTypeLiteral() != null) {
+                    valueClass = element.getContainerTypeLiteral();
+                } else if (element.getDesignCalcPropertyObject() != null) {
+                    LSFDesignCalcPropertyObject calcValue = element.getDesignCalcPropertyObject();
+                    if (calcValue != null) {
+                        LSFPropertyExpression propertyExpression = calcValue.getFormCalcPropertyObject().getFormExprDeclaration().getPropertyExpression();
+                        LSFExClassSet classSet = LSFPsiImplUtil.resolveInferredValueClass(propertyExpression, null);
+                        if (classSet != null) {
+                            valueClass = classSet.classSet;
+                        }
+                    }
+                } else if (element.getDimensionLiteral() != null) {
+                    valueClass = element.getDimensionLiteral();
+                } else if (element.getFlexAlignmentLiteral() != null) {
+                    valueClass = element.getFlexAlignmentLiteral();
+                } else if (element.getTbooleanLiteral() != null) {
+                    valueClass = LogicalClass.threeStateInstance;
+                }
+
+                Class cls = ASTCompletionContributor.DESIGN_PROPERTIES.get(property);
+                if (cls == null) {
+                    addHighlightErrorWithResolving(o, "Can't resolve property " + property); // design property can be meta parameter
+                } else if(valueClass != null) {
+                    Class mismatchClass = null;
+                    if ((cls == Integer.class || cls == int.class) && !(valueClass instanceof IntegerClass)) {
+                        mismatchClass = cls;
+                    } else if ((cls == Double.class || cls == double.class) && !(valueClass instanceof IntegerClass) && !(valueClass instanceof DoubleClass)) {
+                        mismatchClass = cls;
+                    } else if (cls == String.class && !(valueClass instanceof StringClass)) {
+                        mismatchClass = cls;
+                    } else if (cls == Color.class && !(valueClass instanceof ColorClass)) {
+                        mismatchClass = cls;
+                    } else if ((cls == FontInfo.class || cls == KeyStroke.class) && !(valueClass instanceof StringClass)) {
+                        mismatchClass = StringClass.class;
+                    } else if (cls == Dimension.class && !(valueClass instanceof LSFDimensionLiteral)) {
+                        mismatchClass = Dimension.class;
+                    } else if (cls == FlexAlignment.class && !(valueClass instanceof LSFFlexAlignmentLiteral)) {
+                        mismatchClass = FlexAlignment.class;
+                    } else if (cls == ContainerType.class && !(valueClass instanceof LSFContainerTypeLiteral)) {
+                        mismatchClass = ContainerType.class;
+                    }
+                    if (mismatchClass != null) {
+                        addUnderscoredError(element, String.format("Type mismatch: can't cast %s to %s", valueClass, mismatchClass));
+                    }
+                }
+            }
+
+            if (property.equals("columns")) {
                 addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
             } else if (property.equals("type")) {
                 addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'horizontal', 'tabbed', 'lines' instead. Earlier versions: ignore this warning");

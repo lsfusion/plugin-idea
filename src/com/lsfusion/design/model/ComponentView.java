@@ -89,7 +89,7 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public String imagePath;
 
-    public String showIf;
+    public boolean showIf;
 
     public ComponentView() {
         this("");
