@@ -45,6 +45,7 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("margin"),
             new ReflectionProperty("captionFont"),
             new ReflectionProperty("font"),
+            new ReflectionProperty("class"),
             new ReflectionProperty("fontSize"),
             new ReflectionProperty("fontStyle"),
             new ReflectionProperty("background"),
@@ -83,6 +84,8 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public FontInfo captionFont;
     public FontInfo font;
+
+    public String elementClass;
 
     public Color background;
     public Color foreground;

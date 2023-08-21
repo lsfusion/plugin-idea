@@ -106,6 +106,10 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         target.font = font;
     }
 
+    public void setClass(String elementClass) {
+        target.elementClass = elementClass;
+    }
+
     public void setFontSize(int fontSize) {
         FontInfo font = target.font != null ? target.font.derive(fontSize) : new FontInfo(fontSize);
         setFont(font);
