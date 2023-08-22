@@ -212,7 +212,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
         if (className != null) {
             LSFExprParamReference parentRef = PsiTreeUtil.getParentOfType(o.resolveDecl(), LSFExprParamReference.class);
-            if (o != parentRef) {
+            if (o != parentRef && !isInMetaDecl(o)) {
                 addUnderscoredError(o, "Redefinition of reference '" + o.getNameRef() + "'");
             }
         } else {
