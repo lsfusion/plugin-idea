@@ -448,6 +448,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "REGEXP"                  			{ return REGEXP; }
   "REMOVE"                  			{ return REMOVE; }
   "REPORT"              			    { return REPORT; }
+  "REPORTS"              			    { return REPORTS; }
   "REPORTFILES"              			{ return REPORTFILES; }
   "REQUEST"                 			{ return REQUEST; }
   "REQUIRE"                 			{ return REQUIRE; }

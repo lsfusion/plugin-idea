@@ -1538,7 +1538,7 @@ editFormDeclaration ::= EDIT customClassUsage OBJECT objectUsage
     methods = [getDocumentation]
 }
 
-reportFilesDeclaration ::= REPORTFILES groupObjectReportPath (COMMA groupObjectReportPath)* {pin = 1}
+reportFilesDeclaration ::= (REPORTS | REPORTFILES) groupObjectReportPath (COMMA groupObjectReportPath)* {pin = 1}
 
 reportSetting ::= REPORT formCalcPropertyObject
 {
