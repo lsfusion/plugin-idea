@@ -61,6 +61,7 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
     public static final UsageType METACODE_REFERENCE = new UsageType("META reference");
     public static final UsageType METACODE_DECLARATION = new UsageType("META declaration");
     public static final UsageType MODULE_STATEMENT = new UsageType("Module statement");
+    public static final UsageType NEW_STATEMENT = new UsageType("NEW statement");
 
     @Nullable
     @Override
@@ -76,6 +77,10 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
 
     @Nullable
     public static UsageType getLsfUsageType(PsiElement element) {
+        if(element.getParent() instanceof LSFForAddObjClause) {
+            return NEW_STATEMENT;
+        }
+
         element = LSFPsiUtils.getStatementParent(element);
         if (element == null) {
             return null;
