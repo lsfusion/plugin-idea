@@ -1,10 +1,9 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0" is_locked="false">
     <option name="myName" value="Project Default" />
+    <option name="myLocal" value="false" />
     <inspection_tool class="CheckTagEmptyBody" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="DialogTitleCapitalization" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="FieldMayBeFinal" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="InnerClassMayBeStatic" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="JavaDoc" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="TOP_LEVEL_CLASS_OPTIONS">
         <value>
@@ -36,42 +35,7 @@
       <option name="IGNORE_POINT_TO_ITSELF" value="false" />
       <option name="myAdditionalJavadocTags" value="" />
     </inspection_tool>
-    <inspection_tool class="JavadocDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="JavadocReference" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="MissingJavadoc" enabled="false" level="WARNING" enabled_by_default="false">
-      <option name="PACKAGE_SETTINGS">
-        <Options>
-          <option name="ENABLED" value="false" />
-        </Options>
-      </option>
-      <option name="MODULE_SETTINGS">
-        <Options>
-          <option name="ENABLED" value="false" />
-        </Options>
-      </option>
-      <option name="TOP_LEVEL_CLASS_SETTINGS">
-        <Options>
-          <option name="ENABLED" value="false" />
-        </Options>
-      </option>
-      <option name="INNER_CLASS_SETTINGS">
-        <Options>
-          <option name="ENABLED" value="false" />
-        </Options>
-      </option>
-      <option name="METHOD_SETTINGS">
-        <Options>
-          <option name="REQUIRED_TAGS" value="@return@param@throws or @exception" />
-          <option name="ENABLED" value="false" />
-        </Options>
-      </option>
-      <option name="FIELD_SETTINGS">
-        <Options>
-          <option name="ENABLED" value="false" />
-        </Options>
-      </option>
-    </inspection_tool>
-    <inspection_tool class="RawUseOfParameterizedType" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
       <option name="processCode" value="true" />
       <option name="processLiterals" value="true" />
