@@ -1078,6 +1078,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitPropertyCustomView(@NotNull LSFPropertyCustomView o) {
+        LSFStringLiteral selectType = o.getStringLiteral();
+        if(selectType != null) {
+            checkSelect(o, selectType.getText());
+        }
+    }
+
+    @Override
     public void visitSetObjectPropertyStatement(@NotNull LSFSetObjectPropertyStatement o) {
         String text = o.getText();
         if (text != null && text.contains("=")) {
@@ -1160,7 +1168,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private List<String> allowedSelects = Arrays.asList("button", "buttonGroup", "dropdown", "list", "no");
-    private void checkSelect(LSFComponentPropertyValue element, String select) {
+    private void checkSelect(PsiElement element, String select) {
         if (!allowedSelects.contains(LSFStringUtils.unquote(select))) {
             addUnderscoredError(element, "select value must be one of these: " + allowedSelects);
         }
