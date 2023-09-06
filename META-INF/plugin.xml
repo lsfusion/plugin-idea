@@ -11,6 +11,7 @@
         <ul>
             <li>Renamed REPORTFILES to REPORTS (with backward compatibility)</li>
             <li>NEW statement is now separate in usages tree</li>
+            <li>Property design 'select' support</li>
         </ul>
     ]]>
     </change-notes>

@@ -81,7 +81,8 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("askConfirmMessage"),
             new ReflectionProperty("toolTip"),
             new ReflectionProperty("toolbar"),
-            new ReflectionProperty("notNull")
+            new ReflectionProperty("notNull"),
+            new ReflectionProperty("select")
     );
 
     @Override
@@ -156,6 +157,8 @@ public class PropertyDrawView extends ComponentView {
     public boolean toolbar;
 
     public boolean notNull;
+
+    public String select;
 
     public boolean showCaption = true;
 

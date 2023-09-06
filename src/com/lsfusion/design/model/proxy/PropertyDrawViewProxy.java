@@ -216,4 +216,8 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
     public void setNotNull(boolean notNull) {
         target.notNull = notNull;
     }
+
+    public void setSelect(String select) {
+        target.select = select;
+    }
 }

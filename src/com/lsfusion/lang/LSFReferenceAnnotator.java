@@ -45,6 +45,7 @@ import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
+import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -1138,7 +1139,30 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
             } else if (property.equals("type")) {
                 addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'horizontal', 'tabbed', 'lines' instead. Earlier versions: ignore this warning");
+            } else if (element != null && !element.getText().equals("NULL")) {
+                if (property.equals("fontStyle")) {
+                    checkFontStyle(element, element.getText());
+                } else if (property.equals("select")) {
+                    checkSelect(element, element.getText());
+                }
             }
+        }
+    }
+
+    private static List<String> allowedFontStyles = Arrays.asList("bold", "italic");
+    private void checkFontStyle(LSFComponentPropertyValue element, String fontStyle) {
+        for (String style : LSFStringUtils.unquote(fontStyle).split(" ")) {
+            if (!allowedFontStyles.contains(style)) {
+                addUnderscoredError(element, "fontStyle value must be a combination of strings bold and italic");
+                break;
+            }
+        }
+    }
+
+    private List<String> allowedSelects = Arrays.asList("button", "buttonGroup", "dropdown", "list", "no");
+    private void checkSelect(LSFComponentPropertyValue element, String select) {
+        if (!allowedSelects.contains(LSFStringUtils.unquote(select))) {
+            addUnderscoredError(element, "select value must be one of these: " + allowedSelects);
         }
     }
 

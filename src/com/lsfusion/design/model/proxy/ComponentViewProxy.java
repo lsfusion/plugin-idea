@@ -3,7 +3,6 @@ package com.lsfusion.design.model.proxy;
 import com.lsfusion.design.model.ComponentView;
 import com.lsfusion.design.model.FontInfo;
 import com.lsfusion.design.ui.FlexAlignment;
-import com.lsfusion.util.LSFStringUtils;
 
 import java.awt.*;
 
@@ -116,28 +115,8 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
     }
 
     public void setFontStyle(String fontStyle) {
-        fontStyle = LSFStringUtils.unquote(fontStyle);
-        boolean bold;
-        boolean italic;
-        //чтобы не заморачиваться с лишним типом для стиля просто перечисляем все варианты...
-        if ("bold".equals(fontStyle)) {
-            bold = true;
-            italic = false;
-        } else if ("italic".equals(fontStyle)) {
-            bold = false;
-            italic = true;
-        } else if ("bold italic".equals(fontStyle) || "italic bold".equals(fontStyle)) {
-            bold = true;
-            italic = true;
-        } else if ("".equals(fontStyle)) {
-            bold = false;
-            italic = false;
-        } else {
-            throw new IllegalArgumentException("fontStyle value must be a combination of strings bold and italic");
-        }
-
-        FontInfo font = target.font != null ? target.font.derive(bold, italic) : new FontInfo(bold, italic);
-        setFont(font);
+        //no need to parse fontStyle, because this method is never called
+        setFont(new FontInfo(false, false));
     }
 
     public void setBackground(Color background) {
