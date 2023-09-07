@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.lsfusion.util.LSFStringUtils.INTERPOLATION_PREFIX;
+import static com.lsfusion.util.LSFStringUtils.QUOTE;
 
 public class LSFStringInterpolationInjector implements MultiHostInjector {
     @Override
@@ -39,12 +40,14 @@ public class LSFStringInterpolationInjector implements MultiHostInjector {
                 } else {
                     filePrefix.append(" + ");
                 }
-                filePrefix.append("'").append(literal.getText(), lastIndex, block.start).append("'");
+                 filePrefix.append(QUOTE).append(literal.getText(), lastIndex, block.start).append(QUOTE);
                 // wrapping in STRING cast is expected by ElementsContextModifier.resolveParamsInsideStringInterpolations
                 filePrefix.append(" + STRING(");
 
                 registrar.addPlace(filePrefix.toString(), fileSuffix, literal, new TextRange(block.start + INTERPOLATION_PREFIX.length(), block.end));
-                filePrefix.append(literal.getText(), block.start + INTERPOLATION_PREFIX.length(), block.end).append(")");
+                String blockText = literal.getText().substring(block.start + INTERPOLATION_PREFIX.length(), block.end);
+                // Removes possible escaping of quotes. This does not support nested interpolation levels.
+                filePrefix.append(LSFStringUtils.unescapeQuotes(blockText)).append(")");
                 lastIndex = block.end + 1;
             }
             registrar.doneInjecting();

@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.265</b><br>
+        <b>Version 1.0.266</b><br>
         <ul>
-            <li>Renamed REPORTFILES to REPORTS (with backward compatibility)</li>
-            <li>NEW statement is now separate in usages tree</li>
-            <li>Property design 'select' support</li>
+            <li>Several issues with string literals inside string interpolation have been fixed</li>
         </ul>
     ]]>
     </change-notes>

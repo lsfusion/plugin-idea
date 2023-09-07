@@ -11,7 +11,7 @@ import static com.lsfusion.util.LSFStringUtils.StringSpecialBlockType.LOCALIZATI
 
 public class LSFStringUtils {
     private static final String specialEscapeCharacters = "nrt";
-    private static final char QUOTE = '\'';
+    public static final char QUOTE = '\'';
 
     public static final char INTERP_CH = '$';
     public static final char INLINE_CH = 'I';
@@ -85,6 +85,21 @@ public class LSFStringUtils {
         return s.replace(String.valueOf(QUOTE), "\\" + QUOTE);
     }
 
+    // Takes into account that backslash may be escaped itself
+    public static String unescapeQuotes(@NotNull String s) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < s.length(); ++i) {
+            if (s.charAt(i) == '\\' && i+1 < s.length()) {
+                if (s.charAt(i+1) != QUOTE) {
+                    result.append('\\');
+                }
+                ++i;
+            }
+            result.append(s.charAt(i));
+        }
+        return result.toString();
+    }
+    
     public enum StringSpecialBlockType { NONE, LOCALIZATION, INTERPOLATION, INLINE, RESOURCE }
 
     public static class SpecialBlock {

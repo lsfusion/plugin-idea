@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import static com.lsfusion.lang.LSFElementGenerator.createExpressionStringValueLiteral;
+import static com.lsfusion.util.LSFStringUtils.QUOTE;
 import static com.lsfusion.util.LSFStringUtils.quote;
 
 public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValueLiteralImpl implements LSFExpressionStringValueLiteral, PsiLanguageInjectionHost {
@@ -59,6 +60,7 @@ public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValue
     @Override
     public @NotNull LiteralTextEscaper<? extends PsiLanguageInjectionHost> createLiteralTextEscaper() {
         return new LiteralTextEscaper<PsiLanguageInjectionHost>(LSFExpressionStringValueLiteralImpl.this) {
+            // This does not support nested interpolation levels.
             @Override
             public boolean decode(@NotNull TextRange rangeInsideHost, @NotNull StringBuilder outChars) {
                 unescapeQuotes(rangeInsideHost, outChars);
@@ -74,20 +76,29 @@ public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValue
                 String blockText = rangeInsideHost.substring(myHost.getText());
                 int pos = 0;
                 int escapedQuotes = 0;
+                
                 while (pos < blockText.length()) {
+                    boolean isEscapedQuote = false;
+                    
                     if (blockText.charAt(pos) == '\\' && pos+1 < blockText.length()) {
-                        if (blockText.charAt(pos + 1) == '\'') {
+                        if (blockText.charAt(pos + 1) == QUOTE) {
                             ++escapedQuotes;
+                            isEscapedQuote = true;
                         } else if (pos - escapedQuotes == offsetInDecoded) {
                             break;
                         }
                         ++pos;
                     }
+                    
                     if (pos - escapedQuotes == offsetInDecoded) {
+                        // When this is the first escaped quote return the start position of the \' sequence
+                        if (isEscapedQuote && escapedQuotes == 1) --pos;
                         break;
                     }
+                    
                     ++pos;
                 }
+                
                 return rangeInsideHost.getStartOffset() + pos;
             }
 
@@ -98,15 +109,7 @@ public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValue
 
             private void unescapeQuotes(@NotNull TextRange rangeInsideHost, @NotNull StringBuilder outChars) {
                 String substring = rangeInsideHost.substring(myHost.getText());
-                for (int i = 0; i < substring.length(); ++i) {
-                    if (substring.charAt(i) == '\\' && i+1 < substring.length()) {
-                        if (substring.charAt(i+1) != '\'') {
-                            outChars.append('\\');
-                        }
-                        ++i;
-                    }
-                    outChars.append(substring.charAt(i));
-                }
+                outChars.append(LSFStringUtils.unescapeQuotes(substring));
             }
         };
     }
