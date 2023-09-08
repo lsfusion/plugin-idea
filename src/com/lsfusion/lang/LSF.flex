@@ -78,7 +78,7 @@ import java.util.HashMap;
 
 EOL = \r|\n|\r\n
 LINE_WS = [ \t\f]
-STR_LITERAL_CHAR = ("\\" .) | [^\n\r'\\]
+STR_LITERAL_CHAR = ("\\" .) | [^'\\]
 DIGIT = [0-9]
 DIGITS = [0-9]+
 EDIGITS	= [0-9]*
