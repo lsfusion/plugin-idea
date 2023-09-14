@@ -11,6 +11,7 @@
         <ul>
             <li>Several issues with string literals inside string interpolation have been fixed</li>
             <li>Add multiline string literal support</li>
+            <li>Implement support for unescaped quotes within string interpolation</li>
         </ul>
     ]]>
     </change-notes>

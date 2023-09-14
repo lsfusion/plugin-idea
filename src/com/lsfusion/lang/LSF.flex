@@ -62,6 +62,10 @@ import java.util.HashMap;
   public static String getTokenDebugName(IElementType elementType) {
     return tokenDebugNames.get(elementType); 
   }
+
+  private boolean wasStringPart = false;
+  private boolean startedWithID = false;
+  private int depth = 0;
 %}
 
 %public
@@ -87,16 +91,15 @@ FIRST_ID_LETTER	= [a-zA-Z]
 NEXT_ID_LETTER = [a-zA-Z_0-9]
 CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
 
-STRING_LITERAL = "'" {STR_LITERAL_CHAR}* "'"
 ID_LITERAL = {FIRST_ID_LETTER} {NEXT_ID_LETTER}*
 NEXTID_LITERAL = {NEXT_ID_LETTER}+
 
-ID_META_LITERAL = ({ID_LITERAL}? (("###" | "##") {NEXTID_LITERAL})+) | {ID_LITERAL}
-
-STRING_LITERAL_ID = {ID_LITERAL} | {STRING_LITERAL}
-STRING_LITERAL_NEXTID = {NEXTID_LITERAL} | {STRING_LITERAL}
-STRING_META_LITERAL = ({STRING_LITERAL_ID} ("###" | "##"))* {STRING_LITERAL} (("###" | "##") {STRING_LITERAL_NEXTID})*
 INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
+
+%state META_LITERAL
+%state META_LITERAL_START
+%state STRING_LITERAL
+%state INTERPOLATION_BLOCK
 
 %%
 <YYINITIAL> {
@@ -529,8 +532,52 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "YES"                     			{ return YES; }
   "YESNO"                     			{ return YESNO; }
 
-  {STRING_META_LITERAL}                      { return LEX_STRING_LITERAL; }
-  {ID_META_LITERAL}                     { return ID; } // used in isLsfIdentifierPart
+  ("###" | "##")? ("'" | {NEXT_ID_LETTER}) {
+    yypushback(1);
+    yybegin(META_LITERAL_START);
+  }
 
+  [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+
+<META_LITERAL_START> {
+  {ID_LITERAL}     { wasStringPart = false; startedWithID = true; yybegin(META_LITERAL);}
+  {NEXTID_LITERAL} { wasStringPart = false; startedWithID = false; yybegin(META_LITERAL); }
+  "'"              { wasStringPart = true; startedWithID = false; yybegin(STRING_LITERAL); }
+}
+
+<META_LITERAL> {
+  ("###" | "##") {NEXTID_LITERAL} {}
+  ("###" | "##") "'" { wasStringPart = true; yybegin(STRING_LITERAL); }
+  [^] {
+        yypushback(1);
+        yybegin(YYINITIAL);
+        if (!wasStringPart && startedWithID) return ID;
+        else if (wasStringPart) return LEX_STRING_LITERAL;
+        else return com.intellij.psi.TokenType.BAD_CHARACTER;
+      }
+}
+
+<STRING_LITERAL> {
+  "${"               { depth = 1; yybegin(INTERPOLATION_BLOCK); }
+  {STR_LITERAL_CHAR} {}
+  "'"                { yybegin(META_LITERAL); }
+  [^]                { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<INTERPOLATION_BLOCK> {
+  ("\\" .) | [^\\] {
+    String ch = yytext().toString();
+    if (ch.startsWith("{")) {
+      ++depth;
+    } else if (ch.startsWith("}")) {
+      --depth;
+      if (depth == 0) {
+        yypushback(1);
+        yybegin(STRING_LITERAL);
+      }
+    }
+  }
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
