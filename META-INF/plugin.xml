@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.266</b><br>
+        <b>Version 1.0.267</b><br>
         <ul>
-            <li>Several issues with string literals inside string interpolation have been fixed</li>
-            <li>Add multiline string literal support</li>
-            <li>Implement support for unescaped quotes within string interpolation</li>
+            <li>Fix lexer rules priority to ensure correct tokenization</li>
         </ul>
     ]]>
     </change-notes>

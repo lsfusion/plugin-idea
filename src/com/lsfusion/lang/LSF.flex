@@ -97,7 +97,6 @@ NEXTID_LITERAL = {NEXT_ID_LETTER}+
 INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
 
 %state META_LITERAL
-%state META_LITERAL_START
 %state STRING_LITERAL
 %state INTERPOLATION_BLOCK
 
@@ -532,19 +531,11 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "YES"                     			{ return YES; }
   "YESNO"                     			{ return YESNO; }
 
-  ("###" | "##")? ("'" | {NEXT_ID_LETTER}) {
-    yypushback(1);
-    yybegin(META_LITERAL_START);
-  }
+  ("###" | "##")? {ID_LITERAL}     { wasStringPart = false; startedWithID = true; yybegin(META_LITERAL);}
+  ("###" | "##")? {NEXTID_LITERAL} { wasStringPart = false; startedWithID = false; yybegin(META_LITERAL); }
+  ("###" | "##")? "'"              { wasStringPart = true; startedWithID = false; yybegin(STRING_LITERAL); }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
-}
-
-
-<META_LITERAL_START> {
-  {ID_LITERAL}     { wasStringPart = false; startedWithID = true; yybegin(META_LITERAL);}
-  {NEXTID_LITERAL} { wasStringPart = false; startedWithID = false; yybegin(META_LITERAL); }
-  "'"              { wasStringPart = true; startedWithID = false; yybegin(STRING_LITERAL); }
 }
 
 <META_LITERAL> {
