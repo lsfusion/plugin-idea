@@ -25,7 +25,7 @@ public class PropertyColorLineMarkerProvider implements LineMarkerProvider {
     public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
         Pair<Color, Boolean> color = getColor(element);
         if(color != null)  {
-            return createLineMarker(element, color.first);
+            return createLineMarker(element.getFirstChild(), color.first);
         }
         return null;
     }
@@ -67,11 +67,12 @@ public class PropertyColorLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(MouseEvent e, PsiElement element) {
             if (e.getID() == MouseEvent.MOUSE_RELEASED) {
-                Pair<Color, Boolean> color = getColor(element);
+                PsiElement colorLiteral = element.getParent();
+                Pair<Color, Boolean> color = getColor(colorLiteral);
                 if (color != null) {
                     Color newColor = JColorChooser.showDialog(null, "Choose a color", color.first);
                     if (newColor != null) {
-                        List<LSFUintLiteral> rgb = ((LSFColorLiteral) element).getUintLiteralList();
+                        List<LSFUintLiteral> rgb = ((LSFColorLiteral) colorLiteral).getUintLiteralList();
                         String replaceText;
                         if (!rgb.isEmpty()) {
                             replaceText = "RGB(" + newColor.getRed() + ", " + newColor.getGreen() + ", " + newColor.getBlue() + ")";
@@ -79,7 +80,7 @@ public class PropertyColorLineMarkerProvider implements LineMarkerProvider {
                             replaceText = String.format("#%02x%02x%02x", newColor.getRed(), newColor.getGreen(), newColor.getBlue());
                         }
                         ApplicationManager.getApplication().runWriteAction(() -> {
-                            element.replace(LSFElementGenerator.createColorLiteralFromText(element.getProject(), replaceText));
+                            colorLiteral.replace(LSFElementGenerator.createColorLiteralFromText(colorLiteral.getProject(), replaceText));
                         });
                     }
                 }
