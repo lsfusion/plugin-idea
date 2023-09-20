@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.267</b><br>
+        <b>Version 1.0.268</b><br>
         <ul>
-            <li>Fix lexer rules priority to ensure correct tokenization</li>
+            <li>Fix end-of-file scenarios during editing</li>
         </ul>
     ]]>
     </change-notes>

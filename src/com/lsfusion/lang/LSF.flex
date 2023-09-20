@@ -74,9 +74,9 @@ import java.util.HashMap;
 %function advance
 %type IElementType
 %unicode
-%eof{
- return;
-%eof}
+%eofval{
+ return null;
+%eofval}
 
 ////////////////////MACRO///////////////////////
 
@@ -547,7 +547,13 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
         if (!wasStringPart && startedWithID) return ID;
         else if (wasStringPart) return LEX_STRING_LITERAL;
         else return com.intellij.psi.TokenType.BAD_CHARACTER;
-      }
+  }
+  <<EOF>> {
+            yybegin(YYINITIAL);
+            if (!wasStringPart && startedWithID) return ID;
+            else if (wasStringPart) return LEX_STRING_LITERAL;
+            else return com.intellij.psi.TokenType.BAD_CHARACTER;
+  }
 }
 
 <STRING_LITERAL> {
@@ -555,6 +561,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   {STR_LITERAL_CHAR} {}
   "'"                { yybegin(META_LITERAL); }
   [^]                { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+  <<EOF>>            { yybegin(YYINITIAL); return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
 
 <INTERPOLATION_BLOCK> {
@@ -571,4 +578,5 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
     }
   }
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+  <<EOF>> { yybegin(YYINITIAL); return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
