@@ -531,9 +531,9 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "YES"                     			{ return YES; }
   "YESNO"                     			{ return YESNO; }
 
-  ("###" | "##")? {ID_LITERAL}     { wasStringPart = false; startedWithID = true; yybegin(META_LITERAL);}
-  ("###" | "##")? {NEXTID_LITERAL} { wasStringPart = false; startedWithID = false; yybegin(META_LITERAL); }
-  ("###" | "##")? "'"              { wasStringPart = true; startedWithID = false; yybegin(STRING_LITERAL); }
+  ("###" | "##")? {ID_LITERAL} "#"?     { if (yytext().charAt(yylength()-1) == '#') yypushback(1); wasStringPart = false; startedWithID = true; yybegin(META_LITERAL);}
+  ("###" | "##")? {NEXTID_LITERAL} "#"? { if (yytext().charAt(yylength()-1) == '#') yypushback(1); wasStringPart = false; startedWithID = false; yybegin(META_LITERAL); }
+  ("###" | "##")? "'"                   { wasStringPart = true; startedWithID = false; yybegin(STRING_LITERAL); }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

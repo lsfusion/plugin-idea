@@ -7,9 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.268</b><br>
+        <b>Version 1.0.269</b><br>
         <ul>
-            <li>Fix end-of-file scenarios during editing</li>
+            <li>Resolve parsing issue for keyword-like prefixes in ID lexeme</li>
         </ul>
     ]]>
     </change-notes>
