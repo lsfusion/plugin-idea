@@ -18,7 +18,8 @@ import java.util.Map;
 /*adding new property:
 1. add to PROPERTIES
 2. create field
-3. create setter in Proxy*/
+3. create getter if needed for old design preview (not expert)
+4. create setter in Proxy*/
 
 public class GridView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
@@ -66,6 +67,46 @@ public class GridView extends ComponentView {
     private GroupObjectView groupObject;
 
     private JComponentPanel component;
+
+    @SuppressWarnings("unused")
+    public boolean isAutoSize() {
+        return autoSize;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isBoxed() {
+        return boxed;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isTabVertical() {
+        return tabVertical;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isQuickSearch() {
+        return quickSearch;
+    }
+
+    @SuppressWarnings("unused")
+    public int getHeaderHeight() {
+        return headerHeight;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isResizeOverflow() {
+        return resizeOverflow;
+    }
+
+    @SuppressWarnings("unused")
+    public int getLineWidth() {
+        return lineWidth;
+    }
+
+    @SuppressWarnings("unused")
+    public int getLineHeight() {
+        return lineHeight;
+    }
 
     @Override
     public double getBaseDefaultFlex(FormEntity formEntity) {

@@ -21,36 +21,37 @@ import java.util.*;
 /*adding new property:
 1. add to PROPERTIES
 2. create field
-3. create setter in Proxy*/
+3. create getter if needed for old design preview (not expert)
+4. create setter in Proxy*/
 
 public abstract class ComponentView extends PropertiesContainer {
     public static final List<Property> PROPERTIES = Arrays.asList(
             new ReflectionProperty("span"),
-            new ReflectionProperty("defaultComponent"),
-            new ReflectionProperty("activated"),
-            new ReflectionProperty("fill"),
+            new ReflectionProperty("defaultComponent").setExpert(),
+            new ReflectionProperty("activated").setExpert(),
+            new ReflectionProperty("fill").setExpert(),
             new ReflectionProperty("size"),
-            new ReflectionProperty("height"),
-            new ReflectionProperty("width"),
+            new ReflectionProperty("height").setExpert(),
+            new ReflectionProperty("width").setExpert(),
             new ReflectionProperty("flex"),
             new ReflectionProperty("shrink"),
             new ReflectionProperty("alignShrink"),
-            new ReflectionProperty("align"),
+            new ReflectionProperty("align").setExpert(),
             new ReflectionProperty("alignment"),
             new ReflectionProperty("alignCaption"),
-            new ReflectionProperty("marginTop"),
-            new ReflectionProperty("marginBottom"),
-            new ReflectionProperty("marginLeft"),
-            new ReflectionProperty("marginRight"),
-            new ReflectionProperty("margin"),
-            new ReflectionProperty("captionFont"),
-            new ReflectionProperty("font"),
-            new ReflectionProperty("class"),
-            new ReflectionProperty("fontSize"),
-            new ReflectionProperty("fontStyle"),
+            new ReflectionProperty("marginTop").setExpert(),
+            new ReflectionProperty("marginBottom").setExpert(),
+            new ReflectionProperty("marginLeft").setExpert(),
+            new ReflectionProperty("marginRight").setExpert(),
+            new ReflectionProperty("margin").setExpert(),
+            new ReflectionProperty("captionFont").setExpert(),
+            new ReflectionProperty("font").setExpert(),
+            new ReflectionProperty("class").setExpert(),
+            new ReflectionProperty("fontSize").setExpert(),
+            new ReflectionProperty("fontStyle").setExpert(),
             new ReflectionProperty("background"),
             new ReflectionProperty("foreground"),
-            new ReflectionProperty("imagePath"), //removed in v6
+            new ReflectionProperty("imagePath").setExpert(), //removed in v6
             new ReflectionProperty("showIf")
     );
 
@@ -102,8 +103,18 @@ public abstract class ComponentView extends PropertiesContainer {
         this.sID = sID;
     }
 
+    @SuppressWarnings("unused")
+    public int getSpan() {
+        return span;
+    }
+
     public Dimension getSize() {
         return size;
+    }
+
+    @SuppressWarnings("unused")
+    public double getFlex() {
+        return flex;
     }
 
     public double getFlex(FormEntity formEntity) {
@@ -130,6 +141,16 @@ public abstract class ComponentView extends PropertiesContainer {
         this.flex = flex;
     }
 
+    @SuppressWarnings("unused")
+    public boolean isShrink() {
+        return shrink;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isAlignShrink() {
+        return alignShrink;
+    }
+
     public FlexAlignment getAlignment() {
         if (alignment != null) {
             return alignment;
@@ -147,6 +168,11 @@ public abstract class ComponentView extends PropertiesContainer {
 
     public void setAlignment(FlexAlignment alignment) {
         this.alignment = alignment;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isAlignCaption() {
+        return alignCaption;
     }
 
     public void setMarginTop(int marginTop) {
@@ -172,8 +198,23 @@ public abstract class ComponentView extends PropertiesContainer {
         setMarginRight(margin);
     }
 
+    @SuppressWarnings("unused")
+    public Color getBackground() {
+        return background;
+    }
+
+    @SuppressWarnings("unused")
+    public Color getForeground() {
+        return foreground;
+    }
+
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isShowIf() {
+        return showIf;
     }
 
     protected static <T> List<T> addToList(@NotNull List<T> list, T... rest) {

@@ -17,7 +17,8 @@ import java.util.Map;
 /*adding new property:
 1. add to PROPERTIES
 2. create field
-3. create setter in Proxy*/
+3. create getter if needed for old design preview (not expert)
+4. create setter in Proxy*/
 
 public class ToolbarView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
@@ -52,6 +53,11 @@ public class ToolbarView extends ComponentView {
 
     public ToolbarView(String sID) {
         super(sID);
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isVisible() {
+        return visible;
     }
 
     public boolean isShowCountQuantity() {

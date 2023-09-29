@@ -28,7 +28,8 @@ import static com.lsfusion.util.BaseUtils.isRedundantString;
 /*adding new property:
 1. add to PROPERTIES
 2. create field
-3. create setter in Proxy*/
+3. create getter if needed for old design preview (not expert)
+4. create setter in Proxy*/
 
 public class PropertyDrawView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
@@ -38,51 +39,51 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("panelCaptionVertical"),
             new ReflectionProperty("panelCaptionLast"),
             new ReflectionProperty("panelCaptionAlignment"),
-            new ReflectionProperty("editOnSingleClick"), //backward compatibility
-            new ReflectionProperty("changeOnSingleClick"),
-            new ReflectionProperty("hide"),
-            new ReflectionProperty("regexp"),
-            new ReflectionProperty("regexpMessage"),
-            new ReflectionProperty("pattern"),
+            new ReflectionProperty("editOnSingleClick").setExpert(), //backward compatibility
+            new ReflectionProperty("changeOnSingleClick").setExpert(),
+            new ReflectionProperty("hide").setExpert(),
+            new ReflectionProperty("regexp").setExpert(),
+            new ReflectionProperty("regexpMessage").setExpert(),
+            new ReflectionProperty("pattern").setExpert(),
             new ReflectionProperty("maxValue"),
             new ReflectionProperty("echoSymbols"),
-            new ReflectionProperty("noSort"),
+            new ReflectionProperty("noSort").setExpert(),
             new ReflectionProperty("defaultCompare"),
-            new ReflectionProperty("valueSize"),
-            new ReflectionProperty("valueHeight"),
-            new ReflectionProperty("valueWidth"),
+            new ReflectionProperty("valueSize").setExpert(),
+            new ReflectionProperty("valueHeight").setExpert(),
+            new ReflectionProperty("valueWidth").setExpert(),
             new ReflectionProperty("captionHeight"),
             new ReflectionProperty("captionWidth"),
-            new ReflectionProperty("charHeight"),
-            new ReflectionProperty("charWidth"),
+            new ReflectionProperty("charHeight").setExpert(),
+            new ReflectionProperty("charWidth").setExpert(),
             new ReflectionProperty("valueFlex"),
             new ReflectionProperty("changeKey"),
             new ReflectionProperty("changeKeyPriority"),
             new ReflectionProperty("changeMouse"),
             new ReflectionProperty("changeMousePriority"),
-            new ReflectionProperty("showChangeKey"),
+            new ReflectionProperty("showChangeKey").setExpert(),
             new ReflectionProperty("focusable"),
             new ReflectionProperty("panelColumnVertical"),
-            new ReflectionProperty("valueClass"),
-            new ReflectionProperty("captionClass"),
+            new ReflectionProperty("valueClass").setExpert(),
+            new ReflectionProperty("captionClass").setExpert(),
             new ReflectionProperty("caption"),
-            new ReflectionProperty("imagePath"), //backward compatibility
+            new ReflectionProperty("imagePath").setExpert(), //backward compatibility
             new ReflectionProperty("image"),
             new ReflectionProperty("comment"),
-            new ReflectionProperty("commentClass"),
+            new ReflectionProperty("commentClass").setExpert(),
             new ReflectionProperty("panelCommentVertical"),
             new ReflectionProperty("panelCommentFirst"),
             new ReflectionProperty("panelCommentAlignment"),
             new ReflectionProperty("placeholder"),
             new ReflectionProperty("valueAlignment"),
-            new ReflectionProperty("clearText"),
-            new ReflectionProperty("notSelectAll"),
-            new ReflectionProperty("askConfirm"),
-            new ReflectionProperty("askConfirmMessage"),
+            new ReflectionProperty("clearText").setExpert(),
+            new ReflectionProperty("notSelectAll").setExpert(),
+            new ReflectionProperty("askConfirm").setExpert(),
+            new ReflectionProperty("askConfirmMessage").setExpert(),
             new ReflectionProperty("toolTip"),
             new ReflectionProperty("toolbar"),
             new ReflectionProperty("notNull"),
-            new ReflectionProperty("select")
+            new ReflectionProperty("select").setExpert()
     );
 
     @Override
@@ -184,16 +185,101 @@ public class PropertyDrawView extends ComponentView {
         setMargin(2);
     }
 
+    @SuppressWarnings("unused")
+    public boolean isAutoSize() {
+        return autoSize;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isBoxed() {
+        return boxed;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isPanelCaptionVertical() {
+        return panelCaptionVertical;
+    }
+
+    @SuppressWarnings("unused")
+    public Boolean getPanelCaptionLast() {
+        return panelCaptionLast;
+    }
+
+    @SuppressWarnings("unused")
+    public FlexAlignment getPanelCaptionAlignment() {
+        return panelCaptionAlignment;
+    }
+
+    @SuppressWarnings("unused")
+    public Long getMaxValue() {
+        return maxValue;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isEchoSymbols() {
+        return echoSymbols;
+    }
+
+    @SuppressWarnings("unused")
+    public String getDefaultCompare() {
+        return defaultCompare;
+    }
+
+    @SuppressWarnings("unused")
+    public int getCaptionHeight() {
+        return captionHeight;
+    }
+
+    @SuppressWarnings("unused")
+    public int getCaptionWidth() {
+        return captionWidth;
+    }
+
     public void setCharWidth(int charWidth) {
         this.charWidth = charWidth;
+    }
+
+    @SuppressWarnings("unused")
+    public Boolean getValueFlex() {
+        return valueFlex;
+    }
+
+    @SuppressWarnings("unused")
+    public KeyStroke getChangeKey() {
+        return changeKey;
     }
 
     public void setChangeKey(KeyStroke changeKey) {
         this.changeKey = changeKey;
     }
 
+    @SuppressWarnings("unused")
+    public int getChangeKeyPriority() {
+        return changeKeyPriority;
+    }
+
+    @SuppressWarnings("unused")
+    public String getChangeMouse() {
+        return changeMouse;
+    }
+
+    @SuppressWarnings("unused")
+    public int getChangeMousePriority() {
+        return changeMousePriority;
+    }
+
     public void setShowChangeKey(boolean showChangeKey) {
         this.showChangeKey = showChangeKey;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isFocusable() {
+        return focusable;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isPanelColumnVertical() {
+        return panelColumnVertical;
     }
 
     @Override
@@ -211,6 +297,55 @@ public class PropertyDrawView extends ComponentView {
         return showChangeKey && changeKey != null
                 ? caption + " (" + getKeyStrokeCaption(changeKey) + ")"
                 : caption;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    @SuppressWarnings("unused")
+    public String getComment() {
+        return comment;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isPanelCommentVertical() {
+        return panelCommentVertical;
+    }
+
+    @SuppressWarnings("unused")
+    public Boolean getPanelCommentFirst() {
+        return panelCommentFirst;
+    }
+
+    @SuppressWarnings("unused")
+    public FlexAlignment getPanelCommentAlignment() {
+        return panelCommentAlignment;
+    }
+
+    @SuppressWarnings("unused")
+    public String getPlaceholder() {
+        return placeholder;
+    }
+
+    @SuppressWarnings("unused")
+    public FlexAlignment getValueAlignment() {
+        return valueAlignment;
+    }
+
+    @SuppressWarnings("unused")
+    public String getToolTip() {
+        return toolTip;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isToolbar() {
+        return toolbar;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isNotNull() {
+        return notNull;
     }
 
     public boolean isHorizontalValueFlex() {

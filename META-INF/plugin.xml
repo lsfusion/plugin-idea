@@ -10,6 +10,7 @@
         <b>Version 1.0.269</b><br>
         <ul>
             <li>Resolve parsing issue for keyword-like prefixes in ID lexeme</li>
+            <li>Fixed properties in old design preview</li>
         </ul>
     ]]>
     </change-notes>

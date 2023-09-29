@@ -20,18 +20,19 @@ import java.util.Map;
 /*adding new property:
 1. add to PROPERTIES
 2. create field
-3. create setter in Proxy*/
+3. create getter if needed for old design preview (not expert)
+4. create setter in Proxy*/
 
 public class TreeGroupView extends ComponentView implements PropertyGroupContainerView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
-            new ReflectionProperty("autoSize"),
-            new ReflectionProperty("boxed"),
+            new ReflectionProperty("autoSize").setExpert(),
+            new ReflectionProperty("boxed").setExpert(),
             new ReflectionProperty("expandOnClick"),
-            new ReflectionProperty("headerHeight"),
-            new ReflectionProperty("resizeOverflow"),
-            new ReflectionProperty("lineHeight"),
-            new ReflectionProperty("lineWidth")
+            new ReflectionProperty("headerHeight").setExpert(),
+            new ReflectionProperty("resizeOverflow").setExpert(),
+            new ReflectionProperty("lineHeight").setExpert(),
+            new ReflectionProperty("lineWidth").setExpert()
     );
 
     @Override

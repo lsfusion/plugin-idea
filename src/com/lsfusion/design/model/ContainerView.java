@@ -20,7 +20,8 @@ import static java.lang.Math.max;
 /*adding new property:
 1. add to PROPERTIES
 2. create field
-3. create setter in Proxy*/
+3. create getter if needed for old design preview (not expert)
+4. create setter in Proxy*/
 
 public class ContainerView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
@@ -30,7 +31,7 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("collapsible"),
             new ReflectionProperty("border"),
             new ReflectionProperty("collapsed"),
-            new ReflectionProperty("type"),
+            new ReflectionProperty("type").setExpert(), //deprecated
             new ReflectionProperty("horizontal"),
             new ReflectionProperty("tabbed"),
             new ReflectionProperty("childrenAlignment"),
@@ -38,12 +39,12 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("grid"),
             new ReflectionProperty("wrap"),
             new ReflectionProperty("resizeOverflow"),
-            new ReflectionProperty("custom"),
-            new ReflectionProperty("columns"), //backward compatibility
+            new ReflectionProperty("custom").setExpert(),
+            new ReflectionProperty("columns").setExpert(), //backward compatibility
             new ReflectionProperty("lines"),
             new ReflectionProperty("lineSize"),
             new ReflectionProperty("captionLineSize"),
-            new ReflectionProperty("visible") //backward compatibility
+            new ReflectionProperty("visible").setExpert() //backward compatibility
     );
 
     @Override
@@ -113,6 +114,26 @@ public class ContainerView extends ComponentView {
         this.caption = caption;
     }
 
+    @SuppressWarnings("unused")
+    public String getImage() {
+        return image;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isCollapsible() {
+        return collapsible;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isBorder() {
+        return border;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isCollapsed() {
+        return collapsed;
+    }
+
     public void setType(ContainerType type) {
         this.type = type;
     }
@@ -123,6 +144,11 @@ public class ContainerView extends ComponentView {
 
     public boolean isTabbed() {
         return type == TABBED || tabbed;
+    }
+
+    @SuppressWarnings("unused")
+    public Alignment getChildrenAlignment() {
+        return childrenAlignment;
     }
 
     public void setChildrenAlignment(Alignment childrenAlignment) {
@@ -287,6 +313,41 @@ public class ContainerView extends ComponentView {
             return false;
 
         return true;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isGrid() {
+        return grid;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isWrap() {
+        return wrap;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isResizeOverflow() {
+        return resizeOverflow;
+    }
+
+    @SuppressWarnings("unused")
+    public int getLines() {
+        return lines;
+    }
+
+    @SuppressWarnings("unused")
+    public int getLineSize() {
+        return lineSize;
+    }
+
+    @SuppressWarnings("unused")
+    public int getCaptionLineSize() {
+        return captionLineSize;
+    }
+
+    @SuppressWarnings("unused")
+    public String getDescription() {
+        return description;
     }
 
     private JComponentPanel createTabbedPanel(Project project, FormEntity formEntity, Map<ComponentView, Boolean> selection, Map<ComponentView, JComponentPanel> componentToWidget, JComponentPanel oldWidget, HashSet<ComponentView> recursionGuard) {
