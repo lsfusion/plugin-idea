@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.269</b><br>
+        <b>Version 1.0.270</b><br>
         <ul>
-            <li>Resolve parsing issue for keyword-like prefixes in ID lexeme</li>
-            <li>Fixed properties in old design preview</li>
+            <li>DesignView.changeForm fix</li>
         </ul>
     ]]>
     </change-notes>

@@ -5,6 +5,7 @@ import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.references.LSFReference;
+import com.lsfusion.util.BaseUtils;
 
 import java.util.function.Supplier;
 
@@ -48,5 +49,12 @@ public class LSFLocalSearchScope {
         return metaDecl.get();
     }
 
-//    todo:equals for DesignView.changeForm
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LSFLocalSearchScope) {
+            return BaseUtils.nullEquals(lsfFile.get(), ((LSFLocalSearchScope) obj).lsfFile.get())
+                    && BaseUtils.nullEquals(metaDecl.get(), ((LSFLocalSearchScope) obj).metaDecl.get());
+        }
+        return false;
+    }
 }
