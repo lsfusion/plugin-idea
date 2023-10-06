@@ -1,7 +1,6 @@
 package com.lsfusion.dependencies.property;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiDocumentManager;
@@ -10,6 +9,7 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
+import com.lsfusion.LSFLineMarkerProvider;
 import com.lsfusion.actions.ToggleComplexityAction;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFSimpleName;
@@ -25,15 +25,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider {
+public class PropertyComplexityLineMarkerProvider extends LSFLineMarkerProvider {
     @Nullable
     @Override
-    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
+    protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement element) {
         return null;
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
+    protected void collectSlowLSFLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
         if (!elements.isEmpty() && !ToggleComplexityAction.isComplexityEnabled(elements.iterator().next().getProject())) {
             return;
         }
@@ -47,16 +47,14 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
             int lineNumber = document.getLineNumber(element.getTextOffset());
             if (!usedLines.contains(lineNumber)) {
                 if (element instanceof LeafPsiElement && element.getParent() instanceof LSFSimpleName) {
-                    LSFGlobalPropDeclaration propDeclaration = PsiTreeUtil.getParentOfType(element, LSFGlobalPropDeclaration.class);
+                    LSFGlobalPropDeclaration<?, ?> propDeclaration = PsiTreeUtil.getParentOfType(element, LSFGlobalPropDeclaration.class);
                     if (propDeclaration != null) {
                         LSFId nameIdentifier = propDeclaration.getNameIdentifier();
                         if (nameIdentifier != null && nameIdentifier.getFirstChild() == element) {
                             if (propDeclaration.isCorrect() && !propDeclaration.isStoredProperty()) {
                                 LineMarkerInfo<?> marker = createLineMarker(propDeclaration, element);
-                                if (marker != null) {
-                                    result.add(marker);
-                                    usedLines.add(lineNumber);
-                                }
+                                result.add(marker);
+                                usedLines.add(lineNumber);
                             }
                         }
                     }
@@ -65,7 +63,7 @@ public class PropertyComplexityLineMarkerProvider implements LineMarkerProvider 
         }
     }
 
-    private LineMarkerInfo<?> createLineMarker(LSFGlobalPropDeclaration property, PsiElement element) {
+    private LineMarkerInfo<?> createLineMarker(LSFGlobalPropDeclaration<?, ?> property, PsiElement element) {
         int complexity = PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching(property);
         return new LineMarkerInfo<>(element,
                 element.getTextRange(),

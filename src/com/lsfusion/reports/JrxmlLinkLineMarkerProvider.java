@@ -2,7 +2,6 @@ package com.lsfusion.reports;
 
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopupStep;
@@ -13,6 +12,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.LSFLineMarkerProvider;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -29,11 +28,11 @@ import static com.lsfusion.design.DesignPreviewLineMarkerProvider.resolveFormDec
 import static com.lsfusion.reports.ReportUtils.hasReportFiles;
 import static com.lsfusion.util.LSFFileUtils.getFileRelativePath;
 
-public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
+public class JrxmlLinkLineMarkerProvider extends LSFLineMarkerProvider {
 
     @Nullable
     @Override
-    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement psi) {
+    protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement psi) {
         if (hasReportFiles(psi)) {
             return createLineMarker(psi);
         }
@@ -50,10 +49,6 @@ public class JrxmlLinkLineMarkerProvider implements LineMarkerProvider {
                 GutterIconRenderer.Alignment.RIGHT,
                 () -> ""
         );
-    }
-
-    @Override
-    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
     }
 
     private static class TooltipProvider implements Function<PsiElement, String> {

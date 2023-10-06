@@ -1,7 +1,6 @@
 package com.lsfusion.lang.meta;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
@@ -9,6 +8,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
+import com.lsfusion.LSFLineMarkerProvider;
 import com.lsfusion.lang.psi.LSFMetaCodeStatement;
 import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
@@ -17,13 +17,11 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Collection;
-import java.util.List;
 
-public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
+public class MetaNestingLineMarkerProvider extends LSFLineMarkerProvider {
     @Nullable
     @Override
-    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
+    protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement element) {
         if (element instanceof LeafPsiElement && element.getParent() instanceof LSFSimpleName) {
             LSFMetaCodeStatement metaReference = PsiTreeUtil.getParentOfType(element, LSFMetaCodeStatement.class);
             if (metaReference != null) {
@@ -70,10 +68,6 @@ public class MetaNestingLineMarkerProvider implements LineMarkerProvider {
                 return 12;
             }
         };
-    }
-
-    @Override
-    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> psiElements, @NotNull Collection<? super LineMarkerInfo<?>> lineMarkerInfos) {
     }
 
     public static int resolveNestingLevel(PsiElement element) {

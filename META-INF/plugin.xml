@@ -10,6 +10,7 @@
         <b>Version 1.0.270</b><br>
         <ul>
             <li>DesignView.changeForm fix</li>
+            <li>Resolve line marker errors in presence of string interpolation</li>
         </ul>
     ]]>
     </change-notes>

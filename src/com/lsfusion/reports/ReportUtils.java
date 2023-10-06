@@ -25,7 +25,7 @@ import static com.lsfusion.util.LSFFileUtils.findFilesWithShortName;
 public class ReportUtils {
 
     public static boolean hasReportFiles(PsiElement psi) {
-        Result<LSFExtend> declExtend = new Result<>();
+        Result<LSFExtend<?, ?>> declExtend = new Result<>();
         LSFFormDeclaration decl = DesignPreviewLineMarkerProvider.resolveFormDecl(psi, declExtend);
         if (decl != null) {
             return findReportFiles(decl, LSFLocalSearchScope.createFrom(declExtend.getResult()), reportName -> !LSFFileUtils.hasFilesWithShortNameInProject(psi, reportName + ".jrxml"));
@@ -44,7 +44,7 @@ public class ReportUtils {
 
     public static List<PsiFile> findReportFiles(PsiElement psi) {
         List<PsiFile> files = new ArrayList<>();
-        Result<LSFExtend> declExtend = new Result<>();
+        Result<LSFExtend<?, ?>> declExtend = new Result<>();
         LSFFormDeclaration decl = DesignPreviewLineMarkerProvider.resolveFormDecl(psi, declExtend);
         if (decl != null) {
             return findReportFiles(decl, LSFLocalSearchScope.createFrom(declExtend.getResult()));

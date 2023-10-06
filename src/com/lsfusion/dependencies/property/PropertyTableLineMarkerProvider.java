@@ -2,7 +2,6 @@ package com.lsfusion.dependencies.property;
 
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiDocumentManager;
@@ -11,6 +10,7 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
+import com.lsfusion.LSFLineMarkerProvider;
 import com.lsfusion.actions.ToggleShowTableAction;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFId;
@@ -32,15 +32,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
+public class PropertyTableLineMarkerProvider extends LSFLineMarkerProvider {
     @Nullable
     @Override
-    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
+    protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement element) {
         return null;
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
+    protected void collectSlowLSFLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
         if (!elements.isEmpty() && !ToggleShowTableAction.isShowTableEnabled(elements.iterator().next().getProject())) {
             return;
         }
@@ -53,17 +53,15 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
             }
             int lineNumber = document.getLineNumber(element.getTextOffset());
             if (!usedLines.contains(lineNumber)) {
-                LSFGlobalPropDeclaration propDeclaration = getPropertyDeclaration(element);
+                LSFGlobalPropDeclaration<?, ?> propDeclaration = getPropertyDeclaration(element);
                 if (propDeclaration != null) {
                     LSFId nameIdentifier = propDeclaration.getNameIdentifier();
                     if (nameIdentifier != null && nameIdentifier.getFirstChild() == element) {
                         if(!(propDeclaration instanceof LSFAggrParamGlobalPropDeclaration && ((LSFAggrParamGlobalPropDeclaration) propDeclaration).getAggrPropertyDefinition() == null)) {
                             if (propDeclaration.isCorrect() && (propDeclaration.isDataStoredProperty() || propDeclaration.isPersistentProperty())) {
                                 LineMarkerInfo<?> marker = createLineMarker(element);
-                                if (marker != null) {
-                                    result.add(marker);
-                                    usedLines.add(lineNumber);
-                                }
+                                result.add(marker);
+                                usedLines.add(lineNumber);
                             }
                         }
                     }
@@ -72,7 +70,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
         }
     }
     
-    private static LSFGlobalPropDeclaration getPropertyDeclaration(PsiElement element) {
+    private static LSFGlobalPropDeclaration<?, ?> getPropertyDeclaration(PsiElement element) {
         if (element instanceof LeafPsiElement && element.getParent() instanceof LSFSimpleName) {
             return PsiTreeUtil.getParentOfType(element, LSFGlobalPropDeclaration.class);
         }
@@ -122,7 +120,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public String fun(PsiElement psi) {
-            LSFGlobalPropDeclaration propertyDecl = getPropertyDeclaration(psi); 
+            LSFGlobalPropDeclaration<?, ?> propertyDecl = getPropertyDeclaration(psi);
             String name = propertyDecl != null ? propertyDecl.getTableName() : null;
             return name == null ? "Unknown table" : ("Table: " + name);
         }
@@ -134,7 +132,7 @@ public class PropertyTableLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(MouseEvent e, PsiElement psi) {
             if (e.getID() == MouseEvent.MOUSE_RELEASED) {
-                LSFGlobalPropDeclaration propertyDecl = getPropertyDeclaration(psi);
+                LSFGlobalPropDeclaration<?, ?> propertyDecl = getPropertyDeclaration(psi);
                 String name = propertyDecl != null ? propertyDecl.getTableName() : null;
                 if (name != null) {
                     int underscoreIndex = name.indexOf("_");

@@ -2,11 +2,11 @@ package com.lsfusion.dependencies.property;
 
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
+import com.lsfusion.LSFLineMarkerProvider;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.LSFColorLiteral;
 import com.lsfusion.lang.psi.LSFUintLiteral;
@@ -19,10 +19,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-public class PropertyColorLineMarkerProvider implements LineMarkerProvider {
+public class PropertyColorLineMarkerProvider extends LSFLineMarkerProvider {
     @Nullable
     @Override
-    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
+    protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement element) {
         Pair<Color, Boolean> color = getColor(element);
         if(color != null)  {
             return createLineMarker(element.getFirstChild(), color.first);

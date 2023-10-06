@@ -2,7 +2,6 @@ package com.lsfusion.design;
 
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -14,6 +13,7 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.LSFLineMarkerProvider;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
@@ -22,14 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.MouseEvent;
-import java.util.Collection;
-import java.util.List;
 
-public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
+public class DesignPreviewLineMarkerProvider extends LSFLineMarkerProvider {
 
     @Nullable
     @Override
-    public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement psi) {
+    protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement psi) {
         LSFFormDeclaration decl = resolveFormDecl(psi);
         return decl == null ? null : createLineMarker(psi);
     }
@@ -45,14 +43,10 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
         );
     }
 
-    @Override
-    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
-    }
-
     public static LSFFormDeclaration resolveFormDecl(PsiElement psi) {
         return resolveFormDecl(psi, null);
     }
-    public static LSFFormDeclaration resolveFormDecl(PsiElement psi, Result<LSFExtend> extend) {
+    public static LSFFormDeclaration resolveFormDecl(PsiElement psi, Result<LSFExtend<?, ?>> extend) {
         if (psi instanceof LeafPsiElement && psi.getParent() instanceof LSFSimpleName) {
             LSFFormDeclaration formDeclaration = null;
             LSFId nameIdentifier = null;
@@ -108,7 +102,7 @@ public class DesignPreviewLineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public void navigate(MouseEvent e, PsiElement psi) {
-            Result<LSFExtend> formExtend = new Result<>();
+            Result<LSFExtend<?, ?>> formExtend = new Result<>();
             LSFFormDeclaration formDecl = resolveFormDecl(psi, formExtend);
 
             if (formDecl != null) {
