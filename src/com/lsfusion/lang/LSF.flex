@@ -256,6 +256,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "DESC"                    			{ return DESC; }
   "DESIGN"                  			{ return DESIGN; }
   "DIALOG"                  			{ return DIALOG; }
+  "DISABLEIF"                  			{ return DISABLEIF; }
   "DO"                      			{ return DO; }
   "DOC"                      			{ return DOC; }
   "DOCKED"                  			{ return DOCKED; }

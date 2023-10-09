@@ -1733,7 +1733,7 @@ formOptionForce ::= classViewType
 formOptionCustomView ::= propertyCustomView
 formOptionToDraw ::= DRAW groupObjectUsage {pin = 1}
 formOptionEventId ::= EVENTID stringLiteral {pin = 1}
-formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | CLASS | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
+formOptionsWithCalcPropertyObject ::= (SHOWIF | READONLYIF | DISABLEIF | CLASS | BACKGROUND | FOREGROUND | HEADER | FOOTER) formCalcPropertyObject {pin = 1}
 formOptionsWithOptionalCalcPropertyObject ::= (IMAGE (AUTO | formCalcPropertyObject)?) | NOIMAGE {pin = 1}
 formOptionQuickFilter ::= QUICKFILTER formPropertyDrawUsage {pin = 1}
 formOptionInsertType ::= staticRelativePosition | (BEFORE | AFTER) formPropertyDrawUsage {pin = 1}
