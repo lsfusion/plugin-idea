@@ -11,6 +11,7 @@
         <ul>
             <li>DesignView.changeForm fix</li>
             <li>Resolve line marker errors in presence of string interpolation</li>
+            <li>NESTED CLASSES support</li>
         </ul>
     ]]>
     </change-notes>
