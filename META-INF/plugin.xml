@@ -13,6 +13,7 @@
             <li>Resolve line marker errors in presence of string interpolation</li>
             <li>NESTED CLASSES support</li>
             <li>DISABLEIF support</li>
+            <li>Fix metacode errors for IDEA version 2023.2</li>
         </ul>
     ]]>
     </change-notes>

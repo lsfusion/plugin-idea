@@ -6,6 +6,8 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ReferenceRange;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.*;
+import com.intellij.psi.stubs.PsiFileStubImpl;
+import com.intellij.psi.stubs.StubElement;
 import com.intellij.util.Processor;
 import com.intellij.util.Query;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
@@ -54,7 +56,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
     public static List<LSFMetaCodeStatement> findMetaUsages(final String name, int paramCount, final LSFFile file) {
 
         // песец не надежно, но что поделаешь
-        final LSFMetaDeclaration virtDecl = new LSFMetaCodeDeclarationStatementImpl(new MetaStubImpl(name, paramCount, 0), LSFStubElementTypes.META) {
+        final LSFMetaDeclaration virtDecl = new LSFMetaCodeDeclarationStatementImpl(new MetaStubImpl(getFakeParentStub(), name, paramCount, 0), LSFStubElementTypes.META) {
             public LSFFile getLSFFile() {
                 return file;
             }
@@ -73,7 +75,12 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
         });
         return result;
     }
-
+    
+    // We need a non-null parent to avoid throwing of an exception in the constructor of the StubBase class
+    private static StubElement<LSFFile> getFakeParentStub() {
+        return new PsiFileStubImpl<>(null);
+    }
+    
     public static List<LSFFullNameReference> findRenameConflicts(final String name, final LSFFullNameDeclaration decl) {
         final List<LSFFullNameReference> result = new ArrayList<>();
         searchWordUsages(decl.getProject(), name).forEach(ref -> { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all

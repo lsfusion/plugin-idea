@@ -22,8 +22,8 @@ public class MetaStubImpl extends FullNameStubImpl<MetaStubElement, LSFMetaDecla
     }
 
     // виртуальный конструктор для гененрац
-    public MetaStubImpl(String name, int paramCount, int offset) {
-        super(null, LSFStubElementTypes.META, StringRef.fromString(name), offset);
+    public MetaStubImpl(StubElement parent, String name, int paramCount, int offset) {
+        super(parent, LSFStubElementTypes.META, StringRef.fromString(name), offset);
         this.paramCount = paramCount;
     }
 
