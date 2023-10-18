@@ -260,6 +260,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitCustomHeaderLiteral(@NotNull LSFCustomHeaderLiteral o) {
+        super.visitCustomHeaderLiteral(o);
+        if(o.getText().equals("OPTIONS")) {
+            addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use HEADER instead");
+        }
+    }
+
+    @Override
     public void visitGroupObjectUsage(@NotNull LSFGroupObjectUsage o) {
         super.visitGroupObjectUsage(o);
         checkReference(o);

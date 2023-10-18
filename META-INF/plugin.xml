@@ -7,13 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.270</b><br>
+        <b>Version 1.0.271</b><br>
         <ul>
-            <li>DesignView.changeForm fix</li>
-            <li>Resolve line marker errors in presence of string interpolation</li>
-            <li>NESTED CLASSES support</li>
-            <li>DISABLEIF support</li>
-            <li>Fix metacode errors for IDEA version 2023.2</li>
+            <li>CUSTOM OPTIONS -> CUSTOM HEADER (with backward compatibility)</li>
         </ul>
     ]]>
     </change-notes>
