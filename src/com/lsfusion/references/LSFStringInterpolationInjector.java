@@ -4,9 +4,13 @@ import com.intellij.lang.injection.MultiHostInjector;
 import com.intellij.lang.injection.MultiHostRegistrar;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.psi.LSFExpressionStringLiteral;
 import com.lsfusion.lang.psi.LSFExpressionStringValueLiteralImpl;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFScriptStatement;
 import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,38 +26,58 @@ public class LSFStringInterpolationInjector implements MultiHostInjector {
         assert context instanceof LSFExpressionStringValueLiteralImpl;
         LSFExpressionStringValueLiteralImpl literal = (LSFExpressionStringValueLiteralImpl) context;
         List<LSFStringUtils.SpecialBlock> blocks = LSFStringUtils.getInterpolationBlockList(literal.getText(), true);
-
+        
         if (!blocks.isEmpty()) {
+            StringBuilder currentPrefix = new StringBuilder(buildModulePrefix(literal));
+            int lastOffset = 1; // do not take starting quote
+            
             registrar.startInjecting(LSFLanguage.INSTANCE);
-
-            StringBuilder filePrefix = new StringBuilder();
-            String fileText = literal.getContainingFile().getText();
-            filePrefix.append(fileText, 0, literal.getTextOffset());
-
-            int lastIndex = 1; // do not take starting quote
-            boolean isFirst = true;
-            String fileSuffix = ")" + fileText.substring(literal.getTextOffset() + literal.getText().length());
-
+            
             for (LSFStringUtils.SpecialBlock block : blocks) {
-                if (isFirst) {
-                    isFirst = false;
-                } else {
-                    filePrefix.append(" + ");
+                if (block != blocks.get(0)) {
+                    currentPrefix.setLength(0);
+                    currentPrefix.append(" + ");
                 }
-                 filePrefix.append(QUOTE).append(literal.getText(), lastIndex, block.start).append(QUOTE);
+                currentPrefix.append(QUOTE).append(literal.getText(), lastOffset, block.start).append(QUOTE);
                 // wrapping in STRING cast is expected by ElementsContextModifier.resolveParamsInsideStringInterpolations
-                filePrefix.append(" + STRING(");
-
-                registrar.addPlace(filePrefix.toString(), fileSuffix, literal, new TextRange(block.start + INTERPOLATION_PREFIX.length(), block.end));
-                String blockText = literal.getText().substring(block.start + INTERPOLATION_PREFIX.length(), block.end);
-                // Removes possible escaping of quotes. This does not support nested interpolation levels.
-                filePrefix.append(LSFStringUtils.unescapeQuotes(blockText)).append(")");
-                lastIndex = block.end + 1;
+                currentPrefix.append(" + STRING(");
+                
+                registrar.addPlace(currentPrefix.toString(), ")", literal, new TextRange(block.start + INTERPOLATION_PREFIX.length(), block.end));
+                lastOffset = block.end + 1;
             }
+            
             registrar.doneInjecting();
         }
     }
 
+    private String buildModulePrefix(PsiElement literal) {
+        String moduleHeader = createModuleHeaderString(literal);
+        String fileText = literal.getContainingFile().getText();
+        String statementBeforeLiteralText = fileText.substring(getOuterStatementOffset(literal), literal.getTextOffset());
+        return moduleHeader + statementBeforeLiteralText;
+    }
+    
+    private String createModuleHeaderString(PsiElement literal) {
+        String dummyModuleName = LSFElementGenerator.genName;
+        return String.format("MODULE %s;\nREQUIRE %s;\nNAMESPACE %s;\n", dummyModuleName, getModuleName(literal), getNamespaceName(literal));
+    }
+    
+    private int getOuterStatementOffset(PsiElement literal) {
+        PsiElement outerStatement = PsiTreeUtil.getParentOfType(literal, LSFScriptStatement.class);
+        assert outerStatement != null;
+        return outerStatement.getTextOffset();
+    }
+    
+    private String getModuleName(PsiElement literal) {
+        LSFFile file = (LSFFile) literal.getContainingFile();
+        return file.getModuleDeclaration().getDeclName();
+    }
+
+    private String getNamespaceName(PsiElement literal) {
+        LSFFile file = (LSFFile) literal.getContainingFile();
+        return file.getModuleDeclaration().getNamespace();
+    }
+    
     @Override
     public @NotNull List<? extends Class<? extends PsiElement>> elementsToInjectIn() {
         return Collections.singletonList(LSFExpressionStringLiteral.class);

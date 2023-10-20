@@ -11,6 +11,7 @@
         <ul>
             <li>CUSTOM OPTIONS -> CUSTOM HEADER (with backward compatibility)</li>
             <li>Property 'autoSize' deprecated</li>
+            <li>Improvements to the support of string interpolation</li>
         </ul>
     ]]>
     </change-notes>
