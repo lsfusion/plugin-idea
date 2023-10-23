@@ -10,6 +10,7 @@
         <b>Version 1.0.271</b><br>
         <ul>
             <li>CUSTOM OPTIONS -> CUSTOM HEADER (with backward compatibility)</li>
+            <li>Property 'autoSize' deprecated</li>
         </ul>
     ]]>
     </change-notes>

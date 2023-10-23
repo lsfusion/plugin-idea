@@ -1155,6 +1155,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
             } else if (property.equals("type")) {
                 addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'horizontal', 'tabbed', 'lines' instead. Earlier versions: ignore this warning");
+            } else if (property.equals("autoSize")) {
+                addDeprecatedWarningAnnotation(o, "Deprecated since version 6. Earlier versions: ignore this warning");
             } else if (element != null && !element.getText().equals("NULL")) {
                 if (property.equals("fontStyle")) {
                     checkFontStyle(element, element.getText());
