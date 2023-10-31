@@ -422,6 +422,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "PARENT"                  			{ return PARENT; }
   "PARTITION"               			{ return PARTITION; }
   "PASSWORD"                            { return PASSWORD; }
+  "PATCH"                               { return PATCH; }
   "PDF"                     			{ return PDF; }
   "PERIOD"                              { return PERIOD; }
   "PIVOT"                               { return PIVOT; }
