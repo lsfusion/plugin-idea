@@ -494,7 +494,7 @@ jsonPropertyDefinition ::= JSON FROM nonEmptyAliasedPropertyExpressionList where
 
 jsonFormPropertyDefinition ::= JSON LBRAC mappedForm contextFiltersClause? RBRAC
 {
-    pin = 1
+    pin = 3
     implements="com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames resolveFormDecl getDocumentation]
 }
