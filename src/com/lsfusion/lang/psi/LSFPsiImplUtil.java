@@ -17,10 +17,7 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationImpl;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
-import com.lsfusion.lang.psi.impl.LSFCollapseGroupObjectActionPropertyDefinitionBodyImpl;
-import com.lsfusion.lang.psi.impl.LSFExpandGroupObjectActionPropertyDefinitionBodyImpl;
-import com.lsfusion.lang.psi.impl.LSFPropertyExpressionListImpl;
-import com.lsfusion.lang.psi.impl.LSFSeekObjectActionPropertyDefinitionBodyImpl;
+import com.lsfusion.lang.psi.impl.*;
 import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.typeinfer.*;
@@ -4160,6 +4157,22 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
+    public static Inferred inferActionParamClasses(LSFOrderActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
+    public static Inferred inferActionParamClasses(LSFReadOrderActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
+    public static Inferred inferActionParamClasses(LSFFilterActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
+    public static Inferred inferActionParamClasses(LSFReadFilterActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
     public static Inferred inferActionParamClasses(LSFEmailActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         List<Inferred> list = new ArrayList<>();
         for (LSFPropertyExpression pe : body.getPropertyExpressionList()) {
@@ -4435,6 +4448,30 @@ public class LSFPsiImplUtil {
         if (collapseGroupObjectActionBody.getGroupObjectID() != null) {
             formUsage = collapseGroupObjectActionBody.getGroupObjectID().getFormUsage();
         }
+        return resolveFormDecl(formUsage);
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFOrderActionPropertyDefinitionBodyImpl orderActionBody) {
+        LSFFormUsage formUsage = orderActionBody.getGroupObjectID().getFormUsage();
+        return resolveFormDecl(formUsage);
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFReadOrderActionPropertyDefinitionBodyImpl orderActionBody) {
+        LSFFormUsage formUsage = orderActionBody.getGroupObjectID().getFormUsage();
+        return resolveFormDecl(formUsage);
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFilterActionPropertyDefinitionBodyImpl filterActionBody) {
+        LSFFormUsage formUsage = filterActionBody.getGroupObjectID().getFormUsage();
+        return resolveFormDecl(formUsage);
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFReadFilterActionPropertyDefinitionBodyImpl filterActionBody) {
+        LSFFormUsage formUsage = filterActionBody.getGroupObjectID().getFormUsage();
         return resolveFormDecl(formUsage);
     }
 

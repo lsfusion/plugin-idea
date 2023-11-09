@@ -753,6 +753,10 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    seekObjectActionPropertyDefinitionBody
                                       	|	    expandGroupObjectActionPropertyDefinitionBody
                                       	|	    collapseGroupObjectActionPropertyDefinitionBody
+                                      	|       orderActionPropertyDefinitionBody
+                                      	|       readOrderActionPropertyDefinitionBody
+                                      	|       filterActionPropertyDefinitionBody
+                                      	|       readFilterActionPropertyDefinitionBody
                                       	|	    emailActionPropertyDefinitionBody
                                       	|	    evalActionPropertyDefinitionBody
                                       	|	    drillDownActionPropertyDefinitionBody
@@ -1089,6 +1093,34 @@ collapseGroupObjectActionPropertyDefinitionBody ::= COLLAPSE (DOWN | ALL (TOP)?)
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
+orderActionPropertyDefinitionBody ::= ORDER groupObjectID (FROM propertyUsage)?
+{
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
+readOrderActionPropertyDefinitionBody ::= ORDERS groupObjectID (TO propertyUsage)?
+{
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
+filterActionPropertyDefinitionBody ::= FILTER groupObjectID (FROM propertyUsage)?
+{
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
+readFilterActionPropertyDefinitionBody ::= FILTERS groupObjectID (TO propertyUsage)?
+{
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
 // the same trick as with formPropertyDrawMappedDecl
 parameterOrExpression ::=
         (<<checkParameterOrExpression>> &((exprParameterUsage <<matchedSingleParameter>>)?) propertyExpression <<matchedParameterOrExpression>>) |
@@ -1328,8 +1360,8 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
 // some statements are not pinned after the first token, so we need these fake rules to pin incomplete statements (to support recovery assertion) 
 // Important ! after recover the rule should mandatory be pinned (matched)
 private list_action_statement_recover ::= !(ACTIVATE | ACTIVE | NEW | NEWEDIT | APPLY | CANCEL | CHANGE | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | INTERNAL | DELETE
-                                            | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FOR | SHOW | CLOSE | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
-                                            | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE | RECALCULATE
+                                            | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FILTER | FOR | SHOW | CLOSE | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
+                                            | ORDER | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE | RECALCULATE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | COLLAPSE | EXPAND
                                             | EXTERNAL
@@ -1794,6 +1826,8 @@ formEventDeclaration ::= ON
                         |    QUERYCLOSE
                         |    CHANGE ID
                         |    SCHEDULE PERIOD intLiteral FIXED?
+                        |    ORDER groupObjectUsage (TO propertyUsage)?
+                        |    FILTER groupObjectUsage (TO propertyUsage)?
                         )
                         formActionPropertyObject
 {

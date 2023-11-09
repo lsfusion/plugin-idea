@@ -7,12 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.271</b><br>
+        <b>Version 1.0.272</b><br>
         <ul>
-            <li>CUSTOM OPTIONS -> CUSTOM HEADER (with backward compatibility)</li>
-            <li>Property 'autoSize' deprecated</li>
-            <li>Improvements to the support of string interpolation</li>
-            <li>HTTP PATCH support</li>
+            <li>FILTER, ORDER user activity properties / events support</li>
         </ul>
     ]]>
     </change-notes>
