@@ -17,7 +17,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Progressive;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.vcs.FileStatus;
@@ -36,7 +35,7 @@ import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.util.LSFFileUtils;
 import com.lsfusion.util.LSFPsiUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

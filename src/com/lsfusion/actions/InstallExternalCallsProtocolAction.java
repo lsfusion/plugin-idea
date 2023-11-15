@@ -1,7 +1,10 @@
 package com.lsfusion.actions;
 
-import com.intellij.notification.*;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -9,12 +12,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
-import java.nio.file.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -9,7 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.util.BaseUtils;
 import net.gcardone.junidecode.Junidecode;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 
 import javax.swing.*;

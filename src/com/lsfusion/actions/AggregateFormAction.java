@@ -28,14 +28,16 @@ import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.DesignUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AggregateFormAction extends AnAction {
 

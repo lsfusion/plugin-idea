@@ -22,13 +22,14 @@ import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
 import com.lsfusion.util.Pair;
 import lsfusion.server.physics.dev.debug.DebuggerService;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
 
-import static com.lsfusion.debug.DebugUtils.*;
+import static com.lsfusion.debug.DebugUtils.debugProcess;
+import static com.lsfusion.debug.DebugUtils.getDebuggerService;
 
 public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements ProjectManagerListener {
     private Project project;

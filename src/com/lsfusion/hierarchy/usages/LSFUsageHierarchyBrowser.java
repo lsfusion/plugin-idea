@@ -77,7 +77,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
 
     @Override
     protected void createTrees(@NotNull Map<? super String, ? super JTree> trees) {
-        trees.put(CALLER_TYPE, createTree(false));
+        trees.put(getCallerType(), createTree(false));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
     @Nullable
     @Override
     protected HierarchyTreeStructure createHierarchyTreeStructure(@NotNull String type, @NotNull PsiElement psiElement) {
-        if (CALLER_TYPE.equals(type)) {
+        if (getCallerType().equals(type)) {
             return new LSFUsageHierarchyTreeStructure(myProject, findSourceStatement(psiElement));
         } else {
             LOG.error("unexpected type: " + type);

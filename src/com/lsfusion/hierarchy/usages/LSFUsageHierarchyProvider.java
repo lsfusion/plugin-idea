@@ -28,6 +28,6 @@ public class LSFUsageHierarchyProvider implements HierarchyProvider {
 
     @Override
     public void browserActivated(@NotNull HierarchyBrowser hierarchyBrowser) {
-        ((LSFUsageHierarchyBrowser) hierarchyBrowser).changeView(CallHierarchyBrowserBase.CALLER_TYPE);
+        ((LSFUsageHierarchyBrowser) hierarchyBrowser).changeView(CallHierarchyBrowserBase.getCallerType());
     }
 }

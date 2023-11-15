@@ -14,7 +14,7 @@ import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.util.BaseUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 

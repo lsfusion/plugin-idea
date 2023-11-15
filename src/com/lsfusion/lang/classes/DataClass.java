@@ -4,7 +4,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.util.BaseUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.util.ArrayList;

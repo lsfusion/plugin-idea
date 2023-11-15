@@ -4,7 +4,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.tree.IElementType;
 import com.lsfusion.lang.psi.LSFTypes;
 import com.lsfusion.lang.psi.Result;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

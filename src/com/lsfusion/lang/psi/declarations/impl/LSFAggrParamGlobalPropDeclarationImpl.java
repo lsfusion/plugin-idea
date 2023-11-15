@@ -11,7 +11,7 @@ import com.lsfusion.lang.psi.declarations.LSFAggrParamGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.stubs.AggrParamPropStubElement;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

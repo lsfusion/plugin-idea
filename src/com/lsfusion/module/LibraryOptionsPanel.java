@@ -53,7 +53,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 /**
  * based on com.intellij.facet.impl.ui.libraries.LibraryOptionsPanel

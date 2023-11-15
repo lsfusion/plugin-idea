@@ -9,7 +9,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.util.LSFFileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
