@@ -10,6 +10,7 @@
         <b>Version 1.0.272</b><br>
         <ul>
             <li>FILTER, ORDER user activity properties / events support</li>
+            <li>Server start in Idea 2023.3 fix</li>
         </ul>
     ]]>
     </change-notes>

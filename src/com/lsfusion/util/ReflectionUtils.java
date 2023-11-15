@@ -151,12 +151,15 @@ public class ReflectionUtils {
 
     public static Method getPrivateMethod(Class clazz, String methodName, Class<?>... parameterTypes) {
         try {
-            Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
-            method.setAccessible(true);
-            return method;
+            return getPrivateMethodWithException(clazz, methodName, parameterTypes);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
+    }
+    public static Method getPrivateMethodWithException(Class clazz, String methodName, Class<?>... parameterTypes) throws Exception {
+        Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
+        method.setAccessible(true);
+        return method;
     }
     public static <T> T invokePrivateMethod(Class clazz, Object object, String methodName, Class<?>[] parameterTypes, Object... parameters) {
         return invokeMethod(getPrivateMethod(clazz, methodName, parameterTypes), object, parameters);

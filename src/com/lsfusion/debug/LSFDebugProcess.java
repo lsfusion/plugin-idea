@@ -80,7 +80,9 @@ import static com.sun.jdi.request.StepRequest.STEP_OUT;
  */
 public class LSFDebugProcess extends JavaDebugProcess {
 
-    private final java.lang.reflect.Method doStepMethod;
+    // todo: remake into single field after discontinuation of Idea 2023.2 support if method doesn't change again
+    private java.lang.reflect.Method doStepMethod;
+    private java.lang.reflect.Method doStepMethod_2023_3;
 
     private final JavaDebuggerEditorsProvider eEditorsProvider;
 
@@ -166,11 +168,19 @@ public class LSFDebugProcess extends JavaDebugProcess {
         eEditorsProvider = new LSFDebuggerEditorsProvider();
         SESSION_EMPTY_CONTEXT = (DebuggerContextImpl) getPrivateFieldValueByClass(DebuggerSession.class, getDebuggerSession(), DebuggerContextImpl.class); // SESSION_EMPTY_CONTEXT field
 
-        doStepMethod = ReflectionUtils.getPrivateMethod(
-            DebugProcessImpl.class,
-            "doStep",
-            SuspendContextImpl.class, ThreadReferenceProxyImpl.class, Integer.TYPE, Integer.TYPE, RequestHint.class
-        );
+        try {
+            doStepMethod = ReflectionUtils.getPrivateMethodWithException(
+                DebugProcessImpl.class,
+                "doStep",
+                SuspendContextImpl.class, ThreadReferenceProxyImpl.class, Integer.TYPE, Integer.TYPE, RequestHint.class
+            );
+        } catch (Exception e) {
+            doStepMethod_2023_3 = ReflectionUtils.getPrivateMethod(
+                    DebugProcessImpl.class,
+                    "doStep",
+                    SuspendContextImpl.class, ThreadReferenceProxyImpl.class, Integer.TYPE, Integer.TYPE, RequestHint.class, Object.class
+            );
+        }
 
         getJavaDebugProcess().addDebugProcessListener(new DebugProcessListener() {
             @Override
@@ -443,7 +453,11 @@ public class LSFDebugProcess extends JavaDebugProcess {
     }
 
     private void doStep(final SuspendContextImpl suspendContext, final ThreadReferenceProxyImpl stepThread, int depth, RequestHint hint) {
-        ReflectionUtils.invokeMethod(doStepMethod, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint);
+        if (doStepMethod != null) {
+            ReflectionUtils.invokeMethod(doStepMethod, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint);
+        } else {
+            ReflectionUtils.invokeMethod(doStepMethod_2023_3, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint, null);
+        }
     }
     
     @NotNull
