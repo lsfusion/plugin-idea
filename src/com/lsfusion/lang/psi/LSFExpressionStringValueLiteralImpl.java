@@ -52,7 +52,7 @@ public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValue
 
     @Override
     public PsiLanguageInjectionHost updateText(@NotNull String text) {
-        LSFExpressionStringValueLiteral newLiteral = createExpressionStringValueLiteral(getProject(), quote(text));
+        LSFExpressionStringValueLiteral newLiteral = createExpressionStringValueLiteral(getProject(), text);
         replace(newLiteral);
         return this;
     }
@@ -114,8 +114,8 @@ public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValue
         };
     }
 
-    public PsiElement handleElementRename(@NotNull String newText) throws IncorrectOperationException {
-        LSFExpressionStringValueLiteral newLiteral = createExpressionStringValueLiteral(getProject(), newText);
-        return replace(newLiteral);
-    }
+//    public PsiElement handleElementRename(@NotNull String newText) throws IncorrectOperationException {
+//        LSFExpressionStringValueLiteral newLiteral = createExpressionStringValueLiteral(getProject(), newText);
+//        return replace(newLiteral);
+//    }
 }
