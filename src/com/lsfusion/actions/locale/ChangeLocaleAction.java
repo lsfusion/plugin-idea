@@ -231,7 +231,7 @@ public class ChangeLocaleAction extends AnAction {
                 int i = 0;
                 Collection<VirtualFile> files = FileTypeIndex.getFiles(LSFFileType.INSTANCE, scope);
                 for(VirtualFile vfile : files) {
-                    indicator.setText("Processing : " + vfile.getName());
+                    indicator.setText("Processing: " + vfile.getName());
                     PsiFile psiFile = PsiManager.getInstance(project).findFile(vfile);
                     Collection<LSFLocalizedStringValueLiteral> localizedStringLiterals = PsiTreeUtil.findChildrenOfType(psiFile, LSFLocalizedStringValueLiteral.class);
 
@@ -321,7 +321,7 @@ public class ChangeLocaleAction extends AnAction {
             int blockSize = 500;
             int blocks = (postponed.size() - 1) / blockSize + 1;
             for (int i = 0; i < blocks; i++) {
-                indicator.setText2("changing locale : " + i * blockSize + "/" + postponed.size());
+                indicator.setText2("changing locale: " + i * blockSize + "/" + postponed.size());
                 final int fi = i;
                 runEDTWriteUndo(() -> {
                     for (int j = fi * blockSize; j < BaseUtils.min((fi + 1) * blockSize, postponed.size()); j++) {

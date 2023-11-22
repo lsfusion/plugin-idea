@@ -323,7 +323,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
         for (final LSFMetaCodeStatement metaUsage : usages)
             if (metaUsage.isCorrect()) {
                 if(indicator != null)
-                    indicator.setText2("Statements : " + (i++) + '\\' + usages.size());
+                    indicator.setText2("Statements: " + (i++) + '/' + usages.size());
 
                 final Result<ToParse> toParse = new Result<>();
                 DumbService.getInstance(metaUsage.getProject()).runReadActionInSmartMode(() -> {
@@ -387,7 +387,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
                                 } else {
                                     idleTimes++;
                                     indicator.setFraction(inlinePending == 0 ? 1.0d : (double) inlineProceeded / (double) inlinePending);
-                                    indicator.setText((lastProceeded != null ? "Last inlined : " + lastProceeded : "") + " " + inlineProceeded + "/" + inlinePending);
+                                    indicator.setText((lastProceeded != null ? "Last inlined: " + lastProceeded : "") + " " + inlineProceeded + "/" + inlinePending);
                                 }
                             }
                         }
@@ -845,7 +845,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
                 int blockSize = 500;
                 int blocks = (postponed.size() - 1) / blockSize + 1;
                 for(int i=0;i<blocks;i++) {
-                    indicator.setText2("Inlining meta code body : " + i + "/" + blocks);
+                    indicator.setText2("Inlining meta code body: " + i + "/" + blocks);
                     final int fi = i;
                     runEDTWriteUndo(() -> {
                         for(int j=fi*blockSize;j<BaseUtils.min((fi+1)*blockSize, postponed.size());j++) {
@@ -874,7 +874,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
 
             int i = 0;
             for (LSFFile lsfFile : lsfFiles) {
-                indicator.setText("Processing : " + lsfFile.getName());
+                indicator.setText("Processing: " + lsfFile.getName());
 
                 ApplicationManager.getApplication().runReadAction(() -> {
                     List<LSFMetaCodeStatement> metaStatements = reenable ? lsfFile.getDisabledMetaCodeStatementList() : lsfFile.getMetaCodeStatementList();

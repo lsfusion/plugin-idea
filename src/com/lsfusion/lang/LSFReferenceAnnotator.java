@@ -1003,7 +1003,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (!LSFPsiImplUtil.checkOverrideValue(element, required, found)) {
             String requiredClass = required.getResult() instanceof LSFValueClass ? ((LSFValueClass) required.getResult()).getCaption() : required.getResult().getCanonicalName();
             String foundClass = found.getResult() instanceof LSFValueClass ? ((LSFValueClass) found.getResult()).getCaption() : found.getResult().getCanonicalName();
-            addUnderscoredErrorWithResolving(element, "Wrong value class. Required : " + requiredClass + ", found : " + foundClass);
+            addUnderscoredErrorWithResolving(element, "Wrong value class. Required: " + requiredClass + ", found: " + foundClass);
         }
 
         if (!LSFPsiImplUtil.checkNonRecursiveOverride(element)) {
