@@ -206,7 +206,15 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
     }
 
     public void setToolTip(String toolTip) {
-        target.toolTip = toolTip;
+        setTooltip(toolTip);
+    }
+
+    public void setTooltip(String tooltip) {
+        target.tooltip = tooltip;
+    }
+
+    public void setValueTooltip(String valueTooltip) {
+        target.valueTooltip = valueTooltip;
     }
 
     public void setToolbar(boolean toolbar) {

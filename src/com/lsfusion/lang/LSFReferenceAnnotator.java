@@ -252,9 +252,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         String text = o.getText();
         if (text != null) {
             if (text.equals("USERFILTER")) {
-                addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use FILTERS container instead. Earlier versions: ignore this warning");
+                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use FILTERS container instead");
             } else if (text.equals("GRIDBOX")) {
-                addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use GRID container instead. Earlier versions: ignore this warning");
+                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use GRID container instead");
             }
         }
     }
@@ -263,7 +263,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitCustomHeaderLiteral(@NotNull LSFCustomHeaderLiteral o) {
         super.visitCustomHeaderLiteral(o);
         if(o.getText().equals("OPTIONS")) {
-            addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use HEADER instead");
+            addDeprecatedWarningAnnotation(o, "5.2","Use HEADER instead");
         }
     }
 
@@ -466,7 +466,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void checkAutorefresh(LSFFormDeclaration o) {
         for(LSFAutorefreshLiteral autorefresh : ((LSFFormDeclImpl) o).getAutorefreshLiteralList()) {
-            addDeprecatedWarningAnnotation(autorefresh, "Deprecated since version 5, use EVENTS ON SCHEDULE instead. Earlier versions: ignore this warning");
+            addDeprecatedWarningAnnotation(autorefresh, "5.2", "Use EVENTS ON SCHEDULE instead");
         }
     }
 
@@ -534,7 +534,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitExternalActionPropertyDefinitionBody(o);
 
         if(o.getText().startsWith("EXTERNAL SQL 'LOCAL'")) {
-            addDeprecatedWarningAnnotation(o.getPropertyExpressionList().get(0), "EXTERNAL SQL 'LOCAL' EXEC is deprecated since version 5, use INTERNAL DB instead. Earlier versions: ignore this warning");
+            addDeprecatedWarningAnnotation(o.getPropertyExpressionList().get(0), "5.2", "Use INTERNAL DB instead");
         }
     }
 
@@ -547,7 +547,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitDrawRoot(@NotNull LSFDrawRoot o) {
-        addDeprecatedWarningAnnotation(o, "DRAWROOT is deprecated, will be removed in version 6. Earlier versions: ignore this warning");
+        addDeprecatedWarningAnnotation(o, "6.0", "Earlier versions: ignore this warning");
     }
 
     @Override
@@ -905,6 +905,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addWarningAnnotation(element, "Missing " + element.getText() + " in resource bundle", WAVE_UNDERSCORED_WARNING, fixes);
     }
 
+    private void addDeprecatedWarningAnnotation(PsiElement element, String deprecatedVersion, String comment) {
+        addDeprecatedWarningAnnotation(element, String.format("Deprecated since version %s. %s", deprecatedVersion, comment));
+    }
+
+    private void addDeprecatedWarningAnnotation(PsiElement element, String deprecatedVersion, String removedVersion, String comment) {
+        addDeprecatedWarningAnnotation(element, String.format("Deprecated since version %s, removed in version %s. %s", deprecatedVersion, removedVersion, comment));
+    }
+
     private void addDeprecatedWarningAnnotation(PsiElement element, String text) {
         addWarningAnnotation(element, text, DEPRECATED_WARNING);
     }
@@ -1152,11 +1160,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
 
             if (property.equals("columns")) {
-                addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'lines' instead. Earlier versions: ignore this warning");
+                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'lines' instead");
             } else if (property.equals("type")) {
-                addDeprecatedWarningAnnotation(o, "Deprecated since version 5, use 'horizontal', 'tabbed', 'lines' instead. Earlier versions: ignore this warning");
+                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'horizontal', 'tabbed', 'lines' instead");
             } else if (property.equals("autoSize")) {
-                addDeprecatedWarningAnnotation(o, "Deprecated since version 6. Earlier versions: ignore this warning");
+                addDeprecatedWarningAnnotation(o, "6.0", "Earlier versions: ignore this warning");
+            } else if (property.equals("toolTip")) {
+                addDeprecatedWarningAnnotation(o, "5.2", "Use 'tooltip' instead");
             } else if (element != null && !element.getText().equals("NULL")) {
                 if (property.equals("fontStyle")) {
                     checkFontStyle(element, element.getText());

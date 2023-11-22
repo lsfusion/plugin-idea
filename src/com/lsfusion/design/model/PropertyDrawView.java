@@ -80,7 +80,9 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("notSelectAll").setExpert(),
             new ReflectionProperty("askConfirm").setExpert(),
             new ReflectionProperty("askConfirmMessage").setExpert(),
-            new ReflectionProperty("toolTip"),
+            new ReflectionProperty("toolTip"), //deprecated
+            new ReflectionProperty("tooltip"),
+            new ReflectionProperty("valueTooltip"),
             new ReflectionProperty("toolbar"),
             new ReflectionProperty("notNull"),
             new ReflectionProperty("select").setExpert()
@@ -153,7 +155,8 @@ public class PropertyDrawView extends ComponentView {
     public boolean askConfirm;
     public String askConfirmMessage;
 
-    public String toolTip;
+    public String tooltip;
+    public String valueTooltip;
 
     public boolean toolbar;
 
@@ -334,8 +337,13 @@ public class PropertyDrawView extends ComponentView {
     }
 
     @SuppressWarnings("unused")
-    public String getToolTip() {
-        return toolTip;
+    public String getTooltip() {
+        return tooltip;
+    }
+
+    @SuppressWarnings("unused")
+    public String getValueTooltip() {
+        return valueTooltip;
     }
 
     @SuppressWarnings("unused")
@@ -509,7 +517,7 @@ public class PropertyDrawView extends ComponentView {
             "<hr><b>Hotkey:</b> %1$s<br>";
 
     public String getTooltipText(String caption) {
-        String propCaption = BaseUtils.nullTrim(!isRedundantString(toolTip) ? toolTip : caption);
+        String propCaption = BaseUtils.nullTrim(!isRedundantString(tooltip) ? tooltip : caption);
         String editKeyText = changeKey == null ? "" : String.format(EDIT_KEY_TOOL_TIP_FORMAT, KeyStrokes.getKeyStrokeCaption(changeKey));
 
 //        String tableName = this.tableName != null ? this.tableName : "&lt;none&gt;";

@@ -12,6 +12,7 @@
             <li>FILTER, ORDER user activity properties / events support</li>
             <li>Server start in Idea 2023.3 fix</li>
             <li>Fix renaming in string interpolation</li>
+            <li>Tooltip, valueTooltip design properties</li>
         </ul>
     ]]>
     </change-notes>
