@@ -205,6 +205,8 @@
         <moduleBuilder builderClass="com.lsfusion.module.LSFusionModuleBuilder"/>
         <library.presentationProvider implementation="com.lsfusion.module.LSFusionLibraryPresentationProvider"/>
         <configurationType implementation="com.lsfusion.module.run.LSFusionRunConfigurationType"/>
+        <stepsBeforeRunProvider implementation="com.lsfusion.module.run.LSFRecursiveCompileStepBeforeRun" id="lsfCompileBeforeRun"/>
+        <notificationGroup id="LSF Recursive Compile" displayType="BALLOON"></notificationGroup>
 
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.MetaIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ModuleIndex"/>
