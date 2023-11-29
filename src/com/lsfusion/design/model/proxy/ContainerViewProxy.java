@@ -82,6 +82,7 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.custom = custom;
     }
 
+    //deprecated in 5.2, removed in 6.0
     public void setColumns(int columns) {
         setLines(columns);
     }

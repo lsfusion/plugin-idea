@@ -42,6 +42,7 @@ public class FormViewProxy extends ViewProxy<FormView> {
         mainContainerProxy.setWidth(width);
     }
 
+    //deprecated in 5.2, removed in 6.0
     public void setColumns(int columns) {
         mainContainerProxy.setColumns(columns);
     }

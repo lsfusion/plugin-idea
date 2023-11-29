@@ -40,7 +40,7 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("wrap"),
             new ReflectionProperty("resizeOverflow"),
             new ReflectionProperty("custom").setExpert(),
-            new ReflectionProperty("columns").setExpert(), //backward compatibility
+            new ReflectionProperty("columns").setExpert(), //deprecated in 5.2, removed in 6.0
             new ReflectionProperty("lines"),
             new ReflectionProperty("lineSize"),
             new ReflectionProperty("captionLineSize"),
@@ -155,6 +155,7 @@ public class ContainerView extends ComponentView {
         this.childrenAlignment = childrenAlignment;
     }
 
+    //deprecated in 5.2, removed in 6.0
     public void setColumns(int columns) {
         setLines(columns);
     }
