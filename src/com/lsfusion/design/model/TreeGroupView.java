@@ -68,7 +68,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
         toolbarSystem = new ToolbarView(true);
 
         filtersContainer = new ContainerView();
-        filtersContainer.setType(ContainerType.CONTAINERH);
+        filtersContainer.horizontal = true;
         filtersContainer.setAlignment(FlexAlignment.STRETCH);
         filtersContainer.setCaption("Filters");
 

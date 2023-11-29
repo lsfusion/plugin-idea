@@ -31,7 +31,7 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("collapsible"),
             new ReflectionProperty("border"),
             new ReflectionProperty("collapsed"),
-            new ReflectionProperty("type").setExpert(), //deprecated
+            new ReflectionProperty("type").setExpert(), //deprecated in 5.2, removed in 6.0
             new ReflectionProperty("horizontal"),
             new ReflectionProperty("tabbed"),
             new ReflectionProperty("childrenAlignment"),
@@ -63,8 +63,6 @@ public class ContainerView extends ComponentView {
     public boolean border;
 
     public boolean collapsed;
-
-    public ContainerType type = ContainerType.CONTAINERV;
 
     public boolean horizontal;
 
@@ -134,16 +132,23 @@ public class ContainerView extends ComponentView {
         return collapsed;
     }
 
+    //deprecated in 5.2, removed in 6.0
     public void setType(ContainerType type) {
-        this.type = type;
+        if (type == TABBED) {
+            this.tabbed = true;
+        } else if (type == CONTAINERV || type == SPLITV) {
+            this.horizontal = false;
+        } else if (type == CONTAINERH || type == SPLITH) {
+            this.horizontal = true;
+        }
     }
 
     public boolean isHorizontal() {
-        return type == CONTAINERH || type == SPLITH || horizontal;
+        return horizontal;
     }
 
     public boolean isTabbed() {
-        return type == TABBED || tabbed;
+        return tabbed;
     }
 
     @SuppressWarnings("unused")
@@ -226,8 +231,8 @@ public class ContainerView extends ComponentView {
 
         if (isTabbed()) {
             if (oldWidget != null) {
-                ContainerType oldType = (ContainerType) oldWidget.getClientProperty("containerType");
-                if (oldType != type) {
+                boolean oldIsTabbed = (boolean) oldWidget.getClientProperty("isTabbed");
+                if (!oldIsTabbed) {
                     oldWidget = null;
                 }
             }
@@ -244,7 +249,7 @@ public class ContainerView extends ComponentView {
             widget.setBorder(BorderFactory.createTitledBorder(caption));
         }
 
-        widget.putClientProperty("containerType", type);
+        widget.putClientProperty("isTabbed", isTabbed());
 
         return widget;
     }

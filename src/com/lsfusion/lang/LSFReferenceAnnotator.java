@@ -1151,7 +1151,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     } else if (cls == FlexAlignment.class && !(valueClass instanceof LSFFlexAlignmentLiteral)) {
                         mismatchClass = FlexAlignment.class;
                     } else if (cls == ContainerType.class && !(valueClass instanceof LSFContainerTypeLiteral)) {
-                        mismatchClass = ContainerType.class;
+                        mismatchClass = ContainerType.class; //deprecated in 5.2, removed in 6.0
                     }
                     if (mismatchClass != null) {
                         addUnderscoredError(element, String.format("Type mismatch: can't cast %s to %s", valueClass, mismatchClass));

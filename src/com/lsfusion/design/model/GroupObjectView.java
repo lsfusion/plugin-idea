@@ -27,7 +27,7 @@ public class GroupObjectView extends ArrayList<ObjectView> implements PropertyGr
         toolbarSystem = new ToolbarView(false);
 
         filtersContainer = new ContainerView();
-        filtersContainer.setType(ContainerType.CONTAINERH);
+        filtersContainer.horizontal = true;
         filtersContainer.setAlignment(FlexAlignment.STRETCH);
         filtersContainer.setCaption("Filters");
         

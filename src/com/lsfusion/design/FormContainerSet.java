@@ -1,6 +1,5 @@
 package com.lsfusion.design;
 
-import com.lsfusion.design.model.ContainerType;
 import com.lsfusion.design.model.ContainerView;
 import com.lsfusion.design.ui.Alignment;
 import com.lsfusion.design.ui.FlexAlignment;
@@ -47,8 +46,6 @@ public class FormContainerSet {
         FormContainerSet set = new FormContainerSet();
 
         set.mainContainer = form.getMainContainer();
-        set.mainContainer.setType(ContainerType.CONTAINERV);
-//        set.mainContainer.setDescription(getString("form.layout.main.container"));
         
         set.objectsContainer = form.containerFactory.createContainer();
         set.objectsContainer.setSID(DefaultFormView.getObjectsContainerSID());
@@ -73,22 +70,21 @@ public class FormContainerSet {
         set.objectsContainer.setFlex(1);
         set.objectsContainer.setAlignment(FlexAlignment.STRETCH);
 
-        set.toolbarBoxContainer.setType(ContainerType.CONTAINERH);
+        set.toolbarBoxContainer.horizontal = true;
         set.toolbarBoxContainer.setAlignment(FlexAlignment.STRETCH);
 
-        set.panelContainer.setType(ContainerType.CONTAINERH);
+        set.panelContainer.horizontal = true;
         set.panelContainer.setAlignment(FlexAlignment.STRETCH);
         set.panelContainer.setChildrenAlignment(Alignment.START);
         set.panelContainer.add(set.groupContainer);
 
-        set.groupContainer.setType(ContainerType.COLUMNS);
         set.groupContainer.setLines(2);
 
         set.toolbarContainer = contFactory.createContainer(); // контейнер тулбара
 //        set.toolbarContainer.setDescription(LocalizedString.create("{form.layout.toolbar.props.container}"));
         set.toolbarContainer.setSID(DefaultFormView.getToolbarContainerSID());
 
-        set.toolbarContainer.setType(ContainerType.CONTAINERH);
+        set.toolbarContainer.horizontal = true;
         set.toolbarContainer.setAlignment(FlexAlignment.CENTER);
 
         return set;

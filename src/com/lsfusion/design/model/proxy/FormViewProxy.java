@@ -71,6 +71,7 @@ public class FormViewProxy extends ViewProxy<FormView> {
         mainContainerProxy.setChildrenAlignment(falign);
     }
 
+    //deprecated in 5.2, removed in 6.0
     public void setType(ContainerType type) {
         mainContainerProxy.setType(type);
     }

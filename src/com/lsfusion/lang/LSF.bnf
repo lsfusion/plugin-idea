@@ -2670,6 +2670,7 @@ boundsDoubleLiteral ::= LBRAC doubleLiteral COMMA doubleLiteral COMMA doubleLite
 
 insertRelativePositionLiteral ::= BEFORE | AFTER
 
+//deprecated in 5.2, removed in 6.0
 containerTypeLiteral ::=    CONTAINERV
 	                    |	CONTAINERH
 	                    |	COLUMNS

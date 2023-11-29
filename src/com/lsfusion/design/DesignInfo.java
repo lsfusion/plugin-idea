@@ -186,7 +186,7 @@ public class DesignInfo {
             return null; //??????????
         } else if (valueStatement.getBoundsDoubleLiteral() != null) {
             return null; //??????????
-        } else if (valueStatement.getContainerTypeLiteral() != null) {
+        } else if (valueStatement.getContainerTypeLiteral() != null) { //deprecated in 5.2, removed in 6.0
             return ContainerType.valueOf(valueStatement.getContainerTypeLiteral().getText());
         } else if (valueStatement.getFlexAlignmentLiteral() != null) {
             return FlexAlignment.valueOf(valueStatement.getFlexAlignmentLiteral().getText());

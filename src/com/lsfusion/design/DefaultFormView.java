@@ -307,7 +307,6 @@ public class DefaultFormView extends FormView {
 
                 //затем создаём контейнер для текущей группы
                 currentGroupContainer = createContainer(currentGroup.caption, currentGroupContainerSID);
-                currentGroupContainer.setType(ContainerType.COLUMNS);
                 currentGroupContainer.lines = 4;
 
                 getPanelContainer(propertyDraw).add(currentGroupContainer);
@@ -356,12 +355,12 @@ public class DefaultFormView extends FormView {
         setupFormButton(closeFunction, KeyStrokes.getCloseKeyStroke(), null, true);
 
         ContainerView toolbarLeftContainer = createContainer(null, getToolbarLeftContainerSID());
-        toolbarLeftContainer.setType(ContainerType.CONTAINERH);
+        toolbarLeftContainer.horizontal = true;
         toolbarLeftContainer.childrenAlignment = Alignment.START;
         toolbarLeftContainer.setFlex(0);
 
         ContainerView toolbarRightContainer = createContainer(null, getToolbarRightContainerSID());
-        toolbarRightContainer.setType(ContainerType.CONTAINERH);
+        toolbarRightContainer.horizontal = true;
         toolbarRightContainer.childrenAlignment = Alignment.END;
         toolbarRightContainer.setFlex(1);
 

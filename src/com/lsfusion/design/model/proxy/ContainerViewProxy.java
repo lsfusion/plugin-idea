@@ -32,6 +32,7 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.collapsed = collapsed;
     }
 
+    //deprecated in 5.2, removed in 6.0
     public void setType(ContainerType type) {
         target.setType(type);
     }
