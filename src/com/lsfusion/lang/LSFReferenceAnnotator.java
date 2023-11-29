@@ -547,7 +547,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitDrawRoot(@NotNull LSFDrawRoot o) {
-        addDeprecatedWarningAnnotation(o, "6.0", "Earlier versions: ignore this warning");
+        addDeprecatedWarningAnnotation(o, "5.2", "6.0", "");
     }
 
     @Override

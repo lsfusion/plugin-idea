@@ -2135,7 +2135,7 @@ windowHideStatement ::= HIDE WINDOW windowUsage SEMI {pin=2}
 
 windowType ::= MENU | PANEL | TOOLBAR | TREE | NATIVE
 
-//deprecated, removed in version 6
+//deprecated in 5.2, removed in 6.0
 drawRoot ::= DRAWROOT
 
 windowOptions ::=   (	HIDETITLE
