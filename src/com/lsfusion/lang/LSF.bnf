@@ -2289,7 +2289,7 @@ removeComponentStatement ::= REMOVE componentSelector SEMI {pin = 1}
 
 // GROUPOBJECT + TREE
 private componentSingleSelectorType ::=  BOX | OBJECTS | PANEL | TOOLBARBOX | TOOLBARLEFT | TOOLBARRIGHT | TOOLBAR
-//GRIDBOX deprecated in 5.2, removed in 6.0
+//GRIDBOX and USERFILTER deprecated in 5.2, removed in 6.0
 groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID | FILTERBOX | FILTERS | FILTERCONTROLS
 globalSingleSelectorType ::= componentSingleSelectorType 
 
