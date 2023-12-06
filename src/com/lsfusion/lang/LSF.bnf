@@ -1359,7 +1359,8 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
 
 // some statements are not pinned after the first token, so we need these fake rules to pin incomplete statements (to support recovery assertion) 
 // Important ! after recover the rule should mandatory be pinned (matched)
-private list_action_statement_recover ::= !(ACTIVATE | ACTIVE | NEW | NEWEDIT | APPLY | CANCEL | CHANGE | ASK | ASYNCUPDATE | BREAK | CASE | CHANGECLASS | CONFIRM | INTERNAL | DELETE
+private list_action_statement_recover ::= !(ACTIVATE | ACTIVE | NEW | NEWEDIT | APPLY | CANCEL | CHANGE | ASK | ASYNCUPDATE
+                                            | BREAK | CASE | CHANGECLASS | CONFIRM | CONTINUE | INTERNAL | DELETE
                                             | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FILTER | FOR | SHOW | CLOSE | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
                                             | ORDER | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE | RECALCULATE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
@@ -1513,12 +1514,17 @@ breakActionOperator ::= BREAK
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
+continueActionOperator ::= CONTINUE
+{
+    implements = "com.lsfusion.documentation.LSFDocumentation"
+    methods = [getDocumentation]
+}
 returnActionOperator ::= RETURN
 {
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
-terminalFlowActionPropertyDefinitionBody ::= breakActionOperator | returnActionOperator
+terminalFlowActionPropertyDefinitionBody ::= breakActionOperator | continueActionOperator | returnActionOperator
 {
     implements="com.lsfusion.lang.psi.context.ActionExpression" methods = [inferActionParamClasses]
 }

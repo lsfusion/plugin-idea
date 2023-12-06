@@ -4963,6 +4963,10 @@ public class LSFPsiImplUtil {
         return "BREAK_operator";
     }
 
+    public static String getDocumentation(LSFContinueActionOperator lsfBreakActionOperator, PsiElement child) {
+        return "CONTINUE_operator";
+    }
+
     public static String getDocumentation(LSFReturnActionOperator lsfReturnActionOperator, PsiElement child) {
         return "RETURN_operator";
     }

@@ -230,6 +230,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "COMPLEX"                 			{ return COMPLEX; }
   "CONNECTION"                 			{ return CONNECTION; }
   "CONTEXTMENU"                			{ return CONTEXTMENU; }
+  "CONTINUE"                			{ return CONTINUE; }
   "NOHINT"                 			    { return NOHINT; }
   "COLLAPSE"                  			{ return COLLAPSE; }
   "CONCAT"                  			{ return CONCAT; }

@@ -7,12 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.272</b><br>
+        <b>Version 1.0.273</b><br>
         <ul>
-            <li>FILTER, ORDER user activity properties / events support</li>
-            <li>Server start in Idea 2023.3 fix</li>
-            <li>Fix renaming in string interpolation</li>
-            <li>Tooltip, valueTooltip design properties</li>
+            <li>CONTINUE operator support</li>
         </ul>
     ]]>
     </change-notes>
