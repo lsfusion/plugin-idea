@@ -349,6 +349,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "JAVA"                  			    { return JAVA; }
   "JOIN"                    			{ return JOIN; }
   "JSON"                    			{ return JSON; }
+  "JSONTEXT"                    		{ return JSONTEXT; }
   "KEYPRESS"                    		{ return KEYPRESS; }
   "LAST"                                { return LAST; }
   "LEFT"                    			{ return LEFT; }

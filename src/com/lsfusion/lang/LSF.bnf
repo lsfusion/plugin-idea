@@ -485,14 +485,14 @@ castPropertyDefinition ::= builtInClassName LBRAC propertyExpression RBRAC
 concatPropertyDefinition ::= CONCAT stringLiteral COMMA nonEmptyPropertyExpressionList
 {pin = 1 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
-jsonPropertyDefinition ::= JSON FROM nonEmptyAliasedPropertyExpressionList wherePropertyExpression? (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)?
+jsonPropertyDefinition ::= (JSON | JSONTEXT) FROM nonEmptyAliasedPropertyExpressionList wherePropertyExpression? (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)?
 {
     pin = 3
     implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.ExtendParamContext"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getContextModifier getContextInferrer getDocumentation]
 }
 
-jsonFormPropertyDefinition ::= JSON LBRAC mappedForm contextFiltersClause? RBRAC
+jsonFormPropertyDefinition ::= (JSON | JSONTEXT) LBRAC mappedForm contextFiltersClause? RBRAC
 {
     pin = 3
     implements="com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.FormContext"
@@ -2504,7 +2504,7 @@ private commonLiteral ::=
 	|	staticObjectID
 	|	colorLiteral
 
-builtInClassName ::= PRIMITIVE_TYPE | JSON | HTML
+builtInClassName ::= PRIMITIVE_TYPE | JSON | JSONTEXT | HTML
 {
     mixin="com.lsfusion.lang.psi.LSFIdImpl"
     implements="com.lsfusion.lang.psi.LSFId"
