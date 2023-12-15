@@ -16,6 +16,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.beans.Introspector;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -138,6 +139,8 @@ public abstract class GenerateFormAction extends AnAction {
             });
 
             add(mainPanel, BorderLayout.CENTER);
+
+            getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         }
 
         private GridBagConstraints getGridBagConstraints(int row) {
