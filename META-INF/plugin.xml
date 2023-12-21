@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.274</b><br>
+        <b>Version 1.0.275</b><br>
         <ul>
-            <li>JSONTEXT support</li>
-            <li>Generate Form dialog: close on escape</li>
+            <li>PropertyDraw options 'tag' and 'inputType' support</li>
         </ul>
     ]]>
     </change-notes>

@@ -67,6 +67,8 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("valueClass").setExpert(),
             new ReflectionProperty("captionClass").setExpert(),
             new ReflectionProperty("caption"),
+            new ReflectionProperty("tag").setExpert(),
+            new ReflectionProperty("inputType").setExpert(),
             new ReflectionProperty("imagePath").setExpert(), //backward compatibility
             new ReflectionProperty("image"),
             new ReflectionProperty("comment"),
@@ -75,14 +77,14 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("panelCommentFirst"),
             new ReflectionProperty("panelCommentAlignment"),
             new ReflectionProperty("placeholder"),
+            new ReflectionProperty("toolTip").setExpert(), //deprecated
+            new ReflectionProperty("tooltip"),
+            new ReflectionProperty("valueTooltip"),
             new ReflectionProperty("valueAlignment"),
             new ReflectionProperty("clearText").setExpert(),
             new ReflectionProperty("notSelectAll").setExpert(),
             new ReflectionProperty("askConfirm").setExpert(),
             new ReflectionProperty("askConfirmMessage").setExpert(),
-            new ReflectionProperty("toolTip"), //deprecated
-            new ReflectionProperty("tooltip"),
-            new ReflectionProperty("valueTooltip"),
             new ReflectionProperty("toolbar"),
             new ReflectionProperty("notNull"),
             new ReflectionProperty("select").setExpert()
@@ -138,6 +140,9 @@ public class PropertyDrawView extends ComponentView {
     public String captionClass;
     public String caption;
 
+    public String tag;
+    public String inputType;
+
     public String image;
 
     public String comment;
@@ -148,15 +153,15 @@ public class PropertyDrawView extends ComponentView {
 
     public String placeholder;
 
+    public String tooltip;
+    public String valueTooltip;
+
     public FlexAlignment valueAlignment;
     public boolean clearText;
     public boolean notSelectAll;
 
     public boolean askConfirm;
     public String askConfirmMessage;
-
-    public String tooltip;
-    public String valueTooltip;
 
     public boolean toolbar;
 
@@ -332,11 +337,6 @@ public class PropertyDrawView extends ComponentView {
     }
 
     @SuppressWarnings("unused")
-    public FlexAlignment getValueAlignment() {
-        return valueAlignment;
-    }
-
-    @SuppressWarnings("unused")
     public String getTooltip() {
         return tooltip;
     }
@@ -344,6 +344,11 @@ public class PropertyDrawView extends ComponentView {
     @SuppressWarnings("unused")
     public String getValueTooltip() {
         return valueTooltip;
+    }
+
+    @SuppressWarnings("unused")
+    public FlexAlignment getValueAlignment() {
+        return valueAlignment;
     }
 
     @SuppressWarnings("unused")

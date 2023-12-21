@@ -153,6 +153,14 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.caption = caption;
     }
 
+    public void setTag(String tag) {
+        target.tag = tag;
+    }
+
+    public void setInputType(String inputType) {
+        target.inputType = inputType;
+    }
+
     public void setImagePath(String imagePath) {
         setImage(imagePath);
     }
@@ -185,6 +193,18 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.placeholder = placeholder;
     }
 
+    public void setToolTip(String toolTip) {
+        setTooltip(toolTip);
+    }
+
+    public void setTooltip(String tooltip) {
+        target.tooltip = tooltip;
+    }
+
+    public void setValueTooltip(String valueTooltip) {
+        target.valueTooltip = valueTooltip;
+    }
+
     public void setValueAlignment(FlexAlignment valueAlignment) {
         target.valueAlignment = valueAlignment;
     }
@@ -203,18 +223,6 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
 
     public void setAskConfirmMessage(String askConfirmMessage) {
         target.askConfirmMessage = askConfirmMessage;
-    }
-
-    public void setToolTip(String toolTip) {
-        setTooltip(toolTip);
-    }
-
-    public void setTooltip(String tooltip) {
-        target.tooltip = tooltip;
-    }
-
-    public void setValueTooltip(String valueTooltip) {
-        target.valueTooltip = valueTooltip;
     }
 
     public void setToolbar(boolean toolbar) {
