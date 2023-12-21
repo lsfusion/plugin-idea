@@ -1,5 +1,6 @@
 package com.lsfusion.debug;
 
+import com.google.common.base.Throwables;
 import com.intellij.debugger.DebuggerBundle;
 import com.intellij.debugger.DebuggerManagerEx;
 import com.intellij.debugger.engine.*;
@@ -18,6 +19,9 @@ import com.intellij.debugger.jdi.ThreadReferenceProxyImpl;
 import com.intellij.debugger.jdi.VirtualMachineProxyImpl;
 import com.intellij.debugger.ui.breakpoints.BreakpointManager;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.JavaCodeFragment;
@@ -130,13 +134,20 @@ public class LSFDebugProcess extends JavaDebugProcess {
     
             final EvaluationContextImpl evaluationContext = new EvaluationContextImpl(context, frameProxy, (Value) null);
     
-            if (register) {
-                registerSteppingEvaluator.evaluate(evaluationContext);
-            } else {
-                unregisterSteppingEvaluator.evaluate(evaluationContext);
-            }
+            // "You can invoke methods only inside commands invoked for SuspendContext" fix (2023.3)
+            evaluationContext.getManagerThread().invoke(new SuspendContextCommandImpl(context) {
+                @Override
+                public void contextAction(@NotNull SuspendContextImpl suspendContext) throws Exception {
+                    if (register) {
+                        registerSteppingEvaluator.evaluate(evaluationContext);
+                    } else {
+                        unregisterSteppingEvaluator.evaluate(evaluationContext);
+                    }
+                }
+            });
         } catch (Exception e) {
-            e.printStackTrace();
+            Throwables.throwIfUnchecked(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -191,19 +202,26 @@ public class LSFDebugProcess extends JavaDebugProcess {
             }
         });
 
-        ApplicationManager.getApplication().runReadAction(() -> {
-            try {
-                JavaCodeFragmentFactory codeFragmentFactory = JavaCodeFragmentFactory.getInstance(getProject());
+        // "Slow operations are prohibited on EDT" fix (2023.3)
+        ProgressManager.getInstance().run(new Task.Backgroundable(getProject(), "Stepping evaluators initialization") {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    try {
+                        JavaCodeFragmentFactory codeFragmentFactory = JavaCodeFragmentFactory.getInstance(getProject());
 
-                String evalString = ACTION_DEBUGGER_FQN + ".getInstance().registerStepping()";
-                final JavaCodeFragment codeFragment = codeFragmentFactory.createCodeBlockCodeFragment(evalString, null, true);
-                registerSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(codeFragment, null);
+                        String evalString = ACTION_DEBUGGER_FQN + ".getInstance().registerStepping()";
+                        final JavaCodeFragment codeFragment = codeFragmentFactory.createCodeBlockCodeFragment(evalString, null, true);
+                        registerSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(codeFragment, null);
 
-                String unEvalString = ACTION_DEBUGGER_FQN + ".getInstance().unregisterStepping()";
-                final JavaCodeFragment unregisterCodeFragment = codeFragmentFactory.createCodeBlockCodeFragment(unEvalString, null, true);
-                unregisterSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(unregisterCodeFragment, null);
-            } catch (Exception e) {
-                e.printStackTrace();
+                        String unEvalString = ACTION_DEBUGGER_FQN + ".getInstance().unregisterStepping()";
+                        final JavaCodeFragment unregisterCodeFragment = codeFragmentFactory.createCodeBlockCodeFragment(unEvalString, null, true);
+                        unregisterSteppingEvaluator = EvaluatorBuilderImpl.getInstance().build(unregisterCodeFragment, null);
+                    } catch (Exception e) {
+                        Throwables.throwIfUnchecked(e);
+                        throw new RuntimeException(e);
+                    }
+                });
             }
         });
         
@@ -456,7 +474,8 @@ public class LSFDebugProcess extends JavaDebugProcess {
         if (doStepMethod != null) {
             ReflectionUtils.invokeMethod(doStepMethod, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint);
         } else {
-            ReflectionUtils.invokeMethod(doStepMethod_2023_3, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint, null);
+            // todo: token parameter is expected to be SteppingStatistic object (2023.3) 
+            ReflectionUtils.invokeMethod(doStepMethod_2023_3, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint, new Object());
         }
     }
     

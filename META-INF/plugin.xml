@@ -10,6 +10,7 @@
         <b>Version 1.0.275</b><br>
         <ul>
             <li>PropertyDraw options 'tag' and 'inputType' support</li>
+            <li>Fixes for debugger in Idea 2023.3</li>
         </ul>
     ]]>
     </change-notes>
