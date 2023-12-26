@@ -71,7 +71,7 @@ public class LSFRecursiveCompileStepBeforeRun extends BeforeRunTaskProvider<LSFR
     @Override
     public @Nullable RecursiveCompileBeforeRunTask createTask(@NotNull RunConfiguration runConfiguration) {
         RecursiveCompileBeforeRunTask task = new RecursiveCompileBeforeRunTask();
-        task.setEnabled(true);
+        task.setEnabled(false);
         return task;
     }
 
