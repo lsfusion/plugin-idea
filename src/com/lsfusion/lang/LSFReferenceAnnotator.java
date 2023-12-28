@@ -274,6 +274,17 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitGroupSelector(@NotNull LSFGroupSelector o) {
+        super.visitGroupSelector(o);
+        LSFGroupDeclaration groupStatement = o.getGroupUsage().resolveDecl();
+        if(groupStatement instanceof LSFGroupStatement) {
+            if (((LSFGroupStatement) groupStatement).getNativeLiteral() != null) {
+                addUnderscoredError(o, "Group " + o.getText() + " is NATIVE, group containers are not created for it");
+            }
+        }
+    }
+
+    @Override
     public void visitFilterGroupUsage(@NotNull LSFFilterGroupUsage o) {
         super.visitFilterGroupUsage(o);
         checkReference(o);

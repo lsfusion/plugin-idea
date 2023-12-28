@@ -11,6 +11,7 @@
         <ul>
             <li>PropertyDraw options 'tag' and 'inputType' support</li>
             <li>Fixes for debugger in Idea 2023.3</li>
+            <li>Show error for NATIVE groups in GROUP selector</li>
         </ul>
     ]]>
     </change-notes>
