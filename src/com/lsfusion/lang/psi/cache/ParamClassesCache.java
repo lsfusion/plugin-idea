@@ -1,8 +1,10 @@
 package com.lsfusion.lang.psi.cache;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
@@ -39,6 +41,6 @@ public class ParamClassesCache extends PsiDependentCache<LSFActionOrPropDeclarat
     }
     
     public List<LSFExClassSet> resolveParamClassesWithCaching(LSFActionOrPropDeclaration element) {
-        return resolveWithCaching(element, RESOLVER, true, false);
+        return ApplicationManager.getApplication().runReadAction((Computable<List<LSFExClassSet>>) () -> resolveWithCaching(element, RESOLVER, true, false));
     }
 }

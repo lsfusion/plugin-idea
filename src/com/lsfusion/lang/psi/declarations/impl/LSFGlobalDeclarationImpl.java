@@ -2,6 +2,8 @@ package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
@@ -29,7 +31,7 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
 
     @Override
     public String getDeclName() {
-        Stub stub = getStub();
+        Stub stub = ApplicationManager.getApplication().runReadAction((Computable<Stub>) this::getStub);
         if (stub != null)
             return stub.getGlobalName();
 
@@ -38,7 +40,7 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
 
     @Override
     public String getName() {
-        Stub stub = getStub();
+        Stub stub = ApplicationManager.getApplication().runReadAction((Computable<Stub>) this::getStub);
         if (stub != null) // оптимизация
             return stub.getGlobalName();
 

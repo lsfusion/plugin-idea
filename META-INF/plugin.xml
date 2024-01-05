@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.276</b><br>
+        <b>Version 1.0.277</b><br>
         <ul>
-            <li>Made recursive compile task disabled by default</li>
-            <li>Show error for NATIVE groups in GROUP selector</li>
+            <li>'Read access is allowed from inside read-action' exception fix</li>
         </ul>
     ]]>
     </change-notes>

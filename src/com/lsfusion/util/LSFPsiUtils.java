@@ -1,9 +1,11 @@
 package com.lsfusion.util;
 
 import com.intellij.lang.injection.InjectedLanguageManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.util.TextRange;
@@ -413,7 +415,7 @@ public class LSFPsiUtils {
     public static String getLocationString(PsiElement element) {
         final PsiFile file = element.getContainingFile();
         final Document document = PsiDocumentManager.getInstance(element.getProject()).getDocument(file);
-        final SmartPsiElementPointer pointer = SmartPointerManager.getInstance(element.getProject()).createSmartPsiElementPointer(element);
+        final SmartPsiElementPointer pointer = ApplicationManager.getApplication().runReadAction((Computable<SmartPsiElementPointer>) () -> SmartPointerManager.getInstance(element.getProject()).createSmartPsiElementPointer(element));
         final Segment range = pointer.getRange();
         int lineNumber = -1;
         int linePosition = -1;
