@@ -126,7 +126,8 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
     private void invokeRemoteMethod(boolean register, SuspendContextImpl context, Object... args) {
         try {
-            final StackFrameProxyImpl frameProxy = context.getThread().frame(0);
+            ThreadReferenceProxyImpl thread = context.getThread();
+            final StackFrameProxyImpl frameProxy = thread != null ? thread.frame(0) : null;
             if (frameProxy == null) {
                 // might be if the thread has been collected
                 return;
