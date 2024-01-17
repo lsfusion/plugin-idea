@@ -158,6 +158,8 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public void setInlinedBody(LSFMetaCodeBody parsed) {
+        if(getProject().isDisposed())
+            return;
         if(isInline()) {
             if(parsed != null && isCorrect()) {
                 PsiElement parent = getParent();
