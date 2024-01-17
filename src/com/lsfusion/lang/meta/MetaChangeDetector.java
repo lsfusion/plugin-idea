@@ -13,6 +13,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.progress.*;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.util.Computable;
@@ -464,7 +465,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
         }
 
         public void run() {
-            final List<GenParse> genUsages = new ArrayList<>();
+            final Map<LSFMetaCodeStatement, GenParse> genUsages = new HashMap<>();
             final Iterator<LSFMetaCodeStatement> iterator = usages.iterator();
             while (iterator.hasNext()) {
                 final LSFMetaCodeStatement metaUsage = iterator.next();
@@ -496,11 +497,12 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
                 });
 
                 if (toParse.getResult() != null)
-                    genUsages.add(new GenParse(metaUsage, toParse.getResult(), toParse.getResult().version));
+                    genUsages.put(metaUsage, new GenParse(metaUsage, toParse.getResult(), toParse.getResult().version));
             }
             PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(myProject);
             final Document document = psiDocumentManager.getDocument(file);
-            for (final GenParse gen : genUsages) {
+            for (final Map.Entry<LSFMetaCodeStatement, GenParse> genEntry : genUsages.entrySet()) {
+                GenParse gen = genEntry.getValue();
                 final Result<Runnable> runMetaText = new Result<>();
                 runMetaText.setResult(() -> {
                     if (!actualize(gen, file)) // оптимизация
@@ -535,17 +537,22 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
 
                         inlineProceed(false, file);
 
-                        CommandProcessor.getInstance().runUndoTransparentAction(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-                            if (gen.usage.isValid() && gen.usage.isCorrect() && actual(gen)) { // can become not valid
-                                boolean prevEnabled = enabled;
-                                enabled = false; // выключаем чтобы каскадно не вызывались события
-                                try {
-                                    gen.usage.setInlinedBody(gen.toParse.parse(file, gen.usage.isInline()));
-                                } finally {
-                                    enabled = prevEnabled;
+                        try {
+                            CommandProcessor.getInstance().runUndoTransparentAction(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+                                if (gen.usage.isValid() && gen.usage.isCorrect() && actual(gen)) { // can become not valid
+                                    boolean prevEnabled = enabled;
+                                    enabled = false; // выключаем чтобы каскадно не вызывались события
+                                    try {
+                                        gen.usage.setInlinedBody(gen.toParse.parse(file, gen.usage.isInline()));
+                                    } finally {
+                                        enabled = prevEnabled;
+                                    }
                                 }
-                            }
-                        }));
+                            }));
+                        } catch(IndexNotReadyException e) {
+                            //re-add usage to reprocess in inlinePostpone
+                            usages.add(genEntry.getKey());
+                        }
                     });
                 });
 
