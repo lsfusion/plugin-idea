@@ -216,8 +216,10 @@ public class ASTCompletionContributor extends CompletionContributor {
         int tailOffset = context.getTailOffset();
         String lookupString = item.getLookupString();
 
+        //need to move cursor inside [] when it's STRING[] or NUMERIC[,],
+        //but not if it's INTERVAL (interval type is already in lookupString)
         int brIndex = lookupString.lastIndexOf("[");
-        if (brIndex != -1) {
+        if (brIndex != -1 && !lookupString.startsWith("INTERVAL[")) {
             int tailLength = lookupString.length() - brIndex - 1;
             final CaretModel model = editor.getCaretModel();
             if (model.getOffset() == tailOffset) {
