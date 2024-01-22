@@ -10,6 +10,10 @@
         <b>Version 1.0.277</b><br>
         <ul>
             <li>'Read access is allowed from inside read-action' exception fix</li>
+            <li>LSFDebugProcess npe fix</li>
+            <li>IndexNotReady MetaChangeDetector fix</li>
+            <li>ASTCompletionContributor: cursor behaviour fix when inserting INTERVAL keyword</li>
+            <li>Support PATTERN in property declaration</li>
         </ul>
     ]]>
     </change-notes>
