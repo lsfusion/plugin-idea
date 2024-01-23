@@ -211,6 +211,9 @@ public class ASTCompletionContributor extends CompletionContributor {
         TreeUtil.ensureParsed(tempFile.getNode());
     }
 
+    //sessionPropertyType in LSF.bnf
+    private static final List<String> needParentheses = Arrays.asList("PREV", "CHANGED", "SET", "DROPPED", "SETCHANGED", "DROPCHANGED", "SETDROPPED");
+
     public static final InsertHandler keywordInsertHandler = (context, item) -> {
         Editor editor = context.getEditor();
         int tailOffset = context.getTailOffset();
@@ -228,7 +231,16 @@ public class ASTCompletionContributor extends CompletionContributor {
         } else {
             // c/p from com.intellij.codeInsight.lookup.TailTypeDecorator
             PostprocessReformattingAspect.getInstance(context.getProject()).doPostponedFormatting();
-            TailType.insertChar(editor, tailOffset, ' ', true);
+            if(needParentheses.contains(lookupString)) {
+                TailType.insertChar(editor, tailOffset++, '(', true);
+                TailType.insertChar(editor, tailOffset++, ')', true);
+                final CaretModel model = editor.getCaretModel();
+                if (model.getOffset() == tailOffset) {
+                    model.moveToOffset(tailOffset - 1);
+                }
+            } else {
+                TailType.insertChar(editor, tailOffset, ' ', true);
+            }
         }
     };
 
