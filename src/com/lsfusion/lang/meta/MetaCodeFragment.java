@@ -79,18 +79,56 @@ public class MetaCodeFragment {
             assert !parts[i].isEmpty() && !parts[i].equals("#");
         return true;
     }
-    private String[] splitToken(String token) {
+    
+    // Heuristics, may not work in certain cases when there is string interpolation inside string literal
+    private static List<String> splitToken(String token) {
         String[] parts = token.split("##");
-        assert assertOnlyFirstCanBeEmpty(parts);
-        return parts;
+        List<String> result = new ArrayList<>();
+        boolean isSplittedStringLiteral = false;
+        String stringLiteral = "";
+        for (String part : parts) {
+            if (!isSplittedStringLiteral) {
+                if (isStartingStringLiteralPart(part)) {
+                    isSplittedStringLiteral = true;
+                    stringLiteral = part;
+                } else {
+                    result.add(part);
+                }
+            } else {
+                stringLiteral += "##" + part;
+                if (part.endsWith("'")) {
+                    result.add(stringLiteral);
+                    isSplittedStringLiteral = false;
+                    stringLiteral = "";
+                }
+            }
+        }
+        return result;
     }
+    
+    private static boolean isStartingStringLiteralPart(String part) {
+        return part.startsWith("'") && (part.length() == 1 || !endsWithQuote(part)) ||
+                part.startsWith("#'") && (part.length() == 2 || !endsWithQuote(part));
+    }
+    
+    private static boolean endsWithQuote(String part) {
+        if (!part.endsWith("'")) return false;
+        int ind = part.length() - 2;
+        int backSlashes = 0;
+        while (ind >= 0 && part.charAt(ind) == '\\') {
+            ++backSlashes;
+            --ind;
+        }
+        return backSlashes % 2 == 0;
+    }
+    
     private String[] transformParamTokens(List<MetaTransaction.InToken> actualParams, String token, Result<Boolean> rCapitalizeFirstToken, Result<Boolean> rIsColor) {
         List<String> result = new ArrayList<>();
-        String[] parts = splitToken(token);
+        List<String> parts = splitToken(token);
 
         boolean capitalizeFirstToken = false;
-        for (int i = 0; i < parts.length; i++) {
-            String part = parts[i];
+        for (int i = 0; i < parts.size(); i++) {
+            String part = parts.get(i);
 
             if(part.isEmpty()) {
                 assert i == 0;
@@ -107,12 +145,12 @@ public class MetaCodeFragment {
                     if (capitalize && !transformedToken.startsWith("#")) // can be ###a and we don't want to capitalize it one more time
                         transformedToken = "#" + transformedToken;
 
-                    String[] transformedSplit = splitToken(transformedToken);
-                    if(parts.length == 1 && transformedSplit.length == 1 && transformedSplit[0].startsWith("#") && !transformedSplit[0].startsWith("##"))
+                    List<String> transformedSplit = splitToken(transformedToken);
+                    if(parts.size() == 1 && transformedSplit.size() == 1 && transformedSplit.get(0).startsWith("#") && !transformedSplit.get(0).startsWith("##"))
                         rIsColor.setResult(true);
 
-                    for (int j = 0; j < transformedSplit.length; j++) {
-                        String transPart = transformedSplit[j];
+                    for (int j = 0; j < transformedSplit.size(); j++) {
+                        String transPart = transformedSplit.get(j);
                         if (transPart.isEmpty()) {
                             assert j == 0;
                             if(i == 0)

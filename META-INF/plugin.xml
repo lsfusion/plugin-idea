@@ -10,6 +10,7 @@
         <b>Version 1.0.278</b><br>
         <ul>
             <li>ASTCompletionContributor: add parentheses for sessionPropertyType (CHANGED, SET, DROP and so on)</li>
+            <li>Fix issue with special metacode sequences '##' and '###' inside string literal</li>
         </ul>
     ]]>
     </change-notes>
