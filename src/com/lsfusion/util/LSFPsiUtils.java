@@ -175,7 +175,10 @@ public class LSFPsiUtils {
             } else { // не extend - останавливаемся
                 upParams = new HashSet<>();
             }
-            result.addAll(contextModifier.resolveParams(offset, upParams));
+            List<LSFExprParamDeclaration> params = contextModifier.resolveParams(offset, upParams);
+            if(params != null) {
+                result.addAll(params);
+            }
             return result;
         }
 
