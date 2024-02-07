@@ -40,7 +40,7 @@ import static com.intellij.execution.process.ScriptRunnerUtil.STDOUT_OUTPUT_KEY_
 public class LSFRecursiveCompileStepBeforeRun extends BeforeRunTaskProvider<LSFRecursiveCompileStepBeforeRun.RecursiveCompileBeforeRunTask> {
     public static final Key<LSFRecursiveCompileStepBeforeRun.RecursiveCompileBeforeRunTask> ID = Key.create("Recursive compile");
 
-    private final int TIMEOUT = 100000;
+    private final int TIMEOUT = 200000;
     private final Project myProject;
     private static final Logger LOG = Logger.getInstance(Task.class);
 
