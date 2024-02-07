@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.278</b><br>
+        <b>Version 1.0.279</b><br>
         <ul>
-            <li>ASTCompletionContributor: add parentheses for sessionPropertyType (CHANGED, SET, DROP and so on)</li>
-            <li>Fix issue with special metacode sequences '##' and '###' inside string literal</li>
+            <li>LSFConsoleFilterProvider: links to lsf lines in console</li>
         </ul>
     ]]>
     </change-notes>
@@ -301,6 +300,8 @@
         <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.reports.JrxmlLinkLineMarkerProvider"/>
+
+        <consoleFilterProvider implementation="com.lsfusion.LSFConsoleFilterProvider"/>
 
         <!-- migration -->
         <fileTypeFactory implementation="com.lsfusion.migration.lang.MigrationFileTypeFactory"/>
