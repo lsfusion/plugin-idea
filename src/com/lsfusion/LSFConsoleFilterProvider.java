@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 public class LSFConsoleFilterProvider extends ConsoleDependentFilterProvider {
 
     @Override
-    public Filter @NotNull [] getDefaultFilters(@NotNull ConsoleView consoleView, @NotNull Project project, @NotNull GlobalSearchScope globalSearchScope) {
+    public Filter[] getDefaultFilters(@NotNull ConsoleView consoleView, @NotNull Project project, @NotNull GlobalSearchScope globalSearchScope) {
         return new Filter[]{new LSFFilter(consoleView, project)};
     }
 
