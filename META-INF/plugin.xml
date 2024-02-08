@@ -10,6 +10,7 @@
         <b>Version 1.0.279</b><br>
         <ul>
             <li>LSFConsoleFilterProvider: links to lsf lines in console</li>
+            <li>NEWEXECUTOR WAIT|NOWAIT support</li>
         </ul>
     ]]>
     </change-notes>

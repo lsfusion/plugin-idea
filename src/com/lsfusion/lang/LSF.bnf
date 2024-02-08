@@ -1231,7 +1231,7 @@ newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
     methods = [inferActionParamClasses getDocumentation]
 }
 
-newExecutorActionPropertyDefinitionBody ::= NEWEXECUTOR actionPropertyDefinitionBody THREADS propertyExpression SEMI
+newExecutorActionPropertyDefinitionBody ::= NEWEXECUTOR actionPropertyDefinitionBody THREADS propertyExpression syncTypeLiteral? SEMI
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
