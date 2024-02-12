@@ -40,9 +40,9 @@ public class LSFConsoleFilterProvider extends ConsoleDependentFilterProvider {
         @Nullable
         @Override
         public Result applyFilter(@NotNull String line, int entireLength) {
-            Matcher m = Pattern.compile("[a-zA-Z][a-zA-Z_0-9]*:\\d+:\\d+").matcher(line);
+            Matcher m = Pattern.compile("\\s([a-zA-Z][a-zA-Z_0-9]*:\\d+:\\d+)").matcher(line);
             if (m.find()) {
-                String link = m.group();
+                String link = m.group(1);
                 int highlightStart = entireLength - line.length() + line.indexOf(link);
                 return new Filter.Result(highlightStart, highlightStart + link.length(), project -> {
                     if (!project.isDisposed()) {
