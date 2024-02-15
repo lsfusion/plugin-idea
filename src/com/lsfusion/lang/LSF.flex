@@ -99,11 +99,13 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
 %state META_LITERAL
 %state STRING_LITERAL
 %state INTERPOLATION_BLOCK
+%state MULTILINE_COMMENT
 
 %%
 <YYINITIAL> {
   ({LINE_WS} | {EOL})+                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
   "//" [^\n\r]*                         { return COMMENTS; }
+  "/*"                                  { yybegin(MULTILINE_COMMENT); }
 
 
   ("TRUE" | "FALSE")                    { return LEX_LOGICAL_LITERAL; }
@@ -542,6 +544,12 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   ("###" | "##")? "'"                   { wasStringPart = true; startedWithID = false; yybegin(STRING_LITERAL); }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<MULTILINE_COMMENT> {
+    "*/"    { yybegin(YYINITIAL); return COMMENTS; }
+    [^]     {}
+    <<EOF>> { yybegin(YYINITIAL); return COMMENTS; }
 }
 
 <META_LITERAL> {

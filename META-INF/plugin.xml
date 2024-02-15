@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.279</b><br>
+        <b>Version 1.0.280</b><br>
         <ul>
-            <li>LSFConsoleFilterProvider: links to lsf lines in console</li>
-            <li>NEWEXECUTOR WAIT|NOWAIT support</li>
+            <li>Implement support for multiline comments with /* ... */ syntax</li>
         </ul>
     ]]>
     </change-notes>
