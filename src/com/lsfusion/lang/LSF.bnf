@@ -1872,7 +1872,7 @@ filterGroupUsage ::= simpleName
     implements="com.lsfusion.lang.psi.references.LSFFilterGroupReference"
 }
 
-regularFilterDeclaration ::= FILTER localizedStringLiteral formExprDeclaration (stringLiteral)? (filterSetDefault)?
+regularFilterDeclaration ::= FILTER localizedStringLiteral formExprDeclaration (KEY | MOUSE)? (stringLiteral)? (filterSetDefault)?
 
 formExprDeclaration ::= propertyExpression
 formActionDeclaration ::= topActionPropertyDefinitionBody

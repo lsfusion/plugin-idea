@@ -353,6 +353,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "JOIN"                    			{ return JOIN; }
   "JSON"                    			{ return JSON; }
   "JSONTEXT"                    		{ return JSONTEXT; }
+  "KEY"                    		        { return KEY; }
   "KEYPRESS"                    		{ return KEYPRESS; }
   "LAST"                                { return LAST; }
   "LEFT"                    			{ return LEFT; }
@@ -379,6 +380,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "MIN"                     			{ return MIN; }
   "MODULE"                  			{ return MODULE; }
   "MOVE"                                { return MOVE; }
+  "MOUSE"                               { return MOUSE; }
   "MS"                                  { return MS; }
   "MULTI"                   			{ return MULTI; }
   "NAME"                    			{ return NAME; }

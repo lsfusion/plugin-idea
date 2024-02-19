@@ -7,9 +7,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.280</b><br>
+        <b>Version 1.0.281</b><br>
         <ul>
-            <li>Implement support for multiline comments with /* ... */ syntax</li>
+            <li>IS CLASS renamed to ISCLASS</li>
+            <li>FILTER KEY | MOUSE support</li>
         </ul>
     ]]>
     </change-notes>
