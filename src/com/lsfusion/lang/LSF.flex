@@ -348,6 +348,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "INTERNAL"                            { return INTERNAL; }
   "INTERVAL"                            { return INTERVAL; }
   "IS"                      			{ return IS; }
+  "ISCLASS"                      		{ return ISCLASS; }
   "JAVA"                  			    { return JAVA; }
   "JOIN"                    			{ return JOIN; }
   "JSON"                    			{ return JSON; }

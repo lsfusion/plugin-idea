@@ -505,7 +505,7 @@ sessionPropertyType ::= PREV | CHANGED | SET | DROPPED | SETCHANGED | DROPCHANGE
 sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 {pin = 1 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
-signaturePropertyDefinition ::= IS CLASS LBRAC propertyExpression RBRAC
+signaturePropertyDefinition ::= ISCLASS LBRAC propertyExpression RBRAC
 {pin = 2 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
 activeTabPropertyDefinition ::= ACTIVE TAB componentID
