@@ -2,7 +2,7 @@ package com.lsfusion.lang.psi.cache;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
-import com.intellij.util.messages.MessageBus;
+import com.intellij.openapi.project.Project;
 import com.lsfusion.lang.DBNamingPolicy;
 import com.lsfusion.lang.psi.LSFFile;
 import org.jetbrains.annotations.NotNull;
@@ -25,8 +25,8 @@ public class DBNamingPolicyCache extends PsiDependentCache<LSFFile, DBNamingPoli
         return ServiceManager.getService(lsfFile.getProject(), DBNamingPolicyCache.class);
     }
 
-    public DBNamingPolicyCache(@NotNull MessageBus messageBus) {
-        super(messageBus);
+    public DBNamingPolicyCache(Project project) {
+        super(project);
     }
 
     public DBNamingPolicy getDBNamingPolicyWithCaching(LSFFile element) {

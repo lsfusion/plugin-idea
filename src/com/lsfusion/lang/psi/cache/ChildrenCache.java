@@ -3,7 +3,6 @@ package com.lsfusion.lang.psi.cache;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import org.jetbrains.annotations.NotNull;
@@ -34,8 +33,8 @@ public class ChildrenCache extends PsiDependentCache<LSFClassDeclaration, Collec
         return ServiceManager.getService(project, ChildrenCache.class);
     }
 
-    public ChildrenCache(@NotNull MessageBus messageBus) {
-        super(messageBus);
+    public ChildrenCache(Project project) {
+        super(project);
     }
 
     public Collection<LSFClassDeclaration> getChildrenWithCaching(LSFClassDeclaration element) {

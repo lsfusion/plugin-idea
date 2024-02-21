@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFModuleUsage;
 import com.lsfusion.lang.psi.LSFRequireList;
@@ -56,8 +55,8 @@ public class ModuleDependentsCache extends PsiDependentCache<LSFModuleDeclaratio
         }
     };
 
-    public ModuleDependentsCache(@NotNull MessageBus messageBus) {
-        super(messageBus);
+    public ModuleDependentsCache(Project project) {
+        super(project);
     }
 
     @Nullable

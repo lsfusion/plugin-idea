@@ -3,7 +3,6 @@ package com.lsfusion.lang.psi.cache;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +37,8 @@ public class ValueClassCache extends PsiDependentCache<LSFPropDeclaration, LSFEx
         return ServiceManager.getService(project, ValueClassCache.class);
     }
 
-    public ValueClassCache(@NotNull MessageBus messageBus) {
-        super(messageBus);
+    public ValueClassCache(Project project) {
+        super(project);
     }
 
     public LSFExClassSet resolveValueClassWithCaching(LSFPropDeclaration element, boolean infer) {

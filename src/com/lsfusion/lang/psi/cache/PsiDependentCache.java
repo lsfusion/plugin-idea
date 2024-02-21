@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi.cache;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveResult;
@@ -10,7 +11,6 @@ import com.intellij.psi.impl.AnyPsiChangeListener;
 import com.intellij.psi.impl.PsiManagerImpl;
 import com.intellij.reference.SoftReference;
 import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,11 +28,11 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         boolean checkResultClass(Object result); // например при memoize в RecursionGuard возвращается List чего-то
     }
 
-    public PsiDependentCache(@NotNull MessageBus messageBus) {
+    protected PsiDependentCache(Project project) {
         for (int i = 0; i < myMaps.length; i++) {
             myMaps[i] = ContainerUtil.createConcurrentWeakMap();
         }
-        messageBus.connect().subscribe(PsiManagerImpl.ANY_PSI_CHANGE_TOPIC, new AnyPsiChangeListener() {
+        project.getMessageBus().connect().subscribe(PsiManagerImpl.ANY_PSI_CHANGE_TOPIC, new AnyPsiChangeListener() {
             @Override
             public void beforePsiChanged(boolean isPhysical) {
                 clearCache(isPhysical);

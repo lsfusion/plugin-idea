@@ -4,7 +4,6 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import org.jetbrains.annotations.NotNull;
@@ -37,8 +36,8 @@ public class RequireModulesCache extends PsiDependentCache<LSFModuleDeclaration,
         return ServiceManager.getService(project, RequireModulesCache.class);
     }
 
-    public RequireModulesCache(@NotNull MessageBus messageBus) {
-        super(messageBus);
+    public RequireModulesCache(Project project) {
+        super(project);
     }
 
     public Set<VirtualFile> getRequireModulesWithCaching(LSFModuleDeclaration element) {

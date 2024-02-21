@@ -3,7 +3,6 @@ package com.lsfusion.lang.psi.cache;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,8 +25,8 @@ public class PropertyComplexityCache extends PsiDependentCache<LSFPropDeclaratio
         return ServiceManager.getService(project, PropertyComplexityCache.class);
     }
     
-    public PropertyComplexityCache(@NotNull MessageBus messageBus) {
-        super(messageBus);
+    public PropertyComplexityCache(Project project) {
+        super(project);
     }
 
     @Nullable

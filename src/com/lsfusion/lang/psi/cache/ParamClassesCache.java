@@ -5,7 +5,6 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
-import com.intellij.util.messages.MessageBus;
 import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +35,8 @@ public class ParamClassesCache extends PsiDependentCache<LSFActionOrPropDeclarat
         return ServiceManager.getService(project, ParamClassesCache.class);
     }
 
-    public ParamClassesCache(@NotNull MessageBus messageBus) {
-        super(messageBus);
+    public ParamClassesCache(Project project) {
+        super(project);
     }
     
     public List<LSFExClassSet> resolveParamClassesWithCaching(LSFActionOrPropDeclaration element) {
