@@ -1416,6 +1416,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFRoundPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+        LSFExClassSet exClassSet = sourceStatement.getPropertyExpressionList().get(0).resolveInferredValueClass(inferred);
+        if (exClassSet != null) {
+            if (exClassSet.classSet instanceof NumericClass)
+                return new LSFExClassSet(NumericClass.unlimited);
+        }
         return resolveInferredValueClass(sourceStatement.getPropertyExpressionList(), inferred, false);
     }
 

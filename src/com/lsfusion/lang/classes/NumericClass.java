@@ -6,6 +6,8 @@ import java.text.NumberFormat;
 
 public class NumericClass extends DoubleClass {
 
+    public static NumericClass unlimited = new NumericClass(ExtInt.UNLIMITED, ExtInt.UNLIMITED);
+
     private final ExtInt length;
     private final ExtInt precision;
 
