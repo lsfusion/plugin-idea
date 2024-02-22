@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
-    <version>1.0.280</version>
+    <version>1.0.281</version>
     <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -11,6 +11,7 @@
         <ul>
             <li>IS CLASS renamed to ISCLASS</li>
             <li>FILTER KEY | MOUSE support</li>
+            <li>Fixed InstantiationException thrown in IDEA 2024.1</li>
         </ul>
     ]]>
     </change-notes>
