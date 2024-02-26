@@ -1,30 +1,22 @@
 package com.lsfusion.design.model.entity;
 
-import com.lsfusion.design.KeyStrokes;
-
-import javax.swing.*;
 import java.util.Set;
 
+import static com.lsfusion.util.BaseUtils.nvl;
+
 public class RegularFilterEntity {
-    public String name = "";
-    public KeyStroke key;
-    public boolean showKey = true;
+    public String name;
     public Set<ObjectEntity> objects;
     public boolean isDefault;
 
-    public RegularFilterEntity(String iname, KeyStroke ikey, Set<ObjectEntity> objects, boolean isDefault) {
-        name = iname;
-        key = ikey;
+    public RegularFilterEntity(String name, Set<ObjectEntity> objects, boolean isDefault) {
+        this.name = name;
         this.objects = objects;
         this.isDefault = isDefault;
     }
 
     public String getFullCaption() {
-
-        String fullCaption = name;
-        if (showKey && key != null) {
-            fullCaption += " (" + KeyStrokes.getKeyStrokeCaption(key) + ")";
-        }
-        return fullCaption;
+        //key/mouse, binding now not supported, if needed, do the same as in GRegularFilter
+        return nvl(name, "");
     }
 }

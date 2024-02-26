@@ -195,13 +195,8 @@ public class FormEntity {
             LSFFormExprDeclaration formExprDeclaration = regularFilterDeclaration.getFormExprDeclaration();
             Set<ObjectEntity> params = getObjects(formExprDeclaration);
 
-            LSFStringLiteral stringLiteral = regularFilterDeclaration.getStringLiteral();
             boolean isDefault = regularFilterDeclaration.getFilterSetDefault() != null;
-            KeyStroke keyStroke = null;
-            if (stringLiteral != null) {
-                keyStroke = KeyStroke.getKeyStroke(stringLiteral.getValue());
-            }
-            RegularFilterEntity filter = new RegularFilterEntity(regularFilterDeclaration.getLocalizedStringLiteral().getValue(), keyStroke, params, isDefault);
+            RegularFilterEntity filter = new RegularFilterEntity(regularFilterDeclaration.getLocalizedStringLiteral().getValue(), params, isDefault);
             filterGroup.addFilter(filter);
         }
     }
