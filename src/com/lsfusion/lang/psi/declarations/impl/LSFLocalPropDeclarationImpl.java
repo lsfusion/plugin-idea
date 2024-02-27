@@ -95,10 +95,14 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
         if (current instanceof LSFListAction) {
             LSFListAction action = (LSFListAction) current;
             for (PsiElement child : action.getChildren()) {
-                if (child instanceof LSFLocalPropDeclaration && !(this.equals(child))) {
-                    LSFLocalPropDeclaration local = (LSFLocalPropDeclaration) child;
-                    if (getDeclName().equals(local.getDeclName()) && !LSFGlobalResolver.isAfter(getTextOffset(), local) && LSFActionOrGlobalPropDeclarationImpl.resolveEquals(resolveParamClasses(), local.resolveParamClasses())) {
-                        return true;
+                if(child instanceof LSFLocalDataPropertyDefinition) {
+                    LSFNonEmptyLocalPropertyDeclarationNameList decls = ((LSFLocalDataPropertyDefinition) child).getNonEmptyLocalPropertyDeclarationNameList();
+                    if(decls != null) {
+                        for (LSFLocalPropertyDeclarationName decl : decls.getLocalPropertyDeclarationNameList()) {
+                            if (!(this.equals(decl)) && (getDeclName().equals(decl.getDeclName()) && !LSFGlobalResolver.isAfter(getTextOffset(), decl) && LSFActionOrGlobalPropDeclarationImpl.resolveEquals(resolveParamClasses(), decl.resolveParamClasses()))) {
+                                return true;
+                            }
+                        }
                     }
                 }
             }

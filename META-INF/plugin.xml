@@ -10,6 +10,7 @@
         <b>Version 1.0.282</b><br>
         <ul>
             <li>FILTER binding SHOW/HIDE support</li>
+            <li>Resolve duplicates for local prop declaration fix</li>
         </ul>
     ]]>
     </change-notes>
