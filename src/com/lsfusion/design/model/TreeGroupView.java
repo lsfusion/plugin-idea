@@ -29,6 +29,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
             new ReflectionProperty("autoSize").setExpert(),
             new ReflectionProperty("boxed").setExpert(),
             new ReflectionProperty("expandOnClick"),
+            new ReflectionProperty("hierarchicalWidth").setExpert(),
             new ReflectionProperty("headerHeight").setExpert(),
             new ReflectionProperty("resizeOverflow").setExpert(),
             new ReflectionProperty("lineHeight").setExpert(),
@@ -53,6 +54,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     public boolean boxed;
 
     public boolean expandOnClick;
+    public int hierarchicalWidth;
 
     public int headerHeight;
 

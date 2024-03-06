@@ -11,6 +11,7 @@
         <ul>
             <li>FILTER binding SHOW/HIDE support</li>
             <li>Resolve duplicates for local prop declaration fix</li>
+            <li>Design: hierarchicalWidth for tree support</li>
         </ul>
     ]]>
     </change-notes>
