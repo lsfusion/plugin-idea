@@ -25,7 +25,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
     
     boolean isStoredProperty();
 
-    boolean isPersistentProperty();
+    boolean isMaterializedProperty();
 
     boolean isDataProperty();
 

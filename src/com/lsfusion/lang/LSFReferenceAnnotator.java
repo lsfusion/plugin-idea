@@ -169,6 +169,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitIndexedSetting(@NotNull LSFIndexedSetting o) {
+        super.visitIndexedSetting(o);
+        LSFNonEmptyPropertyOptions options = (LSFNonEmptyPropertyOptions) o.getParent();
+        PsiElement propertyStatement = options.getParent();
+        if (propertyStatement instanceof LSFPropertyStatement && !((LSFPropertyStatement) propertyStatement).isStoredProperty()) {
+            addUnderscoredError(o, "INDEXED property should be materialized");
+        }
+    }
+
+    @Override
     public void visitWindowUsage(@NotNull LSFWindowUsage o) {
         super.visitWindowUsage(o);
 

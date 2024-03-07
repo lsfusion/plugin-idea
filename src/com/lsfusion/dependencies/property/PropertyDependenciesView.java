@@ -140,7 +140,7 @@ public class PropertyDependenciesView extends DependenciesView {
     @Override
     public Border getNodeBorder(GraphNode node) {
         LSFActionOrGlobalPropDeclaration<?, ?> prop = ((PropertyGraphNode) node).property;
-        if (prop instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration<?, ?>) prop).isPersistentProperty()) {
+        if (prop instanceof LSFGlobalPropDeclaration && ((LSFGlobalPropDeclaration<?, ?>) prop).isMaterializedProperty()) {
             return new LineBorder(new JBColor(new Color(156, 121, 255), new Color(156, 121, 255)), 2);
         }
         return super.getNodeBorder(node);

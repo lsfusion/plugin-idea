@@ -58,7 +58,7 @@ public class PropertyTableLineMarkerProvider extends LSFLineMarkerProvider {
                     LSFId nameIdentifier = propDeclaration.getNameIdentifier();
                     if (nameIdentifier != null && nameIdentifier.getFirstChild() == element) {
                         if(!(propDeclaration instanceof LSFAggrParamGlobalPropDeclaration && ((LSFAggrParamGlobalPropDeclaration) propDeclaration).getAggrPropertyDefinition() == null)) {
-                            if (propDeclaration.isCorrect() && (propDeclaration.isDataStoredProperty() || propDeclaration.isPersistentProperty())) {
+                            if (propDeclaration.isCorrect() && (propDeclaration.isDataStoredProperty() || propDeclaration.isMaterializedProperty())) {
                                 LineMarkerInfo<?> marker = createLineMarker(element);
                                 result.add(marker);
                                 usedLines.add(lineNumber);

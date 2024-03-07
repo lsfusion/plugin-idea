@@ -37,7 +37,7 @@ public abstract class LSFAggrParamGlobalPropDeclarationImpl extends LSFFullNameD
     }
 
     @Override
-    public boolean isPersistentProperty() {
+    public boolean isMaterializedProperty() {
         return true;
     }
 

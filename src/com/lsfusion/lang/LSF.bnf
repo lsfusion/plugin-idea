@@ -618,7 +618,8 @@ typePropertyDefinition ::= typeIs className
 }
 
 private semiPropertyOption ::= IN groupUsage
-                           |	persistentSetting
+                           |	materializedSetting
+                           |	indexedSetting
                            |    complexSetting
                            |    prereadSetting
                            |    hintSetting
@@ -638,7 +639,6 @@ private semiPropertyOption ::= IN groupUsage
                            |	regexpSetting
                            |	loggableSetting
                            |	echoSymbolsSetting
-                           |	indexSetting
                            |    aggrSetting
                            |	notNullSetting
                            |	eventIdSetting
@@ -658,7 +658,8 @@ nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI |
 
 viewTypeSetting ::= classViewType
 customViewSetting ::= propertyCustomView
-persistentSetting ::= MATERIALIZED stringLiteral?
+materializedSetting ::= MATERIALIZED stringLiteral?
+indexedSetting ::= INDEXED stringLiteral? (LIKE | MATCH)?
 complexSetting ::= COMPLEX | NOCOMPLEX
 hintSetting ::= HINT | NOHINT
 prereadSetting ::= PREREAD
@@ -675,7 +676,6 @@ patternSetting ::= PATTERN localizedStringLiteral
 regexpSetting ::= REGEXP localizedStringLiteral (localizedStringLiteral)?
 loggableSetting ::= LOGGABLE
 echoSymbolsSetting ::= ECHO
-indexSetting ::= INDEXED stringLiteral? (LIKE | MATCH)?
 aggrSetting ::= AGGR
 notNullSetting ::= nullOption (DELETE)? baseEventNotPE
 onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти

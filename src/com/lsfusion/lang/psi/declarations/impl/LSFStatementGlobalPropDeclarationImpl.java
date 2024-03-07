@@ -139,13 +139,13 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
         return dataProp != null && dataProp.getDataPropertySessionModifier() == null;
     }
 
-    public boolean isPersistentProperty() {
+    public boolean isMaterializedProperty() {
         LSFNonEmptyPropertyOptions options = getNonEmptyPropertyOptions();
-        return options != null && !options.getPersistentSettingList().isEmpty();
+        return options != null && !options.getMaterializedSettingList().isEmpty();
     }
     
     public boolean isStoredProperty() {
-        return isDataStoredProperty() || isPersistentProperty();
+        return isDataStoredProperty() || isMaterializedProperty();
     }
 
     @NotNull
@@ -206,7 +206,7 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
         Integer complexity = 1;
         if (!processed.contains(prop)) {
             processed.add(prop);
-            if (prop instanceof LSFGlobalPropDeclaration && !((LSFGlobalPropDeclaration<?, ?>) prop).isPersistentProperty()) {
+            if (prop instanceof LSFGlobalPropDeclaration && !((LSFGlobalPropDeclaration<?, ?>) prop).isMaterializedProperty()) {
                 Set<LSFActionOrGlobalPropDeclaration<?, ?>> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching((LSFGlobalPropDeclaration<?, ?>) prop);
                 if(dependencies != null) {
                     for (LSFActionOrGlobalPropDeclaration<?, ?> dependency : dependencies) {
