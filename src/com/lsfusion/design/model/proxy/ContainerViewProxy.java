@@ -16,6 +16,14 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.setCaption(caption);
     }
 
+    public void setValueClass(String valueClass) {
+        target.valueClass = valueClass;
+    }
+
+    public void setCaptionClass(String captionClass) {
+        target.captionClass = captionClass;
+    }
+
     public void setImage(String image) {
         target.image = image;
     }

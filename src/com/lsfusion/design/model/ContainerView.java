@@ -27,6 +27,8 @@ public class ContainerView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
             new ReflectionProperty("caption"),
+            new ReflectionProperty("valueClass").setExpert(),
+            new ReflectionProperty("captionClass").setExpert(),
             new ReflectionProperty("image"),
             new ReflectionProperty("collapsible"),
             new ReflectionProperty("popup"),
@@ -56,6 +58,8 @@ public class ContainerView extends ComponentView {
     private final List<ComponentView> children = new ArrayList<>();
 
     public String caption;
+    public String valueClass;
+    public String captionClass;
 
     public String image;
 
