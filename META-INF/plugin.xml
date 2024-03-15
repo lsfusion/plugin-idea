@@ -10,6 +10,7 @@
         <b>Version 1.0.283</b><br>
         <ul>
             <li>'INDEXED property should be materialized' error</li>
+            <li>Popup containers support</li>
         </ul>
     ]]>
     </change-notes>

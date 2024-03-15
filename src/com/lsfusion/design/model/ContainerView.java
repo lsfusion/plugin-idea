@@ -29,6 +29,7 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("caption"),
             new ReflectionProperty("image"),
             new ReflectionProperty("collapsible"),
+            new ReflectionProperty("popup"),
             new ReflectionProperty("border"),
             new ReflectionProperty("collapsed"),
             new ReflectionProperty("type").setExpert(), //deprecated in 5.2, removed in 6.0
@@ -59,6 +60,8 @@ public class ContainerView extends ComponentView {
     public String image;
 
     public boolean collapsible;
+
+    public boolean popup;
 
     public boolean border;
 
@@ -120,6 +123,11 @@ public class ContainerView extends ComponentView {
     @SuppressWarnings("unused")
     public boolean isCollapsible() {
         return collapsible;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isPopup() {
+        return popup;
     }
 
     @SuppressWarnings("unused")

@@ -1679,7 +1679,7 @@ formExtKey ::= EXTKEY
 
 formSubReport ::= SUBREPORT formCalcPropertyObject?
 
-classViewType ::= PANEL | GRID | TOOLBAR
+classViewType ::= PANEL | GRID | TOOLBAR | POPUP
 
 renderPropertyCustomView ::= stringLiteral
 changePropertyCustomView ::= CHANGE stringLiteral?
@@ -2298,7 +2298,7 @@ componentInsertPosition ::= (   insertRelativePositionLiteral componentSelector
 removeComponentStatement ::= REMOVE componentSelector SEMI {pin = 1}
 
 // GROUPOBJECT + TREE
-private componentSingleSelectorType ::=  BOX | OBJECTS | PANEL | TOOLBARBOX | TOOLBARLEFT | TOOLBARRIGHT | TOOLBAR
+private componentSingleSelectorType ::=  BOX | OBJECTS | PANEL | TOOLBARBOX | TOOLBARLEFT | TOOLBARRIGHT | TOOLBAR | POPUP
 //GRIDBOX and USERFILTER deprecated in 5.2, removed in 6.0
 groupObjectTreeSingleSelectorType ::= componentSingleSelectorType | TOOLBARSYSTEM | FILTERGROUPS | USERFILTER | GRIDBOX | CLASSCHOOSER | GRID | FILTERBOX | FILTERS | FILTERCONTROLS
 globalSingleSelectorType ::= componentSingleSelectorType 
