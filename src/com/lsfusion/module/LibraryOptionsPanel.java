@@ -59,7 +59,9 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
  * based on com.intellij.facet.impl.ui.libraries.LibraryOptionsPanel
  */
 public class LibraryOptionsPanel {
-    private final String DOWNLOAD_URL = "https://download.lsfusion.org/java";
+    // calling URL without trailing slash follows redirect to the page with CDN id and root folder name 
+    // which causes 404 error as this page is not reachable from the outside
+    private final String DOWNLOAD_URL = "https://download.lsfusion.org/java/";
     private final String SERVER_PATTERN = "lsfusion-server-(\\d+(\\.)?)*\\.jar";
     private final String SOURCES_PATTERN = "lsfusion-server-(\\d+(\\.)?)*-sources\\.jar";
 
@@ -247,11 +249,11 @@ public class LibraryOptionsPanel {
         for(int i = serverUrls.size() - 1; i >=0; i--) {
             String serverUrl = serverUrls.get(i);
             Map<String, String> fileUrls = new HashMap<>();
-            fileUrls.put(SERVER_JAR_KEY, DOWNLOAD_URL + "/" + serverUrl);
+            fileUrls.put(SERVER_JAR_KEY, DOWNLOAD_URL + serverUrl);
 
             String sourceUrl = serverUrl.replace(".jar", "-sources.jar");
             if(sourceUrls.contains(sourceUrl)) {
-                fileUrls.put(SOURCES_JAR_KEY, DOWNLOAD_URL + "/" + sourceUrl);
+                fileUrls.put(SOURCES_JAR_KEY, DOWNLOAD_URL + sourceUrl);
             }
             serverJarUrlsList.add(fileUrls);
             if (latest) {

@@ -7,10 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.283</b><br>
+        <b>Version 1.0.284</b><br>
         <ul>
-            <li>'INDEXED property should be materialized' error</li>
-            <li>Popup containers support</li>
+            <li>Fixed lsFusion library download URL</li>
         </ul>
     ]]>
     </change-notes>
