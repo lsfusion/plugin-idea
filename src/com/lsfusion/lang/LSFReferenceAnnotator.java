@@ -1208,7 +1208,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private List<String> allowedSelects = Arrays.asList("button", "buttonGroup", "dropdown", "list", "no");
+    private List<String> allowedSelects = Arrays.asList("button", "buttonGroup", "dropdown", "input", "list", "no");
     private void checkSelect(PsiElement element, String select) {
         if (!allowedSelects.contains(LSFStringUtils.unquote(select))) {
             addUnderscoredError(element, "select value must be one of these: " + allowedSelects);
