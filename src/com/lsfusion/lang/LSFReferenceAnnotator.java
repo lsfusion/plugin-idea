@@ -611,6 +611,28 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitRoundPropertyDefinition(@NotNull LSFRoundPropertyDefinition o) {
+        super.visitRoundPropertyDefinition(o);
+
+        List<LSFPropertyExpression> expressionList = o.getPropertyExpressionList();
+
+        LSFPropertyExpression prop = expressionList.get(0);
+        LSFExClassSet propClass = prop.resolveValueClass(false);
+        if(propClass != null && !(propClass.classSet instanceof IntegralClass)) {
+            addUnderscoredError(prop, "ROUND is supported only for NUMERIC, INTEGER, LONG and DOUBLE");
+        }
+
+        if(expressionList.size() > 1) {
+            expressionList.size();
+            LSFPropertyExpression scaleProp = expressionList.get(1);
+            LSFExClassSet scalePropClass = scaleProp.resolveValueClass(false);
+            if (scalePropClass != null && !(scalePropClass.classSet instanceof IntegerClass)) {
+                addUnderscoredError(scaleProp, "ROUND scale param should be INTEGER");
+            }
+        }
+    }
+
+    @Override
     public void visitChangePropertyCustomView(@NotNull LSFChangePropertyCustomView changePropertyCustomView) {
         super.visitChangePropertyCustomView(changePropertyCustomView);
 

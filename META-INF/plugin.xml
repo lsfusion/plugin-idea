@@ -10,6 +10,7 @@
         <b>Version 1.0.285</b><br>
         <ul>
             <li>SELECT 'input' support</li>
+            <li>ROUND: check property type</li>
         </ul>
     ]]>
     </change-notes>
