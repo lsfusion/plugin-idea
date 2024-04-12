@@ -559,7 +559,8 @@ abstractPropertyDefinition ::= ABSTRACT ((CASE | MULTI | VALUE) abstractExclusiv
     methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getDocumentation]
 }
 
-formulaPropertyDefinition ::= FORMULA (NULL)? (builtInClassName)? formulaPropertySyntaxList
+//first NULL is valueNull, second NULL is paramsNull
+formulaPropertyDefinition ::= FORMULA (NULL)? (builtInClassName)? formulaPropertySyntaxList (NULL)?
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"

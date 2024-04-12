@@ -11,6 +11,7 @@
         <ul>
             <li>SELECT 'input' support</li>
             <li>ROUND: check property type</li>
+            <li>FORMULA NULL (paramsNull) support</li>
         </ul>
     ]]>
     </change-notes>
