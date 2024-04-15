@@ -1743,7 +1743,7 @@ formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptions
     methods = [ resolveParamClasses getParamList]
 }
 
-formPropertyOptionsList ::= (    CHANGEABLE | READONLY | SELECTOR
+formPropertyOptionsList ::= (    CHANGEABLE | READONLY | DISABLE | SELECTOR
                             |    formOptionSession
                             |    HINTNOUPDATE
                             |    HINTTABLE
