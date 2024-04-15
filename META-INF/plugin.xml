@@ -7,12 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.285</b><br>
+        <b>Version 1.0.286</b><br>
         <ul>
-            <li>SELECT 'input' support</li>
-            <li>ROUND: check property type</li>
-            <li>FORMULA NULL (paramsNull) support</li>
-            <li>DISABLE support</li>
+            <li>LSF web documetation view (ctrl+shift+Q)</li>
         </ul>
     ]]>
     </change-notes>
@@ -107,6 +104,11 @@
             <separator/>
             <action id="InstallExternalCallsProtocolAction" class="com.lsfusion.actions.InstallExternalCallsProtocolAction"
                     text="Install Debug Protocol"/>
+
+            <action id="LSFWebDocumentationAction" class="com.lsfusion.actions.LSFWebDocumentationAction" text="Web Documentation">
+                <add-to-group group-id="Documentation.PrimaryGroup"/>
+                <keyboard-shortcut first-keystroke="control shift Q"  keymap="$default"/>
+            </action>
 
             <separator/>
         </group>

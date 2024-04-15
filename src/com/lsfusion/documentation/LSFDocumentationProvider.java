@@ -58,7 +58,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
         return language != null ? language : "en";
     }
 
-    private String getDocumentationURL(PsiElement element) {
+    public static String getDocumentationURL(PsiElement element) {
         String documentation;
         PsiElement docElement = element;
 
@@ -138,6 +138,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
 
     //disable popup on mouse hover. Available only since 193.5233.102
     //To disable manually: (Idea 211) Go to Settings -> Editor -> Code Editing and uncheck 'Show quick documentation on mouse move'
+    // UPD: is never called now
 //    @Override
 //    public @Nullable String generateHoverDoc(@NotNull PsiElement element, @Nullable PsiElement originalElement) {
 //        return null;
