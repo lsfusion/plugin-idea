@@ -59,6 +59,6 @@ public class ModuleComboAction extends LabeledComboBoxAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.EDT;
+        return ActionUpdateThread.BGT;
     }
 }
