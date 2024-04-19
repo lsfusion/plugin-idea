@@ -1,6 +1,7 @@
 package com.lsfusion.actions;
 
 import com.intellij.codeInsight.TargetElementUtil;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -213,5 +214,10 @@ public class AggregateFormAction extends AnAction {
         }
 
         return file.findElementAt(TargetElementUtil.adjustOffset(file, document, offset));
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

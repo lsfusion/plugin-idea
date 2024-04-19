@@ -226,4 +226,9 @@ public class InsertCompositionAction extends AnAction {
             return text;
         }
     }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
 }

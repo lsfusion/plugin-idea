@@ -1,6 +1,7 @@
 package com.lsfusion.actions;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
@@ -92,5 +93,10 @@ public class MetaCodeEnableAction extends AnAction {
         private void setIncludedModules(List<String> includedModules) {
             propertiesComponent.setValue(INCLUDED_MODULES, StringUtils.join(includedModules, ","));
         }
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.EDT;
     }
 }

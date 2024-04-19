@@ -1,9 +1,6 @@
 package com.lsfusion.dependencies;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.vcs.changes.committed.LabeledComboBoxAction;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
@@ -58,5 +55,10 @@ public class ModuleComboAction extends LabeledComboBoxAction {
     
     public GlobalSearchScope getCurrentModuleScope() {
         return currentModule != null ? currentModule.getModuleWithDependenciesScope() : null;
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.EDT;
     }
 }

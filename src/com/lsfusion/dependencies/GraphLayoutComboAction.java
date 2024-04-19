@@ -1,9 +1,6 @@
 package com.lsfusion.dependencies;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.vcs.changes.committed.LabeledComboBoxAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,4 +54,9 @@ public abstract class GraphLayoutComboAction extends LabeledComboBoxAction {
     }
 
     protected abstract void changeLayout(boolean update);
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
 }
