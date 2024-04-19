@@ -13,6 +13,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Progressive;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Segment;
 import com.intellij.psi.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
@@ -30,16 +31,17 @@ import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.DesignUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AggregateFormAction extends AnAction {
+
+    private Project project;
 
     @Override
     public void update(AnActionEvent e) {
@@ -53,8 +55,10 @@ public class AggregateFormAction extends AnAction {
     }
 
     List<String> codeBlocks;
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        this.project = getEventProject(e);
         final Progressive progress = indicator -> ApplicationManager.getApplication().runReadAction(() -> {
             codeBlocks = new ArrayList<>();
 
@@ -71,8 +75,8 @@ public class AggregateFormAction extends AnAction {
             }
         });
 
-        if(!codeBlocks.isEmpty())
-            new AggregateFormDialog(StringUtils.join(codeBlocks, "\n\n")).setVisible(true);
+        if (!codeBlocks.isEmpty())
+            new AggregateFormDialog(StringUtils.join(codeBlocks, "\n\n")).show();
     }
 
     public static List<String> getFormText(PsiElement sourceElement, boolean skipCreatingNotes) {
@@ -109,29 +113,24 @@ public class AggregateFormAction extends AnAction {
         return result;
     }
 
-    private static class AggregateFormDialog extends JDialog {
+    private class AggregateFormDialog extends DialogWrapper {
+
+        private String text;
 
         public AggregateFormDialog(String text) {
-            super(null, "Aggregate form", ModalityType.APPLICATION_MODAL);
-            setMinimumSize(new Dimension(600, 400));
+            super(project);
+            this.text = text;
+            init();
+            setTitle("Aggregate form");
+        }
 
-            setLocationRelativeTo(null);
-
+        @Override
+        protected @Nullable JComponent createCenterPanel() {
             JTextPane sourceTextPane = new JTextPane();
             sourceTextPane.setText(text);
             sourceTextPane.setBackground(null);
             sourceTextPane.setEditable(false);
-            JBScrollPane sourceScrollPane = new JBScrollPane(sourceTextPane);
-
-            JPanel buttonsPanel = new JPanel();
-            JButton okButton = new JButton("OK");
-            okButton.addActionListener(e -> dispose());
-            buttonsPanel.add(okButton, BorderLayout.CENTER);
-
-            add(sourceScrollPane, BorderLayout.CENTER);
-            add(buttonsPanel, BorderLayout.SOUTH);
-
-            rootPane.registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+            return new JBScrollPane(sourceTextPane);
         }
     }
 

@@ -5,18 +5,21 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.lsfusion.util.BaseUtils;
 import net.gcardone.junidecode.Junidecode;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.beans.Introspector;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -30,17 +33,19 @@ import java.util.stream.Collectors;
 
 public abstract class GenerateFormAction extends AnAction {
 
+    private Project project;
+
     private Set<String> usedObjectIds = new HashSet<>();
     private Set<String> usedObjectsIds = new HashSet<>();
     private Set<String> usedGroupIds = new HashSet<>();
     private Set<String> usedNamespacePrefixes = new HashSet<>();
     private Set<String> usedFilterProperties = new HashSet<>();
 
-    private Set<String> keywords = new HashSet<>(Arrays.asList("TRUE", "FALSE", "TTRUE", "TFALSE", "INTEGER", "LONG", "NUMERIC", "DOUBLE", "DATE", "DATETIME", "TIME", "YEAR",
+    private final Set<String> keywords = new HashSet<>(Arrays.asList("TRUE", "FALSE", "TTRUE", "TFALSE", "INTEGER", "LONG", "NUMERIC", "DOUBLE", "DATE", "DATETIME", "TIME", "YEAR",
             "ZDATETIME", "INTERVAL", "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT", "RICHTEXT", "HTMLTEXT", "WORDFILE", "IMAGEFILE", "PDFFILE", "DBFFILE", "RAWFILE", "FILE",
             "EXCELFILE", "TEXTFILE", "CSVFILE", "HTMLFILE", "JSONFILE", "XMLFILE", "TABLEFILE", "NAMEDFILE", "WORDLINK", "IMAGELINK", "PDFLINK", "DBFLINK", "RAWLINK", "LINK", "EXCELLINK",
             "TEXTLINK", "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK", "TABLELINK", "BOOLEAN", "TBOOLEAN", "COLOR", "ABSTRACT", "ACTIVATE", "ACTIVE", "ATTR", "ASK", "NATIVE",
-            "ACTION", "ACTIONS", "AFTER", "GOAFTER", "AGGR", "NAGGR", "ALL", "AND",  "APPEND", "APPLY", "AS", "ASON", "ASYNCUPDATE", "ATTACH", "AUTOREFRESH", "AUTOSET", "BACKGROUND",
+            "ACTION", "ACTIONS", "AFTER", "GOAFTER", "AGGR", "NAGGR", "ALL", "AND", "APPEND", "APPLY", "AS", "ASON", "ASYNCUPDATE", "ATTACH", "AUTOREFRESH", "AUTOSET", "BACKGROUND",
             "BCC", "BEFORE", "BODY", "BODYPARAMNAMES", "BODYPARAMHEADERS", "BODYURL", "BOTTOM", "BOX", "BREAK",
             "BY", "CANCEL", "CASE", "CC", "CATCH", "CALENDAR", "CENTER", "CHANGE", "CHANGECLASS", "CHANGEABLE", "CHANGEKEY", "CHANGED", "CHANGEMOUSE", "CHANGEWYS", "CHARSET",
             "CHARWIDTH", "CHECK", "CHECKED", "CLASS", "CLASSCHOOSER", "CLASSES", "CLIENT", "CLOSE", "COLUMN", "COLUMNS",
@@ -78,21 +83,101 @@ public abstract class GenerateFormAction extends AnAction {
     abstract List<ParseNode> generateHierarchy(Object element, String key);
 
     @Override
-    public void actionPerformed(final AnActionEvent e) {
-        new GenerateFormDialog(e).setVisible(true);
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        this.project = getEventProject(e);
+        new GenerateFormDialog().show();
     }
 
-    public class GenerateFormDialog extends JDialog {
+    public class GenerateFormDialog extends DialogWrapper {
         JTextPane sourceTextPane;
         JTextPane targetTextPane;
         JButton generateFromTextButton;
 
-        public GenerateFormDialog(AnActionEvent actionEvent) {
-            super(null, "Generate form", ModalityType.APPLICATION_MODAL);
-            setMinimumSize(new Dimension(600, 800));
+        public GenerateFormDialog() {
+            super(project);
+            init();
+            setTitle("Generate form");
+        }
 
-            setLocationRelativeTo(null);
+        private GridBagConstraints getGridBagConstraints(int row) {
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridy = row;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.weightx = 0.1;
+            gbc.weighty = 1.0;
+            return gbc;
+        }
 
+        private void generate(String text) {
+            try {
+                if (text != null && !text.isEmpty()) {
+                    Object rootElement = getRootElement(text);
+                    if (rootElement != null) {
+                        usedObjectIds = new HashSet<>();
+                        usedObjectsIds = new HashSet<>();
+                        usedGroupIds = new HashSet<>();
+                        usedNamespacePrefixes = new HashSet<>();
+                        List<ParseNode> hierarchy = generateHierarchy(rootElement, null);
+                        CodeBlock formCodeBlock = generateForm(hierarchy, null, null, null, null, null);
+                        showFormScript(formCodeBlock);
+                    }
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Generation failed", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private void enableGenerateButton() {
+            generateFromTextButton.setEnabled(!sourceTextPane.getText().isEmpty());
+        }
+
+        private void onGenerateFromFile() {
+            try {
+                final FileChooserDescriptor fileChooser = FileChooserDescriptorFactory.createSingleFileDescriptor(getExtension());
+                VirtualFile file = FileChooser.chooseFile(fileChooser, project, null);
+                if (file != null) {
+                    String inputFile = readFile(Paths.get(file.getPath()));
+                    if (inputFile != null) {
+                        generate(inputFile);
+                    } else {
+                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Unknown charset", "Read file failed", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Read file failed", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        String[] extraCharsets = new String[]{"cp1251"};
+
+        private String readFile(Path file) {
+            String result = null;
+            try {
+                result = Files.readString(file);
+            } catch (IOException e) {
+                for (String charset : extraCharsets) {
+                    try {
+                        result = Files.readString(file, Charset.forName(charset));
+                        break;
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+            return result;
+        }
+
+        private void showFormScript(CodeBlock formCodeBlock) {
+            Form form = generateFormFromCodeBlocks(formCodeBlock);
+
+            String formScript = (form.groupDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.groupDeclarationScripts, "\n") + "\n\n")) +
+                    (form.propertyDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.propertyDeclarationScripts, "\n") + "\n\n")) +
+                    form.formNameScript + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
+
+            targetTextPane.setText(formScript);
+        }
+
+        @Override
+        protected @Nullable JComponent createCenterPanel() {
             sourceTextPane = new JTextPane();
             sourceTextPane.setBackground(null);
             JBScrollPane sourceScrollPane = new JBScrollPane(sourceTextPane);
@@ -102,7 +187,7 @@ public abstract class GenerateFormAction extends AnAction {
             generateFromTextButton.setEnabled(false);
 
             JButton generateFromFileButton = new JButton("Generate from file");
-            generateFromFileButton.addActionListener(e -> onGenerateFromFile(actionEvent));
+            generateFromFileButton.addActionListener(e -> onGenerateFromFile());
 
             targetTextPane = new JTextPane();
             targetTextPane.setBackground(null);
@@ -110,6 +195,7 @@ public abstract class GenerateFormAction extends AnAction {
             JBScrollPane targetScrollPane = new JBScrollPane(targetTextPane);
 
             JPanel mainPanel = new JPanel();
+            mainPanel.setMinimumSize(new Dimension(600, 800));
             mainPanel.setLayout(new GridBagLayout());
             mainPanel.add(sourceScrollPane, getGridBagConstraints(0));
             JPanel buttonsPanel = new JPanel();
@@ -140,86 +226,7 @@ public abstract class GenerateFormAction extends AnAction {
                     enableGenerateButton();
                 }
             });
-
-            add(mainPanel, BorderLayout.CENTER);
-
-            getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        }
-
-        private GridBagConstraints getGridBagConstraints(int row) {
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridy = row;
-            gbc.fill = GridBagConstraints.BOTH;
-            gbc.weightx = 0.1;
-            gbc.weighty = 1.0;
-            return gbc;
-        }
-
-        private void generate(String text) {
-            try {
-                if(text != null && !text.isEmpty()) {
-                    Object rootElement = getRootElement(text);
-                    if (rootElement != null) {
-                        usedObjectIds = new HashSet<>();
-                        usedObjectsIds = new HashSet<>();
-                        usedGroupIds = new HashSet<>();
-                        usedNamespacePrefixes = new HashSet<>();
-                        List<ParseNode> hierarchy = generateHierarchy(rootElement, null);
-                        CodeBlock formCodeBlock = generateForm(hierarchy, null, null, null, null, null);
-                        showFormScript(formCodeBlock);
-                    }
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Generation failed", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-
-        private void enableGenerateButton() {
-            generateFromTextButton.setEnabled(!sourceTextPane.getText().isEmpty());
-        }
-
-        private void onGenerateFromFile(AnActionEvent actionEvent) {
-            try {
-                final FileChooserDescriptor fileChooser = FileChooserDescriptorFactory.createSingleFileDescriptor(getExtension());
-                VirtualFile file = FileChooser.chooseFile(fileChooser, actionEvent.getProject(), null);
-                if(file != null) {
-                    String inputFile = readFile(Paths.get(file.getPath()));
-                    if(inputFile != null) {
-                        generate(inputFile);
-                    } else {
-                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Unknown charset", "Read file failed", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Read file failed", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-
-        String[] extraCharsets = new String[]{"cp1251"};
-        private String readFile(Path file) {
-            String result = null;
-            try {
-                result = Files.readString(file);
-            } catch (IOException e) {
-                for (String charset : extraCharsets) {
-                    try {
-                        result = Files.readString(file, Charset.forName(charset));
-                        break;
-                    } catch (IOException ignored) {
-                    }
-                }
-            }
-            return result;
-        }
-
-        private void showFormScript(CodeBlock formCodeBlock) {
-            Form form = generateFormFromCodeBlocks(formCodeBlock);
-
-            String formScript = (form.groupDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.groupDeclarationScripts, "\n") + "\n\n")) +
-                    (form.propertyDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.propertyDeclarationScripts, "\n") + "\n\n")) +
-                    form.formNameScript + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
-
-            targetTextPane.setText(formScript);
+            return mainPanel;
         }
     }
 
@@ -228,23 +235,23 @@ public abstract class GenerateFormAction extends AnAction {
         Set<String> propertyDeclarationScripts = new LinkedHashSet<>(codeBlock.propertyDeclarationScripts);
         List<String> formScripts = new ArrayList<>(codeBlock.objectsScripts);
 
-        if(codeBlock.namespacePropertiesScript != null) {
+        if (codeBlock.namespacePropertiesScript != null) {
             formScripts.add(codeBlock.namespacePropertiesScript);
         }
-        if(codeBlock.propertiesScript != null) {
+        if (codeBlock.propertiesScript != null) {
             formScripts.add(codeBlock.propertiesScript);
         }
-        if(codeBlock.filtersScript != null) {
+        if (codeBlock.filtersScript != null) {
             formScripts.add(codeBlock.filtersScript);
         }
 
-        if(codeBlock.children != null) {
-            for(CodeBlock child : codeBlock.children) {
+        if (codeBlock.children != null) {
+            for (CodeBlock child : codeBlock.children) {
                 Form blocks = generateFormFromCodeBlocks(child);
                 groupDeclarationScripts.addAll(blocks.groupDeclarationScripts);
                 propertyDeclarationScripts.addAll(blocks.propertyDeclarationScripts);
-                for(String formScript : blocks.formScripts) {
-                    if(!formScripts.contains(formScript)) { //temp check
+                for (String formScript : blocks.formScripts) {
+                    if (!formScripts.contains(formScript)) { //temp check
                         formScripts.add(formScript);
                     }
                 }
@@ -265,7 +272,7 @@ public abstract class GenerateFormAction extends AnAction {
         String filtersScript = null;
         List<CodeBlock> children = new ArrayList<>();
 
-        for(ParseNode element : elements) {
+        for (ParseNode element : elements) {
 
             if (element instanceof GroupObjectParseNode) {
 
@@ -309,7 +316,7 @@ public abstract class GenerateFormAction extends AnAction {
                 for (ParseNode childElement : element.children) {
                     ElementKey childElementKey = new ElementKey(childElement.key);
 
-                    if(childElement instanceof NamespaceParseNode) {
+                    if (childElement instanceof NamespaceParseNode) {
                         namespaces.add(((NamespaceParseNode) childElement).namespace);
                     } else {
                         if (childElement instanceof PropertyParseNode) {
@@ -332,8 +339,8 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private boolean hasPropertyGroupParseNodeChildren(ParseNode element) {
-        for(ParseNode childElement : element.children) {
-            if(childElement instanceof PropertyGroupParseNode) {
+        for (ParseNode childElement : element.children) {
+            if (childElement instanceof PropertyGroupParseNode) {
                 return true;
             }
         }
@@ -350,7 +357,7 @@ public abstract class GenerateFormAction extends AnAction {
 
     private ParseNode deepMerge(ParseNode source, ParseNode target) throws JSONException {
         //swap source and target - GroupParseNode has more priority
-        if(source instanceof PropertyParseNode && target instanceof GroupParseNode) {
+        if (source instanceof PropertyParseNode && target instanceof GroupParseNode) {
             ParseNode buffer = target;
             target = source;
             source = buffer;
@@ -372,7 +379,7 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getGroupDeclarationScript(ElementKey groupKey, ElementNamespace groupNamespace, ElementKey parentGroupKey) {
-        if(groupKey != null && !usedGroupIds.contains(groupKey.ID)) {
+        if (groupKey != null && !usedGroupIds.contains(groupKey.ID)) {
             usedGroupIds.add(groupKey.ID);
             String extID = getExtIDScript(groupKey, groupNamespace);
             String parent = parentGroupKey != null ? (" : " + parentGroupKey.ID) : "";
@@ -393,21 +400,21 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getPropertyDeclarationScript(String property, String type, String parameter) {
-        if(property != null) {
+        if (property != null) {
             return property + " = DATA LOCAL " + type + "(" + (parameter != null ? parameter : "") + ");";
         } else return null;
     }
 
     private String generateObjectId(String id) {
         id = Introspector.decapitalize(id);
-        if(id != null) {
-            if(id.matches("[^a-zA-Z].*")) {
+        if (id != null) {
+            if (id.matches("[^a-zA-Z].*")) {
                 id = "v" + id;
             }
             id = Junidecode.unidecode(id).replaceAll("[^a-zA-Z0-9_]", "_");
         }
         int count = 0;
-        while(notUniqueId(id, count)) {
+        while (notUniqueId(id, count)) {
             count++;
         }
         id = id + (count == 0 ? "" : count);
@@ -421,7 +428,7 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getObjectsScript(ElementKey elementKey, ElementNamespace namespace, ElementKey inGroupKey) {
-        if(elementKey != null && !usedObjectsIds.contains(elementKey.ID)) {
+        if (elementKey != null && !usedObjectsIds.contains(elementKey.ID)) {
             usedObjectsIds.add(elementKey.ID);
             String extID = getExtIDScript(elementKey, namespace);
             String inGroup = (inGroupKey == null || inGroupKey.ID == null ? "" : (" IN " + inGroupKey.ID));
@@ -454,7 +461,7 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getPropertiesScript(ElementKey object, ElementKey inGroup, Set<ElementProperty> properties) {
-        if(!properties.isEmpty()) {
+        if (!properties.isEmpty()) {
             String filtersScript = (object != null ? "\nFILTERS " + "imported(" + object.ID + ")" : "");
             return "PROPERTIES" +
                     "(" + (object == null ? "" : object.ID) + ") " +
@@ -479,7 +486,7 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getFiltersScript(String name, ElementKey parameterKey, ElementKey parentKey) {
-        if(name != null && parameterKey != null && parentKey != null) {
+        if (name != null && parameterKey != null && parentKey != null) {
             return "FILTERS " + name + "(" + parameterKey.ID + ") == " + parentKey.ID;
         } else return null;
     }
@@ -518,7 +525,7 @@ public abstract class GenerateFormAction extends AnAction {
         }
     }
 
-    private class CodeBlock {
+    private static class CodeBlock {
         String formNameScript;
         Set<String> groupDeclarationScripts;
         Set<String> propertyDeclarationScripts;
@@ -543,7 +550,7 @@ public abstract class GenerateFormAction extends AnAction {
         }
     }
 
-    private class Form {
+    private static class Form {
         String formNameScript;
         Set<String> groupDeclarationScripts;
         Set<String> propertyDeclarationScripts;
@@ -557,17 +564,18 @@ public abstract class GenerateFormAction extends AnAction {
         }
     }
 
-    abstract class ParseNode {
+    abstract static class ParseNode {
         String key;
         List<ParseNode> children;
+
         ParseNode(String key, List<ParseNode> children) {
             this.key = key;
             this.children = children;
         }
 
         ParseNode getChild(ParseNode child) {
-            for(ParseNode c : children) {
-                if(c.key != null && c.key.equals(child.key))
+            for (ParseNode c : children) {
+                if (c.key != null && c.key.equals(child.key))
                     return c;
             }
             return null;
@@ -578,7 +586,7 @@ public abstract class GenerateFormAction extends AnAction {
         }
     }
 
-    abstract class GroupParseNode extends ParseNode {
+    abstract static class GroupParseNode extends ParseNode {
         ElementNamespace namespace;
 
         GroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace) {
@@ -587,8 +595,8 @@ public abstract class GenerateFormAction extends AnAction {
         }
     }
 
-    class GroupObjectParseNode extends GroupParseNode {
-        private boolean integrationKey; // key (key in JSON, tag in XML, fields in plain formats) or index (array in JSON, multiple object name tags in xml, order in plain formats)
+    static class GroupObjectParseNode extends GroupParseNode {
+        private final boolean integrationKey; // key (key in JSON, tag in XML, fields in plain formats) or index (array in JSON, multiple object name tags in xml, order in plain formats)
 
         GroupObjectParseNode(String key, List<ParseNode> children, ElementNamespace namespace, boolean integrationKey) {
             super(key, children, namespace);
@@ -600,15 +608,16 @@ public abstract class GenerateFormAction extends AnAction {
         }
     }
 
-    class PropertyGroupParseNode extends GroupParseNode {
+    static class PropertyGroupParseNode extends GroupParseNode {
         String formName;
+
         PropertyGroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace, String formName) {
             super(key, children, namespace);
             this.formName = formName;
         }
     }
 
-    class PropertyParseNode extends ParseNode {
+    static class PropertyParseNode extends ParseNode {
         ElementNamespace namespace;
         String type;
         boolean attr;
@@ -621,8 +630,9 @@ public abstract class GenerateFormAction extends AnAction {
         }
     }
 
-    class NamespaceParseNode extends ParseNode {
+    static class NamespaceParseNode extends ParseNode {
         ElementNamespace namespace;
+
         NamespaceParseNode(ElementNamespace namespace) {
             super(null, new ArrayList<>());
             this.namespace = namespace;
@@ -646,7 +656,7 @@ public abstract class GenerateFormAction extends AnAction {
         }
     }
 
-    class ElementNamespace {
+    static class ElementNamespace {
         String prefix;
         String uri;
 
