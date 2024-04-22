@@ -1282,8 +1282,8 @@ requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO 
 classOrExpression ::=
         (<<checkClassOrExpression>> &((customClassUsage <<matchedClass>>)?) propertyExpression <<matchedClassOrExpression>>) |
         customClassUsage
-private listInputProp ::= LIST propertyExpression {pin = 1}
-private whereInputProp ::= WHERE propertyExpression {pin = 1}
+listInputProp ::= LIST propertyExpression {pin = 1}
+whereInputProp ::= WHERE propertyExpression {pin = 1}
 listWhereInputProps ::= listInputProp? whereInputProp?
 {
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
@@ -1295,10 +1295,6 @@ contextActions ::= ACTIONS contextAction (COMMA contextAction)*
     methods = [ getContextModifier getContextInferrer ]
 }
 contextAction ::= stringLiteral (KEYPRESS stringLiteral)? (TOOLBAR ((ALL | SELECTED | FOCUSED) HOVER?)*)? listActionPropertyDefinitionBody
-{
-    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
-    methods = [ getContextModifier getContextInferrer ]
-}
 changeInputPropertyCustomView ::= CUSTOM stringLiteral?
 inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? changeInputPropertyCustomView? listWhereInputProps contextActions? formSessionScopeClause? staticDestination? doInputBody
 {

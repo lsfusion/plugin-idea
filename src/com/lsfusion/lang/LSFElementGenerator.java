@@ -18,6 +18,7 @@ import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.impl.LSFExprParamDeclarationImpl;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.references.LSFModuleReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
@@ -424,6 +425,20 @@ public class LSFElementGenerator {
             @Override
             public LSFFile getLSFFile() {
                 return file;
+            }
+        };
+    }
+
+    public static LSFExprParamDeclaration createExprParamDeclaration(LSFId nameIdentifier, LSFClassSet classSet) {
+        return new LSFExprParamDeclarationImpl(dummy) {
+            @Override
+            public @Nullable LSFId getNameIdentifier() {
+                return nameIdentifier;
+            }
+
+            @Override
+            public @Nullable LSFClassSet resolveClass() {
+                return classSet;
             }
         };
     }

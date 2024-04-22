@@ -399,36 +399,46 @@ public class LSFPsiImplUtil {
 
     public static ContextModifier getContextModifier(@NotNull LSFContextActions sourceStatement) {
         LSFInputActionPropertyDefinitionBody inputAction = PsiTreeUtil.getParentOfType(sourceStatement, LSFInputActionPropertyDefinitionBody.class);
-        LSFParamDeclare paramDeclare = inputAction.getParamDeclare();
-        if (paramDeclare == null)
-            return ContextModifier.EMPTY;
+        if (inputAction != null) {
+            LSFParamDeclare paramDeclare = inputAction.getParamDeclare();
+            LSFListWhereInputProps listWhereInputProps = inputAction.getListWhereInputProps();
+            if (paramDeclare != null && paramDeclare.resolveClass() instanceof CustomClassSet && listWhereInputProps != null) {
+                LSFListInputProp listInputProp = listWhereInputProps.getListInputProp();
+                if (listInputProp != null) {
+                    LSFPropertyExpression listPropertyExpression = listInputProp.getPropertyExpression();
+                    if (listPropertyExpression != null) {
+                        LSFExClassSet valueClass = listPropertyExpression.resolveValueClass(false);
+                        if (valueClass != null) {
+                            return (offset, currentParams) -> Collections.singletonList(LSFElementGenerator.createExprParamDeclaration(paramDeclare.getNameIdentifier(), valueClass.classSet));
+                        }
+                    }
+                }
+            }
 
-        return (offset, currentParams) -> Collections.singletonList(inputAction.getParamDeclare());
+            return (offset, currentParams) -> Collections.singletonList(paramDeclare);
+        }
+        return ContextModifier.EMPTY;
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFContextActions sourceStatement) {
         return ContextInferrer.EMPTY;
     }
 
-    public static ContextModifier getContextModifier(@NotNull LSFContextAction sourceStatement) {
-        LSFInputActionPropertyDefinitionBody inputAction = PsiTreeUtil.getParentOfType(sourceStatement, LSFInputActionPropertyDefinitionBody.class);
-        LSFParamDeclare paramDeclare = inputAction.getParamDeclare();
-        if (paramDeclare == null)
-            return ContextModifier.EMPTY;
-
-        return (offset, currentParams) -> Collections.singletonList(inputAction.getParamDeclare());
-    }
-
-    public static ContextInferrer getContextInferrer(@NotNull LSFContextAction sourceStatement) {
-        return ContextInferrer.EMPTY;
-    }
-
     public static ContextModifier getContextModifier(@NotNull LSFListWhereInputProps sourceStatement) {
         LSFInputActionPropertyDefinitionBody inputAction = PsiTreeUtil.getParentOfType(sourceStatement, LSFInputActionPropertyDefinitionBody.class);
         LSFClassSet resolveClass = inputAction.resolveClass();
-        if(resolveClass instanceof DataClass)
-            return new ExprsContextModifier(sourceStatement.getPropertyExpressionList());
-        else {
+        if(resolveClass instanceof DataClass) {
+            List<LSFPropertyExpression> propertyExpressionList = new ArrayList<>();
+            LSFListInputProp listInputProp = sourceStatement.getListInputProp();
+            if(listInputProp != null) {
+                propertyExpressionList.add(listInputProp.getPropertyExpression());
+            }
+            LSFWhereInputProp whereInputProp = sourceStatement.getWhereInputProp();
+            if(whereInputProp != null) {
+                propertyExpressionList.add(whereInputProp.getPropertyExpression());
+            }
+            return new ExprsContextModifier(propertyExpressionList);
+        } else {
             LSFParamDeclare paramDeclare = inputAction.getParamDeclare();
             if(paramDeclare == null)
                 return ContextModifier.EMPTY;

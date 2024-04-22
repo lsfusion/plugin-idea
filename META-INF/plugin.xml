@@ -10,6 +10,9 @@
         <b>Version 1.0.286</b><br>
         <ul>
             <li>LSF web documetation view (ctrl+shift+Q)</li>
+            <li>Fixed 'Thread context was already set' exception</li>
+            <li>Fixed 'ActionUpdateThread.OLD_EDT` is deprecated and going to be removed soon.' exception</li>
+            <li>Type from LIST in ACTIONS for INPUT param</li>
         </ul>
     ]]>
     </change-notes>
