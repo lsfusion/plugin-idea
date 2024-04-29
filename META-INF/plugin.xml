@@ -14,6 +14,7 @@
             <li>Fixed 'ActionUpdateThread.OLD_EDT` is deprecated and going to be removed soon.' exception</li>
             <li>Type from LIST in ACTIONS for INPUT param</li>
             <li>EVENTS ON EXPAND|COLLAPSE container support</li>
+            <li>EVENTS ON CHANGE: BEFORE|AFTER and OBJECTS|PROPERTY support</li>
         </ul>
     ]]>
     </change-notes>

@@ -689,7 +689,7 @@ hideEditKey ::= HIDE
 
 contextMenuEventType ::= CONTEXTMENU (<<noIDCheck>> localizedStringLiteral)? { pin = 1 } // there are a lot of rules that start from ID, so we'll ignore that cases
 keyPressedEventType ::= KEYPRESS stringLiteral  { pin = 1 }
-formEventType ::= CHANGE | GROUPCHANGE | CHANGEWYS | EDIT | contextMenuEventType | keyPressedEventType
+formEventType ::= (CHANGE (BEFORE | AFTER)?) | GROUPCHANGE | CHANGEWYS | EDIT | contextMenuEventType | keyPressedEventType
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// ACTION PROPERTIES ///////////////////////////
@@ -1831,7 +1831,7 @@ formEventDeclaration ::= ON
                         |    CANCEL
                         |    DROP
                         |    QUERYCLOSE
-                        |    CHANGE ID
+                        |    CHANGE ((OBJECT? ID) | (PROPERTY (BEFORE | AFTER)? propertySelector))
                         |    (EXPAND | COLLAPSE) componentSelector
                         |    SCHEDULE PERIOD intLiteral FIXED?
                         |    ORDER groupObjectUsage (TO propertyUsage)?
