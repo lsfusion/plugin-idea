@@ -7,14 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.286</b><br>
+        <b>Version 1.0.287</b><br>
         <ul>
-            <li>LSF web documetation view (ctrl+shift+Q)</li>
-            <li>Fixed 'Thread context was already set' exception</li>
-            <li>Fixed 'ActionUpdateThread.OLD_EDT` is deprecated and going to be removed soon.' exception</li>
-            <li>Type from LIST in ACTIONS for INPUT param</li>
-            <li>EVENTS ON EXPAND|COLLAPSE container support</li>
-            <li>EVENTS ON CHANGE: BEFORE|AFTER and OBJECTS|PROPERTY support</li>
+            <li>Added 6 version of documentation. Default version of documetation is 5</li>
         </ul>
     ]]>
     </change-notes>

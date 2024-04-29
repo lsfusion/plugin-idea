@@ -35,6 +35,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     static {
         documentationVersionMap.put("Version 4", "v4/");
         documentationVersionMap.put("Version 5", "");
+        documentationVersionMap.put("Version 6", "next/");
 
         documentationLanguageMap.put("en", "");
         documentationLanguageMap.put("ru", "ru/");
@@ -46,7 +47,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
 
     public static String getDocumentationVersion() {
         String version = PropertiesComponent.getInstance().getValue(documentationVersionPropertyKey);
-        return version != null ? version : "Version 4";
+        return version != null ? version : "Version 5";
     }
 
     public static void setDocumentationLanguage(String language) {
