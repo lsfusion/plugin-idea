@@ -1832,6 +1832,7 @@ formEventDeclaration ::= ON
                         |    DROP
                         |    QUERYCLOSE
                         |    CHANGE ID
+                        |    (EXPAND | COLLAPSE) componentSelector
                         |    SCHEDULE PERIOD intLiteral FIXED?
                         |    ORDER groupObjectUsage (TO propertyUsage)?
                         |    FILTER groupObjectUsage (TO propertyUsage)?

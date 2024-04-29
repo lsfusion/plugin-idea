@@ -13,6 +13,7 @@
             <li>Fixed 'Thread context was already set' exception</li>
             <li>Fixed 'ActionUpdateThread.OLD_EDT` is deprecated and going to be removed soon.' exception</li>
             <li>Type from LIST in ACTIONS for INPUT param</li>
+            <li>EVENTS ON EXPAND|COLLAPSE container support</li>
         </ul>
     ]]>
     </change-notes>
