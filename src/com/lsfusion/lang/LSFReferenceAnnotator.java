@@ -1210,6 +1210,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 addDeprecatedWarningAnnotation(o, "6.0", "Earlier versions: ignore this warning");
             } else if (property.equals("toolTip")) {
                 addDeprecatedWarningAnnotation(o, "5.2", "Use 'tooltip' instead");
+            } else if (property.equals("editOnSingleClick")) {
+                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'changeOnSingleClick' instead");
             } else if (element != null && !element.getText().equals("NULL")) {
                 switch (property) {
                     case "fontStyle":
