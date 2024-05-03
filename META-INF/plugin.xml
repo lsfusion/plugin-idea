@@ -12,6 +12,7 @@
             <li>Added 6 version of documentation. Default version of documetation is 5</li>
             <li>defaultCompare value check</li>
             <li>Deprecated editOnSingleClick</li>
+            <li>Deprecated toolTip</li>
         </ul>
     ]]>
     </change-notes>
