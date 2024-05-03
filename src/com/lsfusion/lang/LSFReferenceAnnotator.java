@@ -1174,11 +1174,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     valueClass = LogicalClass.threeStateInstance;
                 }
 
-                Class cls = ASTCompletionContributor.DESIGN_PROPERTIES.get(property);
+                Class<?> cls = ASTCompletionContributor.DESIGN_PROPERTIES.get(property);
                 if (cls == null) {
                     addHighlightErrorWithResolving(o, "Can't resolve property " + property); // design property can be meta parameter
                 } else if(valueClass != null) {
-                    Class mismatchClass = null;
+                    Class<?> mismatchClass = null;
                     if ((cls == Integer.class || cls == int.class) && !(valueClass instanceof IntegerClass)) {
                         mismatchClass = cls;
                     } else if ((cls == Double.class || cls == double.class) && !(valueClass instanceof IntegerClass) && !(valueClass instanceof DoubleClass)) {
@@ -1211,10 +1211,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             } else if (property.equals("toolTip")) {
                 addDeprecatedWarningAnnotation(o, "5.2", "Use 'tooltip' instead");
             } else if (element != null && !element.getText().equals("NULL")) {
-                if (property.equals("fontStyle")) {
-                    checkFontStyle(element, element.getText());
-                } else if (property.equals("select")) {
-                    checkSelect(element, element.getText());
+                switch (property) {
+                    case "fontStyle":
+                        checkFontStyle(element, element.getText());
+                        break;
+                    case "select":
+                        checkSelect(element, element.getText());
+                        break;
+                    case "defaultCompare":
+                        checkDefaultCompare(element, element.getText());
+                        break;
                 }
             }
         }
@@ -1234,6 +1240,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void checkSelect(PsiElement element, String select) {
         if (!allowedSelects.contains(LSFStringUtils.unquote(select))) {
             addUnderscoredError(element, "select value must be one of these: " + allowedSelects);
+        }
+    }
+
+    private static List<String> allowedDefaultCompares = Arrays.asList("=", ">", "<", ">=", "<=", "!=", "=*", "=@");
+    private static List<String> allowedDefaultCompares5 = Arrays.asList("EQUALS", "GREATER", "LESS", "GREATER_EQUALS", "LESS_EQUALS", "NOT_EQUALS", "LIKE", "CONTAINS");
+    private void checkDefaultCompare(LSFComponentPropertyValue element, String defaultCompare) {
+        defaultCompare = LSFStringUtils.unquote(defaultCompare);
+        if (!allowedDefaultCompares.contains(defaultCompare)) {
+            if(!allowedDefaultCompares5.contains(defaultCompare)) {
+                addUnderscoredError(element, "defaultCompare value must be one of: " + allowedDefaultCompares);
+            } else {
+                addDeprecatedWarningAnnotation(element, "5.2", "6.0", "defaultCompare value must be one of: " + allowedDefaultCompares);
+            }
         }
     }
 

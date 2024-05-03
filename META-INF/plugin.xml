@@ -10,6 +10,7 @@
         <b>Version 1.0.287</b><br>
         <ul>
             <li>Added 6 version of documentation. Default version of documetation is 5</li>
+            <li>defaultCompare value check</li>
         </ul>
     ]]>
     </change-notes>
