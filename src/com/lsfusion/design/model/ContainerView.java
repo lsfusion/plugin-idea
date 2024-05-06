@@ -47,7 +47,7 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("lines"),
             new ReflectionProperty("lineSize"),
             new ReflectionProperty("captionLineSize"),
-            new ReflectionProperty("visible").setExpert() //deprecated in 5.2, removed in 6.0
+            new ReflectionProperty("visible").setExpert() //backward compatibility
     );
 
     @Override
