@@ -1,12 +1,14 @@
 package com.lsfusion.usage;
 
 import com.intellij.navigation.NavigationItem;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.psi.PsiElement;
 import com.intellij.usages.Usage;
 import com.intellij.usages.UsageGroup;
-import com.intellij.usages.UsageView;
+import com.intellij.usages.UsageTarget;
 import com.intellij.usages.rules.PsiElementUsage;
+import com.intellij.usages.rules.SingleParentUsageGroupingRule;
 import com.intellij.usages.rules.UsageGroupingRule;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
@@ -14,12 +16,11 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class LSFStatementGroupingRule implements UsageGroupingRule {
+public class LSFStatementGroupingRule extends SingleParentUsageGroupingRule implements UsageGroupingRule {
     public static final LSFStatementGroupingRule INSTANCE = new LSFStatementGroupingRule();
-    
-    @Nullable
+
     @Override
-    public UsageGroup groupUsage(@NotNull Usage usage) {
+    protected @Nullable UsageGroup getParentGroupFor(@NotNull Usage usage, UsageTarget @NotNull [] targets) {
         if (!(usage instanceof PsiElementUsage)) return null;
 
         PsiElement element = LSFPsiUtils.getStatementParent(((PsiElementUsage)usage).getElement());
@@ -37,19 +38,21 @@ public class LSFStatementGroupingRule implements UsageGroupingRule {
         
         @Nullable
         @Override
-        public Icon getIcon(boolean isOpen) {
-            return statementElement.getIcon(0);
+        public Icon getIcon() {
+            return DumbService.getInstance(statementElement.getProject()).runReadActionInSmartMode(() -> statementElement.getIcon(0));
         }
 
         @NotNull
         @Override
-        public String getText(@Nullable UsageView view) {
-            String text = statementElement.getText(); 
-            if (text.length() <= 40) {
-                return text;
-            } else {
-                return text.substring(0, 40) + "...";
-            }
+        public String getPresentableGroupText() {
+            return DumbService.getInstance(statementElement.getProject()).runReadActionInSmartMode(() -> {
+                String text = statementElement.getText();
+                if (text.length() <= 40) {
+                    return text;
+                } else {
+                    return text.substring(0, 40) + "...";
+                }    
+            });
         }
 
         @Nullable
@@ -69,7 +72,7 @@ public class LSFStatementGroupingRule implements UsageGroupingRule {
 
         @Override
         public int compareTo(UsageGroup o) {
-            return getText(null).compareToIgnoreCase(o.getText(null));
+            return getPresentableGroupText().compareToIgnoreCase(o.getPresentableGroupText());
         }
 
         @Override

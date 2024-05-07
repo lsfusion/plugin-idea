@@ -2,7 +2,6 @@ package com.lsfusion;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.QueryExecutorBase;
-import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.psi.PsiElement;
@@ -16,16 +15,14 @@ public class ImplementationsSearch extends QueryExecutorBase<PsiElement, PsiElem
     @Override
     public void processQuery(@NotNull PsiElement sourceElement, @NotNull Processor consumer) {
         if (sourceElement instanceof LSFId) {
-
-            final LSFDeclaration declParent = PsiTreeUtil.getParentOfType(sourceElement, LSFDeclaration.class);
-
-            if (declParent != null) {
-                ApplicationManager.getApplication().runReadAction(() -> ProgressManager.getInstance().runProcess(() -> {
+            ApplicationManager.getApplication().runReadAction(() -> ProgressManager.getInstance().runProcess(() -> {
+                LSFDeclaration declParent = PsiTreeUtil.getParentOfType(sourceElement, LSFDeclaration.class);
+                if (declParent != null) {
                     for (PsiElement element : declParent.processImplementationsSearch()) {
                         consumer.process(element);
                     }
-                }, new BackgroundableProcessIndicator(sourceElement.getProject(), "Implementations Search", PerformInBackgroundOption.ALWAYS_BACKGROUND,  "cancel", "stop", false)));
-            }
+                }
+            }, new BackgroundableProcessIndicator(sourceElement.getProject(), "Implementations Search", "cancel", "stop", false)));
         }
     }
 }

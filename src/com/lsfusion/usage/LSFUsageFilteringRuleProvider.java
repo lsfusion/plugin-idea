@@ -1,12 +1,10 @@
 package com.lsfusion.usage;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.usages.ReadWriteAccessUsage;
 import com.intellij.usages.ReadWriteAccessUsageInfo2UsageAdapter;
 import com.intellij.usages.Usage;
-import com.intellij.usages.UsageView;
 import com.intellij.usages.rules.UsageFilteringRule;
 import com.intellij.usages.rules.UsageFilteringRuleProvider;
 import com.lsfusion.lang.psi.LSFClassStatement;
@@ -16,23 +14,14 @@ import com.lsfusion.lang.psi.LSFOverridePropertyStatement;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class LSFUsageFilteringRuleProvider implements UsageFilteringRuleProvider {
     @NotNull
     @Override
-    public UsageFilteringRule[] getActiveRules(@NotNull Project project) {
-        List<UsageFilteringRule> rules = new ArrayList<>();
-        rules.add(new TypeUsageFilteringRule());
-
-        return rules.toArray(new UsageFilteringRule[0]);
-    }
-
-    @NotNull
-    @Override
-    public AnAction[] createFilteringActions(@NotNull UsageView view) {
-        return new AnAction[0];
+    public Collection<? extends @NotNull UsageFilteringRule> getApplicableRules(@NotNull Project project) {
+        return List.of(new TypeUsageFilteringRule());
     }
 
     class TypeUsageFilteringRule implements UsageFilteringRule {

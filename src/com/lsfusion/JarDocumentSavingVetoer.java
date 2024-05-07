@@ -26,7 +26,7 @@ public class JarDocumentSavingVetoer extends FileDocumentSynchronizationVetoer {
     }
 
     private boolean isClosing() {
-        return ApplicationManager.getApplication().isDisposeInProgress() || myOnClose() || myExitInProgress();
+        return ApplicationManager.getApplication().isDisposed() || myOnClose() || myExitInProgress();
     }
     
     // FileDocumentManagerImpl.myOnClose value

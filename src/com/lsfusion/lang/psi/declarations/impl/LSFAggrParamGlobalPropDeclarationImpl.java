@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -92,7 +93,7 @@ public abstract class LSFAggrParamGlobalPropDeclarationImpl extends LSFFullNameD
 
     @Override
     public String getPresentableText() {
-        return getDeclName() + getParamPresentableText();
+        return DumbService.getInstance(getProject()).runReadActionInSmartMode(() -> getDeclName() + getParamPresentableText());
     }
 
     @Override
@@ -117,7 +118,7 @@ public abstract class LSFAggrParamGlobalPropDeclarationImpl extends LSFFullNameD
 
     @Override
     public Icon getIcon(int flags) {
-        return LSFActionOrGlobalPropDeclarationImpl.getIcon(getPropType());
+        return DumbService.getInstance(getProject()).runReadActionInSmartMode(() -> LSFActionOrGlobalPropDeclarationImpl.getIcon(getPropType()));
     }
 
     @Override

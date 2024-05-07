@@ -3,12 +3,12 @@ package com.lsfusion.util;
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEnumerator;
 import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -264,15 +264,15 @@ public class LSFFileUtils {
     }
 
     public static Module[] getModules(Project project) {
-        return new ModulesConfigurator(project).getModules();
+        return ModuleManager.getInstance(project).getModules();
     }
 
     public static GlobalSearchScope getScope(List<String> modulesToInclude, Project project) {
         GlobalSearchScope modulesScope = null;
         if (modulesToInclude != null && !modulesToInclude.isEmpty()) {
-            ModulesConfigurator modulesConfigurator = new ModulesConfigurator(project);
+            ModuleManager moduleManager = ModuleManager.getInstance(project);
             for (String moduleToInclude : modulesToInclude) {
-                Module logics = modulesConfigurator.getModule(moduleToInclude);
+                Module logics = moduleManager.findModuleByName(moduleToInclude);
                 if (logics != null) {
                     GlobalSearchScope moduleScope = logics.getModuleWithDependenciesScope();
                     modulesScope = modulesScope == null ? moduleScope : modulesScope.uniteWith(moduleScope);

@@ -39,29 +39,29 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
 //    |	metaCodeStatement // ?
 //    |	metaCodeDeclarationStatement // ?
 
-    public static final UsageType CONSTRAINT_STATEMENT = new UsageType("CONSTRAINT statement");
-    public static final UsageType GROUP_STATEMENT = new UsageType("GROUP statement");
-    public static final UsageType OVERRIDE_PROPERTY_STATEMENT = new UsageType("OVERRIDE property statement");
-    public static final UsageType OVERRIDE_ACTION_STATEMENT = new UsageType("OVERRIDE action statement");
-    public static final UsageType CLASS_STATEMENT = new UsageType("CLASS statement");
-    public static final UsageType FOLLOWS_STATEMENT = new UsageType("FOLLOWS statement");
-    public static final UsageType WRITE_WHEN = new UsageType("WRITE WHEN statement");
-    public static final UsageType PROPERTY_DECLARATION = new UsageType("Property declaration");
-    public static final UsageType EVENT_STATEMENT = new UsageType("Event statement");
-    public static final UsageType SHOWDEP_STATEMENT = new UsageType("SHOWDEP statement");
-    public static final UsageType GLOBAL_EVENT_STATEMENT = new UsageType("Global event statement");
-    public static final UsageType ASPECT_STATEMENT = new UsageType("Aspect statement");
-    public static final UsageType TABLE_DECLARATION = new UsageType("TABLE declaration");
-    public static final UsageType LOGGABLE_STATEMENT = new UsageType("LOGGABLE statement");
-    public static final UsageType INDEX_STATEMENT = new UsageType("INDEX statement");
-    public static final UsageType FORM_STATEMENT = new UsageType("Form statement");
-    public static final UsageType DESIGN_STATEMENT = new UsageType("DESIGN statement");
-    public static final UsageType WINDOW_STATEMENT = new UsageType("WINDOW statement");
-    public static final UsageType NAVIGATOR_STATEMENT = new UsageType("NAVIGATOR statement");
-    public static final UsageType METACODE_REFERENCE = new UsageType("META reference");
-    public static final UsageType METACODE_DECLARATION = new UsageType("META declaration");
-    public static final UsageType MODULE_STATEMENT = new UsageType("Module statement");
-    public static final UsageType NEW_STATEMENT = new UsageType("NEW statement");
+    public static final UsageType CONSTRAINT_STATEMENT = new UsageType(() -> "CONSTRAINT statement");
+    public static final UsageType GROUP_STATEMENT = new UsageType(() -> "GROUP statement");
+    public static final UsageType OVERRIDE_PROPERTY_STATEMENT = new UsageType(() -> "OVERRIDE property statement");
+    public static final UsageType OVERRIDE_ACTION_STATEMENT = new UsageType(() -> "OVERRIDE action statement");
+    public static final UsageType CLASS_STATEMENT = new UsageType(() -> "CLASS statement");
+    public static final UsageType FOLLOWS_STATEMENT = new UsageType(() -> "FOLLOWS statement");
+    public static final UsageType WRITE_WHEN = new UsageType(() -> "WRITE WHEN statement");
+    public static final UsageType PROPERTY_DECLARATION = new UsageType(() -> "Property declaration");
+    public static final UsageType EVENT_STATEMENT = new UsageType(() -> "Event statement");
+    public static final UsageType SHOWDEP_STATEMENT = new UsageType(() -> "SHOWDEP statement");
+    public static final UsageType GLOBAL_EVENT_STATEMENT = new UsageType(() -> "Global event statement");
+    public static final UsageType ASPECT_STATEMENT = new UsageType(() -> "Aspect statement");
+    public static final UsageType TABLE_DECLARATION = new UsageType(() -> "TABLE declaration");
+    public static final UsageType LOGGABLE_STATEMENT = new UsageType(() -> "LOGGABLE statement");
+    public static final UsageType INDEX_STATEMENT = new UsageType(() -> "INDEX statement");
+    public static final UsageType FORM_STATEMENT = new UsageType(() -> "Form statement");
+    public static final UsageType DESIGN_STATEMENT = new UsageType(() -> "DESIGN statement");
+    public static final UsageType WINDOW_STATEMENT = new UsageType(() -> "WINDOW statement");
+    public static final UsageType NAVIGATOR_STATEMENT = new UsageType(() -> "NAVIGATOR statement");
+    public static final UsageType METACODE_REFERENCE = new UsageType(() -> "META reference");
+    public static final UsageType METACODE_DECLARATION = new UsageType(() -> "META declaration");
+    public static final UsageType MODULE_STATEMENT = new UsageType(() -> "Module statement");
+    public static final UsageType NEW_STATEMENT = new UsageType(() -> "NEW statement");
 
     @Nullable
     @Override

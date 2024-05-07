@@ -117,7 +117,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 }
             }
         };
-        ActionManager.getInstance().addTimerListener(500, timerListener);
+        ActionManager.getInstance().addTimerListener(timerListener);
         
         new Timer().schedule(new TimerTask() {
             @Override

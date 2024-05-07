@@ -16,8 +16,13 @@ public abstract class DependencySpeedSearch extends SpeedSearchBase<JGraph> {
     }
 
     @Override
-    protected Object[] getAllElements() {
-        return nodes;
+    protected int getElementCount() {
+        return nodes.length;
+    }
+
+    @Override
+    protected Object getElementAt(int viewIndex) {
+        return nodes[viewIndex];
     }
 
     @Override

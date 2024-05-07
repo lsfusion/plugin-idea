@@ -73,7 +73,7 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         TResult result = reference == null ? null : reference.get();
 
         if (result == null) {
-            RecursionGuard.StackStamp stamp = myGuard.markStack();
+            RecursionGuard.StackStamp stamp = RecursionManager.markStack();
             result = needToPreventRecursion ? (TResult) myGuard.doPreventingRecursion(Pair.create(psi, incompleteCode), true,
                     (Computable<TResult>) () -> resolver.resolve(psi, incompleteCode)) : resolver.resolve(psi, incompleteCode);
             PsiElement element = result instanceof ResolveResult ? ((ResolveResult) result).getElement() : null;
@@ -101,7 +101,7 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         }
     }
 
-    private static final Getter<Object> NULL_RESULT = new StaticGetter<>(null);
+    private static final Getter<Object> NULL_RESULT = () -> null;
 
     private static <Psi extends PsiElement, TResult> void cache(@NotNull Psi psi, @NotNull ConcurrentMap<Psi, Getter<TResult>> map, TResult result) {
         // optimization: less contention

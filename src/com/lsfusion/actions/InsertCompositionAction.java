@@ -145,7 +145,7 @@ public class InsertCompositionAction extends AnAction {
             };
 
             StructureView structureView = new LSFTreeBasedStructureViewBuilder(file, valueClass, navigationHandler).createStructureView(fileEditor, project);
-            FileStructurePopup popup = new FileStructurePopup(project, fileEditor, structureView, true);
+            FileStructurePopup popup = new FileStructurePopup(project, fileEditor, structureView.getTreeModel());
             popup.setTitle(LSFBundle.message("inser.composition.selection.popup.title"));
             popup.show();
             return;

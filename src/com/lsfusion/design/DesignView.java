@@ -117,7 +117,7 @@ public class DesignView extends JPanel implements Disposable {
                 }
             }
         };
-        ActionManager.getInstance().addTimerListener(500, timerListener);
+        ActionManager.getInstance().addTimerListener(timerListener);
     }
 
     private void checkUpdate() {
@@ -368,7 +368,7 @@ public class DesignView extends JPanel implements Disposable {
                     }
                 };
 
-                ActionManager.getInstance().addTimerListener(500, timerListener);
+                ActionManager.getInstance().addTimerListener(timerListener);
                 showForm.setEnabled(false);
             }
             PropertiesComponent.getInstance(project).setValue(LSF_PROPERTY_LIVE_FORM_DESIG_EDITING_ON, Boolean.toString(!liveFormDesignEditingEnable));

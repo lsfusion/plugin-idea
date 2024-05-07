@@ -88,7 +88,6 @@ public class LSFDebuggerRunner extends GenericDebuggerRunner {
                     sessionImpl.addExtraActions(executionResult.getActions());
                     if (executionResult instanceof DefaultExecutionResult) {
                         sessionImpl.addRestartActions(((DefaultExecutionResult) executionResult).getRestartActions());
-                        sessionImpl.addExtraStopActions(((DefaultExecutionResult) executionResult).getAdditionalStopActions());
                     }
                     return new LSFDebugProcess(session, debuggerSession);
                 }

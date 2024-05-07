@@ -151,11 +151,12 @@ public class LSFusionModuleBuilder extends JavaModuleBuilder {
 
                 //Create run configuration
                 RunManager runManager = RunManager.getInstance(project);
-                RunnerAndConfigurationSettings runConfiguration = runManager.createRunConfiguration("Run lsFusion server", LSFusionRunConfigurationType.getInstance().getConfigurationFactory());
+                RunnerAndConfigurationSettings runConfiguration = runManager.createConfiguration("Run lsFusion server", LSFusionRunConfigurationType.getInstance().getConfigurationFactory());
                 ((LSFusionRunConfiguration)runConfiguration.getConfiguration()).setModule(rootModel.getModule());
                 ((LSFusionRunConfiguration)runConfiguration.getConfiguration()).setWorkingDirectory(contentEntryPath);
                 if (runManager instanceof RunManagerEx) {
-                    runManager.addConfiguration(runConfiguration, false);
+                    runConfiguration.storeInLocalWorkspace();
+                    runManager.addConfiguration(runConfiguration);
                     runManager.setSelectedConfiguration(runConfiguration);
                 }
             }

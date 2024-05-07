@@ -14,11 +14,6 @@ public class LSFApplicationComponent implements ApplicationComponent {
         }
     }
 
-    @Override
-    public void disposeComponent() {
-
-    }
-
     @NotNull
     @Override
     public String getComponentName() {
