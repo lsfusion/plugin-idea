@@ -1685,7 +1685,7 @@ propertyCustomView ::= (CUSTOM ((renderPropertyCustomView changePropertyCustomVi
                         | NOSELECT
 
 customHeaderLiteral ::= HEADER | OPTIONS
-listViewType ::= (PIVOT <<pivotCheck>> (DEFAULT | NODEFAULT)? pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral (customHeaderLiteral propertyExpression)?) | CALENDAR
+listViewType ::= (PIVOT <<pivotCheck>> pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral (customHeaderLiteral propertyExpression)?) | CALENDAR
 
 pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS) | (CONFIG stringLiteral))*
 
