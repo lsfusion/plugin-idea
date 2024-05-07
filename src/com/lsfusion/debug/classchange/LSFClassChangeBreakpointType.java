@@ -39,7 +39,7 @@ public class LSFClassChangeBreakpointType extends XLineBreakpointTypeBase implem
     @NotNull
     @Override
     public Breakpoint createJavaBreakpoint(Project project, XBreakpoint breakpoint) {
-        return LSFClassChangeBreakpoint.create(project, breakpoint);
+        return new LSFClassChangeBreakpoint(project, breakpoint);
     }
 
     @Override

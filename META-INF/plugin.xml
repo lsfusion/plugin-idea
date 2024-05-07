@@ -13,6 +13,7 @@
             <li>defaultCompare value check</li>
             <li>Deprecated editOnSingleClick</li>
             <li>Deprecated toolTip</li>
+            <li>Fixed IllegalArgumentException with invalid breakpoints on server start</li>
         </ul>
     ]]>
     </change-notes>

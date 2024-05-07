@@ -77,7 +77,7 @@ public class LSFPropertyBreakpointType  extends XLineBreakpointTypeBase implemen
     @NotNull
     @Override
     public Breakpoint createJavaBreakpoint(Project project, XBreakpoint breakpoint) {
-        return LSFPropertyBreakpoint.create(project, breakpoint);
+        return new LSFPropertyBreakpoint(project, breakpoint);
     }
 
     @Override

@@ -14,11 +14,6 @@ public class LSFPropertyBreakpoint extends LineBreakpoint {
         super(project, breakpoint);
     }
 
-    public static LSFPropertyBreakpoint create(Project project, XBreakpoint breakpoint) {
-        LSFPropertyBreakpoint propertyBreakpoint = new LSFPropertyBreakpoint(project, breakpoint);
-        return (LSFPropertyBreakpoint)propertyBreakpoint.init();
-    }
-
     @Override
     protected Icon getDisabledIcon(boolean isMuted) {
         final Breakpoint master = DebuggerManagerEx.getInstanceEx(myProject).getBreakpointManager().findMasterBreakpoint(this);

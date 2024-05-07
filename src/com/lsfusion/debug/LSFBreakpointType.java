@@ -2,7 +2,6 @@ package com.lsfusion.debug;
 
 import com.intellij.debugger.ui.breakpoints.Breakpoint;
 import com.intellij.debugger.ui.breakpoints.JavaBreakpointType;
-import com.intellij.debugger.ui.breakpoints.LineBreakpoint;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
@@ -91,11 +90,10 @@ public class LSFBreakpointType extends XLineBreakpointTypeBase implements JavaBr
         return PsiTreeUtil.getParentOfType(psiElement, LSFClassStatement.class) != null;
     }
 
-    //createJavaBreakpoint in interface is @NotNull, but this implementation can return null, and it's ok and nothing fails.
-    @SuppressWarnings("NullableProblems")
+    @NotNull
     @Override
     public Breakpoint createJavaBreakpoint(Project project, XBreakpoint breakpoint) {
-        return LineBreakpoint.create(project, breakpoint);
+        return new LSFLineBreakpoint(project, breakpoint);
     }
 
     @Nullable
