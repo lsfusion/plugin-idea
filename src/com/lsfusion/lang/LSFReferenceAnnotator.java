@@ -55,6 +55,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
+import static java.lang.String.format;
 
 public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final String ACTION_FQN = "lsfusion.server.logics.action.Action";
@@ -1371,12 +1372,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
+    public static List<String> supportedMapTileProviders = Arrays.asList("openStreetMap", "google", "yandex");
     @Override
     public void visitMapOptions(@NotNull LSFMapOptions o) {
         super.visitMapOptions(o);
         String option = o.getFirstChild().getText();
-        if (!option.equals("'google'") && !option.equals("'yandex'")) {
-            addUnderscoredError(o, "Wrong map option definition: 'google' or 'yandex' expected");
+        if (!supportedMapTileProviders.contains(LSFStringUtils.unquote(option))) {
+            addUnderscoredError(o, format("'%s' is not supported map option definition, use on of: %s", option, supportedMapTileProviders));
         }
     }
 
