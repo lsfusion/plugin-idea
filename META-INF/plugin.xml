@@ -7,14 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.287</b><br>
+        <b>Version 1.0.288</b><br>
         <ul>
-            <li>Added 6 version of documentation. Default version of documetation is 5</li>
-            <li>defaultCompare value check</li>
-            <li>Deprecated editOnSingleClick</li>
-            <li>Deprecated toolTip</li>
-            <li>Deprecated CUSTOM OPTIONS</li>
-            <li>Fixed IllegalArgumentException with invalid breakpoints on server start</li>
+            <li>ADDED VALUE object operator</li>
         </ul>
     ]]>
     </change-notes>

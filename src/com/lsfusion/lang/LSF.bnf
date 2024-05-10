@@ -366,6 +366,7 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |   activeTabPropertyDefinition
 	    |   roundPropertyDefinition
 	    |	expressionLiteral
+	    |	objectPropertyDefinition
 {
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]
@@ -2491,6 +2492,8 @@ literal ::= commonLiteral |	(<<noIDCheck>> localizedStringLiteral) // since ther
 
 expressionLiteral ::= commonLiteral | (<<noIDCheck>> expressionStringLiteral)
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
+
+objectPropertyDefinition ::= VALUE groupObjectID
 
 private commonLiteral ::=
         ulongLiteral
