@@ -10,6 +10,7 @@
         <b>Version 1.0.288</b><br>
         <ul>
             <li>ADDED VALUE object operator</li>
+            <li>AUTOREFRESH deprecated in 5.2, removed in 6.0</li>
         </ul>
     ]]>
     </change-notes>
