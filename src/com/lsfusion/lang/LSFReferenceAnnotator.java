@@ -1272,6 +1272,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitWindowType(@NotNull LSFWindowType o) {
+        if (!o.getText().equals("NATIVE")) {
+            addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Ignore until 6.0");
+        }
+    }
+
+    @Override
     public void visitAdditiveORPE(@NotNull LSFAdditiveORPE o) {
         List<LSFAdditivePE> additivePEList = o.getAdditivePEList();
         if (additivePEList.size() > 1) {

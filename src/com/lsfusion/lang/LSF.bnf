@@ -120,7 +120,7 @@ stubStatement ::=
     EXTEND (CLASS | FORM) ID
     | CLASS (ABSTRACT | NATIVE)? COMPLEX? ID
     | (ATSIGN | ATSIGN2 | FORM | GROUP | META | DESIGN | TABLE) ID
-    | WINDOW windowType ID
+    | WINDOW windowType? ID
     {pin(".*") = 1}
 
 // Important ! after recover the rule should mandatory be pinned (matched)
@@ -2130,7 +2130,7 @@ indexStatement ::= INDEX ( ((LIKE | MATCH)? nonEmptyMappedPropertyOrSimpleExprPa
 
 windowStatement ::= windowCreateStatement | windowHideStatement {methods = [ getIcon ]}
 
-windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType windowOptions SEMI
+windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType? windowOptions SEMI
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFWindowDeclarationImpl"
     implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.declarations.LSFWindowDeclaration"
@@ -2142,6 +2142,8 @@ windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType
 
 windowHideStatement ::= HIDE WINDOW windowUsage SEMI {pin=2}
 
+//MENU, PANEL, TOOLBAR, TREE removed in 6.0
+//replace to 'NATIVE?'
 windowType ::= MENU | PANEL | TOOLBAR | TREE | NATIVE
 
 //deprecated in 5.2, removed in 6.0
