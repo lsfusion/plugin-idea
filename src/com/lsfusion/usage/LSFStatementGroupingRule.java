@@ -20,7 +20,7 @@ public class LSFStatementGroupingRule extends SingleParentUsageGroupingRule impl
     public static final LSFStatementGroupingRule INSTANCE = new LSFStatementGroupingRule();
 
     @Override
-    protected @Nullable UsageGroup getParentGroupFor(@NotNull Usage usage, UsageTarget @NotNull [] targets) {
+    protected @Nullable UsageGroup getParentGroupFor(@NotNull Usage usage, UsageTarget[] targets) {
         if (!(usage instanceof PsiElementUsage)) return null;
 
         PsiElement element = LSFPsiUtils.getStatementParent(((PsiElementUsage)usage).getElement());

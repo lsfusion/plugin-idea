@@ -20,7 +20,7 @@ import java.util.List;
 public class LSFUsageFilteringRuleProvider implements UsageFilteringRuleProvider {
     @NotNull
     @Override
-    public Collection<? extends @NotNull UsageFilteringRule> getApplicableRules(@NotNull Project project) {
+    public Collection<? extends UsageFilteringRule> getApplicableRules(@NotNull Project project) {
         return List.of(new TypeUsageFilteringRule());
     }
 
