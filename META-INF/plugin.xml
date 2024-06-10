@@ -7,11 +7,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.288</b><br>
+        <b>Version 1.0.289</b><br>
         <ul>
-            <li>ADDED VALUE object operator</li>
-            <li>AUTOREFRESH deprecated in 5.2, removed in 6.0</li>
-            <li>WindowType refactoring: instead of MENU, PANEL, TOOLBAR, TREE, NATIVE now only default (former TOOLBAR) and NATIVE</li>
+            <li>MESSAGE / ASK HEADER support</li>
         </ul>
     ]]>
     </change-notes>

@@ -1050,14 +1050,14 @@ emailPropertyUsage ::= propertyUsage
     methods = [ resolveParamClasses getParamList]
 }
 
-confirmActionPropertyDefinitionBody ::= ASK propertyExpression ((paramDeclare EQUALS)? YESNO)? doInputBody
+confirmActionPropertyDefinitionBody ::= ASK propertyExpression (HEADER propertyExpression)? ((paramDeclare EQUALS)? YESNO)? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression,com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"
     methods = [inferActionParamClasses resolveClass ensureClass getDoContextModifier getDoContextInferrer getDocumentation]
 }
 
-messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression (syncTypeLiteral | LOG)*
+messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression (HEADER propertyExpression)? (syncTypeLiteral | LOG)*
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"

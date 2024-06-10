@@ -4140,11 +4140,11 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFMessageActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        return inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+        return inferExpressionParamClasses(body.getPropertyExpressionList().get(0), null).filter(params);
     }
 
     public static Inferred inferActionParamClasses(LSFConfirmActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        Inferred inputInferred = inferExpressionParamClasses(body.getPropertyExpression(), null).filter(params);
+        Inferred inputInferred = inferExpressionParamClasses(body.getPropertyExpressionList().get(0), null).filter(params);
         return inferDoInputBody(body.getDoInputBody(), inputInferred, params);
     }
 
