@@ -291,10 +291,15 @@ public class PropertyDrawView extends ComponentView {
     }
 
     @Override
+    public String getDisplaySID() {
+        return entity.propertyName != null ? entity.propertyName : getSID();
+    }
+    
+    @Override
     public String getCaption() {
         if (caption == null) {
             String entityCaption = this.entity.getCaption();
-            return entityCaption != null ? entityCaption : getSID();
+            return entityCaption != null ? entityCaption : getDisplaySID();
         } else {
             return caption;
         }

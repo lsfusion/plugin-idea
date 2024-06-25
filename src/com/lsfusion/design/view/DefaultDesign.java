@@ -1,43 +1,34 @@
-package com.lsfusion.design;
+package com.lsfusion.design.view;
 
 import com.intellij.designer.propertyTable.PropertyTable;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
-import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.tools.SimpleActionGroup;
+import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.ui.CheckboxTreeBase;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.content.Content;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
+import com.lsfusion.design.DesignInfo;
 import com.lsfusion.design.model.*;
 import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.ui.*;
-import com.lsfusion.lang.psi.LSFDesignStatement;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.lang.psi.LSFLocalSearchScope;
-import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
-import com.lsfusion.lang.psi.extend.LSFFormExtend;
-import com.lsfusion.lang.psi.impl.LSFFormStatementImpl;
 import com.lsfusion.reports.ReportUtils;
 import com.lsfusion.util.BaseUtils;
 import lsfusion.server.physics.dev.debug.DebuggerService;
@@ -47,6 +38,7 @@ import javax.swing.*;
 import javax.swing.plaf.LayerUI;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -58,28 +50,28 @@ import java.util.*;
 import static com.lsfusion.debug.DebugUtils.debugProcess;
 import static com.lsfusion.debug.DebugUtils.getDebuggerService;
 
-public class DesignView extends JPanel implements Disposable {
-    @NotNull
-    private final Project project;
-    private final ToolWindowEx toolWindow;
+public class DefaultDesign extends FormDesign {
     private ContainerView rootComponent;
     private FormEntity formEntity;
     private ComponentTreeNode rootNode;
 
-    private LSFModuleDeclaration module;
-    private LSFFormDeclaration formDeclaration;
-    private LSFLocalSearchScope localScope;
+    private DesignView.TargetForm targetForm;
 
-    public String formTitle;
     public String formCanonicalName;
 
-    private SimpleActionGroup actions = new SimpleActionGroup();
+    private DefaultActionGroup actions = new DefaultActionGroup();
 
+    private JBScrollPane mainScrollPane;
     private JLayer<?> formLayer;
     private JPanel formPanel;
     private ActionToolbar toolbar;
     private ComponentTree componentTree;
     private PropertyTable propertyTable;
+    private JBSplitter treeAndTable;
+    private JButton createReportButton;
+    private JButton editReportButton;
+    private JButton deleteReportButton;
+    
     private boolean selecting = false;
     
     private boolean highlighting = false;
@@ -89,199 +81,191 @@ public class DesignView extends JPanel implements Disposable {
     private final Map<JComponentPanel, ComponentView> widgetToComponent = new HashMap<>();
     private final Map<ComponentView, Boolean> selection = new HashMap<>();
 
-    private final MergingUpdateQueue myUpdateQueue;
     private final MergingUpdateQueue redrawQueue;
 
     private boolean firstDraw = true;
 
-    public DesignView(@NotNull Project project, final ToolWindowEx toolWindow) {
-        this.project = project;
-        this.toolWindow = toolWindow;
+    public DefaultDesign(@NotNull Project project, final ToolWindowEx toolWindow) {
+        super(project, toolWindow);
 
-        myUpdateQueue = new MergingUpdateQueue("DesignView", 150, false, toolWindow.getComponent(), this, toolWindow.getComponent(), true);
-        myUpdateQueue.setRestartTimerOnAdd(true);
-
-        redrawQueue = new MergingUpdateQueue("DesignView", 150, false, toolWindow.getComponent(), this, toolWindow.getComponent(), true);
+        redrawQueue = new MergingUpdateQueue("DesignView", 400, false, toolWindow.getComponent(), this, toolWindow.getComponent(), true);
         redrawQueue.setRestartTimerOnAdd(true);
 
-        final TimerListener timerListener = new TimerListener() {
-            @Override
-            public ModalityState getModalityState() {
-                return ModalityState.stateForComponent(toolWindow.getComponent());
-            }
+        mainPanel = new FlexPanel(true);
 
-            @Override
-            public void run() {
-                if (toolWindow.isVisible()) {
-                    checkUpdate();
-                }
-            }
-        };
-        ActionManager.getInstance().addTimerListener(timerListener);
+        treeAndTable = new JBSplitter(true);
+        if (rootComponent != null) {
+            treeAndTable.setFirstComponent(createComponentTree());
+            treeAndTable.setSecondComponent(createComponentPropertyTable());
+        }
+
+        toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true); //ActionPlaces.TOOLBAR for suppress warning in log "Please do not use ActionPlaces.UNKNOWN or the empty place. Any string unique enough to deduce the toolbar location will do."
+
+        FlexPanel leftPanel = new FlexPanel(true);
+
+        leftPanel.add(toolbar.getComponent());
+        leftPanel.add(treeAndTable, 1, FlexAlignment.STRETCH);
+
+        formPanel = new JPanel(new BorderLayout());
+
+        JBScrollPane scrollPane = new JBScrollPane(formPanel);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new JBColor(new Color(69, 160, 255), new Color(95, 123, 141))));
+        formLayer = new JLayer(scrollPane, new SelectingLayerUI());
+
+        JBSplitter formSplitter = new JBSplitter(false, 0.25f);
+        formSplitter.setFirstComponent(leftPanel);
+        formSplitter.setSecondComponent(formLayer);
+
+        toolbar.setTargetComponent(formSplitter); // for suppressing error in log as there is a check "targetComponent == null", there will be an error "toolbar by default uses any focused component to update its actions. Toolbar actions that need local UI context would be incorrectly disabled. Please call toolbar.setTargetComponent() explicitly"
+        mainPanel.add(formSplitter, new FlexConstraints(FlexAlignment.STRETCH, 1));
+        mainPanel.add(createAutoReportPanel());
+
+        mainScrollPane = new JBScrollPane(mainPanel);
     }
 
-    private void checkUpdate() {
-        if (project.isDisposed()) return;
+    @Override
+    public JComponent getComponent() {
+        return mainScrollPane;
+    }
 
-        final Component owner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-        final boolean insideToolwindow = SwingUtilities.isDescendingFrom(toolWindow.getComponent(), owner);
-        if (insideToolwindow || JBPopupFactory.getInstance().isPopupActive()) {
+    public void scheduleRebuild(PsiElement element, PsiFile file) {
+        if (element == null || file == null || !DesignViewFactory.getInstance().windowIsVisible() || PsiDocumentManager.getInstance(project).getDocument(file) == null || DumbService.isDumb(project)) {
             return;
         }
 
-        final DataContext dataContext = DataManager.getInstance().getDataContext(owner);
-        if (CommonDataKeys.PROJECT.getData(dataContext) != project) return;
+        // as this event is called before commitTransaction, modificationStamp and unsavedDocument have not been updated, so the indexes cannot be accessed
+        try {
+            Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 
-        final VirtualFile[] files = hasFocus() ? null : CommonDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
+            if (editor != null) {
+                DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
+                new Task.Backgroundable(project, "Reading form") {
+                    PsiElement targetElement;
+                    DesignView.TargetForm targetForm;
 
-        if (files != null && files.length == 1) {
-            changeForm(files[0], dataContext);
+                    @Override
+                    public void onSuccess() {
+                        if (targetForm != null && targetForm.module != null && targetForm.form != null) {
+                            scheduleRebuild(targetForm);
+                        }
+                    }
+
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        targetElement = DumbService.getInstance(project).runReadActionInSmartMode(() -> ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN).getPsiLocation());
+                        targetForm = DesignView.getTargetForm(project, targetElement);
+                    }
+                }.queue();
+            }
+        } catch (PsiInvalidElementAccessException ignored) {
         }
     }
 
-    private void changeForm(VirtualFile file, DataContext dataContext) {
-        if (file == null) {
-            return;
-        }
+    public void scheduleRebuild(DesignView.TargetForm targetForm) {
+        scheduleRebuild("rebuildDefault", targetForm.file, formWithName -> {
+            if (targetForm.form.isValid()) {
+                DefaultDesign.this.targetForm = targetForm;
 
-        PsiElement targetElement = ConfigurationContext.getFromContext(dataContext).getPsiLocation();
-
-        if (targetElement != null) {
-            LSFFormDeclaration formDeclaration = null;
-            LSFLocalSearchScope localScope = null;
-            LSFFormExtend formExtend = PsiTreeUtil.getParentOfType(targetElement, LSFFormExtend.class);
-            if (formExtend != null) {
-                localScope = LSFLocalSearchScope.createFrom(formExtend);
-                formDeclaration = DumbService.getInstance(project).runReadActionInSmartMode(((LSFFormStatementImpl) formExtend)::resolveFormDecl);
-            } else {
-                LSFDesignStatement designStatement = PsiTreeUtil.getParentOfType(targetElement, LSFDesignStatement.class);
-                if (designStatement != null) {
-                    localScope = LSFLocalSearchScope.createFrom(designStatement);
-                    formDeclaration = DumbService.getInstance(project).runReadActionInSmartMode(designStatement::resolveFormDecl);
-                }
-            }
-
-            LSFModuleDeclaration module = null;
-            String formName = formDeclaration != null ? formDeclaration.getDeclName() : null;
-
-            PsiFile containingFile = targetElement.getContainingFile();
-            if (containingFile instanceof LSFFile) {
-                module = ((LSFFile) containingFile).getModuleDeclaration();
-            }
-
-            if (formName != null && module != null) {
-                if (formDeclaration != this.formDeclaration || module != this.module || !BaseUtils.nullEquals(localScope, this.localScope)) {
-                    scheduleRebuild(module, formDeclaration, localScope);
-                }
-            }
-        }
-    }
-
-    public void scheduleRebuild(final LSFModuleDeclaration module, final LSFFormDeclaration formDeclaration, LSFLocalSearchScope localScope) {
-        myUpdateQueue.queue(new Update("rebuild") {
-            @Override
-            public void run() {
-                if (!project.isDisposed() && formDeclaration.isValid()) {
-                    update(module, formDeclaration, localScope);
-                }
+                layoutDesign(targetForm);
             }
         });
-    }         
-    
+    }
+
     public void scheduleRedraw() {
-        redrawQueue.queue(new Update("redraw") {
+        redrawQueue.queue(new Update("redrawDefault") {
             @Override
             public void run() {
                 if (!project.isDisposed()) {
-                    redrawForm();
+                    redrawComponents();
                 }
             }
         });
     }
 
-    public void update(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration, LSFLocalSearchScope localScope) {
-        this.module = module;
-        this.formDeclaration = formDeclaration;
-        this.localScope = localScope;
+    private void layoutDesign(DesignView.TargetForm targetForm) {
+        DesignInfo designInfo = DumbService.getInstance(project).runReadActionInSmartMode(() -> new DesignInfo(targetForm.form, targetForm.file, targetForm.localScope));
 
-        Content content = toolWindow.getContentManager().getContent(this);
-        if (content != null) {
-            content.setDisplayName(formDeclaration.getDeclName());
-        }
-        
-        layoutDesign(module, formDeclaration, localScope);
-    }
+        ApplicationManager.getApplication().invokeLater(() -> {
+            rootComponent = designInfo.formView.mainContainer;
+            formEntity = designInfo.formView.entity;
+            formCanonicalName = targetForm.form.getCanonicalName();
 
-    private void layoutDesign(LSFModuleDeclaration module, LSFFormDeclaration formDeclaration, LSFLocalSearchScope localScope) {
-        DesignInfo designInfo = new DesignInfo(formDeclaration, module.getLSFFile(), localScope);
+            treeAndTable.setFirstComponent(createComponentTree());
+            treeAndTable.setSecondComponent(createComponentPropertyTable());
+            redrawComponents();
 
-        removeAll();
-        rootComponent = designInfo.formView.mainContainer;
-        formEntity = designInfo.formView.entity;
-        formTitle = designInfo.getFormCaption();
-        formCanonicalName = formDeclaration.getCanonicalName();
-        createLayout();
-
-        if (firstDraw) {
-            initUiHandlers();
-            firstDraw = false;
-        } else {
-            initListeners();
-        }
+            if (firstDraw) {
+                initUiHandlers();
+                firstDraw = false;
+            } else {
+                initListeners();
+            }
+        });
     }
 
     private void initUiHandlers() {
         actions.add(new ToggleAction(null, "Show expert properties", LSFIcons.Design.EXPERT_PROPS) {
             @Override
-            public boolean isSelected(AnActionEvent e) {
+            public boolean isSelected(@NotNull AnActionEvent e) {
                 return propertyTable.isShowExpertProperties();
             }
 
             @Override
-            public void setSelected(AnActionEvent e, boolean state) {
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 propertyTable.showExpert(state);
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         });
 
         actions.add(new ToggleAction(null, "Select component", LSFIcons.Design.FIND) {
             @Override
-            public boolean isSelected(AnActionEvent e) {
+            public boolean isSelected(@NotNull AnActionEvent e) {
                 return selecting;
             }
 
             @Override
-            public void setSelected(AnActionEvent e, boolean state) {
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 selecting = state;
             }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
-        
+
         actions.add(new ToggleAction(null, "Highlight selected components", LSFIcons.Design.HIGHLIGHT) {
             @Override
-            public boolean isSelected(AnActionEvent e) {
+            public boolean isSelected(@NotNull AnActionEvent e) {
                 return highlighting;
             }
 
             @Override
-            public void setSelected(AnActionEvent e, boolean state) {
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 highlighting = state;
-                repaint();
+                mainPanel.repaint();
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         });
 
         actions.add(new AnAction(null, "Refresh", LSFIcons.Design.REFRESH) {
             @Override
-            public void actionPerformed(AnActionEvent e) {
-                refresh();
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                layoutDesign(targetForm);
             }
         });
 
         toolbar.updateActionsImmediately();
 
         initListeners();
-    }
-
-    private void refresh() {
-        layoutDesign(module, formDeclaration, localScope);
     }
 
     private void initListeners() {
@@ -301,7 +285,7 @@ public class DesignView extends JPanel implements Disposable {
 
             propertyTable.update(selectedComps, propertyTable.getSelectionProperty());
             if (highlighting) {
-                repaint();
+                mainPanel.repaint();
             }
         });
 
@@ -314,93 +298,16 @@ public class DesignView extends JPanel implements Disposable {
 
             @Override
             public void nodeChecked(ComponentTreeNode node, boolean checked) {
-                redrawForm();
+                redrawComponents();
             }
         });
     }
 
-    private static final String LSF_PROPERTY_LIVE_FORM_DESIG_EDITING_ON = "lsfusion.property.live.form.design.editing.on";
-    private TimerListener timerListener;
-    private FlexPanel liveFormDesignViewPanel;
-    public static boolean isLiveFormDesignEditingEnable(Project project) {
-        return project != null && PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_LIVE_FORM_DESIG_EDITING_ON, false);
-    }
-
-    private FlexPanel createLiveFormDesignViewPanel() {
-        JButton showForm = new JButton("Show form");
-        showForm.setMnemonic('D');
-        showForm.setToolTipText("Click or press Alt+D");
-        showForm.addActionListener(e -> {
-            Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-            if (selectedTextEditor != null) {
-                PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(selectedTextEditor.getDocument());
-                if (file != null) {
-                    PsiElement element = file.findElementAt(selectedTextEditor.getCaretModel().getOffset());
-                    if (element != null)
-                        FormDesignChangeDetector.showLiveDesign(project, element, file);
-                }
-            }
-        });
-
-        JCheckBox enableLiveFormDesignEditing = new JCheckBox("Enable live form design editing", isLiveFormDesignEditingEnable(project));
-        enableLiveFormDesignEditing.addActionListener(e -> {
-            boolean liveFormDesignEditingEnable = isLiveFormDesignEditingEnable(project);
-            if (liveFormDesignEditingEnable) {
-                if (timerListener != null) {
-                    ActionManager.getInstance().removeTimerListener(timerListener);
-                    timerListener = null;
-                }
-                showForm.setEnabled(true);
-            } else if (timerListener == null) {
-                timerListener = new TimerListener() {
-                    @Override
-                    public ModalityState getModalityState() {
-                        return ModalityState.defaultModalityState();
-                    }
-
-                    @Override
-                    public void run() {
-                        PsiElement element = ConfigurationContext.getFromContext(DataManager.getInstance()
-                                .getDataContext(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner())).getPsiLocation();
-
-                        if (element != null)
-                            FormDesignChangeDetector.showLiveDesign(project, element, element.getContainingFile());
-                    }
-                };
-
-                ActionManager.getInstance().addTimerListener(timerListener);
-                showForm.setEnabled(false);
-            }
-            PropertiesComponent.getInstance(project).setValue(LSF_PROPERTY_LIVE_FORM_DESIG_EDITING_ON, Boolean.toString(!liveFormDesignEditingEnable));
-        });
-
-        FlexPanel flexPanel = new FlexPanel(false);
-        flexPanel.add(enableLiveFormDesignEditing, FlexAlignment.CENTER);
-        flexPanel.add(showForm);
-        flexPanel.setBorder(BorderFactory.createLineBorder(new JBColor(new Color(69, 160, 255), new Color(95, 123, 141))));
-
-        return flexPanel;
-    }
-
-    private FlexPanel createAutoReportPanel() {
-        boolean hasReportFiles = ReportUtils.hasReportFiles(formDeclaration);
-
-        JButton createReportButton = new JButton(hasReportFiles ? "Re-create" : "Create", LSFIcons.EDIT_AUTO_REPORT);
+    private JComponent createAutoReportPanel() {
+        createReportButton = new JButton("Create", LSFIcons.EDIT_AUTO_REPORT);
         createReportButton.setToolTipText("Create Default Report Design");
-        createReportButton.addActionListener(e -> {
-            if(debugProcess != null) {
-                try {
-                    createReports(hasReportFiles);
-                    refresh();
-                } catch (Exception ex) {
-                    JBPopupFactory.getInstance().createMessage("Can't create report files: " + ex.getMessage()).show(createReportButton);
-                }
-            } else {
-                JBPopupFactory.getInstance().createHtmlTextBalloonBuilder("Start server to create reports", MessageType.ERROR, null).createBalloon().showInCenterOf(createReportButton);
-            }
-        });
 
-        JButton editReportButton = new JButton("Edit", LSFIcons.EDIT_REPORT);
+        editReportButton = new JButton("Edit", LSFIcons.EDIT_REPORT);
         editReportButton.setToolTipText("Edit Report Design");
         editReportButton.addActionListener(e -> {
             try {
@@ -409,30 +316,24 @@ public class DesignView extends JPanel implements Disposable {
                 JBPopupFactory.getInstance().createMessage("Can't open report files: " + ex.getMessage()).show(editReportButton);
             }
         });
-        if (!hasReportFiles) {
-            editReportButton.setEnabled(false);
-        }
 
-        JButton deleteReportButton = new JButton("Delete", LSFIcons.DELETE_REPORT);
+        deleteReportButton = new JButton("Delete", LSFIcons.DELETE_REPORT);
         deleteReportButton.setToolTipText("Delete Report Design");
         deleteReportButton.addActionListener(e -> {
             deleteReports();
-            refresh();
+            redrawReportButtons();
         });
-        if (!hasReportFiles) {
-            deleteReportButton.setEnabled(false);
-        }
 
-        FlexPanel flexPanel = new FlexPanel(true);
-        flexPanel.add(new JLabel("Jasper Reports"));
+        FlexPanel reportsPanel = new FlexPanel(true);
+        reportsPanel.add(new JLabel("Jasper Reports"));
 
         FlexPanel buttonsPanel = new FlexPanel(false);
         buttonsPanel.add(createReportButton);
         buttonsPanel.add(editReportButton);
         buttonsPanel.add(deleteReportButton);
-        flexPanel.add(buttonsPanel);
+        reportsPanel.add(buttonsPanel);
 
-        return flexPanel;
+        return reportsPanel;
     }
 
     private void createReports(boolean hasReportFiles) throws NotBoundException, IOException {
@@ -452,7 +353,7 @@ public class DesignView extends JPanel implements Disposable {
     }
 
     private void editReports() throws IOException {
-        for (PsiFile file : ReportUtils.findReportFiles(formDeclaration)) {
+        for (PsiFile file : ReportUtils.findReportFiles(targetForm.form)) {
             String path = file.getVirtualFile().getCanonicalPath();
             if(path != null) {
                 Desktop.getDesktop().open(new File(path));
@@ -463,49 +364,13 @@ public class DesignView extends JPanel implements Disposable {
     private void deleteReports() {
         if (JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
                 "Are you sure you want to delete existing report design?", "Jasper reports", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            for (PsiFile file : ReportUtils.findReportFiles(formDeclaration)) {
+            for (PsiFile file : ReportUtils.findReportFiles(targetForm.form)) {
                 String path = file.getVirtualFile().getCanonicalPath();
                 if(path != null) {
                     new File(path).delete();
                 }
             }
         }
-    }
-
-    private void createLayout() {
-        JBSplitter treeAndTable = new JBSplitter(true);
-        treeAndTable.setFirstComponent(createComponentTree());
-        treeAndTable.setSecondComponent(createComponentPropertyTable());
-
-        toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true); //ActionPlaces.TOOLBAR for suppress warning in log "Please do not use ActionPlaces.UNKNOWN or the empty place. Any string unique enough to deduce the toolbar location will do."
-
-        FlexPanel leftPanel = new FlexPanel(true);
-
-        if(liveFormDesignViewPanel == null)
-            liveFormDesignViewPanel = createLiveFormDesignViewPanel();
-
-        leftPanel.add(liveFormDesignViewPanel);
-
-        leftPanel.add(createAutoReportPanel());
-
-        leftPanel.add(toolbar.getComponent());
-        leftPanel.add(treeAndTable, 1, FlexAlignment.STRETCH);
-
-        formPanel = new JPanel(new BorderLayout());
-
-        JBScrollPane scrollPane = new JBScrollPane(formPanel);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new JBColor(new Color(69, 160, 255), new Color(95, 123, 141))));
-        formLayer = new JLayer(scrollPane, new SelectingLayerUI());
-
-        JBSplitter formSplitter = new JBSplitter(false, 0.25f);
-        formSplitter.setFirstComponent(leftPanel);
-        formSplitter.setSecondComponent(formLayer);
-
-        redrawForm();
-
-        setLayout(new BorderLayout());
-        toolbar.setTargetComponent(formSplitter); // for suppressing error in log as there is a check "targetComponent == null", there will be an error "toolbar by default uses any focused component to update its actions. Toolbar actions that need local UI context would be incorrectly disabled. Please call toolbar.setTargetComponent() explicitly"
-        add(formSplitter);
     }
 
     private JComponent createComponentPropertyTable() {
@@ -557,7 +422,7 @@ public class DesignView extends JPanel implements Disposable {
         return true;
     }
 
-    private void redrawForm() {
+    private void redrawComponents() {
         formPanel.removeAll();
 
         JComponent rootWidget = rootComponent.createWidget(project, formEntity, selection, componentToWidget, new HashSet<>());
@@ -567,8 +432,40 @@ public class DesignView extends JPanel implements Disposable {
         if (rootWidget != null) {
             formPanel.add(rootWidget);
         }
-        revalidate();
-        repaint();
+
+        redrawReportButtons();
+
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    private void redrawReportButtons() {
+        new Task.Backgroundable(project, "Updating design components") {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                boolean hasReportFiles = DumbService.getInstance(project).runReadActionInSmartMode(() -> ReportUtils.hasReportFiles(targetForm.form));
+
+                createReportButton.setText(hasReportFiles ? "Re-create" : "Create");
+                for (ActionListener actionListener : createReportButton.getActionListeners()) {
+                    createReportButton.removeActionListener(actionListener);
+                }
+                createReportButton.addActionListener(e -> {
+                    if (debugProcess != null) {
+                        try {
+                            createReports(hasReportFiles);
+                            redrawReportButtons();
+                        } catch (Exception ex) {
+                            JBPopupFactory.getInstance().createMessage("Can't create report files: " + ex.getMessage()).show(createReportButton);
+                        }
+                    } else {
+                        JBPopupFactory.getInstance().createHtmlTextBalloonBuilder("Start server to create reports", MessageType.ERROR, null).createBalloon().showInCenterOf(createReportButton);
+                    }
+                });
+
+                editReportButton.setEnabled(hasReportFiles);
+                deleteReportButton.setEnabled(hasReportFiles);
+            }
+        }.queue();
     }
 
     private void selectInTree(ComponentView component) {
@@ -601,11 +498,6 @@ public class DesignView extends JPanel implements Disposable {
         }
 
         throw new IllegalStateException("shouldn't happen");
-    }
-
-    @Override
-    public void dispose() {
-        // ignore
     }
 
     private class SelectingLayerUI extends LayerUI {
@@ -662,7 +554,7 @@ public class DesignView extends JPanel implements Disposable {
                     case MouseEvent.MOUSE_CLICKED:
                         currentWidget = null;
                         selecting = false;
-                        repaint();
+                        mainPanel.repaint();
                         break;
                     case MouseEvent.MOUSE_ENTERED:
                     case MouseEvent.MOUSE_EXITED:
@@ -672,7 +564,7 @@ public class DesignView extends JPanel implements Disposable {
                         ComponentView component = getDeepestComponentAt(formPanel, p.x, p.y);
                         currentWidget = componentToWidget.get(component);
                         selectInTree(component);
-                        repaint();
+                        mainPanel.repaint();
                         break;
                 }
             } else if (e instanceof KeyEvent) {

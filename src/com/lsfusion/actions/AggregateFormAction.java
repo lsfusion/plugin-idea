@@ -26,7 +26,9 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
+import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.extend.LSFExtend;
+import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.DesignUtils;
@@ -85,7 +87,7 @@ public class AggregateFormAction extends AnAction {
         List<String> result = new ArrayList<>();
 
         final LSFExtend lsfExtend = PsiTreeUtil.getParentOfType(sourceElement, LSFExtend.class);
-        if (lsfExtend != null) {
+        if (lsfExtend instanceof LSFFormExtend || lsfExtend instanceof LSFDesign) {
             LSFFormDeclaration formDecl = (LSFFormDeclaration) lsfExtend.resolveDecl();
             LSFFile lsfFile = lsfExtend.getLSFFile();
 

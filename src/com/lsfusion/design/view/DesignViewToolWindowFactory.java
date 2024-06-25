@@ -1,16 +1,15 @@
-package com.lsfusion.dependencies;
+package com.lsfusion.design.view;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
-import org.jetbrains.annotations.NotNull;
 
-public class DependenciesViewToolWindowFactory implements ToolWindowFactory {
+public class DesignViewToolWindowFactory implements ToolWindowFactory {
     @Override
-    public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        DependenciesViewFactory factory = DependenciesViewFactory.getInstance();
+    public void createToolWindowContent(Project project, ToolWindow toolWindow) {
+        DesignViewFactory factory = DesignViewFactory.getInstance();
         DumbService.getInstance(project).smartInvokeLater(() -> factory.initToolWindow(project, (ToolWindowEx) toolWindow));
     }
 }

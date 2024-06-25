@@ -14,6 +14,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.LSFLineMarkerProvider;
+import com.lsfusion.design.view.DesignView;
+import com.lsfusion.design.view.DesignViewFactory;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
@@ -116,10 +118,18 @@ public class DesignPreviewLineMarkerProvider extends LSFLineMarkerProvider {
                     // переносим курсор, чтобы обновление toolWindow перестало ориентироваться на предыдущее его положение
                     editor.getCaretModel().moveToOffset(psi.getTextOffset());
                 }
+                
+                LSFFile file = null;
+                if (formExtend.getResult().getContainingFile() instanceof LSFFile) {
+                    file = (LSFFile) formExtend.getResult().getContainingFile();
+                }
 
-                DesignViewFactory.getInstance().updateView(((LSFFile) psi.getContainingFile()).getModuleDeclaration(), formDecl, LSFLocalSearchScope.createFrom(formExtend.getResult()));
+                DesignViewFactory.getInstance().updateView(new DesignView.TargetForm(formDecl, 
+                        ((LSFFile) psi.getContainingFile()).getModuleDeclaration(), 
+                        LSFLocalSearchScope.createFrom(formExtend.getResult()),
+                        file
+                ));
             }
         }
     }
-
 }

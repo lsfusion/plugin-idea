@@ -267,6 +267,10 @@ public abstract class ComponentView extends PropertiesContainer {
     private String sID;
     public ContainerView container;
 
+    public String getDisplaySID() {
+        return getSID();
+    }
+    
     public String getSID() {
         return sID;
     }

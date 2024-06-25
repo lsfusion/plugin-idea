@@ -2,7 +2,7 @@
     <id>lsfusion.idea.plugin</id>
     <name>lsFusion</name>
     <version>1.0.288</version>
-    <vendor email="info@lsfusion.org" url="http://lsfusion.org">lsFusion Foundation</vendor>
+    <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
@@ -10,6 +10,7 @@
         <b>Version 1.0.289</b><br>
         <ul>
             <li>MESSAGE / ASK HEADER support</li>
+            <li>Live Design tab in Design tool window</li>
         </ul>
     ]]>
     </change-notes>
@@ -276,13 +277,13 @@
 
         <fileDocumentSynchronizationVetoer implementation="com.lsfusion.JarDocumentSavingVetoer"/>
 
-        <toolWindow id="Design" factoryClass="com.lsfusion.design.DesignViewToolWindowFactory"
-                    anchor="right" icon="/images/lsf_logo.png"/>
+        <toolWindow id="Design" factoryClass="com.lsfusion.design.view.DesignViewToolWindowFactory"
+                    anchor="right" icon="/images/lsf_logo.png" doNotActivateOnStart="true"/>
 
         <!-- Bundled (in Ultimate) Maven Extension plugin already has tool window "Dependencies". 
         For now Idea prohibits using two windows with the same name (id). -->
         <toolWindow id="LSF Dependencies" factoryClass="com.lsfusion.dependencies.DependenciesViewToolWindowFactory"
-                    anchor="right" icon="/images/lsf_logo.png"/>
+                    anchor="right" icon="/images/lsf_logo.png" doNotActivateOnStart="true"/>
 
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.dependencies.property.PropertyComplexityLineMarkerProvider"/>

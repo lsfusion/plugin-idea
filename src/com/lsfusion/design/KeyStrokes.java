@@ -3,9 +3,18 @@ package com.lsfusion.design;
 import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.EventObject;
 
 public class KeyStrokes {
 
+    public static boolean isKeyEvent(EventObject event, int keyCode) {
+        return (event instanceof KeyEvent && ((KeyEvent) event).getKeyCode() == keyCode);
+    }
+
+    public static boolean isEnterEvent(EventObject event) {
+        return isKeyEvent(event, KeyEvent.VK_ENTER);
+    }
+    
     public static KeyStroke getEnter(int modifiers) {
         return KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, modifiers);
     }
