@@ -11,6 +11,7 @@
         <ul>
             <li>MESSAGE / ASK HEADER support</li>
             <li>Live Design tab in Design tool window</li>
+            <li>EXPORT / PRINT TOP propertyExpr support</li>
         </ul>
     ]]>
     </change-notes>
