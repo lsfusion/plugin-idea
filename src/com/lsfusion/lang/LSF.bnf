@@ -874,7 +874,7 @@ printActionPropertyDefinitionBody ::=
 	    (
 		    (
 		        MESSAGE
-		        syncTypeLiteral?
+		        (syncTypeLiteral | messageTypeLiteral)*
 		        selectTop?
 		    )
 		    |
@@ -900,6 +900,9 @@ printActionPropertyDefinitionBody ::=
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl getDocumentation]
 }
+
+messageTypeLiteral ::= LOG | INFO | SUCCESS | WARN | ERROR | DEFAULT
+
 exportActionPropertyDefinitionBody ::=
 	    EXPORT mappedForm contextFiltersClause?
         (
@@ -1057,7 +1060,7 @@ confirmActionPropertyDefinitionBody ::= ASK propertyExpression (HEADER propertyE
     methods = [inferActionParamClasses resolveClass ensureClass getDoContextModifier getDoContextInferrer getDocumentation]
 }
 
-messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression (HEADER propertyExpression)? (syncTypeLiteral | LOG)*
+messageActionPropertyDefinitionBody ::= MESSAGE propertyExpression (HEADER propertyExpression)? (syncTypeLiteral | messageTypeLiteral)*
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"

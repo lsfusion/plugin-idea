@@ -277,6 +277,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "EMAIL"                   			{ return EMAIL; }
   "EMBEDDED"                   			{ return EMBEDDED; }
   "END"                     			{ return END; }
+  "ERROR"                			    { return ERROR; }
   "ESCAPE"                			    { return ESCAPE; }
   "EVAL"                    			{ return EVAL; }
   "EVENTID"                 			{ return EVENTID; }
@@ -343,6 +344,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "IN"                      			{ return IN; }
   "INDEX"                   			{ return INDEX; }
   "INDEXED"                 			{ return INDEXED; }
+  "INFO"                    			{ return INFO; }
   "INIT"                    			{ return INIT; }
   "INLINE"                  			{ return INLINE; }
   "INPUT"                   			{ return INPUT; }
@@ -502,6 +504,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "STRUCT"                  			{ return STRUCT; }
   "SUBJECT"                 			{ return SUBJECT; }
   "SUBREPORT"              			    { return SUBREPORT; }
+  "SUCCESS"                     		{ return SUCCESS; }
   "SUM"                     			{ return SUM; }
   "TAB"                   		        { return TAB; }
   "TABBED"                  			{ return TABBED; }
@@ -531,6 +534,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "VALUE"                               { return VALUE; }
   "VERTICAL"                			{ return VERTICAL; }
   "VIEW"                    			{ return VIEW; }
+  "WARN"                    			{ return WARN; }
   "WHEN"                    			{ return WHEN; }
   "WHERE"                   			{ return WHERE; }
   "WHILE"                   			{ return WHILE; }
