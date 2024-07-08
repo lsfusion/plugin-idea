@@ -875,7 +875,7 @@ printActionPropertyDefinitionBody ::=
 		    (
 		        MESSAGE
 		        (syncTypeLiteral | messageTypeLiteral)*
-		        selectTop?
+		        selectTops?
 		    )
 		    |
 		    (
