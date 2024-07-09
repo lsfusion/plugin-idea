@@ -132,7 +132,9 @@ private inner_statement_start ::= ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE 
 ////////////////////////////////// CLASS STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-classDecl ::= CLASS (ABSTRACT | NATIVE)? COMPLEX? simpleNameWithCaption staticObjectImage?
+abstractLiteral ::= ABSTRACT
+
+classDecl ::= CLASS (abstractLiteral | NATIVE)? COMPLEX? simpleNameWithCaption staticObjectImage?
 {
      pin = 1
      mixin = "com.lsfusion.lang.psi.declarations.impl.LSFClassDeclarationImpl"
@@ -1902,7 +1904,9 @@ pivotPropertyDrawList ::= formPropertyDrawUsage | (LBRAC formPropertyDrawUsage (
 
 formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 
-predefinedAddPropertyName ::=  NEW | NEWEDIT | EDIT
+predefinedNewPropertyName ::=  NEW | NEWEDIT
+
+predefinedAddPropertyName ::=  predefinedNewPropertyName | EDIT
 
 predefinedFormPropertyName ::= VALUE
                            |    INTERVAL

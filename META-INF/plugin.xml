@@ -13,6 +13,7 @@
             <li>Live Design tab in Design tool window</li>
             <li>EXPORT / PRINT TOP propertyExpr support</li>
             <li>MESSAGE / PRINT types (levels) support</li>
+            <li>'NEW / NEWEDIT for ABSTRACT class is not supported' check</li>
         </ul>
     ]]>
     </change-notes>

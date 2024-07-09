@@ -39,6 +39,7 @@ import com.lsfusion.lang.psi.context.ExprsContextModifier;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
+import com.lsfusion.lang.psi.impl.LSFClassDeclImpl;
 import com.lsfusion.lang.psi.impl.LSFFormDeclImpl;
 import com.lsfusion.lang.psi.impl.LSFLocalPropertyDeclarationNameImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
@@ -47,6 +48,7 @@ import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -1398,5 +1400,31 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 addUnderscoredError(lastChild, "Calling '.js' or '.css' file should not have arguments");
         }
         super.visitJsStringUsage(o);
+    }
+
+    @Override
+    public void visitPredefinedNewPropertyName(@NotNull LSFPredefinedNewPropertyName o) {
+        @Nullable LSFFormMappedNamePropertiesList formMappedNamePropertiesList = PsiTreeUtil.getParentOfType(o, LSFFormMappedNamePropertiesList.class);
+        if (formMappedNamePropertiesList != null) {
+            @Nullable LSFObjectUsageList objectUsageList = formMappedNamePropertiesList.getObjectUsageList();
+            if (objectUsageList != null) {
+                LSFNonEmptyObjectUsageList nonEmptyObjectUsageList = objectUsageList.getNonEmptyObjectUsageList();
+                if (nonEmptyObjectUsageList != null) {
+                    for (LSFObjectUsage objectUsage : nonEmptyObjectUsageList.getObjectUsageList()) {
+                        @Nullable LSFClassSet classSet = objectUsage.resolveClass();
+                        if (classSet instanceof CustomClassSet) {
+                            Set<LSFClassDeclaration> classes = ((CustomClassSet) classSet).getClasses();
+                            if (classes.size() == 1) {
+                                LSFClassDeclaration cls = classes.iterator().next();
+                                if(cls instanceof LSFClassDeclImpl && ((LSFClassDeclImpl) cls).getAbstractLiteral() != null) {
+                                    addUnderscoredError(o, o.getText() + " for ABSTRACT class is not supported");
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
     }
 }
