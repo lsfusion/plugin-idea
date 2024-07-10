@@ -22,7 +22,6 @@ import com.intellij.ui.CheckboxTreeBase;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.Consumer;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
@@ -139,7 +138,7 @@ public class EmbeddedDesign extends FormDesign {
     public void onActivated() {
         if (!wasActivated) {
             wasActivated = true;
-            DesignView.openFormUnderCaretDesign(project, (Consumer<DesignView.TargetForm>) this::scheduleRebuild);
+            DesignView.openFormUnderCaretDesign(project, this::scheduleRebuild);
         }
     }
 
@@ -275,7 +274,7 @@ public class EmbeddedDesign extends FormDesign {
         actions.add(new AnAction("Update", "Update", LSFIcons.Design.REFRESH) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                DesignView.openFormUnderCaretDesign(project, (Consumer<DesignView.TargetForm>) targetForm -> scheduleRebuild(targetForm, false));
+                DesignView.openFormUnderCaretDesign(project, targetForm -> scheduleRebuild(targetForm, false));
             }
         });
 
