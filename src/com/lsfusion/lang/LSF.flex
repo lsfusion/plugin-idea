@@ -128,8 +128,8 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   {DIGITS} "." {EDIGITS}[Dd]            { return LEX_UDOUBLE_LITERAL; }
   {DIGITS} "." {EDIGITS}                { return LEX_UNUMERIC_LITERAL; }
   {DIGIT}{4} _ {DIGIT}{2} _ {DIGIT}{2}  { return LEX_DATE_LITERAL; }
-  {DIGIT}{4} _ {DIGIT}{2} _ {DIGIT}{2} _ {DIGIT}{2} : {DIGIT}{2}  { return LEX_DATETIME_LITERAL; }
-  {DIGIT}{2} : {DIGIT}{2}               { return LEX_TIME_LITERAL; }
+  {DIGIT}{4} _ {DIGIT}{2} _ {DIGIT}{2} _ {DIGIT}{2} : {DIGIT}{2} (: {DIGIT}{2})?  { return LEX_DATETIME_LITERAL; }
+  {DIGIT}{2} : {DIGIT}{2} (: {DIGIT}{2})?  { return LEX_TIME_LITERAL; }
   "#" {HEX_DIGIT}{6}                    { return LEX_COLOR_LITERAL; }
   {CODE_LITERAL}                        { return LEX_CODE_LITERAL; }
 

@@ -14,6 +14,7 @@
             <li>EXPORT / PRINT TOP propertyExpr support</li>
             <li>MESSAGE / PRINT types (levels) support</li>
             <li>'NEW / NEWEDIT for ABSTRACT class is not supported' check</li>
+            <li>Add seconds to the TIME and DATETIME literals</li>
         </ul>
     ]]>
     </change-notes>
