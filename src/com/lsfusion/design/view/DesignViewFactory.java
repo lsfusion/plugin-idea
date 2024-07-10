@@ -22,8 +22,10 @@ public class DesignViewFactory {
 
         ContentImpl content = new ContentImpl(designView, "", true);
         toolWindow.getContentManager().addContent(content);
+        
+        designView.toolWindowInitialized();
 
-        DesignView.openFormUnderCursorDesign(project, this::updateView);
+        DesignView.openFormUnderCaretDesign(project, this::updateView);
     }
 
     public boolean windowIsVisible() {

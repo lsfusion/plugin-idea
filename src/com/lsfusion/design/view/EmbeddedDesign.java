@@ -22,6 +22,7 @@ import com.intellij.ui.CheckboxTreeBase;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.Consumer;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
@@ -50,7 +51,7 @@ import java.util.*;
 import static com.lsfusion.debug.DebugUtils.debugProcess;
 import static com.lsfusion.debug.DebugUtils.getDebuggerService;
 
-public class DefaultDesign extends FormDesign {
+public class EmbeddedDesign extends FormDesign {
     private ContainerView rootComponent;
     private FormEntity formEntity;
     private ComponentTreeNode rootNode;
@@ -64,6 +65,7 @@ public class DefaultDesign extends FormDesign {
     private JBScrollPane mainScrollPane;
     private JLayer<?> formLayer;
     private JPanel formPanel;
+    private JLabel formNameLabel;
     private ActionToolbar toolbar;
     private ComponentTree componentTree;
     private PropertyTable propertyTable;
@@ -85,7 +87,7 @@ public class DefaultDesign extends FormDesign {
 
     private boolean firstDraw = true;
 
-    public DefaultDesign(@NotNull Project project, final ToolWindowEx toolWindow) {
+    public EmbeddedDesign(@NotNull Project project, final ToolWindowEx toolWindow) {
         super(project, toolWindow);
 
         redrawQueue = new MergingUpdateQueue("DesignView", 400, false, toolWindow.getComponent(), this, toolWindow.getComponent(), true);
@@ -93,16 +95,20 @@ public class DefaultDesign extends FormDesign {
 
         mainPanel = new FlexPanel(true);
 
+        formNameLabel = new JLabel();
+        formNameLabel.setBorder(BorderFactory.createEmptyBorder(5, 9, 0, 9));
+
+        toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true); //ActionPlaces.TOOLBAR for suppress warning in log "Please do not use ActionPlaces.UNKNOWN or the empty place. Any string unique enough to deduce the toolbar location will do."
+        
         treeAndTable = new JBSplitter(true);
         if (rootComponent != null) {
             treeAndTable.setFirstComponent(createComponentTree());
             treeAndTable.setSecondComponent(createComponentPropertyTable());
         }
 
-        toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actions, true); //ActionPlaces.TOOLBAR for suppress warning in log "Please do not use ActionPlaces.UNKNOWN or the empty place. Any string unique enough to deduce the toolbar location will do."
-
         FlexPanel leftPanel = new FlexPanel(true);
 
+        leftPanel.add(formNameLabel);
         leftPanel.add(toolbar.getComponent());
         leftPanel.add(treeAndTable, 1, FlexAlignment.STRETCH);
 
@@ -121,11 +127,20 @@ public class DefaultDesign extends FormDesign {
         mainPanel.add(createAutoReportPanel());
 
         mainScrollPane = new JBScrollPane(mainPanel);
+
+        initUiHandlers();
     }
 
     @Override
     public JComponent getComponent() {
         return mainScrollPane;
+    }
+    
+    public void onActivated() {
+        if (!wasActivated) {
+            wasActivated = true;
+            DesignView.openFormUnderCaretDesign(project, (Consumer<DesignView.TargetForm>) this::scheduleRebuild);
+        }
     }
 
     public void scheduleRebuild(PsiElement element, PsiFile file) {
@@ -162,9 +177,15 @@ public class DefaultDesign extends FormDesign {
     }
 
     public void scheduleRebuild(DesignView.TargetForm targetForm) {
-        scheduleRebuild("rebuildDefault", targetForm.file, formWithName -> {
+        scheduleRebuild(targetForm, true);
+    }
+
+    public void scheduleRebuild(DesignView.TargetForm targetForm, boolean checkFormEquility) {
+        scheduleRebuild("rebuildEmbedded", targetForm.file, checkFormEquility, formWithName -> {
             if (targetForm.form.isValid()) {
-                DefaultDesign.this.targetForm = targetForm;
+                EmbeddedDesign.this.targetForm = targetForm;
+                
+                formNameLabel.setText("Form: " + targetForm.form.getDeclName());
 
                 layoutDesign(targetForm);
             }
@@ -172,7 +193,7 @@ public class DefaultDesign extends FormDesign {
     }
 
     public void scheduleRedraw() {
-        redrawQueue.queue(new Update("redrawDefault") {
+        redrawQueue.queue(new Update("redrawEmbedded") {
             @Override
             public void run() {
                 if (!project.isDisposed()) {
@@ -193,26 +214,21 @@ public class DefaultDesign extends FormDesign {
             treeAndTable.setFirstComponent(createComponentTree());
             treeAndTable.setSecondComponent(createComponentPropertyTable());
             redrawComponents();
-
-            if (firstDraw) {
-                initUiHandlers();
-                firstDraw = false;
-            } else {
-                initListeners();
-            }
         });
     }
 
     private void initUiHandlers() {
-        actions.add(new ToggleAction(null, "Show expert properties", LSFIcons.Design.EXPERT_PROPS) {
+        actions.add(new ToggleAction("Show expert properties", "Show expert properties", LSFIcons.Design.EXPERT_PROPS) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
-                return propertyTable.isShowExpertProperties();
+                return propertyTable != null && propertyTable.isShowExpertProperties();
             }
 
             @Override
             public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                propertyTable.showExpert(state);
+                if (propertyTable != null) {
+                    propertyTable.showExpert(state);
+                }
             }
 
             @Override
@@ -221,7 +237,7 @@ public class DefaultDesign extends FormDesign {
             }
         });
 
-        actions.add(new ToggleAction(null, "Select component", LSFIcons.Design.FIND) {
+        actions.add(new ToggleAction("Select component", "Select component", LSFIcons.Design.FIND) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
                 return selecting;
@@ -238,7 +254,7 @@ public class DefaultDesign extends FormDesign {
             }
         });
 
-        actions.add(new ToggleAction(null, "Highlight selected components", LSFIcons.Design.HIGHLIGHT) {
+        actions.add(new ToggleAction("Highlight selected components", "Highlight selected components", LSFIcons.Design.HIGHLIGHT) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
                 return highlighting;
@@ -256,51 +272,14 @@ public class DefaultDesign extends FormDesign {
             }
         });
 
-        actions.add(new AnAction(null, "Refresh", LSFIcons.Design.REFRESH) {
+        actions.add(new AnAction("Update", "Update", LSFIcons.Design.REFRESH) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                layoutDesign(targetForm);
+                DesignView.openFormUnderCaretDesign(project, (Consumer<DesignView.TargetForm>) targetForm -> scheduleRebuild(targetForm, false));
             }
         });
 
         toolbar.updateActionsImmediately();
-
-        initListeners();
-    }
-
-    private void initListeners() {
-        componentTree.addTreeSelectionListener(e -> {
-            List<ComponentView> selectedComps = new ArrayList<>();
-            selectedComponents.clear();
-
-            for (ComponentTreeNode node : componentTree.getSelectedNodes(ComponentTreeNode.class, null)) {
-                ComponentView component = node.getComponent();
-                selectedComps.add(component);
-
-                JComponent comp = componentToWidget.get(component);
-                if (node.isChecked() && comp != null && comp.isShowing()) {
-                    selectedComponents.add(comp);
-                }
-            }
-
-            propertyTable.update(selectedComps, propertyTable.getSelectionProperty());
-            if (highlighting) {
-                mainPanel.repaint();
-            }
-        });
-
-        componentTree.setCheckedListener(new CheckedListener() {
-            @Override
-            public void onNodeStateChanged(ComponentTreeNode node) {
-                selection.put(node.getComponent(), node.isChecked());
-                scheduleRedraw();
-            }
-
-            @Override
-            public void nodeChecked(ComponentTreeNode node, boolean checked) {
-                redrawComponents();
-            }
-        });
     }
 
     private JComponent createAutoReportPanel() {
@@ -386,6 +365,40 @@ public class DefaultDesign extends FormDesign {
         componentTree = new ComponentTree(renderer, rootNode, policy);
         componentTree.setRootVisible(true);
         componentTree.expandRow(0);
+
+        componentTree.addTreeSelectionListener(e -> {
+            List<ComponentView> selectedComps = new ArrayList<>();
+            selectedComponents.clear();
+
+            for (ComponentTreeNode node : componentTree.getSelectedNodes(ComponentTreeNode.class, null)) {
+                ComponentView component = node.getComponent();
+                selectedComps.add(component);
+
+                JComponent comp = componentToWidget.get(component);
+                if (node.isChecked() && comp != null && comp.isShowing()) {
+                    selectedComponents.add(comp);
+                }
+            }
+
+            propertyTable.update(selectedComps, propertyTable.getSelectionProperty());
+            if (highlighting) {
+                mainPanel.repaint();
+            }
+        });
+
+        componentTree.setCheckedListener(new CheckedListener() {
+            @Override
+            public void onNodeStateChanged(ComponentTreeNode node) {
+                selection.put(node.getComponent(), node.isChecked());
+                scheduleRedraw();
+            }
+
+            @Override
+            public void nodeChecked(ComponentTreeNode node, boolean checked) {
+                redrawComponents();
+            }
+        });
+        
         return new JBScrollPane(componentTree);
     }
 
@@ -469,6 +482,9 @@ public class DefaultDesign extends FormDesign {
     }
 
     private void selectInTree(ComponentView component) {
+        if (componentTree == null) {
+            return;
+        }
         ComponentTreeNode[] nodes = componentTree.getSelectedNodes(ComponentTreeNode.class, null);
         if ((nodes.length == 1 && nodes[0].getComponent() == component) || component == null) {
             return;

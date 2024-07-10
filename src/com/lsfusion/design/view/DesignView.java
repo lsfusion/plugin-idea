@@ -18,7 +18,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiTreeChangeEvent;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.components.JBTabbedPane;
-import com.intellij.ui.content.Content;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFLocalSearchScope;
@@ -36,7 +35,7 @@ import java.util.function.Consumer;
 public class DesignView extends JBTabbedPane {
     private final Project project;
     private final ToolWindowEx toolWindow;
-    private DefaultDesign defaultDesign;
+    private EmbeddedDesign embeddedDesign;
     private LiveDesign liveDesign;
     private LSFFormDeclaration currentForm;
     private LSFModuleDeclaration currentModule;
@@ -44,12 +43,12 @@ public class DesignView extends JBTabbedPane {
     public DesignView(@NotNull Project project, final ToolWindowEx toolWindow) {
         this.project = project;
         this.toolWindow = toolWindow;
-        
-        defaultDesign = new DefaultDesign(project, toolWindow);
-        addTab("Default Design", defaultDesign.getComponent());
 
         liveDesign = new LiveDesign(project, toolWindow);
-        addTab("Live Design", liveDesign.getComponent());
+        addTab("Live", liveDesign.getComponent());
+        
+        embeddedDesign = new EmbeddedDesign(project, toolWindow);
+        addTab("Embedded", embeddedDesign.getComponent());
 
         ActionManager.getInstance().addTimerListener(new TimerListener() {
             @Override
@@ -66,22 +65,28 @@ public class DesignView extends JBTabbedPane {
         });
 
         addChangeListener(e -> {
-            if (getSelectedIndex() == 1) {
-                liveDesign.onActivated();
+            if (!isLiveDesignEnabled()) {
+                embeddedDesign.onActivated();
             }
         });
+    }
+    
+    public void toolWindowInitialized() {
+        if (isLiveDesignEnabled()) {
+            liveDesign.onActivated();
+        }
     }
 
     public void designCodeChanged(PsiTreeChangeEvent event) {
         PsiElement element = event.getChild();
         PsiFile file = event.getFile();
 
-        if (isLiveFormDesignEditingEnabled()) {
+        if (isLiveDesignEnabled()) {
             if (!liveDesign.isManualMode()) {
                 liveDesign.scheduleRebuild(element, file);
             }
         } else {
-            defaultDesign.scheduleRebuild(element, file);
+            embeddedDesign.scheduleRebuild(element, file);
         }
     }
 
@@ -116,7 +121,7 @@ public class DesignView extends JBTabbedPane {
                             if (targetForm.module != null &&
                                     // additional check to avoid reading the aggregate form and comparing it later
                                     (currentForm != targetForm.form || currentModule != targetForm.module)) {
-                                formUnderCursorChanged(targetForm);
+                                formUnderCaretChanged(targetForm);
                             }
                         }
                     }
@@ -170,8 +175,8 @@ public class DesignView extends JBTabbedPane {
         });
     }
     
-    private void formUnderCursorChanged(TargetForm targetForm) {
-        if (!isLiveFormDesignEditingEnabled() || !liveDesign.isManualMode()) {
+    private void formUnderCaretChanged(TargetForm targetForm) {
+        if (!isLiveDesignEnabled() || !liveDesign.isManualMode()) {
             updateView(targetForm);
         }
     }
@@ -180,23 +185,18 @@ public class DesignView extends JBTabbedPane {
         currentForm = targetForm.form;
         currentModule = targetForm.module;
         
-        Content content = toolWindow.getContentManager().getContent(0);
-        if (content != null) {
-            content.setDisplayName(targetForm.form.getDeclName());
-        }
-        
-        if (isLiveFormDesignEditingEnabled()) {
+        if (isLiveDesignEnabled()) {
             liveDesign.scheduleRebuild(targetForm.form, targetForm.file);
         } else {
-            defaultDesign.scheduleRebuild(targetForm);
+            embeddedDesign.scheduleRebuild(targetForm);
         }
     }
 
-    public boolean isLiveFormDesignEditingEnabled() {
-        return getSelectedIndex() == 1;
+    public boolean isLiveDesignEnabled() {
+        return getSelectedIndex() == 0;
     }
     
-    public static void openFormUnderCursorDesign(Project project, Consumer<TargetForm> formConsumer) {
+    public static void openFormUnderCaretDesign(Project project, Consumer<TargetForm> formConsumer) {
         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 
         if (editor != null) {

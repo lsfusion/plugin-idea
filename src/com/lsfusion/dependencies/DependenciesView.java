@@ -738,7 +738,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
         if (editor != null) {
             DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
-            return ConfigurationContext.getFromContext(dataContext).getPsiLocation();
+            return ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN).getPsiLocation();
         }
         return null;
     }

@@ -19,6 +19,7 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.rmi.RemoteException;
@@ -32,9 +33,6 @@ public class LiveDesign extends FormDesign {
     
     private JBCefBrowser browser;
     private JBTextField addressBar;
-    
-    private boolean wasActivated = false;
-    
     private boolean manualMode;
     
     public LiveDesign(@NotNull Project project, final ToolWindowEx toolWindow) {
@@ -67,14 +65,18 @@ public class LiveDesign extends FormDesign {
 
         manualMode = PropertiesComponent.getInstance().getBoolean(MANUAL_MODE_PROPERTY_KEY);
         JButton updateFormButton = new JButton("Update form");
-        updateFormButton.addActionListener(e -> DesignView.openFormUnderCursorDesign(project, targetForm -> scheduleRebuild(targetForm.form, targetForm.file)));
+        updateFormButton.addActionListener(e -> DesignView.openFormUnderCaretDesign(project, targetForm -> scheduleRebuild(targetForm.form, targetForm.file, false)));
         updateFormButton.setVisible(manualMode);
         
-        JBCheckBox manualModeCB = new JBCheckBox("Update form manually");
+        JBCheckBox manualModeCB = new JBCheckBox("Manual update");
         manualModeCB.setSelected(manualMode);
+        manualModeCB.setToolTipText("Check to stop tracking caret position and form code changes");
+        Border manualModeCBBorder = BorderFactory.createEmptyBorder(6, 0, 6, 0);
+        manualModeCB.setBorder(manualMode ? null : manualModeCBBorder);
         manualModeCB.addActionListener(e -> {
             manualMode = manualModeCB.isSelected();
             updateFormButton.setVisible(manualMode);
+            manualModeCB.setBorder(manualMode ? null : manualModeCBBorder);
             PropertiesComponent.getInstance().setValue(MANUAL_MODE_PROPERTY_KEY, manualMode);
         });
         
@@ -96,14 +98,17 @@ public class LiveDesign extends FormDesign {
             wasActivated = true;
             String latestUrl = PropertiesComponent.getInstance().getValue(LATEST_WEB_CLIENT_URL_PROPERTY_KEY);
             if (latestUrl != null) {
-                changeBrowserUrl(latestUrl);
+                final Timer timer = new Timer(700, evt -> changeBrowserUrl(latestUrl));
+                timer.setRepeats(false);
+                timer.start();
+
                 addressBar.setText(latestUrl);
             }
         }
     }
     
     private void changeBrowserUrl(String url) {
-        browser.getCefBrowser().loadURL(url);     
+        browser.getCefBrowser().loadURL(url);
         
         // we have to set background every time the url changes
         //noinspection UseJBColor
@@ -122,7 +127,7 @@ public class LiveDesign extends FormDesign {
                         "           EVAL \'run() \\{ CLOSE FORM \\'\' + openedFormId() + \'\\';\\}\';\n" +
                         "       }\n" +
                         "       APPLY {\n" +
-                        "           openedFormId() <- '" + currentFormIndexName + "';\n" +
+                        "           openedFormId(currentConnection()) <- '" + currentFormIndexName + "';\n" +
                         "       }\n" +
                         "   } CATCH { \n" +
                         "       showError() <- TRUE;\n" +
@@ -141,8 +146,12 @@ public class LiveDesign extends FormDesign {
     }
 
     public void scheduleRebuild(PsiElement element, PsiFile file) {
+        scheduleRebuild(element, file, true);
+    }
+
+    public void scheduleRebuild(PsiElement element, PsiFile file, boolean checkFormEquility) {
         if (element != null && file != null) {
-            scheduleRebuild("rebuildLive", file, formWithName -> {
+            scheduleRebuild("rebuildLive", file, checkFormEquility, formWithName -> {
                 try {
                     DebuggerService debuggerService = getDebuggerService();
 

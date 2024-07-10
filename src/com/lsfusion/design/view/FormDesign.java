@@ -38,6 +38,8 @@ public abstract class FormDesign implements Disposable {
 
     protected final MergingUpdateQueue myRebuildQueue;
 
+    protected boolean wasActivated = false;
+
     public FormDesign(Project project, ToolWindowEx toolWindow) {
         this.project = project;
         this.toolWindow = toolWindow;
@@ -58,7 +60,7 @@ public abstract class FormDesign implements Disposable {
         return null;
     }
 
-    public void scheduleRebuild(String identity, PsiFile file, Consumer<Pair<String, String>> formConsumer) {
+    public void scheduleRebuild(String identity, PsiFile file, boolean checkFormEquility, Consumer<Pair<String, String>> formConsumer) {
         myRebuildQueue.queue(new Update(identity) {
             @Override
             public void run() {
@@ -69,7 +71,7 @@ public abstract class FormDesign implements Disposable {
                             Pair<String, String> formWithName = DumbService.getInstance(project).runReadActionInSmartMode(() -> getFormWithName(file));
                             if (formWithName != null) {
                                 String currentForm = formWithName.second;
-                                if (oldForm == null || !oldForm.equals(currentForm)) {
+                                if (!checkFormEquility || (oldForm == null || !oldForm.equals(currentForm))) {
                                     oldForm = currentForm;
 
                                     formConsumer.accept(formWithName);
