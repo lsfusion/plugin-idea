@@ -403,8 +403,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 List<LSFParamDeclaration> declareParams = LSFPsiImplUtil.resolveParams(propertyDeclParams.getClassParamDeclareList());
                 Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> incorrect = expressionUnfriendlyPD.checkValueParamClasses(declareParams);
 
-                for (LSFParamDeclaration incParam : incorrect.first) {
-                    addUnderscoredError(incParam, "Not used / No implementation found");
+                //disable for formula
+                if(propertyCalcStatement.getExpressionUnfriendlyPD().getFormulaPropertyDefinition() == null) {
+                    for (LSFParamDeclaration incParam : incorrect.first) {
+                        addUnderscoredError(incParam, "Not used / No implementation found");
+                    }
                 }
 
                 for (Map.Entry<PsiElement, Pair<LSFClassSet, LSFClassSet>> incBy : incorrect.second.entrySet()) {

@@ -563,12 +563,21 @@ abstractPropertyDefinition ::= ABSTRACT ((CASE | MULTI | VALUE) abstractExclusiv
 }
 
 //first NULL is valueNull, second NULL is paramsNull
-formulaPropertyDefinition ::= FORMULA (NULL)? (builtInClassName)? formulaPropertySyntaxList (NULL)?
+formulaPropertyDefinition ::= FORMULA (NULL)? (typedIdOrStringLiteralWithCheck)? formulaPropertySyntaxList (LBRAC typedIdOrStringLiteralList RBRAC)? (NULL)?
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getDocumentation]
 }
+
+idOrStringLiteral ::=  ID | stringLiteral;
+
+typedIdOrStringLiteral ::= builtInClassName (idOrStringLiteral)?;
+typedIdOrStringLiteralWithCheck ::= builtInClassName (<<formulaPropertySyntaxCheck>> idOrStringLiteral)?;
+
+typedIdOrStringLiteralList ::= (nonEmptyTypedIdOrStringLiteralList)?;
+
+nonEmptyTypedIdOrStringLiteralList ::= typedIdOrStringLiteral (COMMA typedIdOrStringLiteral)*;
 
 formulaPropertySyntaxList ::= formulaPropertySyntax (COMMA formulaPropertySyntax)*
 

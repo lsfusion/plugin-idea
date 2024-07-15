@@ -1554,9 +1554,9 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFFormulaPropertyDefinition sourceStatement, boolean infer) {
-        LSFBuiltInClassName builtIn = sourceStatement.getBuiltInClassName();
-        if (builtIn != null)
-            return LSFExClassSet.toEx(resolve(builtIn));
+        @Nullable LSFTypedIdOrStringLiteralWithCheck typedIdOrStringLiteral = sourceStatement.getTypedIdOrStringLiteralWithCheck();
+        if (typedIdOrStringLiteral != null)
+            return LSFExClassSet.toEx(resolve(typedIdOrStringLiteral.getBuiltInClassName()));
         return null;
     }
 
@@ -1795,9 +1795,9 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFFormulaPropertyDefinition sourceStatement) {
-        LSFBuiltInClassName builtIn = sourceStatement.getBuiltInClassName();
-        if (builtIn != null) {
-            return singletonList(builtIn.getName());
+        @Nullable LSFTypedIdOrStringLiteralWithCheck typedIdOrStringLiteral = sourceStatement.getTypedIdOrStringLiteralWithCheck();
+        if (typedIdOrStringLiteral != null) {
+            return singletonList(typedIdOrStringLiteral.getBuiltInClassName().getName());
         }
         return Collections.EMPTY_LIST;
     }

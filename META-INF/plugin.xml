@@ -7,14 +7,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.289</b><br>
+        <b>Version 1.0.290</b><br>
         <ul>
-            <li>MESSAGE / ASK HEADER support</li>
-            <li>Live Design tab in Design tool window</li>
-            <li>EXPORT / PRINT TOP propertyExpr support</li>
-            <li>MESSAGE / PRINT types (levels) support</li>
-            <li>'NEW / NEWEDIT for ABSTRACT class is not supported' check</li>
-            <li>Add seconds to the TIME and DATETIME literals</li>
+            <li>Support "table values" in FORMULA operator</li>
+            <li>Support parameter names in the FORMULA operator</li>
         </ul>
     ]]>
     </change-notes>
