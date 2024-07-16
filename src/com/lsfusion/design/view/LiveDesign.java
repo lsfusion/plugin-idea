@@ -21,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.rmi.RemoteException;
 
@@ -52,16 +54,24 @@ public class LiveDesign extends FormDesign {
                 }
             }
         });
+        addressBar.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                addressBar.selectAll();
+            }
+        });
 
         mainPanel = new FlexPanel(true);
 
         JButton reloadPageButton = new JButton(LSFIcons.Design.REFRESH);
-        reloadPageButton.setToolTipText("Reload this page");
+        int reloadPageButtonPreferredSize = reloadPageButton.getPreferredSize().height;
+        reloadPageButton.setPreferredSize(new Dimension(reloadPageButtonPreferredSize, reloadPageButtonPreferredSize));
+        reloadPageButton.setToolTipText("Reload current page");
         reloadPageButton.addActionListener(e -> browser.getCefBrowser().reload());
         
-        FlexPanel urlRow = new FlexPanel(false); 
-        urlRow.add(addressBar, new FlexConstraints(FlexAlignment.CENTER, 1));
+        FlexPanel urlRow = new FlexPanel(false);
         urlRow.add(reloadPageButton);
+        urlRow.add(addressBar, new FlexConstraints(FlexAlignment.CENTER, 1));
 
         manualMode = PropertiesComponent.getInstance().getBoolean(MANUAL_MODE_PROPERTY_KEY);
         JButton updateFormButton = new JButton("Update form");
