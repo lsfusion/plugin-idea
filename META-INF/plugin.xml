@@ -1,5 +1,6 @@
 <idea-plugin>
     <id>lsfusion.idea.plugin</id>
+    <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
     <version>1.0.289</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
@@ -13,6 +14,7 @@
             <li>Support parameter names in the FORMULA operator</li>
             <li>String type length '+' fix</li>
             <li>Added mnemonics/access keys for LSF menu items</li>
+            <li>Changed 'Show Errors' action keyboard shortcut to alt+shift+E</li>
         </ul>
     ]]>
     </change-notes>
@@ -82,7 +84,7 @@
 
             <action id="Errors" class="com.lsfusion.actions.ShowErrorsAction" text="Show _Errors"
                     description="Show all current errors in all files">
-                <keyboard-shortcut first-keystroke="control alt shift E" keymap="$default"/>
+                <keyboard-shortcut first-keystroke="alt shift E" keymap="$default"/>
             </action>
 
             <separator/>
