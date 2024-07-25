@@ -11,6 +11,7 @@
         <ul>
             <li>Support "table values" in FORMULA operator</li>
             <li>Support parameter names in the FORMULA operator</li>
+            <li>String type length '+' fix</li>
         </ul>
     ]]>
     </change-notes>

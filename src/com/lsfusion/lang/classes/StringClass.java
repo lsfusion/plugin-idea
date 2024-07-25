@@ -25,7 +25,7 @@ public class StringClass extends DataClass {
         assert or || !string;
         StringClass stringClass = (StringClass) compClass;
         return new StringClass(BaseUtils.cmp(blankPadded, stringClass.blankPadded, or && !string), BaseUtils.cmp(caseInsensitive, stringClass.caseInsensitive, or),
-                length.cmp(stringClass.length, or));
+                string ? length.sum(stringClass.length) : length.cmp(stringClass.length, or));
     }
 
     @Override
