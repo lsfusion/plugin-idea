@@ -1406,28 +1406,39 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
-    public void visitPredefinedNewPropertyName(@NotNull LSFPredefinedNewPropertyName o) {
-        @Nullable LSFFormMappedNamePropertiesList formMappedNamePropertiesList = PsiTreeUtil.getParentOfType(o, LSFFormMappedNamePropertiesList.class);
-        if (formMappedNamePropertiesList != null) {
-            @Nullable LSFObjectUsageList objectUsageList = formMappedNamePropertiesList.getObjectUsageList();
-            if (objectUsageList != null) {
-                LSFNonEmptyObjectUsageList nonEmptyObjectUsageList = objectUsageList.getNonEmptyObjectUsageList();
-                if (nonEmptyObjectUsageList != null) {
-                    for (LSFObjectUsage objectUsage : nonEmptyObjectUsageList.getObjectUsageList()) {
-                        @Nullable LSFClassSet classSet = objectUsage.resolveClass();
-                        if (classSet instanceof CustomClassSet) {
-                            Set<LSFClassDeclaration> classes = ((CustomClassSet) classSet).getClasses();
-                            if (classes.size() == 1) {
-                                LSFClassDeclaration cls = classes.iterator().next();
-                                if(cls instanceof LSFClassDeclImpl && ((LSFClassDeclImpl) cls).getAbstractLiteral() != null) {
+    public void visitPredefinedFormPropertyName(@NotNull LSFPredefinedFormPropertyName o) {
+        @Nullable LSFPredefinedAddPropertyName predefinedAdd = o.getPredefinedAddPropertyName();
+        @Nullable LSFExplicitPropClass explicitPropClass = o.getExplicitPropClass();
+        if (predefinedAdd != null) {
+            if (predefinedAdd.getPredefinedNewPropertyName() != null && (explicitPropClass == null || isAbstractClass(LSFPsiImplUtil.resolveClass(explicitPropClass.getClassName())))) {
+                @Nullable LSFFormMappedNamePropertiesList formMappedNamePropertiesList = PsiTreeUtil.getParentOfType(o, LSFFormMappedNamePropertiesList.class);
+                if (formMappedNamePropertiesList != null) {
+                    @Nullable LSFObjectUsageList objectUsageList = formMappedNamePropertiesList.getObjectUsageList();
+                    if (objectUsageList != null) {
+                        LSFNonEmptyObjectUsageList nonEmptyObjectUsageList = objectUsageList.getNonEmptyObjectUsageList();
+                        if (nonEmptyObjectUsageList != null) {
+                            for (LSFObjectUsage objectUsage : nonEmptyObjectUsageList.getObjectUsageList()) {
+                                if (isAbstractClass(objectUsage.resolveClass())) {
                                     addUnderscoredError(o, o.getText() + " for ABSTRACT class is not supported");
                                 }
                             }
                         }
                     }
-
                 }
             }
         }
+    }
+
+    private boolean isAbstractClass(LSFClassSet classSet) {
+        if (classSet instanceof CustomClassSet) {
+            Set<LSFClassDeclaration> classes = ((CustomClassSet) classSet).getClasses();
+            if (classes.size() == 1) {
+                LSFClassDeclaration cls = classes.iterator().next();
+                if (cls instanceof LSFClassDeclImpl && ((LSFClassDeclImpl) cls).getAbstractLiteral() != null) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
