@@ -1362,6 +1362,28 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitInputActionPropertyDefinitionBody(@NotNull LSFInputActionPropertyDefinitionBody o) {
+        // Many if-blocks and null checks is needed to add an error in the right place
+        LSFListWhereInputProps listWhereInputProps = o.getListWhereInputProps();
+        if (listWhereInputProps != null) {
+            LSFListInputProp listInputProp = listWhereInputProps.getListInputProp();
+            if (listInputProp != null) {
+                if (listInputProp.getListActionDefinitionBody() != null) {
+                    LSFParamDeclare paramDeclare = o.getParamDeclare();
+                    if (paramDeclare != null) {
+                        LSFClassSet classSet = paramDeclare.resolveClass();
+                        if (classSet != null && !(classSet instanceof DataClass)) {
+                            LSFClassOrExpression nextSiblingOfType = PsiTreeUtil.getNextSiblingOfType(paramDeclare, LSFClassOrExpression.class);
+                            if (nextSiblingOfType != null)
+                                addUnderscoredError(paramDeclare, nextSiblingOfType.getTextRange(), "Action in LIST can only be used for built-in types");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     public void visitEditFormDeclaration(@NotNull LSFEditFormDeclaration o) {
         visitEditOrListFormDeclaration(o, o.getObjectUsage(), o.getCustomClassUsage());
     }

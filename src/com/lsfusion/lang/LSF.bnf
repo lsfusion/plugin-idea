@@ -1297,7 +1297,13 @@ requestActionPropertyDefinitionBody ::= REQUEST actionPropertyDefinitionBody DO 
 classOrExpression ::=
         (<<checkClassOrExpression>> &((customClassUsage <<matchedClass>>)?) propertyExpression <<matchedClassOrExpression>>) |
         customClassUsage
-listInputProp ::= LIST propertyExpression {pin = 1}
+
+listActionDefinitionBody ::= listActionPropertyDefinitionBody
+{
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext"
+    methods = [ getContextModifier getContextInferrer]
+}
+listInputProp ::= LIST (propertyExpression | listActionDefinitionBody) {pin = 1}
 whereInputProp ::= WHERE propertyExpression {pin = 1}
 listWhereInputProps ::= listInputProp? whereInputProp?
 {

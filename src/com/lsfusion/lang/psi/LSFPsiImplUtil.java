@@ -424,6 +424,14 @@ public class LSFPsiImplUtil {
         return ContextInferrer.EMPTY;
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFListActionDefinitionBody sourceStatement) {
+        return new ActionContextModifier(PsiTreeUtil.getParentOfType(sourceStatement, LSFListActionPropertyDefinitionBody.class));
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFListActionDefinitionBody sourceStatement) {
+        return ContextInferrer.EMPTY;
+    }
+
     public static ContextModifier getContextModifier(@NotNull LSFListWhereInputProps sourceStatement) {
         LSFInputActionPropertyDefinitionBody inputAction = PsiTreeUtil.getParentOfType(sourceStatement, LSFInputActionPropertyDefinitionBody.class);
         LSFClassSet resolveClass = inputAction.resolveClass();
@@ -431,7 +439,10 @@ public class LSFPsiImplUtil {
             List<LSFPropertyExpression> propertyExpressionList = new ArrayList<>();
             LSFListInputProp listInputProp = sourceStatement.getListInputProp();
             if(listInputProp != null) {
-                propertyExpressionList.add(listInputProp.getPropertyExpression());
+                LSFPropertyExpression propertyExpression = listInputProp.getPropertyExpression();
+                if(propertyExpression != null) {
+                    propertyExpressionList.add(propertyExpression);
+                }
             }
             LSFWhereInputProp whereInputProp = sourceStatement.getWhereInputProp();
             if(whereInputProp != null) {

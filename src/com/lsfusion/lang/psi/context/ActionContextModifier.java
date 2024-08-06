@@ -2,7 +2,6 @@ package com.lsfusion.lang.psi.context;
 
 import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.LSFListActionPropertyDefinitionBody;
-import com.lsfusion.lang.psi.LSFPropertyExpression;
 
 import java.util.Collections;
 import java.util.List;

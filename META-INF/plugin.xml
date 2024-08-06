@@ -15,6 +15,7 @@
             <li>String type length '+' fix</li>
             <li>Added mnemonics/access keys for LSF menu items</li>
             <li>Changed 'Show Errors' action keyboard shortcut to alt+shift+E</li>
+            <li>Support actions in the INPUT LIST</li>
         </ul>
     ]]>
     </change-notes>
