@@ -2,7 +2,7 @@
     <id>lsfusion.idea.plugin</id>
     <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
-    <version>1.0.289</version>
+    <version>1.0.290</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
