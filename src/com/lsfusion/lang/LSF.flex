@@ -20,6 +20,7 @@ import java.util.HashMap;
     tokenDebugNames.put(LEX_T_LOGICAL_LITERAL, "TLogical");
     tokenDebugNames.put(PRIMITIVE_TYPE, "Primitive Type");
     tokenDebugNames.put(LEX_STRING_LITERAL, "String");
+    tokenDebugNames.put(LEX_RAW_STRING_LITERAL, "Raw String");
     tokenDebugNames.put(LEX_UINT_LITERAL, "Integer");
     tokenDebugNames.put(LEX_ULONG_LITERAL, "Long");
     tokenDebugNames.put(LEX_UDOUBLE_LITERAL, "Double");
@@ -65,6 +66,7 @@ import java.util.HashMap;
 
   private boolean wasStringPart = false;
   private boolean startedWithID = false;
+  private char rawLiteralPrefixChar;
   private int depth = 0;
 %}
 
@@ -94,10 +96,14 @@ CODE_LITERAL = <\{([^{}]|[\r\n]|((\{|\})+([^{}<>]|[\r\n])))*(\{|\})?\}>
 ID_LITERAL = {FIRST_ID_LETTER} {NEXT_ID_LETTER}*
 NEXTID_LITERAL = {NEXT_ID_LETTER}+
 
+RAW_STR_LITERAL_CHAR = [^']
+RAW_STR_PREFIX_CHAR = [^a-zA-Z_0-9 \n\t'+*,=<>(\[\]{}()#]
+
 INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
 
 %state META_LITERAL
 %state STRING_LITERAL
+%state RAW_STRING_LITERAL
 %state INTERPOLATION_BLOCK
 %state MULTILINE_COMMENT
 
@@ -547,6 +553,9 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "YES"                     			{ return YES; }
   "YESNO"                     			{ return YESNO; }
 
+  ("R" | "r") {RAW_STR_PREFIX_CHAR} "'" { rawLiteralPrefixChar = yytext().charAt(yylength()-2); yybegin(RAW_STRING_LITERAL); }
+  ("R" | "r") "'" {RAW_STR_LITERAL_CHAR}* "'" { return LEX_RAW_STRING_LITERAL; }
+
   ("###" | "##")? {ID_LITERAL} "#"?     { if (yytext().charAt(yylength()-1) == '#') yypushback(1); wasStringPart = false; startedWithID = true; yybegin(META_LITERAL);}
   ("###" | "##")? {NEXTID_LITERAL} "#"? { if (yytext().charAt(yylength()-1) == '#') yypushback(1); wasStringPart = false; startedWithID = false; yybegin(META_LITERAL); }
   ("###" | "##")? "'"                   { wasStringPart = true; startedWithID = false; yybegin(STRING_LITERAL); }
@@ -600,5 +609,15 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
     }
   }
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+  <<EOF>> { yybegin(YYINITIAL); return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<RAW_STRING_LITERAL> {
+  "'" {RAW_STR_PREFIX_CHAR} {
+      if (yytext().charAt(yylength()-1) == rawLiteralPrefixChar) {
+        yybegin(YYINITIAL); return LEX_RAW_STRING_LITERAL;
+      }
+  }
+  [^] {}
   <<EOF>> { yybegin(YYINITIAL); return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

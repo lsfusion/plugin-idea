@@ -4,4 +4,6 @@ public interface LSFLocalizedStringValueLiteral extends LSFStringValueLiteral, L
     boolean needToBeLocalized();
 
     boolean isVariable();
+    
+    boolean isRawLiteral();
 }

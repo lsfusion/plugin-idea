@@ -2443,7 +2443,7 @@ metaCodeLiteral ::= metaCodeStringLiteral
                 |	LEX_COLOR_LITERAL
                 |	NULL
 
-metaCodeStringLiteral ::= LEX_STRING_LITERAL
+metaCodeStringLiteral ::= LEX_STRING_LITERAL | LEX_RAW_STRING_LITERAL
 {
     mixin="com.lsfusion.lang.psi.LSFMetacodeStringValueLiteralImpl"
     implements="com.lsfusion.lang.psi.LSFMetacodeStringValueLiteral"
@@ -2660,19 +2660,19 @@ abstractCaseAddOption ::= FIRST | LAST
 colorLiteral ::= LEX_COLOR_LITERAL | (RGB LBRAC uintLiteral COMMA uintLiteral COMMA uintLiteral RBRAC)
 
 // it's tricky here, now with ID in stringLiteral / localizedStringLiteral it's important that this rules should be after "ID" rules
-stringLiteral ::= LEX_STRING_LITERAL | ID
+stringLiteral ::= LEX_STRING_LITERAL | LEX_RAW_STRING_LITERAL | ID
 {
     mixin="com.lsfusion.lang.psi.LSFStringValueLiteralImpl"
     implements="com.lsfusion.lang.psi.LSFStringValueLiteral"
 }
 
-localizedStringLiteral ::= LEX_STRING_LITERAL | ID
+localizedStringLiteral ::= LEX_STRING_LITERAL | LEX_RAW_STRING_LITERAL | ID
 {
     mixin="com.lsfusion.lang.psi.LSFLocalizedStringValueLiteralImpl"
     implements="com.lsfusion.lang.psi.LSFLocalizedStringValueLiteral"
 }
 
-expressionStringLiteral ::= LEX_STRING_LITERAL | ID
+expressionStringLiteral ::= LEX_STRING_LITERAL | LEX_RAW_STRING_LITERAL | ID
 {
     mixin="com.lsfusion.lang.psi.LSFExpressionStringValueLiteralImpl"
     implements="com.lsfusion.lang.psi.LSFExpressionStringValueLiteral"

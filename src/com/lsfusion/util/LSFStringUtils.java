@@ -19,14 +19,14 @@ public class LSFStringUtils {
 
     public static final String INTERPOLATION_PREFIX = "${";
 
-    // removes quotes, removes escaping, transforms special \n \r \t sequences to special characters
-    public static String getSimpleLiteralValue(String literal, String unescapeCharacters) {
+    // removes quotes, removes escaping, transforms special \n \r \t sequences to special characters (optional)
+    public static String getSimpleLiteralValue(String literal, String unescapeCharacters, boolean transformSpecialSequences) {
         StringBuilder builder = new StringBuilder();
         for (int i = 1; i+1 < literal.length(); ++i) {
             char cur = literal.charAt(i);
             if (cur == '\\' && i+1 < literal.length()) {
                 char next = literal.charAt(i+1);
-                if (specialEscapeCharacters.indexOf(next) != -1) {
+                if (transformSpecialSequences && specialEscapeCharacters.indexOf(next) != -1) {
                     builder.append(toSpecialCharacter(next));
                 } else if (unescapeCharacters.indexOf(next) != -1) {
                     builder.append(next);
@@ -44,17 +44,7 @@ public class LSFStringUtils {
 
     // removes quotes, removes escaping and DO NOT transform special \n \r \t sequences to special characters
     public static String getSimpleLiteralPropertiesFileValue(String literal, String unescapeCharacters) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 1; i+1 < literal.length(); ++i) {
-            char cur = literal.charAt(i);
-            if (cur == '\\' && i+2 < literal.length() && unescapeCharacters.indexOf(literal.charAt(i+1)) != -1) {
-                builder.append(literal.charAt(i+1));
-                ++i;
-                continue;
-            }
-            builder.append(cur);
-        }
-        return builder.toString();
+        return getSimpleLiteralValue(literal, unescapeCharacters, false);
     }
 
     public static char toSpecialCharacter(char ch) {
@@ -205,5 +195,33 @@ public class LSFStringUtils {
 
     private static boolean hasBlock(@NotNull String literal, boolean isExpressionString, final StringSpecialBlockType type) {
         return specialBlockList(literal, isExpressionString).stream().anyMatch(block -> block.type == type);
+    }
+    
+    public static boolean isRawLiteral(@NotNull String literal) {
+        if (!(literal.startsWith("r") || literal.startsWith("R"))) return false;
+        int len = literal.length();
+        if (len > 2 && literal.charAt(1) == QUOTE && literal.charAt(len-1) == QUOTE)
+            return true;
+        return len > 4
+                && literal.charAt(2) == QUOTE
+                && literal.charAt(len-2) == QUOTE
+                && literal.charAt(1) == literal.charAt(len-1);
+    }
+    
+    public static String getRawLiteralValue(@NotNull String literal) {
+        assert isRawLiteral(literal);
+        return getSimpleLiteralValue(removeRawLiteralSyntax(literal), "", false);
+    }
+    
+    // returns "simple" literal
+    // r'text' -> 'text'
+    // r$'text'$ -> 'text'
+    private static String removeRawLiteralSyntax(@NotNull String literal) {
+        assert isRawLiteral(literal);
+        if (literal.charAt(1) != QUOTE) {
+            return literal.substring(2, literal.length() - 1);
+        } else {
+            return literal.substring(1);
+        }
     }
 }

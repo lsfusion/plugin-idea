@@ -16,6 +16,7 @@
             <li>Added mnemonics/access keys for LSF menu items</li>
             <li>Changed 'Show Errors' action keyboard shortcut to alt+shift+E</li>
             <li>Support actions in the INPUT LIST</li>
+            <li>Raw string literal support</li>
         </ul>
     ]]>
     </change-notes>

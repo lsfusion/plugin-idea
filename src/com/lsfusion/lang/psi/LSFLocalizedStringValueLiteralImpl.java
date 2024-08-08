@@ -7,6 +7,7 @@ import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import static com.lsfusion.lang.LSFElementGenerator.createLocalizedStringValueLiteral;
+import static com.lsfusion.util.LSFStringUtils.*;
 
 public class LSFLocalizedStringValueLiteralImpl extends LSFReferencedStringValueLiteral implements LSFLocalizedStringValueLiteral {
     public LSFLocalizedStringValueLiteralImpl(@NotNull ASTNode node) {
@@ -25,16 +26,24 @@ public class LSFLocalizedStringValueLiteralImpl extends LSFReferencedStringValue
 
     @Override
     public String getValue() {
-        return LSFStringUtils.getSimpleLiteralValue(getText(), "\\'{}$");
+        String text = getText();
+        if (isRawLiteral()) {
+            return getRawLiteralValue(text);
+        }
+        return LSFStringUtils.getSimpleLiteralValue(text, "\\'{}$", true);
     }
 
     @Override
     public String getPropertiesFileValue() {
+        assert !isRawLiteral();
         return LSFStringUtils.getSimpleLiteralPropertiesFileValue(getText(), "\\'{}$");
     }
 
     @Override
     public boolean needToBeLocalized() {
+        if (isRawLiteral()) {
+            return false;
+        }
         return LSFStringUtils.hasLocalizationBlock(getText(), false);
     }
 
@@ -42,11 +51,18 @@ public class LSFLocalizedStringValueLiteralImpl extends LSFReferencedStringValue
     public boolean isVariable() {
         return needToBeLocalized();
     }
-
+    
+    @Override
+    public boolean isRawLiteral() {
+        return LSFStringUtils.isRawLiteral(getText());
+    }
+    
     @Override
     public PsiElement handleElementRename(@NotNull String newText) throws IncorrectOperationException {
-        LSFLocalizedStringValueLiteral newLiteral = createLocalizedStringValueLiteral(getProject(), newText);
-        replace(newLiteral);
+        if (!isRawLiteral()) {
+            LSFLocalizedStringValueLiteral newLiteral = createLocalizedStringValueLiteral(getProject(), newText);
+            replace(newLiteral);
+        }
         return this;
     }
 }

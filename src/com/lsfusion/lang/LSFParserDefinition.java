@@ -34,6 +34,7 @@ public class LSFParserDefinition implements ParserDefinition {
         LEX_T_LOGICAL_LITERAL,
         PRIMITIVE_TYPE,
         LEX_STRING_LITERAL,
+        LEX_RAW_STRING_LITERAL,
         LEX_UINT_LITERAL,
         LEX_ULONG_LITERAL,
         LEX_UDOUBLE_LITERAL,

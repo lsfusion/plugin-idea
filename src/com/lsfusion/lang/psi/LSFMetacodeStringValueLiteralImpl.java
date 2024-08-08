@@ -26,13 +26,16 @@ public class LSFMetacodeStringValueLiteralImpl extends LSFReferencedStringValueL
 
     @Override
     public String getPropertiesFileValue() {
+        assert !LSFStringUtils.isRawLiteral(getText());
         return LSFStringUtils.getSimpleLiteralPropertiesFileValue(getText(), "\\'");
     }
 
     @Override
     public PsiElement handleElementRename(@NotNull String newText) throws IncorrectOperationException {
-        LSFMetacodeStringValueLiteral newLiteral = createMetacodeStringValueLiteral(getProject(), newText);
-        replace(newLiteral);
+        if (!LSFStringUtils.isRawLiteral(getText())) {
+            LSFMetacodeStringValueLiteral newLiteral = createMetacodeStringValueLiteral(getProject(), newText);
+            replace(newLiteral);
+        }
         return this;
     }
 }

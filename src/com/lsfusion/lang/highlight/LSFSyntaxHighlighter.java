@@ -22,6 +22,8 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
 public class LSFSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey KEYWORD = createTextAttributesKey("LSF_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
     private static final TextAttributesKey STRING_LITERAL = createTextAttributesKey("LSF_STRING_LITERAL", DefaultLanguageHighlighterColors.STRING);
+    private static final TextAttributesKey RAW_STRING_LITERAL = createTextAttributesKey("LSF_RAW_STRING_LITERAL", DefaultLanguageHighlighterColors.STRING);
+    
     private static final TextAttributesKey NUMBER_LITERAL = createTextAttributesKey("LSF_LITERAL", DefaultLanguageHighlighterColors.NUMBER);
     private static final TextAttributesKey COMMENT = createTextAttributesKey("LSF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
     private static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("LSF_BAD_CHARACTER", new TextAttributes(JBColor.RED, null, null, null, Font.BOLD));
@@ -29,6 +31,7 @@ public class LSFSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
     private static final TextAttributesKey[] STR_LITERAL_KEYS = new TextAttributesKey[]{STRING_LITERAL};
+    private static final TextAttributesKey[] RAW_STR_LITERAL_KEYS = new TextAttributesKey[]{RAW_STRING_LITERAL};
     private static final TextAttributesKey[] NUMBER_LITERAL_KEYS = new TextAttributesKey[]{NUMBER_LITERAL};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
@@ -61,6 +64,9 @@ public class LSFSyntaxHighlighter extends SyntaxHighlighterBase {
         if (tokenType.equals(LSFTypes.LEX_STRING_LITERAL))
             return STR_LITERAL_KEYS;
 
+        if (tokenType.equals(LSFTypes.LEX_RAW_STRING_LITERAL))
+            return RAW_STR_LITERAL_KEYS;
+ 
         if (nonStringLiterals.contains(tokenType))
             return NUMBER_LITERAL_KEYS;
             

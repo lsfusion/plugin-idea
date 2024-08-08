@@ -33,11 +33,17 @@ public class LSFExpressionStringValueLiteralImpl extends LSFLocalizedStringValue
 
     @Override
     public boolean isVariable() {
+        if (isRawLiteral()) {
+            return false;
+        }
         return LSFStringUtils.hasSpecialBlock(getText(), true);
     }
 
     @Override
     public boolean needToBeLocalized() {
+        if (isRawLiteral()) {
+            return false;
+        }
         return LSFStringUtils.hasLocalizationBlock(getText(), true);
     }
 

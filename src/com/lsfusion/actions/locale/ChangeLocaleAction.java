@@ -237,7 +237,7 @@ public class ChangeLocaleAction extends AnAction {
 
                     for (final LSFLocalizedStringValueLiteral literal : localizedStringLiterals) {
                         Runnable inlineRun = () -> {
-                            if (!literal.needToBeLocalized() && !LSFReferenceAnnotator.isInMetaUsage(literal) && isQuoted(literal.getText())) {
+                            if (!literal.needToBeLocalized() && !literal.isRawLiteral() && !LSFReferenceAnnotator.isInMetaUsage(literal) && isQuoted(literal.getText())) {
                                 String value = mapKeepingSpaces(literal.getPropertiesFileValue(), literalsMap);
                                 if (value != null) {
                                     literal.replace(createLocalizedStringValueLiteral(literal.getProject(), value));
@@ -251,7 +251,7 @@ public class ChangeLocaleAction extends AnAction {
 
                     for (final LSFMetacodeStringValueLiteral literal : metacodeStringLiterals) {
                         Runnable inlineRun = () -> {
-                            if (!LSFReferenceAnnotator.isInMetaUsage(literal) && isQuoted(literal.getText())) {
+                            if (!isRawLiteral(literal.getText()) && !LSFReferenceAnnotator.isInMetaUsage(literal) && isQuoted(literal.getText())) {
                                 String value = mapKeepingSpaces(literal.getPropertiesFileValue(), literalsMap);
                                 if (value != null) {
                                     literal.replace(createMetacodeStringValueLiteral(literal.getProject(), value));

@@ -674,22 +674,28 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     public void visitStringValueLiteral(@NotNull LSFStringValueLiteral o) {
         super.visitStringValueLiteral(o);
-        checkEscapeSequences(o, "nrt'\\");
+        if (!LSFStringUtils.isRawLiteral(o.getText())) {
+            checkEscapeSequences(o, "nrt'\\");
+        }
     }
 
     public void visitLocalizedStringValueLiteral(@NotNull LSFLocalizedStringValueLiteral o) {
         super.visitLocalizedStringValueLiteral(o);
-        checkEscapeSequences(o, "nrt'\\{}$");
-        checkBracesConsistency(o);
-
-        if (!o.needToBeLocalized()) {
-            addLocalizationWarnings(o, o);
+        if (!o.isRawLiteral()) {
+            checkEscapeSequences(o, "nrt'\\{}$");
+            checkBracesConsistency(o);
+            
+            if (!o.needToBeLocalized()) {
+                addLocalizationWarnings(o, o);
+            }
         }
     }
 
     public void visitMetacodeStringValueLiteral(@NotNull LSFMetacodeStringValueLiteral o) {
         visitStringValueLiteral(o);
-        addLocalizationWarnings(o, o);
+        if (!LSFStringUtils.isRawLiteral(o.getText())) {
+            addLocalizationWarnings(o, o);
+        }
     }
 
     private void addLocalizationWarnings(PsiElement element, LSFPropertiesFileValueGetter o) {
