@@ -8,15 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.290</b><br>
+        <b>Version 1.0.291</b><br>
         <ul>
-            <li>Support "table values" in FORMULA operator</li>
-            <li>Support parameter names in the FORMULA operator</li>
-            <li>String type length '+' fix</li>
-            <li>Added mnemonics/access keys for LSF menu items</li>
-            <li>Changed 'Show Errors' action keyboard shortcut to alt+shift+E</li>
-            <li>Support actions in the INPUT LIST</li>
-            <li>Raw string literal support</li>
+            <li>VIDEOFILE / VIDEOLINK support</li>
         </ul>
     ]]>
     </change-notes>
