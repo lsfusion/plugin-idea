@@ -80,7 +80,13 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("toolTip").setExpert(), //deprecated
             new ReflectionProperty("tooltip"),
             new ReflectionProperty("valueTooltip"),
-            new ReflectionProperty("valueAlignment"),
+            new ReflectionProperty("valueAlignment"), //deprecated
+            new ReflectionProperty("valueAlignmentHorz").setExpert(),
+            new ReflectionProperty("valueAlignmentVert").setExpert(),
+            new ReflectionProperty("valueOverflowHorz").setExpert(),
+            new ReflectionProperty("valueOverflowVert").setExpert(),
+            new ReflectionProperty("valueShrinkHorz").setExpert(),
+            new ReflectionProperty("valueShrinkVert").setExpert(),
             new ReflectionProperty("clearText").setExpert(),
             new ReflectionProperty("notSelectAll").setExpert(),
             new ReflectionProperty("askConfirm").setExpert(),
@@ -156,7 +162,13 @@ public class PropertyDrawView extends ComponentView {
     public String tooltip;
     public String valueTooltip;
 
-    public FlexAlignment valueAlignment;
+    public FlexAlignment valueAlignmentHorz;
+    public FlexAlignment valueAlignmentVert;
+    public String valueOverflowHorz;
+    public String valueOverflowVert;
+    public boolean valueShrinkHorz;
+    public boolean valueShrinkVert;
+
     public boolean clearText;
     public boolean notSelectAll;
 
@@ -353,7 +365,7 @@ public class PropertyDrawView extends ComponentView {
 
     @SuppressWarnings("unused")
     public FlexAlignment getValueAlignment() {
-        return valueAlignment;
+        return valueAlignmentHorz;
     }
 
     @SuppressWarnings("unused")

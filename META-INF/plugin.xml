@@ -12,6 +12,8 @@
         <ul>
             <li>VIDEOFILE / VIDEOLINK support</li>
             <li>DESIGN: overflowHorz, overflowVert for component</li>
+            <li>DESIGN: valueAlignment is deprecated</li>
+            <li>DESIGN: valueAlignmentHorz, valueAlignmentVert, valueOverflowHorz, valueOverflowVert, valueShrinkHorz, valueShrinkVert for propertyDraw</li>
         </ul>
     ]]>
     </change-notes>
