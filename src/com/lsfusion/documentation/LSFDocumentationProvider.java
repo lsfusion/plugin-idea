@@ -34,7 +34,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
 
     static {
         documentationVersionMap.put("Version 4", "v4/");
-        documentationVersionMap.put("Version 5", "v5");
+        documentationVersionMap.put("Version 5", "v5/");
         documentationVersionMap.put("Version 6", "");
 
         documentationLanguageMap.put("en", "");
