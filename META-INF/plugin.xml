@@ -11,6 +11,7 @@
         <b>Version 1.0.291</b><br>
         <ul>
             <li>VIDEOFILE / VIDEOLINK support</li>
+            <li>DESIGN: overflowHorz, overflowVert for component</li>
         </ul>
     ]]>
     </change-notes>

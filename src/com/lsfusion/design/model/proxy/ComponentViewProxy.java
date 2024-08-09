@@ -75,6 +75,14 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         target.alignCaption = alignCaption;
     }
 
+    public void setOverflowHorz(String overflowHorz) {
+        target.overflowHorz = overflowHorz;
+    }
+
+    public void setOverflowVert(String overflowVert) {
+        target.overflowVert = overflowVert;
+    }
+
     public void setMarginTop(int marginTop) {
         target.setMarginTop(marginTop);
     }

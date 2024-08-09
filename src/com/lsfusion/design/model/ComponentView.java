@@ -39,6 +39,8 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("align").setExpert(),
             new ReflectionProperty("alignment"),
             new ReflectionProperty("alignCaption"),
+            new ReflectionProperty("overflowHorz").setExpert(),
+            new ReflectionProperty("overflowVert").setExpert(),
             new ReflectionProperty("marginTop").setExpert(),
             new ReflectionProperty("marginBottom").setExpert(),
             new ReflectionProperty("marginLeft").setExpert(),
@@ -77,6 +79,9 @@ public abstract class ComponentView extends PropertiesContainer {
     public FlexAlignment alignment;
 
     public boolean alignCaption;
+
+    public String overflowHorz;
+    public String overflowVert;
 
     public int marginTop;
     public int marginBottom;
