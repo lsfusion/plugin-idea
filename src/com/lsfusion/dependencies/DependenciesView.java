@@ -351,6 +351,12 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         }
 
         scrollPane = new JBScrollPane(jgraph);
+        scrollPane.addMouseWheelListener(e -> {
+            if (e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK) {
+                zoom(e.getWheelRotation());
+            }
+        });
+
         add(scrollPane);
 
         initGraphDesign();
@@ -403,12 +409,6 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 if (e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK && e.getKeyCode() == KeyEvent.VK_0) {
                     zoom(0);
                 }
-            }
-        });
-
-        jgraph.addMouseWheelListener(e -> {
-            if (e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK) {
-                zoom(e.getWheelRotation());
             }
         });
 
