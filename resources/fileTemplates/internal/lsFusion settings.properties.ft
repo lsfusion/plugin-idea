@@ -4,7 +4,7 @@ db.server=${DB_SERVER}
 db.name=${DB_NAME}
 # database username
 db.user=${DB_USER}
-# dtabase password
+# database password
 db.password=${DB_PASSWORD}
 
 # lsfusion server port
