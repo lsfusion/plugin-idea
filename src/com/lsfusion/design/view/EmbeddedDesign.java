@@ -217,7 +217,7 @@ public class EmbeddedDesign extends FormDesign {
     }
 
     private void initUiHandlers() {
-        actions.add(new ToggleAction("Show expert properties", "Show expert properties", LSFIcons.Design.EXPERT_PROPS) {
+        actions.add(new LSFToggleAction("Show expert properties", "Show expert properties", LSFIcons.Design.EXPERT_PROPS) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
                 return propertyTable != null && propertyTable.isShowExpertProperties();
@@ -229,14 +229,9 @@ public class EmbeddedDesign extends FormDesign {
                     propertyTable.showExpert(state);
                 }
             }
-
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
         });
 
-        actions.add(new ToggleAction("Select component", "Select component", LSFIcons.Design.FIND) {
+        actions.add(new LSFToggleAction("Select component", "Select component", LSFIcons.Design.FIND) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
                 return selecting;
@@ -246,14 +241,9 @@ public class EmbeddedDesign extends FormDesign {
             public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 selecting = state;
             }
-
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
         });
 
-        actions.add(new ToggleAction("Highlight selected components", "Highlight selected components", LSFIcons.Design.HIGHLIGHT) {
+        actions.add(new LSFToggleAction("Highlight selected components", "Highlight selected components", LSFIcons.Design.HIGHLIGHT) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
                 return highlighting;
@@ -263,11 +253,6 @@ public class EmbeddedDesign extends FormDesign {
             public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 highlighting = state;
                 mainPanel.repaint();
-            }
-
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
             }
         });
 

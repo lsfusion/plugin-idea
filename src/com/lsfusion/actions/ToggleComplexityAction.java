@@ -1,9 +1,7 @@
 package com.lsfusion.actions;
 
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.editor.impl.EditorImpl;
@@ -11,11 +9,11 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.util.LocalTimeCounter;
-import org.jetbrains.annotations.NotNull;
+import com.lsfusion.design.ui.LSFToggleAction;
 
 import java.util.Collections;
 
-public class ToggleComplexityAction extends ToggleAction {
+public class ToggleComplexityAction extends LSFToggleAction {
     public static final String LSF_PROPERTY_COMPLEXITY_ON = "lsfusion.property.complexity.on";
 
     @Override
@@ -43,10 +41,5 @@ public class ToggleComplexityAction extends ToggleAction {
 
     public static void setComplexityEnabled(Project project, boolean enabled) {
         PropertiesComponent.getInstance(project).setValue(LSF_PROPERTY_COMPLEXITY_ON, Boolean.toString(enabled));
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
     }
 }

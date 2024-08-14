@@ -10,10 +10,10 @@ import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.SourceComparator;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.lsfusion.design.ui.LSFToggleAction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
@@ -49,7 +49,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
 
     @Override
     protected void prependActions(@NotNull DefaultActionGroup actionGroup) {
-        actionGroup.add(new ToggleAction("Sort by Usage Type", "Sort by Usage Type", AllIcons.General.Filter) {
+        actionGroup.add(new LSFToggleAction("Sort by Usage Type", "Sort by Usage Type", AllIcons.General.Filter) {
             @Override
             public boolean isSelected(AnActionEvent e) {
                 return sortByType;

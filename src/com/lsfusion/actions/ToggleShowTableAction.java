@@ -2,7 +2,6 @@ package com.lsfusion.actions;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.editor.impl.EditorImpl;
@@ -10,10 +9,11 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.util.LocalTimeCounter;
+import com.lsfusion.design.ui.LSFToggleAction;
 
 import java.util.Collections;
 
-public class ToggleShowTableAction extends ToggleAction {
+public class ToggleShowTableAction extends LSFToggleAction {
     public static final String LSF_PROPERTY_SHOW_TABLE_ON = "lsfusion.property.show.table.on";
 
     @Override

@@ -1,10 +1,10 @@
 package com.lsfusion.actions.folding;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.Project;
+import com.lsfusion.design.ui.LSFToggleAction;
 
-public class ShowAllPropertyFoldingAction extends ToggleAction {
+public class ShowAllPropertyFoldingAction extends LSFToggleAction {
     @Override
     public boolean isSelected(AnActionEvent e) {
         return PropertyFoldingManager.isAll(getEventProject(e));
