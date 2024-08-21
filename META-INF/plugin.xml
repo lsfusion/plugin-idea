@@ -12,6 +12,7 @@
         <ul>
             <li>SHOWIF for NAVIGATOR element support</li>
             <li>EXTERNAL HTTP NOENCODE option</li>
+            <li>EXTERNAL HTTP: options can be in any order</li>
         </ul>
     ]]>
     </change-notes>
