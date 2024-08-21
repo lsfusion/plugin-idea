@@ -11,6 +11,7 @@
         <b>Version 1.0.292</b><br>
         <ul>
             <li>SHOWIF for NAVIGATOR element support</li>
+            <li>EXTERNAL HTTP NOENCODE option</li>
         </ul>
     ]]>
     </change-notes>

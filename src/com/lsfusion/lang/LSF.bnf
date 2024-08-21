@@ -1020,7 +1020,7 @@ private externalType ::=  SQL propertyExpression EXEC propertyExpression
               |   HTTP (CLIENT)? (DELETE| GET | PATCH | POST | PUT)? propertyExpression (BODYURL propertyExpression)?
                     (BODYPARAMNAMES propertyExpression (COMMA propertyExpression)*)?
                     (BODYPARAMHEADERS headersPropertyUsage (COMMA headersPropertyUsage)*)?
-                    (HEADERS headersPropertyUsage)? (COOKIES headersPropertyUsage)? (HEADERSTO headersPropertyUsage)? (COOKIESTO headersPropertyUsage)?
+                    (HEADERS headersPropertyUsage)? (COOKIES headersPropertyUsage)? (HEADERSTO headersPropertyUsage)? (COOKIESTO headersPropertyUsage)? (NOENCODE)?
               |   DBF propertyExpression APPEND (CHARSET stringLiteral)?
               |   LSF propertyExpression (EXEC | (EVAL (ACTION)?)) propertyExpression
               |   JAVA propertyExpression

@@ -411,6 +411,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NOFLEX"                			    { return NOFLEX; }
   "NOCHANGE"                			{ return NOCHANGE; }
   "NOCONSTRAINTFILTER"                  { return NOCONSTRAINTFILTER; }
+  "NOENCODE"                            { return NOENCODE; }
   "NOIMAGE"                			    { return NOIMAGE; }
   "NOINLINE"                			{ return NOINLINE; }
   "NOHEADER"                			{ return NOHEADER; }
