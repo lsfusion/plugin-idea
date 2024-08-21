@@ -2287,6 +2287,7 @@ navigatorElementOptions ::= (	(WINDOW windowUsage PARENT?)
                             |	((IMAGE (propertyExpression | stringLiteral)?) | NOIMAGE)
                             |   CLASS propertyExpression
                             |	HEADER propertyExpression
+                            |	SHOWIF propertyExpression
                             )*
 
 navigatorElementInsertPosition ::=	(   insertRelativePositionLiteral navigatorElementSelector
