@@ -15,6 +15,7 @@
             <li>DESIGN: valueAlignment is deprecated</li>
             <li>DESIGN: valueAlignmentHorz, valueAlignmentVert, valueOverflowHorz, valueOverflowVert, valueShrinkHorz, valueShrinkVert for propertyDraw</li>
             <li>Mouse wheel scroll in 'LSF Dependencies' tab</li>
+            <li>Set, Get and Clear FILTERGROUP and FILTER PROPERTY programmatically</li>
         </ul>
     ]]>
     </change-notes>

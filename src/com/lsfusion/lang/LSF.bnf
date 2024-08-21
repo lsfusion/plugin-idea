@@ -774,6 +774,10 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|       readOrderActionPropertyDefinitionBody
                                       	|       filterActionPropertyDefinitionBody
                                       	|       readFilterActionPropertyDefinitionBody
+                                      	|       filterGroupActionPropertyDefinitionBody
+                                      	|       readFilterGroupsActionPropertyDefinitionBody
+                                      	|       filterPropertyActionPropertyDefinitionBody
+                                      	|       readFiltersPropertyActionPropertyDefinitionBody
                                       	|	    emailActionPropertyDefinitionBody
                                       	|	    evalActionPropertyDefinitionBody
                                       	|	    drillDownActionPropertyDefinitionBody
@@ -1127,7 +1131,7 @@ readOrderActionPropertyDefinitionBody ::= ORDERS groupObjectID (TO propertyUsage
     methods = [inferActionParamClasses resolveFormDecl]
 }
 
-filterActionPropertyDefinitionBody ::= FILTER groupObjectID (FROM propertyUsage)?
+filterActionPropertyDefinitionBody ::= FILTER groupObjectID (FROM propertyExpression)?
 {
     pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
@@ -1135,6 +1139,34 @@ filterActionPropertyDefinitionBody ::= FILTER groupObjectID (FROM propertyUsage)
 }
 
 readFilterActionPropertyDefinitionBody ::= FILTERS groupObjectID (TO propertyUsage)?
+{
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
+filterGroupActionPropertyDefinitionBody ::= FILTERGROUP filterGroupID (FROM propertyExpression)?
+{
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
+readFilterGroupsActionPropertyDefinitionBody ::= FILTERGROUPS filterGroupID (TO propertyUsage)?
+{
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
+filterPropertyActionPropertyDefinitionBody ::= FILTER PROPERTY formPropertyDrawID (FROM propertyExpression)?
+{
+    pin = 2
+    implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
+    methods = [inferActionParamClasses resolveFormDecl]
+}
+
+readFiltersPropertyActionPropertyDefinitionBody ::= FILTERS PROPERTY formPropertyDrawID (TO propertyUsage)?
 {
     pin = 2
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
@@ -1383,7 +1415,8 @@ private listActionStatement ::= (   actionPropertyDefinitionBody //  !} => ;
 // Important ! after recover the rule should mandatory be pinned (matched)
 private list_action_statement_recover ::= !(ACTIVATE | ACTIVE | NEW | NEWEDIT | APPLY | CANCEL | CHANGE | ASK | ASYNCUPDATE
                                             | BREAK | CASE | CHANGECLASS | CONFIRM | CONTINUE | INTERNAL | DELETE
-                                            | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FILTER | FOR | SHOW | CLOSE | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
+                                            | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FILTER | FILTERS | FILTERGROUP | FILTERGROUPS
+                                            | FOR | SHOW | CLOSE | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
                                             | ORDER | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE | RECALCULATE
                                             | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | COLLAPSE | EXPAND
@@ -2637,6 +2670,13 @@ componentID ::= <<innerIDCheck>> formUsage POINT componentSelector
 }
 
 formPropertyDrawID ::= <<innerIDCheck>> formUsage POINT formPropertyDrawUsage
+{
+    pin = 3
+    implements="com.lsfusion.lang.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
+
+filterGroupID ::= <<innerIDCheck>> formUsage POINT filterGroupUsage
 {
     pin = 3
     implements="com.lsfusion.lang.psi.context.FormContext"

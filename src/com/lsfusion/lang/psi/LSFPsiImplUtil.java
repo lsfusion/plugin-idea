@@ -4203,6 +4203,22 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
+    public static Inferred inferActionParamClasses(LSFFilterGroupActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
+    public static Inferred inferActionParamClasses(LSFReadFilterGroupsActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
+    public static Inferred inferActionParamClasses(LSFFilterPropertyActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
+    public static Inferred inferActionParamClasses(LSFReadFiltersPropertyActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
     public static Inferred inferActionParamClasses(LSFEmailActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         List<Inferred> list = new ArrayList<>();
         for (LSFPropertyExpression pe : body.getPropertyExpressionList()) {
@@ -4438,6 +4454,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFilterGroupID filterGroupID) {
+        return resolveFormDecl(filterGroupID.getFormUsage());
+    }
+
+    @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormStatement formStatement) {
         return (LSFFormDeclaration) formStatement.resolveDecl();
     }
@@ -4503,6 +4524,40 @@ public class LSFPsiImplUtil {
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFReadFilterActionPropertyDefinitionBodyImpl filterActionBody) {
         LSFFormUsage formUsage = filterActionBody.getGroupObjectID().getFormUsage();
         return resolveFormDecl(formUsage);
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFilterGroupActionPropertyDefinitionBodyImpl filterActionBody) {
+        LSFFormUsage formUsage = filterActionBody.getFilterGroupID().getFormUsage();
+        return resolveFormDecl(formUsage);
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFReadFilterGroupsActionPropertyDefinitionBodyImpl filterActionBody) {
+        LSFFormUsage formUsage = filterActionBody.getFilterGroupID().getFormUsage();
+        return resolveFormDecl(formUsage);
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFilterPropertyActionPropertyDefinitionBodyImpl filterActionBody) {
+        LSFFormPropertyDrawID formPropertyDrawID = filterActionBody.getFormPropertyDrawID();
+        if(formPropertyDrawID != null) {
+            LSFFormUsage formUsage = formPropertyDrawID.getFormUsage();
+            return resolveFormDecl(formUsage);
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFReadFiltersPropertyActionPropertyDefinitionBodyImpl filterActionBody) {
+        LSFFormPropertyDrawID formPropertyDrawID = filterActionBody.getFormPropertyDrawID();
+        if(formPropertyDrawID != null) {
+            LSFFormUsage formUsage = formPropertyDrawID.getFormUsage();
+            return resolveFormDecl(formUsage);
+        } else {
+            return null;
+        }
     }
 
     public static boolean checkOverrideValue(@NotNull LSFOverridePropertyStatement o, Result<LSFClassSet> required, Result<LSFClassSet> found) {
