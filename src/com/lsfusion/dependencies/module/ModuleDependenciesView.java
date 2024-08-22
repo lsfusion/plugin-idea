@@ -13,6 +13,9 @@ import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.references.LSFReference;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ModuleDependenciesView extends DependenciesView {
@@ -70,18 +73,39 @@ public class ModuleDependenciesView extends DependenciesView {
     public void createDependencyNode(PsiElement element, Set<PsiElement> proceeded) {
         if(element != null) {
             LSFModuleDeclaration module = (LSFModuleDeclaration) element;
-            for (LSFModuleDeclaration moduleDeclaration : module.getRequireModules()) {
-                if (moduleDeclaration != null && moduleDeclaration != module) {
-                    String sourceDeclName = module.getDeclName();
-                    String targetDeclName = moduleDeclaration.getDeclName();
-                    if (allEdges || (!dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName))) {
-                        addModelEdge(module, moduleDeclaration, true);
 
-                        if (proceeded.add(moduleDeclaration)) {
-                            createDependencyNode(moduleDeclaration, proceeded);
+            if(onlyLeafs) {
+                List<LSFModuleDeclaration> leafModules = new ArrayList<>();
+                findDependencyLeafModules(module, leafModules, new HashSet<>());
+                for(LSFModuleDeclaration leafModule : leafModules) {
+                    addModelEdge(module, leafModule, true);
+                }
+            } else {
+                for (LSFModuleDeclaration moduleDeclaration : module.getRequireModules()) {
+                    if (moduleDeclaration != null && moduleDeclaration != module) {
+                        String sourceDeclName = module.getDeclName();
+                        String targetDeclName = moduleDeclaration.getDeclName();
+                        if (allEdges || (!dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName))) {
+                            addModelEdge(module, moduleDeclaration, true);
+
+                            if (proceeded.add(moduleDeclaration)) {
+                                createDependencyNode(moduleDeclaration, proceeded);
+                            }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private void findDependencyLeafModules(LSFModuleDeclaration module, List<LSFModuleDeclaration> leafModules, Set<LSFModuleDeclaration> seenModules) {
+        seenModules.add(module);
+        List<LSFModuleDeclaration> requireModules = module.getRequireModules();
+        if (seenModules.containsAll(requireModules)) {
+            leafModules.add(module);
+        } else {
+            for (LSFModuleDeclaration requiredModule : requireModules) {
+                findDependencyLeafModules(requiredModule, leafModules, seenModules);
             }
         }
     }
@@ -90,21 +114,46 @@ public class ModuleDependenciesView extends DependenciesView {
     public void createDependentNode(GlobalSearchScope scope, PsiElement element, Set<PsiElement> proceeded) {
         if(element != null) {
             LSFModuleDeclaration module = (LSFModuleDeclaration) element;
-            Set<LSFModuleDeclaration> refModules = ModuleDependentsCache.getInstance(project).resolveWithCaching(module);
-            if (refModules != null) {
-                for (LSFModuleDeclaration decl : refModules) {
-                    assert decl != null;
-                    if (scope == null || scope.accept(decl.getLSFFile().getVirtualFile())) {
-                        String sourceDeclName = decl.getDeclName();
-                        String targetDeclName = module.getDeclName();
-                        if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
-                            addModelEdge(decl, module, false);
-                        }
 
-                        if (proceeded.add(decl)) {
-                            createDependentNode(scope, decl, proceeded);
+            if(onlyLeafs) {
+                List<LSFModuleDeclaration> leafModules = new ArrayList<>();
+                findDependentLeafModules(module, leafModules, new HashSet<>());
+                for (LSFModuleDeclaration leafModule : leafModules) {
+                    if (scope == null || scope.accept(leafModule.getLSFFile().getVirtualFile())) {
+                        addModelEdge(leafModule, module, false);
+                    }
+                }
+            } else {
+                Set<LSFModuleDeclaration> refModules = ModuleDependentsCache.getInstance(project).resolveWithCaching(module);
+                if (refModules != null) {
+                    for (LSFModuleDeclaration decl : refModules) {
+                        assert decl != null;
+                        if (scope == null || scope.accept(decl.getLSFFile().getVirtualFile())) {
+                            String sourceDeclName = decl.getDeclName();
+                            String targetDeclName = module.getDeclName();
+                            if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
+                                addModelEdge(decl, module, false);
+                            }
+
+                            if (proceeded.add(decl)) {
+                                createDependentNode(scope, decl, proceeded);
+                            }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private void findDependentLeafModules(LSFModuleDeclaration module, List<LSFModuleDeclaration> leafModules, Set<LSFModuleDeclaration> seenModules) {
+        seenModules.add(module);
+        Set<LSFModuleDeclaration> refModules = ModuleDependentsCache.getInstance(project).resolveWithCaching(module);
+        if(refModules != null) {
+            if (seenModules.containsAll(refModules)) {
+                leafModules.add(module);
+            } else {
+                for (LSFModuleDeclaration refModule : refModules) {
+                    findDependentLeafModules(refModule, leafModules, seenModules);
                 }
             }
         }

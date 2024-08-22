@@ -57,6 +57,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.lsfusion.dependencies.GraphEdgesComboAction.*;
 import static com.lsfusion.dependencies.GraphLayoutComboAction.*;
 
 public abstract class DependenciesView extends JPanel implements Disposable {
@@ -71,6 +72,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     protected boolean showRequired = true;
     protected boolean showRequiring = false;
     protected boolean allEdges = false;
+    protected boolean onlyLeafs = false;
 
     protected boolean showDeclPath = false;
     protected String latestTargetElementInPath;
@@ -90,7 +92,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     protected CheckboxAction showRequiredAction;
     protected CheckboxAction showRequiringAction;
     protected GraphLayoutComboAction layoutAction;
-    
+    protected GraphEdgesComboAction edgesAction;
+
     protected double latestScale = 1;
 
     public DependenciesView(String title, Project project, final ToolWindowEx toolWindow, boolean showTargetField) {
@@ -183,15 +186,10 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         actions.add(showRequiredAction);
         actions.add(showRequiringAction);
 
-        actions.add(new CheckboxAction("All edges") {
+        actions.add(edgesAction = new GraphEdgesComboAction("Edges:") {
             @Override
-            public boolean isSelected(@NotNull AnActionEvent e) {
-                return allEdges;
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                allEdges = state;
+            protected void changeEdges() {
+                DependenciesView.this.changeEdges();
             }
         });
 
@@ -443,6 +441,13 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
             jgraph.setScale(latestScale);
         }
+    }
+
+    private void changeEdges() {
+        String currentEdges = edgesAction.getCurrentEdges();
+        allEdges = currentEdges.equals(ALL_EDGES);
+        onlyLeafs = currentEdges.equals(ONLY_LEAFS);
+        redrawCurrent();
     }
 
     private boolean changeLayout(boolean update) {

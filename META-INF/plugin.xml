@@ -13,6 +13,7 @@
             <li>SHOWIF for NAVIGATOR element support</li>
             <li>EXTERNAL HTTP NOENCODE option</li>
             <li>EXTERNAL HTTP: options can be in any order</li>
+            <li>'Only leafs' option in LSF Dependencies tree</li>
         </ul>
     ]]>
     </change-notes>
