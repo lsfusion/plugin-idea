@@ -12,6 +12,24 @@ public class ToolbarViewProxy extends ComponentViewProxy<ToolbarView> {
         target.visible = visible;
     }
 
+    public void setShowViews(boolean showViews) {
+        target.showViews = showViews;
+    }
+
+    //deprecated since 6.0, will be removed in 7.0
+    @Deprecated
+    public void setShowGroup(boolean showGroup) {
+        setShowViews(showGroup);
+    }
+
+    public void setShowFilters(boolean showFilters) {
+        target.showFilters = showFilters;
+    }
+
+    public void setShowSettings(boolean showSettings) {
+        target.showSettings = showSettings;
+    }
+
     public void setShowCountQuantity(boolean showCountQuantity) {
         target.showCountQuantity = showCountQuantity;
     }
@@ -20,15 +38,11 @@ public class ToolbarViewProxy extends ComponentViewProxy<ToolbarView> {
         target.showCalculateSum = showCalculateSum;
     }
 
-    public void setShowGroup(boolean showGroup) {
-        target.showGroup = showGroup;
-    }
-
     public void setShowPrintGroupXls(boolean showPrintGroupXls) {
         target.showPrintGroupXls = showPrintGroupXls;
     }
 
-    public void setShowSettings(boolean showSettings) {
-        target.showSettings = showSettings;
+    public void setShowManualUpdate(boolean showManualUpdate) {
+        target.showManualUpdate = showManualUpdate;
     }
 }

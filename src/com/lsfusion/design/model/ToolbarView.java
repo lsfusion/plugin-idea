@@ -24,11 +24,13 @@ public class ToolbarView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
             new ReflectionProperty("visible"),
+            new ReflectionProperty("showViews"),
+            new ReflectionProperty("showFilters").setExpert(),
+            new ReflectionProperty("showSettings"),
             new ReflectionProperty("showCountQuantity"),
             new ReflectionProperty("showCalculateSum"),
-            new ReflectionProperty("showGroup"),
             new ReflectionProperty("showPrintGroupXls"),
-            new ReflectionProperty("showSettings")
+            new ReflectionProperty("showManualUpdate").setExpert()
     );
 
     @Override
@@ -38,11 +40,13 @@ public class ToolbarView extends ComponentView {
 
     public boolean visible;
 
+    public boolean showViews = true;
+    public boolean showFilters = true;
+    public boolean showSettings = true;
     public boolean showCountQuantity = true;
     public boolean showCalculateSum = true;
-    public boolean showGroup = true;
     public boolean showPrintGroupXls = true;
-    public boolean showSettings = true;
+    public boolean showManualUpdate = true;
 
     public boolean isTreeToolbar = false;
 
@@ -60,6 +64,14 @@ public class ToolbarView extends ComponentView {
         return visible;
     }
 
+    public boolean isShowViews() {
+        return showViews;
+    }
+
+    public boolean isShowSettings() {
+        return showSettings;
+    }
+
     public boolean isShowCountQuantity() {
         return showCountQuantity;
     }
@@ -68,16 +80,8 @@ public class ToolbarView extends ComponentView {
         return showCalculateSum;
     }
 
-    public boolean isShowGroup() {
-        return showGroup;
-    }
-
     public boolean isShowPrintGroupXls() {
         return showPrintGroupXls;
-    }
-
-    public boolean isShowSettings() {
-        return showSettings;
     }
 
     @Override
@@ -103,7 +107,7 @@ public class ToolbarView extends ComponentView {
         if (isTreeToolbar) {
             panel.add(new ToolbarGridButton(LSFIcons.Design.FILTER));
         } else {
-            if (isShowGroup()) {
+            if (isShowViews()) {
                 panel.add(new ToolbarGridButton(LSFIcons.Design.PIVOT));
                 addSeparator(panel);
             }

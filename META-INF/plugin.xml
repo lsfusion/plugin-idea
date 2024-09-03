@@ -14,6 +14,8 @@
             <li>EXTERNAL HTTP NOENCODE option</li>
             <li>EXTERNAL HTTP: options can be in any order</li>
             <li>'Only leafs' option in LSF Dependencies tree</li>
+            <li>Hide toolbar buttons: showViews, showFilters, showSettings, showCountQuantity, showCalculateSum, showPrintGroupXls, showManualUpdate</li>
+            <li>Hide toolbar buttons: showGroup deprecated</li>
         </ul>
     ]]>
     </change-notes>
