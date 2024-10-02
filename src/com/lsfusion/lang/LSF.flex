@@ -461,6 +461,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "PROPORTION"              			{ return PROPORTION; }
   "PUT"              			        { return PUT; }
   "QUERYCLOSE"              			{ return QUERYCLOSE; }
+  "QUERYOK"              			    { return QUERYOK; }
   "QUICKFILTER"                         { return QUICKFILTER; }
   "READ"                			    { return READ; }
   "READONLY"                			{ return READONLY; }

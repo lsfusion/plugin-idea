@@ -1891,6 +1891,7 @@ formEventDeclaration ::= ON
                         |    INIT
                         |    CANCEL
                         |    DROP
+                        |    QUERYOK
                         |    QUERYCLOSE
                         |    CHANGE ((OBJECT? ID) | (PROPERTY (BEFORE | AFTER)? propertySelector))
                         |    (EXPAND | COLLAPSE) componentSelector

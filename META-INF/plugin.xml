@@ -8,14 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.292</b><br>
+        <b>Version 1.0.293</b><br>
         <ul>
-            <li>SHOWIF for NAVIGATOR element support</li>
-            <li>EXTERNAL HTTP NOENCODE option</li>
-            <li>EXTERNAL HTTP: options can be in any order</li>
-            <li>'Only leafs' option in LSF Dependencies tree</li>
-            <li>Hide toolbar buttons: showViews, showFilters, showSettings, showCountQuantity, showCalculateSum, showPrintGroupXls, showManualUpdate</li>
-            <li>Hide toolbar buttons: showGroup deprecated</li>
+            <li>EVENTS ON QUERYOK support</li>
         </ul>
     ]]>
     </change-notes>
