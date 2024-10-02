@@ -11,6 +11,7 @@
         <b>Version 1.0.293</b><br>
         <ul>
             <li>EVENTS ON QUERYOK support</li>
+            <li>EVENTS REPLACE | NOREPLACE support</li>
         </ul>
     ]]>
     </change-notes>

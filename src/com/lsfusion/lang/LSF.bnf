@@ -1899,6 +1899,7 @@ formEventDeclaration ::= ON
                         |    ORDER groupObjectUsage (TO propertyUsage)?
                         |    FILTER groupObjectUsage (TO propertyUsage)?
                         )
+                        (REPLACE | NOREPLACE)?
                         formActionPropertyObject
 {
     pin = 1

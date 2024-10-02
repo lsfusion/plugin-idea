@@ -471,6 +471,8 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "REFLECTION"                  		{ return REFLECTION; }
   "REGEXP"                  			{ return REGEXP; }
   "REMOVE"                  			{ return REMOVE; }
+  "REPLACE"              			    { return REPLACE; }
+  "NOREPLACE"              			    { return NOREPLACE; }
   "REPORT"              			    { return REPORT; }
   "REPORTS"              			    { return REPORTS; }
   "REPORTFILES"              			{ return REPORTFILES; }
