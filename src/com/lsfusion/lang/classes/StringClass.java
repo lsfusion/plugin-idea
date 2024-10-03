@@ -5,16 +5,10 @@ import com.lsfusion.util.BaseUtils;
 import static java.lang.Math.pow;
 import static java.lang.Math.round;
 
-public class StringClass extends DataClass {
-
-    public final boolean blankPadded;
-    public final boolean caseInsensitive;
-    public final ExtInt length;
+public class StringClass extends AStringClass {
 
     public StringClass(boolean blankPadded, boolean caseInsensitive, ExtInt length) {
-        this.blankPadded = blankPadded;
-        this.caseInsensitive = caseInsensitive;
-        this.length = length;
+        super(blankPadded, caseInsensitive, length);
     }
 
     public DataClass op(DataClass compClass, boolean or, boolean string) {
@@ -42,11 +36,6 @@ public class StringClass extends DataClass {
     }
 
     @Override
-    public String getCaption() {
-        return "String" + (caseInsensitive ? " case insensitive" : "") + (blankPadded ? " blankpadded" : "") + "(" + length + ")";
-    }
-
-    @Override
     public int getDefaultCharWidth() {
         if(length.isUnlimited()) {
             return 15;
@@ -62,11 +51,6 @@ public class StringClass extends DataClass {
     }
 
     @Override
-    public boolean fixedSize() {
-        return false;
-    }
-
-    @Override
     public String getCanonicalName() {
         String userSID = super.getCanonicalName();
         if (length == ExtInt.UNLIMITED || !userSID.contains("_")) {
@@ -76,24 +60,9 @@ public class StringClass extends DataClass {
         }        
     }
 
-    @Override
-    public boolean isAssignable(LSFClassSet set) {
-        return !(set instanceof StringClass && length.less(((StringClass) set).length)) && super.isAssignable(set);
-    }
-
-    @Override
-    public boolean isFlex() {
-        return true;
-    }
-
     public StringClass extend(int times) {
         if(length.isUnlimited())
             return this;
         return new StringClass(blankPadded, caseInsensitive, new ExtInt(BaseUtils.min(length.getValue() * times, 4000)));
-    }
-
-    @Override
-    public ExtInt getCharLength() {
-        return length;
     }
 }

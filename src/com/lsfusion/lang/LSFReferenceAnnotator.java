@@ -1195,7 +1195,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                         mismatchClass = cls;
                     } else if ((cls == Double.class || cls == double.class) && !(valueClass instanceof IntegerClass) && !(valueClass instanceof DoubleClass)) {
                         mismatchClass = cls;
-                    } else if (cls == String.class && !(valueClass instanceof StringClass)) {
+                    } else if (cls == String.class && !(valueClass instanceof AStringClass)) {
                         mismatchClass = cls;
                     } else if (cls == Color.class && !(valueClass instanceof ColorClass)) {
                         mismatchClass = cls;

@@ -1,6 +1,6 @@
 package com.lsfusion.lang.classes;
 
-public class HTMLStringClass extends StringClass {
+public class HTMLStringClass extends AStringClass {
 
     public HTMLStringClass() {
         super(false, false, ExtInt.UNLIMITED);

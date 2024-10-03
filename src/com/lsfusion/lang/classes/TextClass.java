@@ -24,11 +24,6 @@ public class TextClass extends StringClass {
     }
 
     @Override
-    public String getCaption() {
-        return "Text" + (type != null ? " (" + type + ")" : "");
-    }
-
-    @Override
     public int getDefaultHeight(FontMetrics fontMetrics, int charHeight) {
         return super.getDefaultHeight(fontMetrics, charHeight == 1 && length.isUnlimited() ? 4 : charHeight);
     }
