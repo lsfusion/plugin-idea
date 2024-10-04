@@ -13,6 +13,7 @@
             <li>EVENTS ON QUERYOK support</li>
             <li>EVENTS REPLACE | NOREPLACE support</li>
             <li>Support CUSTOM aggregates in the GROUP / PARTITION operators</li>
+            <li>EVENTS ON FILTERGROUPS, ON FILTERS PROPERTY support</li>
         </ul>
     ]]>
     </change-notes>

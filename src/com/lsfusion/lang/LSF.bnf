@@ -1904,17 +1904,34 @@ formEventDeclaration ::= ON
                         |    DROP
                         |    QUERYOK
                         |    QUERYCLOSE
-                        |    CHANGE ((OBJECT? ID) | (PROPERTY (BEFORE | AFTER)? propertySelector))
-                        |    (EXPAND | COLLAPSE) componentSelector
-                        |    SCHEDULE PERIOD intLiteral FIXED?
-                        |    ORDER groupObjectUsage (TO propertyUsage)?
-                        |    FILTER groupObjectUsage (TO propertyUsage)?
+                        |    changeEventDeclaration
+                        |    formContainerEventDeclaration
+                        |    scheduleFormEventDeclaration
                         )
                         (REPLACE | NOREPLACE)?
                         formActionPropertyObject
 {
     pin = 1
 }
+
+changeEventDeclaration ::=
+    CHANGE ID
+    |
+    CHANGE?
+        (   OBJECT groupObjectUsage
+        |   FILTER groupObjectUsage
+        |   ORDER groupObjectUsage
+        |   FILTERS groupObjectUsage
+        |   ORDERS groupObjectUsage
+        |   PROPERTY (BEFORE | AFTER)? propertySelector
+        |   FILTERGROUPS filterGroupUsage
+        |   FILTERS PROPERTY formPropertyDrawUsage
+        )
+    ;
+
+formContainerEventDeclaration ::= (COLLAPSE | EXPAND) (ID | componentSelector)
+
+scheduleFormEventDeclaration ::= SCHEDULE PERIOD intLiteral FIXED?
 
 formFilterGroupDeclaration ::= FILTERGROUP filterGroupName regularFilterDeclaration*
 {
