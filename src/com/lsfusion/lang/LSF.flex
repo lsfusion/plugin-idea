@@ -548,6 +548,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "WHEN"                    			{ return WHEN; }
   "WHERE"                   			{ return WHERE; }
   "WHILE"                   			{ return WHILE; }
+  "WITHIN"                    			{ return WITHIN; }
   "WRITE"                   			{ return WRITE; }
   "WINDOW"                  			{ return WINDOW; }
   "XLS"                                 { return XLS; }

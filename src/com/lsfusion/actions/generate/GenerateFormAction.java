@@ -81,7 +81,7 @@ public abstract class GenerateFormAction extends AnAction {
             "TEXTVALIGN", "THEN", "THREADS", "TO", "DRAW", "TOOLBAR",
             "TOOLBARBOX", "TOOLBARLEFT", "TOOLBARRIGHT", "TOOLBARSYSTEM", "TOP", "TREE", "TRY", "TSQUERY", "TSVECTOR",
             "UDP", "UNGROUP", "UP", "USERFILTER", "USERFILTERS", "VALIGN", "VALUE", "VERTICAL", "VIEW", "WARN", "WHEN",
-            "WHERE", "WHILE", "WRITE", "WINDOW", "XLS", "XLSX", "XML", "XOR", "YES", "YESNO"));
+            "WHERE", "WHILE", "WITHIN", "WRITE", "WINDOW", "XLS", "XLSX", "XML", "XOR", "YES", "YESNO"));
 
     abstract String getExtension();
 

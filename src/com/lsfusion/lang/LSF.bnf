@@ -452,16 +452,24 @@ multiPropertyDefinition ::= MULTI (exclusiveOverrideOption)? nonEmptyPropertyExp
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]
 }
 
+orderPropertyBy ::= ORDER DESC? nonEmptyPropertyExpressionList
+aggrCustomType ::= CUSTOM NULL? builtInClassName? stringLiteral
+
 partitionPropertyBy ::= BY nonEmptyPropertyExpressionList
 partitionPropertyDefinition ::= PARTITION
-                                (   (SUM | PREV)
-                                |   UNGROUP propertyUsage
-                                    (   PROPORTION (STRICT)? ROUND LBRAC LEX_UINT_LITERAL RBRAC
-                                    |   LIMIT (STRICT)?
+                                (
+                                    (
+                                        (   (SUM | PREV)
+                                        |   UNGROUP propertyUsage
+                                            (   PROPORTION (STRICT)? ROUND LBRAC LEX_UINT_LITERAL RBRAC
+                                            |   LIMIT (STRICT)?
+                                            )
+                                        )
+                                        propertyExpression
+                                        orderPropertyBy?
                                     )
+                                    | (aggrCustomType ((nonEmptyPropertyExpressionList orderPropertyBy?) | orderPropertyBy))
                                 )
-                                propertyExpression
-                                (ORDER (DESC )? nonEmptyPropertyExpressionList)?
                                 (WINDOW EXCEPTLAST)?
                                 partitionPropertyBy?
 {
@@ -588,9 +596,12 @@ formulaPropertySyntaxType ::= (PG | MS)?
 groupingType ::= SUM | MAX | MIN | AGGR | NAGGR | EQUAL
 groupingTypeOrder ::= CONCAT | LAST
 groupPropertyBy ::= BY nonEmptyPropertyExpressionList { pin = 1 }
-orderPropertyBy ::= ORDER (DESC)? nonEmptyPropertyExpressionList
-groupPropertyBody ::= ((groupingType nonEmptyPropertyExpressionList) | (groupingTypeOrder nonEmptyPropertyExpressionList orderPropertyBy))
-                        (WHERE propertyExpression)?
+groupPropertyBody ::= (
+                        (groupingType nonEmptyPropertyExpressionList)
+                      | (groupingTypeOrder nonEmptyPropertyExpressionList orderPropertyBy)
+                      | (aggrCustomType ((nonEmptyPropertyExpressionList WITHIN? orderPropertyBy) | (WITHIN? orderPropertyBy)))
+                      )
+                      (WHERE propertyExpression)?
   
 private groupByBefore ::= GROUP groupPropertyBody groupPropertyBy
 //private groupByAfter ::= GROUP groupPropertyBody groupPropertyBy;
