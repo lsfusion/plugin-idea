@@ -30,8 +30,6 @@ import java.util.function.Consumer;
 public abstract class FormDesign implements Disposable {
     protected final Project project;
 
-    protected final ToolWindowEx toolWindow;
-
     protected FlexPanel mainPanel;
 
     protected String oldForm = null;
@@ -42,7 +40,6 @@ public abstract class FormDesign implements Disposable {
 
     public FormDesign(Project project, ToolWindowEx toolWindow) {
         this.project = project;
-        this.toolWindow = toolWindow;
 
         myRebuildQueue = new MergingUpdateQueue("DesignView", 400, false, toolWindow.getComponent(), this, toolWindow.getComponent(), false);
         myRebuildQueue.setRestartTimerOnAdd(true);

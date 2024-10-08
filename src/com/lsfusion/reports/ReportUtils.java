@@ -1,5 +1,6 @@
 package com.lsfusion.reports;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -9,7 +10,10 @@ import com.intellij.psi.search.ProjectScope;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.lsfusion.design.DesignPreviewLineMarkerProvider;
-import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFLocalSearchScope;
+import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
@@ -54,19 +58,21 @@ public class ReportUtils {
 
     public static List<PsiFile> findReportFiles(LSFFormDeclaration decl, LSFLocalSearchScope declScope) {
         List<PsiFile> files = new ArrayList<>();
-        if(decl != null) {
-            findReportFiles(decl, declScope, reportName -> {
-                final Project project = decl.getProject();
-                final GlobalSearchScope scope = ProjectScope.getAllScope(project);
+        if (decl != null) {
+            DumbService.getInstance(decl.getProject()).runReadActionInSmartMode(() -> {
+                findReportFiles(decl, declScope, reportName -> {
+                    final Project project = decl.getProject();
+                    final GlobalSearchScope scope = ProjectScope.getAllScope(project);
 
-                FileBasedIndex.getInstance().processAllKeys(FilenameIndex.NAME, fileName -> {
-                    if (fileName.endsWith(".jrxml") && (fileName.startsWith(reportName + '.') || fileName.startsWith(reportName + '_'))) {
-                        findFilesWithShortName(fileName, files, project, scope);
-                    }
+                    FileBasedIndex.getInstance().processAllKeys(FilenameIndex.NAME, fileName -> {
+                        if (fileName.endsWith(".jrxml") && (fileName.startsWith(reportName + '.') || fileName.startsWith(reportName + '_'))) {
+                            findFilesWithShortName(fileName, files, project, scope);
+                        }
+                        return true;
+                    }, scope, null);
+
                     return true;
-                }, scope, null);
-
-                return true;
+                });
             });
         }
         return files;

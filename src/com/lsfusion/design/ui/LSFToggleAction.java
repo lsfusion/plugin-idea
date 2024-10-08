@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.util.function.Supplier;
 
 public abstract class LSFToggleAction extends ToggleAction {
-    private boolean bgtThread = true;
+    private boolean background = true;
     
     public LSFToggleAction() {
     }
@@ -40,12 +40,12 @@ public abstract class LSFToggleAction extends ToggleAction {
         super(text, Presentation.NULL_STRING, icon);
     }
     
-    public void setBgtThread(boolean bgtThread) {
-        this.bgtThread = bgtThread;
+    public void setBackground(boolean background) {
+        this.background = background;
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return bgtThread ? ActionUpdateThread.BGT : ActionUpdateThread.EDT;
+        return background ? ActionUpdateThread.BGT : ActionUpdateThread.EDT;
     }
 }

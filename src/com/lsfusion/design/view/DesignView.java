@@ -3,6 +3,7 @@ package com.lsfusion.design.view;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -37,6 +38,8 @@ public class DesignView extends JBTabbedPane {
     private final ToolWindowEx toolWindow;
     private EmbeddedDesign embeddedDesign;
     private LiveDesign liveDesign;
+    private ReportsPanel reportsPanel;
+    
     private LSFFormDeclaration currentForm;
     private LSFModuleDeclaration currentModule;
 
@@ -49,6 +52,9 @@ public class DesignView extends JBTabbedPane {
         
         embeddedDesign = new EmbeddedDesign(project, toolWindow);
         addTab("Embedded", embeddedDesign.getComponent());
+        
+        reportsPanel = new ReportsPanel(project);
+        addTab("Jasper Reports", reportsPanel);
 
         ActionManager.getInstance().addTimerListener(new TimerListener() {
             @Override
@@ -65,8 +71,10 @@ public class DesignView extends JBTabbedPane {
         });
 
         addChangeListener(e -> {
-            if (!isLiveDesignEnabled()) {
+            if (isEmbeddedDesignEnabled()) {
                 embeddedDesign.onActivated();
+            } else if (isReportsTabEnabled()) {
+                reportsPanel.onActivated();
             }
         });
     }
@@ -85,7 +93,7 @@ public class DesignView extends JBTabbedPane {
             if (!liveDesign.isManualMode()) {
                 liveDesign.scheduleRebuild(element, file);
             }
-        } else {
+        } else if (isEmbeddedDesignEnabled()) {
             embeddedDesign.scheduleRebuild(element, file);
         }
     }
@@ -131,7 +139,7 @@ public class DesignView extends JBTabbedPane {
 
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+                ApplicationManager.getApplication().invokeLater(() -> {
                     targetElement = ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN).getPsiLocation();
                     targetForm = getTargetForm(project, targetElement);
                     files = hasFocus() ? null : CommonDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
@@ -187,13 +195,23 @@ public class DesignView extends JBTabbedPane {
         
         if (isLiveDesignEnabled()) {
             liveDesign.scheduleRebuild(targetForm.form, targetForm.file);
-        } else {
+        } else if (isEmbeddedDesignEnabled()) {
             embeddedDesign.scheduleRebuild(targetForm);
+        } else {
+            reportsPanel.update(targetForm.form);
         }
     }
 
     public boolean isLiveDesignEnabled() {
         return getSelectedIndex() == 0;
+    }
+    
+    public boolean isEmbeddedDesignEnabled() {
+        return getSelectedIndex() == 1;
+    }
+    
+    public boolean isReportsTabEnabled() {
+        return getSelectedIndex() == 2;
     }
     
     public static void openFormUnderCaretDesign(Project project, Consumer<TargetForm> formConsumer) {

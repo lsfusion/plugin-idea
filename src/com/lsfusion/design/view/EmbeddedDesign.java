@@ -1,23 +1,14 @@
 package com.lsfusion.design.view;
 
 import com.intellij.designer.propertyTable.PropertyTable;
-import com.intellij.execution.actions.ConfigurationContext;
-import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.ui.CheckboxTreeBase;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
@@ -29,35 +20,23 @@ import com.lsfusion.design.DesignInfo;
 import com.lsfusion.design.model.*;
 import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.ui.*;
-import com.lsfusion.reports.ReportUtils;
 import com.lsfusion.util.BaseUtils;
-import lsfusion.server.physics.dev.debug.DebuggerService;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.plaf.LayerUI;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.rmi.NotBoundException;
 import java.util.List;
 import java.util.*;
-
-import static com.lsfusion.debug.DebugUtils.debugProcess;
-import static com.lsfusion.debug.DebugUtils.getDebuggerService;
 
 public class EmbeddedDesign extends FormDesign {
     private ContainerView rootComponent;
     private FormEntity formEntity;
     private ComponentTreeNode rootNode;
 
-    private DesignView.TargetForm targetForm;
-
-    public String formCanonicalName;
 
     private DefaultActionGroup actions = new DefaultActionGroup();
 
@@ -69,9 +48,6 @@ public class EmbeddedDesign extends FormDesign {
     private ComponentTree componentTree;
     private PropertyTable propertyTable;
     private JBSplitter treeAndTable;
-    private JButton createReportButton;
-    private JButton editReportButton;
-    private JButton deleteReportButton;
     
     private boolean selecting = false;
     
@@ -83,8 +59,6 @@ public class EmbeddedDesign extends FormDesign {
     private final Map<ComponentView, Boolean> selection = new HashMap<>();
 
     private final MergingUpdateQueue redrawQueue;
-
-    private boolean firstDraw = true;
 
     public EmbeddedDesign(@NotNull Project project, final ToolWindowEx toolWindow) {
         super(project, toolWindow);
@@ -123,7 +97,6 @@ public class EmbeddedDesign extends FormDesign {
 
         toolbar.setTargetComponent(formSplitter); // for suppressing error in log as there is a check "targetComponent == null", there will be an error "toolbar by default uses any focused component to update its actions. Toolbar actions that need local UI context would be incorrectly disabled. Please call toolbar.setTargetComponent() explicitly"
         mainPanel.add(formSplitter, new FlexConstraints(FlexAlignment.STRETCH, 1));
-        mainPanel.add(createAutoReportPanel());
 
         mainScrollPane = new JBScrollPane(mainPanel);
 
@@ -148,31 +121,7 @@ public class EmbeddedDesign extends FormDesign {
         }
 
         // as this event is called before commitTransaction, modificationStamp and unsavedDocument have not been updated, so the indexes cannot be accessed
-        try {
-            Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-
-            if (editor != null) {
-                DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
-                new Task.Backgroundable(project, "Reading form") {
-                    PsiElement targetElement;
-                    DesignView.TargetForm targetForm;
-
-                    @Override
-                    public void onSuccess() {
-                        if (targetForm != null && targetForm.module != null && targetForm.form != null) {
-                            scheduleRebuild(targetForm);
-                        }
-                    }
-
-                    @Override
-                    public void run(@NotNull ProgressIndicator indicator) {
-                        targetElement = DumbService.getInstance(project).runReadActionInSmartMode(() -> ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN).getPsiLocation());
-                        targetForm = DesignView.getTargetForm(project, targetElement);
-                    }
-                }.queue();
-            }
-        } catch (PsiInvalidElementAccessException ignored) {
-        }
+        DesignView.openFormUnderCaretDesign(project, this::scheduleRebuild);
     }
 
     public void scheduleRebuild(DesignView.TargetForm targetForm) {
@@ -182,8 +131,6 @@ public class EmbeddedDesign extends FormDesign {
     public void scheduleRebuild(DesignView.TargetForm targetForm, boolean checkFormEquility) {
         scheduleRebuild("rebuildEmbedded", targetForm.file, checkFormEquility, formWithName -> {
             if (targetForm.form.isValid()) {
-                EmbeddedDesign.this.targetForm = targetForm;
-                
                 formNameLabel.setText("Form: " + targetForm.form.getDeclName());
 
                 layoutDesign(targetForm);
@@ -208,7 +155,6 @@ public class EmbeddedDesign extends FormDesign {
         ApplicationManager.getApplication().invokeLater(() -> {
             rootComponent = designInfo.formView.mainContainer;
             formEntity = designInfo.formView.entity;
-            formCanonicalName = targetForm.form.getCanonicalName();
 
             treeAndTable.setFirstComponent(createComponentTree());
             treeAndTable.setSecondComponent(createComponentPropertyTable());
@@ -264,76 +210,6 @@ public class EmbeddedDesign extends FormDesign {
         });
 
         toolbar.updateActionsImmediately();
-    }
-
-    private JComponent createAutoReportPanel() {
-        createReportButton = new JButton("Create", LSFIcons.EDIT_AUTO_REPORT);
-        createReportButton.setToolTipText("Create Default Report Design");
-
-        editReportButton = new JButton("Edit", LSFIcons.EDIT_REPORT);
-        editReportButton.setToolTipText("Edit Report Design");
-        editReportButton.addActionListener(e -> {
-            try {
-                editReports();
-            } catch (Exception ex) {
-                JBPopupFactory.getInstance().createMessage("Can't open report files: " + ex.getMessage()).show(editReportButton);
-            }
-        });
-
-        deleteReportButton = new JButton("Delete", LSFIcons.DELETE_REPORT);
-        deleteReportButton.setToolTipText("Delete Report Design");
-        deleteReportButton.addActionListener(e -> {
-            deleteReports();
-            redrawReportButtons();
-        });
-
-        FlexPanel reportsPanel = new FlexPanel(true);
-        reportsPanel.add(new JLabel("Jasper Reports"));
-
-        FlexPanel buttonsPanel = new FlexPanel(false);
-        buttonsPanel.add(createReportButton);
-        buttonsPanel.add(editReportButton);
-        buttonsPanel.add(deleteReportButton);
-        reportsPanel.add(buttonsPanel);
-
-        return reportsPanel;
-    }
-
-    private void createReports(boolean hasReportFiles) throws NotBoundException, IOException {
-        if (hasReportFiles) {
-            deleteReports();
-        }
-
-        DebuggerService debuggerService = getDebuggerService();
-        if (debuggerService != null) {
-            String reportFiles = (String) debuggerService.evalServer("run() {createAutoReport('" + formCanonicalName + "');}");
-            if (reportFiles != null) {
-                for (String file : reportFiles.split(";")) {
-                    Desktop.getDesktop().open(new File(file));
-                }
-            }
-        }
-    }
-
-    private void editReports() throws IOException {
-        for (PsiFile file : ReportUtils.findReportFiles(targetForm.form)) {
-            String path = file.getVirtualFile().getCanonicalPath();
-            if(path != null) {
-                Desktop.getDesktop().open(new File(path));
-            }
-        }
-    }
-
-    private void deleteReports() {
-        if (JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
-                "Are you sure you want to delete existing report design?", "Jasper reports", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            for (PsiFile file : ReportUtils.findReportFiles(targetForm.form)) {
-                String path = file.getVirtualFile().getCanonicalPath();
-                if(path != null) {
-                    new File(path).delete();
-                }
-            }
-        }
     }
 
     private JComponent createComponentPropertyTable() {
@@ -430,39 +306,8 @@ public class EmbeddedDesign extends FormDesign {
             formPanel.add(rootWidget);
         }
 
-        redrawReportButtons();
-
         mainPanel.revalidate();
         mainPanel.repaint();
-    }
-
-    private void redrawReportButtons() {
-        new Task.Backgroundable(project, "Updating design components") {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                boolean hasReportFiles = DumbService.getInstance(project).runReadActionInSmartMode(() -> ReportUtils.hasReportFiles(targetForm.form));
-
-                createReportButton.setText(hasReportFiles ? "Re-create" : "Create");
-                for (ActionListener actionListener : createReportButton.getActionListeners()) {
-                    createReportButton.removeActionListener(actionListener);
-                }
-                createReportButton.addActionListener(e -> {
-                    if (debugProcess != null) {
-                        try {
-                            createReports(hasReportFiles);
-                            redrawReportButtons();
-                        } catch (Exception ex) {
-                            JBPopupFactory.getInstance().createMessage("Can't create report files: " + ex.getMessage()).show(createReportButton);
-                        }
-                    } else {
-                        JBPopupFactory.getInstance().createHtmlTextBalloonBuilder("Start server to create reports", MessageType.ERROR, null).createBalloon().showInCenterOf(createReportButton);
-                    }
-                });
-
-                editReportButton.setEnabled(hasReportFiles);
-                deleteReportButton.setEnabled(hasReportFiles);
-            }
-        }.queue();
     }
 
     private void selectInTree(ComponentView component) {
