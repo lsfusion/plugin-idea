@@ -1,5 +1,6 @@
 package com.lsfusion.dependencies.property;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
@@ -20,6 +21,7 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class PropertyDependenciesView extends DependenciesView {
     public PropertyDependenciesView(Project project, ToolWindowEx toolWindow) {
@@ -31,7 +33,9 @@ public class PropertyDependenciesView extends DependenciesView {
         LSFActionOrGlobalPropDeclaration<?, ?> sourceProperty = (LSFActionOrGlobalPropDeclaration<?, ?>) element;
 
         if (sourceProperty != null && !sourceProperty.isAction()) {
-            Set<LSFActionOrGlobalPropDeclaration<?, ?>> targetProperties = PropertyDependenciesCache.getInstance(project).resolveWithCaching(sourceProperty);
+            Set<LSFActionOrGlobalPropDeclaration<?, ?>> targetProperties = DumbService.getInstance(project).runReadActionInSmartMode(
+                    () -> PropertyDependenciesCache.getInstance(project).resolveWithCaching(sourceProperty)
+            );
             if (targetProperties != null) {
                 for (LSFActionOrGlobalPropDeclaration<?, ?> targetProperty : targetProperties) {
                     if (allEdges || (!dataModel.containsNode(sourceProperty.getPresentableText()) || !dataModel.containsNode(targetProperty.getPresentableText()))) {
@@ -51,7 +55,9 @@ public class PropertyDependenciesView extends DependenciesView {
         LSFActionOrGlobalPropDeclaration<?, ?> targetProperty = (LSFActionOrGlobalPropDeclaration<?, ?>) element;
 
         if (targetProperty != null) {
-            Set<LSFActionOrGlobalPropDeclaration<?, ?>> sourceProperties = PropertyDependentsCache.getInstance(project).resolveWithCaching(targetProperty);
+            Set<LSFActionOrGlobalPropDeclaration<?, ?>> sourceProperties = DumbService.getInstance(project).runReadActionInSmartMode(
+                    () -> PropertyDependentsCache.getInstance(project).resolveWithCaching(targetProperty)
+            );
             if (sourceProperties != null) {
                 for (LSFActionOrGlobalPropDeclaration<?, ?> sourceProperty : sourceProperties) {
                     if (sourceProperty != null && !sourceProperty.isAction() && (scope == null || scope.accept(sourceProperty.getLSFFile().getVirtualFile()))) {
@@ -82,19 +88,23 @@ public class PropertyDependenciesView extends DependenciesView {
     }
 
     @Override
-    public PsiElement getSelectedElement() {
-        PsiElement targetElement = getTargetEditorPsiElement();
-        if (targetElement != null && PsiTreeUtil.getParentOfType(targetElement, LSFId.class) != null) {
-            PsiElement parent = PsiTreeUtil.getParentOfType(targetElement, LSFActionOrPropReference.class, LSFActionOrGlobalPropDeclaration.class);
-            if (parent != null) {
-                if (parent instanceof LSFActionOrPropReference) {
-                    return ((LSFActionOrPropReference<?, ?>) parent).resolveDecl();
-                } else {
-                    return parent;
+    public void getSelectedElement(Consumer<PsiElement> elementConsumer) {
+        getTargetEditorPsiElement(targetElement -> {
+            PsiElement element = DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+                if (targetElement != null && PsiTreeUtil.getParentOfType(targetElement, LSFId.class) != null) {
+                    PsiElement parent = PsiTreeUtil.getParentOfType(targetElement, LSFActionOrPropReference.class, LSFActionOrGlobalPropDeclaration.class);
+                    if (parent != null) {
+                        if (parent instanceof LSFActionOrPropReference) {
+                            return((LSFActionOrPropReference<?, ?>) parent).resolveDecl();
+                        } else {
+                            return parent;
+                        }
+                    }
                 }
-            }
-        }
-        return null;
+                return null;
+            });
+            elementConsumer.accept(element);
+        });
     }
 
     @Override
@@ -103,8 +113,8 @@ public class PropertyDependenciesView extends DependenciesView {
     }
     
     @Override
-    public String getPathTarget() {
-        return null;
+    public void getPathTarget(Consumer<String> pathConsumer) {
+        pathConsumer.accept(null);
     }
 
     @Override

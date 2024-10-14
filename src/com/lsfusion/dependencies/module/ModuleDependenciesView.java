@@ -1,8 +1,10 @@
 package com.lsfusion.dependencies.module;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.dependencies.DependenciesView;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class ModuleDependenciesView extends DependenciesView {
     public ModuleDependenciesView(Project project, ToolWindowEx toolWindow) {
@@ -44,29 +47,39 @@ public class ModuleDependenciesView extends DependenciesView {
     }
 
     @Override
-    public LSFModuleDeclaration getSelectedElement() {
-        PsiElement targetElement = getTargetEditorPsiElement();
-
-        if (targetElement != null && targetElement.getContainingFile() instanceof LSFFile) {
-            return((LSFFile) targetElement.getContainingFile()).getModuleDeclaration();
-        }
-        return null;
+    public void getSelectedElement(Consumer<PsiElement> elementConsumer) {
+        getTargetEditorPsiElement(targetElement -> {
+            if (targetElement != null) {
+                LSFModuleDeclaration moduleDeclaration = DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+                    PsiFile containingFile = targetElement.getContainingFile();
+                    if (containingFile instanceof LSFFile) {
+                        return ((LSFFile) containingFile).getModuleDeclaration();
+                    }
+                    return null;
+                });
+                elementConsumer.accept(moduleDeclaration);
+            }
+            elementConsumer.accept(null);
+        });
     }
 
     @Override
-    public String getPathTarget() {
-        PsiElement targetElement = getTargetEditorPsiElement();
-
-        if (targetElement != null && targetElement.getContainingFile() instanceof LSFFile) {
-            LSFReference<?> ref = PsiTreeUtil.getParentOfType(targetElement, LSFReference.class);
-            if (ref != null) {
-                LSFDeclaration decl = ref.resolveDecl();
-                if (decl != null) {
-                    return decl.getLSFFile().getModuleDeclaration().getName();
+    public void getPathTarget(Consumer<String> pathConsumer) {
+        getTargetEditorPsiElement(targetElement -> {
+            String module = DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+                if (targetElement != null && targetElement.getContainingFile() instanceof LSFFile) {
+                    LSFReference<?> ref = PsiTreeUtil.getParentOfType(targetElement, LSFReference.class);
+                    if (ref != null) {
+                        LSFDeclaration decl = ref.resolveDecl();
+                        if (decl != null) {
+                            return decl.getLSFFile().getModuleDeclaration().getName();
+                        }
+                    }
                 }
-            }
-        }
-        return null;
+                return null;
+            });
+            pathConsumer.accept(module);
+        });
     }
 
     @Override
@@ -124,7 +137,9 @@ public class ModuleDependenciesView extends DependenciesView {
                     }
                 }
             } else {
-                Set<LSFModuleDeclaration> refModules = ModuleDependentsCache.getInstance(project).resolveWithCaching(module);
+                Set<LSFModuleDeclaration> refModules = DumbService.getInstance(project).runReadActionInSmartMode(
+                        () -> ModuleDependentsCache.getInstance(project).resolveWithCaching(module)
+                );
                 if (refModules != null) {
                     for (LSFModuleDeclaration decl : refModules) {
                         assert decl != null;

@@ -10,8 +10,11 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.ui.SearchFieldAction;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -54,10 +57,12 @@ import java.awt.event.*;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.lsfusion.dependencies.GraphEdgesComboAction.*;
+import static com.lsfusion.dependencies.GraphEdgesComboAction.ALL_EDGES;
+import static com.lsfusion.dependencies.GraphEdgesComboAction.ONLY_LEAFS;
 import static com.lsfusion.dependencies.GraphLayoutComboAction.*;
 
 public abstract class DependenciesView extends JPanel implements Disposable {
@@ -113,10 +118,15 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             @Override
             public void run() {
                 if (toolWindow.isVisible() && isVisible()) {
-                    checkUpdate();
-                    if (showPathToElement() && showDeclPath) {
-                        findAndColorPath();
-                    }
+                    new Task.Backgroundable(project, "Updating diagram") {
+                        @Override
+                        public void run(@NotNull ProgressIndicator indicator) {
+                            checkUpdate();
+                            if (showPathToElement() && showDeclPath) {
+                                findAndColorPath();
+                            }
+                        }
+                    }.queue();
                 }
             }
         };
@@ -252,7 +262,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
         });
 
-        return ActionManager.getInstance().createActionToolbar(title, actions, true);
+        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(title, actions, true);
+        actionToolbar.setTargetComponent(this);
+        return actionToolbar;
     }
 
     private ActionToolbar createSecondToolbar() {
@@ -271,7 +283,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             actions.add(target);
         }
 
-        return ActionManager.getInstance().createActionToolbar(title, actions, true);
+        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(title, actions, true);
+        actionToolbar.setTargetComponent(this);
+        return actionToolbar;
     }
     
     public Collection<GraphNode> getAllNodes() {
@@ -287,22 +301,25 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             return;
         }
 
-        final DataContext dataContext = DataManager.getInstance().getDataContext(owner);
-        if (CommonDataKeys.PROJECT.getData(dataContext) != project) return;
+        ApplicationManager.getApplication().invokeLater(() -> {
+            final DataContext dataContext = DataManager.getInstance().getDataContext(owner);
+            if (CommonDataKeys.PROJECT.getData(dataContext) != project) return;
 
-        final VirtualFile[] files = hasFocus() ? null : CommonDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
+            final VirtualFile[] files = hasFocus() ? null : CommonDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
 
-        if (files != null && files.length == 1) {
-            redraw();
-        }
+            if (files != null && files.length == 1) {
+                redraw();
+            }
+        });
     }
 
     public void redraw() {
-        PsiElement newCurrentElement = getSelectedElement();
-        if (newCurrentElement != null && newCurrentElement != currentElement) {
-            currentElement = newCurrentElement;
-            redrawCurrent();
-        }
+        getSelectedElement(newCurrentElement -> {
+            if (newCurrentElement != null && newCurrentElement != currentElement) {
+                currentElement = newCurrentElement;
+                redrawCurrent();
+            }
+        });
     }
 
     private void redrawCurrent() {
@@ -527,17 +544,19 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     public void scrollToNode(final GraphNode node) {
-        try {
-            if (jgraph != null) {
-                DefaultGraphCell vertexCell = m_jgAdapter.getVertexCell(node);
-                if (vertexCell != null) {
-                    Rectangle bounds = jgraph.getCellBounds(vertexCell).getBounds();
-                    scrollPane.getHorizontalScrollBar().setValue(Math.min(bounds.x - 50, scrollPane.getHorizontalScrollBar().getMaximum()));
-                    scrollPane.getVerticalScrollBar().setValue(Math.min(bounds.y - 50, scrollPane.getVerticalScrollBar().getMaximum()));
+        if (scrollPane != null) {
+            try {
+                if (jgraph != null) {
+                    DefaultGraphCell vertexCell = m_jgAdapter.getVertexCell(node);
+                    if (vertexCell != null) {
+                        Rectangle bounds = jgraph.getCellBounds(vertexCell).getBounds();
+                        scrollPane.getHorizontalScrollBar().setValue(Math.min(bounds.x - 50, scrollPane.getHorizontalScrollBar().getMaximum()));
+                        scrollPane.getVerticalScrollBar().setValue(Math.min(bounds.y - 50, scrollPane.getVerticalScrollBar().getMaximum()));
+                    }
                 }
+            } catch (IllegalArgumentException e) {
+                unableToDrawGraph();
             }
-        } catch (IllegalArgumentException e) {
-            unableToDrawGraph();
         }
     }
 
@@ -618,7 +637,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
         }
 
-        m_jgAdapter.edit(cellAttr, null, null, null);
+        try {
+            m_jgAdapter.edit(cellAttr, null, null, null);
+        } catch (Exception ignored) {}
     }
     
     public void recolorGraph(boolean redraw) {
@@ -726,11 +747,14 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     private void findAndColorPath() {
-        String pathTarget = getPathTarget();
-        if (pathTarget != null && !pathTarget.equals(latestTargetElementInPath)) {
-            recolorGraph(pathTarget, false);
-            latestTargetElementInPath = pathTarget;
-        }
+        getPathTarget(pathTarget -> {
+            if (pathTarget != null && !pathTarget.equals(latestTargetElementInPath)) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    recolorGraph(pathTarget, false);
+                    latestTargetElementInPath = pathTarget;
+                });
+            }
+        });
     }
 
     private void unableToDrawGraph() {
@@ -739,13 +763,21 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         ApplicationManager.getApplication().invokeLater(() -> JOptionPane.showMessageDialog(DependenciesView.this, "Unable to apply current layout", title, JOptionPane.WARNING_MESSAGE));
     }
     
-    public PsiElement getTargetEditorPsiElement() {
+    public void getTargetEditorPsiElement(Consumer<PsiElement> elementConsumer) {
         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
         if (editor != null) {
-            DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
-            return ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN).getPsiLocation();
+            ApplicationManager.getApplication().invokeLater(() -> {
+                DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
+                new Task.Backgroundable(project, "Getting target PSI element") {
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        PsiElement psiLocation = ApplicationManager.getApplication().runReadAction((Computable<ConfigurationContext>) () -> ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN)).getPsiLocation();
+                        elementConsumer.accept(psiLocation);
+                    }
+                }.queue();
+            });
         }
-        return null;
+        elementConsumer.accept(null);
     }
 
     public String getDependentTitle() {
@@ -762,9 +794,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     public abstract boolean showPathToElement();
     
-    public abstract PsiElement getSelectedElement();
+    public abstract void getSelectedElement(Consumer<PsiElement> elementConsumer);
     
-    public abstract String getPathTarget();
+    public abstract void getPathTarget(Consumer<String> pathConsumer);
     
     public abstract int getAverageNodeWidth();
 

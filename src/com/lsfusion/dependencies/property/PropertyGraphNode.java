@@ -1,5 +1,6 @@
 package com.lsfusion.dependencies.property;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.pom.Navigatable;
 import com.lsfusion.dependencies.GraphNode;
 import com.lsfusion.lang.psi.cache.PropertyComplexityCache;
@@ -16,7 +17,11 @@ public class PropertyGraphNode implements GraphNode {
         this.dependency = dependency;
         this.property = property;
         
-        complexity = property instanceof LSFGlobalPropDeclaration ? PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching((LSFGlobalPropDeclaration)property) : 0;
+        complexity = property instanceof LSFGlobalPropDeclaration 
+                ? DumbService.getInstance(property.getProject()).runReadActionInSmartMode(
+                        () -> PropertyComplexityCache.getInstance(property.getProject()).resolveWithCaching((LSFGlobalPropDeclaration)property)
+                ) 
+                : 0;
         name = property.getPresentableText();
     }
 

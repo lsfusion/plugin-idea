@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
@@ -99,22 +100,24 @@ public abstract class LSFModuleDeclarationImpl extends LSFNamespaceDeclarationIm
 
     @Override
     public List<LSFModuleDeclaration> getRequireModules() {
-        List<LSFModuleDeclaration> result = new ArrayList<>();
-        List<LSFModuleReference> requireRefs = getRequireRefs();
-        for (LSFModuleReference ref : requireRefs) {
-            LSFModuleDeclaration moduleDecl = ref.resolveDecl();
-            if (moduleDecl != null) {
-                result.add(moduleDecl);
+        return DumbService.getInstance(getProject()).runReadActionInSmartMode(() -> {
+            List<LSFModuleDeclaration> result = new ArrayList<>();
+            List<LSFModuleReference> requireRefs = getRequireRefs();
+            for (LSFModuleReference ref : requireRefs) {
+                LSFModuleDeclaration moduleDecl = ref.resolveDecl();
+                if (moduleDecl != null) {
+                    result.add(moduleDecl);
+                }
             }
-        }
-        
-        // Если REQUIRE вообще не указан, то по умолчанию поведение должно быть эквивалентно REQUIRE System;
-        if (result.isEmpty()) {
-            LSFModuleDeclaration systemModule = LSFGlobalResolver.findModules("System", GlobalSearchScope.allScope(getProject())).findFirst();
-            if(systemModule != null) // теоретически его может не быть
-                result = Collections.singletonList(systemModule);
-        }
-        return result;
+
+            // Если REQUIRE вообще не указан, то по умолчанию поведение должно быть эквивалентно REQUIRE System;
+            if (result.isEmpty()) {
+                LSFModuleDeclaration systemModule = LSFGlobalResolver.findModules("System", GlobalSearchScope.allScope(getProject())).findFirst();
+                if (systemModule != null) // теоретически его может не быть
+                    result = Collections.singletonList(systemModule);
+            }
+            return result;
+        });
     }
     
     @Override
