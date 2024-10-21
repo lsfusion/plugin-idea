@@ -63,7 +63,7 @@ public abstract class GenerateFormAction extends AnAction {
             "FORM", "FORMEXTID", "FORMS", "FORMULA", "FROM", "FULL", "GET", "GLOBAL", "GRID", "GRIDBOX", "GROUP", "GROUPCHANGE", "EQUAL", "HALIGN", "HEADER", "HEADERS",
             "HEADERSTO", "HIDE", "HIDESCROLLBARS", "HIDETITLE", "HINT", "HINTNOUPDATE", "HINTTABLE", "HOVER", "HORIZONTAL", "HTML", "HTTP", "IF", "IMAGE", "IMPORT", "IMPOSSIBLE", "IN",
             "INDEX", "INDEXED", "INFO", "INIT", "INLINE", "INPUT", "INTERNAL", "IS", "JAVA", "JOIN", "JSON", "JSONTEXT", "KEY",
-            "KEYPRESS", "LAST", "LEFT", "LIKE", "LIMIT", "LIST", "LOCAL",
+            "KEYPRESS", "LAST", "LAZY", "LEFT", "LIKE", "LIMIT", "LIST", "LOCAL",
             "LOCALASYNC", "LOG", "LOGGABLE", "LSF", "MANAGESESSION", "NOMANAGESESSION", "MAP", "MATCH", "MATERIALIZED", "MAX", "MEASURE", "MEASURES", "MENU", "MEMO", "MESSAGE", "META", "MIN",
             "MODULE", "MOVE", "MOUSE", "MS", "MULTI", "NAME", "NAMESPACE", "NAVIGATOR", "NESTED", "NESTEDSESSION",
             "NEW", "NEWEDIT", "NEWSESSION", "NEWSQL", "NEWTHREAD", "NO", "NOCANCEL",
@@ -77,11 +77,11 @@ public abstract class GenerateFormAction extends AnAction {
             "REPORT", "REPORTS", "REPORTFILES", "REQUEST", "REQUIRE", "RESOLVE", "RETURN", "RGB", "RIGHT", "ROUND", "ROOT", "ROW",
             "ROWS", "RTF", "SCROLL", "SEEK", "SELECT", "SELECTED", "SELECTOR", "SERIALIZABLE", "SERVER",
             "SET", "SETCHANGED", "SETDROPPED", "SETTINGS", "SCHEDULE", "SHOW", "SHOWDEP", "SHOWIF", "SINGLE", "SHEET", "SPLITH", "SPLITV", "SQL", "START", "STEP", "STICKY",
-            "STRICT", "STRUCT", "SUBJECT", "SUBREPORT", "SUCCESS", "SUM", "TAB", "TABBED", "TABLE", "TAG", "TCP", "TEXTHALIGN",
-            "TEXTVALIGN", "THEN", "THREADS", "TO", "DRAW", "TOOLBAR",
+            "STRICT", "STRONG", "STRUCT", "SUBJECT", "SUBREPORT", "SUCCESS", "SUM", "TAB", "TABBED", "TABLE", "TAG",
+            "TCP", "TEXTHALIGN", "TEXTVALIGN", "THEN", "THREADS", "TO", "DRAW", "TOOLBAR",
             "TOOLBARBOX", "TOOLBARLEFT", "TOOLBARRIGHT", "TOOLBARSYSTEM", "TOP", "TREE", "TRY", "TSQUERY", "TSVECTOR",
-            "UDP", "UNGROUP", "UP", "USERFILTER", "USERFILTERS", "VALIGN", "VALUE", "VERTICAL", "VIEW", "WARN", "WHEN",
-            "WHERE", "WHILE", "WITHIN", "WRITE", "WINDOW", "XLS", "XLSX", "XML", "XOR", "YES", "YESNO"));
+            "UDP", "UNGROUP", "UP", "USERFILTER", "USERFILTERS", "VALIGN", "VALUE", "VERTICAL", "VIEW", "WARN", "WEAK",
+            "WHEN", "WHERE", "WHILE", "WITHIN", "WRITE", "WINDOW", "XLS", "XLSX", "XML", "XOR", "YES", "YESNO"));
 
     abstract String getExtension();
 

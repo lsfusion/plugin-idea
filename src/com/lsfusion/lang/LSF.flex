@@ -365,6 +365,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "KEY"                    		        { return KEY; }
   "KEYPRESS"                    		{ return KEYPRESS; }
   "LAST"                                { return LAST; }
+  "LAZY"                                { return LAZY; }
   "LEFT"                    			{ return LEFT; }
   "LIKE"                   			    { return LIKE; }
   "LIMIT"                   			{ return LIMIT; }
@@ -511,6 +512,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "STEP"                    			{ return STEP; }
   "STICKY"                    			{ return STICKY; }
   "STRICT"                  			{ return STRICT; }
+  "STRONG"                  			{ return STRONG; }
   "STRUCT"                  			{ return STRUCT; }
   "SUBJECT"                 			{ return SUBJECT; }
   "SUBREPORT"              			    { return SUBREPORT; }
@@ -545,6 +547,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "VERTICAL"                			{ return VERTICAL; }
   "VIEW"                    			{ return VIEW; }
   "WARN"                    			{ return WARN; }
+  "WEAK"                    			{ return WEAK; }
   "WHEN"                    			{ return WHEN; }
   "WHERE"                   			{ return WHERE; }
   "WHILE"                   			{ return WHILE; }

@@ -15,6 +15,7 @@
             <li>Support CUSTOM aggregates in the GROUP / PARTITION operators</li>
             <li>EVENTS ON FILTERGROUPS, ON FILTERS PROPERTY support</li>
             <li>Report buttons moved to separate tab in Design window</li>
+            <li>LAZY WEAK STRONG instead of @@lazy</li>
         </ul>
     ]]>
     </change-notes>

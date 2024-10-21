@@ -666,6 +666,7 @@ private semiPropertyOption ::= IN groupUsage
                            |    aggrSetting
                            |	notNullSetting
                            |	eventIdSetting
+                           |	lazySetting
                            |    stickyOption
                            |    syncTypeLiteral
                            |   ATSIGN2 simpleName
@@ -705,6 +706,7 @@ notNullSetting ::= nullOption (DELETE)? baseEventNotPE
 onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти
 asEditActionSetting ::= ASON formEventType noContextActionOrPropertyUsage {pin = 1}
 eventIdSetting ::= EVENTID stringLiteral
+lazySetting ::= LAZY (WEAK | STRONG)?
 
 stickyOption ::= STICKY | NOSTICKY
 
