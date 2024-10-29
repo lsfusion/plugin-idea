@@ -63,37 +63,39 @@ public class SVGExporter {
     }
 
     protected void exportSVG(JGraph graph) {
-        int returnValue = JFileChooser.CANCEL_OPTION;
-        initSVGFileChooser();
-        returnValue = SVGFileChooser.showSaveDialog(graph);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            VertexRenderer oldRenderer = VertexView.renderer;
-            try {
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(
-                        SVGFileChooser.getSelectedFile()));
-                // Set all vertices to use the SVG renderer
-                VertexView.renderer = new SVGVertexRenderer();
-                SVGGraphWriter writer = new SVGGraphWriter() {
-                    @Override
-                    public Object[] getLabels(CellView view) {
-                        if(view instanceof VertexView)
-                            return new Object[]{view.getCell().toString()};
-                        return super.getLabels(view);
-                    }
-                };
-                // SVG nodes will have no size at this point. They need
-                // to be given suitable bounds prior to being passed to the
-                // layout algorithm.
-//				graph.computeVertexSizes();
-                writer.write(new BufferedOutputStream(out), null,
-                        graph.getGraphLayoutCache(), 35);
-                out.flush();
-                out.close();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(graph, e.getMessage(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
+        if(graph != null) {
+            int returnValue = JFileChooser.CANCEL_OPTION;
+            initSVGFileChooser();
+            returnValue = SVGFileChooser.showSaveDialog(graph);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                VertexRenderer oldRenderer = VertexView.renderer;
+                try {
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(
+                            SVGFileChooser.getSelectedFile()));
+                    // Set all vertices to use the SVG renderer
+                    VertexView.renderer = new SVGVertexRenderer();
+                    SVGGraphWriter writer = new SVGGraphWriter() {
+                        @Override
+                        public Object[] getLabels(CellView view) {
+                            if (view instanceof VertexView)
+                                return new Object[]{view.getCell().toString()};
+                            return super.getLabels(view);
+                        }
+                    };
+                    // SVG nodes will have no size at this point. They need
+                    // to be given suitable bounds prior to being passed to the
+                    // layout algorithm.
+				    //graph.computeVertexSizes();
+                    writer.write(new BufferedOutputStream(out), null,
+                            graph.getGraphLayoutCache(), 35);
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(graph, e.getMessage(), "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                VertexView.renderer = oldRenderer;
             }
-            VertexView.renderer = oldRenderer;
         }
     }
 

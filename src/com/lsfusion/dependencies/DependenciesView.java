@@ -15,6 +15,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.ui.SearchFieldAction;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -74,12 +75,6 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     protected PsiElement currentElement;
 
-    protected boolean showRequired = true;
-    protected boolean showRequiring = false;
-    protected boolean allEdges = false;
-    protected boolean onlyLeafs = false;
-
-    protected boolean showDeclPath = false;
     protected String latestTargetElementInPath;
 
     protected GraphDataModel dataModel;
@@ -91,13 +86,23 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     
     protected GraphNode selectedInSearch;
 
+    //first toolbar
+    private BGTCheckboxAction showRequiredAction;
+    private boolean showRequired = true;
+    private BGTCheckboxAction showRequiringAction;
+    private boolean showRequiring = false;
+    private GraphEdgesComboAction edgesAction;
+    protected boolean allEdges = false;
+    protected boolean onlyLeafs = false;
+    private GraphLayoutComboAction layoutAction;
+    private boolean showDeclPath = false;
+
+    //second toolbar
     private ModuleComboAction moduleAction;
     private SearchFieldAction target;
 
-    protected CheckboxAction showRequiredAction;
-    protected CheckboxAction showRequiringAction;
-    protected GraphLayoutComboAction layoutAction;
-    protected GraphEdgesComboAction edgesAction;
+    //third toolbar
+    private boolean manualMode = false;
 
     protected double latestScale = 1;
 
@@ -144,6 +149,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         JPanel toolbar = new JPanel(new VerticalLayout());
         toolbar.add(createFirstToolbar().getComponent());
         toolbar.add(createSecondToolbar().getComponent());
+        toolbar.add(createThirdToolbar().getComponent());
 
         add(toolbar, BorderLayout.NORTH);
     }
@@ -151,34 +157,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     private ActionToolbar createFirstToolbar() {
         SimpleActionGroup actions = new SimpleActionGroup();
 
-        actions.add(new AnAction("Refresh / Apply", "Refresh", LSFIcons.Design.REFRESH) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                redrawCurrent();
-
-                //hack to fix small height after refresh
-                String currentLayout = layoutAction.getCurrentLayout();
-                changeLayout(TREE_LAYOUT, false);
-                changeLayout(currentLayout, false);
-            }
-        });
-
-        showRequiringAction = new CheckboxAction(getDependentTitle()) {
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent e) {
-                return showRequiring;
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                showRequiring = state;
-                if (!showRequired && !showRequiring) {
-                    showRequiredAction.setSelected(e, true);
-                }
-            }
-        };
-
-        showRequiredAction = new CheckboxAction(getDependencyTitle()) {
+        actions.add(showRequiredAction = new BGTCheckboxAction(getDependencyTitle()) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
                 return showRequired;
@@ -191,10 +170,22 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                     showRequiringAction.setSelected(e, true);
                 }
             }
-        };
+        });
 
-        actions.add(showRequiredAction);
-        actions.add(showRequiringAction);
+        actions.add(showRequiringAction = new BGTCheckboxAction(getDependentTitle()) {
+            @Override
+            public boolean isSelected(@NotNull AnActionEvent e) {
+                return showRequiring;
+            }
+
+            @Override
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                showRequiring = state;
+                if (!showRequired && !showRequiring) {
+                    showRequiredAction.setSelected(e, true);
+                }
+            }
+        });
 
         actions.add(edgesAction = new GraphEdgesComboAction("Edges:") {
             @Override
@@ -203,16 +194,17 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
         });
 
-        layoutAction = new GraphLayoutComboAction("Layout:") {
+        actions.add(layoutAction = new GraphLayoutComboAction("Layout:") {
             @Override
             protected void changeLayout(boolean update) {
-                DependenciesView.this.changeLayout(update);
+                if (!manualMode) {
+                    DependenciesView.this.changeLayout(update);
+                }
             }
-        };
-        actions.add(layoutAction);
+        });
 
         if (showPathToElement()) {
-            actions.add(new CheckboxAction("Path to element") {
+            actions.add(new BGTCheckboxAction("Path to element") {
                 @Override
                 public boolean isSelected(@NotNull AnActionEvent e) {
                     return showDeclPath;
@@ -231,6 +223,55 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 }
             });
         }
+
+        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(title, actions, true);
+        actionToolbar.setTargetComponent(this);
+        return actionToolbar;
+    }
+
+    private ActionToolbar createSecondToolbar() {
+        SimpleActionGroup actions = new SimpleActionGroup();
+
+        actions.add(moduleAction = new ModuleComboAction("Logics Module:", Arrays.stream(LSFFileUtils.getModules(project)).collect(Collectors.toMap(Module::getName, Function.identity()))));
+
+        if (showTargetField) {
+            target = new SearchFieldAction("Target LSF:") {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                    redrawCurrent();
+                }
+            };
+            actions.add(target);
+        }
+
+        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(title, actions, true);
+        actionToolbar.setTargetComponent(this);
+        return actionToolbar;
+    }
+
+    private ActionToolbar createThirdToolbar() {
+        SimpleActionGroup actions = new SimpleActionGroup();
+
+        actions.add(new BGTCheckboxAction("Manual update") {
+            @Override
+            public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
+                return manualMode;
+            }
+
+            @Override
+            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean state) {
+                manualMode = state;
+            }
+        });
+
+        actions.add(new AnAction("Refresh / Apply", "Refresh", LSFIcons.Design.REFRESH) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                redrawCurrent(true);
+            }
+        });
+
+        actions.add(new Separator("|"));
 
         actions.add(new AnAction(LSFIcons.DEPENDENCY_ZOOM_OUT) {
             @Override
@@ -267,27 +308,6 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         return actionToolbar;
     }
 
-    private ActionToolbar createSecondToolbar() {
-        SimpleActionGroup actions = new SimpleActionGroup();
-
-        moduleAction = new ModuleComboAction("Logics Module:", Arrays.stream(LSFFileUtils.getModules(project)).collect(Collectors.toMap(Module::getName, Function.identity())));
-        actions.add(moduleAction);
-
-        if(showTargetField) {
-            target = new SearchFieldAction("Target LSF:") {
-                @Override
-                public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                    redrawCurrent();
-                }
-            };
-            actions.add(target);
-        }
-
-        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(title, actions, true);
-        actionToolbar.setTargetComponent(this);
-        return actionToolbar;
-    }
-    
     public Collection<GraphNode> getAllNodes() {
         return dataModel.getNodes();
     }
@@ -317,12 +337,18 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         getSelectedElement(newCurrentElement -> {
             if (newCurrentElement != null && newCurrentElement != currentElement) {
                 currentElement = newCurrentElement;
-                redrawCurrent();
+                if (!manualMode) {
+                    redrawCurrent();
+                }
             }
         });
     }
 
     private void redrawCurrent() {
+        redrawCurrent(false);
+    }
+
+    private void redrawCurrent(boolean fixSmallHeight) {
         Component comp = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
         if (comp != null) {
             remove(comp);
@@ -330,64 +356,81 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         dataModel = new GraphDataModel();
 
-        if (showRequired) {
-            createDependencyNode(currentElement, new HashSet<>());
-        }
+        new Task.Backgroundable(project, "Calculating LSF Dependencies", true) {
 
-        if (showRequiring) {
-            createDependentNode(moduleAction.getCurrentModuleScope(), currentElement, new HashSet<>());
-        }
-
-        g = new ListenableDirectedGraph<>(DefaultEdge.class);
-
-        fillGraph(target != null ? target.getText() : null);
-
-        m_jgAdapter = new JGraphModelAdapter(g);
-
-        initJGraph();
-
-        new DependencySpeedSearch(jgraph) {
             @Override
-            protected GraphNode[] getNodes() {
-                return getAllNodes().toArray(new GraphNode[0]);
+            public void onSuccess() {
+
+                g = new ListenableDirectedGraph<>(DefaultEdge.class);
+
+                fillGraph(target != null ? target.getText() : null);
+
+                m_jgAdapter = new JGraphModelAdapter(g);
+
+                initJGraph();
+
+                new DependencySpeedSearch(jgraph) {
+                    @Override
+                    protected GraphNode[] getNodes() {
+                        return getAllNodes().toArray(new GraphNode[0]);
+                    }
+
+                    @Override
+                    protected void selectElement(Object element, String selectedText) {
+                        selectNode(isPopupActive() ? (GraphNode) element : null);
+                        if (isPopupActive()) {
+                            selectedIndex = Arrays.asList(nodes).indexOf(element);
+                        }
+                    }
+                };
+
+                if (!changeLayout(false)) {
+                    return;
+                }
+
+                scrollPane = new JBScrollPane(jgraph);
+                scrollPane.addMouseWheelListener(e -> {
+                    if (e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK) {
+                        zoom(e.getWheelRotation());
+                    }
+                });
+
+                add(scrollPane);
+
+                initGraphDesign();
+
+                recolorGraph(true);
+
+                jgraph.refresh();
+
+                Content content = toolWindow.getContentManager().getContent(DependenciesView.this);
+                if (content != null && dataModel.rootNode != null) {
+                    content.setDisplayName(dataModel.rootNode.getSID());
+                }
+
+                revalidate();
+
+                if (fixSmallHeight) {
+                    //hack to fix small height after refresh
+                    String currentLayout = layoutAction.getCurrentLayout();
+                    changeLayout(TREE_LAYOUT, false);
+                    changeLayout(currentLayout, false);
+                }
+
             }
 
-            @Override
-            protected void selectElement(Object element, String selectedText) {
-                selectNode(isPopupActive() ? (GraphNode) element : null);
-                if (isPopupActive()) {
-                    selectedIndex = Arrays.asList(nodes).indexOf(element);
+            public void run(@NotNull ProgressIndicator indicator) {
+                if (showRequired) {
+                    createDependencyNode(currentElement, new HashSet<>());
+                }
+
+                if (showRequiring) {
+                    createDependentNode(moduleAction.getCurrentModuleScope(), currentElement, new HashSet<>());
                 }
             }
-        };
-
-        if (!changeLayout(false)) {
-            return;
-        }
-
-        scrollPane = new JBScrollPane(jgraph);
-        scrollPane.addMouseWheelListener(e -> {
-            if (e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK) {
-                zoom(e.getWheelRotation());
-            }
-        });
-
-        add(scrollPane);
-
-        initGraphDesign();
-
-        recolorGraph(true);
-
-        jgraph.refresh();
-
-        Content content = toolWindow.getContentManager().getContent(this);
-        if (content != null && dataModel.rootNode != null) {
-            content.setDisplayName(dataModel.rootNode.getSID());
-        }
-        
-        revalidate();
+        }.queue();
     }
-    
+
     protected void initJGraph() {
         jgraph = new JGraph(m_jgAdapter) {
             @Override
@@ -464,7 +507,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         String currentEdges = edgesAction.getCurrentEdges();
         allEdges = currentEdges.equals(ALL_EDGES);
         onlyLeafs = currentEdges.equals(ONLY_LEAFS);
-        redrawCurrent();
+        if (!manualMode) {
+            redrawCurrent();
+        }
     }
 
     private boolean changeLayout(boolean update) {
@@ -606,12 +651,12 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     public void initGraphDesign() {
-        Map cellAttr = new HashMap();
+        Map<DefaultGraphCell, AttributeMap> cellAttr = new LinkedHashMap<>();
         for (GraphNode node : dataModel.getNodes()) {
             DefaultGraphCell cell = m_jgAdapter.getVertexCell(node);
             if (cell != null) {
-                Map attr = cell.getAttributes();
-                Map newAttr = new AttributeMap(attr);
+                AttributeMap attr = cell.getAttributes();
+                AttributeMap newAttr = new AttributeMap(attr);
                 GraphConstants.setAutoSize(newAttr, true);
                 GraphConstants.setInset(newAttr, 3);
 
@@ -624,8 +669,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         for (Object gEdge : g.edgeSet()) {
             DefaultGraphCell cell = m_jgAdapter.getEdgeCell(gEdge);
             if (cell != null) {
-                Map attr = cell.getAttributes();
-                Map newAttr = new AttributeMap(attr);
+                AttributeMap attr = cell.getAttributes();
+                AttributeMap newAttr = new AttributeMap(attr);
                 GraphConstants.setLabelEnabled(newAttr, false);
                 GraphConstants.setLineEnd(newAttr, GraphConstants.ARROW_CLASSIC);
                 GraphConstants.setDisconnectable(newAttr, false);
@@ -652,7 +697,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             path = dataModel.getPath(g, targetElement, false);
         }
 
-        Map<DefaultGraphCell, AttributeMap> cellAttr = new HashMap<>();
+        Map<DefaultGraphCell, AttributeMap> cellAttr = new LinkedHashMap<>();
         for (GraphNode node : dataModel.getNodes()) {
             DefaultGraphCell cell = m_jgAdapter.getVertexCell(node);
             if (cell != null) {
@@ -803,6 +848,18 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     @Override
     public void dispose() {
         //ignore
+    }
+
+    private abstract static class BGTCheckboxAction extends CheckboxAction {
+
+        public BGTCheckboxAction(@NlsContexts.Checkbox String text) {
+            super(text);
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.BGT;
+        }
     }
 }
 
