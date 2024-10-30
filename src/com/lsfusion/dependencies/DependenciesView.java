@@ -17,7 +17,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.vcs.ui.SearchFieldAction;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
@@ -25,6 +24,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.DarculaColors;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.jgraph.layout.JGraphFacade;
@@ -39,6 +39,8 @@ import com.jgraph.layout.tree.JGraphRadialTreeLayout;
 import com.jgraph.layout.tree.JGraphTreeLayout;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.dependencies.module.DependencySpeedSearch;
+import com.lsfusion.design.ui.FlexAlignment;
+import com.lsfusion.design.ui.FlexPanel;
 import com.lsfusion.util.LSFFileUtils;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jetbrains.annotations.NotNull;
@@ -99,7 +101,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     //second toolbar
     private ModuleComboAction moduleAction;
-    private SearchFieldAction target;
+    private SearchTextField target;
 
     //third toolbar
     private boolean manualMode = false;
@@ -148,7 +150,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         JPanel toolbar = new JPanel(new VerticalLayout());
         toolbar.add(createFirstToolbar().getComponent());
-        toolbar.add(createSecondToolbar().getComponent());
+        toolbar.add(createSecondToolbar());
         toolbar.add(createThirdToolbar().getComponent());
 
         add(toolbar, BorderLayout.NORTH);
@@ -229,24 +231,37 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         return actionToolbar;
     }
 
-    private ActionToolbar createSecondToolbar() {
-        SimpleActionGroup actions = new SimpleActionGroup();
+    private FlexPanel createSecondToolbar() {
+         FlexPanel panel = new FlexPanel(false);
 
+        SimpleActionGroup actions = new SimpleActionGroup();
         actions.add(moduleAction = new ModuleComboAction("Logics Module:", Arrays.stream(LSFFileUtils.getModules(project)).collect(Collectors.toMap(Module::getName, Function.identity()))));
+        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(title, actions, true);
+        actionToolbar.setTargetComponent(this);
+        panel.add(actionToolbar.getComponent());
 
         if (showTargetField) {
-            target = new SearchFieldAction("Target LSF:") {
+            panel.add(new JLabel("Target LSF: "), FlexAlignment.CENTER);
+            target = new SearchTextField() {
+
                 @Override
-                public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                protected void onFieldCleared() {
+                    super.onFieldCleared();
                     redrawCurrent();
                 }
             };
-            actions.add(target);
+            target.addKeyboardListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    super.keyPressed(e);
+                    if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        redrawCurrent();
+                    }
+                }
+            });
+            panel.add(target);
         }
-
-        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(title, actions, true);
-        actionToolbar.setTargetComponent(this);
-        return actionToolbar;
+        return panel;
     }
 
     private ActionToolbar createThirdToolbar() {
@@ -267,7 +282,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         actions.add(new AnAction("Refresh / Apply", "Refresh", LSFIcons.Design.REFRESH) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                redrawCurrent(true);
+                redraw(true);
             }
         });
 
@@ -334,11 +349,15 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     public void redraw() {
+        redraw(false);
+    }
+
+    public void redraw(boolean force) {
         getSelectedElement(newCurrentElement -> {
-            if (newCurrentElement != null && newCurrentElement != currentElement) {
+            if (newCurrentElement != null && (force || newCurrentElement != currentElement)) {
                 currentElement = newCurrentElement;
-                if (!manualMode) {
-                    redrawCurrent();
+                if (force || !manualMode) {
+                    redrawCurrent(force);
                 }
             }
         });
@@ -348,7 +367,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         redrawCurrent(false);
     }
 
-    private void redrawCurrent(boolean fixSmallHeight) {
+    private void redrawCurrent(boolean force) {
         Component comp = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
         if (comp != null) {
             remove(comp);
@@ -363,7 +382,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
                 g = new ListenableDirectedGraph<>(DefaultEdge.class);
 
-                fillGraph(target != null ? target.getText() : null);
+                fillGraph(getTargetText());
 
                 m_jgAdapter = new JGraphModelAdapter(g);
 
@@ -410,11 +429,15 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
                 revalidate();
 
-                if (fixSmallHeight) {
+                if (force) {
                     //hack to fix small height after refresh
                     String currentLayout = layoutAction.getCurrentLayout();
                     changeLayout(TREE_LAYOUT, false);
                     changeLayout(currentLayout, false);
+                }
+
+                if(g.edgeSet().isEmpty() && getTargetText() != null) {
+                    ApplicationManager.getApplication().invokeLater(() -> JOptionPane.showMessageDialog(DependenciesView.this, getTargetText() + " not found in dependencies", title, JOptionPane.WARNING_MESSAGE));
                 }
 
             }
@@ -429,6 +452,10 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                 }
             }
         }.queue();
+    }
+
+    private String getTargetText() {
+        return target != null ? target.getText() : null;
     }
 
     protected void initJGraph() {
