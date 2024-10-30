@@ -41,6 +41,7 @@ import com.lsfusion.LSFIcons;
 import com.lsfusion.dependencies.module.DependencySpeedSearch;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.FlexPanel;
+import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFFileUtils;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jetbrains.annotations.NotNull;
@@ -436,7 +437,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                     changeLayout(currentLayout, false);
                 }
 
-                if(g.edgeSet().isEmpty() && getTargetText() != null) {
+                if(g.edgeSet().isEmpty() && !BaseUtils.isRedundantString(getTargetText())) {
                     ApplicationManager.getApplication().invokeLater(() -> JOptionPane.showMessageDialog(DependenciesView.this, getTargetText() + " not found in dependencies", title, JOptionPane.WARNING_MESSAGE));
                 }
 

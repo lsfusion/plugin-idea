@@ -1,5 +1,7 @@
 package com.lsfusion.dependencies.module;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
@@ -143,17 +145,19 @@ public class ModuleDependenciesView extends DependenciesView {
                 if (refModules != null) {
                     for (LSFModuleDeclaration decl : refModules) {
                         assert decl != null;
-                        if (scope == null || scope.accept(decl.getLSFFile().getVirtualFile())) {
-                            String sourceDeclName = decl.getDeclName();
-                            String targetDeclName = module.getDeclName();
-                            if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
-                                addModelEdge(decl, module, false);
-                            }
+                        ApplicationManager.getApplication().runReadAction(() -> ProgressManager.getInstance().runProcess(() -> {
+                            if (scope == null || scope.accept(decl.getLSFFile().getVirtualFile())) {
+                                String sourceDeclName = decl.getDeclName();
+                                String targetDeclName = module.getDeclName();
+                                if (allEdges || !dataModel.containsNode(targetDeclName) || !dataModel.containsNode(sourceDeclName)) {
+                                    addModelEdge(decl, module, false);
+                                }
 
-                            if (proceeded.add(decl)) {
-                                createDependentNode(scope, decl, proceeded);
+                                if (proceeded.add(decl)) {
+                                    createDependentNode(scope, decl, proceeded);
+                                }
                             }
-                        }
+                        }, null));
                     }
                 }
             }
