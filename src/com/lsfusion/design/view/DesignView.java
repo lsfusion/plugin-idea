@@ -19,7 +19,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiTreeChangeEvent;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.components.JBTabbedPane;
-import com.intellij.util.Consumer;
 import com.lsfusion.lang.psi.LSFDesignStatement;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFLocalSearchScope;
@@ -32,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
 public class DesignView extends JBTabbedPane {
     private final Project project;
