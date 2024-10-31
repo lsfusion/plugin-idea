@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.PsiFile;
-import com.intellij.util.Consumer;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.ui.FlexPanel;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
@@ -78,7 +77,7 @@ public class ReportsPanel extends FlexPanel {
     public void onActivated() {
         if (!wasActivated) {
             wasActivated = true;
-            DesignView.openFormUnderCaretDesign(project, (Consumer<DesignView.TargetForm>) targetForm -> update(targetForm.form));
+            DesignView.openFormUnderCaretDesign(project, targetForm -> update(targetForm.form));
         }
     }
     
