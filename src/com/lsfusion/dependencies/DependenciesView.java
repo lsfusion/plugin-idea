@@ -105,7 +105,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     private SearchTextField target;
 
     //third toolbar
-    private boolean manualMode = false;
+    protected boolean manualMode = false;
 
     protected double latestScale = 1;
 
@@ -117,7 +117,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         setLayout(new BorderLayout());
 
-        final TimerListener timerListener = new TimerListener() {
+        ActionManager.getInstance().addTimerListener(new TimerListener() {
             @Override
             public ModalityState getModalityState() {
                 return ModalityState.stateForComponent(toolWindow.getComponent());
@@ -137,8 +137,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                     }.queue();
                 }
             }
-        };
-        ActionManager.getInstance().addTimerListener(timerListener);
+        });
         
         new Timer().schedule(new TimerTask() {
             @Override
@@ -354,14 +353,14 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     public void redraw(boolean force) {
-        getSelectedElement(newCurrentElement -> {
-            if (newCurrentElement != null && (force || newCurrentElement != currentElement)) {
-                currentElement = newCurrentElement;
-                if (force || !manualMode) {
+        if (force || !manualMode) {
+            getSelectedElement(newCurrentElement -> {
+                if (newCurrentElement != null && (force || newCurrentElement != currentElement)) {
+                    currentElement = newCurrentElement;
                     redrawCurrent(force);
                 }
-            }
-        });
+            });
+        }
     }
 
     private void redrawCurrent() {
@@ -836,21 +835,25 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         ApplicationManager.getApplication().invokeLater(() -> JOptionPane.showMessageDialog(DependenciesView.this, "Unable to apply current layout", title, JOptionPane.WARNING_MESSAGE));
     }
     
-    public void getTargetEditorPsiElement(Consumer<PsiElement> elementConsumer) {
+    public void getTargetEditorPsiElement(Consumer<PsiElement> elementConsumer, boolean skipSameEditor) {
         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
         if (editor != null) {
-            ApplicationManager.getApplication().invokeLater(() -> {
-                DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
-                new Task.Backgroundable(project, "Getting target PSI element") {
-                    @Override
-                    public void run(@NotNull ProgressIndicator indicator) {
-                        PsiElement psiLocation = ApplicationManager.getApplication().runReadAction((Computable<ConfigurationContext>) () -> ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN)).getPsiLocation();
-                        elementConsumer.accept(psiLocation);
-                    }
-                }.queue();
-            });
+            getTargetEditorPsiElement(editor, elementConsumer, skipSameEditor);
+        } else {
+            elementConsumer.accept(null);
         }
-        elementConsumer.accept(null);
+    }
+    public void getTargetEditorPsiElement(Editor editor, Consumer<PsiElement> elementConsumer, boolean skipSameEditor) {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
+            new Task.Backgroundable(project, "Getting target PSI element") {
+                @Override
+                public void run(@NotNull ProgressIndicator indicator) {
+                    PsiElement psiLocation = ApplicationManager.getApplication().runReadAction((Computable<ConfigurationContext>) () -> ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN)).getPsiLocation();
+                    elementConsumer.accept(psiLocation);
+                }
+            }.queue();
+        });
     }
 
     public String getDependentTitle() {

@@ -1,6 +1,7 @@
 package com.lsfusion.dependencies.module;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -24,6 +25,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class ModuleDependenciesView extends DependenciesView {
+    private Editor currentEditor;
+    
     public ModuleDependenciesView(Project project, ToolWindowEx toolWindow) {
         super("Module dependencies", project, toolWindow, true);
     }
@@ -49,6 +52,18 @@ public class ModuleDependenciesView extends DependenciesView {
     }
 
     @Override
+    public void getTargetEditorPsiElement(Editor editor, Consumer<PsiElement> elementConsumer, boolean skipSameEditor) {
+        // if editor doesn't change, skip redraw as module doesn't change either
+        // otherwise background process progress bar flashes in the toolbar
+        if (!skipSameEditor || !editor.equals(currentEditor)) {
+            super.getTargetEditorPsiElement(editor, elementConsumer, skipSameEditor);
+        }
+        if (skipSameEditor) {
+            currentEditor = editor;
+        }
+    }
+
+    @Override
     public void getSelectedElement(Consumer<PsiElement> elementConsumer) {
         getTargetEditorPsiElement(targetElement -> {
             if (targetElement != null) {
@@ -62,7 +77,7 @@ public class ModuleDependenciesView extends DependenciesView {
                 elementConsumer.accept(moduleDeclaration);
             }
             elementConsumer.accept(null);
-        });
+        }, true);
     }
 
     @Override
@@ -81,7 +96,7 @@ public class ModuleDependenciesView extends DependenciesView {
                 return null;
             });
             pathConsumer.accept(module);
-        });
+        }, false);
     }
 
     @Override

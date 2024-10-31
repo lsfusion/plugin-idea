@@ -104,7 +104,7 @@ public class PropertyDependenciesView extends DependenciesView {
                 return null;
             });
             elementConsumer.accept(element);
-        });
+        }, false);
     }
 
     @Override
