@@ -154,9 +154,7 @@ public class ModuleDependenciesView extends DependenciesView {
                     }
                 }
             } else {
-                Set<LSFModuleDeclaration> refModules = DumbService.getInstance(project).runReadActionInSmartMode(
-                        () -> ModuleDependentsCache.getInstance(project).resolveWithCaching(module)
-                );
+                Set<LSFModuleDeclaration> refModules = ModuleDependentsCache.getInstance(project).resolveWithCaching(module);
                 if (refModules != null) {
                     for (LSFModuleDeclaration decl : refModules) {
                         assert decl != null;

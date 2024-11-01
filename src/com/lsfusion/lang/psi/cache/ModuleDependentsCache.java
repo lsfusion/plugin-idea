@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.cache;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.searches.ReferencesSearch;
@@ -61,6 +62,8 @@ public class ModuleDependentsCache extends PsiDependentCache<LSFModuleDeclaratio
 
     @Nullable
     public Set<LSFModuleDeclaration> resolveWithCaching(@NotNull LSFModuleDeclaration element) {
-        return super.resolveWithCaching(element, RESOLVER, false, false);
+        return DumbService.getInstance(element.getProject()).runReadActionInSmartMode(
+                () -> super.resolveWithCaching(element, RESOLVER, false, false)
+        );
     }
 }
