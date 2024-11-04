@@ -64,7 +64,7 @@ public class ModuleDependenciesView extends DependenciesView {
     }
 
     @Override
-    public void getSelectedElement(Consumer<PsiElement> elementConsumer) {
+    public void getSelectedElement(Consumer<PsiElement> elementConsumer, boolean forceUpdate) {
         getTargetEditorPsiElement(targetElement -> {
             if (targetElement != null) {
                 LSFModuleDeclaration moduleDeclaration = DumbService.getInstance(project).runReadActionInSmartMode(() -> {
@@ -77,7 +77,7 @@ public class ModuleDependenciesView extends DependenciesView {
                 elementConsumer.accept(moduleDeclaration);
             }
             elementConsumer.accept(null);
-        }, true);
+        }, !forceUpdate);
     }
 
     @Override

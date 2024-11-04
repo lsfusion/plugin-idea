@@ -352,14 +352,14 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         redraw(false);
     }
 
-    public void redraw(boolean force) {
-        if (force || !manualMode) {
+    public void redraw(boolean forceUpdate) {
+        if (forceUpdate || !manualMode) {
             getSelectedElement(newCurrentElement -> {
-                if (newCurrentElement != null && (force || newCurrentElement != currentElement)) {
+                if (newCurrentElement != null && (forceUpdate || newCurrentElement != currentElement)) {
                     currentElement = newCurrentElement;
-                    redrawCurrent(force);
+                    redrawCurrent(forceUpdate);
                 }
-            });
+            }, forceUpdate);
         }
     }
 
@@ -870,7 +870,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     public abstract boolean showPathToElement();
     
-    public abstract void getSelectedElement(Consumer<PsiElement> elementConsumer);
+    public abstract void getSelectedElement(Consumer<PsiElement> elementConsumer, boolean forceUpdate);
     
     public abstract void getPathTarget(Consumer<String> pathConsumer);
     

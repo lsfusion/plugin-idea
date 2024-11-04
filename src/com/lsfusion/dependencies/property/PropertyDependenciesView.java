@@ -88,7 +88,7 @@ public class PropertyDependenciesView extends DependenciesView {
     }
 
     @Override
-    public void getSelectedElement(Consumer<PsiElement> elementConsumer) {
+    public void getSelectedElement(Consumer<PsiElement> elementConsumer, boolean forceUpdate) {
         getTargetEditorPsiElement(targetElement -> {
             PsiElement element = DumbService.getInstance(project).runReadActionInSmartMode(() -> {
                 if (targetElement != null && PsiTreeUtil.getParentOfType(targetElement, LSFId.class) != null) {
