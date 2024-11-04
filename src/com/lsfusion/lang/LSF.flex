@@ -427,6 +427,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "OBJECT"                  			{ return OBJECT; }
   "OBJECTS"                 			{ return OBJECTS; }
   "CONSTRAINTFILTER"              		{ return CONSTRAINTFILTER; }
+  "OFFSET"              		        { return OFFSET; }
   "OK"                      			{ return OK; }
   "ON"                      			{ return ON; }
   "OPTIMISTICASYNC"                     { return OPTIMISTICASYNC; }

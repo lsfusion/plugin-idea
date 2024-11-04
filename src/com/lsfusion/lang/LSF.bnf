@@ -894,8 +894,8 @@ windowTypeLiteral ::= FLOAT | DOCKED | EMBEDDED | POPUP | (IN componentID)
 staticDestination ::= TO noParamsPropertyUsage
 groupObjectDestination ::= TO groupObjectUsage EQUALS propertyUsage (COMMA groupObjectUsage EQUALS propertyUsage)*
 
-selectTop ::= TOP propertyExpression
-selectTops ::= TOP ((groupObjectUsage EQUALS intLiteral (COMMA groupObjectUsage EQUALS intLiteral)*) | propertyExpression)
+selectTop ::= TOP propertyExpression (OFFSET propertyExpression)?
+selectTops ::= TOP ((groupObjectUsage EQUALS propertyExpression (COMMA groupObjectUsage EQUALS propertyExpression)*) | propertyExpression) (OFFSET ((groupObjectUsage EQUALS propertyExpression (COMMA groupObjectUsage EQUALS propertyExpression)*) | propertyExpression))?
 
 printActionPropertyDefinitionBody ::=
 	    PRINT (CLIENT | SERVER)? mappedForm contextFiltersClause?
