@@ -30,7 +30,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
         try {
             Pattern p = Pattern.compile("<\\?xml version=\".*\" encoding=\"(.*)\"\\?.*");
             int newLine = Math.min(file.indexOf("\r"), file.indexOf("\n"));
-            Matcher m = p.matcher(file.substring(0, newLine > 0 ? Math.min(newLine, file.length()) : file.length()));
+            Matcher m = p.matcher(file.substring(0, newLine > 0 ? newLine : file.length()));
             if (m.matches()) {
                 return Charset.forName(m.group(1));
             }
@@ -73,7 +73,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
                     }
 
                     ParseNode mergedChild = deepMerge(localChildren);
-                    boolean integrationKey = mergedChild.children.size() > 0;
+                    boolean integrationKey = !mergedChild.children.isEmpty();
 
                     List<ParseNode> nChildren = new ArrayList<>();
                     nChildren.add(mergedChild);

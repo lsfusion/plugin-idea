@@ -74,7 +74,7 @@ public interface LSFGlobalPropDeclaration<This extends LSFGlobalPropDeclaration<
         LSFNonEmptyPropertyOptions options = getNonEmptyPropertyOptions();
         if(options != null) {
             List<LSFTableUsage> tableUsages = options.getTableUsageList();
-            if(tableUsages.size() > 0) {
+            if(!tableUsages.isEmpty()) {
                 LSFTableDeclaration table = tableUsages.get(0).resolveDecl();
                 if(table != null)
                     return dbNamingPolicy.getTableName(table);

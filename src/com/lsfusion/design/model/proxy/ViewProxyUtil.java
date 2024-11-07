@@ -40,8 +40,7 @@ public class ViewProxyUtil {
 
         try {
             BeanUtils.setProperty(viewProxy, propertyName, propertyValue);
-        } catch (Exception e) {
-            return;
+        } catch (Exception ignored) {
         }
     }
 

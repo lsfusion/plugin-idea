@@ -284,15 +284,7 @@ public class EmbeddedDesign extends FormDesign {
     }
 
     private boolean defaultSelection(ComponentView component) {
-        if (component instanceof ClassChooserView || component instanceof FilterControlsView) {
-            return false;
-        } else if (component instanceof PropertyDrawView) {
-            PropertyDrawView property = (PropertyDrawView) component;
-            if (!property.isForcedPanel()) {
-//                return false;
-            }
-        }
-        return true;
+        return !(component instanceof ClassChooserView) && !(component instanceof FilterControlsView);
     }
 
     private void redrawComponents() {

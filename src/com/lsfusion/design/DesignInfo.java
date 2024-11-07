@@ -53,16 +53,19 @@ public class DesignInfo {
 
         formView = DefaultFormView.create(formEntity);
 
-        Collection<PsiReference> refs = ReferencesSearch.search(formDecl.getNameIdentifier(), lsfFile.getRequireScope()).findAll();
+        LSFId nameIdentifier = formDecl.getNameIdentifier();
+        if(nameIdentifier != null) {
+            Collection<PsiReference> refs = ReferencesSearch.search(nameIdentifier, lsfFile.getRequireScope()).findAll();
 
-        elementToModule = new HashMap<>();
-        for (PsiReference ref : refs) {
-            if (ref instanceof LSFFormUsage) {
-                LSFFormUsage formUsage = (LSFFormUsage) ref;
-                if (formUsage.getParent() instanceof LSFDesignHeader) {
-                    LSFModuleDeclaration moduleDeclaration = formUsage.getLSFFile().getModuleDeclaration();
-                    if (moduleDeclaration != null) {
-                        elementToModule.put(formUsage, moduleDeclaration);
+            elementToModule = new HashMap<>();
+            for (PsiReference ref : refs) {
+                if (ref instanceof LSFFormUsage) {
+                    LSFFormUsage formUsage = (LSFFormUsage) ref;
+                    if (formUsage.getParent() instanceof LSFDesignHeader) {
+                        LSFModuleDeclaration moduleDeclaration = formUsage.getLSFFile().getModuleDeclaration();
+                        if (moduleDeclaration != null) {
+                            elementToModule.put(formUsage, moduleDeclaration);
+                        }
                     }
                 }
             }
@@ -76,10 +79,6 @@ public class DesignInfo {
             LSFDesignStatement designStatement = (LSFDesignStatement) designHeader.getParent();
             processComponentBody(formView.getMainContainer(), designStatement.getComponentBody());
         }
-    }
-
-    public String getFormCaption() {
-        return formView.getCaption();
     }
 
     private void processComponentBody(ComponentView parentComponent, LSFComponentBody componentBody) {
@@ -108,7 +107,7 @@ public class DesignInfo {
                 ContainerView container = formView.createContainer(null, name);
 
                 LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
-                if (parentComponent instanceof ContainerView) {
+                if (parentComponent instanceof ContainerView && insertPositionSelector != null) {
                     addComponent(container, (ContainerView) parentComponent, insertPositionSelector, formView);
                 }
 
@@ -124,7 +123,7 @@ public class DesignInfo {
                         if (component != null) {
                             if (!(component instanceof PropertyDrawView) || component.getContainer() != null) { // не добавляем свойства, которые уже добавлены в грид
                                 LSFComponentInsertPosition insertPositionSelector = statement.getComponentInsertPosition();
-                                if (parentComponent instanceof ContainerView) {
+                                if (parentComponent instanceof ContainerView && insertPositionSelector != null) {
                                     addComponent(component, (ContainerView) parentComponent, insertPositionSelector, formView);
                                 }
                             }
@@ -200,12 +199,14 @@ public class DesignInfo {
         LSFComponentSelector neighbour = insertPositionSelector.getComponentSelector();
         if (neighbour != null) {
             LSFInsertRelativePositionLiteral insertRelativePositionLiteral = insertPositionSelector.getInsertRelativePositionLiteral();
-            String relativePosition = insertRelativePositionLiteral.getText();
-            ComponentView componentView = form.getComponentBySID(getComponentSID(neighbour, form));
-            if ("BEFORE".equals(relativePosition)) {
-                container.addBefore(component, componentView);
-            } else {
-                container.addAfter(component, componentView);
+            if (insertRelativePositionLiteral != null) {
+                String relativePosition = insertRelativePositionLiteral.getText();
+                ComponentView componentView = form.getComponentBySID(getComponentSID(neighbour, form));
+                if ("BEFORE".equals(relativePosition)) {
+                    container.addBefore(component, componentView);
+                } else {
+                    container.addAfter(component, componentView);
+                }
             }
         } else if ("FIRST".equals(insertPositionSelector.getText())) {
             container.addFirst(component);

@@ -109,7 +109,7 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
             article.select("div[class~=codeBlockLines]").attr("style", cssBackgroundColor);
             Elements oldCodeElements = article.select("div[class=token-line]");
 
-            Elements styles = codeElements.size() == 0 ? oldCodeElements : codeElements;
+            Elements styles = codeElements.isEmpty() ? oldCodeElements : codeElements;
             styles.attr("style", cssColor);
 
             for (Element style : styles) {

@@ -64,7 +64,10 @@ public class DesignPreviewLineMarkerProvider extends LSFLineMarkerProvider {
                     } else {
                         LSFExtendingFormDeclaration extendingFormDeclaration = formExtend.getExtendingFormDeclaration();
                         if (extendingFormDeclaration != null) {
-                            nameIdentifier = extendingFormDeclaration.getFormUsageWrapper().getFormUsage().getFormUsageNameIdentifier();
+                            LSFFormUsageWrapper formUsageWrapper = extendingFormDeclaration.getFormUsageWrapper();
+                            if(formUsageWrapper != null) {
+                                nameIdentifier = formUsageWrapper.getFormUsage().getFormUsageNameIdentifier();
+                            }
                         }
                     }
                 }

@@ -45,7 +45,7 @@ public class FontInfoConverter extends AbstractConverter {
         boolean bold = false;
         boolean italic = false;
         for (String part : sValue.split(" ")) {
-            if (part.length() == 0) {
+            if (part.isEmpty()) {
                 continue;
             }
 

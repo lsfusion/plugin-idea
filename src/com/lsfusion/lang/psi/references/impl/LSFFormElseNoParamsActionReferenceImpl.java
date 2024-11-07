@@ -65,7 +65,7 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
     @Override
     public LSFResolvingError resolveNotFoundErrorAnnotation(Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {
         String errorText;
-        boolean noSuchProperty = similarDeclarations.size() == 0;
+        boolean noSuchProperty = similarDeclarations.isEmpty();
         if (similarDeclarations.size() != 1) {
             if (noSuchProperty) {
                 errorText = "Form or action without params '" + getNameRef() + "' not found";

@@ -4,11 +4,11 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.ID;
 import com.lsfusion.design.DesignPreviewLineMarkerProvider;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
@@ -64,7 +64,8 @@ public class ReportUtils {
                     final Project project = decl.getProject();
                     final GlobalSearchScope scope = ProjectScope.getAllScope(project);
 
-                    FileBasedIndex.getInstance().processAllKeys(FilenameIndex.NAME, fileName -> {
+                    final ID<String, Void> NAME = ID.create("FilenameIndex");
+                    FileBasedIndex.getInstance().processAllKeys(NAME, fileName -> {
                         if (fileName.endsWith(".jrxml") && (fileName.startsWith(reportName + '.') || fileName.startsWith(reportName + '_'))) {
                             findFilesWithShortName(fileName, files, project, scope);
                         }

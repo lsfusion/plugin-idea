@@ -4,6 +4,7 @@ import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataKey;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -49,7 +50,7 @@ public class AggregateFormAction extends AnAction {
     @Override
     public void update(AnActionEvent e) {
 
-        Object editorComponent = e.getDataContext().getData("contextComponent");
+        Object editorComponent = e.getDataContext().getData(DataKey.create("contextComponent"));
         if (editorComponent instanceof EditorComponentImpl) {
             EditorImpl editor = ((EditorComponentImpl) editorComponent).getEditor();
             if (PsiTreeUtil.getParentOfType(findSourceElement(e.getProject(), editor, editor.getCaretModel().getOffset()), LSFExtend.class) == null)
@@ -65,7 +66,7 @@ public class AggregateFormAction extends AnAction {
         final Progressive progress = indicator -> ApplicationManager.getApplication().runReadAction(() -> {
             codeBlocks = new ArrayList<>();
 
-            Object editorComponent = e.getDataContext().getData("contextComponent");
+            Object editorComponent = e.getDataContext().getData(DataKey.create("contextComponent"));
             if (editorComponent instanceof EditorComponentImpl) {
                 EditorImpl editor = ((EditorComponentImpl) editorComponent).getEditor();
                 codeBlocks.addAll(getFormText(findSourceElement(e.getProject(), editor, editor.getCaretModel().getOffset()), false));

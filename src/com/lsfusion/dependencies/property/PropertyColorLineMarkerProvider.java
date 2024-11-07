@@ -10,7 +10,6 @@ import com.lsfusion.LSFLineMarkerProvider;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.LSFColorLiteral;
 import com.lsfusion.lang.psi.LSFUintLiteral;
-import com.lsfusion.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,9 +22,9 @@ public class PropertyColorLineMarkerProvider extends LSFLineMarkerProvider {
     @Nullable
     @Override
     protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement element) {
-        Pair<Color, Boolean> color = getColor(element);
+        Color color = getColor(element);
         if(color != null)  {
-            return createLineMarker(element.getFirstChild(), color.first);
+            return createLineMarker(element.getFirstChild(), color);
         }
         return null;
     }
@@ -68,9 +67,9 @@ public class PropertyColorLineMarkerProvider extends LSFLineMarkerProvider {
         public void navigate(MouseEvent e, PsiElement element) {
             if (e.getID() == MouseEvent.MOUSE_RELEASED) {
                 PsiElement colorLiteral = element.getParent();
-                Pair<Color, Boolean> color = getColor(colorLiteral);
+                Color color = getColor(colorLiteral);
                 if (color != null) {
-                    Color newColor = JColorChooser.showDialog(null, "Choose a color", color.first);
+                    Color newColor = JColorChooser.showDialog(null, "Choose a color", color);
                     if (newColor != null) {
                         List<LSFUintLiteral> rgb = ((LSFColorLiteral) colorLiteral).getUintLiteralList();
                         String replaceText;
@@ -88,16 +87,17 @@ public class PropertyColorLineMarkerProvider extends LSFLineMarkerProvider {
         }
     }
 
-    private static Pair<Color, Boolean> getColor(PsiElement element) {
+    private static JBColor getColor(PsiElement element) {
         if(element instanceof LSFColorLiteral) {
             List<LSFUintLiteral> rgb = ((LSFColorLiteral) element).getUintLiteralList();
             if(!rgb.isEmpty()) {
                 int red = Integer.parseInt(rgb.get(0).getText());
                 int green = Integer.parseInt(rgb.get(1).getText());
                 int blue = Integer.parseInt(rgb.get(2).getText());
-                return new Pair<>(new Color(red, green, blue), true);
+                return new JBColor(new Color(red, green, blue), new Color(red, green, blue));
             } else {
-                return new Pair<>(Color.decode(element.getText()), false);
+                Color color = Color.decode(element.getText());
+                return new JBColor(color, color);
             }
         }
         return null;

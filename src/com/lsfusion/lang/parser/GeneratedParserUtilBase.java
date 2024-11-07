@@ -565,7 +565,7 @@ public class GeneratedParserUtilBase {
 
         public static void initState(ErrorState state, PsiBuilder builder, IElementType root, TokenSet[] extendsSets) {
             state.extendsSets = extendsSets;
-            PsiFile file = builder.getUserDataUnprotected(FileContextUtil.CONTAINING_FILE_KEY);
+            PsiFile file = builder.getUserData(FileContextUtil.CONTAINING_FILE_KEY);
             state.completionCallback = file == null? null: file.getUserData(COMPLETION_CALLBACK_KEY);
             Language language = file == null? root.getLanguage() : file.getLanguage();
             state.caseSensitive = language.isCaseSensitive();

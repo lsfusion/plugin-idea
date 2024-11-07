@@ -21,7 +21,6 @@ import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.*;
 
 public class FormEntity {
@@ -75,8 +74,11 @@ public class FormEntity {
                 addGroupObject(formGroupObjectDeclaration.getFormGroupObject(), position, viewType, pageSize);
             } else {
                 LSFFormTreeGroupObjectList treeGroupObjectDeclaration = (LSFFormTreeGroupObjectList) element;
-                LSFFormGroupObjectRelativePosition position = BaseUtils.last(treeGroupObjectDeclaration.getFormTreeGroupObjectOptions().getFormGroupObjectRelativePositionList());
-                addTreeGroupObject(treeGroupObjectDeclaration, position);
+                LSFFormTreeGroupObjectOptions formTreeGroupObjectOptions = treeGroupObjectDeclaration.getFormTreeGroupObjectOptions();
+                if(formTreeGroupObjectOptions != null) {
+                    LSFFormGroupObjectRelativePosition position = BaseUtils.last(formTreeGroupObjectOptions.getFormGroupObjectRelativePositionList());
+                    addTreeGroupObject(treeGroupObjectDeclaration, position);
+                }
             }
         }
 
@@ -98,9 +100,9 @@ public class FormEntity {
         }
     }
 
-    private GroupObjectEntity addGroupObject(LSFGroupObjectDeclaration gobjDecl, LSFFormGroupObjectRelativePosition position, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
+    private void addGroupObject(LSFGroupObjectDeclaration gobjDecl, LSFFormGroupObjectRelativePosition position, LSFFormGroupObjectViewType viewType, LSFFormGroupObjectPageSize pageSize) {
         Pair<InsertType, GroupObjectEntity> positionType = getPosition(position);
-        return addGroupObject(gobjDecl, positionType.second, positionType.first, viewType, pageSize);
+        addGroupObject(gobjDecl, positionType.second, positionType.first, viewType, pageSize);
     }
 
     private Pair<InsertType, GroupObjectEntity> getPosition(LSFFormGroupObjectRelativePosition position) {
@@ -211,8 +213,10 @@ public class FormEntity {
 
     private Set<ObjectEntity> getObjects(LSFFormActionDeclaration formActionDeclaration) {
         Set<ObjectEntity> params = new HashSet<>();
-        for (String paramDeclaration : formActionDeclaration.getListActionPropertyDefinitionBody().resolveAllParams()) {
-            params.add(getObject(paramDeclaration));
+        if(formActionDeclaration != null) {
+            for (String paramDeclaration : formActionDeclaration.getListActionPropertyDefinitionBody().resolveAllParams()) {
+                params.add(getObject(paramDeclaration));
+            }
         }
         return params;
     }

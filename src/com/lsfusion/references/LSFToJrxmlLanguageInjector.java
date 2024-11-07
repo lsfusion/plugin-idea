@@ -56,12 +56,12 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
         
         rootTag.acceptChildren(new XmlElementVisitor() {
             @Override
-            public void visitXmlTag(XmlTag tag) {
+            public void visitXmlTag(@NotNull XmlTag tag) {
                 tag.acceptChildren(this);
             }
 
             @Override
-            public void visitXmlAttribute(XmlAttribute attribute) {
+            public void visitXmlAttribute(@NotNull XmlAttribute attribute) {
                 if ("name".equals(attribute.getName())) {
                     XmlTag tag = attribute.getParent();
                     if ("field".equals(tag.getName())) {
@@ -79,7 +79,7 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
             }
 
             @Override
-            public void visitXmlText(XmlText xmlText) {
+            public void visitXmlText(@NotNull XmlText xmlText) {
                 String value = xmlText.getText();
                 Matcher m = fieldExprPattern.matcher(value);
                 while (m.find()) {
@@ -103,7 +103,7 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
             }
         });
         
-        if (injections.size() != 0) {
+        if (!injections.isEmpty()) {
             registrar.startInjecting(LSFLanguage.INSTANCE);
             
             boolean first = true;

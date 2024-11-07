@@ -62,7 +62,7 @@ public class LSFusionRunConfigurationType implements ConfigurationType {
 
     @NotNull
     public static LSFusionRunConfigurationType getInstance() {
-        LSFusionRunConfigurationType instance = ContainerUtil.findInstance(Extensions.getExtensions(CONFIGURATION_TYPE_EP), LSFusionRunConfigurationType.class);
+        LSFusionRunConfigurationType instance = ContainerUtil.findInstance(CONFIGURATION_TYPE_EP.getExtensions(), LSFusionRunConfigurationType.class);
         if (instance == null) {
             throw new NullPointerException("Can't find instance of LSFusionRunConfigurationType");
         }

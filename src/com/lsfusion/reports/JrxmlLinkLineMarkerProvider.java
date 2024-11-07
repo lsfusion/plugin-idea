@@ -85,7 +85,7 @@ public class JrxmlLinkLineMarkerProvider extends LSFLineMarkerProvider {
                     openFile(file);
                 }
             } catch (Exception ex) {
-                if (files.size() < 1) {
+                if (files.isEmpty()) {
                     JBPopupFactory
                             .getInstance()
                             .createMessage("Can't find related report files")
@@ -105,8 +105,9 @@ public class JrxmlLinkLineMarkerProvider extends LSFLineMarkerProvider {
         
         private void openFile(PsiFile file) throws Exception {
             String path = file.getVirtualFile().getCanonicalPath();
-            File fileInPath = new File(path);
-            Desktop.getDesktop().open(fileInPath);
+            if(path != null) {
+                Desktop.getDesktop().open(new File(path));
+            }
         }
 
         private ListPopupStep createListPopupStep(final List<PsiFile> files) {

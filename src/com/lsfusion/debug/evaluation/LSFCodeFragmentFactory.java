@@ -21,6 +21,7 @@ import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class LSFCodeFragmentFactory extends DefaultCodeFragmentFactory {
                     if(priorityRefs != null && !priorityRefs.isEmpty()) {
                         priorities = "";
                         for (LSFNamespaceReference priorityRef : priorityRefs)
-                            priorities = (priorities.length() == 0 ? "" : priorities + ",") + priorityRef.getText();
+                            priorities = (priorities.isEmpty() ? "" : priorities + ",") + priorityRef.getText();
                         priorities = "\"" + priorities + "\"";
                     }
                     require = "\"" + moduleDecl.getGlobalName() + "\"";
@@ -97,16 +98,14 @@ public class LSFCodeFragmentFactory extends DefaultCodeFragmentFactory {
             PsiFile containingFile = context.getContainingFile();
             if (containingFile instanceof JavaDummyHolder) {
                 PsiElement fileContext = containingFile.getContext();
-                if (fileContext != null && fileContext.getContainingFile() instanceof LSFFile) {
-                    return true;
-                }
+                return fileContext != null && fileContext.getContainingFile() instanceof LSFFile;
             }
         }
         return false;
     }
 
     @Override
-    public LanguageFileType getFileType() {
+    public @NotNull LanguageFileType getFileType() {
         return LSFFileType.INSTANCE;
     }
 

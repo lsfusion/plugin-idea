@@ -126,7 +126,7 @@ public class FormView {
         return mainContainer;
     }
 
-    private GroupObjectView addGroupObjectBase(GroupObjectEntity groupObjectEntity) {
+    private void addGroupObjectBase(GroupObjectEntity groupObjectEntity) {
         GroupObjectView groupObjectView = new GroupObjectView(groupObjectEntity);
         groupObjects.add(groupObjectView);
 
@@ -140,7 +140,6 @@ public class FormView {
         }
 
         mgroupObjects.put(groupObjectView.entity, groupObjectView);
-        return groupObjectView;
     }
 
     private void addTreeGroupBase(TreeGroupEntity treeGroupEntity) {
@@ -157,14 +156,13 @@ public class FormView {
         mfilters.put(filterGroupView.entity, filterGroupView);
     }
 
-    private RegularFilterGroupView addFilterGroupBase(RegularFilterGroupEntity filterGroup) {
+    private void addFilterGroupBase(RegularFilterGroupEntity filterGroup) {
         RegularFilterGroupView filterGroupView = new RegularFilterGroupView(this, filterGroup);
         regularFilters.add(filterGroupView);
         addRegularFilterGroupView(filterGroupView);
 
         mfilters.put(filterGroupView.entity, filterGroupView);
         setComponentSID(filterGroupView, getFilterGroupSID(filterGroupView));
-        return filterGroupView;
     }
 
     private void addFilterBase(PropertyDrawEntity propertyDraw) {
@@ -178,14 +176,12 @@ public class FormView {
         }
     }
 
-    private PropertyDrawView addPropertyDrawBase(PropertyDrawEntity propertyDrawEntity/*, Pair<Boolean, PropertyDrawView> relative*/) {
+    private void addPropertyDrawBase(PropertyDrawEntity propertyDrawEntity/*, Pair<Boolean, PropertyDrawView> relative*/) {
         PropertyDrawView propertyDrawView = new PropertyDrawView(propertyDrawEntity);
         properties.add(propertyDrawView);
 
         addComponentToMapping(propertyDrawView);
         mproperties.put(propertyDrawEntity, propertyDrawView);
-
-        return propertyDrawView;
     }
 
     private void addPropertyDrawView(PropertyDrawView propertyDraw) {
@@ -205,7 +201,7 @@ public class FormView {
                 if (treeGroupView != null) {
                     treeGroupView.addPropertyDraw(groupObjectView, propertyDraw, properties);
                 }
-            } else
+            } else if(groupObjectView != null)
                 groupObjectView.addGridPropertyDraw(propertyDraw);
         } else
             return false;
@@ -215,9 +211,7 @@ public class FormView {
 
     public boolean putInGrid(PropertyDrawView property, GroupObjectView groupObjectView) {
         if (groupObjectView != null) {
-            if (!groupObjectView.entity.isFixedPanel() && groupObjectView.entity.initClassView == ClassViewType.GRID && !property.isForcedPanel() && !property.entity.isToolbar(entity)) {
-                return true;
-            }
+            return !groupObjectView.entity.isFixedPanel() && groupObjectView.entity.initClassView == ClassViewType.GRID && !property.isForcedPanel() && !property.entity.isToolbar(entity);
         }
         return false;
     }
@@ -392,7 +386,7 @@ public class FormView {
         return propName.toString();
     }
 
-    public class ContainerFactory {
+    public static class ContainerFactory {
         public ContainerView createContainer() {
             return new ContainerView();
         }

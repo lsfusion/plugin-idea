@@ -45,7 +45,7 @@ public class ViewProxyFactory {
 
         Class<? extends ViewProxy> proxyClass = PROXY_CLASSES.get(cz);
         try {
-            return (ViewProxy) proxyClass.getConstructor(cz).newInstance(target);
+            return proxyClass.getConstructor(cz).newInstance(target);
         } catch (Exception e) {
             throw new RuntimeException("Can't create object: ", e);
         }

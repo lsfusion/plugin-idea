@@ -105,12 +105,13 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
 
     @Override
     protected void fillImplementationDependencies(LSFActionOrPropReference<?, ?> impRef, Collection<LSFActionOrPropReference> references) {
-        LSFOverrideActionStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) impRef, LSFOverrideActionStatement.class);
-        LSFPropertyExpression pe = overrideStatement.getPropertyExpression();
-        if(pe != null)
-            references.addAll(PsiTreeUtil.findChildrenOfType(pe, LSFPropReference.class));
-        LSFListActionPropertyDefinitionBody body = overrideStatement.getListActionPropertyDefinitionBody();
-        if(body != null)
+        LSFOverrideActionStatement overrideStatement = PsiTreeUtil.getParentOfType(impRef, LSFOverrideActionStatement.class);
+        if(overrideStatement != null) {
+            LSFPropertyExpression pe = overrideStatement.getPropertyExpression();
+            if (pe != null)
+                references.addAll(PsiTreeUtil.findChildrenOfType(pe, LSFPropReference.class));
+            LSFListActionPropertyDefinitionBody body = overrideStatement.getListActionPropertyDefinitionBody();
             references.addAll(PsiTreeUtil.findChildrenOfType(body, LSFActionOrPropReference.class));
+        }
     }
 }

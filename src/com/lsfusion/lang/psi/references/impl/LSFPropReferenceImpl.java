@@ -66,7 +66,7 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
         }
 
         @Override
-        public boolean execute(@NotNull PsiElement element, ResolveState state) {
+        public boolean execute(@NotNull PsiElement element, @NotNull ResolveState state) {
             if (element instanceof LSFLocalDataPropertyDefinition) {
                 LSFNonEmptyLocalPropertyDeclarationNameList declList = ((LSFLocalDataPropertyDefinition) element).getNonEmptyLocalPropertyDeclarationNameList();
                 if (declList != null) {
@@ -89,7 +89,7 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
         }
 
         @Override
-        public void handleEvent(Event event, @Nullable Object associated) {
+        public void handleEvent(@NotNull Event event, @Nullable Object associated) {
         }
     }
 
@@ -131,7 +131,7 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
     }
 
     private Collection<? extends LSFPropDeclaration> resolveLocals(Condition<LSFPropDeclaration> condition, Finalizer<LSFGlobalPropDeclaration> finalizer) {
-        LocalResolveProcessor processor = new LocalResolveProcessor(getNameRef(), BaseUtils.<Condition<LSFPropDeclaration>>immutableCast(condition));
+        LocalResolveProcessor processor = new LocalResolveProcessor(getNameRef(), BaseUtils.immutableCast(condition));
         PsiTreeUtil.treeWalkUp(processor, this, null, new ResolveState());
         Finalizer<LSFLocalPropDeclaration> castFinalizer = BaseUtils.immutableCast(finalizer);
         return castFinalizer.finalize(processor.found);

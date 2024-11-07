@@ -40,7 +40,7 @@ public class GenerateFormJSONAction extends GenerateFormAction {
             }
 
             ParseNode mergedChild = deepMerge(children);
-            boolean integrationKey = mergedChild != null && mergedChild.children.size() > 0;
+            boolean integrationKey = mergedChild != null && !mergedChild.children.isEmpty();
 
             List<ParseNode> nChildren = new ArrayList<>();
             if(mergedChild != null) {

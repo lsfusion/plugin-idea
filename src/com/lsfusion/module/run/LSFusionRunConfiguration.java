@@ -11,7 +11,6 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.util.JavaParametersUtil;
 import com.intellij.execution.util.ProgramParametersUtil;
 import com.intellij.openapi.components.PathMacroManager;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.options.SettingsEditorGroup;
@@ -218,7 +217,7 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
             }
 
             params.setMainClass(MAIN_CLASS_NAME);
-            for (RunConfigurationExtension ext : Extensions.getExtensions(RunConfigurationExtension.EP_NAME)) {
+            for (RunConfigurationExtension ext : RunConfigurationExtension.EP_NAME.getExtensions()) {
                 ext.updateJavaParameters(myConfiguration, params, getRunnerSettings());
             }
 

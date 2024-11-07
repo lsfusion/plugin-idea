@@ -33,11 +33,11 @@ public class BaseUtils {
     }
 
     public static int max(int a, int b) {
-        return a > b ? a : b;
+        return Math.max(a, b);
     }
 
     public static int min(int a, int b) {
-        return a < b ? a : b;
+        return Math.min(a, b);
     }
 
     public static int cmp(int a, int b, boolean max) {
@@ -148,7 +148,7 @@ public class BaseUtils {
     }
 
     public static String capitalize(String s) {
-        if (s.length() == 0) return s;
+        if (s.isEmpty()) return s;
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
@@ -173,14 +173,14 @@ public class BaseUtils {
     public static <K> String toString(String separator, K... array) {
         String result = "";
         for (K element : array)
-            result = (result.length() == 0 ? "" : result + separator) + element;
+            result = (result.isEmpty() ? "" : result + separator) + element;
         return result;
     }
 
     public static <K> String toString(Collection<K> array, String separator) {
         String result = "";
         for (K element : array)
-            result = (result.length() == 0 ? "" : result + separator) + element;
+            result = (result.isEmpty() ? "" : result + separator) + element;
         return result;
     }
 
@@ -235,7 +235,7 @@ public class BaseUtils {
     }
 
     public static <K> K last(List<K> list) {
-        if (list.size() > 0)
+        if (!list.isEmpty())
             return list.get(list.size() - 1);
         else
             return null;
