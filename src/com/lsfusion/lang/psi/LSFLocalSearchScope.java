@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiInvalidElementAccessException;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
@@ -17,7 +18,16 @@ public class LSFLocalSearchScope {
     private final Supplier<LSFMetaCodeDeclarationStatement> metaDecl;
 
     public LSFLocalSearchScope(PsiElement element) {
-        this(() -> element != null ? (LSFFile) element.getContainingFile() : null, () -> LSFReferenceAnnotator.getMetaDecl(element));
+        this(() -> {
+            if (element != null) {
+                LSFFile containingFile = null;
+                try {
+                    containingFile = (LSFFile) element.getContainingFile();
+                } catch (PsiInvalidElementAccessException ignored) {}
+                return containingFile;
+            }
+            return null;
+        }, () -> LSFReferenceAnnotator.getMetaDecl(element));
     }
 
     public LSFLocalSearchScope(Supplier<LSFFile> lsfFile, Supplier<LSFMetaCodeDeclarationStatement> metaDecl) {
