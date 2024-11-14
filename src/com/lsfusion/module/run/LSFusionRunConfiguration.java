@@ -26,7 +26,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.lsfusion.debug.LSFDebuggerRunner.*;
+import static com.lsfusion.debug.LSFDebuggerRunner.LIGHT_START_PROPERTY;
+import static com.lsfusion.debug.LSFDebuggerRunner.PLUGIN_ENABLED_PROPERTY;
 import static com.lsfusion.module.LSFusionModuleBuilder.BOOTSTRAP_CLASS_NAME;
 
 public class LSFusionRunConfiguration extends AbstractRunConfiguration implements CommonJavaRunConfigurationParameters {//}, RunConfigurationWithSuppressedDefaultDebugAction {
@@ -218,7 +219,13 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
 
             params.setMainClass(MAIN_CLASS_NAME);
             for (RunConfigurationExtension ext : RunConfigurationExtension.EP_NAME.getExtensions()) {
-                ext.updateJavaParameters(myConfiguration, params, getRunnerSettings());
+                // "Internal error: cannot patch the selected configuration." fix
+                // Fails to update Java parameters for JavaProfilerConfigurationExtension
+                // If it falls again, we should find a class that has JavaProfilerConfigurationExtension as a superclass 
+                // and filter it out.
+                if (!"IntelliJProfilerOnDebugExtension".equals(ext.getClass().getSimpleName())) {
+                    ext.updateJavaParameters(myConfiguration, params, getRunnerSettings());
+                }
             }
 
             return params;
