@@ -2327,6 +2327,8 @@ navigatorElementOptions ::= (	(WINDOW windowUsage PARENT?)
                             |   CLASS propertyExpression
                             |	HEADER propertyExpression
                             |	SHOWIF propertyExpression
+                            |   changeKeySetting
+                            |   changeMouseSetting
                             )*
 
 navigatorElementInsertPosition ::=	(   insertRelativePositionLiteral navigatorElementSelector

@@ -11,6 +11,7 @@
         <b>Version 1.0.295</b><br>
         <ul>
             <li>EVENTS ON TAB support</li>
+            <li>Navigator element CHANGEKEY</li>
         </ul>
     ]]>
     </change-notes>
