@@ -1931,7 +1931,7 @@ changeEventDeclaration ::=
         )
     ;
 
-formContainerEventDeclaration ::= (COLLAPSE | EXPAND) (ID | componentSelector)
+formContainerEventDeclaration ::= (COLLAPSE | EXPAND | TAB) (ID | componentSelector)
 
 scheduleFormEventDeclaration ::= SCHEDULE PERIOD intLiteral FIXED?
 
