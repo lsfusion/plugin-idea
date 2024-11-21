@@ -42,8 +42,15 @@ public class LSFCodeFragmentFactory extends DefaultCodeFragmentFactory {
         return null;
     }
 
+    // todo: clean up after the end of support for IDEA 2024.2
+    // IDEA 2024.2-
     @Override
     public JavaCodeFragment createCodeFragment(TextWithImports item, PsiElement context, Project project) {
+        return createPsiCodeFragmentImpl(item, context, project);
+    }
+
+    // IDEA 2024.3+
+    public JavaCodeFragment createPsiCodeFragmentImpl(TextWithImports item, PsiElement context, @NotNull Project project) {
         if (isContextAccepted(context)) {
             String text = item.getText();
             if (text == null) {
@@ -76,12 +83,19 @@ public class LSFCodeFragmentFactory extends DefaultCodeFragmentFactory {
                                     "." + evalMethod + "(action, context," + namespace + ", " + require + ", " + priorities + ", " + evalString + ")";
             return JavaCodeFragmentFactory.getInstance(project).createCodeBlockCodeFragment(javaEvalString, null, true);
         } else {
+            // For IDEA 2024.3+ should be: return super.createPsiCodeFragmentImpl(item, context, project);
             return super.createCodeFragment(item, context, project);
         }
     }
 
+    // IDEA 2024.2-
     @Override
     public JavaCodeFragment createPresentationCodeFragment(TextWithImports item, PsiElement context, Project project) {
+        return createPresentationPsiCodeFragmentImpl(item, context, project);
+    }
+
+    // IDEA 2024.3+
+    protected JavaCodeFragment createPresentationPsiCodeFragmentImpl(@NotNull TextWithImports item, PsiElement context, @NotNull Project project) {
         return new LSFCodeFragment(item.getKind() == CodeFragmentKind.EXPRESSION, project, context, item.getText());
     }
 

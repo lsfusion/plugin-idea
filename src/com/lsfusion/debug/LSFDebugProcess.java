@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import static com.lsfusion.debug.DebugUtils.*;
 import static com.lsfusion.references.LSFToJavaLanguageInjector.INTERNAL_ACTION_FQN;
@@ -273,13 +274,25 @@ public class LSFDebugProcess extends JavaDebugProcess {
     }
 
     private AtomicReference<ThreadReferenceProxyImpl> getSteppingThroughThread() {
-        //приходится делать так жёстко, чтобы встроится во внутреннюю логику java-debuggera
+        //приходится делать так жёстко, чтобы встроиться во внутреннюю логику java-debuggera
         return (AtomicReference<ThreadReferenceProxyImpl>) getPrivateFieldValueByClass(DebuggerSession.class, getDebuggerSession(), AtomicReference.class); // mySteppingThroughThread field
     }
 
-    private EventDispatcher<DebugProcessListener> getDebugProcessDispatcher() {
-        //приходится делать так жёстко, чтобы встроится во внутреннюю логику java-debuggera
-        return (EventDispatcher<DebugProcessListener>) ReflectionUtils.getPrivateFieldValue(DebugProcessImpl.class, getJavaDebugProcess(), "myDebugProcessDispatcher");
+    private void notifyDebugProcessListeners(Consumer<DebugProcessListener> listenerConsumer) {
+        //приходится делать так жёстко, чтобы встроиться во внутреннюю логику java-debuggera
+        try {
+            // todo: clean this up after the end of support for IDEA 2024.2
+            // IDEA 2024.3+
+            List<DebugProcessListener> debuggerProcessListeners = (List<DebugProcessListener>) ReflectionUtils.getPrivateFieldValueWithException(DebugProcessImpl.class, getJavaDebugProcess(), "myDebugProcessListeners");
+            for (DebugProcessListener listener : debuggerProcessListeners) {
+                listenerConsumer.accept(listener);
+            }
+        } catch (NoSuchFieldException e) {
+            // IDEA 2024.2-
+            EventDispatcher<DebugProcessListener> eventDispatcher = (EventDispatcher<DebugProcessListener>) ReflectionUtils.getPrivateFieldValue(DebugProcessImpl.class, getJavaDebugProcess(), "myDebugProcessDispatcher");
+            listenerConsumer.accept(eventDispatcher.getMulticaster());
+        }
+
     }
 
     private void showStatusText(final String text) {
@@ -526,7 +539,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
             doStep(suspendContextImpl, thread, getInitialStepping(), hint);
 
             getSuspendManager().resume(suspendContextImpl);
-            getDebugProcessDispatcher().getMulticaster().resumed(suspendContextImpl);
+            notifyDebugProcessListeners(debugProcessListener -> debugProcessListener.resumed(suspendContextImpl));
         }
 
         public abstract RequestHint createRequestHint(ThreadReferenceProxyImpl thread, SuspendContextImpl suspendContext);
