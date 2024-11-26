@@ -31,7 +31,8 @@ public class GridView extends ComponentView {
             new ReflectionProperty("headerHeight"),
             new ReflectionProperty("resizeOverflow"),
             new ReflectionProperty("lineWidth"),
-            new ReflectionProperty("lineHeight")
+            new ReflectionProperty("lineHeight"),
+            new ReflectionProperty("enableManualUpdate").setExpert()
     );
 
     @Override
@@ -52,6 +53,8 @@ public class GridView extends ComponentView {
 
     public int lineWidth = 0;
     public int lineHeight = 0;
+
+    public boolean enableManualUpdate;
 
     public GridView(GroupObjectView groupObject) {
         this("");

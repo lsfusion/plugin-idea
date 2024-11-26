@@ -39,4 +39,8 @@ public class GridViewProxy extends ComponentViewProxy<GridView> {
     public void setLineHeight(int lineHeight) {
         target.lineHeight = lineHeight;
     }
+
+    public void setEnableManualUpdate(boolean enableManualUpdate) {
+        target.enableManualUpdate = enableManualUpdate;
+    }
 }

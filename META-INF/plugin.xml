@@ -13,6 +13,7 @@
             <li>EVENTS ON TAB support</li>
             <li>Navigator element CHANGEKEY</li>
             <li>IDEA 2024.3: fixed lsf debugger</li>
+            <li>GRID enableManualUpdate support</li>
         </ul>
     ]]>
     </change-notes>
