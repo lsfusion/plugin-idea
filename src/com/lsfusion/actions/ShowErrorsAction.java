@@ -6,6 +6,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationsConfigurationImpl;
+import com.intellij.notification.impl.NotificationsToolWindowFactory;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
@@ -142,9 +143,7 @@ public class ShowErrorsAction extends AnAction {
 
         ProgressManager.getInstance().run(task);
 
-        // todo: Notifications tool window was created in 2021.3. 
-        //  ID should be replaced with NotificationsToolWindowFactory.ID as soon as supported versions range will allow to.
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Notifications");
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(NotificationsToolWindowFactory.ID);
         if (toolWindow == null) {
             toolWindow = EventLog.getEventLog(project);
         }
