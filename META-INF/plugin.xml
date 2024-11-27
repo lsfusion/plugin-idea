@@ -14,6 +14,7 @@
             <li>Navigator element CHANGEKEY</li>
             <li>IDEA 2024.3: fixed lsf debugger</li>
             <li>GRID enableManualUpdate support</li>
+            <li>Fixed opening .jrxml file from lsf editor</li>
         </ul>
     ]]>
     </change-notes>

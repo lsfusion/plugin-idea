@@ -18,7 +18,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.ProjectScope;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
@@ -29,13 +28,13 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.intellij.psi.search.GlobalSearchScope.*;
 import static com.lsfusion.util.BaseUtils.isRedundantString;
 
 public class LSFFileUtils {
     public static boolean hasFilesWithShortNameInProject(PsiElement scopeElement, final String fileName) {
         Project project = scopeElement.getProject();
-        GlobalSearchScope scope = ProjectScope.getAllScope(project);
-        return hasFilesWithShortName(fileName, project, scope);
+        return hasFilesWithShortName(fileName, project, allScope(project));
     }
 
     public static boolean hasFilesWithShortNameInModule(PsiElement scopeElement, final String fileName) {
@@ -45,42 +44,37 @@ public class LSFFileUtils {
 
     public static boolean hasFilesWithShortNameInModule(Module module, final String fileName) {
         if (module != null) {
-            GlobalSearchScope scope = GlobalSearchScope.moduleWithDependentsScope(module);
-            return hasFilesWithShortName(fileName, module.getProject(), scope);
-            
+            return hasFilesWithShortName(fileName, module.getProject(), moduleWithDependentsScope(module));
         }
         return false;
     }
 
     private static boolean hasFilesWithShortName(String fileName, Project project, GlobalSearchScope scope) {
+        PsiManager psiManager = PsiManager.getInstance(project);
         final Result<Boolean> hasFiles = new Result<>(false);
-        FilenameIndex.processFilesByName(
-                fileName, false, file -> {
-                    if (!file.isDirectory() && file instanceof PsiFile) {
-                        hasFiles.setResult(true);
-                        return false;
-                    }
-                    return true;
-                },
-                scope,
-                project,
-                null
-        );
+        FilenameIndex.processFilesByName(fileName, true, scope, file -> {
+            if (file.isValid() && !file.isDirectory()) {
+                if (psiManager.findFile(file) != null) {
+                    hasFiles.setResult(true);
+                    return false;
+                }
+            }
+            return true;
+        });
         return hasFiles.getResult();
     }
 
     public static void findFilesWithShortName(String fileName, final List<PsiFile> files, Project project, GlobalSearchScope scope) {
-        FilenameIndex.processFilesByName(
-                fileName, false, file -> {
-                    if (!file.isDirectory() && file instanceof PsiFile) {
-                        files.add((PsiFile) file);
-                    }
-                    return true;
-                },
-                scope,
-                project,
-                null
-        );
+        PsiManager psiManager = PsiManager.getInstance(project);
+        FilenameIndex.processFilesByName(fileName, true, scope, file -> {
+            if (file.isValid() && !file.isDirectory()) {
+                PsiFile psi = psiManager.findFile(file);
+                if (psi != null) {
+                    files.add(psi);
+                }
+            }
+            return true;
+        });
     }
 
     public static List<PsiFile> findFilesByPath(PsiElement scopeElement, final String path) {
@@ -170,15 +164,15 @@ public class LSFFileUtils {
     public static GlobalSearchScope getModuleWithDependenciesScope(@NotNull PsiElement psi) {
         Module module = ModuleUtil.findModuleForPsiElement(psi);
         return module == null
-               ? GlobalSearchScope.allScope(psi.getProject())
-               : GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module);
+               ? allScope(psi.getProject())
+               : moduleWithDependenciesAndLibrariesScope(module);
     }
 
     public static GlobalSearchScope getModuleWithDependantsScope(@NotNull PsiElement psi) {
         Module module = ModuleUtil.findModuleForPsiElement(psi);
         return module == null
-               ? GlobalSearchScope.allScope(psi.getProject())
-               : GlobalSearchScope.moduleWithDependentsScope(module);
+               ? allScope(psi.getProject())
+               : moduleWithDependentsScope(module);
     }
 
     public static String getTopModule(PsiElement element) {
@@ -241,10 +235,10 @@ public class LSFFileUtils {
         if (moduleName != null) {
             Collection<LSFModuleDeclaration> modules = LSFGlobalResolver.findModules(moduleName, myElement.getProject(), projectScope);
             if (modules.isEmpty()) {
-                return GlobalSearchScope.EMPTY_SCOPE;
+                return EMPTY_SCOPE;
             }
 
-            GlobalSearchScope scope = GlobalSearchScope.EMPTY_SCOPE;
+            GlobalSearchScope scope = EMPTY_SCOPE;
             List<VirtualFile> files = new ArrayList<>();
 
             for (LSFModuleDeclaration lsfModule : modules) {
@@ -257,7 +251,7 @@ public class LSFFileUtils {
 
             return searchInRequiredModules
                    ? scope
-                   : GlobalSearchScope.filesScope(myElement.getProject(), files);
+                   : filesScope(myElement.getProject(), files);
         }
 
         return projectScope;
@@ -279,7 +273,7 @@ public class LSFFileUtils {
                 }
             }
         } else
-            modulesScope = GlobalSearchScope.allScope(project);
+            modulesScope = allScope(project);
         return modulesScope;
     }
 }
