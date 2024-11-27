@@ -304,7 +304,7 @@ public class PropertyDrawView extends ComponentView {
 
     @Override
     public String getDisplaySID() {
-        return entity.propertyName != null ? entity.propertyName : getSID();
+        return entity.propertyName != null ? entity.propertyName : entity.sID;
     }
     
     @Override
