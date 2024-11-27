@@ -7,6 +7,7 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbService;
@@ -85,7 +86,7 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
                         if (simpleElementDescription == null) {
                             LSFNoParamsActionUsage noParamsActionUsage = PsiTreeUtil.getParentOfType(element, LSFNoParamsActionUsage.class);
                             if(noParamsActionUsage == null) {
-                                getPlatformAction().actionPerformed(event);
+                                ActionUtil.performActionDumbAwareWithCallbacks(getPlatformAction(), event);
                             } else {
                                 showChoicePopup(element, actionUsagesAlternatives);
                             }
@@ -160,11 +161,11 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
                 propertyUsagesSearchMode = item;
                 sourceElement = source;
 
-                return doFinalStep(() -> getPlatformAction().actionPerformed(new AnActionEvent(
+                return doFinalStep(() -> ActionUtil.performActionDumbAwareWithCallbacks(getPlatformAction(), new AnActionEvent(
                         e.getInputEvent(),
-                        DataManager.getInstance().getDataContext(component), 
-                        e.getPlace(), e.getPresentation(), 
-                        e.getActionManager(), 
+                        DataManager.getInstance().getDataContext(component),
+                        e.getPlace(), e.getPresentation(),
+                        e.getActionManager(),
                         e.getModifiers()
                 )));
             }

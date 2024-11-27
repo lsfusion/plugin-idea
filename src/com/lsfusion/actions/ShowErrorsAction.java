@@ -8,6 +8,7 @@ import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationsConfigurationImpl;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.module.Module;
@@ -69,7 +70,7 @@ public class ShowErrorsAction extends AnAction {
                 if(JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
                         "Meta code is disabled. You must enable meta before showing errors", "Errors search",
                         JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                    new MetaCodeEnableAction().actionPerformed(e);
+                    ActionUtil.performActionDumbAwareWithCallbacks(new MetaCodeEnableAction(), e);
                     enabledMeta = MetaChangeDetector.getInstance(project).getMetaEnabled();
                 }
             }
