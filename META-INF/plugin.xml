@@ -8,13 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.295</b><br>
+        <b>Version 1.0.296</b><br>
         <ul>
-            <li>EVENTS ON TAB support</li>
-            <li>Navigator element CHANGEKEY</li>
-            <li>IDEA 2024.3: fixed lsf debugger</li>
-            <li>GRID enableManualUpdate support</li>
-            <li>Fixed opening .jrxml file from lsf editor</li>
+            <li>Support TOP (OFFSET) in GROUP / JSON / PARTITION / FOR / EXPORT operators</li>
         </ul>
     ]]>
     </change-notes>
