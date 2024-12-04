@@ -471,8 +471,8 @@ partitionPropertyDefinition ::= PARTITION
                                     | (aggrCustomType ((nonEmptyPropertyExpressionList orderPropertyBy?) | orderPropertyBy))
                                 )
                                 (WINDOW EXCEPTLAST)?
-                                partitionPropertyBy?
                                 selectTop?
+                                partitionPropertyBy?
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.PropertyUsageContext"
@@ -499,7 +499,7 @@ castPropertyDefinition ::= builtInClassName LBRAC propertyExpression RBRAC
 concatPropertyDefinition ::= CONCAT stringLiteral COMMA nonEmptyPropertyExpressionList
 {pin = 1 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
-jsonPropertyDefinition ::= (JSON | JSONTEXT) FROM nonEmptyAliasedPropertyExpressionList wherePropertyExpression? selectTop? (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)?
+jsonPropertyDefinition ::= (JSON | JSONTEXT) FROM nonEmptyAliasedPropertyExpressionList wherePropertyExpression? (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)? selectTop?
 {
     pin = 3
     implements = "com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.ExtendParamContext"
@@ -602,6 +602,7 @@ groupPropertyBody ::= (
                       | (groupingTypeOrder nonEmptyPropertyExpressionList orderPropertyBy)
                       | (aggrCustomType ((nonEmptyPropertyExpressionList WITHIN? orderPropertyBy) | (WITHIN? orderPropertyBy)))
                       )
+                      selectTop?
                       (WHERE propertyExpression)?
   
 private groupByBefore ::= GROUP groupPropertyBody groupPropertyBy
@@ -612,7 +613,7 @@ groupPropertyDefinition ::= groupByBefore //| groupByAfter
     methods = [ getContextModifier getContextInferrer resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getDocumentation]
 }		
 
-groupExprPropertyDefinition ::= GROUP groupPropertyBody selectTop?
+groupExprPropertyDefinition ::= GROUP groupPropertyBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.LSFExpression"
@@ -1566,9 +1567,9 @@ recalculateActionPropertyDefinitionBody ::= RECALCULATE propertyExpression (WHER
 }
 
 forActionPropertyMainBody ::= FOR propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)?
+                              selectTop?
                               inlineOption
                               (forAddObjClause)?
-                              selectTop?
                               DO actionPropertyDefinitionBody
 {
     pin = 1
