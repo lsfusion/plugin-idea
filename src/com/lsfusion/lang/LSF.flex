@@ -288,7 +288,6 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "EVAL"                    			{ return EVAL; }
   "EVENTID"                 			{ return EVENTID; }
   "EVENTS"                  			{ return EVENTS; }
-  "EXCEPTLAST"              			{ return EXCEPTLAST; }
   "EXCLUSIVE"               			{ return EXCLUSIVE; }
   "EXEC"                    			{ return EXEC; }
   "EXPAND"                    			{ return EXPAND; }

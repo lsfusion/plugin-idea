@@ -470,7 +470,6 @@ partitionPropertyDefinition ::= PARTITION
                                     )
                                     | (aggrCustomType ((nonEmptyPropertyExpressionList orderPropertyBy?) | orderPropertyBy))
                                 )
-                                (WINDOW EXCEPTLAST)?
                                 selectTop?
                                 partitionPropertyBy?
 {
