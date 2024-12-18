@@ -62,8 +62,8 @@ public class LibraryOptionsPanel {
     // calling URL without trailing slash follows redirect to the page with CDN id and root folder name 
     // which causes 404 error as this page is not reachable from the outside
     private final String DOWNLOAD_URL = "https://download.lsfusion.org/java/";
-    private final String SERVER_PATTERN = "lsfusion-server-(\\d+(\\.)?)*\\.jar";
-    private final String SOURCES_PATTERN = "lsfusion-server-(\\d+(\\.)?)*-sources\\.jar";
+    private final String SERVER_PATTERN = "lsfusion-server-(\\d+(\\.)?)*(-beta\\d+|-SNAPSHOT)?\\.jar";
+    private final String SOURCES_PATTERN = "lsfusion-server-(\\d+(\\.)?)*(-beta\\d+|-SNAPSHOT)?-sources\\.jar";
 
     private final String SERVER_JAR_KEY = "serverJar";
     private final String SOURCES_JAR_KEY = "sourcesJar";
@@ -300,10 +300,10 @@ public class LibraryOptionsPanel {
                 if (url != null) {
                     indicator.setText(url);
                     try {
-                        Pattern p = Pattern.compile(".*/lsfusion-server-(\\d+)[\\d.]*(-sources)?\\.jar");
+                        Pattern p = Pattern.compile(".*/lsfusion-server-(\\d+)[\\d.]*(-beta\\d+|-SNAPSHOT)?(-sources)?\\.jar");
                         Matcher m = p.matcher(url);
                         if(m.matches()) {
-                            String fileName = "lsfusion-" + m.group(1) + (m.group(2) != null ? m.group(2) : "") + ".jar";
+                            String fileName = "lsfusion-" + m.group(1) + (m.group(2) != null ? m.group(2) : "") + (m.group(3) != null ? m.group(3) : "") + ".jar";
                             File file = new File(targetPath + "/" + fileName);
                             HttpGet httpGet = new HttpGet(url);
                             httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36");

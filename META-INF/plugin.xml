@@ -11,6 +11,7 @@
         <b>Version 1.0.296</b><br>
         <ul>
             <li>Support TOP (OFFSET) in GROUP / JSON / PARTITION / FOR / EXPORT operators</li>
+            <li>Download beta or SNAPSHOT version of lsFusion library in new project wizard</li>
         </ul>
     ]]>
     </change-notes>
