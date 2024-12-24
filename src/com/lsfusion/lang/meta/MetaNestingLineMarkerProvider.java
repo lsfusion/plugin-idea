@@ -43,15 +43,15 @@ public class MetaNestingLineMarkerProvider extends LSFLineMarkerProvider {
         return null;
     }
 
+    private static JBColor markerColor = new JBColor(Gray._160, Gray._90);
     private static Icon createIcon(final int level) {
         return new Icon() {
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
-                String text = "" + level;
-                g.setColor(new JBColor(Gray._160, Gray._90));
+                String text = String.valueOf(level);
+                g.setColor(markerColor);
 
                 g.drawRoundRect(x, y, 12, 12, 2, 2);
-                Font textFont = new Font("Dialog", Font.BOLD, 11);
                 g.setFont(textFont);
 
                 int textWidth = g.getFontMetrics(textFont).stringWidth(text);

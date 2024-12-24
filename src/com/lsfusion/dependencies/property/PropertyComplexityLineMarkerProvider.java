@@ -75,15 +75,15 @@ public class PropertyComplexityLineMarkerProvider extends LSFLineMarkerProvider 
         );
     }
 
+    private static JBColor markerColor = new JBColor(new Color(114, 174, 108), new Color(99, 146, 97));
     private static Icon createIcon(final int complexity) {
         return new Icon() {
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
-                String text = "" + complexity;
-                g.setColor(new JBColor(new Color(114, 174, 108), new Color(99, 146, 97)));
+                String text = String.valueOf(complexity);
+                g.setColor(markerColor);
 
                 g.drawRoundRect(x, y, 12, 12, 2, 2);
-                Font textFont = new Font("Dialog", Font.BOLD, 11);
                 g.setFont(textFont);
 
                 int textWidth = g.getFontMetrics(textFont).stringWidth(text);

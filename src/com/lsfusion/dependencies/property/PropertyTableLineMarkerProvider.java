@@ -88,15 +88,15 @@ public class PropertyTableLineMarkerProvider extends LSFLineMarkerProvider {
         );
     }
 
+    private static JBColor markerColor = new JBColor(new Color(255, 153, 0), new Color(255, 153, 0));
     private static Icon createIcon() {
         return new Icon() {
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
                 String text = "T";
-                g.setColor(new JBColor(new Color(255, 153, 0), new Color(255, 153, 0)));
+                g.setColor(markerColor);
 
                 g.drawRoundRect(x, y, 12, 12, 2, 2);
-                Font textFont = new Font("Dialog", Font.BOLD, 11);
                 g.setFont(textFont);
 
                 int textWidth = g.getFontMetrics(textFont).stringWidth(text);

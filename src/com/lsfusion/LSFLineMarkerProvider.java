@@ -7,10 +7,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 
 public abstract class LSFLineMarkerProvider implements LineMarkerProvider {
+
+    protected static Font textFont = new Font("Dialog", Font.BOLD, 11);
+
     @Override
     final public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
         PsiFile containingFile = element.getContainingFile();
