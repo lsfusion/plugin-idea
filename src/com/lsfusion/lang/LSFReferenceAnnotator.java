@@ -145,6 +145,18 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitConcatPropertyDefinition(@NotNull LSFConcatPropertyDefinition o) {
+        super.visitConcatPropertyDefinition(o);
+        LSFPropertyExpression separatorExpression = o.getPropertyExpression();
+        if (separatorExpression != null) {
+            LSFExClassSet type = separatorExpression.resolveValueClass(false);
+            if (type != null && !(type.classSet instanceof StringClass)) {
+                addUnderscoredError(separatorExpression, "Separator should be STRING");
+            }
+        }
+    }
+
+    @Override
     public void visitCustomClassUsage(@NotNull LSFCustomClassUsage o) {
         super.visitCustomClassUsage(o);
         checkReference(o);
