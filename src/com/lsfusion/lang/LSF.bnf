@@ -495,7 +495,7 @@ structCreationPropertyDefinition ::= STRUCT LBRAC nonEmptyPropertyExpressionList
 castPropertyDefinition ::= builtInClassName LBRAC propertyExpression RBRAC
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
-concatPropertyDefinition ::= CONCAT stringLiteral COMMA nonEmptyPropertyExpressionList
+concatPropertyDefinition ::= CONCAT propertyExpression COMMA nonEmptyPropertyExpressionList
 {pin = 1 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
 jsonPropertyDefinition ::= (JSON | JSONTEXT) FROM nonEmptyAliasedPropertyExpressionList wherePropertyExpression? (ORDER propertyExpressionWithOrder (COMMA propertyExpressionWithOrder)*)? selectTop?

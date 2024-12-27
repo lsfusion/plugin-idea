@@ -1093,8 +1093,8 @@ public class LSFPsiImplUtil {
         return orClasses(fixedClasses, hasString);
     }
 
-    private static LSFExClassSet concatStringClasses(List<LSFExClassSet> classes, String separator) {
-        int separatorLength = separator.length();
+    private static LSFExClassSet concatStringClasses(List<LSFExClassSet> classes, LSFExClassSet separatorClass) {
+        int separatorLength = separatorClass != null ? separatorClass.classSet.getCharLength().value : 0;
 
         ExtInt length = ExtInt.ZERO;
         boolean caseInsensitive = false;
@@ -1396,12 +1396,12 @@ public class LSFPsiImplUtil {
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFConcatPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         LSFNonEmptyPropertyExpressionList nonEmptyPropertyExpressionList = sourceStatement.getNonEmptyPropertyExpressionList();
-        LSFStringLiteral separatorLiteral = sourceStatement.getStringLiteral();
-        if (nonEmptyPropertyExpressionList != null && separatorLiteral != null) {
+        LSFPropertyExpression separatorExpression = sourceStatement.getPropertyExpression();
+        if (nonEmptyPropertyExpressionList != null && separatorExpression != null) {
             List<LSFExClassSet> orClasses = new ArrayList<>();
             for (LSFPropertyExpression pe : nonEmptyPropertyExpressionList.getPropertyExpressionList())
                 orClasses.add(resolveInferredValueClass(pe, inferred));
-            return concatStringClasses(orClasses, separatorLiteral.getValue());
+            return concatStringClasses(orClasses, resolveInferredValueClass(separatorExpression, inferred));
         } else {
             return resolveInferredValueClass(sourceStatement.getNonEmptyPropertyExpressionList(), inferred, true);
         }
