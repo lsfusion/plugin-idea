@@ -763,6 +763,7 @@ private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
                                         |	    importActionPropertyDefinitionBody // mixed
                                         |       newThreadActionPropertyDefinitionBody // mixed
                                         |	    newExecutorActionPropertyDefinitionBody // mixed, recursive but allways semi
+                                        |	    newConnectionActionPropertyDefinitionBody
 
 // extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
 private leafActionPDB ::=  (leafExtendContextActionPDB | leafKeepContextActionPDB) SEMI | SEMI { pin(".*") = 1 } // | EMPTY and not emptyActionPropertyDefinitionBody because it would be pinned and expect seni after it everywhere
@@ -1301,6 +1302,13 @@ newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
 }
 
 newExecutorActionPropertyDefinitionBody ::= NEWEXECUTOR actionPropertyDefinitionBody THREADS propertyExpression syncTypeLiteral? SEMI
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses getDocumentation]
+}
+
+newConnectionActionPropertyDefinitionBody ::= NEWCONNECTION actionPropertyDefinitionBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"

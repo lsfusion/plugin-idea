@@ -4286,6 +4286,10 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
+    public static Inferred inferActionParamClasses(LSFNewConnectionActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
     public static Inferred inferActionParamClasses(LSFNewSessionActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         return inferActionParamClasses(body.getActionPropertyDefinitionBody(), params);
     }

@@ -13,6 +13,7 @@
             <li>Support TOP (OFFSET) in GROUP / JSON / PARTITION / FOR / EXPORT operators</li>
             <li>Download beta or SNAPSHOT version of lsFusion library in new project wizard</li>
             <li>Make CONCAT operator's separator an expression</li>
+            <li>NEWCONNECTION operator support</li>
         </ul>
     ]]>
     </change-notes>

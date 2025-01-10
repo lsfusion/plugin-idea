@@ -398,6 +398,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NESTED"                     			{ return NESTED; }
   "NESTEDSESSION"              			{ return NESTEDSESSION; }
   "NEW"                     			{ return NEW; }
+  "NEWCONNECTION"                     	{ return NEWCONNECTION; }
   "NEWEDIT"                     	    { return NEWEDIT; }
   "NEWSESSION"              			{ return NEWSESSION; }
   "NEWSQL"              			    { return NEWSQL; }
