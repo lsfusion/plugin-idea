@@ -320,7 +320,9 @@ public abstract class GenerateFormAction extends AnAction {
 
                 if (hasPropertyGroupParseNodeChildren(element)) {
                     if (lastGroupObjectParent != null) {
-                        objectsScripts.add(getObjectsScript(key, propertyGroupElement.namespace, parentInGroupKey));
+                        if(lastGroupObjectParent.equals(key)) {
+                            objectsScripts.add(getObjectsScript(key, propertyGroupElement.namespace, parentInGroupKey));
+                        }
                         if (parentKey != null) {
                             groupDeclarationScripts.add(getGroupDeclarationScript(parentKey, propertyGroupElement.namespace, null));
                         }
