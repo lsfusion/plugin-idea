@@ -572,6 +572,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitExternalActionPropertyDefinitionBody(@NotNull LSFExternalActionPropertyDefinitionBody o) {
         super.visitExternalActionPropertyDefinitionBody(o);
 
+        //todo: remove in 7.0
         if(o.getText().startsWith("EXTERNAL SQL 'LOCAL'")) {
             LSFPropertyExpression expr = o.getPropertyExpressionList().get(0);
             addErrorAnnotation(expr, expr.getTextRange(), "Use INTERNAL DB instead");
