@@ -22,6 +22,11 @@ public class GenerateFormXMLAction extends GenerateFormAction {
     }
 
     @Override
+    protected boolean showFullNamespaceCheckBox() {
+        return true;
+    }
+
+    @Override
     protected Object getRootElement(String file) throws JDOMException, IOException {
         return file != null ? new SAXBuilder().build(new ByteArrayInputStream(file.getBytes(getCharset(file)))).getRootElement(): null;
     }

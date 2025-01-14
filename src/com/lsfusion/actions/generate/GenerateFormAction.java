@@ -41,6 +41,8 @@ public abstract class GenerateFormAction extends AnAction {
     private Set<String> usedNamespacePrefixes = new HashSet<>();
     private Set<String> usedFilterProperties = new HashSet<>();
 
+    private boolean fullNamespaceInExtId = false;
+
     private final Set<String> keywords = new HashSet<>(Arrays.asList("TRUE", "FALSE", "TTRUE", "TFALSE", "INTEGER", "LONG", "NUMERIC", "DOUBLE", "DATE", "DATETIME", "TIME", "YEAR",
             "ZDATETIME", "INTERVAL", "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT", "RICHTEXT", "HTMLTEXT",
             "WORDFILE", "IMAGEFILE", "PDFFILE", "VIDEOFILE", "DBFFILE", "RAWFILE", "FILE", "EXCELFILE", "TEXTFILE",
@@ -84,6 +86,8 @@ public abstract class GenerateFormAction extends AnAction {
             "WHEN", "WHERE", "WHILE", "WITHIN", "WRITE", "WINDOW", "XLS", "XLSX", "XML", "XOR", "YES", "YESNO"));
 
     abstract String getExtension();
+
+    abstract boolean showFullNamespaceCheckBox();
 
     abstract Object getRootElement(String file) throws Exception;
 
@@ -196,6 +200,11 @@ public abstract class GenerateFormAction extends AnAction {
             JButton generateFromFileButton = new JButton("Generate from file");
             generateFromFileButton.addActionListener(e -> onGenerateFromFile());
 
+            fullNamespaceInExtId = false;
+            JCheckBox fullNamespaceCheckBox = new JCheckBox("Full namespace in EXTID");
+            fullNamespaceCheckBox.addActionListener(e -> fullNamespaceInExtId = !fullNamespaceInExtId);
+            fullNamespaceCheckBox.setVisible(showFullNamespaceCheckBox());
+
             targetTextPane = new JTextPane();
             targetTextPane.setBackground(null);
             targetTextPane.setEditable(false);
@@ -206,8 +215,10 @@ public abstract class GenerateFormAction extends AnAction {
             mainPanel.setLayout(new GridBagLayout());
             mainPanel.add(sourceScrollPane, getGridBagConstraints(0));
             JPanel buttonsPanel = new JPanel();
-            buttonsPanel.add(generateFromTextButton, BorderLayout.EAST);
-            buttonsPanel.add(generateFromFileButton, BorderLayout.EAST);
+            buttonsPanel.add(fullNamespaceCheckBox, BorderLayout.EAST);
+            buttonsPanel.add(generateFromTextButton, BorderLayout.WEST);
+            buttonsPanel.add(generateFromFileButton, BorderLayout.WEST);
+
             buttonsPanel.setMinimumSize(new Dimension());
 
             JPanel bottomPanel = new JPanel();
@@ -459,9 +470,9 @@ public abstract class GenerateFormAction extends AnAction {
             String prefixOrUri = namespace.prefix.isEmpty() ? namespace.uri : namespace.prefix;
             if (!usedNamespacePrefixes.contains(prefixOrUri)) {
                 usedNamespacePrefixes.add(prefixOrUri);
-                namespaceScript = namespace.prefix + "=" + namespace.uri + ":";
+                namespaceScript =  (fullNamespaceInExtId ? ("=" + namespace.uri) : (namespace.prefix + "=" + namespace.uri)) + ":";
             } else {
-                namespaceScript = namespace.prefix + ":";
+                namespaceScript = (fullNamespaceInExtId ? ("=" + namespace.uri) : namespace.prefix) + ":";
             }
         }
         return namespaceScript;

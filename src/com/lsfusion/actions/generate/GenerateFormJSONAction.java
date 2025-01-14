@@ -17,6 +17,11 @@ public class GenerateFormJSONAction extends GenerateFormAction {
     }
 
     @Override
+    boolean showFullNamespaceCheckBox() {
+        return false;
+    }
+
+    @Override
     protected Object getRootElement(String file) {
         if (file != null) {
             Object object = new JSONTokener(file).nextValue();
