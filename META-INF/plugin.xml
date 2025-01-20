@@ -8,12 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.296</b><br>
+        <b>Version 1.0.297</b><br>
         <ul>
-            <li>Support TOP (OFFSET) in GROUP / JSON / PARTITION / FOR / EXPORT operators</li>
-            <li>Download beta or SNAPSHOT version of lsFusion library in new project wizard</li>
-            <li>Make CONCAT operator's separator an expression</li>
-            <li>NEWCONNECTION operator support</li>
+            <li>The latest stable or beta version of lsf library is downloaded by default in the New Project wizard</li>
         </ul>
     ]]>
     </change-notes>

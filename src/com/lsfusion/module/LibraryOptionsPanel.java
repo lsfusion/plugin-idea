@@ -248,6 +248,11 @@ public class LibraryOptionsPanel {
         List<String> sourceUrls = parseURL(DOWNLOAD_URL, SOURCES_PATTERN);
         for(int i = serverUrls.size() - 1; i >=0; i--) {
             String serverUrl = serverUrls.get(i);
+            
+            if (latest && serverUrl.contains("SNAPSHOT")) {
+                continue;
+            }
+            
             Map<String, String> fileUrls = new HashMap<>();
             fileUrls.put(SERVER_JAR_KEY, DOWNLOAD_URL + serverUrl);
 
