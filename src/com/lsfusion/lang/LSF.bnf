@@ -1753,7 +1753,8 @@ treeGroupParentDeclaration ::= (PARENT formExprDeclaration) | (LBRAC PARENT form
 formGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDeclaration
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFGroupObjectDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration"}
 
-formGroupObjectViewType ::= classViewType | listViewType
+customOptionsLiteral ::= HEADER | OPTIONS
+formGroupObjectViewType ::= (classViewType | listViewType) (customOptionsLiteral propertyExpression)?
 formGroupObjectInitViewType ::= INIT | FIXED
 
 formExtKey ::= EXTKEY
@@ -1768,8 +1769,7 @@ propertyCustomView ::= (CUSTOM ((renderPropertyCustomView changePropertyCustomVi
                         | (SELECT (AUTO | (<<noIDCheck>> stringLiteral))?)
                         | NOSELECT
 
-customHeaderLiteral ::= HEADER | OPTIONS
-listViewType ::= (PIVOT <<pivotCheck>> pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral (customHeaderLiteral propertyExpression)?) | CALENDAR
+listViewType ::= (PIVOT <<pivotCheck>> pivotOptions) | (MAP mapOptions?) | (CUSTOM stringLiteral) | CALENDAR
 
 pivotOptions ::= (stringLiteral | (SUM | MAX | MIN) | (SETTINGS | NOSETTINGS) | (CONFIG stringLiteral))*
 

@@ -285,11 +285,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
-    public void visitCustomHeaderLiteral(@NotNull LSFCustomHeaderLiteral o) {
-        super.visitCustomHeaderLiteral(o);
-        if(o.getText().equals("OPTIONS")) {
-            addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use HEADER instead");
-        }
+    public void visitCustomOptionsLiteral(@NotNull LSFCustomOptionsLiteral o) {
+        super.visitCustomOptionsLiteral(o);
+        if(o.getText().equals("HEADER"))
+            addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use OPTIONS instead");
     }
 
     @Override
