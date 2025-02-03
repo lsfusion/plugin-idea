@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.references.LSFFormReference;
@@ -22,5 +23,10 @@ public abstract class LSFFormReferenceImpl extends LSFFullNameReferenceImpl<LSFF
     @Override
     public LSFId getFormUsageNameIdentifier() {
         return getCompoundID().getSimpleName();
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFFormDeclaration;
     }
 }

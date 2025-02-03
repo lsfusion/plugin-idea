@@ -102,4 +102,9 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
     public PsiElement getWrapper() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFActionOrPropDeclaration;
+    }
 }

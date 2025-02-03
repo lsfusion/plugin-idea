@@ -8,6 +8,7 @@ import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.meta.MetaTransaction;
@@ -71,8 +72,12 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
 
     @Override
     public boolean isReferenceTo(PsiElement element) {
-        return resolve() == element;
+        // need to prevent resolving when it's not needed
+        return isDeclarationType(PsiTreeUtil.getParentOfType(element, LSFDeclaration.class)) && getManager().areElementsEquivalent(resolve(), element);
     }
+
+    // should return instanceof T
+    protected abstract boolean isDeclarationType(PsiElement element);
 
     @Override
     public String getNameRef() {

@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.declarations.LSFWindowDeclaration;
 import com.lsfusion.lang.psi.references.LSFWindowReference;
@@ -27,5 +28,10 @@ public abstract class LSFWindowReferenceImpl extends LSFFullNameReferenceImpl<LS
     protected List<LSFWindowDeclaration> getVirtDecls() {
         Collection<LSFWindowDeclaration> builtInWindows = LSFElementGenerator.getBuiltInWindows(getProject());
         return new ArrayList<>(builtInWindows);
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFWindowDeclaration;
     }
 }

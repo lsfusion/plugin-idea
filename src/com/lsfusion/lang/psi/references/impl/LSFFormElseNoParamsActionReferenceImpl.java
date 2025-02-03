@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.CollectionQuery;
 import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -78,5 +79,10 @@ public abstract class LSFFormElseNoParamsActionReferenceImpl extends LSFFullName
         }
 
         return new LSFResolvingError(this, errorText, !noSuchProperty);
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFFormOrActionDeclaration;
     }
 }

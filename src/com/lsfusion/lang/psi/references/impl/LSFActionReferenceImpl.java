@@ -83,4 +83,9 @@ public abstract class LSFActionReferenceImpl extends LSFActionOrPropReferenceImp
     public PsiElement getWrapper() {
         return PsiTreeUtil.getParentOfType(this, LSFActionUsageWrapper.class);
     }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFActionDeclaration;
+    }
 }

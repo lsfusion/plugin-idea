@@ -47,7 +47,7 @@ public class LSFProblemsVisitor {
         if (parent instanceof LSFPropertyDeclaration || parent instanceof LSFActionDeclaration || parent instanceof LSFGroupStatement || parent instanceof LSFClassDecl) {
             LSFDeclaration objectDecl = PsiTreeUtil.getParentOfType(element, LSFDeclaration.class);
             if (objectDecl != null && objectDecl.getNameIdentifier() != null && !hasShortCut(objectDecl) &&
-                    ReferencesSearch.search(objectDecl.getNameIdentifier(), element.getUseScope(), true).findFirst() == null) {
+                    ReferencesSearch.search(objectDecl.getNameIdentifier(), objectDecl.getUseScope(), true).findFirst() == null) {
 
                 LSFSimpleName simpleName = element.getSimpleName();
                 String warningText = getWarningText(parent);

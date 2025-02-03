@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
@@ -30,4 +31,8 @@ public abstract class LSFGroupObjectReferenceImpl extends LSFFormElementReferenc
         return decl.resolveClasses();
     }
 
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFGroupObjectDeclaration;
+    }
 }

@@ -203,7 +203,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
     }
 
     protected List<LSFActionOrPropReference<?, ?>> findImplementations(LSFId nameIdentifier) {
-        Collection<PsiReference> refs = ReferencesSearch.search(nameIdentifier, GlobalSearchScope.allScope(getProject())).findAll();
+        Collection<PsiReference> refs = ReferencesSearch.search(nameIdentifier, getUseScope()).findAll();
 
         List<LSFActionOrPropReference<?, ?>> impls = new ArrayList<>();
         for (PsiReference ref : refs) {

@@ -91,7 +91,7 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
         if(declaration != null) {
             LSFId identifier = declaration.getNameIdentifier();
             if (identifier != null) {
-                ReferencesSearch.search(identifier).forEach(psiReference -> {
+                ReferencesSearch.search(identifier, declaration.getUseScope()).forEach(psiReference -> {
                     processor.process(new UsageInfo(psiReference));
                     return true;
                 });

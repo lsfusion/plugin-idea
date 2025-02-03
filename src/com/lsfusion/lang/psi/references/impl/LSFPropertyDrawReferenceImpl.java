@@ -2,6 +2,7 @@ package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
@@ -81,5 +82,10 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
         assert aliasUsage != null;
 
         return aliasUsage.getSimpleName();
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFPropertyDrawDeclaration;
     }
 }

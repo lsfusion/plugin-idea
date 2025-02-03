@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.declarations.LSFGroupDeclaration;
 import com.lsfusion.lang.psi.references.LSFGroupReference;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -18,4 +19,8 @@ public abstract class LSFGroupReferenceImpl extends LSFFullNameReferenceImpl<LSF
         return LSFStubElementTypes.GROUP;
     }
 
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFGroupDeclaration;
+    }
 }

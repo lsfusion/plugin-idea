@@ -25,4 +25,9 @@ public abstract class LSFExprParamReferenceImpl extends LSFAbstractParamReferenc
     public LSFId getSimpleName() {
         return getClassParamDeclare().getParamDeclare().getSimpleName();
     }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFExprParamDeclaration;
+    }
 }

@@ -5,8 +5,12 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.impl.ResolveScopeManager;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
+import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.LSFStubBasedPsiElement;
 import com.lsfusion.lang.psi.declarations.LSFGlobalDeclaration;
@@ -98,6 +102,12 @@ public abstract class LSFGlobalDeclarationImpl<This extends LSFGlobalDeclaration
 
     public PsiElement getLookupObject() { // пока не совсем понятно зачем
         return this;
+    }
+
+    @Override
+    public @NotNull SearchScope getUseScope() {
+        // we need only LSF files to avoid parsing Java / JRXML files
+        return GlobalSearchScope.getScopeRestrictedByFileTypes(ResolveScopeManager.getElementUseScope(this), LSFFileType.INSTANCE);
     }
 
     @NotNull

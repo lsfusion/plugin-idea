@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFDesign;
@@ -21,6 +22,11 @@ public abstract class LSFComponentReferenceImpl extends LSFDesignElementReferenc
     @Override
     protected Function<LSFDesign, Collection<LSFComponentDeclaration>> getElementsCollector() {
         return LSFDesign::getComponentDecls;
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFComponentDeclaration;
     }
 
     //    @Override

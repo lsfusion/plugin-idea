@@ -12,6 +12,7 @@
         <ul>
             <li>The latest stable or beta version of lsf library is downloaded by default in the New Project wizard</li>
             <li>HEADER in custom view is DEPRECATED. Added OPTIONS to form group object instead</li>
+            <li>Several minor optimizations in the reference search mechanism</li>
         </ul>
     ]]>
     </change-notes>

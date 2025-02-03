@@ -252,4 +252,9 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
     public Icon getIcon(int flags) {
         return LSFIcons.META_REFERENCE;
     }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFMetaDeclaration;
+    }
 }

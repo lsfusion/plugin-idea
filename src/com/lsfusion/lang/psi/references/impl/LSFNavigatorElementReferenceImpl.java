@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.references.LSFNavigatorElementReference;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -16,5 +17,10 @@ public abstract class LSFNavigatorElementReferenceImpl extends LSFFullNameRefere
     @Override
     protected FullNameStubElementType getStubElementType() {
         return LSFStubElementTypes.NAVIGATORELEMENT;
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFFullNameDeclaration;
     }
 }

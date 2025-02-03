@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -16,5 +17,10 @@ public abstract class LSFClassReferenceImpl extends LSFFullNameReferenceImpl<LSF
     @Override
     protected FullNameStubElementType<?, LSFClassDeclaration> getStubElementType() {
         return LSFStubElementTypes.CLASS;
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFClassDeclaration;
     }
 }

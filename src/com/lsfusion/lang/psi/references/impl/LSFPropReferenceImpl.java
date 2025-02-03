@@ -145,4 +145,9 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
     protected String getErrorName() {
         return "property";
     }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFPropDeclaration;
+    }
 }

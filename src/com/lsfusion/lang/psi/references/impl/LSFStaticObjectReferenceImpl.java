@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.LSFCustomClassUsage;
 import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.LSFResolveResult;
@@ -31,6 +32,11 @@ public abstract class LSFStaticObjectReferenceImpl extends LSFReferenceImpl<LSFS
                 decls.add(decl);
 
         return new LSFResolveResult(decls, resolveDefaultErrorAnnotator(decls, false));
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFStaticObjectDeclaration;
     }
 
     @Override

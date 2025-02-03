@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.references.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.lsfusion.lang.psi.declarations.LSFFilterGroupDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFFilterGroupReference;
@@ -17,5 +18,10 @@ public abstract class LSFFilterGroupReferenceImpl extends LSFFormElementReferenc
     @Override
     protected Function<LSFFormExtend, Collection<LSFFilterGroupDeclaration>> getElementsCollector() {
         return LSFFormExtend::getFilterGroupDecls;
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        return element instanceof LSFFilterGroupDeclaration;
     }
 }
