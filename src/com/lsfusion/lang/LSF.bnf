@@ -1278,7 +1278,7 @@ importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOES
                         |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))? (WHERE propertyExpression)?
                         |   JSON (ROOT propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
-                        |   XML (ROOT propertyExpression)? (ATTR)? (WHERE propertyExpression)?
+                        |   XML (ROOT propertyExpression)? (ATTR)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   TABLE (WHERE propertyExpression)?
 
 importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
