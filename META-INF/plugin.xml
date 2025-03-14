@@ -11,6 +11,7 @@
         <b>Version 1.0.298</b><br>
         <ul>
             <li>Added OPTIONS to form property</li>
+            <li>IMPORT WHERE for XML/JSON</li>
         </ul>
     ]]>
     </change-notes>

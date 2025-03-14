@@ -1277,8 +1277,8 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
 importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
                         |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))? (WHERE propertyExpression)?
-                        |   JSON (ROOT propertyExpression)? (CHARSET stringLiteral)?
-                        |   XML (ROOT propertyExpression)? (ATTR)?
+                        |   JSON (ROOT propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
+                        |   XML (ROOT propertyExpression)? (ATTR)? (WHERE propertyExpression)?
                         |   TABLE (WHERE propertyExpression)?
 
 importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
