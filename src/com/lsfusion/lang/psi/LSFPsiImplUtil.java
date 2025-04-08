@@ -228,7 +228,9 @@ public class LSFPsiImplUtil {
         if(sourceStatement == null)
             return Collections.emptyList();
         List<LSFPropertyExpression> result = new ArrayList<>();
-        result.addAll(sourceStatement.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
+        LSFNonEmptyPropertyExpressionList nonEmptyPropertyExpressionList = sourceStatement.getNonEmptyPropertyExpressionList();
+        if(nonEmptyPropertyExpressionList != null)
+            result.addAll(nonEmptyPropertyExpressionList.getPropertyExpressionList());
         LSFOrderPropertyBy orderBy = sourceStatement.getOrderPropertyBy();
         if (orderBy != null)
             result.addAll(orderBy.getNonEmptyPropertyExpressionList().getPropertyExpressionList());
