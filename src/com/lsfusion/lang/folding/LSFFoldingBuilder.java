@@ -35,7 +35,8 @@ public class LSFFoldingBuilder implements FoldingBuilder {
         IElementType elementType = node.getElementType();
         boolean fullFolding = elementType == LSFTypes.META_CODE_BODY
                               || elementType == LSFTypes.NAVIGATOR_ELEMENT_STATEMENT_BODY
-                              || elementType == LSFTypes.LIST_ACTION_PROPERTY_DEFINITION_BODY;
+                              || elementType == LSFTypes.LIST_ACTION_PROPERTY_DEFINITION_BODY
+                              || elementType == LSFTypes.COMPONENT_BODY;
         if (fullFolding && node.getTextRange().getLength() > 1) {
             final TextRange range = node.getTextRange();
             list.add(new FoldingDescriptor(node, range));

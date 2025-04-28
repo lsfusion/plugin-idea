@@ -14,6 +14,7 @@
             <li>IMPORT WHERE for XML/JSON</li>
             <li>IMPORT XML CHARSET</li>
             <li>Deprecated since 6.0 design options: changeKeyPriority, changeMousePriority</li>
+            <li>Added folding for DESIGN statement</li>
         </ul>
     ]]>
     </change-notes>
