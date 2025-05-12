@@ -5214,6 +5214,10 @@ public class LSFPsiImplUtil {
         return "Selection_CASE_IF_MULTI_OVERRIDE_EXCLUSIVE";
     }
 
+    public static String getDocumentation(LSFNewConnectionActionPropertyDefinitionBody lsfNewConnectionActionPropertyDefinitionBody, PsiElement child) {
+        return "NEWCONNECTION_operator";
+    }
+
     public static String getDocumentation(LSFEqualsSign lsfEqualsSign, PsiElement child) {
         return "=_statement";
     }
