@@ -35,7 +35,9 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
 
     @Override
     public @Nullable NonCodeUsageSearchInfo findUsages(@NotNull PsiElement element, @NotNull PsiElement[] allElementsToDelete, @NotNull List<? super UsageInfo> result) {
-        new LSFFindUsagesHandler(element).processElementUsages(element, new CommonProcessors.CollectProcessor<>(result), new LSFFindUsagesOptions(element.getProject()));
+        Project project = element.getProject();
+        element = getNameIdentifier(element);
+        new LSFFindUsagesHandler(element).processElementUsages(element, new CommonProcessors.CollectProcessor<>(result), new LSFFindUsagesOptions(project));
         return null;
     }
 
