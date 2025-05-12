@@ -1,7 +1,7 @@
 package com.lsfusion.actions;
 
 import com.intellij.codeInsight.navigation.NavigationUtil;
-import com.intellij.ide.util.DefaultPsiElementCellRenderer;
+import com.intellij.codeInsight.navigation.impl.PsiTargetPresentationRenderer;
 import com.intellij.lang.LanguageCodeInsightActionHandler;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -17,7 +17,9 @@ import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.util.LSFPsiUtils;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +72,7 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
             if (targets.size() == 1) {
                 ((Navigatable) targets.get(0)).navigate(true);
             } else if (!targets.isEmpty()) {
-                NavigationUtil.getPsiElementPopup(targets.toArray(new PsiElement[0]), new GoToSuperElementRenderer(mapped), "Choose Element").showInBestPositionFor(editor);
+                NavigationUtil.getPsiElementPopup(() -> targets, new GoToSuperPresentationRenderer(mapped), "Choose Element", project).showInBestPositionFor(editor);
             }
         }
     }
@@ -80,15 +82,16 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
         return true;
     }
 
-    class GoToSuperElementRenderer extends DefaultPsiElementCellRenderer {
+    class GoToSuperPresentationRenderer extends PsiTargetPresentationRenderer {
         private PsiElement metaElement;
 
-        public GoToSuperElementRenderer(PsiElement metaElement) {
+        public GoToSuperPresentationRenderer(PsiElement metaElement) {
             this.metaElement = metaElement;
         }
 
         @Override
-        public String getElementText(PsiElement element) {
+        public @Nls
+        @NotNull String getElementText(@NotNull PsiElement element) {
             if (metaElement == element) {
                 LSFMetaCodeDeclarationStatement metaDecl = PsiTreeUtil.getParentOfType(element, LSFMetaCodeDeclarationStatement.class);
                 if (metaDecl != null) {
@@ -99,7 +102,7 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
         }
 
         @Override
-        public String getContainerText(PsiElement element, String name) {
+        public @Nls @Nullable String getContainerText(@NotNull PsiElement element) {
             return LSFPsiUtils.getLocationString(element);
         }
     }
