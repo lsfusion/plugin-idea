@@ -46,8 +46,9 @@
 
     <!-- JDK definitions -->
 
-    <property name="jdk.home" value="/usr/java/latest"/>
-    
+    <property name="jdk.home" value="/usr/java/idea-plugin"/>
+    <property name="jdk.executable" value="${jdk.home}/bin/java"/>
+
     <path id="jdk.classpath">
         <fileset dir="${jdk.home}">
             <include name="jre/lib/*.jar"/>
@@ -65,11 +66,9 @@
     <property name="javac2.home" value="${idea.home}/plugins/java/lib"/>
     <path id="javac2.classpath">
         <pathelement location="${javac2.home}/javac2.jar"/>
-        <pathelement location="${idea.home}/lib/3rd-party-rt.jar"/>
-        <pathelement location="${idea.home}/lib/jdom.jar"/>
-        <pathelement location="${idea.home}/lib/asm-9.2.jar"/>
         <pathelement location="${idea.home}/lib/forms_rt.jar"/>
         <pathelement location="${idea.home}/lib/util.jar"/>
+        <pathelement location="${idea.home}/lib/util-8.jar"/>
     </path>
     <target name="register.custom.compilers">
         <!--suppress AntResolveInspection : used in Linux -->
@@ -82,7 +81,7 @@
     <!-- Module lsfusion-idea-plugin -->
 
     <property name="compiler.args"
-              value="-encoding UTF-8 -source 11 -target 11"/>
+              value="-encoding UTF-8 -source 17 -target 17"/>
 
     <property name="output.dir"
               value="${basedir}/out/production/lsfusion-idea-plugin"/>
@@ -118,27 +117,17 @@
         <pathelement location="${buildLib}/grammar-kit.jar"/>
         <file name="${basedir}/lib/psiImplUtils.jar"/>
         <fileset dir="${idea.home}/lib">
-            <include name="3rd-party-rt.jar"/>
             <include name="app.jar"/>
-            <include name="asm-9.2.jar"/>
-            <include name="automaton-1.12-1.jar"/>
-            <include name="extensions.jar"/>
-            <include name="guava-29.0-jre.jar"/>
-            <include name="idea.jar"/>
-            <include name="intellij-deps-fastutil-8.5.2-6.jar"/>
-            <include name="jdom.jar"/>
-            <include name="platform-api.jar"/>
-            <include name="platform-concurrency.jar"/>
-            <include name="platform-impl.jar"/>
+            <include name="app-client.jar"/>
             <include name="testFramework.jar"/>
-            <include name="trove4j.jar"/>
             <include name="util.jar"/>
+            <include name="util-8.jar"/>
             <include name="util_rt.jar"/>
         </fileset>
     </path>
 
     <target name="generate.lexer" description="Generate lexer">
-        <java classname="jflex.Main" fork="true" failonerror="true">
+        <java classname="jflex.Main" fork="true" failonerror="true" jvm="${jdk.executable}">
             <classpath refid="lexer.classpath"/>
 
             <arg value="--skel"/>
@@ -149,7 +138,7 @@
             <arg value="${basedir}/src/com/lsfusion/migration"/>
         </java>
 
-        <java classname="jflex.Main" fork="true" failonerror="true">
+        <java classname="jflex.Main" fork="true" failonerror="true" jvm="${jdk.executable}">
             <classpath refid="lexer.classpath"/>
 
             <arg value="--skel"/>
@@ -164,13 +153,13 @@
     <target name="generate.parser" description="Generate java classes, parser">
         <delete dir="${basedir}/gen"/>
         
-        <java classname="org.intellij.grammar.Main" failonerror="true">
+        <java classname="org.intellij.grammar.Main" failonerror="true" fork="true" jvm="${jdk.executable}">
             <classpath refid="parser.classpath"/>
             <arg value="${basedir}/gen"/>
             <arg file="${basedir}/src/com/lsfusion/migration/Migration.bnf"/>
         </java>
 
-        <java classname="org.intellij.grammar.Main" failonerror="true">
+        <java classname="org.intellij.grammar.Main" failonerror="true" fork="true" jvm="${jdk.executable}">
             <classpath refid="parser.classpath"/>
             <arg value="${basedir}/gen" />
             <arg file="${basedir}/src/com/lsfusion/lang/LSF.bnf" />

@@ -81,7 +81,7 @@ public class LSFDumbDebuggerSupport extends XDebuggerSupport {
         myBreakpointPanelProvider = new XBreakpointPanelProvider() {
             // panelProvider в XDebuggerSupport уже предоставляет breakpoint'ы всех XBreakpoint типов
             @Override
-            public void provideBreakpointItems(Project project, Collection<BreakpointItem> items) {
+            public void provideBreakpointItems(Project project, Collection<? super BreakpointItem> items) {
             }
         };
     }

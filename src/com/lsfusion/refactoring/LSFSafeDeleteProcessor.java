@@ -14,6 +14,7 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.usage.LSFFindUsagesHandler;
 import com.lsfusion.usage.LSFFindUsagesOptions;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -22,9 +23,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
-    @Nullable
     @Override
-    public Collection<? extends PsiElement> getElementsToSearch(PsiElement element, @Nullable Module module, Collection<PsiElement> allElementsToDelete) {
+    public @Nullable Collection<? extends PsiElement> getElementsToSearch(@NotNull PsiElement element, @Nullable Module module, @NotNull Collection<? extends PsiElement> allElementsToDelete) {
         return Arrays.asList(getElementToDelete(element));
     }
 
@@ -33,18 +33,14 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
         return element.getLanguage().is(LSFLanguage.INSTANCE) && (!(element instanceof LSFFile) || ((LSFFile) element).getModuleDeclaration() != null);
     }
 
-    @Nullable
     @Override
-    public NonCodeUsageSearchInfo findUsages(PsiElement element, PsiElement[] allElementsToDelete, List<UsageInfo> result) {
-            Project project = element.getProject();
-            element = getNameIdentifier(element);
-        new LSFFindUsagesHandler(element).processElementUsages(element, new CommonProcessors.CollectProcessor<>(result), new LSFFindUsagesOptions(project));
+    public @Nullable NonCodeUsageSearchInfo findUsages(@NotNull PsiElement element, @NotNull PsiElement[] allElementsToDelete, @NotNull List<? super UsageInfo> result) {
+        new LSFFindUsagesHandler(element).processElementUsages(element, new CommonProcessors.CollectProcessor<>(result), new LSFFindUsagesOptions(element.getProject()));
         return null;
     }
 
-    @Nullable
     @Override
-    public Collection<PsiElement> getAdditionalElementsToDelete(PsiElement element, Collection<PsiElement> allElementsToDelete, boolean askUser) {
+    public @Nullable Collection<PsiElement> getAdditionalElementsToDelete(@NotNull PsiElement element, @NotNull Collection<? extends PsiElement> allElementsToDelete, boolean askUser) {
         return null;
     }
 
