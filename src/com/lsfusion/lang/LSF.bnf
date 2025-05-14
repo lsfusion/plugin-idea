@@ -599,7 +599,7 @@ groupPropertyBy ::= BY nonEmptyPropertyExpressionList { pin = 1 }
 groupPropertyBody ::= (
                         (groupingType nonEmptyPropertyExpressionList)
                       | (groupingTypeOrder nonEmptyPropertyExpressionList orderPropertyBy)
-                      | (aggrCustomType ((nonEmptyPropertyExpressionList WITHIN? orderPropertyBy) | (WITHIN? orderPropertyBy)))
+                      | (aggrCustomType ((nonEmptyPropertyExpressionList (WITHIN? orderPropertyBy)?) | (WITHIN? orderPropertyBy)))
                       )
                       selectTop?
                       (WHERE propertyExpression)?

@@ -15,6 +15,7 @@
             <li>IMPORT XML CHARSET</li>
             <li>Deprecated since 6.0 design options: changeKeyPriority, changeMousePriority</li>
             <li>Added folding for DESIGN statement</li>
+            <li>GROUP/PARTITION ORDER fix</li>
         </ul>
     ]]>
     </change-notes>
