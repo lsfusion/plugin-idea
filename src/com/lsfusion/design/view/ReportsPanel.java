@@ -146,7 +146,7 @@ public class ReportsPanel extends FlexPanel {
                         try {
                             Desktop.getDesktop().open(new File(path));
                         } catch (Exception ex) {
-                            JBPopupFactory.getInstance().createMessage("Can't open report files: " + ex.getMessage()).show(editReportButton);
+                            ApplicationManager.getApplication().invokeLater(() -> JBPopupFactory.getInstance().createMessage("Can't open report files: " + ex.getMessage()).show(editReportButton));
                         }
                     }
                 }
