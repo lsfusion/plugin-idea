@@ -35,14 +35,6 @@
         </component>
     </application-components>
 
-    <projectListeners>
-        <listener class="com.lsfusion.design.FormDesignChangeDetector"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-
-        <listener class="com.lsfusion.lang.meta.MetaChangeDetector$MetaChangeListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </projectListeners>
-
     <actions>
         <group id="LSFGroup" popup="true" text="_LSF">
             <add-to-group group-id="MainMenu" anchor="after" relative-to-action="CodeMenu"/>
@@ -144,6 +136,8 @@
 
         <targetElementEvaluator language="Lsf" implementationClass="com.lsfusion.LSFTargetElementEvaluatorEx2"/>
         <postStartupActivity implementation="com.lsfusion.LSFBaseStartupActivity"/>
+        <postStartupActivity implementation="com.lsfusion.design.FormDesignChangeDetector"/>
+        <postStartupActivity implementation="com.lsfusion.lang.meta.MetaChangeDetector$MetaChangeListener"/>
 
         <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupingRuleProvider"/>
         <lang.findUsagesProvider language="Lsf" implementationClass="com.lsfusion.usage.LSFFindUsagesProvider"/>

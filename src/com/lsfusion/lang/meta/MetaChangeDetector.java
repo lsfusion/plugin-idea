@@ -18,7 +18,7 @@ import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManagerListener;
+import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.FileStatus;
@@ -38,9 +38,13 @@ import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFFileUtils;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.intellij.codeInsight.completion.impl.CompletionServiceImpl.getCompletionPhase;
@@ -68,18 +72,14 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
             setMetaEnabled(propertiesComponent.getBoolean(ENABLED_META, false), false);
         });
 
-        myProject.getMessageBus().connect().subscribe(CompletionPhaseListener.TOPIC, isCompletionRunning -> {
-            checkCompletion();
-        });
+        myProject.getMessageBus().connect().subscribe(CompletionPhaseListener.TOPIC, (CompletionPhaseListener) isCompletionRunning -> checkCompletion());
     }
 
-    // By the new idea rules, we can`t implement ProjectComponent anymore.
-    // Instead, we will use ProjectManagerListener and @Service annotation (the listener is needed to initialize the service when the project is opened, and the class with @Service annotation will do all the work).
-    // But if we do this on a single class(Implementation and annotation at the same time), multiple instances of that class will be created, and we need only one instance.
-    public static class MetaChangeListener implements ProjectManagerListener {
+    public static class MetaChangeListener implements ProjectActivity {
         @Override
-        public void projectOpened(@NotNull Project project) {
-            project.getService(MetaChangeDetector.class).init();
+        public @Nullable Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
+            MetaChangeDetector.getInstance(project).init();
+            return Unit.INSTANCE;
         }
     }
 
@@ -160,10 +160,6 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
             }
         }
         return false;
-    }
-
-    @Override
-    public void childMoved(@NotNull PsiTreeChangeEvent event) {
     }
 
     private static String parseText(List<Pair<String, IElementType>> tokens, List<MetaTransaction.InToken> usages, List<String> decls, Set<String> metaDecls) {
@@ -656,11 +652,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
                 if (!processing.contains(statement) && extraCheck(statement)) {
                     synchronized (flush) {
                         G group = group(statement);
-                        Set<T> pendEls = pending.get(group);
-                        if (pendEls == null) {
-                            pendEls = new HashSet<>();
-                            pending.put(group, pendEls);
-                        }
+                        Set<T> pendEls = pending.computeIfAbsent(group, k -> new HashSet<>());
                         pendEls.add(statement);
                         if (pendEls.size() > 4)
                             flushGroup(group);
@@ -714,7 +706,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
         addUsageProcessing(Collections.singleton(statement));
     }
 
-    private ConcurrentMap<LongLivingMeta, List<LSFMetaCodeStatement>> cacheUsages = ContainerUtil.newConcurrentMap();
+    private ConcurrentMap<LongLivingMeta, List<LSFMetaCodeStatement>> cacheUsages = new ConcurrentHashMap<>();
 
 
     void fireChangedNotMetaBody() {

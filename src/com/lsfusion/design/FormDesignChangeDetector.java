@@ -1,17 +1,21 @@
 package com.lsfusion.design;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManagerListener;
+import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiTreeChangeAdapter;
 import com.intellij.psi.PsiTreeChangeEvent;
 import com.lsfusion.design.view.DesignViewFactory;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements ProjectManagerListener {
+public class FormDesignChangeDetector extends PsiTreeChangeAdapter implements ProjectActivity {
     @Override
-    public void projectOpened(@NotNull Project project) {
+    public @Nullable Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         PsiManager.getInstance(project).addPsiTreeChangeListener(this, () -> {});
+        return Unit.INSTANCE;
     }
 
     @Override

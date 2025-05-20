@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
@@ -17,7 +18,10 @@ import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.DesignInfo;
-import com.lsfusion.design.model.*;
+import com.lsfusion.design.model.ClassChooserView;
+import com.lsfusion.design.model.ComponentView;
+import com.lsfusion.design.model.ContainerView;
+import com.lsfusion.design.model.FilterControlsView;
 import com.lsfusion.design.model.entity.FormEntity;
 import com.lsfusion.design.ui.*;
 import com.lsfusion.util.BaseUtils;
@@ -131,7 +135,8 @@ public class EmbeddedDesign extends FormDesign {
     public void scheduleRebuild(DesignView.TargetForm targetForm, boolean checkFormEquility) {
         scheduleRebuild("rebuildEmbedded", targetForm.file, checkFormEquility, formWithName -> {
             if (targetForm.form.isValid()) {
-                formNameLabel.setText("Form: " + targetForm.form.getDeclName());
+                String declName = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> targetForm.form.getDeclName());
+                formNameLabel.setText("Form: " + declName);
 
                 layoutDesign(targetForm);
             }
@@ -272,8 +277,7 @@ public class EmbeddedDesign extends FormDesign {
 
         ComponentTreeNode node = new ComponentTreeNode(component);
         node.setChecked(selected);
-        if (component instanceof ContainerView) {
-            ContainerView container = (ContainerView) component;
+        if (component instanceof ContainerView container) {
             for (ComponentView child : container.getChildren()) {
                 ComponentTreeNode childNode = createComponentNode(child, recursionGuard);
                 if (childNode != null)
@@ -384,8 +388,7 @@ public class EmbeddedDesign extends FormDesign {
                 return;
             }
 
-            if (e instanceof MouseEvent) {
-                MouseEvent me = (MouseEvent) e;
+            if (e instanceof MouseEvent me) {
                 me.consume();
                 switch (e.getID()) {
                     case MouseEvent.MOUSE_CLICKED:
