@@ -5,6 +5,14 @@ import com.google.common.base.Throwables;
 import java.lang.reflect.*;
 
 public class ReflectionUtils {
+    public static Class findClass(String name) {
+        try {
+            return Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Class getFirstTypeParameterOfSuperclass(Class clazz) {
         if (clazz == null) {
             throw new IllegalArgumentException("clazz must not be null");

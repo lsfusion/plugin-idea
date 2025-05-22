@@ -1,7 +1,7 @@
 package com.lsfusion;
 
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.impl.ApplicationImpl;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileDocumentSynchronizationVetoer;
@@ -42,8 +42,9 @@ public class JarDocumentSavingVetoer extends FileDocumentSynchronizationVetoer {
     // ApplicationImpl.myExitInProgress value
     private boolean myExitInProgress() {
         try {
-            ApplicationImpl app = (ApplicationImpl) ApplicationManager.getApplication();
-            return (boolean) ReflectionUtils.getPrivateFieldValue(app, "myExitInProgress");
+            Class applicationImplClass = ReflectionUtils.findClass("com.intellij.openapi.application.impl.ApplicationImpl");
+            Application application = ApplicationManager.getApplication();
+            return (boolean) ReflectionUtils.getPrivateFieldValue(applicationImplClass, application, "myExitInProgress");
         } catch (Exception ignored) {
             return false;
         }
