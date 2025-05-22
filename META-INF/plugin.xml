@@ -8,14 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.298</b><br>
+        <b>Version 1.0.299</b><br>
         <ul>
-            <li>Added OPTIONS to form property</li>
-            <li>IMPORT WHERE for XML/JSON</li>
-            <li>IMPORT XML CHARSET</li>
-            <li>Deprecated since 6.0 design options: changeKeyPriority, changeMousePriority</li>
-            <li>Added folding for DESIGN statement</li>
-            <li>GROUP/PARTITION ORDER fix</li>
+            <li>FILTEGROUP NONULL support</li>
         </ul>
     ]]>
     </change-notes>

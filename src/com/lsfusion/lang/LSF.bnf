@@ -1945,7 +1945,7 @@ formContainerEventDeclaration ::= (COLLAPSE | EXPAND | TAB) (ID | componentSelec
 
 scheduleFormEventDeclaration ::= SCHEDULE PERIOD intLiteral FIXED?
 
-formFilterGroupDeclaration ::= FILTERGROUP filterGroupName regularFilterDeclaration*
+formFilterGroupDeclaration ::= FILTERGROUP filterGroupName NONULL? regularFilterDeclaration*
 {
     pin = 1
     implements = "com.lsfusion.documentation.LSFDocumentation"
