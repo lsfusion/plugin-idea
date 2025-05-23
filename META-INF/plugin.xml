@@ -318,9 +318,6 @@
                              implementationClass="com.lsfusion.migration.lang.folding.MigrationFoldingBuilder"/>
         <fileDocumentManagerListener implementation="com.lsfusion.lang.meta.StripLinesDisabler"/>
 
-        <!--пробуем убрать этот хак, т.к. в данный момент визуально из-за него больше проблем (stepping в ultimate, ...), но надо понаблюдать-->
-        <!--<xdebugger.debuggerSupport implementation="com.lsfusion.debug.LSFDumbDebuggerSupport" order="first"/>-->
-
         <applicationConfigurable instance="com.lsfusion.actions.locale.LSFSettingsConfigurable"
                              id="org.company.ApplicationSettingsConfigurable" displayName="LSF Settings"/>
 
