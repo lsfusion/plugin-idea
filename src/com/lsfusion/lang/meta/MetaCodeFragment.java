@@ -132,7 +132,9 @@ public class MetaCodeFragment {
 
             if(part.isEmpty()) {
                 assert i == 0;
-                capitalizeFirstToken = true; // ###id
+                if (token.startsWith("###")) {
+                    capitalizeFirstToken = true; // ###id
+                }
             } else {
                 boolean capitalize = false;
                 if (part.startsWith("#")) {
