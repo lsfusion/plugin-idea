@@ -111,6 +111,10 @@ public class LSFFileUtils {
         return result;
     }
 
+    public static boolean isPathInsideJar(String path) {
+        return path != null && path.contains("!/");
+    }
+
     private static void proceedModuleRoots(Module module, String path, List<PsiFile> result, PsiManager psiManager) {
         VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
         if (sourceRoots.length > 0) {

@@ -4,7 +4,10 @@ import com.intellij.codeInsight.FileModificationService;
 import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
-import com.intellij.lang.annotation.*;
+import com.intellij.lang.annotation.AnnotationBuilder;
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.lang.annotation.Annotator;
+import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.lang.properties.references.I18nUtil;
 import com.intellij.openapi.application.ApplicationManager;
@@ -713,7 +716,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void addLocalizationWarnings(PsiElement element, LSFPropertiesFileValueGetter o) {
         Module module = ModuleUtil.findModuleForPsiElement(element);
-        LSFResourceBundleUtils.ScopeData scopeData = LSFResourceBundleUtils.getScopeData(module);
+        LSFResourceBundleUtils.ScopeData scopeData = LSFResourceBundleUtils.getScopeData(module, false);
         if(scopeData != null) {
             Map<String, Map<String, PropertiesFile>> propertiesFilesMap = scopeData.propertiesFiles;
             String currentLang = LSFResourceBundleUtils.getLsfStrLiteralsLanguage(module, false);

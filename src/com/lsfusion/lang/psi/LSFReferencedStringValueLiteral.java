@@ -111,7 +111,7 @@ public abstract class LSFReferencedStringValueLiteral extends ASTWrapperPsiEleme
 
             Module module = ModuleUtil.findModuleForPsiElement(LSFReferencedStringValueLiteral.this);
             if (module != null) {
-                for (VirtualFile file : LSFResourceBundleUtils.getScopeData(module).resourceBundleFiles) {
+                for (VirtualFile file : LSFResourceBundleUtils.getScopeData(module, false).resourceBundleFiles) {
                     PropertyReference ref = new AllScopePropertyReference(key, LSFReferencedStringValueLiteral.this, file.getNameWithoutExtension(), true, getRangeInElement());
                     ResolveResult[] result = ref.multiResolve(incompleteCode);
                     Collections.addAll(results, result);

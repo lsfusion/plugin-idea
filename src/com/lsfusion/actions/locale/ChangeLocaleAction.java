@@ -40,7 +40,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 
-import static com.lsfusion.lang.LSFElementGenerator.*;
+import static com.lsfusion.lang.LSFElementGenerator.createLocalizedStringValueLiteral;
+import static com.lsfusion.lang.LSFElementGenerator.createMetacodeStringValueLiteral;
 import static com.lsfusion.util.LSFStringUtils.*;
 
 public class ChangeLocaleAction extends AnAction {
@@ -79,7 +80,7 @@ public class ChangeLocaleAction extends AnAction {
             for(Module module : LSFFileUtils.getModules(project)) {
                 String lsfStrLiteralsLanguage = LSFResourceBundleUtils.getLsfStrLiteralsLanguage(module, true);
                 if(lsfStrLiteralsLanguage != null) {
-                    LSFResourceBundleUtils.ScopeData scopeData = LSFResourceBundleUtils.getScopeData(module);
+                    LSFResourceBundleUtils.ScopeData scopeData = LSFResourceBundleUtils.getScopeData(module, true);
                     for (Map.Entry<String, Map<String, PropertiesFile>> entry : scopeData.propertiesFiles.entrySet()) {
                         resourceBundlesWithScopeMap.put(entry.getKey(), new ResourceBundlesWithScope(module.getModuleScope(), entry.getValue(), lsfStrLiteralsLanguage));
                     }

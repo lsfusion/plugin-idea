@@ -23,9 +23,12 @@ import org.json.JSONTokener;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,9 +42,9 @@ public class LSFResourceBundleUtils {
     private static final Map<String, Map<String, String>> propertiesOrdinaryMap = new HashMap<>();
     private static final Map<String, Map<String, String>> propertiesReverseMap = new HashMap<>();
 
-    public static ScopeData getScopeData(Module module) {
+    public static ScopeData getScopeData(Module module, boolean moduleScopeOnly) {
         if(module != null) {
-            GlobalSearchScope scope = module.getModuleScope();
+            GlobalSearchScope scope = moduleScopeOnly ? module.getModuleScope() : module.getModuleWithDependenciesAndLibrariesScope(false);
             ScopeData scopeData = scopeDataMap.get(scope);
             if (scopeData == null) {
 
@@ -49,12 +52,10 @@ public class LSFResourceBundleUtils {
                 Set<String> resourceBundleNames = new HashSet<>();
                 Pattern pattern = Pattern.compile("([^/]*ResourceBundle)\\.properties");
                 for (VirtualFile file : FileTypeIndex.getFiles(PropertiesFileType.INSTANCE, scope)) {
-                    if (file.isWritable()) {
-                        Matcher matcher = pattern.matcher(file.getName());
-                        if (matcher.matches()) {
-                            resourceBundleFiles.add(file);
-                            resourceBundleNames.add(matcher.group(1));
-                        }
+                    Matcher matcher = pattern.matcher(file.getName());
+                    if (matcher.matches()) {
+                        resourceBundleFiles.add(file);
+                        resourceBundleNames.add(matcher.group(1));
                     }
                 }
 
@@ -142,7 +143,28 @@ public class LSFResourceBundleUtils {
     }
 
     private static ResourceBundle readResourceBundle(String path) throws IOException {
+        if (LSFFileUtils.isPathInsideJar(path)) {
+            return readFromJar(path);
+        }
+
         return new PropertyResourceBundle(new FileInputStream(path));
+    }
+
+    private static ResourceBundle readFromJar(String path) throws IOException {
+        String[] pathParts = path.split("!/", 2);
+        String jarPath = pathParts[0].replace("jar://", "").replace("file:", "");
+        String filePathInJar = pathParts[1];
+
+        try (JarFile jar = new JarFile(jarPath)) {
+            JarEntry entry = jar.getJarEntry(filePathInJar);
+            if (entry == null) {
+                return null;
+            }
+
+            try (InputStream inputStream = jar.getInputStream(entry)) {
+                return new PropertyResourceBundle(inputStream);
+            }
+        }
     }
 
     public static Map<String, String> getOrdinaryMap(String path) {
