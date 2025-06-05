@@ -16,10 +16,11 @@ public class DependenciesViewFactory {
 
     public void initToolWindow(Project project, ToolWindowEx toolWindow) {
         JBTabbedPane tabbedPane = new JBTabbedPane();
+        tabbedPane.add("Class Diagram", new ClassDiagramView(project));
         tabbedPane.add("Module dependencies", new ModuleDependenciesView(project, toolWindow));
         tabbedPane.add("Property dependencies", new PropertyDependenciesView(project, toolWindow));
 
-        tabbedPane.addChangeListener(e -> ((DependenciesView) tabbedPane.getSelectedComponent()).redraw());
+        tabbedPane.addChangeListener(e -> ((DiagramView) tabbedPane.getSelectedComponent()).redraw());
 
         ContentImpl content = new ContentImpl(tabbedPane, "", true);
         toolWindow.getContentManager().addContent(content);
