@@ -69,7 +69,7 @@ import static com.lsfusion.dependencies.GraphEdgesComboAction.ALL_EDGES;
 import static com.lsfusion.dependencies.GraphEdgesComboAction.ONLY_LEAFS;
 import static com.lsfusion.dependencies.GraphLayoutComboAction.*;
 
-public abstract class DependenciesView extends DiagramView {
+public abstract class DependenciesView extends JPanel implements Disposable {
     protected String title;
 
     protected final Project project;
@@ -348,7 +348,6 @@ public abstract class DependenciesView extends DiagramView {
         });
     }
 
-    @Override
     public void redraw() {
         redraw(false);
     }
