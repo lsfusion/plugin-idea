@@ -36,7 +36,7 @@ public class ToggleComplexityAction extends LSFToggleAction {
     }
     
     public static boolean isComplexityEnabled(Project project) {
-        return project != null && PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_COMPLEXITY_ON, true);
+        return project != null && PropertiesComponent.getInstance(project).getBoolean(LSF_PROPERTY_COMPLEXITY_ON, false);
     }
 
     public static void setComplexityEnabled(Project project, boolean enabled) {
