@@ -2,7 +2,7 @@
     <id>lsfusion.idea.plugin</id>
     <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
-    <version>1.0.298</version>
+    <version>1.0.299</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -11,6 +11,10 @@
         <b>Version 1.0.299</b><br>
         <ul>
             <li>FILTEGROUP NONULL support</li>
+            <li>Fixed a minor bug in token concatenation within the metacode</li>
+            <li>Fixed resolving of resource bundle properties inside .jar files</li>
+            <li>UML Diagram in LSF Dependencies</li>
+            <li>"Show Property Complexity" option is turned off by default</li>
         </ul>
     ]]>
     </change-notes>
