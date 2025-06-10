@@ -17,6 +17,7 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.impl.LSFClassStatementImpl;
 import groovyjarjarantlr4.v4.misc.OrderedHashMap;
 import groovyjarjarantlr4.v4.runtime.misc.OrderedHashSet;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.Nullable;
 
@@ -169,8 +170,8 @@ public class UMLDiagramView {
 
                     StringBuilder mermaid = new StringBuilder("classDiagram\n");
                     for (Map.Entry<String, List<PropertyOrAction>> entry : classPropOrActionMap.entrySet()) {
-                        String properties = Strings.join(entry.getValue().stream().filter(p -> !p.isAction).toList(), '\n');
-                        String actions = Strings.join(entry.getValue().stream().filter(p -> p.isAction).toList(), '\n');
+                        String properties = StringUtils.join(entry.getValue().stream().filter(p -> !p.isAction).toList(), '\n');
+                        String actions = StringUtils.join(entry.getValue().stream().filter(p -> p.isAction).toList(), '\n');
                         String fields = (properties.isEmpty() && actions.isEmpty() ? "" : ("{\n" + properties + actions + "\n}"));
                         String classEntry = "class " + getClassName(entry.getKey()) + fields + "\n";
                         mermaid.append(classEntry);
