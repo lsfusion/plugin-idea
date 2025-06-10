@@ -3,6 +3,8 @@ package com.lsfusion.dependencies;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.psi.*;
@@ -18,7 +20,7 @@ import com.lsfusion.lang.psi.impl.LSFClassStatementImpl;
 import groovyjarjarantlr4.v4.misc.OrderedHashMap;
 import groovyjarjarantlr4.v4.runtime.misc.OrderedHashSet;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.util.Strings;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -73,6 +75,13 @@ public class UMLDiagramView {
         mainPanel.add(browser.getComponent(), BorderLayout.CENTER);
 
         updateDiagram();
+
+        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+            @Override
+            public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+                updateDiagram();
+            }
+        });
     }
 
     public void redraw() {
@@ -85,7 +94,8 @@ public class UMLDiagramView {
 
     private void updateDiagram() {
         zoomLevel = 1;
-        String html = "<!DOCTYPE html>\n" +
+        String uml = generateUML();
+        browser.loadHTML(uml != null ? ("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
                 "  <meta charset=\"UTF-8\">\n" +
@@ -107,16 +117,18 @@ public class UMLDiagramView {
                 "<body>\n" +
                 "  <div id=\"diagram-container\">\n" +
                 "    <div id=\"diagram-scale-wrapper\">\n" +
-                "      <div class=\"mermaid\">\n" + generateUML() + "</div>\n" +
+                "      <div class=\"mermaid\">\n" + uml + "</div>\n" +
                 "    </div>\n" +
                 "  </div>\n" +
                 "</body>\n" +
-                "</html>";
-        browser.loadHTML(html);
+                "</html>") : "");
     }
 
     private void export() {
-        new ExportUMLDialog(generateUML()).show();
+        String uml = generateUML();
+        if(uml != null) {
+            new ExportUMLDialog(uml).show();
+        }
     }
 
     private String generateUML() {
