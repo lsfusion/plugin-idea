@@ -101,7 +101,7 @@ public class UMLDiagramView {
                 "  <meta charset=\"UTF-8\">\n" +
                 "  <script type=\"module\">\n" +
                 "    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';\n" +
-                "    mermaid.initialize({ startOnLoad: true });\n" +
+                "    mermaid.initialize({ maxTextSize: 150000, startOnLoad: true });\n" +
                 "  </script>\n" +
                 "  <style>\n" +
                 "    #diagram-container {\n" +
@@ -141,7 +141,7 @@ public class UMLDiagramView {
                     Map<String, List<PropertyOrAction>> classPropOrActionMap = new OrderedHashMap<>();
                     Map<String, List<String>> classExtendsMap = new OrderedHashMap<>();
 
-                    for (LSFFile moduleFile : getModuleFiles((LSFFile) file)) {
+                    for (LSFFile moduleFile : getModuleFiles((LSFFile) file, requiredCheckBox.isSelected(), new OrderedHashSet<>())) {
                         for (PsiElement child : (moduleFile).getStatements()) {
                             if (child instanceof LSFClassStatementImpl cls) {
                                 if (!cls.isInMetaDecl()) {
@@ -180,7 +180,7 @@ public class UMLDiagramView {
                         }
                     }
 
-                    StringBuilder mermaid = new StringBuilder("classDiagram\n");
+                    StringBuilder mermaid = new StringBuilder();
                     for (Map.Entry<String, List<PropertyOrAction>> entry : classPropOrActionMap.entrySet()) {
                         String properties = StringUtils.join(entry.getValue().stream().filter(p -> !p.isAction).toList(), '\n');
                         String actions = StringUtils.join(entry.getValue().stream().filter(p -> p.isAction).toList(), '\n');
@@ -194,7 +194,7 @@ public class UMLDiagramView {
                             mermaid.append(extendClassEntry);
                         }
                     }
-                    result.set(mermaid.toString());
+                    result.set(mermaid.isEmpty() ? null : ("classDiagram\n" + mermaid));
                 });
             }
         }
@@ -221,18 +221,12 @@ public class UMLDiagramView {
         );
     }
 
-    private OrderedHashSet<LSFFile> getModuleFiles(LSFFile file) {
-        OrderedHashSet<LSFFile> files = new OrderedHashSet<>();
-        files.add(file);
-        boolean required = requiredCheckBox.isSelected();
-        if (required) {
-            LSFModuleDeclaration moduleDeclaration = file.getModuleDeclaration();
-            String moduleDeclarationName = moduleDeclaration.getName();
-            if (moduleDeclarationName != null) {
+    private OrderedHashSet<LSFFile> getModuleFiles(LSFFile file, boolean required, OrderedHashSet<LSFFile> files) {
+        if (!files.contains(file)) {
+            files.add(file);
+            if (required) {
                 for (LSFModuleDeclaration module : file.getModuleDeclaration().getRequireModules()) {
-                    if (!moduleDeclarationName.equals(module.getName())) {
-                        files.addAll(getModuleFiles(module.getLSFFile()));
-                    }
+                    files.addAll(getModuleFiles(module.getLSFFile(), true, files));
                 }
             }
         }
