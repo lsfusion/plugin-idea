@@ -8,13 +8,10 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.299</b><br>
+        <b>Version 1.0.300</b><br>
         <ul>
-            <li>FILTEGROUP NONULL support</li>
-            <li>Fixed a minor bug in token concatenation within the metacode</li>
-            <li>Fixed resolving of resource bundle properties inside .jar files</li>
-            <li>UML Diagram in LSF Dependencies</li>
-            <li>"Show Property Complexity" option is turned off by default</li>
+            <li>UML Diagram improvements</li>
+            <li>NEWTHREAD: implement notify action</li>
         </ul>
     ]]>
     </change-notes>

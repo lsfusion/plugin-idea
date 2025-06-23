@@ -1292,6 +1292,7 @@ importFormHierarchicalActionSourceType ::=  JSON (ROOT propertyExpression)? (CHA
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
                                         (   (   CONNECTION propertyExpression
                                             |   (SCHEDULE (PERIOD propertyExpression)? (DELAY propertyExpression)?)
+                                            |   TO propertyUsage
                                             )
                                             SEMI
                                         )?
