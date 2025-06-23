@@ -4,6 +4,7 @@ import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
@@ -20,6 +21,7 @@ import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.cache.PropertyDependenciesCache;
 import com.lsfusion.lang.psi.context.ContextModifier;
 import com.lsfusion.lang.psi.context.ExtendParamContext;
 import com.lsfusion.lang.psi.context.LSFExpression;
@@ -444,4 +446,22 @@ public class LSFPsiUtils {
         }
     }
 
+    //for future ai usages
+    public static void getPropertyDependencies(Project project, PsiElement element, int level, Set<PsiElement> proceeded) {
+        LSFActionOrGlobalPropDeclaration<?, ?> sourceProperty = (LSFActionOrGlobalPropDeclaration<?, ?>) element;
+
+        if (sourceProperty != null && !sourceProperty.isAction()) {
+            proceeded.add(sourceProperty);
+            if(level >= 0) {
+                Set<LSFActionOrGlobalPropDeclaration<?, ?>> targetProperties = DumbService.getInstance(project).runReadActionInSmartMode(
+                        () -> PropertyDependenciesCache.getInstance(project).resolveWithCaching(sourceProperty)
+                );
+                if (targetProperties != null) {
+                    for (LSFActionOrGlobalPropDeclaration<?, ?> targetProperty : targetProperties) {
+                        getPropertyDependencies(project, targetProperty, --level, proceeded);
+                    }
+                }
+            }
+        }
+    }
 }
