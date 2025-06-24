@@ -65,7 +65,7 @@ public abstract class LSFAbstractParamReferenceImpl<T extends LSFExprParamDeclar
         if (getSimpleName() != null) {
             final String nameRef = getNameRef();
             for (LSFExprParamDeclaration decl : getContextParams()) {
-                if (decl.getDeclName().equals(nameRef)) {
+                if (decl != null && decl.getDeclName().equals(nameRef)) {
                     objects.add((T) decl);
                 }
             }

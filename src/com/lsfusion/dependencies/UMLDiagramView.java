@@ -5,6 +5,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.psi.*;
@@ -93,40 +95,47 @@ public class UMLDiagramView {
     }
 
     private void updateDiagram() {
-        zoomLevel = 1;
-        String uml = generateUML();
-        browser.loadHTML(uml != null ? ("<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<head>\n" +
-                "  <meta charset=\"UTF-8\">\n" +
-                "  <script type=\"module\">\n" +
-                "    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';\n" +
-                "    mermaid.initialize({ maxTextSize: 150000, startOnLoad: true });\n" +
-                "  </script>\n" +
-                "  <style>\n" +
-                "    #diagram-container {\n" +
-                "      overflow: auto;\n" +
-                "      height: 95vh;\n" +
-                "    }\n" +
-                "\n" +
-                "    #diagram-scale-wrapper {\n" +
-                "      transform-origin: top left;\n" +
-                "    }\n" +
-                "  </style>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "  <div id=\"diagram-container\">\n" +
-                "    <div id=\"diagram-scale-wrapper\">\n" +
-                "      <div class=\"mermaid\">\n" + uml + "</div>\n" +
-                "    </div>\n" +
-                "  </div>\n" +
-                "</body>\n" +
-                "</html>") : "");
+        new Task.Backgroundable(project, "Updating UML Diagram", true) {
+            @Override
+            public void run(@NotNull ProgressIndicator progressIndicator) {
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    zoomLevel = 1;
+                    String uml = generateUML();
+                    browser.loadHTML(uml != null ? ("<!DOCTYPE html>\n" +
+                            "<html>\n" +
+                            "<head>\n" +
+                            "  <meta charset=\"UTF-8\">\n" +
+                            "  <script type=\"module\">\n" +
+                            "    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';\n" +
+                            "    mermaid.initialize({ maxTextSize: 150000, startOnLoad: true });\n" +
+                            "  </script>\n" +
+                            "  <style>\n" +
+                            "    #diagram-container {\n" +
+                            "      overflow: auto;\n" +
+                            "      height: 95vh;\n" +
+                            "    }\n" +
+                            "\n" +
+                            "    #diagram-scale-wrapper {\n" +
+                            "      transform-origin: top left;\n" +
+                            "    }\n" +
+                            "  </style>\n" +
+                            "</head>\n" +
+                            "<body>\n" +
+                            "  <div id=\"diagram-container\">\n" +
+                            "    <div id=\"diagram-scale-wrapper\">\n" +
+                            "      <div class=\"mermaid\">\n" + uml + "</div>\n" +
+                            "    </div>\n" +
+                            "  </div>\n" +
+                            "</body>\n" +
+                            "</html>") : "");
+                });
+            }
+        }.queue();
     }
 
     private void export() {
         String uml = generateUML();
-        if(uml != null) {
+        if (uml != null) {
             new ExportUMLDialog(uml).show();
         }
     }
@@ -137,65 +146,63 @@ public class UMLDiagramView {
         if (editor != null) {
             PsiFile file = PsiManager.getInstance(project).findFile(editor.getVirtualFile());
             if (file instanceof LSFFile) {
-                ApplicationManager.getApplication().runReadAction(() -> {
-                    Map<String, List<PropertyOrAction>> classPropOrActionMap = new OrderedHashMap<>();
-                    Map<String, List<String>> classExtendsMap = new OrderedHashMap<>();
+                Map<String, List<PropertyOrAction>> classPropOrActionMap = new OrderedHashMap<>();
+                Map<String, List<String>> classExtendsMap = new OrderedHashMap<>();
 
-                    for (LSFFile moduleFile : getModuleFiles((LSFFile) file, requiredCheckBox.isSelected(), new OrderedHashSet<>())) {
-                        for (PsiElement child : (moduleFile).getStatements()) {
-                            if (child instanceof LSFClassStatementImpl cls) {
-                                if (!cls.isInMetaDecl()) {
-                                    String className = cls.getClassName();
-                                    if (!classPropOrActionMap.containsKey(className)) {
-                                        classPropOrActionMap.put(className, new ArrayList<>());
-                                        List<String> classExtends = cls.getExtends().stream().map(c -> c.name).collect(Collectors.toList());
-                                        if (!classExtends.isEmpty()) {
-                                            classExtendsMap.put(className, classExtends);
-                                        }
+                for (LSFFile moduleFile : getModuleFiles((LSFFile) file, requiredCheckBox.isSelected(), new OrderedHashSet<>())) {
+                    for (PsiElement child : (moduleFile).getStatements()) {
+                        if (child instanceof LSFClassStatementImpl cls) {
+                            if (!cls.isInMetaDecl()) {
+                                String className = cls.getClassName();
+                                if (!classPropOrActionMap.containsKey(className)) {
+                                    classPropOrActionMap.put(className, new ArrayList<>());
+                                    List<String> classExtends = cls.getExtends().stream().map(c -> c.name).collect(Collectors.toList());
+                                    if (!classExtends.isEmpty()) {
+                                        classExtendsMap.put(className, classExtends);
                                     }
                                 }
-                            } else if (child instanceof LSFExplicitInterfaceActionOrPropStatement property) {
-                                if (!property.isInMetaDecl()) {
-                                    List<LSFClassSet> params = property.getDeclaration().resolveParamClasses();
-                                    if (params != null && !params.isEmpty()) {
-                                        String signature = params.size() > 1 ?
-                                                "(" + params.subList(1, params.size()).stream().map(c -> c != null ? String.valueOf(c) : "?").collect(joining(", ")) + ")"
-                                                : "";
+                            }
+                        } else if (child instanceof LSFExplicitInterfaceActionOrPropStatement property) {
+                            if (!property.isInMetaDecl()) {
+                                List<LSFClassSet> params = property.getDeclaration().resolveParamClasses();
+                                if (params != null && !params.isEmpty()) {
+                                    String signature = params.size() > 1 ?
+                                            "(" + params.subList(1, params.size()).stream().map(c -> c != null ? String.valueOf(c) : "?").collect(joining(", ")) + ")"
+                                            : "";
 
-                                        String value = null;
-                                        if (property instanceof LSFExplicitInterfacePropStatement) {
-                                            Set<String> valueClasses = ((LSFExplicitInterfacePropStatement) property).getExplicitValues();
-                                            if (!valueClasses.isEmpty())
-                                                value = String.join(",", valueClasses);
-                                        } else {
-                                            value = "";
-                                        }
-                                        if (value != null) {
-                                            PropertyOrAction propertyOrAction = new PropertyOrAction(property.getName(), signature, value, property.isAction());
-                                            classPropOrActionMap.computeIfAbsent(String.valueOf(params.get(0)), k -> new ArrayList<>()).add(propertyOrAction);
-                                        }
+                                    String value = null;
+                                    if (property instanceof LSFExplicitInterfacePropStatement) {
+                                        Set<String> valueClasses = ((LSFExplicitInterfacePropStatement) property).getExplicitValues();
+                                        if (!valueClasses.isEmpty())
+                                            value = String.join(",", valueClasses);
+                                    } else {
+                                        value = "";
+                                    }
+                                    if (value != null) {
+                                        PropertyOrAction propertyOrAction = new PropertyOrAction(property.getName(), signature, value, property.isAction());
+                                        classPropOrActionMap.computeIfAbsent(String.valueOf(params.get(0)), k -> new ArrayList<>()).add(propertyOrAction);
                                     }
                                 }
                             }
                         }
                     }
+                }
 
-                    StringBuilder mermaid = new StringBuilder();
-                    for (Map.Entry<String, List<PropertyOrAction>> entry : classPropOrActionMap.entrySet()) {
-                        String properties = StringUtils.join(entry.getValue().stream().filter(p -> !p.isAction).toList(), '\n');
-                        String actions = StringUtils.join(entry.getValue().stream().filter(p -> p.isAction).toList(), '\n');
-                        String fields = (properties.isEmpty() && actions.isEmpty() ? "" : ("{\n" + properties + actions + "\n}"));
-                        String classEntry = "class " + getClassName(entry.getKey()) + fields + "\n";
-                        mermaid.append(classEntry);
+                StringBuilder mermaid = new StringBuilder();
+                for (Map.Entry<String, List<PropertyOrAction>> entry : classPropOrActionMap.entrySet()) {
+                    String properties = StringUtils.join(entry.getValue().stream().filter(p -> !p.isAction).toList(), '\n');
+                    String actions = StringUtils.join(entry.getValue().stream().filter(p -> p.isAction).toList(), '\n');
+                    String fields = (properties.isEmpty() && actions.isEmpty() ? "" : ("{\n" + properties + actions + "\n}"));
+                    String classEntry = "class " + getClassName(entry.getKey()) + fields + "\n";
+                    mermaid.append(classEntry);
+                }
+                for (Map.Entry<String, List<String>> entry : classExtendsMap.entrySet()) {
+                    for (String extend : entry.getValue()) {
+                        String extendClassEntry = getClassName(entry.getKey()) + " --> " + getClassName(extend) + "\n";
+                        mermaid.append(extendClassEntry);
                     }
-                    for (Map.Entry<String, List<String>> entry : classExtendsMap.entrySet()) {
-                        for (String extend : entry.getValue()) {
-                            String extendClassEntry = getClassName(entry.getKey()) + " --> " + getClassName(extend) + "\n";
-                            mermaid.append(extendClassEntry);
-                        }
-                    }
-                    result.set(mermaid.isEmpty() ? null : ("classDiagram\n" + mermaid));
-                });
+                }
+                result.set(mermaid.isEmpty() ? null : ("classDiagram\n" + mermaid));
             }
         }
         return result.get();
