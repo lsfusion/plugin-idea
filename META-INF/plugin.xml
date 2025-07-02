@@ -12,6 +12,7 @@
         <ul>
             <li>UML Diagram improvements</li>
             <li>NEWTHREAD: implement notify action</li>
+            <li>NAVIGATOR SCHEDULE support</li>
         </ul>
     ]]>
     </change-notes>

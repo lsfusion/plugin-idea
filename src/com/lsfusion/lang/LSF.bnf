@@ -2291,6 +2291,7 @@ navigatorElementStatementBody ::=   (   LBRACE
 navigatorElementBodyStatement ::= (     moveNavigatorElementStatement
                                   |     setupNavigatorElementStatement
                                   |     newNavigatorElementStatement
+                                  |     navigatorSchedulerStatement
                                   |     emptyStatement
                                   |     neStub
                                   )
@@ -2303,7 +2304,7 @@ neStub ::= NEW ID SEMI
     pin = 1
 } 
 
-private ne_statement_recover ::= !(MOVE | NEW | SEMI | RBRACE | ID)
+private ne_statement_recover ::= !(MOVE | NEW | SCHEDULE | SEMI | RBRACE | ID)
 
 moveNavigatorElementStatement ::= MOVE navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
 {
@@ -2318,6 +2319,12 @@ newNavigatorElementStatement ::= NEW navigatorElementDescription navigatorElemen
     stubClass = "com.lsfusion.lang.psi.stubs.NavigatorElementStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
 }
+
+navigatorSchedulerStatement ::= SCHEDULE PERIOD intLiteral FIXED? actionPropertyDefinitionBody
+{
+    pin = 1
+}
+
 
 private folderElementDescription ::= FOLDER simpleName localizedStringLiteral? { pin = 2 }
 simpleElementDescription ::= (simpleName? localizedStringLiteral? EQUALS)? formElseNoParamsActionUsage
