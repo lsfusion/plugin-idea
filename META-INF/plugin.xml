@@ -13,6 +13,7 @@
             <li>UML Diagram improvements</li>
             <li>NEWTHREAD: implement notify action</li>
             <li>NAVIGATOR SCHEDULE support</li>
+            <li>FindImplementations optimisation</li>
         </ul>
     ]]>
     </change-notes>
@@ -218,6 +219,8 @@
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.GroupIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.TableIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.WindowIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.OverrideActionIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.OverridePropertyIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.NavigatorElementIndex"/>
 <!--        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ComponentIndex"/>-->
 

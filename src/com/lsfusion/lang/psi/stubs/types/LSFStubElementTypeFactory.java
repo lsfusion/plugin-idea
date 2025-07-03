@@ -31,6 +31,10 @@ public class LSFStubElementTypeFactory {
                 return LSFStubElementTypes.TABLE;
             case "WINDOW_CREATE_STATEMENT":
                 return LSFStubElementTypes.WINDOW;
+            case "OVERRIDE_ACTION_STATEMENT":
+                return LSFStubElementTypes.OVERRIDEACTION;
+            case "OVERRIDE_PROPERTY_STATEMENT":
+                return LSFStubElementTypes.OVERRIDEPROPERTY;
             case "NEW_NAVIGATOR_ELEMENT_STATEMENT":
                 return LSFStubElementTypes.NAVIGATORELEMENT;
             case "FORM_STATEMENT":

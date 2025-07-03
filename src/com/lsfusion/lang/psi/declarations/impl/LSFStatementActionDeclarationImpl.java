@@ -57,15 +57,6 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
     }
 
     @Override
-    protected LSFActionReference getImplementation(PsiReference ref) {
-        LSFOverrideActionStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) ref, LSFOverrideActionStatement.class);
-        if (overrideStatement != null && ref.equals(overrideStatement.getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage())) {
-            return overrideStatement.getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage();
-        }
-        return null;
-    }
-
-    @Override
     public boolean isAbstract() {
         LSFActionUnfriendlyPD unfriend = getActionUnfriendlyPD();
         if (unfriend != null) {

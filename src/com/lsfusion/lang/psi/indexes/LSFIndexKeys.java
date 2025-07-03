@@ -18,6 +18,8 @@ public class LSFIndexKeys {
     public static final StubIndexKey<String, LSFActionDeclaration> ACTION = StubIndexKey.createIndexKey("lsf.indices.action");
     public static final StubIndexKey<String, LSFTableDeclaration> TABLE = StubIndexKey.createIndexKey("lsf.indices.table");
     public static final StubIndexKey<String, LSFWindowDeclaration> WINDOW = StubIndexKey.createIndexKey("lsf.indices.window");
+    public static final StubIndexKey<String, LSFOverrideActionDeclaration> OVERRIDEACTION = StubIndexKey.createIndexKey("lsf.indices.override.action");
+    public static final StubIndexKey<String, LSFOverridePropertyDeclaration> OVERRIDEPROPERTY = StubIndexKey.createIndexKey("lsf.indices.override.property");
 
     public static final StubIndexKey<String, LSFTableDeclaration> TABLE_CLASSES = StubIndexKey.createIndexKey("lsf.indices.table.classes");
 

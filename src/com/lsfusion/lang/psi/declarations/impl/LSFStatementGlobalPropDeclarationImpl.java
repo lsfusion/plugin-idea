@@ -2,7 +2,6 @@ package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -188,14 +187,6 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
     @Override
     public Collection<FullNameStubElementType> getTypes() {
         return Arrays.asList(LSFStubElementTypes.STATEMENTPROP, LSFStubElementTypes.AGGRPARAMPROP);
-    }
-
-    @Override
-    protected LSFPropReference getImplementation(PsiReference ref) {
-        LSFOverridePropertyStatement overrideStatement = PsiTreeUtil.getParentOfType((PsiElement) ref, LSFOverridePropertyStatement.class);
-        if (overrideStatement != null && ref.equals(overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage()))
-           return overrideStatement.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage();
-        return null;
     }
 
     public static Integer getPropComplexity(LSFPropDeclaration prop) {

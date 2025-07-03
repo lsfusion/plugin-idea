@@ -19,6 +19,8 @@ public interface LSFStubElementTypes {
     GroupStubElementType GROUP = new GroupStubElementType();
     TableStubElementType TABLE = new TableStubElementType();
     WindowStubElementType WINDOW = new WindowStubElementType();
+    OverrideActionStubElementType OVERRIDEACTION = new OverrideActionStubElementType();
+    OverridePropertyStubElementType OVERRIDEPROPERTY = new OverridePropertyStubElementType();
     NavigatorElementStubElementType NAVIGATORELEMENT = new NavigatorElementStubElementType();
 
     ExtendFormStubElementType EXTENDFORM = new ExtendFormStubElementType();
