@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, LSFResolveResult> {
@@ -31,7 +32,10 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
     @Nullable
     @Override
     public LSFResolveResult resolve(@NotNull LSFReference reference, boolean incompleteCode) {
-         return reference.resolveNoCache();
+        if (reference.isInLibrarySources()) {
+            return new LSFResolveResult(Collections.emptyList());
+        }
+        return reference.resolveNoCache();
     }
 
     public static Query<PsiReference> searchWordUsages(Project project, String compoundID) {

@@ -88,6 +88,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public synchronized void annotate(@NotNull PsiElement psiElement, AnnotationHolder holder) {
+        if (psiElement instanceof LSFElement lsfElement && lsfElement.isInLibrarySources()) {
+            return;
+        }
+
         myHolder = holder;
         try {
             psiElement.accept(this);

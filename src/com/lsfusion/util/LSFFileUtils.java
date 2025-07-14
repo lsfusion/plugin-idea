@@ -19,6 +19,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
+import com.lsfusion.lang.psi.LSFSourceFilterScope;
 import com.lsfusion.lang.psi.Result;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import org.jetbrains.annotations.NotNull;
@@ -277,7 +278,8 @@ public class LSFFileUtils {
                 }
             }
         } else
-            modulesScope = allScope(project);
+            // all places without source lsf files by default. is used in errors search and enabling/disabling meta for now
+            modulesScope = LSFSourceFilterScope.allScope(project);
         return modulesScope;
     }
 }
