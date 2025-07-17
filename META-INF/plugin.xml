@@ -14,6 +14,7 @@
             <li>NEWTHREAD: implement notify action</li>
             <li>NAVIGATOR SCHEDULE support</li>
             <li>FindImplementations optimisation</li>
+            <li>TREE hierarchicalCaption support</li>
         </ul>
     ]]>
     </change-notes>

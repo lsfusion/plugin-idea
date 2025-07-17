@@ -24,6 +24,10 @@ public class TreeGroupProxy extends ViewProxy<TreeGroupView> {
         target.hierarchicalWidth = hierarchicalWidth;
     }
 
+    public void setHierarchicalCaption(String hierarchicalCaption) {
+        target.hierarchicalCaption = hierarchicalCaption;
+    }
+
     public void setHeaderHeight(int headerHeight) {
         target.headerHeight = headerHeight;
     }
