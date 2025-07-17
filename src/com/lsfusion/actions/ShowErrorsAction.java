@@ -89,7 +89,7 @@ public class ShowErrorsAction extends AnAction {
         final Progressive progress = indicator -> ApplicationManager.getApplication().runReadAction(() -> {
             Notifications.Bus.notify(new Notification("", "", "Searching for errors started", NotificationType.INFORMATION));
 
-            GlobalSearchScope searchScope = LSFFileUtils.getScope(includedModules, project);
+            GlobalSearchScope searchScope = LSFFileUtils.getScope(includedModules, project, GlobalSearchScope.projectScope(project));
 
             final List<VirtualFile> files = new ArrayList<>();
 

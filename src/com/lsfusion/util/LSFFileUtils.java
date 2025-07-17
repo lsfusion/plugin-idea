@@ -267,6 +267,11 @@ public class LSFFileUtils {
     }
 
     public static GlobalSearchScope getScope(List<String> modulesToInclude, Project project) {
+        // all places without source lsf files by default. is used in enabling/disabling meta for now
+        return getScope(modulesToInclude, project, LSFSourceFilterScope.allScope(project));
+    }
+
+    public static GlobalSearchScope getScope(List<String> modulesToInclude, Project project, GlobalSearchScope allModulesScope) {
         GlobalSearchScope modulesScope = null;
         if (modulesToInclude != null && !modulesToInclude.isEmpty()) {
             ModuleManager moduleManager = ModuleManager.getInstance(project);
@@ -278,8 +283,7 @@ public class LSFFileUtils {
                 }
             }
         } else
-            // all places without source lsf files by default. is used in errors search and enabling/disabling meta for now
-            modulesScope = LSFSourceFilterScope.allScope(project);
+            return allModulesScope;
         return modulesScope;
     }
 }
