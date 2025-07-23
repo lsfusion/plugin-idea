@@ -514,6 +514,8 @@ public abstract class GenerateFormAction extends AnAction {
     protected String getPropertyType(Object element) {
         if (element instanceof Number) {
             return "NUMERIC";
+        } else if (element instanceof Boolean) {
+            return "BOOLEAN";
         } else if (element instanceof String) {
             try {
                 String dateType = DateConverter.smartParse((String) element);
