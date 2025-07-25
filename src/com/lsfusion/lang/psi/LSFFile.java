@@ -131,23 +131,26 @@ public class LSFFile extends PsiFileImpl implements ModifyParamContext {
     }
 
     public List<LSFMetaCodeStatement> getMetaCodeStatementList() {
+        return getMetaCodeStatementList(false);
+    }
+
+    public List<LSFMetaCodeStatement> getMetaCodeStatementList(boolean onlyDisabled) {
         List<LSFMetaCodeStatement> result = new SmartList<>();
         for (PsiElement statement : getStatements()) {
-            if (statement instanceof LSFMetaCodeStatement) {
-                result.add((LSFMetaCodeStatement) statement);
+            if (statement instanceof LSFMetaCodeStatement mcStatement && (!onlyDisabled || mcStatement.getMetaCodeBody() == null)) {
+                result.add(mcStatement);
             }
         }
         return result;
     }
-    
-    public List<LSFMetaCodeStatement> getDisabledMetaCodeStatementList() {
-        List<LSFMetaCodeStatement> result = new SmartList<>();
+
+    public boolean hasEnabledMetaCode() {
         for (PsiElement statement : getStatements()) {
-            if (statement instanceof LSFMetaCodeStatement && ((LSFMetaCodeStatement) statement).getMetaCodeBody() == null) {
-                result.add((LSFMetaCodeStatement) statement);
+            if (statement instanceof LSFMetaCodeStatement mcStatement && mcStatement.getMetaCodeBody() != null) {
+                return true;
             }
         }
-        return result;    
+        return false;
     }
 
     @Override

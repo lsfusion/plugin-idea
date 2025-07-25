@@ -108,6 +108,8 @@
                 <keyboard-shortcut first-keystroke="control shift Q"  keymap="$default"/>
             </action>
 
+            <action id="aiReplaceTest" class="com.lsfusion.ai.ReplaceAndVerifyCodeAction" text="Replace Text"></action>
+
             <separator/>
         </group>
 

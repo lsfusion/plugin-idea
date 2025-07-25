@@ -52,7 +52,7 @@ public class ShowErrorsAction extends AnAction {
     private final String INCLUDE_JAVA_FILES = "INCLUDE_JAVA_FILES_ERRORS_SEARCH";
     private final String INCLUDE_JRXML_FILES = "INCLUDE_JRXML_FILES_ERRORS_SEARCH";
     private final String WARNINGS_SEARCH_MODE = "WARNINGS_SEARCH_MODE";
-    private final LSFReferenceAnnotator ANNOTATOR = new LSFReferenceAnnotator();
+    private final LSFReferenceAnnotator ANNOTATOR = new LSFReferenceAnnotator(true, false);
 
     private Project project;
     PropertiesComponent propertiesComponent;
@@ -86,29 +86,42 @@ public class ShowErrorsAction extends AnAction {
         final boolean showBalloonsState = NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS;
         NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = false;
 
-        final Progressive progress = indicator -> ApplicationManager.getApplication().runReadAction(() -> {
-            Notifications.Bus.notify(new Notification("", "", "Searching for errors started", NotificationType.INFORMATION));
+        GlobalSearchScope searchScope = LSFFileUtils.getScope(includedModules, project, GlobalSearchScope.projectScope(project));
 
-            GlobalSearchScope searchScope = LSFFileUtils.getScope(includedModules, project, GlobalSearchScope.projectScope(project));
+        final List<VirtualFile> files = new ArrayList<>();
 
-            final List<VirtualFile> files = new ArrayList<>();
-
-            if (includeLSFFiles) {
-                files.addAll(FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope));
-            }
-            if (includeJavaFiles) {
-                files.addAll(FileTypeIndex.getFiles(JavaFileType.INSTANCE, searchScope));
-            }
-            if (includeJrxmlFiles) {
-                Collection<VirtualFile> xmlFiles = FileTypeIndex.getFiles(XmlFileType.INSTANCE, searchScope);
-                for (VirtualFile xmlFile : xmlFiles) {
-                    if (xmlFile.getName().endsWith("jrxml")) {
-                        files.add(xmlFile);
-                    }
+        if (includeLSFFiles) {
+            files.addAll(FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope));
+        }
+        if (includeJavaFiles) {
+            files.addAll(FileTypeIndex.getFiles(JavaFileType.INSTANCE, searchScope));
+        }
+        if (includeJrxmlFiles) {
+            Collection<VirtualFile> xmlFiles = FileTypeIndex.getFiles(XmlFileType.INSTANCE, searchScope);
+            for (VirtualFile xmlFile : xmlFiles) {
+                if (xmlFile.getName().endsWith("jrxml")) {
+                    files.add(xmlFile);
                 }
             }
-            ANNOTATOR.errorsSearchMode = true;
-            ANNOTATOR.warningsSearchMode = warningsSearchMode;
+        }
+        ANNOTATOR.setWarningsSearchMode(warningsSearchMode);
+        ProgressManager.getInstance().run(getProcessFilesTask(files));
+
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(NotificationsToolWindowFactory.ID);
+        if (toolWindow == null) {
+            toolWindow = EventLog.getEventLog(project);
+        }
+        if (toolWindow != null && !toolWindow.isVisible()) {
+            toolWindow.activate(null);
+        }
+
+        ApplicationManager.getApplication().invokeLater(() -> NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = showBalloonsState);
+    }
+
+    @NotNull
+    private Task getProcessFilesTask(List<VirtualFile> files) {
+        final Progressive progress = indicator -> ApplicationManager.getApplication().runReadAction(() -> {
+            Notifications.Bus.notify(new Notification("", "", "Searching for errors started", NotificationType.INFORMATION));
 
             int index = 0;
             for (VirtualFile file : files) {
@@ -120,7 +133,8 @@ public class ShowErrorsAction extends AnAction {
                 if (file.getFileType() == LSFFileType.INSTANCE) {
                     PsiFile lsfFile = PsiManager.getInstance(project).findFile(file);
                     if(lsfFile != null) {
-                        findLSFErrors(lsfFile);
+                        ANNOTATOR.annotateRecursively(lsfFile, null);
+
                         if (warningsSearchMode) {
                             LSFProblemsVisitor.analyze(lsfFile);
                         }
@@ -129,7 +143,7 @@ public class ShowErrorsAction extends AnAction {
                 } else {
                     findInjectedErrors(PsiManager.getInstance(project).findFile(file));
                 }
-                indicator.setFraction((double) index/files.size());
+                indicator.setFraction((double) index / files.size());
             }
 
             Notifications.Bus.notify(new Notification("", "", "Searching for errors finished", NotificationType.INFORMATION));
@@ -140,62 +154,65 @@ public class ShowErrorsAction extends AnAction {
                 progress.run(indicator);
             }
         };
-
-        ProgressManager.getInstance().run(task);
-
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(NotificationsToolWindowFactory.ID);
-        if (toolWindow == null) {
-            toolWindow = EventLog.getEventLog(project);
-        }
-        if (toolWindow != null && !toolWindow.isVisible()) {
-            toolWindow.activate(null);
-        }
-        
-        ApplicationManager.getApplication().invokeLater(() -> NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = showBalloonsState);
-    }
-
-    private void findLSFErrors(PsiElement element) {
-        ANNOTATOR.annotate(element, null);
-
-        for (PsiElement child : element.getChildren()) {
-            findLSFErrors(child);
-        }
+        return task;
     }
 
     private void findInjectedErrors(PsiElement element) {
         Set<LSFFile> files = LSFPsiUtils.collectInjectedLSFFiles(element, project);
 
         for (PsiElement lsfFile : files) {
-            findLSFErrors(lsfFile);
+            ANNOTATOR.annotateRecursively(lsfFile, null);
         }
     }
 
-    public static void showErrorMessage(final PsiElement element, final String errorMessage, LSFErrorLevel errorLevel) {
-        final PsiFile file = element.getContainingFile();
-        final Document document = PsiDocumentManager.getInstance(element.getProject()).getDocument(file);
-        final SmartPsiElementPointer<PsiElement> pointer = SmartPointerManager.getInstance(element.getProject()).createSmartPsiElementPointer(element);
-        final Segment range = pointer.getRange();
-        int lineNumber = -1;
-        int linePosition = -1;
-        if (document != null && range != null) {
-            lineNumber = document.getLineNumber(range.getStartOffset()) + 1;
-            linePosition = range.getStartOffset() - document.getLineStartOffset(lineNumber - 1) + 1;
-        }
-
-        Module module = ModuleUtilCore.findModuleForPsiElement(element);
-        if (module != null) {
+    public static void showErrorMessage(final PsiElement element, final String message, LSFErrorLevel errorLevel) {
+        ErrorMessage errorMessage = ErrorMessage.create(element, message);
+        if (errorMessage != null) {
             Notifications.Bus.notify(new Notification(
                             errorLevel == LSFErrorLevel.ERROR ? "LSF errors" : "LSF warnings",
-                            "Error in " + module.getName() + " module:",
-                            errorMessage,
+                        "Error in " + errorMessage.moduleName + " module:",
+                            errorMessage.message,
                             errorLevel == LSFErrorLevel.ERROR ? NotificationType.ERROR : NotificationType.WARNING
                     ).addAction(
                             NotificationAction.create(
-                                    file.getName() + "(" + lineNumber + ":" + linePosition + ")",
+                                    errorMessage.filePositionText,
                                     (event, inotification) -> ((NavigationItem) element).navigate(true)
                             )
                     )
             );
+        }
+    }
+
+    public static class ErrorMessage {
+        public String moduleName;
+        public String message;
+        public String filePositionText;
+
+        public ErrorMessage(String moduleName, String message, String filePositionText) {
+            this.moduleName = moduleName;
+            this.message = message;
+            this.filePositionText = filePositionText;
+        }
+
+        public static ErrorMessage create(final PsiElement element, final String messageText) {
+            Module module = ModuleUtilCore.findModuleForPsiElement(element);
+            if (module != null) {
+                final PsiFile file = element.getContainingFile();
+                Project project = element.getProject();
+                final Document document = PsiDocumentManager.getInstance(project).getDocument(file);
+                final SmartPsiElementPointer<PsiElement> pointer = SmartPointerManager.getInstance(project).createSmartPsiElementPointer(element);
+                final Segment range = pointer.getRange();
+                int lineNumber = -1;
+                int linePosition = -1;
+                if (document != null && range != null) {
+                    lineNumber = document.getLineNumber(range.getStartOffset()) + 1;
+                    linePosition = range.getStartOffset() - document.getLineStartOffset(lineNumber - 1) + 1;
+                }
+
+                String filePositionText = file.getName() + "(" + lineNumber + ":" + linePosition + ")";
+                return new ErrorMessage(module.getName(), messageText, filePositionText);
+            }
+            return null;
         }
     }
 

@@ -83,8 +83,35 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final TextAttributes DEPRECATED_WARNING = new TextAttributes(null, null, JBColor.BLACK, EffectType.STRIKEOUT, Font.PLAIN);
 
     private AnnotationHolder myHolder;
-    public boolean errorsSearchMode = false;
-    public boolean warningsSearchMode = false;
+    private boolean errorsSearchMode;
+    private boolean warningsSearchMode;
+    private boolean stringResultMode;
+    private List<ShowErrorsAction.ErrorMessage> stringMessages;
+
+    public LSFReferenceAnnotator() {
+        this(false, false);
+    }
+
+    public LSFReferenceAnnotator(boolean errorsSearchMode, boolean warningsSearchMode) {
+        this(errorsSearchMode, warningsSearchMode, false);
+    }
+
+    public LSFReferenceAnnotator(boolean errorsSearchMode, boolean warningsSearchMode, boolean stringResultMode) {
+        this.errorsSearchMode = errorsSearchMode;
+        this.warningsSearchMode = warningsSearchMode;
+        this.stringResultMode = stringResultMode;
+        if (stringResultMode) {
+            stringMessages = new ArrayList<>();
+        }
+    }
+
+    public void setWarningsSearchMode(boolean warningsSearchMode) {
+        this.warningsSearchMode = warningsSearchMode;
+    }
+
+    public List<ShowErrorsAction.ErrorMessage> getStringMessages() {
+        return stringMessages;
+    }
 
     @Override
     public synchronized void annotate(@NotNull PsiElement psiElement, AnnotationHolder holder) {
@@ -97,6 +124,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             psiElement.accept(this);
         } finally {
             myHolder = null;
+        }
+    }
+
+    public void annotateRecursively(PsiElement element, AnnotationHolder holder) {
+        annotate(element, holder);
+
+        for (PsiElement child : element.getChildren()) {
+            annotateRecursively(child, holder);
         }
     }
 
@@ -963,7 +998,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes) {
         if (errorsSearchMode) {
-            ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.ERROR);
+            if (stringResultMode) {
+                assert stringMessages != null;
+                stringMessages.add(ShowErrorsAction.ErrorMessage.create(element, text));
+            } else {
+                ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.ERROR);
+            }
         } else {
             AnnotationBuilder annotationBuilder = myHolder.newAnnotation(HighlightSeverity.ERROR, text);
             if (range != null) {

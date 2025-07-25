@@ -879,7 +879,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
                 indicator.setText("Processing: " + lsfFile.getName());
 
                 ApplicationManager.getApplication().runReadAction(() -> {
-                    List<LSFMetaCodeStatement> metaStatements = reenable ? lsfFile.getDisabledMetaCodeStatementList() : lsfFile.getMetaCodeStatementList();
+                    List<LSFMetaCodeStatement> metaStatements = reenable ? lsfFile.getMetaCodeStatementList(true) : lsfFile.getMetaCodeStatementList();
                     syncUsageProcessing(lsfFile, inlineProcessor, indicator, enabled, metaStatements, Collections.emptyList(), null);
                     indicator.setText2("");
                 });
