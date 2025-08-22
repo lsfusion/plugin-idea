@@ -136,7 +136,7 @@ public class LSFGlobalResolver {
     }
 
     public static <G extends LSFStubbedElement> Collection<G> getItemsFromIndex(LSFStringStubIndex<G> index, String name, Project project, GlobalSearchScope scope, LSFLocalSearchScope localScope) {
-        Collection<G> elements = index.get(name, project, new LSFSourceFilterScope(scope));
+        Collection<G> elements = index.get(name, project, scope);
 
         Collection<G> filteredElements = new ArrayList<>();
 

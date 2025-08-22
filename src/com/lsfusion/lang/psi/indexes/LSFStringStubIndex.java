@@ -13,7 +13,7 @@ import java.util.Collection;
 public abstract class LSFStringStubIndex<Psi extends LSFStubbedElement> extends StringStubIndexExtension<Psi> {
     @Override
     public Collection<Psi> get(String s, Project project, GlobalSearchScope scope) {
-        return DumbService.getInstance(project).runReadActionInSmartMode(() -> StubIndex.getElements(getKey(), s, project, new LSFSourceFilterScope(scope), getPsiClass()));
+        return DumbService.getInstance(project).runReadActionInSmartMode(() -> StubIndex.getElements(getKey(), s, project, LSFSourceFilterScope.create(scope), getPsiClass()));
     }
     
     protected abstract Class<Psi> getPsiClass();

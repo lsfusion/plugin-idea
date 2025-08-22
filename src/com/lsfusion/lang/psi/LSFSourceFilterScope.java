@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.DelegatingGlobalSearchScope;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LSFSourceFilterScope extends DelegatingGlobalSearchScope {
     private ProjectFileIndex fileIndex;
@@ -41,5 +42,10 @@ public class LSFSourceFilterScope extends DelegatingGlobalSearchScope {
     @NotNull
     public static LSFSourceFilterScope allScope(@NotNull Project project) {
         return new LSFSourceFilterScope(GlobalSearchScope.allScope(project));
+    }
+
+    @Nullable
+    public static LSFSourceFilterScope create(GlobalSearchScope baseScope) {
+        return baseScope == null ? null : new LSFSourceFilterScope(baseScope);
     }
 }
