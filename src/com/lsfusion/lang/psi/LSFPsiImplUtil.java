@@ -1437,7 +1437,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFActiveTabPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFActivePropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         return LSFExClassSet.logical;
     }
 
@@ -2000,7 +2000,7 @@ public class LSFPsiImplUtil {
         return singletonList(LogicalClass.instance.getName());
     }
 
-    public static List<String> getValueClassNames(@NotNull LSFActiveTabPropertyDefinition sourceStatement) {
+    public static List<String> getValueClassNames(@NotNull LSFActivePropertyDefinition sourceStatement) {
         return singletonList(LogicalClass.instance.getName());
     }
 
@@ -2367,7 +2367,7 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
-    public static List<String> getValuePropertyNames(@NotNull LSFActiveTabPropertyDefinition sourceStatement) {
+    public static List<String> getValuePropertyNames(@NotNull LSFActivePropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -3789,8 +3789,8 @@ public class LSFPsiImplUtil {
         return inferParamClasses(sourceStatement.getPropertyExpression(), null);
     }
 
-    public
-    @NotNull static Inferred inferParamClasses(@NotNull LSFActiveTabPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+    @NotNull
+    public static Inferred inferParamClasses(@NotNull LSFActivePropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return Inferred.EMPTY;
     }
 
@@ -4834,8 +4834,8 @@ public class LSFPsiImplUtil {
         return "Change_operators_SET_CHANGED_etc";
     }
 
-    public static String getDocumentation(LSFActiveTabPropertyDefinition lsfActiveTabPropertyDefinition, PsiElement child) {
-        return "ACTIVE_TAB_operator";
+    public static String getDocumentation(LSFActivePropertyDefinition lsfActivePropertyDefinition, PsiElement child) {
+        return lsfActivePropertyDefinition.getComponentID() != null ? "ACTIVE_TAB_operator" : "ACTIVE_PROPERTY_operator";
     }
 
     public static String getDocumentation(LSFDataPropertyDefinition lsfDataPropertyDefinition, PsiElement child) {
