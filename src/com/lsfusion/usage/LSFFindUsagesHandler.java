@@ -12,7 +12,10 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageInfo;
 import com.intellij.util.Processor;
 import com.lsfusion.ImplementationsSearch;
-import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.lang.psi.LSFFormObjectDeclaration;
+import com.lsfusion.lang.psi.LSFId;
+import com.lsfusion.lang.psi.LSFNewNavigatorElementStatement;
 import com.lsfusion.lang.psi.declarations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,9 +94,11 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
         if(declaration != null) {
             LSFId identifier = declaration.getNameIdentifier();
             if (identifier != null) {
-                ReferencesSearch.search(identifier, declaration.getUseScope()).forEach(psiReference -> {
-                    processor.process(new UsageInfo(psiReference));
-                    return true;
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    ReferencesSearch.search(identifier, declaration.getUseScope()).forEach(psiReference -> {
+                        processor.process(new UsageInfo(psiReference));
+                        return true;
+                    });
                 });
             }
         }
