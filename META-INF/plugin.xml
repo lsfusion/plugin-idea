@@ -11,6 +11,7 @@
         <b>Version 1.0.301</b><br>
         <ul>
             <li>ACTIVE PROPERTY support</li>
+            <li>FORM: 'EVENTS' keyword now is optional</li>
         </ul>
     ]]>
     </change-notes>

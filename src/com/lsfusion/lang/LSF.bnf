@@ -1864,7 +1864,7 @@ formOptionQuickFilter ::= QUICKFILTER formPropertyDrawUsage {pin = 1}
 formOptionInsertType ::= staticRelativePosition | (BEFORE | AFTER) formPropertyDrawUsage {pin = 1}
 formOptionsOnEvents ::= ON formEventType formActionPropertyObject
 {
-    pin = 1
+    pin = 2
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
@@ -1901,9 +1901,9 @@ formFiltersList ::= FILTERS formExprDeclaration (COMMA formExprDeclaration)*
 
 formHintsList ::= (HINTNOUPDATE | HINTTABLE) LIST nonEmptyNoContextPropertyUsageList {pin = 1}
 
-formEventsList ::= EVENTS formEventDeclaration (COMMA formEventDeclaration)*
+formEventsList ::= EVENTS? formEventDeclaration (COMMA formEventDeclaration)*
 {
-    pin = 1
+    pin = 2
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
