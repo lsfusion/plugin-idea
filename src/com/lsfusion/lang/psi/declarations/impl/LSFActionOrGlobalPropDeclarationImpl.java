@@ -9,10 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.indexes.OverrideActionIndex;
 import com.lsfusion.lang.psi.indexes.OverridePropertyIndex;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
@@ -204,25 +201,24 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
 
     protected List<LSFActionOrPropReference<?, ?>> findImplementations(LSFId nameIdentifier) {
         List<LSFActionOrPropReference<?, ?>> impls = new ArrayList<>();
-        List<LSFClassSet> thisClasses = resolveParamClasses();
         if (isAction()) {
             LSFGlobalResolver.getItemsFromIndex(OverrideActionIndex.getInstance(), nameIdentifier.getName(), getProject(), GlobalSearchScope.allScope(getProject()), LSFLocalSearchScope.GLOBAL).forEach(prop -> {
-                if (checkClasses(thisClasses, ((LSFOverrideActionStatement) prop).getMappedActionClassParamDeclare().resolveParamClasses())) {
-                    impls.add(((LSFOverrideActionStatement) prop).getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage());
+                LSFActionUsage usage = ((LSFOverrideActionStatement) prop).getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage();
+                @Nullable LSFActionDeclaration decl = usage.resolveDecl();
+                if (decl != null && decl.equals(this)) {
+                    impls.add(usage);
                 }
             });
         } else {
             LSFGlobalResolver.getItemsFromIndex(OverridePropertyIndex.getInstance(), nameIdentifier.getName(), getProject(), GlobalSearchScope.allScope(getProject()), LSFLocalSearchScope.GLOBAL).forEach(prop -> {
-                if (checkClasses(thisClasses, ((LSFOverridePropertyStatement) prop).getMappedPropertyClassParamDeclare().resolveParamClasses())) {
-                    impls.add(((LSFOverridePropertyStatement) prop).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage());
+                LSFPropertyUsage usage = ((LSFOverridePropertyStatement) prop).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage();
+                @Nullable LSFPropDeclaration decl = usage.resolveDecl();
+                if (decl != null && decl.equals(this)) {
+                    impls.add(usage);
                 }
             });
         }
         return impls;
-    }
-
-    private boolean checkClasses(List<LSFClassSet> thisClasses, List<LSFClassSet> declClasses) {
-        return declClasses != null && declClasses.size() == thisClasses.size() && LSFPsiImplUtil.containsAll(declClasses, thisClasses, false);
     }
 
     @Override
