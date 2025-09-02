@@ -180,7 +180,7 @@ staticObjectDecl ::= simpleNameWithCaption
 
 nativeLiteral ::= NATIVE;
 
-groupStatement ::= GROUP nativeLiteral? simpleNameWithCaption formExtID? (COLON groupUsage)? SEMI
+groupStatement ::= GROUP nativeLiteral? simpleNameWithCaption extIdSetting? (COLON groupUsage)? SEMI
 {
     pin = 2
     implements="com.lsfusion.lang.psi.declarations.LSFGroupDeclaration"
@@ -655,6 +655,7 @@ private semiPropertyOption ::= IN groupUsage
                            |	flexCharWidthSetting
                            |	charWidthSetting
                            |	imageSetting
+                           |	extIdSetting
                            |    defaultCompareSetting
                            |	changeKeySetting
                            |	changeMouseSetting
@@ -1736,7 +1737,7 @@ formGroupObjectOptions ::= (    formGroupObjectViewType
                            |    formGroupObjectBackground
                            |    formGroupObjectForeground
                            |    formInGroup
-                           |    formExtID
+                           |    extIdSetting
                            )*
 {
     implements = "com.lsfusion.documentation.LSFDocumentation"
@@ -1841,7 +1842,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | DISABLE | SELECTOR
                             |    formOptionInsertType
                             |    ATTR
                             |    formInGroup
-                            |    formExtID | NOEXTID
+                            |    extIdSetting | NOEXTID
                             |    EXTNULL
                             |    ORDER (DESC)?
                             |    FILTER
@@ -1871,7 +1872,7 @@ formOptionsOnEvents ::= ON formEventType formActionPropertyObject
 
 formInGroup ::= IN groupUsage
 
-formExtID ::= EXTID stringLiteral
+extIdSetting ::= EXTID stringLiteral
 
 designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formExprDeclaration

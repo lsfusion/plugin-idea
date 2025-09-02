@@ -12,6 +12,8 @@
         <ul>
             <li>ACTIVE PROPERTY support</li>
             <li>FORM: 'EVENTS' keyword now is optional</li>
+            <li>FindImplementations fix</li>
+            <li>EXTID for action</li>
         </ul>
     ]]>
     </change-notes>
