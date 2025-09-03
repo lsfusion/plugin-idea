@@ -30,7 +30,6 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
 //    |	globalEventStatement
 //    |	aspectStatement
 //    |	tableStatement
-//    |	loggableStatement
 //    |	indexStatement
 //    |	formStatement
 //    |	designStatement
@@ -52,7 +51,6 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
     public static final UsageType GLOBAL_EVENT_STATEMENT = new UsageType(() -> "Global event statement");
     public static final UsageType ASPECT_STATEMENT = new UsageType(() -> "Aspect statement");
     public static final UsageType TABLE_DECLARATION = new UsageType(() -> "TABLE declaration");
-    public static final UsageType LOGGABLE_STATEMENT = new UsageType(() -> "LOGGABLE statement");
     public static final UsageType INDEX_STATEMENT = new UsageType(() -> "INDEX statement");
     public static final UsageType FORM_STATEMENT = new UsageType(() -> "Form statement");
     public static final UsageType DESIGN_STATEMENT = new UsageType(() -> "DESIGN statement");
@@ -112,8 +110,6 @@ public class LSFUsageTypeProvider implements UsageTypeProviderEx {
             return ASPECT_STATEMENT;
         } else if (element instanceof LSFTableDeclaration) {
             return TABLE_DECLARATION;
-        } else if (element instanceof LSFLoggableStatement) {
-            return LOGGABLE_STATEMENT;
         } else if (element instanceof LSFIndexStatement) {
             return INDEX_STATEMENT;
         } else if (element instanceof LSFFormExtend) {

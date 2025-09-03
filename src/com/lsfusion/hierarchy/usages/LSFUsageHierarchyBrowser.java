@@ -132,7 +132,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
                 LSFOverridePropertyStatement.class, LSFOverrideActionStatement.class, LSFEventStatement.class, LSFGlobalEventStatement.class, LSFFollowsStatement.class,
                 LSFWriteWhenStatement.class, LSFAspectStatement.class, LSFShowDepStatement.class, LSFConstraintStatement.class,
                 LSFFormStatement.class, LSFDesignStatement.class, LSFNavigatorStatement.class, LSFTableStatement.class,
-                LSFLoggableStatement.class, LSFIndexStatement.class));
+                LSFIndexStatement.class));
 
         public UsageTypeComparator(boolean withAlpha) {
             this.withAlpha = withAlpha;

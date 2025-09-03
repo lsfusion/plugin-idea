@@ -53,7 +53,7 @@ public class LSFParserImpl extends LSFParser {
             return false;
         }
         //assert tokenType in script_statement_recover (recoverWhile in scriptStatement) {
-        // ID | AFTER | BEFORE | HIDE | INDEX | LOGGABLE | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT | INTERNAL
+        // ID | AFTER | BEFORE | HIDE | INDEX | NAVIGATOR | ON | SHOWDEP | WHEN | CONSTRAINT | INTERNAL
         // | CLASS | ATSIGN | ATSIGN2 | FORM | GROUP | META | DESIGN | TABLE | WINDOW | EXTEND | SEMI
         // to cut parsing we can use tokens (or token chains) that can be only used in top rules
 

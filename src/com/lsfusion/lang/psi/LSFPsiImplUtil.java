@@ -4372,11 +4372,6 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static Icon getIcon(@NotNull LSFLoggableStatement loggableStatement, int flags) {
-        return LSFIcons.LOGGABLE;
-    }
-
-    @Nullable
     public static Icon getIcon(@NotNull LSFIndexStatement indexStatement, int flags) {
         return LSFIcons.INDEX;
     }

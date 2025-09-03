@@ -372,7 +372,6 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "LOCAL"                   			{ return LOCAL; }
   "LOCALASYNC"                   		{ return LOCALASYNC; }
   "LOG"                			        { return LOG; }
-  "LOGGABLE"                			{ return LOGGABLE; }
   "LSF"                    			    { return LSF; }
   "MANAGESESSION"           			{ return MANAGESESSION; }
   "NOMANAGESESSION"                     { return NOMANAGESESSION; }
