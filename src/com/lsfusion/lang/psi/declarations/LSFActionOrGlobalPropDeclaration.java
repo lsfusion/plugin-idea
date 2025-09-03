@@ -2,10 +2,7 @@ package com.lsfusion.lang.psi.declarations;
 
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.lsfusion.lang.psi.LSFExplicitClasses;
-import com.lsfusion.lang.psi.LSFId;
-import com.lsfusion.lang.psi.LSFInterfacePropStatement;
-import com.lsfusion.lang.psi.LSFNonEmptyPropertyOptions;
+import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,6 +11,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public interface LSFActionOrGlobalPropDeclaration<This extends LSFActionOrGlobalPropDeclaration<This,Stub>, Stub extends ActionOrPropStubElement<Stub, This>> extends LSFFullNameDeclaration<This, Stub>, LSFInterfacePropStatement, LSFActionOrPropDeclaration {
+
+    @Nullable
+    LSFNonEmptyActionOptions getNonEmptyActionOptions();
 
     @Nullable
     LSFNonEmptyPropertyOptions getNonEmptyPropertyOptions();

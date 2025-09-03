@@ -68,6 +68,11 @@ public abstract class LSFAggrParamGlobalPropDeclarationImpl extends LSFFullNameD
     }
 
     @Override
+    public @Nullable LSFNonEmptyActionOptions getNonEmptyActionOptions() {
+        return null;
+    }
+
+    @Override
     public boolean isAbstract() {
         return false;
     }

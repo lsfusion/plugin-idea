@@ -31,16 +31,16 @@ public class PropertyDrawEntity {
 
     public String sID;
 
-    public boolean isToolbar(FormEntity entity) {
+    public boolean isToolbar() {
         if(forceViewType != null)
             return forceViewType.isToolbar();
         
-        GroupObjectEntity toDraw = getToDraw(entity);
+        GroupObjectEntity toDraw = getToDraw();
         return toDraw != null && toDraw.initClassView.isToolbar();
     }
 
-    public boolean isGrid(FormEntity entity) {
-        GroupObjectEntity toDraw = getToDraw(entity);
+    public boolean isGrid() {
+        GroupObjectEntity toDraw = getToDraw();
         return toDraw != null && toDraw.initClassView.isGrid() && (forceViewType == null || forceViewType.isGrid());
     }
     
@@ -52,9 +52,6 @@ public class PropertyDrawEntity {
     public LSFClassSet baseClass;
 
     public Project project;
-
-    public boolean askConfirm;
-    public String askConfirmMessage;
 
     public String canonicalName = "";
     public String declText;
@@ -111,12 +108,11 @@ public class PropertyDrawEntity {
                 forceViewType = ClassViewType.PANEL;
         }
 
+        LSFNonEmptyActionOptions actionOptions = null;
         LSFNonEmptyPropertyOptions propertyOptions = null;
         if (propDeclaration != null) {
+            actionOptions = propDeclaration.getNonEmptyActionOptions();
             propertyOptions = propDeclaration.getNonEmptyPropertyOptions();
-//            if (caption == null) {
-//                caption = propertyStatement.getDeclName();
-//            }
             declText = propDeclaration.getText();
             declLocation = propDeclaration.getLocationString();
             List<LSFClassSet> paramClasses = propDeclaration.resolveParamClasses();
@@ -132,47 +128,48 @@ public class PropertyDrawEntity {
             }
         }
 
-        if (propertyOptions != null) {
-            for(LSFViewTypeSetting viewType : propertyOptions.getViewTypeSettingList())
-                forceViewType = valueOf(viewType.getClassViewType().getText());
+        if (actionOptions != null)
+            applyOptions(actionOptions.getViewTypeSettingList(), actionOptions.getFlexCharWidthSettingList(),
+                    actionOptions.getCharWidthSettingList(), actionOptions.getImageSettingList(),
+                    actionOptions.getChangeKeySettingList(), actionOptions.getInSettingList());
 
-            List<LSFFlexCharWidthSetting> fixedCharWidthSettings = propertyOptions.getFlexCharWidthSettingList();
-            if (!fixedCharWidthSettings.isEmpty()) {
-                fixedCharWidth = Integer.parseInt(fixedCharWidthSettings.get(fixedCharWidthSettings.size() - 1).getIntLiteral().getText());
-            }
-
-            List<LSFCharWidthSetting> minCharWidthSettings = propertyOptions.getCharWidthSettingList();
-            if (!minCharWidthSettings.isEmpty()) {
-                charWidth = Integer.parseInt(minCharWidthSettings.get(minCharWidthSettings.size() - 1).getIntLiteral().getText());
-            }
-
-            List<LSFImageSetting> imageSettings = propertyOptions.getImageSettingList();
-            if (!imageSettings.isEmpty()) {
-                iconPath = imageSettings.get(imageSettings.size() - 1).getStringLiteral().getValue();
-            }
-
-            List<LSFChangeKeySetting> editKeySettings = propertyOptions.getChangeKeySettingList();
-            if (!editKeySettings.isEmpty()) {
-                LSFChangeKeySetting editKeySetting = editKeySettings.get(editKeySettings.size() - 1);
-                changeKey = KeyStroke.getKeyStroke(editKeySetting.getStringLiteral().getValue());
-                if (editKeySetting.getHideEditKey() != null) {
-                    showChangeKey = false;
-                }
-            }
-
-            getAbstractGroup(propertyOptions);
-        }
+        if (propertyOptions != null)
+            applyOptions(propertyOptions.getViewTypeSettingList(), propertyOptions.getFlexCharWidthSettingList(),
+                    propertyOptions.getCharWidthSettingList(), propertyOptions.getImageSettingList(),
+                    propertyOptions.getChangeKeySettingList(), propertyOptions.getInSettingList());
 
         applyFormOptions(commonFormOptions, form);
         applyFormOptions(propertyFormOptions, form);
     }
 
-    private void getAbstractGroup(LSFNonEmptyPropertyOptions propertyOptions) {
-        List<LSFGroupUsage> groupUsageList = propertyOptions.getGroupUsageList();
-        if (!groupUsageList.isEmpty()) {
-            LSFGroupUsage groupUsage = groupUsageList.get(groupUsageList.size() - 1);
-            parent = addAbstractGroup(groupUsage);
+    private void applyOptions(List<LSFViewTypeSetting> viewTypeSettingList, List<LSFFlexCharWidthSetting> flexCharWidthSettingList,
+                              List<LSFCharWidthSetting> charWidthSettingList, List<LSFImageSetting> imageSettingList,
+                              List<LSFChangeKeySetting> changeKeySettingList, List<LSFInSetting> inSettingList) {
+        for(LSFViewTypeSetting viewType : viewTypeSettingList)
+            forceViewType = valueOf(viewType.getClassViewType().getText());
+
+        if (!flexCharWidthSettingList.isEmpty())
+            fixedCharWidth = Integer.parseInt(flexCharWidthSettingList.get(flexCharWidthSettingList.size() - 1).getIntLiteral().getText());
+
+        if (!charWidthSettingList.isEmpty())
+            charWidth = Integer.parseInt(charWidthSettingList.get(charWidthSettingList.size() - 1).getIntLiteral().getText());
+
+        if (!imageSettingList.isEmpty()) {
+            LSFStringLiteral imageLiteral = imageSettingList.get(imageSettingList.size() - 1).getStringLiteral();
+            if(imageLiteral != null)
+                iconPath = imageLiteral.getValue();
         }
+
+        if (!changeKeySettingList.isEmpty()) {
+            LSFChangeKeySetting editKeySetting = changeKeySettingList.get(changeKeySettingList.size() - 1);
+            changeKey = KeyStroke.getKeyStroke(editKeySetting.getStringLiteral().getValue());
+            if (editKeySetting.getHideEditKey() != null) {
+                showChangeKey = false;
+            }
+        }
+
+        if (!inSettingList.isEmpty())
+            parent = addAbstractGroup(inSettingList.get(inSettingList.size() - 1).getGroupUsage());
     }
 
     private AbstractGroup addAbstractGroup(LSFGroupUsage groupUsage) {
@@ -205,14 +202,13 @@ public class PropertyDrawEntity {
         List<LSFFormOptionForce> formOptionForceList = optionList.getFormOptionForceList();
         if (!formOptionForceList.isEmpty()) {
             LSFFormOptionForce forceOption = formOptionForceList.get(formOptionForceList.size() - 1);
-            if (forceOption.getClassViewType() != null) {
-                String forceText = forceOption.getClassViewType().getText();
-                forceViewType = ClassViewType.valueOf(forceText);
-            }
+            forceOption.getClassViewType();
+            String forceText = forceOption.getClassViewType().getText();
+            forceViewType = ClassViewType.valueOf(forceText);
         }
     }
 
-    public GroupObjectEntity getToDraw(FormEntity form) {
+    public GroupObjectEntity getToDraw() {
         return toDraw;
     }
 

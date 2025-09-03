@@ -189,7 +189,7 @@ public class FormView {
     }
     
     protected boolean addGridDrawView(PropertyDrawView propertyDraw) { // в том числе и HIDE
-        GroupObjectEntity groupObject = propertyDraw.entity.getToDraw(entity);
+        GroupObjectEntity groupObject = propertyDraw.entity.getToDraw();
         GroupObjectView groupObjectView = mgroupObjects.get(groupObject);
 
         if (groupObjectView != null && groupObjectView.entity.initClassView == ClassViewType.HIDE || propertyDraw.hide || propertyDraw.isForceHide()) {
@@ -211,7 +211,7 @@ public class FormView {
 
     public boolean putInGrid(PropertyDrawView property, GroupObjectView groupObjectView) {
         if (groupObjectView != null) {
-            return !groupObjectView.entity.isFixedPanel() && groupObjectView.entity.initClassView == ClassViewType.GRID && !property.isForcedPanel() && !property.entity.isToolbar(entity);
+            return !groupObjectView.entity.isFixedPanel() && groupObjectView.entity.initClassView == ClassViewType.GRID && !property.isForcedPanel() && !property.entity.isToolbar();
         }
         return false;
     }

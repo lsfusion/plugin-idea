@@ -174,7 +174,7 @@ public class DefaultFormView extends FormView {
     }
 
     private PropertyGroupContainerView getPropertyContainer(PropertyDrawView property) {
-        return getPropertyGroupContainer(property.entity.getToDraw(entity));
+        return getPropertyGroupContainer(property.entity.getToDraw());
     }
 
     private PropertyGroupContainerView getPropertyGroupContainer(GroupObjectEntity groupObject) {
@@ -275,7 +275,7 @@ public class DefaultFormView extends FormView {
 
     public void addPanelPropertyDrawView(PropertyDrawView propertyDraw) {
         ContainerView propertyContainer;
-        if (propertyDraw.entity.isToolbar(entity)) {
+        if (propertyDraw.entity.isToolbar()) {
             propertyContainer = getToolbarPropsContainer(propertyDraw);
             propertyDraw.setAlignment(FlexAlignment.CENTER);
         } else {

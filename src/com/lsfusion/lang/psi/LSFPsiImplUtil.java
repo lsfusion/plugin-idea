@@ -4866,6 +4866,10 @@ public class LSFPsiImplUtil {
         return "IS_AS_operators";
     }
 
+    public static String getDocumentation(LSFNonEmptyActionOptions lsfNonEmptyActionOptions, PsiElement child) {
+        return "Action_options";
+    }
+
     public static String getDocumentation(LSFNonEmptyPropertyOptions lsfNonEmptyPropertyOptions, PsiElement child) {
         return "Property_options";
     }

@@ -62,13 +62,13 @@ public class LSFProblemsVisitor {
 
     private static boolean hasShortCut(LSFDeclaration objectDecl) {
         if(objectDecl instanceof LSFPropertyStatementImpl) {
-            LSFNonEmptyPropertyOptions propertyOptions = ((LSFPropertyStatementImpl) objectDecl).getNonEmptyPropertyOptions();
+            LSFNonEmptyActionOptions propertyOptions = ((LSFPropertyStatementImpl) objectDecl).getNonEmptyActionOptions();
             if(propertyOptions != null) {
                 for(LSFAsEditActionSetting editAction : propertyOptions.getAsEditActionSettingList()) {
                     LSFFormEventType formEventType = editAction.getFormEventType();
                     if(formEventType != null && formEventType.getContextMenuEventType() != null)
                         return true;
-                }    
+                }
             }
         }
         return false;

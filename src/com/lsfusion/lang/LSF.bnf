@@ -246,8 +246,8 @@ explicitInterfaceActStatement ::= actionStatement
 }
 
 actionStatement ::= propertyDeclaration
-                        (   actionUnfriendlyPD (nonEmptyPropertyOptions | SEMI)
-                        |   topActionPropertyDefinitionBody nonEmptyPropertyOptions?
+                        (   actionUnfriendlyPD (nonEmptyActionOptions | SEMI)
+                        |   topActionPropertyDefinitionBody nonEmptyActionOptions?
                         )
 {
     pin(".*") = 1
@@ -642,81 +642,96 @@ typePropertyDefinition ::= typeIs className
     methods = [getDocumentation]
 }
 
-private semiPropertyOption ::= IN groupUsage
+private semiActionOrPropertyOption ::=
+                                inSetting
+                           |	viewTypeSetting
+                           |	customViewSetting
+                           |	flexCharWidthSetting
+                           |	charWidthSetting
+                           |	changeKeySetting
+                           |	changeMouseSetting
+                           |    stickyOption
+                           |    syncTypeLiteral
+                           |	imageSetting
+                           |	extIdSetting
+                           |   ATSIGN2 simpleName
+
+private semiActionOption ::= semiActionOrPropertyOption
+                           |    shortcutSetting
+                           |	asEditActionSetting
+                           |	confirmSetting
+
+private semiPropertyOption ::= semiActionOrPropertyOption
                            |	materializedSetting
                            |	indexedSetting
                            |    complexSetting
                            |    prereadSetting
                            |    hintSetting
-                           |	TABLE tableUsage
-                           |	asEditActionSetting
-                           |	viewTypeSetting
-                           |	customViewSetting
-                           |	flexCharWidthSetting
-                           |	charWidthSetting
-                           |	imageSetting
-                           |	extIdSetting
+                           |    tableSetting
                            |    defaultCompareSetting
-                           |	changeKeySetting
-                           |	changeMouseSetting
                            |	autosetSetting
-                           |	confirmSetting
                            |	patternSetting
                            |	regexpSetting
-                           |	loggableSetting
                            |	echoSymbolsSetting
-                           |    aggrSetting
                            |	notNullSetting
+                           |    aggrSetting
                            |	eventIdSetting
                            |	lazySetting
-                           |    stickyOption
-                           |    syncTypeLiteral
-                           |   ATSIGN2 simpleName
+                           |	loggableSetting
+
 private nonSemiPropertyOption ::= onEditEventSetting
 
 //((semiPropertyOption | nonSemiPropertyOption)* (semiPropertyOption SEMI | nonSemiPropertyOption)
 // recursive-LL might be better because of pins (? naybe it would not be possible to pin 1 rule because of for example } TABLE X (A)), but needs some refactoring
 //semiPropertyOption (SEMI | nonEmptyPropertyOptions) | nonSemiPropertyOption nonEmptyPropertyOptions?
+nonEmptyActionOptions ::= ((nonSemiPropertyOption* semiActionOption)+ SEMI | (semiActionOption* nonSemiPropertyOption)+)
+{
+    implements = "com.lsfusion.documentation.LSFDocumentation"
+    methods = [getDocumentation]
+}
+
 nonEmptyPropertyOptions ::= ((nonSemiPropertyOption* semiPropertyOption)+ SEMI | (semiPropertyOption* nonSemiPropertyOption)+)
 {
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
 
+inSetting ::= IN groupUsage
 viewTypeSetting ::= classViewType
 customViewSetting ::= propertyCustomView
-materializedSetting ::= MATERIALIZED stringLiteral?
-indexedSetting ::= INDEXED stringLiteral? (LIKE | MATCH)?
-complexSetting ::= COMPLEX | NOCOMPLEX
-hintSetting ::= HINT | NOHINT
-prereadSetting ::= PREREAD
-charWidthSetting ::= CHARWIDTH intLiteral
 flexCharWidthSetting ::= CHARWIDTH intLiteral (FLEX | NOFLEX)
-imageSetting ::= (IMAGE stringLiteral?) | NOIMAGE
-staticObjectImage ::= (IMAGE stringLiteral) | NOIMAGE
-defaultCompareSetting ::= DEFAULTCOMPARE stringLiteral
+charWidthSetting ::= CHARWIDTH intLiteral
 changeKeySetting ::= CHANGEKEY stringLiteral (SHOW | hideEditKey)?
 changeMouseSetting ::= CHANGEMOUSE stringLiteral (SHOW | hideEditKey)?
-autosetSetting ::= AUTOSET
-confirmSetting ::= CONFIRM
-patternSetting ::= PATTERN localizedStringLiteral
-regexpSetting ::= REGEXP localizedStringLiteral (localizedStringLiteral)?
-loggableSetting ::= LOGGABLE
-echoSymbolsSetting ::= ECHO
-aggrSetting ::= AGGR
-notNullSetting ::= nullOption (DELETE)? baseEventNotPE
-onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти
-asEditActionSetting ::= ASON formEventType noContextActionOrPropertyUsage {pin = 1}
-eventIdSetting ::= EVENTID stringLiteral
-lazySetting ::= LAZY (WEAK | STRONG)?
-
-stickyOption ::= STICKY | NOSTICKY
-
 hideEditKey ::= HIDE
+stickyOption ::= STICKY | NOSTICKY
+imageSetting ::= (IMAGE stringLiteral?) | NOIMAGE
+staticObjectImage ::= (IMAGE stringLiteral) | NOIMAGE
 
 contextMenuEventType ::= CONTEXTMENU (<<noIDCheck>> localizedStringLiteral)? { pin = 1 } // there are a lot of rules that start from ID, so we'll ignore that cases
 keyPressedEventType ::= KEYPRESS stringLiteral  { pin = 1 }
 formEventType ::= (CHANGE (BEFORE | AFTER)?) | GROUPCHANGE | CHANGEWYS | EDIT | contextMenuEventType | keyPressedEventType
+onEditEventSetting ::= ON formEventType topActionPropertyDefinitionBody  {pin = 2} // нельзя pin'ить 1 так как после действия ON может идти
+shortcutSetting ::= ASON CONTEXTMENU (<<noIDCheck>> localizedStringLiteral)? actionOrPropertyUsage
+asEditActionSetting ::= ASON formEventType noContextActionOrPropertyUsage {pin = 1}
+confirmSetting ::= CONFIRM
+
+materializedSetting ::= MATERIALIZED stringLiteral?
+indexedSetting ::= INDEXED stringLiteral? (LIKE | MATCH)?
+complexSetting ::= COMPLEX | NOCOMPLEX
+prereadSetting ::= PREREAD
+hintSetting ::= HINT | NOHINT
+tableSetting ::= TABLE tableUsage
+defaultCompareSetting ::= DEFAULTCOMPARE stringLiteral
+autosetSetting ::= AUTOSET
+patternSetting ::= PATTERN localizedStringLiteral
+regexpSetting ::= REGEXP localizedStringLiteral (localizedStringLiteral)?
+echoSymbolsSetting ::= ECHO
+notNullSetting ::= nullOption (DELETE)? baseEventNotPE
+aggrSetting ::= AGGR
+eventIdSetting ::= EVENTID stringLiteral
+lazySetting ::= LAZY (WEAK | STRONG)?
+loggableSetting ::= LOGGABLE
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// ACTION PROPERTIES ///////////////////////////

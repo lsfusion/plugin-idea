@@ -34,6 +34,11 @@ public abstract class LSFBaseEventActionDeclarationImpl extends LSFFullNameDecla
     }
 
     @Override
+    public @Nullable LSFNonEmptyActionOptions getNonEmptyActionOptions() {
+        return null;
+    }
+
+    @Override
     public boolean isAbstract() {
         return false;
     }

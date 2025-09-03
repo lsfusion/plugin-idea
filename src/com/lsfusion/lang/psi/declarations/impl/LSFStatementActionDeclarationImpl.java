@@ -105,4 +105,9 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
             references.addAll(PsiTreeUtil.findChildrenOfType(body, LSFActionOrPropReference.class));
         }
     }
+
+    @Override
+    public @Nullable LSFNonEmptyPropertyOptions getNonEmptyPropertyOptions() {
+        return null;
+    }
 }

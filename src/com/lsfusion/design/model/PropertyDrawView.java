@@ -386,7 +386,7 @@ public class PropertyDrawView extends ComponentView {
 
     @Override
     public double getBaseDefaultFlex(FormEntity formEntity) {
-        if ((container.isHorizontal() || entity.isGrid(formEntity)) && isHorizontalValueFlex())
+        if ((container.isHorizontal() || entity.isGrid()) && isHorizontalValueFlex())
             return getValueWidth(new JLabel());
         return super.getBaseDefaultFlex(formEntity);
     }

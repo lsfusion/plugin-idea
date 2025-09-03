@@ -235,4 +235,9 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
             }
         }
     }
+
+    @Override
+    public @Nullable LSFNonEmptyActionOptions getNonEmptyActionOptions() {
+        return null;
+    }
 }
