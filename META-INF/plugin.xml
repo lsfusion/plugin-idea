@@ -8,12 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.301</b><br>
+        <b>Version 1.0.302</b><br>
         <ul>
-            <li>ACTIVE PROPERTY support</li>
-            <li>FORM: 'EVENTS' keyword now is optional</li>
-            <li>FindImplementations fix</li>
-            <li>EXTID for action</li>
+            <li>Building the stub index fix</li>
         </ul>
     ]]>
     </change-notes>

@@ -1875,22 +1875,17 @@ public class LSFPsiImplUtil {
         return getValueClassNames(pCalcStatement.getExpressionUnfriendlyPD());
     }
 
-    @Nullable
+    @NotNull
     private static List<String> getValueClassNames(List<LSFPropertyExpression> list) {
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return Collections.EMPTY_LIST;
         }
 
-        List<String> result = null;
-        for (int i = 0; i < list.size(); i++) {
-            List<String> valueClass = getValueClassNames(list.get(i));
-            if (i == 0) {
-                result = valueClass;
-            } else {
-                result.addAll(valueClass);
-            }
+        List<String> result = new ArrayList<>();
+        for (LSFPropertyExpression lsfPropertyExpression : list) {
+            result.addAll(getValueClassNames(lsfPropertyExpression));
         }
-        return result;
+        return result.size() == 1 ? singletonList(result.get(0)) : result;
     }
 
     private static List<String> getValueClassNames(@Nullable LSFNonEmptyPropertyExpressionList list) {
@@ -1900,22 +1895,17 @@ public class LSFPsiImplUtil {
         return getValueClassNames(list.getPropertyExpressionList());
     }
 
-    @Nullable
+    @NotNull
     private static List<String> getAliasedValueClassNames(List<LSFAliasedPropertyExpression> list) {
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return Collections.EMPTY_LIST;
         }
 
-        List<String> result = null;
-        for (int i = 0; i < list.size(); i++) {
-            List<String> valueClass = getValueClassNames(list.get(i));
-            if (i == 0) {
-                result = valueClass;
-            } else {
-                result.addAll(valueClass);
-            }
+        List<String> result = new ArrayList<>();
+        for (LSFAliasedPropertyExpression lsfAliasedPropertyExpression : list) {
+            result.addAll(getValueClassNames(lsfAliasedPropertyExpression));
         }
-        return result;
+        return result.size() == 1 ? singletonList(result.get(0)) : result;
     }
 
     private static List<String> getValueClassNames(@Nullable LSFNonEmptyAliasedPropertyExpressionList list) {
