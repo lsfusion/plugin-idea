@@ -1465,7 +1465,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitPredefinedFormPropertyName(@NotNull LSFPredefinedFormPropertyName o) {
         @Nullable LSFPredefinedAddPropertyName predefinedAdd = o.getPredefinedAddPropertyName();
         @Nullable LSFExplicitPropClass explicitPropClass = o.getExplicitPropClass();
-        if (predefinedAdd != null) {
+        if (predefinedAdd != null && !isInMetaDecl(predefinedAdd)) {
             if (predefinedAdd.getPredefinedNewPropertyName() != null && (explicitPropClass == null || isAbstractClass(LSFPsiImplUtil.resolveClass(explicitPropClass.getClassName())))) {
                 @Nullable LSFFormMappedNamePropertiesList formMappedNamePropertiesList = PsiTreeUtil.getParentOfType(o, LSFFormMappedNamePropertiesList.class);
                 if (formMappedNamePropertiesList != null) {
