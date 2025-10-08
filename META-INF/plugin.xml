@@ -11,6 +11,7 @@
         <b>Version 1.0.302</b><br>
         <ul>
             <li>Building the stub index fix</li>
+            <li>Pivot: MEASURES(groupObject) for '(column)'</li>
         </ul>
     ]]>
     </change-notes>

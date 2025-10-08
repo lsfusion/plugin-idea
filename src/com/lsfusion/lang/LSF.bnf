@@ -2011,7 +2011,9 @@ formPivotOptionsDeclaration ::= PIVOT (
     methods = [getDocumentation]
 }
 
-pivotPropertyDrawList ::= formPropertyDrawUsage | (LBRAC formPropertyDrawUsage (COMMA formPropertyDrawUsage)* RBRAC)
+pivotFormPropertyDrawUsage::= formPropertyDrawUsage | (MEASURES LBRAC ID RBRAC)
+
+pivotPropertyDrawList ::= pivotFormPropertyDrawUsage | (LBRAC pivotFormPropertyDrawUsage (COMMA pivotFormPropertyDrawUsage)* RBRAC)
 
 formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
 
