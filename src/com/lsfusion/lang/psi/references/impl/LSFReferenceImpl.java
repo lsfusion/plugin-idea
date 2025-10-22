@@ -138,8 +138,10 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     private LSFResolvingError checkDeprecated(List<LSFAnnotationSetting> annotationList) {
         for (LSFAnnotationSetting annotation : annotationList) {
             if (annotation.getSimpleName().getName().equals("deprecated")) {
-                LSFStringLiteral textLiteral = annotation.getStringLiteral();
-                return new LSFResolvingError(this, getTextRange(), "Deprecated" + (textLiteral != null ? (", " + textLiteral.getValue()) : ""), false, true);
+                List<LSFStringLiteral> options = annotation.getStringLiteralList();
+                String since = !options.isEmpty() ? (" since " + options.get(0).getValue()) : "";
+                String message = options.size() > 1 ? (", " + options.get(1).getValue()) : "";
+                return new LSFResolvingError(this, getTextRange(), "Deprecated" + since + message, false, true);
             }
             return null;
         }

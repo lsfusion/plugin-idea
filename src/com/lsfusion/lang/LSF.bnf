@@ -1886,7 +1886,7 @@ formInGroup ::= IN groupUsage
 
 extIdSetting ::= EXTID stringLiteral
 
-annotationSetting ::= ATSIGN2 simpleName stringLiteral?
+annotationSetting ::= ATSIGN2 simpleName (LBRAC stringLiteral (COMMA stringLiteral)? RBRAC)?
 
 designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formExprDeclaration
