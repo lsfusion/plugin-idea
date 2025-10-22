@@ -13,6 +13,7 @@ import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.references.LSFReference;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElementImpl implements LSFReference<T>, PsiPolyVariantReference {
 
@@ -116,7 +118,32 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
 
     @Override
     public LSFResolvingError resolveErrorAnnotation(final AnnotationHolder holder) {
-        return multiResolveDecl(true).resolveErrorAnnotation(holder);
+        LSFResolveResult resolveResult = multiResolveDecl(true);
+        LSFResolvingError error = resolveResult.resolveErrorAnnotation(holder);
+        if (error == null) {
+            for (LSFDeclaration decl : resolveResult.declarations) {
+                if (decl instanceof LSFActionOrGlobalPropDeclaration) {
+                    LSFNonEmptyPropertyOptions propertyOptions = ((LSFActionOrGlobalPropDeclaration) decl).getNonEmptyPropertyOptions();
+                    if (propertyOptions != null)
+                        error = checkDeprecated(propertyOptions.getAnnotationSettingList());
+                    LSFNonEmptyActionOptions actionOptions = ((LSFActionOrGlobalPropDeclaration) decl).getNonEmptyActionOptions();
+                    if (actionOptions != null)
+                        error = checkDeprecated(actionOptions.getAnnotationSettingList());
+                }
+            }
+        }
+        return error;
+    }
+
+    private LSFResolvingError checkDeprecated(List<LSFAnnotationSetting> annotationList) {
+        for (LSFAnnotationSetting annotation : annotationList) {
+            if (annotation.getSimpleName().getName().equals("deprecated")) {
+                LSFStringLiteral textLiteral = annotation.getStringLiteral();
+                return new LSFResolvingError(this, getTextRange(), "Deprecated" + (textLiteral != null ? (", " + textLiteral.getValue()) : ""), false, true);
+            }
+            return null;
+        }
+        return null;
     }
 
     public LSFResolvingError resolveAmbiguousErrorAnnotation(Collection<? extends LSFDeclaration> declarations) {

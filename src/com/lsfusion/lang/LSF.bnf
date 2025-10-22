@@ -653,7 +653,7 @@ private semiActionOrPropertyOption ::=
                            |    syncTypeLiteral
                            |	imageSetting
                            |	extIdSetting
-                           |   ATSIGN2 simpleName
+                           |    annotationSetting
 
 private semiActionOption ::= semiActionOrPropertyOption
                            |    shortcutSetting
@@ -1885,6 +1885,8 @@ formOptionsOnEvents ::= ON formEventType formActionPropertyObject
 formInGroup ::= IN groupUsage
 
 extIdSetting ::= EXTID stringLiteral
+
+annotationSetting ::= ATSIGN2 simpleName stringLiteral?
 
 designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formExprDeclaration

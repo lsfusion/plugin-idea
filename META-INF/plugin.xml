@@ -12,6 +12,7 @@
         <ul>
             <li>Building the stub index fix</li>
             <li>Pivot: MEASURES(groupObject) for '(column)'</li>
+            <li>@@deprecated annotation support</li>
         </ul>
     ]]>
     </change-notes>

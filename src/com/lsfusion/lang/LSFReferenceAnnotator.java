@@ -863,7 +863,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private boolean checkReference(LSFReference reference) {
         LSFResolvingError errorAnnotation = reference.resolveErrorAnnotation(myHolder);
         if (errorAnnotation != null) { // !isInMetaDecl(reference)
-            addErrorWithResolving(reference, errorAnnotation); // since in meta usage there can be total different resolved references
+            if(errorAnnotation.deprecated)
+                addDeprecatedWarningAnnotation(reference, errorAnnotation.text);
+            else
+                addErrorWithResolving(reference, errorAnnotation); // since in meta usage there can be total different resolved references
             return false;
         }
         return true;
