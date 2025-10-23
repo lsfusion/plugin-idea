@@ -55,7 +55,7 @@ public class InstallExternalCallsProtocolAction extends AnAction {
                     fillExecFile(linuxExecFile.toPath(), modulesPaths, true);
 
                     String linuxExecPath = linuxExecFile.getPath();
-                    exitCode = Runtime.getRuntime().exec("chmod +x " + linuxExecPath).waitFor(); //make file executable
+                    exitCode = Runtime.getRuntime().exec(new String[] {"chmod", "+x", linuxExecPath}).waitFor(); //make file executable
 
                     if (exitCode == 0)
                         exitCode = registerLinuxProtocol(linuxExecPath);
@@ -70,7 +70,7 @@ public class InstallExternalCallsProtocolAction extends AnAction {
                     String windowsExecPath = windowsExecFile.getPath().replaceAll("\\\\", "\\\\\\\\");
                     Files.write(windowsSetupFilePath, Files.readString(windowsSetupFilePath)
                             .replace("$1$", "\"\\\"" + windowsExecPath + "\\\" \\\"%1\\\"\"").getBytes());
-                    exitCode = Runtime.getRuntime().exec("cmd /c " + windowsSetupFilePath).waitFor();
+                    exitCode = Runtime.getRuntime().exec(new String[]{"cmd", "/c", windowsSetupFilePath.toString()}).waitFor();
                 }
 
                 sendNotification(project, exitCode, exitCode == 0 ? "Successfully installed lsfusion-protocol" : "Error code " + exitCode);
@@ -89,7 +89,7 @@ public class InstallExternalCallsProtocolAction extends AnAction {
         String desctopFileContent =
                 "[Desktop Entry]\n" +
                         "Name=lsfusion-protocol\n" +
-                        "Exec=" + scriptPath + " %u\n" +
+                        "Exec=\"" + scriptPath + "\" %u\n" +
                         "Type=Application\n" +
                         "Terminal=false\n" +
                         "MimeType=x-scheme-handler/lsfusion-protocol;";

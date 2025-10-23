@@ -13,6 +13,7 @@
             <li>Building the stub index fix</li>
             <li>Pivot: MEASURES(groupObject) for '(column)'</li>
             <li>@@deprecated annotation support</li>
+            <li>Fixed installing debug protocol error when setupFilePath contains a spaces</li>
         </ul>
     ]]>
     </change-notes>
