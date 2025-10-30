@@ -399,6 +399,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitActionStatement(o);
 
         checkAlreadyDefined(o);
+        LSFNonEmptyActionOptions actionOptions = o.getNonEmptyActionOptions();
+        if(actionOptions != null) {
+            checkDeprecated(o.getPropertyDeclaration(), actionOptions.getAnnotationSettingList());
+        }
     }
     
     @Override
@@ -406,6 +410,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitPropertyStatement(o);
 
         checkAlreadyDefined(o);
+        LSFNonEmptyPropertyOptions actionOptions = o.getNonEmptyPropertyOptions();
+        if(actionOptions != null) {
+            checkDeprecated(o.getPropertyDeclaration(), actionOptions.getAnnotationSettingList());
+        }
 
         if (o.isStoredProperty()) {
             if (o.resolveDuplicateColumns()) {
@@ -923,6 +931,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
+    private void checkDeprecated(PsiElement declaration, List<LSFAnnotationSetting> annotationList) {
+        for (LSFAnnotationSetting annotation : annotationList) {
+            if (annotation.getSimpleName().getName().equals("deprecated")) {
+                addWarningAnnotation(declaration, "deprecated");
+            }
+        }
+    }
+
     private void addDuplicateColumnNameError(PsiElement element, String tableName, String columnName) {
         addUnderscoredErrorWithResolving(element, "The property has duplicate column name. Table: " + tableName + ", column: " + columnName);
     }
@@ -1273,7 +1289,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private static List<String> allowedFontStyles = Arrays.asList("bold", "italic");
+    private static final List<String> allowedFontStyles = Arrays.asList("bold", "italic");
     private void checkFontStyle(LSFComponentPropertyValue element, String fontStyle) {
         for (String style : LSFStringUtils.unquote(fontStyle).split(" ")) {
             if (!allowedFontStyles.contains(style)) {
@@ -1283,22 +1299,22 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private List<String> allowedSelects = Arrays.asList("button", "buttonGroup", "dropdown", "input", "list");
+    private static final List<String> supportedSelects = Arrays.asList("button", "buttonGroup", "dropdown", "input", "list");
     private void checkSelect(PsiElement element, String select) {
-        if (!allowedSelects.contains(LSFStringUtils.unquote(select))) {
-            addUnderscoredError(element, "select value must be one of these: " + allowedSelects);
+        if (!supportedSelects.contains(LSFStringUtils.unquote(select))) {
+            addUnderscoredError(element, format("%s is not supported select value, use on of: %s", select, supportedSelects));
         }
     }
 
-    private static List<String> allowedDefaultCompares = Arrays.asList("=", ">", "<", ">=", "<=", "!=", "=*", "=@");
-    private static List<String> allowedDefaultCompares5 = Arrays.asList("EQUALS", "GREATER", "LESS", "GREATER_EQUALS", "LESS_EQUALS", "NOT_EQUALS", "LIKE", "CONTAINS");
+    private static final List<String> supportedDefaultCompares = Arrays.asList("=", ">", "<", ">=", "<=", "!=", "=*", "=@");
+    private static final List<String> supportedDefaultCompares5 = Arrays.asList("EQUALS", "GREATER", "LESS", "GREATER_EQUALS", "LESS_EQUALS", "NOT_EQUALS", "LIKE", "CONTAINS");
     private void checkDefaultCompare(LSFComponentPropertyValue element, String defaultCompare) {
         defaultCompare = LSFStringUtils.unquote(defaultCompare);
-        if (!allowedDefaultCompares.contains(defaultCompare)) {
-            if(!allowedDefaultCompares5.contains(defaultCompare)) {
-                addUnderscoredError(element, "defaultCompare value must be one of: " + allowedDefaultCompares);
+        if (!supportedDefaultCompares.contains(defaultCompare)) {
+            if(!supportedDefaultCompares5.contains(defaultCompare)) {
+                addUnderscoredError(element, format("'%s' is not supported defaultCompare, use on of: %s", defaultCompare, supportedDefaultCompares));
             } else {
-                addDeprecatedWarningAnnotation(element, "5.2", "6.0", "defaultCompare value must be one of: " + allowedDefaultCompares);
+                addDeprecatedWarningAnnotation(element, "5.2", "6.0", "use on of: " + supportedDefaultCompares);
             }
         }
     }
@@ -1332,6 +1348,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     addUnderscoredErrorWithResolving(child, "Can't add / subtract " + classSet + " value"); // uses resolving
                 }
             }
+        }
+    }
+
+    private static final List<String> supportedAnnotations = Arrays.asList("api", "noauth", "deprecated");
+    @Override
+    public void visitAnnotationSetting(@NotNull LSFAnnotationSetting annotation) {
+        String name = annotation.getSimpleName().getName();
+        if(!supportedAnnotations.contains(name)) {
+            addErrorAnnotation(annotation, annotation.getTextRange(), format("'%s' is not supported annotation, use on of: %s", name, supportedAnnotations));
         }
     }
 
@@ -1445,13 +1470,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    public static List<String> supportedMapTileProviders = Arrays.asList("openStreetMap", "google", "yandex");
+    private static final List<String> supportedMapTileProviders = Arrays.asList("openStreetMap", "google", "yandex");
     @Override
     public void visitMapOptions(@NotNull LSFMapOptions o) {
         super.visitMapOptions(o);
         String option = o.getFirstChild().getText();
         if (!supportedMapTileProviders.contains(LSFStringUtils.unquote(option))) {
-            addUnderscoredError(o, format("'%s' is not supported map option definition, use on of: %s", option, supportedMapTileProviders));
+            addUnderscoredError(o, format("%s is not supported map option definition, use on of: %s", option, supportedMapTileProviders));
         }
     }
 

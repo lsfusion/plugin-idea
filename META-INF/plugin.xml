@@ -8,12 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.302</b><br>
+        <b>Version 1.0.303</b><br>
         <ul>
-            <li>Building the stub index fix</li>
-            <li>Pivot: MEASURES(groupObject) for '(column)'</li>
-            <li>@@deprecated annotation support</li>
-            <li>Fixed installing debug protocol error when setupFilePath contains a spaces</li>
+            <li>Annotations(@@): check supported; Deprecated: highlight declaration</li>
         </ul>
     ]]>
     </change-notes>
