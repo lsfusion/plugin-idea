@@ -1255,6 +1255,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 addDeprecatedWarningAnnotation(o, "6.0", "Use parameter 'priority' in 'changeKey' instead");
             } else if (property.equals("changeMousePriority")) {
                 addDeprecatedWarningAnnotation(o, "6.0", "Use parameter 'priority' in 'changeMouse' instead");
+            } else if (property.equals("expandOnClick")) {
+                addDeprecatedWarningAnnotation(o, "6.2", "7.0","This will be default behaviour");
             } else if (element != null && !element.getText().equals("NULL")) {
                 switch (property) {
                     case "fontStyle":
