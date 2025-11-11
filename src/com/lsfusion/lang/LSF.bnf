@@ -504,9 +504,9 @@ jsonPropertyDefinition ::= (JSON | JSONTEXT) FROM nonEmptyAliasedPropertyExpress
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getContextModifier getContextInferrer getDocumentation]
 }
 
-jsonFormPropertyDefinition ::= (JSON | JSONTEXT) LBRAC mappedForm contextFiltersClause? selectTop? RBRAC
+jsonFormPropertyDefinition ::= (JSON | JSONTEXT) LBRAC <<mappedFormCheck>> mappedForm contextFiltersClause? selectTop? RBRAC
 {
-    pin = 3
+    pin = 4
     implements="com.lsfusion.lang.psi.context.LSFExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames resolveFormDecl getDocumentation]
 }

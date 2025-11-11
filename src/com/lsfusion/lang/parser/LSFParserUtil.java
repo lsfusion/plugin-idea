@@ -75,6 +75,11 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         return true;
     }
 
+    public static boolean mappedFormCheck(PsiBuilder builder_, int level_) {
+        boolean isPropertyExpression = builder_.getTokenType() == LSFTypes.ID && builder_.lookAhead(1) == LSFTypes.LBRAC;
+        return !isPropertyExpression;
+    }
+
     private static Key<Integer> MATCHEDSINGLEPARAMETER = Key.create("lsf.matched.single.parameter");
 
     public static boolean checkParameterOrExpression(PsiBuilder builder_, int level_) {

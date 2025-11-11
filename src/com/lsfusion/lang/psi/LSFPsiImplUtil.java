@@ -1411,7 +1411,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFJsonFormPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
-        return LSFExClassSet.logical;
+        return LSFExClassSet.json;
     }
 
     @Nullable
