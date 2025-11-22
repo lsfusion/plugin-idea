@@ -66,6 +66,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("panelColumnVertical"),
             new ReflectionProperty("valueClass").setExpert(),
             new ReflectionProperty("captionClass").setExpert(),
+            new ReflectionProperty("footerClass").setExpert(),
             new ReflectionProperty("caption"),
             new ReflectionProperty("tag").setExpert(),
             new ReflectionProperty("inputType").setExpert(),
@@ -144,6 +145,7 @@ public class PropertyDrawView extends ComponentView {
 
     public String valueClass;
     public String captionClass;
+    public String footerClass;
     public String caption;
 
     public String tag;

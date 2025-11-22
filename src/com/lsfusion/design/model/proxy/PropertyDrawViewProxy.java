@@ -149,6 +149,10 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.captionClass = captionClass;
     }
 
+    public void setFooterClass(String footerClass) {
+        target.footerClass = footerClass;
+    }
+
     public void setCaption(String caption) {
         target.caption = caption;
     }

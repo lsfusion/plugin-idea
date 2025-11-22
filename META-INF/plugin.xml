@@ -11,6 +11,7 @@
         <b>Version 1.0.303</b><br>
         <ul>
             <li>Annotations(@@): check supported; Deprecated: highlight declaration</li>
+            <li>Design: footerClass support</li>
         </ul>
     ]]>
     </change-notes>
