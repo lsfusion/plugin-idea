@@ -12,6 +12,7 @@
         <ul>
             <li>Annotations(@@): check supported; Deprecated: highlight declaration</li>
             <li>Design: footerClass support</li>
+            <li>Added 2gis tile to MAP</li>
         </ul>
     ]]>
     </change-notes>

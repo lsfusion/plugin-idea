@@ -1470,7 +1470,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private static final List<String> supportedMapTileProviders = Arrays.asList("openStreetMap", "google", "yandex");
+    private static final List<String> supportedMapTileProviders = Arrays.asList("openStreetMap", "google", "yandex", "twoGis");
     @Override
     public void visitMapOptions(@NotNull LSFMapOptions o) {
         super.visitMapOptions(o);
