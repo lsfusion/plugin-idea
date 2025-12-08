@@ -18,6 +18,7 @@ import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
@@ -32,7 +33,10 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
+import com.lsfusion.design.DesignInfo;
+import com.lsfusion.design.model.ComponentView;
 import com.lsfusion.design.model.ContainerType;
+import com.lsfusion.design.model.ContainerView;
 import com.lsfusion.design.model.FontInfo;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.lang.classes.*;
@@ -1253,39 +1257,63 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 }
             }
 
-            if (property.equals("columns")) {
-                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'lines' instead");
-            } else if (property.equals("type")) {
-                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'horizontal', 'tabbed', 'lines' instead");
-            } else if (property.equals("autoSize")) {
-                addDeprecatedWarningAnnotation(o, "6.0", "Earlier versions: ignore this warning");
-            } else if (property.equals("toolTip")) {
-                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'tooltip' instead");
-            } else if (property.equals("editOnSingleClick")) {
-                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'changeOnSingleClick' instead");
-            } else if (property.equals("valueAlignment")) {
-                addDeprecatedWarningAnnotation(o, "6.0", "Use 'valueAlignmentHorz' instead");
-            } else if (property.equals("showGroup")) {
-                addDeprecatedWarningAnnotation(o, "6.0", "Use 'showViews' instead");
-            } else if (property.equals("changeKeyPriority")) {
-                addDeprecatedWarningAnnotation(o, "6.0", "7.0", "Use parameter 'priority' in 'changeKey' instead");
-            } else if (property.equals("changeMousePriority")) {
-                addDeprecatedWarningAnnotation(o, "6.0", "7.0", "Use parameter 'priority' in 'changeMouse' instead");
-            } else if (property.equals("expandOnClick")) {
-                addDeprecatedWarningAnnotation(o, "6.2", "7.0","This will be default behaviour");
-            } else if (element != null && !element.getText().equals("NULL")) {
-                switch (property) {
-                    case "fontStyle":
-                        checkFontStyle(element, element.getText());
-                        break;
-                    case "select":
-                        checkSelect(element, element.getText());
-                        break;
-                    case "defaultCompare":
-                        checkDefaultCompare(element, element.getText());
-                        break;
-                }
+            switch (property) {
+                case "columns":
+                    addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'lines' instead");
+                    break;
+                case "type":
+                    addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'horizontal', 'tabbed', 'lines' instead");
+                    break;
+                case "toolTip":
+                    addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'tooltip' instead");
+                    break;
+                case "editOnSingleClick":
+                    addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'changeOnSingleClick' instead");
+                    break;
+                case "valueAlignment":
+                    addDeprecatedWarningAnnotation(o, "6.0", "Use 'valueAlignmentHorz' instead");
+                    break;
+                case "showGroup":
+                    addDeprecatedWarningAnnotation(o, "6.0", "Use 'showViews' instead");
+                    break;
+                case "autoSize":
+                    addDeprecatedWarningAnnotation(o, "6.0", "Earlier versions: ignore this warning");
+                    break;
+                case "changeKeyPriority":
+                    addDeprecatedWarningAnnotation(o, "6.0", "7.0", "Use parameter 'priority' in 'changeKey' instead");
+                    break;
+                case "changeMousePriority":
+                    addDeprecatedWarningAnnotation(o, "6.0", "7.0", "Use parameter 'priority' in 'changeMouse' instead");
+                    break;
+                case "expandOnClick":
+                    addDeprecatedWarningAnnotation(o, "6.2", "7.0", "This will be default behaviour");
+                    break;
+                case "panelCaptionVertical":
+                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionVertical' instead");
+                    break;
+                case "panelCaptionLast":
+                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionLast' instead");
+                    break;
+                case "panelCaptionAlignment":
+                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionAlignmentHorz' instead");
+                    break;
+                default:
+                    if (element != null && !element.getText().equals("NULL")) {
+                        switch (property) {
+                            case "fontStyle":
+                                checkFontStyle(element, element.getText());
+                                break;
+                            case "select":
+                                checkSelect(element, element.getText());
+                                break;
+                            case "defaultCompare":
+                                checkDefaultCompare(element, element.getText());
+                                break;
+                        }
+                    }
             }
+
+
         }
     }
 

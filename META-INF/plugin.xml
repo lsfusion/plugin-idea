@@ -13,6 +13,7 @@
             <li>Annotations(@@): check supported; Deprecated: highlight declaration</li>
             <li>Design: footerClass support</li>
             <li>Added 2gis tile to MAP</li>
+            <li>Design: panelCaptionVertical -> captionVertical; panelCaptionLast -> captionLast; panelCaptionAlignment -> captionAlignmentHorz / captionAlignmentVert</li>
         </ul>
     ]]>
     </change-notes>

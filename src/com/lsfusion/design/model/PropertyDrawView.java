@@ -36,9 +36,13 @@ public class PropertyDrawView extends ComponentView {
             ComponentView.PROPERTIES,
             new ReflectionProperty("autoSize"),
             new ReflectionProperty("boxed"),
-            new ReflectionProperty("panelCaptionVertical"),
-            new ReflectionProperty("panelCaptionLast"),
-            new ReflectionProperty("panelCaptionAlignment"),
+            new ReflectionProperty("panelCaptionVertical"), //deprecated
+            new ReflectionProperty("captionVertical").setExpert(),
+            new ReflectionProperty("panelCaptionLast"), //deprecated
+            new ReflectionProperty("captionLast").setExpert(),
+            new ReflectionProperty("panelCaptionAlignment"), //deprecated
+            new ReflectionProperty("captionAlignmentHorz").setExpert(),
+            new ReflectionProperty("captionAlignmentVert").setExpert(),
             new ReflectionProperty("editOnSingleClick").setExpert(), //backward compatibility
             new ReflectionProperty("changeOnSingleClick").setExpert(),
             new ReflectionProperty("hide").setExpert(),
@@ -109,8 +113,12 @@ public class PropertyDrawView extends ComponentView {
     public boolean boxed;
 
     public boolean panelCaptionVertical;
+    public boolean captionVertical;
     public Boolean panelCaptionLast;
+    public Boolean captionLast;
     public FlexAlignment panelCaptionAlignment;
+    public FlexAlignment captionAlignmentHorz;
+    public FlexAlignment captionAlignmentVert;
 
     public boolean changeOnSingleClick;
     public boolean hide;
