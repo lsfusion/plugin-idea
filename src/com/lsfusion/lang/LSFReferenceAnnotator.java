@@ -715,7 +715,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitLocalizedStringValueLiteral(o);
         if (!o.isRawLiteral()) {
             checkEscapeSequences(o, "nrt'\\{}$");
-            checkBracesConsistency(o);
+            checkLocalizedStringFormat(o);
             
             if (!o.needToBeLocalized()) {
                 addLocalizationWarnings(o, o);
@@ -845,25 +845,71 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private void checkBracesConsistency(PsiElement element) {
-        String str = element.getText();
-        Stack<Integer> opened = new Stack<>();
-        for (int i = 0; i < str.length(); ++i) {
-            char ch = str.charAt(i);
+    //based on server checkLocalizedStringFormat (added interpolation)
+    //The specifics of escaping and interpolation are not fully taken into account
+    private void checkLocalizedStringFormat(PsiElement element) {
+        char OPEN_CH = '{';
+        char CLOSE_CH = '}';
+
+        String error = null;
+        String s = element.getText();
+        boolean insideKey = false;
+        boolean keyIsEmpty = true;
+        boolean interpolation = false;
+        int i;
+        for (i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
             if (ch == '\\') {
-                ++i;
-            } else if (ch == '{') {
-                opened.push(i);
-            } else if (ch == '}') {
-                if (opened.empty()) {
-                    addUnderscoredError(element, createRange(element, i, 1), "'{' is missing");
-                } else {
-                    opened.pop();
+                if (i + 1 == s.length()) {
+                    error = "wrong escape sequence at the end of the string";
+                    break;
                 }
+                //this check is now in checkEscapeSequences
+                /*char nextCh = s.charAt(i + 1);
+                if (nextCh != '\\' && nextCh != OPEN_CH && nextCh != CLOSE_CH) {
+                    error = String.format("wrong escape sequence: '%s'", nextCh);
+                    break;
+                }*/
+                if (insideKey) {
+                    keyIsEmpty = false;
+                }
+                ++i;
+            } else if (ch == CLOSE_CH) {
+                if(!interpolation) {
+                    if (!insideKey) {
+                        error = String.format("invalid character '%c', should be escaped with '\\'", CLOSE_CH);
+                        break;
+                    } else if (keyIsEmpty) {
+                        error = "empty key is forbidden";
+                        break;
+                    } else {
+                        insideKey = false;
+                    }
+                }
+            } else if (ch == OPEN_CH) {
+                interpolation = s.charAt(i - 1) == '$';
+                if(!interpolation) {
+                    if (insideKey) {
+                        error = String.format("invalid character '%c', should be escaped with '\\'", OPEN_CH);
+                        break;
+                    } else {
+                        insideKey = true;
+                        keyIsEmpty = true;
+                    }
+                }
+            } else if (insideKey && !interpolation && Character.isWhitespace(ch)) {
+                error = "any whitespace is forbidden inside key";
+                break;
+            } else if (insideKey) {
+                keyIsEmpty = false;
             }
         }
-        if (!opened.empty()) {
-            addUnderscoredError(element, createRange(element, opened.peek(), 1), "'}' is missing");
+        if (error == null && insideKey) {
+            error = String.format("key was not closed with '%c'", CLOSE_CH);
+        }
+
+        if (error != null) {
+            addErrorAnnotation(element, new TextRange(element.getTextOffset() + i, element.getTextOffset() + i + 1), error, WAVE_UNDERSCORED_ERROR);
         }
     }
 
