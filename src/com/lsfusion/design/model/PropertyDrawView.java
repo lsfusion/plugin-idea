@@ -98,7 +98,8 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("askConfirmMessage").setExpert(),
             new ReflectionProperty("toolbar"),
             new ReflectionProperty("notNull"),
-            new ReflectionProperty("select").setExpert()
+            new ReflectionProperty("select").setExpert(),
+            new ReflectionProperty("defaultValue").setExpert()
     );
 
     @Override
@@ -190,6 +191,8 @@ public class PropertyDrawView extends ComponentView {
     public boolean notNull;
 
     public String select;
+
+    public String defaultValue;
 
     public boolean showCaption = true;
 

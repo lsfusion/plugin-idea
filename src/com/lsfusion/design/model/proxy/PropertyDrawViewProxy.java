@@ -280,4 +280,8 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
     public void setSelect(String select) {
         target.select = select;
     }
+
+    public void setDefaultValue(String defaultValue) {
+        target.defaultValue = defaultValue;
+    }
 }

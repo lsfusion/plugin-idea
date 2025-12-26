@@ -15,6 +15,7 @@
             <li>Added 2gis tile to MAP</li>
             <li>Design: panelCaptionVertical -> captionVertical; panelCaptionLast -> captionLast; panelCaptionAlignment -> captionAlignmentHorz / captionAlignmentVert</li>
             <li>Added LocalizedString checks</li>
+            <li>PropertyDrawViewProxy: defaultValue (works only in interpreter)</li>
         </ul>
     ]]>
     </change-notes>
