@@ -784,6 +784,7 @@ private leafExtendContextActionPDB ::=          assignActionPropertyDefinitionBo
                                         |	    changeClassActionPropertyDefinitionBody
                                         |	    deleteActionPropertyDefinitionBody
                                         |	    newWhereActionPropertyDefinitionBody // should be before new
+                                        |       returnActionPropertyDefinitionBody
                                         |       recalculateActionPropertyDefinitionBody
 
 private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody // should be after assign	
@@ -1079,6 +1080,13 @@ private newWhereClause ::= WHERE propertyExpression newWhereToClause? { pin = 1 
 newWhereActionPropertyDefinitionBody ::= NEW customClassUsage newWhereClause
 {
     pin = 3
+    implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [ getContextModifier getContextInferrer inferActionParamClasses getDocumentation ]
+}
+
+returnActionPropertyDefinitionBody ::= RETURN propertyExpression
+{
+    pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses getDocumentation ]
 }

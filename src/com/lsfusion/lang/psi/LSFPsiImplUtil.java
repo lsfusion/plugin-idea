@@ -587,7 +587,15 @@ public class LSFPsiImplUtil {
         return new ExprsContextModifier(sourceStatement.getPropertyExpression());
     }
 
+    public static ContextModifier getContextModifier(@NotNull LSFReturnActionPropertyDefinitionBody sourceStatement) {
+        return new ExprsContextModifier(sourceStatement.getPropertyExpression());
+    }
+
     public static ContextInferrer getContextInferrer(@NotNull LSFNewWhereActionPropertyDefinitionBody sourceStatement) {
+        return ContextInferrer.EMPTY;
+    }
+
+    public static ContextInferrer getContextInferrer(@NotNull LSFReturnActionPropertyDefinitionBody sourceStatement) {
         return ContextInferrer.EMPTY;
     }
 
@@ -3955,6 +3963,10 @@ public class LSFPsiImplUtil {
         return result;
     }
 
+    public static Inferred inferActionParamClasses(LSFReturnActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return inferParamClasses(body.getPropertyExpression(), null).filter(params);
+    }
+
     public static Inferred inferActionParamClasses(LSFListActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         // берем условия for, если есть, для остальных из внутреннего action'а
         Inferred result = Inferred.EMPTY;
@@ -4909,6 +4921,10 @@ public class LSFPsiImplUtil {
 
     public static String getDocumentation(LSFNewWhereActionPropertyDefinitionBody lsfNewWhereActionPropertyDefinitionBody, PsiElement child) {
         return "NEW_operator";
+    }
+
+    public static String getDocumentation(LSFReturnActionPropertyDefinitionBody lsfReturnActionPropertyDefinitionBody, PsiElement child) {
+        return "RETURN_operator";
     }
 
     public static String getDocumentation(LSFEmailActionPropertyDefinitionBody lsfEmailActionPropertyDefinitionBody, PsiElement child) {

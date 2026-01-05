@@ -16,6 +16,7 @@
             <li>Design: panelCaptionVertical -> captionVertical; panelCaptionLast -> captionLast; panelCaptionAlignment -> captionAlignmentHorz / captionAlignmentVert</li>
             <li>Added LocalizedString checks</li>
             <li>PropertyDrawViewProxy: defaultValue (works only in interpreter)</li>
+            <li>RETURN support</li>
         </ul>
     ]]>
     </change-notes>
