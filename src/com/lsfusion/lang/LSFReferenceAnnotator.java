@@ -716,8 +716,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if (!o.isRawLiteral()) {
             checkEscapeSequences(o, "nrt'\\{}$");
             checkLocalizedStringFormat(o);
-            
-            if (!o.needToBeLocalized()) {
+
+            if (!o.needToBeLocalized() && !o.getValue().isEmpty()) {
                 addLocalizationWarnings(o, o);
             }
         }
