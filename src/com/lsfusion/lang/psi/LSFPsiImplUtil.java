@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi;
 import com.intellij.lang.ASTFactory;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafElement;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -35,6 +36,209 @@ import static java.util.Collections.singletonList;
 
 @SuppressWarnings("UnusedParameters")
 public class LSFPsiImplUtil {
+
+    public static final String DEFAULT_CUT_PLACEHOLDER = "/*…*/";
+
+    /**
+     * If the original cut fragment is not significantly longer than the placeholder, keep original text.
+     * For example, with value {@code 1.5} we keep the original if {@code originalLen <= placeholderLen * 1.5}.
+     */
+    private static final double CUT_KEEP_ORIGINAL_MAX_RATIO = 1.5;
+
+    /**
+     * Configuration of rules for producing a "short" text.
+     *
+     * <p>Only {@code cutRules} are supported: elements matched by these rules are replaced with a placeholder.
+     * A rule may optionally keep a prefix of the element text and cut the rest.
+     */
+    public static final class TextCutRules {
+        public static final class CutRule {
+            public final @NotNull Class<? extends PsiElement> ruleClass;
+            public final int keepPrefixLength;
+
+            public CutRule(@NotNull Class<? extends PsiElement> ruleClass, int keepPrefixLength) {
+                this.ruleClass = ruleClass;
+                this.keepPrefixLength = keepPrefixLength;
+            }
+        }
+
+        public final @NotNull CutRule[] cutRules;
+
+        public TextCutRules(@Nullable CutRule[] cutRules) {
+            this.cutRules = cutRules != null ? cutRules : new CutRule[0];
+        }
+
+        public static @NotNull TextCutRules of(@Nullable CutRule[] cutRules) {
+            return new TextCutRules(cutRules);
+        }
+    }
+
+    public static @NotNull String getTextWithCutRules(@NotNull PsiElement element,
+                                                      @NotNull TextCutRules rules) {
+        TextRange elementRange = element.getTextRange();
+        if (elementRange == null) {
+            return element.getText();
+        }
+
+        String text = element.getText();
+        if (text.isEmpty()) {
+            return text;
+        }
+
+        List<TextRange> cutMerged = mergeRanges(text, collectRelativeRanges(element, elementRange, rules.cutRules));
+
+        if (cutMerged.isEmpty()) {
+            return text;
+        }
+
+        return applyCuts(text, DEFAULT_CUT_PLACEHOLDER, cutMerged);
+    }
+
+    private static @NotNull List<TextRange> collectRelativeRanges(@NotNull PsiElement element,
+                                                                  @NotNull TextRange elementRange,
+                                                                  @Nullable TextCutRules.CutRule[] cutRules) {
+        if (cutRules == null || cutRules.length == 0) {
+            return Collections.emptyList();
+        }
+
+        int baseStart = elementRange.getStartOffset();
+        int baseEnd = elementRange.getEndOffset();
+        List<TextRange> ranges = new ArrayList<>();
+
+        for (TextCutRules.CutRule rule : cutRules) {
+            if (rule == null || rule.ruleClass == null) {
+                continue;
+            }
+            Collection<? extends PsiElement> els = PsiTreeUtil.findChildrenOfAnyType(element, false, rule.ruleClass);
+            if (els.isEmpty()) {
+                continue;
+            }
+            int keepPrefix = Math.max(0, rule.keepPrefixLength);
+            for (PsiElement el : els) {
+                TextRange r = el.getTextRange();
+                if (r == null) {
+                    continue;
+                }
+                int startAbs = Math.max(r.getStartOffset(), baseStart);
+                int endAbs = Math.min(r.getEndOffset(), baseEnd);
+                if (startAbs >= endAbs) {
+                    continue;
+                }
+
+                int cutStartAbs = startAbs + keepPrefix;
+                if (cutStartAbs < startAbs) {
+                    cutStartAbs = startAbs;
+                }
+                if (cutStartAbs >= endAbs) {
+                    continue;
+                }
+                ranges.add(new TextRange(cutStartAbs - baseStart, endAbs - baseStart));
+            }
+        }
+
+        return ranges;
+    }
+
+    private static @NotNull List<TextRange> mergeRanges(@NotNull String text, @NotNull List<TextRange> ranges) {
+        if (ranges.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        ranges.sort(Comparator.comparingInt(TextRange::getStartOffset));
+        List<TextRange> merged = new ArrayList<>(ranges.size());
+        for (TextRange r : ranges) {
+            if (merged.isEmpty()) {
+                merged.add(r);
+                continue;
+            }
+
+            TextRange last = merged.get(merged.size() - 1);
+            int lastEnd = last.getEndOffset();
+            int nextStart = r.getStartOffset();
+            if (nextStart <= lastEnd || isAllWhitespace(text, lastEnd, nextStart)) {
+                merged.set(merged.size() - 1, new TextRange(last.getStartOffset(), Math.max(lastEnd, r.getEndOffset())));
+            } else {
+                merged.add(r);
+            }
+        }
+        return merged;
+    }
+
+    private static @NotNull String applyCuts(@NotNull String text,
+                                             @NotNull String cutPlaceholder,
+                                             @NotNull List<TextRange> cutMerged) {
+        StringBuilder out = new StringBuilder(text.length());
+        int pos = 0;
+        int placeholderLen = cutPlaceholder.length();
+        for (TextRange r : cutMerged) {
+            int start = Math.max(0, r.getStartOffset());
+            int end = Math.min(text.length(), r.getEndOffset());
+            if (start >= end) {
+                continue;
+            }
+            if (pos < start) {
+                out.append(text, pos, start);
+            }
+
+            int originalLen = end - start;
+            boolean shouldKeepOriginal = placeholderLen > 0 && originalLen <= (int) Math.ceil(placeholderLen * CUT_KEEP_ORIGINAL_MAX_RATIO);
+            if (shouldKeepOriginal) {
+                out.append(text, start, end);
+            } else {
+                boolean hadNewline = false;
+                for (int i = start; i < end; i++) {
+                    if (text.charAt(i) == '\n') {
+                        hadNewline = true;
+                        break;
+                    }
+                }
+
+                boolean needLeadingSpace = out.length() > 0 && !Character.isWhitespace(out.charAt(out.length() - 1))
+                        && !cutPlaceholder.isEmpty() && !Character.isWhitespace(cutPlaceholder.charAt(0));
+                if (needLeadingSpace) {
+                    out.append(' ');
+                }
+
+                out.append(cutPlaceholder);
+
+                boolean nextIsWhitespace = end >= text.length() || Character.isWhitespace(text.charAt(end));
+                boolean placeholderEndsWithWhitespace = !cutPlaceholder.isEmpty() && Character.isWhitespace(cutPlaceholder.charAt(cutPlaceholder.length() - 1));
+
+                if (hadNewline) {
+                    boolean alreadyHasNewline = (!cutPlaceholder.isEmpty() && cutPlaceholder.indexOf('\n') >= 0)
+                            || (end < text.length() && text.charAt(end) == '\n');
+                    if (!alreadyHasNewline) {
+                        out.append('\n');
+                        nextIsWhitespace = true;
+                    }
+                }
+
+                boolean needTrailingSpace = !nextIsWhitespace && !placeholderEndsWithWhitespace;
+                if (needTrailingSpace) {
+                    out.append(' ');
+                }
+            }
+            pos = end;
+        }
+        if (pos < text.length()) {
+            out.append(text, pos, text.length());
+        }
+        return out.toString();
+    }
+
+    private static boolean isAllWhitespace(@NotNull String s, int from, int to) {
+        if (from >= to) {
+            return true;
+        }
+        int start = Math.max(0, from);
+        int end = Math.min(s.length(), to);
+        for (int i = start; i < end; i++) {
+            if (!Character.isWhitespace(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static ContextModifier getContextAPModifier(@Nullable LSFPropertyCalcStatement calcStatement) {
         if(calcStatement != null) {
@@ -126,18 +330,18 @@ public class LSFPsiImplUtil {
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFConstraintStatement sourceStatement) {
-        LSFPropertyExpression decl = sourceStatement.getPropertyExpression();
+        @Nullable LSFConstraintPropertyExpression decl = sourceStatement.getConstraintPropertyExpression();
         if (decl != null) {
-            return new ExprsContextModifier(decl);
+            return new ExprsContextModifier(decl.getPropertyExpression());
         } else {
             return ContextModifier.EMPTY;
         }
     }
 
     public static ContextInferrer getContextInferrer(@NotNull LSFConstraintStatement sourceStatement) {
-        LSFPropertyExpression decl = sourceStatement.getPropertyExpression();
+        @Nullable LSFConstraintPropertyExpression decl = sourceStatement.getConstraintPropertyExpression();
         if (decl != null) {
-            return new ExprsContextInferrer(decl);
+            return new ExprsContextInferrer(decl.getPropertyExpression());
         } else {
             return ContextInferrer.EMPTY;
         }
@@ -701,6 +905,9 @@ public class LSFPsiImplUtil {
     }
 
     public static DataClass resolveDataClass(String name) {
+        return resolveDataClass(name, false);
+    }
+    public static DataClass resolveDataClass(String name, boolean nullIfNotExists) {
         if (name.equals("DOUBLE"))
             return DoubleClass.instance;
         if (name.equals("INTEGER"))
@@ -845,7 +1052,7 @@ public class LSFPsiImplUtil {
                 return TSQueryClass.instance;
         }
 
-        return new SimpleDataClass(name);
+        return nullIfNotExists ? null : new SimpleDataClass(name);
     }
 
     @Nullable

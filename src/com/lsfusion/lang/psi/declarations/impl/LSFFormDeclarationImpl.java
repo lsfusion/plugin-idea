@@ -9,9 +9,11 @@ import com.lsfusion.lang.psi.LSFLocalizedStringLiteral;
 import com.lsfusion.lang.psi.LSFSimpleNameWithCaption;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
+import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.FormStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,8 +56,13 @@ public abstract class LSFFormDeclarationImpl extends LSFFullNameDeclarationImpl<
     }
 
     @Override
+    public ExtendStubElementType<?, ?> getExtendElementType() {
+        return LSFStubElementTypes.EXTENDFORM;
+    }
+
+    @Override
     public PsiElement[] processImplementationsSearch() {
-        List<PsiElement> names = LSFFormExtendImpl.processFormImplementationsSearch(this);
+        List<LSFFullNameReference> names = LSFFormExtendImpl.processFormImplementationsSearch(this);
         return names.toArray(new PsiElement[0]);
     }
 }

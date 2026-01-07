@@ -168,7 +168,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
                     ASTNode metaNode = getNode();
                     List<ASTNode> inlineNodes = new ArrayList<>();
                     
-                    // вырезаем первую { и перевод строки
+                    // cut the first '{' and the following newline
                     ASTNode from = parsed.getNode().getFirstChildNode();
                     while(from.getElementType() != LSFTypes.META_CODE_BODY_LEFT_BRACE)
                         from = from.getTreeNext();
@@ -186,7 +186,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
                         }                            
                     }
 
-                    // вырезаем последнюю } и перевод строки
+                    // cut the last '}' and the preceding newline
                     ASTNode lastNode = null;
                     ASTNode to = parsed.getNode().getLastChildNode();
                     if (from != to) { //empty meta code check

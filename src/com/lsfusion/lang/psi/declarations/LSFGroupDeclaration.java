@@ -2,10 +2,11 @@ package com.lsfusion.lang.psi.declarations;
 
 import com.lsfusion.documentation.LSFDocumentation;
 import com.lsfusion.lang.psi.LSFGroupUsage;
+import com.lsfusion.mcp.LSFMCPDeclaration;
 import com.lsfusion.lang.psi.stubs.GroupStubElement;
 import org.jetbrains.annotations.Nullable;
 
-public interface LSFGroupDeclaration extends LSFFullNameDeclaration<LSFGroupDeclaration, GroupStubElement>, LSFDocumentation {
+public interface LSFGroupDeclaration extends LSFFullNameDeclaration<LSFGroupDeclaration, GroupStubElement>, LSFDocumentation, LSFMCPDeclaration {
     String getGroupName();
 
     String getCaption();

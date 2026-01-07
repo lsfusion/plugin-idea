@@ -1,7 +1,6 @@
 package com.lsfusion.lang.psi.extend.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.LSFElementGenerator;
@@ -13,7 +12,6 @@ import com.lsfusion.lang.psi.declarations.LSFStaticObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.extend.ExtendClassStubElement;
-import com.lsfusion.lang.psi.stubs.extend.types.ExtendClassStubElementType;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -182,27 +180,19 @@ public abstract class LSFClassExtendImpl extends LSFExtendImpl<LSFClassExtend, E
         return result;
     }
 
-    private static ExtendClassStubElementType getContextExtendType() {
-        return LSFStubElementTypes.EXTENDCLASS;
-    }
-
-    public static List<PsiElement> processClassImplementationsSearch(LSFClassDeclaration decl) {
-        return processImplementationsSearch(decl, getContextExtendType());
+    public static List<LSFFullNameReference> processClassImplementationsSearch(LSFClassDeclaration decl) {
+        return processImplementationsSearch(decl);
     }
 
     public static <T extends LSFDeclaration> Set<T> processClassContext(LSFClassDeclaration decl, LSFFile file, int offset, LSFLocalSearchScope localScope, final Function<LSFClassExtend, Collection<T>> processor) {
         // we don't want to respect offset, since static objects are parsed in separate step
-        return processContext(decl, file, getContextExtendType(), processor, null, localScope, false);
+        return processContext(decl, file, null, processor, null, localScope, false);
     }
 
     protected List<Function<LSFClassExtend, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {
         List<Function<LSFClassExtend, Collection<? extends LSFDeclaration>>> processors = new ArrayList<>();
         processors.add(LSFClassExtend::getStaticObjects);
         return processors;
-    }
-
-    protected ExtendStubElementType<LSFClassExtend, ExtendClassStubElement> getDuplicateExtendType() {
-        return getContextExtendType();
     }
 
     public Set<LSFDeclaration> resolveDuplicates() {

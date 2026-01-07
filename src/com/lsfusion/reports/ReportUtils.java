@@ -17,6 +17,7 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.LSFFileUtils;
 
@@ -88,7 +89,7 @@ public class ReportUtils {
         if(!processor.process("xls_" + reportName))
             return true;
 
-        for (LSFFormExtend extend : LSFGlobalResolver.findExtendElements(decl, LSFStubElementTypes.EXTENDFORM, (LSFFile) decl.getContainingFile(), scope)) {
+        for (LSFFormExtend extend : LSFGlobalResolver.<ExtendFormStubElement, LSFFormExtend>findExtendElements(decl, (LSFFile) decl.getContainingFile(), scope)) {
             for (LSFGroupObjectDeclaration groupObjectDecl : extend.getGroupObjectDecls()) {
                 String groupName = groupObjectDecl.getDeclName();
                 if (groupName != null) {

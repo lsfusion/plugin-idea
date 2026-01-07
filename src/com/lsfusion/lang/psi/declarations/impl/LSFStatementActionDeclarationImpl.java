@@ -13,6 +13,7 @@ import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFActionReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.StatementActionStubElement;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.typeinfer.InferExResult;
@@ -44,6 +45,11 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
         if (unfriend != null)
             return LSFPsiImplUtil.getValueParamClassNames(unfriend);
         return null;
+    }
+
+    @Override
+    public ExtendStubElementType<?, ?> getExtendElementType() {
+        return LSFStubElementTypes.EXTENDACTION;
     }
 
     @Nullable

@@ -17,6 +17,7 @@ import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.tree.IFileElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.SmartList;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFLanguage;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Collection;
 import java.util.List;
 
 public class LSFFile extends PsiFileImpl implements ModifyParamContext {
@@ -128,6 +130,13 @@ public class LSFFile extends PsiFileImpl implements ModifyParamContext {
             }
         }
         return result;
+    }
+
+    public Collection<LSFScriptStatement> getScriptStatements() {
+        return PsiTreeUtil.findChildrenOfType(this, LSFScriptStatement.class);
+    }
+    public Collection<LSFLazyScriptStatement> getLazyScriptStatements() {
+        return PsiTreeUtil.findChildrenOfType(this, LSFLazyScriptStatement.class);
     }
 
     public List<LSFMetaCodeStatement> getMetaCodeStatementList() {

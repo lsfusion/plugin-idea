@@ -59,7 +59,7 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
     protected abstract LSFFullNameDeclaration getOwnDeclaration();
 
     @Nullable
-    protected LSFFullNameDeclaration resolveExtendingDeclaration() {
+    public LSFFullNameDeclaration resolveExtendingDeclaration() {
         LSFFullNameReference<LSFFullNameDeclaration, ?> extendingReference = getExtendingReference();
         if(extendingReference != null)
             return extendingReference.resolveDecl();
@@ -102,15 +102,17 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
 
     // used for resolving + completion + duplicates
     private static <Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> Query<Extend> findElements(LSFFullNameDeclaration decl, LSFFile file, ExtendStubElementType<Extend, Stub> type, LSFLocalSearchScope localScope) {
-        return LSFGlobalResolver.findExtendElements(decl, type, file, localScope);
+        // 'type' retained for signature compatibility, actual type is derived from decl
+        return LSFGlobalResolver.findExtendElements(decl, file, type, localScope);
     }
 
     // used for implementations
-    protected static <Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> List<PsiElement> processImplementationsSearch(LSFFullNameDeclaration decl, ExtendStubElementType<Extend, Stub> type) {
-        List<PsiElement> names = new ArrayList<>();
+    protected static <Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> List<LSFFullNameReference> processImplementationsSearch(LSFFullNameDeclaration decl) {
+        List<LSFFullNameReference> names = new ArrayList<>();
 
         Project project = decl.getProject();
-        for (Extend extend : LSFGlobalResolver.findExtendElements(decl, type, project, GlobalSearchScope.allScope(project), LSFLocalSearchScope.createFrom(decl))) {
+        // 'type' retained for signature compatibility, actual type is derived from decl
+        for (Extend extend : LSFGlobalResolver.<Stub, Extend>findExtendElements(decl, project, GlobalSearchScope.allScope(project), LSFLocalSearchScope.createFrom(decl))) {
             LSFFullNameReference extendingReference = extend.getExtendingReference();
             if (extendingReference != null)
                 names.add(extendingReference);
@@ -129,7 +131,9 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
         return finalResult;
     }
 
-    protected abstract ExtendStubElementType<This, Stub> getDuplicateExtendType();
+    protected ExtendStubElementType<This, Stub> getDuplicateExtendType() {
+        return null;
+    }
 
     protected abstract List<Function<This, Collection<? extends LSFDeclaration>>> getDuplicateProcessors();
 

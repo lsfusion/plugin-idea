@@ -2,6 +2,7 @@ package com.lsfusion.util;
 
 import com.intellij.lang.properties.IProperty;
 import com.intellij.lang.properties.psi.PropertiesFile;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
@@ -9,6 +10,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEnumerator;
 import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.vcs.FileStatus;
+import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -16,8 +20,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiUtilBase;
+import com.lsfusion.lang.LSFFileType;
+import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFSourceFilterScope;
 import com.lsfusion.lang.psi.Result;
@@ -285,5 +293,25 @@ public class LSFFileUtils {
         } else
             return allModulesScope;
         return modulesScope;
+    }
+
+
+    public static List<LSFFile> getLsfFiles(List<String> modulesToInclude, Project myProject) {
+        GlobalSearchScope searchScope = getScope(modulesToInclude, myProject);
+        return ApplicationManager.getApplication().runReadAction((Computable<List<LSFFile>>) () -> getLsfFiles(searchScope));
+    }
+
+    public static List<LSFFile> getLsfFiles(GlobalSearchScope searchScope) {
+        Project myProject = searchScope.getProject();
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope);
+        List<LSFFile> lsfFiles = new ArrayList<>();
+        for(VirtualFile virtualFile : virtualFiles) {
+            if(FileStatusManager.getInstance(myProject).getStatus(virtualFile) != FileStatus.IGNORED) {
+                PsiFile psiFile = PsiUtilBase.getPsiFile(myProject, virtualFile);
+                if(psiFile instanceof LSFFile)
+                    lsfFiles.add((LSFFile) psiFile);
+            }
+        }
+        return lsfFiles;
     }
 }

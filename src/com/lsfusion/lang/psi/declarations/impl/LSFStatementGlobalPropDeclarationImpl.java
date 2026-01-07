@@ -11,6 +11,7 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.StatementPropStubElement;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.typeinfer.InferExResult;
@@ -219,6 +220,10 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
                 return LSFPsiImplUtil.resolveParams(pe);
         }
         return null;
+    }
+
+    public ExtendStubElementType<?, ?> getExtendElementType() {
+        return LSFStubElementTypes.EXTENDPROPERTY;
     }
 
     @Override

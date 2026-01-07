@@ -9,6 +9,7 @@ import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFLocalSearchScope;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
+import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.LSFFileUtils;
 
@@ -22,7 +23,7 @@ public class FormDeclByReportNameResolver {
 
         if (formDeclaration != null) {
             final Set<String> requiredModules = new HashSet<>();
-            for(LSFFormExtend extend : LSFGlobalResolver.findExtendElements(formDeclaration, LSFStubElementTypes.EXTENDFORM, formDeclaration.getProject(), LSFFileUtils.getModuleWithDependenciesScope(source), LSFLocalSearchScope.GLOBAL))
+            for(LSFFormExtend extend : LSFGlobalResolver.<ExtendFormStubElement, LSFFormExtend>findExtendElements(formDeclaration, formDeclaration.getProject(), LSFFileUtils.getModuleWithDependenciesScope(source), LSFLocalSearchScope.GLOBAL))
                 requiredModules.add(extend.getLSFFile().getModuleDeclaration().getGlobalName());
 
             String requires = "";

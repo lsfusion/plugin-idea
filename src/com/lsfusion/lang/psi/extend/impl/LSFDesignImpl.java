@@ -13,7 +13,6 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.extend.DesignStubElement;
-import com.lsfusion.lang.psi.stubs.extend.types.DesignStubElementType;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -101,14 +100,10 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
         return result;
     }
 
-    private static DesignStubElementType getContextExtendType() {
-        return LSFStubElementTypes.DESIGN;
-    }
-
     public static <T extends LSFDesignElementDeclaration<T>> Set<T> processDesignContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<LSFDesign, Collection<T>> processor) {
         return processContext(current, offset, localScope, processor,
                 element -> element instanceof FormContext ? (FormContext)element : null,
-                FormContext::resolveFormDecl, getContextExtendType());
+                FormContext::resolveFormDecl, LSFStubElementTypes.DESIGN);
     }
 
     protected List<Function<LSFDesign, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {
@@ -119,7 +114,7 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
 
     @Override
     protected ExtendStubElementType<LSFDesign, DesignStubElement> getDuplicateExtendType() {
-        return getContextExtendType();
+        return LSFStubElementTypes.DESIGN;
     }
 
     public Set<LSFDeclaration> resolveDuplicates() {

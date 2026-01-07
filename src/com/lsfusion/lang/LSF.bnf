@@ -1,3 +1,4 @@
+
 {
   psiImplUtilClass="com.lsfusion.lang.psi.LSFPsiImplUtil"
 
@@ -1640,25 +1641,28 @@ terminalFlowActionPropertyDefinitionBody ::= breakActionOperator | continueActio
 /////////////////////////////////// FORM STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+formOptions ::=  formHintsList
+                |	listFormDeclaration
+                |	editFormDeclaration
+                |   reportFilesDeclaration
+                |   reportSetting
+                |   formExtIDSetting
+
+
 formStatement ::=	(	formDecl
             		|	extendingFormDeclaration
 		            )
                     (	formGroupObjectsList
                     |	formTreeGroupObjectList
-                    |	formFiltersList
                     |	formPropertiesList
-                    |	formHintsList
-                    |	formEventsList
+                    |	formFiltersList
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
                     |   userFiltersDeclaration
                     |	formOrderByList
                     |	formPivotOptionsDeclaration
-                    |	listFormDeclaration
-                    |	editFormDeclaration
-                    |   reportFilesDeclaration
-                    |   reportSetting
-                    |   formExtIDSetting
+                    |	formEventsList
+                    |   formOptions
                     )*
                     emptyStatement
 {
@@ -1701,11 +1705,12 @@ formExtIDSetting ::= FORMEXTID stringLiteral
 
 groupObjectReportPath ::= (TOP | groupObjectUsage) formCalcPropertyObject
 
-formDecl ::= FORM simpleNameWithCaption
-		            (   imageSetting
-		            |   autorefreshLiteral
-		            |   LOCALASYNC
-		            )*
+formDeclOptions ::= (   imageSetting
+                        |   autorefreshLiteral
+                        |   LOCALASYNC
+                    )*
+
+formDecl ::= FORM simpleNameWithCaption formDeclOptions
 {
     pin = 2
     mixin ="com.lsfusion.lang.psi.declarations.impl.LSFFormDeclarationImpl"
@@ -1815,9 +1820,11 @@ formMultiGroupObjectDeclaration ::= (simpleName EQUALS)?
 			                        formObjectDeclaration (COMMA formObjectDeclaration)*
 		                            RBRAC
 
+formObjectOptions ::= (ON CHANGE formActionPropertyObject)?
+
 formObjectDeclaration ::= (simpleName? localizedStringLiteral? EQUALS)?
 		                  className
-		                  (ON CHANGE formActionPropertyObject)?
+		                  formObjectOptions
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFObjectDeclarationImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFObjectDeclaration"
@@ -2083,11 +2090,11 @@ overrideActionStatement ::= mappedActionClassParamDeclare PLUS
 		                topActionPropertyDefinitionBody OPTIMISTICASYNC?
 {
 //    pin = 2;
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.declarations.LSFOverrideActionDeclaration"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.declarations.LSFActionExtend"
     methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
-    stubClass = "com.lsfusion.lang.psi.stubs.OverrideActionStubElement"
+    stubClass = "com.lsfusion.lang.psi.stubs.ExtendActionStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
-    mixin="com.lsfusion.lang.psi.declarations.impl.LSFOverrideActionDeclarationImpl"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFActionExtendImpl"
 }
 
 overridePropertyStatement ::= mappedPropertyClassParamDeclare PLUSEQ
@@ -2095,25 +2102,29 @@ overridePropertyStatement ::= mappedPropertyClassParamDeclare PLUSEQ
 		                propertyExpression SEMI
 {
     pin = 2;
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.declarations.LSFOverridePropertyDeclaration"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.declarations.LSFPropertyExtend"
     methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
-    stubClass = "com.lsfusion.lang.psi.stubs.OverridePropertyStubElement"
+    stubClass = "com.lsfusion.lang.psi.stubs.ExtendPropertyStubElement"
     elementTypeFactory = "com.lsfusion.lang.psi.stubs.types.LSFStubElementTypeFactory.create"
-    mixin="com.lsfusion.lang.psi.declarations.impl.LSFOverridePropertyDeclarationImpl"
+    mixin="com.lsfusion.lang.psi.declarations.impl.LSFPropertyExtendImpl"
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// CONSTRAINT STATEMENT //////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-constraintStatement ::= CONSTRAINT baseEventPE propertyExpression
-		                (CHECKED (BY nonEmptyNoContextPropertyUsageList)? )?
+constraintPropertyExpression ::= propertyExpression
+constraintCheckedBy ::= CHECKED (BY nonEmptyNoContextPropertyUsageList)?
+constraintProperties ::= PROPERTIES nonEmptyPropertyExpressionList
+
+constraintStatement ::= CONSTRAINT baseEventPE constraintPropertyExpression
+		                constraintCheckedBy?
 		                MESSAGE messagePropertyExpression
-		                (PROPERTIES nonEmptyPropertyExpressionList)?
+		                constraintProperties?
 		                SEMI
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.mcp.LSFMCPDeclaration"
     methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
 }
 
@@ -2129,11 +2140,11 @@ messagePropertyExpression ::= propertyExpression
 ////////////////////////////////////////////////////////////////////////////////
 
 followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS baseEventPE
-                     propertyExpression (RESOLVE LEFT? RIGHT?)?		             
+                     propertyExpression (RESOLVE LEFT? RIGHT?)? 		             
 		             SEMI
 {
     pin = 2
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.mcp.LSFMCPDeclaration"
     methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
 }
 
@@ -2144,7 +2155,7 @@ followsStatement ::= mappedPropertyClassParamDeclare FOLLOWS baseEventPE
 writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression WHEN (DO)? propertyExpression SEMI
 {
     pin = 2
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.mcp.LSFMCPDeclaration"
     methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
 }
 
@@ -2152,11 +2163,13 @@ writeWhenStatement ::= mappedPropertyClassParamDeclare ARROW propertyExpression 
 ////////////////////////////////// EVENT STATEMENT /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-eventStatement ::= WHEN baseEventPE propertyExpression (ORDER (DESC)? nonEmptyPropertyExpressionList)?
-		                inlineOption DO actionPropertyDefinitionBody
+eventOrder ::= (ORDER (DESC)? nonEmptyPropertyExpressionList)? inlineOption
+
+eventStatement ::= WHEN baseEventPE propertyExpression eventOrder
+		                DO actionPropertyDefinitionBody
 {
     pin = 1
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.mcp.LSFMCPDeclaration"
     methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
 }
 
@@ -2167,7 +2180,7 @@ eventStatement ::= WHEN baseEventPE propertyExpression (ORDER (DESC)? nonEmptyPr
 globalEventStatement ::= ON baseEventNotPE (SINGLE)? (SHOWDEP noContextActionOrPropertyUsage)? actionPropertyDefinitionBody
 {
     pin=1
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.mcp.LSFMCPDeclaration"
     methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
 }
 
@@ -2248,7 +2261,7 @@ indexStatement ::= INDEX ( ((LIKE | MATCH)? nonEmptyMappedPropertyOrSimpleExprPa
                          )
                    SEMI
 {
-    implements="com.lsfusion.lang.psi.context.ModifyParamContext"
+    implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.mcp.LSFMCPDeclaration"
     methods = [ getContextModifier getContextInferrer getDocumentation]
     pin=1 methods = [ getIcon ]
 }
@@ -2257,7 +2270,7 @@ indexStatement ::= INDEX ( ((LIKE | MATCH)? nonEmptyMappedPropertyOrSimpleExprPa
 /////////////////////////////// WINDOW STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-windowStatement ::= windowCreateStatement | windowHideStatement {methods = [ getIcon ]}
+windowStatement ::= windowCreateStatement | windowHideStatement {implements="com.lsfusion.mcp.LSFMCPDeclaration" methods = [ getIcon ]}
 
 windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType? windowOptions SEMI
 {
@@ -2302,7 +2315,7 @@ dockPosition ::= POSITION LBRAC intLiteral COMMA intLiteral COMMA intLiteral COM
 navigatorStatement ::= NAVIGATOR navigatorElementStatementBody
 {
     pin=1
-    implements = "com.lsfusion.documentation.LSFDocumentation,com.lsfusion.lang.psi.context.ModifyParamContext"
+    implements = "com.lsfusion.documentation.LSFDocumentation,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.mcp.LSFMCPDeclaration"
     methods = [ getContextModifier getContextInferrer getIcon getDocumentation]
 }
 

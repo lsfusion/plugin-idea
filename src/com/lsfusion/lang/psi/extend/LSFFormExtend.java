@@ -6,12 +6,13 @@ import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFObjectDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
+import com.lsfusion.mcp.LSFMCPDeclaration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
 
-public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubElement> {
+public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubElement>, LSFMCPDeclaration {
 
     LSFFormDecl getFormDecl();
 

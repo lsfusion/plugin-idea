@@ -94,7 +94,7 @@ public class AggregateFormAction extends AnAction {
 
             //FORM
             Map<PsiElement, LSFModuleDeclaration> elementToModule = new HashMap<>();
-            LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile, LSFLocalSearchScope.createFrom(lsfExtend))
+            LSFGlobalResolver.findExtendElements(formDecl, lsfFile, LSFLocalSearchScope.createFrom(lsfExtend))
                     .findAll().forEach(formExtend -> {
                         LSFModuleDeclaration moduleDeclaration = formExtend.getLSFFile().getModuleDeclaration();
                         if (moduleDeclaration != null)
@@ -185,13 +185,17 @@ public class AggregateFormAction extends AnAction {
 
         if (copyElement instanceof LSFFormStatement) {
 
-            //remove editFormDeclaration
-            ((LSFFormStatement) copyElement).getEditFormDeclarationList()
-                    .forEach(editForm -> editForm.replace(LSFElementGenerator.createPsiCommentFromText(project, editForm.getText() + " // Unable to call EDIT in interpreter")));
+            for(LSFFormOptions options : ((LSFFormStatement) copyElement).getFormOptionsList()) {
+                //remove editFormDeclaration
+                LSFEditFormDeclaration editForm = options.getEditFormDeclaration();
+                if(editForm != null)
+                    editForm.replace(LSFElementGenerator.createPsiCommentFromText(project, editForm.getText() + " // Unable to call EDIT in interpreter"));
 
-            //remove listFormDeclaration
-            ((LSFFormStatement) copyElement).getListFormDeclarationList()
-                    .forEach(listForm -> listForm.replace(LSFElementGenerator.createPsiCommentFromText(project, listForm.getText() + " // Unable to call LIST in interpreter")));
+                //remove listFormDeclaration
+                LSFListFormDeclaration listForm = options.getListFormDeclaration();
+                if(listForm != null)
+                    listForm.replace(LSFElementGenerator.createPsiCommentFromText(project, listForm.getText() + " // Unable to call LIST in interpreter"));
+            }
 
             //remove semicolon
             LSFEmptyStatement semicolon = ((LSFFormStatement) copyElement).getEmptyStatement();

@@ -3,15 +3,12 @@ package com.lsfusion.lang.psi.declarations.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
-import com.lsfusion.lang.psi.indexes.OverrideActionIndex;
-import com.lsfusion.lang.psi.indexes.OverridePropertyIndex;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.stubs.ActionOrPropStubElement;
 import com.lsfusion.lang.typeinfer.InferExResult;
@@ -189,36 +186,10 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
 
     @Override
     public PsiElement[] processImplementationsSearch() {
-        LSFId nameIdentifier = getNameIdentifier();
-        if (nameIdentifier == null) {
-            return PsiElement.EMPTY_ARRAY;
-        }
         List<PsiElement> result = new ArrayList<>();
-        for (LSFActionOrPropReference<?, ?> impl : findImplementations(nameIdentifier))
+        for (LSFActionOrPropReference<?, ?> impl : LSFActionOrPropExtendImpl.processActionOrGlobalPropImplementationsSearch(this))
             result.add(impl.getWrapper());
         return result.toArray(new PsiElement[0]);
-    }
-
-    protected List<LSFActionOrPropReference<?, ?>> findImplementations(LSFId nameIdentifier) {
-        List<LSFActionOrPropReference<?, ?>> impls = new ArrayList<>();
-        if (isAction()) {
-            LSFGlobalResolver.getItemsFromIndex(OverrideActionIndex.getInstance(), nameIdentifier.getName(), getProject(), GlobalSearchScope.allScope(getProject()), LSFLocalSearchScope.GLOBAL).forEach(prop -> {
-                LSFActionUsage usage = ((LSFOverrideActionStatement) prop).getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage();
-                @Nullable LSFActionDeclaration decl = usage.resolveDecl();
-                if (decl != null && decl.equals(this)) {
-                    impls.add(usage);
-                }
-            });
-        } else {
-            LSFGlobalResolver.getItemsFromIndex(OverridePropertyIndex.getInstance(), nameIdentifier.getName(), getProject(), GlobalSearchScope.allScope(getProject()), LSFLocalSearchScope.GLOBAL).forEach(prop -> {
-                LSFPropertyUsage usage = ((LSFOverridePropertyStatement) prop).getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage();
-                @Nullable LSFPropDeclaration decl = usage.resolveDecl();
-                if (decl != null && decl.equals(this)) {
-                    impls.add(usage);
-                }
-            });
-        }
-        return impls;
     }
 
     @Override
@@ -296,7 +267,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
 
         if (isAbstract()) {
             propReferences = new ArrayList<>();
-            for (LSFActionOrPropReference<?, ?> reference : findImplementations(getNameIdentifier())) {
+            for (LSFActionOrPropReference<?, ?> reference : LSFActionOrPropExtendImpl.processActionOrGlobalPropImplementationsSearch(this)) {
                 fillImplementationDependencies(reference, propReferences);
             }
         } else {

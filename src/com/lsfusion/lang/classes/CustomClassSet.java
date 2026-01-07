@@ -47,7 +47,7 @@ public class CustomClassSet implements LSFClassSet {
         }
     }
 
-    public static Collection<LSFValueClass> getClassParentsRecursively(LSFValueClass valueClass) {
+    public static Set<LSFValueClass> getClassParentsRecursively(LSFValueClass valueClass) {
         Set<LSFValueClass> result = new LinkedHashSet<>();
         result.add(valueClass);
         if (valueClass instanceof LSFClassDeclaration) {

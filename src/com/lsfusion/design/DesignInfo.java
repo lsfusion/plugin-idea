@@ -36,7 +36,7 @@ public class DesignInfo {
 
         List<LSFModuleDeclaration> requiredModules = DesignUtils.getRequiredModules(((LSFFile) formDecl.getContainingFile()).getModuleDeclaration());
 
-        Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, LSFStubElementTypes.EXTENDFORM, lsfFile, localScope);
+        Query<LSFFormExtend> lsfFormExtends = LSFGlobalResolver.findExtendElements(formDecl, lsfFile, localScope);
         
         Map<PsiElement, LSFModuleDeclaration> elementToModule = new HashMap<>();
         for (LSFFormExtend formExtend : lsfFormExtends.findAll()) {

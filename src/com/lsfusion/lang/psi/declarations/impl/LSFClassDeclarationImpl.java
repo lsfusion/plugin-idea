@@ -18,6 +18,7 @@ import com.lsfusion.lang.psi.references.LSFClassReference;
 import com.lsfusion.lang.psi.stubs.ClassStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.refactoring.ClassMigration;
 import com.lsfusion.refactoring.ElementMigration;
 import org.jetbrains.annotations.NotNull;
@@ -66,6 +67,11 @@ public abstract class LSFClassDeclarationImpl extends LSFFullNameDeclarationImpl
     @Override
     protected FullNameStubElementType getType() {
         return LSFStubElementTypes.CLASS;
+    }
+
+    @Override
+    public ExtendStubElementType<?, ?> getExtendElementType() {
+        return LSFStubElementTypes.EXTENDCLASS;
     }
 
     @Override

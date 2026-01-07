@@ -20,6 +20,11 @@ public abstract class LSFNamespaceDeclarationImpl<This extends LSFNamespaceDecla
         super(stub, nodeType);
     }
 
+    @Override
+    public String getCanonicalName() {
+        return getDeclName();
+    }
+
     @Nullable
     @Override
     public Icon getIcon(int flags) {

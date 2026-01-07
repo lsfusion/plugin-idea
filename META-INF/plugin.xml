@@ -17,6 +17,7 @@
             <li>Added LocalizedString checks</li>
             <li>PropertyDrawViewProxy: defaultValue (works only in interpreter)</li>
             <li>RETURN support</li>
+            <li>MCP support</li>
         </ul>
     ]]>
     </change-notes>
@@ -28,13 +29,6 @@
          on how to target different products -->
     <depends>com.intellij.properties</depends>
     <depends>com.intellij.modules.java</depends>
-
-    <application-components>
-        <!-- Add your application components here -->
-        <component>
-            <implementation-class>com.lsfusion.LSFApplicationComponent</implementation-class>
-        </component>
-    </application-components>
 
     <actions>
         <group id="LSFGroup" popup="true" text="_LSF">
@@ -222,8 +216,8 @@
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.GroupIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.TableIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.WindowIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.indexes.OverrideActionIndex"/>
-        <stubIndex implementation="com.lsfusion.lang.psi.indexes.OverridePropertyIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendActionIndex"/>
+        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ExtendPropertyIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.NavigatorElementIndex"/>
 <!--        <stubIndex implementation="com.lsfusion.lang.psi.indexes.ComponentIndex"/>-->
 
@@ -325,6 +319,9 @@
         <lang.foldingBuilder language="LsfMigration"
                              implementationClass="com.lsfusion.migration.lang.folding.MigrationFoldingBuilder"/>
         <fileDocumentManagerListener implementation="com.lsfusion.lang.meta.StripLinesDisabler"/>
+
+        <!-- it's very important not to have io.netty libraries in the plugin lib directory (because it will give the error cannot find proper constructor) -->
+        <httpRequestHandler implementation="com.lsfusion.mcp.McpServerService"/>
 
         <applicationConfigurable instance="com.lsfusion.actions.locale.LSFSettingsConfigurable"
                              id="org.company.ApplicationSettingsConfigurable" displayName="LSF Settings"/>

@@ -18,14 +18,14 @@ public class LSFIndexKeys {
     public static final StubIndexKey<String, LSFActionDeclaration> ACTION = StubIndexKey.createIndexKey("lsf.indices.action");
     public static final StubIndexKey<String, LSFTableDeclaration> TABLE = StubIndexKey.createIndexKey("lsf.indices.table");
     public static final StubIndexKey<String, LSFWindowDeclaration> WINDOW = StubIndexKey.createIndexKey("lsf.indices.window");
-    public static final StubIndexKey<String, LSFOverrideActionDeclaration> OVERRIDEACTION = StubIndexKey.createIndexKey("lsf.indices.override.action");
-    public static final StubIndexKey<String, LSFOverridePropertyDeclaration> OVERRIDEPROPERTY = StubIndexKey.createIndexKey("lsf.indices.override.property");
 
     public static final StubIndexKey<String, LSFTableDeclaration> TABLE_CLASSES = StubIndexKey.createIndexKey("lsf.indices.table.classes");
 
     public static final StubIndexKey<String, LSFFormExtend> EXTENDFORM = StubIndexKey.createIndexKey("lsf.indices.extends.form");
     public static final StubIndexKey<String, LSFClassExtend> EXTENDCLASS = StubIndexKey.createIndexKey("lsf.indices.extends.class");
     public static final StubIndexKey<String, LSFClassExtend> EXTENDCLASS_SHORT = StubIndexKey.createIndexKey("lsf.indices.extends.class.short");
+    public static final StubIndexKey<String, LSFActionExtend> EXTENDACTION = StubIndexKey.createIndexKey("lsf.indices.override.action");
+    public static final StubIndexKey<String, LSFPropertyExtend> EXTENDPROPERTY = StubIndexKey.createIndexKey("lsf.indices.override.property");
     public static final StubIndexKey<String, LSFDesign> DESIGN = StubIndexKey.createIndexKey("lsf.indices.design");
 
     public static final StubIndexKey<String, LSFExplicitInterfaceProp> EXPLICIT_INTERFACE_PROP = StubIndexKey.createIndexKey("lsf.indices.explicit.prop.interface");

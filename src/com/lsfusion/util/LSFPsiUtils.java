@@ -266,7 +266,6 @@ public class LSFPsiUtils {
     }
 
     public static <T> Set<T> mapPropertiesWithClassInSignature(LSFValueClass valueClass, Project project, GlobalSearchScope scope, LSFLocalSearchScope localScope, ApplicableMapper<T> applicableMapper, boolean isLight, boolean isHeavy) {
-        mapPropertiesWithClassesInSignature(valueClass, project, scope, localScope, applicableMapper, isLight, isHeavy, Collections.singletonList(valueClass));
         return mapPropertiesWithClassesInSignature(valueClass, project, scope, localScope, applicableMapper, isLight, isHeavy, Collections.singletonList(valueClass));
     }
 
@@ -347,7 +346,7 @@ public class LSFPsiUtils {
     }
 
     private static <T> Set<T> mapActionsOrPropertiesApplicableToClass(LSFValueClass valueClass, Collection<LSFInterfacePropStatement> statements, ApplicableMapper<T> applicableMapper) {
-        LSFClassSet valueClassSet = valueClass instanceof LSFClassDeclaration ? new CustomClassSet((LSFClassDeclaration) valueClass) : (LSFClassSet) valueClass;
+        LSFClassSet valueClassSet = valueClass != null ? valueClass.getUpSet() : null;
         Set<T> result = new HashSet<>();
         for (LSFInterfacePropStatement statement : statements) {
             List<LSFClassSet> paramClasses = statement.resolveParamClasses();

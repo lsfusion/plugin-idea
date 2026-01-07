@@ -522,7 +522,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void checkAutorefresh(LSFFormDeclaration o) {
-        for(LSFAutorefreshLiteral autorefresh : ((LSFFormDeclImpl) o).getAutorefreshLiteralList()) {
+        LSFFormDeclOptions formDeclOptions = ((LSFFormDeclImpl) o).getFormDeclOptions();
+        if(formDeclOptions == null) return;
+        for(LSFAutorefreshLiteral autorefresh : formDeclOptions.getAutorefreshLiteralList()) {
             addDeprecatedWarningAnnotation(autorefresh, "5.2", "6.0", "Use EVENTS ON SCHEDULE PERIOD n formRefresh() instead");
         }
     }
