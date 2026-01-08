@@ -223,9 +223,14 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
                 // Fails to update Java parameters for JavaProfilerConfigurationExtension
                 // If it falls again, we should find a class that has JavaProfilerConfigurationExtension as a superclass 
                 // and filter it out.
-                if (!"IntelliJProfilerOnDebugExtension".equals(ext.getClass().getSimpleName())) {
-                    ext.updateJavaParameters(myConfiguration, params, getRunnerSettings());
+                // 2: class com.lsfusion.module.run.LSFusionRunConfiguration cannot be cast to class com.haulmont.ampsbb.run.SpringBootRunConfiguration fix
+                // for openide
+                if ("IntelliJProfilerOnDebugExtension".equals(ext.getClass().getSimpleName())) {
+                    continue;
+                } else if ("com.haulmont.ampsbb.run.SpringBootRunConfigurationExtension".equals(ext.getClass().getName())) {
+                    continue;
                 }
+                ext.updateJavaParameters(myConfiguration, params, getRunnerSettings());
             }
 
             return params;

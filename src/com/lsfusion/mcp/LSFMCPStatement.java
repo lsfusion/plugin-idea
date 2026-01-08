@@ -13,21 +13,21 @@ import com.lsfusion.lang.psi.declarations.LSFGlobalDeclaration;
 import com.lsfusion.lang.psi.references.LSFGlobalReference;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
 import com.lsfusion.util.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 import java.util.Collections;
 
 public interface LSFMCPStatement extends PsiElement {
     // next uses
-    static @NonNull Collection<LSFGlobalReference> getNameReferences(LSFMCPStatement el) {
+    static @NotNull Collection<LSFGlobalReference> getNameReferences(LSFMCPStatement el) {
         return PsiTreeUtil.findChildrenOfAnyType(el, false, LSFGlobalReference.class).stream()
                 .filter(ref -> !(ref instanceof LSFNamespaceReference))
                 .toList();
     }
 
-    static @NonNull Collection<PsiReference> getNameReferenced(LSFGlobalDeclaration<?, ?> cur, GlobalSearchScope scope) {
+    static @NotNull Collection<PsiReference> getNameReferenced(LSFGlobalDeclaration<?, ?> cur, GlobalSearchScope scope) {
         LSFId nameIdentifier = cur.getNameIdentifier();
         if (nameIdentifier != null)
             return ReferencesSearch.search(nameIdentifier, scope).findAll().stream()

@@ -1,52 +1,48 @@
 package com.lsfusion.mcp;
 
 import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
-// removed unused VirtualFile import
+import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
+import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.psi.search.UsageSearchContext;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.MergeQuery;
 import com.intellij.util.Processor;
-import com.intellij.openapi.util.Condition;
-import com.intellij.psi.search.PsiSearchHelper;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.openapi.editor.Document;
 import com.intellij.util.Query;
+import com.lsfusion.lang.classes.CustomClassSet;
+import com.lsfusion.lang.classes.LSFClassSet;
+import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
-// removed unused override/usage imports (we now use LSFActionOrGlobalPropDeclaration.findImplementations())
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFExtend;
-import com.lsfusion.lang.psi.indexes.*;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.references.LSFGlobalReference;
-import com.lsfusion.lang.psi.stubs.types.GlobalDeclStubElementType;
-import com.lsfusion.util.BaseUtils;
-import com.lsfusion.util.LSFPsiUtils;
-import com.lsfusion.lang.classes.LSFClassSet;
-import com.lsfusion.lang.classes.CustomClassSet;
-import com.lsfusion.lang.classes.LSFValueClass;
-import com.lsfusion.lang.psi.LSFPsiImplUtil;
-import com.lsfusion.util.LSFFileUtils;
-import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
+import com.lsfusion.lang.psi.stubs.types.GlobalDeclStubElementType;
+import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.refactoring.CanonicalNameUtils;
 import com.lsfusion.refactoring.PropertyCanonicalNameUtils;
+import com.lsfusion.util.BaseUtils;
+import com.lsfusion.util.LSFFileUtils;
+import com.lsfusion.util.LSFPsiUtils;
 import com.lsfusion.util.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -200,8 +196,8 @@ public class MCPSearchUtils {
         return resultObject;
     }
 
-    private static @NotNull GlobalSearchScope run(@NonNull Project project,
-                                                 @NonNull JSONObject query,
+    private static @NotNull GlobalSearchScope run(@NotNull Project project,
+                                                 @NotNull JSONObject query,
                                                  @NotNull AtomicBoolean stopRequested,
                                                  @NotNull Set<LSFMCPDeclaration> seen,
                                                  @NotNull ConcurrentMap<RelatedKey, RelatedState> relatedCache,
