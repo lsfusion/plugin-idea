@@ -150,6 +150,31 @@ public final class McpServerService extends RestService {
     }
 
     private JSONObject buildFindElementsToolDescriptor() {
+        JSONObject relatedElementItemSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("type", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Expected element type (best-effort). Required if name is set, otherwise name is ignored."))
+                        .put("name", new JSONObject()
+                                .put("type", "string")
+                                .put("description",
+                                        "Seed name for named elements. Canonical form is accepted; namespace is optional. " +
+                                                "For property/action elements, a parameter signature in brackets is supported."))
+                        .put("location", new JSONObject()
+                                .put("type", "string")
+                                .put("description",
+                                        "Seed location for unnamed elements: `<module>(<line>:<col>)`, 1-based. Example: `MyModule(10:5)`."))
+                        .put("only", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Traversal direction: `uses` (forward), `used` (reverse), if omitted - both directions")
+                                .put("enum", new JSONArray().put("uses").put("used").put("both"))))
+                // `oneOf` must be on the *item* schema. Putting it on the array makes validators complain about missing `items`.
+                .put("oneOf", new JSONArray()
+                        .put(new JSONObject().put("required", new JSONArray().put("name")))
+                        .put(new JSONObject().put("required", new JSONArray().put("location"))))
+                .put("additionalProperties", false);
+
         // Base schema for a single filter object (without `moreFilters` to avoid recursive schema).
         JSONObject filterSchema = new JSONObject()
                 .put("type", "object")
@@ -241,29 +266,7 @@ public final class McpServerService extends RestService {
                                         "Usage-graph traversal seeds. Each item must identify a seed element by `name` (named) OR `location` (unnamed). " +
                                                 "`name` may be canonical or short (namespace optional). For property/action elements you may include a signature in brackets, " +
                                                 "e.g. \"MyNS.myProp[MyNS.MyClass]\" or \"myProp[MyClass]\". Traversal is best-effort and may be large.")
-                                .put("items", new JSONObject()
-                                        .put("type", "object")
-                                        .put("properties", new JSONObject()
-                                                .put("type", new JSONObject()
-                                                        .put("type", "string")
-                                                        .put("description", "Expected element type (best-effort). Required if name is set, otherwise name is ignored."))
-                                                .put("name", new JSONObject()
-                                                        .put("type", "string")
-                                                        .put("description",
-                                                                "Seed name for named elements. Canonical form is accepted; namespace is optional. " +
-                                                                        "For property/action elements, a parameter signature in brackets is supported."))
-                                                .put("location", new JSONObject()
-                                                        .put("type", "string")
-                                                        .put("description",
-                                                                "Seed location for unnamed elements: `<module>(<line>:<col>)`, 1-based. Example: `MyModule(10:5)`."))
-                                                .put("only", new JSONObject()
-                                                        .put("type", "string")
-                                                        .put("description", "Traversal direction: `uses` (forward), `used` (reverse), if omitted - both directions")
-                                                        .put("enum", new JSONArray().put("uses").put("used").put("both")))))
-                                .put("oneOf", new JSONArray()
-                                        .put(new JSONObject().put("required", new JSONArray().put("name")))
-                                        .put(new JSONObject().put("required", new JSONArray().put("location"))))
-                                .put("additionalProperties", false)))
+                                .put("items", relatedElementItemSchema)))
             .put("additionalProperties", false);
 
         // Allow nesting `moreFilters` only inside the primary filter.

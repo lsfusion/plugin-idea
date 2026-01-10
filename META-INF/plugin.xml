@@ -2,22 +2,15 @@
     <id>lsfusion.idea.plugin</id>
     <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
-    <version>1.0.303</version>
+    <version>1.0.304</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.303</b><br>
+        <b>Version 1.0.304</b><br>
         <ul>
-            <li>Annotations(@@): check supported; Deprecated: highlight declaration</li>
-            <li>Design: footerClass support</li>
-            <li>Added 2gis tile to MAP</li>
-            <li>Design: panelCaptionVertical -> captionVertical; panelCaptionLast -> captionLast; panelCaptionAlignment -> captionAlignmentHorz / captionAlignmentVert</li>
-            <li>Added LocalizedString checks</li>
-            <li>PropertyDrawViewProxy: defaultValue (works only in interpreter)</li>
-            <li>RETURN support</li>
-            <li>MCP support</li>
+            <li>Bugfix in the MCP server service</li>
         </ul>
     ]]>
     </change-notes>
