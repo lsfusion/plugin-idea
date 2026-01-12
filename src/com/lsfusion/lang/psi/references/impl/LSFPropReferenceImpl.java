@@ -12,9 +12,9 @@ import com.intellij.util.CollectionQuery;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.PropertyUsageContext;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFLocalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
+import com.lsfusion.lang.psi.declarations.impl.LSFStatementActionDeclarationImpl;
+import com.lsfusion.lang.psi.impl.LSFActionUsageImpl;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
@@ -40,6 +40,18 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
 
     protected FullNameStubElementType getStubElementType() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected List<LSFGlobalPropDeclaration> getVirtDecls() {
+        List<LSFGlobalPropDeclaration> result = new ArrayList<>();
+        LSFActionDeclaration actionDecl = new LSFActionUsageImpl(getNode()).resolveDecl();
+        if (actionDecl instanceof LSFStatementActionDeclarationImpl) {
+            SyntheticPropertyStatement syntheticProperty = ((LSFStatementActionDeclarationImpl) actionDecl).getSyntheticProperty();
+            if (syntheticProperty != null)
+                result.add(syntheticProperty);
+        }
+        return result;
     }
 
     public boolean isImplement() {

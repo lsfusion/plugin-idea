@@ -735,12 +735,15 @@ lazySetting ::= LAZY (WEAK | STRONG)?
 ////////////////////////////////// ACTION PROPERTIES ///////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+abstractReturn ::= className (LBRAC classNameList RBRAC)?
+
 abstractActionPropertyDefinition ::= ABSTRACT
                                     (   ((CASE | MULTI) abstractExclusiveOverrideOption?)
                                     |	(LIST abstractCaseAddOption?)
                                     )?
                                     (FULL)?
                                     (LBRAC classNameList RBRAC)?
+                                    abstractReturn?
 {
     pin = 1
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
@@ -1087,7 +1090,7 @@ newWhereActionPropertyDefinitionBody ::= NEW customClassUsage newWhereClause
 
 returnActionPropertyDefinitionBody ::= RETURN propertyExpression
 {
-    pin = 1
+    pin = 2
     implements="com.lsfusion.lang.psi.context.ExtendParamContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ getContextModifier getContextInferrer inferActionParamClasses getDocumentation ]
 }
@@ -1505,9 +1508,23 @@ execActionPropertyDefinitionBody ::= execActionPropertyDefinitionBody1 | execAct
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext, com.lsfusion.lang.psi.context.ActionExpression"
     methods = [ resolveParamClasses inferActionParamClasses getParamList getDocumentation ]
 }
-private execActionPropertyDefinitionBody1 ::= EXEC actionUsage LBRAC propertyExpressionList RBRAC {pin = 1}
+
+execActionBody ::= actionUsage LBRAC propertyExpressionList RBRAC
+{
+    pin = 2
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList ]
+}
+
+execActionTo ::= TO propertyUsage
+{
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList ]
+}
+
+private execActionPropertyDefinitionBody1 ::= EXEC execActionBody execActionTo? {pin = 1}
 //EXEC - последнее правило, которое может начинаться с ID, поэтому спокойно пиним
-private execActionPropertyDefinitionBody2 ::= actionUsage LBRAC propertyExpressionList RBRAC {pin = 1}
+private execActionPropertyDefinitionBody2 ::= execActionBody execActionTo? {pin = 1}
 
 //Разбиваем правило, чтобы была возможность запинить по ASSIGN
 assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | assignActionPropertyDefinitionBody2
@@ -1518,6 +1535,7 @@ assignActionPropertyDefinitionBody ::= assignActionPropertyDefinitionBody1 | ass
 
 changePropertyBody ::= propertyUsage LBRAC parameterOrExpressionList RBRAC
 {
+    pin = 2
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList ]
 }
@@ -1629,6 +1647,7 @@ continueActionOperator ::= CONTINUE
 }
 returnActionOperator ::= RETURN
 {
+    pin = 1;
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }

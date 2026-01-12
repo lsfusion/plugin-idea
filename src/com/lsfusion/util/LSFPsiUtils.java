@@ -272,6 +272,8 @@ public class LSFPsiUtils {
     @NotNull
     private static <T> Set<T> mapPropertiesWithClassesInSignature(LSFValueClass valueClass, Project project, GlobalSearchScope scope, LSFLocalSearchScope localScope, ApplicableMapper<T> applicableMapper, boolean isLight, boolean isHeavy, Collection<LSFValueClass> classParents) {
         Set<LSFInterfacePropStatement> resultStatements = newActionsOrPropertiesWithClassesInSignature(project, scope, localScope, isLight, isHeavy, ExplicitInterfacePropIndex.getInstance(), valueClass, classParents);
+        //todo: need to add only actions with RETURN
+        resultStatements.addAll(newActionsOrPropertiesWithClassesInSignature(project, scope, localScope, isLight, isHeavy, ExplicitInterfaceActionIndex.getInstance(), valueClass, classParents));
         if(isHeavy) {
             List<LSFGlobalPropDeclaration<?, ?>> statementsWithClassAsResult = new ArrayList<>();
             for (LSFValueClass clazz : classParents) {

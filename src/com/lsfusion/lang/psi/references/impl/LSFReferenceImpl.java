@@ -14,6 +14,7 @@ import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.SyntheticPropertyStatement;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.references.LSFReference;
 import org.jetbrains.annotations.NotNull;
@@ -75,7 +76,12 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     @Override
     public boolean isReferenceTo(PsiElement element) {
         // need to prevent resolving when it's not needed
-        return isDeclarationType(PsiTreeUtil.getParentOfType(element, LSFDeclaration.class)) && getManager().areElementsEquivalent(resolve(), element);
+        boolean result = isDeclarationType(PsiTreeUtil.getParentOfType(element, LSFDeclaration.class)) && getManager().areElementsEquivalent(resolve(), element);
+        if(!result) {
+            T decl = resolveDecl();
+            result = decl instanceof SyntheticPropertyStatement && decl.isEquivalentTo(element.getParent());
+        }
+        return result;
     }
 
     // should return instanceof T

@@ -3286,11 +3286,20 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFExecActionPropertyDefinitionBody sourceStatement) {
-        LSFPropertyExpressionList peList = sourceStatement.getPropertyExpressionList();
+        LSFPropertyExpressionList peList = sourceStatement.getExecActionBody().getPropertyExpressionList();
         if (peList == null) {
             return Collections.emptyList();
         }
         return resolveParamClasses(peList);
+    }
+
+    @Nullable
+    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFExecActionBody sourceStatement) {
+        return resolveParamClasses(sourceStatement.getPropertyExpressionList());
+    }
+
+    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFExecActionTo sourceStatement) {
+        return sourceStatement.getPropertyUsage().getExplicitClasses();
     }
 
     @Nullable
@@ -3370,7 +3379,17 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static PsiElement getParamList(@NotNull LSFExecActionPropertyDefinitionBody sourceStatement) {
+        return sourceStatement.getExecActionBody().getPropertyExpressionList();
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFExecActionBody sourceStatement) {
         return sourceStatement.getPropertyExpressionList();
+    }
+
+    @Nullable
+    public static PsiElement getParamList(@NotNull LSFExecActionTo sourceStatement) {
+        return sourceStatement.getPropertyUsage();
     }
 
     @Nullable
@@ -4216,11 +4235,11 @@ public class LSFPsiImplUtil {
     }
 
     public static Inferred inferActionParamClasses(LSFExecActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
-        LSFActionUsage actionUsage = body.getActionUsage();
+        LSFActionUsage actionUsage = body.getExecActionBody().getActionUsage();
         if (actionUsage == null) {
             return Inferred.EMPTY;
         }
-        return inferExecParamClasses(actionUsage, body.getPropertyExpressionList()).filter(params);
+        return inferExecParamClasses(actionUsage, body.getExecActionBody().getPropertyExpressionList()).filter(params);
     }
 
     public static Inferred inferActionParamClasses(LSFIfActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
@@ -4855,7 +4874,7 @@ public class LSFPsiImplUtil {
 
         Collection<LSFExecActionPropertyDefinitionBody> execActions = PsiTreeUtil.findChildrenOfType(override, LSFExecActionPropertyDefinitionBody.class);
         for (LSFExecActionPropertyDefinitionBody execAction : execActions) {
-            LSFActionUsage rightUsage = execAction.getActionUsage();
+            LSFActionUsage rightUsage = execAction.getExecActionBody().getActionUsage();
             if (equalReferences(leftUsage, rightUsage)) {
                 LSFListActionPropertyDefinitionBody rightListAction = override.getListActionPropertyDefinitionBody();
                 if (rightListAction != null) {

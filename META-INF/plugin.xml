@@ -8,9 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.304</b><br>
+        <b>Version 1.0.305</b><br>
         <ul>
-            <li>Bugfix in the MCP server service</li>
+            <li>Resolve and find usages of actions with RETURN</li>
         </ul>
     ]]>
     </change-notes>
@@ -133,6 +133,7 @@
         <usageTypeProvider implementation="com.lsfusion.usage.LSFUsageTypeProvider"/>
         <usageFilteringRuleProvider implementation="com.lsfusion.usage.LSFUsageFilteringRuleProvider"/>
         <findUsagesHandlerFactory implementation="com.lsfusion.usage.LSFFindUsagesHandlerFactory"/>
+        <referencesSearch implementation="com.lsfusion.usage.LSFReferenceSearch"/>
         <actionPromoter implementation="com.lsfusion.actions.LSFActionPromoter"/>
 
         <callHierarchyProvider language="Lsf"
