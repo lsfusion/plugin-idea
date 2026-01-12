@@ -150,146 +150,66 @@ public final class McpServerService extends RestService {
     }
 
     private JSONObject buildFindElementsToolDescriptor() {
-        JSONObject relatedElementItemSchema = new JSONObject()
-                .put("type", "object")
-                .put("properties", new JSONObject()
-                        .put("type", new JSONObject()
-                                .put("type", "string")
-                                .put("description", "Expected element type (best-effort). Required if name is set, otherwise name is ignored."))
-                        .put("name", new JSONObject()
-                                .put("type", "string")
-                                .put("description",
-                                        "Seed name for named elements. Canonical form is accepted; namespace is optional. " +
-                                                "For property/action elements, a parameter signature in brackets is supported."))
-                        .put("location", new JSONObject()
-                                .put("type", "string")
-                                .put("description",
-                                        "Seed location for unnamed elements: `<module>(<line>:<col>)`, 1-based. Example: `MyModule(10:5)`."))
-                        .put("only", new JSONObject()
-                                .put("type", "string")
-                                .put("description", "Traversal direction: `uses` (forward), `used` (reverse), if omitted - both directions")
-                                .put("enum", new JSONArray().put("uses").put("used").put("both"))))
-                // `oneOf` must be on the *item* schema. Putting it on the array makes validators complain about missing `items`.
-                .put("oneOf", new JSONArray()
-                        .put(new JSONObject().put("required", new JSONArray().put("name")))
-                        .put(new JSONObject().put("required", new JSONArray().put("location"))))
-                .put("additionalProperties", false);
-
-        // Base schema for a single filter object (without `moreFilters` to avoid recursive schema).
+        // Base schema for a single (root) filter object (without `moreFilters` to avoid recursive schema).
         JSONObject filterSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
                         .put("modules", new JSONObject()
-                                .put("type", "array")
+                                .put("type", "string")
+                                .put("description", "Module names as CSV (comma-separated), e.g. `ModuleA, ModuleB`."))
+                        .put("scope", new JSONObject()
+                                .put("type", "string")
                                 .put("description",
-                                        "Module scope filter")
-                                .put("items", new JSONObject()
-                                        .put("type", "object")
-                                        .put("properties", new JSONObject()
-                                                .put("name", new JSONObject()
-                                                        .put("type", "string")
-                                                        .put("description", "lsFusion module name as in `MODULE <name>` / `REQUIRE <name>`, e.g. \"MyModule\"."))
-                                                .put("only", new JSONObject()
-                                                        .put("type", "string")
-                                                        .put("description",
-                                                                "Scope behavior: omitted = REQUIRE expansion and may include libraries (wider). " +
-                                                                        "`project` = REQUIRE expansion but project content only. " +
-                                                                        "`this` = only the file that declares the module (no REQUIRE expansion).")
-                                                        .put("enum", new JSONArray().put("project").put("this"))))
-                                        .put("required", new JSONArray().put("name"))
-                                        .put("additionalProperties", false)))
-                        .put("names", new JSONObject()
-                                .put("type", "array")
+                                        "Scope mode for ALL modules in `modules`. Omitted keeps legacy behavior (REQUIRE expansion and may include libraries)." +
+                                                " `project` = REQUIRE expansion but project content only. `modules` = only module declaration files (no REQUIRE expansion).")
+                                .put("enum", new JSONArray().put("project").put("modules")))
+                        .put("name", new JSONObject()
+                                .put("type", "string")
                                 .put("description",
-                                        "Name/text matchers (OR across items). Each matcher is AND across provided fields. " +
-                                                "The match target is controlled by `inCode` (see `inCode` below). " +
-                                                "Performance: `word` (length >= 3) can act as a fast prefilter;")
-                                .put("items", new JSONObject()
-                                        .put("type", "object")
-                                        .put("properties", new JSONObject()
-                                                .put("word", new JSONObject()
-                                                        .put("type", "string")
-                                                        .put("description",
-                                                                "Logical match: case-insensitive substring. " +
-                                                                        "This prefilter is case-sensitive and token-based, so it may miss matches if casing differs or the text is split differently. " +
-                                                                        "If you need fully case-insensitive / non-token substring matching, prefer `regex` without `word` (slower but more complete).")
-                                                        .put("examples", new JSONArray().put("cust").put("order")))
-                                                .put("regex", new JSONObject()
-                                                        .put("type", "string")
-                                                        .put("description",
-                                                                "Java Pattern, `.find()`. Use `(?i)` for ignore-case. If regex fails to compile, it is ignored.")
-                                                        .put("examples", new JSONArray().put("(?i)cust.*").put("\\\\bORDER\\\\b")))
-                                                .put("inCode", new JSONObject()
-                                                        .put("type", "boolean")
-                                                        .put("default", false)
-                                                        .put("description", "`false` = applied to element names; `true` = applied to element code text.")))
-                                        .put("oneOf", new JSONArray()
-                                                .put(new JSONObject().put("required", new JSONArray().put("word")))
-                                                .put(new JSONObject().put("required", new JSONArray().put("regex"))))
-                                        .put("additionalProperties", false)))
+                                        "Element name filter as CSV (comma-separated). " +
+                                                "Each item is either a word-search (lsFusion ID literal) " +
+                                                "or a Java regex (Pattern.find). Word-search is used only when the item matches lsFusion identifier tokenization (see LSF.flex ID_LITERAL), " +
+                                                "otherwise it is treated as regex."))
+                        .put("contains", new JSONObject()
+                                .put("type", "string")
+                                .put("description",
+                                        "Element code filter as CSV (comma-separated). " +
+                                                "Each item is either a word-search (lsFusion ID literal) " +
+                                                "or a Java regex (Pattern.find). Word-search is used only when the item matches lsFusion identifier tokenization (see LSF.flex ID_LITERAL), " +
+                                                "otherwise it is treated as regex."))
                         .put("elementTypes", new JSONObject()
-                                .put("type", "array")
-                                .put("description", "Element type filter. If set, only these element types are returned.")
-                                .put("items", new JSONObject()
-                                        .put("type", "string")
-                                        .put("enum", new JSONArray()
-                                                .put("module")
-                                                .put("metacode")
-                                                .put("class")
-                                                .put("property")
-                                                .put("action")
-                                                .put("form")
-                                                .put("navigatorElement")
-                                                .put("window")
-                                                .put("group")
-                                                .put("table")
-                                                .put("event")
-                                                .put("calculatedEvent")
-                                                .put("constraint")
-                                                .put("index"))))
+                                .put("type", "string")
+                                .put("description", "Element type filter as CSV (comma-separated). If set, only these element types are returned."))
                         .put("classes", new JSONObject()
-                                .put("type", "array")
+                                .put("type", "string")
                                 .put("description",
-                                        "Class filter: [{name}]. Name may be canonical (with namespace) or short (no namespace). " +
-                                                "For property/action elements: matches parameter classes (best-effort).")
-                                .put("items", new JSONObject()
-                                        .put("type", "object")
-                                        .put("properties", new JSONObject()
-                                                .put("name", new JSONObject()
-                                                        .put("type", "string")
-                                                        .put("description", "Class name, e.g. \"MyNS.MyClass\" or \"MyClass\".")))
-                                        .put("required", new JSONArray().put("name"))
-                                        .put("additionalProperties", false)))
+                                        "Class filter as CSV (comma-separated). Name may be canonical (with namespace) or short (no namespace). " +
+                                                "For property/action elements: matches parameter classes (best-effort)."))
                         .put("relatedElements", new JSONObject()
-                                .put("type", "array")
+                                .put("type", "string")
                                 .put("description",
-                                        "Usage-graph traversal seeds. Each item must identify a seed element by `name` (named) OR `location` (unnamed). " +
-                                                "`name` may be canonical or short (namespace optional). For property/action elements you may include a signature in brackets, " +
-                                                "e.g. \"MyNS.myProp[MyNS.MyClass]\" or \"myProp[MyClass]\". Traversal is best-effort and may be large.")
-                                .put("items", relatedElementItemSchema)))
-            .put("additionalProperties", false);
+                                        "Usage-graph traversal seeds as CSV (comma-separated). Each item is either `type:name` (named element) or `location` for unnamed elements. " +
+                                                "Location format: `<module>(<line>:<col>)`, 1-based. Example: `MyModule(10:5)`. " +
+                                                "For `type:name`, `name` may be canonical or short (namespace optional). For property/action elements you may include a signature in brackets, " +
+                                                "e.g. \"property:MyNS.myProp[MyNS.MyClass]\" or \"property:myProp[MyClass]\". Traversal is best-effort and may be large."))
+                        .put("relatedDirection", new JSONObject()
+                                .put("type", "string")
+                                .put("default", "both")
+                                .put("enum", new JSONArray().put("both").put("uses").put("used"))
+                                .put("description",
+                                        "Direction for ALL `relatedElements` seeds. `both` (default) traverses in both directions, `uses` traverses forward (what the element uses), `used` traverses reverse (what uses the element)."))
+                )
+                .put("additionalProperties", false);
 
-        // Allow nesting `moreFilters` only inside the primary filter.
-        JSONObject filterWithMoreSchema = new JSONObject()
+        // Allow nesting `moreFilters` only at the root level.
+        JSONObject rootWithMoreSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject(filterSchema.getJSONObject("properties").toMap())
                         .put("moreFilters", new JSONObject()
                                 .put("type", "array")
                                 .put("description",
-                                        "Additional filter objects (same structure as `filter`). Each filter is executed independently; results are merged (OR).")
-                                .put("items", filterSchema)));
-
-        JSONObject inputSchema = new JSONObject()
-                .put("type", "object")
-                .put("title", "lsFusion code search query")
-                .put("description",
-                        "Search lsFusion elements using `filter` (AND within one filter). " +
-                                "Use `filter.moreFilters` for OR (merge). If `filter` is omitted, search runs without filters.")
-                .put("properties", new JSONObject()
-                        .put("filter", new JSONObject()
-                                .put("description", "Primary filter (AND within). Use `moreFilters` for OR.")
-                                .put("type", "object")
-                                .put("properties", filterWithMoreSchema.getJSONObject("properties")))
+                                        "Additional filter objects (same structure as the root). Each filter is executed independently; results are merged (OR).")
+                                .put("items", filterSchema))
                         .put("minSymbols", new JSONObject()
                                 .put("type", "integer")
                                 .put("minimum", 0)
@@ -306,6 +226,15 @@ public final class McpServerService extends RestService {
                                 .put("minimum", 1)
                                 .put("default", MCPSearchUtils.DEFAULT_TIMEOUT_SECS)
                                 .put("description", "Best-effort wall-clock timeout for the request (integer seconds).")))
+                .put("additionalProperties", false);
+
+        JSONObject inputSchema = new JSONObject()
+                .put("type", "object")
+                .put("title", "lsFusion code search query")
+                .put("description",
+                        "Search lsFusion elements using AND between the provided fields at the root level. " +
+                                "Use `moreFilters` for OR (merge). If no filter fields are provided, search runs without filters.")
+                .put("properties", rootWithMoreSchema.getJSONObject("properties"))
                 .put("additionalProperties", false);
 
         return new JSONObject()

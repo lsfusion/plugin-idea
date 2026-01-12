@@ -1,0 +1,34 @@
+# Gradle / IntelliJ build artifacts
+.gradle/
+build/
+out/
+
+# IntelliJ Platform Gradle Plugin cache
+.intellijPlatform/
+
+# Kotlin compiler caches
+.kotlin/
+
+# Local wrapper temp folder (if created)
+.wrapper-tmp/
+
+# JVM crash dumps / profiling
+*.hprof
+java_pid*.hprof
+
+# Local compiler args dumps
+javac.*.args
+
+# Editor backup files
+*~
+
+# IntelliJ user-specific
+.idea/workspace.xml
+.idea/shelf/
+
+# Local logs
+.output.txt
+
+# Bundled tools (optional; keep untracked by default)
+jflex-1.9.1.jar
+/gen/

@@ -38,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -69,20 +70,20 @@ public class MCPSearchUtils {
 
     /**
      * Main entry: executes search based on provided JSON query.
-     * Expected structure (simplified initial version):
+     * Expected structure (simplified):
      * {
-     *   modules: [ { name: "ModuleA" }, { name: "ModuleB", only: "this" }, { name: "ModuleC", only: "project" } ], // optional; only defaults to "(with libraries)"
-     *   names: [ { word: "cust", regex: "(?i)cust.*", inCode: true } ], // optional
-     *   elementTypes: ["class","property","action","form","navigatorElement","window","group","table"], // optional
-     *   classes: [ { name: "MyNS.MyClass" } ], // optional, class canonical names
-     *   relatedElements: [ // optional
-     *     { type: "property", name: "MyNS.myProp[MyNS.MyClass]", only: "uses" },
-     *     { type: "event", location: "MyModule(10:5)", only: "both" }
-     *   ],
-     *   excludedElements: [ // optional (best-effort)
-     *     { type:"property", name:"MyNS.myProp[MyNS.MyClass]" },
-     *     { type:"event", location:"MyModule(10:5)" }
-     *   ],
+     *   modules: "ModuleA, ModuleB", // optional, CSV
+     *   scope: "project" | "modules", // optional; applies to ALL modules in `modules`
+     *     // omitted scope keeps legacy behavior: REQUIRE expansion and may include libraries
+     *     // scope=project  -> REQUIRE expansion but project content only
+     *     // scope=modules  -> only the file that declares each module (no REQUIRE expansion)
+     *   name: "cust,Order", // optional, CSV; filters by element name
+     *   contains: "(?i)cust.*", // optional, CSV; filters by element code
+     *   elementTypes: "class,property,action", // optional, CSV
+     *   classes: "MyNS.MyClass, MyOtherNS.OtherClass", // optional, CSV canonical names
+     *   relatedElements: "property:MyNS.myProp[MyNS.MyClass], MyModule(10:5)", // optional, CSV
+     *   relatedDirection: "both" | "uses" | "used", // optional, applies to ALL relatedElements (default: both)
+     *   moreFilters: [ { ... }, { ... } ], // optional: additional filter objects; results are merged (OR)
      *   maxSymbols: 100000 // approximate cap for total result code length
      * }
      */
@@ -142,11 +143,9 @@ public class MCPSearchUtils {
             });
         };
 
-        JSONObject filter = query.optJSONObject("filter");
-        if(filter == null) filter = new JSONObject();
-        GlobalSearchScope searchScope = run(project, filter, stopRequested, seen, relatedCache, result, resultStatements, totalSymbols, maxSymbols, submit);
+        GlobalSearchScope searchScope = run(project, query, stopRequested, seen, relatedCache, result, resultStatements, totalSymbols, maxSymbols, submit);
 
-        JSONArray moreFilters = filter.optJSONArray("moreFilters");
+        JSONArray moreFilters = query.optJSONArray("moreFilters");
         if (moreFilters != null && !moreFilters.isEmpty())
             for (int i = 0; i < moreFilters.length(); i++)
                 searchScope = searchScope.union(run(project, moreFilters.optJSONObject(i), stopRequested, seen, relatedCache, result, resultStatements, totalSymbols, maxSymbols, submit));
@@ -206,11 +205,12 @@ public class MCPSearchUtils {
                                                  @NotNull Result<Integer> totalSymbols,
                                                  int maxSymbols,
                                                  @NotNull Consumer<Runnable> submit) {
-        GlobalSearchScope searchScope = ReadAction.compute(() -> buildScopeByModules(project, query.optJSONArray("modules")));
-        List<NameFilter> nameFilters = parseNameFilters(query.optJSONArray("names"));
-        Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optJSONArray("elementTypes"));
-        Set<LSFClassDeclaration> classDecls = ReadAction.compute(() -> parseClasses(project, searchScope, query.optJSONArray("classes")));
-        Map<LSFMCPDeclaration, Direction> related = ReadAction.compute(() -> parseRelated(project, searchScope, query.optJSONArray("relatedElements")));
+        GlobalSearchScope searchScope = ReadAction.compute(() -> buildScopeByModules(project, query.optString("modules"), query.optString("scope")));
+        List<NameFilter> nameFilters = parseMatchersCsv(query.optString("name"));
+        List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
+        Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
+        Set<LSFClassDeclaration> classDecls = ReadAction.compute(() -> parseClasses(project, searchScope, query.optString("classes")));
+        Map<LSFMCPDeclaration, Direction> related = ReadAction.compute(() -> parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection")));
 
         // Shared processor that applies all filters and returns false to stop the current iteration
         final Processor<LSFMCPDeclaration> processor = st -> {
@@ -220,7 +220,7 @@ public class MCPSearchUtils {
 
             // already processed
 
-            if (!matchesAllFilters(st, nameFilters, elementTypes, classDecls, related, searchScope, relatedCache)) return true;
+            if (!matchesAllFilters(st, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache)) return true;
 
             SelectedStatement selSt = new SelectedStatement(st, searchScope);
             JSONObject json = getJsonFromStatement(selSt, 1);
@@ -234,23 +234,25 @@ public class MCPSearchUtils {
             return totalSymbols.getResult() <= maxSymbols;
         };
 
-        // Track which blocks are fully streamable while assembling iterations
-        // Names are considered fully streamable only if ALL name filters are "word-only" with length > 3 and without regex
-        boolean namesFullyStreamable = !nameFilters.isEmpty();
-        // Name-based iterations (only for word length > 3)
+        // Track which blocks are fully streamable while assembling iterations.
+        // Name/code filters are considered fully streamable only if ALL matchers are "word-only" with length >= 3.
+        boolean nameFullyStreamable = !nameFilters.isEmpty();
+        // Name/code-based iterations (only for word length >= 3)
         for (NameFilter nf : nameFilters) {
-            if (nf.word != null && nf.word.length() >= 3) {
-                submit.accept(() -> ReadAction.run(() -> {
-                    PsiSearchHelper helper = PsiSearchHelper.getInstance(project);
-                    helper.processElementsWithWord((element, offsetInElement) -> processStatement(element, processor),
-                            searchScope,
-                            nf.word,
-                            (short)(UsageSearchContext.IN_CODE | UsageSearchContext.IN_FOREIGN_LANGUAGES | UsageSearchContext.IN_COMMENTS),
-                            true);
-                }));
+            if (nf.isWordStreamable()) {
+                submit.accept(() -> ReadAction.run(() -> streamWord(project, nf, processor, searchScope)));
             } else {
                 // Non-streamable filters (regex or short words): do not schedule name-based task here
-                namesFullyStreamable = false;
+                nameFullyStreamable = false;
+            }
+        }
+        boolean containsFullyStreamable = !containsFilters.isEmpty();
+        for (NameFilter nf : containsFilters) {
+            if (nf.isWordStreamable()) {
+                submit.accept(() -> ReadAction.run(() -> streamWord(project, nf, processor, searchScope)));
+            } else {
+                // Non-streamable filters (regex or short words): do not schedule name-based task here
+                containsFullyStreamable = false;
             }
         }
 
@@ -307,7 +309,7 @@ public class MCPSearchUtils {
         }
 
         // Per-file iterations (fallback) — run only if no block is fully streamable
-        if (!namesFullyStreamable && classDecls.isEmpty() && related.isEmpty() && !typesFullyStreamable) {
+        if (!nameFullyStreamable && !containsFullyStreamable && classDecls.isEmpty() && related.isEmpty() && !typesFullyStreamable) {
             for (LSFFile lsfFile : ReadAction.compute(() -> LSFFileUtils.getLsfFiles(searchScope))) {
                 submit.accept(() -> ReadAction.run(() -> {
                     for (LSFMCPDeclaration st : LSFMCPDeclaration.getMCPDeclarations(lsfFile)) {
@@ -318,6 +320,15 @@ public class MCPSearchUtils {
         }
 
         return searchScope;
+    }
+
+    private static void streamWord(@NonNull Project project, NameFilter nf, Processor<LSFMCPDeclaration> processor, GlobalSearchScope searchScope) {
+        PsiSearchHelper helper = PsiSearchHelper.getInstance(project);
+        helper.processElementsWithWord((element, offsetInElement) -> processStatement(element, processor),
+                searchScope,
+                nf.word,
+                (short)(UsageSearchContext.IN_CODE | UsageSearchContext.IN_FOREIGN_LANGUAGES | UsageSearchContext.IN_COMMENTS),
+                true);
     }
 
     private static boolean isTimedOut(long deadlineMillis) {
@@ -482,59 +493,89 @@ public class MCPSearchUtils {
     // Models for filters (direct PSI declarations)
     private enum Direction { USES, USED, BOTH }
 
-    private static List<NameFilter> parseNameFilters(JSONArray arr) {
-        if (arr == null) return Collections.emptyList();
+    private static boolean isWordSearch(@NotNull String s) {
+        // Treat as a "word" ONLY when it matches lsFusion ID tokenization and what
+        // PsiSearchHelper.processElementsWithWord expects.
+        // lsFusion ID (see LSF.flex): FIRST_ID_LETTER=[a-zA-Z], NEXT_ID_LETTER=[a-zA-Z_0-9]
+        // Everything else is treated as regex.
+        if (s.isEmpty()) return false;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (i == 0) {
+                if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) return false;
+            } else {
+                boolean ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
+                if (!ok) return false;
+            }
+        }
+        return true;
+    }
+
+    private static @NotNull List<NameFilter> parseMatchersCsv(@Nullable String csv) {
         List<NameFilter> res = new ArrayList<>();
-        for (int i = 0; i < arr.length(); i++) {
-            JSONObject o = arr.optJSONObject(i);
-            if (o == null) continue;
-            String word = o.optString("word", null);
-            if(word != null && word.isEmpty()) word = null;
-            String regex = o.optString("regex", null);
-             if(regex != null && regex.isEmpty()) regex = null;
-            boolean inCode = o.optBoolean("inCode", false);
-            if (word == null && regex == null) continue;
-            Pattern pattern = null;
-            try {
-                if (regex != null && !regex.isEmpty()) pattern = Pattern.compile(regex);
-            } catch (Exception ignore) {}
-            res.add(new NameFilter(word, pattern, inCode));
+        for (String token : parseCsv(csv)) {
+            if (token.isEmpty()) continue;
+
+            if (isWordSearch(token)) {
+                res.add(new NameFilter(token, null));
+            } else {
+                Pattern pattern = null;
+                try {
+                    pattern = Pattern.compile(token);
+                } catch (Exception ignore) {
+                    // ignore invalid regex
+                }
+                if (pattern != null) {
+                    res.add(new NameFilter(null, pattern));
+                }
+            }
+        }
+        return res;
+    }
+
+    private static @NotNull List<String> parseCsv(@Nullable String csv) {
+        if (csv == null) return Collections.emptyList();
+        String s = csv.trim();
+        if (s.isEmpty()) return Collections.emptyList();
+
+        List<String> res = new ArrayList<>();
+        for (String part : s.split(",", -1)) {
+            String v = part.trim();
+            if (!v.isEmpty()) res.add(v);
         }
         return res;
     }
 
     // region Parse + generate
 
-    private static Set<LSFClassDeclaration> parseClasses(Project project, GlobalSearchScope scope, JSONArray arr) {
-        if (arr == null) return Collections.emptySet();
-        Set<LSFClassDeclaration> res = new HashSet<>();
-        for (int i = 0; i < arr.length(); i++) {
-            JSONObject o = arr.optJSONObject(i);
-            String name = o.optString("name", null);
-            if (name == null) continue;
+    private static Set<LSFClassDeclaration> parseClasses(Project project, GlobalSearchScope scope, @Nullable String classesCsv) {
+        if (classesCsv.isEmpty()) return Collections.emptySet();
 
+        Set<LSFClassDeclaration> res = new HashSet<>();
+        for (String name : parseCsv(classesCsv)) {
             res.addAll(resolveClassesByName(project, scope, name));
         }
         return res;
     }
 
-    private static Map<LSFMCPDeclaration, Direction> parseRelated(Project project, GlobalSearchScope scope, JSONArray arr) {
-        if (arr == null) return Collections.emptyMap();
+    private static Map<LSFMCPDeclaration, Direction> parseRelated(Project project,
+                                                                  GlobalSearchScope scope,
+                                                                  @Nullable String relatedElementsCsv,
+                                                                  @Nullable String relatedDirection) {
+        if (relatedElementsCsv.isEmpty()) return Collections.emptyMap();
+
+        Direction dir = Direction.BOTH;
+        if ("uses".equals(relatedDirection)) {
+            dir = Direction.USES;
+        } else if ("used".equals(relatedDirection)) {
+            dir = Direction.USED;
+        }
+
         Map<LSFMCPDeclaration, Direction> units = new HashMap<>();
-        // Resolve each item separately with its own direction
-        for (int i = 0; i < arr.length(); i++) {
-            JSONObject o = arr.optJSONObject(i);
-            if (o == null) continue;
-
-            Direction dir = Direction.BOTH;
-            String only = o.optString("only", null);
-            if (only != null && !only.isEmpty()) {
-                if ("uses".equalsIgnoreCase(only)) dir = Direction.USES;
-                else if ("used".equalsIgnoreCase(only)) dir = Direction.USED;
-            }
-
-            for(LSFMCPDeclaration stmt : getStatementsFromJson(project, scope, o))
+        for (String token : parseCsv(relatedElementsCsv)) {
+            for (LSFMCPDeclaration stmt : getStatementsFromJson(project, scope, token)) {
                 units.put(stmt, dir);
+            }
         }
         return units;
     }
@@ -592,31 +633,38 @@ public class MCPSearchUtils {
     }
 
     /**
-     * Single entry point: read an element (LSFFullNameDeclaration/LSFMCPStatement) description from JSON.
-     * Input contract (for MCP UI generation):
-     *  - Named elements: require field { type, name }, where name is canonicalName.
-     *  - Unnamed elements: require field { location } where location is "<module>(<line>:<symbolInLine>)",
-     *    e.g. "MyModule(10:5)". In this mode resolution is best-effort by module and position.
+     * Single entry point: resolve an element (LSFFullNameDeclaration/LSFMCPStatement) from a related-element token.
+     * Token contract:
+     *  - Named elements: `type:name`, where `name` is canonicalName (best-effort).
+     *  - Unnamed elements: `location` where location is "<module>(<line>:<symbolInLine>)", e.g. "MyModule(10:5)".
      */
-    private static Collection<LSFMCPDeclaration> getStatementsFromJson(Project project, GlobalSearchScope scope, JSONObject o) {
-        if (o == null) return Collections.emptySet();
+    private static Collection<LSFMCPDeclaration> getStatementsFromJson(Project project, GlobalSearchScope scope, @Nullable String token) {
+        String s = token.trim();
+        if (s.isEmpty()) return Collections.emptySet();
 
-        LSFMCPDeclaration.ElementType type = LSFMCPDeclaration.ElementType.fromString(o.optString("type", null));
-
-        // 1) name-based resolution using resolver + condition when possible (for named types)
-        Set<LSFMCPDeclaration> byName = getStatementsFromName(project, scope, type, o.optString("name"));
-        if (!byName.isEmpty()) return byName;
-
-        // 2) location-based resolution (for unnamed elements)
-        LSFMCPDeclaration byLocation = getStatementByLocation(project, scope, o.optString("location"), type);
+        // 1) location-based resolution (for unnamed elements)
+        // Try to parse/resolve as location first; if it doesn't work, fallback to `type:name`.
+        LSFMCPDeclaration byLocation = getStatementByLocation(project, scope, s);
         if (byLocation != null) return Collections.singletonList(byLocation);
+
+        // 2) name-based resolution using resolver + condition when possible (for named types)
+        int colon = s.indexOf(':');
+        if (colon <= 0 || colon >= s.length() - 1) return Collections.emptyList();
+
+        String typeStr = s.substring(0, colon).trim();
+        String name = s.substring(colon + 1).trim();
+        if (typeStr.isEmpty() || name.isEmpty()) return Collections.emptyList();
+
+        LSFMCPDeclaration.ElementType type = LSFMCPDeclaration.ElementType.fromString(typeStr);
+        Set<LSFMCPDeclaration> byName = getStatementsFromName(project, scope, type, name);
+        if (!byName.isEmpty()) return byName;
 
         return Collections.emptyList();
     }
 
     // Expected format: <module>(<line>:<symbolInLine>) e.g. MyModule(10:5)
     // line and symbolInLine are 1-based
-    private static LSFMCPDeclaration getStatementByLocation(Project project, GlobalSearchScope scope, String location, LSFMCPDeclaration.ElementType type) {
+    private static LSFMCPDeclaration getStatementByLocation(Project project, GlobalSearchScope scope, String location) {
         if (location == null) return null;
         String s = location.trim();
         if (s.isEmpty()) return null;
@@ -626,7 +674,6 @@ public class MCPSearchUtils {
         if (lParen <= 0 || rParen <= lParen) return null;
 
         String module = s.substring(0, lParen);
-        if (module.isEmpty()) return null;
 
         String inside = s.substring(lParen + 1, rParen);
         int colon = inside.indexOf(':');
@@ -671,10 +718,6 @@ public class MCPSearchUtils {
 
             LSFMCPDeclaration st = getStatement(el);
             if (st == null) continue;
-
-            if (type == null) return st;
-            LSFMCPDeclaration.ElementType stType = st.getMCPType();
-            if (stType == type) return st;
 
             return st;
         }
@@ -780,11 +823,11 @@ public class MCPSearchUtils {
         return new LSFPsiImplUtil.TextCutRules(scaled);
     }
 
-    private static Set<LSFMCPDeclaration.ElementType> parseElementTypes(JSONArray arr) {
-        if (arr == null) return Collections.emptySet();
+    private static Set<LSFMCPDeclaration.ElementType> parseElementTypes(@Nullable String elementTypesCsv) {
+        if (elementTypesCsv.isEmpty()) return Collections.emptySet();
         Set<LSFMCPDeclaration.ElementType> res = EnumSet.noneOf(LSFMCPDeclaration.ElementType.class);
-        for (int i = 0; i < arr.length(); i++) {
-            String s = String.valueOf(arr.opt(i));
+
+        for (String s : parseCsv(elementTypesCsv)) {
             LSFMCPDeclaration.ElementType t = LSFMCPDeclaration.ElementType.fromString(s);
             if (t != null) res.add(t);
         }
@@ -795,25 +838,26 @@ public class MCPSearchUtils {
 
     // region Scope by modules
 
-    private static GlobalSearchScope buildScopeByModules(Project project, JSONArray modules) {
+    private static GlobalSearchScope buildScopeByModules(Project project, String modules, String modulesScope) {
         GlobalSearchScope projectOnly = ProjectScope.getProjectScope(project);
         GlobalSearchScope allScope = ProjectScope.getAllScope(project);
 
-        if (modules == null || modules.isEmpty()) {
+        boolean thisMode = "modules".equals(modulesScope);
+        boolean projectMode = "project".equals(modulesScope);
+
+        if (modules.isEmpty()) {
+            // If `scope` is explicitly provided without `modules`, it should still affect the global search.
+            // Currently only `project` mode is meaningful here.
+            if (projectMode)
+                return projectOnly;
+            if (thisMode)
+                return GlobalSearchScope.EMPTY_SCOPE;
             return allScope;
         }
 
         GlobalSearchScope acc = null;
-        for (int i = 0; i < modules.length(); i++) {
-            JSONObject obj = modules.optJSONObject(i);
-
-            String moduleName = obj.optString("name", null);
-
-            String only = obj.optString("only", null);
-            boolean projectMode = "project".equals(only);
-            boolean thisMode = "this".equals(only);
-
-            // Default (no `only`): keep legacy behavior — allow libraries.
+        for (String moduleName : parseCsv(modules)) {
+            // Default (no `scope`): keep legacy behavior — allow libraries.
             Collection<LSFModuleDeclaration> decls = LSFGlobalResolver.findModules(moduleName, project, projectMode ? projectOnly : allScope);
             for (LSFModuleDeclaration md : decls) {
                 LSFFile file = md.getLSFFile();
@@ -845,10 +889,18 @@ public class MCPSearchUtils {
 
     // region Matching
 
-    private static boolean matchesAllFilters(LSFMCPDeclaration stmt, List<NameFilter> nameFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, Set<LSFClassDeclaration> classDecls, Map<LSFMCPDeclaration, Direction> related, GlobalSearchScope scope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
+    private static boolean matchesAllFilters(LSFMCPDeclaration stmt,
+                                             List<NameFilter> nameFilters,
+                                             List<NameFilter> containsFilters,
+                                             Set<LSFMCPDeclaration.ElementType> elementTypes,
+                                             Set<LSFClassDeclaration> classDecls,
+                                             Map<LSFMCPDeclaration, Direction> related,
+                                             GlobalSearchScope scope,
+                                             ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
         LSFMCPDeclaration.ElementType t;
         return (elementTypes.isEmpty() || ((t = stmt.getMCPType()) != null && elementTypes.contains(t))) &&
-                (nameFilters.isEmpty() || matchesNameFilters(stmt, nameFilters, scope)) &&
+                (nameFilters.isEmpty() || matchesNameFilters(stmt, nameFilters, scope, false)) &&
+                (containsFilters.isEmpty() || matchesNameFilters(stmt, containsFilters, scope, true)) &&
                 (classDecls.isEmpty() || matchesClassesFilter(stmt, classDecls, scope)) &&
                 (related.isEmpty() || matchesRelatedFilters(stmt, related, scope, relatedCache));
     }
@@ -1051,12 +1103,12 @@ public class MCPSearchUtils {
         }
     }
 
-    private static boolean matchesNameFilters(LSFMCPDeclaration stmt, List<NameFilter> nameFilters, GlobalSearchScope scope) {
+    private static boolean matchesNameFilters(LSFMCPDeclaration stmt, List<NameFilter> nameFilters, GlobalSearchScope scope, boolean inCode) {
         List<String> names = null;
         List<String> code = null;
         for (NameFilter f : nameFilters) {
             List<String> hays;
-            if(f.inCode) {
+            if(inCode) {
                 if(code == null)
                     code = getElementCodeWithExtends(stmt, scope);
                 hays = code;
@@ -1088,12 +1140,14 @@ public class MCPSearchUtils {
     private static class NameFilter {
         final String word;
         final Pattern regex;
-        final boolean inCode;
+        
+        public boolean isWordStreamable() {
+            return word != null && word.length() >= 3 && regex == null;
+        }
 
-        NameFilter(String word, Pattern regex, boolean inCode) {
+        NameFilter(String word, Pattern regex) {
             this.word = word;
             this.regex = regex;
-            this.inCode = inCode;
         }
     }
 

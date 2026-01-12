@@ -78,6 +78,32 @@
                  classpathref="javac2.classpath"/>
     </target>
 
+    <!-- Kotlin compiler (bundled with IntelliJ IDEA via Kotlin plugin) -->
+
+    <property name="kotlin.home" value="${idea.home}/plugins/Kotlin"/>
+    <property name="kotlin.kotlinc.lib" value="${kotlin.home}/kotlinc/lib"/>
+    <property name="kotlin.lib" value="${kotlin.home}/lib"/>
+
+    <path id="kotlin.compiler.classpath">
+        <fileset dir="${kotlin.kotlinc.lib}" erroronmissingdir="false">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${kotlin.lib}" erroronmissingdir="false">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <!-- Kotlin serialization compiler plugin (required to generate serializers for @Serializable DTOs). -->
+
+    <path id="kotlin.serialization.plugin.classpath">
+        <fileset dir="${kotlin.kotlinc.lib}" erroronmissingdir="false">
+            <include name="kotlinx-serialization-compiler-plugin*.jar"/>
+        </fileset>
+        <fileset dir="${kotlin.lib}" erroronmissingdir="false">
+            <include name="kotlinx-serialization-compiler-plugin*.jar"/>
+        </fileset>
+    </path>
+
     <!-- Module lsfusion-idea-plugin -->
 
     <property name="compiler.args"
@@ -180,6 +206,9 @@
             <patternset refid="excluded.from.compilation"/>
         </javac2>
 
+        <!-- Compile Kotlin sources (required for MCP toolsets with stable parameter names in schema). -->
+        <antcall target="compile.kotlin"/>
+
         <copy todir="${output.dir}">
             <fileset dir="${basedir}/src">
                 <patternset refid="compiler.resources"/>
@@ -194,6 +223,45 @@
                 <type type="file"/>
             </fileset>
         </copy>
+    </target>
+
+    <target name="compile.kotlin" description="Compile Kotlin sources">
+        <available property="kotlin.compiler.available" classname="org.jetbrains.kotlin.cli.jvm.K2JVMCompiler"
+                   classpathref="kotlin.compiler.classpath"/>
+        <fail unless="kotlin.compiler.available"
+              message="Kotlin compiler not found under ${kotlin.home}. Expected jars in ${kotlin.kotlinc.lib} or ${kotlin.lib}."/>
+
+        <available property="kotlin.serialization.plugin.available" classname="org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationComponentRegistrar"
+                   classpathref="kotlin.serialization.plugin.classpath"/>
+        <fail unless="kotlin.serialization.plugin.available"
+              message="Kotlin serialization compiler plugin not found under ${kotlin.home}. Expected kotlinx-serialization-compiler-plugin*.jar in ${kotlin.kotlinc.lib} or ${kotlin.lib}."/>
+
+        <path id="kotlin.compile.classpath">
+            <path refid="lsfusion-idea-plugin.classpath"/>
+            <pathelement location="${output.dir}"/>
+        </path>
+        <pathconvert property="kotlin.compile.classpath.string" refid="kotlin.compile.classpath"/>
+
+        <pathconvert property="kotlin.serialization.plugin.classpath.string" refid="kotlin.serialization.plugin.classpath"/>
+
+        <java classname="org.jetbrains.kotlin.cli.jvm.K2JVMCompiler" fork="true" failonerror="true" jvm="${jdk.executable}">
+            <classpath refid="kotlin.compiler.classpath"/>
+
+            <arg value="-d"/>
+            <arg value="${output.dir}"/>
+            <arg value="-classpath"/>
+            <arg value="${kotlin.compile.classpath.string}"/>
+
+            <arg value="-Xplugin=${kotlin.serialization.plugin.classpath.string}"/>
+
+            <!--
+              Compile ALL Kotlin sources under the project.
+              We pass source roots (directories) so newly added *.kt files are picked up automatically
+              without editing build.xml (important for CI/Jenkins builds).
+            -->
+            <arg value="${basedir}/src"/>
+            <arg value="${basedir}/gen"/>
+        </java>
     </target>
 
     <target name="clean" description="cleanup module">

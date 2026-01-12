@@ -17,10 +17,6 @@
       <entry name="?*.sh" />
       <entry name="?*.reg" />
     </wildcardResourcePatterns>
-  </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="lsfusion-idea-plugin" options="--add-exports com.fasterxml.aalto/com.intellij.openapi.diagnostic=ALL-UNNAMED --add-exports com.fasterxml.aalto/com.intellij.icons=ALL-UNNAMED --add-exports com.fasterxml.aalto/com.intellij.ui=ALL-UNNAMED --add-exports com.fasterxml.aalto/com.intellij.openapi.util=ALL-UNNAMED --add-exports com.fasterxml.aalto/com.intellij.util=ALL-UNNAMED --add-exports com.fasterxml.aalto/com.intellij.openapi.application=ALL-UNNAMED --add-exports com.fasterxml.aalto/com.intellij.util.text=ALL-UNNAMED --add-exports com.fasterxml.aalto/com.intellij.util.containers=ALL-UNNAMED --add-exports com.fasterxml.aalto/org.jdom.input=ALL-UNNAMED --add-exports com.fasterxml.aalto/org.jdom=ALL-UNNAMED --add-modules java.desktop,java.rmi" />
-    </option>
+    <bytecodeTargetLevel target="21" />
   </component>
 </project>
