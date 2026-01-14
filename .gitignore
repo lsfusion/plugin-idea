@@ -30,5 +30,5 @@ javac.*.args
 .output.txt
 
 # Bundled tools (optional; keep untracked by default)
-jflex-1.9.1.jar
+../jenkins/vars/jflex-1.9.1.jar
 /gen/

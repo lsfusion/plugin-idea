@@ -156,13 +156,15 @@ public final class McpServerService extends RestService {
                 .put("properties", new JSONObject()
                         .put("modules", new JSONObject()
                                 .put("type", "string")
-                                .put("description", "Module names as CSV (comma-separated), e.g. `ModuleA, ModuleB`."))
+                                .put("description", "lsFusion module names as CSV (comma-separated), e.g. `ModuleA, ModuleB`. Filters elements by their module."))
+                        .put("requiredModules", new JSONObject()
+                                .put("type", "boolean")
+                                .put("default", true)
+                                .put("description", "Include required lsFusion modules for specified lsFusion modules (only if 'modules' is provided). Default: true."))
                         .put("scope", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Scope mode for ALL modules in `modules`. Omitted keeps legacy behavior (REQUIRE expansion and may include libraries)." +
-                                                " `project` = REQUIRE expansion but project content only. `modules` = only module declaration files (no REQUIRE expansion).")
-                                .put("enum", new JSONArray().put("project").put("modules")))
+                                        "Search scope mode (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."))
                         .put("name", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
@@ -179,25 +181,21 @@ public final class McpServerService extends RestService {
                                                 "otherwise it is treated as regex."))
                         .put("elementTypes", new JSONObject()
                                 .put("type", "string")
-                                .put("description", "Element type filter as CSV (comma-separated). If set, only these element types are returned."))
+                                .put("description", "Element type filter as CSV. Allowed values: `module`, `metacode`, `class`, `property`, `action`, `form`, `navigatorElement`, `window`, `group`, `table`, `event`, `calculatedEvent`, `constraint`, `index`."))
                         .put("classes", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Class filter as CSV (comma-separated). Name may be canonical (with namespace) or short (no namespace). " +
-                                                "For property/action elements: matches parameter classes (best-effort)."))
+                                        "Class filter as CSV (with namespace `MyNS.MyClass` or without `MyClass`). For property/action: matches parameter classes (best-effort)."))
                         .put("relatedElements", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Usage-graph traversal seeds as CSV (comma-separated). Each item is either `type:name` (named element) or `location` for unnamed elements. " +
-                                                "Location format: `<module>(<line>:<col>)`, 1-based. Example: `MyModule(10:5)`. " +
-                                                "For `type:name`, `name` may be canonical or short (namespace optional). For property/action elements you may include a signature in brackets, " +
-                                                "e.g. \"property:MyNS.myProp[MyNS.MyClass]\" or \"property:myProp[MyClass]\". Traversal is best-effort and may be large."))
+                                        "Usage-graph traversal seeds as CSV. Each item is either `type:name` (named element) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`."))
                         .put("relatedDirection", new JSONObject()
                                 .put("type", "string")
                                 .put("default", "both")
                                 .put("enum", new JSONArray().put("both").put("uses").put("used"))
                                 .put("description",
-                                        "Direction for ALL `relatedElements` seeds. `both` (default) traverses in both directions, `uses` traverses forward (what the element uses), `used` traverses reverse (what uses the element)."))
+                                        "Direction for ALL `relatedElements` seeds. Allowed values: `both`, `uses`, `used`. Default: `both`."))
                 )
                 .put("additionalProperties", false);
 
@@ -206,26 +204,25 @@ public final class McpServerService extends RestService {
                 .put("type", "object")
                 .put("properties", new JSONObject(filterSchema.getJSONObject("properties").toMap())
                         .put("moreFilters", new JSONObject()
-                                .put("type", "array")
+                                .put("type", "string")
                                 .put("description",
-                                        "Additional filter objects (same structure as the root). Each filter is executed independently; results are merged (OR).")
-                                .put("items", filterSchema))
+                                        "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"names\":\"Foo\", \"modules\" : \"MyModule\"},{\"names\":\"Bar\"}]`). Results are merged (OR)."))
                         .put("minSymbols", new JSONObject()
                                 .put("type", "integer")
                                 .put("minimum", 0)
                                 .put("default", MCPSearchUtils.DEFAULT_MIN_SYMBOLS)
                                 .put("description",
-                                        "Best-effort minimum output size (JSON chars). If too small, server may append neighboring elements from the same files until reaching this value (maxSymbols is a hard cap)."))
+                                        "Best-effort minimum output size in JSON chars; server may append neighboring elements if too small (>= 0). Default: " + MCPSearchUtils.DEFAULT_MIN_SYMBOLS + "."))
                         .put("maxSymbols", new JSONObject()
                                 .put("type", "integer")
                                 .put("minimum", 1)
                                 .put("default", MCPSearchUtils.DEFAULT_MAX_SYMBOLS)
-                                .put("description", "Hard cap for total output size (JSON chars)."))
+                                .put("description", "Hard cap for total output size in JSON chars (>= 1). Default: " + MCPSearchUtils.DEFAULT_MAX_SYMBOLS + "."))
                         .put("timeoutSeconds", new JSONObject()
                                 .put("type", "integer")
                                 .put("minimum", 1)
                                 .put("default", MCPSearchUtils.DEFAULT_TIMEOUT_SECS)
-                                .put("description", "Best-effort wall-clock timeout for the request (integer seconds).")))
+                                .put("description", "Best-effort wall-clock timeout in seconds (>= 1). Default: " + MCPSearchUtils.DEFAULT_TIMEOUT_SECS + ".")))
                 .put("additionalProperties", false);
 
         JSONObject inputSchema = new JSONObject()
@@ -241,7 +238,7 @@ public final class McpServerService extends RestService {
                 .put("name", TOOL_NAME)
                 .put("description",
                         "Find and inspect lsFusion elements in the current IntelliJ project. " +
-                                "Returns JSON as text: {items:[...], meta?:string}. " +
+                                "Returns JSON as text: {items:[...], meta?:string, errors?:string[]}. " +
                                 "meta values: `too long - timeout hit` | `too large - max symbols hit` | `too small - non matching elements added`.")
                 .put("inputSchema", inputSchema);
     }

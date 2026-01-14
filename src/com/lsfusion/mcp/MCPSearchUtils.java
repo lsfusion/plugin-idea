@@ -2,6 +2,9 @@ package com.lsfusion.mcp;
 
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
@@ -53,6 +56,7 @@ import java.util.regex.Pattern;
  * It supports filters: modules, names, elementTypes, excludedElements, and maxSymbols (approximate early-stop).
 */
 public class MCPSearchUtils {
+    private static final Logger LOG = Logger.getInstance(MCPSearchUtils.class);
 
     public static final int DEFAULT_MAX_SYMBOLS = 200_000; // fail-safe
     public static final int DEFAULT_MIN_SYMBOLS = 1_000; // fail-safe
@@ -72,11 +76,12 @@ public class MCPSearchUtils {
      * Main entry: executes search based on provided JSON query.
      * Expected structure (simplified):
      * {
-     *   modules: "ModuleA, ModuleB", // optional, CSV
-     *   scope: "project" | "modules", // optional; applies to ALL modules in `modules`
-     *     // omitted scope keeps legacy behavior: REQUIRE expansion and may include libraries
-     *     // scope=project  -> REQUIRE expansion but project content only
-     *     // scope=modules  -> only the file that declares each module (no REQUIRE expansion)
+     *   modules: "ModuleA, ModuleB", // optional, CSV; filter results by these modules
+     *   scope: "project" | "project and libraries" | "modules", // optional; SearchScope concept from IDEA
+     *     // omitted scope or "project and libraries" -> allScope (includes libraries)
+     *     // scope=project -> projectOnly scope (excludes libraries)
+     *     // otherwise, scope can be a CSV list of IDEA module names (e.g. "my-idea-module1,my-idea-module2")
+     *   requiredModules: true, // optional (default: true); if true, include REQUIRE-d modules for modules in `modules`
      *   name: "cust,Order", // optional, CSV; filters by element name
      *   contains: "(?i)cust.*", // optional, CSV; filters by element code
      *   elementTypes: "class,property,action", // optional, CSV
@@ -111,6 +116,7 @@ public class MCPSearchUtils {
 
         Set<LSFMCPDeclaration> seen = Collections.newSetFromMap(new ConcurrentHashMap<>());
         ConcurrentMap<RelatedKey, RelatedState> relatedCache = new ConcurrentHashMap<>();
+        List<String> errors = Collections.synchronizedList(new ArrayList<>());
 
         // Executor and dynamic scheduling support
         ExecutorService exec = Executors.newFixedThreadPool(Math.min(6, Math.max(1, Runtime.getRuntime().availableProcessors() - 1)));
@@ -139,7 +145,15 @@ public class MCPSearchUtils {
         java.util.function.Consumer<Runnable> submit = r -> {
             pendingTasks.incrementAndGet();
             exec.submit(() -> {
-                try { r.run(); } finally { pendingTasks.decrementAndGet(); }
+                try {
+                    r.run();
+                } catch (com.intellij.openapi.progress.ProcessCanceledException e) {
+                    throw e; // Standard platform cancellation, must be rethrown or handled by the platform
+                } catch (Throwable t) {
+                    handleError(t, "Error executing MCP search task", errors);
+                } finally {
+                    pendingTasks.decrementAndGet();
+                }
             });
         };
 
@@ -160,10 +174,14 @@ public class MCPSearchUtils {
 
         // 1) First, try to expand shortCode for the selected set under maxSymbols.
         if (bestTotal < maxSymbols) {
-            JSONArray expanded = tryExpandShortCodeUntilBudget(bestStatements, maxSymbols, deadlineMillis);
-            if (expanded != null) {
-                best = expanded;
-                bestTotal = expanded.toString().length();
+            try {
+                JSONArray expanded = tryExpandShortCodeUntilBudget(bestStatements, maxSymbols, deadlineMillis);
+                if (expanded != null) {
+                    best = expanded;
+                    bestTotal = expanded.toString().length();
+                }
+            } catch (Throwable t) {
+                handleError(t, "Error expanding short code", errors);
             }
         } else {
             maxSymbolsHit = true;
@@ -172,8 +190,12 @@ public class MCPSearchUtils {
         final AtomicBoolean nonMatchingStatementsAdded = new AtomicBoolean(false);
         // 2) If still below minSymbols, append neighboring declarations (in-file PSI order) with full code.
         if (!timeoutHit.get() && minSymbols > 0 && bestTotal < minSymbols && bestTotal < maxSymbols) {
-            // Neighbor fill ignores the original filter predicate by design; report this to the caller.
-            fillNeighborsUntilMinSymbols(bestStatements, best, bestTotal, searchScope, minSymbols, maxSymbols, deadlineMillis, nonMatchingStatementsAdded);
+            try {
+                // Neighbor fill ignores the original filter predicate by design; report this to the caller.
+                fillNeighborsUntilMinSymbols(bestStatements, best, bestTotal, searchScope, minSymbols, maxSymbols, deadlineMillis, nonMatchingStatementsAdded);
+            } catch (Throwable t) {
+                handleError(t, "Error filling neighbors", errors);
+            }
         }
 
         // Single-line meta reason (exactly one string).
@@ -191,6 +213,9 @@ public class MCPSearchUtils {
                 .put("items", best);
         if(meta != null)
             resultObject.put("meta", meta);
+        if (!errors.isEmpty()) {
+            resultObject.put("errors", new JSONArray(new LinkedHashSet<>(errors)));
+        }
 
         return resultObject;
     }
@@ -205,7 +230,7 @@ public class MCPSearchUtils {
                                                  @NotNull Result<Integer> totalSymbols,
                                                  int maxSymbols,
                                                  @NotNull Consumer<Runnable> submit) {
-        GlobalSearchScope searchScope = ReadAction.compute(() -> buildScopeByModules(project, query.optString("modules"), query.optString("scope")));
+        GlobalSearchScope searchScope = ReadAction.compute(() -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
         List<NameFilter> nameFilters = parseMatchersCsv(query.optString("name"));
         List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
         Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
@@ -749,6 +774,11 @@ public class MCPSearchUtils {
     }
 
 
+    private static void handleError(Throwable t, String logMessage, List<String> errors) {
+        LOG.error(logMessage, t);
+        errors.add(t.getMessage() != null ? t.getMessage() : t.toString());
+    }
+
     private static @NotNull JSONObject getJsonFromStatement(LSFMCPDeclaration stmt,
                                                             GlobalSearchScope searchScope) {
         return getJsonFromStatement(new SelectedStatement(stmt, searchScope), MCPSearchUtils.FULL_TEXT_SHORT_CODE_FACTOR);
@@ -838,51 +868,58 @@ public class MCPSearchUtils {
 
     // region Scope by modules
 
-    private static GlobalSearchScope buildScopeByModules(Project project, String modules, String modulesScope) {
-        GlobalSearchScope projectOnly = ProjectScope.getProjectScope(project);
-        GlobalSearchScope allScope = ProjectScope.getAllScope(project);
-
-        boolean thisMode = "modules".equals(modulesScope);
-        boolean projectMode = "project".equals(modulesScope);
-
-        if (modules.isEmpty()) {
-            // If `scope` is explicitly provided without `modules`, it should still affect the global search.
-            // Currently only `project` mode is meaningful here.
-            if (projectMode)
-                return projectOnly;
-            if (thisMode)
-                return GlobalSearchScope.EMPTY_SCOPE;
-            return allScope;
+    private static GlobalSearchScope buildScope(@NotNull Project project, @Nullable String scopeMode) {
+        if (scopeMode == null || scopeMode.isEmpty() || "project and libraries".equals(scopeMode)) {
+            return ProjectScope.getAllScope(project);
+        }
+        if ("project".equals(scopeMode)) {
+            return ProjectScope.getProjectScope(project);
         }
 
         GlobalSearchScope acc = null;
+        ModuleManager moduleManager = ModuleManager.getInstance(project);
+        for (String moduleName : parseCsv(scopeMode)) {
+            Module module = moduleManager.findModuleByName(moduleName.trim());
+            if (module != null) {
+                GlobalSearchScope moduleScope = module.getModuleContentScope();
+                acc = (acc == null) ? moduleScope : acc.union(moduleScope);
+            }
+        }
+        return acc != null ? acc : GlobalSearchScope.EMPTY_SCOPE;
+    }
+
+    private static GlobalSearchScope buildModulesFilter(@NotNull Project project, @NotNull String modules, boolean requiredModules, @NotNull GlobalSearchScope baseScope) {
+        GlobalSearchScope acc = null;
         for (String moduleName : parseCsv(modules)) {
-            // Default (no `scope`): keep legacy behavior — allow libraries.
-            Collection<LSFModuleDeclaration> decls = LSFGlobalResolver.findModules(moduleName, project, projectMode ? projectOnly : allScope);
+            // We search for modules within the baseScope (which respects the 'scope' parameter)
+            Collection<LSFModuleDeclaration> decls = LSFGlobalResolver.findModules(moduleName, project, baseScope);
             for (LSFModuleDeclaration md : decls) {
                 LSFFile file = md.getLSFFile();
 
                 GlobalSearchScope scope;
-                if (thisMode) {
+                if (!requiredModules) {
                     VirtualFile vf = file.getVirtualFile();
                     if (vf == null) continue;
                     scope = GlobalSearchScope.fileScope(project, vf);
                 } else {
                     scope = file.getRequireScope();
                     if (scope == null) continue;
-
-                    if (projectMode) {
-                        // Keep search inside project content only.
-                        scope = scope.intersectWith(projectOnly);
-                    }
                 }
 
                 acc = acc == null ? scope : acc.union(scope);
             }
         }
 
-        // If modules were provided but nothing resolved, keep it empty (no fallback widening).
         return acc == null ? GlobalSearchScope.EMPTY_SCOPE : acc;
+    }
+
+    private static GlobalSearchScope buildSearchScope(Project project, String modules, String scopeMode, boolean requiredModules) {
+        GlobalSearchScope baseScope = buildScope(project, scopeMode);
+        if (modules == null || modules.isEmpty()) {
+            return baseScope;
+        }
+        GlobalSearchScope modulesFilter = buildModulesFilter(project, modules, requiredModules, baseScope);
+        return baseScope.intersectWith(modulesFilter);
     }
 
     // endregion

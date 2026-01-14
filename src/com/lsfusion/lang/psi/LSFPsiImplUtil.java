@@ -2630,12 +2630,12 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return ((UnfriendlyPE) sourceStatement.getChildren()[0]).resolveValueParamClasses(declareParams);
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFExpressionUnfriendlyPD sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return ((UnfriendlyPE) sourceStatement.getChildren()[0]).checkValueParamClasses(declareParams);
     }
 
@@ -2647,22 +2647,22 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFActionUnfriendlyPD actionDef, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFActionUnfriendlyPD actionDef, @Nullable List<LSFParamDeclaration> declareParams) {
         return ((UnfriendlyPE) actionDef.getChildren()[0]).resolveValueParamClasses(declareParams);
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFActionUnfriendlyPD sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFActionUnfriendlyPD sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return ((UnfriendlyPE) sourceStatement.getChildren()[0]).checkValueParamClasses(declareParams);
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFDataPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         if((sourceStatement.getClassNameList() == null)) {
             return Pair.create(new ArrayList<>(), new HashMap<>());
         } else {
@@ -2671,22 +2671,22 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFNativePropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFNativePropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFNativePropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFNativePropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFAbstractPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         if((sourceStatement.getClassNameList() == null)) {
             return Pair.create(new ArrayList<>(), new HashMap<>());
         } else {
@@ -2695,17 +2695,17 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return LSFExClassSet.toEx(resolveClasses(sourceStatement.getClassNameList()));
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFAbstractActionPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return checkValueParamClasses(sourceStatement, sourceStatement.getClassNameList(), declareParams);
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         LSFBracketedClassNameList bracketedClassNameList = sourceStatement.getBracketedClassNameList();
         if (bracketedClassNameList != null)
             return LSFExClassSet.toEx(resolveClasses(bracketedClassNameList.getClassNameList()));
@@ -2714,7 +2714,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFCustomActionPropertyDefinitionBody sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         LSFBracketedClassNameList bracketedClassNameList = sourceStatement.getBracketedClassNameList();
         if (bracketedClassNameList != null)
             return checkValueParamClasses(sourceStatement, bracketedClassNameList.getClassNameList(), declareParams);
@@ -2722,7 +2722,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         if (groupBy == null)
             return new ArrayList<>();
@@ -2750,7 +2750,7 @@ public class LSFPsiImplUtil {
         return allGroupProps;
     }
     
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFGroupPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         LSFGroupPropertyBy groupBy = sourceStatement.getGroupPropertyBy();
         assert groupBy != null;
 
@@ -2761,6 +2761,8 @@ public class LSFPsiImplUtil {
         List<LSFPropertyExpression> groupExprs = groupExprsList == null ? Collections.emptyList() : groupExprsList.getPropertyExpressionList(); 
         List<LSFClassSet> groupClasses = finishParamClasses(groupExprsList);
         List<LSFClassSet> declareClasses = resolveParamDeclClasses(declareParams);
+
+        if (declareParams == null) return new Pair<>(incorrectParams, incorrectBys);
 
         Set<String> usedInterfaces = new ExprsContextModifier(getContextExprs(sourceStatement)).resolveAllParams();
 //        нужно groupProps в дырки вставить для context independent группировки
@@ -2799,7 +2801,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         List<LSFStringLiteral> stringLiteralList = new ArrayList<>();
         LSFFormulaPropertySyntaxList formulaPropertySyntaxList = sourceStatement.getFormulaPropertySyntaxList();
         if (formulaPropertySyntaxList != null) {
@@ -2828,15 +2830,17 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFFormulaPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         Map<LSFStringLiteral, Set<Integer>> implementationsParams = getFormulaParams(sourceStatement);
         
         List<LSFParamDeclaration> unusedDeclarations = new ArrayList<>();
-        for (int paramIndex = 0; paramIndex < declareParams.size(); ++paramIndex) {
-            for (Set<Integer> implParameters : implementationsParams.values()) {
-                if (!implParameters.contains(paramIndex+1)) {
-                    unusedDeclarations.add(declareParams.get(paramIndex));
-                    break;
+        if (declareParams != null) {
+            for (int paramIndex = 0; paramIndex < declareParams.size(); ++paramIndex) {
+                for (Set<Integer> implParameters : implementationsParams.values()) {
+                    if (!implParameters.contains(paramIndex + 1)) {
+                        unusedDeclarations.add(declareParams.get(paramIndex));
+                        break;
+                    }
                 }
             }
         }
@@ -2844,7 +2848,7 @@ public class LSFPsiImplUtil {
         Map<PsiElement, Pair<LSFClassSet, LSFClassSet>> wrongImplementations = new HashMap<>();
         for (Map.Entry<LSFStringLiteral, Set<Integer>> entry : implementationsParams.entrySet()) {
             Set<Integer> usedParameters = entry.getValue();
-            if (!usedParameters.isEmpty() && (Collections.max(usedParameters) > declareParams.size() || Collections.min(usedParameters) < 1)) {
+            if (!usedParameters.isEmpty() && (declareParams == null || Collections.max(usedParameters) > declareParams.size() || Collections.min(usedParameters) < 1)) {
                 wrongImplementations.put(entry.getKey(), null);
             }
         }
@@ -2874,7 +2878,7 @@ public class LSFPsiImplUtil {
     }
     
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         LSFGroupObjectUsage groupObjectUsage = sourceStatement.getGroupObjectID().getGroupObjectUsage();
         if (groupObjectUsage != null) {
             return LSFExClassSet.toEx(groupObjectUsage.resolveClasses());
@@ -2883,7 +2887,7 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAggrPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFAggrPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
         if(pe != null)
             return LSFExClassSet.toEx(resolveValueParamClasses(pe, declareParams));
@@ -2891,7 +2895,7 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         LSFGroupObjectUsage groupObjectUsage = sourceStatement.getGroupObjectID().getGroupObjectUsage();
         if (groupObjectUsage != null) {
             return checkValueParamClasses(sourceStatement, groupObjectUsage, declareParams);
@@ -2900,18 +2904,18 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFAggrPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFAggrPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         LSFPropertyExpression pe = sourceStatement.getPropertyExpression();
         return checkValueParamClasses(sourceStatement, pe != null ? pe.resolveParams() : Collections.emptyList(), declareParams);
     }
 
     @Nullable
-    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFReflectionPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFReflectionPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return null;
     }
 
     @NotNull
-    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFReflectionPropertyDefinition sourceStatement, List<LSFParamDeclaration> declareParams) {
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFReflectionPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
         return new Pair<>(Collections.emptyList(), Collections.emptyMap());
     }
 

@@ -6,11 +6,15 @@ plugins {
     id("org.jetbrains.intellij.platform") version "2.10.5"
 }
 
+val ideaVersion = "2025.3"
+val javaVersion = 21
+
 group = "com.lsfusion"
 version = "1.0.304"
 
 repositories {
     mavenCentral()
+    maven("https://plugins.jetbrains.com/maven")
     intellijPlatform {
         defaultRepositories()
     }
@@ -24,12 +28,12 @@ java {
         // IntelliJ IDEA 2025.3 platform jars are built with Java 21 bytecode (class version 65).
         // Therefore the compiler toolchain must be at least Java 21.
         // We still emit Java 17 bytecode via `sourceCompatibility/targetCompatibility` on the tasks below.
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(javaVersion)
     }
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(javaVersion)
 }
 
 // IntelliJ Platform is configured via `dependencies { intellijPlatform { ... } }` in plugin 2.x.
@@ -40,16 +44,37 @@ sourceSets {
         kotlin.srcDirs("src", "gen")
 
         // Keep existing project layout: resources are spread across multiple roots.
-        resources.srcDirs("resources", "src", "gen", "META-INF")
+        resources.srcDirs("resources")
     }
 }
 
-// Ensure `META-INF/plugin.xml` is present in resources root for IntelliJ tasks (searchable options, sandbox).
-// In this project `plugin.xml` is stored under `META-INF/` directory at the project root.
+// Ensure `META-INF/` metadata (plugin.xml, mcp.xml) is present in the final jar.
 tasks.named<ProcessResources>("processResources") {
-    from(layout.projectDirectory.file("META-INF/plugin.xml")) {
+    from(layout.projectDirectory.dir("META-INF")) {
         into("META-INF")
     }
+}
+
+val packPsiImplUtils by tasks.registering(Jar::class) {
+    description = "Pack psiImplUtils jar"
+    archiveFileName.set("psiImplUtils.jar")
+    destinationDirectory.set(layout.projectDirectory.dir("lib"))
+
+    val compileJava = tasks.named<JavaCompile>("compileJava")
+    val compileKotlin = tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileKotlin")
+
+    from(compileJava.map { it.destinationDirectory }) {
+        include("com/lsfusion/migration/lang/psi/MigrationPsiImplUtil.class")
+        include("com/lsfusion/lang/psi/LSFPsiImplUtil.class")
+        include("com/lsfusion/lang/psi/LSFPsiImplUtil$*.class")
+    }
+    from(compileKotlin.map { it.destinationDirectory }) {
+        include("com/lsfusion/migration/lang/psi/MigrationPsiImplUtil.class")
+        include("com/lsfusion/lang/psi/LSFPsiImplUtil.class")
+        include("com/lsfusion/lang/psi/LSFPsiImplUtil$*.class")
+    }
+
+    dependsOn(compileJava, compileKotlin)
 }
 
 // `buildSearchableOptions` запускает headless IDE и падает на старых/кастомных code style providers.
@@ -58,7 +83,14 @@ tasks.matching { it.name == "buildSearchableOptions" || it.name == "prepareJarSe
     enabled = false
 }
 
+// Configurations for lexer and parser generation
+val jflexConfig by configurations.creating
+val grammarKitConfig by configurations.creating
+
 dependencies {
+    jflexConfig(files("buildLib/jflex.jar"))
+    grammarKitConfig(files("buildLib/grammar-kit.jar"))
+
     // Old Ant build packaged everything from /lib except psiImplUtils.jar
     implementation(
         fileTree("lib") {
@@ -79,9 +111,8 @@ dependencies {
     // IntelliJ Platform + required bundled plugins.
     // NOTE: In IntelliJ Platform Gradle Plugin 2.x, the IntelliJ SDK is declared as a dependency.
     intellijPlatform {
-        // Target IntelliJ IDEA (2025.3.x). This artifact provides the platform for compilation and `runIde`.
-        // If you need to pin an exact patch build, you can set e.g. "2025.3.1.1".
-        intellijIdea("2025.3")
+        // Target IntelliJ IDEA. This artifact provides the platform for compilation.
+        intellijIdea(ideaVersion)
 
         // Explicit bundled plugin deps so they are available without manual Project Structure setup.
         bundledPlugin("com.intellij.java")
@@ -90,24 +121,184 @@ dependencies {
     }
 }
 
+intellijPlatform {
+    pluginVerification {
+        ides {
+            create("IC", ideaVersion)
+        }
+    }
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    sourceCompatibility = "17"
-    targetCompatibility = "17"
+    sourceCompatibility = javaVersion.toString()
+    targetCompatibility = javaVersion.toString()
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(javaVersion.toString()))
         freeCompilerArgs.addAll(
             "-Xjsr305=strict",
         )
     }
 }
 
-// NOTE:
-// The legacy Ant build generated lexer/parser sources via JFlex + Grammar-Kit.
-// The project already contains generated sources under `gen/` (and lexer outputs in `src/`).
-// To keep Gradle build reliable without additional toolchain dependencies, we compile using
-// existing generated sources. If you need regeneration tasks, we can add them via `JavaExec`
-// (JFlex jar is present in the repo as `jflex-1.9.1.jar`) and a Grammar-Kit dependency.
+abstract class LexerTask @javax.inject.Inject constructor(
+    private val fileSystemOperations: org.gradle.api.file.FileSystemOperations
+) : JavaExec() {
+    @get:InputFile
+    abstract val flexFile: RegularFileProperty
+
+    @get:InputFile
+    abstract val skeletonFile: RegularFileProperty
+
+    @get:Internal
+    abstract val outputDir: DirectoryProperty
+
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
+
+    init {
+        mainClass.set("jflex.Main")
+    }
+
+    override fun exec() {
+        fileSystemOperations.delete { delete(outputFile) }
+
+        args(
+            "--skel", skeletonFile.get().asFile.absolutePath,
+            "--nobak",
+            flexFile.get().asFile.absolutePath,
+            "-d", outputDir.get().asFile.absolutePath
+        )
+        super.exec()
+    }
+}
+
+@CacheableTask
+abstract class ParserTask @Inject constructor(
+    private val fileSystemOperations: org.gradle.api.file.FileSystemOperations,
+    private val objects: ObjectFactory,
+    private val layout: ProjectLayout,
+    private val execOperations: ExecOperations
+) : DefaultTask() {
+
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val bnfFile: RegularFileProperty
+
+    @get:Internal
+    abstract val outputDirs: ListProperty<String>
+
+    /**
+     * IntelliJ SDK jars are required only to RUN the generator,
+     * but must NOT be a Gradle task input (otherwise Gradle fingerprints hundreds of jars).
+     */
+    @get:Internal
+    abstract val intellijPlatformJars: ConfigurableFileCollection
+
+    /**
+     * Precomputed IDEA lib directory (…/lib). Stored as Internal to avoid fingerprinting.
+     * Also avoids resolving IntelliJ configuration during task execution (configuration cache friendly).
+     */
+    @get:Internal
+    abstract val ideaLibDir: DirectoryProperty
+
+    /** Small classpath inputs that really affect generation. */
+    @get:Classpath
+    abstract val grammarKitClasspath: ConfigurableFileCollection
+
+    @get:Classpath
+    abstract val psiImplUtilsJar: ConfigurableFileCollection
+
+    /** Declare output directories so Gradle can track UP-TO-DATE and cache state. */
+    @get:OutputDirectories
+    val outputDirectories: List<Directory>
+        get() = outputDirs.get().map { layout.projectDirectory.dir(it) }
+
+    @TaskAction
+    fun generate() {
+        val resolvedDirs = outputDirs.get().map { layout.projectDirectory.dir(it) }
+        fileSystemOperations.delete {
+            resolvedDirs.forEach { delete(it) }
+        }
+
+        val ideaLibTree = objects.fileTree().setDir(ideaLibDir.get()).matching { include("*.jar") }
+
+        execOperations.javaexec {
+            mainClass.set("org.intellij.grammar.Main")
+            classpath = grammarKitClasspath + psiImplUtilsJar + ideaLibTree
+            args("gen", bnfFile.get().asFile.absolutePath)
+        }
+    }
+}
+
+fun TaskContainer.registerLexerTask(name: String, flexPath: String, outputDirPath: String, outputPath: String) =
+    register<LexerTask>(name) {
+        classpath = jflexConfig
+        flexFile.set(layout.projectDirectory.file(flexPath))
+        skeletonFile.set(layout.projectDirectory.file("buildLib/idea-flex.skeleton"))
+        outputDir.set(layout.projectDirectory.dir(outputDirPath))
+        outputFile.set(layout.projectDirectory.file(outputPath))
+    }
+
+fun TaskContainer.registerParserTask(name: String, bnfPath: String, outputDirPaths: List<String>) =
+    register<ParserTask>(name) {
+        val intellijDep = configurations.named("intellijPlatformDependency")
+        intellijPlatformJars.from(intellijDep)
+
+        // Compute IDEA lib directory ONCE at configuration time.
+        // This prevents resolving IntelliJ SDK during task execution (config-cache friendly).
+        val platformFiles = intellijDep.get().files
+        val platformLib = platformFiles.find { it.name.startsWith("idea") && it.isDirectory }?.resolve("lib")
+            ?: platformFiles.find { it.name.startsWith("idea") && it.name.endsWith(".jar") }?.parentFile
+
+        require(platformLib != null && platformLib.exists()) {
+            "Cannot locate IntelliJ IDEA 'lib' directory from intellijPlatformDependency."
+        }
+        ideaLibDir.set(platformLib)
+
+        // Previously: classpath(grammarKitConfig, files("lib/psiImplUtils.jar"), intellijPlatformJars)
+        // Now: keep only small jars as task inputs; IDEA libs are runtime-only and Internal.
+        grammarKitClasspath.from(grammarKitConfig)
+        psiImplUtilsJar.from(files("lib/psiImplUtils.jar"))
+
+        bnfFile.set(layout.projectDirectory.file(bnfPath))
+        outputDirs.set(outputDirPaths)
+        outputDirPaths.forEach { outputs.dir(layout.projectDirectory.dir(it)) } // keep as you had
+    }
+
+val generateLsfLexer by tasks.registerLexerTask(
+    "generateLsfLexer",
+    "src/com/lsfusion/lang/LSF.flex",
+    "gen/com/lsfusion/lang",
+    "gen/com/lsfusion/lang/LSFLexer.java"
+)
+
+val generateMigrationLexer by tasks.registerLexerTask(
+    "generateMigrationLexer",
+    "src/com/lsfusion/migration/Migration.flex",
+    "gen/com/lsfusion/migration",
+    "gen/com/lsfusion/migration/MigrationLexer.java"
+)
+
+val generateLsfParser by tasks.registerParserTask(
+    "generateLsfParser",
+    "src/com/lsfusion/lang/LSF.bnf",
+    listOf("gen/com/lsfusion/lang/parser", "gen/com/lsfusion/lang/psi")
+)
+
+val generateMigrationParser by tasks.registerParserTask(
+    "generateMigrationParser",
+    "src/com/lsfusion/migration/Migration.bnf",
+    listOf("gen/com/lsfusion/migration/lang/parser", "gen/com/lsfusion/migration/lang/psi")
+)
+
+tasks.withType<JavaCompile>().configureEach {
+    dependsOn(generateLsfLexer, generateMigrationLexer, generateLsfParser, generateMigrationParser)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    dependsOn(generateLsfLexer, generateMigrationLexer, generateLsfParser, generateMigrationParser)
+}

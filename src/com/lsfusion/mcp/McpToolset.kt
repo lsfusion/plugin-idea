@@ -11,11 +11,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
@@ -65,6 +61,8 @@ data class FindElementsResult(
     val items: List<FindElementItem>,
     @McpDescription(description = "Optional single-line meta reason (e.g. `too long - timeout hit`, `too large - max symbols hit`, `too small - non matching elements added`).")
     val meta: String? = null,
+    @McpDescription(description = "List of errors encountered during search (e.g. timeouts, internal errors).")
+    val errors: List<String>? = null,
 )
 
 @Serializable
@@ -145,10 +143,11 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
              *    - POST https://ai.lsfusion.org/mcp method=`initialize` to obtain `mcp-session-id` header.
              *    - POST method=`tools/list` with `mcp-session-id` and required Accept header.
              * 2) Compare remote `tools[*].name`, `description`, `inputSchema`, and `outputSchema` with the local
-             *    wrappers below (currently: `retrieve_docs`, `retrieve_samples`, `retrieve_learning`,
-             *    `validate_dsl_statements`, `get_brief`).
+             *    wrappers below (currently: `lsfusion_retrieve_docs`, `lsfusion_retrieve_samples`, `lsfusion_retrieve_learning`,
+             *    `lsfusion_validate_dsl_statements`, `lsfusion_get_brief`).
              * 3) For each tool:
              *    - Update/add a corresponding `@McpTool` wrapper method.
+             *    - IMPORTANT: Always use the `lsfusion_` prefix for the tool name in the `@McpTool(name = "...")` annotation.
              *    - Update/add `@Serializable` DTOs with `@McpDescription` on ALL fields so output schema is not empty.
              *    - Keep parsing tolerant (`ignoreUnknownKeys = true`) because remote schemas can evolve.
              * 4) Validate manually by running IDEA MCP `tools/list` and checking that parameter names and
@@ -332,48 +331,52 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         return RemoteMcpClient.mcpExpectedError(message)
     }
 
-    @McpTool(name = "find_lsfusion_elements")
-    @McpDescription(description = "Find and inspect lsFusion elements in the current IntelliJ project.")
+    @McpTool(name = "lsfusion_find_elements")
+    @McpDescription(description = "Find and inspect lsFusion elements in the IntelliJ project.")
     @Suppress("unused")
     suspend fun findElements(
-        @McpDescription(description = "Module names as CSV (comma-separated), e.g. `ModuleA, ModuleB`.")
-        modules: String?,
+        @McpDescription(description = "lsFusion module names as CSV (comma-separated), e.g. `ModuleA, ModuleB`. Filters elements by their module.")
+        modules: String? = null,
         @McpDescription(
-            description = "Search scope mode: omitted = project + libraries; `project` = project content only; `modules` = only modules in 'modules' parameter (no REQUIRE expansion)."
+            description = "Include required lsFusion modules for specified lsFusion modules (only if 'modules' is provided). Default: true."
         )
-        scope: String?,
+        requiredModules: Boolean = true,
+        @McpDescription(
+            description = "Search scope mode (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."
+        )
+        scope: String? = null,
         @McpDescription(
             description = "Element name filter as CSV (comma-separated). Each item is either a word-search or a Java regex (Pattern.find)."
         )
-        name: String?,
+        names: String? = null,
         @McpDescription(
             description = "Element code filter as CSV. Each item is either a word-search or a Java regex (Pattern.find)."
         )
-        contains: String?,
+        contains: String? = null,
         @McpDescription(
             description = "Element type filter as CSV. Allowed values: `module`, `metacode`, `class`, `property`, `action`, `form`, `navigatorElement`, `window`, `group`, `table`, `event`, `calculatedEvent`, `constraint`, `index`."
         )
-        elementTypes: String?,
+        elementTypes: String? = null,
         @McpDescription(
             description = "Class filter as CSV (with namespace `MyNS.MyClass` or without `MyClass`). For property/action: matches parameter classes (best-effort)."
         )
-        classes: String?,
+        classes: String? = null,
         @McpDescription(
             description = "Usage-graph traversal seeds as CSV. Each item is either `type:name` (named element) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`."
         )
-        relatedElements: String?,
-        @McpDescription(description = "Direction for ALL `relatedElements` seeds. Default: `both`. Allowed values: `both`, `uses`, `used`.")
-        relatedDirection: String?,
+        relatedElements: String? = null,
+        @McpDescription(description = "Direction for ALL `relatedElements` seeds. Allowed values: `both`, `uses`, `used`. Default: `both`.")
+        relatedDirection: String? = null,
         @McpDescription(
-            description = "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"name\":\"Foo\"},{\"name\":\"Bar\"}]`). Results are merged (OR)."
+            description = "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"names\":\"Foo\", \"modules\" : \"MyModule\"},{\"names\":\"Bar\"}]`). Results are merged (OR)."
         )
-        moreFiltersJson: String?,
-        @McpDescription(description = "Best-effort minimum output size in JSON chars; server may append neighboring elements if too small (>= 0).")
-        minSymbols: Int?,
-        @McpDescription(description = "Hard cap for total output size in JSON chars (>= 1).")
-        maxSymbols: Int?,
-        @McpDescription(description = "Best-effort wall-clock timeout in seconds (>= 1).")
-        timeoutSeconds: Int?,
+        moreFilters: String? = null,
+        @McpDescription(description = "Best-effort minimum output size in JSON chars; server may append neighboring elements if too small (>= 0). Default: ${MCPSearchUtils.DEFAULT_MIN_SYMBOLS}.")
+        minSymbols: Int = MCPSearchUtils.DEFAULT_MIN_SYMBOLS,
+        @McpDescription(description = "Hard cap for total output size in JSON chars (>= 1). Default: ${MCPSearchUtils.DEFAULT_MAX_SYMBOLS}.")
+        maxSymbols: Int = MCPSearchUtils.DEFAULT_MAX_SYMBOLS,
+        @McpDescription(description = "Best-effort wall-clock timeout in seconds (>= 1). Default: ${MCPSearchUtils.DEFAULT_TIMEOUT_SECS}.")
+        timeoutSeconds: Int = MCPSearchUtils.DEFAULT_TIMEOUT_SECS,
     ): FindElementsResult {
         // Prefer project from MCP call context (correct when multiple projects are open).
         // Fall back to "first open project" if MCP call context doesn't expose project in this build.
@@ -388,29 +391,32 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
             val query = JSONObject()
             if (modules != null) query.put("modules", modules)
             if (scope != null) query.put("scope", scope)
-            if (name != null) query.put("name", name)
+            query.put("requiredModules", requiredModules)
+            if (names != null) query.put("name", names)
             if (contains != null) query.put("contains", contains)
             if (elementTypes != null) query.put("elementTypes", elementTypes)
             if (classes != null) query.put("classes", classes)
             if (relatedElements != null) query.put("relatedElements", relatedElements)
             if (relatedDirection != null) query.put("relatedDirection", relatedDirection)
-            if (minSymbols != null) query.put("minSymbols", minSymbols)
-            if (maxSymbols != null) query.put("maxSymbols", maxSymbols)
-            if (timeoutSeconds != null) query.put("timeoutSeconds", timeoutSeconds)
-            if (moreFiltersJson != null && !moreFiltersJson.isEmpty()) {
-                query.put("moreFilters", JSONArray(moreFiltersJson))
+            query.put("minSymbols", minSymbols)
+            query.put("maxSymbols", maxSymbols)
+            query.put("timeoutSeconds", timeoutSeconds)
+            if (moreFilters != null && !moreFilters.isEmpty()) {
+                query.put("moreFilters", JSONArray(moreFilters))
             }
 
             val result = MCPSearchUtils.findElements(project, query)
             val jsonElement = json.parseToJsonElement(result.toString())
             return json.decodeFromJsonElement<FindElementsResult>(jsonElement)
+        } catch (e: McpExpectedError) {
+            throw e
         } catch (e: Exception) {
             // Preserve user-visible error text
             throw mcpExpectedError("Invalid query or internal error: ${e.message}")
         }
     }
 
-    @McpTool(name = "retrieve_docs")
+    @McpTool(name = "lsfusion_retrieve_docs")
     @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (documentation and language reference) — based on a single search query.")
     @Suppress("unused")
     suspend fun retrieveDocs(
@@ -421,7 +427,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
-    @McpTool(name = "retrieve_samples")
+    @McpTool(name = "lsfusion_retrieve_samples")
     @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (how-tos and code samples) — based on a single search query.")
     @Suppress("unused")
     suspend fun retrieveSamples(
@@ -432,7 +438,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
-    @McpTool(name = "retrieve_learning")
+    @McpTool(name = "lsfusion_retrieve_learning")
     @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (tutorials and articles) — based on a single search query.")
     @Suppress("unused")
     suspend fun retrieveLearning(
@@ -443,7 +449,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
-    @McpTool(name = "validate_dsl_statements")
+    @McpTool(name = "lsfusion_validate_dsl_statements")
     @McpDescription(description = "Validate the syntax of the list of lsFusion statements")
     @Suppress("unused")
     suspend fun validateDslStatements(
@@ -454,7 +460,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         return json.decodeFromJsonElement<DSLValidationResult>(resultEl)
     }
 
-    @McpTool(name = "get_brief")
+    @McpTool(name = "lsfusion_get_brief")
     @McpDescription(
         description = "Initialize context for remote MCP server. Call this tool first before using any other remote tools. " +
             "It loads the contents of brief.md so the calling model can read guidance before generating or editing lsFusion code."

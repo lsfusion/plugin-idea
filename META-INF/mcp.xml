@@ -1,0 +1,5 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <mcpServer.mcpToolset implementation="com.lsfusion.mcp.McpToolset"/>
+    </extensions>
+</idea-plugin>
