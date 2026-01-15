@@ -271,7 +271,7 @@ public class SyntheticPropertyStatement extends LightElement implements LSFGloba
     }
 
     @Override
-    public char @NotNull [] textToCharArray() {
+    public char[] textToCharArray() {
         return origin.textToCharArray();
     }
 
