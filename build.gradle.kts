@@ -164,8 +164,6 @@ abstract class LexerTask @javax.inject.Inject constructor(
     }
 
     override fun exec() {
-        fileSystemOperations.delete { delete(outputFile) }
-
         args(
             "--skel", skeletonFile.get().asFile.absolutePath,
             "--nobak",
@@ -178,7 +176,6 @@ abstract class LexerTask @javax.inject.Inject constructor(
 
 @CacheableTask
 abstract class ParserTask @Inject constructor(
-    private val fileSystemOperations: org.gradle.api.file.FileSystemOperations,
     private val objects: ObjectFactory,
     private val layout: ProjectLayout,
     private val execOperations: ExecOperations
@@ -219,11 +216,6 @@ abstract class ParserTask @Inject constructor(
 
     @TaskAction
     fun generate() {
-        val resolvedDirs = outputDirs.get().map { layout.projectDirectory.dir(it) }
-        fileSystemOperations.delete {
-            resolvedDirs.forEach { delete(it) }
-        }
-
         val ideaLibTree = objects.fileTree().setDir(ideaLibDir.get()).matching { include("*.jar") }
 
         execOperations.javaexec {
@@ -297,8 +289,10 @@ val generateMigrationParser by tasks.registerParserTask(
 
 tasks.withType<JavaCompile>().configureEach {
     dependsOn(generateLsfLexer, generateMigrationLexer, generateLsfParser, generateMigrationParser)
+    finalizedBy(packPsiImplUtils)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     dependsOn(generateLsfLexer, generateMigrationLexer, generateLsfParser, generateMigrationParser)
+    finalizedBy(packPsiImplUtils)
 }
