@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Kotlin2JvmCompilerArguments">
+    <option name="jvmTarget" value="17" />
+    <option name="pluginClasspaths">
+      <array>
+        <option value="$KOTLIN_BUNDLED$/lib/kotlinx-serialization-compiler-plugin.jar" />
+        <option value="$KOTLIN_BUNDLED$/lib/kotlin-serialization-compiler-plugin.jar" />
+        <option value="$APPLICATION_HOME_DIR$/plugins/Kotlin/lib/kotlinc.kotlinx-serialization-compiler-plugin.jar" />
+      </array>
+    </option>
+  </component>
+  <component name="KotlinJpsPluginSettings">
+    <option name="externalSystemId" value="Gradle" />
+    <option name="version" value="2.2.0" />
+  </component>
+</project>
