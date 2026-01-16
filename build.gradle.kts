@@ -10,7 +10,14 @@ val ideaVersion = "2025.3"
 val javaVersion = 21
 
 group = "com.lsfusion"
-version = "1.0.304"
+version = file("META-INF/plugin.xml").let {
+    if (it.exists()) {
+        val doc = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it)
+        doc.getElementsByTagName("version").item(0).textContent
+    } else {
+        "1.0.0"
+    }
+}
 
 repositories {
     mavenCentral()

@@ -2,14 +2,15 @@
     <id>lsfusion.idea.plugin</id>
     <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
-    <version>1.0.306</version>
+    <version>1.0.305</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.306</b><br>
+        <b>Version 1.0.305</b><br>
         <ul>
+            <li>Resolve and find usages of actions with RETURN</li>
             <li>Add MCP tools for lsFusion: element search, documentation access, and DSL validation</li>
             <li>Migrate build system from Ant/IDEA to Gradle everywhere</li>
         </ul>
