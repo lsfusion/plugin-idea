@@ -47,7 +47,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
 /**
@@ -58,6 +58,30 @@ import java.util.regex.Pattern;
 public class MCPSearchUtils {
     private static final Logger LOG = Logger.getInstance(MCPSearchUtils.class);
 
+    private static final List<LSFMCPDeclaration.ElementType> priorityTypes = BaseUtils.toList(
+        LSFMCPDeclaration.ElementType.MODULE,
+        LSFMCPDeclaration.ElementType.CLASS,
+        LSFMCPDeclaration.ElementType.PROPERTY,
+        LSFMCPDeclaration.ElementType.ACTION,
+        LSFMCPDeclaration.ElementType.FORM);
+
+    private static int getPriority(LSFMCPDeclaration.ElementType type) {
+        if (type == null) return 5;
+        switch (type) {
+            case MODULE:
+            case CLASS:
+                return 1;
+            case PROPERTY:
+                return 2;
+            case ACTION:
+                return 3;
+            case FORM:
+                return 4;
+            default:
+                return 5;
+        }
+    }
+
     public static final int DEFAULT_MAX_SYMBOLS = 200_000; // fail-safe
     public static final int DEFAULT_MIN_SYMBOLS = 1_000; // fail-safe
     public static final int DEFAULT_TIMEOUT_SECS = 10; // default 10 seconds
@@ -65,10 +89,14 @@ public class MCPSearchUtils {
     private static final class SelectedStatement {
         private final @NotNull LSFMCPDeclaration decl;
         private final @NotNull List<LSFMCPStatement> withExtends;
+        private final @NotNull JSONObject json;
+        private final int jsonSize;
 
         private SelectedStatement(@NotNull LSFMCPDeclaration decl, GlobalSearchScope searchScope) {
             this.decl = decl;
             this.withExtends = getElementWithExtends(decl, searchScope);
+            this.json = getJsonFromStatement(this, 1);
+            this.jsonSize = this.json.toString().length();
         }
     }
 
@@ -107,22 +135,140 @@ public class MCPSearchUtils {
         final long searchBudgetMillis = Math.max(1L, (timeoutMillis * 9L) / 10L);
         final long startMillis = System.currentTimeMillis();
         final long deadlineMillis = startMillis + timeoutMillis;
-        final AtomicBoolean stopRequested = new AtomicBoolean(false);
 
+        SearchState state = new SearchState(maxSymbols);
+        List<String> errors = Collections.synchronizedList(new ArrayList<>());
+        AtomicBoolean timeoutHit = new AtomicBoolean(false);
+
+        GlobalSearchScope searchScope = searchElements(project, query, state, searchBudgetMillis, timeoutHit, errors);
+
+        List<SelectedStatement> bestStatements = new ArrayList<>();
+        JSONArray best = sortAndTruncate(state.statementsByPriority, maxSymbols, bestStatements);
+
+        int bestTotal = best.toString().length();
+
+        // 1) First, try to expand shortCode for the selected set under maxSymbols.
+        if (bestTotal < maxSymbols) {
+            try {
+                JSONArray expanded = tryExpandShortCodeUntilBudget(bestStatements, maxSymbols, deadlineMillis);
+                if (expanded != null) {
+                    best = expanded;
+                    bestTotal = expanded.toString().length();
+                }
+            } catch (Throwable t) {
+                handleError(t, "Error expanding short code", errors);
+            }
+        }
+
+        final AtomicBoolean nonMatchingStatementsAdded = new AtomicBoolean(false);
+        // 2) If still below minSymbols, append neighboring declarations (in-file PSI order) with full code.
+        if (!timeoutHit.get() && minSymbols > 0 && bestTotal < minSymbols && bestTotal < maxSymbols) {
+            try {
+                // Neighbor fill ignores the original filter predicate by design; report this to the caller.
+                fillNeighborsUntilMinSymbols(bestStatements, best, bestTotal, searchScope, minSymbols, maxSymbols, deadlineMillis, nonMatchingStatementsAdded);
+            } catch (Throwable t) {
+                handleError(t, "Error filling neighbors", errors);
+            }
+        }
+
+        String meta = getMetaReason(timeoutHit.get(), best.toString().length() >= maxSymbols, nonMatchingStatementsAdded.get());
+        return assembleResult(best, meta, errors);
+    }
+
+    private static @NonNull GlobalSearchScope searchElements(@NonNull Project project, @NonNull JSONObject query, SearchState state, long searchBudgetMillis, AtomicBoolean timeoutHit, List<String> errors) {
         // Build iterations: run all applicable types simultaneously with in-iteration filtering
-        JSONArray result = new JSONArray();
-        List<SelectedStatement> resultStatements = new ArrayList<>();
-        Result<Integer> totalSymbols = new Result<>(0);
-
         Set<LSFMCPDeclaration> seen = Collections.newSetFromMap(new ConcurrentHashMap<>());
         ConcurrentMap<RelatedKey, RelatedState> relatedCache = new ConcurrentHashMap<>();
-        List<String> errors = Collections.synchronizedList(new ArrayList<>());
 
         // Executor and dynamic scheduling support
-        ExecutorService exec = Executors.newFixedThreadPool(Math.min(6, Math.max(1, Runtime.getRuntime().availableProcessors() - 1)));
-        AtomicInteger pendingTasks = new AtomicInteger(0);
-        AtomicBoolean timeoutHit = new AtomicBoolean(false);
-        Runnable awaitAll = () -> {
+        ExecutorService exec = createPriorityExecutor(Math.min(6, Math.max(1, Runtime.getRuntime().availableProcessors() - 1)));
+        Runnable awaitAll = createAwaitAll(exec, searchBudgetMillis, timeoutHit, state.stopRequested);
+        // helper to submit tasks with accounting
+        TaskSubmitter submit = createSubmit(exec, state, errors);
+
+        GlobalSearchScope searchScope = run(project, query, seen, relatedCache, state, submit);
+
+        JSONArray moreFilters = query.optJSONArray("moreFilters");
+        if (moreFilters != null && !moreFilters.isEmpty())
+            for (int i = 0; i < moreFilters.length(); i++)
+                searchScope = searchScope.union(run(project, moreFilters.optJSONObject(i), seen, relatedCache, state, submit));
+
+        // Wait for all tasks to complete (but keep a reserve for post-processing)
+        awaitAll.run();
+
+        return searchScope;
+    }
+
+    private static JSONArray sortAndTruncate(List<SelectedStatement>[] state, int maxSymbols, List<SelectedStatement> bestStatements) {
+        int currentTotalSymbols = 0;
+        JSONArray best = new JSONArray();
+
+        for (int p = 1; p <= 5; p++) {
+            for (SelectedStatement selSt : state[p]) {
+                currentTotalSymbols += selSt.jsonSize;
+                if (currentTotalSymbols > maxSymbols)
+                    return best;
+
+                best.put(selSt.json);
+                bestStatements.add(selSt);
+            }
+        }
+        return best;
+    }
+
+    private static String getMetaReason(boolean timeoutHit, boolean maxSymbolsHit, boolean nonMatchingAdded) {
+        // Single-line meta reason (exactly one string).
+        // Priority: timeout > maxSymbols > nonMatching elements added.
+        if (timeoutHit) {
+            return "too long - timeout hit";
+        } else if (maxSymbolsHit) {
+            return "too large - max symbols hit";
+        } else if (nonMatchingAdded) {
+            return "too small - non matching elements added";
+        }
+        return null;
+    }
+
+    private static JSONObject assembleResult(JSONArray items, String meta, List<String> errors) {
+        JSONObject resultObject = new JSONObject()
+                .put("items", items);
+        if (meta != null)
+            resultObject.put("meta", meta);
+        if (!errors.isEmpty()) {
+            resultObject.put("errors", new JSONArray(new LinkedHashSet<>(errors)));
+        }
+        return resultObject;
+    }
+
+    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, Set<LSFClassDeclaration> classDecls, Map<LSFMCPDeclaration, Direction> related, GlobalSearchScope searchScope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
+        return st -> {
+            if (state.stopRequested.get()) {
+                return false;
+            }
+            int p = getPriority(st.getMCPType());
+            if (p > state.stopPriorityThreshold.get()) {
+                return true;
+            }
+            assert getStatement(st) == st; // is not extend
+            if (!seen.add(st)) return true;
+
+            // already processed
+
+            if (matchesAllFilters(st, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache)) {
+                SelectedStatement selSt = new SelectedStatement(st, searchScope);
+
+                synchronized (state.statementsByPriority[p]) {
+                    state.statementsByPriority[p].add(selSt);
+                }
+                state.symbolsByPriority[p].addAndGet(selSt.jsonSize);
+                state.updateThreshold();
+            }
+            return true; // continue search
+        };
+    }
+
+    private static Runnable createAwaitAll(ExecutorService exec, long searchBudgetMillis, AtomicBoolean timeoutHit, AtomicBoolean stopRequested) {
+        return () -> {
             try {
                 exec.shutdown();
                 try {
@@ -141,10 +287,12 @@ public class MCPSearchUtils {
                 exec.shutdownNow();
             }
         };
-        // helper to submit tasks with accounting
-        java.util.function.Consumer<Runnable> submit = r -> {
-            pendingTasks.incrementAndGet();
-            exec.submit(() -> {
+    }
+
+    private static TaskSubmitter createSubmit(ExecutorService exec, SearchState state, List<String> errors) {
+        return (priority, r) -> {
+            state.pendingTasksByPriority[priority].incrementAndGet();
+            exec.execute(new PriorityTask(priority, () -> {
                 try {
                     r.run();
                 } catch (com.intellij.openapi.progress.ProcessCanceledException e) {
@@ -152,146 +300,20 @@ public class MCPSearchUtils {
                 } catch (Throwable t) {
                     handleError(t, "Error executing MCP search task", errors);
                 } finally {
-                    pendingTasks.decrementAndGet();
+                    state.pendingTasksByPriority[priority].decrementAndGet();
+                    state.checkAllPBetterDone();
                 }
-            });
+            }));
         };
-
-        GlobalSearchScope searchScope = run(project, query, stopRequested, seen, relatedCache, result, resultStatements, totalSymbols, maxSymbols, submit);
-
-        JSONArray moreFilters = query.optJSONArray("moreFilters");
-        if (moreFilters != null && !moreFilters.isEmpty())
-            for (int i = 0; i < moreFilters.length(); i++)
-                searchScope = searchScope.union(run(project, moreFilters.optJSONObject(i), stopRequested, seen, relatedCache, result, resultStatements, totalSymbols, maxSymbols, submit));
-
-        // Wait for all tasks to complete (but keep a reserve for post-processing)
-        awaitAll.run();
-
-        JSONArray best = result;
-        int bestTotal = totalSymbols.getResult();
-        boolean maxSymbolsHit = false;
-        List<SelectedStatement> bestStatements = resultStatements;
-
-        // 1) First, try to expand shortCode for the selected set under maxSymbols.
-        if (bestTotal < maxSymbols) {
-            try {
-                JSONArray expanded = tryExpandShortCodeUntilBudget(bestStatements, maxSymbols, deadlineMillis);
-                if (expanded != null) {
-                    best = expanded;
-                    bestTotal = expanded.toString().length();
-                }
-            } catch (Throwable t) {
-                handleError(t, "Error expanding short code", errors);
-            }
-        } else {
-            maxSymbolsHit = true;
-        }
-
-        final AtomicBoolean nonMatchingStatementsAdded = new AtomicBoolean(false);
-        // 2) If still below minSymbols, append neighboring declarations (in-file PSI order) with full code.
-        if (!timeoutHit.get() && minSymbols > 0 && bestTotal < minSymbols && bestTotal < maxSymbols) {
-            try {
-                // Neighbor fill ignores the original filter predicate by design; report this to the caller.
-                fillNeighborsUntilMinSymbols(bestStatements, best, bestTotal, searchScope, minSymbols, maxSymbols, deadlineMillis, nonMatchingStatementsAdded);
-            } catch (Throwable t) {
-                handleError(t, "Error filling neighbors", errors);
-            }
-        }
-
-        // Single-line meta reason (exactly one string).
-        // Priority: timeout > maxSymbols > nonMatching elements added.
-        String meta = null;
-        if (timeoutHit.get()) {
-            meta = "too long - timeout hit";
-        } else if (maxSymbolsHit) {
-            meta = "too large - max symbols hit";
-        } else if (nonMatchingStatementsAdded.get()) {
-            meta = "too small - non matching elements added";
-        }
-
-        JSONObject resultObject = new JSONObject()
-                .put("items", best);
-        if(meta != null)
-            resultObject.put("meta", meta);
-        if (!errors.isEmpty()) {
-            resultObject.put("errors", new JSONArray(new LinkedHashSet<>(errors)));
-        }
-
-        return resultObject;
     }
 
-    private static @NotNull GlobalSearchScope run(@NotNull Project project,
-                                                 @NotNull JSONObject query,
-                                                 @NotNull AtomicBoolean stopRequested,
-                                                 @NotNull Set<LSFMCPDeclaration> seen,
-                                                 @NotNull ConcurrentMap<RelatedKey, RelatedState> relatedCache,
-                                                 @NotNull JSONArray result,
-                                                 @NotNull List<SelectedStatement> resultStatements,
-                                                 @NotNull Result<Integer> totalSymbols,
-                                                 int maxSymbols,
-                                                 @NotNull Consumer<Runnable> submit) {
-        GlobalSearchScope searchScope = ReadAction.compute(() -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
-        List<NameFilter> nameFilters = parseMatchersCsv(query.optString("name"));
-        List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
-        Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
-        Set<LSFClassDeclaration> classDecls = ReadAction.compute(() -> parseClasses(project, searchScope, query.optString("classes")));
-        Map<LSFMCPDeclaration, Direction> related = ReadAction.compute(() -> parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection")));
-
-        // Shared processor that applies all filters and returns false to stop the current iteration
-        final Processor<LSFMCPDeclaration> processor = st -> {
-            if (stopRequested.get()) { return false; }
-            assert getStatement(st) == st; // is not extend
-            if (st == null || !seen.add(st)) return true;
-
-            // already processed
-
-            if (!matchesAllFilters(st, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache)) return true;
-
-            SelectedStatement selSt = new SelectedStatement(st, searchScope);
-            JSONObject json = getJsonFromStatement(selSt, 1);
-
-            synchronized (result) {
-                result.put(json);
-                resultStatements.add(selSt);
-                totalSymbols.setResult(totalSymbols.getResult() + json.toString().length());
-            }
-            // return false to signal stop when limit exceeded
-            return totalSymbols.getResult() <= maxSymbols;
-        };
-
-        // Track which blocks are fully streamable while assembling iterations.
-        // Name/code filters are considered fully streamable only if ALL matchers are "word-only" with length >= 3.
-        boolean nameFullyStreamable = !nameFilters.isEmpty();
-        // Name/code-based iterations (only for word length >= 3)
-        for (NameFilter nf : nameFilters) {
-            if (nf.isWordStreamable()) {
-                submit.accept(() -> ReadAction.run(() -> streamWord(project, nf, processor, searchScope)));
-            } else {
-                // Non-streamable filters (regex or short words): do not schedule name-based task here
-                nameFullyStreamable = false;
-            }
-        }
-        boolean containsFullyStreamable = !containsFilters.isEmpty();
-        for (NameFilter nf : containsFilters) {
-            if (nf.isWordStreamable()) {
-                submit.accept(() -> ReadAction.run(() -> streamWord(project, nf, processor, searchScope)));
-            } else {
-                // Non-streamable filters (regex or short words): do not schedule name-based task here
-                containsFullyStreamable = false;
-            }
-        }
-
-        boolean onlyPropertiesClassesActions = !elementTypes.isEmpty();
-        // Element-type iterations (only for index-backed types and only if elementTypes filter provided)
+    private static boolean submitTypeTasks(Project project, GlobalSearchScope searchScope, Set<LSFMCPDeclaration.ElementType> elementTypes, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
         boolean typesFullyStreamable = !elementTypes.isEmpty();
-        // Imperative calculation without streams: fully streamable iff every requested type has an index
-        for (LSFMCPDeclaration.ElementType et : elementTypes) {
-            onlyPropertiesClassesActions &= et.equals(LSFMCPDeclaration.ElementType.PROPERTY) || et.equals(LSFMCPDeclaration.ElementType.CLASS) || et.equals(LSFMCPDeclaration.ElementType.ACTION);
-
+        for (LSFMCPDeclaration.ElementType et : elementTypes.isEmpty() ? priorityTypes : (Collection<LSFMCPDeclaration.ElementType>) elementTypes) {
             GlobalDeclStubElementType<?, ?> stubType = et.stubType;
             if (stubType != null) { // only index-backed types
                 LSFStringStubIndex<? extends LSFGlobalDeclaration> index = stubType.getGlobalIndex();
-                submit.accept(() -> ReadAction.run(() -> {
+                submit.submit(getPriority(et), () -> ReadAction.run(() -> {
                     for (String key : index.getAllKeys(project)) {
                         Collection<? extends LSFGlobalDeclaration> items = LSFGlobalResolver.getItemsFromIndex(index, key, project, searchScope, LSFLocalSearchScope.GLOBAL);
                         for (LSFGlobalDeclaration<?, ?> it : items) {
@@ -304,11 +326,13 @@ public class MCPSearchUtils {
                 typesFullyStreamable = false;
             }
         }
+        return typesFullyStreamable;
+    }
 
-        // Classes-based iterations
+    private static boolean submitClassTasks(GlobalSearchScope searchScope, Set<LSFClassDeclaration> classDecls, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit, boolean onlyPropertiesClassesActions) {
+        Project project = searchScope.getProject();
         for (LSFClassDeclaration targetClass : classDecls) {
-            boolean finalOnlyPropertiesClassesActions = onlyPropertiesClassesActions;
-            submit.accept(() -> ReadAction.run(() -> {
+            submit.submit(1, () -> ReadAction.run(() -> {
                 for (LSFValueClass vc : CustomClassSet.getClassParentsRecursively(targetClass)) {
                     if (vc instanceof LSFClassDeclaration cls && !processStatement(cls, processor)) return; // early stop
                 }
@@ -319,32 +343,93 @@ public class MCPSearchUtils {
                 for (PsiElement item : LSFPsiUtils.getActionsApplicableToClass(targetClass, project, searchScope, LSFLocalSearchScope.GLOBAL, true, true)) {
                     if (!processStatement(item, processor)) return; // early stop for this task
                 }
-                if (!finalOnlyPropertiesClassesActions) {
+                if (!onlyPropertiesClassesActions) {
                     for (LSFMCPDeclaration item : nextUsed(getStatement(targetClass), searchScope))
                         if (!processor.process(item)) return;
                 }
             }));
         }
+        return !classDecls.isEmpty();
+    }
 
-        // Related elements iterations: dynamically schedule traversal tasks
+    private static boolean submitRelatedTasks(Map<LSFMCPDeclaration, Direction> related, GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
         // Global visited marks (single set for all directions)
         final Set<LSFMCPDeclaration> visitedRelated = Collections.newSetFromMap(new ConcurrentHashMap<>());
         for (Map.Entry<LSFMCPDeclaration, Direction> unit : related.entrySet()) {
-            submit.accept(() -> ReadAction.run(() -> streamRelated(unit.getKey(), unit.getValue(), searchScope, processor, visitedRelated)));
+            submit.submit(1, () -> ReadAction.run(() -> streamRelated(unit.getKey(), unit.getValue(), searchScope, processor, visitedRelated)));
         }
+        return !related.isEmpty();
+    }
+
+    private static void submitFileTasks(GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
+        for (LSFFile lsfFile : ReadAction.compute(() -> LSFFileUtils.getLsfFiles(searchScope))) {
+            submit.submit(5, () -> ReadAction.run(() -> {
+                for (LSFMCPDeclaration st : LSFMCPDeclaration.getMCPDeclarations(lsfFile)) {
+                    if (!processor.process(st)) break;
+                }
+            }));
+        }
+    }
+
+    private static boolean submitWordTasks(Project project, GlobalSearchScope searchScope, List<NameFilter> filters, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
+        if (filters.isEmpty()) return false;
+        boolean fullyStreamable = true;
+        for (NameFilter nf : filters) {
+            if (nf.isWordStreamable()) {
+                submit.submit(5, () -> ReadAction.run(() -> streamWord(project, nf, processor, searchScope)));
+            } else {
+                fullyStreamable = false;
+            }
+        }
+        return fullyStreamable;
+    }
+
+    private static @NotNull GlobalSearchScope run(@NotNull Project project,
+                                                 @NotNull JSONObject query,
+                                                 @NotNull Set<LSFMCPDeclaration> seen,
+                                                 @NotNull ConcurrentMap<RelatedKey, RelatedState> relatedCache,
+                                                 @NotNull SearchState state,
+                                                 @NotNull TaskSubmitter submit) {
+        GlobalSearchScope searchScope = ReadAction.compute(() -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
+        List<NameFilter> nameFilters = parseMatchersCsv(query.optString("name"));
+        List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
+        Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
+
+        Set<LSFClassDeclaration> classDecls = ReadAction.compute(() -> parseClasses(project, searchScope, query.optString("classes")));
+        Map<LSFMCPDeclaration, Direction> related = ReadAction.compute(() -> parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection")));
+
+        // Shared processor that applies all filters and returns false to stop the current iteration
+        final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache);
+
+        // Track which blocks are fully streamable while assembling iterations.
+        // Name/code filters are considered fully streamable only if ALL matchers are "word-only" with length >= 3.
+        // Name/code-based iterations (only for word length >= 3)
+        boolean nameFullyStreamable = submitWordTasks(project, searchScope, nameFilters, processor, submit);
+        boolean containsFullyStreamable = submitWordTasks(project, searchScope, containsFilters, processor, submit);
+
+        // Element-type iterations (only for index-backed types and only if elementTypes filter provided)
+        boolean typesFullyStreamable = submitTypeTasks(project, searchScope, elementTypes, processor, submit);
+
+        // Classes-based iterations
+        boolean classesFullyStreamable = submitClassTasks(searchScope, classDecls, processor, submit, isOnlyPropertiesClassesActions(elementTypes));
+
+        // Related elements iterations: dynamically schedule traversal tasks
+        boolean relatedFullyStreamable = submitRelatedTasks(related, searchScope, processor, submit);
 
         // Per-file iterations (fallback) — run only if no block is fully streamable
-        if (!nameFullyStreamable && !containsFullyStreamable && classDecls.isEmpty() && related.isEmpty() && !typesFullyStreamable) {
-            for (LSFFile lsfFile : ReadAction.compute(() -> LSFFileUtils.getLsfFiles(searchScope))) {
-                submit.accept(() -> ReadAction.run(() -> {
-                    for (LSFMCPDeclaration st : LSFMCPDeclaration.getMCPDeclarations(lsfFile)) {
-                        if (!processor.process(st)) break;
-                    }
-                }));
-            }
+        if (!nameFullyStreamable && !containsFullyStreamable && !classesFullyStreamable && !relatedFullyStreamable && !typesFullyStreamable) {
+            submitFileTasks(searchScope, processor, submit);
         }
 
         return searchScope;
+    }
+
+    private static boolean isOnlyPropertiesClassesActions(Set<LSFMCPDeclaration.ElementType> elementTypes) {
+        boolean onlyPropertiesClassesActions = !elementTypes.isEmpty();
+        for (LSFMCPDeclaration.ElementType et : elementTypes) {
+            onlyPropertiesClassesActions &= et.equals(LSFMCPDeclaration.ElementType.PROPERTY) || et.equals(LSFMCPDeclaration.ElementType.CLASS) || et.equals(LSFMCPDeclaration.ElementType.ACTION);
+        }
+        return onlyPropertiesClassesActions;
     }
 
     private static void streamWord(@NonNull Project project, NameFilter nf, Processor<LSFMCPDeclaration> processor, GlobalSearchScope searchScope) {
@@ -1189,5 +1274,111 @@ public class MCPSearchUtils {
     }
 
     // endregion
+
+    private static int getPriorityLimit(Set<LSFMCPDeclaration.ElementType> elementTypes) {
+        if (elementTypes.isEmpty()) return 5;
+        int limit = 0;
+        for (LSFMCPDeclaration.ElementType et : elementTypes) {
+            limit = Math.max(limit, getPriority(et));
+        }
+        return limit;
+    }
+
+    private static ExecutorService createPriorityExecutor(int threads) {
+        return new ThreadPoolExecutor(threads, threads,
+                0L, TimeUnit.MILLISECONDS,
+                new PriorityBlockingQueue<>(),
+                new ThreadFactory() {
+                    private final AtomicInteger count = new AtomicInteger(0);
+                    @Override
+                    public Thread newThread(@NotNull Runnable r) {
+                        Thread t = new Thread(r, "MCP-Search-" + count.getAndIncrement());
+                        t.setDaemon(true);
+                        return t;
+                    }
+                });
+    }
+
+    private static class PriorityTask implements Runnable, Comparable<PriorityTask> {
+        private static final AtomicLong seqSource = new AtomicLong(0);
+        private final int priority;
+        private final long seq = seqSource.getAndIncrement();
+        private final Runnable runnable;
+
+        PriorityTask(int priority, Runnable runnable) {
+            this.priority = priority;
+            this.runnable = runnable;
+        }
+
+        @Override
+        public void run() {
+            runnable.run();
+        }
+
+        @Override
+        public int compareTo(@NotNull PriorityTask o) {
+            int res = Integer.compare(this.priority, o.priority);
+            if (res == 0) return Long.compare(this.seq, o.seq);
+            return res;
+        }
+    }
+
+    private static class SearchState {
+        final AtomicBoolean stopRequested;
+        final AtomicInteger stopPriorityThreshold = new AtomicInteger(5);
+
+        final AtomicInteger[] symbolsByPriority = new AtomicInteger[6];
+        final AtomicInteger[] pendingTasksByPriority = new AtomicInteger[6];
+
+        final List<SelectedStatement>[] statementsByPriority = new List[6];
+
+        final int maxSymbols;
+
+        SearchState(int maxSymbols) {
+            this.maxSymbols = maxSymbols;
+            this.stopRequested = new AtomicBoolean(false);
+            this.stopPriorityThreshold.set(5);
+            for (int i = 0; i < 6; i++) {
+                symbolsByPriority[i] = new AtomicInteger(0);
+                pendingTasksByPriority[i] = new AtomicInteger(0);
+                statementsByPriority[i] = new ArrayList<>();
+            }
+        }
+
+        void updateThreshold() {
+            int total = 0;
+            for (int p = 1; p <= 5; p++) {
+                total += symbolsByPriority[p].get();
+                if (total >= maxSymbols) {
+                    int current = stopPriorityThreshold.get();
+                    if (p < current) {
+                        stopPriorityThreshold.compareAndSet(current, p);
+                        checkAllPBetterDone();
+                    }
+                    break;
+                }
+            }
+        }
+
+        private void checkAllPBetterDone() {
+            int p = stopPriorityThreshold.get();
+
+            boolean allPBetterDone = true;
+            for (int i = 1; i <= p; i++) {
+                if (pendingTasksByPriority[i].get() > 0) {
+                    allPBetterDone = false;
+                    break;
+                }
+            }
+            if (allPBetterDone) {
+                stopRequested.set(true);
+            }
+        }
+    }
+
+    @FunctionalInterface
+    private interface TaskSubmitter {
+        void submit(int priority, Runnable runnable);
+    }
 }
 
