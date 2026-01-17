@@ -143,11 +143,10 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
              *    - POST https://ai.lsfusion.org/mcp method=`initialize` to obtain `mcp-session-id` header.
              *    - POST method=`tools/list` with `mcp-session-id` and required Accept header.
              * 2) Compare remote `tools[*].name`, `description`, `inputSchema`, and `outputSchema` with the local
-             *    wrappers below (currently: `lsfusion_retrieve_docs`, `lsfusion_retrieve_samples`, `lsfusion_retrieve_learning`,
-             *    `lsfusion_validate_dsl_statements`, `lsfusion_get_brief`).
+             *    wrappers below (currently: `lsfusion_retrieve_docs`, `lsfusion_retrieve_howtos_and_samples`, `lsfusion_retrieve_community`,
+             *    `lsfusion_validate_syntax`, `lsfusion_get_guidance`).
              * 3) For each tool:
              *    - Update/add a corresponding `@McpTool` wrapper method.
-             *    - IMPORTANT: Always use the `lsfusion_` prefix for the tool name in the `@McpTool(name = "...")` annotation.
              *    - Update/add `@Serializable` DTOs with `@McpDescription` on ALL fields so output schema is not empty.
              *    - Keep parsing tolerant (`ignoreUnknownKeys = true`) because remote schemas can evolve.
              * 4) Validate manually by running IDEA MCP `tools/list` and checking that parameter names and
@@ -417,57 +416,58 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     }
 
     @McpTool(name = "lsfusion_retrieve_docs")
-    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (documentation and language reference) — based on a single search query.")
+    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (official documentation and language reference) — based on a single search query.")
     @Suppress("unused")
     suspend fun retrieveDocs(
         @McpDescription(description = "Query")
         query: String,
     ): RetrieveDocsOutput {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("retrieve_docs", JSONObject().put("query", query))
+        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_retrieve_docs", JSONObject().put("query", query))
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
-    @McpTool(name = "lsfusion_retrieve_samples")
-    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (how-tos and code samples) — based on a single search query.")
+    @McpTool(name = "lsfusion_retrieve_howtos_and_samples")
+    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (code samples for combined tasks / scenarios and how-to) — based on a single search query.")
     @Suppress("unused")
-    suspend fun retrieveSamples(
+    suspend fun retrieveHowtosAndSamples(
         @McpDescription(description = "Query")
         query: String,
     ): RetrieveDocsOutput {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("retrieve_samples", JSONObject().put("query", query))
+        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_retrieve_howtos_and_samples", JSONObject().put("query", query))
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
-    @McpTool(name = "lsfusion_retrieve_learning")
-    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (tutorials and articles) — based on a single search query.")
+    @McpTool(name = "lsfusion_retrieve_community")
+    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (tutorials, articles, and community discussions) — based on a single search query. Use this ONLY for deep, ambiguous tasks when other retrieval tools (docs, howtos) did not provide a solution.")
     @Suppress("unused")
-    suspend fun retrieveLearning(
+    suspend fun retrieveCommunity(
         @McpDescription(description = "Query")
         query: String,
     ): RetrieveDocsOutput {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("retrieve_learning", JSONObject().put("query", query))
+        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_retrieve_community", JSONObject().put("query", query))
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
-    @McpTool(name = "lsfusion_validate_dsl_statements")
+    @McpTool(name = "lsfusion_validate_syntax")
     @McpDescription(description = "Validate the syntax of the list of lsFusion statements")
     @Suppress("unused")
-    suspend fun validateDslStatements(
+    suspend fun validateSyntax(
         @McpDescription(description = "Text")
         text: String,
     ): DSLValidationResult {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("validate_dsl_statements", JSONObject().put("text", text))
+        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_validate_syntax", JSONObject().put("text", text))
         return json.decodeFromJsonElement<DSLValidationResult>(resultEl)
     }
 
-    @McpTool(name = "lsfusion_get_brief")
+    @McpTool(name = "lsfusion_get_guidance")
     @McpDescription(
-        description = "Initialize context for remote MCP server. Call this tool first before using any other remote tools. " +
-            "It loads the contents of brief.md so the calling model can read guidance before generating or editing lsFusion code."
+        description = "Fetch the brief overview and mandatory rules for working with lsFusion. " +
+            "IMPORTANT: The assistant MUST call this tool before ANY task related to lsFusion if it's not already in your context. " +
+            "The assistant MUST read and strictly follow all rules and guidelines provided by this tool for ANY lsFusion-related task."
     )
     @Suppress("unused")
-    suspend fun getBrief(): String {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("get_brief", JSONObject())
+    suspend fun getGuidance(): String {
+        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_get_guidance", JSONObject())
         return if (resultEl is JsonPrimitive) {
             resultEl.content
         } else {
