@@ -334,14 +334,14 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     @McpDescription(description = "Find and inspect lsFusion elements in the IntelliJ project.")
     @Suppress("unused")
     suspend fun findElements(
-        @McpDescription(description = "lsFusion module names as CSV (comma-separated), e.g. `ModuleA, ModuleB`. Filters elements by their module.")
+        @McpDescription(description = "Module filter as CSV (comma-separated), e.g. `ModuleA, ModuleB`.")
         modules: String? = null,
         @McpDescription(
             description = "Include required lsFusion modules for specified lsFusion modules (only if 'modules' is provided). Default: true."
         )
         requiredModules: Boolean = true,
         @McpDescription(
-            description = "Search scope mode (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."
+            description = "Scope filter (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."
         )
         scope: String? = null,
         @McpDescription(
@@ -361,7 +361,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         )
         classes: String? = null,
         @McpDescription(
-            description = "Usage-graph traversal seeds as CSV. Each item is either `type:name` (named element) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`."
+            description = "Related elements filter (usage-graph traversal seeds) as CSV. Each item is either `type:name` (named element) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`."
         )
         relatedElements: String? = null,
         @McpDescription(description = "Direction for ALL `relatedElements` seeds. Allowed values: `both`, `uses`, `used`. Default: `both`.")
