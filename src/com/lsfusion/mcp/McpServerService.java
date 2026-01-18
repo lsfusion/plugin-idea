@@ -26,7 +26,7 @@ public final class McpServerService extends RestService {
     private static final Logger LOG = Logger.getInstance(McpServerService.class);
 
     private static final String MCP_PROTOCOL_VERSION = "2024-11-05";
-    private static final String TOOL_NAME = "lsf_find_elements";
+    private static final String TOOL_NAME = "lsfusion_find_elements";
 
     @NotNull
     @Override
@@ -156,7 +156,7 @@ public final class McpServerService extends RestService {
                 .put("properties", new JSONObject()
                         .put("modules", new JSONObject()
                                 .put("type", "string")
-                                .put("description", "lsFusion module names as CSV (comma-separated), e.g. `ModuleA, ModuleB`. Filters elements by their module."))
+                                .put("description", "Module filter as CSV (comma-separated), e.g. `ModuleA, ModuleB`."))
                         .put("requiredModules", new JSONObject()
                                 .put("type", "boolean")
                                 .put("default", true)
@@ -164,21 +164,15 @@ public final class McpServerService extends RestService {
                         .put("scope", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Search scope mode (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."))
+                                        "Scope filter (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."))
                         .put("name", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Element name filter as CSV (comma-separated). " +
-                                                "Each item is either a word-search (lsFusion ID literal) " +
-                                                "or a Java regex (Pattern.find). Word-search is used only when the item matches lsFusion identifier tokenization (see LSF.flex ID_LITERAL), " +
-                                                "otherwise it is treated as regex."))
+                                        "Element name filter as CSV (comma-separated). Word if valid ID, else Java regex."))
                         .put("contains", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Element code filter as CSV (comma-separated). " +
-                                                "Each item is either a word-search (lsFusion ID literal) " +
-                                                "or a Java regex (Pattern.find). Word-search is used only when the item matches lsFusion identifier tokenization (see LSF.flex ID_LITERAL), " +
-                                                "otherwise it is treated as regex."))
+                                        "Element code filter as CSV. Word if valid ID, else Java regex."))
                         .put("elementTypes", new JSONObject()
                                 .put("type", "string")
                                 .put("description", "Element type filter as CSV. Allowed values: `module`, `metacode`, `class`, `property`, `action`, `form`, `navigatorElement`, `window`, `group`, `table`, `event`, `calculatedEvent`, `constraint`, `index`."))
@@ -189,7 +183,7 @@ public final class McpServerService extends RestService {
                         .put("relatedElements", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Usage-graph traversal seeds as CSV. Each item is either `type:name` (named element) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`."))
+                                        "Related elements filter (usage-graph traversal seeds) as CSV. Each item is either `type:name` (named element) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`."))
                         .put("relatedDirection", new JSONObject()
                                 .put("type", "string")
                                 .put("default", "both")
@@ -234,13 +228,70 @@ public final class McpServerService extends RestService {
                 .put("properties", rootWithMoreSchema.getJSONObject("properties"))
                 .put("additionalProperties", false);
 
+        JSONObject codePartSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("location", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Element location in source. Format: `<module>(<line>:<col>)` (1-based), e.g. `MyModule(10:5)`."))
+                        .put("code", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Element source code snippet. May be shortened depending on output size limits."))
+                        .put("metacodeStack", new JSONObject()
+                                .put("type", "array")
+                                .put("items", new JSONObject().put("type", "string"))
+                                .put("description", "Stack of enclosing `META` blocks (headers), from nearest to farthest. Omitted when element is not inside `META`.")));
+
+        JSONObject itemSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("type", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Element type, e.g. `property`, `class`, `action`, ..."))
+                        .put("name", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Canonical element name (best-effort). Omitted for unnamed statements."))
+                        .put("moreNames", new JSONObject()
+                                .put("type", "array")
+                                .put("items", new JSONObject().put("type", "string"))
+                                .put("description", "Additional canonical names for the same declaration (e.g. from `EXTEND`)."))
+                        .put("location", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Location of the main statement. Format: `<module>(<line>:<col>)` (1-based)."))
+                        .put("code", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Main statement code snippet. May be shortened depending on output size limits."))
+                        .put("metacodeStack", new JSONObject()
+                                .put("type", "array")
+                                .put("items", new JSONObject().put("type", "string"))
+                                .put("description", "Stack of enclosing `META` blocks for the main statement (headers), from nearest to farthest."))
+                        .put("extends", new JSONObject()
+                                .put("type", "array")
+                                .put("items", codePartSchema)
+                                .put("description", "Code fragments for `EXTEND`-ed declarations of the same element. Each entry contains its own `location`, `code`, and `metacodeStack`.")));
+
+        JSONObject outputSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("items", new JSONObject()
+                                .put("type", "array")
+                                .put("items", itemSchema)
+                                .put("description", "Found elements (each item represents one declaration plus optional `EXTEND` fragments)."))
+                        .put("meta", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Optional single-line meta reason (e.g. `too long - timeout hit`, `too large - max symbols hit`, `too small - non matching elements added`)."))
+                        .put("errors", new JSONObject()
+                                .put("type", "array")
+                                .put("items", new JSONObject().put("type", "string"))
+                                .put("description", "List of errors encountered during search (e.g. timeouts, internal errors).")))
+                .put("required", new JSONArray().put("items"));
+
         return new JSONObject()
                 .put("name", TOOL_NAME)
                 .put("description",
-                        "Find and inspect lsFusion elements in the current IntelliJ project. " +
-                                "Returns JSON as text: {items:[...], meta?:string, errors?:string[]}. " +
-                                "meta values: `too long - timeout hit` | `too large - max symbols hit` | `too small - non matching elements added`.")
-                .put("inputSchema", inputSchema);
+                        "Find and inspect lsFusion elements. Results are prioritized (modules/classes > properties > actions > forms > others) and automatically truncated to a 'brief' (keeping key parts) to fit maxSymbols. If elements cannot be found (e.g. by name), search with minimal filters to explore.")
+                .put("inputSchema", inputSchema)
+                .put("outputSchema", outputSchema);
     }
 
     // --- tools/call ---
@@ -280,12 +331,12 @@ public final class McpServerService extends RestService {
 
             return rpcResult(jsonrpc, id, callResult);
         } catch (Exception e) {
-            LOG.warn("lsf_find_elements failed", e);
+            LOG.warn(TOOL_NAME + " failed", e);
             JSONObject callResult = new JSONObject()
                     .put("content", new JSONArray().put(
                             new JSONObject()
                                     .put("type", "text")
-                                    .put("text", "lsf_find_elements error: " + e.getMessage())
+                                    .put("text", TOOL_NAME + " error: " + e.getMessage())
                     ))
                     .put("isError", true);
 

@@ -143,7 +143,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
              *    - POST https://ai.lsfusion.org/mcp method=`initialize` to obtain `mcp-session-id` header.
              *    - POST method=`tools/list` with `mcp-session-id` and required Accept header.
              * 2) Compare remote `tools[*].name`, `description`, `inputSchema`, and `outputSchema` with the local
-             *    wrappers below (currently: `lsfusion_retrieve_docs`, `lsfusion_retrieve_howtos_and_samples`, `lsfusion_retrieve_community`,
+             *    wrappers below (currently: `lsfusion_retrieve_docs`, `lsfusion_retrieve_howtos`, `lsfusion_retrieve_community`,
              *    `lsfusion_validate_syntax`, `lsfusion_get_guidance`).
              * 3) For each tool:
              *    - Update/add a corresponding `@McpTool` wrapper method.
@@ -331,7 +331,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     }
 
     @McpTool(name = "lsfusion_find_elements")
-    @McpDescription(description = "Find and inspect lsFusion elements in the IntelliJ project.")
+    @McpDescription(description = "Find and inspect lsFusion elements. Results are prioritized (modules/classes > properties > actions > forms > others) and automatically truncated to a 'brief' (keeping key parts) to fit maxSymbols. If elements cannot be found (e.g. by name), search with minimal filters to explore.")
     @Suppress("unused")
     suspend fun findElements(
         @McpDescription(description = "Module filter as CSV (comma-separated), e.g. `ModuleA, ModuleB`.")
@@ -345,11 +345,11 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         )
         scope: String? = null,
         @McpDescription(
-            description = "Element name filter as CSV (comma-separated). Each item is either a word-search or a Java regex (Pattern.find)."
+            description = "Element name filter as CSV (comma-separated). Word if valid ID, else Java regex."
         )
         names: String? = null,
         @McpDescription(
-            description = "Element code filter as CSV. Each item is either a word-search or a Java regex (Pattern.find)."
+            description = "Element code filter as CSV. Word if valid ID, else Java regex."
         )
         contains: String? = null,
         @McpDescription(
@@ -426,14 +426,14 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
-    @McpTool(name = "lsfusion_retrieve_howtos_and_samples")
-    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (code samples for combined tasks / scenarios and how-to) — based on a single search query.")
+    @McpTool(name = "lsfusion_retrieve_howtos")
+    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (examples for combined tasks / scenarios and how-tos) — based on a single search query.")
     @Suppress("unused")
-    suspend fun retrieveHowtosAndSamples(
+    suspend fun retrieveHowtos(
         @McpDescription(description = "Query")
         query: String,
     ): RetrieveDocsOutput {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_retrieve_howtos_and_samples", JSONObject().put("query", query))
+        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_retrieve_howtos", JSONObject().put("query", query))
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
