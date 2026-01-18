@@ -449,7 +449,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     }
 
     @McpTool(name = "lsfusion_validate_syntax")
-    @McpDescription(description = "Validate the syntax of the list of lsFusion statements")
+    @McpDescription(description = "Validate the syntax of the list of lsFusion statements. Use this ONLY when IDE tools for error checking and code execution are not available.")
     @Suppress("unused")
     suspend fun validateSyntax(
         @McpDescription(description = "Text")
