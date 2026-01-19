@@ -134,6 +134,9 @@ intellijPlatform {
             create("IC", ideaVersion)
         }
     }
+    publishing {
+        token.set(providers.gradleProperty("intellijPublishToken"))
+    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
