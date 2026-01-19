@@ -18,6 +18,35 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * MCP Server implementation for lsFusion IntelliJ plugin.
+ *
+ * TODO (AI agent task): Keep the list of proxied tools from https://ai.lsfusion.org/mcp up to date.
+ * IMPORTANT: When updating AI tools, ensure that both McpServerService.java and McpToolset.kt are synchronized.
+ * These tools are proxied from https://ai.lsfusion.org, and their descriptors must be manually updated in both files.
+ *
+ * Background:
+ * - We intentionally expose remote MCP tools as explicit local tools (not a generic JSON-RPC proxy),
+ *   so IntelliJ MCP `tools/list` shows stable names, descriptions, and proper input/output schemas.
+ * - The remote server uses MCP sessions: you MUST call `initialize` first and then pass the
+ *   `mcp-session-id` header on subsequent requests.
+ * - The remote server requires `Accept: application/json, text/event-stream` and may still respond
+ *   with SSE (`text/event-stream`), so we extract JSON from the first `data:` line.
+ *
+ * How to refresh when remote tools/schemas change:
+ * 1) Fetch remote tool descriptors:
+ *    - POST https://ai.lsfusion.org/mcp method=`initialize` to obtain `mcp-session-id` header.
+ *    - POST method=`tools/list` with `mcp-session-id` and required Accept header.
+ * 2) Compare remote `tools[*].name`, `description`, `inputSchema`, and `outputSchema` with the local
+ *    wrappers (currently: `lsfusion_retrieve_docs`, `lsfusion_retrieve_howtos`, `lsfusion_retrieve_community`,
+ *    `lsfusion_validate_syntax`, `lsfusion_get_guidance`).
+ * 3) For each tool:
+ *    - Update/add a corresponding tool descriptor in `handleToolsList`.
+ *    - Update/add logic in `handleToolsCall` and constants for tool names.
+ *    - Keep parsing tolerant because remote schemas can evolve.
+ * 4) Validate manually by running IDEA MCP `tools/list` and checking that parameter names and
+ *    input/output schemas match expectations.
+ */
 public final class McpServerService extends RestService {
 
     public McpServerService() {
@@ -140,13 +169,69 @@ public final class McpServerService extends RestService {
         return rpcResult(jsonrpc, id, result);
     }
 
+    private static final String TOOL_RETRIEVE_DOCS = "lsfusion_retrieve_docs";
+    private static final String TOOL_RETRIEVE_HOWTOS = "lsfusion_retrieve_howtos";
+    private static final String TOOL_RETRIEVE_COMMUNITY = "lsfusion_retrieve_community";
+    private static final String TOOL_VALIDATE_SYNTAX = "lsfusion_validate_syntax";
+    private static final String TOOL_GET_GUIDANCE = "lsfusion_get_guidance";
+
     // --- tools/list ---
 
     private JSONObject handleToolsList(String jsonrpc, Object id, @Nullable JSONObject params) {
-        JSONObject tool = buildFindElementsToolDescriptor();
-        JSONObject result = new JSONObject()
-                .put("tools", new JSONArray().put(tool));
+        JSONArray tools = new JSONArray();
+        tools.put(buildFindElementsToolDescriptor());
+        tools.put(buildQueryToolDescriptor(TOOL_RETRIEVE_DOCS, "Fetch prioritized chunks from lsFusion RAG store (official documentation and language reference) — based on a single search query."));
+        tools.put(buildQueryToolDescriptor(TOOL_RETRIEVE_HOWTOS, "Fetch prioritized chunks from lsFusion RAG store (examples for combined tasks / scenarios and how-tos) — based on a single search query."));
+        tools.put(buildQueryToolDescriptor(TOOL_RETRIEVE_COMMUNITY, "Fetch prioritized chunks from lsFusion RAG store (tutorials, articles, and community discussions) — based on a single search query. Use this ONLY for deep, ambiguous tasks when other retrieval tools (docs, howtos) did not provide a solution."));
+        tools.put(buildValidateSyntaxToolDescriptor());
+        tools.put(buildGetGuidanceToolDescriptor());
+
+        JSONObject result = new JSONObject().put("tools", tools);
         return rpcResult(jsonrpc, id, result);
+    }
+
+    private JSONObject buildQueryToolDescriptor(String name, String description) {
+        JSONObject inputSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("query", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Query")))
+                .put("required", new JSONArray().put("query"))
+                .put("additionalProperties", false);
+
+        return new JSONObject()
+                .put("name", name)
+                .put("description", description)
+                .put("inputSchema", inputSchema);
+    }
+
+    private JSONObject buildValidateSyntaxToolDescriptor() {
+        JSONObject inputSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("text", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Text")))
+                .put("required", new JSONArray().put("text"))
+                .put("additionalProperties", false);
+
+        return new JSONObject()
+                .put("name", TOOL_VALIDATE_SYNTAX)
+                .put("description", "Validate the syntax of the list of lsFusion statements. Use this ONLY when IDE tools for error checking and code execution are not available.")
+                .put("inputSchema", inputSchema);
+    }
+
+    private JSONObject buildGetGuidanceToolDescriptor() {
+        JSONObject inputSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject())
+                .put("additionalProperties", false);
+
+        return new JSONObject()
+                .put("name", TOOL_GET_GUIDANCE)
+                .put("description", "Fetch the brief overview and mandatory rules for working with lsFusion. IMPORTANT: The assistant MUST call this tool before ANY task related to lsFusion if it's not already in your context. The assistant MUST read and strictly follow all rules and guidelines provided by this tool for ANY lsFusion-related task.")
+                .put("inputSchema", inputSchema);
     }
 
     private JSONObject buildFindElementsToolDescriptor() {
@@ -294,6 +379,33 @@ public final class McpServerService extends RestService {
                 .put("outputSchema", outputSchema);
     }
 
+    private JSONObject handleRemoteToolCall(String jsonrpc, Object id, String toolName, JSONObject arguments) {
+        try {
+            String payload = RemoteMcpClient.callRemoteTool(toolName, arguments);
+
+            JSONObject callResult = new JSONObject()
+                    .put("content", new JSONArray().put(
+                            new JSONObject()
+                                    .put("type", "text")
+                                    .put("text", payload)
+                    ))
+                    .put("isError", false);
+
+            return rpcResult(jsonrpc, id, callResult);
+        } catch (Exception e) {
+            LOG.warn(toolName + " failed", e);
+            JSONObject callResult = new JSONObject()
+                    .put("content", new JSONArray().put(
+                            new JSONObject()
+                                    .put("type", "text")
+                                    .put("text", toolName + " error: " + e.getMessage())
+                    ))
+                    .put("isError", true);
+
+            return rpcResult(jsonrpc, id, callResult);
+        }
+    }
+
     // --- tools/call ---
 
     private JSONObject handleToolsCall(Project project,
@@ -305,13 +417,22 @@ public final class McpServerService extends RestService {
         }
 
         String name = params.optString("name", params.optString("toolName", null));
-        if (!TOOL_NAME.equals(name)) {
-            return rpcError(jsonrpc, id, -32601, "Unknown tool: " + name, null);
-        }
 
         JSONObject arguments = params.optJSONObject("arguments");
         if (arguments == null) {
             arguments = new JSONObject();
+        }
+
+        if (TOOL_RETRIEVE_DOCS.equals(name) ||
+                TOOL_RETRIEVE_HOWTOS.equals(name) ||
+                TOOL_RETRIEVE_COMMUNITY.equals(name) ||
+                TOOL_VALIDATE_SYNTAX.equals(name) ||
+                TOOL_GET_GUIDANCE.equals(name)) {
+            return handleRemoteToolCall(jsonrpc, id, name, arguments);
+        }
+
+        if (!TOOL_NAME.equals(name)) {
+            return rpcError(jsonrpc, id, -32601, "Unknown tool: " + name, null);
         }
 
         try {

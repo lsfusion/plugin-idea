@@ -25,6 +25,7 @@
          on how to target different products -->
     <depends>com.intellij.properties</depends>
     <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.platform</depends>
 
     <depends optional="true" config-file="mcp.xml">com.intellij.mcpServer</depends>
 
@@ -324,6 +325,7 @@
                              id="org.company.ApplicationSettingsConfigurable" displayName="LSF Settings"/>
 
         <!-- MCP tools are registered via bundled JetBrains MCP Server plugin (com.intellij.mcpServer.mcpToolset) -->
+        <restService implementation="com.lsfusion.mcp.McpServerService"/>
 
         <!-- To use old PreCachedDataContext instead of new PreCachedDataContext2 (in 2021.3),
         which broke find element usages when cursor is on element usage-->

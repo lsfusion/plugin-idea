@@ -117,6 +117,32 @@ data class DSLValidationResult(
  *
  * NOTE: Implemented in Kotlin so that JetBrains `mcpserver` (which uses Kotlin reflection
  * for schema generation) can expose stable parameter names in `tools/list`.
+ *
+ * TODO (AI agent task): Keep the list of proxied tools from https://ai.lsfusion.org/mcp up to date.
+ * IMPORTANT: When updating AI tools, ensure that both McpServerService.java and McpToolset.kt are synchronized.
+ * These tools are proxied from https://ai.lsfusion.org, and their descriptors must be manually updated in both files.
+ *
+ * Background:
+ * - We intentionally expose remote MCP tools as explicit local tools (not a generic JSON-RPC proxy),
+ *   so IntelliJ MCP `tools/list` shows stable names, descriptions, and proper input/output schemas.
+ * - The remote server uses MCP sessions: you MUST call `initialize` first and then pass the
+ *   `mcp-session-id` header on subsequent requests.
+ * - The remote server requires `Accept: application/json, text/event-stream` and may still respond
+ *   with SSE (`text/event-stream`), so we extract JSON from the first `data:` line.
+ *
+ * How to refresh when remote tools/schemas change:
+ * 1) Fetch remote tool descriptors:
+ *    - POST https://ai.lsfusion.org/mcp method=`initialize` to obtain `mcp-session-id` header.
+ *    - POST method=`tools/list` with `mcp-session-id` and required Accept header.
+ * 2) Compare remote `tools[*].name`, `description`, `inputSchema`, and `outputSchema` with the local
+ *    wrappers (currently: `lsfusion_retrieve_docs`, `lsfusion_retrieve_howtos`, `lsfusion_retrieve_community`,
+ *    `lsfusion_validate_syntax`, `lsfusion_get_guidance`).
+ * 3) For each tool:
+ *    - Update/add a corresponding `@McpTool` wrapper method.
+ *    - Update/add `@Serializable` DTOs with `@McpDescription` on ALL fields so output schema is not empty.
+ *    - Keep parsing tolerant (`ignoreUnknownKeys = true`) because remote schemas can evolve.
+ * 4) Validate manually by running IDEA MCP `tools/list` and checking that parameter names and
+ *    input/output schemas match expectations.
  */
 class McpToolset : com.intellij.mcpserver.McpToolset {
 
@@ -125,191 +151,13 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         ignoreUnknownKeys = true
     }
 
-    private class RemoteMcpClient {
-        companion object {
-            /*
-             * TODO (AI agent task): Keep the list of proxied tools from https://ai.lsfusion.org/mcp up to date.
-             *
-             * Background:
-             * - We intentionally expose remote MCP tools as explicit local tools (not a generic JSON-RPC proxy),
-             *   so IntelliJ MCP `tools/list` shows stable names, descriptions, and proper input/output schemas.
-             * - The remote server uses MCP sessions: you MUST call `initialize` first and then pass the
-             *   `mcp-session-id` header on subsequent requests.
-             * - The remote server requires `Accept: application/json, text/event-stream` and may still respond
-             *   with SSE (`text/event-stream`), so we extract JSON from the first `data:` line.
-             *
-             * How to refresh when remote tools/schemas change:
-             * 1) Fetch remote tool descriptors:
-             *    - POST https://ai.lsfusion.org/mcp method=`initialize` to obtain `mcp-session-id` header.
-             *    - POST method=`tools/list` with `mcp-session-id` and required Accept header.
-             * 2) Compare remote `tools[*].name`, `description`, `inputSchema`, and `outputSchema` with the local
-             *    wrappers below (currently: `lsfusion_retrieve_docs`, `lsfusion_retrieve_howtos`, `lsfusion_retrieve_community`,
-             *    `lsfusion_validate_syntax`, `lsfusion_get_guidance`).
-             * 3) For each tool:
-             *    - Update/add a corresponding `@McpTool` wrapper method.
-             *    - Update/add `@Serializable` DTOs with `@McpDescription` on ALL fields so output schema is not empty.
-             *    - Keep parsing tolerant (`ignoreUnknownKeys = true`) because remote schemas can evolve.
-             * 4) Validate manually by running IDEA MCP `tools/list` and checking that parameter names and
-             *    input/output schemas match expectations.
-             */
-            private const val URL = "https://ai.lsfusion.org/mcp"
-            private const val DEFAULT_TIMEOUT_SECONDS = 30
 
-            @Volatile
-            private var sessionId: String? = null
-
-            private fun extractJsonFromSseOrPlain(body: String): String {
-                // Remote server may respond with `text/event-stream` even when `Accept` includes JSON.
-                // Typical format:
-                //   event: message\n
-                //   data: { ...json... }\n
-                // We extract the first `data:` line.
-                val idx = body.indexOf("data:")
-                if (idx >= 0) {
-                    val after = body.substring(idx + "data:".length)
-                    return after.lineSequence().firstOrNull()?.trim().orEmpty()
-                }
-                return body.trim()
-            }
-
-            internal fun mcpExpectedError(message: String): McpExpectedError {
-                return try {
-                    McpExpectedError::class.java.getConstructor(String::class.java, JsonObject::class.java)
-                        .newInstance(message, null)
-                } catch (_: Exception) {
-                    McpExpectedError::class.java.getConstructor(String::class.java)
-                        .newInstance(message)
-                }
-            }
-
-            private fun doPostJson(
-                requestBody: String,
-                timeoutSeconds: Int,
-                session: String?,
-            ): String {
-                val safeTimeout = timeoutSeconds.coerceAtLeast(1)
-                return HttpRequests.post(URL, "application/json")
-                    .connectTimeout(safeTimeout * 1000)
-                    .readTimeout(safeTimeout * 1000)
-                    .accept("application/json, text/event-stream")
-                    .tuner { connection ->
-                        if (session != null) {
-                            connection.setRequestProperty("mcp-session-id", session)
-                        }
-                    }
-                    .connect { req ->
-                        req.write(requestBody)
-                        val responseText = req.readString()
-                        val code = (req.connection as? HttpURLConnection)?.responseCode ?: -1
-                        if (code < 200 || code >= 300) {
-                            throw mcpExpectedError("Remote MCP HTTP error $code: ${responseText.take(2_000)}")
-                        }
-                        responseText
-                    }
-            }
-
-            private fun ensureSessionId(timeoutSeconds: Int): String {
-                val existing = sessionId
-                if (!existing.isNullOrBlank()) return existing
-
-                synchronized(RemoteMcpClient::class.java) {
-                    val existing2 = sessionId
-                    if (!existing2.isNullOrBlank()) return existing2
-
-                    val requestBody = JSONObject()
-                        .put("jsonrpc", "2.0")
-                        .put("id", 1)
-                        .put("method", "initialize")
-                        .put(
-                            "params",
-                            JSONObject()
-                                .put("protocolVersion", "2024-11-05")
-                                .put("capabilities", JSONObject())
-                                .put(
-                                    "clientInfo",
-                                    JSONObject()
-                                        .put("name", "lsfusion-intellij")
-                                        .put("version", "0")
-                                )
-                        )
-                        .toString()
-
-                    // For session initialization we need the `mcp-session-id` response header.
-                    var headerSessionId: String? = null
-                    val responseBody = HttpRequests.post(URL, "application/json")
-                        .connectTimeout(timeoutSeconds.coerceAtLeast(1) * 1000)
-                        .readTimeout(timeoutSeconds.coerceAtLeast(1) * 1000)
-                        .accept("application/json, text/event-stream")
-                        .connect { req ->
-                            req.write(requestBody)
-                            val responseText = req.readString()
-                            val conn = req.connection as? HttpURLConnection
-                            val code = conn?.responseCode ?: -1
-                            if (code < 200 || code >= 300) {
-                                throw mcpExpectedError("Remote MCP HTTP error $code: ${responseText.take(2_000)}")
-                            }
-                            headerSessionId = conn?.getHeaderField("mcp-session-id")
-                            responseText
-                        }
-
-                    if (headerSessionId.isNullOrBlank()) {
-                        throw mcpExpectedError("Remote MCP initialize did not return 'mcp-session-id'. Body: ${responseBody.take(2_000)}")
-                    }
-
-                    sessionId = headerSessionId
-                    return headerSessionId!!
-                }
-            }
-
-            internal fun callRemoteToolResultJson(
-                toolName: String,
-                arguments: JSONObject,
-                timeoutSeconds: Int = DEFAULT_TIMEOUT_SECONDS,
-            ): JsonElement {
-                val sid = ensureSessionId(timeoutSeconds)
-                val requestBody = JSONObject()
-                    .put("jsonrpc", "2.0")
-                    .put("id", 1)
-                    .put("method", "tools/call")
-                    .put(
-                        "params",
-                        JSONObject()
-                            .put("name", toolName)
-                            .put("arguments", arguments)
-                    )
-                    .toString()
-
-                val responseText = doPostJson(requestBody, timeoutSeconds, sid)
-                val jsonText = extractJsonFromSseOrPlain(responseText)
-
-                try {
-                    val json = Json { ignoreUnknownKeys = true }
-                    val root = json.parseToJsonElement(jsonText)
-                    val result = root.jsonObject["result"]
-                        ?: throw IllegalStateException("Missing 'result' in remote response")
-                    
-                    val content = result.jsonObject["content"]?.jsonArray
-                        ?: throw IllegalStateException("Missing 'content' in remote result")
-                    
-                    val text = content.firstOrNull()?.jsonObject?.get("text")?.jsonPrimitive?.content
-                        ?: throw IllegalStateException("Empty or missing 'text' in remote content")
-                    
-                    return try {
-                        json.parseToJsonElement(text)
-                    } catch (e: Exception) {
-                        // Return as raw string if it's not a JSON. 
-                        // The caller should handle it or wrap it into a DTO.
-                        if (text.startsWith("Error executing tool")) {
-                            throw mcpExpectedError(text)
-                        }
-                        JsonPrimitive(text)
-                    }
-                } catch (e: McpExpectedError) {
-                    throw e
-                } catch (e: Exception) {
-                    throw mcpExpectedError("Remote MCP tool '$toolName' call failed: ${e.message}")
-                }
-            }
+    private fun callRemoteToolResultJson(toolName: String, arguments: JSONObject): JsonElement {
+        val res = RemoteMcpClient.callRemoteTool(toolName, arguments)
+        return try {
+            json.parseToJsonElement(res)
+        } catch (e: Exception) {
+            JsonPrimitive(res)
         }
     }
 
@@ -422,7 +270,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         @McpDescription(description = "Query")
         query: String,
     ): RetrieveDocsOutput {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_retrieve_docs", JSONObject().put("query", query))
+        val resultEl = callRemoteToolResultJson("lsfusion_retrieve_docs", JSONObject().put("query", query))
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
@@ -433,7 +281,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         @McpDescription(description = "Query")
         query: String,
     ): RetrieveDocsOutput {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_retrieve_howtos", JSONObject().put("query", query))
+        val resultEl = callRemoteToolResultJson("lsfusion_retrieve_howtos", JSONObject().put("query", query))
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
@@ -444,7 +292,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         @McpDescription(description = "Query")
         query: String,
     ): RetrieveDocsOutput {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_retrieve_community", JSONObject().put("query", query))
+        val resultEl = callRemoteToolResultJson("lsfusion_retrieve_community", JSONObject().put("query", query))
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
@@ -455,7 +303,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         @McpDescription(description = "Text")
         text: String,
     ): DSLValidationResult {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_validate_syntax", JSONObject().put("text", text))
+        val resultEl = callRemoteToolResultJson("lsfusion_validate_syntax", JSONObject().put("text", text))
         return json.decodeFromJsonElement<DSLValidationResult>(resultEl)
     }
 
@@ -467,7 +315,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     )
     @Suppress("unused")
     suspend fun getGuidance(): String {
-        val resultEl = RemoteMcpClient.callRemoteToolResultJson("lsfusion_get_guidance", JSONObject())
+        val resultEl = callRemoteToolResultJson("lsfusion_get_guidance", JSONObject())
         return if (resultEl is JsonPrimitive) {
             resultEl.content
         } else {
