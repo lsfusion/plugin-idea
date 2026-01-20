@@ -65,7 +65,7 @@ tasks.named<ProcessResources>("processResources") {
 val packPsiImplUtils by tasks.registering(Jar::class) {
     description = "Pack psiImplUtils jar"
     archiveFileName.set("psiImplUtils.jar")
-    destinationDirectory.set(layout.projectDirectory.dir("lib"))
+    destinationDirectory.set(layout.projectDirectory.dir("buildLib"))
 
     val compileJava = tasks.named<JavaCompile>("compileJava")
     val compileKotlin = tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileKotlin")
@@ -98,15 +98,15 @@ dependencies {
     jflexConfig(files("buildLib/jflex.jar"))
     grammarKitConfig(files("buildLib/grammar-kit.jar"))
 
-    // Old Ant build packaged everything from /lib except psiImplUtils.jar
-    implementation(
-        fileTree("lib") {
-            include("*.jar")
-            exclude("psiImplUtils.jar")
-        }
-    )
-
-//    implementation(kotlin("reflect"))
+    // Libraries previously in lib/
+    implementation("commons-beanutils:commons-beanutils:1.8.0")
+    implementation("org.apache.commons:commons-lang3:3.4")
+    implementation("jgraph:jgraph:5.13.0.0")
+    implementation("org.jgrapht:jgrapht-core:0.9.0")
+    implementation("org.jgrapht:jgrapht-ext:0.9.0")
+    implementation("org.json:json:20180813")
+    implementation("org.jsoup:jsoup:1.15.3")
+    implementation("net.gcardone.junidecode:junidecode:0.5.2")
 
     // Needed by MCP toolset DTOs; compiler plugin generates serializers.
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
@@ -264,7 +264,7 @@ fun TaskContainer.registerParserTask(name: String, bnfPath: String, outputDirPat
         // Previously: classpath(grammarKitConfig, files("lib/psiImplUtils.jar"), intellijPlatformJars)
         // Now: keep only small jars as task inputs; IDEA libs are runtime-only and Internal.
         grammarKitClasspath.from(grammarKitConfig)
-        psiImplUtilsJar.from(files("lib/psiImplUtils.jar"))
+        psiImplUtilsJar.from(files("buildLib/psiImplUtils.jar"))
 
         bnfFile.set(layout.projectDirectory.file(bnfPath))
         outputDirs.set(outputDirPaths)
