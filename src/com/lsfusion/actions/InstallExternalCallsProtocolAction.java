@@ -115,9 +115,24 @@ public class InstallExternalCallsProtocolAction extends AnAction {
         String fileContent = Files.readString(filePath);
         String ideaBinPath = PathManager.getBinPath();
 
-        String ideaRunnableReplacement = isOsLinux ?
-                ideaBinPath + "/idea.sh" :
-                "\"" + ideaBinPath.replaceAll("\\\\", "/") + ((Files.exists(Paths.get(ideaBinPath, "idea64.exe")) ? "/idea64.exe" : "/idea.exe")) + "\"";
+        String ideaRunnableReplacement;
+        if (isOsLinux) {
+            Path linuxPath = Paths.get(ideaBinPath, "idea.sh");
+            if (!Files.exists(linuxPath)) {
+                throw new IOException("Could not find idea.sh in " + ideaBinPath);
+            }
+            ideaRunnableReplacement = ideaBinPath + "/idea.sh";
+        } else {
+            String exeName;
+            if (Files.exists(Paths.get(ideaBinPath, "idea64.exe"))) {
+                exeName = "idea64.exe";
+            } else if (Files.exists(Paths.get(ideaBinPath, "openide64.exe"))) {
+                exeName = "openide64.exe";
+            } else {
+                throw new IOException("Could not find idea executable file in " + ideaBinPath);
+            }
+            ideaRunnableReplacement = "\"" + ideaBinPath.replaceAll("\\\\", "/") + "/" + exeName + "\"";
+        }
 
         String projectModulesReplacement = isOsLinux ?
                 "(" + StringUtils.join(modulesPaths, " ") + ")" :
