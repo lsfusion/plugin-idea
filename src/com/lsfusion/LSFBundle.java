@@ -14,7 +14,7 @@ public class LSFBundle {
   private static Reference<ResourceBundle> ourBundle;
 
   @NonNls
-  private static final String BUNDLE = "com.lsfusion.LSFBundle";
+  private static final String BUNDLE = "LSFBundle";
 
   @NotNull
   public static String message(@PropertyKey(resourceBundle = BUNDLE)String key, Object... params) {
