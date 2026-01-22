@@ -86,7 +86,11 @@ val packPsiImplUtils by tasks.registering(Jar::class) {
 
 // `buildSearchableOptions` запускает headless IDE и падает на старых/кастомных code style providers.
 // Для сборки/CI это не критично, поэтому отключаем, как рекомендовано сообщением Gradle задачи.
-tasks.matching { it.name == "buildSearchableOptions" || it.name == "prepareJarSearchableOptions" }.configureEach {
+tasks.matching {
+    it.name == "buildSearchableOptions"
+            || it.name == "prepareJarSearchableOptions"
+            || it.name == "jarSearchableOptions"
+}.configureEach {
     enabled = false
 }
 
