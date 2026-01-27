@@ -135,7 +135,7 @@ dependencies {
 intellijPlatform {
     pluginVerification {
         ides {
-            create("IC", ideaVersion)
+            recommended()
         }
     }
     publishing {
