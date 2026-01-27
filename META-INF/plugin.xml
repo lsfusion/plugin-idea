@@ -19,15 +19,14 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="242"/>
+    <idea-version since-build="252"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
     <depends>com.intellij.properties</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.modules.platform</depends>
-
-    <depends optional="true" config-file="mcp.xml">com.intellij.mcpServer</depends>
+    <depends>com.intellij.mcpServer</depends>
 
     <actions>
         <group id="LSFGroup" popup="true" text="_LSF">
@@ -325,6 +324,7 @@
                              id="org.company.ApplicationSettingsConfigurable" displayName="LSF Settings"/>
 
         <!-- MCP tools are registered via bundled JetBrains MCP Server plugin (com.intellij.mcpServer.mcpToolset) -->
+        <mcpServer.mcpToolset implementation="com.lsfusion.mcp.McpToolset"/>
         <restService implementation="com.lsfusion.mcp.McpServerService"/>
 
         <!-- To use old PreCachedDataContext instead of new PreCachedDataContext2 (in 2021.3),
