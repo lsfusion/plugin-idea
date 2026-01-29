@@ -34,7 +34,7 @@ public class LSFusionLibrarySettingsStep extends ModuleWizardStep {
         String dbHost = config.getValue(DB_HOST_KEY, "localhost");
         String dbPort = config.getValue(DB_PORT_KEY, "");
         String dbUser = config.getValue(DB_USER_KEY, "postgres");
-        String dbPass = config.getValue(DB_PASS_KEY, "psw");
+        String dbPass = config.getValue(DB_PASS_KEY, "11111");
 
         return new SettingsPanel(moduleNameField, dbHost, dbPort, dbUser, dbPass);
     }
