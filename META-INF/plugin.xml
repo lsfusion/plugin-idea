@@ -8,12 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.305</b><br>
+        <b>Version 1.0.306</b><br>
         <ul>
-            <li>Optimize MCP search: add element prioritization (modules/classes first), early stop when budget exceeded, and performance improvements</li>
-            <li>Resolve and find usages of actions with RETURN</li>
-            <li>Add MCP tools for lsFusion: element search, documentation access, and DSL validation</li>
-            <li>Migrate build system from Ant/IDEA to Gradle everywhere</li>
+            <li>PropertyDrawViewProxy: `imagePath` deprecated (use `image` instead)</li>
         </ul>
     ]]>
     </change-notes>

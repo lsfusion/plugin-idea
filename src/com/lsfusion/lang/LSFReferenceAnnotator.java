@@ -1345,6 +1345,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 case "panelCaptionAlignment":
                     addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionAlignmentHorz' instead");
                     break;
+                case "imagePath":
+                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'image' instead");
+                    break;
                 default:
                     if (element != null && !element.getText().equals("NULL")) {
                         switch (property) {
