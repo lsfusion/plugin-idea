@@ -14,8 +14,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
-import com.intellij.psi.search.PsiSearchHelper;
-import com.intellij.psi.search.UsageSearchContext;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.MergeQuery;
 import com.intellij.util.Processor;
@@ -85,6 +83,7 @@ public class MCPSearchUtils {
     public static final int DEFAULT_MAX_SYMBOLS = 200_000; // fail-safe
     public static final int DEFAULT_MIN_SYMBOLS = 1_000; // fail-safe
     public static final int DEFAULT_TIMEOUT_SECS = 10; // default 10 seconds
+    public static final int DEFAULT_RAG_TOP_K = 200; // TODO: tune
 
     private static final class SelectedStatement {
         private final @NotNull LSFMCPDeclaration decl;
@@ -112,6 +111,8 @@ public class MCPSearchUtils {
      *   requiredModules: true, // optional (default: true); if true, include REQUIRE-d modules for modules in `modules`
      *   name: "cust,Order", // optional, CSV; filters by element name
      *   contains: "(?i)cust.*", // optional, CSV; filters by element code
+     *   query: "cust,Order", // optional, CSV; semantic query for local RAG (vector search)
+     *   useVectorSearch: false, // optional; if true, use local vector search for `query`
      *   elementTypes: "class,property,action", // optional, CSV
      *   classes: "MyNS.MyClass, MyOtherNS.OtherClass", // optional, CSV canonical names
      *   relatedElements: "property:MyNS.myProp[MyNS.MyClass], MyModule(10:5)", // optional, CSV
@@ -361,6 +362,26 @@ public class MCPSearchUtils {
         return !related.isEmpty();
     }
 
+    private static boolean submitRagTask(Project project, GlobalSearchScope searchScope, String queryText, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
+        submit.submit(1, () -> {
+            try {
+                LocalMcpRagService rag = LocalMcpRagService.getInstance(project);
+                List<String> locations = rag.search(queryText, DEFAULT_RAG_TOP_K);
+                if (locations.isEmpty()) return;
+                ReadAction.run(() -> {
+                    for (String location : locations) {
+                        LSFMCPDeclaration st = getStatementByLocation(project, searchScope, location);
+                        if (st == null) continue;
+                        if (!processor.process(st)) return;
+                    }
+                });
+            } catch (Exception e) {
+                LOG.warn("Error executing MCP RAG search", e);
+            }
+        });
+        return true;
+    }
+
     private static void submitFileTasks(GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
         for (LSFFile lsfFile : ReadAction.compute(() -> LSFFileUtils.getLsfFiles(searchScope))) {
             submit.submit(5, () -> ReadAction.run(() -> {
@@ -369,19 +390,6 @@ public class MCPSearchUtils {
                 }
             }));
         }
-    }
-
-    private static boolean submitWordTasks(Project project, GlobalSearchScope searchScope, List<NameFilter> filters, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
-        if (filters.isEmpty()) return false;
-        boolean fullyStreamable = true;
-        for (NameFilter nf : filters) {
-            if (nf.isWordStreamable()) {
-                submit.submit(5, () -> ReadAction.run(() -> streamWord(project, nf, processor, searchScope)));
-            } else {
-                fullyStreamable = false;
-            }
-        }
-        return fullyStreamable;
     }
 
     private static @NotNull GlobalSearchScope run(@NotNull Project project,
@@ -393,6 +401,7 @@ public class MCPSearchUtils {
         GlobalSearchScope searchScope = ReadAction.compute(() -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
         List<NameFilter> nameFilters = parseMatchersCsv(query.optString("name"));
         List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
+        String rawQuery = query.optString("query", "").trim();
         Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
 
         Set<LSFClassDeclaration> classDecls = ReadAction.compute(() -> parseClasses(project, searchScope, query.optString("classes")));
@@ -401,11 +410,14 @@ public class MCPSearchUtils {
         // Shared processor that applies all filters and returns false to stop the current iteration
         final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache);
 
-        // Track which blocks are fully streamable while assembling iterations.
-        // Name/code filters are considered fully streamable only if ALL matchers are "word-only" with length >= 3.
-        // Name/code-based iterations (only for word length >= 3)
-        boolean nameFullyStreamable = submitWordTasks(project, searchScope, nameFilters, processor, submit);
-        boolean containsFullyStreamable = submitWordTasks(project, searchScope, containsFilters, processor, submit);
+        boolean ragSubmitted = false;
+        if (query.optBoolean("useVectorSearch", false) && !rawQuery.isEmpty()) {
+            ragSubmitted = submitRagTask(project, searchScope, rawQuery, processor, submit);
+        }
+
+        if (ragSubmitted) {
+            return searchScope;
+        }
 
         // Element-type iterations (only for index-backed types and only if elementTypes filter provided)
         boolean typesFullyStreamable = submitTypeTasks(project, searchScope, elementTypes, processor, submit);
@@ -417,7 +429,7 @@ public class MCPSearchUtils {
         boolean relatedFullyStreamable = submitRelatedTasks(related, searchScope, processor, submit);
 
         // Per-file iterations (fallback) — run only if no block is fully streamable
-        if (!nameFullyStreamable && !containsFullyStreamable && !classesFullyStreamable && !relatedFullyStreamable && !typesFullyStreamable) {
+        if (!classesFullyStreamable && !relatedFullyStreamable && !typesFullyStreamable) {
             submitFileTasks(searchScope, processor, submit);
         }
 
@@ -430,15 +442,6 @@ public class MCPSearchUtils {
             onlyPropertiesClassesActions &= et.equals(LSFMCPDeclaration.ElementType.PROPERTY) || et.equals(LSFMCPDeclaration.ElementType.CLASS) || et.equals(LSFMCPDeclaration.ElementType.ACTION);
         }
         return onlyPropertiesClassesActions;
-    }
-
-    private static void streamWord(@NonNull Project project, NameFilter nf, Processor<LSFMCPDeclaration> processor, GlobalSearchScope searchScope) {
-        PsiSearchHelper helper = PsiSearchHelper.getInstance(project);
-        helper.processElementsWithWord((element, offsetInElement) -> processStatement(element, processor),
-                searchScope,
-                nf.word,
-                (short)(UsageSearchContext.IN_CODE | UsageSearchContext.IN_FOREIGN_LANGUAGES | UsageSearchContext.IN_COMMENTS),
-                true);
     }
 
     private static boolean isTimedOut(long deadlineMillis) {
@@ -774,7 +777,7 @@ public class MCPSearchUtils {
 
     // Expected format: <module>(<line>:<symbolInLine>) e.g. MyModule(10:5)
     // line and symbolInLine are 1-based
-    private static LSFMCPDeclaration getStatementByLocation(Project project, GlobalSearchScope scope, String location) {
+    public static LSFMCPDeclaration getStatementByLocation(Project project, GlobalSearchScope scope, String location) {
         if (location == null) return null;
         String s = location.trim();
         if (s.isEmpty()) return null;
@@ -834,7 +837,7 @@ public class MCPSearchUtils {
         return null;
     }
 
-    private static String getLocationByStatement(LSFMCPStatement stmt) {
+    public static String getLocationByStatement(LSFMCPStatement stmt) {
         if (stmt == null) return null;
 
         Pair<LSFFile, TextRange> location = LSFMCPStatement.getLocation(stmt);
@@ -1262,10 +1265,6 @@ public class MCPSearchUtils {
     private static class NameFilter {
         final String word;
         final Pattern regex;
-        
-        public boolean isWordStreamable() {
-            return word != null && word.length() >= 3 && regex == null;
-        }
 
         NameFilter(String word, Pattern regex) {
             this.word = word;

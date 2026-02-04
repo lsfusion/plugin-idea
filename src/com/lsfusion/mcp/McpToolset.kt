@@ -201,6 +201,14 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         )
         contains: String? = null,
         @McpDescription(
+            description = "Semantic query for local RAG (vector search). CSV allowed."
+        )
+        query: String? = null,
+        @McpDescription(
+            description = "If true, use local vector search for `query`. If false, use standard filters (names/contains). Default: false."
+        )
+        useVectorSearch: Boolean = false,
+        @McpDescription(
             description = "Element type filter as CSV. Allowed values: `module`, `metacode`, `class`, `property`, `action`, `form`, `navigatorElement`, `window`, `group`, `table`, `event`, `calculatedEvent`, `constraint`, `index`."
         )
         elementTypes: String? = null,
@@ -215,7 +223,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         @McpDescription(description = "Direction for ALL `relatedElements` seeds. Allowed values: `both`, `uses`, `used`. Default: `both`.")
         relatedDirection: String? = null,
         @McpDescription(
-            description = "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"names\":\"Foo\", \"modules\" : \"MyModule\"},{\"names\":\"Bar\"}]`). Results are merged (OR)."
+            description = "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"name\":\"Foo\", \"contains\":\"bar\", \"modules\" : \"MyModule\"},{\"query\":\"Foo\", \"useVectorSearch\":true}]`). Results are merged (OR)."
         )
         moreFilters: String? = null,
         @McpDescription(description = "Best-effort minimum output size in JSON chars; server may append neighboring elements if too small (>= 0). Default: ${MCPSearchUtils.DEFAULT_MIN_SYMBOLS}.")
@@ -235,24 +243,26 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         }
 
         try {
-            val query = JSONObject()
-            if (modules != null) query.put("modules", modules)
-            if (scope != null) query.put("scope", scope)
-            query.put("requiredModules", requiredModules)
-            if (names != null) query.put("name", names)
-            if (contains != null) query.put("contains", contains)
-            if (elementTypes != null) query.put("elementTypes", elementTypes)
-            if (classes != null) query.put("classes", classes)
-            if (relatedElements != null) query.put("relatedElements", relatedElements)
-            if (relatedDirection != null) query.put("relatedDirection", relatedDirection)
-            query.put("minSymbols", minSymbols)
-            query.put("maxSymbols", maxSymbols)
-            query.put("timeoutSeconds", timeoutSeconds)
+            val payload = JSONObject()
+            if (modules != null) payload.put("modules", modules)
+            if (scope != null) payload.put("scope", scope)
+            payload.put("requiredModules", requiredModules)
+            if (names != null) payload.put("name", names)
+            if (contains != null) payload.put("contains", contains)
+            if (query != null) payload.put("query", query)
+            if (useVectorSearch) payload.put("useVectorSearch", true)
+            if (elementTypes != null) payload.put("elementTypes", elementTypes)
+            if (classes != null) payload.put("classes", classes)
+            if (relatedElements != null) payload.put("relatedElements", relatedElements)
+            if (relatedDirection != null) payload.put("relatedDirection", relatedDirection)
+            payload.put("minSymbols", minSymbols)
+            payload.put("maxSymbols", maxSymbols)
+            payload.put("timeoutSeconds", timeoutSeconds)
             if (moreFilters != null && !moreFilters.isEmpty()) {
-                query.put("moreFilters", JSONArray(moreFilters))
+                payload.put("moreFilters", JSONArray(moreFilters))
             }
 
-            val result = MCPSearchUtils.findElements(project, query)
+            val result = MCPSearchUtils.findElements(project, payload)
             val jsonElement = json.parseToJsonElement(result.toString())
             return json.decodeFromJsonElement<FindElementsResult>(jsonElement)
         } catch (e: McpExpectedError) {

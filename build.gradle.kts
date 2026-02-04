@@ -111,6 +111,10 @@ dependencies {
     implementation("org.json:json:20180813")
     implementation("org.jsoup:jsoup:1.15.3")
     implementation("net.gcardone.junidecode:junidecode:0.5.2")
+    implementation("com.microsoft.onnxruntime:onnxruntime:1.23.2")
+    implementation("ai.djl.huggingface:tokenizers:0.36.0")
+    implementation("org.apache.lucene:lucene-core:10.3.2")
+    implementation("org.apache.lucene:lucene-analysis-common:10.3.2")
 
     // Needed by MCP toolset DTOs; compiler plugin generates serializers.
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
