@@ -14,8 +14,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
-import com.intellij.psi.search.PsiSearchHelper;
-import com.intellij.psi.search.UsageSearchContext;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.MergeQuery;
 import com.intellij.util.Processor;
@@ -110,8 +108,7 @@ public class MCPSearchUtils {
      *     // scope=project -> projectOnly scope (excludes libraries)
      *     // otherwise, scope can be a CSV list of IDEA module names (e.g. "my-idea-module1,my-idea-module2")
      *   requiredModules: true, // optional (default: true); if true, include REQUIRE-d modules for modules in `modules`
-     *   name: "cust,Order", // optional, CSV; filters by element name
-     *   contains: "(?i)cust.*", // optional, CSV; filters by element code
+     *   query: "cust,Order", // optional, CSV; filters by element name and code (word or regex)
      *   elementTypes: "class,property,action", // optional, CSV
      *   classes: "MyNS.MyClass, MyOtherNS.OtherClass", // optional, CSV canonical names
      *   relatedElements: "property:MyNS.myProp[MyNS.MyClass], MyModule(10:5)", // optional, CSV
@@ -240,7 +237,7 @@ public class MCPSearchUtils {
         return resultObject;
     }
 
-    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, Set<LSFClassDeclaration> classDecls, Map<LSFMCPDeclaration, Direction> related, GlobalSearchScope searchScope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
+    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> queryFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, Set<LSFClassDeclaration> classDecls, Map<LSFMCPDeclaration, Direction> related, GlobalSearchScope searchScope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
         return st -> {
             if (state.stopRequested.get()) {
                 return false;
@@ -254,7 +251,7 @@ public class MCPSearchUtils {
 
             // already processed
 
-            if (matchesAllFilters(st, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache)) {
+            if (matchesAllFilters(st, queryFilters, elementTypes, classDecls, related, searchScope, relatedCache)) {
                 SelectedStatement selSt = new SelectedStatement(st, searchScope);
 
                 synchronized (state.statementsByPriority[p]) {
@@ -371,19 +368,6 @@ public class MCPSearchUtils {
         }
     }
 
-    private static boolean submitWordTasks(Project project, GlobalSearchScope searchScope, List<NameFilter> filters, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
-        if (filters.isEmpty()) return false;
-        boolean fullyStreamable = true;
-        for (NameFilter nf : filters) {
-            if (nf.isWordStreamable()) {
-                submit.submit(5, () -> ReadAction.run(() -> streamWord(project, nf, processor, searchScope)));
-            } else {
-                fullyStreamable = false;
-            }
-        }
-        return fullyStreamable;
-    }
-
     private static @NotNull GlobalSearchScope run(@NotNull Project project,
                                                  @NotNull JSONObject query,
                                                  @NotNull Set<LSFMCPDeclaration> seen,
@@ -391,21 +375,14 @@ public class MCPSearchUtils {
                                                  @NotNull SearchState state,
                                                  @NotNull TaskSubmitter submit) {
         GlobalSearchScope searchScope = ReadAction.compute(() -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
-        List<NameFilter> nameFilters = parseMatchersCsv(query.optString("name"));
-        List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
+        List<NameFilter> queryFilters = parseMatchersCsv(query.optString("query"));
         Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
 
         Set<LSFClassDeclaration> classDecls = ReadAction.compute(() -> parseClasses(project, searchScope, query.optString("classes")));
         Map<LSFMCPDeclaration, Direction> related = ReadAction.compute(() -> parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection")));
 
         // Shared processor that applies all filters and returns false to stop the current iteration
-        final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache);
-
-        // Track which blocks are fully streamable while assembling iterations.
-        // Name/code filters are considered fully streamable only if ALL matchers are "word-only" with length >= 3.
-        // Name/code-based iterations (only for word length >= 3)
-        boolean nameFullyStreamable = submitWordTasks(project, searchScope, nameFilters, processor, submit);
-        boolean containsFullyStreamable = submitWordTasks(project, searchScope, containsFilters, processor, submit);
+        final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, queryFilters, elementTypes, classDecls, related, searchScope, relatedCache);
 
         // Element-type iterations (only for index-backed types and only if elementTypes filter provided)
         boolean typesFullyStreamable = submitTypeTasks(project, searchScope, elementTypes, processor, submit);
@@ -417,7 +394,7 @@ public class MCPSearchUtils {
         boolean relatedFullyStreamable = submitRelatedTasks(related, searchScope, processor, submit);
 
         // Per-file iterations (fallback) — run only if no block is fully streamable
-        if (!nameFullyStreamable && !containsFullyStreamable && !classesFullyStreamable && !relatedFullyStreamable && !typesFullyStreamable) {
+        if (!classesFullyStreamable && !relatedFullyStreamable && !typesFullyStreamable) {
             submitFileTasks(searchScope, processor, submit);
         }
 
@@ -430,15 +407,6 @@ public class MCPSearchUtils {
             onlyPropertiesClassesActions &= et.equals(LSFMCPDeclaration.ElementType.PROPERTY) || et.equals(LSFMCPDeclaration.ElementType.CLASS) || et.equals(LSFMCPDeclaration.ElementType.ACTION);
         }
         return onlyPropertiesClassesActions;
-    }
-
-    private static void streamWord(@NonNull Project project, NameFilter nf, Processor<LSFMCPDeclaration> processor, GlobalSearchScope searchScope) {
-        PsiSearchHelper helper = PsiSearchHelper.getInstance(project);
-        helper.processElementsWithWord((element, offsetInElement) -> processStatement(element, processor),
-                searchScope,
-                nf.word,
-                (short)(UsageSearchContext.IN_CODE | UsageSearchContext.IN_FOREIGN_LANGUAGES | UsageSearchContext.IN_COMMENTS),
-                true);
     }
 
     private static boolean isTimedOut(long deadlineMillis) {
@@ -1012,8 +980,7 @@ public class MCPSearchUtils {
     // region Matching
 
     private static boolean matchesAllFilters(LSFMCPDeclaration stmt,
-                                             List<NameFilter> nameFilters,
-                                             List<NameFilter> containsFilters,
+                                             List<NameFilter> queryFilters,
                                              Set<LSFMCPDeclaration.ElementType> elementTypes,
                                              Set<LSFClassDeclaration> classDecls,
                                              Map<LSFMCPDeclaration, Direction> related,
@@ -1021,10 +988,14 @@ public class MCPSearchUtils {
                                              ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
         LSFMCPDeclaration.ElementType t;
         return (elementTypes.isEmpty() || ((t = stmt.getMCPType()) != null && elementTypes.contains(t))) &&
-                (nameFilters.isEmpty() || matchesNameFilters(stmt, nameFilters, scope, false)) &&
-                (containsFilters.isEmpty() || matchesNameFilters(stmt, containsFilters, scope, true)) &&
+                (queryFilters.isEmpty() || matchesQueryFilters(stmt, queryFilters, scope)) &&
                 (classDecls.isEmpty() || matchesClassesFilter(stmt, classDecls, scope)) &&
                 (related.isEmpty() || matchesRelatedFilters(stmt, related, scope, relatedCache));
+    }
+
+    private static boolean matchesQueryFilters(LSFMCPDeclaration stmt, List<NameFilter> queryFilters, GlobalSearchScope scope) {
+        return matchesNameFilters(stmt, queryFilters, scope, false) ||
+                matchesNameFilters(stmt, queryFilters, scope, true);
     }
 
     private static boolean matchesClassesFilter(LSFMCPDeclaration stmt, Set<LSFClassDeclaration> classDecls, GlobalSearchScope scope) {
@@ -1262,10 +1233,6 @@ public class MCPSearchUtils {
     private static class NameFilter {
         final String word;
         final Pattern regex;
-        
-        public boolean isWordStreamable() {
-            return word != null && word.length() >= 3 && regex == null;
-        }
 
         NameFilter(String word, Pattern regex) {
             this.word = word;
