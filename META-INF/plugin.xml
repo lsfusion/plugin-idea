@@ -11,6 +11,7 @@
         <b>Version 1.0.306</b><br>
         <ul>
             <li>PropertyDrawViewProxy: `imagePath` deprecated (use `image` instead)</li>
+            <li>NAVIGATOR formElseActionName resolving fix</li>
         </ul>
     ]]>
     </change-notes>

@@ -45,6 +45,11 @@ public class LSFPsiImplUtil {
      */
     private static final double CUT_KEEP_ORIGINAL_MAX_RATIO = 1.5;
 
+    @Nullable
+    public static LSFSimpleName getSimpleName(@NotNull LSFNavigatorElementDescription o) {
+        return PsiTreeUtil.findChildOfType(o, LSFSimpleName.class);
+    }
+
     /**
      * Configuration of rules for producing a "short" text.
      *

@@ -2382,14 +2382,17 @@ navigatorSchedulerStatement ::= SCHEDULE PERIOD intLiteral FIXED? actionProperty
 }
 
 
-private folderElementDescription ::= FOLDER simpleName localizedStringLiteral? { pin = 2 }
+folderElementDescription ::= FOLDER simpleName localizedStringLiteral? { pin = 2 }
+navigatorElementSimpleName ::= simpleName
 simpleElementDescription ::= (simpleName? localizedStringLiteral? EQUALS)? formElseNoParamsActionUsage
-navigatorElementDescription ::= (   ACTION (simpleName? localizedStringLiteral? EQUALS)? noParamsActionUsage
-                                |   FORM (simpleName? localizedStringLiteral? EQUALS)? formUsage
+navigatorElementDescription ::= (   ACTION (navigatorElementSimpleName? localizedStringLiteral? EQUALS)? noParamsActionUsage
+                                |   FORM (navigatorElementSimpleName? localizedStringLiteral? EQUALS)? formUsage
                                 |   folderElementDescription
                                 |   simpleElementDescription
                                 )
- 
+  {
+      methods = [ getSimpleName ]
+  }
 setupNavigatorElementStatement ::= navigatorElementSelector (localizedStringLiteral)? navigatorElementOptions navigatorElementStatementBody
 {
     pin = 1
