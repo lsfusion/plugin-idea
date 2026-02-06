@@ -63,8 +63,12 @@ public abstract class LSFNavigatorElementDeclarationImpl extends LSFFullNameDecl
     @Override
     public LSFSimpleName getSimpleName() {
         LSFNavigatorElementDescription navigatorElementDescription = getNavigatorElementDescription();
-        if(navigatorElementDescription != null)
+        if(navigatorElementDescription != null) {
+            LSFSimpleElementDescription simpleElementDescription = navigatorElementDescription.getSimpleElementDescription();
+            if(simpleElementDescription != null)
+                return simpleElementDescription.getSimpleName();
             return navigatorElementDescription.getSimpleName();
+        }
         return null;
     }
 
