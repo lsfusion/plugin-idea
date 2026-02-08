@@ -254,6 +254,15 @@ public final class McpServerService extends RestService {
                                 .put("type", "string")
                                 .put("description",
                                         "Element name filter as CSV (comma-separated). Word if valid ID, else Java regex."))
+                        .put("query", new JSONObject()
+                                .put("type", "string")
+                                .put("description",
+                                        "Semantic query for local RAG (vector search). CSV allowed."))
+                        .put("useVectorSearch", new JSONObject()
+                                .put("type", "boolean")
+                                .put("default", false)
+                                .put("description",
+                                        "If true, use local vector search for `query`. If false, use standard filters (names/contains)."))
                         .put("contains", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
@@ -285,7 +294,7 @@ public final class McpServerService extends RestService {
                         .put("moreFilters", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"names\":\"Foo\", \"modules\" : \"MyModule\"},{\"names\":\"Bar\"}]`). Results are merged (OR)."))
+                                        "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"name\":\"Foo\", \"contains\":\"bar\", \"modules\" : \"MyModule\"},{\"query\":\"Foo\", \"useVectorSearch\":true}]`). Results are merged (OR)."))
                         .put("minSymbols", new JSONObject()
                                 .put("type", "integer")
                                 .put("minimum", 0)
