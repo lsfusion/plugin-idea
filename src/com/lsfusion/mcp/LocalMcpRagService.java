@@ -15,24 +15,28 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.document.KnnVectorField;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.KnnVectorQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.BytesRef;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -129,13 +133,22 @@ public final class LocalMcpRagService {
             if (vector.length == 0) return List.of();
             try (IndexReader reader = DirectoryReader.open(writer)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
-                KnnVectorQuery query = new KnnVectorQuery(FIELD_VECTOR, vector, topK);
-                TopDocs hits = searcher.search(query, topK);
+                TopDocs hits = searcher.search(new MatchAllDocsQuery(), Math.max(1, reader.numDocs()));
                 List<String> out = new ArrayList<>();
+                List<ScoredId> scored = new ArrayList<>(hits.scoreDocs.length);
                 for (ScoreDoc hit : hits.scoreDocs) {
                     Document doc = searcher.doc(hit.doc);
                     String location = doc.get(FIELD_ID);
-                    if (location != null) out.add(location);
+                    BytesRef br = doc.getBinaryValue(FIELD_VECTOR);
+                    byte[] raw = br != null ? Arrays.copyOfRange(br.bytes, br.offset, br.offset + br.length) : null;
+                    if (location == null || raw == null) continue;
+                    float[] vec = decodeVector(raw);
+                    float score = dot(vector, vec);
+                    scored.add(new ScoredId(location, score));
+                }
+                scored.sort((a, b) -> Float.compare(b.score, a.score));
+                for (int i = 0; i < Math.min(topK, scored.size()); i++) {
+                    out.add(scored.get(i).id);
                 }
                 LOG.info("MCP RAG search: " + out.size() + " hits in " + (System.currentTimeMillis() - start) + "ms");
                 return out;
@@ -176,7 +189,7 @@ public final class LocalMcpRagService {
         }
         doc.add(new StringField(FIELD_TYPE, typeName, Field.Store.YES));
         doc.add(new TextField(FIELD_CODE, decl.getText(), Field.Store.NO));
-        doc.add(new KnnVectorField(FIELD_VECTOR, vector));
+        doc.add(new StoredField(FIELD_VECTOR, encodeVector(vector)));
         writer.addDocument(doc);
     }
 
@@ -189,6 +202,36 @@ public final class LocalMcpRagService {
         }
         sb.append(decl.getText());
         return sb.toString();
+    }
+
+    private static byte[] encodeVector(float[] v) {
+        ByteBuffer buf = ByteBuffer.allocate(v.length * 4).order(ByteOrder.LITTLE_ENDIAN);
+        for (float x : v) buf.putFloat(x);
+        return buf.array();
+    }
+
+    private static float[] decodeVector(byte[] raw) {
+        ByteBuffer buf = ByteBuffer.wrap(raw).order(ByteOrder.LITTLE_ENDIAN);
+        float[] out = new float[raw.length / 4];
+        for (int i = 0; i < out.length; i++) out[i] = buf.getFloat();
+        return out;
+    }
+
+    private static float dot(float[] a, float[] b) {
+        int n = Math.min(a.length, b.length);
+        float sum = 0f;
+        for (int i = 0; i < n; i++) sum += a[i] * b[i];
+        return sum;
+    }
+
+    private static final class ScoredId {
+        final String id;
+        final float score;
+
+        private ScoredId(String id, float score) {
+            this.id = id;
+            this.score = score;
+        }
     }
 
     private @Nullable EmbeddingProvider createEmbeddingProvider() {
