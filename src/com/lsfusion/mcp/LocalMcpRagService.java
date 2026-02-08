@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class LocalMcpRagService {
@@ -59,6 +60,7 @@ public final class LocalMcpRagService {
     private static final String MODEL_DIR_PROPERTY = "lsfusion.mcp.embedding.modelDir";
     private static final String MODEL_DIR_ENV = "LSFUSION_MCP_EMBEDDING_MODEL_DIR";
     private static final String DEFAULT_MODEL_DIR_NAME = ".mcp-model";
+    private static final AtomicBoolean ONNX_SELF_TEST_DONE = new AtomicBoolean(false);
 
     private LocalMcpRagService(Project project) throws Exception {
         this.project = project;
@@ -80,9 +82,20 @@ public final class LocalMcpRagService {
 
     public void indexProjectAsync() {
         if (indexing.getAndSet(true)) return;
+        if (com.intellij.openapi.project.DumbService.isDumb(project)) {
+            com.intellij.openapi.project.DumbService.getInstance(project)
+                    .runWhenSmart(this::indexProjectAsync);
+            indexing.set(false);
+            return;
+        }
         com.intellij.openapi.application.ApplicationManager.getApplication().executeOnPooledThread(() -> {
             long start = System.currentTimeMillis();
             try {
+                if (embeddingProvider == null) {
+                    LOG.warn("MCP RAG index skipped: embedding provider not available");
+                    return;
+                }
+                LOG.info("MCP RAG index started");
                 indexProject();
                 LOG.info("MCP RAG index built in " + (System.currentTimeMillis() - start) + "ms");
             } catch (Throwable t) {
@@ -94,17 +107,29 @@ public final class LocalMcpRagService {
     }
 
     public void indexProject() throws Exception {
+        if (embeddingProvider == null) return;
+        if (com.intellij.openapi.project.DumbService.isDumb(project)) {
+            LOG.info("MCP RAG index skipped: IDE is in dumb mode");
+            return;
+        }
         ReadAction.run(() -> {
+            int fileCount = 0;
             for (LSFFile lsfFile : LSFFileUtils.getLsfFiles(ProjectScope.getAllScope(project))) {
                 indexFile(lsfFile);
+                fileCount++;
             }
+            LOG.info("MCP RAG index pass completed: " + fileCount + " files");
         });
         writer.commit();
     }
 
     public void updateFile(@NotNull VirtualFile file) {
         if (!file.getName().endsWith(".lsf")) return;
+        if (embeddingProvider == null) return;
+        if (com.intellij.openapi.project.DumbService.isDumb(project)) return;
         try {
+            long start = System.currentTimeMillis();
+            LOG.info("MCP RAG reindex start: " + file.getPath());
             ReadAction.run(() -> {
                 PsiFile psi = PsiManager.getInstance(project).findFile(file);
                 if (psi instanceof LSFFile lsfFile) {
@@ -112,6 +137,7 @@ public final class LocalMcpRagService {
                 }
             });
             writer.commit();
+            LOG.info("MCP RAG reindex done: " + file.getPath() + " in " + (System.currentTimeMillis() - start) + "ms");
         } catch (Throwable t) {
             LOG.warn("MCP RAG updateFile failed: " + file.getPath(), t);
         }
@@ -132,7 +158,11 @@ public final class LocalMcpRagService {
         if (embeddingProvider == null) return List.of();
         try {
             long start = System.currentTimeMillis();
+            long vectorStart = System.currentTimeMillis();
+            LOG.info("MCP RAG query vectorization start: length=" + queryText.length());
             float[] vector = embeddingProvider.embed(queryText);
+            LOG.info("MCP RAG query vectorization done: dim=" + vector.length +
+                    ", " + (System.currentTimeMillis() - vectorStart) + "ms");
             if (vector.length == 0) return List.of();
             try (IndexReader reader = DirectoryReader.open(writer)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
@@ -165,11 +195,17 @@ public final class LocalMcpRagService {
     private void indexFile(@NotNull LSFFile file) {
         VirtualFile vf = file.getVirtualFile();
         if (vf == null) return;
+        if (embeddingProvider == null) return;
         try {
+            long start = System.currentTimeMillis();
+            LOG.info("MCP RAG indexFile start: " + vf.getPath());
             writer.deleteDocuments(new Term(FIELD_FILE, vf.getPath()));
-            for (LSFMCPDeclaration decl : LSFMCPDeclaration.getMCPDeclarations(file)) {
+            Collection<LSFMCPDeclaration> decls = LSFMCPDeclaration.getMCPDeclarations(file);
+            for (LSFMCPDeclaration decl : decls) {
                 indexStatement(file, decl);
             }
+            LOG.info("MCP RAG indexFile done: " + vf.getPath() + " (" + decls.size() + " items) in " +
+                    (System.currentTimeMillis() - start) + "ms");
         } catch (Throwable t) {
             LOG.warn("MCP RAG indexFile failed: " + vf.getPath(), t);
         }
@@ -238,6 +274,13 @@ public final class LocalMcpRagService {
     }
 
     private @Nullable EmbeddingProvider createEmbeddingProvider() {
+        LOG.info("MCP ONNX env: os.name=" + System.getProperty("os.name") +
+                ", os.arch=" + System.getProperty("os.arch") +
+                ", java.version=" + System.getProperty("java.version") +
+                ", java.io.tmpdir=" + System.getProperty("java.io.tmpdir") +
+                ", onnxruntime.native.path=" + System.getProperty("onnxruntime.native.path") +
+                ", onnxruntime.native.onnxruntime.path=" + System.getProperty("onnxruntime.native.onnxruntime.path") +
+                ", onnxruntime.native.onnxruntime4j_jni.path=" + System.getProperty("onnxruntime.native.onnxruntime4j_jni.path"));
         String modelDir = System.getProperty(MODEL_DIR_PROPERTY);
         if (modelDir == null || modelDir.isBlank()) {
             modelDir = System.getenv(MODEL_DIR_ENV);
@@ -251,16 +294,45 @@ public final class LocalMcpRagService {
                 }
             }
         }
+        if (modelDir == null || modelDir.isBlank()) {
+            String cwd = System.getProperty("user.dir");
+            if (cwd != null && !cwd.isBlank()) {
+                Path fallback = Path.of(cwd).resolve(DEFAULT_MODEL_DIR_NAME);
+                if (Files.isDirectory(fallback)) {
+                    modelDir = fallback.toString();
+                }
+            }
+        }
 
         if (modelDir == null || modelDir.isBlank()) {
             LOG.warn("MCP embedding model dir not set: set -D" + MODEL_DIR_PROPERTY +
-                    " or env " + MODEL_DIR_ENV + " or place model under <project>/" + DEFAULT_MODEL_DIR_NAME);
+                    " or env " + MODEL_DIR_ENV + " or place model under <project>/" + DEFAULT_MODEL_DIR_NAME +
+                    " or <working dir>/" + DEFAULT_MODEL_DIR_NAME);
             return null;
         }
         try {
             LOG.info("MCP embedding model dir: " + modelDir);
-            return new OnnxEmbeddingProvider(Path.of(modelDir));
+            if (ONNX_SELF_TEST_DONE.compareAndSet(false, true)) {
+                try {
+                    ai.onnxruntime.OrtEnvironment.getEnvironment();
+                    LOG.info("MCP ONNX self-test: OK");
+                } catch (Throwable t) {
+                    LOG.warn("MCP ONNX self-test failed: " + t.getMessage(), t);
+                }
+            }
+            EmbeddingProvider provider = new OnnxEmbeddingProvider(Path.of(modelDir));
+            LOG.info("MCP embedding provider init: OK");
+            return provider;
         } catch (Throwable t) {
+            String message = t.getMessage();
+            if (message != null && !message.isBlank()) {
+                LOG.warn("MCP embedding provider init failed: " + message);
+            }
+            if (t instanceof UnsatisfiedLinkError) {
+                LOG.warn("MCP embedding provider init failed: native ONNX runtime could not load. " +
+                        "On Windows this is usually missing MSVC runtime. " +
+                        "Install Microsoft Visual C++ 2015-2022 Redistributable (x64) and restart IDE.");
+            }
             LOG.warn("MCP embedding provider init failed", t);
             return null;
         }

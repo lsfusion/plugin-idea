@@ -43,7 +43,17 @@ public final class OnnxEmbeddingProvider implements EmbeddingProvider {
 
         this.env = OrtEnvironment.getEnvironment();
         this.session = env.createSession(modelPath.toString(), new OrtSession.SessionOptions());
-        this.tokenizer = HuggingFaceTokenizer.newInstance(tokenizerPath);
+        // Ensure DJL can see its native resources via context classloader in IntelliJ.
+        ClassLoader prevCl = Thread.currentThread().getContextClassLoader();
+        ClassLoader tokenizersCl = HuggingFaceTokenizer.class.getClassLoader();
+        try {
+            if (tokenizersCl != null) {
+                Thread.currentThread().setContextClassLoader(tokenizersCl);
+            }
+            this.tokenizer = HuggingFaceTokenizer.newInstance(tokenizerPath);
+        } finally {
+            Thread.currentThread().setContextClassLoader(prevCl);
+        }
 
         this.inputIdsName = pickInputName("input_ids");
         this.attentionMaskName = pickInputName("attention_mask");

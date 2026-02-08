@@ -1,3 +1,6 @@
+import java.io.File
+import java.net.URL
+
 plugins {
     java
     // Must be compatible with Kotlin compiler bundled with IntelliJ IDEA 2025.3 (metadata 2.2.0)
@@ -8,6 +11,8 @@ plugins {
 
 val ideaVersion = "2025.3"
 val javaVersion = 21
+val onnxRuntimeVersion = "1.20.0"
+val djlTokenizersVersion = "0.33.0"
 
 group = "com.lsfusion"
 version = file("META-INF/plugin.xml").let {
@@ -24,6 +29,15 @@ repositories {
     maven("https://plugins.jetbrains.com/maven")
     intellijPlatform {
         defaultRepositories()
+    }
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "com.microsoft.onnxruntime") {
+            useVersion(onnxRuntimeVersion)
+            because("Keep all ONNX Runtime jars on one version")
+        }
     }
 }
 
@@ -111,8 +125,8 @@ dependencies {
     implementation("org.json:json:20180813")
     implementation("org.jsoup:jsoup:1.15.3")
     implementation("net.gcardone.junidecode:junidecode:0.5.2")
-    implementation("com.microsoft.onnxruntime:onnxruntime:1.23.2")
-    implementation("ai.djl.huggingface:tokenizers:0.36.0")
+    implementation("com.microsoft.onnxruntime:onnxruntime:$onnxRuntimeVersion")
+    implementation("ai.djl.huggingface:tokenizers:$djlTokenizersVersion")
     implementation("org.apache.lucene:lucene-core:10.3.2")
     implementation("org.apache.lucene:lucene-analysis-common:10.3.2")
 
@@ -139,10 +153,15 @@ dependencies {
 val modelDir = layout.projectDirectory.dir(".mcp-model")
 val e5ModelUrl = "https://huggingface.co/intfloat/e5-small/resolve/main/model.onnx?download=true"
 val e5TokenizerUrl = "https://huggingface.co/intfloat/e5-small/resolve/main/tokenizer.json?download=true"
+val onnxNativeDir = layout.buildDirectory.dir("onnxruntime-native")
+val onnxTempDir = layout.buildDirectory.dir("onnxruntime-tmp")
+val onnxRuntimeDll = onnxNativeDir.map { it.file("onnxruntime.dll") }
+val onnxRuntimeJniDll = onnxNativeDir.map { it.file("onnxruntime4j_jni.dll") }
 
 tasks.register("downloadE5Model") {
     group = "mcp"
     description = "Download e5-small ONNX model and tokenizer if missing"
+    notCompatibleWithConfigurationCache("Downloads model files to project directory")
     doLast {
         val dirFile = modelDir.asFile
         if (!dirFile.exists()) {
@@ -151,9 +170,9 @@ tasks.register("downloadE5Model") {
         val modelFile = modelDir.file("model.onnx").asFile
         val tokenizerFile = modelDir.file("tokenizer.json").asFile
 
-        fun downloadIfMissing(url: String, target: java.io.File) {
+        fun downloadIfMissing(url: String, target: File) {
             if (target.exists() && target.length() > 0) return
-            java.net.URL(url).openStream().use { input ->
+            URL(url).openStream().use { input ->
                 target.outputStream().use { output -> input.copyTo(output) }
             }
         }
@@ -163,8 +182,44 @@ tasks.register("downloadE5Model") {
     }
 }
 
-tasks.named("runIde") {
-    dependsOn("downloadE5Model")
+val extractOnnxRuntimeNative by tasks.registering(Sync::class) {
+    group = "mcp"
+    description = "Extract ONNX Runtime native libs into build dir"
+    val runtimeClasspath = configurations.runtimeClasspath
+    from({
+        runtimeClasspath.get()
+            .filter { it.name.startsWith("onnxruntime-") && it.extension == "jar" }
+            .map { zipTree(it) }
+    }) {
+        include("**/onnxruntime*.dll")
+        include("**/onnxruntime_providers_*.dll")
+        include("**/onnxruntime*.so")
+        include("**/onnxruntime*.dylib")
+        include("**/libonnxruntime*.dylib")
+        include("**/onnxruntime4j_jni*")
+        include("**/libonnxruntime4j_jni*")
+    }
+    into(onnxNativeDir)
+    includeEmptyDirs = false
+    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+    eachFile { path = name }
+}
+
+val createOnnxTempDir by tasks.registering {
+    group = "mcp"
+    description = "Create ONNX Runtime temp dir"
+    doLast {
+        onnxTempDir.get().asFile.mkdirs()
+    }
+}
+
+tasks.withType<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>().configureEach {
+    dependsOn("downloadE5Model", extractOnnxRuntimeNative, createOnnxTempDir)
+    jvmArgs("-Dlsfusion.mcp.embedding.modelDir=${modelDir.asFile.absolutePath}")
+    jvmArgs("-Donnxruntime.native.path=${onnxNativeDir.get().asFile.absolutePath}")
+    jvmArgs("-Donnxruntime.native.onnxruntime.path=${onnxRuntimeDll.get().asFile.absolutePath}")
+    jvmArgs("-Donnxruntime.native.onnxruntime4j_jni.path=${onnxRuntimeJniDll.get().asFile.absolutePath}")
+    jvmArgs("-Djava.io.tmpdir=${onnxTempDir.get().asFile.absolutePath}")
 }
 
 intellijPlatform {
