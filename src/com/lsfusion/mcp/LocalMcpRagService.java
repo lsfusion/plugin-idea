@@ -137,7 +137,7 @@ public final class LocalMcpRagService {
                 List<String> out = new ArrayList<>();
                 List<ScoredId> scored = new ArrayList<>(hits.scoreDocs.length);
                 for (ScoreDoc hit : hits.scoreDocs) {
-                    Document doc = searcher.doc(hit.doc);
+                    Document doc = searcher.storedFields().document(hit.doc);
                     String location = doc.get(FIELD_ID);
                     BytesRef br = doc.getBinaryValue(FIELD_VECTOR);
                     byte[] raw = br != null ? Arrays.copyOfRange(br.bytes, br.offset, br.offset + br.length) : null;

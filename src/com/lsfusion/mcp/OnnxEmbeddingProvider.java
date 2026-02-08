@@ -10,6 +10,7 @@ import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 
+import java.nio.LongBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -63,9 +64,9 @@ public final class OnnxEmbeddingProvider implements EmbeddingProvider {
         }
 
         long[] shape = new long[]{1, inputIds.length};
-        try (OnnxTensor idsTensor = OnnxTensor.createTensor(env, wrapLong(inputIds), shape);
-             OnnxTensor maskTensor = OnnxTensor.createTensor(env, wrapLong(attentionMask), shape);
-             OnnxTensor typeTensor = OnnxTensor.createTensor(env, wrapLong(tokenTypeIds), shape)) {
+        try (OnnxTensor idsTensor = OnnxTensor.createTensor(env, LongBuffer.wrap(inputIds), shape);
+             OnnxTensor maskTensor = OnnxTensor.createTensor(env, LongBuffer.wrap(attentionMask), shape);
+             OnnxTensor typeTensor = OnnxTensor.createTensor(env, LongBuffer.wrap(tokenTypeIds), shape)) {
 
             Map<String, OnnxTensor> inputs = new HashMap<>();
             if (inputIdsName != null) inputs.put(inputIdsName, idsTensor);
@@ -73,7 +74,7 @@ public final class OnnxEmbeddingProvider implements EmbeddingProvider {
             if (tokenTypeIdsName != null) inputs.put(tokenTypeIdsName, typeTensor);
 
             try (OrtSession.Result result = session.run(inputs)) {
-                OnnxValue value = result.get(outputName);
+                OnnxValue value = result.get(outputName).orElseThrow();
                 float[] vector = extractEmbedding(value, attentionMask);
                 normalize(vector);
                 return vector;
@@ -118,12 +119,6 @@ public final class OnnxEmbeddingProvider implements EmbeddingProvider {
             }
         }
         return 384; // fallback for e5-small
-    }
-
-    private static long[][] wrapLong(long[] input) {
-        long[][] out = new long[1][input.length];
-        System.arraycopy(input, 0, out[0], 0, input.length);
-        return out;
     }
 
     private float[] extractEmbedding(OnnxValue value, long[] attentionMask) throws OrtException {
