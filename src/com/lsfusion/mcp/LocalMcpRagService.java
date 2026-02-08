@@ -56,6 +56,9 @@ public final class LocalMcpRagService {
     private final IndexWriter writer;
     private final EmbeddingProvider embeddingProvider;
     private final AtomicBoolean indexing = new AtomicBoolean(false);
+    private static final String MODEL_DIR_PROPERTY = "lsfusion.mcp.embedding.modelDir";
+    private static final String MODEL_DIR_ENV = "LSFUSION_MCP_EMBEDDING_MODEL_DIR";
+    private static final String DEFAULT_MODEL_DIR_NAME = ".mcp-model";
 
     private LocalMcpRagService(Project project) throws Exception {
         this.project = project;
@@ -235,12 +238,27 @@ public final class LocalMcpRagService {
     }
 
     private @Nullable EmbeddingProvider createEmbeddingProvider() {
-        String modelDir = System.getProperty("lsfusion.mcp.embedding.modelDir");
+        String modelDir = System.getProperty(MODEL_DIR_PROPERTY);
         if (modelDir == null || modelDir.isBlank()) {
-            LOG.warn("MCP embedding model dir not set: set -Dlsfusion.mcp.embedding.modelDir");
+            modelDir = System.getenv(MODEL_DIR_ENV);
+        }
+        if (modelDir == null || modelDir.isBlank()) {
+            String basePath = project.getBasePath();
+            if (basePath != null) {
+                Path fallback = Path.of(basePath).resolve(DEFAULT_MODEL_DIR_NAME);
+                if (Files.isDirectory(fallback)) {
+                    modelDir = fallback.toString();
+                }
+            }
+        }
+
+        if (modelDir == null || modelDir.isBlank()) {
+            LOG.warn("MCP embedding model dir not set: set -D" + MODEL_DIR_PROPERTY +
+                    " or env " + MODEL_DIR_ENV + " or place model under <project>/" + DEFAULT_MODEL_DIR_NAME);
             return null;
         }
         try {
+            LOG.info("MCP embedding model dir: " + modelDir);
             return new OnnxEmbeddingProvider(Path.of(modelDir));
         } catch (Throwable t) {
             LOG.warn("MCP embedding provider init failed", t);

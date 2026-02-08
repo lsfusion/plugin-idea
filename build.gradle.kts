@@ -136,6 +136,37 @@ dependencies {
     }
 }
 
+val modelDir = layout.projectDirectory.dir(".mcp-model")
+val e5ModelUrl = "https://huggingface.co/intfloat/e5-small/resolve/main/model.onnx?download=true"
+val e5TokenizerUrl = "https://huggingface.co/intfloat/e5-small/resolve/main/tokenizer.json?download=true"
+
+tasks.register("downloadE5Model") {
+    group = "mcp"
+    description = "Download e5-small ONNX model and tokenizer if missing"
+    doLast {
+        val dirFile = modelDir.asFile
+        if (!dirFile.exists()) {
+            dirFile.mkdirs()
+        }
+        val modelFile = modelDir.file("model.onnx").asFile
+        val tokenizerFile = modelDir.file("tokenizer.json").asFile
+
+        fun downloadIfMissing(url: String, target: java.io.File) {
+            if (target.exists() && target.length() > 0) return
+            java.net.URL(url).openStream().use { input ->
+                target.outputStream().use { output -> input.copyTo(output) }
+            }
+        }
+
+        downloadIfMissing(e5ModelUrl, modelFile)
+        downloadIfMissing(e5TokenizerUrl, tokenizerFile)
+    }
+}
+
+tasks.named("runIde") {
+    dependsOn("downloadE5Model")
+}
+
 intellijPlatform {
     pluginVerification {
         ides {
