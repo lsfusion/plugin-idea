@@ -60,7 +60,7 @@ public final class McpServerService extends RestService {
     @NotNull
     @Override
     public String getServiceName() {
-        return "sse-lsf";
+        return "http-lsf";
     }
 
     @Override
@@ -200,10 +200,32 @@ public final class McpServerService extends RestService {
                 .put("required", new JSONArray().put("query"))
                 .put("additionalProperties", false);
 
+        // Output schema matches RetrieveDocsOutput in McpToolset.kt
+        JSONObject docItemSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("source", new JSONObject().put("type", "string").put("description", "Chunk origin (e.g. docs, howto, tutorial)."))
+                        .put("text", new JSONObject().put("type", "string").put("description", "Retrieved text snippet."))
+                        .put("score", new JSONObject().put("type", "number").put("description", "Similarity score (higher = more relevant).")))
+                .put("required", new JSONArray().put("source").put("text").put("score"));
+
+
+        // Output schema matches RetrieveDocsOutput in McpToolset.kt
+        JSONObject outputSchema = new JSONObject()
+                        .put("type", "object")
+                        .put("properties", new JSONObject()
+                            .put("docs", new JSONObject()
+                                .put("type", "array")
+                                .put("items", docItemSchema)
+                                .put("description", "Relevant chunks returned from the RAG store.")))
+                        .put("required", new JSONArray().put("docs"))
+                            .put("additionalProperties", false);
+
         return new JSONObject()
                 .put("name", name)
                 .put("description", description)
-                .put("inputSchema", inputSchema);
+                .put("inputSchema", inputSchema)
+                .put("outputSchema", outputSchema);
     }
 
     private JSONObject buildValidateSyntaxToolDescriptor() {
@@ -216,10 +238,39 @@ public final class McpServerService extends RestService {
                 .put("required", new JSONArray().put("text"))
                 .put("additionalProperties", false);
 
+        // Output schema matches DSLValidationResult in McpToolset.kt
+        JSONObject dslErrorSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("type", new JSONObject().put("type", "string").put("description", "Error category: 'syntax' or 'semantic'."))
+                        .put("message", new JSONObject().put("type", "string").put("description", "Readable explanation of the problem."))
+                        .put("line", new JSONObject().put("type", "integer").put("description", "Line number (1-based) where error starts."))
+                        .put("column", new JSONObject().put("type", "integer").put("description", "Column number (0-based) where error starts."))
+                        .put("found", new JSONObject().put("type", "string").put("description", "Actual token or fragment found, if any."))
+                        .put("expected", new JSONObject().put("type", "array").put("items", new JSONObject().put("type", "string")).put("description", "List of tokens or constructs expected at this point."))
+                        .put("hint", new JSONObject().put("type", "string").put("description", "Short fix suggestion to resolve the issue."))
+                        .put("excerpt", new JSONObject().put("type", "string").put("description", "Line of source where the error occurred."))
+                        .put("pointer", new JSONObject().put("type", "string").put("description", "Caret marker showing error position in the excerpt.")))
+                .put("required", new JSONArray().put("type").put("message").put("line").put("column"));
+
+        JSONObject outputSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("ok", new JSONObject()
+                                .put("type", "boolean")
+                                .put("description", "True if DSL text parsed successfully without errors."))
+                        .put("errors", new JSONObject()
+                                .put("type", "array")
+                                .put("items", dslErrorSchema)
+                                .put("description", "Detailed error entries (empty if ok=True).")))
+                .put("required", new JSONArray().put("ok").put("errors"))
+                .put("additionalProperties", false);
+
         return new JSONObject()
                 .put("name", TOOL_VALIDATE_SYNTAX)
                 .put("description", "Validate the syntax of the list of lsFusion statements. Use this ONLY when IDE tools for error checking and code execution are not available.")
-                .put("inputSchema", inputSchema);
+                .put("inputSchema", inputSchema)
+                .put("outputSchema", outputSchema);
     }
 
     private JSONObject buildGetGuidanceToolDescriptor() {
@@ -250,7 +301,7 @@ public final class McpServerService extends RestService {
                                 .put("type", "string")
                                 .put("description",
                                         "Scope filter (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."))
-                        .put("name", new JSONObject()
+                        .put("names", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
                                         "Element name filter as CSV (comma-separated). Word if valid ID, else Java regex."))
@@ -313,6 +364,7 @@ public final class McpServerService extends RestService {
                 .put("properties", rootWithMoreSchema.getJSONObject("properties"))
                 .put("additionalProperties", false);
 
+        // Output schema matches FindElementsResult / FindElementItem in McpToolset.kt
         JSONObject codePartSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
@@ -384,12 +436,24 @@ public final class McpServerService extends RestService {
             String payload = RemoteMcpClient.callRemoteTool(toolName, arguments);
 
             JSONObject callResult = new JSONObject()
-                    .put("content", new JSONArray().put(
-                            new JSONObject()
-                                    .put("type", "text")
-                                    .put("text", payload)
-                    ))
+                    .put("content", new JSONArray().put(new JSONObject()
+                            .put("type", "text")
+                            .put("text", payload)))
                     .put("isError", false);
+
+            if (!TOOL_GET_GUIDANCE.equals(toolName)) {
+                // Most remote tools (except get_guidance for now) return JSON object; try parse and attach structuredContent
+                try {
+                    callResult.put("structuredContent", new JSONObject(payload));
+                } catch (Exception e1) {
+                    // Some tools could return JSON arrays; try that too
+                    try {
+                        callResult.put("structuredContent", new JSONArray(payload));
+                    } catch (Exception ignored) {
+                        callResult.put("structuredContent", payload);
+                    }
+                }
+            }
 
             return rpcResult(jsonrpc, id, callResult);
         } catch (Exception e) {
@@ -438,16 +502,15 @@ public final class McpServerService extends RestService {
         try {
             JSONObject payloadObj = MCPSearchUtils.findElements(project, arguments);
 
-            // Some MCP clients only accept content types: text, image, audio, resource_link, resource.
-            // So we serialize JSON into a text block to avoid schema validation errors.
-            String payload = payloadObj.toString();
-
             JSONObject callResult = new JSONObject()
                     .put("content", new JSONArray().put(
                             new JSONObject()
                                     .put("type", "text")
-                                    .put("text", payload)
+                                    .put("text", payloadObj.toString())
                     ))
+                    // CRITICAL: tool declares outputSchema, so it must return structuredContent
+                    // as an object, not as JSON string inside text.
+                    .put("structuredContent", payloadObj)
                     .put("isError", false);
 
             return rpcResult(jsonrpc, id, callResult);

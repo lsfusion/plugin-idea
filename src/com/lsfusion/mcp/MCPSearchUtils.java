@@ -110,7 +110,7 @@ public class MCPSearchUtils {
      *     // scope=project -> projectOnly scope (excludes libraries)
      *     // otherwise, scope can be a CSV list of IDEA module names (e.g. "my-idea-module1,my-idea-module2")
      *   requiredModules: true, // optional (default: true); if true, include REQUIRE-d modules for modules in `modules`
-     *   name: "cust,Order", // optional, CSV; filters by element name
+     *   names: "cust,Order", // optional, CSV; filters by element name
      *   contains: "(?i)cust.*", // optional, CSV; filters by element code
      *   elementTypes: "class,property,action", // optional, CSV
      *   classes: "MyNS.MyClass, MyOtherNS.OtherClass", // optional, CSV canonical names
@@ -188,7 +188,9 @@ public class MCPSearchUtils {
 
         GlobalSearchScope searchScope = run(project, query, seen, relatedCache, state, submit);
 
-        JSONArray moreFilters = query.optJSONArray("moreFilters");
+        String moreFiltersStr = query.optString("moreFilters", "");
+        JSONArray moreFilters = !moreFiltersStr.isEmpty() ? new JSONArray(moreFiltersStr) : null;
+
         if (moreFilters != null && !moreFilters.isEmpty())
             for (int i = 0; i < moreFilters.length(); i++)
                 searchScope = searchScope.union(run(project, moreFilters.optJSONObject(i), seen, relatedCache, state, submit));
@@ -391,7 +393,7 @@ public class MCPSearchUtils {
                                                  @NotNull SearchState state,
                                                  @NotNull TaskSubmitter submit) {
         GlobalSearchScope searchScope = ReadAction.compute(() -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
-        List<NameFilter> nameFilters = parseMatchersCsv(query.optString("name"));
+        List<NameFilter> nameFilters = parseMatchersCsv(query.optString("names"));
         List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
         Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
 
@@ -1119,7 +1121,8 @@ public class MCPSearchUtils {
         return out.process(getStatement(element));
     }
     private static boolean processStatement(PsiElement element, Processor<LSFMCPDeclaration> out) {
-        return out.process(getStatement(element));
+        LSFMCPDeclaration st = getStatement(element);
+        return st == null || out.process(st);
     }
 
     private static LSFMCPDeclaration getStatement(LSFFullNameDeclaration decl) {

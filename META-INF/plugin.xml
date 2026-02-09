@@ -12,6 +12,7 @@
         <ul>
             <li>PropertyDrawViewProxy: `imagePath` deprecated (use `image` instead)</li>
             <li>NAVIGATOR formElseActionName resolving fix</li>
+            <li>Bugfix in the lsFusion MCP server</li>
         </ul>
     ]]>
     </change-notes>
@@ -323,7 +324,9 @@
 
         <!-- MCP tools are registered via bundled JetBrains MCP Server plugin (com.intellij.mcpServer.mcpToolset) -->
         <mcpServer.mcpToolset implementation="com.lsfusion.mcp.McpToolset"/>
-        <restService implementation="com.lsfusion.mcp.McpServerService"/>
+
+        <!-- it's very important not to have io.netty libraries in the plugin lib directory (because it will give the error cannot find proper constructor) -->
+        <httpRequestHandler implementation="com.lsfusion.mcp.McpServerService"/>
 
         <!-- To use old PreCachedDataContext instead of new PreCachedDataContext2 (in 2021.3),
         which broke find element usages when cursor is on element usage-->

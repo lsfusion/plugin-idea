@@ -239,7 +239,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
             if (modules != null) query.put("modules", modules)
             if (scope != null) query.put("scope", scope)
             query.put("requiredModules", requiredModules)
-            if (names != null) query.put("name", names)
+            if (names != null) query.put("names", names)
             if (contains != null) query.put("contains", contains)
             if (elementTypes != null) query.put("elementTypes", elementTypes)
             if (classes != null) query.put("classes", classes)
@@ -249,7 +249,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
             query.put("maxSymbols", maxSymbols)
             query.put("timeoutSeconds", timeoutSeconds)
             if (moreFilters != null && !moreFilters.isEmpty()) {
-                query.put("moreFilters", JSONArray(moreFilters))
+                query.put("moreFilters", moreFilters)
             }
 
             val result = MCPSearchUtils.findElements(project, query)
