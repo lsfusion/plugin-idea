@@ -193,13 +193,9 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         )
         scope: String? = null,
         @McpDescription(
-            description = "Element name filter as CSV (comma-separated). Word if valid ID, else Java regex."
+            description = "Query filter as CSV (comma-separated). Word if valid ID, else Java regex. Matches against element names and code."
         )
-        names: String? = null,
-        @McpDescription(
-            description = "Element code filter as CSV. Word if valid ID, else Java regex."
-        )
-        contains: String? = null,
+        queryText: String? = null,
         @McpDescription(
             description = "Element type filter as CSV. Allowed values: `module`, `metacode`, `class`, `property`, `action`, `form`, `navigatorElement`, `window`, `group`, `table`, `event`, `calculatedEvent`, `constraint`, `index`."
         )
@@ -215,7 +211,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         @McpDescription(description = "Direction for ALL `relatedElements` seeds. Allowed values: `both`, `uses`, `used`. Default: `both`.")
         relatedDirection: String? = null,
         @McpDescription(
-            description = "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"names\":\"Foo\", \"modules\" : \"MyModule\"},{\"names\":\"Bar\"}]`). Results are merged (OR)."
+            description = "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"query\":\"Foo\", \"modules\" : \"MyModule\"},{\"query\":\"Bar\"}]`). Results are merged (OR)."
         )
         moreFilters: String? = null,
         @McpDescription(description = "Best-effort minimum output size in JSON chars; server may append neighboring elements if too small (>= 0). Default: ${MCPSearchUtils.DEFAULT_MIN_SYMBOLS}.")
@@ -235,24 +231,23 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         }
 
         try {
-            val query = JSONObject()
-            if (modules != null) query.put("modules", modules)
-            if (scope != null) query.put("scope", scope)
-            query.put("requiredModules", requiredModules)
-            if (names != null) query.put("name", names)
-            if (contains != null) query.put("contains", contains)
-            if (elementTypes != null) query.put("elementTypes", elementTypes)
-            if (classes != null) query.put("classes", classes)
-            if (relatedElements != null) query.put("relatedElements", relatedElements)
-            if (relatedDirection != null) query.put("relatedDirection", relatedDirection)
-            query.put("minSymbols", minSymbols)
-            query.put("maxSymbols", maxSymbols)
-            query.put("timeoutSeconds", timeoutSeconds)
+            val payload = JSONObject()
+            if (modules != null) payload.put("modules", modules)
+            if (scope != null) payload.put("scope", scope)
+            payload.put("requiredModules", requiredModules)
+            if (queryText != null) payload.put("query", queryText)
+            if (elementTypes != null) payload.put("elementTypes", elementTypes)
+            if (classes != null) payload.put("classes", classes)
+            if (relatedElements != null) payload.put("relatedElements", relatedElements)
+            if (relatedDirection != null) payload.put("relatedDirection", relatedDirection)
+            payload.put("minSymbols", minSymbols)
+            payload.put("maxSymbols", maxSymbols)
+            payload.put("timeoutSeconds", timeoutSeconds)
             if (moreFilters != null && !moreFilters.isEmpty()) {
-                query.put("moreFilters", JSONArray(moreFilters))
+                payload.put("moreFilters", JSONArray(moreFilters))
             }
 
-            val result = MCPSearchUtils.findElements(project, query)
+            val result = MCPSearchUtils.findElements(project, payload)
             val jsonElement = json.parseToJsonElement(result.toString())
             return json.decodeFromJsonElement<FindElementsResult>(jsonElement)
         } catch (e: McpExpectedError) {

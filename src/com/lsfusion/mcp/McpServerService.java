@@ -250,14 +250,10 @@ public final class McpServerService extends RestService {
                                 .put("type", "string")
                                 .put("description",
                                         "Scope filter (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."))
-                        .put("name", new JSONObject()
+                        .put("query", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Element name filter as CSV (comma-separated). Word if valid ID, else Java regex."))
-                        .put("contains", new JSONObject()
-                                .put("type", "string")
-                                .put("description",
-                                        "Element code filter as CSV. Word if valid ID, else Java regex."))
+                                        "Query filter as CSV (comma-separated). Word if valid ID, else Java regex. Matches against element names and code."))
                         .put("elementTypes", new JSONObject()
                                 .put("type", "string")
                                 .put("description", "Element type filter as CSV. Allowed values: `module`, `metacode`, `class`, `property`, `action`, `form`, `navigatorElement`, `window`, `group`, `table`, `event`, `calculatedEvent`, `constraint`, `index`."))
@@ -285,7 +281,7 @@ public final class McpServerService extends RestService {
                         .put("moreFilters", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"names\":\"Foo\", \"modules\" : \"MyModule\"},{\"names\":\"Bar\"}]`). Results are merged (OR)."))
+                                        "Additional filter objects of the same structure as the root. JSON array string (e.g. `[{\"query\":\"Foo\", \"modules\" : \"MyModule\"},{\"query\":\"Bar\"}]`). Results are merged (OR)."))
                         .put("minSymbols", new JSONObject()
                                 .put("type", "integer")
                                 .put("minimum", 0)
