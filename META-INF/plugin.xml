@@ -13,6 +13,7 @@
             <li>PropertyDrawViewProxy: `imagePath` deprecated (use `image` instead)</li>
             <li>NAVIGATOR formElseActionName resolving fix</li>
             <li>Bugfix in the lsFusion MCP server</li>
+            <li>Implemented SSE protocol for the lsFusion MCP server</li>
         </ul>
     ]]>
     </change-notes>
