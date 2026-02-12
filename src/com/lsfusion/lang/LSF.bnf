@@ -1995,7 +1995,7 @@ formContainerEventDeclaration ::= (COLLAPSE | EXPAND | TAB) (ID | componentSelec
 
 scheduleFormEventDeclaration ::= SCHEDULE PERIOD intLiteral FIXED?
 
-formFilterGroupDeclaration ::= FILTERGROUP filterGroupName NONULL? regularFilterDeclaration*
+formFilterGroupDeclaration ::= FILTERGROUP filterGroupName (NULL | NONULL)? regularFilterDeclaration*
 {
     pin = 1
     implements = "com.lsfusion.documentation.LSFDocumentation"
@@ -2008,7 +2008,7 @@ filterGroupName ::= simpleName
     implements="com.lsfusion.lang.psi.declarations.LSFFilterGroupDeclaration"
 }
 
-formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage regularFilterDeclaration+
+formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage (NULL | NONULL)? regularFilterDeclaration+
 {
     pin(".*") = 1
     implements = "com.lsfusion.documentation.LSFDocumentation"

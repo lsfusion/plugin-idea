@@ -14,6 +14,7 @@
             <li>NAVIGATOR formElseActionName resolving fix</li>
             <li>Bugfix in the lsFusion MCP server</li>
             <li>Implemented SSE protocol for the lsFusion MCP server</li>
+            <li>FILTERGROUP NULL | NONULL support</li>
         </ul>
     ]]>
     </change-notes>
