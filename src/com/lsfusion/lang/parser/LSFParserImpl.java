@@ -103,7 +103,8 @@ public class LSFParserImpl extends LSFParser {
                 if (tokenType == NAVIGATOR) break;
                 if (tokenType == ATSIGN) break;
                 if (tokenType == DESIGN) break;
-                if (tokenCount > 40) { // we don't want to have very small non-recursive lazy blocks 
+                if (tokenType == WINDOW && prevTokenType == SEMI) break; //to avoid WINDOW ... CLASS (in windowOptions)
+                if (tokenCount > 40) { // we don't want to have very small non-recursive lazy blocks
                     if (tokenType == EXTEND && builder_.lookAhead(1) != FILTERGROUP) {
                         break;
                     }
