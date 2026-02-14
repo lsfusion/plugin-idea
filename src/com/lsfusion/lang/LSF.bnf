@@ -1674,6 +1674,7 @@ formStatement ::=	(	formDecl
                     (	formGroupObjectsList
                     |	formTreeGroupObjectList
                     |	formPropertiesList
+                    |	formExtendPropertiesList
                     |	formFiltersList
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
@@ -1857,7 +1858,7 @@ formPropertyDrawNameDecl ::= (simpleNameOrWithCaption EQUALS)? formPropertyName 
 
 formPropertiesNamesDeclList ::=	formPropertyDrawNameDecl (COMMA formPropertyDrawNameDecl)*
 
-formPropertiesList ::=  PROPERTIES (formMappedNamePropertiesList | formPropertyOptionsList formMappedPropertiesList)
+formPropertiesList ::= PROPERTIES (formMappedNamePropertiesList | formPropertyOptionsList formMappedPropertiesList)
 {
     pin = 1
     implements = "com.lsfusion.documentation.LSFDocumentation"
@@ -1870,6 +1871,31 @@ formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptions
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList]
 }
+
+formExtendPropertiesList ::= EXTEND PROPERTIES (formExtendMappedNamePropertiesList | formPropertyOptionsList formExtendPropertyDrawUsageList)
+{
+    pin = 2
+    implements = "com.lsfusion.documentation.LSFDocumentation"
+    methods = [getDocumentation]
+}
+
+formExtendPropertyDrawUsageList ::= formExtendPropertyDrawUsage (COMMA formExtendPropertyDrawUsage)* {pin = 1}
+formExtendPropertyDrawUsage ::= formPropertyDrawUsage formPropertyOptionsList
+
+formExtendMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptionsList formExtendPropertiesNamesUsageList
+{
+    pin = 1
+    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
+    methods = [ resolveParamClasses getParamList]
+}
+formExtendPropertiesNamesUsageList ::= formExtendPropertyDrawNameUsage (COMMA formExtendPropertyDrawNameUsage)*
+
+formExtendPropertyDrawNameUsage ::= simpleNameOrWithCaptionEquals? formPropertyDrawPropertyUsage formPropertyOptionsList
+{
+    mixin="com.lsfusion.lang.psi.references.impl.LSFExtendPropertyDrawNameUsageImpl"
+    implements="com.lsfusion.lang.psi.references.LSFExtendPropertyDrawNameUsage"
+}
+simpleNameOrWithCaptionEquals ::= simpleNameOrWithCaption EQUALS
 
 formPropertyOptionsList ::= (    CHANGEABLE | READONLY | DISABLE | SELECTOR
                             |    formOptionSession
