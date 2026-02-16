@@ -5339,6 +5339,10 @@ public class LSFPsiImplUtil {
         return "Object_blocks";
     }
 
+    public static String getDocumentation(LSFFormExtendTreeGroupObjectList lsfFormTreeGroupObjectList, PsiElement child) {
+        return "Object_blocks";
+    }
+
     public static String getDocumentation(LSFFormGroupObjectOptions lsfFormGroupObjectOptions, PsiElement child) {
         return "Object_blocks";
     }

@@ -1674,6 +1674,7 @@ formStatement ::=	(	formDecl
                     (	formGroupObjectsList
                     |	formExtendGroupObjectsList
                     |	formTreeGroupObjectList
+                    |	formExtendTreeGroupObjectList
                     |	formPropertiesList
                     |	formExtendPropertiesList
                     |	formFiltersList
@@ -1773,6 +1774,13 @@ formTreeGroupObjectList ::= TREE (treeGroupDeclaration)? formTreeGroupObjectDecl
     methods = [getDocumentation]
 }
 
+formExtendTreeGroupObjectList ::= EXTEND TREE (treeGroupUsage)? formExtendTreeGroupObjectUsage (COMMA formExtendTreeGroupObjectUsage)* formTreeGroupObjectOptions
+{
+    pin = 2
+    implements = "com.lsfusion.documentation.LSFDocumentation"
+    methods = [getDocumentation]
+}
+
 treeGroupDeclaration ::= simpleName
 {
     implements="com.lsfusion.lang.psi.declarations.LSFTreeGroupDecl"
@@ -1803,6 +1811,8 @@ formTreeGroupObjectOptions ::= (   formGroupObjectRelativePosition
                            
 formTreeGroupObjectDeclaration ::= formGroupObject (treeGroupParentDeclaration)?
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
+
+formExtendTreeGroupObjectUsage ::= formExtendGroupObject (treeGroupParentDeclaration)?
 
 treeGroupParentDeclaration ::= (PARENT formExprDeclaration) | (LBRAC PARENT formExprDeclaration (COMMA formExprDeclaration)* RBRAC) { pin = 1 }
 
