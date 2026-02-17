@@ -408,6 +408,22 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitActionStatement(@NotNull LSFActionStatement o) {
         super.visitActionStatement(o);
 
+        LSFPropertyDeclaration propertyDecl = o.getPropertyDeclaration();
+        LSFPropertyDeclParams propertyDeclParams = propertyDecl.getPropertyDeclParams();
+        if(propertyDeclParams == null) {
+            LSFListActionPropertyDefinitionBody listActionPropertyDefinitionBody = o.getListActionPropertyDefinitionBody();
+            if(listActionPropertyDefinitionBody != null) {
+                List<LSFActionPropertyDefinitionBody> actionPropertyDefinitionBodyList = listActionPropertyDefinitionBody.getActionPropertyDefinitionBodyList();
+                for(LSFActionPropertyDefinitionBody action : actionPropertyDefinitionBodyList) {
+                    if (action.getRecursiveExtendContextActionPDB() != null || action.getLeafExtendContextActionPDB() != null) {
+                        //The same error as on the server.
+                        //There is also a hack for EXEC on the server (isKeepContext), but in the plugin EXEC is leafKeepContext, not leafExtendContext
+                        addUnderscoredError(propertyDecl, propertyDecl.getTextRange(), "Action parameters must be defined explicitly");
+                    }
+                }
+            }
+        }
+
         checkAlreadyDefined(o);
         LSFNonEmptyActionOptions actionOptions = o.getNonEmptyActionOptions();
         if(actionOptions != null) {

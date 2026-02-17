@@ -762,7 +762,7 @@ actionPropertyDefinitionBody ::=    (   leafActionPDB
 }
 
 private recursiveActionPDB ::=  recursiveExtendContextActionPDB | recursiveKeepContextActionPDB
-private recursiveExtendContextActionPDB ::=  	forActionPropertyDefinitionBody
+recursiveExtendContextActionPDB ::=  	        forActionPropertyDefinitionBody
                                             |   whileActionPropertyDefinitionBody
                                             |	dialogActionPropertyDefinitionBody // mixed, input
                                             |	inputActionPropertyDefinitionBody // mixed, input
@@ -784,7 +784,7 @@ private recursiveKeepContextActionPDB ::=  		listActionPropertyDefinitionBody
 
 // extendContextActionPDB comes before keepContextActionPDB to check assign action before exec action
 private leafActionPDB ::=  (leafExtendContextActionPDB | leafKeepContextActionPDB) SEMI | SEMI { pin(".*") = 1 } // | EMPTY and not emptyActionPropertyDefinitionBody because it would be pinned and expect seni after it everywhere
-private leafExtendContextActionPDB ::=          assignActionPropertyDefinitionBody // should be before exec
+leafExtendContextActionPDB ::=                  assignActionPropertyDefinitionBody // should be before exec
                                         |	    changeClassActionPropertyDefinitionBody
                                         |	    deleteActionPropertyDefinitionBody
                                         |	    newWhereActionPropertyDefinitionBody // should be before new

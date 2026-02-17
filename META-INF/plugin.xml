@@ -16,6 +16,7 @@
             <li>Implemented SSE protocol for the lsFusion MCP server</li>
             <li>FILTERGROUP NULL | NONULL support</li>
             <li>EXTEND OBJECTS | TREE | PROPERTIES support</li>
+            <li>'Action parameters must be defined explicitly' error as on the server start</li>
         </ul>
     ]]>
     </change-notes>
