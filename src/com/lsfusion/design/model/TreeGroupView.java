@@ -28,13 +28,14 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
             ComponentView.PROPERTIES,
             new ReflectionProperty("autoSize").setExpert(),
             new ReflectionProperty("boxed").setExpert(),
-            new ReflectionProperty("expandOnClick"),
+            new ReflectionProperty("expandOnClick"), //deprecated since 6.2
             new ReflectionProperty("hierarchicalWidth").setExpert(),
             new ReflectionProperty("hierarchicalCaption").setExpert(),
-            new ReflectionProperty("headerHeight").setExpert(),
+            new ReflectionProperty("headerHeight").setExpert(), //deprecated since 6.2
+            new ReflectionProperty("captionHeight").setExpert(),
             new ReflectionProperty("resizeOverflow").setExpert(),
-            new ReflectionProperty("lineHeight").setExpert(),
-            new ReflectionProperty("lineWidth").setExpert()
+            new ReflectionProperty("lineWidth").setExpert(),
+            new ReflectionProperty("lineHeight").setExpert()
     );
 
     @Override
@@ -59,11 +60,12 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     public String hierarchicalCaption;
 
     public int headerHeight;
+    public int captionHeight;
 
     public boolean resizeOverflow;
 
-    public int lineHeight;
     public int lineWidth;
+    public int lineHeight;
 
     public TreeGroupView(TreeGroupEntity entity) {
         super(entity.sID);

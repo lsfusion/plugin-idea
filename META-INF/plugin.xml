@@ -17,7 +17,7 @@
             <li>FILTERGROUP NULL | NONULL support</li>
             <li>EXTEND OBJECTS | TREE | PROPERTIES support</li>
             <li>'Action parameters must be defined explicitly' error as on the server start</li>
-            <li>GRID: captionHeight and captionCharHeight support; headerHeight deprecated</li>
+            <li>GRID/TREE: captionHeight and captionCharHeight support; headerHeight deprecated</li>
         </ul>
     ]]>
     </change-notes>

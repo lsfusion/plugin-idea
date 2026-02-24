@@ -32,15 +32,19 @@ public class TreeGroupProxy extends ViewProxy<TreeGroupView> {
         target.headerHeight = headerHeight;
     }
 
+    public void setCaptionHeight(int captionHeight) {
+        target.captionHeight = captionHeight;
+    }
+
     public void setResizeOverflow(boolean resizeOverflow) {
         target.resizeOverflow = resizeOverflow;
     }
 
-    public void setLineHeight(int lineHeight) {
-        target.lineHeight = lineHeight;
-    }
-
     public void setLineWidth(int lineWidth) {
         target.lineWidth = lineWidth;
+    }
+
+    public void setLineHeight(int lineHeight) {
+        target.lineHeight = lineHeight;
     }
 }
