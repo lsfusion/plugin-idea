@@ -28,7 +28,9 @@ public class GridView extends ComponentView {
             new ReflectionProperty("boxed"),
             new ReflectionProperty("tabVertical"),
             new ReflectionProperty("quickSearch"),
-            new ReflectionProperty("headerHeight"),
+            new ReflectionProperty("headerHeight"), //deprecated since 6.2
+            new ReflectionProperty("captionHeight"),
+            new ReflectionProperty("captionCharHeight"),
             new ReflectionProperty("resizeOverflow"),
             new ReflectionProperty("lineWidth"),
             new ReflectionProperty("lineHeight"),
@@ -48,6 +50,8 @@ public class GridView extends ComponentView {
     public boolean quickSearch;
 
     public int headerHeight;
+    public int captionHeight;
+    public int captionCharHeight;
 
     public boolean resizeOverflow;
 

@@ -28,6 +28,14 @@ public class GridViewProxy extends ComponentViewProxy<GridView> {
         target.headerHeight = headerHeight;
     }
 
+    public void setCaptionHeight(int captionHeight) {
+        target.captionHeight = captionHeight;
+    }
+
+    public void setCaptionCharHeight(int captionCharHeight) {
+        target.captionCharHeight = captionCharHeight;
+    }
+
     public void setResizeOverflow(boolean resizeOverflow) {
         target.resizeOverflow = resizeOverflow;
     }

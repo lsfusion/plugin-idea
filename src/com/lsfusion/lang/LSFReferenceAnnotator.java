@@ -1370,6 +1370,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 case "imagePath":
                     addDeprecatedWarningAnnotation(o, "6.2", "Use 'image' instead");
                     break;
+                case "headerHeight":
+                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionHeight' instead");
+                    break;
                 default:
                     if (element != null && !element.getText().equals("NULL")) {
                         switch (property) {
