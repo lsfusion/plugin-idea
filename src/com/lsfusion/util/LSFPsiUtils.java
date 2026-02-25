@@ -418,6 +418,19 @@ public class LSFPsiUtils {
         return languageManager.isInjectedFragment(injectedFile);
     }
 
+    public static boolean isInjectedInMarkdown(PsiElement element) {
+        PsiFile injectedFile = element.getContainingFile();
+        if (injectedFile == null) return false;
+        Project project = injectedFile.getProject();
+        InjectedLanguageManager languageManager = InjectedLanguageManager.getInstance(project);
+        if (!languageManager.isInjectedFragment(injectedFile)) return false;
+        PsiElement host = languageManager.getInjectionHost(injectedFile);
+        if (host == null) return false;
+        PsiFile hostFile = host.getContainingFile();
+        if (hostFile == null) return false;
+        return "Markdown".equalsIgnoreCase(hostFile.getLanguage().getID());
+    }
+
     public static String getLocationString(PsiElement element) {
         final PsiFile file = element.getContainingFile();
         final Document document = PsiDocumentManager.getInstance(element.getProject()).getDocument(file);

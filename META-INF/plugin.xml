@@ -18,6 +18,7 @@
             <li>EXTEND OBJECTS | TREE | PROPERTIES support</li>
             <li>'Action parameters must be defined explicitly' error as on the server start</li>
             <li>GRID/TREE: captionHeight and captionCharHeight support; headerHeight deprecated</li>
+            <li>Disable errors in markdown lsf examples</li>
         </ul>
     ]]>
     </change-notes>

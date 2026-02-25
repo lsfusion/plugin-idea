@@ -17,6 +17,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.PairProcessor;
 import com.intellij.util.containers.LimitedPool;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -466,6 +467,10 @@ public class GeneratedParserUtilBase {
                                        Frame frame,
                                        boolean force,
                                        boolean advance) {
+        PsiFile file = builder_.getUserData(FileContextUtil.CONTAINING_FILE_KEY);
+        if(file != null && LSFPsiUtils.isInjectedInMarkdown(file))
+            return false;
+
         String expectedText = state.getExpectedText(builder_);
         boolean notEmpty = StringUtil.isNotEmpty(expectedText);
         if (force || notEmpty || advance) {
