@@ -366,6 +366,7 @@ expressionFriendlyPD ::= joinPropertyDefinition
 	    |	sessionPropertyDefinition
 	    |	signaturePropertyDefinition
 	    |   activePropertyDefinition
+	    |   activeTabDefinition
 	    |   roundPropertyDefinition
 	    |	expressionLiteral
 	    |	objectPropertyDefinition
@@ -380,6 +381,7 @@ expressionUnfriendlyPD ::= dataPropertyDefinition
                            |   formulaPropertyDefinition
                            |   groupPropertyDefinition
                            |   aggrPropertyDefinition
+                           |   propertyDrawPropertyDefinition
                            |   filterPropertyDefinition
                            |   reflectionPropertyDefinition
 {methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses]}
@@ -519,9 +521,16 @@ sessionPropertyDefinition ::= sessionPropertyType LBRAC propertyExpression RBRAC
 signaturePropertyDefinition ::= ISCLASS LBRAC propertyExpression RBRAC
 {pin = 2 implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames ]}
 
-activePropertyDefinition ::= ACTIVE (TAB componentID | PROPERTY formPropertyDrawID)
+activePropertyDefinition ::= ACTIVE PROPERTY formPropertyDrawID
 {
-    pin = 1
+    pin = 2
+    implements = "com.lsfusion.lang.psi.context.LSFExpression"
+    methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]
+}
+
+activeTabDefinition ::= ACTIVE TAB componentID
+{
+    pin = 2
     implements = "com.lsfusion.lang.psi.context.LSFExpression"
     methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]
 }
@@ -619,9 +628,19 @@ groupExprPropertyDefinition ::= GROUP groupPropertyBody
     methods = [ resolveInferredValueClass inferParamClasses getContextModifier getContextInferrer getValueClassNames getValuePropertyNames getDocumentation]
 }		                    
 
-filterPropertyDefinition ::= (FILTER | ORDER | VIEW) groupObjectID
+filterPropertyNoParams ::= VIEWTYPE | (SELECT ACTIVE)
+filterPropertyType ::= FILTER | ORDER | VIEW | filterPropertyNoParams | SELECT
+
+filterPropertyDefinition ::= filterPropertyType groupObjectID
 {
     pin = 1
+    implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
+    methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getDocumentation isNoParams]
+}
+
+propertyDrawPropertyDefinition ::= SELECT PROPERTY formPropertyDrawID
+{
+    pin = 2
     implements = "com.lsfusion.lang.psi.context.UnfriendlyPE"
     methods = [ resolveUnfriendValueClass resolveValueParamClasses checkValueParamClasses getValueParamClassNames getValueClassNames getValuePropertyNames getDocumentation]
 }
@@ -1138,7 +1157,7 @@ asyncUpdateActionPropertyDefinitionBody ::= ASYNCUPDATE propertyExpression
 
 objectExpr ::= objectUsage EQUALS propertyExpression
 
-seekObjectActionPropertyDefinitionBody ::= SEEK (FIRST | LAST | NULL)? 
+seekObjectActionPropertyDefinitionBody ::= (SEEK | ACTIVATE) (FIRST | LAST | NULL)?
                                             (   (objectID EQUALS propertyExpression) 
                                             |   (groupObjectID (OBJECTS objectExpr (COMMA objectExpr)*)?)
                                             )
@@ -2722,7 +2741,7 @@ literal ::= commonLiteral |	(<<noIDCheck>> localizedStringLiteral) // since ther
 expressionLiteral ::= commonLiteral | (<<noIDCheck>> expressionStringLiteral)
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
-objectPropertyDefinition ::= VALUE groupObjectID
+objectPropertyDefinition ::= (VALUE | ACTIVE) groupObjectID
 
 private commonLiteral ::=
         ulongLiteral

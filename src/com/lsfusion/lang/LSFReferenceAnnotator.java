@@ -1631,4 +1631,22 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
         return false;
     }
+
+    @Override
+    public void visitSeekObjectActionPropertyDefinitionBody(@NotNull LSFSeekObjectActionPropertyDefinitionBody o) {
+        super.visitSeekObjectActionPropertyDefinitionBody(o);
+        PsiElement firstChild = o.getFirstChild();
+        if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.SEEK) {
+            addDeprecatedWarningAnnotation(firstChild, "SEEK is deprecated, use ACTIVATE instead");
+        }
+    }
+
+    @Override
+    public void visitObjectPropertyDefinition(@NotNull LSFObjectPropertyDefinition o) {
+        super.visitObjectPropertyDefinition(o);
+        PsiElement firstChild = o.getFirstChild();
+        if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.VALUE) {
+            addDeprecatedWarningAnnotation(firstChild, "VALUE is deprecated, use ACTIVE instead");
+        }
+    }
 }

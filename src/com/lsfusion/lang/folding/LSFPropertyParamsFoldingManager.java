@@ -45,7 +45,7 @@ public class LSFPropertyParamsFoldingManager {
             if(pCalcStatement != null) {
                 LSFExpressionUnfriendlyPD expressionUnfriendlyPD = pCalcStatement.getExpressionUnfriendlyPD();
                 if (expressionUnfriendlyPD != null) {
-                    if (expressionUnfriendlyPD.getFilterPropertyDefinition() == null && expressionUnfriendlyPD.getGroupPropertyDefinition() == null) {
+                    if (expressionUnfriendlyPD.getFilterPropertyDefinition() == null && expressionUnfriendlyPD.getPropertyDrawPropertyDefinition() == null && expressionUnfriendlyPD.getGroupPropertyDefinition() == null) {
                         printParamClasses = false;
                         printValueClass = false;
                     }

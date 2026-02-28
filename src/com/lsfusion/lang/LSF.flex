@@ -546,6 +546,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "VALUE"                               { return VALUE; }
   "VERTICAL"                			{ return VERTICAL; }
   "VIEW"                    			{ return VIEW; }
+  "VIEWTYPE"                			{ return VIEWTYPE; }
   "WARN"                    			{ return WARN; }
   "WEAK"                    			{ return WEAK; }
   "WHEN"                    			{ return WHEN; }

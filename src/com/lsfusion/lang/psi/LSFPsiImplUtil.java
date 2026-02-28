@@ -1657,6 +1657,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static LSFExClassSet resolveInferredValueClass(@NotNull LSFActiveTabDefinition sourceStatement, @Nullable InferExResult inferred) {
+        return LSFExClassSet.logical;
+    }
+
+    @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFRoundPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         LSFExClassSet exClassSet = sourceStatement.getPropertyExpressionList().get(0).resolveInferredValueClass(inferred);
         if (exClassSet != null) {
@@ -1794,6 +1799,11 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFFilterPropertyDefinition sourceStatement, boolean infer) {
+        return LSFExClassSet.logical;
+    }
+
+    @Nullable
+    public static LSFExClassSet resolveUnfriendValueClass(@NotNull LSFPropertyDrawPropertyDefinition sourceStatement, boolean infer) {
         return LSFExClassSet.logical;
     }
 
@@ -2052,6 +2062,10 @@ public class LSFPsiImplUtil {
         return singletonList(LogicalClass.instance.getName());
     }
 
+    public static List<String> getValueClassNames(@NotNull LSFPropertyDrawPropertyDefinition sourceStatement) {
+        return singletonList(LogicalClass.instance.getName());
+    }
+
     public static List<String> getValueClassNames(@NotNull LSFReflectionPropertyDefinition sourceStatement) {
         switch (LSFReflectionType.valueOf(sourceStatement.getReflectionPropertyType().getText())) {
             case CANONICALNAME:
@@ -2206,6 +2220,10 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFActivePropertyDefinition sourceStatement) {
+        return singletonList(LogicalClass.instance.getName());
+    }
+
+    public static List<String> getValueClassNames(@NotNull LSFActiveTabDefinition sourceStatement) {
         return singletonList(LogicalClass.instance.getName());
     }
 
@@ -2415,6 +2433,10 @@ public class LSFPsiImplUtil {
         return Collections.EMPTY_LIST;
     }
 
+    public static List<String> getValuePropertyNames(@NotNull LSFPropertyDrawPropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
     public static List<String> getValuePropertyNames(@NotNull LSFAggrPropertyDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
@@ -2573,6 +2595,10 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFActivePropertyDefinition sourceStatement) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public static List<String> getValuePropertyNames(@NotNull LSFActiveTabDefinition sourceStatement) {
         return Collections.EMPTY_LIST;
     }
 
@@ -2877,13 +2903,57 @@ public class LSFPsiImplUtil {
         return params; 
     }
     
+    public static List<LSFClassSet> getGroupColumnClasses(@Nullable LSFPropertyDrawDeclaration drawDecl) {
+        LSFNonEmptyGroupObjectUsageList usageList = getGroupColumnUsageList(drawDecl);
+        return usageList != null ? resolveGroupParamClasses(usageList.getGroupObjectUsageList()) : null;
+    }
+
+    private static List<LSFClassSet> resolveGroupParamClasses(List<LSFGroupObjectUsage> groupUsageList) {
+        List<LSFClassSet> result = new ArrayList<>();
+        for (LSFGroupObjectUsage usage : groupUsageList) {
+            result.addAll(usage.resolveClasses());
+        }
+        return result;
+    }
+
+    private static LSFNonEmptyGroupObjectUsageList getGroupColumnUsageList(@Nullable LSFPropertyDrawDeclaration drawDecl) {
+        if (drawDecl != null) {
+            LSFFormPropertyOptionsList optionsList = drawDecl.getFormPropertyOptionsList();
+            // todp: later extends should be also taken into account
+            if (optionsList != null) {
+                for (LSFFormOptionColumns columns : optionsList.getFormOptionColumnsList()) {
+                    LSFNonEmptyGroupObjectUsageList usageList = columns.getNonEmptyGroupObjectUsageList();
+                    if (usageList != null) {
+                        return usageList;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean isNoParams(@NotNull LSFFilterPropertyDefinition sourceStatement) {
+        return sourceStatement.getFilterPropertyType().getFilterPropertyNoParams() != null;
+    }
+
     @Nullable
     public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
-        LSFGroupObjectUsage groupObjectUsage = sourceStatement.getGroupObjectID().getGroupObjectUsage();
+        if (sourceStatement.isNoParams()) {
+            return Collections.emptyList();
+        }
+        LSFGroupObjectID groupObjectID = sourceStatement.getGroupObjectID();
+        LSFGroupObjectUsage groupObjectUsage = groupObjectID != null ? groupObjectID.getGroupObjectUsage() : null;
         if (groupObjectUsage != null) {
             return LSFExClassSet.toEx(groupObjectUsage.resolveClasses());
         }
         return null;
+    }
+
+    @Nullable
+    public static List<LSFExClassSet> resolveValueParamClasses(@NotNull LSFPropertyDrawPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
+        LSFFormPropertyDrawUsage formPropertyDrawUsage = sourceStatement.getFormPropertyDrawID().getFormPropertyDrawUsage();
+        List<LSFClassSet> classes = getGroupColumnClasses(formPropertyDrawUsage.resolveDecl());
+        return classes != null ? LSFExClassSet.toEx(classes) : Collections.emptyList();
     }
 
     @Nullable
@@ -2896,9 +2966,28 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFFilterPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
-        LSFGroupObjectUsage groupObjectUsage = sourceStatement.getGroupObjectID().getGroupObjectUsage();
+        if (sourceStatement.isNoParams()) {
+            return new Pair<>(Collections.emptyList(), Collections.emptyMap());
+        }
+        LSFGroupObjectID groupObjectID = sourceStatement.getGroupObjectID();
+        LSFGroupObjectUsage groupObjectUsage = groupObjectID != null ? groupObjectID.getGroupObjectUsage() : null;
         if (groupObjectUsage != null) {
             return checkValueParamClasses(sourceStatement, groupObjectUsage, declareParams);
+        }
+        return new Pair<>(Collections.emptyList(), Collections.emptyMap());
+    }
+
+    @NotNull
+    public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull LSFPropertyDrawPropertyDefinition sourceStatement, @Nullable List<LSFParamDeclaration> declareParams) {
+        LSFFormPropertyDrawID formPropertyDrawID = sourceStatement.getFormPropertyDrawID();
+        if(formPropertyDrawID != null) {
+            LSFFormPropertyDrawUsage formPropertyDrawUsage = formPropertyDrawID.getFormPropertyDrawUsage();
+            if(formPropertyDrawUsage != null) {
+                LSFNonEmptyGroupObjectUsageList usageList = getGroupColumnUsageList(formPropertyDrawUsage.resolveDecl());
+                if (usageList != null) {
+                    return checkValueParamClasses(sourceStatement, usageList.getGroupObjectUsageList(), declareParams);
+                }
+            }
         }
         return new Pair<>(Collections.emptyList(), Collections.emptyMap());
     }
@@ -2978,6 +3067,10 @@ public class LSFPsiImplUtil {
     }
 
     public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFFilterPropertyDefinition sourceStatement) {
+        return null;
+    }
+
+    public static LSFExplicitClasses getValueParamClassNames(@NotNull LSFPropertyDrawPropertyDefinition sourceStatement) {
         return null;
     }
 
@@ -4033,6 +4126,11 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
+    public static Inferred inferParamClasses(@NotNull LSFActiveTabDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
+        return Inferred.EMPTY;
+    }
+
+    @NotNull
     public static Inferred inferParamClasses(@NotNull LSFRoundPropertyDefinition sourceStatement, @Nullable LSFExClassSet valueClass) {
         return Inferred.EMPTY;
     }
@@ -5072,7 +5170,11 @@ public class LSFPsiImplUtil {
     }
 
     public static String getDocumentation(LSFActivePropertyDefinition lsfActivePropertyDefinition, PsiElement child) {
-        return lsfActivePropertyDefinition.getComponentID() != null ? "ACTIVE_TAB_operator" : "ACTIVE_PROPERTY_operator";
+        return "ACTIVE_PROPERTY_operator";
+    }
+
+    public static String getDocumentation(LSFActiveTabDefinition lsfActiveTabDefinition, PsiElement child) {
+        return "ACTIVE_TAB_operator";
     }
 
     public static String getDocumentation(LSFDataPropertyDefinition lsfDataPropertyDefinition, PsiElement child) {
@@ -5097,6 +5199,10 @@ public class LSFPsiImplUtil {
 
     public static String getDocumentation(LSFFilterPropertyDefinition lsfFilterPropertyDefinition, PsiElement child) {
         return "Object_group_operator";
+    }
+
+    public static String getDocumentation(LSFPropertyDrawPropertyDefinition lsfPropertyDrawPropertyDefinition, PsiElement child) {
+        return "SELECT_PROPERTY_operator";
     }
 
     public static String getDocumentation(LSFTypePropertyDefinition lsfTypePropertyDefinition, PsiElement child) {

@@ -19,6 +19,11 @@
             <li>'Action parameters must be defined explicitly' error as on the server start</li>
             <li>GRID/TREE: captionHeight and captionCharHeight support; headerHeight deprecated</li>
             <li>Disable errors in markdown lsf examples</li>
+            <li>SEEK deprecated (use ACTIVATE instead); ACTIVATE keyword support in seekObjectAction</li>
+            <li>VALUE deprecated in object property definition (use ACTIVE instead)</li>
+            <li>ACTIVE TAB and ACTIVE PROPERTY split into separate grammar rules with proper resolving</li>
+            <li>SELECT PROPERTY formPropertyDrawID expression support</li>
+            <li>VIEWTYPE and SELECT ACTIVE support in filter property definitions</li>
         </ul>
     ]]>
     </change-notes>
