@@ -5,7 +5,6 @@ import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.LSFComponentDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDesignElementDeclaration;
@@ -101,9 +100,7 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
     }
 
     public static <T extends LSFDesignElementDeclaration<T>> Set<T> processDesignContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<LSFDesign, Collection<T>> processor) {
-        return LSFFormExtendImpl.processFormContext(current, offset, localScope, processor,
-                element -> element instanceof FormContext ? (FormContext)element : null,
-                FormContext::resolveFormDecl, LSFStubElementTypes.DESIGN);
+        return LSFFormExtendImpl.processFormContext(current, offset, localScope, processor, LSFStubElementTypes.DESIGN);
     }
 
     protected List<Function<LSFDesign, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {

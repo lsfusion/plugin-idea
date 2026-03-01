@@ -149,7 +149,7 @@ public class LSFPsiUtils {
     @NotNull
     public static Set<LSFExprParamDeclaration> getContextParams(PsiElement current, int offset, LSFLocalSearchScope localScope, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
         // current instanceof FormContext || current instancof LSFFormStatement
-        Set<LSFObjectDeclaration> objects = LSFFormExtendImpl.processFormContext(current, LSFFormExtend::getObjectDecls, offset, localScope, objectRef, ignoreUseBeforeDeclarationCheck);
+        Set<LSFObjectDeclaration> objects = LSFFormExtendImpl.processFormContext(current, offset, localScope, LSFFormExtend::getObjectDecls, ignoreUseBeforeDeclarationCheck, null, objectRef);
         if (objects != null) {
             return BaseUtils.immutableCast(objects);
         }

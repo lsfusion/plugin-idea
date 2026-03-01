@@ -155,41 +155,22 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         return processImplementationsSearch(decl);
     }
 
-    private static Function<PsiElement, FormContext> getContext(boolean objectRef) {
-        return current -> current instanceof FormContext && (objectRef || current instanceof LSFFormStatement || current instanceof LSFDesignStatement) ? (FormContext)current : null;
-    }
-
-    protected static <T extends LSFDeclaration, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>>
-                    Set<T> processFormContext(PsiElement current, final Function<Extend, Collection<T>> processor, final int offset, LSFLocalSearchScope localScope, boolean ignoreUseBeforeDeclarationCheck,
-                              Function<PsiElement, FormContext> getContext, Function<FormContext, LSFFullNameDeclaration> resolveContextDecl, ExtendStubElementType<Extend, Stub> type) {
-        FormContext context = getContext.apply(current);
+    public static <T extends LSFDeclaration, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>>
+                    Set<T> processFormContext(PsiElement current, final int offset, LSFLocalSearchScope localScope, final Function<Extend, Collection<T>> processor, boolean ignoreUseBeforeDeclarationCheck,
+                                              ExtendStubElementType<Extend, Stub> type, boolean objectRef) {
+        FormContext context = current instanceof FormContext && (objectRef || current instanceof LSFFormStatement || current instanceof LSFDesignStatement) ? (FormContext) current : null;
         if (context != null)
-            return processContext(resolveContextDecl.apply(context), (LSFFile) current.getContainingFile(), type, processor, offset, localScope, ignoreUseBeforeDeclarationCheck);
+            return processContext(context.resolveFormDecl(), (LSFFile) current.getContainingFile(), type, processor, offset, localScope, ignoreUseBeforeDeclarationCheck);
         return null;
     }
 
-    protected static <T extends LSFDeclaration, This extends LSFExtend<This, Stub>, Stub extends ExtendStubElement<This, Stub>>
+    public static <T extends LSFDeclaration, This extends LSFExtend<This, Stub>, Stub extends ExtendStubElement<This, Stub>>
                     Set<T> processFormContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<This, Collection<T>> processor,
-                              Function<PsiElement, FormContext> getContext, Function<FormContext, LSFFullNameDeclaration> resolveContextDecl, ExtendStubElementType<This, Stub> type) {
-        Set<T> processedContext = processFormContext(current, processor, offset, localScope, false, getContext, resolveContextDecl, type);
-        if (processedContext != null) {
-            return processedContext;
-        }
-
-        PsiElement parent = current.getParent();
-        if (!(parent == null || parent instanceof LSFFile)) {
-            return processFormContext(parent, offset, localScope, processor, getContext, resolveContextDecl, type);
-        }
-
+                                              ExtendStubElementType<This, Stub> type) {
+        FormContext formContext = PsiTreeUtil.getParentOfType(current, FormContext.class);
+        if(formContext != null)
+            return processFormContext(formContext, offset, localScope, processor, false, type, true);
         return new HashSet<>();
-    }
-
-    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<LSFFormExtend, Collection<T>> processor) {
-        return processFormContext(current, offset, localScope, processor, getContext(true), FormContext::resolveFormDecl, null);
-    }
-
-    public static <T extends LSFFormExtendElement> Set<T> processFormContext(PsiElement current, final Function<LSFFormExtend, Collection<T>> processor, final int offset, LSFLocalSearchScope localScope, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
-        return processFormContext(current, processor, offset, localScope, ignoreUseBeforeDeclarationCheck, getContext(objectRef), FormContext::resolveFormDecl, null);
     }
 
     protected List<Function<LSFFormExtend, Collection<? extends LSFDeclaration>>> getDuplicateProcessors() {

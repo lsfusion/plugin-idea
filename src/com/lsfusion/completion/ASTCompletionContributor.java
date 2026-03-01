@@ -550,7 +550,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                     completed.setValue(true);
                     FormContext psi = getLastPsiOfType(FormContext.class);
                     if (psi != null) {
-                        Set<T> declaration = LSFFormExtendImpl.processFormContext(psi, getOriginalFrameOffset(elementUsage), getLocalScope(), formExtendProcessor);
+                        Set<T> declaration = LSFFormExtendImpl.processFormContext(psi, getOriginalFrameOffset(elementUsage), getLocalScope(), formExtendProcessor, null);
                         for (T elementDecl : declaration) {
                             addLookupElement(createLookupElement(elementDecl, FORM_OBJECT_PRIORITY));
                         }
