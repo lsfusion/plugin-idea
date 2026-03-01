@@ -4,7 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.FilteredQuery;
@@ -74,31 +73,6 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
     }
 
     protected abstract FullNameStubElementType getStubType();
-
-    protected static <T extends LSFDeclaration, This extends LSFExtend<This, Stub>, Stub extends ExtendStubElement<This, Stub>, Context>
-                Set<T> processContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<This, Collection<T>> processor,
-                Function<PsiElement, Context> getContext, Function<Context, LSFFullNameDeclaration> resolveContextDecl, ExtendStubElementType<This, Stub> type) {
-        Set<T> processedContext = processContext(current, processor, offset, localScope, false, getContext, resolveContextDecl, type);
-        if (processedContext != null) {
-            return processedContext;
-        }
-
-        PsiElement parent = current.getParent();
-        if (!(parent == null || parent instanceof LSFFile)) {
-            return processContext(parent, offset, localScope, processor, getContext, resolveContextDecl, type);
-        }
-
-        return new HashSet<>();
-    }
-
-    protected static <T extends LSFDeclaration, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>, Context>
-                Set<T> processContext(PsiElement current, final Function<Extend, Collection<T>> processor, final int offset, LSFLocalSearchScope localScope, boolean ignoreUseBeforeDeclarationCheck,
-                                      Function<PsiElement, Context> getContext, Function<Context, LSFFullNameDeclaration> resolveContextDecl, ExtendStubElementType<Extend, Stub> type) {
-        Context context = getContext.apply(current);
-        if (context != null)
-            return processContext(resolveContextDecl.apply(context), (LSFFile) current.getContainingFile(), type, processor, offset, localScope, ignoreUseBeforeDeclarationCheck);
-        return null;
-    }
 
     // used for resolving + completion + duplicates
     private static <Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> Query<Extend> findElements(LSFFullNameDeclaration decl, LSFFile file, ExtendStubElementType<Extend, Stub> type, LSFLocalSearchScope localScope) {

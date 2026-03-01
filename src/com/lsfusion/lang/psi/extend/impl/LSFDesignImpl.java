@@ -101,7 +101,7 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
     }
 
     public static <T extends LSFDesignElementDeclaration<T>> Set<T> processDesignContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<LSFDesign, Collection<T>> processor) {
-        return processContext(current, offset, localScope, processor,
+        return LSFFormExtendImpl.processFormContext(current, offset, localScope, processor,
                 element -> element instanceof FormContext ? (FormContext)element : null,
                 FormContext::resolveFormDecl, LSFStubElementTypes.DESIGN);
     }
