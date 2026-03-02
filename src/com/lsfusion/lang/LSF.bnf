@@ -886,6 +886,7 @@ formActionPropertyDefinitionBody ::=
 		|   CHECK
 		|   READONLY
 		)*
+        listActionDefinitionBody?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
@@ -911,6 +912,7 @@ dialogActionPropertyDefinitionBody ::=
 		|   CHECK
 		|   READONLY
 		)*
+		listActionDefinitionBody?
 		doInputBody
 {
     pin = 1

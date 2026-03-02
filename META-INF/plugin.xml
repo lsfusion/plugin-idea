@@ -24,6 +24,7 @@
             <li>ACTIVE TAB and ACTIVE PROPERTY split into separate grammar rules with proper resolving</li>
             <li>SELECT PROPERTY formPropertyDrawID expression support</li>
             <li>VIEWTYPE and SELECT ACTIVE support in filter property definitions</li>
+            <li>Init action support for SHOW and DIALOG</li>
         </ul>
     ]]>
     </change-notes>
