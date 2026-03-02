@@ -1164,7 +1164,7 @@ seekObjectActionPropertyDefinitionBody ::= (SEEK | ACTIVATE) (FIRST | LAST | NUL
                                             |   (groupObjectID (OBJECTS objectExpr (COMMA objectExpr)*)?)
                                             )
 {                        
-    pin = 1
+    pin = 3
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl getDocumentation]
 }
