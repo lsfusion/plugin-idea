@@ -1637,7 +1637,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitSeekObjectActionPropertyDefinitionBody(o);
         PsiElement firstChild = o.getFirstChild();
         if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.SEEK) {
-            addDeprecatedWarningAnnotation(firstChild, "SEEK is deprecated, use ACTIVATE instead");
+            addDeprecatedWarningAnnotation(firstChild, "7.0", "use ACTIVATE instead");
         }
     }
 
@@ -1646,7 +1646,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitObjectPropertyDefinition(o);
         PsiElement firstChild = o.getFirstChild();
         if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.VALUE) {
-            addDeprecatedWarningAnnotation(firstChild, "VALUE is deprecated, use ACTIVE instead");
+            addDeprecatedWarningAnnotation(firstChild, "7.0", "use ACTIVE instead");
         }
     }
 }
