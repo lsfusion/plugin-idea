@@ -110,7 +110,7 @@ public interface LSFMCPDeclaration extends LSFMCPStatement {
         FORM("form", LSFStubElementTypes.FORM, LSFComponentBody.class,
                 LSFFormObjectOptions.class, LSFFormGroupObjectOptions.class, LSFFormPropertyOptionsList.class, LSFFormDeclOptions.class, LSFFormOptions.class,
                 LSFFormPropertiesList.class, FORM_PROPERTIES_PREFIX_LEN,
-                LSFFormFiltersList.class, LSFFormFilterGroupDeclaration.class, LSFFormExtendFilterGroupDeclaration.class, LSFUserFiltersDeclaration.class,
+                LSFFormFiltersList.class, LSFFormFilterGroupDeclaration.class, LSFUserFiltersDeclaration.class,
                 LSFFormOrderByList.class, LSFFormPivotOptionsDeclaration.class, LSFFormEventsList.class,
                 LSFPropertyExpression.class, LSFListActionPropertyDefinitionBody.class),
         NAVIGATOR_ELEMENT("navigatorElement", LSFStubElementTypes.NAVIGATORELEMENT, LSFNavigatorElementOptions.class, LSFNavigatorSchedulerStatement.class),

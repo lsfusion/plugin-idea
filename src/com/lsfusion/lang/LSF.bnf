@@ -1693,14 +1693,10 @@ formStatement ::=	(	formDecl
             		|	extendingFormDeclaration
 		            )
                     (	formGroupObjectsList
-                    |	formExtendGroupObjectsList
                     |	formTreeGroupObjectList
-                    |	formExtendTreeGroupObjectList
                     |	formPropertiesList
-                    |	formExtendPropertiesList
                     |	formFiltersList
                     |	formFilterGroupDeclaration
-                    |	formExtendFilterGroupDeclaration
                     |   userFiltersDeclaration
                     |	formOrderByList
                     |	formPivotOptionsDeclaration
@@ -1774,30 +1770,16 @@ extendingFormDeclaration ::= EXTEND FORM formUsageWrapper
 
 formUsageWrapper ::= formUsage // for usages search filter
 
-formGroupObjectsList ::= OBJECTS formGroupObjectDeclaration (COMMA formGroupObjectDeclaration)*
+formGroupObjectsList ::= <<resetExtendObjects>> (EXTEND <<setExtendObjects>>)? OBJECTS formGroupObjectDeclaration (COMMA formGroupObjectDeclaration)*
 {
-    pin = 1
+    pin = 3
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
 
-formExtendGroupObjectsList ::= EXTEND OBJECTS formExtendGroupObjectUsage (COMMA formExtendGroupObjectUsage)*
+formTreeGroupObjectList ::= <<resetExtendTree>> (EXTEND <<setExtendTree>>)? TREE ((!<<isExtendTree>> treeGroupDeclaration) | (<<isExtendTree>> treeGroupUsage))? formTreeGroupObjectDeclaration (COMMA formTreeGroupObjectDeclaration)* formTreeGroupObjectOptions
 {
-    pin = 2
-    implements = "com.lsfusion.documentation.LSFDocumentation"
-    methods = [getDocumentation]
-}
-
-formTreeGroupObjectList ::= TREE (treeGroupDeclaration)? formTreeGroupObjectDeclaration (COMMA formTreeGroupObjectDeclaration)* formTreeGroupObjectOptions
-{
-    pin = 1
-    implements = "com.lsfusion.documentation.LSFDocumentation"
-    methods = [getDocumentation]
-}
-
-formExtendTreeGroupObjectList ::= EXTEND TREE (treeGroupUsage)? formExtendTreeGroupObjectUsage (COMMA formExtendTreeGroupObjectUsage)* formTreeGroupObjectOptions
-{
-    pin = 2
+    pin = 3
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
@@ -1808,8 +1790,8 @@ treeGroupDeclaration ::= simpleName
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFTreeGroupDeclImpl"
 }
 
-formGroupObjectDeclaration ::= formGroupObject formGroupObjectOptions
-formExtendGroupObjectUsage ::= formExtendGroupObject formGroupObjectOptions
+formGroupObjectDeclarationOrUsage ::= (!<<isExtendObjects>> formGroupObject) | (<<isExtendObjects>> formExtendGroupObject)
+formGroupObjectDeclaration ::=  formGroupObjectDeclarationOrUsage formGroupObjectOptions
 formGroupObjectOptions ::= (    formGroupObjectViewType
                            |    formExtKey
                            |    formSubReport 
@@ -1830,10 +1812,8 @@ formGroupObjectOptions ::= (    formGroupObjectViewType
 formTreeGroupObjectOptions ::= (   formGroupObjectRelativePosition
                                )*
                            
-formTreeGroupObjectDeclaration ::= formGroupObject (treeGroupParentDeclaration)?
+formTreeGroupObjectDeclaration ::= ((!<<isExtendTree>> formGroupObject) | (<<isExtendTree>> formExtendGroupObject)) treeGroupParentDeclaration?
 {implements = "com.lsfusion.lang.psi.context.PropertyUsageContext" methods = [ resolveParamClasses getParamList ]}
-
-formExtendTreeGroupObjectUsage ::= formExtendGroupObject (treeGroupParentDeclaration)?
 
 treeGroupParentDeclaration ::= (PARENT formExprDeclaration) | (LBRAC PARENT formExprDeclaration (COMMA formExprDeclaration)* RBRAC) { pin = 1 }
 
@@ -1907,11 +1887,11 @@ formPropertyDrawNameDecl ::= (simpleNameOrWithCaption EQUALS)? formPropertyName 
     implements="com.lsfusion.lang.psi.declarations.LSFPropertyDrawNameDeclaration"
 }
 
-formPropertiesNamesDeclList ::=	formPropertyDrawNameDecl (COMMA formPropertyDrawNameDecl)*
+formPropertiesNamesDeclList ::= (!<<isExtendProperties>> formPropertyDrawNameDecl (COMMA formPropertyDrawNameDecl)*) | (<<isExtendProperties>> formExtendPropertyDrawNameUsage (COMMA formExtendPropertyDrawNameUsage)*)
 
-formPropertiesList ::= PROPERTIES (formMappedNamePropertiesList | formPropertyOptionsList formMappedPropertiesList)
+formPropertiesList ::= <<resetExtendProperties>> (EXTEND <<setExtendProperties>>)? PROPERTIES (formMappedNamePropertiesList | formPropertyOptionsList formMappedPropertiesList)
 {
-    pin = 1
+    pin = 3
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
@@ -1922,24 +1902,6 @@ formMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptions
     implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
     methods = [ resolveParamClasses getParamList]
 }
-
-formExtendPropertiesList ::= EXTEND PROPERTIES (formExtendMappedNamePropertiesList | formPropertyOptionsList formExtendPropertyDrawUsageList)
-{
-    pin = 2
-    implements = "com.lsfusion.documentation.LSFDocumentation"
-    methods = [getDocumentation]
-}
-
-formExtendPropertyDrawUsageList ::= formExtendPropertyDrawUsage (COMMA formExtendPropertyDrawUsage)* {pin = 1}
-formExtendPropertyDrawUsage ::= formPropertyDrawUsage formPropertyOptionsList
-
-formExtendMappedNamePropertiesList ::= LBRAC objectUsageList RBRAC formPropertyOptionsList formExtendPropertiesNamesUsageList
-{
-    pin = 1
-    implements = "com.lsfusion.lang.psi.context.PropertyUsageContext"
-    methods = [ resolveParamClasses getParamList]
-}
-formExtendPropertiesNamesUsageList ::= formExtendPropertyDrawNameUsage (COMMA formExtendPropertyDrawNameUsage)*
 
 formExtendPropertyDrawNameUsage ::= simpleNameOrWithCaptionEquals? formPropertyDrawPropertyUsage formPropertyOptionsList
 {
@@ -2003,12 +1965,12 @@ designCalcPropertyObject ::= formCalcPropertyObject
 formCalcPropertyObject ::= formExprDeclaration
 formActionPropertyObject ::= formActionObject | formActionDeclaration
 
-formPropertyDrawMappedDecl ::= (formPropertyDrawObject  
+formPropertyDrawMappedDecl ::= (!<<isExtendProperties>> (formPropertyDrawObject
                                | (simpleNameOrWithCaption? EQUALS (
                                                         // pretty tricky solution, we do lookahead to match formPropertyDrawObject, then we save last token and compare it to last token in formExprDeclaration, if the same - move to formPropertyDrawObject, otherwise map formExprDeclaration, the same approach is used in CHANGECLASS / DELETE  
                                                         (<<checkFormExpr>> &((formPropertyDrawObject <<matchedFormDrawObject>>)?) formExprDeclaration <<matchedFormExpr>>) | 
                                                         formPropertyDrawObject | 
-                                                        formActionDeclaration)))
+                                                        formActionDeclaration)))) | (<<isExtendProperties>> formPropertyDrawUsage)
                                 formPropertyOptionsList
 {
     pin = 1
@@ -2016,7 +1978,7 @@ formPropertyDrawMappedDecl ::= (formPropertyDrawObject
     implements="com.lsfusion.lang.psi.declarations.LSFPropertyDrawMappedDeclaration"
 }
 
-formMappedPropertiesList ::= formPropertyDrawMappedDecl (COMMA formPropertyDrawMappedDecl)* {pin = 1}
+formMappedPropertiesList ::= formPropertyDrawMappedDecl (COMMA formPropertyDrawMappedDecl)*  {pin = 1}
 
 formFiltersList ::= FILTERS formExprDeclaration (COMMA formExprDeclaration)*
 {
@@ -2072,9 +2034,9 @@ formContainerEventDeclaration ::= (COLLAPSE | EXPAND | TAB) (ID | componentSelec
 
 scheduleFormEventDeclaration ::= SCHEDULE PERIOD intLiteral FIXED?
 
-formFilterGroupDeclaration ::= FILTERGROUP filterGroupName (NULL | NONULL)? regularFilterDeclaration*
+formFilterGroupDeclaration ::= <<resetExtendFilters>> (EXTEND <<setExtendFilters>>)? FILTERGROUP ((!<<isExtendFilters>> filterGroupName (NULL | NONULL)? regularFilterDeclaration*) | (<<isExtendFilters>> filterGroupUsage (NULL | NONULL)? regularFilterDeclaration+))
 {
-    pin = 1
+    pin = 3
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
@@ -2083,13 +2045,6 @@ filterGroupName ::= simpleName
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFFilterGroupDeclarationImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFFilterGroupDeclaration"
-}
-
-formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage (NULL | NONULL)? regularFilterDeclaration+
-{
-    pin(".*") = 1
-    implements = "com.lsfusion.documentation.LSFDocumentation"
-    methods = [getDocumentation]
 }
 
 userFiltersDeclaration ::= USERFILTERS formPropertyDrawUsage (COMMA formPropertyDrawUsage)*

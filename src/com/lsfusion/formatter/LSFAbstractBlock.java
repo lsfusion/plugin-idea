@@ -103,7 +103,7 @@ public abstract class LSFAbstractBlock extends AbstractBlock {
     }
 
     private boolean isHasBegin(PsiElement element) {
-        return element instanceof LSFFormFilterGroupDeclaration || element instanceof LSFFormExtendFilterGroupDeclaration
+        return element instanceof LSFFormFilterGroupDeclaration
                 || element instanceof LSFFormFiltersList
                 || element instanceof LSFFormEventsList
                 || element instanceof LSFFormMappedPropertiesList || element instanceof LSFFormPropertiesNamesDeclList

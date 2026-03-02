@@ -36,8 +36,6 @@ public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubEl
     Collection<LSFPropertyDrawDeclaration> getPropertyDrawDecls();
 
     List<LSFFormFilterGroupDeclaration> getFormFilterGroupDeclarationList();
-
-    List<LSFFormExtendFilterGroupDeclaration> getFormExtendFilterGroupDeclarationList();
     
     List<LSFUserFiltersDeclaration> getUserFiltersDeclarationList();
 }

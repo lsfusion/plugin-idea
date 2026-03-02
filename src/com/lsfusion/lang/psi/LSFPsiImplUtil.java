@@ -3503,11 +3503,6 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static PsiElement getParamList(@NotNull LSFFormExtendMappedNamePropertiesList sourceStatement) {
-        return null;
-    }
-
-    @Nullable
     public static PsiElement getParamList(@NotNull LSFFormPropertyObject sourceStatement) {
         return sourceStatement.getObjectUsageList();
     }
@@ -3556,11 +3551,6 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFFormMappedNamePropertiesList sourceStatement) {
-        return resolveParamClasses(sourceStatement.getObjectUsageList());
-    }
-
-    @Nullable
-    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFFormExtendMappedNamePropertiesList sourceStatement) {
         return resolveParamClasses(sourceStatement.getObjectUsageList());
     }
 
@@ -5443,19 +5433,11 @@ public class LSFPsiImplUtil {
         return "Object_blocks";
     }
 
-    public static String getDocumentation(LSFFormExtendTreeGroupObjectList lsfFormTreeGroupObjectList, PsiElement child) {
-        return "Object_blocks";
-    }
-
     public static String getDocumentation(LSFFormGroupObjectOptions lsfFormGroupObjectOptions, PsiElement child) {
         return "Object_blocks";
     }
 
     public static String getDocumentation(LSFFormPropertiesList lsfFormPropertiesList, PsiElement child) {
-        return "Properties_and_actions_block";
-    }
-
-    public static String getDocumentation(LSFFormExtendPropertiesList lsfFormPropertiesList, PsiElement child) {
         return "Properties_and_actions_block";
     }
 
@@ -5472,10 +5454,6 @@ public class LSFPsiImplUtil {
     }
 
     public static String getDocumentation(LSFFormFilterGroupDeclaration lsfFormFilterGroupDeclaration, PsiElement child) {
-        return "Filters_and_sortings_block";
-    }
-
-    public static String getDocumentation(LSFFormExtendFilterGroupDeclaration lsfFormExtendFilterGroupDeclaration, PsiElement child) {
         return "Filters_and_sortings_block";
     }
 
