@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.FilteredQuery;
@@ -94,7 +95,7 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
 
         return names;
     }
-    protected static <T extends LSFDeclaration, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> Set<T> processContext(LSFFullNameDeclaration decl, LSFFile file, ExtendStubElementType<Extend, Stub> type, Function<Extend, Collection<T>> processor, Integer offset, LSFLocalSearchScope localScope, boolean ignoreUseBeforeDeclarationCheck) {
+    protected static <T extends PsiElement, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> Set<T> processContext(LSFFullNameDeclaration decl, LSFFile file, ExtendStubElementType<Extend, Stub> type, Function<Extend, Collection<T>> processor, Integer offset, LSFLocalSearchScope localScope, boolean ignoreUseBeforeDeclarationCheck) {
         Set<T> finalResult = new HashSet<>();
         for(Extend formExtend : findElements(decl, file, type, localScope)) {
             boolean sameFile = offset != null && file == formExtend.getLSFFile();

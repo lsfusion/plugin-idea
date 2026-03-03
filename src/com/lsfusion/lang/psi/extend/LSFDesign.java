@@ -7,7 +7,7 @@ import com.lsfusion.lang.psi.stubs.extend.DesignStubElement;
 
 import java.util.Collection;
 
-public interface LSFDesign extends LSFExtend<LSFDesign, DesignStubElement>, LSFDocumentation {
+public interface LSFDesign extends LSFFormContextExtend<LSFDesign, DesignStubElement>, LSFDocumentation {
     Collection<LSFComponentDeclaration> getComponentDecls();
     
     LSFId getFormUsageNameIdentifier();

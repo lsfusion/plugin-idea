@@ -1,10 +1,7 @@
 package com.lsfusion.lang.psi.extend;
 
 import com.lsfusion.lang.psi.*;
-import com.lsfusion.lang.psi.declarations.LSFFilterGroupDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFObjectDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
 import com.lsfusion.mcp.LSFMCPDeclaration;
 import org.jetbrains.annotations.NotNull;
@@ -12,9 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.List;
 
-public interface LSFFormExtend extends LSFExtend<LSFFormExtend, ExtendFormStubElement>, LSFMCPDeclaration {
+public interface LSFFormExtend extends LSFFormContextExtend<LSFFormExtend, ExtendFormStubElement>, LSFMCPDeclaration {
 
     LSFFormDecl getFormDecl();
+
+    Collection<LSFFormFormsListItem> getFormDecls();
 
     Collection<LSFObjectDeclaration> getObjectDecls();
     

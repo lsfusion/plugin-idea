@@ -11,12 +11,12 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.declarations.impl.LSFFormExtendElement;
-import com.lsfusion.lang.psi.extend.LSFExtend;
+import com.lsfusion.lang.psi.extend.LSFFormContextExtend;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
-import com.lsfusion.lang.psi.stubs.extend.ExtendStubElement;
-import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.FormContextExtendStubElement;
+import com.lsfusion.lang.psi.stubs.extend.types.FormContextExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +41,9 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
 
     @NotNull
     protected abstract List<LSFFormGroupObjectsList> getFormGroupObjectsListList();
+
+    @NotNull
+    protected abstract List<LSFFormFormsList> getFormFormsListList();
 
     @Override
     public String getGlobalName() {
@@ -82,6 +85,14 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     @Override
     protected FullNameStubElementType getStubType() {
         return LSFStubElementTypes.FORM;
+    }
+
+    @Override
+    public Collection<LSFFormFormsListItem> getFormDecls() {
+        Collection<LSFFormFormsListItem> result = new ArrayList<>();
+        for (LSFFormFormsList formGroupObject : getFormFormsListList())
+            result.addAll(formGroupObject.getFormFormsListItemList());
+        return result;
     }
 
     @Override
@@ -155,21 +166,48 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         return processImplementationsSearch(decl);
     }
 
-    public static <T extends LSFDeclaration, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>>
+    public static <T extends LSFDeclaration, Extend extends LSFFormContextExtend<Extend, Stub>, Stub extends FormContextExtendStubElement<Extend, Stub>>
                     Set<T> processFormContext(PsiElement current, final int offset, LSFLocalSearchScope localScope, final Function<Extend, Collection<T>> processor, boolean ignoreUseBeforeDeclarationCheck,
-                                              ExtendStubElementType<Extend, Stub> type, boolean objectRef) {
+                                              FormContextExtendStubElementType<Extend, Stub> type, boolean objectRef) {
         FormContext context = current instanceof FormContext && (objectRef || current instanceof LSFFormStatement || current instanceof LSFDesignStatement) ? (FormContext) current : null;
-        if (context != null)
-            return processContext(context.resolveFormDecl(), (LSFFile) current.getContainingFile(), type, processor, offset, localScope, ignoreUseBeforeDeclarationCheck);
+        if (context != null) {
+            LSFFile file = (LSFFile) current.getContainingFile();
+            Set<T> finalResult = new HashSet<>();
+            for(LSFFormDeclaration formDecl : findFormElements(context, file, offset, localScope, ignoreUseBeforeDeclarationCheck))
+                finalResult.addAll(processContext(formDecl, file, type, processor, offset, localScope, ignoreUseBeforeDeclarationCheck));
+            return finalResult;
+        }
         return null;
     }
 
-    public static <T extends LSFDeclaration, This extends LSFExtend<This, Stub>, Stub extends ExtendStubElement<This, Stub>>
+    public static <T extends LSFDeclaration, Extend extends LSFFormContextExtend<Extend, Stub>, Stub extends FormContextExtendStubElement<Extend, Stub>>
+                Set<T> processFormContext(FormContext formContext, final int offset, LSFLocalSearchScope localScope, final Function<Extend, Collection<T>> processor, boolean ignoreUseBeforeDeclarationCheck,
+                              FormContextExtendStubElementType<Extend, Stub> type) {
+        LSFFile file = (LSFFile) formContext.getContainingFile();
+        Set<T> finalResult = new HashSet<>();
+        for(LSFFormDeclaration formDecl : findFormElements(formContext, file, offset, localScope, ignoreUseBeforeDeclarationCheck))
+            finalResult.addAll(processContext(formDecl, file, type, processor, offset, localScope, ignoreUseBeforeDeclarationCheck));
+        return finalResult;
+    }
+
+    private static Set<LSFFormDeclaration> findFormElements(FormContext formContext, LSFFile file, Integer offset, LSFLocalSearchScope localScope, boolean ignoreUseBeforeDeclarationCheck) {
+        Set<LSFFormDeclaration> formDecls = new HashSet<>();
+        LSFFormDeclaration formDecl = formContext.resolveFormDecl();
+        if(formDecl != null)
+            formDecls.add(formDecl);
+
+        for(LSFFormFormsListItem aggrForm : processContext(formDecl, file, null, LSFFormExtend::getFormDecls, offset, localScope, ignoreUseBeforeDeclarationCheck))
+            formDecls.addAll(findFormElements(aggrForm, file, offset, localScope, ignoreUseBeforeDeclarationCheck));
+
+        return formDecls;
+    }
+
+    public static <T extends LSFDeclaration, This extends LSFFormContextExtend<This, Stub>, Stub extends FormContextExtendStubElement<This, Stub>>
                     Set<T> processFormContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<This, Collection<T>> processor,
-                                              ExtendStubElementType<This, Stub> type) {
+                                              FormContextExtendStubElementType<This, Stub> type) {
         FormContext formContext = PsiTreeUtil.getParentOfType(current, FormContext.class);
         if(formContext != null)
-            return processFormContext(formContext, offset, localScope, processor, false, type, true);
+            return processFormContext(formContext, offset, localScope, processor, false, type);
         return new HashSet<>();
     }
 

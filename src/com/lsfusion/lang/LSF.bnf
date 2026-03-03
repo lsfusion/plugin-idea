@@ -1692,7 +1692,8 @@ formOptions ::=  formHintsList
 formStatement ::=	(	formDecl
             		|	extendingFormDeclaration
 		            )
-                    (	formGroupObjectsList
+                    (	formFormsList
+                    |   formGroupObjectsList
                     |	formTreeGroupObjectList
                     |	formPropertiesList
                     |	formFiltersList
@@ -1769,6 +1770,23 @@ extendingFormDeclaration ::= EXTEND FORM formUsageWrapper
 }
 
 formUsageWrapper ::= formUsage // for usages search filter
+
+formFormsList ::= EXTEND? FORMS formFormsListItem (COMMA formFormsListItem)*
+{
+    pin = 2
+}
+
+formFormsListItem ::= formUsage (LPAREN (formMappingObjects | formMappingProperties | formMappingFilterGroups | formMappingComponents)* RPAREN)? {
+    implements="com.lsfusion.lang.psi.context.FormContext"
+    methods = [resolveFormDecl]
+}
+
+formMappingObjects ::= OBJECTS formMapping (COMMA formMapping)* { pin = 1 }
+formMappingProperties ::= PROPERTIES formMapping (COMMA formMapping)* { pin = 1 }
+formMappingFilterGroups ::= FILTERGROUPS formMapping (COMMA formMapping)* { pin = 1 }
+formMappingComponents ::= DESIGN formMapping (COMMA formMapping)* { pin = 1 }
+
+formMapping ::= simpleName EQUALS simpleName
 
 formGroupObjectsList ::= <<resetExtendObjects>> (EXTEND <<setExtendObjects>>)? OBJECTS formGroupObjectDeclaration (COMMA formGroupObjectDeclaration)*
 {
@@ -2598,6 +2616,7 @@ metaCodeStatement ::= metaCodeStatementHeader metaCodeBody? metaCodeStatementSem
     mixin="com.lsfusion.lang.psi.references.impl.LSFMetaReferenceImpl"
     implements="com.lsfusion.lang.psi.references.LSFMetaReference"
     methods=[isInline]
+
 }
 
 metaCodeStatementType ::= ATSIGN | ATSIGN2

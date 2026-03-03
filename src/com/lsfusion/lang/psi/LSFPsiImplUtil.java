@@ -4732,6 +4732,11 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
+    public static LSFFormDeclaration resolveFormDecl(@NotNull LSFFormFormsListItem formActionBody) {
+        return resolveFormDecl(formActionBody.getFormUsage());
+    }
+
+    @Nullable
     public static LSFFormDeclaration resolveFormDecl(@NotNull LSFDialogActionPropertyDefinitionBody formActionBody) {
         return resolveFormDecl(formActionBody.getFormUsage());
     }

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class ExtendFormStubElementType extends ExtendStubElementType<LSFFormExtend, ExtendFormStubElement> {
+public class ExtendFormStubElementType extends FormContextExtendStubElementType<LSFFormExtend, ExtendFormStubElement> {
 
     public ExtendFormStubElementType() {
         super("EXTEND_FORM");

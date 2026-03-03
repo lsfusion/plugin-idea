@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.*;
@@ -307,6 +308,9 @@ public class LSFGlobalResolver {
     }
     public static boolean isAfter(int offset, LSFExtend extend) {
         return extend.getTextOffset() >= offset; // later stubs should be added here together with all get*Decls
+    }
+    public static boolean isAfter(int offset, PsiElement element) {
+        return element.getTextOffset() > offset; // later stubs should be added here together with all get*Decls
     }
 
     public static Collection<LSFModuleDeclaration> findModules(String moduleName, Project project, GlobalSearchScope scope) {

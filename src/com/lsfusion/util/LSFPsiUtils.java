@@ -22,10 +22,7 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.PropertyDependenciesCache;
-import com.lsfusion.lang.psi.context.ContextModifier;
-import com.lsfusion.lang.psi.context.ExtendParamContext;
-import com.lsfusion.lang.psi.context.LSFExpression;
-import com.lsfusion.lang.psi.context.ModifyParamContext;
+import com.lsfusion.lang.psi.context.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
@@ -149,10 +146,9 @@ public class LSFPsiUtils {
     @NotNull
     public static Set<LSFExprParamDeclaration> getContextParams(PsiElement current, int offset, LSFLocalSearchScope localScope, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
         // current instanceof FormContext || current instancof LSFFormStatement
-        Set<LSFObjectDeclaration> objects = LSFFormExtendImpl.processFormContext(current, offset, localScope, LSFFormExtend::getObjectDecls, ignoreUseBeforeDeclarationCheck, null, objectRef);
-        if (objects != null) {
-            return BaseUtils.immutableCast(objects);
-        }
+        FormContext formContext = current instanceof FormContext && (objectRef || current instanceof LSFFormStatement || current instanceof LSFDesignStatement) ? (FormContext) current : null;
+        if (formContext != null)
+            return BaseUtils.immutableCast(LSFFormExtendImpl.processFormContext(formContext, offset, localScope, LSFFormExtend::getObjectDecls, ignoreUseBeforeDeclarationCheck, null));
 
         if (current instanceof ModifyParamContext) {
             ContextModifier contextModifier = ((ModifyParamContext) current).getContextModifier();

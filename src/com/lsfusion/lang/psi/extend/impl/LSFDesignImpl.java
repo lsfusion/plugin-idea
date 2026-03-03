@@ -12,7 +12,7 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.extend.LSFDesign;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.extend.DesignStubElement;
-import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
+import com.lsfusion.lang.psi.stubs.extend.types.FormContextExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import org.jetbrains.annotations.NotNull;
@@ -110,7 +110,7 @@ public abstract class LSFDesignImpl extends LSFExtendImpl<LSFDesign, DesignStubE
     }
 
     @Override
-    protected ExtendStubElementType<LSFDesign, DesignStubElement> getDuplicateExtendType() {
+    protected FormContextExtendStubElementType<LSFDesign, DesignStubElement> getDuplicateExtendType() {
         return LSFStubElementTypes.DESIGN;
     }
 
