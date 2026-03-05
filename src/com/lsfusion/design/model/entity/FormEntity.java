@@ -265,17 +265,14 @@ public class FormEntity {
 
                     LSFFormPropertiesNamesDeclList formPropertiesNamesDeclList = mappedProps.getFormPropertiesNamesDeclList();
 
-                    List<LSFFormPropertyDrawNameDeclOrUsage> formPropertyDrawNameDeclList;
+                    List<LSFFormPropertyDrawNameDecl> formPropertyDrawNameDeclList;
                     boolean reverseFor = relativePosition != null && (relativePosition.first == InsertType.FIRST || relativePosition.first == InsertType.AFTER);
                     if (formPropertiesNamesDeclList != null) {
-                        formPropertyDrawNameDeclList = formPropertiesNamesDeclList.getFormPropertyDrawNameDeclOrUsageList();
+                        formPropertyDrawNameDeclList = formPropertiesNamesDeclList.getFormPropertyDrawNameDeclList();
                         for (int i = reverseFor ? formPropertyDrawNameDeclList.size() - 1 : 0; (reverseFor && i >= 0) || (!reverseFor && i < formPropertyDrawNameDeclList.size()); i = i + (reverseFor ? -1 : 1)) {
-                            LSFFormPropertyDrawNameDeclOrUsage declOrUsage = formPropertyDrawNameDeclList.get(i);
-                            LSFFormPropertyDrawNameDecl prop = declOrUsage.getFormPropertyDrawNameDecl();
-                            if (prop != null) {
-                                String alias = prop.getSimpleName() != null ? prop.getSimpleName().getName() : null;
-                                addPropertyWithOptions(alias, prop.getLocalizedStringLiteral(), prop.getFormPropertyName(), false, null, commonOptions, prop.getFormPropertyOptionsList(), relativePosition, objectUsageList);
-                            }
+                            LSFFormPropertyDrawNameDecl prop = formPropertyDrawNameDeclList.get(i);
+                            String alias = prop.getSimpleName() != null ? prop.getSimpleName().getName() : null;
+                            addPropertyWithOptions(alias, prop.getLocalizedStringLiteral(), prop.getFormPropertyName(), false,  null, commonOptions, prop.getFormPropertyOptionsList(), relativePosition, objectUsageList);
                         }
                     }
                 }

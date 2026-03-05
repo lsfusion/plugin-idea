@@ -162,20 +162,13 @@ public class LSFElementGenerator {
         return rowParamDecl;
     }
 
-    private static List<LSFPropertyDrawDeclaration> builtInFormProps = null;
+    private static List<? extends LSFPropertyDrawDeclaration> builtInFormProps = null;
 
-    public static List<LSFPropertyDrawDeclaration> getBuiltInFormProps(final Project project) {
+    public static List<? extends LSFPropertyDrawDeclaration> getBuiltInFormProps(final Project project) {
         if (builtInFormProps == null || builtInFormProps.iterator().next().getProject().isDisposed()) {
             final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formEdit,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
 //            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
-            List<LSFFormPropertyDrawNameDeclOrUsage> declOrUsageList = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclOrUsageList();
-            builtInFormProps = new ArrayList<>();
-            declOrUsageList.forEach(declOrUsage -> {
-                @Nullable LSFFormPropertyDrawNameDecl decl = declOrUsage.getFormPropertyDrawNameDecl();
-                if(decl != null) {
-                    builtInFormProps.add(decl);
-                }
-            });
+            builtInFormProps = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
         }
         return builtInFormProps;
     }
