@@ -108,7 +108,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
             if(noChildren) { //assert !noAttributes
                 result.add(new PropertyParseNode(key, namespace, getPropertyType(element.getValue()), false));
             }
-            result.add(new PropertyGroupParseNode(key, children, namespace, key == null ? element.getName() : null));
+            result.add(new PropertyGroupParseNode(key, children, namespace, getExtraNamespaces(element), key == null ? element.getName() : null));
             return result;
         }
     }
@@ -129,5 +129,16 @@ public class GenerateFormXMLAction extends GenerateFormAction {
         String prefix = element.getNamespacePrefix();
         String uri = element.getNamespaceURI();
         return prefix.isEmpty() && uri.isEmpty() ? null : new ElementNamespace(prefix, uri);
+    }
+
+    private List<ElementNamespace> getExtraNamespaces(Element element) {
+        List<ElementNamespace> extraNamespaces = new ArrayList<>();
+        for(Namespace namespace : element.getAdditionalNamespaces()) {
+            String prefix = namespace.getPrefix();
+            String uri = namespace.getURI();
+            if(!prefix.isEmpty() || !uri.isEmpty())
+                extraNamespaces.add(new ElementNamespace(prefix, uri));
+        }
+        return extraNamespaces;
     }
 }

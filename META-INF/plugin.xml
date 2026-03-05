@@ -25,6 +25,7 @@
             <li>VIEWTYPE and SELECT ACTIVE support in filter property definitions</li>
             <li>Init action support for SHOW and DIALOG</li>
             <li>FORMS clause in the FORM operator support</li>
+            <li>Generate form from XML: extra namespaces support</li>
         </ul>
     ]]>
     </change-notes>

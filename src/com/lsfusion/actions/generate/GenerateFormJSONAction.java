@@ -67,7 +67,7 @@ public class GenerateFormJSONAction extends GenerateFormAction {
 
             }
 
-            return Collections.singletonList(new PropertyGroupParseNode(key, localChildren, null, null));
+            return Collections.singletonList(new PropertyGroupParseNode(key, localChildren, null, new ArrayList<>(), null));
 
         } else {
             return Collections.singletonList(new PropertyParseNode(key, null, getPropertyType(element), false));

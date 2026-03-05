@@ -317,7 +317,7 @@ public abstract class GenerateFormAction extends AnAction {
 
             } else if (element instanceof PropertyGroupParseNode) {
                 PropertyGroupParseNode propertyGroupElement = ((PropertyGroupParseNode) element);
-                formNameScript = parentElement == null ? getFormNameScript(propertyGroupElement.formName, propertyGroupElement.namespace) : null;
+                formNameScript = parentElement == null ? getFormNameScript(propertyGroupElement) : null;
 
                 if (hasPropertyGroupParseNodeChildren(element)) {
                     if (lastGroupObjectParent != null) {
@@ -458,12 +458,19 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     private String getExtIDScript(ElementKey key, ElementNamespace namespace) {
-        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + getNamespaceScript(namespace) + key.extID + "'") : "";
+        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + getNamespaceScript(namespace) + ":" + key.extID + "'") : "";
     }
 
-    private String getFormNameScript(String formName, ElementNamespace formNamespace) {
-        String formId = formName == null ? "generated" : generateObjectId(formName);
-        String formExtId = (formName == null || formId.equals(formName)) && formNamespace == null ? "" : (" FORMEXTID '" + getNamespaceScript(formNamespace) + formName + "'");
+    private String getFormNameScript(PropertyGroupParseNode propertyGroupElement) {
+        String formId = propertyGroupElement.formName == null ? "generated" : generateObjectId(propertyGroupElement.formName);
+        List<String> namespaceScripts = new ArrayList<>();
+        if(propertyGroupElement.namespace != null) {
+            namespaceScripts.add(getNamespaceScript(propertyGroupElement.namespace) + ":" + propertyGroupElement.formName);
+        }
+        for(ElementNamespace namespace : propertyGroupElement.extraNamespaces) {
+            namespaceScripts.add(getNamespaceScript(namespace));
+        }
+        String formExtId = (propertyGroupElement.formName == null || formId.equals(propertyGroupElement.formName)) && namespaceScripts.isEmpty() ? "" : (" FORMEXTID '" + StringUtils.join(namespaceScripts, ";") + "'");
         return "FORM " + formId + formExtId;
     }
 
@@ -473,9 +480,9 @@ public abstract class GenerateFormAction extends AnAction {
             String prefixOrUri = namespace.prefix.isEmpty() ? namespace.uri : namespace.prefix;
             if (!usedNamespacePrefixes.contains(prefixOrUri)) {
                 usedNamespacePrefixes.add(prefixOrUri);
-                namespaceScript =  (fullNamespaceInExtId ? ("=" + namespace.uri) : (namespace.prefix + "=" + namespace.uri)) + ":";
+                namespaceScript =  (fullNamespaceInExtId ? ("=" + namespace.uri) : (namespace.prefix + "=" + namespace.uri));
             } else {
-                namespaceScript = (fullNamespaceInExtId ? ("=" + namespace.uri) : namespace.prefix) + ":";
+                namespaceScript = (fullNamespaceInExtId ? ("=" + namespace.uri) : namespace.prefix);
             }
         }
         return namespaceScript;
@@ -632,10 +639,12 @@ public abstract class GenerateFormAction extends AnAction {
     }
 
     static class PropertyGroupParseNode extends GroupParseNode {
+        List<ElementNamespace> extraNamespaces;
         String formName;
 
-        PropertyGroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace, String formName) {
+        PropertyGroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace, List<ElementNamespace> extraNamespaces, String formName) {
             super(key, children, namespace);
+            this.extraNamespaces = extraNamespaces;
             this.formName = formName;
         }
     }
