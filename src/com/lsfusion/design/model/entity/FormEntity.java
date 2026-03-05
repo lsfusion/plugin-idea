@@ -71,7 +71,7 @@ public class FormEntity {
                 LSFFormGroupObjectViewType viewType = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectViewTypeList());
                 LSFFormGroupObjectPageSize pageSize = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectPageSizeList());
                 LSFFormGroupObjectRelativePosition position = BaseUtils.last(formGroupObjectDeclaration.getFormGroupObjectOptions().getFormGroupObjectRelativePositionList());
-                addGroupObject(formGroupObjectDeclaration.getFormGroupObjectDeclarationOrUsage().getFormGroupObject(), position, viewType, pageSize);
+                addGroupObject(formGroupObjectDeclaration.getFormGroupObject(), position, viewType, pageSize);
             } else {
                 LSFFormTreeGroupObjectList treeGroupObjectDeclaration = (LSFFormTreeGroupObjectList) element;
                 LSFFormTreeGroupObjectOptions formTreeGroupObjectOptions = treeGroupObjectDeclaration.getFormTreeGroupObjectOptions();
@@ -85,10 +85,11 @@ public class FormEntity {
         extractPropertyDraws(formExtend);
 
         for (LSFFormFilterGroupDeclaration lsfFormFilterGroupDeclaration : formExtend.getFormFilterGroupDeclarationList()) {
-            if(lsfFormFilterGroupDeclaration.getFilterGroupName() != null)
-                addRegularFilterGroup(lsfFormFilterGroupDeclaration);
-            else
-                extendRegularFilterGroup(lsfFormFilterGroupDeclaration);
+            addRegularFilterGroup(lsfFormFilterGroupDeclaration);
+        }
+
+        for (LSFFormExtendFilterGroupDeclaration lsfFormExtendFilterGroupDeclaration : formExtend.getFormExtendFilterGroupDeclarationList()) {
+            extendRegularFilterGroup(lsfFormExtendFilterGroupDeclaration);
         }
         
         for (LSFUserFiltersDeclaration lsfUserFiltersDeclaration : formExtend.getUserFiltersDeclarationList()) {
@@ -177,7 +178,7 @@ public class FormEntity {
         regularFilterGroups.add(filterGroup);
     }
     
-    private void extendRegularFilterGroup(LSFFormFilterGroupDeclaration filterGroupExtend) {
+    private void extendRegularFilterGroup(LSFFormExtendFilterGroupDeclaration filterGroupExtend) {
         LSFFilterGroupUsage filterGroupUsage = filterGroupExtend.getFilterGroupUsage();
         if (filterGroupUsage != null) {
             LSFFilterGroupDeclaration filterGroupDecl = filterGroupUsage.resolveDecl();

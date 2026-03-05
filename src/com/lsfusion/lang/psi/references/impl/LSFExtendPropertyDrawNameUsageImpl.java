@@ -60,7 +60,7 @@ public abstract class LSFExtendPropertyDrawNameUsageImpl extends LSFFormElementR
 
     @Override
     public LSFObjectUsageList getObjectUsageList() {
-        LSFFormMappedNamePropertiesList propertiesList = PsiTreeUtil.getParentOfType(this, LSFFormMappedNamePropertiesList.class);
+        LSFFormExtendMappedNamePropertiesList propertiesList = PsiTreeUtil.getParentOfType(this, LSFFormExtendMappedNamePropertiesList.class);
         return propertiesList != null ? propertiesList.getObjectUsageList() : null;
     }
 
