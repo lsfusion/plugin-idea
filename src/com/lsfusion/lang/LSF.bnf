@@ -1907,8 +1907,8 @@ formPropertyDrawNameDecl ::= (simpleNameOrWithCaption EQUALS)? formPropertyName 
 
 formExtendPropertyDrawNameUsage ::= simpleNameOrWithCaptionEquals? formPropertyDrawPropertyUsage formPropertyOptionsList
 {
-    mixin="com.lsfusion.lang.psi.references.impl.LSFPropertyDrawReferenceImpl"
-    implements="com.lsfusion.lang.psi.references.LSFPropertyDrawReference"
+    mixin="com.lsfusion.lang.psi.references.impl.LSFExtendPropertyDrawNameUsageImpl"
+    implements="com.lsfusion.lang.psi.references.LSFExtendPropertyDrawNameUsage"
 }
 simpleNameOrWithCaptionEquals ::= simpleNameOrWithCaption EQUALS
 

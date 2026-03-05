@@ -7,16 +7,12 @@ import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 import org.jetbrains.annotations.Nullable;
 
 public interface LSFPropertyDrawReference extends LSFFormElementReference<LSFPropertyDrawDeclaration> {
-
-    default LSFAliasUsage getAliasUsage() {
-        return null;
-    }
+    @Nullable
+    LSFAliasUsage getAliasUsage();
 
     @Nullable
     LSFFormPropertyDrawPropertyUsage getFormPropertyDrawPropertyUsage();
 
     @Nullable
-    default LSFObjectUsageList getObjectUsageList() {
-        return null;
-    }
+    LSFObjectUsageList getObjectUsageList();
 }
