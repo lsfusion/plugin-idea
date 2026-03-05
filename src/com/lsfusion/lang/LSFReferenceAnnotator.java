@@ -326,12 +326,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
-    public void visitFormExtendPropertyDrawNameUsage(@NotNull LSFFormExtendPropertyDrawNameUsage o) {
-        super.visitFormExtendPropertyDrawNameUsage(o);
-        checkReference(o);
-    }
-
-    @Override
     public void visitObjectUsage(@NotNull LSFObjectUsage o) {
         super.visitObjectUsage(o);
 
