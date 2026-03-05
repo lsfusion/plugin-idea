@@ -105,12 +105,11 @@ public class LSFParserImpl extends LSFParser {
                 if (tokenType == DESIGN) break;
                 if (tokenType == WINDOW && prevTokenType == SEMI) break; //to avoid WINDOW ... CLASS (in windowOptions)
                 if (tokenCount > 40) { // we don't want to have very small non-recursive lazy blocks
-                    IElementType nextTokenType = builder_.lookAhead(1);
-                    if (tokenType == EXTEND && nextTokenType != FORMS && nextTokenType != OBJECTS && nextTokenType != PROPERTIES && nextTokenType != FILTERGROUP) {
+                    if (tokenType == EXTEND && builder_.lookAhead(1) != FILTERGROUP) {
                         break;
                     }
                     if (tokenType == CLASS && prevTokenType != EXTEND) {
-                        if (nextTokenType != LBRAC) { // to avoid CLASS()
+                        if (builder_.lookAhead(1) != LBRAC) { // to avoid CLASS()
                             break;
                         }
                     }

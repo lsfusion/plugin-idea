@@ -1694,7 +1694,6 @@ formStatement ::=	(	formDecl
 		            )
                     (	formFormsList
                     |   formGroupObjectsList
-                    |	formExtendGroupObjectsList
                     |	formTreeGroupObjectList
                     |	formPropertiesList
                     |	formExtendPropertiesList
@@ -1798,13 +1797,6 @@ formGroupObjectsList ::= OBJECTS formGroupObjectDeclaration (COMMA formGroupObje
     methods = [getDocumentation]
 }
 
-formExtendGroupObjectsList ::= EXTEND OBJECTS formExtendGroupObjectUsage (COMMA formExtendGroupObjectUsage)*
-{
-    pin = 2
-    implements = "com.lsfusion.documentation.LSFDocumentation"
-    methods = [getDocumentation]
-}
-
 formTreeGroupObjectList ::= TREE (treeGroupDeclaration)? formTreeGroupObjectDeclaration (COMMA formTreeGroupObjectDeclaration)* formTreeGroupObjectOptions
 {
     pin = 1
@@ -1819,7 +1811,6 @@ treeGroupDeclaration ::= simpleName
 }
 
 formGroupObjectDeclaration ::= formGroupObject formGroupObjectOptions
-formExtendGroupObjectUsage ::= formExtendGroupObject formGroupObjectOptions
 formGroupObjectOptions ::= (    formGroupObjectViewType
                            |    formExtKey
                            |    formSubReport 
@@ -1847,8 +1838,6 @@ treeGroupParentDeclaration ::= (PARENT formExprDeclaration) | (LBRAC PARENT form
 
 formGroupObject ::= formSingleGroupObjectDeclaration | formMultiGroupObjectDeclaration
 {mixin="com.lsfusion.lang.psi.declarations.impl.LSFGroupObjectDeclarationImpl" implements="com.lsfusion.lang.psi.declarations.LSFGroupObjectDeclaration"}
-
-formExtendGroupObject ::= formExtendSingleGroupObjectUsage | formExtendMultiGroupObjectUsage
 
 customOptionsLiteral ::= HEADER | OPTIONS
 formGroupObjectViewType ::= (classViewType | listViewType) (customOptionsLiteral propertyExpression)?
@@ -1884,15 +1873,10 @@ formGroupObjectBackground ::= BACKGROUND formCalcPropertyObject
 formGroupObjectForeground ::= FOREGROUND formCalcPropertyObject
 
 formSingleGroupObjectDeclaration ::= formObjectDeclaration
-formExtendSingleGroupObjectUsage ::= formExtendObjectUsage
 
 formMultiGroupObjectDeclaration ::= (simpleName EQUALS)?
 		                            LBRAC
 			                        formObjectDeclaration (COMMA formObjectDeclaration)*
-		                            RBRAC
-formExtendMultiGroupObjectUsage ::= (groupObjectUsage EQUALS)?
-		                            LBRAC
-			                        formExtendObjectUsage (COMMA formExtendObjectUsage)*
 		                            RBRAC
 
 formObjectOptions ::= (ON CHANGE formActionPropertyObject)?
@@ -1904,10 +1888,6 @@ formObjectDeclaration ::= (simpleName? localizedStringLiteral? EQUALS)?
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFObjectDeclarationImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFObjectDeclaration"
 }
-
-formExtendObjectUsage ::= (objectUsage? localizedStringLiteral? EQUALS)?
-		                  className
-		                  formObjectOptions
 
 formPropertyDrawNameDecl ::= (simpleNameOrWithCaption EQUALS)? formPropertyName formPropertyOptionsList
 {
