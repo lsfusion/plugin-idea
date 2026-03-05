@@ -42,18 +42,6 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    protected List<LSFGlobalPropDeclaration> getVirtDecls() {
-        List<LSFGlobalPropDeclaration> result = new ArrayList<>();
-        LSFActionDeclaration actionDecl = new LSFActionUsageImpl(getNode()).resolveDecl();
-        if (actionDecl instanceof LSFStatementActionDeclarationImpl) {
-            SyntheticPropertyStatement syntheticProperty = ((LSFStatementActionDeclarationImpl) actionDecl).getSyntheticProperty();
-            if (syntheticProperty != null)
-                result.add(syntheticProperty);
-        }
-        return result;
-    }
-
     public boolean isImplement() {
         PropertyUsageContext usageContext = getPropertyUsageContext();
         if(usageContext instanceof LSFMappedPropertyClassParamDeclare)
@@ -66,13 +54,13 @@ public abstract class LSFPropReferenceImpl extends LSFActionOrPropReferenceImpl<
         return PsiTreeUtil.getParentOfType(this, LSFPropertyUsageWrapper.class);
     }
 
-    private static class LocalResolveProcessor implements PsiScopeProcessor {
+    static class LocalResolveProcessor implements PsiScopeProcessor {
 
         private final String name;
-        private Collection<LSFLocalPropDeclaration> found = new ArrayList<>();
+        Collection<LSFLocalPropDeclaration> found = new ArrayList<>();
         private final Condition<LSFPropDeclaration> condition;
 
-        private LocalResolveProcessor(String name, Condition<LSFPropDeclaration> condition) {
+        LocalResolveProcessor(String name, Condition<LSFPropDeclaration> condition) {
             this.name = name;
             this.condition = condition;
         }

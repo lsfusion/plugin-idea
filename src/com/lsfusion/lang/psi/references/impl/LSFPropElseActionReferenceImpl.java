@@ -3,18 +3,18 @@ package com.lsfusion.lang.psi.references.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.CollectionQuery;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.Finalizer;
 import com.lsfusion.lang.psi.LSFNoContextActionOrPropertyUsage;
 import com.lsfusion.lang.psi.context.PropertyUsageContext;
-import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
-import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
+import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.LSFPropElseActionReference;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
+import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,6 +48,13 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
     protected Collection<? extends LSFActionOrPropDeclaration> resolveDeclarations() {
         Collection<? extends LSFActionOrPropDeclaration> declarations = BaseUtils.emptyList();
 
+        if (getFullNameRef() == null) {
+            declarations = resolveLocals(BaseUtils.immutableCast(getCondition()), getFinalizer());
+            if (declarations.isEmpty() && canBeUsedInDirect()) {
+                declarations = resolveLocals(getInDirectCondition(), Finalizer.EMPTY);
+            }
+        }
+
         if (declarations.isEmpty()) {
             declarations = super.resolveDeclarations();
         }
@@ -72,6 +79,13 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
         return declarations;
     }
 
+    private Collection<? extends LSFPropDeclaration> resolveLocals(Condition<LSFActionOrPropDeclaration> condition, Finalizer<LSFActionOrGlobalPropDeclaration> finalizer) {
+        LSFPropReferenceImpl.LocalResolveProcessor processor = new LSFPropReferenceImpl.LocalResolveProcessor(getNameRef(), BaseUtils.immutableCast(condition));
+        PsiTreeUtil.treeWalkUp(processor, this, null, new ResolveState());
+        Finalizer<LSFLocalPropDeclaration> castFinalizer = BaseUtils.immutableCast(finalizer);
+        return castFinalizer.finalize(processor.found);
+    }
+
     @Override
     protected Collection<? extends LSFActionOrPropDeclaration> resolveNoConditionDeclarations() {
         Collection<? extends LSFActionOrPropDeclaration> declarations = BaseUtils.emptyList();
@@ -91,6 +105,11 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
     @Override
     public boolean isNoContext(PropertyUsageContext usageContext) {
         return usageContext instanceof LSFNoContextActionOrPropertyUsage;
+    }
+
+    @Override
+    public boolean isJoin() {
+        return true;
     }
 
     @Override

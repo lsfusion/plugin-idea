@@ -397,7 +397,7 @@ aggrPropertyDefinition ::= AGGR baseEventPE customClassUsage
 } 
 
 // для pin
-private joinUsagePropertyDefinition ::= propertyUsage LBRAC propertyExpressionList RBRAC { pin = 2 }
+private joinUsagePropertyDefinition ::= propertyElseActionUsage LBRAC propertyExpressionList RBRAC { pin = 2 }
 private joinExprObjectPropertyDefinition ::= propertyExprObject LBRAC propertyExpressionList RBRAC { pin = 1 }
 
 joinPropertyDefinition ::= JOIN? (joinUsagePropertyDefinition | joinExprObjectPropertyDefinition)

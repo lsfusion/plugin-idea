@@ -3,14 +3,14 @@ package com.lsfusion.lang.psi.cache;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
-import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import org.jetbrains.annotations.NotNull;
 
-public class ValueClassCache extends PsiDependentCache<LSFPropDeclaration, LSFExClassSet> {
-    public static final PsiResolver<LSFPropDeclaration, LSFExClassSet> INFER_RESOLVER = new PsiResolver<>() {
+public class ValueClassCache extends PsiDependentCache<LSFActionOrPropDeclaration, LSFExClassSet> {
+    public static final PsiResolver<LSFActionOrPropDeclaration, LSFExClassSet> INFER_RESOLVER = new PsiResolver<>() {
         @Override
-        public LSFExClassSet resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
+        public LSFExClassSet resolve(@NotNull LSFActionOrPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.resolveExValueClassNoCache(true);
         }
 
@@ -20,9 +20,9 @@ public class ValueClassCache extends PsiDependentCache<LSFPropDeclaration, LSFEx
         }
     };
     
-    public static final PsiResolver<LSFPropDeclaration, LSFExClassSet> NO_INFER_RESOLVER = new PsiResolver<>() {
+    public static final PsiResolver<LSFActionOrPropDeclaration, LSFExClassSet> NO_INFER_RESOLVER = new PsiResolver<>() {
         @Override
-        public LSFExClassSet resolve(@NotNull LSFPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
+        public LSFExClassSet resolve(@NotNull LSFActionOrPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
             return lsfPropDeclaration.resolveExValueClassNoCache(false);
         }
 
@@ -41,7 +41,7 @@ public class ValueClassCache extends PsiDependentCache<LSFPropDeclaration, LSFEx
         super(project);
     }
 
-    public LSFExClassSet resolveValueClassWithCaching(LSFPropDeclaration element, boolean infer) {
+    public LSFExClassSet resolveValueClassWithCaching(LSFActionOrPropDeclaration element, boolean infer) {
         return resolveWithCaching(element, infer ? INFER_RESOLVER : NO_INFER_RESOLVER, true, false);
     }
 }

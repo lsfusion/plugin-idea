@@ -4,11 +4,11 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFExprParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFParamDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFStatementActionDeclaration;
-import com.lsfusion.lang.psi.declarations.SyntheticPropertyStatement;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.StatementActionStubElement;
@@ -117,46 +117,58 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
         return null;
     }
 
-    private Boolean needSyntheticProperty = null;
-    private List<LSFExClassSet> syntheticPropertyReturnParams = null;
-    private boolean needSyntheticProperty() {
-        if(needSyntheticProperty == null) {
-            syntheticPropertyReturnParams = new ArrayList<>();
+    @Override
+    public LSFExClassSet resolveExValueClassNoCache(boolean infer) {
+        List<LSFExClassSet> result = new ArrayList<>();
 
-            Collection<LSFReturnActionPropertyDefinitionBody> returnChildren = PsiTreeUtil.findChildrenOfType(this, LSFReturnActionPropertyDefinitionBody.class);
-            for (LSFReturnActionPropertyDefinitionBody returnChild : returnChildren) {
-                LSFPropertyExpression propertyExpression = returnChild.getPropertyExpression();
-                for (LSFExprParamDeclaration param : propertyExpression.resolveParams()) {
-                    syntheticPropertyReturnParams.add(LSFExClassSet.toEx(param.resolveClass()));
-                }
+        Collection<LSFReturnActionPropertyDefinitionBody> returnChildren = PsiTreeUtil.findChildrenOfType(this, LSFReturnActionPropertyDefinitionBody.class);
+        for (LSFReturnActionPropertyDefinitionBody returnChild : returnChildren) {
+            result.add(returnChild.getPropertyExpression().resolveValueClass(infer));
+        }
+
+        Collection<LSFAbstractReturn> abstractReturns = PsiTreeUtil.findChildrenOfType(this, LSFAbstractReturn.class);
+        for (LSFAbstractReturn abstractReturn : abstractReturns) {
+            LSFClassName className = abstractReturn.getClassName();
+            LSFClassSet classSet = LSFPsiImplUtil.resolveClass(className);
+            if (classSet != null)
+                result.add(LSFExClassSet.toEx(classSet));
+        }
+
+        return LSFPsiImplUtil.orClasses(result, false);
+    }
+
+    @Override
+    public List<LSFClassSet> resolveJoinParamClasses() {
+        List<LSFClassSet> result = resolveParamClasses();
+        if(result == null)
+            result = new ArrayList<>();
+        result.addAll(LSFExClassSet.fromEx(getReturnParams()));
+        return result;
+    }
+
+    private List<LSFExClassSet> getReturnParams() {
+        List<LSFExClassSet> result = new ArrayList<>();
+
+        Collection<LSFReturnActionPropertyDefinitionBody> returnChildren = PsiTreeUtil.findChildrenOfType(this, LSFReturnActionPropertyDefinitionBody.class);
+        for (LSFReturnActionPropertyDefinitionBody returnChild : returnChildren) {
+            LSFPropertyExpression propertyExpression = returnChild.getPropertyExpression();
+            for (LSFExprParamDeclaration param : propertyExpression.resolveParams()) {
+                result.add(LSFExClassSet.toEx(param.resolveClass()));
             }
+        }
 
-            Collection<LSFAbstractReturn> abstractReturns = PsiTreeUtil.findChildrenOfType(this, LSFAbstractReturn.class);
-            for (LSFAbstractReturn abstractReturn : abstractReturns) {
-                LSFClassNameList classNameList = abstractReturn.getClassNameList();
-                if (classNameList != null) {
-                    LSFNonEmptyClassNameList nonEmptyClassNameList = classNameList.getNonEmptyClassNameList();
-                    if(nonEmptyClassNameList != null) {
-                        for (LSFClassName param : nonEmptyClassNameList.getClassNameList()) {
-                            syntheticPropertyReturnParams.add(LSFExClassSet.toEx(LSFPsiImplUtil.resolveClass(param)));
-                        }
+        Collection<LSFAbstractReturn> abstractReturns = PsiTreeUtil.findChildrenOfType(this, LSFAbstractReturn.class);
+        for (LSFAbstractReturn abstractReturn : abstractReturns) {
+            LSFClassNameList classNameList = abstractReturn.getClassNameList();
+            if (classNameList != null) {
+                LSFNonEmptyClassNameList nonEmptyClassNameList = classNameList.getNonEmptyClassNameList();
+                if (nonEmptyClassNameList != null) {
+                    for (LSFClassName param : nonEmptyClassNameList.getClassNameList()) {
+                        result.add(LSFExClassSet.toEx(LSFPsiImplUtil.resolveClass(param)));
                     }
                 }
             }
-
-            needSyntheticProperty = !returnChildren.isEmpty() || !abstractReturns.isEmpty();
         }
-        return needSyntheticProperty;
-    }
-
-    private SyntheticPropertyStatement syntheticProperty;
-    public SyntheticPropertyStatement getSyntheticProperty() {
-        if (needSyntheticProperty()) {
-            if (syntheticProperty == null) {
-                syntheticProperty = new SyntheticPropertyStatement(this, syntheticPropertyReturnParams);
-            }
-            return syntheticProperty;
-        }
-        return null;
+        return result;
     }
 }
