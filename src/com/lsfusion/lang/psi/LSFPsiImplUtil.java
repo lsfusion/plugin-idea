@@ -19,7 +19,6 @@ import com.lsfusion.lang.psi.declarations.impl.LSFActionOrGlobalPropDeclarationI
 import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.extend.impl.LSFFormExtendImpl;
 import com.lsfusion.lang.psi.impl.*;
-import com.lsfusion.lang.psi.references.LSFAbstractParamReference;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.typeinfer.*;
 import com.lsfusion.util.BaseUtils;
@@ -3263,9 +3262,9 @@ public class LSFPsiImplUtil {
     }
 
     @NotNull
-    public static List<LSFClassSet> resolveParamRefClasses(List<? extends LSFAbstractParamReference> refs) {
+    public static List<LSFClassSet> resolveParamRefClasses(List<LSFObjectUsage> refs) {
         List<LSFClassSet> result = new ArrayList<>();
-        for (LSFAbstractParamReference ref : refs)
+        for (LSFObjectUsage ref : refs)
             result.add(ref.resolveClass());
         return result;
     }

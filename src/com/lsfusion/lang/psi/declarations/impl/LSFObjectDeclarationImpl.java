@@ -1,16 +1,24 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.lsfusion.LSFIcons;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFObjectDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LSFObjectDeclarationImpl extends LSFExprParamDeclarationImpl implements LSFObjectDeclaration {
+import javax.swing.*;
+
+public abstract class LSFObjectDeclarationImpl extends LSFFormElementDeclarationImpl<LSFObjectDeclaration> implements LSFObjectDeclaration {
 
     public LSFObjectDeclarationImpl(@NotNull ASTNode node) {
         super(node);
+    }
+
+    @Override
+    public Icon getIcon(int flags) {
+        return LSFIcons.PARAMETER;
     }
 
     @Nullable
