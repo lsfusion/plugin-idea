@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public abstract class LSFObjectDeclarationImpl extends LSFFormElementDeclarationImpl<LSFObjectDeclaration> implements LSFObjectDeclaration {
+public abstract class LSFObjectDeclarationImpl extends LSFObjectOrGroupObjectDeclarationImpl<LSFObjectDeclaration> implements LSFObjectDeclaration {
 
     public LSFObjectDeclarationImpl(@NotNull ASTNode node) {
         super(node);

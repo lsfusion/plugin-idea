@@ -381,22 +381,12 @@ public class FormEntity {
         InsertType type = positionType.first;
         boolean reverse = type == InsertType.FIRST || type == InsertType.BEFORE && neighbourGroupObject != null;
 
-        List<LSFFormTreeGroupObjectDeclaration> gobjList = tgobjDecl.getFormTreeGroupObjectDeclarationList();
-        for (LSFFormTreeGroupObjectDeclaration treeGroupObjectDeclaration : (reverse ? BaseUtils.reverse(gobjList) : gobjList)) {
-            GroupObjectEntity groupObjectEntity = addGroupObject(treeGroupObjectDeclaration.getFormGroupObject(), neighbourGroupObject, type, null, null);
+        List<LSFFormGroupObjectDeclaration> gobjList = tgobjDecl.getFormGroupObjectDeclarationList();
+        for (LSFFormGroupObjectDeclaration groupObjectDeclaration : (reverse ? BaseUtils.reverse(gobjList) : gobjList)) {
+            GroupObjectEntity groupObjectEntity = addGroupObject(groupObjectDeclaration.getFormGroupObject(), neighbourGroupObject, type, null, null);
             if(neighbourGroupObject != null)
                 neighbourGroupObject = groupObjectEntity;
             treeGroup.addGroupObject(groupObjectEntity);
-
-            LSFTreeGroupParentDeclaration parentDeclaration = treeGroupObjectDeclaration.getTreeGroupParentDeclaration();
-            if (parentDeclaration != null) {
-                List<LSFPropertyExpression> properties = new ArrayList<>();
-                for(LSFFormExprDeclaration formExprDeclaration : parentDeclaration.getFormExprDeclarationList()) {
-                    properties.add(formExprDeclaration.getPropertyExpression());
-                }
-                // todo setIsParents?
-            }
-
         }
 
     }

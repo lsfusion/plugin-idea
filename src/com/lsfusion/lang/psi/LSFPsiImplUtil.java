@@ -3522,11 +3522,6 @@ public class LSFPsiImplUtil {
     }
 
     @Nullable
-    public static PsiElement getParamList(@NotNull LSFFormTreeGroupObjectDeclaration sourceStatement) {
-        return null;
-    }
-
-    @Nullable
     public static PsiElement getParamList(@NotNull LSFFormMappedNamePropertiesList sourceStatement) {
         return null;
     }
@@ -3571,11 +3566,6 @@ public class LSFPsiImplUtil {
         assert formMultiGroupObjectDeclaration != null;
 
         return formMultiGroupObjectDeclaration.getFormObjectDeclarationList();
-    }
-
-    @Nullable
-    public static List<LSFClassSet> resolveParamClasses(@NotNull LSFFormTreeGroupObjectDeclaration sourceStatement) {
-        return resolveParamDeclClasses(getObjectDecls(sourceStatement.getFormGroupObject()));
     }
 
     @Nullable
@@ -5463,7 +5453,15 @@ public class LSFPsiImplUtil {
         return "Object_blocks";
     }
 
+    public static String getDocumentation(LSFFormExtendGroupObjectsList lsfFormExtendGroupObjectsList, PsiElement child) {
+        return "Object_blocks";
+    }
+
     public static String getDocumentation(LSFFormTreeGroupObjectList lsfFormTreeGroupObjectList, PsiElement child) {
+        return "Object_blocks";
+    }
+
+    public static String getDocumentation(LSFFormExtendTreeGroupObjectList lsfFormExtendTreeGroupObjectList, PsiElement child) {
         return "Object_blocks";
     }
 

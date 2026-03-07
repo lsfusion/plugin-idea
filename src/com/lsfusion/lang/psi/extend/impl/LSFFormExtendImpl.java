@@ -205,7 +205,7 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     public static <T extends LSFDeclaration, This extends LSFFormContextExtend<This, Stub>, Stub extends FormContextExtendStubElement<This, Stub>>
                     Set<T> processFormContext(PsiElement current, int offset, LSFLocalSearchScope localScope, final Function<This, Collection<T>> processor,
                                               FormContextExtendStubElementType<This, Stub> type) {
-        FormContext formContext = PsiTreeUtil.getParentOfType(current, FormContext.class);
+        FormContext formContext = PsiTreeUtil.getParentOfType(current, FormContext.class, false);
         if(formContext != null)
             return processFormContext(formContext, offset, localScope, processor, false, type);
         return new HashSet<>();

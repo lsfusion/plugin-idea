@@ -26,6 +26,7 @@
             <li>Init action support for SHOW and DIALOG</li>
             <li>FORMS clause in the FORM operator support</li>
             <li>Generate form from XML: extra namespaces support</li>
+            <li>EXTEND OBJECTS / EXTEND TREE support: resolving, error highlighting, and completion</li>
         </ul>
     ]]>
     </change-notes>

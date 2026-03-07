@@ -234,6 +234,11 @@ abstract class ParserTask @Inject constructor(
 
     @TaskAction
     fun generate() {
+        // Clean output directories before generation so stale files from removed rules are removed.
+        outputDirs.get().forEach { dirPath ->
+            layout.projectDirectory.dir(dirPath).asFile.deleteRecursively()
+        }
+
         val ideaLibTree = objects.fileTree().setDir(ideaLibDir.get()).matching { include("*.jar") }
 
         execOperations.javaexec {

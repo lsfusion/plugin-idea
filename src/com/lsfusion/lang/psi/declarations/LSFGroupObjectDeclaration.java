@@ -6,7 +6,9 @@ import com.lsfusion.lang.psi.LSFFormObjectDeclaration;
 import java.util.Collection;
 import java.util.List;
 
-public interface LSFGroupObjectDeclaration extends LSFFormElementDeclaration<LSFGroupObjectDeclaration> {
+public interface LSFGroupObjectDeclaration extends LSFObjectOrGroupObjectDeclaration<LSFGroupObjectDeclaration> {
+
+    boolean isSingle();
 
     List<LSFClassSet> resolveClasses();
 

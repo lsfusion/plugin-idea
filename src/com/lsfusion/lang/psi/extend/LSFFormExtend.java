@@ -6,6 +6,7 @@ import com.lsfusion.lang.psi.stubs.extend.ExtendFormStubElement;
 import com.lsfusion.mcp.LSFMCPDeclaration;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,8 +17,18 @@ public interface LSFFormExtend extends LSFFormContextExtend<LSFFormExtend, Exten
     Collection<LSFFormFormsListItem> getFormDecls();
 
     Collection<LSFObjectDeclaration> getObjectDecls();
-    
+
     Collection<LSFGroupObjectDeclaration> getGroupObjectDecls();
+
+    @SuppressWarnings("rawtypes")
+    default Collection<LSFObjectOrGroupObjectDeclaration> getObjectOrGroupObjectDecls() {
+        List<LSFObjectOrGroupObjectDeclaration> result = new ArrayList<>();
+        result.addAll(getObjectDecls());
+        for (LSFGroupObjectDeclaration go : getGroupObjectDecls())
+            if (!go.isSingle())
+                result.add(go);
+        return result;
+    }
     
     Collection<LSFTreeGroupDeclaration> getTreeGroupDecls();
     

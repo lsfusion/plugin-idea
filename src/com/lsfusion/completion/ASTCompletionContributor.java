@@ -270,6 +270,7 @@ public class ASTCompletionContributor extends CompletionContributor {
         boolean staticObjectCompleted = false;
         BooleanValueHolder objectCompleted = new BooleanValueHolder(false);
         BooleanValueHolder groupObjectCompleted = new BooleanValueHolder(false);
+        BooleanValueHolder objectOrGroupObjectCompleted = new BooleanValueHolder(false);
         BooleanValueHolder propertyDrawCompleted = new BooleanValueHolder(false);
         BooleanValueHolder filterGroupCompleted = new BooleanValueHolder(false);
         BooleanValueHolder componentCompleted = new BooleanValueHolder(false);
@@ -391,6 +392,7 @@ public class ASTCompletionContributor extends CompletionContributor {
                 if (!res) res = completeFormName();
                 if (!res) res = completeNavigatorName();
                 if (!res) res = completeStaticObjectUsage();
+                if (!res) res = completeObjectOrGroupObjectUsage();
                 if (!res) res = completeObjectUsage();
                 if (!res) res = completeGroupObjectUsage();
                 if (!res) res = completeFilterGroupUsage();
@@ -516,6 +518,15 @@ public class ASTCompletionContributor extends CompletionContributor {
                     groupObjectCompleted,
                     GROUP_OBJECT_USAGE,
                     LSFFormExtend::getGroupObjectDecls
+            );
+        }
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        private boolean completeObjectOrGroupObjectUsage() {
+            return completeFormContextObject(
+                    objectOrGroupObjectCompleted,
+                    OBJECT_OR_GROUP_OBJECT_USAGE,
+                    LSFFormExtend::getObjectOrGroupObjectDecls
             );
         }
 
