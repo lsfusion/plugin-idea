@@ -5473,6 +5473,10 @@ public class LSFPsiImplUtil {
         return "Properties_and_actions_block";
     }
 
+    public static String getDocumentation(LSFFormExtendPropertiesList lsfFormExtendPropertiesList, PsiElement child) {
+        return "Properties_and_actions_block";
+    }
+
     public static String getDocumentation(LSFFormOptionsOnEvents lsfFormOptionsOnEvents, PsiElement child) {
         return "Form_events";
     }

@@ -1698,6 +1698,7 @@ formStatement ::=	(	formDecl
                     |	formTreeGroupObjectList
                     |   formExtendTreeGroupObjectList
                     |	formPropertiesList
+                    |	formExtendPropertiesList
                     |	formFiltersList
                     |	formFilterGroupDeclaration
                     |	formExtendFilterGroupDeclaration
@@ -1805,7 +1806,7 @@ formExtendGroupObjectsList ::= EXTEND OBJECTS formExtendGroupObjectDeclaration (
     methods = [getDocumentation]
 }
 
-formExtendGroupObjectDeclaration ::= objectOrGroupObjectUsage formObjectOptions formGroupObjectOptions
+formExtendGroupObjectDeclaration ::= (localizedStringLiteral EQUALS)? objectOrGroupObjectUsage formObjectOptions formGroupObjectOptions { pin = 2 }
 
 formTreeGroupObjectList ::= TREE (treeGroupDeclaration)? formGroupObjectDeclaration (COMMA formGroupObjectDeclaration)* formTreeGroupObjectOptions
 {
@@ -1903,6 +1904,7 @@ formObjectDeclaration ::= (simpleName? localizedStringLiteral? EQUALS)?
 
 formPropertyDrawNameDecl ::= (simpleNameOrWithCaption EQUALS)? formPropertyName formPropertyOptionsList
 {
+    pin = 2
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFPropertyDrawNameDeclarationImpl"
     implements="com.lsfusion.lang.psi.declarations.LSFPropertyDrawNameDeclaration"
 }
@@ -1992,6 +1994,16 @@ formPropertyDrawMappedDecl ::= (formPropertyDrawObject
 }
 
 formMappedPropertiesList ::= formPropertyDrawMappedDecl (COMMA formPropertyDrawMappedDecl)* {pin = 1}
+
+formExtendPropertiesList ::= EXTEND PROPERTIES formPropertyOptionsList formExtendMappedPropertyListItem (COMMA formExtendMappedPropertyListItem)*
+{
+    pin = 2
+
+    implements = "com.lsfusion.documentation.LSFDocumentation"
+    methods = [getDocumentation]
+}
+
+formExtendMappedPropertyListItem ::= (localizedStringLiteral EQUALS)? formPropertyDrawUsage formPropertyOptionsList {pin = 2}
 
 formFiltersList ::= FILTERS formExprDeclaration (COMMA formExprDeclaration)*
 {
