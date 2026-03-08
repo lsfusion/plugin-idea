@@ -14,10 +14,6 @@ public interface LSFActionOrPropDeclaration extends LSFDeclaration, LSFInterface
 
     boolean isAbstract();
 
-    default LSFClassSet resolveValueClass() {
-        return LSFExClassSet.fromEx(resolveExValueClass(false));
-    }
-
     default LSFExClassSet resolveExValueClass(boolean infer) {
         return ValueClassCache.getInstance(getProject()).resolveValueClassWithCaching(this, infer);
     }

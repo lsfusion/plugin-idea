@@ -1443,10 +1443,10 @@ public class LSFPsiImplUtil {
         return ((LSFExpression) sourceStatement.getChildren()[0]).resolveInferredValueClass(inferred);
     }
 
-    private static LSFExClassSet resolveValueClass(LSFActionOrPropReference<?, ?> usage, boolean infer) {
-        LSFActionOrPropDeclaration decl = usage.resolveDecl();
+    private static LSFExClassSet resolveValueClass(LSFPropertyUsage usage, boolean infer) {
+        LSFPropDeclaration decl = usage.resolveDecl();
         if (decl != null)
-            return decl.resolveJoinValueClass(infer);
+            return decl.resolveExValueClass(infer);
         return null;
     }
 
@@ -1489,9 +1489,9 @@ public class LSFPsiImplUtil {
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFJoinPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
         LSFPropertyElseActionUsage usage = sourceStatement.getPropertyElseActionUsage();
         if (usage != null) {
-            LSFExClassSet valueClass = resolveValueClass(usage, inferred != null);
-            if (valueClass != null)
-                return valueClass;
+            LSFActionOrPropDeclaration decl = usage.resolveDecl();
+            if (decl != null)
+                return decl.resolveJoinValueClass(inferred != null);
             return null;
         }
 
