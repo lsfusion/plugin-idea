@@ -156,6 +156,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitFormFormsComponentUsage(@NotNull LSFFormFormsComponentUsage o) {
+        super.visitFormFormsComponentUsage(o);
+        checkReference(o);
+    }
+
+    @Override
     public void visitConcatPropertyDefinition(@NotNull LSFConcatPropertyDefinition o) {
         super.visitConcatPropertyDefinition(o);
         LSFPropertyExpression separatorExpression = o.getPropertyExpression();

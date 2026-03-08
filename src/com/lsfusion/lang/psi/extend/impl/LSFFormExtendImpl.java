@@ -88,8 +88,8 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
     }
 
     @Override
-    public Collection<LSFFormFormsListItem> getFormDecls() {
-        Collection<LSFFormFormsListItem> result = new ArrayList<>();
+    public Collection<LSFFormFormsDeclaration> getFormDecls() {
+        Collection<LSFFormFormsDeclaration> result = new ArrayList<>();
         for (LSFFormFormsList formGroupObject : getFormFormsListList())
             result.addAll(formGroupObject.getFormFormsListItemList());
         return result;
@@ -196,7 +196,7 @@ public abstract class LSFFormExtendImpl extends LSFExtendImpl<LSFFormExtend, Ext
         if(formDecl != null)
             formDecls.add(formDecl);
 
-        for(LSFFormFormsListItem aggrForm : processContext(formDecl, file, null, LSFFormExtend::getFormDecls, offset, localScope, ignoreUseBeforeDeclarationCheck))
+        for(LSFFormFormsDeclaration aggrForm : processContext(formDecl, file, null, LSFFormExtend::getFormDecls, offset, localScope, ignoreUseBeforeDeclarationCheck))
             formDecls.addAll(findFormElements(aggrForm, file, offset, localScope, ignoreUseBeforeDeclarationCheck));
 
         return formDecls;

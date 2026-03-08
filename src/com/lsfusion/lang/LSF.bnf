@@ -1781,7 +1781,8 @@ formFormsList ::= EXTEND? FORMS formFormsListItem (COMMA formFormsListItem)*
 }
 
 formFormsListItem ::= formUsage (LPAREN (formMappingObjects | formMappingProperties | formMappingFilterGroups | formMappingComponents)* RPAREN)? {
-    implements="com.lsfusion.lang.psi.context.FormContext"
+    mixin = "com.lsfusion.lang.psi.declarations.impl.LSFFormFormsDeclarationImpl"
+    implements = ["com.lsfusion.lang.psi.context.FormContext" "com.lsfusion.lang.psi.declarations.LSFFormFormsDeclaration"]
     methods = [resolveFormDecl]
 }
 
@@ -2545,12 +2546,19 @@ private groupComponentSelector ::= groupSelector? (COMMA groupObjectTreeSelector
 
 private pinnedGroupObjectTreeSelector ::= groupObjectTreeSingleSelectorType LBRAC groupObjectTreeSelector RBRAC {pin = 2}
 
+globalFormComponentSelector ::= componentSingleSelectorType LBRAC FORM formFormsComponentUsage RBRAC { pin = 3 }
+formFormsComponentUsage ::= simpleName {
+    mixin = "com.lsfusion.lang.psi.references.impl.LSFFormFormsItemReferenceImpl"
+    implements = "com.lsfusion.lang.psi.references.LSFFormFormsItemReference"
+}
+
 // should match component_statement_recover
 componentSelector ::=   PARENT LBRAC componentSelector RBRAC
                 	|	PROPERTY LBRAC propertySelector RBRAC
                 	|	FILTER LBRAC filterPropertySelector RBRAC
                 	|   FILTERGROUP LBRAC filterGroupSelector RBRAC
                 	|   groupSingleSelectorType LBRAC groupComponentSelector RBRAC
+                	|   globalFormComponentSelector // must be before pinnedGroupObjectTreeSelector (pin=3 on FORM avoids pinning on '(')
                 	|   pinnedGroupObjectTreeSelector // pinned для нижнего правила
                 	|   globalSingleSelectorType
                     |	componentUsage

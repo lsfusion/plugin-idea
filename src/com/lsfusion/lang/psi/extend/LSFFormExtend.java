@@ -14,7 +14,7 @@ public interface LSFFormExtend extends LSFFormContextExtend<LSFFormExtend, Exten
 
     LSFFormDecl getFormDecl();
 
-    Collection<LSFFormFormsListItem> getFormDecls();
+    Collection<LSFFormFormsDeclaration> getFormDecls();
 
     Collection<LSFObjectDeclaration> getObjectDecls();
 
