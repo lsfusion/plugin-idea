@@ -1452,37 +1452,7 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFJoinPropertyDefinition sourceStatement) {
-        LSFPropertyExpressionList peList = sourceStatement.getPropertyExpressionList();
-        if (peList != null) {
-            return resolveParamClasses(peList);
-        }
-
-        LSFPropertyElseActionUsage usage = sourceStatement.getPropertyElseActionUsage();
-        if (usage != null) {
-            LSFActionOrPropDeclaration decl = usage.resolveDecl();
-            if (decl != null)
-                return decl.resolveJoinParamClasses();
-        }
-
-        LSFPropertyExprObject exprObject = sourceStatement.getPropertyExprObject();
-        if (exprObject != null) {
-            LSFPropertyCalcStatement pCalcStatement = exprObject.getPropertyCalcStatement();
-            if (pCalcStatement != null) {
-                LSFPropertyExpression pe = pCalcStatement.getPropertyExpression();
-                if (pe != null) {
-                    List<LSFClassSet> result = new ArrayList<>();
-                    for (LSFExprParamDeclaration param : pe.resolveParams()) {
-                        result.add(param.resolveClass());
-                    }
-                    return result;
-                }
-
-                LSFExpressionUnfriendlyPD expressionUnfriendlyPD = pCalcStatement.getExpressionUnfriendlyPD();
-                if (expressionUnfriendlyPD != null)
-                    return LSFExClassSet.fromEx(expressionUnfriendlyPD.resolveValueParamClasses(null));
-            }
-        }
-        return null;
+        return resolveParamClasses(sourceStatement.getPropertyExpressionList());
     }
 
     @Nullable
