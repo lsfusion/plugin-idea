@@ -8,6 +8,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.CollectionQuery;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.Finalizer;
+import com.lsfusion.lang.psi.LSFJoinPropertyDefinition;
 import com.lsfusion.lang.psi.LSFNoContextActionOrPropertyUsage;
 import com.lsfusion.lang.psi.context.PropertyUsageContext;
 import com.lsfusion.lang.psi.declarations.*;
@@ -109,7 +110,7 @@ public abstract class LSFPropElseActionReferenceImpl extends LSFActionOrPropRefe
 
     @Override
     public boolean isJoin() {
-        return true;
+        return getPropertyUsageContext() instanceof LSFJoinPropertyDefinition;
     }
 
     @Override

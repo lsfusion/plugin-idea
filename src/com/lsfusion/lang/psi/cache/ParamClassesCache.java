@@ -15,7 +15,25 @@ public class ParamClassesCache extends PsiDependentCache<LSFActionOrPropDeclarat
     public static final PsiResolver<LSFActionOrPropDeclaration, List<LSFExClassSet>> RESOLVER = new PsiResolver<>() {
         @Override
         public List<LSFExClassSet> resolve(@NotNull LSFActionOrPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
-            return lsfPropDeclaration.resolveExParamClassesNoCache();
+            return lsfPropDeclaration.resolveExParamClassesNoCache(false);
+        }
+
+        @Override
+        public boolean checkResultClass(Object result) {
+            if(!(result instanceof List))
+                return false;
+
+            for(Object element : (List)result)
+                if(element != null && !(element instanceof LSFExClassSet))
+                    return false;
+            return true;
+        }
+    };
+
+    public static final PsiResolver<LSFActionOrPropDeclaration, List<LSFExClassSet>> JOINACTION_RESOLVER = new PsiResolver<>() {
+        @Override
+        public List<LSFExClassSet> resolve(@NotNull LSFActionOrPropDeclaration lsfPropDeclaration, boolean incompleteCode) {
+            return lsfPropDeclaration.resolveExParamClassesNoCache(true);
         }
 
         @Override
@@ -39,7 +57,7 @@ public class ParamClassesCache extends PsiDependentCache<LSFActionOrPropDeclarat
         super(project);
     }
     
-    public List<LSFExClassSet> resolveParamClassesWithCaching(LSFActionOrPropDeclaration element) {
-        return ApplicationManager.getApplication().runReadAction((Computable<List<LSFExClassSet>>) () -> resolveWithCaching(element, RESOLVER, true, false));
+    public List<LSFExClassSet> resolveParamClassesWithCaching(LSFActionOrPropDeclaration element, boolean joinAction) {
+        return resolveWithCaching(element, joinAction ? JOINACTION_RESOLVER : RESOLVER, true, false);
     }
 }

@@ -54,7 +54,7 @@ public abstract class LSFLocalPropDeclarationImpl extends LSFDeclarationImpl imp
     }
 
     @Override
-    public List<LSFExClassSet> resolveExParamClassesNoCache() {
+    public List<LSFExClassSet> resolveExParamClassesNoCache(boolean joinAction) {
         return LSFExClassSet.toEx(LSFPsiImplUtil.resolveClasses(getClassNameList()));
     }
 

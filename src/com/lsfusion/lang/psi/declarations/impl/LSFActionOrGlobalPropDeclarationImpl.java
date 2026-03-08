@@ -136,7 +136,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
     }
 
     @Override
-    public List<LSFExClassSet> resolveExParamClassesNoCache() {
+    public List<LSFExClassSet> resolveExParamClassesNoCache(boolean joinAction) {
         LSFPropertyDeclaration decl = getPropertyDeclaration();
         LSFPropertyDeclParams cpd = decl.getPropertyDeclParams();
         List<LSFExClassSet> declareClasses = null;
@@ -165,7 +165,7 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
             if (declareClasses.get(i) == null)
                 mixed.set(i, valueClasses.get(i));
         }
-        return Collections.unmodifiableList(mixed);
+        return mixed;
     }
 
     @Override

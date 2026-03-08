@@ -24,17 +24,25 @@ public interface LSFActionOrPropDeclaration extends LSFDeclaration, LSFInterface
 
     @Nullable
     default List<LSFExClassSet> resolveExParamClasses() {
-        return ParamClassesCache.getInstance(getProject()).resolveParamClassesWithCaching(this);
+        return resolveExParamClasses(false);
     }
 
-    List<LSFExClassSet> resolveExParamClassesNoCache();
+    default List<LSFExClassSet> resolveExParamClasses(boolean joinAction) {
+        return ParamClassesCache.getInstance(getProject()).resolveParamClassesWithCaching(this, joinAction);
+    }
+
+    List<LSFExClassSet> resolveExParamClassesNoCache(boolean joinAction);
 
     default String getParamPresentableText() {
         return LSFActionOrGlobalPropDeclarationImpl.getParamPresentableText(resolveParamClasses());
     }
 
     default List<LSFClassSet> resolveParamClasses() {
-        return LSFExClassSet.fromEx(resolveExParamClasses());
+        return resolveParamClasses(false);
+    }
+
+    default List<LSFClassSet> resolveParamClasses(boolean joinAction) {
+        return LSFExClassSet.fromEx(resolveExParamClasses(joinAction));
     }
 
     @Nullable
@@ -45,6 +53,6 @@ public interface LSFActionOrPropDeclaration extends LSFDeclaration, LSFInterface
     }
 
     default List<LSFClassSet> resolveJoinParamClasses() {
-        return resolveParamClasses();
+        return resolveParamClasses(true);
     }
 }

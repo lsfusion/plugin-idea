@@ -22,6 +22,7 @@ import com.lsfusion.lang.psi.impl.*;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
 import com.lsfusion.lang.typeinfer.*;
 import com.lsfusion.util.BaseUtils;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1277,6 +1278,21 @@ public class LSFPsiImplUtil {
                 result = classSet;
             else
                 result = or(result, classSet, string);
+        }
+        return result;
+    }
+
+    @Nullable
+    public static List<LSFExClassSet> orClassesList(List<List<LSFExClassSet>> classesList, boolean string) {
+        List<LSFExClassSet> result = null;
+        for (List<LSFExClassSet> classes : classesList) {
+            if (result == null) {
+                result = new ArrayList<>(classes);
+            } else {
+                for (int i = 0; i < result.size() && i < classes.size(); i++) {
+                    result.set(i, or(result.get(i), classes.get(i), string));
+                }
+            }
         }
         return result;
     }
@@ -3161,7 +3177,7 @@ public class LSFPsiImplUtil {
     // по идее должен вызываться если подразумевается отсутствие внешнего контекста
     @NotNull
     public static List<LSFExprParamDeclaration> resolveParams(@NotNull LSFPropertyExpression sourceStatement) {
-        return new ExprsContextModifier(sourceStatement).resolveParams(Integer.MAX_VALUE, new HashSet<>());
+        return LSFPsiUtils.resolveParams(sourceStatement, new HashSet<>());
     }
 
     @NotNull

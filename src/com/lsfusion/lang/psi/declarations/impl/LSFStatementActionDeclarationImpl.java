@@ -17,13 +17,11 @@ import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
+import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGlobalPropDeclarationImpl<LSFStatementActionDeclaration, StatementActionStubElement> implements LSFStatementActionDeclaration {
     public LSFStatementActionDeclarationImpl(@NotNull ASTNode node) {
@@ -119,55 +117,62 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
 
     @Override
     public LSFExClassSet resolveExValueClassNoCache(boolean infer) {
-        List<LSFExClassSet> result = new ArrayList<>();
-
-        Collection<LSFReturnActionPropertyDefinitionBody> returnChildren = PsiTreeUtil.findChildrenOfType(this, LSFReturnActionPropertyDefinitionBody.class);
-        for (LSFReturnActionPropertyDefinitionBody returnChild : returnChildren) {
-            result.add(returnChild.getPropertyExpression().resolveValueClass(infer));
+        LSFActionUnfriendlyPD actionUnfriendlyPD = getActionUnfriendlyPD();
+        if(actionUnfriendlyPD != null) {
+            LSFAbstractActionPropertyDefinition abstractAction = actionUnfriendlyPD.getAbstractActionPropertyDefinition();
+            if(abstractAction != null) {
+                LSFAbstractReturn abstractReturn = abstractAction.getAbstractReturn();
+                if(abstractReturn != null) {
+                    LSFClassName className = abstractReturn.getClassName();
+                    LSFClassSet classSet = LSFPsiImplUtil.resolveClass(className);
+                    if (classSet != null)
+                        return LSFExClassSet.toEx(classSet);
+                }
+            }
+        } else {
+            LSFListActionPropertyDefinitionBody listActionPropertyDefinitionBody = getListActionPropertyDefinitionBody();
+            Collection<LSFReturnActionPropertyDefinitionBody> returnChildren = PsiTreeUtil.findChildrenOfType(listActionPropertyDefinitionBody, LSFReturnActionPropertyDefinitionBody.class);
+            List<LSFExClassSet> returnValueClasses = new ArrayList<>();
+            for (LSFReturnActionPropertyDefinitionBody returnChild : returnChildren) {
+                LSFExClassSet dependClass = returnChild.getPropertyExpression().resolveValueClass(infer);
+                if (dependClass != null)
+                    returnValueClasses.add(dependClass);
+            }
+            return LSFPsiImplUtil.orClasses(returnValueClasses, false);
         }
-
-        Collection<LSFAbstractReturn> abstractReturns = PsiTreeUtil.findChildrenOfType(this, LSFAbstractReturn.class);
-        for (LSFAbstractReturn abstractReturn : abstractReturns) {
-            LSFClassName className = abstractReturn.getClassName();
-            LSFClassSet classSet = LSFPsiImplUtil.resolveClass(className);
-            if (classSet != null)
-                result.add(LSFExClassSet.toEx(classSet));
-        }
-
-        return LSFPsiImplUtil.orClasses(result, false);
+        return null;
     }
 
     @Override
-    public List<LSFClassSet> resolveJoinParamClasses() {
-        List<LSFClassSet> result = resolveParamClasses();
-        if(result == null)
-            result = new ArrayList<>();
-        result.addAll(LSFExClassSet.fromEx(getReturnParams()));
-        return result;
-    }
+    public List<LSFExClassSet> resolveExParamClassesNoCache(boolean joinAction) {
+        List<LSFExClassSet> params = super.resolveExParamClassesNoCache(joinAction);
+        if(!joinAction || params == null)
+            return params;
 
-    private List<LSFExClassSet> getReturnParams() {
         List<LSFExClassSet> result = new ArrayList<>();
+        result.addAll(params);
 
-        Collection<LSFReturnActionPropertyDefinitionBody> returnChildren = PsiTreeUtil.findChildrenOfType(this, LSFReturnActionPropertyDefinitionBody.class);
-        for (LSFReturnActionPropertyDefinitionBody returnChild : returnChildren) {
-            LSFPropertyExpression propertyExpression = returnChild.getPropertyExpression();
-            for (LSFExprParamDeclaration param : propertyExpression.resolveParams()) {
-                result.add(LSFExClassSet.toEx(param.resolveClass()));
+        LSFActionUnfriendlyPD actionUnfriendlyPD = getActionUnfriendlyPD();
+        if(actionUnfriendlyPD != null) {
+            LSFAbstractActionPropertyDefinition abstractAction = actionUnfriendlyPD.getAbstractActionPropertyDefinition();
+            if(abstractAction != null) {
+                LSFAbstractReturn abstractReturn = abstractAction.getAbstractReturn();
+                if(abstractReturn != null)
+                    result.addAll(LSFExClassSet.toEx(LSFPsiImplUtil.resolveClasses(abstractReturn.getClassNameList())));
             }
-        }
+        } else {
+            List<List<LSFExClassSet>> resultInterfaceClasses = new ArrayList<>();
+            LSFListActionPropertyDefinitionBody listActionPropertyDefinitionBody = getListActionPropertyDefinitionBody();
+            Collection<LSFReturnActionPropertyDefinitionBody> returnChildren = PsiTreeUtil.findChildrenOfType(listActionPropertyDefinitionBody, LSFReturnActionPropertyDefinitionBody.class);
+            for (LSFReturnActionPropertyDefinitionBody returnChild : returnChildren) {
+                Set<LSFExprParamDeclaration> upParams = LSFPsiUtils.getContextParams(returnChild, LSFLocalSearchScope.GLOBAL, false, false);
+                List<LSFExprParamDeclaration> returnParams = LSFPsiUtils.resolveParams(returnChild.getPropertyExpression(), upParams);
 
-        Collection<LSFAbstractReturn> abstractReturns = PsiTreeUtil.findChildrenOfType(this, LSFAbstractReturn.class);
-        for (LSFAbstractReturn abstractReturn : abstractReturns) {
-            LSFClassNameList classNameList = abstractReturn.getClassNameList();
-            if (classNameList != null) {
-                LSFNonEmptyClassNameList nonEmptyClassNameList = classNameList.getNonEmptyClassNameList();
-                if (nonEmptyClassNameList != null) {
-                    for (LSFClassName param : nonEmptyClassNameList.getClassNameList()) {
-                        result.add(LSFExClassSet.toEx(LSFPsiImplUtil.resolveClass(param)));
-                    }
-                }
+                resultInterfaceClasses.add(LSFExClassSet.toEx(LSFPsiImplUtil.resolveParamDeclClasses(returnParams)));
             }
+            List<LSFExClassSet> merged = LSFPsiImplUtil.orClassesList(resultInterfaceClasses, false);
+            if (merged != null)
+                result.addAll(merged);
         }
         return result;
     }

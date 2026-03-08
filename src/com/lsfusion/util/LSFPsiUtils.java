@@ -133,6 +133,10 @@ public class LSFPsiUtils {
         return text;
     }
 
+    public static List<LSFExprParamDeclaration> resolveParams(@NotNull LSFPropertyExpression sourceStatement, Set<LSFExprParamDeclaration> upParams) {
+        return new ExprsContextModifier(sourceStatement).resolveParams(Integer.MAX_VALUE, upParams);
+    }
+
     @NotNull
     public static Set<LSFExprParamDeclaration> getContextParams(@NotNull PsiElement current, LSFLocalSearchScope localScope, boolean objectRef, boolean ignoreUseBeforeDeclarationCheck) {
         return getContextParams(current, current.getTextOffset(), localScope, objectRef, ignoreUseBeforeDeclarationCheck);

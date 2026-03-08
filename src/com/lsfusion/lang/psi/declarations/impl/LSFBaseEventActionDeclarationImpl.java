@@ -74,7 +74,7 @@ public abstract class LSFBaseEventActionDeclarationImpl extends LSFFullNameDecla
     }
 
     @Override
-    public List<LSFExClassSet> resolveExParamClassesNoCache() {
+    public List<LSFExClassSet> resolveExParamClassesNoCache(boolean joinAction) {
         return Collections.emptyList();
     }
     

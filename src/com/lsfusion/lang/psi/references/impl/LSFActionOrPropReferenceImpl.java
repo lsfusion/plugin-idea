@@ -12,6 +12,7 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.PropertyUsageContext;
+import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
@@ -35,7 +36,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
             GlobalSearchScope scope = GlobalSearchScope.allScope(getProject());
 
             for (T decl : decls) {
-                List<LSFClassSet> declClasses = decl.resolveParamClasses();
+                List<LSFClassSet> declClasses = resolveParamClasses(decl);
                 if (declClasses == null) {
                     declMap.put(decl, 0);
                     continue;
@@ -113,9 +114,16 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
             if(isImplement && !decl.isAbstract())
                 return false;
 
-            List<LSFClassSet> declClasses = isJoin() ? decl.resolveJoinParamClasses() : decl.resolveParamClasses();
+            List<LSFClassSet> declClasses = resolveParamClasses(decl);
             return declClasses == null || (declClasses.size() == fDirectClasses.size() && LSFPsiImplUtil.containsAll(declClasses, fDirectClasses, false));
         };
+    }
+
+    private List<LSFClassSet> resolveParamClasses(T decl) {
+        if(decl instanceof LSFActionDeclaration && !(this instanceof LSFPropReferenceImpl) && getPropertyUsageContext() instanceof LSFJoinPropertyDefinition)
+            return decl.resolveJoinParamClasses();
+
+        return decl.resolveParamClasses();
     }
 
     protected Condition<T> getInDirectCondition() {
@@ -127,7 +135,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
             if(isImplement && !decl.isAbstract())
                 return false;
 
-            List<LSFClassSet> declClasses = isJoin() ? decl.resolveJoinParamClasses() : decl.resolveParamClasses(); // can be null, since there is also offset check
+            List<LSFClassSet> declClasses = resolveParamClasses(decl);
             return declClasses == null || (declClasses.size() == usageClasses.size() && LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject())));
         };
     }
@@ -149,7 +157,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
             Map<T, List<LSFClassSet>> mapClasses = new HashMap<>();
             Set<T> equals = isNotEquals ? new HashSet<>() : null;
             for (T decl : decls) {
-                List<LSFClassSet> declClasses = isJoin() ? decl.resolveJoinParamClasses() : decl.resolveParamClasses();
+                List<LSFClassSet> declClasses = resolveParamClasses(decl);
                 if(declClasses != null && declClasses.size() == fDirectClasses.size()) { // double check, так как из-за recursion guard'а decl.resolvePC может внутри проверки condition возвращать null и соотвественно подходить, а в finalizer'е классы resolve'ся и уже не подходит (можно было бы и containsAll проверять но это серьезный overhead будет)
                     assert declClasses.size() == fDirectClasses.size();
                     if(isNotEquals && declClasses.equals(fDirectClasses))
@@ -280,7 +288,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         T decl = resolveDecl();
         assert decl != null; // предполагается что ошибка resolve'а уже отработана
 
-        List<LSFClassSet> declClasses = decl.resolveParamClasses();
+        List<LSFClassSet> declClasses = resolveParamClasses(decl);
         if (declClasses == null)
             return true;
 

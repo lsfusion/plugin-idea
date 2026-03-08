@@ -172,7 +172,7 @@ public abstract class LSFAggrParamGlobalPropDeclarationImpl extends LSFFullNameD
 //    }
 
     @Override
-    public List<LSFExClassSet> resolveExParamClassesNoCache() {
+    public List<LSFExClassSet> resolveExParamClassesNoCache(boolean joinAction) {
         LSFAggrPropertyDefinition aggrProp = getAggrPropertyDefinition();
         if(aggrProp != null)
             return Collections.singletonList(LSFExClassSet.toEx(LSFPsiImplUtil.resolveClass(aggrProp.getCustomClassUsage())));

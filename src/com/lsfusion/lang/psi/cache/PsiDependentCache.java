@@ -14,12 +14,14 @@ import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
     private static final Logger LOG = Logger.getInstance("#com.lsfusion.lang.psi.cache.LSFResolveCache");
 
-    private final ConcurrentMap<Psi, Getter<TResult>>[] myMaps = new ConcurrentMap[2 * 2]; //boolean physical, boolean incompleteCode
+    private final ConcurrentMap<PsiResolver<Psi, TResult>, ConcurrentMap<Psi, Getter<TResult>>>[] myMaps = new ConcurrentMap[2 * 2]; //boolean physical, boolean incompleteCode
     private final RecursionGuard myGuard = RecursionManager.createGuard("lsfResolveCache");
 
     public interface PsiResolver<Psi extends PsiElement, TResult> {
@@ -30,7 +32,7 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
 
     protected PsiDependentCache(Project project) {
         for (int i = 0; i < myMaps.length; i++) {
-            myMaps[i] = ContainerUtil.createConcurrentWeakMap();
+            myMaps[i] = new ConcurrentHashMap<>();
         }
         project.getMessageBus().connect().subscribe(PsiManagerImpl.ANY_PSI_CHANGE_TOPIC, new AnyPsiChangeListener() {
             @Override
@@ -48,6 +50,9 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         int startIndex = isPhysical ? 0 : 1;
         for (int i = startIndex; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
+                for (Map.Entry<PsiResolver<Psi, TResult>, ConcurrentMap<Psi, Getter<TResult>>> entry : myMaps[i * 2 + j].entrySet()) {
+                    entry.getValue().clear();
+                }
                 myMaps[i * 2 + j].clear();
             }
         }
@@ -67,14 +72,14 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         ProgressIndicatorProvider.checkCanceled();
         ApplicationManager.getApplication().assertReadAccessAllowed();
 
-        ConcurrentMap<Psi, Getter<TResult>> map = getMap(isPhysical, incompleteCode);
+        ConcurrentMap<Psi, Getter<TResult>> map = getMap(isPhysical, incompleteCode, resolver);
 
         Getter<TResult> reference = map.get(psi);
         TResult result = reference == null ? null : reference.get();
 
         if (result == null) {
             RecursionGuard.StackStamp stamp = RecursionManager.markStack();
-            result = needToPreventRecursion ? (TResult) myGuard.doPreventingRecursion(Pair.create(psi, incompleteCode), true,
+            result = needToPreventRecursion ? (TResult) myGuard.doPreventingRecursion(new CacheKey<>(psi, resolver, incompleteCode), true,
                     (Computable<TResult>) () -> resolver.resolve(psi, incompleteCode)) : resolver.resolve(psi, incompleteCode);
             PsiElement element = result instanceof ResolveResult ? ((ResolveResult) result).getElement() : null;
 
@@ -90,9 +95,41 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         return result;
     }
 
-    private ConcurrentMap<Psi, Getter<TResult>> getMap(boolean physical, boolean incompleteCode) {
+    private ConcurrentMap<Psi, Getter<TResult>> getMap(boolean physical, boolean incompleteCode, @NotNull PsiResolver<Psi, TResult> resolver) {
         //noinspection unchecked
-        return myMaps[(physical ? 0 : 1) * 2 + (incompleteCode ? 0 : 1)];
+        return myMaps[(physical ? 0 : 1) * 2 + (incompleteCode ? 0 : 1)]
+                .computeIfAbsent(resolver, key -> ContainerUtil.createConcurrentWeakMap());
+    }
+
+    private static final class CacheKey<Psi extends PsiElement, TResult> {
+        private final Psi psi;
+        private final PsiResolver<Psi, TResult> resolver;
+        private final boolean incompleteCode;
+
+        private CacheKey(Psi psi, PsiResolver<Psi, TResult> resolver, boolean incompleteCode) {
+            this.psi = psi;
+            this.resolver = resolver;
+            this.incompleteCode = incompleteCode;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof CacheKey<?, ?> other)) {
+                return false;
+            }
+            return psi.equals(other.psi) && resolver == other.resolver && incompleteCode == other.incompleteCode;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = psi.hashCode();
+            result = 31 * result + System.identityHashCode(resolver);
+            result = 31 * result + Boolean.hashCode(incompleteCode);
+            return result;
+        }
     }
 
     private static class SoftGetter<T> extends SoftReference<T> implements Getter<T> {
