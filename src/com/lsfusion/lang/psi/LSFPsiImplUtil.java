@@ -3409,7 +3409,34 @@ public class LSFPsiImplUtil {
     }
 
     public static List<LSFClassSet> resolveParamClasses(@NotNull LSFExecActionTo sourceStatement) {
-        return sourceStatement.getPropertyUsage().getExplicitClasses();
+        List<LSFClassSet> explicitClasses = sourceStatement.getPropertyUsage().getExplicitClasses();
+        if (explicitClasses != null) {
+            return explicitClasses;
+        }
+
+        LSFExecActionPropertyDefinitionBody execBody = PsiTreeUtil.getParentOfType(sourceStatement, LSFExecActionPropertyDefinitionBody.class);
+        if (execBody == null) {
+            return null;
+        }
+
+        LSFActionUsage actionUsage = execBody.getExecActionBody().getActionUsage();
+        LSFActionDeclaration actionDecl = actionUsage.resolveDecl();
+        if (actionDecl == null) {
+            return null;
+        }
+
+        List<LSFClassSet> actionParams = actionDecl.resolveParamClasses();
+        List<LSFClassSet> actionWithReturns = actionDecl.resolveJoinParamClasses();
+        if (actionWithReturns == null) {
+            return null;
+        }
+
+        int paramCount = actionParams == null ? 0 : actionParams.size();
+        if (actionWithReturns.size() <= paramCount) {
+            return Collections.emptyList();
+        }
+
+        return new ArrayList<>(actionWithReturns.subList(paramCount, actionWithReturns.size()));
     }
 
     @Nullable
