@@ -2,7 +2,7 @@
     <id>lsfusion.idea.plugin</id>
     <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
-    <version>1.0.305</version>
+    <version>1.0.306</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -27,6 +27,7 @@
             <li>FORMS clause in the FORM operator support</li>
             <li>Generate form from XML: extra namespaces support</li>
             <li>EXTEND OBJECTS / EXTEND TREE support: resolving, error highlighting, and completion</li>
+            <li>RETURN operator support</li>
         </ul>
     ]]>
     </change-notes>
