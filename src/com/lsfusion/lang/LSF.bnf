@@ -2755,7 +2755,7 @@ private commonLiteral ::=
 	|	staticObjectID
 	|	colorLiteral
 
-builtInClassName ::= PRIMITIVE_TYPE | JSON | JSONTEXT | HTML
+builtInClassName ::= PRIMITIVE_TYPE | JSON | JSONTEXT | XML | HTML
 {
     mixin="com.lsfusion.lang.psi.LSFIdImpl"
     implements="com.lsfusion.lang.psi.LSFId"

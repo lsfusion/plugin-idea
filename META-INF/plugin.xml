@@ -8,26 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.306</b><br>
+        <b>Version 1.0.307</b><br>
         <ul>
-            <li>PropertyDrawViewProxy: `imagePath` deprecated (use `image` instead)</li>
-            <li>NAVIGATOR formElseActionName resolving fix</li>
-            <li>Bugfix in the lsFusion MCP server</li>
-            <li>Implemented SSE protocol for the lsFusion MCP server</li>
-            <li>FILTERGROUP NULL | NONULL support</li>
-            <li>'Action parameters must be defined explicitly' error as on the server start</li>
-            <li>GRID/TREE: captionHeight and captionCharHeight support; headerHeight deprecated</li>
-            <li>Disable errors in markdown lsf examples</li>
-            <li>SEEK deprecated (use ACTIVATE instead); ACTIVATE keyword support in seekObjectAction</li>
-            <li>VALUE deprecated in object property definition (use ACTIVE instead)</li>
-            <li>ACTIVE TAB and ACTIVE PROPERTY split into separate grammar rules with proper resolving</li>
-            <li>SELECT PROPERTY formPropertyDrawID expression support</li>
-            <li>VIEWTYPE and SELECT ACTIVE support in filter property definitions</li>
-            <li>Init action support for SHOW and DIALOG</li>
-            <li>FORMS clause in the FORM operator support</li>
-            <li>Generate form from XML: extra namespaces support</li>
-            <li>EXTEND OBJECTS / EXTEND TREE support: resolving, error highlighting, and completion</li>
-            <li>RETURN operator support</li>
+            <li>Introduce XML type support</li>
         </ul>
     ]]>
     </change-notes>
