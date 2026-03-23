@@ -1945,8 +1945,8 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | DISABLE | SELECTOR
                             |    formInGroup
                             |    extIdSetting | NOEXTID
                             |    EXTNULL
-                            |    ORDER (DESC)?
-                            |    FILTER
+                            |    ORDER (USER | FIXED)? (DESC)?
+                            |    FILTER (USER | FIXED)?
                             |    COLUMN
                             |    ROW
                             |    MEASURE
@@ -2006,7 +2006,7 @@ formExtendPropertiesList ::= EXTEND PROPERTIES formPropertyOptionsList formExten
 
 formExtendMappedPropertyListItem ::= (localizedStringLiteral EQUALS)? formPropertyDrawUsage formPropertyOptionsList {pin = 2}
 
-formFiltersList ::= FILTERS formExprDeclaration (COMMA formExprDeclaration)*
+formFiltersList ::= FILTERS propertyDrawOrPropertyExpr (COMMA propertyDrawOrPropertyExpr)*
 {
     pin(".*") = 1
     implements = "com.lsfusion.documentation.LSFDocumentation"
@@ -2080,7 +2080,8 @@ formExtendFilterGroupDeclaration ::= EXTEND FILTERGROUP filterGroupUsage (NULL |
     methods = [getDocumentation]
 }
 
-userFiltersDeclaration ::= USERFILTERS formPropertyDrawUsage (COMMA formPropertyDrawUsage)*
+userFilters ::= USERFILTERS
+userFiltersDeclaration ::= userFilters formPropertyDrawUsage (COMMA formPropertyDrawUsage)*
 
 filterGroupUsage ::= simpleName
 {
@@ -2094,7 +2095,7 @@ formExprDeclaration ::= propertyExpression
 formActionDeclaration ::= topActionPropertyDefinitionBody
 filterSetDefault ::= DEFAULT
 
-formOrderByList ::= ORDERS FIRST? formPropertyDrawWithOrder (COMMA formPropertyDrawWithOrder)*
+formOrderByList ::= ORDERS FIRST? propertyDrawOrPropertyExprWithOrder (COMMA propertyDrawOrPropertyExprWithOrder)*
 {
     pin(".*") = 1
     implements = "com.lsfusion.documentation.LSFDocumentation"
@@ -2116,7 +2117,15 @@ pivotFormPropertyDrawUsage::= formPropertyDrawUsage | (MEASURES LBRAC ID RBRAC)
 
 pivotPropertyDrawList ::= pivotFormPropertyDrawUsage | (LBRAC pivotFormPropertyDrawUsage (COMMA pivotFormPropertyDrawUsage)* RBRAC)
 
-formPropertyDrawWithOrder ::= formPropertyDrawUsage (DESC)?
+propertyDrawOrPropertyExpr ::= (propertyDrawOrPropertyExprUsage | propertyExpression) (USER | FIXED)?
+{
+    implements="com.lsfusion.lang.psi.references.LSFPropertyDrawReference"
+    mixin="com.lsfusion.lang.psi.references.impl.LSFPropertyDrawOrPropertyExprReference"
+}
+
+propertyDrawOrPropertyExprUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage LBRAC objectUsageList RBRAC) | aliasUsage
+
+propertyDrawOrPropertyExprWithOrder ::= propertyDrawOrPropertyExpr (DESC)?
 
 predefinedNewPropertyName ::=  NEW | NEWEDIT
 

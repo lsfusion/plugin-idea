@@ -146,6 +146,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitPropertyDrawOrPropertyExpr(@NotNull LSFPropertyDrawOrPropertyExpr o) {
+        super.visitPropertyDrawOrPropertyExpr(o);
+        if (o.getReference() instanceof LSFReference reference) {
+            checkReference(reference);
+        }
+    }
+
+    @Override
     public void visitFormElseNoParamsActionReference(@NotNull LSFFormElseNoParamsActionReference o) {
         super.visitFormElseNoParamsActionReference(o);
         checkReference(o);
@@ -1461,6 +1469,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 }
             }
         }
+    }
+
+    @Override
+    public void visitUserFiltersDeclaration(@NotNull LSFUserFiltersDeclaration o) {
+        addDeprecatedWarningAnnotation(o.getUserFilters(), "7.0", "Use FILTERS ... USER instead");
     }
 
     @Override

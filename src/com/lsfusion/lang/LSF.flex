@@ -540,6 +540,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "UDP"                 			    { return UDP; }
   "UNGROUP"                 			{ return UNGROUP; }
   "UP"                 			        { return UP; }
+  "USER"                 			    { return USER; }
   "USERFILTER"                 			{ return USERFILTER; }
   "USERFILTERS"                 		{ return USERFILTERS; }
   "VALIGN"                  			{ return VALIGN; }

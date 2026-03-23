@@ -11,6 +11,7 @@
         <b>Version 1.0.307</b><br>
         <ul>
             <li>Introduce XML type support</li>
+            <li>FILTER/FILTERS and ORDER/ORDERS in FORM: support unified USER | FIXED rules; USERFILTERS deprecated</li>
         </ul>
     ]]>
     </change-notes>
