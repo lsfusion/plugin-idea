@@ -1494,7 +1494,7 @@ private list_action_statement_recover ::= !(ACTIVATE | ACTIVE | NEW | NEWEDIT | 
                                             | DRILLDOWN | EDIT | EMAIL | EVAL | EXEC | FILTER | FILTERS | FILTERGROUP | FILTERGROUPS
                                             | FOR | SHOW | CLOSE | DIALOG | PRINT | EXPORT | TRY | IF | IMPORT | LOCAL | MESSAGE | MULTI
                                             | ORDER | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE | RECALCULATE
-                                            | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
+                                            | NEWCONNECTION | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | COLLAPSE | EXPAND
                                             | EXTERNAL
                                             | ID // pinned with execActionPropertyDefinitionBody
