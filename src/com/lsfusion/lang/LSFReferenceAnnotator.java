@@ -201,6 +201,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitTreeGroupUsage(@NotNull LSFTreeGroupUsage o) {
+        super.visitTreeGroupUsage(o);
+
+        checkReference(o);
+    }
+
+    @Override
     public void visitIndexedSetting(@NotNull LSFIndexedSetting o) {
         super.visitIndexedSetting(o);
         LSFNonEmptyPropertyOptions options = (LSFNonEmptyPropertyOptions) o.getParent();
