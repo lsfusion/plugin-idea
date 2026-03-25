@@ -50,6 +50,7 @@ import com.lsfusion.lang.psi.impl.LSFClassDeclImpl;
 import com.lsfusion.lang.psi.impl.LSFFormDeclImpl;
 import com.lsfusion.lang.psi.impl.LSFLocalPropertyDeclarationNameImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
+import com.lsfusion.lang.psi.declarations.impl.LSFStatementActionDeclarationImpl;
 import com.lsfusion.lang.psi.references.*;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
@@ -130,6 +131,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitPropertyElseActionUsage(@NotNull LSFPropertyElseActionUsage o) {
         super.visitPropertyElseActionUsage(o);
         checkIndirectUsage(o);
+        checkVoidActionUsageInExpression(o);
     }
 
     public void checkIndirectUsage(@NotNull LSFActionOrPropReference o) {
@@ -363,6 +365,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static boolean isInMetaDecl(PsiElement o) {
         return getMetaDecl(o) != null;
         //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
+    }
+
+    private void checkVoidActionUsageInExpression(@NotNull LSFPropertyElseActionUsage usage) {
+        if (PsiTreeUtil.getParentOfType(usage, LSFJoinPropertyDefinition.class) == null) {
+            return;
+        }
+
+        LSFActionOrPropDeclaration declaration = usage.resolveDecl();
+        if (declaration instanceof LSFStatementActionDeclarationImpl) {
+            if (!((LSFStatementActionDeclarationImpl) declaration).hasExplicitReturn()) {
+                addUnderscoredErrorWithResolving(usage, format("Action '%s' has no return value", declaration.getDeclName()));
+            }
+        }
     }
 
     private void checkMetaNestingUsage(@NotNull PsiElement o) {

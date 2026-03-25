@@ -115,6 +115,15 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
         return null;
     }
 
+    public boolean hasExplicitReturn() {
+        LSFActionUnfriendlyPD actionUnfriendlyPD = getActionUnfriendlyPD();
+        if (actionUnfriendlyPD != null) {
+            LSFAbstractActionPropertyDefinition abstractAction = actionUnfriendlyPD.getAbstractActionPropertyDefinition();
+            return abstractAction != null && abstractAction.getAbstractReturn() != null;
+        }
+        return !getReturnStatements().isEmpty();
+    }
+
     @Override
     public LSFExClassSet resolveExValueClassNoCache(boolean infer) {
         LSFActionUnfriendlyPD actionUnfriendlyPD = getActionUnfriendlyPD();
@@ -130,10 +139,8 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
                 }
             }
         } else {
-            LSFListActionPropertyDefinitionBody listActionPropertyDefinitionBody = getListActionPropertyDefinitionBody();
-            Collection<LSFReturnActionPropertyDefinitionBody> returnChildren = PsiTreeUtil.findChildrenOfType(listActionPropertyDefinitionBody, LSFReturnActionPropertyDefinitionBody.class);
             List<LSFExClassSet> returnValueClasses = new ArrayList<>();
-            for (LSFReturnActionPropertyDefinitionBody returnChild : returnChildren) {
+            for (LSFReturnActionPropertyDefinitionBody returnChild : getReturnStatements()) {
                 LSFExClassSet dependClass = returnChild.getPropertyExpression().resolveValueClass(infer);
                 if (dependClass != null)
                     returnValueClasses.add(dependClass);
@@ -141,6 +148,10 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
             return LSFPsiImplUtil.orClasses(returnValueClasses, false);
         }
         return null;
+    }
+
+    private Collection<LSFReturnActionPropertyDefinitionBody> getReturnStatements() {
+        return PsiTreeUtil.findChildrenOfType(getListActionPropertyDefinitionBody(), LSFReturnActionPropertyDefinitionBody.class);
     }
 
     @Override
@@ -162,9 +173,7 @@ public abstract class LSFStatementActionDeclarationImpl extends LSFActionOrGloba
             }
         } else {
             List<List<LSFExClassSet>> resultInterfaceClasses = new ArrayList<>();
-            LSFListActionPropertyDefinitionBody listActionPropertyDefinitionBody = getListActionPropertyDefinitionBody();
-            Collection<LSFReturnActionPropertyDefinitionBody> returnChildren = PsiTreeUtil.findChildrenOfType(listActionPropertyDefinitionBody, LSFReturnActionPropertyDefinitionBody.class);
-            for (LSFReturnActionPropertyDefinitionBody returnChild : returnChildren) {
+            for (LSFReturnActionPropertyDefinitionBody returnChild : getReturnStatements()) {
                 Set<LSFExprParamDeclaration> upParams = LSFPsiUtils.getContextParams(returnChild, LSFLocalSearchScope.GLOBAL, false, false);
                 List<LSFExprParamDeclaration> returnParams = LSFPsiUtils.resolveParams(returnChild.getPropertyExpression(), upParams);
 
