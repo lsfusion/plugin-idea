@@ -765,6 +765,8 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
 
     private void addDeclProcessing(LSFMetaCodeDeclarationStatement decl) {
         assert ApplicationManager.getApplication().isWriteAccessAllowed();
+        if (!decl.isCorrect())
+            return;
 
         declPending.add(getLongLivingDecl(decl));
 
