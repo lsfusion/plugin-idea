@@ -2117,13 +2117,13 @@ pivotFormPropertyDrawUsage::= formPropertyDrawUsage | (MEASURES LBRAC ID RBRAC)
 
 pivotPropertyDrawList ::= pivotFormPropertyDrawUsage | (LBRAC pivotFormPropertyDrawUsage (COMMA pivotFormPropertyDrawUsage)* RBRAC)
 
-propertyDrawOrPropertyExpr ::= (propertyDrawOrPropertyExprUsage | propertyExpression) (USER | FIXED)?
+propertyDrawOrPropertyExpr ::= ((<<checkFormExpr>> &((propertyDrawOrPropertyExprUsage <<matchedFormDrawObject>>)?) propertyExpression <<matchedFormExpr>>) | propertyDrawOrPropertyExprUsage) (USER | FIXED)?
 {
     implements="com.lsfusion.lang.psi.references.LSFPropertyDrawReference"
     mixin="com.lsfusion.lang.psi.references.impl.LSFPropertyDrawOrPropertyExprReference"
 }
 
-propertyDrawOrPropertyExprUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage LBRAC objectUsageList RBRAC) | aliasUsage
+propertyDrawOrPropertyExprUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage LBRAC objectUsageList RBRAC) | (<< notLbracAhead >> aliasUsage)
 
 propertyDrawOrPropertyExprWithOrder ::= propertyDrawOrPropertyExpr (DESC)?
 
