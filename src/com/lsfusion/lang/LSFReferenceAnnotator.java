@@ -388,6 +388,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
+    @Override
+    public void visitBooleanLiteral(@NotNull LSFBooleanLiteral o) {
+        super.visitBooleanLiteral(o);
+        if ("FALSE".equals(o.getText()) && PsiTreeUtil.getParentOfType(o, LSFDesignStatement.class) == null) {
+            addFalseToBooleanError(o);
+        }
+    }
+
     private void checkMetaNestingUsage(@NotNull PsiElement o) {
         if (MetaNestingLineMarkerProvider.resolveNestingLevel(o) > 1) {
             addSilentInfoAnnotation(o, META_NESTING_USAGE);
@@ -1268,8 +1276,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (leftClass != null && rightClass != null) {
                 if (!leftClass.isCompatible(rightClass)) {
                     addTypeMismatchError(o, rightClass, leftClass);
-                } else if (leftClass.getCanonicalName().equals("BOOLEAN") && rightPropertyExpression.getText().equals("FALSE")) {
-                    addFalseToBooleanAssignError(o);
                 }
             }
         }
@@ -1285,7 +1291,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         return false;
     }
 
-    private void addFalseToBooleanAssignError(LSFAssignActionPropertyDefinitionBody o) {
+    private void addFalseToBooleanError(PsiElement o) {
         addUnderscoredError(o, "use NULL instead of FALSE");
     }
 
