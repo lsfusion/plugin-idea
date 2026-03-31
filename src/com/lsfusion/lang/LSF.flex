@@ -400,6 +400,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NEWCONNECTION"                     	{ return NEWCONNECTION; }
   "NEWEDIT"                     	    { return NEWEDIT; }
   "NEWSESSION"              			{ return NEWSESSION; }
+  "THISSESSION"              			{ return THISSESSION; }
   "NEWSQL"              			    { return NEWSQL; }
   "NEWTHREAD"              			    { return NEWTHREAD; }
   "NO"                      			{ return NO; }

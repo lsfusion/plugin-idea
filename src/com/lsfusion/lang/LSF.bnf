@@ -894,7 +894,7 @@ formActionPropertyDefinitionBody ::=
 }
 
 manageSessionClause ::= MANAGESESSION | NOMANAGESESSION
-formSessionScopeClause ::= NEWSESSION | NESTEDSESSION
+formSessionScopeClause ::= NEWSESSION | NESTEDSESSION | THISSESSION
 noCancelClause ::= CANCEL | NOCANCEL 
 
 dialogActionPropertyDefinitionBody ::=
