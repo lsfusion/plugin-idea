@@ -94,6 +94,12 @@ tasks.matching {
     enabled = false
 }
 
+tasks.withType<org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask>().configureEach {
+    // IntelliJ IDEA starts the bundled Kubernetes plugin in dev sandbox, and it crashes
+    // with missing split/RPC backend APIs. The plugin is unrelated to this project, so disable it.
+    disabledPlugins.add("com.intellij.kubernetes")
+}
+
 // Configurations for lexer and parser generation
 val jflexConfig by configurations.creating
 val grammarKitConfig by configurations.creating
