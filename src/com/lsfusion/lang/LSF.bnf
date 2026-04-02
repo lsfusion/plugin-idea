@@ -1425,7 +1425,7 @@ contextActions ::= ACTIONS contextAction (COMMA contextAction)*
 }
 contextAction ::= stringLiteral (KEYPRESS stringLiteral)? (TOOLBAR ((ALL | SELECTED | FOCUSED) HOVER?)*)? listActionPropertyDefinitionBody
 changeInputPropertyCustomView ::= CUSTOM stringLiteral?
-inputActionPropertyDefinitionBody ::= INPUT (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? changeInputPropertyCustomView? listWhereInputProps contextActions? formSessionScopeClause? staticDestination? doInputBody
+inputActionPropertyDefinitionBody ::= INPUT MULTI? (((paramDeclare EQUALS)? builtInClassName) | (paramDeclare? EQUALS classOrExpression)) (CHANGE (EQUALS propertyExpression)? NOCONSTRAINTFILTER? NOCHANGE?)? changeInputPropertyCustomView? listWhereInputProps contextActions? formSessionScopeClause? staticDestination? doInputBody
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.ClassParamDeclareContext, com.lsfusion.lang.psi.context.ExtendDoParamContext"

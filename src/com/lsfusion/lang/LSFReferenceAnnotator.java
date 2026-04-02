@@ -1578,6 +1578,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitInputActionPropertyDefinitionBody(@NotNull LSFInputActionPropertyDefinitionBody o) {
+        if (LSFPsiImplUtil.isMultipleInput(o)) {
+            LSFClassSet classSet = o.resolveClass();
+            if (classSet != null && !(classSet instanceof FileClass)) {
+                PsiElement multiKeyword = o.getNode().findChildByType(LSFTypes.MULTI).getPsi();
+                addUnderscoredError(multiKeyword, "INPUT MULTI is currently supported only for file-based input types");
+            }
+        }
+
         // Many if-blocks and null checks is needed to add an error in the right place
         LSFListWhereInputProps listWhereInputProps = o.getListWhereInputProps();
         if (listWhereInputProps != null) {

@@ -579,8 +579,16 @@ public class LSFPsiImplUtil {
         return new ActionExprInferrer(sourceStatement);
     }
 
+    public static boolean isMultipleInput(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
+        return sourceStatement.getNode().findChildByType(LSFTypes.MULTI) != null;
+    }
+
     public static ContextModifier getDoContextModifier(@NotNull LSFInputActionPropertyDefinitionBody sourceStatement) {
-        return new ExprParamContextModifier(sourceStatement.getParamDeclare());
+        ContextModifier result = new ExprParamContextModifier(sourceStatement.getParamDeclare());
+        if (isMultipleInput(sourceStatement)) {
+            result = new AndContextModifier(new ExprParamContextModifier(LSFElementGenerator.getRowParam(sourceStatement.getProject())), result);
+        }
+        return result;
     }
 
     public static ContextModifier getContextModifier(@NotNull LSFContextFiltersClause sourceStatement) {

@@ -12,6 +12,7 @@
         <ul>
             <li>Introduce XML type support</li>
             <li>FILTER/FILTERS and ORDER/ORDERS in FORM: support unified USER | FIXED rules; USERFILTERS deprecated</li>
+            <li>Add IDE support for <code>INPUT MULTI</code> for file-based input types</li>
         </ul>
     ]]>
     </change-notes>
