@@ -725,26 +725,24 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
         }
 
         public void run() {
-            if (!DumbService.isDumb(myProject)) {
-                for (final LongLivingMeta metaDecl : decls) {
-                    DumbService.getInstance(myProject).smartInvokeLater(() -> {
-                        List<LSFMetaCodeStatement> usages = null;
-                        if (metaDecl.file.isValid()) {
-                            usages = cacheUsages.get(metaDecl);
-                            if (usages == null) {
-                                usages = LSFResolver.findMetaUsages(metaDecl.name, metaDecl.paramCount, metaDecl.file);
-                                cacheUsages.put(metaDecl, usages);
-                            }
+            DumbService dumbService = DumbService.getInstance(myProject);
+            for (final LongLivingMeta metaDecl : decls) {
+                dumbService.runReadActionInSmartMode(() -> {
+                    List<LSFMetaCodeStatement> usages = null;
+                    if (metaDecl.file.isValid()) {
+                        usages = cacheUsages.get(metaDecl);
+                        if (usages == null) {
+                            usages = LSFResolver.findMetaUsages(metaDecl.name, metaDecl.paramCount, metaDecl.file);
+                            cacheUsages.put(metaDecl, usages);
                         }
-                        boolean removed = declPending.processing.remove(metaDecl);
-                        assert removed;
+                    }
+                    boolean removed = declPending.processing.remove(metaDecl);
+                    assert removed;
 
-                        if (usages != null)
-                            addUsageProcessing(usages);
-                    });
-                }
-            } else
-                inlinePostpone(this, false);
+                    if (usages != null)
+                        addUsageProcessing(usages);
+                });
+            }
         }
     }
 
