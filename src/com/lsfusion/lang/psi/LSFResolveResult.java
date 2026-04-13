@@ -67,14 +67,21 @@ public class LSFResolveResult {
         }
 
         public LSFResolvingError resolveErrorAnnotation(AnnotationHolder holder) {
-            if(decls.size() == 1) {
-                LSFDeclaration singleDecl = decls.iterator().next();
-                if(singleDecl instanceof LSFFullNameDeclaration && LSFGlobalResolver.isAfter(ref.getLSFFile(), ref.getTextOffset(), (LSFFullNameDeclaration) singleDecl)) {
-                    String errorText = "Symbol '" + ref.getNameRef() + "' is declared after it is used";
-                    return new LSFResolvingError(ref, errorText, true);
+            String errorText = null;
+            for(LSFDeclaration decl : decls) {
+                if(decl instanceof LSFFullNameDeclaration) {
+                    if(LSFGlobalResolver.isAfter(ref.getLSFFile(), ref.getTextOffset(), (LSFFullNameDeclaration) decl))
+                        errorText = "Symbol '" + ref.getNameRef() + "' is declared after it is used";
+                    else {
+                        errorText = null;
+                        break;
+                    }
                 }
             }
-            return ref.resolveNotFoundErrorAnnotation(decls, canBeDeclaredAfterAndNotChecked);
+            if(errorText != null)
+                return new LSFResolvingError(ref, errorText, true);
+            else
+                return ref.resolveNotFoundErrorAnnotation(decls, canBeDeclaredAfterAndNotChecked);
         }
     }
 }
