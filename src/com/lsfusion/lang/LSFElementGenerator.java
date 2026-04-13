@@ -166,8 +166,7 @@ public class LSFElementGenerator {
 
     public static List<? extends LSFPropertyDrawDeclaration> getBuiltInFormProps(final Project project) {
         if (builtInFormProps == null || builtInFormProps.iterator().next().getProject().isDisposed()) {
-            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formEdit,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
-//            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formPrint,formEdit,formXls,formRefresh,formApply,formCancel,formOk,formClose,formDrop;");
+            final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formEdit,formRefresh,formApply,formCancel,formOk,formClose,formDrop,formShare;");
             builtInFormProps = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
         }
         return builtInFormProps;
