@@ -90,6 +90,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private AnnotationHolder myHolder;
     public boolean errorsSearchMode = false;
     public boolean warningsSearchMode = false;
+    public SearchMessageConsumer searchMessageConsumer;
+
+    public interface SearchMessageConsumer {
+        void accept(PsiElement element, String text, LSFErrorLevel level);
+    }
 
     @Override
     public synchronized void annotate(@NotNull PsiElement psiElement, AnnotationHolder holder) {
@@ -1100,7 +1105,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes) {
         if (errorsSearchMode) {
-            ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.ERROR);
+            if (searchMessageConsumer != null) {
+                searchMessageConsumer.accept(element, text, LSFErrorLevel.ERROR);
+            } else {
+                ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.ERROR);
+            }
         } else {
             AnnotationBuilder annotationBuilder = myHolder.newAnnotation(HighlightSeverity.ERROR, text);
             if (range != null) {
@@ -1139,7 +1148,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void addWarningAnnotation(PsiElement element, String text, TextAttributes textAttributes, List<IntentionAction> fixes) {
         if(warningsSearchMode) {
-            ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.WARNING);
+            if (searchMessageConsumer != null) {
+                searchMessageConsumer.accept(element, text, LSFErrorLevel.WARNING);
+            } else {
+                ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.WARNING);
+            }
         } else if(!errorsSearchMode) {
             AnnotationBuilder builder = myHolder.newAnnotation(HighlightSeverity.WARNING, text).range(element);
             if(textAttributes != null) {
