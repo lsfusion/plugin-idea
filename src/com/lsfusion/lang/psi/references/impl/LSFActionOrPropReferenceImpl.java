@@ -109,13 +109,16 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
         }
 
         final List<LSFClassSet> fDirectClasses = directClasses;
+        final LSFActionOrPropDeclaration currentDeclaration = PsiTreeUtil.getParentOfType(this, LSFActionOrPropDeclaration.class);
         final boolean isImplement = isImplement();
         return decl -> {
             if(isImplement && !decl.isAbstract())
                 return false;
 
             List<LSFClassSet> declClasses = resolveParamClasses(decl);
-            return declClasses == null || (declClasses.size() == fDirectClasses.size() && LSFPsiImplUtil.containsAll(declClasses, fDirectClasses, false));
+            if (declClasses == null)
+                return notCurrentDeclaration(decl, currentDeclaration);
+            return declClasses.size() == fDirectClasses.size() && LSFPsiImplUtil.containsAll(declClasses, fDirectClasses, false);
         };
     }
 
@@ -129,6 +132,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
     protected Condition<T> getInDirectCondition() {
         final List<LSFClassSet> usageClasses = getUsageContext();
         assert canBeUsedInDirect(); // потому как иначе direct бы подошел  
+        final LSFActionOrPropDeclaration currentDeclaration = PsiTreeUtil.getParentOfType(this, LSFActionOrPropDeclaration.class);
         final boolean isImplement = isImplement();
 
         return decl -> {
@@ -136,8 +140,14 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
                 return false;
 
             List<LSFClassSet> declClasses = resolveParamClasses(decl);
-            return declClasses == null || (declClasses.size() == usageClasses.size() && LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject())));
+            if (declClasses == null)
+                return notCurrentDeclaration(decl, currentDeclaration);
+            return declClasses.size() == usageClasses.size() && LSFPsiImplUtil.haveCommonChilds(declClasses, usageClasses, GlobalSearchScope.allScope(getProject()));
         };
+    }
+
+    private boolean notCurrentDeclaration(T decl, LSFActionOrPropDeclaration currentDeclaration) {
+        return currentDeclaration == null || !getManager().areElementsEquivalent(currentDeclaration, decl);
     }
 
     protected Finalizer<T> getDirectFinalizer() {
