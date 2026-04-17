@@ -9,10 +9,14 @@ import com.lsfusion.lang.psi.LSFSourceFilterScope;
 import com.lsfusion.lang.psi.LSFStubbedElement;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public abstract class LSFStringStubIndex<Psi extends LSFStubbedElement> extends StringStubIndexExtension<Psi> {
     @Override
     public Collection<Psi> get(String s, Project project, GlobalSearchScope scope) {
+        if (s == null) {
+            return Collections.emptyList();
+        }
         return DumbService.getInstance(project).runReadActionInSmartMode(() -> StubIndex.getElements(getKey(), s, project, LSFSourceFilterScope.create(scope), getPsiClass()));
     }
     
