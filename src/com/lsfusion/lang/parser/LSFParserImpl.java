@@ -109,7 +109,7 @@ public class LSFParserImpl extends LSFParser {
                     if (tokenType == EXTEND && nextTokenType != FORMS && nextTokenType != OBJECTS && nextTokenType != TREE && nextTokenType != PROPERTIES && nextTokenType != FILTERGROUP) {
                         break;
                     }
-                    if (tokenType == CLASS && prevTokenType != EXTEND) {
+                    if (tokenType == CLASS && prevTokenType != EXTEND && prevTokenType != INTERNAL) {
                         if (nextTokenType != LBRAC) { // to avoid CLASS()
                             break;
                         }
