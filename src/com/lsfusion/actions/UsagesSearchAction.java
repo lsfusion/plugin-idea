@@ -4,9 +4,13 @@ import com.intellij.codeInsight.CodeInsightActionHandler;
 import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.codeInsight.actions.BaseCodeInsightAction;
 import com.intellij.ide.DataManager;
+import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -86,7 +90,7 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
                         if (simpleElementDescription == null) {
                             LSFNoParamsActionUsage noParamsActionUsage = PsiTreeUtil.getParentOfType(element, LSFNoParamsActionUsage.class);
                             if(noParamsActionUsage == null) {
-                                ActionUtil.performActionDumbAwareWithCallbacks(getPlatformAction(), event);
+                                performPlatformAction(element, event.getDataContext());
                             } else {
                                 showChoicePopup(element, actionUsagesAlternatives);
                             }
@@ -161,15 +165,23 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
                 propertyUsagesSearchMode = item;
                 sourceElement = source;
 
-                return doFinalStep(() -> ActionUtil.performActionDumbAwareWithCallbacks(getPlatformAction(), new AnActionEvent(
-                        e.getInputEvent(),
-                        DataManager.getInstance().getDataContext(component),
-                        e.getPlace(), e.getPresentation(),
-                        e.getActionManager(),
-                        e.getModifiers()
-                )));
+                return doFinalStep(() -> performPlatformAction(source, DataManager.getInstance().getDataContext(component)));
             }
         };
+    }
+
+    private void performPlatformAction(PsiElement element, DataContext dataContext) {
+        PsiFile file = element.getContainingFile();
+        if (InjectedLanguageManager.getInstance(element.getProject()).isInjectedFragment(file)) {
+            dataContext = SimpleDataContext.builder()
+                    .setParent(dataContext)
+                    .add(CommonDataKeys.EDITOR, BaseCodeInsightAction.getInjectedEditor(element.getProject(), event.getData(CommonDataKeys.EDITOR)))
+                    .add(CommonDataKeys.PSI_FILE, file)
+                    .add(CommonDataKeys.PSI_ELEMENT, element)
+                    .build();
+        }
+
+        ActionUtil.performActionDumbAwareWithCallbacks(getPlatformAction(), event.withDataContext(dataContext));
     }
     
     protected abstract AnAction getPlatformAction();
