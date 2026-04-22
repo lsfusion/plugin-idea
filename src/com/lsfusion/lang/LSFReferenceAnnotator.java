@@ -1231,6 +1231,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     @Override
     public void visitOverridePropertyStatement(@NotNull LSFOverridePropertyStatement element) {
+        LSFPropertyUsage propertyUsage = element.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage();
+        if (LSFPsiImplUtil.isNonAbstractOverrideActionOrProperty(propertyUsage)) {
+            addUnderscoredErrorWithResolving(element, "Property '" + propertyUsage.getNameRef() + "' is not abstract");
+        }
+
         Result<LSFClassSet> required = new Result<>();
         Result<LSFClassSet> found = new Result<>();
         if (!LSFPsiImplUtil.checkOverrideValue(element, required, found)) {
@@ -1245,6 +1250,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
     @Override
     public void visitOverrideActionStatement(@NotNull LSFOverrideActionStatement element) {
+        LSFActionUsage actionUsage = element.getMappedActionClassParamDeclare().getActionUsageWrapper().getActionUsage();
+        if (LSFPsiImplUtil.isNonAbstractOverrideActionOrProperty(actionUsage)) {
+            addUnderscoredErrorWithResolving(element, "Action '" + actionUsage.getNameRef() + "' is not abstract");
+        }
+
         if (!LSFPsiImplUtil.checkNonRecursiveOverride(element)) {
             addUnderscoredErrorWithResolving(element, "Recursive implement");
         }

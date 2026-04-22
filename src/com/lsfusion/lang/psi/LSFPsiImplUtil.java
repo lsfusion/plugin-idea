@@ -4962,6 +4962,15 @@ public class LSFPsiImplUtil {
 
         return true;
     }
+
+    public static boolean isNonAbstractOverrideActionOrProperty(@NotNull LSFActionOrPropReference<?, ?> reference) {
+        LSFResolveResult resolveResult = reference.resolveNoCache();
+        if (resolveResult.errorAnnotator == null || resolveResult.declarations.size() != 1)
+            return false;
+
+        LSFDeclaration declaration = resolveResult.declarations.iterator().next();
+        return declaration instanceof LSFActionOrPropDeclaration && !((LSFActionOrPropDeclaration) declaration).isAbstract();
+    }
     
     public static boolean checkNonRecursiveOverride(@NotNull LSFOverridePropertyStatement override) {
         LSFPropertyUsage leftUsage = override.getMappedPropertyClassParamDeclare().getPropertyUsageWrapper().getPropertyUsage();
