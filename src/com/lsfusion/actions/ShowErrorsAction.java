@@ -177,6 +177,7 @@ public class ShowErrorsAction extends AnAction {
     }
 
     private void findLSFErrors(PsiElement element) {
+        showSyntaxError(element);
         ANNOTATOR.annotate(element, null);
 
         for (PsiElement child : element.getChildren()) {
@@ -198,8 +199,21 @@ public class ShowErrorsAction extends AnAction {
         confirmAnnotator.errorsSearchMode = true;
         confirmAnnotator.warningsSearchMode = warningsSearchMode;
         confirmAnnotator.searchMessageConsumer = (element, text, level) -> errors.add(ReportedError.from(file, element, text, level));
-        DumbService.getInstance(project).runReadActionInSmartMode(() -> collectFileErrors(file, confirmAnnotator));
+        DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+            collectSyntaxErrors(file, errors);
+            collectFileErrors(file, confirmAnnotator);
+        });
         return errors;
+    }
+
+    private void collectSyntaxErrors(PsiElement element, Set<ReportedError> errors) {
+        if (element instanceof PsiErrorElement) {
+            errors.add(ReportedError.from(element.getContainingFile(), element, getSyntaxErrorText((PsiErrorElement) element), LSFErrorLevel.ERROR));
+        }
+
+        for (PsiElement child : element.getChildren()) {
+            collectSyntaxErrors(child, errors);
+        }
     }
 
     private void collectFileErrors(PsiElement element, LSFReferenceAnnotator annotator) {
@@ -209,9 +223,21 @@ public class ShowErrorsAction extends AnAction {
         }
     }
 
+    private void showSyntaxError(PsiElement element) {
+        if (element instanceof PsiErrorElement) {
+            showErrorMessage(element, getSyntaxErrorText((PsiErrorElement) element), LSFErrorLevel.ERROR);
+        }
+    }
+
+    private static String getSyntaxErrorText(PsiErrorElement errorElement) {
+        String description = errorElement.getErrorDescription();
+        return description.isEmpty() ? "Syntax error" : description;
+    }
+
     public static void showErrorMessage(final PsiElement element, final String errorMessage, LSFErrorLevel errorLevel) {
         final Segment range = SmartPointerManager.getInstance(element.getProject()).createSmartPsiElementPointer(element).getRange();
-        showErrorMessage(element.getContainingFile(), range != null ? range.getStartOffset() : -1, errorMessage, errorLevel, ModuleUtilCore.findModuleForPsiElement(element), () -> ((NavigationItem) element).navigate(true));
+        int startOffset = range != null ? range.getStartOffset() : -1;
+        showErrorMessage(element.getContainingFile(), startOffset, errorMessage, errorLevel, ModuleUtilCore.findModuleForPsiElement(element), () -> navigate(element, startOffset));
     }
 
     private static void showErrorMessage(PsiFile file, int offset, String errorMessage, LSFErrorLevel errorLevel,
@@ -237,6 +263,19 @@ public class ShowErrorsAction extends AnAction {
                             )
                     )
             );
+        }
+    }
+
+    private static void navigate(PsiElement element, int offset) {
+        if (element instanceof NavigationItem) {
+            ((NavigationItem) element).navigate(true);
+            return;
+        }
+
+        PsiFile file = element.getContainingFile();
+        VirtualFile virtualFile = file != null ? file.getVirtualFile() : null;
+        if (virtualFile != null) {
+            new OpenFileDescriptor(file.getProject(), virtualFile, Math.max(offset, 0)).navigate(true);
         }
     }
 
