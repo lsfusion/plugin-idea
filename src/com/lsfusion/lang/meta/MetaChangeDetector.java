@@ -34,7 +34,9 @@ import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.cache.ModuleDependentsCache;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFFileUtils;
@@ -713,8 +715,34 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
         cacheUsages.clear();
     }
 
-    void fireChangedModuleHeader() {
+    void fireChangedModuleHeader(LSFFile file) {
         LSFGlobalResolver.cached.clear(); // убираем все, потому как могут быть зависимости
+
+        if (enabled && file != null)
+            addModuleHeaderUsageProcessing(file);
+    }
+
+    private void addModuleHeaderUsageProcessing(LSFFile file) {
+        addUsageProcessing(file.getMetaCodeStatementList());
+        ApplicationManager.getApplication().executeOnPooledThread(() -> DumbService.getInstance(myProject).runReadActionInSmartMode(() -> {
+            PsiFile psiFile = PsiManager.getInstance(myProject).findFile(file.getVirtualFile());
+            LSFModuleDeclaration module = psiFile instanceof LSFFile ? ((LSFFile) psiFile).getModuleDeclaration() : null;
+            if (module != null && module.isValid()) {
+                addDependentModulesUsageProcessing(module, Set.of(module));
+            }
+        }));
+    }
+
+    private void addDependentModulesUsageProcessing(LSFModuleDeclaration module, Set<LSFModuleDeclaration> proceeded) {
+        List<LSFModuleDeclaration> dependentModules = module.getRequireModules();//ModuleDependentsCache.getInstance(myProject).resolveWithCaching(module);
+        for (LSFModuleDeclaration dependent : dependentModules) {
+            if (dependent.isValid() && proceeded.add(dependent)) {
+                LSFFile dependentFile = dependent.getLSFFile();
+                if (dependentFile != null && dependentFile.isValid())
+                    addUsageProcessing(dependentFile.getMetaCodeStatementList());
+                addDependentModulesUsageProcessing(dependent, proceeded);
+            }
+        }
     }
 
     private class MetaDeclProcessing implements Runnable {
@@ -920,6 +948,8 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
         boolean inMetaBody = false;
         boolean inMetaDeclBody = false;
         boolean inModuleHeader = false;
+        PsiFile containingFile = element.getContainingFile();
+        LSFFile lsfFile = containingFile instanceof LSFFile ? (LSFFile) containingFile : null;
         while (element != null && !(element instanceof LSFFile)) {
             if (enabled) {
                 if (element instanceof LSFMetaCodeDeclarationStatement && !inMetaBody) { // if we changed something in meta code body, it's not considered meta decl change
@@ -947,7 +977,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
             fireChangedNotMetaBody();
         }
         if (inModuleHeader) {
-            fireChangedModuleHeader();
+            fireChangedModuleHeader(lsfFile);
         }
     }
 
