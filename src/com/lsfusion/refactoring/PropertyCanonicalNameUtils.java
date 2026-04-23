@@ -45,6 +45,22 @@ public final class PropertyCanonicalNameUtils {
         builder.append(CanonicalNameUtils.DELIMITER);
     }
     
+    public static String createSignatureClassName(LSFClassSet cs) {
+        if (cs instanceof StringClass) {
+            return commonStringClassName;
+        } else if (cs instanceof NumericClass) {
+            return commonNumericClassName;
+        } else if (cs instanceof StaticFormatFileClass) {
+            return commonStaticFormatFileClassName;
+        } else if (cs instanceof StaticFormatLinkClass) {
+            return commonStaticFormatLinkClassName;
+        } else if (cs != null) {
+            return cs.getCanonicalName();
+        } else {
+            return UNKNOWNCLASS;
+        }
+    }
+
     private static String createSignature(List<LSFClassSet> signature) {
         StringBuilder snBuilder = new StringBuilder();
         snBuilder.append(signatureLBracket);
@@ -55,19 +71,7 @@ public final class PropertyCanonicalNameUtils {
                     snBuilder.append(",");
                 }
                 isFirst = false;
-                if (cs instanceof StringClass) {
-                    snBuilder.append(commonStringClassName);
-                } else if (cs instanceof NumericClass) {
-                    snBuilder.append(commonNumericClassName);
-                } else if (cs instanceof StaticFormatFileClass) {
-                    snBuilder.append(commonStaticFormatFileClassName);
-                } else if (cs instanceof StaticFormatLinkClass) {
-                    snBuilder.append(commonStaticFormatLinkClassName);
-                } else if (cs != null) {
-                    snBuilder.append(cs.getCanonicalName());
-                } else {
-                    snBuilder.append(UNKNOWNCLASS);
-                }
+                snBuilder.append(createSignatureClassName(cs));
             }
         }
         snBuilder.append(signatureRBracket);

@@ -62,7 +62,9 @@ public abstract class LSFActionOrGlobalPropDeclarationImpl<Decl extends LSFActio
                     return false;
                 }
             } else {
-                if (!list1.get(i).equals(list2.get(i))) {
+                String className1 = PropertyCanonicalNameUtils.createSignatureClassName(list1.get(i));
+                String className2 = list2.get(i) == null ? null : PropertyCanonicalNameUtils.createSignatureClassName(list2.get(i));
+                if (!className1.equals(className2)) {
                     return false;
                 }
             }
