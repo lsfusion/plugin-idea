@@ -366,6 +366,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         checkReference(o);
     }
 
+    @Override
+    public void visitSimpleName(@NotNull LSFSimpleName o) {
+        super.visitSimpleName(o);
+
+        if (o.getText().contains("##") && !isInMetaDecl(o)) {
+            addUnderscoredError(o, "Name '" + o.getText() + "' contains forbidden symbols");
+        }
+    }
+
     public static boolean isInMetaUsage(PsiElement o) {
         return PsiTreeUtil.getParentOfType(o, LSFMetaCodeBody.class) != null;
         //&& PsiTreeUtil.getParentOfType(o, LSFMetaCodeStatement.class) == null
