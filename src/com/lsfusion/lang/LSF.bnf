@@ -1045,7 +1045,7 @@ formActionObjectList ::= OBJECTS formActionObjectUsage (COMMA formActionObjectUs
 
 bracketedClassNameList ::= LBRAC classNameList RBRAC
 jsStringUsage ::= stringLiteral
-customActionPropertyDefinitionBody ::= INTERNAL ((CLIENT jsStringUsage bracketedClassNameList?) | (javaClassStringUsage bracketedClassNameList?)  | codeLiteral) (NULL)?
+customActionPropertyDefinitionBody ::= INTERNAL ((CLIENT syncTypeLiteral? jsStringUsage bracketedClassNameList?) | (javaClassStringUsage bracketedClassNameList?)  | codeLiteral) (NULL)?
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.UnfriendlyPE"
