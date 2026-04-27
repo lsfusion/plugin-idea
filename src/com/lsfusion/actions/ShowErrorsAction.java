@@ -159,7 +159,8 @@ public class ShowErrorsAction extends AnAction {
         if (virtualFile.getFileType() == LSFFileType.INSTANCE) {
             Set<ReportedError> initialErrors = collectReportedErrors(psiFile);
             if (!initialErrors.isEmpty()) {
-                ApplicationManager.getApplication().invokeAndWait(() -> PsiDocumentManager.getInstance(project).reparseFiles(Collections.singleton(psiFile.getVirtualFile()), true));
+                //second param false -> do not include opened in editor files
+                ApplicationManager.getApplication().invokeAndWait(() -> PsiDocumentManager.getInstance(project).reparseFiles(Collections.singleton(psiFile.getVirtualFile()), false));
                 Set<ReportedError> confirmedErrors = collectReportedErrors(ApplicationManager.getApplication().runReadAction((Computable<PsiFile>) () -> PsiManager.getInstance(project).findFile(psiFile.getVirtualFile())));
                 for (ReportedError error : confirmedErrors) {
                     showErrorMessage(error.file, error.startOffset, error.text, error.level, ModuleUtilCore.findModuleForFile(error.file.getVirtualFile(),
@@ -224,7 +225,7 @@ public class ShowErrorsAction extends AnAction {
     }
 
     private void showSyntaxError(PsiElement element) {
-        if (element instanceof PsiErrorElement) {
+        if (element instanceof PsiErrorElement && !LSFReferenceAnnotator.isInMetaDecl(element)) {
             showErrorMessage(element, getSyntaxErrorText((PsiErrorElement) element), LSFErrorLevel.ERROR);
         }
     }
