@@ -2042,10 +2042,10 @@ formEventDeclaration ::= ON
 }
 
 changeEventDeclaration ::=
-    CHANGE ID
+    CHANGE objectUsage
     |
     CHANGE?
-        (   OBJECT groupObjectUsage
+        (   OBJECT objectUsage
         |   FILTER groupObjectUsage
         |   ORDER groupObjectUsage
         |   FILTERS groupObjectUsage
