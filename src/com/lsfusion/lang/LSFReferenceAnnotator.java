@@ -42,6 +42,7 @@ import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.lang.classes.*;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.context.ExprsContextModifier;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
@@ -1723,8 +1724,23 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitSeekObjectActionPropertyDefinitionBody(@NotNull LSFSeekObjectActionPropertyDefinitionBody o) {
         super.visitSeekObjectActionPropertyDefinitionBody(o);
         PsiElement firstChild = o.getFirstChild();
-        if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.SEEK) {
-            addDeprecatedWarningAnnotation(firstChild, "7.0", "use ACTIVATE instead");
+        if (firstChild != null) {
+            if (firstChild.getNode().getElementType() == LSFTypes.SEEK) {
+                addDeprecatedWarningAnnotation(firstChild, "7.0", "use ACTIVATE instead");
+            }
+            checkSeekAppliedForm(o, firstChild, firstChild.getText());
+        }
+    }
+
+    private void checkSeekAppliedForm(@NotNull LSFSeekObjectActionPropertyDefinitionBody seekBody, @NotNull PsiElement seekKeyword, @NotNull String actionKeyword) {
+        LSFFormDeclaration seekFormDecl = seekBody.resolveFormDecl();
+        FormContext appliedFormContext = PsiTreeUtil.getParentOfType(seekBody, FormContext.class, true);
+        if(seekFormDecl != null && appliedFormContext != null) {
+            LSFFormDeclaration appliedFormDecl = appliedFormContext.resolveFormDecl();
+            if (appliedFormDecl != null && !seekFormDecl.equals(appliedFormDecl)) {
+                addUnderscoredError(seekKeyword, format("%s for form '%s' will be ignored in form '%s'",
+                        actionKeyword, seekFormDecl.getDeclName(), appliedFormDecl.getDeclName()));
+            }
         }
     }
 
