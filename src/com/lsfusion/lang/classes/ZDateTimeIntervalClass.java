@@ -2,7 +2,7 @@ package com.lsfusion.lang.classes;
 
 public class ZDateTimeIntervalClass extends DateTimeIntervalClass {
 
-    public final static DateTimeIntervalClass instance = new DateTimeIntervalClass();
+    public final static ZDateTimeIntervalClass instance = new ZDateTimeIntervalClass();
 
     @Override
     public String getName() {

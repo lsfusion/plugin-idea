@@ -1733,13 +1733,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void checkSeekAppliedForm(@NotNull LSFSeekObjectActionPropertyDefinitionBody seekBody, @NotNull PsiElement seekKeyword, @NotNull String actionKeyword) {
-        LSFFormDeclaration seekFormDecl = seekBody.resolveFormDecl();
-        FormContext appliedFormContext = PsiTreeUtil.getParentOfType(seekBody, FormContext.class, true);
-        if(seekFormDecl != null && appliedFormContext != null) {
-            LSFFormDeclaration appliedFormDecl = appliedFormContext.resolveFormDecl();
-            if (appliedFormDecl != null && !seekFormDecl.equals(appliedFormDecl)) {
-                addUnderscoredError(seekKeyword, format("%s for form '%s' will be ignored in form '%s'",
-                        actionKeyword, seekFormDecl.getDeclName(), appliedFormDecl.getDeclName()));
+        if(PsiTreeUtil.getParentOfType(seekBody, LSFDialogActionPropertyDefinitionBody.class, true) == null) {
+            LSFFormDeclaration seekFormDecl = seekBody.resolveFormDecl();
+            FormContext appliedFormContext = PsiTreeUtil.getParentOfType(seekBody, FormContext.class, true);
+            if (seekFormDecl != null && appliedFormContext != null) {
+                LSFFormDeclaration appliedFormDecl = appliedFormContext.resolveFormDecl();
+                if (appliedFormDecl != null && !seekFormDecl.equals(appliedFormDecl)) {
+                    addUnderscoredError(seekKeyword, format("%s for form '%s' will be ignored in form '%s'",
+                            actionKeyword, seekFormDecl.getDeclName(), appliedFormDecl.getDeclName()));
+                }
             }
         }
     }

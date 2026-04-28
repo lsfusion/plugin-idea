@@ -208,7 +208,7 @@ public class ShowErrorsAction extends AnAction {
     }
 
     private void collectSyntaxErrors(PsiElement element, Set<ReportedError> errors) {
-        if (element instanceof PsiErrorElement) {
+        if (element instanceof PsiErrorElement && !LSFReferenceAnnotator.isInMetaDecl(element)) {
             errors.add(ReportedError.from(element.getContainingFile(), element, getSyntaxErrorText((PsiErrorElement) element), LSFErrorLevel.ERROR));
         }
 
@@ -225,7 +225,7 @@ public class ShowErrorsAction extends AnAction {
     }
 
     private void showSyntaxError(PsiElement element) {
-        if (element instanceof PsiErrorElement && !LSFReferenceAnnotator.isInMetaDecl(element)) {
+        if (element instanceof PsiErrorElement) {
             showErrorMessage(element, getSyntaxErrorText((PsiErrorElement) element), LSFErrorLevel.ERROR);
         }
     }

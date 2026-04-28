@@ -881,7 +881,10 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
                         for(int j=fi*blockSize;j<BaseUtils.min((fi+1)*blockSize, postponed.size());j++) {
                             postponed.get(j).run();
                         }
-                        FileDocumentManager.getInstance().saveAllDocuments();
+                        FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+                        for (Document document : fileDocumentManager.getUnsavedDocuments()) {
+                            fileDocumentManager.saveDocumentAsIs(document);
+                        }
                     });
                 }
                 indicator.setText2("");
