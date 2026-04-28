@@ -134,6 +134,18 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitNoParamsActionUsage(@NotNull LSFNoParamsActionUsage o) {
+        super.visitNoParamsActionUsage(o);
+        LSFActionDeclaration actionDecl = o.getActionUsage().resolveDecl();
+        if (actionDecl != null) {
+            List<LSFClassSet> paramClasses = actionDecl.resolveParamClasses();
+            if (paramClasses != null && !paramClasses.isEmpty()) {
+                addUnderscoredError(o, "Action cannot have parameters in NAVIGATOR");
+            }
+        }
+    }
+
+    @Override
     public void visitPropertyElseActionUsage(@NotNull LSFPropertyElseActionUsage o) {
         super.visitPropertyElseActionUsage(o);
         checkIndirectUsage(o);
