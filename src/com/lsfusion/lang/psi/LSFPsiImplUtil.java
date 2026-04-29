@@ -542,16 +542,20 @@ public class LSFPsiImplUtil {
                 }
             }
         }
-//        LSFFormSingleActionObject singleObject = sourceStatement.getFormSingleActionObject();
-//        if(singleObject != null) {
-//            if(singleObject.getObjectInputProps() != null) {
-//                ContextModifier inputModifier = new InputContextModifier(singleObject);
-//                if (result == null)
-//                    result = inputModifier;
-//                else
-//                    result = new AndContextModifier(result, inputModifier);
-//            }
-//        }
+        LSFFormSingleActionObject singleObject = sourceStatement.getFormSingleActionObject();
+        if (singleObject != null) {
+            LSFObjectInputProps objectInputProps = singleObject.getObjectInputProps();
+            LSFSimpleName paramName = objectInputProps != null ? objectInputProps.getSimpleName() : null;
+            if (paramName != null) {
+                ContextModifier inputModifier = new ExprParamContextModifier(
+                        LSFElementGenerator.createExprParamDeclaration(paramName, resolveClass(sourceStatement.getCustomClassUsage()))
+                );
+                if (result == null)
+                    result = inputModifier;
+                else
+                    result = new AndContextModifier(result, inputModifier);
+            }
+        }
         return result != null ? result : ContextModifier.EMPTY;
     }
 
