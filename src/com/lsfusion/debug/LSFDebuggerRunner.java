@@ -75,8 +75,7 @@ public class LSFDebuggerRunner extends GenericDebuggerRunner {
             debugProcess.putUserData(BatchEvaluator.REMOTE_SESSION_KEY, Boolean.TRUE);
         }
 
-        int debuggerPort = ((LSFusionRunConfiguration) env.getRunProfile()).getDebuggerPort();
-        debugProcess.putUserData(DEBUGGER_PROPERTY_KEY, debuggerPort);
+        debugProcess.putUserData(DEBUGGER_PROPERTY_KEY, ((LSFusionRunConfiguration) env.getRunProfile()).getDebuggerPort(state));
 
         XDebugSession debugSession =
             XDebuggerManager.getInstance(env.getProject()).startSession(env, new XDebugProcessStarter() {

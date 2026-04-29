@@ -22,9 +22,14 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static com.lsfusion.debug.LSFDebuggerRunner.LIGHT_START_PROPERTY;
 import static com.lsfusion.debug.LSFDebuggerRunner.PLUGIN_ENABLED_PROPERTY;
@@ -35,6 +40,9 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
     public static final String MAIN_CLASS_NAME = BOOTSTRAP_CLASS_NAME;
 
     private static final int DEFAULT_DEBUGGER_PORT = 1299;
+    private static final String LSFUSION_DEBUGGER_PORT = "lsfusion.debugger.port";
+    private static final String DEBUGGER_PORT = "debugger.port";
+    private static final String SETTINGS_FILE = "conf/settings.properties";
 
     public String VM_PARAMETERS;
     public String PROGRAM_PARAMETERS;
@@ -177,16 +185,26 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
         return new LSFusionRunConfiguration(getName(), getProject(), LSFusionRunConfigurationType.getInstance().getConfigurationFactory());
     }
     
-    public int getDebuggerPort() {
+    public Integer getDebuggerPort(RunProfileState state) {
         String vmParams = getVMParameters();
         String[] strings = vmParams.split(" ");
         for (String s : strings) {
-            if (s.startsWith("-Dlsfusion.debugger.port")) {
-                Integer result = Integer.valueOf(s.substring(s.lastIndexOf("=") + 1));
-                if (result != null) {
-                    return result;
+            if (s.startsWith("-D" + LSFUSION_DEBUGGER_PORT)) {
+                return Integer.parseInt(s.substring(s.lastIndexOf("=") + 1));
+            }
+        }
+
+        try {
+            if (state instanceof JavaCommandLine) {
+                try (InputStream stream = Files.newInputStream(Paths.get(((JavaCommandLine) state).getJavaParameters().getWorkingDirectory(), SETTINGS_FILE))) {
+                    Properties properties = new Properties();
+                    properties.load(stream);
+                    String debuggerPort = properties.getProperty(DEBUGGER_PORT);
+                    if (debuggerPort != null)
+                        return Integer.parseInt(debuggerPort);
                 }
             }
+        } catch (ExecutionException | IOException ignored) {
         }
         return DEFAULT_DEBUGGER_PORT;
     }
@@ -211,10 +229,15 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
             final String jreHome = myConfiguration.ALTERNATIVE_JRE_PATH_ENABLED ? myConfiguration.ALTERNATIVE_JRE_PATH : null;
             JavaParametersUtil.configureModule(module, params, classPathType, jreHome);
             JavaParametersUtil.configureConfiguration(params, myConfiguration);
-            params.getVMParametersList().addProperty(LIGHT_START_PROPERTY, String.valueOf(lightStart));
+            ParametersList vmParametersList = params.getVMParametersList();
+            vmParametersList.addProperty(LIGHT_START_PROPERTY, String.valueOf(lightStart));
 
-            if (!params.getVMParametersList().hasProperty(PLUGIN_ENABLED_PROPERTY)) {
-                params.getVMParametersList().addProperty(PLUGIN_ENABLED_PROPERTY, "true");
+            if (!vmParametersList.hasProperty(PLUGIN_ENABLED_PROPERTY)) {
+                vmParametersList.addProperty(PLUGIN_ENABLED_PROPERTY, "true");
+            }
+
+            if (!vmParametersList.hasProperty(DEBUGGER_PORT)) {
+                vmParametersList.addProperty(DEBUGGER_PORT, vmParametersList.getPropertyValue(LSFUSION_DEBUGGER_PORT));
             }
 
             params.setMainClass(MAIN_CLASS_NAME);
