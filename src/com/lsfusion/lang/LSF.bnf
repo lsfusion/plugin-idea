@@ -2740,7 +2740,7 @@ exprParameterUsageList ::= (exprParameterUsage (COMMA exprParameterUsage)*)? { p
 nonEmptyActionPDBList ::= actionPropertyDefinitionBody (COMMA actionPropertyDefinitionBody)* { pin(".*") = 1}
 
 propertyExpressionList ::= (nonEmptyPropertyExpressionList)?
-nonEmptyPropertyExpressionList ::= propertyExpression (COMMA propertyExpression)* { pin(".*") = 1}
+nonEmptyPropertyExpressionList ::= propertyExpression (COMMA propertyExpression)* { pin = 1}
 
 literal ::= commonLiteral |	(<<noIDCheck>> localizedStringLiteral) // since there is a parameter afterwards we need to do lookahead (same as in staticObjectID)
 {implements = "com.lsfusion.documentation.LSFDocumentation" methods = [getDocumentation]}
