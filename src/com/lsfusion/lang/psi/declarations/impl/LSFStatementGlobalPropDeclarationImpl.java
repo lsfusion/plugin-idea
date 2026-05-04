@@ -9,7 +9,6 @@ import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.cache.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.references.LSFActionOrPropReference;
-import com.lsfusion.lang.psi.references.LSFPropReference;
 import com.lsfusion.lang.psi.stubs.StatementPropStubElement;
 import com.lsfusion.lang.psi.stubs.extend.types.ExtendStubElementType;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -21,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static com.lsfusion.util.BaseUtils.nvl;
 
 public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrGlobalPropDeclarationImpl<LSFStatementGlobalPropDeclaration, StatementPropStubElement> implements LSFStatementGlobalPropDeclaration {
 
@@ -198,7 +199,14 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
         Integer complexity = 1;
         if (!processed.contains(prop)) {
             processed.add(prop);
-            if (prop instanceof LSFGlobalPropDeclaration && !((LSFGlobalPropDeclaration<?, ?>) prop).isMaterializedProperty()) {
+            if (prop instanceof LSFStatementGlobalPropDeclarationImpl statementProp && !statementProp.isMaterializedProperty()) {
+                LSFAbstractPropertyDefinition abstractPropertyDefinition = getAbstractPropertyDefinition(statementProp);
+                if (abstractPropertyDefinition != null) {
+                    complexity = getAbstractComplexity(statementProp, processed);
+                } else {
+                    complexity += getComplexity(statementProp, processed);
+                }
+            } else if (prop instanceof LSFGlobalPropDeclaration && !((LSFGlobalPropDeclaration<?, ?>) prop).isMaterializedProperty()) {
                 Set<LSFActionOrGlobalPropDeclaration<?, ?>> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching((LSFGlobalPropDeclaration<?, ?>) prop);
                 if(dependencies != null) {
                     for (LSFActionOrGlobalPropDeclaration<?, ?> dependency : dependencies) {
@@ -209,6 +217,81 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
         }
 
         return complexity;    
+    }
+
+    private static int getComplexity(LSFStatementGlobalPropDeclarationImpl statementProp, Set<LSFPropDeclaration> processed) {
+        LSFPropertyCalcStatement propertyCalcStatement = statementProp.getPropertyCalcStatement();
+        if(propertyCalcStatement != null) {
+            return getElementComplexity(nvl(propertyCalcStatement.getPropertyExpression(), propertyCalcStatement), processed);
+        }
+        return 0;
+    }
+
+    private static int getElementComplexity(PsiElement element, Set<LSFPropDeclaration> processed) {
+        if (element instanceof LSFIfElsePropertyDefinition) {
+            return getIfElseComplexity((LSFIfElsePropertyDefinition) element, processed);
+        } else if (element instanceof LSFCasePropertyDefinition) {
+            return getCaseComplexity((LSFCasePropertyDefinition) element, processed);
+        } else if (element instanceof LSFActionOrPropReference<?, ?> reference) {
+            LSFActionOrPropDeclaration decl = reference.resolveDecl();
+            return decl instanceof LSFGlobalPropDeclaration ? getPropComplexity((LSFPropDeclaration) decl, processed) : 0;
+        }
+        int complexity = 0;
+        for (PsiElement child : element.getChildren()) {
+            complexity += getElementComplexity(child, processed);
+        }
+        return complexity;
+    }
+
+    private static int getAbstractComplexity(LSFStatementGlobalPropDeclarationImpl statementProp, Set<LSFPropDeclaration> processed) {
+        int complexity = 1;
+        Set<LSFActionOrGlobalPropDeclaration<?, ?>> dependencies = PropertyDependenciesCache.getInstance(statementProp.getProject()).resolveWithCaching(statementProp);
+        if (dependencies != null) {
+            for (LSFActionOrGlobalPropDeclaration<?, ?> dependency : dependencies) {
+                complexity = Math.max(complexity, 1 + getPropComplexity((LSFGlobalPropDeclaration<?, ?>) dependency, processed));
+            }
+        }
+        return complexity;
+    }
+
+    private static int getIfElseComplexity(LSFIfElsePropertyDefinition ifElsePropertyDefinition, Set<LSFPropDeclaration> processed) {
+        List<LSFPropertyExpression> expressions = ifElsePropertyDefinition.getPropertyExpressionList();
+        int complexity = expressions.isEmpty() ? 0 : getElementComplexity(expressions.getFirst(), processed);
+        int branchComplexity = 0;
+        for (int i = 1; i < expressions.size(); i++) {
+            branchComplexity = Math.max(branchComplexity, getElementComplexity(expressions.get(i), processed));
+        }
+        return complexity + branchComplexity;
+    }
+
+    private static int getCaseComplexity(LSFCasePropertyDefinition casePropertyDefinition, Set<LSFPropDeclaration> processed) {
+        int conditionsComplexity = 0;
+        int branchComplexity = 0;
+        for (LSFCaseBranchBody caseBranchBody : casePropertyDefinition.getCaseBranchBodyList()) {
+            List<LSFPropertyExpression> expressions = caseBranchBody.getPropertyExpressionList();
+            if (!expressions.isEmpty()) {
+                conditionsComplexity += getElementComplexity(expressions.get(0), processed);
+                if (expressions.size() > 1) {
+                    branchComplexity = Math.max(branchComplexity, getElementComplexity(expressions.get(1), processed));
+                }
+            }
+        }
+        LSFPropertyExpression elseExpression = casePropertyDefinition.getPropertyExpression();
+        if (elseExpression != null) {
+            branchComplexity = Math.max(branchComplexity, getElementComplexity(elseExpression, processed));
+        }
+        return conditionsComplexity + branchComplexity;
+    }
+
+    private static LSFAbstractPropertyDefinition getAbstractPropertyDefinition(LSFStatementGlobalPropDeclarationImpl statementProp) {
+        LSFPropertyCalcStatement propertyCalcStatement = statementProp.getPropertyCalcStatement();
+        if (propertyCalcStatement != null) {
+            LSFExpressionUnfriendlyPD expressionUnfriendlyPD = propertyCalcStatement.getExpressionUnfriendlyPD();
+            if (expressionUnfriendlyPD != null) {
+                return expressionUnfriendlyPD.getAbstractPropertyDefinition();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -236,7 +319,7 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
         LSFOverridePropertyStatement overrideStatement = PsiTreeUtil.getParentOfType(impRef, LSFOverridePropertyStatement.class);
         if(overrideStatement != null) {
             for (LSFPropertyExpression propertyExpression : overrideStatement.getPropertyExpressionList()) {
-                references.addAll(PsiTreeUtil.findChildrenOfType(propertyExpression, LSFPropReference.class));
+                references.addAll(PsiTreeUtil.findChildrenOfType(propertyExpression, LSFActionOrPropReference.class));
             }
         }
     }
