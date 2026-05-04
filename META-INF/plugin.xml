@@ -2,7 +2,7 @@
     <id>lsfusion.idea.plugin</id>
     <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
-    <version>1.0.306</version>
+    <version>1.0.307</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -11,8 +11,12 @@
         <b>Version 1.0.307</b><br>
         <ul>
             <li>Introduce XML type support</li>
-            <li>FILTER/FILTERS and ORDER/ORDERS in FORM: support unified USER | FIXED rules; USERFILTERS deprecated</li>
-            <li>Add IDE support for <code>INPUT MULTI</code> for file-based input types</li>
+            <li>Add IDE support for `INPUT MULTI`, `THISSESSION`, refined `CUSTOM ACTION` sync grammar, and unified `FILTER/FILTERS` and `ORDER/ORDERS` rules in forms</li>
+            <li>Improve language support for embedded lsFusion in Java, including `Ctrl+Alt+F7` usages and parser fixes for `DIALOG INPUT DO`, `NEWCONNECTION`, `EVENTS ON CHANGE`, and related grammar pins</li>
+            <li>Expand inspections and diagnostics with syntax-aware Show Errors, new abstract/action validation, SEEK cross-context checks, duplicate signature detection, and clearer error reporting</li>
+            <li>Fix resolver and type inference issues for filters/orders, TreeGroup usage, symbol ordering, parameter class resolution, NAVIGATOR actions, and local debugger values</li>
+            <li>Improve metacode stability with automatic refresh on required module changes, support for <code>##</code> and <code>###</code> outside declarations, and EDT-related fixes</li>
+            <li>Fix form generation and runtime integration issues, including JSON `EXTID`, sandbox Kubernetes plugin conflicts, and several stability fixes such as `IllegalArgumentException` handling</li>
         </ul>
     ]]>
     </change-notes>
