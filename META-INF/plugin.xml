@@ -11,6 +11,7 @@
         <b>Version 1.0.308</b><br>
         <ul>
             <li>Property Complexity fix for ABSTRACT, IF, CASE</li>
+            <li>Parameter info for actions and properties (CTRL+P)</li>
         </ul>
     ]]>
     </change-notes>
@@ -174,6 +175,7 @@
         <elementDescriptionProvider implementation="com.lsfusion.lang.psi.LSFElementDescriptionProvider"/>
 
         <completion.contributor language="Lsf" implementationClass="com.lsfusion.completion.ASTCompletionContributor"/>
+        <codeInsight.parameterInfo language="Lsf" implementationClass="com.lsfusion.parameterInfo.LSFParameterInfoHandler"/>
 
         <statementUpDownMover implementation="com.lsfusion.LSFStatementUpDownMover"/>
 
