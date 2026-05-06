@@ -1468,7 +1468,8 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFExpressionFriendlyPD sourceStatement, @Nullable InferExResult inferred) {
-        return ((LSFExpression) sourceStatement.getChildren()[0]).resolveInferredValueClass(inferred);
+        PsiElement firstChild = sourceStatement.getFirstChild();
+        return firstChild instanceof LSFExpression ? ((LSFExpression) firstChild).resolveInferredValueClass(inferred) : null;
     }
 
     private static LSFExClassSet resolveValueClass(LSFPropertyUsage usage, boolean infer) {
@@ -2106,7 +2107,8 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValueClassNames(@NotNull LSFExpressionFriendlyPD sourceStatement) {
-        return ((LSFExpression) sourceStatement.getFirstChild()).getValueClassNames();
+        PsiElement firstChild = sourceStatement.getFirstChild();
+        return firstChild instanceof LSFExpression ? ((LSFExpression) firstChild).getValueClassNames() : Collections.EMPTY_LIST;
     }
 
     public static List<String> getValueClassNames(@NotNull LSFJoinPropertyDefinition sourceStatement) {
@@ -2476,7 +2478,8 @@ public class LSFPsiImplUtil {
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFExpressionFriendlyPD sourceStatement) {
-        return ((LSFExpression) sourceStatement.getFirstChild()).getValuePropertyNames();
+        PsiElement firstChild = sourceStatement.getFirstChild();
+        return firstChild instanceof LSFExpression ? ((LSFExpression) firstChild).getValuePropertyNames() : Collections.EMPTY_LIST;
     }
 
     public static List<String> getValuePropertyNames(@NotNull LSFJoinPropertyDefinition sourceStatement) {
@@ -3866,7 +3869,8 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Inferred inferParamClasses(@NotNull LSFExpressionFriendlyPD sourceStatement, @Nullable LSFExClassSet valueClass) {
-        return ((LSFExpression) sourceStatement.getChildren()[0]).inferParamClasses(valueClass);
+        PsiElement firstChild = sourceStatement.getFirstChild();
+        return firstChild instanceof LSFExpression ? ((LSFExpression) firstChild).inferParamClasses(valueClass) : Inferred.EMPTY;
     }
 
     public static Inferred inferJoinParamClasses(LSFActionOrPropReference<?, ?> usage, LSFPropertyExprObject exprObject, LSFPropertyExpressionList peList, @Nullable LSFExClassSet valueClass) {
