@@ -13,7 +13,7 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.LSFLineMarkerProvider;
+import com.lsfusion.LSFLineMarkerProviderDescriptor;
 import com.lsfusion.design.view.DesignView;
 import com.lsfusion.design.view.DesignViewFactory;
 import com.lsfusion.lang.psi.*;
@@ -25,7 +25,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.event.MouseEvent;
 
-public class DesignPreviewLineMarkerProvider extends LSFLineMarkerProvider {
+public class DesignPreviewLineMarkerProvider extends LSFLineMarkerProviderDescriptor {
+    @Override
+    public @NotNull String getName() {
+        return "lsFusion design preview";
+    }
+
+    @Override
+    public javax.swing.Icon getIcon() {
+        return LSFIcons.Design.DESIGN;
+    }
 
     @Nullable
     @Override

@@ -12,6 +12,7 @@
         <ul>
             <li>Property Complexity fix for ABSTRACT, IF, CASE</li>
             <li>Parameter info for actions and properties (CTRL+P)</li>
+            <li>Line Markers refactored and moved to Gutter Icons Settings</li>
         </ul>
     ]]>
     </change-notes>
@@ -49,13 +50,13 @@
 
             <separator/>
             <!--suppress PluginXmlCapitalization -->
+            <action id="LSFGutterIcons"
+                    class="com.lsfusion.actions.LSFGutterIconsAction"
+                    text="lsFusion _Line Markers Settings"
+                    description="Open Gutter Icons settings for lsFusion line markers"/>
             <action id="ToggleLSFCompletion" class="com.lsfusion.actions.ToggleCompletionAction"
                     text="lsFusion Co_mpletion Support"
                     description="Toggle lsFusion completion support"/>
-            <action id="ToggleLSFComplexity" class="com.lsfusion.actions.ToggleComplexityAction"
-                    text="Show _Property Complexity" description="Toggle property complexity"/>
-            <action id="ToggleLSFShowTable" class="com.lsfusion.actions.ToggleShowTableAction"
-                    text="Show Property _Table" description="Toggle showing property table"/>
 
             <group id="propertyFolding" popup="true" text="Property _Classes">
                 <action id="AllPropertyFolding" class="com.lsfusion.actions.folding.ShowAllPropertyFoldingAction"
@@ -157,12 +158,6 @@
         <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>
         <gotoTargetRendererProvider implementation="com.lsfusion.LSFGoToTargetRendererProvider"/>
         <structureViewBuilder factoryClass="com.lsfusion.structure.LSFInterfacesStructureViewBuilderFactory"/>
-
-        <codeInsight.lineMarkerProvider language="Lsf"
-                                        implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>
-
-        <codeInsight.lineMarkerProvider language="Lsf"
-                                        implementationClass="com.lsfusion.lang.meta.MetaNestingLineMarkerProvider"/>
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
 
@@ -287,6 +282,17 @@
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.dependencies.property.PropertyColorLineMarkerProvider"/>
 
+        <!-- reports related stuff -->
+        <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>
+        <codeInsight.lineMarkerProvider language="Lsf"
+                                        implementationClass="com.lsfusion.reports.JrxmlLinkLineMarkerProvider"/>
+
+        <codeInsight.lineMarkerProvider language="Lsf"
+                                        implementationClass="com.lsfusion.design.DesignPreviewLineMarkerProvider"/>
+
+        <codeInsight.lineMarkerProvider language="Lsf"
+                                        implementationClass="com.lsfusion.lang.meta.MetaNestingLineMarkerProvider"/>
+
         <!-- debugger -->
         <xdebugger.breakpointType implementation="com.lsfusion.debug.LSFBreakpointType" />
         <xdebugger.breakpointType implementation="com.lsfusion.debug.property.LSFPropertyBreakpointType" />
@@ -296,11 +302,6 @@
 
         <programRunner implementation="com.lsfusion.debug.LSFDebuggerRunner" />
         <debugger.codeFragmentFactory implementation="com.lsfusion.debug.evaluation.LSFCodeFragmentFactory"/>
-
-        <!-- reports related stuff -->
-        <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>
-        <codeInsight.lineMarkerProvider language="Lsf"
-                                        implementationClass="com.lsfusion.reports.JrxmlLinkLineMarkerProvider"/>
 
         <consoleFilterProvider implementation="com.lsfusion.LSFConsoleFilterProvider"/>
 

@@ -8,7 +8,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
-import com.lsfusion.LSFLineMarkerProvider;
+import com.lsfusion.LSFLineMarkerProviderDescriptor;
+import com.lsfusion.actions.LSFGutterIconsAction;
 import com.lsfusion.lang.psi.LSFMetaCodeStatement;
 import com.lsfusion.lang.psi.LSFSimpleName;
 import com.lsfusion.lang.psi.references.LSFMetaReference;
@@ -18,7 +19,17 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
-public class MetaNestingLineMarkerProvider extends LSFLineMarkerProvider {
+public class MetaNestingLineMarkerProvider extends LSFLineMarkerProviderDescriptor {
+    @Override
+    public @NotNull String getName() {
+        return "lsFusion meta nesting";
+    }
+
+    @Override
+    public Icon getIcon() {
+        return LSFGutterIconsAction.createTextBadgeIcon(markerColor, () -> "M", 2);
+    }
+
     @Nullable
     @Override
     protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement element) {
@@ -45,29 +56,7 @@ public class MetaNestingLineMarkerProvider extends LSFLineMarkerProvider {
 
     private static JBColor markerColor = new JBColor(Gray._160, Gray._90);
     private static Icon createIcon(final int level) {
-        return new Icon() {
-            @Override
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                String text = String.valueOf(level);
-                g.setColor(markerColor);
-
-                g.drawRoundRect(x, y, 12, 12, 2, 2);
-                g.setFont(textFont);
-
-                int textWidth = g.getFontMetrics(textFont).stringWidth(text);
-                g.drawString(text, x + (12 - textWidth) / 2, y + 11);
-            }
-
-            @Override
-            public int getIconWidth() {
-                return 12;
-            }
-
-            @Override
-            public int getIconHeight() {
-                return 12;
-            }
-        };
+        return LSFGutterIconsAction.createTextBadgeIcon(markerColor, () -> String.valueOf(level), 0);
     }
 
     public static int resolveNestingLevel(PsiElement element) {

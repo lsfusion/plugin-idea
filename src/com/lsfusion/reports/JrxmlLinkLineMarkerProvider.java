@@ -12,7 +12,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.Function;
 import com.lsfusion.LSFIcons;
-import com.lsfusion.LSFLineMarkerProvider;
+import com.lsfusion.LSFLineMarkerProviderDescriptor;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +28,16 @@ import static com.lsfusion.design.DesignPreviewLineMarkerProvider.resolveFormDec
 import static com.lsfusion.reports.ReportUtils.hasReportFiles;
 import static com.lsfusion.util.LSFFileUtils.getFileRelativePath;
 
-public class JrxmlLinkLineMarkerProvider extends LSFLineMarkerProvider {
+public class JrxmlLinkLineMarkerProvider extends LSFLineMarkerProviderDescriptor {
+    @Override
+    public @NotNull String getName() {
+        return "lsFusion jrxml reports";
+    }
+
+    @Override
+    public Icon getIcon() {
+        return LSFIcons.PRINT;
+    }
 
     @Nullable
     @Override

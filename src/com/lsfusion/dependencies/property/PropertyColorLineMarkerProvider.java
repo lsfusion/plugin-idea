@@ -6,7 +6,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
-import com.lsfusion.LSFLineMarkerProvider;
+import com.lsfusion.LSFLineMarkerProviderDescriptor;
+import com.lsfusion.actions.LSFGutterIconsAction;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.psi.LSFColorLiteral;
 import com.lsfusion.lang.psi.LSFUintLiteral;
@@ -18,7 +19,18 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-public class PropertyColorLineMarkerProvider extends LSFLineMarkerProvider {
+public class PropertyColorLineMarkerProvider extends LSFLineMarkerProviderDescriptor {
+
+    @Override
+    public @NotNull String getName() {
+        return "lsFusion property color";
+    }
+
+    @Override
+    public Icon getIcon() {
+        return LSFGutterIconsAction.createFilledSquareIcon(JBColor.GRAY);
+    }
+
     @Nullable
     @Override
     protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement element) {
@@ -32,32 +44,12 @@ public class PropertyColorLineMarkerProvider extends LSFLineMarkerProvider {
     private LineMarkerInfo<?> createLineMarker(PsiElement psi, Color color) {
         return new LineMarkerInfo<>(psi,
                 psi.getTextRange(),
-                createIcon(color),
+                LSFGutterIconsAction.createFilledSquareIcon(new JBColor(color, color)),
                 null,
                 ShowTableNavigationProvider.INSTANCE,
                 GutterIconRenderer.Alignment.LEFT,
                 () -> ""
         );
-    }
-
-    private static Icon createIcon(Color color) {
-        return new Icon() {
-            @Override
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                g.setColor(new JBColor(color, color));
-                g.fillRect(x, y, 12, 12);
-            }
-
-            @Override
-            public int getIconWidth() {
-                return 12;
-            }
-
-            @Override
-            public int getIconHeight() {
-                return 12;
-            }
-        };
     }
 
     private static class ShowTableNavigationProvider implements GutterIconNavigationHandler<PsiElement> {

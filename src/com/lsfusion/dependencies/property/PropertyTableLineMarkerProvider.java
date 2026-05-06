@@ -10,8 +10,8 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Function;
-import com.lsfusion.LSFLineMarkerProvider;
-import com.lsfusion.actions.ToggleShowTableAction;
+import com.lsfusion.LSFLineMarkerProviderDescriptor;
+import com.lsfusion.actions.LSFGutterIconsAction;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.LSFId;
 import com.lsfusion.lang.psi.LSFSimpleName;
@@ -32,7 +32,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class PropertyTableLineMarkerProvider extends LSFLineMarkerProvider {
+public class PropertyTableLineMarkerProvider extends LSFLineMarkerProviderDescriptor {
+    @Override
+    public @NotNull String getName() {
+        return "lsFusion property table";
+    }
+
+    @Override
+    public Icon getIcon() {
+        return createIcon();
+    }
+
     @Nullable
     @Override
     protected LineMarkerInfo<?> getLSFLineMarkerInfo(@NotNull PsiElement element) {
@@ -41,10 +51,6 @@ public class PropertyTableLineMarkerProvider extends LSFLineMarkerProvider {
 
     @Override
     protected void collectSlowLSFLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
-        if (!elements.isEmpty() && !ToggleShowTableAction.isShowTableEnabled(elements.iterator().next().getProject())) {
-            return;
-        }
-        
         Document document = null;
         Set<Integer> usedLines = new HashSet<>();
         for (PsiElement element : elements) {
@@ -88,31 +94,9 @@ public class PropertyTableLineMarkerProvider extends LSFLineMarkerProvider {
         );
     }
 
-    private static JBColor markerColor = new JBColor(new Color(255, 153, 0), new Color(255, 153, 0));
+    private static final JBColor markerColor = new JBColor(new Color(255, 153, 0), new Color(255, 153, 0));
     private static Icon createIcon() {
-        return new Icon() {
-            @Override
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                String text = "T";
-                g.setColor(markerColor);
-
-                g.drawRoundRect(x, y, 12, 12, 2, 2);
-                g.setFont(textFont);
-
-                int textWidth = g.getFontMetrics(textFont).stringWidth(text);
-                g.drawString(text, x + (14 - textWidth) / 2, y + 11);
-            }
-
-            @Override
-            public int getIconWidth() {
-                return 12;
-            }
-
-            @Override
-            public int getIconHeight() {
-                return 12;
-            }
-        };
+        return LSFGutterIconsAction.createTextBadgeIcon(markerColor,() -> "T", 2);
     }
 
     private static class PropertyShowTableTooltipProvider implements Function<PsiElement, String> {
