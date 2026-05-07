@@ -728,7 +728,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
             PsiFile psiFile = PsiManager.getInstance(myProject).findFile(file.getVirtualFile());
             LSFModuleDeclaration module = psiFile instanceof LSFFile ? ((LSFFile) psiFile).getModuleDeclaration() : null;
             if (module != null && module.isValid()) {
-                addDependentModulesUsageProcessing(module, Set.of(module));
+                addDependentModulesUsageProcessing(module, ContainerUtil.newHashSet(module));
             }
         }));
     }

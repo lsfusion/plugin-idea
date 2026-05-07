@@ -18,10 +18,10 @@ import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -33,10 +33,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
-import com.lsfusion.design.DesignInfo;
-import com.lsfusion.design.model.ComponentView;
 import com.lsfusion.design.model.ContainerType;
-import com.lsfusion.design.model.ContainerView;
 import com.lsfusion.design.model.FontInfo;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.lang.classes.*;
@@ -53,6 +50,8 @@ import com.lsfusion.lang.psi.impl.LSFLocalPropertyDeclarationNameImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.declarations.impl.LSFStatementActionDeclarationImpl;
 import com.lsfusion.lang.psi.references.*;
+import com.lsfusion.lang.psi.references.impl.LSFFullNameReferenceImpl;
+import com.lsfusion.lang.psi.references.impl.LSFReferenceImpl;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFStringUtils;
@@ -1022,15 +1021,41 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private boolean checkReference(LSFReference reference) {
-        LSFResolvingError errorAnnotation = reference.resolveErrorAnnotation(myHolder);
+        LSFResolveResult resolveResult = reference instanceof LSFReferenceImpl<?> referenceImpl ? referenceImpl.multiResolveDecl(true) : null;
+        LSFResolvingError errorAnnotation = resolveResult != null ? resolveResult.resolveErrorAnnotation(myHolder) : reference.resolveErrorAnnotation(myHolder);
         if (errorAnnotation != null) { // !isInMetaDecl(reference)
             if(errorAnnotation.deprecated)
                 addDeprecatedWarningAnnotation(reference, errorAnnotation.text);
             else
-                addErrorWithResolving(reference, errorAnnotation); // since in meta usage there can be total different resolved references
+                addErrorWithResolving(reference, errorAnnotation, getRequireModuleFixes(reference, resolveResult)); // since in meta usage there can be total different resolved references
             return false;
         }
         return true;
+    }
+
+    private List<IntentionAction> getRequireModuleFixes(LSFReference reference, @Nullable LSFResolveResult resolveResult) {
+        List<IntentionAction> candidates = new ArrayList<>();
+        if ((resolveResult != null && resolveResult.errorAnnotator instanceof LSFResolveResult.NotFoundErrorAnnotator)
+                && (reference instanceof LSFFullNameReferenceImpl<?, ?> fullNameReference)) {
+            LSFModuleDeclaration currentModule = LSFRequireModuleFix.findModuleDeclaration(fullNameReference.getLSFFile());
+            if (currentModule != null) {
+                Set<VirtualFile> requiredFiles = LSFGlobalResolver.getRequireModules(currentModule);
+                for (LSFFullNameDeclaration declaration : fullNameReference.findDeclarationsInScope(fullNameReference.getLSFFile().getScope())) {
+                    LSFFile declarationFile = declaration.getLSFFile();
+                    VirtualFile declarationVirtualFile = declarationFile.getVirtualFile();
+                    if (declarationVirtualFile != null && !requiredFiles.contains(declarationVirtualFile)) {
+                        LSFModuleDeclaration candidateModule = declarationFile.getModuleDeclaration();
+                        if (candidateModule != null) {
+                            String candidateModuleName = candidateModule.getGlobalName();
+                            if (candidateModuleName != null && !candidateModuleName.equals(currentModule.getGlobalName())) {
+                                candidates.add(new LSFRequireModuleFix(currentModule, candidateModuleName));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return candidates;
     }
 
     private void checkRelationalPE(LSFRelationalPE relationalPE) {
@@ -1113,19 +1138,25 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addErrorWithResolving(element, new LSFResolvingError(element, message, true));
     }
     private void addErrorWithResolving(PsiElement element, LSFResolvingError error) {
-        addError(element, error, true);
+        addErrorWithResolving(element, error, null);
+    }
+    private void addErrorWithResolving(PsiElement element, LSFResolvingError error, List<IntentionAction> fixes) {
+        addError(element, error, true, fixes);
     }
     private void addUnderscoredError(PsiElement element, TextRange range, String message) {
-        addError(element, new LSFResolvingError(element, range, message, true), false);
+        addError(element, new LSFResolvingError(element, range, message, true));
     }
     private void addUnderscoredError(PsiElement element, String message) {
-        addError(element, new LSFResolvingError(element, message, true), false);
+        addError(element, new LSFResolvingError(element, message, true));
     }
-    private void addError(PsiElement element, LSFResolvingError error, boolean hasResolving) {
+    private void addError(PsiElement element, LSFResolvingError error) {
+        addError(element, error, false, null);
+    }
+    private void addError(PsiElement element, LSFResolvingError error, boolean hasResolving, List<IntentionAction> fixes) {
         if (isInMetaDecl(element) && hasResolving) {
             addInfoAnnotation(element, error.range, error.text, error.underscored ? WAVE_UNDERSCORED_META_ERROR : META_ERROR);
         } else {
-            addErrorAnnotation(element, error.range, error.text, error.underscored ? WAVE_UNDERSCORED_ERROR : ERROR);
+            addErrorAnnotation(element, error.range, error.text, error.underscored ? WAVE_UNDERSCORED_ERROR : ERROR, fixes);
         }
     }
 
@@ -1134,6 +1165,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes) {
+        addErrorAnnotation(element, range, text, textAttributes, null);
+    }
+
+    private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes, List<IntentionAction> fixes) {
         if (errorsSearchMode) {
             if (searchMessageConsumer != null) {
                 searchMessageConsumer.accept(element, text, LSFErrorLevel.ERROR);
@@ -1145,8 +1180,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (range != null) {
                 annotationBuilder = annotationBuilder.range(range);
             }
-            annotationBuilder.enforcedTextAttributes(mergeMetaAttributes(element, textAttributes))
-                    .create();
+            annotationBuilder = annotationBuilder.enforcedTextAttributes(mergeMetaAttributes(element, textAttributes));
+            if (fixes != null) {
+                for (IntentionAction fix : fixes) {
+                    annotationBuilder = annotationBuilder.withFix(fix);
+                }
+            }
+            annotationBuilder.create();
         }
     }
 

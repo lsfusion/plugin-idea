@@ -3,11 +3,13 @@ package com.lsfusion.lang.psi.references.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
+import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.FullNameStubElement;
 import com.lsfusion.lang.psi.stubs.types.FullNameStubElementType;
@@ -17,7 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 // G extends T
 public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G extends LSFFullNameDeclaration> extends LSFGlobalReferenceImpl<T> implements LSFFullNameReference<T, G> {
@@ -97,6 +101,32 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     protected List<G> getVirtDecls() {
         return new ArrayList<>();
     }
+
+    public Collection<G> findDeclarationsInScope(GlobalSearchScope scope) {
+        Collection<G> declarations = new ArrayList<>();
+        Set<LSFStringStubIndex<G>> usedIndices = new HashSet<>();
+        LSFLocalSearchScope localScope = LSFLocalSearchScope.createFrom(this);
+        for (FullNameStubElementType type : getStubElementTypes()) {
+            LSFStringStubIndex<G> index = type.getGlobalIndex();
+            if (usedIndices.add(index)) {
+                declarations.addAll(LSFGlobalResolver.getItemsFromIndex(index, getNameRef(), getProject(), scope, localScope));
+            }
+        }
+
+        String fullNameRef = getFullNameRef();
+        Integer offsetRef = getOffsetRef();
+        Condition<G> condition = getCondition();
+        Collection<G> fitDeclarations = new ArrayList<>();
+        for (G declaration : declarations) {
+            if ((fullNameRef == null || fullNameRef.equals(declaration.getNamespaceName()))
+                    && condition.value(declaration)
+                    && (offsetRef == null || !LSFGlobalResolver.isAfter(getLSFFile(), offsetRef, declaration))) {
+                fitDeclarations.add(declaration);
+            }
+        }
+        return fitDeclarations;
+    }
+
     protected Collection<? extends T> resolveDeclarations() {
         List<G> virtDecls = getVirtDecls();
         Collection decls = findElements(this, getStubElementTypes(), getCondition(), getFinalizer(), virtDecls);
