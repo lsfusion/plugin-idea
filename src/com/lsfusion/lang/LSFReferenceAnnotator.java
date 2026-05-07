@@ -801,6 +801,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     public void visitStringValueLiteral(@NotNull LSFStringValueLiteral o) {
         super.visitStringValueLiteral(o);
+        checkNonMetacodeStringLiteral(o);
         if (!LSFStringUtils.isRawLiteral(o.getText())) {
             checkEscapeSequences(o, "nrt'\\");
         }
@@ -808,6 +809,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     public void visitLocalizedStringValueLiteral(@NotNull LSFLocalizedStringValueLiteral o) {
         super.visitLocalizedStringValueLiteral(o);
+        checkNonMetacodeStringLiteral(o);
         if (!o.isRawLiteral()) {
             checkEscapeSequences(o, "nrt'\\{}$");
             checkLocalizedStringFormat(o);
@@ -815,6 +817,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (!o.needToBeLocalized() && !o.getValue().isEmpty()) {
                 addLocalizationWarnings(o, o);
             }
+        }
+    }
+
+    private void checkNonMetacodeStringLiteral(@NotNull PsiElement literal) {
+        if (!isInMetaDecl(literal) && literal.getNode().getFirstChildNode().getElementType() == LSFTypes.ID) {
+            addUnderscoredError(literal, "String literal expected");
         }
     }
 
