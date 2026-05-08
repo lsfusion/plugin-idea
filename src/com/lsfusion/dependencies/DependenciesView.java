@@ -10,6 +10,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -106,6 +107,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     //third toolbar
     protected boolean manualMode = false;
+    private ActionToolbar thirdToolbar;
 
     protected double latestScale = 1;
 
@@ -151,7 +153,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         JPanel toolbar = new JPanel(new VerticalLayout());
         toolbar.add(createFirstToolbar().getComponent());
         toolbar.add(createSecondToolbar());
-        toolbar.add(createThirdToolbar().getComponent());
+        thirdToolbar = createThirdToolbar();
+        toolbar.add(thirdToolbar.getComponent());
 
         add(toolbar, BorderLayout.NORTH);
     }
@@ -286,6 +289,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
         });
 
+        addThirdToolbarActions(actions);
+
         actions.add(new Separator("|"));
 
         actions.add(new AnAction(LSFIcons.DEPENDENCY_ZOOM_OUT) {
@@ -321,6 +326,22 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(title, actions, true);
         actionToolbar.setTargetComponent(this);
         return actionToolbar;
+    }
+
+    protected void addThirdToolbarActions(@NotNull SimpleActionGroup actions) {
+    }
+
+    protected void refreshThirdToolbarActions() {
+        Runnable updateToolbarActions = () -> {
+            if (thirdToolbar != null) {
+                thirdToolbar.updateActionsImmediately();
+            }
+        };
+        if (ApplicationManager.getApplication().isDispatchThread()) {
+            updateToolbarActions.run();
+        } else {
+            ApplicationManager.getApplication().invokeLater(updateToolbarActions);
+        }
     }
 
     public Collection<GraphNode> getAllNodes() {
@@ -443,13 +464,15 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
 
             public void run(@NotNull ProgressIndicator indicator) {
-                if (showRequired) {
-                    createDependencyNode(currentElement, new HashSet<>());
-                }
+                DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+                    if (showRequired) {
+                        createDependencyNode(currentElement, new HashSet<>());
+                    }
 
-                if (showRequiring) {
-                    createDependentNode(moduleAction.getCurrentModuleScope(), currentElement, new HashSet<>());
-                }
+                    if (showRequiring) {
+                        createDependentNode(moduleAction.getCurrentModuleScope(), currentElement, new HashSet<>());
+                    }
+                });
             }
         }.queue();
     }
