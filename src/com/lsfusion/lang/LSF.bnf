@@ -2749,6 +2749,10 @@ expressionLiteral ::= commonLiteral | (<<noIDCheck>> expressionStringLiteral)
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
 objectPropertyDefinition ::= (VALUE | ACTIVE) groupObjectID
+{
+    implements = "com.lsfusion.documentation.LSFDocumentation"
+    methods = [getDocumentation]
+}
 
 private commonLiteral ::=
         ulongLiteral

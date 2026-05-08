@@ -5225,11 +5225,11 @@ public class LSFPsiImplUtil {
     }
 
     public static String getDocumentation(LSFActivePropertyDefinition lsfActivePropertyDefinition, PsiElement child) {
-        return "ACTIVE_PROPERTY_operator";
+        return "ACTIVE_operator";
     }
 
     public static String getDocumentation(LSFActiveTabDefinition lsfActiveTabDefinition, PsiElement child) {
-        return "ACTIVE_TAB_operator";
+        return "ACTIVE_operator";
     }
 
     public static String getDocumentation(LSFDataPropertyDefinition lsfDataPropertyDefinition, PsiElement child) {
@@ -5341,7 +5341,11 @@ public class LSFPsiImplUtil {
     }
 
     public static String getDocumentation(LSFSeekObjectActionPropertyDefinitionBody lsfSeekObjectActionPropertyDefinitionBody, PsiElement child) {
-        return "SEEK_operator";
+        return "ACTIVATE_operator";
+    }
+
+    public static String getDocumentation(LSFObjectPropertyDefinition lsfObjectPropertyDefinition, PsiElement child) {
+        return "ACTIVE_operator";
     }
 
     public static String getDocumentation(LSFChangeClassActionPropertyDefinitionBody lsfChangeClassActionPropertyDefinitionBody, PsiElement child) {
@@ -5397,7 +5401,7 @@ public class LSFPsiImplUtil {
     }
 
     public static String getDocumentation(LSFActiveFormActionPropertyDefinitionBody lsfActiveFormActionPropertyDefinitionBody, PsiElement child) {
-        return "ACTIVE_FORM_operator";
+        return "ACTIVE_operator";
     }
 
     public static String getDocumentation(LSFActivateActionPropertyDefinitionBody lsfActivateActionPropertyDefinitionBody, PsiElement child) {
