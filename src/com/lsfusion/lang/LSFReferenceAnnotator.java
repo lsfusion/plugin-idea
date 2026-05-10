@@ -1814,4 +1814,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             addDeprecatedWarningAnnotation(firstChild, "7.0", "use ACTIVE instead");
         }
     }
+
+    @Override
+    public void visitNewThreadActionPropertyDefinitionBody(@NotNull LSFNewThreadActionPropertyDefinitionBody o) {
+        super.visitNewThreadActionPropertyDefinitionBody(o);
+        for (PsiElement child = o.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child.getNode().getElementType() == LSFTypes.CONNECTION) {
+                addDeprecatedWarningAnnotation(child, "7.0", "use NEWEXECUTOR { ... } CLIENT conn NOWAIT instead");
+                break;
+            }
+        }
+    }
 }

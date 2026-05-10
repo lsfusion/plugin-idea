@@ -13,6 +13,7 @@
             <li>Property Complexity fix for ABSTRACT, IF, CASE</li>
             <li>Parameter info for actions and properties (CTRL+P)</li>
             <li>Line Markers refactored and moved to Gutter Icons Settings</li>
+            <li>Add IDE support for <code>NEWEXECUTOR ... CLIENT conn</code> and deprecation warning for legacy <code>NEWTHREAD ... CONNECTION conn</code></li>
         </ul>
     ]]>
     </change-notes>
