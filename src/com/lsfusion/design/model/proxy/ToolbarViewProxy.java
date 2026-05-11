@@ -16,12 +16,6 @@ public class ToolbarViewProxy extends ComponentViewProxy<ToolbarView> {
         target.showViews = showViews;
     }
 
-    //deprecated since 6.0, will be removed in 7.0
-    @Deprecated
-    public void setShowGroup(boolean showGroup) {
-        setShowViews(showGroup);
-    }
-
     public void setShowFilters(boolean showFilters) {
         target.showFilters = showFilters;
     }

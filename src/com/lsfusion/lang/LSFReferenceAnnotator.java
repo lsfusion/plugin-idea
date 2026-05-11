@@ -1479,7 +1479,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     addDeprecatedWarningAnnotation(o, "6.0", "Use 'valueAlignmentHorz' instead");
                     break;
                 case "showGroup":
-                    addDeprecatedWarningAnnotation(o, "6.0", "Use 'showViews' instead");
+                    addDeprecatedWarningAnnotation(o, "6.0", "8.0", "Use 'showViews' instead");
                     break;
                 case "autoSize":
                     addDeprecatedWarningAnnotation(o, "6.0", "Earlier versions: ignore this warning");
@@ -1503,10 +1503,10 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionAlignmentHorz' instead");
                     break;
                 case "imagePath":
-                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'image' instead");
+                    addDeprecatedWarningAnnotation(o, "6.2", "8.0", "Use 'image' instead");
                     break;
                 case "headerHeight":
-                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionHeight' instead");
+                    addDeprecatedWarningAnnotation(o, "6.2", "8.0", "Use 'captionHeight' instead");
                     break;
                 default:
                     if (element != null && !element.getText().equals("NULL")) {
