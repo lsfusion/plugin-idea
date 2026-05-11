@@ -15,6 +15,7 @@
             <li>Line Markers refactored and moved to Gutter Icons Settings</li>
             <li>Add IDE support for <code>NEWEXECUTOR ... CLIENT conn</code> and deprecation warning for legacy <code>NEWTHREAD ... CONNECTION conn</code></li>
             <li>Add IDE support for <code>NEWTHREAD ... CLIENT p</code> (notification id) and <code>NEWTHREAD { ... RETURN ...; } TO p</code> (RETURN capture); deprecation warning for legacy <code>NEWTHREAD a TO p</code> as notification id</li>
+            <li>Allow <code>SCHEDULE [PERIOD] [DELAY] TO p</code> in <code>NEWTHREAD</code> for delayed RETURN capture</li>
             <li>Module Dependencies: show redundant modules in REQUIRE</li>
         </ul>
     ]]>
