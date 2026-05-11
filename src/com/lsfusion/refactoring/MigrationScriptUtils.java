@@ -1,5 +1,8 @@
 package com.lsfusion.refactoring;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -16,6 +19,7 @@ import com.lsfusion.migration.lang.psi.MigrationVersionBlock;
 import com.lsfusion.migration.lang.psi.MigrationVersionBlockBody;
 import com.lsfusion.util.LSFFileUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -27,6 +31,25 @@ public class MigrationScriptUtils {
     public static void modifyMigrationScripts(List<ElementMigration> migrations, MigrationChangePolicy migrationChangePolicy, GlobalSearchScope scope) {
         Project project = scope.getProject();
         assert project != null;
+
+        List<ElementMigration> validMigrations = new ArrayList<>();
+        List<ElementMigration> invalidMigrations = new ArrayList<>();
+        for (ElementMigration migration : migrations) {
+            (migration.isValid() ? validMigrations : invalidMigrations).add(migration);
+        }
+
+        if (!invalidMigrations.isEmpty()) {
+            StringBuilder message = new StringBuilder("Cannot create correct migration entry. " +
+                    "Some references are unresolved or metacodes are disabled. The following entries were skipped:");
+            for (ElementMigration migration : invalidMigrations) {
+                message.append("<br>").append(migration.getMigrationString());
+            }
+            Notifications.Bus.notify(new Notification("rename", "Migration", message.toString(), NotificationType.ERROR));
+        }
+
+        if (validMigrations.isEmpty())
+            return;
+
         Collection<VirtualFile> migrationFiles = FileTypeIndex.getFiles(MigrationFileType.INSTANCE, scope);
         for (VirtualFile file : migrationFiles) {
             PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
@@ -45,8 +68,7 @@ public class MigrationScriptUtils {
                 }
                 
                 MigrationFile migrationFile = (MigrationFile)psiFile;
-                
-                 String statements = filterMigrationsToString(migrations, searchScope);
+                String statements = filterMigrationsToString(validMigrations, searchScope);
                 if (statements.isEmpty()) {
                     continue;
                 }

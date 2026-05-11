@@ -7,9 +7,11 @@ import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
 
 public class PropertyDrawMigration extends ElementMigration {
+    private final boolean formDeclResolved;
+
     public PropertyDrawMigration(LSFPropertyDrawDeclaration decl, String newName) {
         super(decl, "", newName);
-        
+
         LSFSimpleName aliasName = decl.getSimpleName();
         if (aliasName == null) { // значит внутри rename'ся, нужно добавить postfix
             LSFId nameDecl = LSFRenameFullNameProcessor.getDeclPropName(decl);
@@ -23,11 +25,17 @@ public class PropertyDrawMigration extends ElementMigration {
         }
 
         LSFFormDeclaration formDecl = decl.resolveFormDecl();
-        if (formDecl != null) {
+        formDeclResolved = formDecl != null;
+        if (formDeclResolved) {
             String formName = formDecl.getCanonicalName();
             this.oldName = formName + "." + this.oldName;
             this.newName = formName + "." + this.newName;
         }
+    }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid() && formDeclResolved;
     }
 
     @Override

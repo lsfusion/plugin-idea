@@ -22,5 +22,10 @@ public abstract class ElementMigration {
         return getPrefix() + " " + oldName + " -> " + newName;
     }
 
+    public boolean isValid() {
+        return !oldName.contains(PropertyCanonicalNameUtils.UNKNOWNCLASS)
+                && !newName.contains(PropertyCanonicalNameUtils.UNKNOWNCLASS);
+    }
+
     protected abstract String getPrefix();
 }
