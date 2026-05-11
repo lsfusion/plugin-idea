@@ -27,6 +27,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
@@ -1818,10 +1819,24 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitNewThreadActionPropertyDefinitionBody(@NotNull LSFNewThreadActionPropertyDefinitionBody o) {
         super.visitNewThreadActionPropertyDefinitionBody(o);
+        PsiElement toKeyword = null;
         for (PsiElement child = o.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child.getNode().getElementType() == LSFTypes.CONNECTION) {
+            IElementType type = child.getNode().getElementType();
+            if (type == LSFTypes.CONNECTION) {
                 addDeprecatedWarningAnnotation(child, "7.0", "use NEWEXECUTOR { ... } CLIENT conn NOWAIT instead");
-                break;
+                return;
+            }
+            if (type == LSFTypes.TO) {
+                toKeyword = child;
+            }
+        }
+        // `NEWTHREAD a TO p;` as notification id is legacy — modern spelling is `NEWTHREAD a CLIENT p;`.
+        // Structural check: if the inner action contains a RETURN, treat `TO p` as the new result-capture
+        // form (valid inside NEWEXECUTOR ... WAIT). Otherwise it is the legacy notification-id form.
+        if (toKeyword != null) {
+            LSFActionPropertyDefinitionBody inner = o.getActionPropertyDefinitionBody();
+            if (inner != null && PsiTreeUtil.findChildOfType(inner, LSFReturnActionPropertyDefinitionBody.class) == null) {
+                addDeprecatedWarningAnnotation(toKeyword, "7.0", "use CLIENT instead (TO as notification id is deprecated; TO is now reserved for capturing RETURN value of the inner action)");
             }
         }
     }

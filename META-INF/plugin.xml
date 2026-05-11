@@ -14,6 +14,7 @@
             <li>Parameter info for actions and properties (CTRL+P)</li>
             <li>Line Markers refactored and moved to Gutter Icons Settings</li>
             <li>Add IDE support for <code>NEWEXECUTOR ... CLIENT conn</code> and deprecation warning for legacy <code>NEWTHREAD ... CONNECTION conn</code></li>
+            <li>Add IDE support for <code>NEWTHREAD ... CLIENT p</code> (notification id) and <code>NEWTHREAD { ... RETURN ...; } TO p</code> (RETURN capture); deprecation warning for legacy <code>NEWTHREAD a TO p</code> as notification id</li>
         </ul>
     ]]>
     </change-notes>
