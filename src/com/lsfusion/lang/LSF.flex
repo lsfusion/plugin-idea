@@ -489,6 +489,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "ROW"                   			    { return ROW; }
   "ROWS"                   			    { return ROWS; }
   "RTF"                     			{ return RTF; }
+  "SCREENSHOT"                          { return SCREENSHOT; }
   "SCROLL"                              { return SCROLL; }
   "SEEK"                    			{ return SEEK; }
   "SELECT"                			    { return SELECT; }

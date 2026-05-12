@@ -840,6 +840,7 @@ private leafKeepContextActionPDB ::=  	        execActionPropertyDefinitionBody 
                                       	|	    activateActionPropertyDefinitionBody
                                       	|	    closeFormActionPropertyDefinitionBody
                                       	|       expandCollapseActionPropertyDefinitionBody
+                                        |       screenShotActionPropertyDefinitionBody
                                       	|       internalActionPropertyDefinitionBody
                                       	|       externalActionPropertyDefinitionBody
 
@@ -1466,7 +1467,14 @@ expandCollapseActionPropertyDefinitionBody ::= (COLLAPSE | EXPAND) CONTAINER com
     pin = 3
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
-}                                         
+}
+
+screenShotActionPropertyDefinitionBody ::= SCREENSHOT HTML? (FORM | ID)? (TO propertyUsage)?
+{
+    pin = 1
+    implements="com.lsfusion.lang.psi.context.ActionExpression"
+    methods = [inferActionParamClasses]
+}
 
 listActionPropertyDefinitionBody ::=    LBRACE
 			                            listActionStatement*
@@ -1497,6 +1505,7 @@ private list_action_statement_recover ::= !(ACTIVATE | ACTIVE | NEW | NEWEDIT | 
                                             | ORDER | READ | REQUEST | INPUT | RETURN | SEEK | WHILE| WRITE | RECALCULATE
                                             | NEWCONNECTION | NEWEXECUTOR | NEWSESSION | NEWTHREAD | NESTEDSESSION
                                             | COLLAPSE | EXPAND
+                                            | SCREENSHOT
                                             | EXTERNAL
                                             | ID // pinned with execActionPropertyDefinitionBody
                                             | SEMI

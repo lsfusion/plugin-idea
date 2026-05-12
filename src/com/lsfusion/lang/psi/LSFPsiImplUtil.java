@@ -4280,6 +4280,10 @@ public class LSFPsiImplUtil {
         return Inferred.EMPTY;
     }
 
+    public static Inferred inferActionParamClasses(LSFScreenShotActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
+        return Inferred.EMPTY;
+    }
+
     public static Inferred inferActionParamClasses(LSFWhileActionPropertyDefinitionBody body, @Nullable Set<LSFExprParamDeclaration> params) {
         // берем условия for, если есть, для остальных из внутреннего action'а
 
