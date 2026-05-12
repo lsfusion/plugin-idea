@@ -192,21 +192,25 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
     }
 
     public static Integer getPropComplexity(LSFPropDeclaration prop) {
-        return getPropComplexity(prop, new HashSet<>());
+        return getPropComplexity(prop, new HashSet<>(), true);
     }
-    
+
     private static Integer getPropComplexity(LSFPropDeclaration prop, Set<LSFPropDeclaration> processed) {
+        return getPropComplexity(prop, processed, false);
+    }
+
+    private static Integer getPropComplexity(LSFPropDeclaration prop, Set<LSFPropDeclaration> processed, boolean topLevel) {
         Integer complexity = 1;
         if (!processed.contains(prop)) {
             processed.add(prop);
-            if (prop instanceof LSFStatementGlobalPropDeclarationImpl statementProp && !statementProp.isMaterializedProperty()) {
+            if (prop instanceof LSFStatementGlobalPropDeclarationImpl statementProp && (topLevel || !statementProp.isMaterializedProperty())) {
                 LSFAbstractPropertyDefinition abstractPropertyDefinition = getAbstractPropertyDefinition(statementProp);
                 if (abstractPropertyDefinition != null) {
                     complexity = getAbstractComplexity(statementProp, processed);
                 } else {
                     complexity += getComplexity(statementProp, processed);
                 }
-            } else if (prop instanceof LSFGlobalPropDeclaration && !((LSFGlobalPropDeclaration<?, ?>) prop).isMaterializedProperty()) {
+            } else if (prop instanceof LSFGlobalPropDeclaration && (topLevel || !((LSFGlobalPropDeclaration<?, ?>) prop).isMaterializedProperty())) {
                 Set<LSFActionOrGlobalPropDeclaration<?, ?>> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching((LSFGlobalPropDeclaration<?, ?>) prop);
                 if(dependencies != null) {
                     for (LSFActionOrGlobalPropDeclaration<?, ?> dependency : dependencies) {
@@ -216,7 +220,7 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
             }
         }
 
-        return complexity;    
+        return complexity;
     }
 
     private static int getComplexity(LSFStatementGlobalPropDeclarationImpl statementProp, Set<LSFPropDeclaration> processed) {
