@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Set;
 
 public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
 
@@ -42,13 +42,16 @@ public class LSFStructureTreeElementBase extends PsiTreeElementBase<PsiFile> {
             GlobalSearchScope scope = LSFGlobalResolver.getRequireScope((LSFFile) getElement());
             LSFLocalSearchScope localScope = LSFLocalSearchScope.GLOBAL;
 
-            if(type.isProp())
-                children.addAll(LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, localScope, new LSFPsiUtils.ApplicableMapper<LSFPropertyStatementTreeElement>() {
+            if(type.isProp()) {
+                Set<LSFPropertyStatementTreeElement> propElements = LSFPsiUtils.mapPropertiesApplicableToClass(valueClass, getElement().getProject(), scope, localScope, new LSFPsiUtils.ApplicableMapper<>() {
                     @Override
                     public LSFPropertyStatementTreeElement map(LSFInterfacePropStatement statement, LSFValueClass valueClass) {
-                        return new LSFPropertyStatementTreeElement(valueClass, ((LSFGlobalPropDeclaration) statement), navigationHandler);
+                        return statement instanceof LSFGlobalPropDeclaration ? new LSFPropertyStatementTreeElement(valueClass, ((LSFGlobalPropDeclaration) statement), navigationHandler) : null;
                     }
-                }, true, true));
+                }, true, true);
+                propElements.remove(null);
+                children.addAll(propElements);
+            }
             if(type.isAction())
                 children.addAll(LSFPsiUtils.mapActionsApplicableToClass(valueClass, getElement().getProject(), scope, localScope, new LSFPsiUtils.ApplicableMapper<LSFActionStatementTreeElement>() {
                     @Override
