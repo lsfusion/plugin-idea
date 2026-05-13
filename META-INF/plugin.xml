@@ -18,6 +18,7 @@
             <li>Allow <code>SCHEDULE [PERIOD] [DELAY] TO p</code> in <code>NEWTHREAD</code> for delayed RETURN capture</li>
             <li>Allow optional timeout expression on <code>NEWEXECUTOR ... WAIT n</code></li>
             <li>Module Dependencies: show redundant modules in REQUIRE</li>
+            <li>Highlight missing semicolon at the end of FORM statement (closes #81)</li>
         </ul>
     ]]>
     </change-notes>

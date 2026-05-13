@@ -163,6 +163,11 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         return true;
     }
 
+    public static boolean expectSemicolon(PsiBuilder builder_, int level_) {
+        builder_.error("';' expected");
+        return true;
+    }
+
     public static boolean formulaPropertySyntaxCheck(PsiBuilder builder_, int level_) {
         return builder_.lookAhead(1) == LSFTypes.FORMULA_PROPERTY_SYNTAX_TYPE | builder_.lookAhead(1) == LSFTypes.LEX_STRING_LITERAL;
     }
