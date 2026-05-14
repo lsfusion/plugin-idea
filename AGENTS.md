@@ -36,15 +36,15 @@ Coordinate commits across the two repos (cross-link in commit messages, or close
 ./gradlew runIde                 # launch IntelliJ sandbox with the plugin loaded
 ```
 
-Toolchain: Java 21 JDK (required by IntelliJ Platform 2025.3). Source and bytecode level are both pinned to the same `javaVersion` value in `build.gradle.kts` (currently 21); check that file for the authoritative target rather than hard-coding a number here.
+Toolchain: Java 21 JDK (required by IntelliJ Platform 2025.3). Source and bytecode level are pinned to `javaVersion` in `build.gradle.kts` (currently 21) — check that file rather than hard-coding here.
 
-After editing `LSF.bnf` or `LSF.flex`, regenerate before the next build or sandbox launch so `gen/` matches the source grammar. `gen/` itself is gitignored — don't stage generated files in commits.
+After editing `LSF.bnf` or `LSF.flex`, regenerate before the next build or sandbox launch so `gen/` matches the sources. `gen/` is gitignored — don't stage it.
 
 ### Testing changes
 
-`./gradlew runIde` launches an IntelliJ sandbox with the plugin loaded against a fresh project — open or create a `.lsf` file to exercise highlighting, references, completion, and annotations. The sandbox state lives under `build/idea-sandbox/`; deleting it forces a clean re-init on the next launch.
+`./gradlew runIde` launches an IntelliJ sandbox with the plugin loaded — open or create a `.lsf` file to exercise highlighting, references, completion, annotations. Sandbox state lives under `build/idea-sandbox/`; deleting it forces a clean re-init.
 
-There's no headless test rig for the plugin in this repo — UI verification is interactive in the sandbox. There is also no `test` sourceSet currently configured in `build.gradle.kts`: the existing `main` sourceSet maps everything under `src/` (and `gen/`) as production code, so a file placed at `src/test/...` would compile into the plugin artifact. To add unit tests for pure logic (PSI walkers, reference resolution helpers), first wire a dedicated `test` sourceSet pointing at a directory that does not overlap with `src/` (e.g. a sibling `tests/`), then run `./gradlew test`.
+No headless test rig — UI verification is interactive in the sandbox. No `test` sourceSet is currently configured either: `main` maps everything under `src/` (and `gen/`) as production code, so a file at `src/test/...` would ship in the plugin artifact. To add unit tests (PSI walkers, reference resolution helpers), first wire a dedicated `test` sourceSet pointing at a directory that doesn't overlap with `src/` (e.g. a sibling `tests/`), then run `./gradlew test`.
 
 ## Commits
 
@@ -53,9 +53,9 @@ There's no headless test rig for the plugin in this repo — UI verification is 
 - Never amend or force-push commits that may have been pulled by others. Always create a new commit on top.
 - Never pass `--no-verify` unless the user explicitly requests it. If a pre-commit hook fails, fix the underlying issue and create a new commit.
 - When the change is AI-assisted, include a `Co-Authored-By:` trailer naming the model.
-- When a new file is created as part of the change, stage it (`git add <path>`) immediately at creation, not deferred to commit time. This keeps `git status` honest throughout the session — pending work shows up as `A`/`M` (intended) rather than `??` (forgettable), and the file can't silently fall out of the final commit. (Generated artifacts under `gen/` or `build/` are gitignored and stay unstaged.)
-- Before each commit, run `git status`, `git diff` (unstaged hunks), and `git diff --cached` (staged hunks). Stage only files relevant to the change at hand; never sweep up unrelated edits the user happens to have in the working tree.
-- For non-trivial changes, record in the commit body which verifications actually ran (parser/lexer regen, Gradle build, sandbox launch, manual highlighting/completion check) and which were skipped and why. Be precise: `./gradlew build` in this repo is a build/package verification — it counts as a test verification only when Gradle actually discovered and executed tests (and as noted in Testing changes, no `test` sourceSet is currently configured, so `./gradlew test` has nothing to run by default). Don't write "tests passed" unless JUnit tests actually ran. The next reader needs to know what is confirmed vs. assumed.
+- Stage new files (`git add <path>`) at creation, not at commit time. Pending work then shows as `A`/`M` in `git status` instead of `??`, and can't silently fall out of the commit. (`gen/` and `build/` are gitignored and stay unstaged.)
+- Before each commit, run `git status`, `git diff`, and `git diff --cached`. Stage only files relevant to the change; never sweep up unrelated working-tree edits.
+- For non-trivial changes, record in the commit body which verifications ran (parser/lexer regen, Gradle build, sandbox launch, manual highlighting/completion check) and which were skipped and why. Be precise: `./gradlew build` is a build/package verification — it becomes a test verification only if Gradle actually discovered and ran tests (and no `test` sourceSet is currently wired, so `./gradlew test` has nothing to run by default). Don't write "tests passed" unless JUnit tests actually ran.
 
 Use a HEREDOC so newlines and trailers are preserved:
 
