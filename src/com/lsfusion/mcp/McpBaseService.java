@@ -23,20 +23,15 @@ public abstract class McpBaseService extends RestService {
     protected static final String TOOL_NAME = "lsfusion_find_elements";
 
     protected static final String TOOL_RETRIEVE_DOCS = "lsfusion_retrieve_docs";
-    protected static final String TOOL_RETRIEVE_HOWTOS = "lsfusion_retrieve_howtos";
-    protected static final String TOOL_RETRIEVE_COMMUNITY = "lsfusion_retrieve_community";
-    protected static final String TOOL_VALIDATE_SYNTAX = "lsfusion_validate_syntax";
     protected static final String TOOL_GET_GUIDANCE = "lsfusion_get_guidance";
 
-    private static final String TOOL_RETRIEVE_DOCS_DESCRIPTION = "Fetch prioritized chunks from lsFusion RAG store (official documentation and language reference) — based on a single search query.";
-    private static final String TOOL_RETRIEVE_HOWTOS_DESCRIPTION = "Fetch prioritized chunks from lsFusion RAG store (examples for combined tasks / scenarios and how-tos) — based on a single search query.";
-    private static final String TOOL_RETRIEVE_COMMUNITY_DESCRIPTION = "Fetch prioritized chunks from lsFusion RAG store (tutorials, articles, and community discussions) — based on a single search query. Use this ONLY for deep, ambiguous tasks when other retrieval tools (docs, howtos) did not provide a solution.";
+    private static final String TOOL_RETRIEVE_DOCS_DESCRIPTION = "Search official lsFusion documentation (language reference + paradigm concepts) for chunks relevant to a query. Returns `{docs:[{source,text,score}]}` sorted by descending score. Use `type` to narrow by axis when known; omit to search both. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.";
 
+    // Sister tools lsfusion_retrieve_howtos / lsfusion_retrieve_community were
+    // removed together with the legacy Pinecone backend that fed them — only
+    // language + paradigm sourceTypes are indexed in the new OpenAI VS.
     private static final Set<String> REMOTE_TOOL_NAMES = Set.of(
             TOOL_RETRIEVE_DOCS,
-            TOOL_RETRIEVE_HOWTOS,
-            TOOL_RETRIEVE_COMMUNITY,
-            TOOL_VALIDATE_SYNTAX,
             TOOL_GET_GUIDANCE
     );
 
@@ -219,20 +214,22 @@ public abstract class McpBaseService extends RestService {
     protected JSONArray buildToolsList() {
         return new JSONArray()
                 .put(buildFindElementsToolDescriptor())
-                .put(buildQueryToolDescriptor(TOOL_RETRIEVE_DOCS, TOOL_RETRIEVE_DOCS_DESCRIPTION))
-                .put(buildQueryToolDescriptor(TOOL_RETRIEVE_HOWTOS, TOOL_RETRIEVE_HOWTOS_DESCRIPTION))
-                .put(buildQueryToolDescriptor(TOOL_RETRIEVE_COMMUNITY, TOOL_RETRIEVE_COMMUNITY_DESCRIPTION))
-                .put(buildValidateSyntaxToolDescriptor())
+                .put(buildRetrieveDocsToolDescriptor())
                 .put(buildGetGuidanceToolDescriptor());
     }
 
-    protected static JSONObject buildQueryToolDescriptor(String name, String description) {
+    private static JSONObject buildRetrieveDocsToolDescriptor() {
+        JSONObject typeProp = new JSONObject()
+                .put("type", "string")
+                .put("enum", new JSONArray().put("language").put("paradigm"))
+                .put("description", "Optional sourceType filter. Omit (or pass null) to search both axes. `language` returns syntax / operator reference chunks; `paradigm` returns conceptual / abstraction chunks.");
         JSONObject inputSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
                         .put("query", new JSONObject()
                                 .put("type", "string")
-                                .put("description", "Query")))
+                                .put("description", "Short topical phrase. Semantic match (not literal); rephrase rather than retry the same query if results are weak."))
+                        .put("type", typeProp))
                 .put("required", new JSONArray().put("query"))
                 .put("additionalProperties", false);
 
@@ -240,13 +237,11 @@ public abstract class McpBaseService extends RestService {
         JSONObject docItemSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
-                        .put("source", new JSONObject().put("type", "string").put("description", "Chunk origin (e.g. docs, howto, tutorial)."))
+                        .put("source", new JSONObject().put("type", "string").put("description", "Chunk origin (e.g. documentation-language, documentation-paradigm)."))
                         .put("text", new JSONObject().put("type", "string").put("description", "Retrieved text snippet."))
                         .put("score", new JSONObject().put("type", "number").put("description", "Similarity score (higher = more relevant).")))
                 .put("required", new JSONArray().put("source").put("text").put("score"));
 
-
-        // Output schema matches RetrieveDocsOutput in McpToolset.kt
         JSONObject outputSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
@@ -258,53 +253,8 @@ public abstract class McpBaseService extends RestService {
                 .put("additionalProperties", false);
 
         return new JSONObject()
-                .put("name", name)
-                .put("description", description)
-                .put("inputSchema", inputSchema)
-                .put("outputSchema", outputSchema);
-    }
-
-    protected static JSONObject buildValidateSyntaxToolDescriptor() {
-        JSONObject inputSchema = new JSONObject()
-                .put("type", "object")
-                .put("properties", new JSONObject()
-                        .put("text", new JSONObject()
-                                .put("type", "string")
-                                .put("description", "Text")))
-                .put("required", new JSONArray().put("text"))
-                .put("additionalProperties", false);
-
-        // Output schema matches DSLValidationResult in McpToolset.kt
-        JSONObject dslErrorSchema = new JSONObject()
-                .put("type", "object")
-                .put("properties", new JSONObject()
-                        .put("type", new JSONObject().put("type", "string").put("description", "Error category: 'syntax' or 'semantic'."))
-                        .put("message", new JSONObject().put("type", "string").put("description", "Readable explanation of the problem."))
-                        .put("line", new JSONObject().put("type", "integer").put("description", "Line number (1-based) where error starts."))
-                        .put("column", new JSONObject().put("type", "integer").put("description", "Column number (0-based) where error starts."))
-                        .put("found", new JSONObject().put("type", "string").put("description", "Actual token or fragment found, if any."))
-                        .put("expected", new JSONObject().put("type", "array").put("items", new JSONObject().put("type", "string")).put("description", "List of tokens or constructs expected at this point."))
-                        .put("hint", new JSONObject().put("type", "string").put("description", "Short fix suggestion to resolve the issue."))
-                        .put("excerpt", new JSONObject().put("type", "string").put("description", "Line of source where the error occurred."))
-                        .put("pointer", new JSONObject().put("type", "string").put("description", "Caret marker showing error position in the excerpt.")))
-                .put("required", new JSONArray().put("type").put("message").put("line").put("column"));
-
-        JSONObject outputSchema = new JSONObject()
-                .put("type", "object")
-                .put("properties", new JSONObject()
-                        .put("ok", new JSONObject()
-                                .put("type", "boolean")
-                                .put("description", "True if DSL text parsed successfully without errors."))
-                        .put("errors", new JSONObject()
-                                .put("type", "array")
-                                .put("items", dslErrorSchema)
-                                .put("description", "Detailed error entries (empty if ok=True).")))
-                .put("required", new JSONArray().put("ok").put("errors"))
-                .put("additionalProperties", false);
-
-        return new JSONObject()
-                .put("name", TOOL_VALIDATE_SYNTAX)
-                .put("description", "Validate the syntax of the list of lsFusion statements. Use this ONLY when IDE tools for error checking and code execution are not available.")
+                .put("name", TOOL_RETRIEVE_DOCS)
+                .put("description", TOOL_RETRIEVE_DOCS_DESCRIPTION)
                 .put("inputSchema", inputSchema)
                 .put("outputSchema", outputSchema);
     }
@@ -317,7 +267,7 @@ public abstract class McpBaseService extends RestService {
 
         return new JSONObject()
                 .put("name", TOOL_GET_GUIDANCE)
-                .put("description", "Fetch the brief overview and mandatory rules for working with lsFusion. IMPORTANT: The assistant MUST call this tool before ANY task related to lsFusion if it's not already in your context. The assistant MUST read and strictly follow all rules and guidelines provided by this tool for ANY lsFusion-related task.")
+                .put("description", "Fetch the brief overview and mandatory rules for working with lsFusion. The assistant MUST call this at the start of ANY lsFusion-related task if the guidance isn't already in context, and MUST then read and strictly follow all rules it returns.")
                 .put("inputSchema", inputSchema);
     }
 

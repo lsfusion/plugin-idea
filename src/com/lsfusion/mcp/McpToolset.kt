@@ -67,7 +67,7 @@ data class FindElementsResult(
 
 @Serializable
 data class RemoteDocItem(
-    @McpDescription(description = "Chunk origin (e.g. docs, howto, tutorial).")
+    @McpDescription(description = "Chunk origin (e.g. documentation-language, documentation-paradigm).")
     val source: String,
     @McpDescription(description = "Retrieved text snippet.")
     val text: String,
@@ -79,36 +79,6 @@ data class RemoteDocItem(
 data class RetrieveDocsOutput(
     @McpDescription(description = "Relevant chunks returned from the RAG store.")
     val docs: List<RemoteDocItem>,
-)
-
-@Serializable
-data class DSLError(
-    @McpDescription(description = "Error category: 'syntax' or 'semantic'.")
-    val type: String,
-    @McpDescription(description = "Readable explanation of the problem.")
-    val message: String,
-    @McpDescription(description = "Line number (1-based) where error starts.")
-    val line: Int,
-    @McpDescription(description = "Column number (0-based) where error starts.")
-    val column: Int,
-    @McpDescription(description = "Actual token or fragment found, if any.")
-    val found: String? = null,
-    @McpDescription(description = "List of tokens or constructs expected at this point.")
-    val expected: List<String> = emptyList(),
-    @McpDescription(description = "Short fix suggestion to resolve the issue.")
-    val hint: String? = null,
-    @McpDescription(description = "Line of source where the error occurred.")
-    val excerpt: String? = null,
-    @McpDescription(description = "Caret marker showing error position in the excerpt.")
-    val pointer: String? = null,
-)
-
-@Serializable
-data class DSLValidationResult(
-    @McpDescription(description = "True if DSL text parsed successfully without errors.")
-    val ok: Boolean,
-    @McpDescription(description = "Detailed error entries (empty if ok=True).")
-    val errors: List<DSLError> = emptyList(),
 )
 
 
@@ -135,8 +105,7 @@ data class DSLValidationResult(
  *    - POST https://ai.lsfusion.org/mcp method=`initialize` to obtain `mcp-session-id` header.
  *    - POST method=`tools/list` with `mcp-session-id` and required Accept header.
  * 2) Compare remote `tools[*].name`, `description`, `inputSchema`, and `outputSchema` with the local
- *    wrappers (currently: `lsfusion_retrieve_docs`, `lsfusion_retrieve_howtos`, `lsfusion_retrieve_community`,
- *    `lsfusion_validate_syntax`, `lsfusion_get_guidance`).
+ *    wrappers (currently: `lsfusion_retrieve_docs`, `lsfusion_get_guidance`).
  * 3) For each tool:
  *    - Update/add a corresponding `@McpTool` wrapper method.
  *    - Update/add `@Serializable` DTOs with `@McpDescription` on ALL fields so output schema is not empty.
@@ -264,54 +233,25 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     }
 
     @McpTool(name = "lsfusion_retrieve_docs")
-    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (official documentation and language reference) — based on a single search query.")
+    @McpDescription(description = "Search official lsFusion documentation (language reference + paradigm concepts) for chunks relevant to a query. Returns `{docs:[{source,text,score}]}` sorted by descending score. Use `type` to narrow by axis when known; omit to search both. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.")
     @Suppress("unused")
     suspend fun retrieveDocs(
-        @McpDescription(description = "Query")
+        @McpDescription(description = "Short topical phrase. Semantic match (not literal); rephrase rather than retry the same query if results are weak.")
         query: String,
+        @McpDescription(description = "Optional sourceType filter. Omit (or pass null) to search both axes. `language` returns syntax / operator reference chunks; `paradigm` returns conceptual / abstraction chunks.")
+        type: String? = null,
     ): RetrieveDocsOutput {
-        val resultEl = callRemoteToolResultJson("lsfusion_retrieve_docs", JSONObject().put("query", query))
+        val args = JSONObject().put("query", query)
+        if (type != null) args.put("type", type)
+        val resultEl = callRemoteToolResultJson("lsfusion_retrieve_docs", args)
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
-    }
-
-    @McpTool(name = "lsfusion_retrieve_howtos")
-    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (examples for combined tasks / scenarios and how-tos) — based on a single search query.")
-    @Suppress("unused")
-    suspend fun retrieveHowtos(
-        @McpDescription(description = "Query")
-        query: String,
-    ): RetrieveDocsOutput {
-        val resultEl = callRemoteToolResultJson("lsfusion_retrieve_howtos", JSONObject().put("query", query))
-        return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
-    }
-
-    @McpTool(name = "lsfusion_retrieve_community")
-    @McpDescription(description = "Fetch prioritized chunks from lsFusion RAG store (tutorials, articles, and community discussions) — based on a single search query. Use this ONLY for deep, ambiguous tasks when other retrieval tools (docs, howtos) did not provide a solution.")
-    @Suppress("unused")
-    suspend fun retrieveCommunity(
-        @McpDescription(description = "Query")
-        query: String,
-    ): RetrieveDocsOutput {
-        val resultEl = callRemoteToolResultJson("lsfusion_retrieve_community", JSONObject().put("query", query))
-        return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
-    }
-
-    @McpTool(name = "lsfusion_validate_syntax")
-    @McpDescription(description = "Validate the syntax of the list of lsFusion statements. Use this ONLY when IDE tools for error checking and code execution are not available.")
-    @Suppress("unused")
-    suspend fun validateSyntax(
-        @McpDescription(description = "Text")
-        text: String,
-    ): DSLValidationResult {
-        val resultEl = callRemoteToolResultJson("lsfusion_validate_syntax", JSONObject().put("text", text))
-        return json.decodeFromJsonElement<DSLValidationResult>(resultEl)
     }
 
     @McpTool(name = "lsfusion_get_guidance")
     @McpDescription(
         description = "Fetch the brief overview and mandatory rules for working with lsFusion. " +
-            "IMPORTANT: The assistant MUST call this tool before ANY task related to lsFusion if it's not already in your context. " +
-            "The assistant MUST read and strictly follow all rules and guidelines provided by this tool for ANY lsFusion-related task."
+            "The assistant MUST call this at the start of ANY lsFusion-related task if the guidance isn't already in context, " +
+            "and MUST then read and strictly follow all rules it returns."
     )
     @Suppress("unused")
     suspend fun getGuidance(): String {
