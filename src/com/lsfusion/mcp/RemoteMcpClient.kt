@@ -75,7 +75,19 @@ object RemoteMcpClient {
                         }
                     }
 
-                    if (code == 400 || code == 401) {
+                    // Reset the cached session id and trigger a re-initialize when the
+                    // upstream signals the current session is gone:
+                    //   401 — auth-level rejection (bearer expired / revoked).
+                    //   404 with a JSON-RPC -32600 / "Session not found" body — the MCP
+                    //     container was recreated (e.g. `docker compose up -d mcp`) so the
+                    //     session id we cached against the previous instance no longer
+                    //     maps to anything server-side.
+                    // 400 is intentionally NOT a reset trigger: it means the upstream
+                    // parsed the request and rejected the *payload* (bad JSON-RPC, bad
+                    // tool args). Retrying with a fresh session won't fix that and would
+                    // surface a misleading "session expired" diagnostic. Mirrors
+                    // platform's MCPRemoteClient.doPostJson.
+                    if (code == 401 || (code == 404 && isSessionDropped(errorText))) {
                         synchronized(this) {
                             if (sessionId == session) {
                                 sessionId = null
@@ -85,6 +97,28 @@ object RemoteMcpClient {
                     throw mcpExpectedError("Remote MCP HTTP error $code: ${errorText.take(2_000)}")
                 }
             }
+    }
+
+    /**
+     * Decide whether a 404 body indicates a dead session (upstream container recreated,
+     * cached session id no longer recognized) as opposed to a deployment-level miss.
+     *
+     * Prefers the structured JSON-RPC error code — MCP returns `error.code == -32600`
+     * ("Invalid Request") for this case, which is stable across upstream message
+     * rewording. Falls back to a case-insensitive substring on the raw body so a minor
+     * server-side rewording or wrapper-format change doesn't silently regress
+     * self-healing. Mirrors platform's MCPRemoteClient.isSessionDropped.
+     */
+    private fun isSessionDropped(err: String): Boolean {
+        if (err.isEmpty()) return false
+        try {
+            val root = JSONObject(err)
+            val error = root.optJSONObject("error")
+            if (error != null && error.optInt("code") == -32600) return true
+        } catch (_: Exception) {
+            // body was not JSON / unexpected shape — fall through to substring fallback
+        }
+        return err.lowercase(java.util.Locale.ROOT).contains("session not found")
     }
 
     private fun ensureSessionId(timeoutSeconds: Int): String {
@@ -168,7 +202,12 @@ object RemoteMcpClient {
         try {
             responseText = doPostJson(requestBody, timeoutSeconds, sid)
         } catch (e: Exception) {
-            if (sessionId == null) { // Session was reset in doPostJson due to 400/401
+            // `doPostJson` clears `sessionId` only on session-drop signals (401 or 404
+            // + JSON-RPC -32600 / "Session not found"). A null cache here therefore
+            // means "previous session was rejected as dead", so a single re-init +
+            // retry is the right recovery — anything else (400, network error, etc.)
+            // is not session-recoverable and propagates unchanged.
+            if (sessionId == null) {
                 sid = ensureSessionId(timeoutSeconds)
                 responseText = doPostJson(requestBody, timeoutSeconds, sid)
             } else {
