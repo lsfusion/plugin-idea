@@ -72,7 +72,62 @@ EOF
 
 ## Branches
 
-No maintained version or backport branches; the release line is `master`. Feature branches for work-in-progress are fine and merge back into `master`. Releases are tagged on `master` and published to JetBrains Marketplace via a separate process.
+No maintained version or backport branches; the release line is `master`. Feature branches for work-in-progress are fine and merge back into `master`.
+
+## Releases
+
+The plugin ships to the [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/7601) via a Jenkins pipeline that **publishes on every push to `master`** whenever it detects a version bump. There is no separate release branch, no manual upload step, no GitHub release. Pushing a `<version>` bump *is* the release.
+
+### Pipeline mechanics
+
+- GitHub push webhook → Jenkins job `buildAndUploadPluginTrigger` (freestyle, watches any branch) → triggers the `buildAndUploadPlugin` workflow.
+- The workflow checks out the new master, reads `<version>` from `META-INF/plugin.xml`, and `curl`s `https://plugins.jetbrains.com/api/plugins/7601/updates` to learn the version currently published.
+- If the two match, the pipeline logs `Version <X.Y.Z> matches the latest version in Marketplace. Skipping build.` and exits successfully — pushes that don't bump are no-ops on the release side.
+- If they differ, the pipeline builds the plugin and uploads the artifact (with its embedded `<change-notes>` HTML) to the Marketplace under plugin id 7601.
+
+### Bumping the version
+
+1. Open `META-INF/plugin.xml` and patch-bump `<version>X.Y.Z</version>` to the value that already appears in the `<b>Version X.Y.Z</b>` header inside the current `<change-notes>` block — those two MUST agree at upload time, otherwise the Marketplace listing shows notes for the wrong version.
+2. Verify every user-visible change since the last release has a `<li>` bullet in the block (see *Release notes* below). Add any that are missing.
+3. Commit. Subject like `Release X.Y.Z` is fine; the body should list what's shipping, mirroring the change-notes bullets. Don't squash this with unrelated work — the release commit should diff cleanly to `plugin.xml` (and only `plugin.xml` unless the rollout literally needs another file).
+4. Push to `master`. Jenkins picks up the webhook, sees the version diff against Marketplace, and publishes.
+
+The change-notes block is intentionally **not** reset by the release commit — it keeps showing what shipped in `X.Y.Z` until the next contributor with a user-visible change does the rollover (see below).
+
+### Release notes (`<change-notes>`)
+
+The CDATA block in `META-INF/plugin.xml` is the **only** source of release notes; the Marketplace renders it verbatim and there is no parallel CHANGELOG.md. The block is HTML — basic tags only (`<b>`, `<br>`, `<ul>`, `<li>`, `<code>`).
+
+**What to write.** One terse `<li>` bullet per user-visible improvement, in past-or-imperative tense, framed as what the developer-of-lsFusion sees in the IDE — not as what the plugin internally does. Mention concrete syntax (`<code>NEWEXECUTOR ... CLIENT conn</code>`), inspection names, settings paths. Skip plugin-internal mechanics (BNF rule names, PSI class names, mixin wiring) — those belong in the commit body, not in the marketplace listing.
+
+**When to write.** Append a bullet to the change-notes block in the **same commit** that introduces the user-visible change.
+
+If the `<b>Version X.Y.Z</b>` header in the block still matches the currently-published `<version>` (i.e. you are the first contributor with a user-visible change after a release), do the rollover in your commit:
+
+1. Bump the header to the next patch version: `<b>Version X.Y.Z+1</b>`.
+2. Empty the `<ul>` list of the previous release's bullets.
+3. Add your new `<li>` as the first entry.
+
+If the header is already ahead of `<version>` (a previous contributor has already rolled over), just append your `<li>` to the existing list.
+
+This way release notes are maintained lazily — no dedicated cleanup commit, and at any point in time the block accurately reflects "what's queued for the next release."
+
+Examples of changes that warrant an entry:
+
+- New / changed syntax support in the grammar (parser, lexer, annotator).
+- New inspection, intention, completion behavior, or gutter icon.
+- A deprecation warning the developer will start seeing.
+- Changes to the MCP / AI-assistant tool surface the plugin exposes.
+- Behavior changes in Go To Definition, Find Usages, Refactor, or any IDE action.
+
+Examples of changes that do **not** warrant an entry:
+
+- Internal refactors with no observable effect.
+- Build / Gradle / CI tweaks.
+- Regenerated `gen/` after a `.bnf` / `.flex` edit when the user-visible effect is already covered by another bullet for that edit.
+- Test infrastructure.
+
+If a release accidentally landed with a bullet that turned out to be wrong, fix it in a follow-up `<version>` bump rather than amending the published one — the Marketplace caches the published notes externally.
 
 ## GitHub issues
 
@@ -110,7 +165,7 @@ Treat the following as requiring explicit user authorization each time, even if 
 - `git push` and any remote-affecting operation; force-pushes are never automatic.
 - Destructive operations: `git reset --hard`, `git clean -fd`, branch deletion, force pushes, `rm -rf` of working trees or generated directories outside the explicit build outputs (`build/`, `gen/`).
 - Anything that publishes outside the local machine: GitHub PR/issue creation, comments, releases, JetBrains Marketplace uploads.
-- Bumping `META-INF/plugin.xml` `<version>` — only when explicitly preparing a release.
+- Bumping `META-INF/plugin.xml` `<version>` — only when explicitly preparing a release (see *Releases* section: the bump is the publish trigger).
 
 Local, reversible work — editing files, running tests, regenerating `gen/` via `./gradlew generate*` — doesn't need per-action confirmation.
 

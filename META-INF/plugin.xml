@@ -2,7 +2,7 @@
     <id>lsfusion.idea.plugin</id>
     <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
-    <version>1.0.307</version>
+    <version>1.0.308</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -19,6 +19,10 @@
             <li>Allow optional timeout expression on <code>NEWEXECUTOR ... WAIT n</code></li>
             <li>Module Dependencies: show redundant modules in REQUIRE</li>
             <li>Highlight missing semicolon at the end of FORM statement (closes #81)</li>
+            <li>Align grammar with the new <code>SCREENSHOT</code> operator (lsfusion/platform#1629)</li>
+            <li>Show property complexity for materialized properties (closes #24)</li>
+            <li>MCP: trim assistant tool surface — <code>lsfusion_retrieve_docs</code> now accepts an optional <code>type</code> filter (<code>language</code> / <code>paradigm</code>); legacy <code>lsfusion_retrieve_howtos</code>, <code>lsfusion_retrieve_community</code>, and <code>lsfusion_validate_syntax</code> removed</li>
+            <li>MCP: self-heal session cache on upstream server restart (eliminates stuck-session errors after the public MCP endpoint is redeployed)</li>
         </ul>
     ]]>
     </change-notes>
