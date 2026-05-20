@@ -8,21 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.308</b><br>
+        <b>Version 1.0.309</b><br>
         <ul>
-            <li>Property Complexity fix for ABSTRACT, IF, CASE</li>
-            <li>Parameter info for actions and properties (CTRL+P)</li>
-            <li>Line Markers refactored and moved to Gutter Icons Settings</li>
-            <li>Add IDE support for <code>NEWEXECUTOR ... CLIENT conn</code> and deprecation warning for legacy <code>NEWTHREAD ... CONNECTION conn</code></li>
-            <li>Add IDE support for <code>NEWTHREAD ... CLIENT p</code> (notification id) and <code>NEWTHREAD { ... RETURN ...; } TO p</code> (RETURN capture); deprecation warning for legacy <code>NEWTHREAD a TO p</code> as notification id</li>
-            <li>Allow <code>SCHEDULE [PERIOD] [DELAY] TO p</code> in <code>NEWTHREAD</code> for delayed RETURN capture</li>
-            <li>Allow optional timeout expression on <code>NEWEXECUTOR ... WAIT n</code></li>
-            <li>Module Dependencies: show redundant modules in REQUIRE</li>
-            <li>Highlight missing semicolon at the end of FORM statement (closes #81)</li>
-            <li>Align grammar with the new <code>SCREENSHOT</code> operator (lsfusion/platform#1629)</li>
-            <li>Show property complexity for materialized properties (closes #24)</li>
-            <li>MCP: trim assistant tool surface — <code>lsfusion_retrieve_docs</code> now accepts an optional <code>type</code> filter (<code>language</code> / <code>paradigm</code>); legacy <code>lsfusion_retrieve_howtos</code>, <code>lsfusion_retrieve_community</code>, and <code>lsfusion_validate_syntax</code> removed</li>
-            <li>MCP: self-heal session cache on upstream server restart (eliminates stuck-session errors after the public MCP endpoint is redeployed)</li>
+            <li>Property Complexity: references inside string interpolations ichavchavadze 5 minutes ago</li>
         </ul>
     ]]>
     </change-notes>

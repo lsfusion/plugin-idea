@@ -1,6 +1,7 @@
 package com.lsfusion.lang.psi.declarations.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -16,12 +17,14 @@ import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.lang.typeinfer.InferExResult;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
+import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 import static com.lsfusion.util.BaseUtils.nvl;
+import static com.lsfusion.util.LSFStringUtils.INTERPOLATION_PREFIX;
 
 public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrGlobalPropDeclarationImpl<LSFStatementGlobalPropDeclaration, StatementPropStubElement> implements LSFStatementGlobalPropDeclaration {
 
@@ -239,10 +242,35 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
         } else if (element instanceof LSFActionOrPropReference<?, ?> reference) {
             LSFActionOrPropDeclaration decl = reference.resolveDecl();
             return decl instanceof LSFGlobalPropDeclaration ? getPropComplexity((LSFPropDeclaration) decl, processed) : 0;
+        } else if (element instanceof LSFExpressionStringValueLiteral literal
+                && LSFStringUtils.hasInterpolationBlock(literal.getText(), true)) {
+            // String interpolation contents are language-injected, so they don't appear among the
+            // host literal's PSI children. Walk the injected STRING(...) wrappers explicitly.
+            return getInterpolationComplexity(literal, processed);
         }
         int complexity = 0;
         for (PsiElement child : element.getChildren()) {
             complexity += getElementComplexity(child, processed);
+        }
+        return complexity;
+    }
+
+    private static int getInterpolationComplexity(LSFExpressionStringValueLiteral literal, Set<LSFPropDeclaration> processed) {
+        List<LSFStringUtils.SpecialBlock> blocks = LSFStringUtils.getInterpolationBlockList(literal.getText(), true);
+        InjectedLanguageManager manager = InjectedLanguageManager.getInstance(literal.getProject());
+        int complexity = 0;
+        for (LSFStringUtils.SpecialBlock block : blocks) {
+            PsiElement injected = manager.findInjectedElementAt(literal.getContainingFile(),
+                    literal.getTextOffset() + block.start + INTERPOLATION_PREFIX.length());
+            if (injected == null) continue;
+            // walk up to the STRING(expression) wrapper, mirroring ElementsContextModifier
+            while (injected.getParent() != null && injected.getParent().getTextOffset() == injected.getTextOffset()) {
+                injected = injected.getParent();
+            }
+            PsiElement wrapper = injected.getParent(); // STRING(expression)
+            if (wrapper != null) {
+                complexity += getElementComplexity(wrapper, processed);
+            }
         }
         return complexity;
     }
