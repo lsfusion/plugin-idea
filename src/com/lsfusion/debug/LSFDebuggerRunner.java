@@ -24,12 +24,15 @@ import com.lsfusion.module.run.LSFusionRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class LSFDebuggerRunner extends GenericDebuggerRunner {
     public static final String PLUGIN_ENABLED_PROPERTY = "lsfusion.server.plugin.enabled";
     public static final String DEBUG_ACTIONS_PROPERTY = "lsfusion.server.debug.actions";
     public static final String LIGHT_START_PROPERTY = "lsfusion.server.lightstart";
     public static final Key<Integer> DEBUGGER_PROPERTY_KEY = new Key<>("lsfusion.debuggerPort");
-    
+
     @Override
     public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile) {
         return executorId.equals(DefaultDebugExecutor.EXECUTOR_ID) && profile instanceof LSFusionRunConfiguration;
@@ -77,20 +80,69 @@ public class LSFDebuggerRunner extends GenericDebuggerRunner {
 
         debugProcess.putUserData(DEBUGGER_PROPERTY_KEY, ((LSFusionRunConfiguration) env.getRunProfile()).getDebuggerPort(state));
 
-        XDebugSession debugSession =
-            XDebuggerManager.getInstance(env.getProject()).startSession(env, new XDebugProcessStarter() {
-                @Override
-                @NotNull
-                public XDebugProcess start(final @NotNull XDebugSession session) {
-                    XDebugSessionImpl sessionImpl = (XDebugSessionImpl) session;
-                    ExecutionResult executionResult = debugProcess.getExecutionResult();
-                    sessionImpl.addExtraActions(executionResult.getActions());
-                    if (executionResult instanceof DefaultExecutionResult) {
-                        sessionImpl.addRestartActions(((DefaultExecutionResult) executionResult).getRestartActions());
-                    }
-                    return new LSFDebugProcess(session, debuggerSession);
+        return startCompatibleSession(env, new XDebugProcessStarter() {
+            @Override
+            @NotNull
+            public XDebugProcess start(final @NotNull XDebugSession session) {
+                XDebugSessionImpl sessionImpl = (XDebugSessionImpl) session;
+                ExecutionResult executionResult = debugProcess.getExecutionResult();
+                sessionImpl.addExtraActions(executionResult.getActions());
+                if (executionResult instanceof DefaultExecutionResult) {
+                    sessionImpl.addRestartActions(((DefaultExecutionResult) executionResult).getRestartActions());
                 }
-            });
-        return debugSession.getRunContentDescriptor();
+                return new LSFDebugProcess(session, debuggerSession);
+            }
+        });
+    }
+
+    //backward compatibility with 2025.2 (newSessionBuilder is available since 2026.1)
+    //todo: refactor once the since-build is bumped to 261
+    private RunContentDescriptor startCompatibleSession(@NotNull ExecutionEnvironment env,
+                                                        @NotNull XDebugProcessStarter processStarter) throws ExecutionException {
+        XDebuggerManager debuggerManager = XDebuggerManager.getInstance(env.getProject());
+        RunContentDescriptor descriptor = startSessionWithBuilder(debuggerManager, env, processStarter);
+        if (descriptor != null) {
+            return descriptor;
+        }
+        return debuggerManager.startSession(env, processStarter).getRunContentDescriptor();
+    }
+
+    @Nullable
+    private RunContentDescriptor startSessionWithBuilder(@NotNull XDebuggerManager debuggerManager,
+                                                         @NotNull ExecutionEnvironment env,
+                                                         @NotNull XDebugProcessStarter processStarter) throws ExecutionException {
+        try {
+            Method newSessionBuilder = XDebuggerManager.class.getMethod("newSessionBuilder", XDebugProcessStarter.class);
+            Object sessionBuilder = newSessionBuilder.invoke(debuggerManager, processStarter);
+            Class<?> sessionBuilderClass = newSessionBuilder.getReturnType();
+
+            Method environmentMethod = sessionBuilderClass.getMethod("environment", ExecutionEnvironment.class);
+            Object configuredBuilder = environmentMethod.invoke(sessionBuilder, env);
+
+            Method startSession = sessionBuilderClass.getMethod("startSession");
+            Object sessionStartedResult = startSession.invoke(configuredBuilder);
+            if (sessionStartedResult == null) {
+                return null;
+            }
+
+            Method getRunContentDescriptor = startSession.getReturnType().getMethod("getRunContentDescriptor");
+            return (RunContentDescriptor) getRunContentDescriptor.invoke(sessionStartedResult);
+        } catch (NoSuchMethodException e) {
+            return null;
+        } catch (IllegalAccessException e) {
+            throw new ExecutionException("Failed to start debugger session", e);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getTargetException();
+            if (cause instanceof ExecutionException) {
+                throw (ExecutionException) cause;
+            }
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            if (cause instanceof Error) {
+                throw (Error) cause;
+            }
+            throw new ExecutionException("Failed to start debugger session", cause);
+        }
     }
 }
