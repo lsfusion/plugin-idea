@@ -25,11 +25,12 @@ public abstract class McpBaseService extends RestService {
     protected static final String TOOL_RETRIEVE_DOCS = "lsfusion_retrieve_docs";
     protected static final String TOOL_GET_GUIDANCE = "lsfusion_get_guidance";
 
-    private static final String TOOL_RETRIEVE_DOCS_DESCRIPTION = "Search official lsFusion documentation (language reference + paradigm concepts) for chunks relevant to a query. Returns `{docs:[{source,text,score}]}` sorted by descending score. Use `type` to narrow by axis when known; omit to search both. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.";
+    private static final String TOOL_RETRIEVE_DOCS_DESCRIPTION = "Search official lsFusion documentation (language, paradigm, how-to, brief, rules) for chunks relevant to a query. Returns `{docs:[{source,text,score}]}` sorted by descending score. Use `type` to narrow to one branch when known; omit to search all and merge. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.";
 
     // Sister tools lsfusion_retrieve_howtos / lsfusion_retrieve_community were
-    // removed together with the legacy Pinecone backend that fed them — only
-    // language + paradigm sourceTypes are indexed in the new OpenAI VS.
+    // removed together with the legacy Pinecone backend that fed them; the new
+    // OpenAI VS indexes all five doc folders (language, paradigm, how-to, brief,
+    // rules) under the single lsfusion_retrieve_docs tool.
     private static final Set<String> REMOTE_TOOL_NAMES = Set.of(
             TOOL_RETRIEVE_DOCS,
             TOOL_GET_GUIDANCE
@@ -221,8 +222,8 @@ public abstract class McpBaseService extends RestService {
     private static JSONObject buildRetrieveDocsToolDescriptor() {
         JSONObject typeProp = new JSONObject()
                 .put("type", "string")
-                .put("enum", new JSONArray().put("language").put("paradigm"))
-                .put("description", "Optional sourceType filter. Omit (or pass null) to search both axes. `language` returns syntax / operator reference chunks; `paradigm` returns conceptual / abstraction chunks.");
+                .put("enum", new JSONArray().put("language").put("paradigm").put("how-to").put("brief").put("rules"))
+                .put("description", "Optional sourceType filter (the docs folder). Omit (or pass null) to search all branches and merge. `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes; `brief` = concise capability map; `rules` = code conventions.");
         JSONObject inputSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
