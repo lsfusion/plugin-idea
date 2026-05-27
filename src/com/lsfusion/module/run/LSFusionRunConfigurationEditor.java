@@ -18,6 +18,7 @@ public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunCo
     private LabeledComponent<ModulesComboBox> myModule;
     private JrePathEditor myJREPanel;
     private JCheckBox lightStartCheckBox;
+    private JCheckBox devModeCheckBox;
 
     private final ConfigurationModuleSelector myModuleSelector;
 
@@ -37,6 +38,7 @@ public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunCo
         configuration.ALTERNATIVE_JRE_PATH = myJREPanel.getJrePathOrName();
         configuration.ALTERNATIVE_JRE_PATH_ENABLED = myJREPanel.isAlternativeJreSelected();
         configuration.LIGHT_START = lightStartCheckBox.isSelected();
+        configuration.DEV_MODE = devModeCheckBox.isSelected();
     }
 
     public void resetEditorFrom(final LSFusionRunConfiguration configuration) {
@@ -44,6 +46,7 @@ public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunCo
         myModuleSelector.reset(configuration);
         myJREPanel.setPathOrName(configuration.ALTERNATIVE_JRE_PATH, configuration.ALTERNATIVE_JRE_PATH_ENABLED);
         lightStartCheckBox.setSelected(configuration.LIGHT_START);
+        devModeCheckBox.setSelected(configuration.DEV_MODE);
     }
 
     @NotNull

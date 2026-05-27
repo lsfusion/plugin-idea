@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.lsfusion.debug.LSFDebuggerRunner.DEV_MODE_PROPERTY;
 import static com.lsfusion.debug.LSFDebuggerRunner.LIGHT_START_PROPERTY;
 import static com.lsfusion.debug.LSFDebuggerRunner.PLUGIN_ENABLED_PROPERTY;
 import static com.lsfusion.module.LSFusionModuleBuilder.BOOTSTRAP_CLASS_NAME;
@@ -50,6 +51,7 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
     public boolean ALTERNATIVE_JRE_PATH_ENABLED;
     public String ALTERNATIVE_JRE_PATH;
     public boolean LIGHT_START;
+    public boolean DEV_MODE = true;
 
     public boolean PASS_PARENT_ENVS = true;
     private Map<String, String> myEnvs = new LinkedHashMap<>();
@@ -69,7 +71,7 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
     }
 
     public RunProfileState getState(@NotNull final Executor executor, @NotNull final ExecutionEnvironment env) {
-        final JavaCommandLineState state = new LSFServerCommandLineState(this, env, LIGHT_START);
+        final JavaCommandLineState state = new LSFServerCommandLineState(this, env, LIGHT_START, DEV_MODE);
         JavaRunConfigurationModule module = getConfigurationModule();
         state.setConsoleBuilder(TextConsoleBuilderFactory.getInstance().createBuilder(getProject(), module.getSearchScope()));
         return state;
@@ -213,11 +215,13 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
 
         private final LSFusionRunConfiguration myConfiguration;
         private final boolean lightStart;
+        private final boolean devMode;
 
-        public LSFServerCommandLineState(@NotNull final LSFusionRunConfiguration configuration, final ExecutionEnvironment environment, final boolean lightStart) {
+        public LSFServerCommandLineState(@NotNull final LSFusionRunConfiguration configuration, final ExecutionEnvironment environment, final boolean lightStart, final boolean devMode) {
             super(environment);
             myConfiguration = configuration;
             this.lightStart = lightStart;
+            this.devMode = devMode;
 
         }
 
@@ -231,6 +235,14 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
             JavaParametersUtil.configureConfiguration(params, myConfiguration);
             ParametersList vmParametersList = params.getVMParametersList();
             vmParametersList.addProperty(LIGHT_START_PROPERTY, String.valueOf(lightStart));
+
+            // Dev mode: VM Options take precedence over the checkbox — if -Dlsfusion.server.devmode is
+            // already set explicitly in VM_PARAMETERS, the checkbox value is ignored. This preserves
+            // backward compatibility for run configurations that historically hard-coded the flag
+            // in VM Options (e.g. ERP-Logics with -Dlsfusion.server.devmode=false).
+            if (!vmParametersList.hasProperty(DEV_MODE_PROPERTY)) {
+                vmParametersList.addProperty(DEV_MODE_PROPERTY, String.valueOf(devMode));
+            }
 
             if (!vmParametersList.hasProperty(PLUGIN_ENABLED_PROPERTY)) {
                 vmParametersList.addProperty(PLUGIN_ENABLED_PROPERTY, "true");
