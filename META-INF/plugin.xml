@@ -10,8 +10,9 @@
     <change-notes><![CDATA[
         <b>Version 1.0.309</b><br>
         <ul>
-            <li>Property Complexity: references inside string interpolations ichavchavadze 5 minutes ago</li>
+            <li>Property Complexity: references inside string interpolations</li>
             <li>Added 'Dev mode' checkbox to lsFusion Server run configuration</li>
+            <li>Make Shift+F6 rename update FILTERS / ORDERS references that don't go through PROPERTIES (closes #90)</li>
         </ul>
     ]]>
     </change-notes>
