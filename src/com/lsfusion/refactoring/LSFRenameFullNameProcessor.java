@@ -198,13 +198,20 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
             }
 
             for (UsageInfo usage : usages) {
-                LSFFullNameReference reference = (LSFFullNameReference) usage.getReference();
+                PsiReference reference = usage.getReference();
                 if (reference != null) {
 //                if(usage instanceof PossibleConflict) {
 //                    LSFDeclaration refDecl = reference.resolveDecl();
 //                    possibleConflicts.add(new Pair<LSFFullNameReference, LSFDeclaration>(reference, refDecl));
 //                } else
-                    possibleConflicts.add(new Pair<>((LSFFullNameReference) reference.handleElementRename(newName), decl));
+                    PsiElement renamed = reference.handleElementRename(newName);
+                    // Only LSFFullNameReference usages participate in possible-conflict qualification —
+                    // simple-name references (e.g. propertyDrawOrPropertyExpr in FILTERS / ORDERS) can't
+                    // be fully qualified, so we just rewrite their simple-name text via handleElementRename
+                    // above and skip the conflict-tracking step.
+                    if (renamed instanceof LSFFullNameReference) {
+                        possibleConflicts.add(new Pair<>((LSFFullNameReference) renamed, decl));
+                    }
                 }
             }
 

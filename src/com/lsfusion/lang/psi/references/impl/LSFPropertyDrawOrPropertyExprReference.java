@@ -14,7 +14,9 @@ import com.lsfusion.lang.psi.LSFResolveResult;
 import com.lsfusion.lang.psi.LSFResolveUtil;
 import com.lsfusion.lang.psi.LSFPsiImplUtil;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropertyDrawDeclaration;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,6 +86,18 @@ public abstract class LSFPropertyDrawOrPropertyExprReference extends LSFProperty
     public LSFObjectUsageList getObjectUsageList() {
         LSFPropertyDrawOrPropertyExprUsage usage = getPropertyDrawOrPropertyExprUsage();
         return usage == null ? null : PsiTreeUtil.getChildOfType(usage, LSFObjectUsageList.class);
+    }
+
+    @Override
+    protected boolean isDeclarationType(PsiElement element) {
+        // The reference can resolve to either a propertyDraw declaration (when the
+        // property is exposed via PROPERTIES on the form and matched by name+objects)
+        // or to the underlying property declaration (when only FILTERS/ORDERS refer
+        // to it via the propertyExpr-shorthand fallback in resolvePropertyDeclaration).
+        // Without LSFPropDeclaration here, isReferenceTo skips the reference when
+        // the renamed element is the property itself, leaving FILTERS-only usages
+        // out of the rename refactoring.
+        return element instanceof LSFPropertyDrawDeclaration || element instanceof LSFPropDeclaration;
     }
 
     @Nullable
