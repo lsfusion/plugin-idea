@@ -6,7 +6,9 @@ import com.intellij.mcpserver.annotations.McpTool
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.util.io.HttpRequests
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -79,6 +81,95 @@ data class RemoteDocItem(
 data class RetrieveDocsOutput(
     @McpDescription(description = "Relevant chunks returned from the RAG store.")
     val docs: List<RemoteDocItem>,
+)
+
+
+// report_feedback DTOs — mirror mcp/tools/feedback.py (central validates authoritatively).
+// Enum-valued fields are typed as String here (allowed values documented inline) to keep
+// the JSON keys aligned via @SerialName without enum-name mapping.
+@Serializable
+data class FbExpectation(
+    @McpDescription(description = "What the agent expected (depersonalized).") val expected: String,
+    @McpDescription(description = "What actually happened (depersonalized).") val actual: String,
+)
+
+@Serializable
+data class FbEvalError(
+    @McpDescription(description = "The error text (depersonalized).") val message: String,
+    @McpDescription(description = "Where it surfaced: syntax|semantic|runtime|unknown.") val phase: String = "unknown",
+    @SerialName("code_excerpt")
+    @McpDescription(description = "Tiny abstracted snippet if essential — NO full source / project code.") val codeExcerpt: String? = null,
+    @SerialName("normalized_message")
+    @McpDescription(description = "Optional normalized form (ids/literals stripped) for clustering.") val normalizedMessage: String? = null,
+)
+
+@Serializable
+data class FbRetrieveQuery(
+    @McpDescription(description = "The query text.") val query: String,
+    @SerialName("returned_sources")
+    @McpDescription(description = "Doc branches/files it surfaced, if noted.") val returnedSources: List<String>? = null,
+    @McpDescription(description = "How useful: helpful|irrelevant|misleading|incomplete.") val usefulness: String? = null,
+)
+
+@Serializable
+data class FbRecommendation(
+    @SerialName("primary_target")
+    @McpDescription(description = "Main artifact to change: how-to|rules|brief|paradigm|language|code-bug|rag-retrieval|eval-error-message.") val primaryTarget: String,
+    @SerialName("secondary_targets")
+    @McpDescription(description = "Other plausibly-affected artifacts (same value set as primary_target).") val secondaryTargets: List<String> = emptyList(),
+    @SerialName("suggested_change")
+    @McpDescription(description = "Concrete suggestion (depersonalized).") val suggestedChange: String,
+    @McpDescription(description = "Confidence: low|medium|high.") val confidence: String = "medium",
+    @McpDescription(description = "Why, briefly.") val rationale: String? = null,
+)
+
+@Serializable
+data class FbToolContext(
+    @SerialName("eval_server_kind")
+    @McpDescription(description = "Eval server kind.") val evalServerKind: String? = null,
+    @SerialName("eval_server_version")
+    @McpDescription(description = "Eval server version.") val evalServerVersion: String? = null,
+)
+
+@Serializable
+data class FeedbackReportInput(
+    @SerialName("agent_journey_id")
+    @McpDescription(description = "Agent-generated id grouping this task's errors/queries.") val agentJourneyId: String,
+    @SerialName("signal_type")
+    @McpDescription(description = "Signal kind: doc-gap|expectation-mismatch|unclear-error|missing-capability|rag-retrieval|other.") val signalType: String,
+    @SerialName("problem_summary")
+    @McpDescription(description = "Short depersonalized task description.") val problemSummary: String,
+    @McpDescription(description = "Suggested fix (a hint for triage, not a decision).") val recommendation: FbRecommendation,
+    @McpDescription(description = "For expectation-mismatch/unclear-error: expected vs actual.") val expectation: FbExpectation? = null,
+    @SerialName("eval_errors")
+    @McpDescription(description = "Errors hit while running lsFusion code via eval.") val evalErrors: List<FbEvalError> = emptyList(),
+    @SerialName("retrieve_queries")
+    @McpDescription(description = "retrieve_docs queries tried while fixing the error.") val retrieveQueries: List<FbRetrieveQuery> = emptyList(),
+    @SerialName("retrieved_docs_summary")
+    @McpDescription(description = "Short PUBLIC summaries of retrieved docs (no chunk bodies).") val retrievedDocsSummary: List<String> = emptyList(),
+    @SerialName("final_outcome")
+    @McpDescription(description = "How the task ended: fixed|not_fixed|workaround|abandoned|unknown.") val finalOutcome: String = "unknown",
+    @SerialName("tool_context")
+    @McpDescription(description = "Optional eval-server context.") val toolContext: FbToolContext? = null,
+    @SerialName("client_dedup_hint")
+    @McpDescription(description = "Optional agent hint; the SERVER computes the canonical dedup_fingerprint.") val clientDedupHint: String? = null,
+    @SerialName("lsfusion_version")
+    @McpDescription(description = "lsFusion version, if known.") val lsfusionVersion: String? = null,
+    @SerialName("deployment_kind")
+    @McpDescription(description = "Deployment kind, if known.") val deploymentKind: String? = null,
+    @McpDescription(description = "Reporting client name/version, e.g. claude-code.") val agent: String? = null,
+    @SerialName("n_eval_attempts")
+    @McpDescription(description = "Number of eval attempts.") val nEvalAttempts: Int? = null,
+)
+
+@Serializable
+data class FeedbackOutput(
+    @SerialName("report_id")
+    @McpDescription(description = "Server-assigned id for this submission.") val reportId: String,
+    @McpDescription(description = "Outcome: recorded|disabled|rejected.") val status: String,
+    @SerialName("dedup_fingerprint")
+    @McpDescription(description = "Server-computed clustering fingerprint (when recorded).") val dedupFingerprint: String? = null,
+    @McpDescription(description = "Reason when disabled/rejected.") val detail: String? = null,
 )
 
 
@@ -262,5 +353,23 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
             // Should not happen based on server code, but for robustness:
             resultEl.toString()
         }
+    }
+
+    @McpTool(name = "lsfusion_report_feedback")
+    @McpDescription(
+        description = "Submit ONE anonymous, depersonalized reinforcement-quality signal so lsFusion docs / RAG / eval diagnostics / the platform can be improved. " +
+            "Use `signal_type` to say what kind: a documentation gap, an expectation-mismatch (you expected lsFusion to behave/mean X but it was actually Y — fill `expectation`), " +
+            "an unclear/unactionable `eval` error, a missing capability, a RAG miss, or other. " +
+            "Call this ONLY per the workflow rule from `lsfusion_get_guidance` (the friction was action-affecting) AND only after the user explicitly consents. " +
+            "Send NO source code, file paths, schema/table/customer names, or secrets — only the depersonalized journey and a recommendation. The feedback is a suggestion, not a decision."
+    )
+    @Suppress("unused")
+    suspend fun reportFeedback(
+        @McpDescription(description = "The depersonalized feedback report. NO code, paths, schema/table/customer names, or secrets.")
+        report: FeedbackReportInput,
+    ): FeedbackOutput {
+        val args = JSONObject().put("report", JSONObject(json.encodeToString(report)))
+        val resultEl = callRemoteToolResultJson("lsfusion_report_feedback", args)
+        return json.decodeFromJsonElement<FeedbackOutput>(resultEl)
     }
 }

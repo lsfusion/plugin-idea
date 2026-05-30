@@ -24,6 +24,7 @@ public abstract class McpBaseService extends RestService {
 
     protected static final String TOOL_RETRIEVE_DOCS = "lsfusion_retrieve_docs";
     protected static final String TOOL_GET_GUIDANCE = "lsfusion_get_guidance";
+    protected static final String TOOL_REPORT_FEEDBACK = "lsfusion_report_feedback";
 
     private static final String TOOL_RETRIEVE_DOCS_DESCRIPTION = "Search official lsFusion documentation (language, paradigm, how-to, brief, rules) for chunks relevant to a query. Returns `{docs:[{source,text,score}]}` sorted by descending score. Use `type` to narrow to one branch when known; omit to search all and merge. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.";
 
@@ -33,7 +34,8 @@ public abstract class McpBaseService extends RestService {
     // rules) under the single lsfusion_retrieve_docs tool.
     private static final Set<String> REMOTE_TOOL_NAMES = Set.of(
             TOOL_RETRIEVE_DOCS,
-            TOOL_GET_GUIDANCE
+            TOOL_GET_GUIDANCE,
+            TOOL_REPORT_FEEDBACK
     );
 
     private static final int FALLBACK_ID = 0;
@@ -216,7 +218,8 @@ public abstract class McpBaseService extends RestService {
         return new JSONArray()
                 .put(buildFindElementsToolDescriptor())
                 .put(buildRetrieveDocsToolDescriptor())
-                .put(buildGetGuidanceToolDescriptor());
+                .put(buildGetGuidanceToolDescriptor())
+                .put(buildReportFeedbackToolDescriptor());
     }
 
     private static JSONObject buildRetrieveDocsToolDescriptor() {
@@ -270,6 +273,109 @@ public abstract class McpBaseService extends RestService {
                 .put("name", TOOL_GET_GUIDANCE)
                 .put("description", "Fetch the brief overview and mandatory rules for working with lsFusion. The assistant MUST call this at the start of ANY lsFusion-related task if the guidance isn't already in context, and MUST then read and strictly follow all rules it returns.")
                 .put("inputSchema", inputSchema);
+    }
+
+    // --- report_feedback schema helpers (mirror mcp/tools/feedback.py; central validates) ---
+    private static JSONArray feArr(String... values) {
+        JSONArray a = new JSONArray();
+        for (String v : values) a.put(v);
+        return a;
+    }
+
+    private static JSONObject feStr(String description) {
+        return new JSONObject().put("type", "string").put("description", description);
+    }
+
+    private static JSONObject feEnum(String description, JSONArray values) {
+        return new JSONObject().put("type", "string").put("enum", values).put("description", description);
+    }
+
+    private static JSONObject feArrOf(JSONObject items, String description) {
+        return new JSONObject().put("type", "array").put("items", items).put("description", description);
+    }
+
+    private static JSONObject buildReportFeedbackToolDescriptor() {
+        JSONArray targets = feArr("how-to", "rules", "brief", "paradigm", "language",
+                "code-bug", "rag-retrieval", "eval-error-message");
+        JSONObject recommendation = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("primary_target", feEnum("Main artifact to change.", targets))
+                        .put("secondary_targets", feArrOf(feEnum("", targets), "Other plausibly-affected artifacts."))
+                        .put("suggested_change", feStr("Concrete suggestion (depersonalized)."))
+                        .put("confidence", feEnum("How confident the agent is.", feArr("low", "medium", "high")))
+                        .put("rationale", feStr("Why, briefly.")))
+                .put("required", feArr("primary_target", "suggested_change"));
+        JSONObject expectation = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("expected", feStr("What the agent expected (depersonalized)."))
+                        .put("actual", feStr("What actually happened (depersonalized).")))
+                .put("required", feArr("expected", "actual"));
+        JSONObject evalError = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("message", feStr("The error text (depersonalized)."))
+                        .put("phase", feEnum("Where it surfaced.", feArr("syntax", "semantic", "runtime", "unknown")))
+                        .put("code_excerpt", feStr("Tiny abstracted snippet if essential — NO full source / project code."))
+                        .put("normalized_message", feStr("Optional normalized form (ids/literals stripped) for clustering.")))
+                .put("required", feArr("message"));
+        JSONObject retrieveQuery = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("query", feStr("The query text."))
+                        .put("returned_sources", feArrOf(new JSONObject().put("type", "string"), "Doc branches/files it surfaced, if noted."))
+                        .put("usefulness", feEnum("How useful the result was for this error.", feArr("helpful", "irrelevant", "misleading", "incomplete"))))
+                .put("required", feArr("query"));
+        JSONObject toolContext = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("eval_server_kind", feStr("Eval server kind."))
+                        .put("eval_server_version", feStr("Eval server version.")));
+        JSONObject report = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("agent_journey_id", feStr("Agent-generated id grouping this task's errors/queries."))
+                        .put("signal_type", feEnum("What kind of reinforcement signal this is (routing hint, not the decision).",
+                                feArr("doc-gap", "expectation-mismatch", "unclear-error", "missing-capability", "rag-retrieval", "other")))
+                        .put("problem_summary", feStr("Short depersonalized task description."))
+                        .put("recommendation", recommendation)
+                        .put("expectation", expectation)
+                        .put("eval_errors", feArrOf(evalError, "Errors hit while running lsFusion code via eval."))
+                        .put("retrieve_queries", feArrOf(retrieveQuery, "retrieve_docs queries tried while fixing the error."))
+                        .put("retrieved_docs_summary", feArrOf(new JSONObject().put("type", "string"), "Short PUBLIC summaries of retrieved docs (no chunk bodies)."))
+                        .put("final_outcome", feEnum("How the task ended (guards against survivorship bias).",
+                                feArr("fixed", "not_fixed", "workaround", "abandoned", "unknown")))
+                        .put("tool_context", toolContext)
+                        .put("client_dedup_hint", feStr("Optional agent hint; the SERVER computes the canonical dedup_fingerprint."))
+                        .put("lsfusion_version", feStr("lsFusion version, if known."))
+                        .put("deployment_kind", feStr("Deployment kind, if known."))
+                        .put("agent", feStr("Reporting client name/version, e.g. claude-code."))
+                        .put("n_eval_attempts", new JSONObject().put("type", "integer").put("description", "Number of eval attempts.")))
+                .put("required", feArr("agent_journey_id", "signal_type", "problem_summary", "recommendation"));
+        JSONObject inputSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject().put("report", report))
+                .put("required", feArr("report"))
+                .put("additionalProperties", false);
+
+        // Output schema matches FeedbackOutput in McpToolset.kt
+        JSONObject outputSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("report_id", feStr("Server-assigned id for this submission."))
+                        .put("status", feEnum("Outcome.", feArr("recorded", "disabled", "rejected")))
+                        .put("dedup_fingerprint", feStr("Server-computed clustering fingerprint (when recorded)."))
+                        .put("detail", feStr("Reason when disabled/rejected.")))
+                .put("required", feArr("report_id", "status"))
+                .put("additionalProperties", false);
+
+        return new JSONObject()
+                .put("name", TOOL_REPORT_FEEDBACK)
+                .put("description",
+                        "Submit ONE anonymous, depersonalized reinforcement-quality signal so lsFusion docs / RAG / eval diagnostics / the platform can be improved. Use `signal_type` to say what kind: a documentation gap, an expectation-mismatch (you expected lsFusion to behave/mean X but it was actually Y — fill `expectation`), an unclear/unactionable `eval` error, a missing capability, a RAG miss, or other. Call this ONLY per the workflow rule from `lsfusion_get_guidance` (the friction was action-affecting) AND only after the user explicitly consents. Send NO source code, file paths, schema/table/customer names, or secrets — only the depersonalized journey and a recommendation. The feedback is a suggestion, not a decision. Returns `{report_id, status, dedup_fingerprint}`.")
+                .put("inputSchema", inputSchema)
+                .put("outputSchema", outputSchema);
     }
 
     protected static JSONObject buildFindElementsToolDescriptor() {
