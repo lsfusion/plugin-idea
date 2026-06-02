@@ -14,6 +14,7 @@
             <li>Added 'Dev mode' checkbox to lsFusion Server run configuration</li>
             <li>Make Shift+F6 rename update FILTERS / ORDERS references that don't go through PROPERTIES (closes #90)</li>
             <li>Added the <code>lsfusion_report_feedback</code> MCP tool for sending depersonalized feedback that helps improve lsFusion documentation, RAG retrieval, and <code>eval</code> diagnostics.</li>
+            <li>SelectTop / selectTops: accept standalone OFFSET without TOP</li>
         </ul>
     ]]>
     </change-notes>
