@@ -24,6 +24,7 @@ public class ToolbarView extends ComponentView {
     public static final List<Property> PROPERTIES = addToList(
             ComponentView.PROPERTIES,
             new ReflectionProperty("visible"),
+            new ReflectionProperty("showGroup"), //deprecated since 6.0, will be removed in 8.0
             new ReflectionProperty("showViews"),
             new ReflectionProperty("showFilters").setExpert(),
             new ReflectionProperty("showSettings"),

@@ -12,6 +12,10 @@ public class ToolbarViewProxy extends ComponentViewProxy<ToolbarView> {
         target.visible = visible;
     }
 
+    public void setShowGroup(boolean showGroup) {
+        setShowViews(showGroup);
+    }
+
     public void setShowViews(boolean showViews) {
         target.showViews = showViews;
     }
