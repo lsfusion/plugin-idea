@@ -135,6 +135,7 @@ dependencies {
         bundledPlugin("com.intellij.java")
         bundledPlugin("com.intellij.properties")
         bundledPlugin("com.intellij.mcpServer")
+        bundledModule("intellij.spellchecker")
     }
 }
 

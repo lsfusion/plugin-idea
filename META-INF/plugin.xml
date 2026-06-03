@@ -29,6 +29,7 @@
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.mcpServer</depends>
+    <depends>com.intellij.modules.spellchecker</depends>
 
     <actions>
         <group id="LSFGroup" popup="true" text="_LSF">
@@ -156,6 +157,7 @@
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
         <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
+        <spellchecker.support language="Lsf" implementationClass="com.lsfusion.spellchecker.LSFSpellcheckingStrategy"/>
         <annotator language="Lsf" implementationClass="com.lsfusion.lang.LSFReferenceAnnotator"/>
         <readWriteAccessDetector implementation="com.lsfusion.LSFReadWriteAccessDetector"/>
         <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>
