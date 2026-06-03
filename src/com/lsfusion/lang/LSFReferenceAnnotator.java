@@ -15,6 +15,8 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.undo.UndoUtil;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.EffectType;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
@@ -63,6 +65,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
@@ -329,9 +332,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         String text = o.getText();
         if (text != null) {
             if (text.equals("USERFILTER")) {
-                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use FILTERS container instead");
+                addDeprecatedReplaceWarning(o, "5.2", "6.0", "FILTERS");
             } else if (text.equals("GRIDBOX")) {
-                addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use GRID container instead");
+                addDeprecatedReplaceWarning(o, "5.2", "6.0", "GRID");
             }
         }
     }
@@ -340,7 +343,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitCustomOptionsLiteral(@NotNull LSFCustomOptionsLiteral o) {
         super.visitCustomOptionsLiteral(o);
         if(o.getText().equals("HEADER"))
-            addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use OPTIONS instead");
+            addDeprecatedReplaceWarning(o, "5.2", "6.0", "OPTIONS");
     }
 
     @Override
@@ -1150,6 +1153,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void addUnderscoredError(PsiElement element, String message) {
         addError(element, new LSFResolvingError(element, message, true));
     }
+    private void addUnderscoredError(PsiElement element, String message, List<IntentionAction> fixes) {
+        addError(element, new LSFResolvingError(element, message, true), false, fixes);
+    }
     private void addError(PsiElement element, LSFResolvingError error) {
         addError(element, error, false, null);
     }
@@ -1209,6 +1215,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addWarningAnnotation(element, text, DEPRECATED_WARNING);
     }
 
+    private void addDeprecatedReplaceWarning(PsiElement element, String deprecatedVersion, String removedVersion, String replacement) {
+        // for option statements `name = value` swap only the name (text before '='), keeping the value
+        String elementText = element.getText();
+        int eq = elementText.indexOf('=');
+        String oldToken = (eq >= 0 ? elementText.substring(0, eq) : elementText).trim();
+        addWarningAnnotation(element, String.format("Deprecated since version %s, removed in version %s. Use '%s' instead", deprecatedVersion, removedVersion, replacement), CodeInsightColors.DEPRECATED_ATTRIBUTES, Collections.singletonList(new LSFReplaceFix(element, oldToken, replacement)));
+    }
+
     private void addWarningAnnotation(PsiElement element, String text) {
         addWarningAnnotation(element, text, null);
     }
@@ -1218,18 +1232,39 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addWarningAnnotation(PsiElement element, String text, TextAttributes textAttributes, List<IntentionAction> fixes) {
-        if(warningsSearchMode) {
+        if (warningsSearchMode) {
             if (searchMessageConsumer != null) {
                 searchMessageConsumer.accept(element, text, LSFErrorLevel.WARNING);
             } else {
                 ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.WARNING);
             }
-        } else if(!errorsSearchMode) {
+        } else if (!errorsSearchMode) {
             AnnotationBuilder builder = myHolder.newAnnotation(HighlightSeverity.WARNING, text).range(element);
-            if(textAttributes != null) {
+            if (textAttributes != null) {
                 builder = builder.enforcedTextAttributes(textAttributes);
             }
-            if(fixes != null) {
+            if (fixes != null) {
+                for (IntentionAction fix : fixes) {
+                    builder = builder.withFix(fix);
+                }
+            }
+            builder.create();
+        }
+    }
+
+    private void addWarningAnnotation(PsiElement element, String text, TextAttributesKey textAttributesKey, List<IntentionAction> fixes) {
+        if (warningsSearchMode) {
+            if (searchMessageConsumer != null) {
+                searchMessageConsumer.accept(element, text, LSFErrorLevel.WARNING);
+            } else {
+                ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.WARNING);
+            }
+        } else if (!errorsSearchMode) {
+            AnnotationBuilder builder = myHolder.newAnnotation(HighlightSeverity.WARNING, text).range(element);
+            if (textAttributesKey != null) {
+                builder = builder.textAttributes(textAttributesKey);
+            }
+            if (fixes != null) {
                 for (IntentionAction fix : fixes) {
                     builder = builder.withFix(fix);
                 }
@@ -1386,7 +1421,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addFalseToBooleanError(PsiElement o) {
-        addUnderscoredError(o, "use NULL instead of FALSE");
+        addUnderscoredError(o, "use NULL instead of FALSE", Collections.singletonList(new LSFReplaceFix(o, "FALSE", "NULL")));
     }
 
     private void addAssignError(LSFAssignActionPropertyDefinitionBody o) {
@@ -1465,22 +1500,22 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
             switch (property) {
                 case "columns":
-                    addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'lines' instead");
+                    addDeprecatedReplaceWarning(o, "5.2", "6.0", "lines");
                     break;
                 case "type":
                     addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'horizontal', 'tabbed', 'lines' instead");
                     break;
                 case "toolTip":
-                    addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'tooltip' instead");
+                    addDeprecatedReplaceWarning(o, "5.2", "6.0", "tooltip");
                     break;
                 case "editOnSingleClick":
-                    addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'changeOnSingleClick' instead");
+                    addDeprecatedReplaceWarning(o, "5.2", "6.0", "changeOnSingleClick");
                     break;
                 case "valueAlignment":
-                    addDeprecatedWarningAnnotation(o, "6.0", "Use 'valueAlignmentHorz' instead");
+                    addDeprecatedReplaceWarning(o, "6.0", "8.0", "valueAlignmentHorz");
                     break;
                 case "showGroup":
-                    addDeprecatedWarningAnnotation(o, "6.0", "8.0", "Use 'showViews' instead");
+                    addDeprecatedReplaceWarning(o, "6.0", "8.0", "showViews");
                     break;
                 case "autoSize":
                     addDeprecatedWarningAnnotation(o, "6.0", "Earlier versions: ignore this warning");
@@ -1495,19 +1530,19 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     addDeprecatedWarningAnnotation(o, "6.2", "7.0", "This will be default behaviour");
                     break;
                 case "panelCaptionVertical":
-                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionVertical' instead");
+                    addDeprecatedReplaceWarning(o, "6.0", "8.0", "captionVertical");
                     break;
                 case "panelCaptionLast":
-                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionLast' instead");
+                    addDeprecatedReplaceWarning(o, "6.2", "8.0", "captionLast");
                     break;
                 case "panelCaptionAlignment":
-                    addDeprecatedWarningAnnotation(o, "6.2", "Use 'captionAlignmentHorz' instead");
+                    addDeprecatedReplaceWarning(o, "6.2", "8.0", "captionAlignmentHorz");
                     break;
                 case "imagePath":
-                    addDeprecatedWarningAnnotation(o, "6.2", "8.0", "Use 'image' instead");
+                    addDeprecatedReplaceWarning(o, "6.2", "8.0", "image");
                     break;
                 case "headerHeight":
-                    addDeprecatedWarningAnnotation(o, "6.2", "8.0", "Use 'captionHeight' instead");
+                    addDeprecatedReplaceWarning(o, "6.2", "8.0", "captionHeight");
                     break;
                 default:
                     if (element != null && !element.getText().equals("NULL")) {
@@ -1554,7 +1589,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if(!supportedDefaultCompares5.contains(defaultCompare)) {
                 addUnderscoredError(element, format("'%s' is not supported defaultCompare, use on of: %s", defaultCompare, supportedDefaultCompares));
             } else {
-                addDeprecatedWarningAnnotation(element, "5.2", "6.0", "use on of: " + supportedDefaultCompares);
+                String replacement = supportedDefaultCompares.get(supportedDefaultCompares5.indexOf(defaultCompare));
+                addWarningAnnotation(element, format("Deprecated since version 5.2, removed in version 6.0. Use '%s' instead", replacement),
+                        CodeInsightColors.DEPRECATED_ATTRIBUTES, Collections.singletonList(new LSFReplaceFix(element, defaultCompare, replacement)));
             }
         }
     }
