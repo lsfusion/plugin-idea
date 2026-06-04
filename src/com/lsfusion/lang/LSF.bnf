@@ -1716,6 +1716,7 @@ formStatement ::=	(	formDecl
                     |	formOrderByList
                     |	formPivotOptionsDeclaration
                     |	formEventsList
+                    |	formAPIList
                     |   formOptions
                     )*
                     (emptyStatement | <<expectSemicolon>>)
@@ -2032,6 +2033,13 @@ formEventsList ::= EVENTS? formEventDeclaration (COMMA formEventDeclaration)*
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
 }
+
+formAPIList ::= API formAPIPropertyUsage (COMMA formAPIPropertyUsage)*
+{ pin = 1 }
+
+// allow-listed action/property for the form controller; optional alias, ACTION-prefix and signature handled by actionOrPropertyUsage
+formAPIPropertyUsage ::= (simpleName EQUALS)? actionOrPropertyUsage
+{ pin = 2 }
 
 formEventDeclaration ::= ON
                         (    OK (BEFORE | AFTER)?

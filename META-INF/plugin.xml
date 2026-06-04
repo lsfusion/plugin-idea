@@ -17,6 +17,7 @@
             <li>SelectTop / selectTops: accept standalone OFFSET without TOP</li>
             <li>Add quick-fix to replace deprecated constructs with their replacement</li>
             <li>Form <code>PROPERTIES</code>: recognize the <code>APPLY</code> commit-on-edit option, e.g. <code>PROPERTIES(o) f NEWSESSION APPLY</code></li>
+            <li>Form <code>API</code>: recognize the clause that allow-lists actions/properties for the form JS controller, e.g. <code>API recalc, setQty = setQuantity, note</code></li>
         </ul>
     ]]>
     </change-notes>
