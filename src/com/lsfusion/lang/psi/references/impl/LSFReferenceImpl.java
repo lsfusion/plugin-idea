@@ -126,9 +126,11 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
                     LSFNonEmptyPropertyOptions propertyOptions = ((LSFActionOrGlobalPropDeclaration) decl).getNonEmptyPropertyOptions();
                     if (propertyOptions != null)
                         error = checkDeprecated(propertyOptions.getAnnotationSettingList());
+                    if (error != null) break;
                     LSFNonEmptyActionOptions actionOptions = ((LSFActionOrGlobalPropDeclaration) decl).getNonEmptyActionOptions();
                     if (actionOptions != null)
                         error = checkDeprecated(actionOptions.getAnnotationSettingList());
+                    if (error != null) break;
                 }
             }
         }
@@ -143,7 +145,6 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
                 String message = options.size() > 1 ? (", " + options.get(1).getValue()) : "";
                 return new LSFResolvingError(this, getTextRange(), "Deprecated" + since + message, false, true);
             }
-            return null;
         }
         return null;
     }
