@@ -29,7 +29,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
@@ -48,7 +47,6 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.extend.LSFClassExtend;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.lang.psi.impl.LSFClassDeclImpl;
-import com.lsfusion.lang.psi.impl.LSFFormDeclImpl;
 import com.lsfusion.lang.psi.impl.LSFLocalPropertyDeclarationNameImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.psi.declarations.impl.LSFStatementActionDeclarationImpl;
@@ -57,6 +55,7 @@ import com.lsfusion.lang.psi.references.impl.LSFFullNameReferenceImpl;
 import com.lsfusion.lang.psi.references.impl.LSFReferenceImpl;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
+import com.lsfusion.inspections.LSFProblemsVisitor;
 import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,7 +64,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
@@ -84,7 +82,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final TextAttributes META_NESTING_USAGE = new TextAttributes(new JBColor(Gray._180, Gray._91), null, null, null, Font.PLAIN);
     public static final TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), null, null, null, Font.PLAIN);
     public static final TextAttributes WAVE_UNDERSCORED_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
-    public static final TextAttributes WARNING = new TextAttributes(new JBColor(Gray._211, new Color(100, 100, 255)), null, null, null, Font.PLAIN);
     public static final TextAttributes WAVE_UNDERSCORED_WARNING = new TextAttributes(null, null, new JBColor(Gray._211, new Color(100, 100, 255)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
     public static final TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
     public static final TextAttributes OUTER_PARAM = new TextAttributes(new JBColor(new Color(102, 14, 122), new Color(152, 118, 170)), null, null, null, Font.PLAIN);
@@ -100,6 +97,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         void accept(PsiElement element, String text, LSFErrorLevel level);
     }
 
+    private final LSFProblemsVisitor.DeprecationConsumer deprecationLiveSink = (element, version, text, fix) -> {
+        if (warningsSearchMode) {
+            addWarningAnnotation(element, text, null, CodeInsightColors.DEPRECATED_ATTRIBUTES, fix != null ? Collections.singletonList(fix) : null);
+        }
+    };
+
     @Override
     public synchronized void annotate(@NotNull PsiElement psiElement, AnnotationHolder holder) {
         if (psiElement instanceof LSFElement lsfElement && lsfElement.isInLibrarySources()) {
@@ -109,6 +112,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         myHolder = holder;
         try {
             psiElement.accept(this);
+            LSFProblemsVisitor.visitDeprecations(psiElement, deprecationLiveSink);
         } finally {
             myHolder = null;
         }
@@ -325,25 +329,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             return true;
 
         return false;
-    }
-
-    public void visitGroupObjectTreeSingleSelectorType(@NotNull LSFGroupObjectTreeSingleSelectorType o) {
-        super.visitGroupObjectTreeSingleSelectorType(o);
-        String text = o.getText();
-        if (text != null) {
-            if (text.equals("USERFILTER")) {
-                addDeprecatedReplaceWarning(o, "5.2", "6.0", "FILTERS");
-            } else if (text.equals("GRIDBOX")) {
-                addDeprecatedReplaceWarning(o, "5.2", "6.0", "GRID");
-            }
-        }
-    }
-
-    @Override
-    public void visitCustomOptionsLiteral(@NotNull LSFCustomOptionsLiteral o) {
-        super.visitCustomOptionsLiteral(o);
-        if(o.getText().equals("HEADER"))
-            addDeprecatedReplaceWarning(o, "5.2", "6.0", "OPTIONS");
     }
 
     @Override
@@ -614,15 +599,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitFormDeclaration(o);
 
         checkAlreadyDefined(o);
-        checkAutorefresh(o);
-    }
-
-    private void checkAutorefresh(LSFFormDeclaration o) {
-        LSFFormDeclOptions formDeclOptions = ((LSFFormDeclImpl) o).getFormDeclOptions();
-        if(formDeclOptions == null) return;
-        for(LSFAutorefreshLiteral autorefresh : formDeclOptions.getAutorefreshLiteralList()) {
-            addDeprecatedWarningAnnotation(autorefresh, "5.2", "6.0", "Use EVENTS ON SCHEDULE PERIOD n formRefresh() instead");
-        }
     }
 
     @Override
@@ -690,7 +666,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
         //todo: remove in 7.0
         if(o.getText().startsWith("EXTERNAL SQL 'LOCAL'")) {
-            LSFPropertyExpression expr = o.getPropertyExpressionList().get(0);
+            LSFPropertyExpression expr = o.getPropertyExpressionList().getFirst();
             addErrorAnnotation(expr, expr.getTextRange(), "Use INTERNAL DB instead");
         }
     }
@@ -700,11 +676,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitDesignStatement(o);
 
         checkAlreadyDefined(o);
-    }
-
-    @Override
-    public void visitDrawRoot(@NotNull LSFDrawRoot o) {
-        addDeprecatedWarningAnnotation(o, "5.2", "6.0", "");
     }
 
     @Override
@@ -1029,7 +1000,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         LSFResolvingError errorAnnotation = resolveResult != null ? resolveResult.resolveErrorAnnotation(myHolder) : reference.resolveErrorAnnotation(myHolder);
         if (errorAnnotation != null) { // !isInMetaDecl(reference)
             if(errorAnnotation.deprecated)
-                addDeprecatedWarningAnnotation(reference, errorAnnotation.text);
+                addWarningAnnotation(reference, errorAnnotation.text, DEPRECATED_WARNING, null);
             else
                 addErrorWithResolving(reference, errorAnnotation, getRequireModuleFixes(reference, resolveResult)); // since in meta usage there can be total different resolved references
             return false;
@@ -1203,35 +1174,15 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addWarningAnnotation(element, "Missing " + element.getText() + " in resource bundle", WAVE_UNDERSCORED_WARNING, fixes);
     }
 
-    private void addDeprecatedWarningAnnotation(PsiElement element, String deprecatedVersion, String comment) {
-        addDeprecatedWarningAnnotation(element, String.format("Deprecated since version %s. %s", deprecatedVersion, comment));
-    }
-
-    private void addDeprecatedWarningAnnotation(PsiElement element, String deprecatedVersion, String removedVersion, String comment) {
-        addDeprecatedWarningAnnotation(element, String.format("Deprecated since version %s, removed in version %s. %s", deprecatedVersion, removedVersion, comment));
-    }
-
-    private void addDeprecatedWarningAnnotation(PsiElement element, String text) {
-        addWarningAnnotation(element, text, DEPRECATED_WARNING);
-    }
-
-    private void addDeprecatedReplaceWarning(PsiElement element, String deprecatedVersion, String removedVersion, String replacement) {
-        // for option statements `name = value` swap only the name (text before '='), keeping the value
-        String elementText = element.getText();
-        int eq = elementText.indexOf('=');
-        String oldToken = (eq >= 0 ? elementText.substring(0, eq) : elementText).trim();
-        addWarningAnnotation(element, String.format("Deprecated since version %s, removed in version %s. Use '%s' instead", deprecatedVersion, removedVersion, replacement), CodeInsightColors.DEPRECATED_ATTRIBUTES, Collections.singletonList(new LSFReplaceFix(element, oldToken, replacement)));
-    }
-
     private void addWarningAnnotation(PsiElement element, String text) {
-        addWarningAnnotation(element, text, null);
-    }
-
-    private void addWarningAnnotation(PsiElement element, String text, TextAttributes textAttributes) {
-        addWarningAnnotation(element, text, textAttributes, null);
+        addWarningAnnotation(element, text, null, null);
     }
 
     private void addWarningAnnotation(PsiElement element, String text, TextAttributes textAttributes, List<IntentionAction> fixes) {
+        addWarningAnnotation(element, text, textAttributes, null, fixes);
+    }
+
+    private void addWarningAnnotation(PsiElement element, String text, TextAttributes textAttributes, TextAttributesKey textAttributesKey, List<IntentionAction> fixes) {
         if (warningsSearchMode) {
             if (searchMessageConsumer != null) {
                 searchMessageConsumer.accept(element, text, LSFErrorLevel.WARNING);
@@ -1243,24 +1194,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (textAttributes != null) {
                 builder = builder.enforcedTextAttributes(textAttributes);
             }
-            if (fixes != null) {
-                for (IntentionAction fix : fixes) {
-                    builder = builder.withFix(fix);
-                }
-            }
-            builder.create();
-        }
-    }
-
-    private void addWarningAnnotation(PsiElement element, String text, TextAttributesKey textAttributesKey, List<IntentionAction> fixes) {
-        if (warningsSearchMode) {
-            if (searchMessageConsumer != null) {
-                searchMessageConsumer.accept(element, text, LSFErrorLevel.WARNING);
-            } else {
-                ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.WARNING);
-            }
-        } else if (!errorsSearchMode) {
-            AnnotationBuilder builder = myHolder.newAnnotation(HighlightSeverity.WARNING, text).range(element);
             if (textAttributesKey != null) {
                 builder = builder.textAttributes(textAttributesKey);
             }
@@ -1498,66 +1431,18 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 }
             }
 
-            switch (property) {
-                case "columns":
-                    addDeprecatedReplaceWarning(o, "5.2", "6.0", "lines");
-                    break;
-                case "type":
-                    addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Use 'horizontal', 'tabbed', 'lines' instead");
-                    break;
-                case "toolTip":
-                    addDeprecatedReplaceWarning(o, "5.2", "6.0", "tooltip");
-                    break;
-                case "editOnSingleClick":
-                    addDeprecatedReplaceWarning(o, "5.2", "6.0", "changeOnSingleClick");
-                    break;
-                case "valueAlignment":
-                    addDeprecatedReplaceWarning(o, "6.0", "8.0", "valueAlignmentHorz");
-                    break;
-                case "showGroup":
-                    addDeprecatedReplaceWarning(o, "6.0", "8.0", "showViews");
-                    break;
-                case "autoSize":
-                    addDeprecatedWarningAnnotation(o, "6.0", "Earlier versions: ignore this warning");
-                    break;
-                case "changeKeyPriority":
-                    addDeprecatedWarningAnnotation(o, "6.0", "7.0", "Use parameter 'priority' in 'changeKey' instead");
-                    break;
-                case "changeMousePriority":
-                    addDeprecatedWarningAnnotation(o, "6.0", "7.0", "Use parameter 'priority' in 'changeMouse' instead");
-                    break;
-                case "expandOnClick":
-                    addDeprecatedWarningAnnotation(o, "6.2", "7.0", "This will be default behaviour");
-                    break;
-                case "panelCaptionVertical":
-                    addDeprecatedReplaceWarning(o, "6.0", "8.0", "captionVertical");
-                    break;
-                case "panelCaptionLast":
-                    addDeprecatedReplaceWarning(o, "6.2", "8.0", "captionLast");
-                    break;
-                case "panelCaptionAlignment":
-                    addDeprecatedReplaceWarning(o, "6.2", "8.0", "captionAlignmentHorz");
-                    break;
-                case "imagePath":
-                    addDeprecatedReplaceWarning(o, "6.2", "8.0", "image");
-                    break;
-                case "headerHeight":
-                    addDeprecatedReplaceWarning(o, "6.2", "8.0", "captionHeight");
-                    break;
-                default:
-                    if (element != null && !element.getText().equals("NULL")) {
-                        switch (property) {
-                            case "fontStyle":
-                                checkFontStyle(element, element.getText());
-                                break;
-                            case "select":
-                                checkSelect(element, element.getText());
-                                break;
-                            case "defaultCompare":
-                                checkDefaultCompare(element, element.getText());
-                                break;
-                        }
-                    }
+            if (element != null && !element.getText().equals("NULL")) {
+                switch (property) {
+                    case "fontStyle":
+                        checkFontStyle(element, element.getText());
+                        break;
+                    case "select":
+                        checkSelect(element, element.getText());
+                        break;
+                    case "defaultCompare":
+                        checkDefaultCompare(element, element.getText());
+                        break;
+                }
             }
 
 
@@ -1585,14 +1470,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private static final List<String> supportedDefaultCompares5 = Arrays.asList("EQUALS", "GREATER", "LESS", "GREATER_EQUALS", "LESS_EQUALS", "NOT_EQUALS", "LIKE", "CONTAINS");
     private void checkDefaultCompare(LSFComponentPropertyValue element, String defaultCompare) {
         defaultCompare = LSFStringUtils.unquote(defaultCompare);
-        if (!supportedDefaultCompares.contains(defaultCompare)) {
-            if(!supportedDefaultCompares5.contains(defaultCompare)) {
-                addUnderscoredError(element, format("'%s' is not supported defaultCompare, use on of: %s", defaultCompare, supportedDefaultCompares));
-            } else {
-                String replacement = supportedDefaultCompares.get(supportedDefaultCompares5.indexOf(defaultCompare));
-                addWarningAnnotation(element, format("Deprecated since version 5.2, removed in version 6.0. Use '%s' instead", replacement),
-                        CodeInsightColors.DEPRECATED_ATTRIBUTES, Collections.singletonList(new LSFReplaceFix(element, defaultCompare, replacement)));
-            }
+        if (!supportedDefaultCompares.contains(defaultCompare) && !supportedDefaultCompares5.contains(defaultCompare)) {
+            addUnderscoredError(element, format("'%s' is not supported defaultCompare, use on of: %s", defaultCompare, supportedDefaultCompares));
         }
     }
 
@@ -1605,18 +1484,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     addUnderscoredErrorWithResolving(child, "Can't multiply / divide " + classSet + " value"); // uses resolving
                 }
             }
-        }
-    }
-
-    @Override
-    public void visitUserFiltersDeclaration(@NotNull LSFUserFiltersDeclaration o) {
-        addDeprecatedWarningAnnotation(o.getUserFilters(), "7.0", "Use FILTERS ... USER instead");
-    }
-
-    @Override
-    public void visitWindowType(@NotNull LSFWindowType o) {
-        if (!o.getText().equals("NATIVE")) {
-            addDeprecatedWarningAnnotation(o, "5.2", "6.0", "Ignore until 6.0");
         }
     }
 
@@ -1823,9 +1690,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitSeekObjectActionPropertyDefinitionBody(o);
         PsiElement firstChild = o.getFirstChild();
         if (firstChild != null) {
-            if (firstChild.getNode().getElementType() == LSFTypes.SEEK) {
-                addDeprecatedWarningAnnotation(firstChild, "7.0", "use ACTIVATE instead");
-            }
             checkSeekAppliedForm(o, firstChild, firstChild.getText());
         }
     }
@@ -1840,40 +1704,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     addUnderscoredError(seekKeyword, format("%s for form '%s' will be ignored in form '%s'",
                             actionKeyword, seekFormDecl.getDeclName(), appliedFormDecl.getDeclName()));
                 }
-            }
-        }
-    }
-
-    @Override
-    public void visitObjectPropertyDefinition(@NotNull LSFObjectPropertyDefinition o) {
-        super.visitObjectPropertyDefinition(o);
-        PsiElement firstChild = o.getFirstChild();
-        if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.VALUE) {
-            addDeprecatedWarningAnnotation(firstChild, "7.0", "use ACTIVE instead");
-        }
-    }
-
-    @Override
-    public void visitNewThreadActionPropertyDefinitionBody(@NotNull LSFNewThreadActionPropertyDefinitionBody o) {
-        super.visitNewThreadActionPropertyDefinitionBody(o);
-        PsiElement toKeyword = null;
-        for (PsiElement child = o.getFirstChild(); child != null; child = child.getNextSibling()) {
-            IElementType type = child.getNode().getElementType();
-            if (type == LSFTypes.CONNECTION) {
-                addDeprecatedWarningAnnotation(child, "7.0", "use NEWEXECUTOR { ... } CLIENT conn NOWAIT instead");
-                return;
-            }
-            if (type == LSFTypes.TO) {
-                toKeyword = child;
-            }
-        }
-        // `NEWTHREAD a TO p;` as notification id is legacy — modern spelling is `NEWTHREAD a CLIENT p;`.
-        // Structural check: if the inner action contains a RETURN, treat `TO p` as the new result-capture
-        // form (valid inside NEWEXECUTOR ... WAIT). Otherwise it is the legacy notification-id form.
-        if (toKeyword != null) {
-            LSFActionPropertyDefinitionBody inner = o.getActionPropertyDefinitionBody();
-            if (inner != null && PsiTreeUtil.findChildOfType(inner, LSFReturnActionPropertyDefinitionBody.class) == null) {
-                addDeprecatedWarningAnnotation(toKeyword, "7.0", "use CLIENT instead (TO as notification id is deprecated; TO is now reserved for capturing RETURN value of the inner action)");
             }
         }
     }

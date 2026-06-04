@@ -18,6 +18,7 @@
             <li>Add quick-fix to replace deprecated constructs with their replacement</li>
             <li>Form <code>PROPERTIES</code>: recognize the <code>APPLY</code> commit-on-edit option, e.g. <code>PROPERTIES(o) f NEWSESSION APPLY</code></li>
             <li>Form <code>API</code>: recognize the clause that allow-lists actions/properties for the form JS controller, e.g. <code>API recalc, setQty = setQuantity, note</code></li>
+            <li>Refactored deprecation warnings into inspections</li>
         </ul>
     ]]>
     </change-notes>
@@ -192,6 +193,22 @@
         <localInspection groupPath="Lsf" language="Lsf" shortName="LSFTypeMismatch" displayName="LSF Type mismatch"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFTypeMismatchInspectionTool" hasStaticDescription="true"/>
+
+        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecated52" displayName="Deprecated since 5.2 lsFusion constructs"
+                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
+                         implementationClass="com.lsfusion.inspections.LSFDeprecated52Inspection" hasStaticDescription="true"/>
+
+        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecated60" displayName="Deprecated since 6.0 lsFusion constructs"
+                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
+                         implementationClass="com.lsfusion.inspections.LSFDeprecated60Inspection" hasStaticDescription="true"/>
+
+        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecated62" displayName="Deprecated since 6.2 lsFusion constructs"
+                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
+                         implementationClass="com.lsfusion.inspections.LSFDeprecated62Inspection" hasStaticDescription="true"/>
+
+        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecated70" displayName="Deprecated since 7.0 lsFusion constructs"
+                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
+                         implementationClass="com.lsfusion.inspections.LSFDeprecated70Inspection" hasStaticDescription="true"/>
 
         <!--<localInspection groupPath="Lsf" language="Lsf" shortName="LSFClassViewTypeInPrint" displayName="LSF ClassViewType in PRINT"-->
                          <!--groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"-->

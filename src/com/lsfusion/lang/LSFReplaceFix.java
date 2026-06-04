@@ -2,6 +2,8 @@ package com.lsfusion.lang;
 
 import com.intellij.codeInsight.FileModificationService;
 import com.intellij.codeInsight.intention.IntentionAction;
+import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
 import com.intellij.openapi.editor.Document;
@@ -16,11 +18,11 @@ import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Quick-fix that replaces the first occurrence of {@code oldText} inside an element's text with {@code newText}.
- * Used mainly for deprecation warnings of the form "... Use 'newName' instead", where only a single token
- * (e.g. an option name) needs to be swapped while the rest of the statement is preserved.
+ * Replaces the first occurrence of {@code oldText} inside an element's text with {@code newText}.
+ * Usable both as an annotator fix ({@link IntentionAction}) and as an inspection fix ({@link LocalQuickFix}),
+ * so the same fix can back either reporting mechanism.
  */
-public class LSFReplaceFix implements IntentionAction {
+public class LSFReplaceFix implements IntentionAction, LocalQuickFix {
     private final SmartPsiElementPointer<PsiElement> elementPointer;
     private final String oldText;
     private final String newText;
@@ -37,6 +39,11 @@ public class LSFReplaceFix implements IntentionAction {
     }
 
     @Override
+    public @IntentionName @NotNull String getName() {
+        return getText();
+    }
+
+    @Override
     public @IntentionFamilyName @NotNull String getFamilyName() {
         return "Replace deprecated lsFusion construct";
     }
@@ -47,8 +54,19 @@ public class LSFReplaceFix implements IntentionAction {
         return element != null && element.isValid() && element.getText().contains(oldText);
     }
 
+    // IntentionAction entry point
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
+        doReplace(project);
+    }
+
+    // LocalQuickFix entry point
+    @Override
+    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+        doReplace(project);
+    }
+
+    private void doReplace(@NotNull Project project) {
         PsiElement element = elementPointer.getElement();
         if (element == null || !element.isValid()) {
             return;

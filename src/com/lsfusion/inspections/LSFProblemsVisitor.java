@@ -7,11 +7,13 @@ import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.searches.ReferencesSearch;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.lang.LSFErrorLevel;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.LSFReferenceAnnotator;
+import com.lsfusion.lang.LSFReplaceFix;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
@@ -21,8 +23,10 @@ import com.lsfusion.lang.psi.impl.LSFLocalDataPropertyDefinitionImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyStatementImpl;
 import com.lsfusion.lang.psi.impl.LSFPropertyUsageImpl;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
+import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class LSFProblemsVisitor {
@@ -196,5 +200,134 @@ public class LSFProblemsVisitor {
         } else {
             holder.registerProblem(new ProblemDescriptorImpl(element, element, message, null, ProblemHighlightType.WEAK_WARNING, false, null, true));
         }
+    }
+
+    public interface DeprecationConsumer {
+        void accept(PsiElement element, String version, String text, LSFReplaceFix fix);
+    }
+
+    public static void visitDeprecations(PsiElement element, DeprecationConsumer sink) {
+        if (element instanceof LSFGroupObjectTreeSingleSelectorType) {
+            String text = element.getText();
+            if ("USERFILTER".equals(text)) {
+                reportReplace(element, "5.2", "6.0", "FILTERS", sink);
+            } else if ("GRIDBOX".equals(text)) {
+                reportReplace(element, "5.2", "6.0", "GRID", sink);
+            }
+        } else if (element instanceof LSFCustomOptionsLiteral) {
+            if ("HEADER".equals(element.getText())) {
+                reportReplace(element, "5.2", "6.0", "OPTIONS", sink);
+            }
+        } else if (element instanceof LSFAutorefreshLiteral) {
+            reportWarning(element, "5.2", "6.0", "Use EVENTS ON SCHEDULE PERIOD n formRefresh() instead", sink);
+        } else if (element instanceof LSFDrawRoot) {
+            reportWarning(element, "5.2", "6.0", "", sink);
+        } else if (element instanceof LSFWindowType) {
+            if (!"NATIVE".equals(element.getText())) {
+                reportWarning(element, "5.2", "6.0", "Ignore until 6.0", sink);
+            }
+        } else if (element instanceof LSFSetObjectPropertyStatement) {
+            visitSetObjectPropertyDeprecations((LSFSetObjectPropertyStatement) element, sink);
+        } else if (element instanceof LSFUserFiltersDeclaration) {
+            PsiElement userFilters = ((LSFUserFiltersDeclaration) element).getUserFilters();
+            if (userFilters != null) {
+                reportWarning(userFilters, "7.0", "Use FILTERS ... USER instead", sink);
+            }
+        } else if (element instanceof LSFSeekObjectActionPropertyDefinitionBody) {
+            PsiElement firstChild = element.getFirstChild();
+            if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.SEEK) {
+                reportWarning(firstChild, "7.0", "use ACTIVATE instead", sink);
+            }
+        } else if (element instanceof LSFObjectPropertyDefinition) {
+            PsiElement firstChild = element.getFirstChild();
+            if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.VALUE) {
+                reportWarning(firstChild, "7.0", "use ACTIVE instead", sink);
+            }
+        } else if (element instanceof LSFNewThreadActionPropertyDefinitionBody) {
+            visitNewThreadDeprecations((LSFNewThreadActionPropertyDefinitionBody) element, sink);
+        }
+    }
+
+    private static void visitNewThreadDeprecations(LSFNewThreadActionPropertyDefinitionBody o, DeprecationConsumer sink) {
+        PsiElement toKeyword = null;
+        for (PsiElement child = o.getFirstChild(); child != null; child = child.getNextSibling()) {
+            IElementType type = child.getNode().getElementType();
+            if (type == LSFTypes.CONNECTION) {
+                reportWarning(child, "7.0", "use NEWEXECUTOR { ... } CLIENT conn NOWAIT instead", sink);
+                return;
+            }
+            if (type == LSFTypes.TO) {
+                toKeyword = child;
+            }
+        }
+        // `NEWTHREAD a TO p;` as notification id is legacy - modern spelling is `NEWTHREAD a CLIENT p;`. If the inner
+        // action contains a RETURN, `TO p` is the new result-capture form (valid); otherwise it is the legacy form.
+        if (toKeyword != null) {
+            LSFActionPropertyDefinitionBody inner = o.getActionPropertyDefinitionBody();
+            if (inner != null && PsiTreeUtil.findChildOfType(inner, LSFReturnActionPropertyDefinitionBody.class) == null) {
+                reportWarning(toKeyword, "7.0", "use CLIENT instead (TO as notification id is deprecated; TO is now reserved for capturing RETURN value of the inner action)", sink);
+            }
+        }
+    }
+
+    private static void visitSetObjectPropertyDeprecations(LSFSetObjectPropertyStatement o, DeprecationConsumer sink) {
+        String text = o.getText();
+        if (text == null || !text.contains("=")) {
+            return;
+        }
+        String property = text.substring(0, text.indexOf("=")).trim();
+        switch (property) {
+            case "columns": reportReplace(o, "5.2", "6.0", "lines", sink); break;
+            case "type": reportWarning(o, "5.2", "6.0", "Use 'horizontal', 'tabbed', 'lines' instead", sink); break;
+            case "toolTip": reportReplace(o, "5.2", "6.0", "tooltip", sink); break;
+            case "editOnSingleClick": reportReplace(o, "5.2", "6.0", "changeOnSingleClick", sink); break;
+            case "valueAlignment": reportReplace(o, "6.0", "8.0", "valueAlignmentHorz", sink); break;
+            case "showGroup": reportReplace(o, "6.0", "8.0", "showViews", sink); break;
+            case "autoSize": reportWarning(o, "6.0", "Earlier versions: ignore this warning", sink); break;
+            case "changeKeyPriority": reportWarning(o, "6.0", "7.0", "Use parameter 'priority' in 'changeKey' instead", sink); break;
+            case "changeMousePriority": reportWarning(o, "6.0", "7.0", "Use parameter 'priority' in 'changeMouse' instead", sink); break;
+            case "expandOnClick": reportWarning(o, "6.2", "7.0", "This will be default behaviour", sink); break;
+            case "panelCaptionVertical": reportReplace(o, "6.0", "8.0", "captionVertical", sink); break;
+            case "panelCaptionLast": reportReplace(o, "6.2", "8.0", "captionLast", sink); break;
+            case "panelCaptionAlignment": reportReplace(o, "6.2", "8.0", "captionAlignmentHorz", sink); break;
+            case "imagePath": reportReplace(o, "6.2", "8.0", "image", sink); break;
+            case "headerHeight": reportReplace(o, "6.2", "8.0", "captionHeight", sink); break;
+            case "defaultCompare": reportDefaultCompareDeprecation(o, sink); break;
+        }
+    }
+
+    private static final List<String> supportedDefaultCompares = Arrays.asList("=", ">", "<", ">=", "<=", "!=", "=*", "=@");
+    private static final List<String> supportedDefaultCompares5 = Arrays.asList("EQUALS", "GREATER", "LESS", "GREATER_EQUALS", "LESS_EQUALS", "NOT_EQUALS", "LIKE", "CONTAINS");
+
+    private static void reportDefaultCompareDeprecation(LSFSetObjectPropertyStatement o, DeprecationConsumer sink) {
+        LSFComponentPropertyValue element = o.getComponentPropertyValue();
+        if (element == null || "NULL".equals(element.getText())) {
+            return;
+        }
+        String defaultCompare = LSFStringUtils.unquote(element.getText());
+        int idx = supportedDefaultCompares5.indexOf(defaultCompare);
+        if (idx >= 0 && !supportedDefaultCompares.contains(defaultCompare)) { // v5 symbolic name -> deprecated since 5.2
+            String replacement = supportedDefaultCompares.get(idx);
+            sink.accept(element, "5.2",
+                    String.format("Deprecated since version 5.2, removed in version 6.0. Use '%s' instead", replacement),
+                    new LSFReplaceFix(element, defaultCompare, replacement));
+        }
+    }
+
+    private static void reportWarning(PsiElement element, String version, String removedVersion, String comment, DeprecationConsumer sink) {
+        sink.accept(element, version, String.format("Deprecated since version %s, removed in version %s. %s", version, removedVersion, comment), null);
+    }
+
+    private static void reportWarning(PsiElement element, String version, String comment, DeprecationConsumer sink) {
+        sink.accept(element, version, String.format("Deprecated since version %s. %s", version, comment), null);
+    }
+
+    private static void reportReplace(PsiElement element, String version, String removedVersion, String replacement, DeprecationConsumer sink) {
+        // for option statements `name = value` swap only the name (text before '='), keeping the value
+        String elementText = element.getText();
+        int eq = elementText.indexOf('=');
+        String oldToken = (eq >= 0 ? elementText.substring(0, eq) : elementText).trim();
+        sink.accept(element, version, String.format("Deprecated since version %s, removed in version %s. Use '%s' instead", version, removedVersion, replacement),
+                new LSFReplaceFix(element, oldToken, replacement));
     }
 }
