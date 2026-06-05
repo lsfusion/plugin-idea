@@ -46,7 +46,8 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
 
             assert propertyDrawName != null;
 
-            String refName = propertyDrawName.getSimpleName().getText();
+            LSFId refNameId = getUsageNameId(propertyDrawName);
+            String refName = refNameId == null ? null : refNameId.getText();
             LSFFormPropertyName formPropertyName = decl.getFormPropertyName();
             if(formPropertyName == null)
                 return false;
@@ -74,7 +75,7 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
     public LSFId getSimpleName() {
         LSFFormPropertyDrawPropertyUsage propertyDrawName = getFormPropertyDrawPropertyUsage();
         if(propertyDrawName != null) {
-            return propertyDrawName.getSimpleName();
+            return getUsageNameId(propertyDrawName);
         }
 
         LSFAliasUsage aliasUsage = getAliasUsage();
@@ -82,6 +83,12 @@ public abstract class LSFPropertyDrawReferenceImpl extends LSFFormElementReferen
         assert aliasUsage != null;
 
         return aliasUsage.getSimpleName();
+    }
+
+    // the usage name is either an ordinary simpleName or a predefined operator (NEW[Class], EDIT, VALUE, ...), both of which are LSFId
+    private static LSFId getUsageNameId(LSFFormPropertyDrawPropertyUsage propertyDrawName) {
+        LSFSimpleName simpleName = propertyDrawName.getSimpleName();
+        return simpleName != null ? simpleName : propertyDrawName.getPredefinedFormPropertyName();
     }
 
     @Override

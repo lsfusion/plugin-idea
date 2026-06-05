@@ -113,9 +113,14 @@ public abstract class LSFPropertyDrawOrPropertyExprReference extends LSFProperty
             return null;
         }
 
+        LSFId nameId = propertyUsage.getSimpleName();
+        if (nameId == null) { // a predefined operator usage (NEW[Class], EDIT, ...) is a form draw, not a property expression
+            return null;
+        }
+
         List<LSFClassSet> usageClasses = LSFPsiImplUtil.resolveParamClasses(getObjectUsageList());
         return LSFElementGenerator
-                .createPropRefFromText(propertyUsage.getSimpleName().getText(), null, getLSFFile(), null, usageClasses, false, false)
+                .createPropRefFromText(nameId.getText(), null, getLSFFile(), null, usageClasses, false, false)
                 .resolveDecl();
     }
 }

@@ -64,7 +64,10 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
     }
 
     public void handleElementRename(String newElementName, MetaTransaction transaction) {
-        getSimpleName().setName(newElementName, transaction);
+        LSFId name = getSimpleName();
+        if (name instanceof LSFPredefinedFormPropertyName) // predefined operator draws (NEW, EDIT, VALUE, ...) are keywords and cannot be renamed
+            return;
+        name.setName(newElementName, transaction);
     }
 
     @Override
