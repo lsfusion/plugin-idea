@@ -2184,7 +2184,7 @@ formActionObject ::= actionUsage LBRAC objectUsageList RBRAC
 
 aliasUsage ::= simpleName
 
-formPropertyDrawPropertyUsage ::= simpleName
+formPropertyDrawPropertyUsage ::= simpleName | predefinedFormPropertyName
 
 formPropertyDrawUsage ::= (<< notSimpleIdAhead >> formPropertyDrawPropertyUsage LBRAC objectUsageList RBRAC) | aliasUsage
 {

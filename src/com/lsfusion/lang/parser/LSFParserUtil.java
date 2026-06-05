@@ -21,7 +21,15 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
     }
 
     public static boolean notSimpleIdAhead(PsiBuilder builder_, int level_) {
-        return builder_.getTokenType() == LSFTypes.ID && builder_.lookAhead(1) == LSFTypes.LBRAC;
+        IElementType token = builder_.getTokenType();
+        if (token == LSFTypes.ID)
+            return builder_.lookAhead(1) == LSFTypes.LBRAC;
+        // predefined operator draws are mapped property-draw usages, not simple-id aliases; fire only when it actually looks like
+        // a mapped draw -- NEW/NEWEDIT/EDIT followed by [class] or (objects), the others by (objects) -- so e.g. a bare VALUE expression is left alone
+        if (token == LSFTypes.NEW || token == LSFTypes.NEWEDIT || token == LSFTypes.EDIT)
+            return builder_.lookAhead(1) == LSFTypes.LBRAC || builder_.lookAhead(1) == LSFTypes.LSQBR;
+        return (token == LSFTypes.VALUE || token == LSFTypes.INTERVAL || token == LSFTypes.DELETE)
+                && builder_.lookAhead(1) == LSFTypes.LBRAC;
     }
 
     public static boolean notLbracAhead(PsiBuilder builder_, int level_) {
