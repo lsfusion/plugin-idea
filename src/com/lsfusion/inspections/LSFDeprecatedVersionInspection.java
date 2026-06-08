@@ -10,14 +10,23 @@ import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * Base inspection that reports usages of lsFusion constructs deprecated since a single platform version, so deprecations
  * can be disabled / re-leveled / suppressed per version via Settings | Editor | Inspections.
  */
 public abstract class LSFDeprecatedVersionInspection extends LocalInspectionTool {
 
-    @NotNull
+    /** Platform version this inspection reports (e.g. {@code "5.2"}); {@code null} = unversioned (@@deprecated). */
+    @Nullable
     protected abstract String getVersion();
+
+    /** How matched deprecations are highlighted; defaults to strikethrough ("Deprecated symbol"). */
+    @NotNull
+    protected ProblemHighlightType getHighlightType() {
+        return ProblemHighlightType.LIKE_DEPRECATED;
+    }
 
     @NotNull
     @Override
@@ -26,8 +35,8 @@ public abstract class LSFDeprecatedVersionInspection extends LocalInspectionTool
             @Override
             public void visit(PsiElement element) {
                 LSFProblemsVisitor.visitDeprecations(element, (e, version, text, fix) -> {
-                    if (getVersion().equals(version)) {
-                        holder.registerProblem(e, text, ProblemHighlightType.LIKE_DEPRECATED,
+                    if (Objects.equals(getVersion(), version)) {
+                        holder.registerProblem(e, text, getHighlightType(),
                                 fix == null ? LocalQuickFix.EMPTY_ARRAY : new LocalQuickFix[]{fix});
                     }
                 });
@@ -38,6 +47,9 @@ public abstract class LSFDeprecatedVersionInspection extends LocalInspectionTool
     @Nullable
     @Override
     public String getStaticDescription() {
-        return "Reports usages of lsFusion constructs deprecated since platform version " + getVersion() + ".";
+        String version = getVersion();
+        return version == null
+                ? "Reports declarations and usages of lsFusion constructs marked with the @@deprecated annotation."
+                : "Reports usages of lsFusion constructs deprecated since platform version " + version + ".";
     }
 }

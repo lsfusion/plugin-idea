@@ -86,7 +86,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
     public static final TextAttributes OUTER_PARAM = new TextAttributes(new JBColor(new Color(102, 14, 122), new Color(152, 118, 170)), null, null, null, Font.PLAIN);
     public static final TextAttributes UNTYPED_IMPLICIT_DECL = new TextAttributes(new JBColor(new Color(56, 96, 255), new Color(100, 100, 255)), null, null, null, Font.PLAIN);
-    public static final TextAttributes DEPRECATED_WARNING = new TextAttributes(null, null, JBColor.BLACK, EffectType.STRIKEOUT, Font.PLAIN);
+    public static final TextAttributes DEPRECATED_ANNOTATION = new TextAttributes(new JBColor(new Color(0x80, 0x80, 0x00), new Color(0xBB, 0xB5, 0x29)), null, null, null, Font.PLAIN);
 
     private AnnotationHolder myHolder;
     public boolean errorsSearchMode = false;
@@ -484,10 +484,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
 
         checkAlreadyDefined(o);
-        LSFNonEmptyActionOptions actionOptions = o.getNonEmptyActionOptions();
-        if(actionOptions != null) {
-            checkDeprecated(o.getPropertyDeclaration(), actionOptions.getAnnotationSettingList());
-        }
     }
     
     @Override
@@ -495,10 +491,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitPropertyStatement(o);
 
         checkAlreadyDefined(o);
-        LSFNonEmptyPropertyOptions actionOptions = o.getNonEmptyPropertyOptions();
-        if(actionOptions != null) {
-            checkDeprecated(o.getPropertyDeclaration(), actionOptions.getAnnotationSettingList());
-        }
 
         if (o.isStoredProperty()) {
             if (o.resolveDuplicateColumns()) {
@@ -999,9 +991,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         LSFResolveResult resolveResult = reference instanceof LSFReferenceImpl<?> referenceImpl ? referenceImpl.multiResolveDecl(true) : null;
         LSFResolvingError errorAnnotation = reference.resolveErrorAnnotation(myHolder);
         if (errorAnnotation != null) { // !isInMetaDecl(reference)
-            if(errorAnnotation.deprecated)
-                addWarningAnnotation(reference, errorAnnotation.text, DEPRECATED_WARNING, null);
-            else
+            if(!errorAnnotation.deprecated)
                 addErrorWithResolving(reference, errorAnnotation, getRequireModuleFixes(reference, resolveResult)); // since in meta usage there can be total different resolved references
             return false;
         }
@@ -1081,14 +1071,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void checkAlreadyDefined(LSFDeclaration declaration) {
         if (declaration.getName() != null && declaration.resolveDuplicates()) {
             addAlreadyDefinedError(declaration);
-        }
-    }
-
-    private void checkDeprecated(PsiElement declaration, List<LSFAnnotationSetting> annotationList) {
-        for (LSFAnnotationSetting annotation : annotationList) {
-            if (annotation.getSimpleName().getName().equals("deprecated")) {
-                addWarningAnnotation(declaration, "deprecated");
-            }
         }
     }
 
@@ -1223,9 +1205,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addSilentInfoAnnotation(PsiElement element, TextAttributes textAttributes) {
+        addSilentInfoAnnotation(element.getTextRange(), textAttributes);
+    }
+
+    private void addSilentInfoAnnotation(TextRange range, TextAttributes textAttributes) {
         if(!errorsSearchMode) {
             myHolder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-                    .range(element.getTextRange())
+                    .range(range)
                     .enforcedTextAttributes(textAttributes)
                     .create();
         }
@@ -1503,9 +1489,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private static final List<String> supportedAnnotations = Arrays.asList("api", "noauth", "deprecated");
     @Override
     public void visitAnnotationSetting(@NotNull LSFAnnotationSetting annotation) {
-        String name = annotation.getSimpleName().getName();
+        LSFSimpleName simpleName = annotation.getSimpleName();
+        String name = simpleName.getName();
         if(!supportedAnnotations.contains(name)) {
             addErrorAnnotation(annotation, annotation.getTextRange(), format("'%s' is not supported annotation, use on of: %s", name, supportedAnnotations));
+        } else if("deprecated".equals(name)) {
+            addSilentInfoAnnotation(new TextRange(annotation.getTextRange().getStartOffset(), simpleName.getTextRange().getEndOffset()), DEPRECATED_ANNOTATION);
         }
     }
 

@@ -210,6 +210,10 @@
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFDeprecated70Inspection" hasStaticDescription="true"/>
 
+        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecatedAnnotation" displayName="@@deprecated lsFusion constructs"
+                         groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
+                         implementationClass="com.lsfusion.inspections.LSFDeprecatedAnnotationInspection" hasStaticDescription="true"/>
+
         <!--<localInspection groupPath="Lsf" language="Lsf" shortName="LSFClassViewTypeInPrint" displayName="LSF ClassViewType in PRINT"-->
                          <!--groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"-->
                          <!--implementationClass="com.lsfusion.inspections.LSFClassViewTypeInPrintInspectionTool" hasStaticDescription="true"/>-->

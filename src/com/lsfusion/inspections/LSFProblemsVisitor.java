@@ -14,8 +14,10 @@ import com.lsfusion.lang.LSFErrorLevel;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.LSFReferenceAnnotator;
 import com.lsfusion.lang.LSFReplaceFix;
+import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
+import com.lsfusion.lang.psi.references.LSFReference;
 import com.lsfusion.lang.psi.declarations.LSFActionDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
@@ -245,6 +247,36 @@ public class LSFProblemsVisitor {
             }
         } else if (element instanceof LSFNewThreadActionPropertyDefinitionBody) {
             visitNewThreadDeprecations((LSFNewThreadActionPropertyDefinitionBody) element, sink);
+        } else if (element instanceof LSFActionStatement) {
+            LSFNonEmptyActionOptions options = ((LSFActionStatement) element).getNonEmptyActionOptions();
+            if (options != null) {
+                reportDeprecatedAnnotation(((LSFActionStatement) element).getPropertyDeclaration(), options.getAnnotationSettingList(), sink);
+            }
+        } else if (element instanceof LSFPropertyStatement) {
+            LSFNonEmptyPropertyOptions options = ((LSFPropertyStatement) element).getNonEmptyPropertyOptions();
+            if (options != null) {
+                reportDeprecatedAnnotation(((LSFPropertyStatement) element).getPropertyDeclaration(), options.getAnnotationSettingList(), sink);
+            }
+        } else if (element instanceof LSFReference) {
+            // usage of a symbol whose declaration is marked @@deprecated (resolved error annotation with deprecated=true)
+            LSFResolvingError error = ((LSFReference) element).resolveErrorAnnotation(null);
+            if (error != null && error.deprecated) {
+                sink.accept(element, null, error.text, null);
+            }
+        }
+    }
+
+    // @@deprecated declaration -> unversioned deprecation reported on the declaration name (LSFDeprecatedAnnotationInspection)
+    private static void reportDeprecatedAnnotation(PsiElement declaration, List<LSFAnnotationSetting> annotations, DeprecationConsumer sink) {
+        if (declaration == null || annotations == null) {
+            return;
+        }
+        for (LSFAnnotationSetting annotation : annotations) {
+            LSFSimpleName name = annotation.getSimpleName();
+            if (name != null && "deprecated".equals(name.getName())) {
+                sink.accept(declaration, null, "deprecated", null);
+                return;
+            }
         }
     }
 
