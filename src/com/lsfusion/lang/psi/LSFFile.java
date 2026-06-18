@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
+import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -67,12 +68,52 @@ public class LSFFile extends PsiFileImpl implements ModifyParamContext {
         return LSFFileType.INSTANCE;
     }
 
+    // for string-interpolation injected fragments (see LSFStringInterpolationInjector) the host literal in the real file.
+    // volatile with literal written before the flag, so a reader seeing the flag is guaranteed to see the literal too.
+    private volatile boolean interpolationHostComputed;
+    private volatile LSFExpressionStringValueLiteral interpolationHostLiteral;
+
+    // returns the host string literal if this file is a string-interpolation injection, null otherwise
+    // (intentionally does not match other LSF injections such as jrxml or markdown, whose host is not a string literal)
+    @Nullable
+    public LSFExpressionStringValueLiteral getInterpolationHostLiteral() {
+        if (!interpolationHostComputed) {
+            LSFExpressionStringValueLiteral host = null;
+            InjectedLanguageManager manager = InjectedLanguageManager.getInstance(getProject());
+            if (manager.isInjectedFragment(this)) {
+                PsiElement injectionHost = manager.getInjectionHost(this);
+                if (injectionHost instanceof LSFExpressionStringValueLiteral) {
+                    host = (LSFExpressionStringValueLiteral) injectionHost;
+                }
+            }
+            interpolationHostLiteral = host;
+            interpolationHostComputed = true;
+        }
+        return interpolationHostLiteral;
+    }
+
+    @Nullable
+    public LSFFile getInterpolationHostFile() {
+        LSFExpressionStringValueLiteral host = getInterpolationHostLiteral();
+        if (host != null) {
+            PsiFile hostFile = host.getContainingFile();
+            if (hostFile instanceof LSFFile && hostFile != this) {
+                return (LSFFile) hostFile;
+            }
+        }
+        return null;
+    }
+
     public GlobalSearchScope getScope() {
         if (this instanceof LSFCodeFragment && getContext() != null) {
             PsiFile containingFile = getContext().getContainingFile();
             if (containingFile instanceof LSFFile && containingFile != this) {
                 return ((LSFFile) containingFile).getScope();
             }
+        }
+        LSFFile interpolationHostFile = getInterpolationHostFile();
+        if (interpolationHostFile != null) {
+            return interpolationHostFile.getScope();
         }
         Project project = getProject();
         
@@ -110,6 +151,10 @@ public class LSFFile extends PsiFileImpl implements ModifyParamContext {
     }
 
     public LSFModuleDeclaration getModuleDeclaration() {
+        LSFFile interpolationHostFile = getInterpolationHostFile();
+        if (interpolationHostFile != null) {
+            return interpolationHostFile.getModuleDeclaration();
+        }
         return getStubOrPsiChild(LSFStubElementTypes.MODULE);
     }
 

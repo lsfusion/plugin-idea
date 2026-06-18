@@ -71,6 +71,12 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
     }
     
     public Integer getOffsetRef() {
+        // inside a string-interpolation injection use the host literal position, so that the use-before-declaration
+        // order is checked against the real file and only declarations preceding the literal are visible (issue #80)
+        LSFExpressionStringValueLiteral hostLiteral = ((LSFFile) getContainingFile()).getInterpolationHostLiteral();
+        if (hostLiteral != null) {
+            return hostLiteral.getTextOffset();
+        }
         return getTextOffset();
     }
 
