@@ -2034,7 +2034,7 @@ formEventsList ::= EVENTS? formEventDeclaration (COMMA formEventDeclaration)*
     methods = [getDocumentation]
 }
 
-formAPIList ::= API formAPIPropertyUsage (COMMA formAPIPropertyUsage)*
+formAPIList ::= CUSTOMS formAPIPropertyUsage (COMMA formAPIPropertyUsage)*
 { pin = 1 }
 
 // allow-listed action/property for the form controller; optional alias, ACTION-prefix and signature handled by actionOrPropertyUsage

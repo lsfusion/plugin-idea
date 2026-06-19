@@ -191,7 +191,6 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NAGGR"                    			{ return NAGGR; }
   "ALL"                     			{ return ALL; }
   "AND"                     			{ return AND; }
-  "API"                     			{ return API; }
   "APPEND"                   			{ return APPEND; }
   "APPLY"                   			{ return APPLY; }
   "AS"                      			{ return AS; }
@@ -255,6 +254,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "CANONICALNAME"                  		{ return CANONICALNAME; }
   "CSV"                  			    { return CSV; }
   "CUSTOM"                  			{ return CUSTOM; }
+  "CUSTOMS"                  			{ return CUSTOMS; }
   "CYCLES"                  			{ return CYCLES; }
   "DATA"                    			{ return DATA; }
   "DB"                    			    { return DB; }
