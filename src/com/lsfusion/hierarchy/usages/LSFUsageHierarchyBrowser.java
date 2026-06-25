@@ -42,7 +42,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
     protected PsiElement getElementFromDescriptor(@NotNull HierarchyNodeDescriptor descriptor) {
         if (descriptor instanceof LSFUsageHierarchyNodeDescriptor) {
             LSFUsageHierarchyNodeDescriptor nodeDescriptor = (LSFUsageHierarchyNodeDescriptor) descriptor;
-            return nodeDescriptor.getPsiElement();
+            return nodeDescriptor.getTargetElement();
         }
         return null;
     }
@@ -70,7 +70,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
     protected PsiElement getOpenFileElementFromDescriptor(@NotNull HierarchyNodeDescriptor descriptor) {
         if (descriptor instanceof LSFUsageHierarchyNodeDescriptor) {
             LSFUsageHierarchyNodeDescriptor nodeDescriptor = (LSFUsageHierarchyNodeDescriptor) descriptor;
-            return nodeDescriptor.getPsiElement();
+            return nodeDescriptor.getTargetElement();
         }
         return null;
     }
@@ -161,8 +161,8 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
         }
 
         private int compareEqual(LSFUsageHierarchyNodeDescriptor d1, LSFUsageHierarchyNodeDescriptor d2) {
-            PsiElement nodeElement1 = d1.getPsiElement();
-            PsiElement nodeElement2 = d2.getPsiElement();
+            PsiElement nodeElement1 = d1.getTargetElement();
+            PsiElement nodeElement2 = d2.getTargetElement();
             if (nodeElement1 instanceof LSFExplicitInterfaceActionOrPropStatement && nodeElement2 instanceof LSFExplicitInterfaceActionOrPropStatement) {
                 boolean isAction1 = ((LSFExplicitInterfaceActionOrPropStatement) nodeElement1).isAction();
                 boolean isAction2 = ((LSFExplicitInterfaceActionOrPropStatement) nodeElement2).isAction();
@@ -182,7 +182,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
 
         private int getIndex(LSFUsageHierarchyNodeDescriptor node) {
             for (Class ord : classOrder) {
-                if (ord.isInstance(node.getPsiElement())) {
+                if (ord.isInstance(node.getTargetElement())) {
                     return classOrder.indexOf(ord);
                 }
             }

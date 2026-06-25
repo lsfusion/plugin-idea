@@ -1,6 +1,5 @@
 package com.lsfusion.design.view;
 
-import com.intellij.designer.propertyTable.PropertyTable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbService;
@@ -50,7 +49,7 @@ public class EmbeddedDesign extends FormDesign {
     private JLabel formNameLabel;
     private ActionToolbar toolbar;
     private ComponentTree componentTree;
-    private PropertyTable propertyTable;
+    private ComponentPropertyTable propertyTable;
     private JBSplitter treeAndTable;
     
     private boolean selecting = false;

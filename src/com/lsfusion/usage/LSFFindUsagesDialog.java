@@ -1,6 +1,5 @@
 package com.lsfusion.usage;
 
-import com.intellij.find.FindBundle;
 import com.intellij.find.findUsages.AbstractFindUsagesDialog;
 import com.intellij.find.findUsages.FindUsagesOptions;
 import com.intellij.lang.findUsages.DescriptiveNameUtil;
@@ -65,7 +64,7 @@ public class LSFFindUsagesDialog extends AbstractFindUsagesDialog {
     @Override
     protected JPanel createFindWhatPanel() {
         JPanel findWhatPanel = new JPanel();
-        findWhatPanel.setBorder(IdeBorderFactory.createTitledBorder(FindBundle.message("find.what.group"), true));
+        findWhatPanel.setBorder(IdeBorderFactory.createTitledBorder("Find What", true));
         findWhatPanel.setLayout(new BoxLayout(findWhatPanel, BoxLayout.Y_AXIS));
 
         usagesCB = addCheckboxToPanel("Usages", getFindUsagesOptions().isUsages, findWhatPanel, true);

@@ -7,21 +7,27 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.SmartPointerManager;
+import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.ui.JBColor;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionOrPropStatement;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
 public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor implements Navigatable {
     private LSFId nameIdentifier;
+    // Own pointer to the represented element: SmartElementDescriptor.getPsiElement() is platform-internal.
+    private final SmartPsiElementPointer<PsiElement> targetPointer;
 
     protected LSFUsageHierarchyNodeDescriptor(@NotNull Project project, NodeDescriptor parentDescriptor, @NotNull PsiElement element, boolean isBase) {
         super(project, parentDescriptor, element, isBase);
 
+        targetPointer = SmartPointerManager.getInstance(project).createSmartPsiElementPointer(element);
         nameIdentifier = getId();
 
         String presentableText = element.getText();
@@ -36,9 +42,14 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
         myHighlightedText.getEnding().addText(" (" + ((LSFFile) element.getContainingFile()).getModuleDeclaration().getName() + ")", new TextAttributes(JBColor.GRAY, null, null, null, Font.PLAIN));
     }
 
+    /** Replacement for the platform-internal {@code SmartElementDescriptor.getPsiElement()}. */
+    public @Nullable PsiElement getTargetElement() {
+        return targetPointer.getElement();
+    }
+
     @Override
     public boolean isValid() {
-        PsiElement psiElement = getPsiElement();
+        PsiElement psiElement = getTargetElement();
         if(psiElement == null)
             return false;
 
@@ -47,7 +58,7 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
 
     @Override
     public void navigate(boolean requestFocus) {
-        ((NavigationItem) getPsiElement()).navigate(true);
+        ((NavigationItem) getTargetElement()).navigate(true);
     }
 
     @Override
@@ -65,7 +76,7 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
     }
 
     private LSFId getId() {
-        PsiElement myElement = getPsiElement();
+        PsiElement myElement = getTargetElement();
         if (myElement instanceof LSFFormStatement) {
             LSFFormDeclaration formDeclaration = ((LSFFormStatement) myElement).resolveFormDecl();
             return formDeclaration != null ? formDeclaration.getNameIdentifier() : null;
@@ -87,6 +98,6 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof LSFUsageHierarchyNodeDescriptor && BaseUtils.nullEquals(getPsiElement(),((LSFUsageHierarchyNodeDescriptor) obj).getPsiElement());
+        return obj instanceof LSFUsageHierarchyNodeDescriptor && BaseUtils.nullEquals(getTargetElement(),((LSFUsageHierarchyNodeDescriptor) obj).getTargetElement());
     }
 }

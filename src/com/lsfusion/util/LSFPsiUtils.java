@@ -11,7 +11,6 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.tree.injected.InjectedLanguageManagerImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -209,7 +208,7 @@ public class LSFPsiUtils {
     }
 
     public static void collectInjectedLSFFiles(PsiElement root, Project project, Set<LSFFile> lsfFiles) {
-        List<Pair<PsiElement, TextRange>> injectedPsiFiles = InjectedLanguageManagerImpl.getInstance(project).getInjectedPsiFiles(root);
+        List<Pair<PsiElement, TextRange>> injectedPsiFiles = InjectedLanguageManager.getInstance(project).getInjectedPsiFiles(root);
         if (injectedPsiFiles != null) {
             for (Pair<PsiElement, TextRange> injectedPsiFile : injectedPsiFiles) {
                 PsiElement file = injectedPsiFile.first;

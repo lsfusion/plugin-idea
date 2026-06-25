@@ -32,7 +32,7 @@ public class LSFUsageHierarchyTreeStructure extends HierarchyTreeStructure {
             ReferencesSearch.search(element, GlobalSearchScope.allScope(myProject)).forEach(ref -> {
                 PsiElement el = LSFPsiUtils.getStatementParent(ref.getElement());
                 if (el != null) {
-                    PsiElement nodeElement = descriptor.getPsiElement();
+                    PsiElement nodeElement = ((LSFUsageHierarchyNodeDescriptor) descriptor).getTargetElement();
                     if (!ignore(nodeElement, el, ref.getElement())) {
                         result.add(new LSFUsageHierarchyNodeDescriptor(myProject, descriptor, el, false));
                     }

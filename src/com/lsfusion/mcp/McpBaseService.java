@@ -1,10 +1,11 @@
 package com.lsfusion.mcp;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.Unpooled;
+import com.intellij.openapi.util.io.BufferExposingByteArrayOutputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,6 @@ import org.jetbrains.ide.RestService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
@@ -525,33 +525,23 @@ public abstract class McpBaseService extends RestService {
     }
 
     protected static JSONObject readJsonBody(@NotNull FullHttpRequest request) throws Exception {
-        ByteBuf content = request.content();
-        if (!content.isReadable()) {
-            return new JSONObject();
-        }
-        try (InputStream is = new ByteBufInputStream(content)) {
-            byte[] bytes = is.readAllBytes();
-            String s = new String(bytes, StandardCharsets.UTF_8).trim();
-            if (s.isEmpty()) {
+        // createJsonReader() wraps the request content for us, avoiding the platform-internal io.netty.buffer API.
+        try (JsonReader reader = createJsonReader(request)) {
+            JsonElement element = JsonParser.parseReader(reader);
+            if (element == null || element.isJsonNull()) { // empty body
                 return new JSONObject();
             }
-            return new JSONObject(s);
+            return new JSONObject(element.toString());
         }
     }
 
     protected void sendJsonResponse(@NotNull ChannelHandlerContext ctx,
                                     @NotNull FullHttpRequest req,
                                     @NotNull JSONObject json) {
+        // send() builds an application/json response (with Content-Length) without us touching io.netty.buffer.
         byte[] bytes = json.toString().getBytes(StandardCharsets.UTF_8);
-        ByteBuf buf = Unpooled.wrappedBuffer(bytes);
-        FullHttpResponse response = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1,
-                HttpResponseStatus.OK,
-                buf
-        );
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8");
-        response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, buf.readableBytes());
-
-        sendResponse(req, ctx, response);
+        BufferExposingByteArrayOutputStream out = new BufferExposingByteArrayOutputStream();
+        out.write(bytes, 0, bytes.length);
+        send(out, req, ctx);
     }
 }

@@ -1,7 +1,6 @@
 package com.lsfusion.formatter;
 
 import com.intellij.formatting.Block;
-import com.intellij.formatting.Formatter;
 import com.intellij.formatting.Indent;
 import com.intellij.formatting.Spacing;
 import com.intellij.lang.ASTNode;
@@ -179,7 +178,7 @@ public abstract class LSFAbstractBlock extends AbstractBlock {
     }
 
     protected static Indent getNormalChildIndent() {
-        return Formatter.getInstance().getNormalIndent(true);
+        return Indent.getNormalIndent(true);
     }
 
     protected static Indent getNoneIndent() {

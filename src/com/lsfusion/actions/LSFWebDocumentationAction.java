@@ -2,6 +2,7 @@ package com.lsfusion.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataKey;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -21,6 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class LSFWebDocumentationAction extends AnAction {
+    // The quick-doc popup is published into the data context under this id; use the public DataKey-based
+    // accessor instead of the internal DataContext.getData(String).
+    private static final DataKey<Object> DOCUMENTATION_POPUP = DataKey.create("documentation.popup");
+
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
@@ -34,7 +39,7 @@ public class LSFWebDocumentationAction extends AnAction {
             
             String url = getEditorElementDocUrl(project);
             if (url != null) {
-                Object popup = e.getDataContext().getData("documentation.popup");
+                Object popup = e.getDataContext().getData(DOCUMENTATION_POPUP);
                 if (popup instanceof AbstractPopup) {
                     ((AbstractPopup) popup).setUiVisible(false);
                 }

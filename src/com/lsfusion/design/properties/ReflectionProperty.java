@@ -2,7 +2,6 @@ package com.lsfusion.design.properties;
 
 import com.intellij.designer.model.Property;
 import com.intellij.designer.propertyTable.PropertyRenderer;
-import com.intellij.designer.propertyTable.renderers.LabelPropertyRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +13,7 @@ public class ReflectionProperty extends ReadOnlyProperty {
     }
     
     public ReflectionProperty(@NotNull String name, @NotNull String propName) {
-        this(null, name, propName, new LabelPropertyRenderer(null));
+        this(null, name, propName, new TextPropertyRenderer());
     }
     
     public ReflectionProperty(@Nullable Property parent, @NotNull String name, @NotNull String propName, PropertyRenderer renderer) {

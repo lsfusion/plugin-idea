@@ -7,7 +7,6 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.openapi.wm.impl.ToolWindowImpl;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -121,7 +120,7 @@ public class DesignPreviewLineMarkerProvider extends LSFLineMarkerProviderDescri
 
             if (formDecl != null) {
                 ToolWindow toolWindow = ToolWindowManager.getInstance(formDecl.getProject()).getToolWindow("Design");
-                if (toolWindow instanceof ToolWindowImpl) {
+                if (toolWindow != null) {
                     toolWindow.activate(null);
                 }
 
