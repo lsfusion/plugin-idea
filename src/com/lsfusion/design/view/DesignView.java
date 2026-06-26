@@ -3,8 +3,8 @@ package com.lsfusion.design.view;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -110,6 +110,8 @@ public class DesignView extends JBTabbedPane {
         final DataContext dataContext = DataManager.getInstance().getDataContext(owner);
         if (CommonDataKeys.PROJECT.getData(dataContext) != project) return;
 
+        final boolean viewHasFocus = hasFocus();
+
         new Task.Backgroundable(project, "Reading form") {
             PsiElement targetElement;
             TargetForm targetForm;
@@ -139,14 +141,17 @@ public class DesignView extends JBTabbedPane {
 
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                ApplicationManager.getApplication().invokeLater(() -> {
+                // Resolve off the EDT: ConfigurationContext.getFromContext() resolves the module for the file
+                // via the workspace index (a slow operation prohibited on the EDT). The data context is a
+                // pre-cached snapshot, so its slow rules can be computed here on this background thread.
+                ReadAction.run(() -> {
                     targetElement = ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN).getPsiLocation();
-                    targetForm = getTargetForm(project, targetElement);
-                    files = hasFocus() ? null : CommonDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
+                    files = viewHasFocus ? null : CommonDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
                     if (targetElement != null) {
                         containingFile = targetElement.getContainingFile();
                     }
                 });
+                targetForm = getTargetForm(project, targetElement);
             }
         }.queue();
     }
