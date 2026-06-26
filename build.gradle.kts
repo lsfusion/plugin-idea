@@ -248,9 +248,21 @@ abstract class ParserTask @Inject constructor(
 
         val ideaLibTree = objects.fileTree().setDir(ideaLibDir.get()).matching { include("*.jar") }
 
+        // Running org.intellij.grammar.Main with the IDEA distribution on the classpath boots enough of the
+        // platform to emit telemetry/log files. Without redirection those land in the IDE distribution inside
+        // Gradle's immutable transform cache, which corrupts it ("contents of the immutable workspace have been
+        // modified") and breaks every subsequent build. Point the platform's system/log/config/plugins paths at
+        // build/ so generation never writes into the shared cache.
+        val ideaWorkDir = layout.buildDirectory.dir("grammarKitIdea").get().asFile
+        ideaWorkDir.mkdirs()
+
         execOperations.javaexec {
             mainClass.set("org.intellij.grammar.Main")
             classpath = grammarKitClasspath + psiImplUtilsJar + ideaLibTree
+            systemProperty("idea.system.path", ideaWorkDir.resolve("system").absolutePath)
+            systemProperty("idea.log.path", ideaWorkDir.resolve("log").absolutePath)
+            systemProperty("idea.config.path", ideaWorkDir.resolve("config").absolutePath)
+            systemProperty("idea.plugins.path", ideaWorkDir.resolve("plugins").absolutePath)
             args("gen", bnfFile.get().asFile.absolutePath)
         }
     }
