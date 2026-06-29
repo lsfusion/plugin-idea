@@ -1,7 +1,6 @@
 package com.lsfusion.lang.psi.cache;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
@@ -50,7 +49,7 @@ public class ParamClassesCache extends PsiDependentCache<LSFActionOrPropDeclarat
 
     public static ParamClassesCache getInstance(Project project) {
         ProgressIndicatorProvider.checkCanceled();
-        return ServiceManager.getService(project, ParamClassesCache.class);
+        return project.getService(ParamClassesCache.class);
     }
 
     public ParamClassesCache(Project project) {

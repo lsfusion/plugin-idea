@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.cache;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
@@ -30,7 +29,7 @@ public class PropertyDependentsCache extends PsiDependentCache<LSFActionOrGlobal
 
     public static PropertyDependentsCache getInstance(Project project) {
         ProgressIndicatorProvider.checkCanceled();
-        return ServiceManager.getService(project, PropertyDependentsCache.class);
+        return project.getService(PropertyDependentsCache.class);
     }
     
     public PropertyDependentsCache(Project project) {

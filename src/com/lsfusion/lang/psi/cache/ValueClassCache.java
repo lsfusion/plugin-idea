@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.cache;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.lang.psi.declarations.LSFActionOrPropDeclaration;
@@ -34,7 +33,7 @@ public class ValueClassCache extends PsiDependentCache<LSFActionOrPropDeclaratio
 
     public static ValueClassCache getInstance(Project project) {
         ProgressIndicatorProvider.checkCanceled();
-        return ServiceManager.getService(project, ValueClassCache.class);
+        return project.getService(ValueClassCache.class);
     }
 
     public ValueClassCache(Project project) {

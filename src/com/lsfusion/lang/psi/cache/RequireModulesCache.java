@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.cache;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -33,7 +32,7 @@ public class RequireModulesCache extends PsiDependentCache<LSFModuleDeclaration,
 
     public static RequireModulesCache getInstance(Project project) {
         ProgressIndicatorProvider.checkCanceled();
-        return ServiceManager.getService(project, RequireModulesCache.class);
+        return project.getService(RequireModulesCache.class);
     }
 
     public RequireModulesCache(Project project) {

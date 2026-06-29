@@ -1,6 +1,7 @@
 package com.lsfusion.completion;
 
 import com.intellij.codeInsight.TailType;
+import com.intellij.codeInsight.TailTypes;
 import com.intellij.codeInsight.completion.InsertHandler;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -88,7 +89,7 @@ public class CompletionUtils {
 
         LookupElement element = elementBuilder;
         if (tailType != null) {
-            element = withTail(element, TailType.SPACE);
+            element = withTail(element, TailTypes.spaceType());
         }
 
         if (insertHandler != null) {

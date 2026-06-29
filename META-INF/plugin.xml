@@ -228,6 +228,7 @@
         <configurationType implementation="com.lsfusion.module.run.LSFusionRunConfigurationType"/>
         <stepsBeforeRunProvider implementation="com.lsfusion.module.run.LSFRecursiveCompileStepBeforeRun" id="lsfCompileBeforeRun"/>
         <notificationGroup id="LSF Recursive Compile" displayType="BALLOON"></notificationGroup>
+        <notificationGroup id="Custom protocol Group" displayType="BALLOON"></notificationGroup>
 
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.MetaIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ModuleIndex"/>

@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.cache;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.lang.psi.declarations.LSFPropDeclaration;
@@ -22,7 +21,7 @@ public class PropertyComplexityCache extends PsiDependentCache<LSFPropDeclaratio
 
     public static PropertyComplexityCache getInstance(Project project) {
         ProgressIndicatorProvider.checkCanceled();
-        return ServiceManager.getService(project, PropertyComplexityCache.class);
+        return project.getService(PropertyComplexityCache.class);
     }
     
     public PropertyComplexityCache(Project project) {

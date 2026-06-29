@@ -87,7 +87,7 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
 
         Project project = decl.getProject();
         // 'type' retained for signature compatibility, actual type is derived from decl
-        for (Extend extend : LSFGlobalResolver.<Stub, Extend>findExtendElements(decl, project, GlobalSearchScope.allScope(project), LSFLocalSearchScope.createFrom(decl))) {
+        for (Extend extend : LSFGlobalResolver.<Stub, Extend>findExtendElements(decl, project, GlobalSearchScope.allScope(project), LSFLocalSearchScope.createFrom(decl)).findAll()) {
             LSFFullNameReference extendingReference = extend.getExtendingReference();
             if (extendingReference != null)
                 names.add(extendingReference);
@@ -97,7 +97,7 @@ public abstract class LSFExtendImpl<This extends LSFExtend<This, Stub>, Stub ext
     }
     protected static <T extends PsiElement, Extend extends LSFExtend<Extend, Stub>, Stub extends ExtendStubElement<Extend, Stub>> Set<T> processContext(LSFFullNameDeclaration decl, LSFFile file, ExtendStubElementType<Extend, Stub> type, Function<Extend, Collection<T>> processor, Integer offset, LSFLocalSearchScope localScope, boolean ignoreUseBeforeDeclarationCheck) {
         Set<T> finalResult = new HashSet<>();
-        for(Extend formExtend : findElements(decl, file, type, localScope)) {
+        for(Extend formExtend : findElements(decl, file, type, localScope).findAll()) {
             boolean sameFile = offset != null && file == formExtend.getLSFFile();
             for(T element : processor.apply(formExtend))
                 if(ignoreUseBeforeDeclarationCheck || !(sameFile && LSFGlobalResolver.isAfter(offset, element)))

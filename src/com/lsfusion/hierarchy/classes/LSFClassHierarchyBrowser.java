@@ -109,7 +109,7 @@ public class LSFClassHierarchyBrowser extends TypeHierarchyBrowserBase {
     @Override
     protected Comparator<NodeDescriptor<?>> getComparator() {
         if (HierarchyBrowserManager.getInstance(myProject).getState().SORT_ALPHABETICALLY) {
-            return AlphaComparator.INSTANCE;
+            return AlphaComparator.getInstance();
         }
         return null;
     }

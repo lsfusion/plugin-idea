@@ -3,7 +3,6 @@ package com.lsfusion.usage;
 import com.intellij.find.findUsages.AbstractFindUsagesDialog;
 import com.intellij.find.findUsages.FindUsagesOptions;
 import com.intellij.lang.findUsages.DescriptiveNameUtil;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
@@ -41,7 +40,7 @@ public class LSFFindUsagesDialog extends AbstractFindUsagesDialog {
     @Override
     protected boolean isInFileOnly() {
         return super.isInFileOnly() ||
-                ServiceManager.getService(myPsiElement.getProject(), PsiSearchHelper.class).getUseScope(myPsiElement) instanceof LocalSearchScope;
+                myPsiElement.getProject().getService(PsiSearchHelper.class).getUseScope(myPsiElement) instanceof LocalSearchScope;
     }
 
     @Override

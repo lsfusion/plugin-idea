@@ -556,7 +556,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
                 // resuming and all breakpoints in other threads will be ignored.
                 // As resume() implicitly cleares the filter, the filter must be always applied _before_ any resume() action happens
                 final BreakpointManager breakpointManager = getBreakpointManager();
-                breakpointManager.applyThreadFilter(getJavaDebugProcess(), thread.getThreadReference());
+                breakpointManager.applyThreadFilter(getJavaDebugProcess(), new RealThreadInfo(thread.getThreadReference()));
             }
         }
     }

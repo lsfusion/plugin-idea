@@ -16,7 +16,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PostprocessReformattingAspect;
 import com.intellij.psi.impl.source.tree.TreeUtil;
-import com.intellij.psi.scope.BaseScopeProcessor;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -889,7 +889,7 @@ public class ASTCompletionContributor extends CompletionContributor {
             // search local properties
             PsiElement lastElement = getLastPsiOfType(PsiElement.class);
             if (lastElement != null) {
-                PsiTreeUtil.treeWalkUp(new BaseScopeProcessor() {
+                PsiTreeUtil.treeWalkUp(new PsiScopeProcessor() {
                     @Override
                     public boolean execute(@NotNull PsiElement element, @NotNull ResolveState state) {
                         if (element instanceof LSFLocalPropDeclaration) {

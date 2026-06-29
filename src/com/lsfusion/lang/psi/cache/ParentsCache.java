@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.cache;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.lang.classes.CustomClassSet;
@@ -31,7 +30,7 @@ public class ParentsCache extends PsiDependentCache<LSFClassDeclaration, Collect
 
     public static ParentsCache getInstance(Project project) {
         ProgressIndicatorProvider.checkCanceled();
-        return ServiceManager.getService(project, ParentsCache.class);
+        return project.getService(ParentsCache.class);
     }
 
     public ParentsCache(Project project) {

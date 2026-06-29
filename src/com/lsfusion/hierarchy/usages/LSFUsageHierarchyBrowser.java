@@ -120,7 +120,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
             return HierarchyBrowserManager.getInstance(myProject).getState().SORT_ALPHABETICALLY ? usageTypeComparatorWithAlpha : usageTypeComparatorWithoutAlpha;
         }
         if (HierarchyBrowserManager.getInstance(myProject).getState().SORT_ALPHABETICALLY) {
-            return AlphaComparator.INSTANCE;
+            return AlphaComparator.getInstance();
         }
         return SourceComparator.INSTANCE;
     }
@@ -150,7 +150,7 @@ public class LSFUsageHierarchyBrowser extends CallHierarchyBrowserBase {
                 }
                 if (result == 0) {
                     if (withAlpha) {
-                        return AlphaComparator.INSTANCE.compare(q1, q2);
+                        return AlphaComparator.getInstance().compare(q1, q2);
                     } else {
                         return SourceComparator.INSTANCE.compare(q1, q2);
                     }

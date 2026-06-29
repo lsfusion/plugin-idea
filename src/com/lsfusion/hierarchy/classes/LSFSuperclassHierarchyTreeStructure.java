@@ -27,7 +27,7 @@ public class LSFSuperclassHierarchyTreeStructure extends HierarchyTreeStructure 
         LSFClassHierarchyNodeDescriptor nodeDescriptor = (LSFClassHierarchyNodeDescriptor) descriptor;
         Set<LSFClassHierarchyNodeDescriptor> result = new ArrayListSet<>();
 
-        for (LSFClassExtend classExtend : LSFGlobalResolver.findParentExtends(nodeDescriptor.getClassDecl()))
+        for (LSFClassExtend classExtend : LSFGlobalResolver.findParentExtends(nodeDescriptor.getClassDecl()).findAll())
             result.addAll(createNode(classExtend, descriptor));
 
         return result.toArray();

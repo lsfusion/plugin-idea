@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.cache;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -20,7 +19,7 @@ import java.util.Set;
 public class ModuleDependentsCache extends PsiDependentCache<LSFModuleDeclaration, Set<LSFModuleDeclaration>> {
     public static ModuleDependentsCache getInstance(Project project) {
         ProgressIndicatorProvider.checkCanceled();
-        return ServiceManager.getService(project, ModuleDependentsCache.class);
+        return project.getService(ModuleDependentsCache.class);
     }
 
     public static final PsiResolver<LSFModuleDeclaration, Set<LSFModuleDeclaration>> RESOLVER = new PsiResolver<>() {
@@ -29,7 +28,7 @@ public class ModuleDependentsCache extends PsiDependentCache<LSFModuleDeclaratio
             Set<LSFModuleDeclaration> result = new HashSet<>();
             LSFId nameIdentifier = declaration.getNameIdentifier();
             if (nameIdentifier != null) {
-                ReferencesSearch.search(nameIdentifier, declaration.getUseScope()).forEach(reference -> {
+                ReferencesSearch.search(nameIdentifier, declaration.getUseScope()).findAll().forEach(reference -> {
                     if (reference instanceof LSFModuleUsage && PsiTreeUtil.getParentOfType((PsiElement) reference, LSFRequireList.class) != null) {
                         LSFModuleDeclaration decl = PsiTreeUtil.getParentOfType((PsiElement) reference, LSFModuleDeclaration.class);
                         if (decl != null) {

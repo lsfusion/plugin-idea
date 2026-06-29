@@ -70,7 +70,7 @@ public class CustomClassSet implements LSFClassSet {
 
     public static Collection<LSFClassDeclaration> getParentsNoCache(LSFClassDeclaration decl) {
         Set<LSFClassDeclaration> result = new HashSet<>();
-        for (LSFClassExtend extDecl : LSFGlobalResolver.findParentExtends(decl))
+        for (LSFClassExtend extDecl : LSFGlobalResolver.findParentExtends(decl).findAll())
             result.addAll(extDecl.resolveExtends());
         return result;
     }

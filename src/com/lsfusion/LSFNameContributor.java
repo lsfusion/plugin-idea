@@ -57,7 +57,7 @@ public abstract class LSFNameContributor implements ChooseByNameContributorEx {
     }
 
     protected boolean matches(String name, String pattern) {
-        MinusculeMatcher totalMatcher = NameUtil.buildMatcher(pattern, NameUtil.MatchingCaseSensitivity.NONE);
+        MinusculeMatcher totalMatcher = NameUtil.buildMatcher(pattern).build();
         if (totalMatcher.matches(name)) {
             return true;
         }
@@ -68,7 +68,7 @@ public abstract class LSFNameContributor implements ChooseByNameContributorEx {
         for (int i = words.length - 1; i > 0; i--) {
             String word = words[i];
             cutPattern = cutPattern.substring(0, cutPattern.lastIndexOf(word));
-            MinusculeMatcher matcher = NameUtil.buildMatcher(cutPattern, NameUtil.MatchingCaseSensitivity.NONE);
+            MinusculeMatcher matcher = NameUtil.buildMatcher(cutPattern).build();
             if (matcher.matches(name)) {
                 return true;
             }

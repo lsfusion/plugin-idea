@@ -31,7 +31,7 @@ public interface LSFActionOrGlobalPropDeclaration<This extends LSFActionOrGlobal
 
         LSFId nameIdentifier = getNameIdentifier();
         if(nameIdentifier != null) {
-            ReferencesSearch.search(nameIdentifier, getUseScope()).forEach(reference -> {
+            ReferencesSearch.search(nameIdentifier, getUseScope()).findAll().forEach(reference -> {
                 LSFActionOrGlobalPropDeclaration<?, ?> dependent = PsiTreeUtil.getParentOfType(reference.getElement(), LSFActionOrGlobalPropDeclaration.class);
                 if (dependent != null) {
                     result.add(dependent);

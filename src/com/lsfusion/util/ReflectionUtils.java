@@ -1,6 +1,5 @@
 package com.lsfusion.util;
 
-import com.google.common.base.Throwables;
 
 import java.lang.reflect.*;
 
@@ -59,7 +58,7 @@ public class ReflectionUtils {
             field.setAccessible(true);
             return field.get(target);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -86,7 +85,7 @@ public class ReflectionUtils {
                 }
             }
         } catch (Exception e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         return null;
     }
@@ -101,7 +100,7 @@ public class ReflectionUtils {
             field.setAccessible(true);
             field.set(target, value);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -111,7 +110,7 @@ public class ReflectionUtils {
             method.setAccessible(true);
             return (T) method.invoke(target, params);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -146,7 +145,7 @@ public class ReflectionUtils {
         try {
             getSingleMethod(object, "set" + BaseUtils.capitalize(field), 1).invoke(object, set);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -155,7 +154,7 @@ public class ReflectionUtils {
             Method method = object.getClass().getMethod("get" + BaseUtils.capitalize(field));
             return method.invoke(object);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -163,7 +162,7 @@ public class ReflectionUtils {
         try {
             return (T) method.invoke(object, parameters);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -171,7 +170,7 @@ public class ReflectionUtils {
         try {
             return getPrivateMethodWithException(clazz, methodName, parameterTypes);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
     public static Method getPrivateMethodWithException(Class clazz, String methodName, Class<?>... parameterTypes) throws Exception {
@@ -197,7 +196,7 @@ public class ReflectionUtils {
             ctor.setAccessible(true);
             return ctor.newInstance(parameters);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

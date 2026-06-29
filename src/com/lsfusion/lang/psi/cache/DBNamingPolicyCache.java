@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.cache;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.lang.DBNamingPolicy;
@@ -22,7 +21,7 @@ public class DBNamingPolicyCache extends PsiDependentCache<LSFFile, DBNamingPoli
 
     public static DBNamingPolicyCache getInstance(LSFFile lsfFile) {
         ProgressIndicatorProvider.checkCanceled();
-        return ServiceManager.getService(lsfFile.getProject(), DBNamingPolicyCache.class);
+        return lsfFile.getProject().getService(DBNamingPolicyCache.class);
     }
 
     public DBNamingPolicyCache(Project project) {

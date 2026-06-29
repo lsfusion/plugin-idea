@@ -1,6 +1,5 @@
 package com.lsfusion.lang.psi.cache;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
@@ -21,7 +20,7 @@ public class ColumnNameCache extends PsiDependentCache<LSFGlobalPropDeclaration,
     
     public static ColumnNameCache getInstance(Project project) {
         ProgressIndicatorProvider.checkCanceled();
-        return ServiceManager.getService(project, ColumnNameCache.class);
+        return project.getService(ColumnNameCache.class);
     }
 
     public ColumnNameCache(Project project) {

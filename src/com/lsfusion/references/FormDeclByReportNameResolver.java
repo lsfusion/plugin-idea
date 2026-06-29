@@ -23,7 +23,7 @@ public class FormDeclByReportNameResolver {
 
         if (formDeclaration != null) {
             final Set<String> requiredModules = new HashSet<>();
-            for(LSFFormExtend extend : LSFGlobalResolver.<ExtendFormStubElement, LSFFormExtend>findExtendElements(formDeclaration, formDeclaration.getProject(), LSFFileUtils.getModuleWithDependenciesScope(source), LSFLocalSearchScope.GLOBAL))
+            for(LSFFormExtend extend : LSFGlobalResolver.<ExtendFormStubElement, LSFFormExtend>findExtendElements(formDeclaration, formDeclaration.getProject(), LSFFileUtils.getModuleWithDependenciesScope(source), LSFLocalSearchScope.GLOBAL).findAll())
                 requiredModules.add(extend.getLSFFile().getModuleDeclaration().getGlobalName());
 
             String requires = "";

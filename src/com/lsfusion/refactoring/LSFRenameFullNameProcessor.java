@@ -118,7 +118,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
                 cascadePostRenameActions.add(getMigrationClassRunnable(groupMap.get(gscope), oldCanonicalNames, MigrationChangePolicy.USE_LAST_VERSION, gscope));
             }
 
-            for (LSFClassExtend extend : LSFGlobalResolver.findParentExtends(cls)) {
+            for (LSFClassExtend extend : LSFGlobalResolver.findParentExtends(cls).findAll()) {
                 for (LSFStaticObjectDeclaration staticDecl : extend.getStaticObjects()) {
                     cascadeRenameElements.add(staticDecl);
                     cascadePostRenameActions.add(getMigrationClassRunnable(staticDecl, cls.getNamespaceName(), cls.getName(), newName, MigrationChangePolicy.USE_LAST_VERSION));

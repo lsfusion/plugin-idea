@@ -1,7 +1,7 @@
 package com.lsfusion.actions;
 
-import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -27,10 +27,8 @@ import java.util.stream.Stream;
 
 public class InstallExternalCallsProtocolAction extends AnAction {
 
-    //scheduled for removal in version 2021.3
-    @SuppressWarnings({"deprecation","UnstableApiUsage"})
     private static final NotificationGroup NOTIFICATION_GROUP =
-            new NotificationGroup("Custom protocol Group", NotificationDisplayType.BALLOON, true);
+            NotificationGroupManager.getInstance().getNotificationGroup("Custom protocol Group");
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -115,7 +113,7 @@ public class InstallExternalCallsProtocolAction extends AnAction {
         if (!fileContent.contains(desctopFileContent))
             Files.write(desktopFilePath, desctopFileContent.getBytes());
 
-        return Runtime.getRuntime().exec("update-desktop-database " + applicationsPath).waitFor();
+        return Runtime.getRuntime().exec(new String[]{"update-desktop-database", applicationsPath}).waitFor();
     }
 
     private int registerMacProtocol(String customProtocolPath, String execScriptPath) throws IOException, InterruptedException {
