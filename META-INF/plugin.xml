@@ -8,19 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.309</b><br>
+        <b>Version 1.0.310</b><br>
         <ul>
-            <li>Property Complexity: references inside string interpolations</li>
-            <li>Added 'Dev mode' checkbox to lsFusion Server run configuration</li>
-            <li>Make Shift+F6 rename update FILTERS / ORDERS references that don't go through PROPERTIES (closes #90)</li>
-            <li>Added the <code>lsfusion_report_feedback</code> MCP tool for sending depersonalized feedback that helps improve lsFusion documentation, RAG retrieval, and <code>eval</code> diagnostics.</li>
-            <li>SelectTop / selectTops: accept standalone OFFSET without TOP</li>
-            <li>Add quick-fix to replace deprecated constructs with their replacement</li>
-            <li>Form <code>PROPERTIES</code>: recognize the <code>APPLY</code> commit-on-edit option, e.g. <code>PROPERTIES(o) f NEWSESSION APPLY</code></li>
-            <li>Form <code>CUSTOMS</code>: recognize the clause that allow-lists actions/properties for the form JS controller, e.g. <code>CUSTOMS recalc, setQty = setQuantity, note</code></li>
-            <li>Refactored deprecation warnings into inspections</li>
-            <li>Install Debug Protocol now also works on macOS</li>
-            <li>Install Debug Protocol on Windows no longer requires administrator rights (registers per-user)</li>
+            <li>Restored the inline evaluate-expression / add-to-watches field above the Watches list in the debugger</li>
         </ul>
     ]]>
     </change-notes>

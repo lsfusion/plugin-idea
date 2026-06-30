@@ -50,10 +50,13 @@ public class LSFDebuggerEditorsProvider extends JavaDebuggerEditorsProvider {
             return super.createExpression(project, document, language, mode);
         }
 
-        PsiDocumentManager.getInstance(project).commitDocument(document);
+        // The platform invokes this from the "Add to Watches" action's update(), which now runs in a
+        // read-only action on a background thread, so we must not commit the document here: commitDocument
+        // mutates the PSI model and requires write access. The watch text is the document text; the cached
+        // fragment PSI is read-safe and only needed for the imports round-trip.
         PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
         if (psiFile instanceof LSFFile) {
-            return new XExpressionImpl(psiFile.getText(), language, ((JavaCodeFragment)psiFile).importsToString(), mode);
+            return new XExpressionImpl(document.getText(), language, ((JavaCodeFragment)psiFile).importsToString(), mode);
         }
         return XDebuggerUtil.getInstance().createExpression(document.getText(), language, null, mode);
     }
@@ -67,10 +70,5 @@ public class LSFDebuggerEditorsProvider extends JavaDebuggerEditorsProvider {
         } else {
             return super.createExpressionCodeFragment(project, expression, context, isPhysical);
         }
-    }
-
-    // disabled debugger expression evaluation field, which caused idea crashing when stopped on breakpoint
-    public boolean isEvaluateExpressionFieldEnabled() {
-        return false;
     }
 }
