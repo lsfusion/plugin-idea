@@ -57,7 +57,7 @@ public class LSFStructureFileCaretListener implements CaretListener {
                         currentClassElement = parent;
                         StructureViewWrapper structureViewWrapper = StructureViewFactoryEx.getInstanceEx(project).getStructureViewWrapper();
                         if (structureViewWrapper instanceof StructureViewWrapperImpl) {
-                            ((StructureViewWrapperImpl) structureViewWrapper).rebuild();
+                            ((StructureViewWrapperImpl) structureViewWrapper).rebuildNow("lsFusion caret class changed");
                         }
                     }
                 })

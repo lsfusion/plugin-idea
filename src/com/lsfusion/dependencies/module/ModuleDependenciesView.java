@@ -6,6 +6,7 @@ import com.intellij.codeInsight.daemon.impl.UpdateHighlightersUtil;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -79,6 +80,11 @@ public class ModuleDependenciesView extends DependenciesView {
     @Override
     protected void addThirdToolbarActions(@NotNull SimpleActionGroup actions) {
         actions.add(new ToggleAction("Highlight redundant modules") {
+            {
+                // Show the action's text label in the toolbar (replaces the removed displayTextInToolbar() override).
+                getTemplatePresentation().putClientProperty(ActionUtil.SHOW_TEXT_IN_TOOLBAR, true);
+            }
+
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
                 return redundantModulesWarningsEnabled;
@@ -103,12 +109,6 @@ public class ModuleDependenciesView extends DependenciesView {
             @Override
             public @NotNull ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
-            }
-
-            @SuppressWarnings("removal")
-            @Override
-            public boolean displayTextInToolbar() {
-                return true;
             }
         });
     }
