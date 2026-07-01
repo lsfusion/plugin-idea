@@ -16,6 +16,7 @@ import com.lsfusion.lang.psi.indexes.LSFStringStubIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class LSFNameContributor implements ChooseByNameContributorEx {
@@ -33,7 +34,21 @@ public abstract class LSFNameContributor implements ChooseByNameContributorEx {
     public void processNames(@NotNull Processor<? super String> processor, @NotNull GlobalSearchScope scope, @Nullable IdFilter filter) {
 
         for (LSFStringStubIndex index : getIndices()) {
-            index.processAllKeys(scope.getProject(), getProcessor(index, processor, scope));
+            // collect keys first, then process them once processAllKeys has returned : getProcessor() results
+            // (e.g. LSFSymbolContributor's) can issue their own stub index queries, and nesting those under
+            // processAllKeys's own stub index traversal throws IllegalStateException (deadlock guard)
+            Collection<String> keys = new ArrayList<>();
+            index.processAllKeys(scope.getProject(), key -> {
+                keys.add((String) key);
+                return true;
+            });
+
+            Processor<? super String> keyProcessor = getProcessor(index, processor, scope);
+            for (String key : keys) {
+                if (!keyProcessor.process(key)) {
+                    break;
+                }
+            }
         }
     }
 
