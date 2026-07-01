@@ -82,6 +82,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     protected String latestTargetElementInPath;
 
     protected GraphDataModel dataModel;
+    private ProgressIndicator calculationIndicator;
     
     protected JGraph jgraph;
     protected ListenableDirectedGraph g;
@@ -389,6 +390,10 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     private void redrawCurrent(boolean force) {
+        if (calculationIndicator != null) {
+            calculationIndicator.cancel();
+        }
+
         Component comp = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.CENTER);
         if (comp != null) {
             remove(comp);
@@ -464,6 +469,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
 
             public void run(@NotNull ProgressIndicator indicator) {
+                calculationIndicator = indicator;
+
                 DumbService.getInstance(project).runReadActionInSmartMode(() -> {
                     if (showRequired) {
                         createDependencyNode(currentElement, new HashSet<>());
