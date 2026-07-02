@@ -1,10 +1,8 @@
 package com.lsfusion.module.run;
 
-import com.intellij.execution.configuration.ConfigurationFactoryEx;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.LSFBundle;
@@ -17,14 +15,11 @@ public class LSFusionRunConfigurationType implements ConfigurationType {
     private final ConfigurationFactory myFactory;
 
     public LSFusionRunConfigurationType() {
-        myFactory = new ConfigurationFactoryEx(this) {
+        // The former ConfigurationFactoryEx.onNewConfigurationCreated override only called the
+        // inherited no-op RunConfigurationBase.onNewConfigurationCreated, so it is dropped, not migrated.
+        myFactory = new ConfigurationFactory(this) {
             public RunConfiguration createTemplateConfiguration(Project project) {
                 return new LSFusionRunConfiguration("", project, this, true);
-            }
-
-            @Override
-            public void onNewConfigurationCreated(@NotNull RunConfiguration configuration) {
-                ((LSFusionRunConfiguration)configuration).onNewConfigurationCreated();
             }
 
             @NotNull

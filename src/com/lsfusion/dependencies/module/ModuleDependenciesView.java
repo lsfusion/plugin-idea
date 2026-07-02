@@ -5,6 +5,7 @@ import com.intellij.codeInsight.daemon.impl.HighlightInfoType;
 import com.intellij.codeInsight.daemon.impl.UpdateHighlightersUtil;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
@@ -23,7 +24,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.tools.SimpleActionGroup;
 import com.lsfusion.dependencies.DependenciesView;
 import com.lsfusion.dependencies.GraphNode;
 import com.lsfusion.lang.psi.LSFFile;
@@ -78,7 +78,7 @@ public class ModuleDependenciesView extends DependenciesView {
     }
 
     @Override
-    protected void addThirdToolbarActions(@NotNull SimpleActionGroup actions) {
+    protected void addThirdToolbarActions(@NotNull DefaultActionGroup actions) {
         actions.add(new ToggleAction("Highlight redundant modules") {
             {
                 // Show the action's text label in the toolbar (replaces the removed displayTextInToolbar() override).

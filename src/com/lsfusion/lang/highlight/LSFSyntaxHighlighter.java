@@ -2,17 +2,15 @@ package com.lsfusion.lang.highlight;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
+import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.ui.JBColor;
 import com.lsfusion.lang.LSFLexerAdapter;
 import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +24,7 @@ public class LSFSyntaxHighlighter extends SyntaxHighlighterBase {
     
     private static final TextAttributesKey NUMBER_LITERAL = createTextAttributesKey("LSF_LITERAL", DefaultLanguageHighlighterColors.NUMBER);
     private static final TextAttributesKey COMMENT = createTextAttributesKey("LSF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
-    private static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("LSF_BAD_CHARACTER", new TextAttributes(JBColor.RED, null, null, null, Font.BOLD));
+    private static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("LSF_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
 
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};

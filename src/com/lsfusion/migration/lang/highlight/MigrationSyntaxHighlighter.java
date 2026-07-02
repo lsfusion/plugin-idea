@@ -2,17 +2,15 @@ package com.lsfusion.migration.lang.highlight;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
+import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.ui.JBColor;
 import com.lsfusion.migration.MigrationLexerAdapter;
 import com.lsfusion.migration.lang.psi.MigrationTypes;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,8 +21,7 @@ public class MigrationSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey KEY = createTextAttributesKey("SIMPLE_KEY", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey COMMENT = createTextAttributesKey("SIMPLE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
 
-    static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("SIMPLE_BAD_CHARACTER",
-                                                                           new TextAttributes(JBColor.RED, null, null, null, Font.BOLD));
+    static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("SIMPLE_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
 
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] KEY_KEYS = new TextAttributesKey[]{KEY};

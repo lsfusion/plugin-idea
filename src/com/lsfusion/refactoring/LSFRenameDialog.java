@@ -5,8 +5,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.psi.PsiElement;
 import com.intellij.refactoring.rename.RenameDialog;
-import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.NonFocusableCheckBox;
+import com.intellij.ui.dsl.listCellRenderer.BuilderKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,16 +70,9 @@ class LSFRenameDialog extends RenameDialog {
 
             setSelectedItem(INCREMENT_VERSION_IF_COMMITED);
             
-            setRenderer(new ListCellRendererWrapper() {
-                @Override
-                public void customize(JList list, Object value, int index, boolean selected, boolean hasFocus) {
-                    if (value instanceof MigrationChangePolicy) {
-                        setText(((MigrationChangePolicy) value).getDisplayText());
-                    } else if (value instanceof String) {
-                        setText((String) value);
-                    }
-                }
-            });
+            // The (nullValue, extractor) overload is @ApiStatus.Internal in 252/253 (stabilized only in 262),
+            // so null is handled in the extractor instead.
+            setRenderer(BuilderKt.textListCellRenderer((MigrationChangePolicy v) -> v == null ? "" : v.getDisplayText()));
         }
 
 

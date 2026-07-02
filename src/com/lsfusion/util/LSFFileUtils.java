@@ -7,6 +7,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEnumerator;
 import com.intellij.openapi.roots.ProjectFileIndex;
@@ -149,12 +150,12 @@ public class LSFFileUtils {
         if (project == null) {
             return url;
         }
-        VirtualFile root = ProjectFileIndex.SERVICE.getInstance(project).getContentRootForFile(virtualFile);
+        VirtualFile root = ProjectFileIndex.getInstance(project).getContentRootForFile(virtualFile);
         if (root != null) {
             return root.getName() + File.separatorChar + VfsUtilCore.getRelativePath(virtualFile, root, File.separatorChar);
         }
 
-        final VirtualFile baseDir = project.getBaseDir();
+        final VirtualFile baseDir = ProjectUtil.guessProjectDir(project);
         if (baseDir != null) {
             //noinspection ConstantConditions
             final String projectHomeUrl = baseDir.getPresentableUrl();

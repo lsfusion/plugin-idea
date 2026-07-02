@@ -22,7 +22,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.DarculaColors;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SearchTextField;
@@ -161,7 +160,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     private ActionToolbar createFirstToolbar() {
-        SimpleActionGroup actions = new SimpleActionGroup();
+        DefaultActionGroup actions = new DefaultActionGroup();
 
         actions.add(showRequiredAction = new BGTCheckboxAction(getDependencyTitle()) {
             @Override
@@ -238,7 +237,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     private FlexPanel createSecondToolbar() {
          FlexPanel panel = new FlexPanel(false);
 
-        SimpleActionGroup actions = new SimpleActionGroup();
+        DefaultActionGroup actions = new DefaultActionGroup();
         actions.add(moduleAction = new ModuleComboAction("Logics Module:", Arrays.stream(LSFFileUtils.getModules(project)).collect(Collectors.toMap(Module::getName, Function.identity()))));
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(title, actions, true);
         actionToolbar.setTargetComponent(this);
@@ -269,7 +268,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     }
 
     private ActionToolbar createThirdToolbar() {
-        SimpleActionGroup actions = new SimpleActionGroup();
+        DefaultActionGroup actions = new DefaultActionGroup();
 
         actions.add(new BGTCheckboxAction("Manual update") {
             @Override
@@ -329,7 +328,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
         return actionToolbar;
     }
 
-    protected void addThirdToolbarActions(@NotNull SimpleActionGroup actions) {
+    protected void addThirdToolbarActions(@NotNull DefaultActionGroup actions) {
     }
 
     protected void refreshThirdToolbarActions() {

@@ -123,9 +123,6 @@ public class ShowErrorsAction extends AnAction {
         ProgressManager.getInstance().run(task);
 
         ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(NotificationsToolWindowFactory.ID);
-        if (toolWindow == null) {
-            toolWindow = EventLog.getEventLog(project);
-        }
         if (toolWindow != null && !toolWindow.isVisible()) {
             toolWindow.activate(null);
         }
