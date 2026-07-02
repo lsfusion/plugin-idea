@@ -122,7 +122,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <fileTypeFactory implementation="com.lsfusion.lang.LSFFileTypeFactory"/>
+        <fileType name="lsFusion module" implementationClass="com.lsfusion.lang.LSFFileType" fieldName="INSTANCE" language="Lsf" extensions="lsf"/>
         <lang.parserDefinition language="Lsf" implementationClass="com.lsfusion.lang.LSFParserDefinition"/>
 
         <targetElementEvaluator language="Lsf" implementationClass="com.lsfusion.LSFTargetElementEvaluatorEx2"/>
@@ -304,7 +304,8 @@
                                         implementationClass="com.lsfusion.dependencies.property.PropertyColorLineMarkerProvider"/>
 
         <!-- reports related stuff -->
-        <fileTypeFactory implementation="com.lsfusion.reports.JrxmlFileTypeFactory"/>
+        <!-- Associate the .jrxml extension with the platform's built-in XML file type (name-reference form: no implementationClass). -->
+        <fileType name="XML" extensions="jrxml"/>
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.reports.JrxmlLinkLineMarkerProvider"/>
 
@@ -327,7 +328,8 @@
         <consoleFilterProvider implementation="com.lsfusion.LSFConsoleFilterProvider"/>
 
         <!-- migration -->
-        <fileTypeFactory implementation="com.lsfusion.migration.lang.MigrationFileTypeFactory"/>
+        <!-- Matched by exact file name "migration.script" (fileNames), not by extension. -->
+        <fileType name="lsFusion migration script file" implementationClass="com.lsfusion.migration.lang.MigrationFileType" fieldName="INSTANCE" language="LsfMigration" fileNames="migration.script"/>
         <lang.parserDefinition language="LsfMigration"
                                implementationClass="com.lsfusion.migration.lang.MigrationParserDefinition"/>
 
