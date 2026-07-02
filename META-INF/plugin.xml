@@ -11,6 +11,7 @@
         <b>Version 1.0.310</b><br>
         <ul>
             <li>Restored the inline evaluate-expression / add-to-watches field above the Watches list in the debugger</li>
+            <li>New Module wizard: picking an lsFusion distribution directory without a server jar now shows an explicit error instead of silently refusing the selection</li>
         </ul>
     ]]>
     </change-notes>

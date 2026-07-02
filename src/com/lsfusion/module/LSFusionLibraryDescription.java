@@ -37,10 +37,16 @@ public class LSFusionLibraryDescription extends CustomLibraryDescription {
 
     @Override
     public NewLibraryConfiguration createNewLibrary(@NotNull JComponent parentComponent, VirtualFile contextDirectory) {
+        // isFileSelectable is @NonExtendable (and withFileFilter is not applied to directories),
+        // so the distribution directory is validated on OK instead of being filtered in the tree.
         final FileChooserDescriptor descriptor = new FileChooserDescriptor(false, true, false, false, false, false) {
             @Override
-            public boolean isFileSelectable(VirtualFile file) {
-                return super.isFileSelectable(file) && isLSFusionServerDirectory(file);
+            public void validateSelectedFiles(VirtualFile @NotNull [] files) throws Exception {
+                for (VirtualFile file : files) {
+                    if (!isLSFusionServerDirectory(file)) {
+                        throw new Exception("Directory does not contain an lsFusion server jar");
+                    }
+                }
             }
         };
         descriptor.setTitle("lsFusion");
