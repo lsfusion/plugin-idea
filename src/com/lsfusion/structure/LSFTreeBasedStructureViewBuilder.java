@@ -9,6 +9,7 @@ import com.intellij.ide.structureView.newStructureView.StructureViewComponent;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ui.tree.TreeModelAdapter;
@@ -57,8 +58,16 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
 
         LSFValueClass currentClass = valueClass;
         if (currentClass == null && editor != null) {
-            PsiElement targetElement = DumbService.getInstance(editor.getProject()).runReadActionInSmartMode(() -> TargetElementUtil.findTargetElement(editor, ImplementationSearcher.getFlags()));
-            
+            PsiElement targetElement;
+            try {
+                targetElement = DumbService.getInstance(editor.getProject()).runReadActionInSmartMode(() -> TargetElementUtil.findTargetElement(editor, ImplementationSearcher.getFlags()));
+            } catch (IndexNotReadyException e) {
+                // Structure view rebuilds run on EDT under the write-intent lock, where
+                // runReadActionInSmartMode can't wait for smart mode and resolve fails while
+                // indexing (e.g. on IDE startup) — show the view without caret preselection.
+                targetElement = null;
+            }
+
             if (targetElement instanceof LSFId) {
                 PsiElement parent = targetElement;
                 while (parent != null) {
