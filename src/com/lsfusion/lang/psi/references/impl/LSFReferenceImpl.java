@@ -15,6 +15,7 @@ import com.lsfusion.lang.meta.MetaTransaction;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFDeclaration;
+import com.lsfusion.lang.psi.declarations.LSFFullNameDeclaration;
 import com.lsfusion.lang.psi.references.LSFReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -154,6 +155,22 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
 
     public LSFResolvingError resolveAmbiguousErrorAnnotation(Collection<? extends LSFDeclaration> declarations) {
         return new LSFResolvingError(this, "Ambiguous reference", true);
+    }
+
+    protected static String getAmbiguousReferenceText(Collection<? extends LSFDeclaration> declarations) {
+        List<? extends LSFDeclaration> decls = new ArrayList<>(declarations);
+        StringBuilder description = new StringBuilder();
+        for (int i = 0; i < decls.size(); i++) {
+            LSFDeclaration decl = decls.get(i);
+            String namespace = decl instanceof LSFFullNameDeclaration ? ((LSFFullNameDeclaration) decl).getNamespaceName() : null;
+            description.append(namespace != null ? namespace + "." + decl.getPresentableText() : decl.getPresentableText());
+            if (i < decls.size() - 2) {
+                description.append(", ");
+            } else if (i == decls.size() - 2) {
+                description.append(" and ");
+            }
+        }
+        return "Ambiguous reference" + (description.length() == 0 ? "" : ": " + description + " match");
     }
 
     public LSFResolvingError resolveNotFoundErrorAnnotation(Collection<? extends LSFDeclaration> similarDeclarations, boolean canBeDeclaredAfterAndNotChecked) {

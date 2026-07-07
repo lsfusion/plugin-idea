@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.LSFElementGenerator;
+import com.lsfusion.lang.LSFResolvingError;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.LSFAliasUsage;
 import com.lsfusion.lang.psi.LSFId;
@@ -20,6 +21,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,16 +54,26 @@ public abstract class LSFPropertyDrawOrPropertyExprReference extends LSFProperty
             return new LSFResolveResult(Collections.emptyList());
         }
 
+        LSFResolveResult propertyResult = resolvePropertyResult();
+        if (propertyResult != null && propertyResult.declarations.size() > 1) {
+            return new LSFResolveResult(propertyResult.declarations, new LSFResolveResult.AmbigiousErrorAnnotator(this, propertyResult.declarations));
+        }
+
         LSFResolveResult result = super.resolveNoCache();
         if (!result.declarations.isEmpty() || getAliasUsage() != null) {
             return result;
         }
 
-        LSFDeclaration propertyDeclaration = resolvePropertyDeclaration();
-        if (propertyDeclaration == null) {
-            return result;
+        // no form property draw -> use the (single) global property, if any
+        if (propertyResult != null && !propertyResult.declarations.isEmpty()) {
+            return new LSFResolveResult(propertyResult.declarations);
         }
-        return new LSFResolveResult(Collections.singletonList(propertyDeclaration));
+        return result;
+    }
+
+    @Override
+    public LSFResolvingError resolveAmbiguousErrorAnnotation(Collection<? extends LSFDeclaration> declarations) {
+        return new LSFResolvingError(this, getAmbiguousReferenceText(declarations), true);
     }
 
     @Nullable
@@ -107,7 +119,7 @@ public abstract class LSFPropertyDrawOrPropertyExprReference extends LSFProperty
     }
 
     @Nullable
-    private LSFDeclaration resolvePropertyDeclaration() {
+    private LSFResolveResult resolvePropertyResult() {
         LSFFormPropertyDrawPropertyUsage propertyUsage = getFormPropertyDrawPropertyUsage();
         if (propertyUsage == null) {
             return null;
@@ -121,6 +133,6 @@ public abstract class LSFPropertyDrawOrPropertyExprReference extends LSFProperty
         List<LSFClassSet> usageClasses = LSFPsiImplUtil.resolveParamClasses(getObjectUsageList());
         return LSFElementGenerator
                 .createPropRefFromText(nameId.getText(), null, getLSFFile(), null, usageClasses, false, false)
-                .resolveDecl();
+                .multiResolveDecl(true);
     }
 }

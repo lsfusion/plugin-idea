@@ -225,28 +225,7 @@ public abstract class LSFActionOrPropReferenceImpl<T extends LSFActionOrPropDecl
 
     @Override
     public LSFResolvingError resolveAmbiguousErrorAnnotation(Collection<? extends LSFDeclaration> declarations) {
-        String ambError = "Ambiguous reference";
-
-        String description = "";
-        int i = 1;
-        List<T> decls = new ArrayList<>((Collection<? extends T>) declarations);
-        for (T decl : decls) {
-            description += decl.getPresentableText();
-
-            if (i < decls.size() - 1) {
-                description += ", ";
-            } else if (i == decls.size() - 1) {
-                description += " and ";
-            }
-
-            i++;
-        }
-
-        if (!description.isEmpty()) {
-            ambError += ": " + description + " match";
-        }
-
-        return resolveErrorTarget(ambError, false);
+        return resolveErrorTarget(getAmbiguousReferenceText(declarations), false);
     }
     
     protected abstract String getErrorName();

@@ -95,28 +95,7 @@ public abstract class LSFMetaReferenceImpl extends LSFFullNameReferenceImpl<LSFM
 
     @Override
     public LSFResolvingError resolveAmbiguousErrorAnnotation(Collection<? extends LSFDeclaration> declarations) {
-        String ambError = "Ambiguous reference";
-
-        String description = "";
-        int i = 1;
-        List<LSFMetaCodeDeclarationStatement> decls = new ArrayList<>((Collection<? extends LSFMetaCodeDeclarationStatement>) declarations);
-        for (LSFMetaCodeDeclarationStatement decl : decls) {
-            description += decl.getPresentableText();
-
-            if (i < decls.size() - 1) {
-                description += ", ";
-            } else if (i == decls.size() - 1) {
-                description += " and ";
-            }
-
-            i++;
-        }
-
-        if (!description.isEmpty()) {
-            ambError += ": " + description + " match";
-        }
-
-        return new LSFResolvingError(getMetaCodeIdList(), ambError, true);
+        return new LSFResolvingError(getMetaCodeIdList(), getAmbiguousReferenceText(declarations), true);
     }
 
     @Override
