@@ -175,6 +175,12 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         super.visitPropertyDrawOrPropertyExpr(o);
         if (o.getReference() instanceof LSFReference reference) {
             checkReference(reference);
+        } else if (o.getNode().findChildByType(LSFTypes.USER) != null) {
+            // a USER order / filter requires a property on the form, an arbitrary expression can only be FIXED
+            LSFPropertyExpression expression = o.getPropertyExpression();
+            if (expression != null) {
+                addUnderscoredError(o, expression.getTextRange(), "Unable to resolve user property");
+            }
         }
     }
 
