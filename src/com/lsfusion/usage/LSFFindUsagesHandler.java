@@ -4,9 +4,12 @@ import com.intellij.find.findUsages.AbstractFindUsagesDialog;
 import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.find.findUsages.FindUsagesOptions;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.LocalSearchScope;
+import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageInfo;
@@ -36,7 +39,11 @@ public class LSFFindUsagesHandler extends FindUsagesHandler {
     public AbstractFindUsagesDialog getFindUsagesDialog(boolean isSingleFile, boolean toShowInNewTab, boolean mustOpenInNewTab) {
         if (getPsiElement().getContainingFile() instanceof LSFFile) {
             boolean searchForTextOccurrencesAvailable = !isSingleFile && isSearchForTextOccurrencesAvailable(getPsiElement(), false);
-            return new LSFFindUsagesDialog(getPsiElement(), getProject(), options, toShowInNewTab, mustOpenInNewTab, isSingleFile, searchForTextOccurrencesAvailable);
+            // getUseScope does PSI search work, so it can't run on the EDT inside dialog init()
+            // (SlowOperations assertion); compute it up front in a background read action
+            boolean isLocalUseScope = ActionUtil.underModalProgress(getProject(), "Analyzing Usage Scope...",
+                    () -> PsiSearchHelper.getInstance(getProject()).getUseScope(getPsiElement()) instanceof LocalSearchScope);
+            return new LSFFindUsagesDialog(getPsiElement(), getProject(), options, toShowInNewTab, mustOpenInNewTab, isSingleFile, searchForTextOccurrencesAvailable, isLocalUseScope);
         }
         return super.getFindUsagesDialog(isSingleFile, toShowInNewTab, mustOpenInNewTab);
     }

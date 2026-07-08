@@ -6,8 +6,6 @@ import com.intellij.lang.findUsages.DescriptiveNameUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.LocalSearchScope;
-import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
@@ -21,10 +19,14 @@ public class LSFFindUsagesDialog extends AbstractFindUsagesDialog {
     private StateRestoringCheckBox usagesCB;
     private StateRestoringCheckBox implementationsCB;
     private PsiElement myPsiElement;
+    // precomputed by LSFFindUsagesHandler: getUseScope is a slow operation and must not run
+    // in isInFileOnly(), which init() calls on the EDT (SlowOperations assertion, IDEA-347939)
+    private final boolean isLocalUseScope;
 
-    public LSFFindUsagesDialog(@NotNull PsiElement element, @NotNull Project project, @NotNull LSFFindUsagesOptions findUsagesOptions, boolean toShowInNewTab, boolean mustOpenInNewTab, boolean isSingleFile, boolean searchForTextOccurrencesAvailable) {
+    public LSFFindUsagesDialog(@NotNull PsiElement element, @NotNull Project project, @NotNull LSFFindUsagesOptions findUsagesOptions, boolean toShowInNewTab, boolean mustOpenInNewTab, boolean isSingleFile, boolean searchForTextOccurrencesAvailable, boolean isLocalUseScope) {
         super(project, findUsagesOptions, toShowInNewTab, mustOpenInNewTab, isSingleFile, searchForTextOccurrencesAvailable, true);
         myPsiElement = element;
+        this.isLocalUseScope = isLocalUseScope;
         init();
     }
 
@@ -39,8 +41,7 @@ public class LSFFindUsagesDialog extends AbstractFindUsagesDialog {
     // c/p from CommonFindUsagesDialog
     @Override
     protected boolean isInFileOnly() {
-        return super.isInFileOnly() ||
-                myPsiElement.getProject().getService(PsiSearchHelper.class).getUseScope(myPsiElement) instanceof LocalSearchScope;
+        return super.isInFileOnly() || isLocalUseScope;
     }
 
     @Override
