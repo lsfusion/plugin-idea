@@ -606,7 +606,7 @@ groupingType ::= SUM | MAX | MIN | AGGR | NAGGR | EQUAL
 groupingTypeOrder ::= CONCAT | LAST
 groupPropertyBy ::= BY nonEmptyPropertyExpressionList { pin = 1 }
 groupPropertyBody ::= (
-                        (groupingType nonEmptyPropertyExpressionList)
+                        (groupingType nonEmptyPropertyExpressionList orderPropertyBy?)
                       | (groupingTypeOrder nonEmptyPropertyExpressionList orderPropertyBy)
                       | (aggrCustomType ((nonEmptyPropertyExpressionList (WITHIN? orderPropertyBy)?) | (WITHIN? orderPropertyBy)))
                       )
