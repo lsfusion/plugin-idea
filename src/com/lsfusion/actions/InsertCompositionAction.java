@@ -1,7 +1,7 @@
 package com.lsfusion.actions;
 
 import com.intellij.codeInsight.unwrap.ScopeHighlighter;
-import com.intellij.ide.structureView.StructureView;
+import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.ide.util.FileStructurePopup;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
@@ -144,8 +144,11 @@ public class InsertCompositionAction extends AnAction {
                 }
             };
 
-            StructureView structureView = new LSFTreeBasedStructureViewBuilder(file, valueClass, navigationHandler).createStructureView(fileEditor, project);
-            FileStructurePopup popup = new FileStructurePopup(project, fileEditor, structureView.getTreeModel());
+            // Build only the model, as ViewStructureAction does for TreeBasedStructureViewBuilder: the popup
+            // renders its own tree and disposes the model, while a full createStructureView() component would
+            // never be shown nor disposed.
+            StructureViewModel treeModel = new LSFTreeBasedStructureViewBuilder(file, valueClass, navigationHandler).createStructureViewModel(editor);
+            FileStructurePopup popup = new FileStructurePopup(project, fileEditor, treeModel);
             popup.setTitle(LSFBundle.message("inser.composition.selection.popup.title"));
             popup.show();
             return;

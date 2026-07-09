@@ -2,6 +2,7 @@ package com.lsfusion.design.view;
 
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.ReadAction;
@@ -12,6 +13,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
@@ -33,13 +35,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
 
-public class DesignView extends JBTabbedPane {
+public class DesignView extends JBTabbedPane implements Disposable {
     private final Project project;
     private final ToolWindowEx toolWindow;
     private EmbeddedDesign embeddedDesign;
     private LiveDesign liveDesign;
     private ReportsPanel reportsPanel;
-    
+
+    private final TimerListener timerListener;
+
     private LSFFormDeclaration currentForm;
     private LSFModuleDeclaration currentModule;
 
@@ -48,15 +52,17 @@ public class DesignView extends JBTabbedPane {
         this.toolWindow = toolWindow;
 
         liveDesign = new LiveDesign(project, toolWindow);
+        Disposer.register(this, liveDesign);
         addTab("Live", liveDesign.getComponent());
-        
+
         embeddedDesign = new EmbeddedDesign(project, toolWindow);
+        Disposer.register(this, embeddedDesign);
         addTab("Embedded", embeddedDesign.getComponent());
-        
+
         reportsPanel = new ReportsPanel(project);
         addTab("Jasper Reports", reportsPanel);
 
-        ActionManager.getInstance().addTimerListener(new TimerListener() {
+        timerListener = new TimerListener() {
             @Override
             public ModalityState getModalityState() {
                 return ModalityState.stateForComponent(toolWindow.getComponent());
@@ -68,7 +74,10 @@ public class DesignView extends JBTabbedPane {
                     maybeUpdateView();
                 }
             }
-        });
+        };
+        // ActionManager is application-level: without removal in dispose() the listener would keep the
+        // whole closed project reachable and keep firing on timer.
+        ActionManager.getInstance().addTimerListener(timerListener);
 
         addChangeListener(e -> {
             if (isEmbeddedDesignEnabled()) {
@@ -77,6 +86,11 @@ public class DesignView extends JBTabbedPane {
                 reportsPanel.onActivated();
             }
         });
+    }
+
+    @Override
+    public void dispose() {
+        ActionManager.getInstance().removeTimerListener(timerListener);
     }
     
     public void toolWindowInitialized() {

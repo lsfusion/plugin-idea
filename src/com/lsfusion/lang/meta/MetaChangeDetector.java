@@ -3,6 +3,7 @@ package com.lsfusion.lang.meta;
 import com.intellij.codeInsight.completion.CompletionPhase;
 import com.intellij.codeInsight.completion.CompletionPhaseListener;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.Service;
@@ -53,7 +54,7 @@ import static com.intellij.codeInsight.completion.impl.CompletionServiceImpl.get
 import static com.lsfusion.util.LSFPsiUtils.findChildrenOfType;
 
 @Service(Service.Level.PROJECT)
-public final class MetaChangeDetector extends PsiTreeChangeAdapter {
+public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Disposable {
 
     private final Project myProject;
     public MetaChangeDetector(final Project project) {
@@ -67,14 +68,18 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter {
     private final static String ENABLED_META = "ENABLED_META";
 
     public void init() {
-        PsiManager.getInstance(myProject).addPsiTreeChangeListener(this, () -> {});
+        PsiManager.getInstance(myProject).addPsiTreeChangeListener(this, this);
 
         DumbService.getInstance(myProject).smartInvokeLater(() -> {
             PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(myProject);
             setMetaEnabled(propertiesComponent.getBoolean(ENABLED_META, false), false);
         });
 
-        myProject.getMessageBus().connect().subscribe(CompletionPhaseListener.TOPIC, (CompletionPhaseListener) isCompletionRunning -> checkCompletion());
+        myProject.getMessageBus().connect(this).subscribe(CompletionPhaseListener.TOPIC, (CompletionPhaseListener) isCompletionRunning -> checkCompletion());
+    }
+
+    @Override
+    public void dispose() {
     }
 
     public static class MetaChangeListener implements ProjectActivity {

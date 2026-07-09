@@ -111,6 +111,9 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     protected double latestScale = 1;
 
+    private final TimerListener timerListener;
+    private final Timer offscreenReleaseTimer = new Timer("lsFusion.DependenciesView.offscreenRelease", true);
+
     public DependenciesView(String title, Project project, final ToolWindowEx toolWindow, boolean showTargetField) {
         this.title = title;
         this.project = project;
@@ -119,7 +122,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
         setLayout(new BorderLayout());
 
-        ActionManager.getInstance().addTimerListener(new TimerListener() {
+        timerListener = new TimerListener() {
             @Override
             public ModalityState getModalityState() {
                 return ModalityState.stateForComponent(toolWindow.getComponent());
@@ -139,9 +142,12 @@ public abstract class DependenciesView extends JPanel implements Disposable {
                     }.queue();
                 }
             }
-        });
-        
-        new Timer().schedule(new TimerTask() {
+        };
+        // ActionManager is application-level: without removal in dispose() the listener would keep the
+        // whole closed project reachable and keep firing on timer.
+        ActionManager.getInstance().addTimerListener(timerListener);
+
+        offscreenReleaseTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 if (!toolWindow.isVisible() && jgraph != null && jgraph.getOffscreen() != null && jgraph.getOffgraphics() != null) {
@@ -907,7 +913,8 @@ public abstract class DependenciesView extends JPanel implements Disposable {
 
     @Override
     public void dispose() {
-        //ignore
+        ActionManager.getInstance().removeTimerListener(timerListener);
+        offscreenReleaseTimer.cancel();
     }
 
     private abstract static class BGTCheckboxAction extends CheckboxAction {

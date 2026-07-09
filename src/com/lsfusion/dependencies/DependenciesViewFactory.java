@@ -1,6 +1,7 @@
 package com.lsfusion.dependencies;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.content.impl.ContentImpl;
@@ -17,20 +18,30 @@ public class DependenciesViewFactory {
     public void initToolWindow(Project project, ToolWindowEx toolWindow) {
         JBTabbedPane tabbedPane = new JBTabbedPane();
 
-        UMLDiagramView UMLDiagramView = new UMLDiagramView(project);
-        tabbedPane.add("Class Diagram", UMLDiagramView.getComponent());
-        tabbedPane.add("Module dependencies", new ModuleDependenciesView(project, toolWindow));
-        tabbedPane.add("Property dependencies", new PropertyDependenciesView(project, toolWindow));
+        UMLDiagramView umlDiagramView = new UMLDiagramView(project);
+        tabbedPane.add("Class Diagram", umlDiagramView.getComponent());
+        ModuleDependenciesView moduleView = new ModuleDependenciesView(project, toolWindow);
+        tabbedPane.add("Module dependencies", moduleView);
+        PropertyDependenciesView propertyView = new PropertyDependenciesView(project, toolWindow);
+        tabbedPane.add("Property dependencies", propertyView);
 
         tabbedPane.addChangeListener(e -> {
             if(tabbedPane.getSelectedIndex() == 0) {
-                UMLDiagramView.redraw();
+                umlDiagramView.redraw();
             } else {
                 ((DependenciesView) tabbedPane.getSelectedComponent()).redraw();
             }
         });
 
         ContentImpl content = new ContentImpl(tabbedPane, "", true);
+        // Dispose the tab views with the tool window content (project close): their application-level
+        // ActionManager timer listeners, update-timer threads and the JCEF browser must not outlive
+        // the project.
+        content.setDisposer(() -> {
+            Disposer.dispose(umlDiagramView);
+            Disposer.dispose(moduleView);
+            Disposer.dispose(propertyView);
+        });
         toolWindow.getContentManager().addContent(content);
     }
 }

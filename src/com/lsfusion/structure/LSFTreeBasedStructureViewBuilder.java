@@ -6,11 +6,15 @@ import com.intellij.ide.structureView.StructureView;
 import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.ide.structureView.TreeBasedStructureViewBuilder;
 import com.intellij.ide.structureView.newStructureView.StructureViewComponent;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ui.tree.TreeModelAdapter;
 import com.intellij.util.ui.tree.TreeUtil;
@@ -92,6 +96,24 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
     public StructureView createStructureView(FileEditor fileEditor, @NotNull Project project) {
         StructureView structureView = super.createStructureView(fileEditor, project);
 
+        // StructureViewWrapperImpl (2025.3) parents the returned view via Disposer.register on a later
+        // EDT dispatch that its collectLatest rebuild loop can cancel first, orphaning the component in
+        // the Disposer tree ("Memory leak detected" blaming this plugin on IDE exit). Parent it to the
+        // project lifecycle up front; the platform's register() re-parents it in the normal flow.
+        // On IDE exit the wrapper rebuilds once more ("clear a structure on hide") while the project
+        // container is being disposed — getService then throws AlreadyDisposedException (a quiet
+        // cancellation) and tryRegister fails. Nobody would ever dispose the just-created view in that
+        // case, so drop it here and cancel the rebuild.
+        Disposable leakGuard = null;
+        try {
+            leakGuard = project.getService(ProjectDisposable.class);
+        } catch (RuntimeException ignored) {
+        }
+        if (leakGuard == null || !Disposer.tryRegister(leakGuard, structureView)) {
+            Disposer.dispose(structureView);
+            throw new ProcessCanceledException();
+        }
+
         final JTree tree = ((StructureViewComponent) structureView).getTree();
 
         tree.getModel().addTreeModelListener(new TreeModelAdapter() {
@@ -111,5 +133,12 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
     @Override
     public boolean isRootNodeShown() {
         return false;
+    }
+
+    @Service(Service.Level.PROJECT)
+    public static final class ProjectDisposable implements Disposable {
+        @Override
+        public void dispose() {
+        }
     }
 }

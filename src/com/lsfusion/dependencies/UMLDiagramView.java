@@ -1,5 +1,6 @@
 package com.lsfusion.dependencies;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -9,6 +10,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.*;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBScrollPane;
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
 
-public class UMLDiagramView {
+public class UMLDiagramView implements Disposable {
     private final Project project;
     private final JBCefBrowser browser;
     private final JPanel mainPanel;
@@ -78,12 +80,17 @@ public class UMLDiagramView {
 
         updateDiagram();
 
-        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+        project.getMessageBus().connect(this).subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
                 updateDiagram();
             }
         });
+    }
+
+    @Override
+    public void dispose() {
+        Disposer.dispose(browser);
     }
 
     public void redraw() {
@@ -154,9 +161,10 @@ public class UMLDiagramView {
                         if (child instanceof LSFClassStatementImpl cls) {
                             if (!cls.isInMetaDecl()) {
                                 String className = cls.getClassName();
-                                if (!classPropOrActionMap.containsKey(className)) {
+                                // getClassName() is null for incomplete declarations (e.g. mid-typing)
+                                if (className != null && !classPropOrActionMap.containsKey(className)) {
                                     classPropOrActionMap.put(className, new ArrayList<>());
-                                    List<String> classExtends = cls.getExtends().stream().map(c -> c.name).collect(Collectors.toList());
+                                    List<String> classExtends = cls.getExtends().stream().map(c -> c.name).filter(Objects::nonNull).collect(Collectors.toList());
                                     if (!classExtends.isEmpty()) {
                                         classExtendsMap.put(className, classExtends);
                                     }

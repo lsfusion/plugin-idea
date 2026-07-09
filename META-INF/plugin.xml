@@ -14,6 +14,7 @@
             <li>New Module wizard: picking an lsFusion distribution directory without a server jar now shows an explicit error instead of silently refusing the selection</li>
             <li>Show ambiguous ORDERS/FILTERS property references and list candidates</li>
             <li>Allow ORDER in GROUP SUM/MAX/... property expressions</li>
+            <li>Fixed "Memory leak detected" IDE errors on exit (structure view, design view, PSI change listeners)</li>
         </ul>
     ]]>
     </change-notes>
@@ -130,7 +131,7 @@
 
         <targetElementEvaluator language="Lsf" implementationClass="com.lsfusion.LSFTargetElementEvaluatorEx2"/>
         <postStartupActivity implementation="com.lsfusion.LSFBaseStartupActivity"/>
-        <postStartupActivity implementation="com.lsfusion.design.FormDesignChangeDetector"/>
+        <psi.treeChangeListener implementation="com.lsfusion.design.FormDesignChangeDetector"/>
         <postStartupActivity implementation="com.lsfusion.lang.meta.MetaChangeDetector$MetaChangeListener"/>
 
         <fileStructureGroupRuleProvider implementation="com.lsfusion.usage.LSFStatementGroupingRuleProvider"/>
