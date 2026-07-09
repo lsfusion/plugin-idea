@@ -95,7 +95,7 @@ public class LSFFile extends PsiFileImpl implements ModifyParamContext {
     public <Psi extends PsiElement> Psi getStubOrPsiChild(final IStubElementType<? extends StubElement, Psi> elementType) {
         StubElement stub = getStub();
         if (stub != null) {
-            final StubElement<Psi> element = stub.findChildStubByType(elementType);
+            final StubElement<Psi> element = (StubElement<Psi>) stub.findChildStubByElementType(elementType);
             if (element != null) {
                 return element.getPsi();
             }

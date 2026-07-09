@@ -76,7 +76,7 @@ public class ShowErrorsAction extends AnAction {
                 if(JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
                         "Meta code is disabled. You must enable meta before showing errors", "Errors search",
                         JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                    ActionUtil.performActionDumbAwareWithCallbacks(new MetaCodeEnableAction(), e);
+                    ActionUtil.performAction(new MetaCodeEnableAction(), e);
                     enabledMeta = MetaChangeDetector.getInstance(project).getMetaEnabled();
                 }
             }

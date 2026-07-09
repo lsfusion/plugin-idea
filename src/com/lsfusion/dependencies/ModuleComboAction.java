@@ -22,7 +22,7 @@ public class ModuleComboAction extends LabeledComboBoxAction {
 
     @NotNull
     @Override
-    protected DefaultActionGroup createPopupActionGroup(JComponent button) {
+    protected DefaultActionGroup createPopupActionGroup(@NotNull JComponent button, @NotNull DataContext dataContext) {
         final DefaultActionGroup group = new DefaultActionGroup();
 
         group.add(new AnAction(ALL) {

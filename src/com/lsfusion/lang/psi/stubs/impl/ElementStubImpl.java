@@ -14,7 +14,7 @@ public abstract class ElementStubImpl<This extends LSFStubElement<This, Decl>, D
     private boolean isInMetaDecl;
 
     public ElementStubImpl(StubElement parent, Decl psi) {
-        super(parent, psi.getElementType());
+        super(parent, psi.getIElementType());
 
         isCorrect = psi.isCorrect();
         isInMetaDecl = psi.isInMetaDecl();

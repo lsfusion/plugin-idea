@@ -340,7 +340,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
     protected void refreshThirdToolbarActions() {
         Runnable updateToolbarActions = () -> {
             if (thirdToolbar != null) {
-                thirdToolbar.updateActionsImmediately();
+                thirdToolbar.updateActionsAsync();
             }
         };
         if (ApplicationManager.getApplication().isDispatchThread()) {

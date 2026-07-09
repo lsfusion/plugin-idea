@@ -5,7 +5,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
-import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
+import com.intellij.application.options.CodeStyle;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.impl.source.codeStyle.CodeFormatterFacade;
 import com.intellij.psi.impl.source.tree.CompositePsiElement;
@@ -198,7 +198,7 @@ public class LSFElementGenerator {
     }
 
     public static void format(Project project, PsiElement element) {
-        final CodeFormatterFacade codeFormatter = new CodeFormatterFacade(CodeStyleSettingsManager.getSettings(project), LSFLanguage.INSTANCE);
+        final CodeFormatterFacade codeFormatter = new CodeFormatterFacade(CodeStyle.getSettings(project), LSFLanguage.INSTANCE);
         codeFormatter.processText(element.getContainingFile(), new FormatTextRanges(element.getTextRange(), true), false);
     }
 

@@ -181,7 +181,7 @@ public abstract class UsagesSearchAction extends BaseCodeInsightAction implement
                     .build();
         }
 
-        ActionUtil.performActionDumbAwareWithCallbacks(getPlatformAction(), event.withDataContext(dataContext));
+        ActionUtil.performAction(getPlatformAction(), event.withDataContext(dataContext));
     }
     
     protected abstract AnAction getPlatformAction();

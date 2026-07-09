@@ -1,7 +1,7 @@
 package com.lsfusion.debug;
 
 import com.google.common.base.Throwables;
-import com.intellij.debugger.DebuggerBundle;
+import com.intellij.debugger.JavaDebuggerBundle;
 import com.intellij.debugger.DebuggerManagerEx;
 import com.intellij.debugger.engine.*;
 import com.intellij.debugger.engine.evaluation.EvaluateException;
@@ -526,7 +526,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
         
         @Override
         public void contextAction(@NotNull SuspendContextImpl suspendContext) {
-            showStatusText(DebuggerBundle.message("status.process.resumed"));
+            showStatusText(JavaDebuggerBundle.message("status.process.resumed"));
             
             SuspendContextImpl suspendContextImpl = getSuspendContext();
             ThreadReferenceProxyImpl thread = getContextThread();

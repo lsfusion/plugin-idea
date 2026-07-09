@@ -1,18 +1,13 @@
 package com.lsfusion.actions.generate;
 
+import com.intellij.openapi.util.JDOMUtil;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class GenerateFormXMLAction extends GenerateFormAction {
 
@@ -28,20 +23,7 @@ public class GenerateFormXMLAction extends GenerateFormAction {
 
     @Override
     protected Object getRootElement(String file) throws JDOMException, IOException {
-        return file != null ? new SAXBuilder().build(new ByteArrayInputStream(file.getBytes(getCharset(file)))).getRootElement(): null;
-    }
-
-    private Charset getCharset(String file) {
-        try {
-            Pattern p = Pattern.compile("<\\?xml version=\".*\" encoding=\"(.*)\"\\?.*");
-            int newLine = Math.min(file.indexOf("\r"), file.indexOf("\n"));
-            Matcher m = p.matcher(file.substring(0, newLine > 0 ? newLine : file.length()));
-            if (m.matches()) {
-                return Charset.forName(m.group(1));
-            }
-        } catch (Exception ignored) {
-        }
-        return StandardCharsets.UTF_8;
+        return file != null ? JDOMUtil.load(file) : null;
     }
 
     @Override

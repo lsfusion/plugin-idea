@@ -19,7 +19,7 @@ public abstract class GraphEdgesComboAction extends LabeledComboBoxAction {
 
     @NotNull
     @Override
-    protected DefaultActionGroup createPopupActionGroup(JComponent button) {
+    protected DefaultActionGroup createPopupActionGroup(@NotNull JComponent button, @NotNull DataContext dataContext) {
         final DefaultActionGroup group = new DefaultActionGroup();
         for (final String layout : new String[]{NORMAL, ALL_EDGES, ONLY_LEAFS}) {
             group.add(new AnAction(layout) {

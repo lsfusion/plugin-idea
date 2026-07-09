@@ -24,7 +24,7 @@ public abstract class GraphLayoutComboAction extends LabeledComboBoxAction {
 
     @NotNull
     @Override
-    protected DefaultActionGroup createPopupActionGroup(JComponent button) {
+    protected DefaultActionGroup createPopupActionGroup(@NotNull JComponent button, @NotNull DataContext dataContext) {
         final DefaultActionGroup group = new DefaultActionGroup();
         String[] layouts = new String[]{COMPACT_TREE_LAYOUT, TREE_LAYOUT, HIERARCHICAL_LAYOUT, SIMPLE_LAYOUT, 
                 RADIAL_TREE_LAYOUT, ORGANIC_LAYOUT, FAST_ORGANIC_LAYOUT, SELF_ORGANIZING_ORGANIC_LAYOUT};
