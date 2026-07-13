@@ -26,7 +26,7 @@ public abstract class McpBaseService extends RestService {
     protected static final String TOOL_GET_GUIDANCE = "lsfusion_get_guidance";
     protected static final String TOOL_REPORT_FEEDBACK = "lsfusion_report_feedback";
 
-    private static final String TOOL_RETRIEVE_DOCS_DESCRIPTION = "Search official lsFusion documentation (language, paradigm, how-to, brief, rules) for chunks relevant to a query. Returns `{docs:[{source,text,score}]}` sorted by descending score. Use `type` to narrow to one branch when known; omit to search all and merge. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.";
+    private static final String TOOL_RETRIEVE_DOCS_DESCRIPTION = "Search official lsFusion documentation (language, paradigm, how-to; plus brief/rules on explicit request) for chunks relevant to a query. Returns `{docs:[{source,text,score}]}` sorted by descending score. Use `type` to narrow to one branch when known; omit to search the default branches and merge. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.";
 
     // Sister tools lsfusion_retrieve_howtos / lsfusion_retrieve_community were
     // removed together with the legacy Pinecone backend that fed them; the new
@@ -226,7 +226,7 @@ public abstract class McpBaseService extends RestService {
         JSONObject typeProp = new JSONObject()
                 .put("type", "string")
                 .put("enum", new JSONArray().put("language").put("paradigm").put("how-to").put("brief").put("rules"))
-                .put("description", "Optional sourceType filter (the docs folder). Omit (or pass null) to search all branches and merge. `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes; `brief` = concise capability map; `rules` = code conventions.");
+                .put("description", "Optional sourceType filter (the docs folder). Omit (or pass null) to search language, paradigm and how-to and merge; `brief` and `rules` are searched only when requested explicitly (their full text already arrives via get_guidance). `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes; `brief` = concise capability map; `rules` = code conventions.");
         JSONObject inputSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
