@@ -4,13 +4,8 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.lang.properties.PropertiesFileType;
 import com.intellij.lang.properties.PropertiesReferenceManager;
 import com.intellij.lang.properties.psi.PropertiesFile;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.util.LSFFileUtils;
@@ -117,16 +112,12 @@ public class LSFResourceBundleUtils {
         propertiesReverseMap.put(path, reverseMap);
     }
 
-    public static void updateFile(Project project, VirtualFile file) {
+    public static void updateFile(VirtualFile file) {
         try {
             if (isLsfusionProperties(file.getName())) {
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-                if (psiFile != null) {
-                    Module module = ModuleUtil.findModuleForPsiElement(psiFile);
-                    if (module != null) {
-                        ApplicationManager.getApplication().invokeLater(() -> getLsfStrLiteralsLanguage(module, true));
-                    }
-                }
+                // VFS events arrive on EDT, where index access is prohibited; instead of recomputing
+                // eagerly, drop the cache and let the next annotator pass recompute it on a background thread
+                lsfStrLiteralsLanguageMap.clear();
             } else if (isResourceBundle(file.getName())) {
                 updateResourceBundleMaps(file);
             }

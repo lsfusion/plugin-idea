@@ -1,17 +1,11 @@
 package com.lsfusion.actions.locale;
 
 import com.intellij.lang.properties.PropertiesFileType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.*;
 import com.lsfusion.lang.LSFResourceBundleUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class LSFPropertiesFileListener implements VirtualFileListener {
-    Project project;
-
-    public LSFPropertiesFileListener(Project project) {
-        this.project = project;
-    }
 
     @Override
     public void propertyChanged(@NotNull VirtualFilePropertyEvent event) {
@@ -45,7 +39,7 @@ public class LSFPropertiesFileListener implements VirtualFileListener {
 
     private void checkFile(VirtualFile file) {
         if (file.getFileType() instanceof PropertiesFileType) {
-            LSFResourceBundleUtils.updateFile(project, file);
+            LSFResourceBundleUtils.updateFile(file);
         }
     }
 }
