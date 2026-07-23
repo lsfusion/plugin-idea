@@ -15,6 +15,7 @@
             <li>Show ambiguous ORDERS/FILTERS property references and list candidates</li>
             <li>Allow ORDER in GROUP SUM/MAX/... property expressions</li>
             <li>Fixed "Memory leak detected" IDE errors on exit (structure view, design view, PSI change listeners)</li>
+            <li>Recognize the invalidation timing option in <code>LAZY [WEAK | STRONG] [WAIT | NOWAIT]</code> property settings</li>
         </ul>
     ]]>
     </change-notes>

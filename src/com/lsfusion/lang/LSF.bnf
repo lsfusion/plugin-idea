@@ -748,7 +748,7 @@ echoSymbolsSetting ::= ECHO
 notNullSetting ::= nullOption (DELETE)? baseEventNotPE
 aggrSetting ::= AGGR
 eventIdSetting ::= EVENTID stringLiteral
-lazySetting ::= LAZY (WEAK | STRONG)?
+lazySetting ::= LAZY (WEAK | STRONG)? syncTypeLiteral?
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// ACTION PROPERTIES ///////////////////////////
