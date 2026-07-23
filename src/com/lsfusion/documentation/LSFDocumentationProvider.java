@@ -60,10 +60,10 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     }
 
     public static String getDocumentationURL(PsiElement element) {
-        String documentation;
+        String documentation = null;
         PsiElement docElement = element;
 
-        while (true) {
+        while (docElement != null) {
             PsiElement parentElement = docElement.getParent();
 
             documentation = parentElement instanceof LSFDocumentation ? ((LSFDocumentation) parentElement).getDocumentation(docElement) : null;
