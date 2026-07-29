@@ -1,0 +1,5 @@
+<idea-plugin>
+    <!-- Loaded only when com.intellij.modules.jcef is present (IntelliJ 2026.1+).
+         Exists solely to satisfy the optional <depends> that puts the JCEF module
+         on this plugin's classloader so com.intellij.ui.jcef.* resolves at runtime. -->
+</idea-plugin>

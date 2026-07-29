@@ -30,6 +30,11 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.mcpServer</depends>
     <depends>com.intellij.modules.spellchecker</depends>
+    <!-- JCEF (com.intellij.ui.jcef.*, used by the Design tool window's "Live" tab, LSF web docs and the UML diagram view)
+         was extracted into a separate platform module in IntelliJ 2026.1. Without this dependency the plugin's class
+         loader can't see JBCefBrowser on 2026.1+ and the whole Design tool window crashes with NoClassDefFoundError.
+         Optional (with a stub config-file) so the plugin still loads on 2025.x, where JCEF lived in the core platform. -->
+    <depends optional="true" config-file="lsf-jcef.xml">com.intellij.modules.jcef</depends>
 
     <actions>
         <group id="LSFGroup" popup="true" text="_LSF">
