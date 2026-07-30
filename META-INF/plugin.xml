@@ -16,6 +16,7 @@
             <li>Allow ORDER in GROUP SUM/MAX/... property expressions</li>
             <li>Fixed "Memory leak detected" IDE errors on exit (structure view, design view, PSI change listeners)</li>
             <li>Recognize the invalidation timing option in <code>LAZY [WEAK | STRONG] [WAIT | NOWAIT]</code> property settings</li>
+            <li>New MCP tool <code>lsfusion_set_meta_visibility</code>: show/hide generated <code>META</code> code bodies for a single file, whether or not it's open in the editor</li>
         </ul>
     ]]>
     </change-notes>

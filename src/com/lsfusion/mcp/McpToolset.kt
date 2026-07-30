@@ -6,6 +6,8 @@ import com.intellij.mcpserver.annotations.McpTool
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.util.io.HttpRequests
+import com.lsfusion.lang.meta.MetaChangeDetector
+import com.lsfusion.util.LSFFileUtils
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -321,6 +323,37 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
             // Preserve user-visible error text
             throw mcpExpectedError("Invalid query or internal error: ${e.message}")
         }
+    }
+
+    @McpTool(name = "lsfusion_set_meta_visibility")
+    @McpDescription(
+        description = "Show (expand) or hide (collapse) generated `META` code bodies for ONE lsFusion file, without touching other files or the project-wide meta-code toggle. " +
+            "`hide` collapses `@name(args){ ... }` usages back to bare `@name(args);` (the form that must be committed - a raised code-review rule rejects commits with expanded meta bodies). " +
+            "`show` re-expands previously collapsed usages back to their generated body (e.g. to inspect or edit the generated code). " +
+            "Works regardless of whether the file is currently open in the editor, and saves the file to disk before returning, so a `hide` call is immediately safe to commit."
+    )
+    @Suppress("unused")
+    suspend fun setMetaVisibility(
+        @McpDescription(description = "Absolute path, or path relative to the project root, of the `.lsf` file.")
+        path: String,
+        @McpDescription(description = "`show` to expand META bodies inline; `hide` to collapse them back to bare declarations.")
+        action: String,
+    ): String {
+        val project = getProjectFromMcpCallContextOrNull()
+            ?: ProjectManager.getInstance().openProjects.firstOrNull()
+            ?: throw mcpExpectedError("No open project to run on")
+
+        val show = when (action) {
+            "show" -> true
+            "hide" -> false
+            else -> throw mcpExpectedError("`action` must be `show` or `hide`, got: $action")
+        }
+
+        val file = LSFFileUtils.findLsfFile(project, path)
+            ?: throw mcpExpectedError("Not an lsFusion file, or file not found in the project: $path")
+
+        MetaChangeDetector.getInstance(project).reprocessFileForMcp(file, show)
+        return if (show) "Meta code shown for $path" else "Meta code hidden for $path"
     }
 
     @McpTool(name = "lsfusion_retrieve_docs")

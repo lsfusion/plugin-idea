@@ -6,6 +6,9 @@ import com.google.gson.stream.JsonReader;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.BufferExposingByteArrayOutputStream;
+import com.lsfusion.lang.meta.MetaChangeDetector;
+import com.lsfusion.lang.psi.LSFFile;
+import com.lsfusion.util.LSFFileUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +24,7 @@ public abstract class McpBaseService extends RestService {
 
     protected static final String MCP_PROTOCOL_VERSION = "2024-11-05";
     protected static final String TOOL_NAME = "lsfusion_find_elements";
+    protected static final String TOOL_SET_META_VISIBILITY = "lsfusion_set_meta_visibility";
 
     protected static final String TOOL_RETRIEVE_DOCS = "lsfusion_retrieve_docs";
     protected static final String TOOL_GET_GUIDANCE = "lsfusion_get_guidance";
@@ -81,6 +85,10 @@ public abstract class McpBaseService extends RestService {
 
         if (isRemoteToolName(name)) {
             return handleRemoteToolCall(jsonrpc, id, name, arguments);
+        }
+
+        if (TOOL_SET_META_VISIBILITY.equals(name)) {
+            return handleSetMetaVisibilityToolCall(project, jsonrpc, id, arguments);
         }
 
         if (!TOOL_NAME.equals(name)) {
@@ -193,6 +201,40 @@ public abstract class McpBaseService extends RestService {
         }
     }
 
+    protected JSONObject handleSetMetaVisibilityToolCall(@NotNull Project project,
+                                                         String jsonrpc,
+                                                         Object id,
+                                                         @NotNull JSONObject arguments) {
+        try {
+            String path = arguments.optString("path", null);
+            String action = arguments.optString("action", null);
+            if (path == null || path.isEmpty()) {
+                return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_SET_META_VISIBILITY, "Missing required argument: path"));
+            }
+            boolean show;
+            if ("show".equals(action)) {
+                show = true;
+            } else if ("hide".equals(action)) {
+                show = false;
+            } else {
+                return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_SET_META_VISIBILITY, "`action` must be `show` or `hide`, got: " + action));
+            }
+
+            LSFFile file = LSFFileUtils.findLsfFile(project, path);
+            if (file == null) {
+                return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_SET_META_VISIBILITY, "Not an lsFusion file, or file not found in the project: " + path));
+            }
+
+            MetaChangeDetector.getInstance(project).reprocessFileForMcp(file, show);
+
+            JSONObject payloadObj = new JSONObject().put("status", show ? "shown" : "hidden").put("path", path);
+            return rpcResult(jsonrpc, id, buildLocalToolCallResult(payloadObj));
+        } catch (Exception e) {
+            getLogger().warn(TOOL_SET_META_VISIBILITY + " failed", e);
+            return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_SET_META_VISIBILITY, e.getMessage()));
+        }
+    }
+
     protected JSONObject buildLocalToolCallResult(@NotNull JSONObject payloadObj) {
         return new JSONObject()
                 .put("content", new JSONArray().put(new JSONObject()
@@ -217,9 +259,45 @@ public abstract class McpBaseService extends RestService {
     protected JSONArray buildToolsList() {
         return new JSONArray()
                 .put(buildFindElementsToolDescriptor())
+                .put(buildSetMetaVisibilityToolDescriptor())
                 .put(buildRetrieveDocsToolDescriptor())
                 .put(buildGetGuidanceToolDescriptor())
                 .put(buildReportFeedbackToolDescriptor());
+    }
+
+    private static final String SET_META_VISIBILITY_DESCRIPTION =
+            "Show (expand) or hide (collapse) generated `META` code bodies for ONE lsFusion file, without touching other files or the project-wide meta-code toggle. " +
+            "`hide` collapses `@name(args){ ... }` usages back to bare `@name(args);` (the form that must be committed - a raised code-review rule rejects commits with expanded meta bodies). " +
+            "`show` re-expands previously collapsed usages back to their generated body (e.g. to inspect or edit the generated code). " +
+            "Works regardless of whether the file is currently open in the editor, and saves the file to disk before returning, so a `hide` call is immediately safe to commit.";
+
+    protected static JSONObject buildSetMetaVisibilityToolDescriptor() {
+        JSONObject inputSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("path", new JSONObject()
+                                .put("type", "string")
+                                .put("description", "Absolute path, or path relative to the project root, of the `.lsf` file."))
+                        .put("action", new JSONObject()
+                                .put("type", "string")
+                                .put("enum", new JSONArray().put("show").put("hide"))
+                                .put("description", "`show` to expand META bodies inline; `hide` to collapse them back to bare declarations.")))
+                .put("required", new JSONArray().put("path").put("action"))
+                .put("additionalProperties", false);
+
+        JSONObject outputSchema = new JSONObject()
+                .put("type", "object")
+                .put("properties", new JSONObject()
+                        .put("status", new JSONObject().put("type", "string").put("enum", new JSONArray().put("shown").put("hidden")))
+                        .put("path", new JSONObject().put("type", "string")))
+                .put("required", new JSONArray().put("status").put("path"))
+                .put("additionalProperties", false);
+
+        return new JSONObject()
+                .put("name", TOOL_SET_META_VISIBILITY)
+                .put("description", SET_META_VISIBILITY_DESCRIPTION)
+                .put("inputSchema", inputSchema)
+                .put("outputSchema", outputSchema);
     }
 
     private static JSONObject buildRetrieveDocsToolDescriptor() {

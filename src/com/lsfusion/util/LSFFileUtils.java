@@ -12,10 +12,12 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEnumerator;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -273,6 +275,26 @@ public class LSFFileUtils {
 
     public static Module[] getModules(Project project) {
         return ModuleManager.getInstance(project).getModules();
+    }
+
+    // Resolves independently of editor state (doesn't rely on an open Editor/FileEditor), unlike
+    // MetaFileAction.getLSFFile - so it works for MCP calls against files not currently open in IDEA.
+    @Nullable
+    public static LSFFile findLsfFile(Project project, String path) {
+        return ApplicationManager.getApplication().runReadAction((Computable<LSFFile>) () -> {
+            String systemIndependentPath = FileUtil.toSystemIndependentName(path);
+            VirtualFile vFile = LocalFileSystem.getInstance().findFileByPath(systemIndependentPath);
+            if (vFile == null) {
+                String basePath = project.getBasePath();
+                if (basePath != null)
+                    vFile = LocalFileSystem.getInstance().findFileByPath(basePath + "/" + systemIndependentPath);
+            }
+            if (vFile == null)
+                return null;
+
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(vFile);
+            return psiFile instanceof LSFFile ? (LSFFile) psiFile : null;
+        });
     }
 
     public static GlobalSearchScope getScope(List<String> modulesToInclude, Project project) {

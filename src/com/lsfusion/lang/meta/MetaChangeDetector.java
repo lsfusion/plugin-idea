@@ -836,6 +836,40 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         addForcedUsageProcessing(file, file.getMetaCodeStatementList(), enabled);
     }
 
+    // Synchronous show/hide for one file, for MCP tool calls: unlike reprocessFile (fire-and-forget
+    // via invokeLater, meant for the "Show/Hide Meta for File" editor actions), this blocks until the
+    // edit is actually applied and explicitly saves the document - needed because there may be no open
+    // editor/autosave to flush the change to disk, and the caller (an AI agent doing e.g. svn diff or
+    // a commit right after) needs the result to already be on disk when the call returns.
+    public void reprocessFileForMcp(LSFFile file, boolean show) {
+        List<Runnable> inlines = new ArrayList<>();
+        InlineProcessor collector = inlines::add;
+
+        ApplicationManager.getApplication().runReadAction(() -> {
+            List<LSFMetaCodeStatement> statements = show ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
+            syncUsageProcessing(file, collector, null, show, statements, Collections.emptyList(), null);
+        });
+
+        if (inlines.isEmpty())
+            return;
+
+        ApplicationManager.getApplication().invokeAndWait(() ->
+            CommandProcessor.getInstance().runUndoTransparentAction(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+                boolean prevEnabled = enabled;
+                enabled = false; // suppress cascading reprocessing from our own PSI change events (see fireChanged)
+                try {
+                    for (Runnable inline : inlines)
+                        inline.run();
+                } finally {
+                    enabled = prevEnabled;
+                }
+
+                Document document = PsiDocumentManager.getInstance(myProject).getDocument(file);
+                if (document != null)
+                    FileDocumentManager.getInstance().saveDocumentAsIs(document);
+            })));
+    }
+
     public void reprocessAllDocuments() {
         reprocessAllDocuments(null, false);
     }
