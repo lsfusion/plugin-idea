@@ -69,7 +69,9 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
         } else if (element instanceof LSFFormStatement) {
             return ((LSFFormStatement) element).getFormDecl().getNameIdentifier();
         } else if (element instanceof LSFWindowStatement) {
-            return ((LSFWindowStatement) element).getWindowCreateStatement().getNameIdentifier();
+            // only a declaration has a name to delete; EXTEND WINDOW and HIDE WINDOW name a window declared elsewhere
+            LSFWindowCreateStatement createStatement = ((LSFWindowStatement) element).getWindowCreateStatement();
+            return createStatement != null ? createStatement.getNameIdentifier() : null;
         } else if (element instanceof LSFExplicitInterfaceActionOrPropStatement) {
             return ((LSFExplicitInterfaceActionOrPropStatement) element).getDeclaration().getNameIdentifier();
         } else if (element instanceof LSFNewComponentStatement) {

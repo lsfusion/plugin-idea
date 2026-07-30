@@ -2382,7 +2382,7 @@ indexStatement ::= INDEX ( ((LIKE | MATCH)? nonEmptyMappedPropertyOrSimpleExprPa
 /////////////////////////////// WINDOW STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-windowStatement ::= windowCreateStatement | windowHideStatement {implements="com.lsfusion.mcp.LSFMCPDeclaration" methods = [ getIcon ]}
+windowStatement ::= windowCreateStatement | windowExtendStatement | windowHideStatement {implements="com.lsfusion.mcp.LSFMCPDeclaration" methods = [ getIcon ]}
 
 windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType? windowOptions SEMI
 {
@@ -2394,6 +2394,7 @@ windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType
     pin = 2
 }
 
+windowExtendStatement ::= EXTEND WINDOW windowUsage CUSTOM propertyExpression SEMI {pin=2}
 windowHideStatement ::= HIDE WINDOW windowUsage SEMI {pin=2}
 
 //MENU, PANEL, TOOLBAR, TREE removed in 6.0
@@ -2414,6 +2415,7 @@ windowOptions ::=   (	HIDETITLE
                     |	TEXTHALIGN LBRAC alignmentLiteral RBRAC
                     |	TEXTVALIGN LBRAC alignmentLiteral RBRAC
                     |   CLASS propertyExpression
+                    |   CUSTOM propertyExpression
                     )*
 
 borderPosition ::= LEFT	| RIGHT | TOP | BOTTOM
@@ -2494,6 +2496,7 @@ navigatorElementOptions ::= (	(WINDOW windowUsage PARENT?)
                             |   CLASS propertyExpression
                             |	HEADER propertyExpression
                             |	SHOWIF propertyExpression
+                            |   LSF
                             |   changeKeySetting
                             |   changeMouseSetting
                             )*
