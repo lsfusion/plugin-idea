@@ -2,12 +2,15 @@ package com.lsfusion.lang.folding;
 
 import com.intellij.codeInsight.folding.CodeFoldingManager;
 import com.intellij.lang.folding.FoldingDescriptor;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.ConcatenateClassSet;
 import com.lsfusion.lang.classes.CustomClassSet;
@@ -161,11 +164,20 @@ public class LSFPropertyParamsFoldingManager {
         Project project = editor.getProject();
         if (project != null && !project.isDisposed()) {
             PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
-            Runnable runnable = CodeFoldingManager.getInstance(project).updateFoldRegionsAsync(editor, true);
-            if (runnable != null && !editor.isDisposed()) {
-                runnable.run();
-                foldingsRebuilt(editor);
-            }
+            // updateFoldRegionsAsync builds foldings from PSI and must be called on a background thread under a
+            // read action; the returned Runnable applies them back on the EDT.
+            ReadAction.nonBlocking(() -> CodeFoldingManager.getInstance(project).updateFoldRegionsAsync(editor, true))
+                    .inSmartMode(project)
+                    .withDocumentsCommitted(project)
+                    .expireWhen(() -> project.isDisposed() || editor.isDisposed())
+                    .coalesceBy(LSFPropertyParamsFoldingManager.class, editor)
+                    .finishOnUiThread(ModalityState.defaultModalityState(), runnable -> {
+                        if (runnable != null && !editor.isDisposed()) {
+                            runnable.run();
+                            foldingsRebuilt(editor);
+                        }
+                    })
+                    .submit(AppExecutorUtil.getAppExecutorService());
         }
     }
 }
