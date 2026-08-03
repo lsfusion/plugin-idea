@@ -865,7 +865,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
                 }
 
                 Document document = PsiDocumentManager.getInstance(myProject).getDocument(file);
-                if (document != null)
+                if (document != null && FileDocumentManager.getInstance().isDocumentUnsaved(document))
                     FileDocumentManager.getInstance().saveDocumentAsIs(document);
             })));
     }
