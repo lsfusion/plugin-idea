@@ -2067,11 +2067,13 @@ changeEventDeclaration ::=
         (   OBJECT objectUsage
         |   FILTER groupObjectUsage
         |   ORDER groupObjectUsage
+        |   SELECT groupObjectUsage
         |   FILTERS groupObjectUsage
         |   ORDERS groupObjectUsage
         |   PROPERTY (BEFORE | AFTER)? propertySelector
         |   FILTERGROUPS filterGroupUsage
         |   FILTERS PROPERTY formPropertyDrawUsage
+        |   SELECT PROPERTY formPropertyDrawUsage
         )
     ;
 
