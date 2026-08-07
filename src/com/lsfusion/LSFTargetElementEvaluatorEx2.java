@@ -1,6 +1,7 @@
 package com.lsfusion;
 
 import com.intellij.codeInsight.TargetElementEvaluatorEx2;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -13,14 +14,16 @@ import org.jetbrains.annotations.Nullable;
 public class LSFTargetElementEvaluatorEx2 extends TargetElementEvaluatorEx2 {
     @Override
     public boolean isAcceptableNamedParent(@NotNull PsiElement parent) {
-        LSFExprParameterUsage paramUsageParent = PsiTreeUtil.getParentOfType(parent, LSFExprParameterUsage.class);
-        if (paramUsageParent != null) {
-            return false;
-        }
-        LSFDeclaration declParent = PsiTreeUtil.getParentOfType(parent, LSFDeclaration.class);
-        return declParent != null &&
-                !(declParent instanceof LSFPropertyDrawDeclaration) &&
-                parent.equals(declParent.getNameIdentifier());
+        return ReadAction.compute(() -> {
+            LSFExprParameterUsage paramUsageParent = PsiTreeUtil.getParentOfType(parent, LSFExprParameterUsage.class);
+            if (paramUsageParent != null) {
+                return false;
+            }
+            LSFDeclaration declParent = PsiTreeUtil.getParentOfType(parent, LSFDeclaration.class);
+            return declParent != null &&
+                    !(declParent instanceof LSFPropertyDrawDeclaration) &&
+                    parent.equals(declParent.getNameIdentifier());
+        });
     }
 
     // for backward compatibility
