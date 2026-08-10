@@ -54,8 +54,11 @@ public class LSFDebuggerEditorsProvider extends JavaDebuggerEditorsProvider {
         // read-only action on a background thread, so we must not commit the document here: commitDocument
         // mutates the PSI model and requires write access. The watch text is the document text; the cached
         // fragment PSI is read-safe and only needed for the imports round-trip.
-        PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
-        if (psiFile instanceof LSFFile) {
+        // Use getCachedPsiFile (not getPsiFile) because getPsiFile throws PsiInvalidElementAccessException
+        // when the cached fragment's debugger context has already died (e.g. after the stack frame is gone),
+        // which happens routinely while restoring/updating watches.
+        PsiFile psiFile = PsiDocumentManager.getInstance(project).getCachedPsiFile(document);
+        if (psiFile instanceof LSFFile && psiFile.isValid()) {
             return new XExpressionImpl(document.getText(), language, ((JavaCodeFragment)psiFile).importsToString(), mode);
         }
         return XDebuggerUtil.getInstance().createExpression(document.getText(), language, null, mode);
