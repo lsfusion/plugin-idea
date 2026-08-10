@@ -300,7 +300,13 @@ public class MCPSearchUtils {
                 } catch (com.intellij.openapi.progress.ProcessCanceledException e) {
                     throw e; // Standard platform cancellation, must be rethrown or handled by the platform
                 } catch (Throwable t) {
-                    handleError(t, "Error executing MCP search task", errors);
+                    // exec.shutdownNow() (search budget timeout / explicit stop, see createAwaitAll) interrupts
+                    // in-flight tasks; the platform's concurrent PSI search surfaces that as a wrapped
+                    // InterruptedException rather than ProcessCanceledException. That's expected cancellation,
+                    // not a real failure, so don't log it as an error.
+                    if (!isInterruption(t)) {
+                        handleError(t, "Error executing MCP search task", errors);
+                    }
                 } finally {
                     state.pendingTasksByPriority[priority].decrementAndGet();
                     state.checkAllPBetterDone();
@@ -864,6 +870,13 @@ public class MCPSearchUtils {
     private static void handleError(Throwable t, String logMessage, List<String> errors) {
         LOG.error(logMessage, t);
         errors.add(t.getMessage() != null ? t.getMessage() : t.toString());
+    }
+
+    private static boolean isInterruption(Throwable t) {
+        for (Throwable cur = t; cur != null; cur = cur.getCause()) {
+            if (cur instanceof InterruptedException) return true;
+        }
+        return false;
     }
 
     private static @NotNull JSONObject getJsonFromStatement(LSFMCPDeclaration stmt,
