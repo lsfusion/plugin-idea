@@ -989,7 +989,7 @@ exportActionPropertyDefinitionBody ::=
         |
             (
                 (   JSON (CHARSET stringLiteral)?
-                |   XML hasHeaderOption? (ROOT propertyExpression)? (TAG propertyExpression)? ATTR? (CHARSET stringLiteral)?
+                |   XML hasHeaderOption? (CHARSET stringLiteral)?
                 )?
                 selectTops?
                 staticDestination?
