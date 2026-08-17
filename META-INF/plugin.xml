@@ -11,6 +11,7 @@
         <b>Version 1.0.311</b><br>
         <ul>
             <li>Form <code>EVENTS</code>: recognize the selection change events, e.g. <code>EVENTS ON CHANGE SELECT s recalcSelected()</code> for an object group and <code>EVENTS ON CHANGE SELECT PROPERTY qty(s) recalcQty()</code> for a column</li>
+            <li>Fixed the IDE freezing for the whole network timeout when quick documentation is slow or unreachable</li>
         </ul>
     ]]>
     </change-notes>

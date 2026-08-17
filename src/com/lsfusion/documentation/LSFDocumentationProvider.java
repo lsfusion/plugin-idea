@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.tree.TreeUtil;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import com.intellij.util.ui.JBUI;
 import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.psi.LSFFile;
@@ -23,10 +24,25 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class LSFDocumentationProvider extends AbstractDocumentationProvider {
 
-    public static final Map<String, String> documentation = new HashMap<>();
+    public static final Map<String, String> documentation = new ConcurrentHashMap<>();
+    private static final Map<String, CompletableFuture<String>> documentationLoading = new ConcurrentHashMap<>();
+
+    // The platform calls generateDoc() inside a cancellable read action on a background thread. A thread
+    // parked in a socket read never reaches a cancellation point, so the read lock is held for the whole
+    // network timeout and every write action - i.e. every keystroke - waits on it. So the fetch runs on a
+    // pooled thread and generateDoc() waits only briefly; a slower answer lands in the cache and shows up
+    // on the next hover instead of freezing the editor.
+    private static final long DOC_WAIT_MS = 1000;
+    private static final int DOC_FETCH_TIMEOUT_MS = 10_000;
+
     public static final Map<String, String> documentationVersionMap = new HashMap<>();
     public static final Map<String, String> documentationLanguageMap = new HashMap<>();
     private static final String documentationVersionPropertyKey = "documentationVersion";
@@ -87,8 +103,37 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
     }
 
     private String readExternalDocumentation(String documentationURL) {
+        String cached = documentation.get(documentationURL);
+        if (cached != null)
+            return cached;
+
+        CompletableFuture<String> loading = documentationLoading.computeIfAbsent(documentationURL, url ->
+                CompletableFuture.supplyAsync(() -> {
+                    try {
+                        String result = fetchExternalDocumentation(url);
+                        if (result != null)
+                            documentation.put(url, result);
+                        return result;
+                    } finally {
+                        documentationLoading.remove(url);
+                    }
+                }, AppExecutorUtil.getAppExecutorService()));
+
         try {
-            Document document = Jsoup.connect(documentationURL).get();
+            return loading.get(DOC_WAIT_MS, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            return null; // still loading; the result is cached and the next hover will show it
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        } catch (ExecutionException e) {
+            return null;
+        }
+    }
+
+    private String fetchExternalDocumentation(String documentationURL) {
+        try {
+            Document document = Jsoup.connect(documentationURL).timeout(DOC_FETCH_TIMEOUT_MS).get();
             Elements article = document.select("article");
             article.select("button").remove(); //remove "copy" buttons under code-blocks
             article.select("a[class=hash-link]").remove(); //remove all "#" hash-links in headers
