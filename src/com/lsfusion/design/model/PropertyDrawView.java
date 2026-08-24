@@ -58,6 +58,8 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("valueWidth").setExpert(),
             new ReflectionProperty("captionHeight"),
             new ReflectionProperty("captionWidth"),
+            new ReflectionProperty("captionWrap").setExpert(),
+            new ReflectionProperty("captionWrapWordBreak").setExpert(),
             new ReflectionProperty("charHeight").setExpert(),
             new ReflectionProperty("charWidth").setExpert(),
             new ReflectionProperty("valueFlex"),
@@ -136,6 +138,9 @@ public class PropertyDrawView extends ComponentView {
 
     public int captionHeight;
     public int captionWidth;
+
+    public boolean captionWrap;
+    public boolean captionWrapWordBreak;
 
     public int charHeight;
     public int charWidth;

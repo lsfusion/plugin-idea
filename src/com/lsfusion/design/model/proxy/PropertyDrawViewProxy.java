@@ -49,6 +49,14 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.captionAlignmentVert = captionAlignmentVert;
     }
 
+    public void setCaptionWrap(boolean captionWrap) {
+        target.captionWrap = captionWrap;
+    }
+
+    public void setCaptionWrapWordBreak(boolean captionWrapWordBreak) {
+        target.captionWrapWordBreak = captionWrapWordBreak;
+    }
+
     public void setEditOnSingleClick(boolean editOnSingleClick) {
         setChangeOnSingleClick(editOnSingleClick);
     }
