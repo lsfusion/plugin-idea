@@ -302,8 +302,14 @@ public abstract class McpBaseService extends RestService {
 
     private static JSONObject buildRetrieveDocsToolDescriptor() {
         JSONObject typeProp = new JSONObject()
-                .put("type", "string")
-                .put("enum", new JSONArray().put("language").put("paradigm").put("how-to").put("brief").put("rules"))
+                // anyOf, not a bare enum: the description offers `null` as a way to
+                // say "search everything", and a strict client validating against a
+                // string-only enum would reject exactly that.
+                .put("anyOf", new JSONArray()
+                        .put(new JSONObject()
+                                .put("type", "string")
+                                .put("enum", new JSONArray().put("language").put("paradigm").put("how-to").put("brief").put("rules")))
+                        .put(new JSONObject().put("type", "null")))
                 .put("description", "Optional sourceType filter (the docs folder). Omit (or pass null) to search all five branches and merge; only the two TOP articles (`Brief`, `Rules`) are excluded, because get_guidance already delivers them in full. `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes; `brief` = concise capability map; `rules` = coding constraints for one area — unlike the other branches this lookup is not optional: perform it before working in an area.");
         JSONObject excludeIdsProp = new JSONObject()
                 .put("type", "array")

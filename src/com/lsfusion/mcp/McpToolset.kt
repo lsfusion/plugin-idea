@@ -71,18 +71,18 @@ data class FindElementsResult(
 
 @Serializable
 data class RemoteDocItem(
-    // Nullable with a default, deliberately: `ignoreUnknownKeys = true` protects an old
-    // plugin talking to a new server, and the nullable default protects a new plugin
-    // talking to an older server that does not send `id` yet — a non-null field would
-    // make the new plugin fail to decode the old server's response.
-    @McpDescription(description = "Stable chunk id; pass the ids you already received back in `excludeIds` to avoid getting the same chunks again.")
-    val id: String? = null,
     @McpDescription(description = "Chunk origin (e.g. documentation-language, documentation-paradigm).")
     val source: String,
     @McpDescription(description = "Retrieved text snippet.")
     val text: String,
     @McpDescription(description = "Similarity score (higher = more relevant).")
     val score: Double,
+    // Nullable with a default, deliberately: `ignoreUnknownKeys = true` protects an old
+    // plugin talking to a new server, and the nullable default protects a new plugin
+    // talking to an older server that does not send `id` yet — a non-null field would
+    // make the new plugin fail to decode the old server's response.
+    @McpDescription(description = "Stable chunk id; pass the ids you already received back in `excludeIds` to avoid getting the same chunks again.")
+    val id: String? = null,
 )
 
 @Serializable
