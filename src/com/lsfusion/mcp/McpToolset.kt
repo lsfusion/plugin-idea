@@ -71,6 +71,12 @@ data class FindElementsResult(
 
 @Serializable
 data class RemoteDocItem(
+    // Nullable with a default, deliberately: `ignoreUnknownKeys = true` protects an old
+    // plugin talking to a new server, and the nullable default protects a new plugin
+    // talking to an older server that does not send `id` yet — a non-null field would
+    // make the new plugin fail to decode the old server's response.
+    @McpDescription(description = "Stable chunk id; pass the ids you already received back in `excludeIds` to avoid getting the same chunks again.")
+    val id: String? = null,
     @McpDescription(description = "Chunk origin (e.g. documentation-language, documentation-paradigm).")
     val source: String,
     @McpDescription(description = "Retrieved text snippet.")
@@ -357,25 +363,34 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     }
 
     @McpTool(name = "lsfusion_retrieve_docs")
-    @McpDescription(description = "Search official lsFusion documentation (language, paradigm, how-to; plus brief/rules on explicit request) for chunks relevant to a query. Returns `{docs:[{source,text,score}]}` sorted by descending score. Use `type` to narrow to one branch when known; omit to search the default branches and merge. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.")
+    @McpDescription(description = "Search official lsFusion documentation for chunks relevant to a query. Returns `{docs:[{id,source,text,score}]}` sorted by descending score. Use `type` to narrow to one branch when known; omit to search all five and merge (the two top guidance articles are always excluded — get_guidance serves those in full). Pass the `id` values you already received in `excludeIds` when continuing a lookup, so the same chunks are not returned twice. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.")
     @Suppress("unused")
     suspend fun retrieveDocs(
         @McpDescription(description = "Short topical phrase. Semantic match (not literal); rephrase rather than retry the same query if results are weak.")
         query: String,
-        @McpDescription(description = "Optional sourceType filter (the docs folder). Omit (or pass null) to search language, paradigm and how-to and merge; `brief` and `rules` are searched only when requested explicitly (their full text already arrives via get_guidance). `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes; `brief` = concise capability map; `rules` = code conventions.")
+        @McpDescription(description = "Optional sourceType filter (the docs folder). Omit (or pass null) to search all five branches and merge; only the two TOP articles (`Brief`, `Rules`) are excluded, because get_guidance already delivers them in full. `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes; `brief` = concise capability map; `rules` = coding constraints for one area — unlike the other branches this lookup is not optional: perform it before working in an area.")
         type: String? = null,
+        @McpDescription(description = "Chunk `id` values already received in this session. They are excluded server-side, so a follow-up lookup returns new material instead of repeating what you have. Pass the accumulated ids when continuing a lookup on the same topic; leave empty on the first call.")
+        excludeIds: List<String>? = null,
     ): RetrieveDocsOutput {
         val args = JSONObject().put("query", query)
         if (type != null) args.put("type", type)
+        if (excludeIds != null && excludeIds.isNotEmpty()) {
+            val ids = JSONArray()
+            excludeIds.forEach { ids.put(it) }
+            args.put("exclude_ids", ids)
+        }
         val resultEl = callRemoteToolResultJson("lsfusion_retrieve_docs", args)
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }
 
     @McpTool(name = "lsfusion_get_guidance")
     @McpDescription(
-        description = "Fetch the brief overview and mandatory rules for working with lsFusion. " +
-            "The assistant MUST call this at the start of ANY lsFusion-related task if the guidance isn't already in context, " +
-            "and MUST then read and strictly follow all rules it returns."
+        description = "Fetch the brief overview and the CORE rules for working with lsFusion. " +
+            "The assistant MUST call this at the start of ANY lsFusion-related task — writing, modifying or reviewing lsFusion code, " +
+            "or answering questions about its syntax or semantics — and MUST then read what it returns and apply each rule according to " +
+            "that rule's stated strength (MUST / MUST NOT are binding; SHOULD / SHOULD NOT are recommendations). Once per session is enough. " +
+            "This is the top level only: the rules for a specific area are separate articles, retrieved with `lsfusion_retrieve_docs(type='rules')`."
     )
     @Suppress("unused")
     suspend fun getGuidance(): String {

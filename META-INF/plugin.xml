@@ -13,6 +13,7 @@
             <li>Form <code>EVENTS</code>: recognize the selection change events, e.g. <code>EVENTS ON CHANGE SELECT s recalcSelected()</code> for an object group and <code>EVENTS ON CHANGE SELECT PROPERTY qty(s) recalcQty()</code> for a column</li>
             <li>Fixed the IDE freezing for the whole network timeout when quick documentation is slow or unreachable</li>
             <li>Design properties captionWrap and captionWrapWordBreak support</li>
+            <li>AI tool <code>lsfusion_retrieve_docs</code>: every returned chunk now carries a stable <code>id</code>, and the new <code>excludeIds</code> parameter takes the ids already received, so continuing a lookup on the same topic returns new material instead of the same chunks</li>
         </ul>
     ]]>
     </change-notes>
