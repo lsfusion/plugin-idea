@@ -2,7 +2,7 @@
     <id>lsfusion.idea.plugin</id>
     <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
-    <version>1.0.310</version>
+    <version>1.0.311</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -12,8 +12,11 @@
         <ul>
             <li>Form <code>EVENTS</code>: recognize the selection change events, e.g. <code>EVENTS ON CHANGE SELECT s recalcSelected()</code> for an object group and <code>EVENTS ON CHANGE SELECT PROPERTY qty(s) recalcQty()</code> for a column</li>
             <li>Fixed the IDE freezing for the whole network timeout when quick documentation is slow or unreachable</li>
+            <li>Fixed an exception while updating or restoring debugger watches on an lsFusion expression</li>
+            <li>Fixed an exception on renaming an element from IntelliJ's Next Edit history</li>
+            <li>MCP element search no longer reports its own budget cutoff as an error in the log</li>
             <li>Design properties captionWrap and captionWrapWordBreak support</li>
-            <li>AI tool <code>lsfusion_retrieve_docs</code>: every returned chunk now carries a stable <code>id</code>, and the new <code>excludeIds</code> parameter takes the ids already received, so continuing a lookup on the same topic returns new material instead of the same chunks</li>
+            <li>AI tool <code>lsfusion_retrieve_docs</code>: every returned chunk now carries a stable <code>id</code>, and the new <code>excludeIds</code> parameter takes the ids you already hold, so a lookup can page deeper into the same question instead of returning what you have</li>
         </ul>
     ]]>
     </change-notes>
