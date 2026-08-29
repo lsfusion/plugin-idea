@@ -30,7 +30,7 @@ public abstract class McpBaseService extends RestService {
     protected static final String TOOL_GET_GUIDANCE = "lsfusion_get_guidance";
     protected static final String TOOL_REPORT_FEEDBACK = "lsfusion_report_feedback";
 
-    private static final String TOOL_RETRIEVE_DOCS_DESCRIPTION = "Search official lsFusion documentation for chunks relevant to a query. Returns `{docs:[{id,source,text,score}]}` sorted by descending score. Use `type` to narrow to one branch when known; omit to search all five and merge (the two top guidance articles are always excluded — get_guidance serves those in full). Pass the `id` values you already received in `exclude_ids` when continuing a lookup, so the same chunks are not returned twice. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.";
+    private static final String TOOL_RETRIEVE_DOCS_DESCRIPTION = "Search official lsFusion documentation for chunks relevant to a query. Returns `{docs:[{id,source,text,score}]}` sorted by descending score. Use `type` to narrow to one branch when known; omit to search all five and merge (the two top guidance articles are always excluded — get_guidance serves those in full). To page deeper on one information need, pass the `id` values you already hold in `exclude_ids`; they are filtered out before ranking. Omit them when rephrasing for a better ranking or asking a different question, or the filter will drop the chunk that best answers it. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.";
 
     // Sister tools lsfusion_retrieve_howtos / lsfusion_retrieve_community were
     // removed together with the legacy Pinecone backend that fed them; the new
@@ -314,7 +314,7 @@ public abstract class McpBaseService extends RestService {
         JSONObject excludeIdsProp = new JSONObject()
                 .put("type", "array")
                 .put("items", new JSONObject().put("type", "string"))
-                .put("description", "Chunk `id` values already received in this session. They are excluded server-side, so a follow-up lookup returns new material instead of repeating what you have. Pass the accumulated ids when continuing a lookup on the same topic; leave empty on the first call.");
+                .put("description", "Chunk `id` values you already hold. They are excluded server-side BEFORE ranking, so the quota is spent on material you do not have. Use this to page deeper on the same information need. Do NOT use it to rephrase a query for a better ranking, or to ask a different question about the same area: the filter ignores the new query, so a chunk that is now the most relevant one would be dropped before ranking. Leave empty on the first call.");
         JSONObject inputSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()

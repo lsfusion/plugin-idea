@@ -370,7 +370,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         query: String,
         @McpDescription(description = "Optional sourceType filter (the docs folder). Omit (or pass null) to search all five branches and merge; only the two TOP articles (`Brief`, `Rules`) are excluded, because get_guidance already delivers them in full. `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes; `brief` = concise capability map; `rules` = coding constraints for one area — unlike the other branches this lookup is not optional: perform it before working in an area.")
         type: String? = null,
-        @McpDescription(description = "Chunk `id` values already received in this session. They are excluded server-side, so a follow-up lookup returns new material instead of repeating what you have. Pass the accumulated ids when continuing a lookup on the same topic; leave empty on the first call.")
+        @McpDescription(description = "Chunk `id` values you already hold. They are excluded server-side BEFORE ranking, so the quota is spent on material you do not have. Use this to page deeper on the same information need. Do NOT use it to rephrase a query for a better ranking, or to ask a different question about the same area: the filter ignores the new query, so a chunk that is now the most relevant one would be dropped before ranking. Leave empty on the first call.")
         excludeIds: List<String>? = null,
     ): RetrieveDocsOutput {
         val args = JSONObject().put("query", query)
