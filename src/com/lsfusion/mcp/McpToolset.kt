@@ -366,14 +366,14 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     }
 
     @McpTool(name = "lsfusion_retrieve_docs")
-    @McpDescription(description = "Search official lsFusion documentation for chunks relevant to a query, or to several independent queries at once (`queries`). Returns `{docs:[{id,source,text,score,query}]}` sorted by descending score, where `query` names which of the submitted queries a chunk answers. Use `type` to narrow to one branch when known; omit to search all five and merge (the two top guidance articles are always excluded — get_guidance serves those in full). Pass the `id` values you already received in `excludeIds` when continuing a lookup, so the same chunks are not returned twice. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.")
+    @McpDescription(description = "Search official lsFusion documentation for chunks relevant to a query, or to several independent queries at once (`queries`). Returns `{docs:[{id,source,text,score,query}]}` sorted by descending score, where `query` names which of the submitted queries a chunk answers. Use `type` to narrow to one branch when known; omit to search all three reference branches and merge. The `brief` and `rules` branches are NOT here — those are read whole, by name, with `lsfusion_get_guidance`. Pass the `id` values you already received in `excludeIds` when continuing a lookup, so the same chunks are not returned twice. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.")
     @Suppress("unused")
     suspend fun retrieveDocs(
         @McpDescription(description = "One short technical query. Semantic match (not literal); rephrase rather than retry the same query if results are weak. For several independent needs known in advance, use `queries` instead.")
         query: String? = null,
         @McpDescription(description = "Several DISTINCT queries for independent needs already known before this call — instead of `query`, not alongside it. Batch only lookups that do not depend on one another; when one answer can determine or refine the next query, call the tool again instead. Do not batch alternative phrasings of one need. `type` and `excludeIds` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to.")
         queries: List<String>? = null,
-        @McpDescription(description = "Optional sourceType filter (the docs folder). Omit (or pass null) to search all five branches and merge; only the two TOP articles (`Brief`, `Rules`) are excluded, because get_guidance already delivers them in full. `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes; `brief` = concise capability map; `rules` = coding constraints for one area — unlike the other branches this lookup is not optional: perform it before working in an area.")
+        @McpDescription(description = "Optional sourceType filter (the docs folder); in a batch it applies to every query. Omit (or pass null) to search all three reference branches and merge. `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes. The `brief` and `rules` branches are not here at all: an area's capability map and its coding rules are read whole, by name, with `lsfusion_get_guidance`.")
         type: String? = null,
         @McpDescription(description = "Chunk `id` values you already hold. They are excluded server-side BEFORE ranking, so the quota is spent on material you do not have. Use this to page deeper on the same information need. Do NOT use it to rephrase a query for a better ranking, or to ask a different question about the same area: the filter ignores the new query, so a chunk that is now the most relevant one would be dropped before ranking. Leave empty on the first call.")
         excludeIds: List<String>? = null,
@@ -404,15 +404,19 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
 
     @McpTool(name = "lsfusion_get_guidance")
     @McpDescription(
-        description = "Fetch the brief overview and the CORE rules for working with lsFusion. " +
-            "The assistant MUST call this at the start of ANY lsFusion-related task — writing, modifying or reviewing lsFusion code, " +
-            "or answering questions about its syntax or semantics — and MUST then read what it returns and apply each rule according to " +
-            "that rule's stated strength (MUST / MUST NOT are binding; SHOULD / SHOULD NOT are recommendations). Once per session is enough. " +
-            "This is the top level only: the rules for a specific area are separate articles, retrieved with `lsfusion_retrieve_docs(type='rules')`."
+        description = "Read ONE lsFusion guidance article WHOLE — the coding rules of an area (`rules`) or its capability map (`brief`). These two branches are a small hierarchy of articles, not a search corpus: you name an article and receive all of it, so nothing relevant can be silently withheld the way a top-N chunk retrieval withholds it. Call with NO arguments at the start of any lsFusion task: that returns the top article of both branches, each carrying the base material plus the complete map of its branch, and the `rules` map states per area the point at which reading that area's article stops being optional. Apply each rule at its stated strength (MUST / MUST NOT are binding; SHOULD / SHOULD NOT are recommendations). Syntax, concepts and recipes are a different tool: `lsfusion_retrieve_docs`. Every article is fenced by `=== BEGIN ... ===` / `=== END ... ===`; the END fence is what proves you hold the complete text."
     )
     @Suppress("unused")
-    suspend fun getGuidance(): String {
-        val resultEl = callRemoteToolResultJson("lsfusion_get_guidance", JSONObject())
+    suspend fun getGuidance(
+        @McpDescription(description = "Name of the `rules` area whose article you need — the short name in the FIRST COLUMN of the map inside the top `rules` article, not a slug and not a title. The whole article comes back: no search, no ranking, no excerpt. Reading an area's article is BINDING wherever the map states a trigger for it. Omit BOTH parameters to get the top article of each branch.")
+        rules: String? = null,
+        @McpDescription(description = "Name of the `brief` area whose article you need — the short name from the map inside the top `brief` article. Same shape as `rules`, and only one of the two may be given per call: one call delivers one whole article. Reading an area's brief before working in it is STRONGLY RECOMMENDED rather than binding.")
+        brief: String? = null,
+    ): String {
+        val args = JSONObject()
+        rules?.let { args.put("rules", it) }
+        brief?.let { args.put("brief", it) }
+        val resultEl = callRemoteToolResultJson("lsfusion_get_guidance", args)
         return if (resultEl is JsonPrimitive) {
             resultEl.content
         } else {
