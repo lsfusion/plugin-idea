@@ -30,6 +30,7 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiUtilBase;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFFileType;
@@ -49,6 +50,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.intellij.codeInsight.completion.impl.CompletionServiceImpl.getCompletionPhase;
 import static com.lsfusion.util.LSFPsiUtils.findChildrenOfType;
@@ -78,8 +82,18 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         myProject.getMessageBus().connect(this).subscribe(CompletionPhaseListener.TOPIC, (CompletionPhaseListener) isCompletionRunning -> checkCompletion());
     }
 
+    // Plugin unload disposes the service but leaves the project alive, so myProject.isDisposed() cannot be
+    // used to stop the asynchronous handoffs from resurrecting work (and retaining the plugin class loader).
+    private volatile boolean disposed;
+
     @Override
     public void dispose() {
+        disposed = true;
+        ScheduledFuture<?> pending = pendingHeaderReprocess.getAndSet(null);
+        if (pending != null)
+            pending.cancel(false);
+        pendingHeaderFiles.clear();
+        processedHeaders.clear();
     }
 
     public static class MetaChangeListener implements ProjectActivity {
@@ -306,12 +320,12 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
     private static class GenParse {
 
         public final LSFMetaCodeStatement usage;
-        public final ToParse toParse;
+        public final LSFMetaCodeBody body;
         public final long version;
 
-        private GenParse(LSFMetaCodeStatement usage, ToParse toParse, long version) {
+        private GenParse(LSFMetaCodeStatement usage, LSFMetaCodeBody body, long version) {
             this.usage = usage;
-            this.toParse = toParse;
+            this.body = body;
             this.version = version;
         }
     }
@@ -442,11 +456,13 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         return gen.version >= gen.usage.getVersion() && !usagesPending.processing.contains(gen.usage);
     }
 
-    private boolean actualize(GenParse gen, LSFFile file) {
-        boolean result = actual(gen);
-        if (!result)
-            inlineProceed(true, file);
-        return result;
+    private void dropStaleGens(Map<LSFMetaCodeStatement, GenParse> gens, LSFFile file) {
+        gens.values().removeIf(gen -> {
+            boolean stale = !actual(gen);
+            if (stale)
+                inlineProceed(true, file);
+            return stale;
+        });
     }
 
     private static Set<String> getMetaDecls(LSFMetaReference metaCodeStatement) {
@@ -472,16 +488,19 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
 
         public void run() {
             final Map<LSFMetaCodeStatement, GenParse> genUsages = new HashMap<>();
+            final List<LSFMetaCodeStatement> dumbRetry = new ArrayList<>();
             final Iterator<LSFMetaCodeStatement> iterator = usages.iterator();
             while (iterator.hasNext()) {
                 final LSFMetaCodeStatement metaUsage = iterator.next();
                 final Result<ToParse> toParse = new Result<>();
+                final Result<Boolean> inline = new Result<>();
                 ApplicationManager.getApplication().runReadAction(() -> {
                     version++; // синхронизация не волнует может быть и одна версия (если в рамках нескольких read'ов но не write'ов)
                     boolean keep = false;
                     if (metaUsage.isValid() && metaUsage.isCorrect()) {
                         if (!DumbService.isDumb(myProject)) {
-                            LSFMetaDeclaration metaDecl = (forcedEnabled != null ? forcedEnabled : enabled) || metaUsage.isInline() ? metaUsage.resolveDecl() : null;
+                            inline.setResult(metaUsage.isInline());
+                            LSFMetaDeclaration metaDecl = (forcedEnabled != null ? forcedEnabled : enabled) || inline.getResult() ? metaUsage.resolveDecl() : null;
                             assert metaDecl == null || metaDecl.isValid();
                             if (metaDecl == null || !declPending.processing.contains(getLongLivingDecl(metaDecl))) { // не обновляем, потому как все равно обновится при обработке metaDeclChanged
                                 if (metaDecl == null || !metaDecl.isCorrect())
@@ -502,21 +521,43 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
                     }
                 });
 
-                if (toParse.getResult() != null)
-                    genUsages.put(metaUsage, new GenParse(metaUsage, toParse.getResult(), toParse.getResult().version));
+                // Parsing here, not inside the write action below, keeps that write action to pure tree
+                // surgery - the parse of a whole batch used to run on the EDT - and a statement whose
+                // expansion hits dumb mode (resolving a nested usage throws IndexNotReadyException) is
+                // retried alone through the inlinePostpone at the end, instead of aborting the write action
+                // and silently losing the batch.
+                if (toParse.getResult() != null) {
+                    try {
+                        LSFMetaCodeBody body = ApplicationManager.getApplication().runReadAction(
+                                (Computable<LSFMetaCodeBody>) () -> toParse.getResult().parse(file, inline.getResult()));
+                        genUsages.put(metaUsage, new GenParse(metaUsage, body, toParse.getResult().version));
+                    } catch (IndexNotReadyException e) {
+                        dumbRetry.add(metaUsage);
+                    }
+                }
             }
-            PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(myProject);
-            final Document document = psiDocumentManager.getDocument(file);
-            for (final Map.Entry<LSFMetaCodeStatement, GenParse> genEntry : genUsages.entrySet()) {
-                GenParse gen = genEntry.getValue();
+            // back into processing as well, not just into usages: the read action above already took these out of
+            // it, and without that an addUsageProcessing arriving before the retry would queue a second run for the
+            // same statement (the dumb path keeps them in processing by not removing them at all)
+            usagesPending.processing.addAll(dumbRetry);
+            usages.addAll(dumbRetry);
+            // Every applied body is a physical PSI change, which restarts the daemon and drops every PsiDependentCache
+            // in the plugin. Applying the whole batch of a file in one write action instead of one per statement keeps
+            // that cost proportional to the number of edited files rather than to the number of metacode usages.
+            if (!genUsages.isEmpty()) {
+                PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(myProject);
+                final Document document = psiDocumentManager.getDocument(file);
+
                 final Result<Runnable> runMetaText = new Result<>();
                 runMetaText.setResult(() -> {
-                    if (!actualize(gen, file)) // оптимизация
+                    dropStaleGens(genUsages, file); // оптимизация
+                    if (genUsages.isEmpty())
                         return;
 
                     // без perform for commited постоянно рассинхронизируется дерево с текстом
                     psiDocumentManager.performForCommittedDocument(document, () -> {
-                        if (!actualize(gen, file)) // оптимизация
+                        dropStaleGens(genUsages, file); // оптимизация
+                        if (genUsages.isEmpty())
                             return;
 
                         if (reprocessing) {
@@ -541,39 +582,40 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
                             changedDocs.put(document, current);
                         }
 
-                        inlineProceed(false, file);
+                        for (int i = 0; i < genUsages.size(); i++)
+                            inlineProceed(false, file);
 
                         try {
                             CommandProcessor.getInstance().runUndoTransparentAction(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-                                if (gen.usage.isValid() && gen.usage.isCorrect() && actual(gen)) { // can become not valid
-                                    boolean prevEnabled = enabled;
-                                    enabled = false; // выключаем чтобы каскадно не вызывались события
-                                    try {
-                                        gen.usage.setInlinedBody(gen.toParse.parse(file, gen.usage.isInline()));
-                                    } finally {
-                                        enabled = prevEnabled;
-                                    }
+                                boolean prevEnabled = enabled;
+                                enabled = false; // выключаем чтобы каскадно не вызывались события
+                                try {
+                                    for (GenParse gen : genUsages.values())
+                                        if (gen.usage.isValid() && gen.usage.isCorrect() && actual(gen)) // can become not valid
+                                            gen.usage.setInlinedBody(gen.body);
+                                } finally {
+                                    enabled = prevEnabled;
                                 }
                             }));
                         } catch(IndexNotReadyException e) {
-                            //re-add usage to reprocess in inlinePostpone
-                            usages.add(genEntry.getKey());
+                            // with the bodies parsed up front nothing here should touch an index anymore, but if
+                            // some path still does, re-queue the batch - run() has long returned by this point,
+                            // so adding back to usages would be dead
+                            addUsageProcessing(new ArrayList<>(genUsages.keySet()));
                         }
                     });
                 });
 
-                Runnable runGenUsage = () -> {
-                    if (!actual(gen)) // оптимизация
-                        return;
-
-                    inlinePend(sync);
-                    runMetaText.getResult().run();
-                };
-
                 ApplicationManager.getApplication().invokeLater(new CompletionRunner(file) {
                     @Override
                     public void runNoCompletion() {
-                        runGenUsage.run();
+                        genUsages.values().removeIf(gen -> !actual(gen)); // оптимизация, до inlinePend, чтобы не сбивать счетчик
+                        if (genUsages.isEmpty())
+                            return;
+
+                        for (int i = 0; i < genUsages.size(); i++)
+                            inlinePend(sync);
+                        runMetaText.getResult().run();
                     }
                 });
             }
@@ -654,6 +696,11 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
             return true;
         }
 
+        // Only a safety valve for pathological bursts: the flush below is scheduled right away anyway, so flushing
+        // early just splits what would have been one batch (= one write action per file) into many tiny ones.
+        private static final int MAX_PENDING_PER_GROUP = 500;
+        private static final int MAX_PENDING_GROUPS = 50;
+
         public void add(Collection<T> elements) {
             for (T statement : elements) {
                 if (!processing.contains(statement) && extraCheck(statement)) {
@@ -661,9 +708,9 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
                         G group = group(statement);
                         Set<T> pendEls = pending.computeIfAbsent(group, k -> new HashSet<>());
                         pendEls.add(statement);
-                        if (pendEls.size() > 4)
+                        if (pendEls.size() > MAX_PENDING_PER_GROUP)
                             flushGroup(group);
-                        if (pending.size() > 4)
+                        if (pending.size() > MAX_PENDING_GROUPS)
                             flushAll();
                         if (!flushing) {
                             flushing = true;
@@ -724,18 +771,74 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         LSFGlobalResolver.cached.clear(); // убираем все, потому как могут быть зависимости
 
         if (enabled && file != null)
-            addModuleHeaderUsageProcessing(file);
+            scheduleModuleHeaderUsageProcessing(file);
     }
 
-    private void addModuleHeaderUsageProcessing(LSFFile file) {
-        addUsageProcessing(file.getMetaCodeStatementList());
-        ApplicationManager.getApplication().executeOnPooledThread(() -> DumbService.getInstance(myProject).runReadActionInSmartMode(() -> {
-            PsiFile psiFile = PsiManager.getInstance(myProject).findFile(file.getVirtualFile());
-            LSFModuleDeclaration module = psiFile instanceof LSFFile ? ((LSFFile) psiFile).getModuleDeclaration() : null;
-            if (module != null && module.isValid()) {
-                addDependentModulesUsageProcessing(module, ContainerUtil.newHashSet(module));
+    // Re-inlining the metacode of the whole REQUIRE closure is far too expensive to do per keystroke - and the header
+    // is edited character by character, each character producing two PSI events. So the reprocessing is postponed
+    // until the typing stops, and then skipped altogether if the header text ended up the same as the last one we
+    // processed (typing that was undone, reformatting, whitespace).
+    private static final int HEADER_REPROCESS_DELAY = 700;
+
+    private final Set<LSFFile> pendingHeaderFiles = ContainerUtil.newConcurrentSet();
+    private final Map<LSFFile, String> processedHeaders = ContainerUtil.createConcurrentWeakMap();
+    private final AtomicReference<ScheduledFuture<?>> pendingHeaderReprocess = new AtomicReference<>();
+
+    private void scheduleModuleHeaderUsageProcessing(LSFFile file) {
+        pendingHeaderFiles.add(file);
+        // the scheduler is only used to count down the delay - reprocessChangedModuleHeaders waits for smart mode,
+        // which during indexing means minutes, and the scheduler's threads are shared with the rest of the IDE
+        ScheduledFuture<?> previous = pendingHeaderReprocess.getAndSet(AppExecutorUtil.getAppScheduledExecutorService()
+                .schedule(() -> ApplicationManager.getApplication().executeOnPooledThread(this::reprocessChangedModuleHeaders),
+                        HEADER_REPROCESS_DELAY, TimeUnit.MILLISECONDS));
+        if (previous != null)
+            previous.cancel(false);
+    }
+
+    private void reprocessChangedModuleHeaders() {
+        if (disposed || myProject.isDisposed())
+            return;
+
+        DumbService dumbService = DumbService.getInstance(myProject);
+        // don't park a shared pool worker for the whole indexing (runReadActionInSmartMode blocks, and every
+        // overlapping invocation would stack another blocked worker) - runWhenSmart holds no thread
+        if (dumbService.isDumb()) {
+            dumbService.runWhenSmart(() -> ApplicationManager.getApplication().executeOnPooledThread(this::reprocessChangedModuleHeaders));
+            return;
+        }
+
+        // draining instead of copying and clearing: a file added in between would be dropped without being processed
+        for (Iterator<LSFFile> iterator = pendingHeaderFiles.iterator(); iterator.hasNext(); ) {
+            LSFFile file = iterator.next();
+            iterator.remove();
+            try {
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    if (!file.isValid() || !enabled)
+                        return;
+
+                    // the module declaration is the module header (the moduleHeader rule carries both the
+                    // LSFModuleDeclaration mixin and the MODULE stub type), so this is at once the text to compare
+                    // and the root of the REQUIRE closure below
+                    LSFModuleDeclaration module = file.getModuleDeclaration();
+                    String headerText = module == null ? "" : module.getText();
+                    if (headerText.equals(processedHeaders.get(file)))
+                        return;
+
+                    addUsageProcessing(file.getMetaCodeStatementList());
+                    if (module != null && module.isValid())
+                        addDependentModulesUsageProcessing(module, ContainerUtil.newHashSet(module));
+
+                    // recorded only once the whole closure is queued, so a failure above leaves the header pending
+                    processedHeaders.put(file, headerText);
+                });
+            } catch (IndexNotReadyException e) {
+                // indexing started between the isDumb check and the read action; the undrained files would hit
+                // it too, so put this one back and retry them all together after the indexing ends
+                pendingHeaderFiles.add(file);
+                dumbService.runWhenSmart(() -> ApplicationManager.getApplication().executeOnPooledThread(this::reprocessChangedModuleHeaders));
+                return;
             }
-        }));
+        }
     }
 
     private void addDependentModulesUsageProcessing(LSFModuleDeclaration module, Set<LSFModuleDeclaration> proceeded) {

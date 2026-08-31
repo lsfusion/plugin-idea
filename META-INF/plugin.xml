@@ -8,12 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.312</b><br>
+        <b>Version 1.0.313</b><br>
         <ul>
-            <li>Add missing DESIGN properties to match platform and docs</li>
-            <li>Fix NPE in getDefaultBundleKey on Cyrillic letters outside Russian alphabet</li>
-            <li>Make DESIGN property validation type-aware</li>
-            <li>`lsfusion_get_guidance` reads one guidance article whole, by name: `rules`/`brief` name an area and the article comes back entire. Those two branches leave `lsfusion_retrieve_docs`, which now searches `language`/`paradigm`/`how-to`</li>
+            <li>Much less editor freezing while META code is inlined</li>
         </ul>
     ]]>
     </change-notes>
