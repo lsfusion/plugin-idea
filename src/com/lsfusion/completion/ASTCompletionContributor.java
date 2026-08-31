@@ -22,6 +22,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.BooleanValueHolder;
 import com.intellij.util.ProcessingContext;
+import com.lsfusion.design.model.*;
 import com.lsfusion.design.model.proxy.*;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFLanguage;
@@ -88,6 +89,110 @@ public class ASTCompletionContributor extends CompletionContributor {
             }
         }
     };
+
+    public static final Map<Class<?>, Map<String, Class>> DESIGN_PROPERTIES_BY_TYPE = new LinkedHashMap<>() {
+        {
+            for (Map.Entry<Class<?>, Class<? extends ViewProxy>> entry : ViewProxyFactory.PROXY_CLASSES.entrySet()) {
+                Map<String, Class> properties = new LinkedHashMap<>();
+                Class<?> proxyClass = entry.getValue();
+                while (proxyClass != null && ViewProxy.class.isAssignableFrom(proxyClass)) {
+                    for (Method method : proxyClass.getDeclaredMethods()) {
+                        if (method.getName().startsWith("set") && !method.isBridge() && method.getParameterTypes().length == 1) {
+                            properties.putIfAbsent(Character.toLowerCase(method.getName().charAt(3)) + method.getName().substring(4),
+                                    method.getParameterTypes()[0]);
+                        }
+                    }
+                    proxyClass = proxyClass.getSuperclass();
+                }
+                put(entry.getKey(), properties);
+            }
+        }
+    };
+
+    @Nullable
+    public static Class<?> resolveDesignComponentClass(@NotNull LSFSetObjectPropertyStatement statement) {
+        LSFComponentBody body = PsiTreeUtil.getParentOfType(statement, LSFComponentBody.class);
+        if (body == null) {
+            return null;
+        }
+        PsiElement owner = body.getParent();
+        if (owner instanceof LSFNewComponentStatement || owner instanceof LSFDesignStatement) {
+            return ContainerView.class;
+        }
+        if (owner instanceof LSFMoveComponentStatement) {
+            return resolveComponentSelectorClass(((LSFMoveComponentStatement) owner).getComponentSelector());
+        }
+        if (owner instanceof LSFSetupComponentStatement) {
+            return resolveComponentSelectorClass(((LSFSetupComponentStatement) owner).getComponentSelector());
+        }
+        return null;
+    }
+
+    @Nullable
+    private static Class<?> resolveComponentSelectorClass(@Nullable LSFComponentSelector selector) {
+        if (selector == null) {
+            return null;
+        }
+        if (selector.getComponentSelector() != null) {
+            return ContainerView.class;
+        }
+        if (selector.getPropertySelector() != null) {
+            return PropertyDrawView.class;
+        }
+        if (selector.getFilterPropertySelector() != null) {
+            return FilterView.class;
+        }
+        if (selector.getFilterGroupSelector() != null) {
+            return ComponentView.class;
+        }
+        if (selector.getGroupObjectTreeSingleSelectorType() != null) {
+            switch (selector.getGroupObjectTreeSingleSelectorType().getText()) {
+                case "GRID":
+                case "GRIDBOX":
+                    return selector.getTreeGroupSelector() != null ? TreeGroupView.class : GridView.class;
+                case "TOOLBARSYSTEM":
+                    return ToolbarView.class;
+                case "CLASSCHOOSER":
+                    return ClassChooserView.class;
+                case "FILTERCONTROLS":
+                    return ComponentView.class;
+                case "BOX":
+                case "PANEL":
+                case "TOOLBARBOX":
+                case "TOOLBARLEFT":
+                case "TOOLBARRIGHT":
+                case "TOOLBAR":
+                case "FILTERBOX":
+                case "FILTERGROUPS":
+                case "FILTERS":
+                case "USERFILTER":
+                    return ContainerView.class;
+                default:
+                    return null;
+            }
+        }
+        if (selector.getGroupSingleSelectorType() != null) {
+            return ContainerView.class;
+        }
+        if (selector.getGlobalSingleSelectorType() != null) {
+            switch (selector.getGlobalSingleSelectorType().getText()) {
+                case "BOX":
+                case "OBJECTS":
+                case "PANEL":
+                case "TOOLBARBOX":
+                case "TOOLBARLEFT":
+                case "TOOLBARRIGHT":
+                case "TOOLBAR":
+                    return ContainerView.class;
+                default:
+                    return null;
+            }
+        }
+        if (selector.getComponentUsage() != null) {
+            return selector.getComponentUsage().resolveDecl() != null ? ContainerView.class : null;
+        }
+        return null;
+    }
 
     enum ClassUsagePolicy {
         /**

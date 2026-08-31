@@ -12,6 +12,7 @@
         <ul>
             <li>Add missing DESIGN properties to match platform and docs</li>
             <li>Fix NPE in getDefaultBundleKey on Cyrillic letters outside Russian alphabet</li>
+            <li>Make DESIGN property validation type-aware</li>
         </ul>
     ]]>
     </change-notes>

@@ -1395,7 +1395,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                     valueClass = LogicalClass.threeStateInstance;
                 }
 
-                Class<?> cls = ASTCompletionContributor.DESIGN_PROPERTIES.get(property);
+                Class<?> componentClass = ASTCompletionContributor.resolveDesignComponentClass(o);
+                Map<String, Class> scopedProperties = componentClass != null ? ASTCompletionContributor.DESIGN_PROPERTIES_BY_TYPE.get(componentClass) : null;
+                Class<?> cls = scopedProperties != null ? scopedProperties.get(property) : ASTCompletionContributor.DESIGN_PROPERTIES.get(property);
                 if (cls == null) {
                     addHighlightErrorWithResolving(o, "Can't resolve property " + property); // design property can be meta parameter
                 } else if(valueClass != null) {
