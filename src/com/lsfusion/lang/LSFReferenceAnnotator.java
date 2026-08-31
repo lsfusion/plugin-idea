@@ -64,6 +64,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.lsfusion.util.JavaPsiUtils.hasSuperClass;
@@ -994,17 +995,21 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private boolean checkReference(LSFReference reference) {
-        LSFResolveResult resolveResult = reference instanceof LSFReferenceImpl<?> referenceImpl ? referenceImpl.multiResolveDecl(true) : null;
         LSFResolvingError errorAnnotation = reference.resolveErrorAnnotation(myHolder);
         if (errorAnnotation != null) { // !isInMetaDecl(reference)
             if(!errorAnnotation.deprecated)
-                addErrorWithResolving(reference, errorAnnotation, getRequireModuleFixes(reference, resolveResult)); // since in meta usage there can be total different resolved references
+                addErrorWithResolving(reference, errorAnnotation, () -> getRequireModuleFixes(reference)); // since in meta usage there can be total different resolved references
             return false;
         }
         return true;
     }
 
-    private List<IntentionAction> getRequireModuleFixes(LSFReference reference, @Nullable LSFResolveResult resolveResult) {
+    // Every candidate lookup below is a stub index query over the whole module-with-dependencies scope, so it is only
+    // worth doing when the fixes are actually going to be shown - see addErrorAnnotation, which is where this is called
+    // from. Inside a META declaration the errors are reported as info annotations without fixes, and the unresolvable
+    // ### parameter placeholders there would otherwise account for most of the queries in a metacode-heavy file.
+    private List<IntentionAction> getRequireModuleFixes(LSFReference reference) {
+        LSFResolveResult resolveResult = reference instanceof LSFReferenceImpl<?> referenceImpl ? referenceImpl.multiResolveDecl(true) : null;
         List<IntentionAction> candidates = new ArrayList<>();
         if ((resolveResult != null && resolveResult.errorAnnotator instanceof LSFResolveResult.NotFoundErrorAnnotator)
                 && (reference instanceof LSFFullNameReferenceImpl<?, ?> fullNameReference)) {
@@ -1103,7 +1108,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void addErrorWithResolving(PsiElement element, LSFResolvingError error) {
         addErrorWithResolving(element, error, null);
     }
-    private void addErrorWithResolving(PsiElement element, LSFResolvingError error, List<IntentionAction> fixes) {
+    private void addErrorWithResolving(PsiElement element, LSFResolvingError error, Supplier<List<IntentionAction>> fixes) {
         addError(element, error, true, fixes);
     }
     private void addUnderscoredError(PsiElement element, TextRange range, String message) {
@@ -1112,13 +1117,13 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     private void addUnderscoredError(PsiElement element, String message) {
         addError(element, new LSFResolvingError(element, message, true));
     }
-    private void addUnderscoredError(PsiElement element, String message, List<IntentionAction> fixes) {
+    private void addUnderscoredError(PsiElement element, String message, Supplier<List<IntentionAction>> fixes) {
         addError(element, new LSFResolvingError(element, message, true), false, fixes);
     }
     private void addError(PsiElement element, LSFResolvingError error) {
         addError(element, error, false, null);
     }
-    private void addError(PsiElement element, LSFResolvingError error, boolean hasResolving, List<IntentionAction> fixes) {
+    private void addError(PsiElement element, LSFResolvingError error, boolean hasResolving, Supplier<List<IntentionAction>> fixes) {
         if (isInMetaDecl(element) && hasResolving) {
             addInfoAnnotation(element, error.range, error.text, error.underscored ? WAVE_UNDERSCORED_META_ERROR : META_ERROR);
         } else {
@@ -1134,7 +1139,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         addErrorAnnotation(element, range, text, textAttributes, null);
     }
 
-    private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes, List<IntentionAction> fixes) {
+    private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes, Supplier<List<IntentionAction>> fixes) {
         if (errorsSearchMode) {
             if (searchMessageConsumer != null) {
                 searchMessageConsumer.accept(element, text, LSFErrorLevel.ERROR);
@@ -1142,13 +1147,16 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 ShowErrorsAction.showErrorMessage(element, text, LSFErrorLevel.ERROR);
             }
         } else {
+            // evaluated before newAnnotation(): the lookup queries the stub index and can throw
+            // ProcessCanceledException, which must not abandon a registered AnnotationBuilder
+            List<IntentionAction> fixList = fixes != null ? fixes.get() : null;
             AnnotationBuilder annotationBuilder = myHolder.newAnnotation(HighlightSeverity.ERROR, text);
             if (range != null) {
                 annotationBuilder = annotationBuilder.range(range);
             }
             annotationBuilder = annotationBuilder.enforcedTextAttributes(mergeMetaAttributes(element, textAttributes));
-            if (fixes != null) {
-                for (IntentionAction fix : fixes) {
+            if (fixList != null) {
+                for (IntentionAction fix : fixList) {
                     annotationBuilder = annotationBuilder.withFix(fix);
                 }
             }
@@ -1346,7 +1354,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addFalseToBooleanError(PsiElement o) {
-        addUnderscoredError(o, "use NULL instead of FALSE", Collections.singletonList(new LSFReplaceFix(o, "FALSE", "NULL")));
+        addUnderscoredError(o, "use NULL instead of FALSE", () -> Collections.singletonList(new LSFReplaceFix(o, "FALSE", "NULL")));
     }
 
     private void addAssignError(LSFAssignActionPropertyDefinitionBody o) {

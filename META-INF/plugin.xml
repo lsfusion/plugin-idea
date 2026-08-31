@@ -11,6 +11,7 @@
         <b>Version 1.0.313</b><br>
         <ul>
             <li>Much less editor freezing while META code is inlined</li>
+            <li>Faster highlighting of files with many META declarations</li>
         </ul>
     ]]>
     </change-notes>
