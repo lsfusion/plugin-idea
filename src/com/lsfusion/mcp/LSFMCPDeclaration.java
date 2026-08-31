@@ -28,8 +28,8 @@ public interface LSFMCPDeclaration extends LSFMCPStatement {
             if (file == null) return java.util.Collections.emptyList();
 
             // Use ordered PSI traversal instead of TextRange sorting.
-            // IMPORTANT: we must include ALL descendants of LSFMCPDeclaration, including nested ones.
-            // (LSFPsiUtils.findChildrenOfType() stops descending into a subtree once it matches the class.)
+            // IMPORTANT: we must include ALL descendants of LSFMCPDeclaration, including nested ones,
+            // which is what PsiTreeUtil.findChildrenOfType collects.
             java.util.Collection<LSFMCPDeclaration> children = PsiTreeUtil.findChildrenOfType(file, LSFMCPDeclaration.class);
             if (children.isEmpty()) return java.util.Collections.emptyList();
 

@@ -21,6 +21,7 @@ import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.util.LowMemoryWatcher;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.openapi.vcs.FileStatusManager;
@@ -55,7 +56,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.intellij.codeInsight.completion.impl.CompletionServiceImpl.getCompletionPhase;
-import static com.lsfusion.util.LSFPsiUtils.findChildrenOfType;
 
 @Service(Service.Level.PROJECT)
 public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Disposable {
@@ -80,6 +80,11 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         });
 
         myProject.getMessageBus().connect(this).subscribe(CompletionPhaseListener.TOPIC, (CompletionPhaseListener) isCompletionRunning -> checkCompletion());
+
+        // Each cached list holds the metacode statements of every file that uses the declaration, and those are
+        // AST-backed, so the parsed trees of those files cannot be released while the entry lives. Dropping the
+        // whole cache when the IDE runs low on memory costs one usage search per declaration edited afterwards.
+        LowMemoryWatcher.register(cacheUsages::clear, this);
     }
 
     // Plugin unload disposes the service but leaves the project alive, so myProject.isDisposed() cannot be
@@ -94,6 +99,7 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
             pending.cancel(false);
         pendingHeaderFiles.clear();
         processedHeaders.clear();
+        cacheUsages.clear();
     }
 
     public static class MetaChangeListener implements ProjectActivity {
@@ -763,12 +769,64 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
     private ConcurrentMap<LongLivingMeta, List<LSFMetaCodeStatement>> cacheUsages = new ConcurrentHashMap<>();
 
 
-    void fireChangedNotMetaBody() {
-        cacheUsages.clear();
+    // Each entry here is a project-wide usage search (findMetaUsages), hundreds of milliseconds. The whole cache used
+    // to be dropped on any change outside a metacode body - in practice on every keystroke - so the search was
+    // repeated for every burst of typing in a file that declares metacodes. A cached list is only dangerous when it
+    // misses a live usage: an extra statement is re-resolved when the list is processed, and a dead one is dropped
+    // by the isValid check when the list is read. A usage of a name can appear through the subtree of an add/remove
+    // event (changedUsages, collected at every depth by collectMetaStatements), through an in-place edit of the
+    // header of an enclosing usage (the ancestor walk below - renaming @foo to @bar, or changing its arity,
+    // replaces a leaf deep inside the statement), or through a REQUIRE change re-targeting usages to other
+    // declarations wholesale (fireChangedModuleHeader).
+    private void invalidateCachedUsages(PsiElement element, Set<String> changedUsages) {
+        if (cacheUsages.isEmpty())
+            return;
+
+        // starting at the element itself, not at its parent: the body we inline is replaced as a whole, and that
+        // event carries the body as the element - walking from its parent would attribute our own inlining to the
+        // enclosing usage and drop the very list the inlining was started from
+        for (PsiElement parent = element; parent != null && !(parent instanceof PsiFile); parent = parent.getParent()) {
+            if (parent instanceof LSFMetaCodeBody || parent instanceof LSFMetaCodeDeclBody)
+                break; // a change inside a body cannot touch the header of the enclosing statement
+            if (parent instanceof LSFMetaCodeStatement) {
+                addChangedUsage(parent, changedUsages);
+                break;
+            }
+        }
+
+        if (!changedUsages.isEmpty())
+            cacheUsages.keySet().removeIf(decl -> changedUsages.contains(decl.name));
+    }
+
+    private static void addChangedUsage(PsiElement element, Set<String> changedUsages) {
+        if (element instanceof LSFMetaCodeStatement usage && usage.isCorrect()) {
+            String name = usage.getNameRef();
+            if (name != null)
+                changedUsages.add(name);
+        }
+    }
+
+    // One walk of an added/removed subtree serving both consumers. Reprocessing (statements) wants only the
+    // outermost meta statements: re-inlining a usage regenerates its nested usages recursively, and
+    // addDeclProcessing reprocesses the usages inside the declaration body itself. Cache invalidation
+    // (changedUsages) needs the names from every depth: the cached lists come from a text search, so they also
+    // hold usages nested inside inlined bodies.
+    private static void collectMetaStatements(PsiElement element, boolean outermost, List<PsiElement> statements, Set<String> changedUsages) {
+        boolean statement = element instanceof LSFMetaCodeStatement || element instanceof LSFMetaCodeDeclarationStatement;
+        if (statement) {
+            if (outermost)
+                statements.add(element);
+            addChangedUsage(element, changedUsages);
+        }
+        for (PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling())
+            collectMetaStatements(child, outermost && !statement, statements, changedUsages);
     }
 
     void fireChangedModuleHeader(LSFFile file) {
         LSFGlobalResolver.cached.clear(); // убираем все, потому как могут быть зависимости
+        // the cached lists are REQUIRE-scope dependent (findMetaUsages keeps only the usages that resolve to the
+        // declaration), so a header change can re-target any usage in the project to another declaration
+        cacheUsages.clear();
 
         if (enabled && file != null)
             scheduleModuleHeaderUsageProcessing(file);
@@ -867,6 +925,8 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
                     List<LSFMetaCodeStatement> usages = null;
                     if (metaDecl.file.isValid()) {
                         usages = cacheUsages.get(metaDecl);
+                        if (usages != null && !ContainerUtil.all(usages, PsiElement::isValid))
+                            usages = null; // a file can be reparsed as a whole without any add/remove event we could see
                         if (usages == null) {
                             usages = LSFResolver.findMetaUsages(metaDecl.name, metaDecl.paramCount, metaDecl.file);
                             cacheUsages.put(metaDecl, usages);
@@ -925,6 +985,8 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
 
     public void setMetaEnabled(List<String> modulesToInclude, boolean enabled, boolean reprocess) {
         this.enabled = enabled;
+        if (!enabled)
+            cacheUsages.clear(); // don't pin project-wide statement lists while disabled; also unlocks the fast path in fireRemoved
         PropertiesComponent.getInstance(myProject).setValue(ENABLED_META, Boolean.toString(enabled));
 
         if (reprocess)
@@ -1091,7 +1153,6 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
     private void fireChanged(PsiElement element) {
         // this whole thing doesn't actually work because of lazy elements (see comment in LSF.bnf)
         boolean inMetaBody = false;
-        boolean inMetaDeclBody = false;
         boolean inModuleHeader = false;
         PsiFile containingFile = element.getContainingFile();
         LSFFile lsfFile = containingFile instanceof LSFFile ? (LSFFile) containingFile : null;
@@ -1103,8 +1164,6 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
 
                 if (element instanceof LSFMetaCodeBody)
                     inMetaBody = true;
-                if (element instanceof LSFMetaCodeDeclBody)
-                    inMetaDeclBody = true;
             }
                 
             if (element instanceof LSFMetaCodeStatement && (enabled || ((LSFMetaCodeStatement) element).isInline())) {
@@ -1118,17 +1177,18 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
             element = element.getParent();
         }
 
-        if (!(inMetaBody || inMetaDeclBody)) {
-            fireChangedNotMetaBody();
-        }
         if (inModuleHeader) {
             fireChangedModuleHeader(lsfFile);
         }
     }
 
     private void fireAdded(PsiElement element) {
-        Collection<PsiElement> children = findChildrenOfType(element, LSFMetaCodeStatement.class, LSFMetaCodeDeclarationStatement.class);
-        for (PsiElement child : children) {
+        List<PsiElement> statements = new ArrayList<>();
+        Set<String> changedUsages = new HashSet<>();
+        collectMetaStatements(element, true, statements, changedUsages);
+        invalidateCachedUsages(element, changedUsages);
+
+        for (PsiElement child : statements) {
             if (child instanceof LSFMetaCodeStatement && (enabled || ((LSFMetaCodeStatement) child).isInline())) {
                 // нужно перегенерировать тело использования
                 addUsageProcessing((LSFMetaCodeStatement) child);
@@ -1140,11 +1200,18 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
     }
 
     private void fireRemoved(PsiElement element) {
+        if (!enabled && cacheUsages.isEmpty())
+            return;
+
+        List<PsiElement> statements = new ArrayList<>();
+        Set<String> changedUsages = new HashSet<>();
+        collectMetaStatements(element, true, statements, changedUsages);
+        invalidateCachedUsages(element, changedUsages);
+
         if (!enabled)
             return;
 
-        Collection<PsiElement> children = findChildrenOfType(element, LSFMetaCodeDeclarationStatement.class);
-        for (PsiElement child : children) {
+        for (PsiElement child : statements) {
             if (child instanceof LSFMetaCodeDeclarationStatement) {
                 // нужно перегенерить все usage'ы этого метакода
                 addDeclProcessing((LSFMetaCodeDeclarationStatement) child);

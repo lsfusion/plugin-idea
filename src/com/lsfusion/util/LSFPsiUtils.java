@@ -12,10 +12,8 @@ import com.intellij.openapi.util.Segment;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ArrayListSet;
-import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
@@ -363,26 +361,6 @@ public class LSFPsiUtils {
             }
         }
         return result;
-    }
-
-    public static Collection<PsiElement> findChildrenOfType(final PsiElement element, final Class<? extends PsiElement>... classes) {
-        if (element == null) {
-            return ContainerUtil.emptyList();
-        }
-
-        PsiElementProcessor.CollectElements<PsiElement> processor = new PsiElementProcessor.CollectElements<>() {
-            @Override
-            public boolean execute(@NotNull PsiElement each) {
-                if (each == element) return true;
-                if (PsiTreeUtil.instanceOf(each, classes)) {
-                    super.execute(each);
-                    return false;
-                }
-                return true;
-            }
-        };
-        PsiTreeUtil.processElements(element, processor);
-        return processor.getCollection();
     }
 
     public static <T extends PsiElement> T getLastChildOfType(@Nullable PsiElement element, @NotNull Class<T> aClass) {
