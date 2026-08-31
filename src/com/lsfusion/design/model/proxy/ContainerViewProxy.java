@@ -104,12 +104,20 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.setLines(lines);
     }
 
+    public void setReversed(boolean reversed) {
+        target.reversed = reversed;
+    }
+
     public void setLineSize(int lineSize) {
         target.lineSize = lineSize;
     }
 
     public void setCaptionLineSize(int captionLineSize) {
         target.captionLineSize = captionLineSize;
+    }
+
+    public void setLineShrink(boolean lineShrink) {
+        target.lineShrink = lineShrink;
     }
 
     public void setVisible(boolean visible) {

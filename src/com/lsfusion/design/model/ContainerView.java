@@ -45,8 +45,10 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("custom").setExpert(),
             new ReflectionProperty("columns").setExpert(), //deprecated in 5.2, removed in 6.0
             new ReflectionProperty("lines"),
+            new ReflectionProperty("reversed").setExpert(),
             new ReflectionProperty("lineSize"),
             new ReflectionProperty("captionLineSize"),
+            new ReflectionProperty("lineShrink").setExpert(),
             new ReflectionProperty("visible").setExpert() //backward compatibility
     );
 
@@ -89,9 +91,13 @@ public class ContainerView extends ComponentView {
 
     public int lines = 1;
 
+    public boolean reversed;
+
     public int lineSize;
 
     public int captionLineSize;
+
+    public boolean lineShrink;
 
     public String description;
 

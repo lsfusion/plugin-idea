@@ -52,22 +52,32 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("maxValue"),
             new ReflectionProperty("echoSymbols"),
             new ReflectionProperty("noSort").setExpert(),
+            new ReflectionProperty("highlightDuplicate"),
             new ReflectionProperty("defaultCompare"),
             new ReflectionProperty("valueSize").setExpert(),
             new ReflectionProperty("valueHeight").setExpert(),
             new ReflectionProperty("valueWidth").setExpert(),
             new ReflectionProperty("captionHeight"),
             new ReflectionProperty("captionWidth"),
+            new ReflectionProperty("captionCharHeight"),
+            new ReflectionProperty("wrapWordBreak").setExpert(),
+            new ReflectionProperty("ellipsis").setExpert(),
+            new ReflectionProperty("collapse").setExpert(),
             new ReflectionProperty("captionWrap").setExpert(),
             new ReflectionProperty("captionWrapWordBreak").setExpert(),
+            new ReflectionProperty("captionEllipsis").setExpert(),
+            new ReflectionProperty("captionCollapse").setExpert(),
             new ReflectionProperty("charHeight").setExpert(),
             new ReflectionProperty("charWidth").setExpert(),
             new ReflectionProperty("valueFlex"),
+            new ReflectionProperty("panelCustom").setExpert(),
             new ReflectionProperty("changeKey"),
             new ReflectionProperty("changeKeyPriority"),
             new ReflectionProperty("changeMouse"),
             new ReflectionProperty("changeMousePriority"),
             new ReflectionProperty("showChangeKey").setExpert(),
+            new ReflectionProperty("showChangeMouse").setExpert(),
+            new ReflectionProperty("inline").setExpert(),
             new ReflectionProperty("focusable"),
             new ReflectionProperty("panelColumnVertical"),
             new ReflectionProperty("valueClass").setExpert(),
@@ -99,6 +109,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("askConfirm").setExpert(),
             new ReflectionProperty("askConfirmMessage").setExpert(),
             new ReflectionProperty("toolbar"),
+            new ReflectionProperty("toolbarActions"),
             new ReflectionProperty("notNull"),
             new ReflectionProperty("select").setExpert(),
             new ReflectionProperty("defaultValue").setExpert()
@@ -132,26 +143,39 @@ public class PropertyDrawView extends ComponentView {
     public boolean echoSymbols;
 
     public boolean noSort;
+    public boolean highlightDuplicate;
     public String defaultCompare;
 
     public Dimension valueSize;
 
     public int captionHeight;
     public int captionWidth;
+    public int captionCharHeight;
+
+    public boolean wrapWordBreak;
+    public boolean ellipsis;
+    public boolean collapse;
 
     public boolean captionWrap;
     public boolean captionWrapWordBreak;
+    public boolean captionEllipsis;
+    public boolean captionCollapse;
 
     public int charHeight;
     public int charWidth;
 
     public Boolean valueFlex;
 
+    public boolean panelCustom;
+
     public KeyStroke changeKey;
     public int changeKeyPriority;
     public String changeMouse;
     public int changeMousePriority;
     public boolean showChangeKey;
+    public boolean showChangeMouse;
+
+    public boolean inline;
 
     public boolean focusable;
 
@@ -192,6 +216,7 @@ public class PropertyDrawView extends ComponentView {
     public String askConfirmMessage;
 
     public boolean toolbar;
+    public boolean toolbarActions;
 
     public boolean notNull;
 

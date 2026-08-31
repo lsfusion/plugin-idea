@@ -24,6 +24,10 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         target.activated = activated;
     }
 
+    public void setLsf(boolean lsf) {
+        target.lsf = lsf;
+    }
+
     /* ========= constraints properties ========= */
 
     public void setFill(double fill) {

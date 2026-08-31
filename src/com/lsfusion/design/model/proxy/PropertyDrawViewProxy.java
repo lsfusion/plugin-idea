@@ -57,6 +57,50 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.captionWrapWordBreak = captionWrapWordBreak;
     }
 
+    public void setCaptionEllipsis(boolean captionEllipsis) {
+        target.captionEllipsis = captionEllipsis;
+    }
+
+    public void setCaptionCollapse(boolean captionCollapse) {
+        target.captionCollapse = captionCollapse;
+    }
+
+    public void setCaptionCharHeight(int captionCharHeight) {
+        target.captionCharHeight = captionCharHeight;
+    }
+
+    public void setWrapWordBreak(boolean wrapWordBreak) {
+        target.wrapWordBreak = wrapWordBreak;
+    }
+
+    public void setEllipsis(boolean ellipsis) {
+        target.ellipsis = ellipsis;
+    }
+
+    public void setCollapse(boolean collapse) {
+        target.collapse = collapse;
+    }
+
+    public void setHighlightDuplicate(boolean highlightDuplicate) {
+        target.highlightDuplicate = highlightDuplicate;
+    }
+
+    public void setPanelCustom(boolean panelCustom) {
+        target.panelCustom = panelCustom;
+    }
+
+    public void setShowChangeMouse(boolean showChangeMouse) {
+        target.showChangeMouse = showChangeMouse;
+    }
+
+    public void setInline(boolean inline) {
+        target.inline = inline;
+    }
+
+    public void setToolbarActions(boolean toolbarActions) {
+        target.toolbarActions = toolbarActions;
+    }
+
     public void setEditOnSingleClick(boolean editOnSingleClick) {
         setChangeOnSingleClick(editOnSingleClick);
     }
