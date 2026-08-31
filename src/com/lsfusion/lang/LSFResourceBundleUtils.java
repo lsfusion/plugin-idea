@@ -181,15 +181,16 @@ public class LSFResourceBundleUtils {
         }
     }
 
-    //copy from lsfusion.server.physics.dev.i18n.ResourceBundleGenerator
-    private static final String russianAlphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
-    private static final String[] transliteration = {"a", "b", "v", "g", "d", "e", "e", "zh", "z", "i", "i", "k", "l", "m",
-            "n", "o", "p", "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "shch", "ie", "y", "", "e", "iu", "ia"};
+    //copy from lsfusion.server.physics.dev.i18n.ResourceBundleGenerator, extended with Belarusian/Ukrainian letters
+    private static final String cyrillicAlphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяіўїєґ";
+    private static final String[] cyrillicTransliteration = {"a", "b", "v", "g", "d", "e", "e", "zh", "z", "i", "i", "k", "l", "m",
+            "n", "o", "p", "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "shch", "ie", "y", "", "e", "iu", "ia",
+            "i", "u", "yi", "ie", "g"};
 
     private static final Map<Character, String> transliterationMap = new HashMap<>();
     static {
-        for (int i = 0; i < russianAlphabet.length(); ++i) {
-            transliterationMap.put(russianAlphabet.charAt(i), transliteration[i]);
+        for (int i = 0; i < cyrillicAlphabet.length(); ++i) {
+            transliterationMap.put(cyrillicAlphabet.charAt(i), cyrillicTransliteration[i]);
         }
     }
 
@@ -203,7 +204,9 @@ public class LSFResourceBundleUtils {
                 isStart = false;
             } else if (Character.UnicodeBlock.of(ch).equals(Character.UnicodeBlock.CYRILLIC)) {
                 String tranliterated = transliterationMap.get(Character.toLowerCase(ch));
-                if (Character.isUpperCase(ch)) {
+                if (tranliterated == null) {
+                    tranliterated = String.valueOf(ch);
+                } else if (Character.isUpperCase(ch)) {
                     tranliterated = tranliterated.toUpperCase();
                 }
                 builder.append(tranliterated);

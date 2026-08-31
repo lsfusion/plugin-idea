@@ -11,6 +11,7 @@
         <b>Version 1.0.312</b><br>
         <ul>
             <li>Add missing DESIGN properties to match platform and docs</li>
+            <li>Fix NPE in getDefaultBundleKey on Cyrillic letters outside Russian alphabet</li>
         </ul>
     ]]>
     </change-notes>
