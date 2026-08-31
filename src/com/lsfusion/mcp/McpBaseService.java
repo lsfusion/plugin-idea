@@ -318,9 +318,14 @@ public abstract class McpBaseService extends RestService {
         JSONObject inputSchema = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
+                        // string OR array: one call may carry several independent
+                        // needs, which is the normal shape of real traffic.
                         .put("query", new JSONObject()
-                                .put("type", "string")
-                                .put("description", "Short topical phrase. Semantic match (not literal); rephrase rather than retry the same query if results are weak."))
+                                .put("anyOf", new JSONArray()
+                                        .put(new JSONObject().put("type", "string"))
+                                        .put(new JSONObject().put("type", "array")
+                                                .put("items", new JSONObject().put("type", "string"))))
+                                .put("description", "One short technical query, or a list of DISTINCT queries for independent needs already known before this call. Batch only lookups that do not depend on one another; when one answer can determine or refine the next query, call the tool again instead. Do not batch alternative phrasings of one need. In a batch, `type` and `exclude_ids` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to. Semantic match (not literal); rephrase rather than retry the same query if results are weak."))
                         .put("type", typeProp)
                         .put("exclude_ids", excludeIdsProp))
                 .put("required", new JSONArray().put("query"))
@@ -335,7 +340,9 @@ public abstract class McpBaseService extends RestService {
                         .put("id", new JSONObject().put("type", "string").put("description", "Stable chunk id; pass the ids you already received back in `exclude_ids` to avoid getting the same chunks again."))
                         .put("source", new JSONObject().put("type", "string").put("description", "Chunk origin (e.g. documentation-language, documentation-paradigm)."))
                         .put("text", new JSONObject().put("type", "string").put("description", "Retrieved text snippet."))
-                        .put("score", new JSONObject().put("type", "number").put("description", "Similarity score (higher = more relevant).")))
+                        .put("score", new JSONObject().put("type", "number").put("description", "Similarity score (higher = more relevant)."))
+                        // Like `id`, deliberately not required: an older server does not send it.
+                        .put("query", new JSONObject().put("type", "string").put("description", "Which of the submitted queries this chunk answers; null when only one was submitted.")))
                 .put("required", new JSONArray().put("source").put("text").put("score"));
 
         JSONObject outputSchema = new JSONObject()

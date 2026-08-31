@@ -77,6 +77,9 @@ data class RemoteDocItem(
     val text: String,
     @McpDescription(description = "Similarity score (higher = more relevant).")
     val score: Double,
+    // Nullable for the same reason `id` is: an older server does not send it.
+    @McpDescription(description = "Which of the submitted queries this chunk answers; null when only one was submitted.")
+    val query: String? = null,
     // Nullable with a default, deliberately: `ignoreUnknownKeys = true` protects an old
     // plugin talking to a new server, and the nullable default protects a new plugin
     // talking to an older server that does not send `id` yet — a non-null field would
@@ -363,17 +366,32 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     }
 
     @McpTool(name = "lsfusion_retrieve_docs")
-    @McpDescription(description = "Search official lsFusion documentation for chunks relevant to a query. Returns `{docs:[{id,source,text,score}]}` sorted by descending score. Use `type` to narrow to one branch when known; omit to search all five and merge (the two top guidance articles are always excluded — get_guidance serves those in full). Pass the `id` values you already received in `excludeIds` when continuing a lookup, so the same chunks are not returned twice. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.")
+    @McpDescription(description = "Search official lsFusion documentation for chunks relevant to a query, or to several independent queries at once (`queries`). Returns `{docs:[{id,source,text,score,query}]}` sorted by descending score, where `query` names which of the submitted queries a chunk answers. Use `type` to narrow to one branch when known; omit to search all five and merge (the two top guidance articles are always excluded — get_guidance serves those in full). Pass the `id` values you already received in `excludeIds` when continuing a lookup, so the same chunks are not returned twice. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.")
     @Suppress("unused")
     suspend fun retrieveDocs(
-        @McpDescription(description = "Short topical phrase. Semantic match (not literal); rephrase rather than retry the same query if results are weak.")
-        query: String,
+        @McpDescription(description = "One short technical query. Semantic match (not literal); rephrase rather than retry the same query if results are weak. For several independent needs known in advance, use `queries` instead.")
+        query: String? = null,
+        @McpDescription(description = "Several DISTINCT queries for independent needs already known before this call — instead of `query`, not alongside it. Batch only lookups that do not depend on one another; when one answer can determine or refine the next query, call the tool again instead. Do not batch alternative phrasings of one need. `type` and `excludeIds` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to.")
+        queries: List<String>? = null,
         @McpDescription(description = "Optional sourceType filter (the docs folder). Omit (or pass null) to search all five branches and merge; only the two TOP articles (`Brief`, `Rules`) are excluded, because get_guidance already delivers them in full. `language` = syntax / operator reference; `paradigm` = concepts / abstractions; `how-to` = task recipes; `brief` = concise capability map; `rules` = coding constraints for one area — unlike the other branches this lookup is not optional: perform it before working in an area.")
         type: String? = null,
         @McpDescription(description = "Chunk `id` values you already hold. They are excluded server-side BEFORE ranking, so the quota is spent on material you do not have. Use this to page deeper on the same information need. Do NOT use it to rephrase a query for a better ranking, or to ask a different question about the same area: the filter ignores the new query, so a chunk that is now the most relevant one would be dropped before ranking. Leave empty on the first call.")
         excludeIds: List<String>? = null,
     ): RetrieveDocsOutput {
-        val args = JSONObject().put("query", query)
+        // The central tool takes one field that is either a string or a list;
+        // Kotlin cannot express that as one typed parameter, so the two are
+        // separate here and folded back together for the call.
+        require((query == null) != (queries.isNullOrEmpty())) {
+            "pass either query or queries, not both and not neither"
+        }
+        val args = JSONObject()
+        if (query != null) {
+            args.put("query", query)
+        } else {
+            val qs = JSONArray()
+            queries!!.forEach { qs.put(it) }
+            args.put("query", qs)
+        }
         if (type != null) args.put("type", type)
         if (excludeIds != null && excludeIds.isNotEmpty()) {
             val ids = JSONArray()
