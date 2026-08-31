@@ -100,6 +100,13 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         pendingHeaderFiles.clear();
         processedHeaders.clear();
         cacheUsages.clear();
+        // a runMetaText that died between inlinePend and the matching inlineProceed would leave the counters
+        // unequal, keeping the progress loop in inlinePend spinning at its 200ms period (and the class loader
+        // reachable) forever; with the counters equal the loop exits within a second
+        synchronized (displaySync) {
+            inlinePending = 0;
+            inlineProceeded = 0;
+        }
     }
 
     public static class MetaChangeListener implements ProjectActivity {
@@ -493,6 +500,9 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         }
 
         public void run() {
+            if (disposed) // this reschedules itself through inlinePostpone below, so it has to stop explicitly
+                return;
+
             final Map<LSFMetaCodeStatement, GenParse> genUsages = new HashMap<>();
             final List<LSFMetaCodeStatement> dumbRetry = new ArrayList<>();
             final Iterator<LSFMetaCodeStatement> iterator = usages.iterator();
@@ -643,6 +653,9 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
 
         @Override
         public void run() {
+            if (disposed) // the postpone below reschedules this runnable, so it has to stop explicitly
+                return;
+
             // the problem here is that changing editing document stops completion (expires document), so if we see that there is a completion running, we postpone the inlining
             if (isRunningCompletion(file))
                 inlinePostpone(this, true);
@@ -708,6 +721,8 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         private static final int MAX_PENDING_GROUPS = 50;
 
         public void add(Collection<T> elements) {
+            if (disposed)
+                return;
             for (T statement : elements) {
                 if (!processing.contains(statement) && extraCheck(statement)) {
                     synchronized (flush) {

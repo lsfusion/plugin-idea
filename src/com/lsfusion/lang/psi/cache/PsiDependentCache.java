@@ -11,6 +11,7 @@ import com.intellij.psi.impl.AnyPsiChangeListener;
 import com.intellij.psi.impl.PsiManagerImpl;
 import java.lang.ref.SoftReference;
 import com.intellij.util.containers.ContainerUtil;
+import com.lsfusion.LSFProjectDisposable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +35,9 @@ public abstract class PsiDependentCache<Psi extends PsiElement, TResult> {
         for (int i = 0; i < myMaps.length; i++) {
             myMaps[i] = new ConcurrentHashMap<>();
         }
-        project.getMessageBus().connect().subscribe(PsiManagerImpl.ANY_PSI_CHANGE_TOPIC, new AnyPsiChangeListener() {
+        // connect(<plugin scope>), not connect(): a connection owned by the project message bus keeps this
+        // listener - and through it the plugin's class loader - alive after the plugin is unloaded.
+        project.getMessageBus().connect(project.getService(LSFProjectDisposable.class)).subscribe(PsiManagerImpl.ANY_PSI_CHANGE_TOPIC, new AnyPsiChangeListener() {
             @Override
             public void beforePsiChanged(boolean isPhysical) {
                 clearCache(isPhysical);

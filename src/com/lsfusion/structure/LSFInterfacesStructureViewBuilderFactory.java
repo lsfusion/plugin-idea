@@ -21,12 +21,6 @@ public class LSFInterfacesStructureViewBuilderFactory implements StructureViewBu
         final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
         if (!(psiFile instanceof LSFFile)) return null;
 
-        LSFStructureFileCaretListener caretListener = project.getUserData(LSFStructureFileCaretListener.PROJECT_COMPONENT_KEY);
-        if (caretListener == null) {
-            caretListener = new LSFStructureFileCaretListener(project);
-            project.putUserData(LSFStructureFileCaretListener.PROJECT_COMPONENT_KEY, caretListener);
-        }
-
-        return new LSFTreeBasedStructureViewBuilder((LSFFile) psiFile, caretListener);
+        return new LSFTreeBasedStructureViewBuilder((LSFFile) psiFile, project.getService(LSFStructureFileCaretListener.class));
     }
 }                                                       

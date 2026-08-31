@@ -7,7 +7,6 @@ import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.ide.structureView.TreeBasedStructureViewBuilder;
 import com.intellij.ide.structureView.newStructureView.StructureViewComponent;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.components.Service;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.progress.ProcessCanceledException;
@@ -18,6 +17,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ui.tree.TreeModelAdapter;
 import com.intellij.util.ui.tree.TreeUtil;
+import com.lsfusion.LSFProjectDisposable;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -106,7 +106,7 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
         // case, so drop it here and cancel the rebuild.
         Disposable leakGuard = null;
         try {
-            leakGuard = project.getService(ProjectDisposable.class);
+            leakGuard = project.getService(LSFProjectDisposable.class);
         } catch (RuntimeException ignored) {
         }
         if (leakGuard == null || !Disposer.tryRegister(leakGuard, structureView)) {
@@ -133,12 +133,5 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
     @Override
     public boolean isRootNodeShown() {
         return false;
-    }
-
-    @Service(Service.Level.PROJECT)
-    public static final class ProjectDisposable implements Disposable {
-        @Override
-        public void dispose() {
-        }
     }
 }

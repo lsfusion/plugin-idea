@@ -12,6 +12,7 @@
         <ul>
             <li>Much less editor freezing while META code is inlined</li>
             <li>Faster highlighting of files with many META declarations</li>
+            <li>Less memory left behind when the plugin is updated or disabled</li>
         </ul>
     ]]>
     </change-notes>
