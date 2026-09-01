@@ -408,9 +408,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     )
     @Suppress("unused")
     suspend fun getGuidance(
-        @McpDescription(description = "Name of the `rules` area whose article you need — the short name in the FIRST COLUMN of the map inside the top `rules` article, not a slug and not a title. The whole article comes back: no search, no ranking, no excerpt. Reading an area's article is BINDING wherever the map states a trigger for it. Omit BOTH parameters to get the top article of each branch.")
-        rules: String? = null,
-        @McpDescription(description = "Name of the `brief` area whose article you need — the short name from the map inside the top `brief` article. Same shape as `rules`, and only one of the two may be given per call: one call delivers one whole article. Reading an area's brief before working in it is STRONGLY RECOMMENDED rather than binding.")
+        @McpDescription(description = "Name of the `brief` area whose article you need — the short name from the map inside the top `brief` article. Same shape as `rules`, and only one of the two may be given per call: one call delivers one whole article. Read an area's brief when the material already present does not identify a likely platform mechanism for the job — it is what stops you inventing a mechanism the platform already has. It is a survey, not an inventory: an article arrives whole, but a capability it does not mention is UNKNOWN, not absent, and that silence never supports a claim that lsFusion lacks something. Search `language` / `paradigm` / `how-to` with `lsfusion_retrieve_docs` before reporting that no documented mechanism exists. And the brief says WHAT exists; those three branches say how to write it.")
         brief: String? = null,
     ): String {
         val args = JSONObject()
