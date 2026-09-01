@@ -2,7 +2,7 @@
     <id>lsfusion.idea.plugin</id>
     <!--suppress PluginXmlCapitalization -->
     <name>lsFusion</name>
-    <version>1.0.311</version>
+    <version>1.0.312</version>
     <vendor email="info@lsfusion.org" url="https://lsfusion.org">lsFusion Foundation</vendor>
 
     <description>Plugin provides lsFusion language support.</description>
@@ -13,6 +13,7 @@
             <li>Add missing DESIGN properties to match platform and docs</li>
             <li>Fix NPE in getDefaultBundleKey on Cyrillic letters outside Russian alphabet</li>
             <li>Make DESIGN property validation type-aware</li>
+            <li>`lsfusion_get_guidance` reads one guidance article whole, by name: `rules`/`brief` name an area and the article comes back entire. Those two branches leave `lsfusion_retrieve_docs`, which now searches `language`/`paradigm`/`how-to`</li>
         </ul>
     ]]>
     </change-notes>
