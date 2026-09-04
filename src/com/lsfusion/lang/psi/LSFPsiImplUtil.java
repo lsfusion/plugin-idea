@@ -2645,7 +2645,10 @@ public class LSFPsiImplUtil {
 
     @NotNull
     public static Pair<List<LSFParamDeclaration>, Map<PsiElement, Pair<LSFClassSet, LSFClassSet>>> checkValueParamClasses(@NotNull UnfriendlyPE pe, PsiElement singleElement, List<LSFParamDeclaration> declareParams) {
-        int size = pe.resolveValueParamClasses(declareParams).size();
+        List<LSFExClassSet> valueClasses = pe.resolveValueParamClasses(declareParams);
+        if (valueClasses == null)
+            return new Pair<>(Collections.emptyList(), Collections.emptyMap());
+        int size = valueClasses.size();
         List<PsiElement> elements = new ArrayList<>();
         for(int i=0;i<size;i++)
             elements.add(singleElement);
@@ -2669,6 +2672,8 @@ public class LSFPsiImplUtil {
 
         List<LSFClassSet> declareClasses = resolveParamDeclClasses(declareParams);
         List<LSFClassSet> valueClasses = LSFExClassSet.fromEx(pe.resolveValueParamClasses(declareParams));
+        if (valueClasses == null)
+            return new Pair<>(incorrectParams, incorrectBys);
         assert elements.size() == valueClasses.size();
         for(int i=0,size=declareClasses.size();i<size;i++) {
             LSFClassSet declareClass = declareClasses.get(i);
