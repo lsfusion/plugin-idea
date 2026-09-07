@@ -62,16 +62,6 @@ public class ReflectionUtils {
         }
     }
 
-    public static Object getPrivateFieldValueWithException(Class clazz, Object target, String fieldName) throws NoSuchFieldException {
-        try {
-            Field field = clazz.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(target);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
     // Делалось, чтобы избежать необходимости подстраиваться под каждую версию Idea. В Ultimate версии некоторые классы,
     // в частности com.intellij.debugger.impl.DebuggerSession, компилируются без debug info, поэтому каждый раз приходилось
     // заново искать буквы, которые присваивались именам полей. Вместо этого ищем поля по классам.

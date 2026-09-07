@@ -26,7 +26,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.JavaCodeFragment;
 import com.intellij.psi.JavaCodeFragmentFactory;
-import com.intellij.util.EventDispatcher;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
@@ -85,9 +84,8 @@ import static com.sun.jdi.request.StepRequest.STEP_OUT;
  */
 public class LSFDebugProcess extends JavaDebugProcess {
 
-    // todo: remake into single field after discontinuation of Idea 2023.2 support if method doesn't change again
-    private java.lang.reflect.Method doStepMethod;
-    private java.lang.reflect.Method doStepMethod_2023_3;
+    // DebugProcessImpl.doStep is protected and LSFDebugProcess is not its subclass
+    private final java.lang.reflect.Method doStepMethod;
 
     private final JavaDebuggerEditorsProvider eEditorsProvider;
 
@@ -181,19 +179,11 @@ public class LSFDebugProcess extends JavaDebugProcess {
         eEditorsProvider = new LSFDebuggerEditorsProvider();
         SESSION_EMPTY_CONTEXT = (DebuggerContextImpl) getPrivateFieldValueByClass(DebuggerSession.class, getDebuggerSession(), DebuggerContextImpl.class); // SESSION_EMPTY_CONTEXT field
 
-        try {
-            doStepMethod = ReflectionUtils.getPrivateMethodWithException(
-                DebugProcessImpl.class,
-                "doStep",
-                SuspendContextImpl.class, ThreadReferenceProxyImpl.class, Integer.TYPE, Integer.TYPE, RequestHint.class
-            );
-        } catch (Exception e) {
-            doStepMethod_2023_3 = ReflectionUtils.getPrivateMethod(
-                    DebugProcessImpl.class,
-                    "doStep",
-                    SuspendContextImpl.class, ThreadReferenceProxyImpl.class, Integer.TYPE, Integer.TYPE, RequestHint.class, Object.class
-            );
-        }
+        doStepMethod = ReflectionUtils.getPrivateMethod(
+            DebugProcessImpl.class,
+            "doStep",
+            SuspendContextImpl.class, ThreadReferenceProxyImpl.class, Integer.TYPE, Integer.TYPE, RequestHint.class, Object.class
+        );
 
         getJavaDebugProcess().addDebugProcessListener(new DebugProcessListener() {
             @Override
@@ -280,19 +270,8 @@ public class LSFDebugProcess extends JavaDebugProcess {
 
     private void notifyDebugProcessListeners(Consumer<DebugProcessListener> listenerConsumer) {
         //приходится делать так жёстко, чтобы встроиться во внутреннюю логику java-debuggera
-        try {
-            // todo: clean this up after the end of support for IDEA 2024.2
-            // IDEA 2024.3+
-            List<DebugProcessListener> debuggerProcessListeners = (List<DebugProcessListener>) ReflectionUtils.getPrivateFieldValueWithException(DebugProcessImpl.class, getJavaDebugProcess(), "myDebugProcessListeners");
-            for (DebugProcessListener listener : debuggerProcessListeners) {
-                listenerConsumer.accept(listener);
-            }
-        } catch (NoSuchFieldException e) {
-            // IDEA 2024.2-
-            EventDispatcher<DebugProcessListener> eventDispatcher = (EventDispatcher<DebugProcessListener>) ReflectionUtils.getPrivateFieldValue(DebugProcessImpl.class, getJavaDebugProcess(), "myDebugProcessDispatcher");
-            listenerConsumer.accept(eventDispatcher.getMulticaster());
-        }
-
+        List<DebugProcessListener> listeners = (List<DebugProcessListener>) ReflectionUtils.getPrivateFieldValue(DebugProcessImpl.class, getJavaDebugProcess(), "myDebugProcessListeners");
+        listeners.forEach(listenerConsumer);
     }
 
     private void showStatusText(final String text) {
@@ -485,12 +464,8 @@ public class LSFDebugProcess extends JavaDebugProcess {
     }
 
     private void doStep(final SuspendContextImpl suspendContext, final ThreadReferenceProxyImpl stepThread, int depth, RequestHint hint) {
-        if (doStepMethod != null) {
-            ReflectionUtils.invokeMethod(doStepMethod, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint);
-        } else {
-            // todo: token parameter is expected to be SteppingStatistic object (2023.3) 
-            ReflectionUtils.invokeMethod(doStepMethod_2023_3, getJavaDebugProcess(), suspendContext, stepThread, -2, depth, hint, new Object());
-        }
+        // the trailing commandToken only feeds the platform's own stepping statistics (StatisticsStorage) and is optional
+        ReflectionUtils.invokeMethod(doStepMethod, getJavaDebugProcess(), suspendContext, stepThread, StepRequest.STEP_LINE, depth, hint, null);
     }
     
     @NotNull
