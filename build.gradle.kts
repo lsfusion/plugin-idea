@@ -119,8 +119,8 @@ dependencies {
     implementation("net.gcardone.junidecode:junidecode:0.5.2")
 
     // Needed by MCP toolset DTOs; compiler plugin generates serializers.
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.3")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
 
     // Annotations used in Java sources (e.g. `@NonNull`).
     compileOnly("org.jspecify:jspecify:1.0.0")
