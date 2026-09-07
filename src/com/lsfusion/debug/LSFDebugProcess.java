@@ -137,7 +137,7 @@ public class LSFDebugProcess extends JavaDebugProcess {
             final EvaluationContextImpl evaluationContext = new EvaluationContextImpl(context, frameProxy, (Value) null);
     
             // "You can invoke methods only inside commands invoked for SuspendContext" fix (2023.3)
-            evaluationContext.getManagerThread().invoke(new SuspendContextCommandImpl(context) {
+            evaluationContext.getManagerThread().invokeNow(new SuspendContextCommandImpl(context) {
                 @Override
                 public void contextAction(@NotNull SuspendContextImpl suspendContext) throws Exception {
                     if (register) {

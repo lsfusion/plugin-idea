@@ -43,7 +43,7 @@ public class LSFStackFrame extends XStackFrame {
         this.debugProcess = debugProcess;
         this.position = position;
 
-        debugProcess.getManagerThread().invoke(new DebuggerContextCommandImpl(debugProcess.getDebuggerContext()) {
+        debugProcess.getManagerThread().invokeNow(new DebuggerContextCommandImpl(debugProcess.getDebuggerContext()) {
             @Override
             public void threadAction(@NotNull SuspendContextImpl suspendContext) {
                 StackFrameDescriptorImpl stackFrameDescriptor = new StackFrameDescriptorImpl(new MethodsTracker(), frame);
