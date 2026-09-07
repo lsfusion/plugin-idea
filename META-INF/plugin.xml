@@ -163,7 +163,7 @@
         <annotator language="Lsf" implementationClass="com.lsfusion.lang.LSFReferenceAnnotator"/>
         <readWriteAccessDetector implementation="com.lsfusion.LSFReadWriteAccessDetector"/>
         <definitionsSearch implementation="com.lsfusion.ImplementationsSearch"/>
-        <gotoTargetRendererProvider implementation="com.lsfusion.LSFGoToTargetRendererProvider"/>
+        <gotoTargetPresentationProvider implementation="com.lsfusion.LSFGoToTargetPresentationProvider"/>
         <structureViewBuilder factoryClass="com.lsfusion.structure.LSFInterfacesStructureViewBuilderFactory"/>
 
         <codeInsight.gotoSuper language="Lsf" implementationClass="com.lsfusion.actions.LSFGoToSuperHandler"/>
