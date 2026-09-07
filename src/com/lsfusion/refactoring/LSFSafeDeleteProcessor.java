@@ -9,6 +9,7 @@ import com.intellij.refactoring.safeDelete.SafeDeleteProcessorDelegateBase;
 import com.intellij.usageView.UsageInfo;
 import com.intellij.util.CommonProcessors;
 import com.intellij.util.IncorrectOperationException;
+import com.intellij.util.containers.MultiMap;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
@@ -46,15 +47,13 @@ public class LSFSafeDeleteProcessor extends SafeDeleteProcessorDelegateBase {
         return null;
     }
 
-    @Nullable
     @Override
-    public Collection<String> findConflicts(PsiElement element, PsiElement[] allElementsToDelete) {
-            List<UsageInfo> usages = new ArrayList<>();
-            findUsages(element, allElementsToDelete, usages);
-            if (!usages.isEmpty()) {
-                return Arrays.asList("Element '" + getNameIdentifier(element).getText() +  "' has some usages.");
-            }
-        return null;
+    public void findConflicts(@NotNull PsiElement element, PsiElement @NotNull [] allElementsToDelete, UsageInfo @NotNull [] usages, @NotNull MultiMap<PsiElement, String> conflicts) {
+        List<UsageInfo> elementUsages = new ArrayList<>();
+        findUsages(element, allElementsToDelete, elementUsages);
+        if (!elementUsages.isEmpty()) {
+            conflicts.putValue(element, "Element '" + getNameIdentifier(element).getText() + "' has some usages.");
+        }
     }
 
     @Nullable

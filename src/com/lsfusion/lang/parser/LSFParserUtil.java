@@ -202,7 +202,7 @@ public class LSFParserUtil extends GeneratedParserUtilBase {
         IElementType curr;
         do {
             curr = builder.rawLookup(--currIndex);
-            while (curr != null && builder.whitespaceOrComment(curr)) {
+            while (curr != null && builder.isWhitespaceOrComment(curr)) {
                 curr = builder.rawLookup(--currIndex);
             }
             --steps;

@@ -10,9 +10,10 @@ public abstract class DependencySpeedSearch extends SpeedSearchBase<JGraph> {
     protected GraphNode[] nodes;
     
     public DependencySpeedSearch(JGraph component) {
-        super(component);
+        super(component, null);
         setClearSearchOnNavigateNoMatch(true);
         nodes = getNodes();
+        setupListeners();
     }
 
     @Override

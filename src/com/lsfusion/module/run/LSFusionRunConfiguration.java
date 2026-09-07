@@ -177,16 +177,10 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
         super.writeExternal(element);
         JavaRunConfigurationExtensionManager.getInstance().writeExternal(this, element);
         DefaultJDOMExternalizer.writeExternal(this, element);
-        writeModule(element);
         EnvironmentVariablesComponent.writeExternal(element, getEnvs());
         PathMacroManager.getInstance(getProject()).collapsePathsRecursively(element);
     }
 
-    @Override
-    protected ModuleBasedConfiguration createInstance() {
-        return new LSFusionRunConfiguration(getName(), getProject(), LSFusionRunConfigurationType.getInstance().getConfigurationFactory());
-    }
-    
     public Integer getDebuggerPort(RunProfileState state) {
         String vmParams = getVMParameters();
         String[] strings = vmParams.split(" ");

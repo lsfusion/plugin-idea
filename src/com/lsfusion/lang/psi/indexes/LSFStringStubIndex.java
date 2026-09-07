@@ -12,8 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 public abstract class LSFStringStubIndex<Psi extends LSFStubbedElement> extends StringStubIndexExtension<Psi> {
-    @Override
-    public Collection<Psi> get(String s, Project project, GlobalSearchScope scope) {
+    public Collection<Psi> getElements(String s, Project project, GlobalSearchScope scope) {
         if (s == null) {
             return Collections.emptyList();
         }

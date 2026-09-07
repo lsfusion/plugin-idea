@@ -38,9 +38,10 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
         return reference.resolveNoCache();
     }
 
-    public static Query<PsiReference> searchWordUsages(Project project, String compoundID) {
+    public static Query<PsiReference> searchWordUsages(PsiElement target, String compoundID) {
+        Project project = target.getProject();
         SearchRequestCollector request = new SearchRequestCollector(new SearchSession());
-        request.searchWord(compoundID, new LSFFilesSearchScope(project), UsageSearchContext.IN_CODE, true, new RequestResultProcessor() {
+        request.searchWord(compoundID, new LSFFilesSearchScope(project), UsageSearchContext.IN_CODE, true, target, new RequestResultProcessor() {
             @Override
             public boolean processTextOccurrence(@NotNull PsiElement element, int offsetInElement, @NotNull Processor consumer) {
                 for (PsiReference ref : element.getReferences())
@@ -70,7 +71,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
         };
         final List<LSFMetaCodeStatement> result = new ArrayList<>();
         // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
-        searchWordUsages(file.getProject(), name).forEach(ref -> {
+        searchWordUsages(file, name).forEach(ref -> {
             if (ref instanceof LSFMetaReference && ((LSFMetaReference) ref).isResolveToVirt(virtDecl))
                 synchronized (result) {
                     result.add((LSFMetaCodeStatement) ref);
@@ -87,7 +88,7 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
     
     public static List<LSFFullNameReference> findRenameConflicts(final String name, final LSFFullNameDeclaration decl) {
         final List<LSFFullNameReference> result = new ArrayList<>();
-        searchWordUsages(decl.getProject(), name).forEach(ref -> { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
+        searchWordUsages(decl, name).forEach(ref -> { // на самом деле нужны только модули которые зависят от заданного файла, но не могу найти такой scope, пока не страшно если будет all
             if (ref instanceof LSFFullNameReference) {
                 //Fix a bug when renaming forms by shift+F6: when renaming uses the name of the property declared on the form, we get a ClassCastException.
                 //We need to check only the relevant classes
