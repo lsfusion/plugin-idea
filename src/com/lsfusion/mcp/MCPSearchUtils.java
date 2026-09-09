@@ -1,11 +1,12 @@
 package com.lsfusion.mcp;
 
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.TextRange;
@@ -321,7 +322,7 @@ public class MCPSearchUtils {
             GlobalDeclStubElementType<?, ?> stubType = et.stubType;
             if (stubType != null) { // only index-backed types
                 LSFStringStubIndex<? extends LSFGlobalDeclaration> index = stubType.getGlobalIndex();
-                submit.submit(getPriority(et), () -> ReadAction.run(() -> {
+                submit.submit(getPriority(et), () -> ApplicationManager.getApplication().runReadAction(() -> {
                     for (String key : index.getAllKeys(project)) {
                         Collection<? extends LSFGlobalDeclaration> items = LSFGlobalResolver.getItemsFromIndex(index, key, project, searchScope, LSFLocalSearchScope.GLOBAL);
                         for (LSFGlobalDeclaration<?, ?> it : items) {
@@ -340,7 +341,7 @@ public class MCPSearchUtils {
     private static boolean submitClassTasks(GlobalSearchScope searchScope, Set<LSFClassDeclaration> classDecls, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit, boolean onlyPropertiesClassesActions) {
         Project project = searchScope.getProject();
         for (LSFClassDeclaration targetClass : classDecls) {
-            submit.submit(1, () -> ReadAction.run(() -> {
+            submit.submit(1, () -> ApplicationManager.getApplication().runReadAction(() -> {
                 for (LSFValueClass vc : CustomClassSet.getClassParentsRecursively(targetClass)) {
                     if (vc instanceof LSFClassDeclaration cls && !processStatement(cls, processor)) return; // early stop
                 }
@@ -364,14 +365,14 @@ public class MCPSearchUtils {
         // Global visited marks (single set for all directions)
         final Set<LSFMCPDeclaration> visitedRelated = Collections.newSetFromMap(new ConcurrentHashMap<>());
         for (Map.Entry<LSFMCPDeclaration, Direction> unit : related.entrySet()) {
-            submit.submit(1, () -> ReadAction.run(() -> streamRelated(unit.getKey(), unit.getValue(), searchScope, processor, visitedRelated)));
+            submit.submit(1, () -> ApplicationManager.getApplication().runReadAction(() -> streamRelated(unit.getKey(), unit.getValue(), searchScope, processor, visitedRelated)));
         }
         return !related.isEmpty();
     }
 
     private static void submitFileTasks(GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
-        for (LSFFile lsfFile : ReadAction.compute(() -> LSFFileUtils.getLsfFiles(searchScope))) {
-            submit.submit(5, () -> ReadAction.run(() -> {
+        for (LSFFile lsfFile : ApplicationManager.getApplication().runReadAction((Computable<List<LSFFile>>) () -> LSFFileUtils.getLsfFiles(searchScope))) {
+            submit.submit(5, () -> ApplicationManager.getApplication().runReadAction(() -> {
                 for (LSFMCPDeclaration st : LSFMCPDeclaration.getMCPDeclarations(lsfFile)) {
                     if (!processor.process(st)) break;
                 }
@@ -384,7 +385,7 @@ public class MCPSearchUtils {
         boolean fullyStreamable = true;
         for (NameFilter nf : filters) {
             if (nf.isWordStreamable()) {
-                submit.submit(5, () -> ReadAction.run(() -> streamWord(project, nf, processor, searchScope)));
+                submit.submit(5, () -> ApplicationManager.getApplication().runReadAction(() -> streamWord(project, nf, processor, searchScope)));
             } else {
                 fullyStreamable = false;
             }
@@ -398,13 +399,13 @@ public class MCPSearchUtils {
                                                  @NotNull ConcurrentMap<RelatedKey, RelatedState> relatedCache,
                                                  @NotNull SearchState state,
                                                  @NotNull TaskSubmitter submit) {
-        GlobalSearchScope searchScope = ReadAction.compute(() -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
+        GlobalSearchScope searchScope = ApplicationManager.getApplication().runReadAction((Computable<GlobalSearchScope>) () -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
         List<NameFilter> nameFilters = parseMatchersCsv(query.optString("names"));
         List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
         Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
 
-        Set<LSFClassDeclaration> classDecls = ReadAction.compute(() -> parseClasses(project, searchScope, query.optString("classes")));
-        Map<LSFMCPDeclaration, Direction> related = ReadAction.compute(() -> parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection")));
+        Set<LSFClassDeclaration> classDecls = ApplicationManager.getApplication().runReadAction((Computable<Set<LSFClassDeclaration>>) () -> parseClasses(project, searchScope, query.optString("classes")));
+        Map<LSFMCPDeclaration, Direction> related = ApplicationManager.getApplication().runReadAction((Computable<Map<LSFMCPDeclaration, Direction>>) () -> parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection")));
 
         // Shared processor that applies all filters and returns false to stop the current iteration
         final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache);
@@ -466,7 +467,7 @@ public class MCPSearchUtils {
         // Best-effort: keep already selected JSON (typically expanded shortCode) and append neighboring declarations
         // in the same file (in-file PSI order) until reaching minSymbols (maxSymbols is a hard cap).
         // Neighbor code is generated with a large factor to effectively include full text.
-        ReadAction.run(() -> {
+        ApplicationManager.getApplication().runReadAction(() -> {
             // Build per-file ordered declarations and declaration→index maps.
             Map<LSFFile, List<LSFMCPDeclaration>> fileDecls = new HashMap<>();
             Map<LSFFile, Map<LSFMCPDeclaration, Integer>> fileDeclToIndex = new HashMap<>();
@@ -566,7 +567,7 @@ public class MCPSearchUtils {
                                                                     long deadlineMillis) {
         // Rebuild the same set of statements with progressively larger "keepPrefixLength" values
         // (x10 each iteration) while staying within the maxSymbols budget.
-        return ReadAction.compute(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<JSONArray>) () -> {
             JSONArray best = null;
             int bestLen = -1;
 
@@ -1145,7 +1146,7 @@ public class MCPSearchUtils {
         return LSFMCPDeclaration.getMCPDeclaration(decl);
     }
     private static LSFMCPDeclaration getStatement(PsiElement element) {
-        return ReadAction.compute(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<LSFMCPDeclaration>) () -> {
             LSFExtend extend = PsiTreeUtil.getParentOfType(element, LSFExtend.class, false);
             if(extend != null) {
                 LSFFullNameDeclaration extendDependent = extend.resolveExtendingDeclaration();
@@ -1252,7 +1253,7 @@ public class MCPSearchUtils {
                 hays = code;
             } else {
                 if(names == null) {
-                    names = ReadAction.compute(() -> {
+                    names = ApplicationManager.getApplication().runReadAction((Computable<List<String>>) () -> {
                         List<String> result = new ArrayList<>();
                         Collection<LSFGlobalDeclaration<?, ?>> decls = LSFMCPDeclaration.getNameDeclarations(stmt);
                         for( LSFGlobalDeclaration<?, ?> d : decls) {

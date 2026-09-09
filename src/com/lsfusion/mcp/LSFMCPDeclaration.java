@@ -1,6 +1,7 @@
 package com.lsfusion.mcp;
 
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.lsfusion.lang.psi.*;
@@ -24,7 +25,7 @@ public interface LSFMCPDeclaration extends LSFMCPStatement {
     }
 
     static java.util.List<LSFMCPDeclaration> getMCPDeclarationsInFileOrder(LSFFile file) {
-        return ReadAction.compute(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<java.util.List<LSFMCPDeclaration>>) () -> {
             if (file == null) return java.util.Collections.emptyList();
 
             // Use ordered PSI traversal instead of TextRange sorting.
@@ -44,7 +45,7 @@ public interface LSFMCPDeclaration extends LSFMCPStatement {
     }
 
     static LSFMCPDeclaration getMCPDeclaration(PsiElement element) {
-        return ReadAction.compute(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<LSFMCPDeclaration>) () -> {
             // For all other cases return the topmost MCP statement (non-strict), not the nearest one.
             LSFMCPDeclaration mcpElement = PsiTreeUtil.getParentOfType(element, LSFMCPDeclaration.class, false);
 
@@ -63,7 +64,7 @@ public interface LSFMCPDeclaration extends LSFMCPStatement {
 
     // next uses / used, matches names / classes, result
     static Collection<LSFGlobalDeclaration<?, ?>> getNameDeclarations(LSFMCPDeclaration stmt) {
-        return BaseUtils.immutableCast(ReadAction.compute(() ->
+        return BaseUtils.immutableCast(ApplicationManager.getApplication().runReadAction((Computable<java.util.List<LSFGlobalDeclaration>>) () ->
                 PsiTreeUtil.findChildrenOfAnyType(stmt, false, LSFGlobalDeclaration.class)
                         .stream()
                         .filter(decl ->

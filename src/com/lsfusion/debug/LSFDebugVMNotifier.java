@@ -2,7 +2,7 @@ package com.lsfusion.debug;
 
 import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferenceHelper;
@@ -56,7 +56,7 @@ public class LSFDebugVMNotifier {
     private String getModuleName(XBreakpoint<?> breakpoint) {
         XSourcePosition position = breakpoint.getSourcePosition();
         if (position != null) {
-            return ReadAction.compute(() -> {
+            return ApplicationManager.getApplication().runReadAction((Computable<String>) () -> {
                 PsiFileSystemItem systemItem = FileReferenceHelper.getPsiFileSystemItem(PsiManager.getInstance(myProcess.getProject()), position.getFile());
                 if (systemItem instanceof LSFFile) {
                     return ((LSFFile) systemItem).getModuleDeclaration().getNameIdentifier().getName();

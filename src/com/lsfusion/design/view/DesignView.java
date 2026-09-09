@@ -4,8 +4,8 @@ import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -158,7 +158,7 @@ public class DesignView extends JBTabbedPane implements Disposable {
                 // Resolve off the EDT: ConfigurationContext.getFromContext() resolves the module for the file
                 // via the workspace index (a slow operation prohibited on the EDT). The data context is a
                 // pre-cached snapshot, so its slow rules can be computed here on this background thread.
-                ReadAction.run(() -> {
+                ApplicationManager.getApplication().runReadAction(() -> {
                     targetElement = ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN).getPsiLocation();
                     files = viewHasFocus ? null : CommonDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
                     if (targetElement != null) {

@@ -1,7 +1,8 @@
 package com.lsfusion;
 
 import com.intellij.codeInsight.TargetElementEvaluatorEx2;
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 public class LSFTargetElementEvaluatorEx2 extends TargetElementEvaluatorEx2 {
     @Override
     public boolean isAcceptableNamedParent(@NotNull PsiElement parent) {
-        return ReadAction.compute(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> {
             LSFExprParameterUsage paramUsageParent = PsiTreeUtil.getParentOfType(parent, LSFExprParameterUsage.class);
             if (paramUsageParent != null) {
                 return false;
