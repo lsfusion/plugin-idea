@@ -15,9 +15,10 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.options.SettingsEditorGroup;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.DefaultJDOMExternalizer;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.util.xmlb.SerializationFilter;
+import com.intellij.util.xmlb.XmlSerializer;
 import com.lsfusion.LSFBundle;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -25,12 +26,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.lsfusion.debug.LSFDebuggerRunner.DEV_MODE_PROPERTY;
 import static com.lsfusion.debug.LSFDebuggerRunner.LIGHT_START_PROPERTY;
@@ -56,6 +62,19 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
 
     public boolean PASS_PARENT_ENVS = true;
     private Map<String, String> myEnvs = new LinkedHashMap<>();
+
+    // The saved state is every public instance field - the rule of the DefaultJDOMExternalizer this replaces,
+    // so a field added later is persisted with no change here. XmlSerializer alone would also bind getter/setter
+    // pairs, and none of ours mirrors its field: getVMParameters() and getWorkingDirectory() substitute defaults
+    // for null, getEnvs() is written by EnvironmentVariablesComponent as an <envs> block. The inherited platform
+    // properties (allowRunningInParallel, projectPathOnTarget, selectedOptions, show_console_on_std_*) are
+    // already serialized into the same element by super.writeExternal(), in their own format.
+    private static final Set<String> SERIALIZED_FIELDS = Arrays.stream(LSFusionRunConfiguration.class.getFields())
+            .filter(field -> !Modifier.isStatic(field.getModifiers()))
+            .map(Field::getName)
+            .collect(Collectors.toUnmodifiableSet());
+
+    private static final SerializationFilter FIELDS_ONLY = (accessor, bean) -> SERIALIZED_FIELDS.contains(accessor.getName());
 
     protected LSFusionRunConfiguration(final String name, final Project project, final ConfigurationFactory factory) {
         super(name, new JavaRunConfigurationModule(project, true), factory);
@@ -169,7 +188,7 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
         PathMacroManager.getInstance(getProject()).expandPaths(element);
         super.readExternal(element);
         JavaRunConfigurationExtensionManager.getInstance().readExternal(this, element);
-        DefaultJDOMExternalizer.readExternal(this, element);
+        XmlSerializer.deserializeInto(this, element);
         readModule(element);
         EnvironmentVariablesComponent.readExternal(element, getEnvs());
     }
@@ -177,7 +196,7 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
     public void writeExternal(final Element element) throws WriteExternalException {
         super.writeExternal(element);
         JavaRunConfigurationExtensionManager.getInstance().writeExternal(this, element);
-        DefaultJDOMExternalizer.writeExternal(this, element);
+        XmlSerializer.serializeInto(this, element, FIELDS_ONLY);
         EnvironmentVariablesComponent.writeExternal(element, getEnvs());
         PathMacroManager.getInstance(getProject()).collapsePathsRecursively(element);
     }
