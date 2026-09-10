@@ -8,17 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.313</b><br>
+        <b>Version 1.0.314</b><br>
         <ul>
-            <li>Much less editor freezing while META code is inlined</li>
-            <li>Faster highlighting of files with many META declarations</li>
-            <li>Editing outside a metacode body no longer discards the whole metacode usage cache</li>
-            <li>Less memory left behind when the plugin is updated or disabled</li>
-            <li>The documentation tools can read an article whole, by name, instead of only searching it: ask for one or several, and the answer says in words whether you have all of it and how to fetch the rest</li>
-            <li>A documentation search now returns fewer, closer results instead of filling its budget with weak ones</li>
-            <li>Fixed an error when a form FILTER referred to an object group that could not be resolved</li>
-            <li>Go To Declaration and Go To Implementation build their chooser popup off the UI thread</li>
-            <li>The plugin no longer calls deprecated or internal IDE APIs, so IDE updates are less likely to break it</li>
+            <li><code>Recursive compile</code> before-launch step now runs as a regular Maven build and can be stopped</li>
         </ul>
     ]]>
     </change-notes>
@@ -38,6 +30,8 @@
          loader can't see JBCefBrowser on 2026.1+ and the whole Design tool window crashes with NoClassDefFoundError.
          Optional (with a stub config-file) so the plugin still loads on 2025.x, where JCEF lived in the core platform. -->
     <depends optional="true" config-file="lsf-jcef.xml">com.intellij.modules.jcef</depends>
+    <!-- The "Recursive compile" before-launch step is built on the bundled Maven plugin; see lsf-maven.xml. -->
+    <depends optional="true" config-file="lsf-maven.xml">org.jetbrains.idea.maven</depends>
 
     <actions>
         <group id="LSFGroup" popup="true" text="_LSF">
@@ -229,8 +223,6 @@
         <moduleBuilder builderClass="com.lsfusion.module.LSFusionModuleBuilder"/>
         <library.presentationProvider implementation="com.lsfusion.module.LSFusionLibraryPresentationProvider"/>
         <configurationType implementation="com.lsfusion.module.run.LSFusionRunConfigurationType"/>
-        <stepsBeforeRunProvider implementation="com.lsfusion.module.run.LSFRecursiveCompileStepBeforeRun" id="lsfCompileBeforeRun"/>
-        <notificationGroup id="LSF Recursive Compile" displayType="BALLOON"></notificationGroup>
         <notificationGroup id="Custom protocol Group" displayType="BALLOON"></notificationGroup>
 
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.MetaIndex"/>

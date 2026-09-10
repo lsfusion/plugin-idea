@@ -3,46 +3,45 @@ package com.lsfusion.module.run;
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.BeforeRunTaskProvider;
 import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.Executor;
+import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileWithCompileBeforeLaunchOption;
-import com.intellij.execution.process.ScriptRunnerUtil;
+import com.intellij.execution.executors.DefaultRunExecutor;
+import com.intellij.execution.impl.DefaultJavaProgramRunner;
+import com.intellij.execution.impl.RunConfigurationBeforeRunProvider;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationAction;
-import com.intellij.notification.NotificationGroupManager;
-import com.intellij.notification.NotificationType;
+import com.intellij.execution.runners.ExecutionUtil;
+import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Key;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.JBTextArea;
-import com.intellij.util.concurrency.Semaphore;
 import com.lsfusion.LSFIcons;
-import org.jdesktop.swingx.util.Utilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.idea.maven.execution.MavenRunConfigurationType;
+import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
+import org.jetbrains.idea.maven.model.MavenId;
+import org.jetbrains.idea.maven.project.MavenProject;
+import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import javax.swing.*;
-import java.awt.*;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 
-import static com.intellij.execution.process.ScriptRunnerUtil.STDOUT_OUTPUT_KEY_FILTER;
-
+/**
+ * "Recursive compile" before-launch step: {@code mvn compile --also-make} for the run configuration's module.
+ * Same mechanics as the bundled "Run Maven Goal" step (a temporary Maven run configuration in the Run tool window,
+ * so the build is visible, can be stopped, and honors the IDE's Maven settings), except that the module is taken
+ * from the run configuration instead of being picked by hand for every configuration.
+ */
 public class LSFRecursiveCompileStepBeforeRun extends BeforeRunTaskProvider<LSFRecursiveCompileStepBeforeRun.RecursiveCompileBeforeRunTask> {
-    public static final Key<LSFRecursiveCompileStepBeforeRun.RecursiveCompileBeforeRunTask> ID = Key.create("Recursive compile");
+    public static final Key<RecursiveCompileBeforeRunTask> ID = Key.create("Recursive compile");
 
-    private final int TIMEOUT = 200000;
     private final Project myProject;
-    private static final Logger LOG = Logger.getInstance(Task.class);
 
     public LSFRecursiveCompileStepBeforeRun(@NotNull Project project) {
         myProject = project;
@@ -70,127 +69,53 @@ public class LSFRecursiveCompileStepBeforeRun extends BeforeRunTaskProvider<LSFR
 
     @Override
     public @Nullable RecursiveCompileBeforeRunTask createTask(@NotNull RunConfiguration runConfiguration) {
+        if (!(runConfiguration instanceof RunProfileWithCompileBeforeLaunchOption)) {
+            return null;
+        }
         RecursiveCompileBeforeRunTask task = new RecursiveCompileBeforeRunTask();
         task.setEnabled(false);
         return task;
     }
 
     @Override
-    public boolean executeTask(@NotNull DataContext context, @NotNull RunConfiguration configuration, @NotNull ExecutionEnvironment environment, @NotNull RecursiveCompileBeforeRunTask task) {
-        final Module[] modules = ((RunProfileWithCompileBeforeLaunchOption) configuration).getModules();
-        final boolean[] canceled = {false};
-        if (modules.length > 0) {
-            Module module = modules[0]; // expecting single module here
-            String exe = Utilities.isWindows() ? "cmd" : "/bin/sh";
-            String exec = Utilities.isWindows() ? "/c" : "-c";
-
-            GeneralCommandLine generalCommandLine = new GeneralCommandLine(exe, exec, "mvn", "--pl", ":" + module.getName(), "--am", "compile");
-            generalCommandLine.setCharset(StandardCharsets.UTF_8);
-            generalCommandLine.setWorkDirectory(myProject.getBasePath());
-            generalCommandLine.setRedirectErrorStream(true);
-
-            final Semaphore compileDone = new Semaphore();
-            compileDone.down();
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                try {
-                    if (myProject.isDisposed()) {
-                        compileDone.up();
-                    } else {
-                        FileDocumentManager.getInstance().saveAllDocuments();
-                        
-                        String moduleRCText = "'" + module.getName() + "' recursive compile";
-                        ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Performing " + moduleRCText, false) {
-                            public void run(final @NotNull ProgressIndicator indicator) {
-                                String commandLineOutputStr = null;
-                                try {
-                                    commandLineOutputStr = ScriptRunnerUtil.getProcessOutput(generalCommandLine, STDOUT_OUTPUT_KEY_FILTER, TIMEOUT);
-                                } catch (ExecutionException e) {
-                                    compileDone.up();
-                                    LOG.error(e);
-                                }
-                                String finalCommandLineOutputStr = commandLineOutputStr;
-
-                                if (commandLineOutputStr != null && commandLineOutputStr.contains("[ERROR]")) {
-                                    Notification notification = NotificationGroupManager.getInstance().getNotificationGroup("LSF Recursive Compile").createNotification(
-                                            moduleRCText + " failed",
-                                            NotificationType.ERROR);
-                                    Notification action = notification.addAction(NotificationAction.create("Details...", anActionEvent -> {
-                                        RecursiveCompileErrorDialog.showDialog(myProject, moduleRCText + " log", finalCommandLineOutputStr);
-                                        notification.expire();
-                                    }));
-                                    action.notify(myProject);
-                                    canceled[0] = true;
-                                }
-                                compileDone.up();
-                            }
-                        });
-                    }
-                } catch (Throwable e) {
-                    compileDone.up();
-                    LOG.error(e);
-                }
-            });
-
-            compileDone.waitFor();
+    public boolean executeTask(@NotNull DataContext context, @NotNull RunConfiguration configuration, @NotNull ExecutionEnvironment env, @NotNull RecursiveCompileBeforeRunTask task) {
+        Module[] modules = ((RunProfileWithCompileBeforeLaunchOption) configuration).getModules();
+        if (modules.length == 0) {
+            return true;
         }
-        
-        return !canceled[0];
+        Module module = modules[0];
+
+        MavenProjectsManager projectsManager = MavenProjectsManager.getInstance(myProject);
+        MavenProject mavenProject = ApplicationManager.getApplication().runReadAction((Computable<MavenProject>) () -> projectsManager.findProject(module));
+        if (mavenProject == null) {
+            ExecutionUtil.handleExecutionError(myProject, env.getExecutor().getToolWindowId(), configuration.getName(),
+                    new ExecutionException("Module '" + module.getName() + "' is not a Maven module, nothing to compile recursively"));
+            return false;
+        }
+
+        // --also-make only picks up reactor dependencies when Maven is started from the aggregator root
+        MavenProject rootProject = projectsManager.findRootProject(mavenProject);
+        MavenId mavenId = mavenProject.getMavenId();
+        MavenRunnerParameters params = new MavenRunnerParameters(true, rootProject.getDirectoryFile().getPath(), rootProject.getFile().getName(),
+                List.of("compile"), projectsManager.getExplicitProfiles());
+        params.setProjectsCmdOptionValues(List.of(mavenId.getGroupId() + ":" + mavenId.getArtifactId()));
+        params.setCmdOptions("--also-make");
+
+        ApplicationManager.getApplication().invokeAndWait(() -> FileDocumentManager.getInstance().saveAllDocuments());
+
+        RunnerAndConfigurationSettings settings = MavenRunConfigurationType.createRunnerAndConfigurationSettings(null, null, params, myProject,
+                module.getName() + " [recursive compile]", false);
+        ProgramRunner<?> runner = DefaultJavaProgramRunner.getInstance();
+        Executor executor = DefaultRunExecutor.getRunExecutorInstance();
+        ExecutionEnvironment mavenEnv = new ExecutionEnvironment(executor, runner, settings, myProject);
+        mavenEnv.setExecutionId(env.getExecutionId());
+        return RunConfigurationBeforeRunProvider.doRunTask(executor.getId(), mavenEnv, runner);
     }
 
     public static class RecursiveCompileBeforeRunTask extends BeforeRunTask<RecursiveCompileBeforeRunTask> {
         public RecursiveCompileBeforeRunTask() {
             super(ID);
             setEnabled(true);
-        }
-    }
-
-    public static final class RecursiveCompileErrorDialog extends DialogWrapper {
-        private final JBScrollPane myContentPanel;
-        private final JBTextArea textArea;
-
-        private RecursiveCompileErrorDialog(String title,
-                                            Project project,
-                                            String error) {
-            super(project, true);
-            setTitle(title);
-
-            final boolean[] initialPaint = {true};
-            textArea = new JBTextArea(error) {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    if (initialPaint[0]) {
-                        scrollToEnd();
-                        initialPaint[0] = false;
-                    }
-                }
-            };
-            textArea.setEditable(false);
-
-            myContentPanel = new JBScrollPane(textArea) {
-                @Override
-                public Dimension getPreferredSize() {
-                    return new Dimension(850, 500);
-                }
-            };
-            init();
-        }
-
-        private void scrollToEnd() {
-            JScrollBar verticalScrollBar = myContentPanel.getVerticalScrollBar();
-            verticalScrollBar.setValue(verticalScrollBar.getMaximum());
-        }
-
-        public static void showDialog(@NotNull Project project,
-                                      @NotNull String title,
-                                      @NotNull String error) {
-            new RecursiveCompileErrorDialog(title, project, error).show();
-        }
-
-        @Override
-        protected JComponent createCenterPanel() {
-            return myContentPanel;
         }
     }
 }

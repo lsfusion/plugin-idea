@@ -1,0 +1,8 @@
+<idea-plugin>
+    <!-- Loaded only when the bundled Maven plugin is enabled: the "Recursive compile" before-launch step runs
+         the build through Maven's run configuration infrastructure, so it lives here instead of plugin.xml
+         and the plugin still loads when a user has disabled Maven support. -->
+    <extensions defaultExtensionNs="com.intellij">
+        <stepsBeforeRunProvider implementation="com.lsfusion.module.run.LSFRecursiveCompileStepBeforeRun" id="lsfCompileBeforeRun"/>
+    </extensions>
+</idea-plugin>
