@@ -92,7 +92,6 @@ data class RemoteDocItem(
 data class RetrieveDocsOutput(
     @McpDescription(description = "Relevant chunks returned from the RAG store.")
     val docs: List<RemoteDocItem>,
-    @McpDescription(description = "The corpus generation that served this response. Two pages of one article are two pages of the SAME article only while this matches; if it changes under you, what you hold is a mixture, and the traversal has to start again without the old `exclude_ids`.")
     @McpDescription(description = "Whether this response is the whole answer, and what to do when it is not. Always present, always a sentence, because the decision it drives — page again, or stop — is one a number leaves the reader to infer. It opens with a fixed label: COMPLETE, MORE, ARTICLE_COMPLETE, ARTICLE_PARTIAL or ARTICLE_NONE. Counts stay inside it; the log keeps them separately for us.")
     val status: String = "",
 )
