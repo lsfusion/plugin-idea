@@ -75,8 +75,8 @@ data class RemoteDocItem(
     val source: String,
     @McpDescription(description = "Retrieved text snippet.")
     val text: String,
-    @McpDescription(description = "Similarity score (higher = more relevant).")
-    val score: Double,
+    @McpDescription(description = "Similarity to the query, higher = closer. NULL when no query was given — an article traversal has nothing to be similar to, and inventing a number there would make the ordering look like a ranking. When it is null the list is in document order; when it is set the list is ranked by it, descending.")
+    val score: Double? = null,
     // Nullable for the same reason `id` is: an older server does not send it.
     @McpDescription(description = "Which of the submitted queries this chunk answers; null when only one was submitted.")
     val query: String? = null,
@@ -84,7 +84,7 @@ data class RemoteDocItem(
     // plugin talking to a new server, and the nullable default protects a new plugin
     // talking to an older server that does not send `id` yet — a non-null field would
     // make the new plugin fail to decode the old server's response.
-    @McpDescription(description = "Stable chunk id; pass the ids you already received back in `excludeIds` to avoid getting the same chunks again.")
+    @McpDescription(description = "Stable chunk id, shaped `<article>::<section>`. Two uses, and the second is the one worth knowing: pass it in `exclude_ids` to keep this chunk out of a follow-up call, or pass it as `article` — unchanged, section and all — to read the WHOLE article this chunk came from. A chunk cannot show you the constraint it depends on, the case it omits, or the table it points at; those sit elsewhere in the same article. Reaching for the article is the cheap move there. Searching again with different wording is the expensive one.")
     val id: String? = null,
 )
 
@@ -92,6 +92,9 @@ data class RemoteDocItem(
 data class RetrieveDocsOutput(
     @McpDescription(description = "Relevant chunks returned from the RAG store.")
     val docs: List<RemoteDocItem>,
+    @McpDescription(description = "The corpus generation that served this response. Two pages of one article are two pages of the SAME article only while this matches; if it changes under you, what you hold is a mixture, and the traversal has to start again without the old `exclude_ids`.")
+    @McpDescription(description = "Whether this response is the whole answer, and what to do when it is not. Always present, always a sentence, because the decision it drives — page again, or stop — is one a number leaves the reader to infer. It opens with a fixed label: COMPLETE, MORE, ARTICLE_COMPLETE, ARTICLE_PARTIAL or ARTICLE_NONE. Counts stay inside it; the log keeps them separately for us.")
+    val status: String = "",
 )
 
 
@@ -369,14 +372,16 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     @McpDescription(description = "Search official lsFusion documentation. Returns `{docs:[{id,source,text,score,query}]}`; `score` is cosine similarity, and the combined list is not globally score-sorted. Omit `type` by default: each branch has its own quota of up to 3 chunks (up to 9 total), so setting `type` only removes the other two branches — it does not improve or change the results of the branch it keeps. For capability maps and coding rules use `lsfusion_get_guidance`, which returns whole articles; reading the rules of an area you are about to work in is mandatory. Use `exclude_ids` only to page deeper on the same need; omit it when rephrasing or asking a different question, or the filter drops the chunk that would have answered it. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.")
     @Suppress("unused")
     suspend fun retrieveDocs(
-        @McpDescription(description = "One short technical question, or a list of at most 4 DISTINCT queries for independent needs already known before this call — beyond that each one gets too small a share of one call's result budget to be worth asking, so split larger sets across calls. State what you need to learn or achieve; include a construct or module name when you know it, plus the behaviour or constraint that matters. Prefer `NEWSESSION APPLY behaviour when a nested session is canceled` to `sessions`: a bare noun is what every article in a branch is about, and the search answers it with whichever one is closest to that whole topic. Search is semantic, not literal — exact documentation wording is not required, and rephrasing beats retrying the same query. Batch only independent lookups, never alternative phrasings of one need; when one answer can determine or refine the next query, call again instead. In a batch, `type` and `exclude_ids` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to.")
+        @McpDescription(description = "One short technical question, or a list of at most 16 DISTINCT queries for independent needs already known before this call — beyond that each one gets too small a share of one call's result budget to be worth asking, so split larger sets across calls. State what you need to learn or achieve; include a construct or module name when you know it, plus the behaviour or constraint that matters. Prefer `NEWSESSION APPLY behaviour when a nested session is canceled` to `sessions`: a bare noun is what every article in a branch is about, and the search answers it with whichever one is closest to that whole topic. Search is semantic, not literal — exact documentation wording is not required, and rephrasing beats retrying the same query. Batch only independent lookups, never alternative phrasings of one need; when one answer can determine or refine the next query, call again instead. In a batch, `type` and `exclude_ids` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to.")
         query: String? = null,
-        @McpDescription(description = "At most 4 DISTINCT queries for independent needs already known before this call — instead of `query`, not alongside it. Batch only lookups that do not depend on one another; when one answer can determine or refine the next query, call the tool again instead. Do not batch alternative phrasings of one need. `type` and `excludeIds` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to.")
+        @McpDescription(description = "At most 16 DISTINCT queries for independent needs already known before this call — instead of `query`, not alongside it. Batch only lookups that do not depend on one another; when one answer can determine or refine the next query, call the tool again instead. Do not batch alternative phrasings of one need. `type` and `excludeIds` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to.")
         queries: List<String>? = null,
         @McpDescription(description = "Optional branch filter; in a batch it applies to every query. Omit or pass null unless you specifically need answers from one branch. Choose by the ANSWER you need, not by the words in your query: `language` — the exact syntax, parameters and behaviour of a construct; `paradigm` — how the platform works: its concepts, its mechanisms and how they relate; `how-to` — a worked recipe for a task. An operator name in the query does not by itself justify `language`. For a mixed or uncertain need, omit the filter. `brief` and `rules` are not here at all: an area's capability map and its coding rules are read whole, by name, with `lsfusion_get_guidance`.")
         type: String? = null,
         @McpDescription(description = "Chunk `id` values you already hold. They are excluded server-side BEFORE ranking, so the quota is spent on material you do not have. Use this to page deeper on the same information need. Do NOT use it to rephrase a query for a better ranking, or to ask a different question about the same area: the filter ignores the new query, so a chunk that is now the most relevant one would be dropped before ranking. Leave empty on the first call.")
         excludeIds: List<String>? = null,
+        @McpDescription(description = "Name of the article to read instead of searching the whole corpus — one name, or a list of at most 12. Give it ALONE to WALK those articles from the top in DOCUMENT order; that is what you want when a chunk was on the right subject but plainly partial, because the constraint it depends on, the case it omits and the table it points at all sit elsewhere in the same article. Give it WITH `query` to SEARCH inside that set instead. Three shapes are accepted, all of which you are already holding: a published slug (`Interactive_view`); any chunk `id` verbatim (`Interactive_view::examples`) — everything from `::` names the section, the article is what gets read; or the DESTINATION of any `.md` link in chunk text (`../paradigm/Actions.md` and `Actions.md` both mean `Actions`) — the destination, never the visible label. Naming an article already picks its branch, so do not also pass `type`. Articles are PAGED, not delivered whole: every one named gets at least its next chunk, `status` says in words which of them are finished and which are not, and when any remain it gives you the exact call that continues — repeat it until `status` stops offering one.")
+        article: String? = null,
     ): RetrieveDocsOutput {
         // The central tool takes one field that is either a string or a list;
         // Kotlin cannot express that as one typed parameter, so the two are
@@ -393,6 +398,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
             args.put("query", qs)
         }
         if (type != null) args.put("type", type)
+        if (article != null) args.put("article", article)
         if (excludeIds != null && excludeIds.isNotEmpty()) {
             val ids = JSONArray()
             excludeIds.forEach { ids.put(it) }
