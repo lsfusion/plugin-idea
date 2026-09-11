@@ -18,6 +18,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.DefaultJDOMExternalizer;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.lsfusion.LSFBundle;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,9 +81,9 @@ public class LSFusionRunConfiguration extends AbstractRunConfiguration implement
     @NotNull
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
         SettingsEditorGroup<LSFusionRunConfiguration> group = new SettingsEditorGroup<>();
-        group.addEditor(ExecutionBundle.message("run.configuration.configuration.tab.title"), new LSFusionRunConfigurationEditor(getProject()));
+        group.addEditor(LSFBundle.message("run.configuration.configuration.tab.title"), new LSFusionRunConfigurationEditor(getProject()));
         JavaRunConfigurationExtensionManager.getInstance().appendEditors(this, group);
-        group.addEditor(ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel<>());
+        group.addEditor(LSFBundle.message("run.configuration.logs.tab.title"), new LogConfigurationPanel<>());
         return group;
     }
 
