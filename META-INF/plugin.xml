@@ -12,7 +12,13 @@
         <ul>
             <li>Much less editor freezing while META code is inlined</li>
             <li>Faster highlighting of files with many META declarations</li>
+            <li>Editing outside a metacode body no longer discards the whole metacode usage cache</li>
             <li>Less memory left behind when the plugin is updated or disabled</li>
+            <li>The documentation tools can read an article whole, by name, instead of only searching it: ask for one or several, and the answer says in words whether you have all of it and how to fetch the rest</li>
+            <li>A documentation search now returns fewer, closer results instead of filling its budget with weak ones</li>
+            <li>Fixed an error when a form FILTER referred to an object group that could not be resolved</li>
+            <li>Go To Declaration and Go To Implementation build their chooser popup off the UI thread</li>
+            <li>The plugin no longer calls deprecated or internal IDE APIs, so IDE updates are less likely to break it</li>
         </ul>
     ]]>
     </change-notes>
