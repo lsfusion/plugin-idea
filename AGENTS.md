@@ -42,7 +42,7 @@ After editing `LSF.bnf` or `LSF.flex`, regenerate before the next build or sandb
 
 ### Testing changes
 
-`./gradlew runIde` launches an IntelliJ sandbox with the plugin loaded — open or create a `.lsf` file to exercise highlighting, references, completion, annotations. Sandbox state lives under `build/idea-sandbox/`; deleting it forces a clean re-init.
+`./gradlew runIde` launches an IntelliJ sandbox with the plugin loaded — open or create a `.lsf` file to exercise highlighting, references, completion, annotations. Sandbox state lives under `.intellijPlatform/sandbox/` (outside `build/`, so `./gradlew clean` keeps it); deleting it forces a clean re-init.
 
 No headless test rig — UI verification is interactive in the sandbox. No `test` sourceSet is currently configured either: `main` maps everything under `src/` (and `gen/`) as production code, so a file at `src/test/...` would ship in the plugin artifact. To add unit tests (PSI walkers, reference resolution helpers), first wire a dedicated `test` sourceSet pointing at a directory that doesn't overlap with `src/` (e.g. a sibling `tests/`), then run `./gradlew test`.
 

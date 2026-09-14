@@ -3,7 +3,7 @@ plugins {
     // Must be compatible with Kotlin compiler bundled with IntelliJ IDEA 2025.3 (metadata 2.2.0)
     kotlin("jvm") version "2.2.0"
     kotlin("plugin.serialization") version "2.2.0"
-    id("org.jetbrains.intellij.platform") version "2.10.5"
+    id("org.jetbrains.intellij.platform") version "2.18.1"
 }
 
 val ideaVersion = "2025.3"
