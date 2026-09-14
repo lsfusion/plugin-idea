@@ -78,35 +78,33 @@ No maintained version or backport branches; the release line is `master`. Featur
 
 ## Releases
 
-The plugin has two distribution channels, and they ship out of band:
+Pushing a `<version>` bump to `master` *is* a release. One Jenkins run publishes it to both distribution channels:
 
-1. **`lsfusion.org` download / IDE auto-update channel.** A Jenkins pipeline publishes here automatically on every push to `master` that bumps `<version>`. This is what `lsfusion.org` users get and what `IDE → Settings → Plugins → Manage Plugin Repositories → https://www.lsfusion.org/...` pulls.
-2. **JetBrains Marketplace** ([plugin/7601](https://plugins.jetbrains.com/plugin/7601)). Upload here is **manual** — the JetBrains API `curl` is checked-in but currently commented out in `buildAndUploadPluginManually`, so Marketplace lags behind the lsfusion.org channel until someone runs it by hand.
+1. **JetBrains Marketplace** ([plugin/7601](https://plugins.jetbrains.com/plugin/7601)). Every update goes through JetBrains review; Marketplace users get it once it is approved.
+2. **`lsfusion.org` download / IDE auto-update channel.** `exe/ext/lsfusion-idea-plugin.zip`, the file `IDE → Settings → Plugins → Manage Plugin Repositories → https://www.lsfusion.org/...` pulls. Uploaded as soon as the Marketplace accepts the upload, without waiting for the review.
 
-The lsfusion.org auto-publish is the one a version bump triggers. Pushing a `<version>` bump *is* a release for that channel; the Marketplace listing is a follow-up.
+### Pipeline mechanics
 
-### Pipeline mechanics (lsfusion.org channel)
-
-- GitHub push webhook → Jenkins job `buildAndUploadPluginTrigger` (freestyle, watches any branch) → triggers the `buildAndUploadPlugin` workflow.
-- The workflow reads `<version>` from `META-INF/plugin.xml`, and `curl`s `https://plugins.jetbrains.com/api/plugins/7601/updates` purely to learn what the *Marketplace* lists as the most-recently-published version. (The Marketplace listing is treated as the canonical "what's currently published anywhere" baseline.)
-- If the two match, the pipeline logs `Version <X.Y.Z> matches the latest version in Marketplace. Skipping build.` and exits successfully — pushes that don't bump are no-ops.
-- If they differ, the pipeline builds the plugin and uploads the artifact (with its embedded `<change-notes>` HTML) over FTP to `lsfusion.org`'s `exe/ext/lsfusion-idea-plugin.zip` — the file the IDE's update-checker downloads.
-
-Slack #jenkins gets a colored notification (green / red) on completion.
+- GitHub push webhook → Jenkins job `buildAndUploadPluginTrigger` (freestyle, watches any branch) → triggers the `buildAndUploadPlugin` pipeline (`vars/buildAndUploadPlugin.groovy` in the `lsfusion/jenkins` shared library), which always builds `master`.
+- It compares `<version>` from `META-INF/plugin.xml` with the newest update listed by `https://plugins.jetbrains.com/api/plugins/7601/updates`; an update still in review is not listed. If they match, it logs `Version <X.Y.Z> matches the latest version in Marketplace. Skipping build.` and succeeds — pushes that don't bump are no-ops.
+- Otherwise it runs `./gradlew buildPlugin` and `./gradlew publishPlugin`. `publishPlugin` depends on `verifyPlugin`, which checks the plugin against the `recommended()` IDEs, the newest EAP included, and fails on compatibility problems and on internal or override-only API usages — what Marketplace review rejects. Then:
+  - the upload is accepted: the zip goes over FTP to lsfusion.org, and Slack #jenkins gets the change-notes bullets;
+  - the Marketplace answers `already contains version`: an earlier run uploaded this version and it is still in review, so every push until the approval ends here. The build succeeds with the description `<X.Y.Z>: already uploaded, not approved yet`; nothing is uploaded, no Slack message;
+  - any other failure (verification, a rejected token, network): nothing reaches either channel, the build fails, and Slack gets Gradle's "What went wrong" text. The version stays unpublished, so the next push or a manual run of `buildAndUploadPlugin` retries it.
 
 ### Bumping the version
 
 1. Open `META-INF/plugin.xml` and patch-bump `<version>X.Y.Z</version>` to the value that already appears in the `<b>Version X.Y.Z</b>` header inside the current `<change-notes>` block — those two MUST agree at upload time so the bundled release notes match the version users see.
 2. Verify every user-visible change since the last release has a `<li>` bullet in the block (see *Release notes* below). Add any that are missing.
-3. Commit. Subject like `Release X.Y.Z` is fine; the body should list what's shipping, mirroring the change-notes bullets. Don't squash this with unrelated work — the release commit should diff cleanly to `plugin.xml` (and only `plugin.xml` unless the rollout literally needs another file).
-4. Push to `master`. Jenkins picks up the webhook, sees the version diff against Marketplace, builds, and FTP-publishes the new artifact for the lsfusion.org channel.
-5. If you also want the Marketplace listing updated — and not just the lsfusion.org channel — run the JetBrains upload separately (the `buildAndUploadPluginManually` script has the commented-out `curl -F pluginId=7601 -F file=@lsfusion-idea-plugin.zip https://plugins.jetbrains.com/plugin/uploadPlugin` recipe). This is a deliberate two-step so the Marketplace listing can be vetted before exposing it to JetBrains' broader audience.
+3. Run `./gradlew verifyPlugin` (the first run downloads the recommended IDEs): a finding fails the release in both channels.
+4. Commit. Subject like `Release X.Y.Z` is fine; the body should list what's shipping, mirroring the change-notes bullets. Don't squash this with unrelated work — the release commit should diff cleanly to `plugin.xml` (and only `plugin.xml` unless the rollout literally needs another file).
+5. Push to `master`. Jenkins publishes to both channels as described above; Marketplace users get the version after JetBrains approves it.
 
 The change-notes block is intentionally **not** reset by the release commit — it keeps showing what shipped in `X.Y.Z` until the next contributor with a user-visible change does the rollover (see below).
 
 ### Release notes (`<change-notes>`)
 
-The CDATA block in `META-INF/plugin.xml` is the **only** source of release notes; both the lsfusion.org channel and (when uploaded) the Marketplace render it verbatim, and there is no parallel CHANGELOG.md. The block is HTML — basic tags only (`<b>`, `<br>`, `<ul>`, `<li>`, `<code>`).
+The CDATA block in `META-INF/plugin.xml` is the **only** source of release notes; both channels render it verbatim, and there is no parallel CHANGELOG.md. The block is HTML — basic tags only (`<b>`, `<br>`, `<ul>`, `<li>`, `<code>`).
 
 **What to write.** One terse `<li>` bullet per user-visible improvement, in past-or-imperative tense, framed as what the developer-of-lsFusion sees in the IDE — not as what the plugin internally does. Mention concrete syntax (`<code>NEWEXECUTOR ... CLIENT conn</code>`), inspection names, settings paths. Skip plugin-internal mechanics (BNF rule names, PSI class names, mixin wiring) — those belong in the commit body, not in the marketplace listing.
 
@@ -174,8 +172,8 @@ Treat the following as requiring explicit user authorization each time, even if 
 
 - `git push` and any remote-affecting operation; force-pushes are never automatic.
 - Destructive operations: `git reset --hard`, `git clean -fd`, branch deletion, force pushes, `rm -rf` of working trees or generated directories outside the explicit build outputs (`build/`, `gen/`).
-- Anything that publishes outside the local machine: GitHub PR/issue creation, comments, releases, JetBrains Marketplace uploads (the latter is a deliberate manual step; see *Releases*).
-- Bumping `META-INF/plugin.xml` `<version>` — only when explicitly preparing a release (see *Releases* section: the bump auto-publishes to the lsfusion.org channel).
+- Anything that publishes outside the local machine: GitHub PR/issue creation, comments, releases, JetBrains Marketplace uploads (`./gradlew publishPlugin`).
+- Bumping `META-INF/plugin.xml` `<version>` — only when explicitly preparing a release (see *Releases*: the bump publishes to both channels).
 
 Local, reversible work — editing files, running tests, regenerating `gen/` via `./gradlew generate*` — doesn't need per-action confirmation.
 
