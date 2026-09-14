@@ -215,13 +215,6 @@ abstract class ParserTask @Inject constructor(
     abstract val outputDirs: ListProperty<String>
 
     /**
-     * IntelliJ SDK jars are required only to RUN the generator,
-     * but must NOT be a Gradle task input (otherwise Gradle fingerprints hundreds of jars).
-     */
-    @get:Internal
-    abstract val intellijPlatformJars: ConfigurableFileCollection
-
-    /**
      * Precomputed IDEA lib directory (…/lib). Stored as Internal to avoid fingerprinting.
      * Also avoids resolving IntelliJ configuration during task execution (configuration cache friendly).
      */
@@ -280,22 +273,17 @@ fun TaskContainer.registerLexerTask(name: String, flexPath: String, outputDirPat
 
 fun TaskContainer.registerParserTask(name: String, bnfPath: String, outputDirPaths: List<String>) =
     register<ParserTask>(name) {
-        val intellijDep = configurations.named("intellijPlatformDependency")
-        intellijPlatformJars.from(intellijDep)
-
         // Compute IDEA lib directory ONCE at configuration time.
         // This prevents resolving IntelliJ SDK during task execution (config-cache friendly).
-        val platformFiles = intellijDep.get().files
-        val platformLib = platformFiles.find { it.name.startsWith("idea") && it.isDirectory }?.resolve("lib")
-            ?: platformFiles.find { it.name.startsWith("idea") && it.name.endsWith(".jar") }?.parentFile
+        // Ask the plugin: the directory name depends on where the IDE comes from ("idea-2025.3-win" in the Gradle cache,
+        // "IU-2025.3" in the IntelliJ Platform IDE cache, any local() path).
+        val platformLib = intellijPlatform.platformPath.resolve("lib").toFile()
 
-        require(platformLib != null && platformLib.exists()) {
-            "Cannot locate IntelliJ IDEA 'lib' directory from intellijPlatformDependency."
+        require(platformLib.isDirectory) {
+            "Cannot locate the IntelliJ Platform 'lib' directory: $platformLib"
         }
         ideaLibDir.set(platformLib)
 
-        // Previously: classpath(grammarKitConfig, files("lib/psiImplUtils.jar"), intellijPlatformJars)
-        // Now: keep only small jars as task inputs; IDEA libs are runtime-only and Internal.
         grammarKitClasspath.from(grammarKitConfig)
         psiImplUtilsJar.from(files("buildLib/psiImplUtils.jar"))
 
