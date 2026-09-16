@@ -1,28 +1,49 @@
 package com.lsfusion.module;
 
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.util.ui.FormBuilder;
+import com.intellij.util.ui.JBUI;
+import com.lsfusion.LSFBundle;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 
 public class SettingsPanel {
-    private JPanel mainPanel;
+    private final JPanel mainPanel;
 
-    private JPanel propertiesPanel;
-
-    private JCheckBox cbCreateSettingsFile;
-    private JTextField databaseHostTextField;
-    private JTextField databasePortTextField;
-    private JTextField databaseUsernameTextField;
-    private JTextField databasePasswordTextField;
-    private JTextField serverPortTextField;
-    private JTextField databaseNameTextField;
-    private JTextField initialAdminPasswordTextField;
+    private final JCheckBox cbCreateSettingsFile = new JCheckBox(LSFBundle.message("module.wizard.create.settings.file"), true);
+    private final JTextField databaseHostTextField = new JTextField();
+    private final JTextField databasePortTextField = new JTextField();
+    private final JTextField databaseUsernameTextField = new JTextField();
+    private final JTextField databasePasswordTextField = new JTextField();
+    private final JTextField serverPortTextField = new JTextField("7652");
+    private final JTextField databaseNameTextField = new JTextField("lsfusion_untitled");
+    private final JTextField initialAdminPasswordTextField = new JTextField();
 
     private boolean dbNameChangedByUser = false;
     private boolean dbNameDocListenerEnabled = true;
 
     public SettingsPanel(final JTextField moduleNameField, String dbHost, String dbPort, String dbUser, String dbPass) {
+        JPanel propertiesPanel = FormBuilder.createFormBuilder()
+                .addComponent(new JLabel(LSFBundle.message("module.wizard.dbsettings")))
+                .setFormLeftIndent(10)
+                .addLabeledComponent(LSFBundle.message("module.wizard.dbhost"), databaseHostTextField)
+                .addLabeledComponent(LSFBundle.message("module.wizard.dbport"), databasePortTextField)
+                .addLabeledComponent(LSFBundle.message("module.wizard.dbname"), databaseNameTextField)
+                .addLabeledComponent(LSFBundle.message("module.wizard.dbuser"), databaseUsernameTextField)
+                .addLabeledComponent(LSFBundle.message("module.wizard.dbpass"), databasePasswordTextField)
+                .setFormLeftIndent(0)
+                .addComponent(new JLabel(LSFBundle.message("module.wizard.lsfusion.settings")))
+                .setFormLeftIndent(10)
+                .addLabeledComponent(LSFBundle.message("module.wizard.serverport"), serverPortTextField)
+                .addLabeledComponent(LSFBundle.message("module.wizard.inital.adminpassword"), initialAdminPasswordTextField)
+                .getPanel();
+        mainPanel = FormBuilder.createFormBuilder()
+                // FormBuilder stretches components across the row; wrapped, the checkbox reacts to clicks on itself only
+                .addComponent(JBUI.Panels.simplePanel().addToLeft(cbCreateSettingsFile))
+                .addComponent(propertiesPanel)
+                .getPanel();
+
         setDbHost(dbHost);
         setDbPort(dbPort);
         setDbUser(dbUser);

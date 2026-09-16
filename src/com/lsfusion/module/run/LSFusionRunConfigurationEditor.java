@@ -8,17 +8,31 @@ import com.intellij.execution.ui.JrePathEditor;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LabeledComponent;
+import com.intellij.util.ui.FormBuilder;
+import com.intellij.util.ui.JBUI;
+import com.lsfusion.LSFBundle;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.BorderLayout;
 
 public class LSFusionRunConfigurationEditor extends SettingsEditor<LSFusionRunConfiguration> {
-    private JPanel myWholePanel;
-    private CommonJavaParametersPanel myCommonProgramParameters;
-    private LabeledComponent<ModulesComboBox> myModule;
-    private JrePathEditor myJREPanel;
-    private JCheckBox lightStartCheckBox;
-    private JCheckBox devModeCheckBox;
+    private final CommonJavaParametersPanel myCommonProgramParameters = new CommonJavaParametersPanel();
+    private final LabeledComponent<ModulesComboBox> myModule =
+            LabeledComponent.create(new ModulesComboBox(), LSFBundle.message("run.configuration.module.label"), BorderLayout.WEST);
+    private final JrePathEditor myJREPanel = new JrePathEditor();
+    private final JCheckBox lightStartCheckBox = new JCheckBox("Light start");
+    private final JCheckBox devModeCheckBox = new JCheckBox("Dev mode");
+    private final JPanel myWholePanel = FormBuilder.createFormBuilder()
+            .addComponent(myCommonProgramParameters)
+            .addVerticalGap(10)
+            .addComponent(myModule)
+            .addComponent(myJREPanel)
+            // FormBuilder stretches components across the row; wrapped, a checkbox reacts to clicks on itself only
+            .addComponent(JBUI.Panels.simplePanel().addToLeft(lightStartCheckBox))
+            .addComponent(JBUI.Panels.simplePanel().addToLeft(devModeCheckBox))
+            .addComponentFillVertically(JBUI.Panels.simplePanel(), 0)
+            .getPanel();
 
     private final ConfigurationModuleSelector myModuleSelector;
 

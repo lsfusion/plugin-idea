@@ -32,6 +32,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
 import com.intellij.util.PlatformIcons;
+import com.intellij.util.ui.JBUI;
+import com.lsfusion.LSFIcons;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
@@ -43,6 +45,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import javax.swing.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -68,12 +72,12 @@ public class LibraryOptionsPanel {
     private final String SERVER_JAR_KEY = "serverJar";
     private final String SOURCES_JAR_KEY = "sourcesJar";
     
-    private JComboBox myExistingLibraryComboBox;
-    private JButton myCreateButton;
-    private JButton myDownloadButton;
+    private final JComboBox myExistingLibraryComboBox = new JComboBox();
+    private final JButton myCreateButton = new JButton("Create...");
+    private final JButton myDownloadButton = new JButton("Download");
     private JPopupMenu myPopupMenu;
-    private JButton myPopupButton;
-    private JPanel mySimplePanel;
+    private final JButton myPopupButton = new JButton(LSFIcons.loadIcon("/images/expand_arrow.png"));
+    private final JPanel mySimplePanel = new JPanel(new GridBagLayout());
 
     private LibraryCompositionSettings mySettings;
     private final LibrariesContainer myLibrariesContainer;
@@ -91,6 +95,19 @@ public class LibraryOptionsPanel {
     }
 
     private void showSettingsPanel() {
+        myCreateButton.setMnemonic('C');
+        myDownloadButton.setMnemonic('D');
+        myPopupButton.setPreferredSize(JBUI.size(24));
+        myPopupButton.setMinimumSize(JBUI.size(24));
+
+        GridBagConstraints comboConstraints = new GridBagConstraints();
+        comboConstraints.fill = GridBagConstraints.HORIZONTAL;
+        comboConstraints.weightx = 1;
+        mySimplePanel.add(myExistingLibraryComboBox, comboConstraints);
+        mySimplePanel.add(myCreateButton);
+        mySimplePanel.add(myDownloadButton);
+        mySimplePanel.add(myPopupButton);
+
         List<Library> libraries = calculateSuitableLibraries();
 
         myLibraryComboBoxModel = new SortedComboBoxModel<>((o1, o2) -> {
