@@ -94,6 +94,13 @@ tasks.matching {
     enabled = false
 }
 
+tasks.runIde {
+    // HotSwap reloads classes from the compileJava output, which lacks the $$$reportNull$$$ methods instrumentCode
+    // adds for @NotNull, so a standard JVM rejects the swap as a method deletion. JetBrains Runtime's enhanced class
+    // redefinition accepts it, as well as added or removed methods and fields.
+    jvmArgs("-XX:+AllowEnhancedClassRedefinition")
+}
+
 tasks.withType<org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask>().configureEach {
     // IntelliJ IDEA starts the bundled Kubernetes plugin in dev sandbox, and it crashes
     // with missing split/RPC backend APIs. The plugin is unrelated to this project, so disable it.
