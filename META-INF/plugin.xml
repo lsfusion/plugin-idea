@@ -12,6 +12,7 @@
         <ul>
             <li><code>Recursive compile</code> before-launch step now runs as a regular Maven build and can be stopped</li>
             <li>Fix the Lsf code style page and make the formatter honor its settings</li>
+            <li>Fixed an error in Find Usages results after editing code</li>
         </ul>
     ]]>
     </change-notes>
