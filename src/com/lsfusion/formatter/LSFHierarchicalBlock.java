@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LSFHierarchicalBlock extends LSFAbstractBlock {
-    public LSFHierarchicalBlock(ASTNode node, Indent indent, BlockType type) {
-        super(node, indent, type);
+    public LSFHierarchicalBlock(ASTNode node, Indent indent, BlockType type, LSFCodeStyle codeStyle) {
+        super(node, indent, type, codeStyle);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class LSFHierarchicalBlock extends LSFAbstractBlock {
     @Nullable
     @Override
     public Spacing getSpacing(@Nullable Block block, @NotNull Block block1) {
-        return ((LSFAbstractBlock) block1).type == BlockType.LINEFEEDED ? LINE_SPACING : super.getSpacing(block, block1);
+        return ((LSFAbstractBlock) block1).type == BlockType.LINEFEEDED ? codeStyle.beforeObjects() : super.getSpacing(block, block1);
     }
 
     @Override

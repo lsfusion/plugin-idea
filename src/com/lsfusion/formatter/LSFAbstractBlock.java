@@ -6,6 +6,7 @@ import com.intellij.formatting.Spacing;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.formatter.WhiteSpaceFormattingStrategy;
 import com.intellij.psi.formatter.WhiteSpaceFormattingStrategyFactory;
@@ -38,11 +39,13 @@ public abstract class LSFAbstractBlock extends AbstractBlock {
 
     protected Indent indent;
     protected BlockType type;
+    protected LSFCodeStyle codeStyle;
 
-    protected LSFAbstractBlock(ASTNode node, Indent indent, BlockType type) {
+    protected LSFAbstractBlock(ASTNode node, Indent indent, BlockType type, LSFCodeStyle codeStyle) {
         super(node, null, null);
         this.indent = indent;
         this.type = type;
+        this.codeStyle = codeStyle;
     }
 
     protected void processChild(List<Block> result, ASTNode child, Indent indent) {
@@ -50,9 +53,9 @@ public abstract class LSFAbstractBlock extends AbstractBlock {
         if ((psi.getLanguage() == LSFFileType.INSTANCE.getLanguage() || isBadCharacter(psi)) && !containsWhiteSpacesOnly(child)) {
             BlockType childType = getBlockType(psi);
             if (childType.isPlain()) {
-                result.add(new LSFPlainBlock(child, indent, childType));
+                result.add(new LSFPlainBlock(child, indent, childType, codeStyle));
             } else {
-                result.add(new LSFHierarchicalBlock(child, indent, childType));
+                result.add(new LSFHierarchicalBlock(child, indent, childType, codeStyle));
             }
         }
     }
@@ -195,17 +198,6 @@ public abstract class LSFAbstractBlock extends AbstractBlock {
         return indent;
     }
 
-    private static Spacing DEFAULT_SPACING = Spacing.createSpacing(0, 1, 0, true, 1);
-
-    //empty line before element
-    protected static Spacing LINE_SPACING = Spacing.createSpacing(0, 1, 2, true, 1);
-
-    //single space before/after element
-    protected static Spacing SPACE_SPACING = Spacing.createSpacing(1, 1, 0, true, 1);
-
-    //no space before/after element
-    protected static Spacing NOSPACE_SPACING = Spacing.createSpacing(0, 0, 0, true, 1);
-
     private boolean isSpaceAround(Block block) {
         return block instanceof LSFPlainBlock && ((LSFPlainBlock) block).type == BlockType.SPACEAROUND;
     }
@@ -214,14 +206,24 @@ public abstract class LSFAbstractBlock extends AbstractBlock {
         return block instanceof LSFPlainBlock && ((LSFPlainBlock) block).type == BlockType.SPACEAFTER;
     }
 
+    //children of the file and of the statement lists (top level, META bodies) are declarations, everything nested deeper is code
+    protected boolean isDeclarationList() {
+        PsiElement psi = myNode.getPsi();
+        return psi instanceof PsiFile || psi instanceof LSFLazyParsableElement;
+    }
+
     @Override
     public @Nullable Spacing getSpacing(@Nullable Block block, @NotNull Block block1) {
-        if(isSpaceAfter(block) || isSpaceAround(block) || isSpaceAround(block1)) {
-            return SPACE_SPACING;
+        if(isSpaceAfter(block)) {
+            return codeStyle.afterComma();
+        } else if(isSpaceAround(block)) {
+            return codeStyle.aroundOperator(((LSFPlainBlock) block).getNode().getPsi());
+        } else if(isSpaceAround(block1)) {
+            return codeStyle.aroundOperator(((LSFPlainBlock) block1).getNode().getPsi());
         } else if(isSpaceAfter(block1)) {
-            return NOSPACE_SPACING;
+            return codeStyle.beforeComma();
         } else {
-            return DEFAULT_SPACING;
+            return codeStyle.defaultSpacing(isDeclarationList());
         }
     }
 

@@ -11,6 +11,7 @@
         <b>Version 1.0.314</b><br>
         <ul>
             <li><code>Recursive compile</code> before-launch step now runs as a regular Maven build and can be stopped</li>
+            <li>Fix the Lsf code style page and make the formatter honor its settings</li>
         </ul>
     ]]>
     </change-notes>
@@ -361,7 +362,7 @@
         which broke find element usages when cursor is on element usage-->
         <registryKey defaultValue="false" description="." key="actionSystem.update.actions.async.data-context2"/>
 
-        <codeStyleSettingsProvider implementation="com.lsfusion.formatter.LSFLanguageCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="com.lsfusion.formatter.LSFLanguageCodeStyleSettingsProvider"/>
         <lang.formatter language="Lsf" implementationClass="com.lsfusion.formatter.LSFFormattingModelBuilder"/>
 
     </extensions>

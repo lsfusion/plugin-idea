@@ -12,12 +12,12 @@ import java.util.List;
 
 public class LSFPlainBlock extends LSFAbstractBlock {
 
-    public LSFPlainBlock(ASTNode node) {
-        this(node, getNoneIndent(), BlockType.DEFAULT);
+    public LSFPlainBlock(ASTNode node, LSFCodeStyle codeStyle) {
+        this(node, getNoneIndent(), BlockType.DEFAULT, codeStyle);
     }
 
-    public LSFPlainBlock(ASTNode node, Indent indent, BlockType type) {
-        super(node, indent, type);
+    public LSFPlainBlock(ASTNode node, Indent indent, BlockType type, LSFCodeStyle codeStyle) {
+        super(node, indent, type, codeStyle);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class LSFPlainBlock extends LSFAbstractBlock {
     @Override
     public @Nullable Spacing getSpacing(@Nullable Block block, @NotNull Block block1) {
         if (type == BlockType.HEADER && ((LSFPlainBlock) block1).type != BlockType.COMMENT) {
-            return LINE_SPACING;
+            return codeStyle.betweenModuleHeaderStatements();
         }
         return super.getSpacing(block, block1);
     }

@@ -7,6 +7,7 @@ import com.intellij.formatting.FormattingModelProvider;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.impl.source.SourceTreeToPsiMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +15,8 @@ public class LSFFormattingModelBuilder implements FormattingModelBuilder {
     @Override
     public @NotNull FormattingModel createModel(@NotNull FormattingContext formattingContext) {
         PsiFile psiFile = formattingContext.getPsiElement().getContainingFile();
-        return FormattingModelProvider.createFormattingModelForPsiFile(psiFile, new LSFPlainBlock(SourceTreeToPsiMap.psiElementToTree(psiFile)), formattingContext.getCodeStyleSettings());
+        CodeStyleSettings settings = formattingContext.getCodeStyleSettings();
+        return FormattingModelProvider.createFormattingModelForPsiFile(psiFile, new LSFPlainBlock(SourceTreeToPsiMap.psiElementToTree(psiFile), new LSFCodeStyle(settings)), settings);
     }
 
     @Override
