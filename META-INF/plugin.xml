@@ -16,6 +16,7 @@
             <li>Replace the hand-made color gutter marker with an ElementColorProvider</li>
             <li>Editor colors of lsFusion code (META backgrounds, errors, implicit parameters, deprecations) can be changed in IDEA Settings</li>
             <li>Collapse-by-default options for META, action, FORM, DESIGN and NAVIGATOR bodies in IDEA Code Folding settings; <code>//region</code> comments fold in .lsf files</li>
+            <li>Improved lsFusion server download in the New Project wizard</li>
         </ul>
     ]]>
     </change-notes>

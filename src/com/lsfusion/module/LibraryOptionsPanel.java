@@ -4,9 +4,11 @@ import com.intellij.facet.impl.ui.libraries.LibraryCompositionSettings;
 import com.intellij.framework.library.FrameworkLibraryVersionFilter;
 import com.intellij.ide.util.frameworkSupport.OldCustomLibraryDescription;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Progressive;
@@ -31,24 +33,22 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
+import com.intellij.ui.components.JBOptionButton;
 import com.intellij.util.PlatformIcons;
-import com.intellij.util.ui.JBUI;
-import com.lsfusion.LSFIcons;
+import com.intellij.util.text.VersionComparatorUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import javax.swing.*;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -67,17 +67,21 @@ public class LibraryOptionsPanel {
     // which causes 404 error as this page is not reachable from the outside
     private final String DOWNLOAD_URL = "https://download.lsfusion.org/java/";
     private final String SERVER_PATTERN = "lsfusion-server-(\\d+(\\.)?)*(-beta\\d+|-SNAPSHOT)?\\.jar";
-    private final String SOURCES_PATTERN = "lsfusion-server-(\\d+(\\.)?)*(-beta\\d+|-SNAPSHOT)?-sources\\.jar";
 
     private final String SERVER_JAR_KEY = "serverJar";
     private final String SOURCES_JAR_KEY = "sourcesJar";
     
     private final JComboBox myExistingLibraryComboBox = new JComboBox();
     private final JButton myCreateButton = new JButton("Create...");
-    private final JButton myDownloadButton = new JButton("Download");
-    private JPopupMenu myPopupMenu;
-    private final JButton myPopupButton = new JButton(LSFIcons.loadIcon("/images/expand_arrow.png"));
+    private final JBOptionButton myDownloadButton = new JBOptionButton(new AbstractAction("Download") {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            downloadSelected(myLatestRelease);
+        }
+    }, null);
     private final JPanel mySimplePanel = new JPanel(new GridBagLayout());
+    // the release the Download button offers, null until the version list is loaded
+    private Map<String, String> myLatestRelease;
 
     private LibraryCompositionSettings mySettings;
     private final LibrariesContainer myLibrariesContainer;
@@ -97,8 +101,11 @@ public class LibraryOptionsPanel {
     private void showSettingsPanel() {
         myCreateButton.setMnemonic('C');
         myDownloadButton.setMnemonic('D');
-        myPopupButton.setPreferredSize(JBUI.size(24));
-        myPopupButton.setMinimumSize(JBUI.size(24));
+        // a split button inside the page opens its drop-down with Down while it has focus; Alt+Shift+Enter, named by
+        // JBOptionButton.getDefaultTooltip(), works only for the option buttons of DialogWrapper's own button bar
+        myDownloadButton.setOptionTooltipText("Download another version (" + KeymapUtil.getKeystrokeText(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)) + ")");
+        // the options are versions, not distinct actions, so they are not separated from each other
+        myDownloadButton.setAddSeparator(false);
 
         GridBagConstraints comboConstraints = new GridBagConstraints();
         comboConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -106,7 +113,6 @@ public class LibraryOptionsPanel {
         mySimplePanel.add(myExistingLibraryComboBox, comboConstraints);
         mySimplePanel.add(myCreateButton);
         mySimplePanel.add(myDownloadButton);
-        mySimplePanel.add(myPopupButton);
 
         List<Library> libraries = calculateSuitableLibraries();
 
@@ -146,21 +152,34 @@ public class LibraryOptionsPanel {
         });
 
         myCreateButton.addActionListener(e -> doCreate());
-        myDownloadButton.addActionListener(e -> downloadSelected(null));
-        myPopupMenu = new JPopupMenu();
-        myPopupButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                try {
-                    myPopupMenu.removeAll();
-                    for(Map<String, String> serverUrls : getLsfusionServerJars(false)) {
-                        JMenuItem menuItem = new JMenuItem(serverUrls.get(SERVER_JAR_KEY));
-                        menuItem.addActionListener(event -> downloadSelected(serverUrls));
-                        myPopupMenu.add(menuItem);
+
+        // JBOptionButton shows its drop-down arrow only when it already has options, so the versions are read
+        // from the download page in advance rather than on a click
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            try {
+                List<Map<String, String>> serverJars = getLsfusionServerJars();
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    myLatestRelease = findLatestRelease(serverJars);
+                    List<Action> options = new ArrayList<>();
+                    for (Map<String, String> serverJar : serverJars) {
+                        if (serverJar == myLatestRelease) {
+                            String version = getVersion(serverJar);
+                            myDownloadButton.getAction().putValue(Action.NAME, "Download " + version);
+                            // without a tooltip of its own the main part would show the drop-down arrow's tooltip
+                            myDownloadButton.getAction().putValue(Action.SHORT_DESCRIPTION, "Download lsFusion server " + version
+                                    + (serverJar.containsKey(SOURCES_JAR_KEY) ? " with sources" : ""));
+                        } else {
+                            options.add(new AbstractAction(getVersion(serverJar)) {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    downloadSelected(serverJar);
+                                }
+                            });
+                        }
                     }
-                    myPopupMenu.show(myDownloadButton, 0, myDownloadButton.getHeight());
-                } catch (IOException ignored) {
-                }
+                    myDownloadButton.setOptions(options.toArray(new Action[0]));
+                }, ModalityState.any());
+            } catch (IOException ignored) {
             }
         });
     }
@@ -255,54 +274,53 @@ public class LibraryOptionsPanel {
     }
 
     private Map<String, File> getLatestLsfusionServerJar() throws IOException {
-        List<Map<String, String>> serverJarUrlsList = getLsfusionServerJars(true);
-        return !serverJarUrlsList.isEmpty() ? downloadFiles(serverJarUrlsList.get(0)) : null;
+        Map<String, String> latestRelease = findLatestRelease(getLsfusionServerJars());
+        return latestRelease != null ? downloadFiles(latestRelease) : null;
     }
 
-    private List<Map<String, String>> getLsfusionServerJars(boolean latest) throws IOException {
-        List<Map<String, String>> serverJarUrlsList = new ArrayList<>();
-        List<String> serverUrls = parseURL(DOWNLOAD_URL, SERVER_PATTERN);
-        List<String> sourceUrls = parseURL(DOWNLOAD_URL, SOURCES_PATTERN);
-        for(int i = serverUrls.size() - 1; i >=0; i--) {
-            String serverUrl = serverUrls.get(i);
-            
-            if (latest && serverUrl.contains("SNAPSHOT")) {
-                continue;
-            }
-            
-            Map<String, String> fileUrls = new HashMap<>();
-            fileUrls.put(SERVER_JAR_KEY, DOWNLOAD_URL + serverUrl);
+    // newest first; for the same version number VersionComparatorUtil puts the release before its betas
+    // and the betas before the SNAPSHOT
+    private List<Map<String, String>> getLsfusionServerJars() throws IOException {
+        List<String> hrefs = new ArrayList<>();
+        for (Element item : Jsoup.connect(DOWNLOAD_URL).timeout(10000).get().getElementsByTag("a")) {
+            hrefs.add(item.attr("href"));
+        }
 
-            String sourceUrl = serverUrl.replace(".jar", "-sources.jar");
-            if(sourceUrls.contains(sourceUrl)) {
-                fileUrls.put(SOURCES_JAR_KEY, DOWNLOAD_URL + sourceUrl);
-            }
-            serverJarUrlsList.add(fileUrls);
-            if (latest) {
-                break;
+        List<Map<String, String>> serverJarUrlsList = new ArrayList<>();
+        for (String href : hrefs) {
+            String releaseHref = href.replaceFirst("-beta\\d+", "");
+            // betas are offered only until their version is released
+            if (href.matches(SERVER_PATTERN) && (releaseHref.equals(href) || !hrefs.contains(releaseHref))) {
+                Map<String, String> fileUrls = new HashMap<>();
+                fileUrls.put(SERVER_JAR_KEY, DOWNLOAD_URL + href);
+
+                String sourcesHref = href.replace(".jar", "-sources.jar");
+                if (hrefs.contains(sourcesHref)) {
+                    fileUrls.put(SOURCES_JAR_KEY, DOWNLOAD_URL + sourcesHref);
+                }
+                serverJarUrlsList.add(fileUrls);
             }
         }
+        serverJarUrlsList.sort((jar1, jar2) -> VersionComparatorUtil.compare(getVersion(jar2), getVersion(jar1)));
         return serverJarUrlsList;
     }
 
-    private List<String> parseURL(String url, String pattern) throws IOException {
-        List<String> result = new ArrayList<>();
-        Connection connection = Jsoup.connect(url);
-        connection.timeout(10000);
-        Document doc = connection.get();
-        for (Element item : doc.getElementsByTag("a")) {
-            String href = item.attr("href");
-            if (href != null && href.matches(pattern)) {
-                result.add(href);
-            }
-        }
-        return result;
+    // a release is a version without a -beta or -SNAPSHOT suffix
+    @Nullable
+    private Map<String, String> findLatestRelease(List<Map<String, String>> serverJars) {
+        return serverJars.stream().filter(serverJar -> !getVersion(serverJar).contains("-")).findFirst().orElse(null);
+    }
+
+    private String getVersion(Map<String, String> serverJar) {
+        String url = serverJar.get(SERVER_JAR_KEY);
+        return url.substring((DOWNLOAD_URL + "lsfusion-server-").length(), url.length() - ".jar".length());
     }
     
     private Map<String, File> downloadFiles(Map<String, String> serverJarUrls) {
         Map<String, File> resultFiles = new HashMap<>();
 
-        final FileChooserDescriptor dirChooser = FileChooserDescriptorFactory.createSingleFolderDescriptor();
+        final FileChooserDescriptor dirChooser = FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                .withTitle("Select Folder to Download lsFusion " + getVersion(serverJarUrls));
         FileChooser.chooseFiles(dirChooser, getProject(), null, paths -> {
             if (!paths.isEmpty()) {
                 String targetPath = paths.get(0).getPath();
