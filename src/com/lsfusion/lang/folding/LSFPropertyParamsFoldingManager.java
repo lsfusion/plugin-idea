@@ -9,6 +9,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.SimpleModificationTracker;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import com.intellij.util.containers.ContainerUtil;
@@ -24,10 +25,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class LSFPropertyParamsFoldingManager {
     public static Map<Document, Integer> lineUnderChange = ContainerUtil.createConcurrentWeakMap();
     
+    // The platform caches an editor's folding result until one of its dependencies changes, and these regions also depend
+    // on the caret line: the caret listener bumps this tracker so that the next folding pass does not reuse a stale result.
+    public static final SimpleModificationTracker CARET_LINE_TRACKER = new SimpleModificationTracker();
+    private static final Set<Object> DEPENDENCIES = Set.of(CARET_LINE_TRACKER);
+
     private final Document document;
     private LSFPropertyStatement propertyStatement;
     
@@ -85,7 +92,7 @@ public class LSFPropertyParamsFoldingManager {
 
                 if (!text.isEmpty()) {
                     text += "=";
-                    result.add(new LSFNamedFoldingDescriptor(equalsSign, text));
+                    result.add(new LSFNamedFoldingDescriptor(equalsSign, text, DEPENDENCIES));
                 }
             }
         }
@@ -110,7 +117,7 @@ public class LSFPropertyParamsFoldingManager {
                             lineUnderChange.put(document, equalsLine);
                             FoldRegion foldRegion = selectedTextEditor.getFoldingModel().getCollapsedRegionAtOffset(equalsOffset);
                             if (foldRegion != null) {
-                                descriptors.add(new LSFNamedFoldingDescriptor(equalsSign, foldRegion.getPlaceholderText()));
+                                descriptors.add(new LSFNamedFoldingDescriptor(equalsSign, foldRegion.getPlaceholderText(), DEPENDENCIES));
                             }
                             return true;
                         }

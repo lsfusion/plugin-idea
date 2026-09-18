@@ -5,7 +5,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import com.lsfusion.lang.folding.LSFPropertyParamsFoldingManager;
 
@@ -43,7 +42,7 @@ public class LSFFileEditorCaretListener implements CaretListener {
                         .schedule(() -> ApplicationManager.getApplication().invokeLater(() -> {
                             if (editor.isDisposed())
                                 return;
-                            editor.putUserData(Key.findKeyByName("code folding"), null); // reset cache
+                            LSFPropertyParamsFoldingManager.CARET_LINE_TRACKER.incModificationCount();
                             LSFPropertyParamsFoldingManager.updateFoldRegions(editor);
                         }), UPDATE_FOLDINGS_DELAY, TimeUnit.MILLISECONDS));
                 if (previous != null)
