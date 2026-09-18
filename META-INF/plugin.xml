@@ -13,6 +13,7 @@
             <li><code>Recursive compile</code> before-launch step now runs as a regular Maven build and can be stopped</li>
             <li>Fix the Lsf code style page and make the formatter honor its settings</li>
             <li>Fixed an error in Find Usages results after editing code</li>
+            <li>Replace the hand-made color gutter marker with an ElementColorProvider</li>
         </ul>
     ]]>
     </change-notes>
@@ -307,8 +308,6 @@
                                         implementationClass="com.lsfusion.dependencies.property.PropertyComplexityLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.dependencies.property.PropertyTableLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="Lsf"
-                                        implementationClass="com.lsfusion.dependencies.property.PropertyColorLineMarkerProvider"/>
 
         <!-- reports related stuff -->
         <!-- Associate the .jrxml extension with the platform's built-in XML file type (name-reference form: no implementationClass). -->
@@ -365,6 +364,7 @@
 
         <langCodeStyleSettingsProvider implementation="com.lsfusion.formatter.LSFLanguageCodeStyleSettingsProvider"/>
         <lang.formatter language="Lsf" implementationClass="com.lsfusion.formatter.LSFFormattingModelBuilder"/>
+        <colorProvider implementation="com.lsfusion.lang.LSFColorProvider"/>
 
     </extensions>
 </idea-plugin>

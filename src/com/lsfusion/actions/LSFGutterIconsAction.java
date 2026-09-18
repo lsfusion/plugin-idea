@@ -23,16 +23,6 @@ public class LSFGutterIconsAction extends AnAction {
 
     private static final Font TEXT_FONT = new Font("Dialog", Font.BOLD, 11);
 
-    public static Icon createFilledSquareIcon(Color color) {
-        return new LSFFixedSizeIcon() {
-            @Override
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                g.setColor(color);
-                g.fillRect(x, y, LSFFixedSizeIcon.SIZE, LSFFixedSizeIcon.SIZE);
-            }
-        };
-    }
-
     public static Icon createTextBadgeIcon(Color color, Supplier<String> textSupplier, int horizontalOffset) {
         return new LSFFixedSizeIcon() {
             @Override
