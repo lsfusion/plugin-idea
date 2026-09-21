@@ -15,6 +15,7 @@
             <li>Fixed an error in Find Usages results after editing code</li>
             <li>Replace the hand-made color gutter marker with an ElementColorProvider</li>
             <li>Editor colors of lsFusion code (META backgrounds, errors, implicit parameters, deprecations) can be changed in IDEA Settings</li>
+            <li>Collapse-by-default options for META, action, FORM, DESIGN and NAVIGATOR bodies in IDEA Code Folding settings; <code>//region</code> comments fold in .lsf files</li>
         </ul>
     ]]>
     </change-notes>
@@ -166,6 +167,7 @@
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
         <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
+        <codeFoldingOptionsProvider instance="com.lsfusion.lang.folding.LSFCodeFoldingOptionsProvider"/>
         <spellchecker.support language="Lsf" implementationClass="com.lsfusion.spellchecker.LSFSpellcheckingStrategy"/>
         <annotator language="Lsf" implementationClass="com.lsfusion.lang.LSFReferenceAnnotator"/>
         <readWriteAccessDetector implementation="com.lsfusion.LSFReadWriteAccessDetector"/>

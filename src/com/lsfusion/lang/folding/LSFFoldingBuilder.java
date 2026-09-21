@@ -1,11 +1,12 @@
 package com.lsfusion.lang.folding;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.folding.FoldingBuilder;
+import com.intellij.lang.folding.CustomFoldingBuilder;
 import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.lsfusion.actions.folding.PropertyFoldingManager;
 import com.lsfusion.lang.psi.LSFPropertyStatement;
@@ -13,22 +14,18 @@ import com.lsfusion.lang.psi.LSFTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class LSFFoldingBuilder implements FoldingBuilder {
-    
-    @NotNull
+// CustomFoldingBuilder adds the '//region' / '// <editor-fold>' comment regions on top of the language ones
+public class LSFFoldingBuilder extends CustomFoldingBuilder {
+
     @Override
-    public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
-        List<FoldingDescriptor> list = new ArrayList<>();
-        Project project = node.getPsi().getProject();
+    protected void buildLanguageFoldRegions(@NotNull List<FoldingDescriptor> descriptors, @NotNull PsiElement root, @NotNull Document document, boolean quick) {
+        Project project = root.getProject();
         boolean propFoldNone = PropertyFoldingManager.isNone(project);
         boolean propFoldImplicit = PropertyFoldingManager.isImplicit(project);
-        
-        buildFolding(node, list, document, propFoldNone, propFoldImplicit);
-        FoldingDescriptor[] descriptors = new FoldingDescriptor[list.size()];
-        return list.toArray(descriptors);
+
+        buildFolding(root.getNode(), descriptors, document, propFoldNone, propFoldImplicit);
     }
 
     private static void buildFolding(ASTNode node, List<FoldingDescriptor> list, Document document, boolean propFoldNone, boolean propFoldImplicit) {
@@ -64,14 +61,39 @@ public class LSFFoldingBuilder implements FoldingBuilder {
         }
     }
 
+    // CustomFoldingBuilder declares itself dumb-aware, but the inferred property classes fold resolves through the
+    // stub indexes, so the builder keeps waiting for indexing as it always did
+    @Override
+    public boolean isDumbAware() {
+        return false;
+    }
+
     @Nullable
     @Override
-    public String getPlaceholderText(@NotNull ASTNode node) {
+    protected String getLanguagePlaceholderText(@NotNull ASTNode node, @NotNull TextRange range) {
         return "{...}";
     }
 
+    // the inferred property classes are always shown folded (that is the point of that region); the rest follows
+    // Settings > Editor > General > Code Folding
     @Override
-    public boolean isCollapsedByDefault(@NotNull ASTNode node) {
-        return node.getElementType() == LSFTypes.EQUALS_SIGN;
+    protected boolean isRegionCollapsedByDefault(@NotNull ASTNode node) {
+        IElementType elementType = node.getElementType();
+        if (elementType == LSFTypes.EQUALS_SIGN) {
+            return true;
+        }
+        LSFCodeFoldingSettings settings = LSFCodeFoldingSettings.getInstance();
+        if (elementType == LSFTypes.META_CODE_BODY) {
+            return settings.COLLAPSE_META_BODIES;
+        } else if (elementType == LSFTypes.LIST_ACTION_PROPERTY_DEFINITION_BODY) {
+            return settings.COLLAPSE_ACTION_BODIES;
+        } else if (elementType == LSFTypes.FORM_STATEMENT) {
+            return settings.COLLAPSE_FORM_BODIES;
+        } else if (elementType == LSFTypes.COMPONENT_BODY) {
+            return settings.COLLAPSE_DESIGN_COMPONENTS;
+        } else if (elementType == LSFTypes.NAVIGATOR_ELEMENT_STATEMENT_BODY) {
+            return settings.COLLAPSE_NAVIGATOR;
+        }
+        return false;
     }
 }
