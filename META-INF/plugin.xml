@@ -17,6 +17,7 @@
             <li>Editor colors of lsFusion code (META backgrounds, errors, implicit parameters, deprecations) can be changed in IDEA Settings</li>
             <li>Collapse-by-default options for META, action, FORM, DESIGN and NAVIGATOR bodies in IDEA Code Folding settings; <code>//region</code> comments fold in .lsf files</li>
             <li>Improved lsFusion server download in the New Project wizard</li>
+            <li>Typing <code>'</code> inserts the closing quote of a string literal and typing it again before the closing quote skips over it, like in Java</li>
         </ul>
     ]]>
     </change-notes>
@@ -166,6 +167,7 @@
         <additionalTextAttributes scheme="Default" file="colorSchemes/lsFusionDefault.xml"/>
         <additionalTextAttributes scheme="Darcula" file="colorSchemes/lsFusionDarcula.xml"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
+        <lang.quoteHandler language="Lsf" implementationClass="com.lsfusion.lang.LSFQuoteHandler"/>
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
         <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
         <codeFoldingOptionsProvider instance="com.lsfusion.lang.folding.LSFCodeFoldingOptionsProvider"/>
