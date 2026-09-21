@@ -14,6 +14,7 @@
             <li>Fix the Lsf code style page and make the formatter honor its settings</li>
             <li>Fixed an error in Find Usages results after editing code</li>
             <li>Replace the hand-made color gutter marker with an ElementColorProvider</li>
+            <li>Editor colors of lsFusion code (META backgrounds, errors, implicit parameters, deprecations) can be changed in IDEA Settings</li>
         </ul>
     ]]>
     </change-notes>
@@ -159,6 +160,9 @@
         <multiHostInjector implementation="com.lsfusion.references.LSFStringInterpolationInjector"/>
         <lang.syntaxHighlighterFactory language="Lsf"
                                        implementationClass="com.lsfusion.lang.highlight.LSFSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.lsfusion.lang.highlight.LSFColorSettingsPage"/>
+        <additionalTextAttributes scheme="Default" file="colorSchemes/lsFusionDefault.xml"/>
+        <additionalTextAttributes scheme="Darcula" file="colorSchemes/lsFusionDarcula.xml"/>
         <lang.braceMatcher language="Lsf" implementationClass="com.lsfusion.lang.LSFBraceMatcher"/>
         <lang.commenter language="Lsf" implementationClass="com.lsfusion.lang.LSFCommenter"/>
         <lang.foldingBuilder language="Lsf" implementationClass="com.lsfusion.lang.folding.LSFFoldingBuilder"/>
@@ -184,39 +188,39 @@
 
         <statementUpDownMover implementation="com.lsfusion.LSFStatementUpDownMover"/>
 
-        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFUnused" displayName="LSF Unused element"
+        <localInspection groupPath="lsFusion" language="Lsf" shortName="LSFUnused" displayName="LSF Unused element"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="false" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFUnusedInspectionTool" hasStaticDescription="true"/>
 
-        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFUnusedInMeta" displayName="LSF Unused element in metacode"
+        <localInspection groupPath="lsFusion" language="Lsf" shortName="LSFUnusedInMeta" displayName="LSF Unused element in metacode"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="false" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFUnusedInMetaInspectionTool" hasStaticDescription="true"/>
 
-        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFTypeMismatch" displayName="LSF Type mismatch"
+        <localInspection groupPath="lsFusion" language="Lsf" shortName="LSFTypeMismatch" displayName="LSF Type mismatch"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFTypeMismatchInspectionTool" hasStaticDescription="true"/>
 
-        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecated52" displayName="Deprecated since 5.2 lsFusion constructs"
+        <localInspection groupPath="lsFusion" language="Lsf" shortName="LSFDeprecated52" displayName="Deprecated since 5.2 lsFusion constructs"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFDeprecated52Inspection" hasStaticDescription="true"/>
 
-        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecated60" displayName="Deprecated since 6.0 lsFusion constructs"
+        <localInspection groupPath="lsFusion" language="Lsf" shortName="LSFDeprecated60" displayName="Deprecated since 6.0 lsFusion constructs"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFDeprecated60Inspection" hasStaticDescription="true"/>
 
-        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecated62" displayName="Deprecated since 6.2 lsFusion constructs"
+        <localInspection groupPath="lsFusion" language="Lsf" shortName="LSFDeprecated62" displayName="Deprecated since 6.2 lsFusion constructs"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFDeprecated62Inspection" hasStaticDescription="true"/>
 
-        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecated70" displayName="Deprecated since 7.0 lsFusion constructs"
+        <localInspection groupPath="lsFusion" language="Lsf" shortName="LSFDeprecated70" displayName="Deprecated since 7.0 lsFusion constructs"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFDeprecated70Inspection" hasStaticDescription="true"/>
 
-        <localInspection groupPath="Lsf" language="Lsf" shortName="LSFDeprecatedAnnotation" displayName="@@deprecated lsFusion constructs"
+        <localInspection groupPath="lsFusion" language="Lsf" shortName="LSFDeprecatedAnnotation" displayName="@@deprecated lsFusion constructs"
                          groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"
                          implementationClass="com.lsfusion.inspections.LSFDeprecatedAnnotationInspection" hasStaticDescription="true"/>
 
-        <!--<localInspection groupPath="Lsf" language="Lsf" shortName="LSFClassViewTypeInPrint" displayName="LSF ClassViewType in PRINT"-->
+        <!--<localInspection groupPath="lsFusion" language="Lsf" shortName="LSFClassViewTypeInPrint" displayName="LSF ClassViewType in PRINT"-->
                          <!--groupKey="lsf.warnings" groupBundle="com.lsfusion.LSFBundle" enabledByDefault="true" level="WARNING"-->
                          <!--implementationClass="com.lsfusion.inspections.LSFClassViewTypeInPrintInspectionTool" hasStaticDescription="true"/>-->
 
@@ -350,7 +354,7 @@
 
 
         <applicationConfigurable instance="com.lsfusion.actions.locale.LSFSettingsConfigurable"
-                             id="org.company.ApplicationSettingsConfigurable" displayName="LSF Settings"/>
+                                 parentId="language" id="com.lsfusion.settings" displayName="lsFusion"/>
 
         <!-- MCP tools are registered via bundled JetBrains MCP Server plugin (com.intellij.mcpServer.mcpToolset) -->
         <mcpServer.mcpToolset implementation="com.lsfusion.mcp.McpToolset"/>

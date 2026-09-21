@@ -23,7 +23,7 @@ public class LSFSettingsConfigurable implements Configurable {
 
     @Override
     public @NlsContexts.ConfigurableName String getDisplayName() {
-        return "LSF settings";
+        return "lsFusion";
     }
 
     @Override

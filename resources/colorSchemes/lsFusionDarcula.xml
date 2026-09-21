@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- the dark-theme values the annotator used to hard-code -->
+<list>
+  <option name="LSF_META_DECL">
+    <value>
+      <option name="BACKGROUND" value="253125"/>
+    </value>
+  </option>
+  <option name="LSF_META_USAGE">
+    <value>
+      <option name="BACKGROUND" value="3d3d3d"/>
+    </value>
+  </option>
+  <option name="LSF_META_DECL_USAGE">
+    <value>
+      <option name="BACKGROUND" value="313731"/>
+    </value>
+  </option>
+  <option name="LSF_META_NESTING_USAGE">
+    <value>
+      <option name="FOREGROUND" value="5b5b5b"/>
+    </value>
+  </option>
+  <option name="LSF_META_ERROR">
+    <value>
+      <option name="FOREGROUND" value="703030"/>
+    </value>
+  </option>
+  <option name="LSF_META_ERROR_UNDERSCORED">
+    <value>
+      <option name="EFFECT_COLOR" value="703030"/>
+      <option name="EFFECT_TYPE" value="2"/>
+    </value>
+  </option>
+  <option name="LSF_IMPLICIT_DECL">
+    <value>
+      <option name="FOREGROUND" value="606060"/>
+    </value>
+  </option>
+  <option name="LSF_UNTYPED_IMPLICIT_DECL">
+    <value>
+      <option name="FOREGROUND" value="6464ff"/>
+    </value>
+  </option>
+  <option name="LSF_OUTER_PARAM">
+    <value>
+      <option name="FOREGROUND" value="9876aa"/>
+    </value>
+  </option>
+  <option name="LSF_ERROR">
+    <value>
+      <option name="FOREGROUND" value="bc3f3c"/>
+    </value>
+  </option>
+  <option name="LSF_ERROR_UNDERSCORED">
+    <value>
+      <option name="EFFECT_COLOR" value="bc3f3c"/>
+      <option name="EFFECT_TYPE" value="2"/>
+    </value>
+  </option>
+  <option name="LSF_WARNING_UNDERSCORED">
+    <value>
+      <option name="EFFECT_COLOR" value="6464ff"/>
+      <option name="EFFECT_TYPE" value="2"/>
+    </value>
+  </option>
+  <option name="LSF_DEPRECATED_ANNOTATION">
+    <value>
+      <option name="FOREGROUND" value="bbb529"/>
+    </value>
+  </option>
+</list>

@@ -14,10 +14,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.undo.UndoUtil;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -30,8 +28,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.ui.Gray;
-import com.intellij.ui.JBColor;
 import com.intellij.util.IncorrectOperationException;
 import com.lsfusion.actions.ShowErrorsAction;
 import com.lsfusion.completion.ASTCompletionContributor;
@@ -40,6 +36,7 @@ import com.lsfusion.design.model.FontInfo;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.lang.classes.*;
 import com.lsfusion.lang.meta.MetaNestingLineMarkerProvider;
+import com.lsfusion.lang.highlight.LSFHighlightingColors;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.context.FormContext;
 import com.lsfusion.lang.psi.context.ExprsContextModifier;
@@ -73,22 +70,6 @@ import static java.lang.String.format;
 public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public static final String ACTION_FQN = "lsfusion.server.logics.action.Action";
 
-    public static final TextAttributes META_USAGE = new TextAttributes(null, new JBColor(Gray._239, Gray._61), null, null, Font.PLAIN);
-    public static final TextAttributes META_DECL = new TextAttributes(null, new JBColor(new Color(255, 255, 192), new Color(37, 49, 37)), null, null, Font.PLAIN);
-
-    public static final TextAttributes META_DECL_USAGE = new TextAttributes(null, new JBColor(new Color(239, 239, 207), new Color(49, 55, 49)), null, null, Font.PLAIN);
-    public static final TextAttributes META_ERROR = new TextAttributes(new JBColor(new Color(255, 128, 0), new Color(112, 48, 48)), null, null, null, Font.PLAIN);
-    public static final TextAttributes WAVE_UNDERSCORED_META_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 128, 0), new Color(112, 48, 48)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
-
-    public static final TextAttributes META_NESTING_USAGE = new TextAttributes(new JBColor(Gray._180, Gray._91), null, null, null, Font.PLAIN);
-    public static final TextAttributes ERROR = new TextAttributes(new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), null, null, null, Font.PLAIN);
-    public static final TextAttributes WAVE_UNDERSCORED_ERROR = new TextAttributes(null, null, new JBColor(new Color(255, 0, 0), new Color(188, 63, 60)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
-    public static final TextAttributes WAVE_UNDERSCORED_WARNING = new TextAttributes(null, null, new JBColor(Gray._211, new Color(100, 100, 255)), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
-    public static final TextAttributes IMPLICIT_DECL = new TextAttributes(Gray._96, null, null, null, Font.PLAIN);
-    public static final TextAttributes OUTER_PARAM = new TextAttributes(new JBColor(new Color(102, 14, 122), new Color(152, 118, 170)), null, null, null, Font.PLAIN);
-    public static final TextAttributes UNTYPED_IMPLICIT_DECL = new TextAttributes(new JBColor(new Color(56, 96, 255), new Color(100, 100, 255)), null, null, null, Font.PLAIN);
-    public static final TextAttributes DEPRECATED_ANNOTATION = new TextAttributes(new JBColor(new Color(0x80, 0x80, 0x00), new Color(0xBB, 0xB5, 0x29)), null, null, null, Font.PLAIN);
-
     private AnnotationHolder myHolder;
     public boolean errorsSearchMode = false;
     public boolean warningsSearchMode = false;
@@ -100,7 +81,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private final LSFProblemsVisitor.DeprecationConsumer deprecationLiveSink = (element, version, text, fix) -> {
         if (warningsSearchMode) {
-            addWarningAnnotation(element, text, null, CodeInsightColors.DEPRECATED_ATTRIBUTES, fix != null ? Collections.singletonList(fix) : null);
+            addWarningAnnotation(element, text, CodeInsightColors.DEPRECATED_ATTRIBUTES, fix != null ? Collections.singletonList(fix) : null);
         }
     };
 
@@ -122,9 +103,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     @Override
     public void visitElement(@NotNull PsiElement o) {
         if (o instanceof LeafPsiElement) { // фокус в том что побеждает наибольший приоритет, но важно следить что у верхнего правила всегда приоритет выше, так как в противном случае annotator просто херится
-            TextAttributes textAttributes = mergeMetaAttributes(o, null);
-            if (textAttributes != null) {
-                addSilentInfoAnnotation(o, textAttributes);
+            TextAttributesKey metaBackground = getMetaBackground(o);
+            if (metaBackground != null) {
+                addSilentInfoAnnotation(o, metaBackground);
             }
         }
     }
@@ -318,7 +299,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     private void addOuterRef(PsiElement element) {
-        addWarningAnnotation(element, "Outer param", mergeMetaAttributes(element, OUTER_PARAM), null);
+        addWarningAnnotation(element, "Outer param", LSFHighlightingColors.OUTER_PARAM, null);
     }
 
     public static boolean isOuter(LSFExprParamDeclaration decl, LSFPropertyExprObject pExprObject) {
@@ -420,7 +401,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void checkMetaNestingUsage(@NotNull PsiElement o) {
         if (MetaNestingLineMarkerProvider.resolveNestingLevel(o) > 1) {
-            addSilentInfoAnnotation(o, META_NESTING_USAGE);
+            addSilentInfoAnnotation(o, LSFHighlightingColors.META_NESTING_USAGE);
         }
     }
 
@@ -985,7 +966,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
 
         if (error != null) {
-            addErrorAnnotation(element, new TextRange(element.getTextOffset() + i, element.getTextOffset() + i + 1), error, WAVE_UNDERSCORED_ERROR);
+            addErrorAnnotation(element, new TextRange(element.getTextOffset() + i, element.getTextOffset() + i + 1), error, LSFHighlightingColors.ERROR_UNDERSCORED);
         }
     }
 
@@ -1125,21 +1106,23 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
     private void addError(PsiElement element, LSFResolvingError error, boolean hasResolving, Supplier<List<IntentionAction>> fixes) {
         if (isInMetaDecl(element) && hasResolving) {
-            addInfoAnnotation(element, error.range, error.text, error.underscored ? WAVE_UNDERSCORED_META_ERROR : META_ERROR);
+            addInfoAnnotation(element, error.range, error.text, error.underscored ? LSFHighlightingColors.META_ERROR_UNDERSCORED : LSFHighlightingColors.META_ERROR);
         } else {
-            addErrorAnnotation(element, error.range, error.text, error.underscored ? WAVE_UNDERSCORED_ERROR : ERROR, fixes);
+            addErrorAnnotation(element, error.range, error.text, error.underscored ? LSFHighlightingColors.ERROR_UNDERSCORED : LSFHighlightingColors.ERROR, fixes);
         }
     }
 
     private void addErrorAnnotation(PsiElement element, TextRange range, String text) {
-        addErrorAnnotation(element, range, text, ERROR);
+        addErrorAnnotation(element, range, text, LSFHighlightingColors.ERROR);
     }
 
-    private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes) {
+    private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributesKey textAttributes) {
         addErrorAnnotation(element, range, text, textAttributes, null);
     }
 
-    private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes, Supplier<List<IntentionAction>> fixes) {
+    // The META background is not merged in here any more: it is painted by the per-leaf annotations of visitElement,
+    // and the editor combines the layers itself (this annotation sets the foreground / effect, that one the background).
+    private void addErrorAnnotation(PsiElement element, TextRange range, String text, TextAttributesKey textAttributes, Supplier<List<IntentionAction>> fixes) {
         if (errorsSearchMode) {
             if (searchMessageConsumer != null) {
                 searchMessageConsumer.accept(element, text, LSFErrorLevel.ERROR);
@@ -1154,7 +1137,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             if (range != null) {
                 annotationBuilder = annotationBuilder.range(range);
             }
-            annotationBuilder = annotationBuilder.enforcedTextAttributes(mergeMetaAttributes(element, textAttributes));
+            annotationBuilder = annotationBuilder.textAttributes(textAttributes);
             if (fixList != null) {
                 for (IntentionAction fix : fixList) {
                     annotationBuilder = annotationBuilder.withFix(fix);
@@ -1167,18 +1150,14 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     //warning annotations
 
     private void addWarningResourceBundleAnnotation(PsiElement element, List<IntentionAction> fixes) {
-        addWarningAnnotation(element, "Missing " + element.getText() + " in resource bundle", WAVE_UNDERSCORED_WARNING, fixes);
+        addWarningAnnotation(element, "Missing " + element.getText() + " in resource bundle", LSFHighlightingColors.WARNING_UNDERSCORED, fixes);
     }
 
     private void addWarningAnnotation(PsiElement element, String text) {
         addWarningAnnotation(element, text, null, null);
     }
 
-    private void addWarningAnnotation(PsiElement element, String text, TextAttributes textAttributes, List<IntentionAction> fixes) {
-        addWarningAnnotation(element, text, textAttributes, null, fixes);
-    }
-
-    private void addWarningAnnotation(PsiElement element, String text, TextAttributes textAttributes, TextAttributesKey textAttributesKey, List<IntentionAction> fixes) {
+    private void addWarningAnnotation(PsiElement element, String text, TextAttributesKey textAttributesKey, List<IntentionAction> fixes) {
         if (warningsSearchMode) {
             if (searchMessageConsumer != null) {
                 searchMessageConsumer.accept(element, text, LSFErrorLevel.WARNING);
@@ -1187,9 +1166,6 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
             }
         } else if (!errorsSearchMode) {
             AnnotationBuilder builder = myHolder.newAnnotation(HighlightSeverity.WARNING, text).range(element);
-            if (textAttributes != null) {
-                builder = builder.enforcedTextAttributes(textAttributes);
-            }
             if (textAttributesKey != null) {
                 builder = builder.textAttributes(textAttributesKey);
             }
@@ -1204,68 +1180,53 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     //info annotations
 
-    private void addInfoAnnotation(PsiElement element, String text, TextAttributes textAttributes) {
+    private void addInfoAnnotation(PsiElement element, String text, TextAttributesKey textAttributes) {
         addInfoAnnotation(element, element.getTextRange(), text, textAttributes);
     }
 
-    private void addInfoAnnotation(PsiElement element, TextRange range, String text, TextAttributes textAttributes) {
+    private void addInfoAnnotation(PsiElement element, TextRange range, String text, TextAttributesKey textAttributes) {
         if(!errorsSearchMode) {
             AnnotationBuilder builder = myHolder.newAnnotation(HighlightSeverity.INFORMATION, text);
             if(range != null) {
                 builder = builder.range(range);
             }
-            builder.enforcedTextAttributes(mergeMetaAttributes(element, textAttributes)).create();
+            builder.textAttributes(textAttributes).create();
         }
     }
 
-    private void addSilentInfoAnnotation(PsiElement element, TextAttributes textAttributes) {
+    private void addSilentInfoAnnotation(PsiElement element, TextAttributesKey textAttributes) {
         addSilentInfoAnnotation(element.getTextRange(), textAttributes);
     }
 
-    private void addSilentInfoAnnotation(TextRange range, TextAttributes textAttributes) {
+    private void addSilentInfoAnnotation(TextRange range, TextAttributesKey textAttributes) {
         if(!errorsSearchMode) {
             myHolder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                     .range(range)
-                    .enforcedTextAttributes(textAttributes)
+                    .textAttributes(textAttributes)
                     .create();
         }
     }
 
-    private TextAttributes mergeMetaAttributes(PsiElement element, TextAttributes attributes) {
+    // the background every leaf of a META declaration / usage gets; the schemes define only BACKGROUND for these keys
+    private TextAttributesKey getMetaBackground(PsiElement element) {
         boolean inMetaUsage = isInMetaUsage(element);
         boolean inMetaDecl = isInMetaDecl(element);
-        TextAttributes metaAttr;
         if (inMetaUsage) {
-            if(inMetaDecl)
-                metaAttr = META_DECL_USAGE;
-            else
-                metaAttr = META_USAGE;
-        } else {
-            if (inMetaDecl)
-                metaAttr = META_DECL;
-            else
-                metaAttr = null;
+            return inMetaDecl ? LSFHighlightingColors.META_DECL_USAGE : LSFHighlightingColors.META_USAGE;
         }
-
-        if(metaAttr != null) {
-            if (attributes != null)
-                attributes = TextAttributes.merge(attributes, metaAttr);
-            else
-                attributes = metaAttr;
-        }
-        return attributes;
+        return inMetaDecl ? LSFHighlightingColors.META_DECL : null;
     }
 
     private void addIndirectProp(PsiElement element) {
-        addInfoAnnotation(element, "Indirect usage", IMPLICIT_DECL);
+        addInfoAnnotation(element, "Indirect usage", LSFHighlightingColors.IMPLICIT_DECL);
     }
 
     private void addImplicitDecl(PsiElement element) {
-        addInfoAnnotation(element, "Implicit parameter declaration", IMPLICIT_DECL);
+        addInfoAnnotation(element, "Implicit parameter declaration", LSFHighlightingColors.IMPLICIT_DECL);
     }
 
     private void addUntypedImplicitDecl(PsiElement element) {
-        addInfoAnnotation(element, "Untyped implicit parameter declaration", UNTYPED_IMPLICIT_DECL);
+        addInfoAnnotation(element, "Untyped implicit parameter declaration", LSFHighlightingColors.UNTYPED_IMPLICIT_DECL);
     }
 
     @Override
@@ -1510,7 +1471,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         if(!supportedAnnotations.contains(name)) {
             addErrorAnnotation(annotation, annotation.getTextRange(), format("'%s' is not supported annotation, use on of: %s", name, supportedAnnotations));
         } else if("deprecated".equals(name)) {
-            addSilentInfoAnnotation(new TextRange(annotation.getTextRange().getStartOffset(), simpleName.getTextRange().getEndOffset()), DEPRECATED_ANNOTATION);
+            addSilentInfoAnnotation(new TextRange(annotation.getTextRange().getStartOffset(), simpleName.getTextRange().getEndOffset()), LSFHighlightingColors.DEPRECATED_ANNOTATION);
         }
     }
 
