@@ -6,27 +6,24 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.PathManager;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 
+// Registers lsfusion-protocol:// with the OS for the lsFusion clients before 7.0, whose tooltips still link to the
+// declarations through that scheme. The handler it installs is a small script that forwards the link to the
+// plugin's /api/lsfusion-open on the IDE's built-in web server (see LSFOpenFileService), so nothing about the
+// project or the IDE is baked into it and it is done once per machine. The 7.0+ clients call the endpoint directly.
 public class InstallExternalCallsProtocolAction extends AnAction {
-
     private static final NotificationGroup NOTIFICATION_GROUP =
             NotificationGroupManager.getInstance().getNotificationGroup("Custom protocol Group");
 
@@ -34,54 +31,23 @@ public class InstallExternalCallsProtocolAction extends AnAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         Project project = anActionEvent.getProject();
         if (project != null) {
-            List<String> modulesPaths = new ArrayList<>();
-            for (Module module : ModuleManager.getInstance(project).getModules()) {
-                VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
-                for (VirtualFile contentRoot : contentRoots) {
-                    Path path = Paths.get(contentRoot.getPath(), "src/main/lsfusion");
-                    if (Files.exists(path))
-                        modulesPaths.add("\"" + path + "\"");
-                }
-            }
-
             String customProtocolPath = Paths.get(PathManager.getPluginsPath(), "lsfusion-idea-plugin", "custom-protocol").toString();
             try {
                 int exitCode = -1;
                 if (SystemUtils.IS_OS_LINUX) {
-                    //copy .sh file to project root
-                    File linuxExecFile = new File(customProtocolPath, "linux-exec.sh");
-                    copyFile(linuxExecFile);
-                    fillExecFile(linuxExecFile.toPath(), modulesPaths);
-
-                    String linuxExecPath = linuxExecFile.getPath();
-                    exitCode = Runtime.getRuntime().exec(new String[] {"chmod", "+x", linuxExecPath}).waitFor(); //make file executable
-
+                    File execFile = copyFile(customProtocolPath, "lsfusion-open.sh");
+                    exitCode = Runtime.getRuntime().exec(new String[]{"chmod", "+x", execFile.getPath()}).waitFor();
                     if (exitCode == 0)
-                        exitCode = registerLinuxProtocol(linuxExecPath);
+                        exitCode = registerLinuxProtocol(execFile.getPath());
                 } else if (SystemUtils.IS_OS_MAC) {
-                    File macExecFile = new File(customProtocolPath, "macos-exec.sh");
-                    copyFile(macExecFile);
-                    fillExecFile(macExecFile.toPath(), modulesPaths);
-
-                    String macExecPath = macExecFile.getPath();
-                    exitCode = Runtime.getRuntime().exec(new String[] {"chmod", "+x", macExecPath}).waitFor(); //make file executable
-
+                    File execFile = copyFile(customProtocolPath, "lsfusion-open.sh");
+                    exitCode = Runtime.getRuntime().exec(new String[]{"chmod", "+x", execFile.getPath()}).waitFor();
                     if (exitCode == 0)
-                        exitCode = registerMacProtocol(customProtocolPath, macExecPath);
+                        exitCode = registerMacProtocol(customProtocolPath, execFile.getPath());
                 } else if (SystemUtils.IS_OS_WINDOWS) {
-                    File windowsExecFile = new File(customProtocolPath, "windows-exec.bat");
-                    copyFile(windowsExecFile);
-                    fillExecFile(windowsExecFile.toPath(), modulesPaths);
-
-                    File windowsSetupFile = new File(customProtocolPath, "windows-setup.reg");
-                    copyFile(windowsSetupFile);
-                    Path windowsSetupFilePath = windowsSetupFile.toPath();
-                    String windowsExecPath = windowsExecFile.getPath().replaceAll("\\\\", "\\\\\\\\");
-                    Files.write(windowsSetupFilePath, Files.readString(windowsSetupFilePath)
-                            .replace("$1$", "\"\\\"" + windowsExecPath + "\\\" \\\"%1\\\"\"").getBytes());
-                    exitCode = Runtime.getRuntime().exec(new String[]{"cmd", "/c", windowsSetupFilePath.toString()}).waitFor();
+                    File execFile = copyFile(customProtocolPath, "lsfusion-open.ps1");
+                    exitCode = registerWindowsProtocol(customProtocolPath, execFile.getPath());
                 }
-
                 sendNotification(project, exitCode, exitCode == 0 ? "Successfully installed lsfusion-protocol" : "Error code " + exitCode);
             } catch (IOException | InterruptedException e) {
                 sendNotification(project, -1, e.getMessage());
@@ -93,6 +59,21 @@ public class InstallExternalCallsProtocolAction extends AnAction {
         NOTIFICATION_GROUP.createNotification(message, exitCode == 0 ? NotificationType.INFORMATION : NotificationType.ERROR).notify(project);
     }
 
+    private int registerWindowsProtocol(String customProtocolPath, String execScriptPath) throws IOException, InterruptedException {
+        File setupFile = copyFile(customProtocolPath, "windows-setup.reg");
+        Path setupFilePath = setupFile.toPath();
+        String systemRoot = System.getenv("SystemRoot");
+        String powershell = Paths.get(systemRoot != null ? systemRoot : "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe").toString();
+        // a .reg string value: backslashes and quotes escaped
+        String command = "\"" + powershell + "\" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"" + execScriptPath + "\" \"%1\"";
+        String regValue = "\"" + command.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+        // UTF-16LE with a BOM is what regedit exports and "reg import" reads without guessing the encoding: the
+        // command holds the plugins path, which may well have non-ASCII characters in it
+        Files.write(setupFilePath, ("﻿" + Files.readString(setupFilePath).replace("$1$", regValue)).getBytes(StandardCharsets.UTF_16LE));
+        // "reg import" writes the HKCU keys without the confirmation dialog regedit shows for a double-clicked .reg
+        return Runtime.getRuntime().exec(new String[]{"reg", "import", setupFilePath.toString()}).waitFor();
+    }
+
     private int registerLinuxProtocol(String scriptPath) throws IOException, InterruptedException {
         //create .desktop file and register new custom protocol
         String desctopFileContent =
@@ -102,36 +83,32 @@ public class InstallExternalCallsProtocolAction extends AnAction {
                         "Type=Application\n" +
                         "Terminal=false\n" +
                         "MimeType=x-scheme-handler/lsfusion-protocol;";
-
         String applicationsPath = System.getProperty("user.home") + "/.local/share/applications";
         Path desktopFilePath = Paths.get(applicationsPath + "/lsfusion-protocol.desktop");
-
-        if (!Files.exists(desktopFilePath))
+        if (!Files.exists(desktopFilePath)) {
+            Files.createDirectories(desktopFilePath.getParent()); // a fresh account may have no ~/.local/share/applications
             Files.createFile(desktopFilePath);
-
+        }
         String fileContent = Files.readString(desktopFilePath);
         if (!fileContent.contains(desctopFileContent))
-            Files.write(desktopFilePath, desctopFileContent.getBytes());
-
+            Files.write(desktopFilePath, desctopFileContent.getBytes(StandardCharsets.UTF_8));
         return Runtime.getRuntime().exec(new String[]{"update-desktop-database", applicationsPath}).waitFor();
     }
 
     private int registerMacProtocol(String customProtocolPath, String execScriptPath) throws IOException, InterruptedException {
         //macOS delivers custom-scheme URLs via the "open location" Apple Event, which a bare shell
         //script cannot receive, so wrap the exec script in an AppleScript .app bundle.
-        File setupFile = new File(customProtocolPath, "macos-setup.applescript");
-        copyFile(setupFile);
+        File setupFile = copyFile(customProtocolPath, "macos-setup.applescript");
         Path setupFilePath = setupFile.toPath();
-        Files.write(setupFilePath, Files.readString(setupFilePath).replace("$1$", execScriptPath).getBytes());
-
+        // an AppleScript string literal: a path may legally contain a quote or a backslash on macOS
+        String quotedScriptPath = execScriptPath.replace("\\", "\\\\").replace("\"", "\\\"");
+        Files.write(setupFilePath, Files.readString(setupFilePath).replace("$1$", quotedScriptPath).getBytes(StandardCharsets.UTF_8));
         File appFile = new File(customProtocolPath, "lsfusion-protocol.app");
         if (appFile.exists())
             FileUtils.deleteDirectory(appFile);
-
         int exitCode = Runtime.getRuntime().exec(new String[]{"osacompile", "-o", appFile.getPath(), setupFile.getPath()}).waitFor();
         if (exitCode != 0)
             return exitCode;
-
         //declare the lsfusion-protocol scheme in the bundle's Info.plist and hide it from the Dock
         String infoPlistPath = new File(appFile, "Contents/Info.plist").getPath();
         exitCode = Runtime.getRuntime().exec(new String[]{
@@ -146,61 +123,19 @@ public class InstallExternalCallsProtocolAction extends AnAction {
         }).waitFor();
         if (exitCode != 0)
             return exitCode;
-
         //register the bundle with Launch Services so the scheme resolves to it
         String lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister";
         return Runtime.getRuntime().exec(new String[]{lsregister, "-f", appFile.getPath()}).waitFor();
     }
 
-    private void copyFile(File file) throws IOException {
-        FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("custom-protocol/" + file.getName()), file);
-    }
-
-    private void fillExecFile(Path filePath, List<String> modulesPaths) throws IOException {
-        String fileContent = Files.readString(filePath);
-        String ideaBinPath = PathManager.getBinPath();
-
-        String ideaRunnableReplacement;
-        if (SystemUtils.IS_OS_LINUX) {
-            Path linuxPath = Paths.get(ideaBinPath, "idea.sh");
-            if (!Files.exists(linuxPath)) {
-                throw new IOException("Could not find idea.sh in " + ideaBinPath);
+    private File copyFile(String customProtocolPath, String name) throws IOException {
+        File file = new File(customProtocolPath, name);
+        try (InputStream resource = getClass().getClassLoader().getResourceAsStream("custom-protocol/" + name)) {
+            if (resource == null) {
+                throw new IOException("custom-protocol/" + name + " is missing from the plugin");
             }
-            ideaRunnableReplacement = ideaBinPath + "/idea.sh";
-        } else if (SystemUtils.IS_OS_MAC) {
-            //on macOS the home path is "<IDE>.app/Contents"; the command-line launcher lives in Contents/MacOS
-            Path macOsDir = Paths.get(PathManager.getHomePath(), "MacOS");
-            Path launcher = macOsDir.resolve("idea");
-            if (!Files.exists(launcher)) {
-                launcher = findMacLauncher(macOsDir);
-            }
-            //the path contains spaces ("IntelliJ IDEA.app"), so it must stay quoted in the script
-            ideaRunnableReplacement = "\"" + launcher + "\"";
-        } else {
-            String exeName;
-            if (Files.exists(Paths.get(ideaBinPath, "idea64.exe"))) {
-                exeName = "idea64.exe";
-            } else if (Files.exists(Paths.get(ideaBinPath, "openide64.exe"))) {
-                exeName = "openide64.exe";
-            } else {
-                throw new IOException("Could not find idea executable file in " + ideaBinPath);
-            }
-            ideaRunnableReplacement = "\"" + ideaBinPath.replaceAll("\\\\", "/") + "/" + exeName + "\"";
+            FileUtils.copyInputStreamToFile(resource, file);
         }
-
-        String projectModulesReplacement = SystemUtils.IS_OS_WINDOWS ?
-                StringUtils.join(modulesPaths, " ").replaceAll("\\\\", "/") :
-                "(" + StringUtils.join(modulesPaths, " ") + ")";
-
-        fileContent = fileContent.replaceAll("IDEA_RUNNABLE=.*", "IDEA_RUNNABLE=" + ideaRunnableReplacement);
-        fileContent = fileContent.replaceAll("PROJECT_MODULES=.*", "PROJECT_MODULES=" + projectModulesReplacement);
-        Files.write(filePath, fileContent.getBytes());
-    }
-
-    private Path findMacLauncher(Path macOsDir) throws IOException {
-        try (Stream<Path> files = Files.list(macOsDir)) {
-            return files.filter(Files::isExecutable).findFirst()
-                    .orElseThrow(() -> new IOException("Could not find idea executable in " + macOsDir));
-        }
+        return file;
     }
 }

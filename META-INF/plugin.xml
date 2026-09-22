@@ -19,6 +19,7 @@
             <li>Improved lsFusion server download in the New Project wizard</li>
             <li>Typing <code>'</code> inserts the closing quote of a string literal and typing it again before the closing quote skips over it, like in Java</li>
             <li>Alt+Enter on a syntax error offers to insert the missing <code>;</code>, <code>)</code>, <code>THEN</code>, <code>END</code> or another token the parser was waiting for</li>
+            <li>"Open in IDE" links in the lsFusion clients now go through the IDE's built-in web server (<code>/api/lsfusion-open</code>); for clients before 7.0 "Install Debug Protocol" only registers the <code>lsfusion-protocol://</code> scheme once per machine and forwards their links to the same endpoint - run it once after this update, the previous handler pointed at scripts this update replaces. Both need the IDE's built-in server port at its default (63342 and up)</li>
         </ul>
     ]]>
     </change-notes>
@@ -108,7 +109,8 @@
 
             <separator/>
             <action id="InstallExternalCallsProtocolAction" class="com.lsfusion.actions.InstallExternalCallsProtocolAction"
-                    text="Install Debug Protocol"/>
+                    text="Install Debug Protocol (clients before 7.0)"
+                    description="Register the lsfusion-protocol:// links of older lsFusion clients to open declarations in this IDE"/>
 
             <action id="LSFWebDocumentationAction" class="com.lsfusion.actions.LSFWebDocumentationAction" text="Web _Documentation">
                 <add-to-group group-id="Documentation.PrimaryGroup"/>
@@ -237,7 +239,6 @@
         <moduleBuilder builderClass="com.lsfusion.module.LSFusionModuleBuilder"/>
         <library.presentationProvider implementation="com.lsfusion.module.LSFusionLibraryPresentationProvider"/>
         <configurationType implementation="com.lsfusion.module.run.LSFusionRunConfigurationType"/>
-        <notificationGroup id="Custom protocol Group" displayType="BALLOON"></notificationGroup>
 
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.MetaIndex"/>
         <stubIndex implementation="com.lsfusion.lang.psi.indexes.ModuleIndex"/>
@@ -368,6 +369,9 @@
 
         <!-- it's very important not to have io.netty libraries in the plugin lib directory (because it will give the error cannot find proper constructor) -->
         <httpRequestHandler implementation="com.lsfusion.mcp.McpServerService"/>
+        <!-- "Open in IDE" links in the lsFusion clients: /api/lsfusion-open on the built-in web server -->
+        <httpRequestHandler implementation="com.lsfusion.LSFOpenFileService"/>
+        <notificationGroup id="Custom protocol Group" displayType="BALLOON"/>
 
         <langCodeStyleSettingsProvider implementation="com.lsfusion.formatter.LSFLanguageCodeStyleSettingsProvider"/>
         <lang.formatter language="Lsf" implementationClass="com.lsfusion.formatter.LSFFormattingModelBuilder"/>
