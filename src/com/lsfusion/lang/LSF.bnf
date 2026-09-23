@@ -886,6 +886,7 @@ formActionPropertyDefinitionBody ::=
 
 		|   CHECK
 		|   READONLY
+		|   formActivateClause
 		)*
         listActionDefinitionBody?
 {
@@ -893,6 +894,9 @@ formActionPropertyDefinitionBody ::=
     implements="com.lsfusion.lang.psi.context.ActionExpression, com.lsfusion.lang.psi.context.FormContext"
     methods = [inferActionParamClasses resolveFormDecl getDocumentation]
 }
+
+// SHOW ... ACTIVATE [USER]: the form already open in the window is activated instead of a second one
+formActivateClause ::= ACTIVATE USER?
 
 manageSessionClause ::= MANAGESESSION | NOMANAGESESSION
 formSessionScopeClause ::= NEWSESSION | NESTEDSESSION | THISSESSION
@@ -931,7 +935,9 @@ doMainBody ::= DO actionPropertyDefinitionBody
 }
 
 syncTypeLiteral ::= WAIT | NOWAIT
-windowTypeLiteral ::= FLOAT | DOCKED | EMBEDDED | POPUP | (IN componentID)
+windowTypeLiteral ::= FLOAT | dockedWindowTypeLiteral | EMBEDDED | POPUP | (IN componentID)
+// WINDOW [windowName]: a tab in System.forms or in the FORMS window named; DOCKED is its deprecated spelling
+dockedWindowTypeLiteral ::= (WINDOW | DOCKED) windowUsage?
 
 staticDestination ::= TO noParamsPropertyUsage
 groupObjectDestination ::= TO groupObjectUsage EQUALS propertyUsage (COMMA groupObjectUsage EQUALS propertyUsage)*
@@ -1443,7 +1449,7 @@ activeFormActionPropertyDefinitionBody ::= ACTIVE FORM formUsage
 
 emptyActionPropertyDefinitionBody ::= 
 
-activateActionPropertyDefinitionBody ::= ACTIVATE (  FORM formUsage 
+activateActionPropertyDefinitionBody ::= ACTIVATE (  FORM formAddress
                                                    | TAB componentID
                                                    | PROPERTY formPropertyDrawID
                                                    )
@@ -1454,12 +1460,15 @@ activateActionPropertyDefinitionBody ::= ACTIVATE (  FORM formUsage
 }
 
 //todo: add getDocumentation
-closeFormActionPropertyDefinitionBody ::= CLOSE FORM stringLiteral
+closeFormActionPropertyDefinitionBody ::= CLOSE FORM formAddress
 {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ActionExpression"
     methods = [inferActionParamClasses]
 }
+
+// ['label' =] [form] [WINDOW window], at least one part: which open forms ACTIVATE FORM and CLOSE FORM name
+formAddress ::= (((stringLiteral equalsSign formUsage) | formUsage | stringLiteral) (WINDOW windowUsage)?) | (WINDOW windowUsage)
 
 
 expandCollapseActionPropertyDefinitionBody ::= (COLLAPSE | EXPAND) CONTAINER componentID
@@ -2386,7 +2395,7 @@ indexStatement ::= INDEX ( ((LIKE | MATCH)? nonEmptyMappedPropertyOrSimpleExprPa
 
 windowStatement ::= windowCreateStatement | windowExtendStatement | windowHideStatement {implements="com.lsfusion.mcp.LSFMCPDeclaration" methods = [ getIcon ]}
 
-windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType? windowOptions SEMI
+windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? (windowType | formsWindowKind)? windowOptions SEMI
 {
     mixin="com.lsfusion.lang.psi.declarations.impl.LSFWindowDeclarationImpl"
     implements="com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.lang.psi.declarations.LSFWindowDeclaration"
@@ -2396,17 +2405,23 @@ windowCreateStatement ::= WINDOW simpleName (localizedStringLiteral)? windowType
     pin = 2
 }
 
-windowExtendStatement ::= EXTEND WINDOW windowUsage CUSTOM propertyExpression SEMI {pin=2}
+windowExtendStatement ::= EXTEND WINDOW windowUsage (CUSTOM propertyExpression | FORMS ((formsKind formsClose?) | formsClose)) SEMI {pin=2}
 windowHideStatement ::= HIDE WINDOW windowUsage SEMI {pin=2}
 
 //MENU, PANEL, TOOLBAR, TREE removed in 6.0
 //replace to 'NATIVE?'
 windowType ::= MENU | PANEL | TOOLBAR | TREE | NATIVE
 
+// a window that holds forms: one at a time unless TABBED, and the displaced one closed after CLOSE seconds or never
+formsWindowKind ::= FORMS formsKind? formsClose?
+formsKind ::= TABBED | NOTABBED
+formsClose ::= (CLOSE intLiteral) | NOCLOSE
+
 //deprecated in 5.2, removed in 6.0
 drawRoot ::= DRAWROOT
 
 windowOptions ::=   (	HIDETITLE
+                    |	AUTOSIZE
                     |	drawRoot
                     |	HIDESCROLLBARS
                     |	orientation

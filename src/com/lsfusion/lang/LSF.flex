@@ -200,6 +200,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "AUTO"                                { return AUTO; }
   "AUTOREFRESH"                         { return AUTOREFRESH; }
   "AUTOSET"                 			{ return AUTOSET; }
+  "AUTOSIZE"                			{ return AUTOSIZE; }
   "BACKGROUND"              			{ return BACKGROUND; }
   "BCC"                     			{ return BCC; }
   "BEFORE"                  			{ return BEFORE; }
@@ -406,6 +407,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NEWTHREAD"              			    { return NEWTHREAD; }
   "NO"                      			{ return NO; }
   "NOCANCEL"                			{ return NOCANCEL; }
+  "NOCLOSE"                 			{ return NOCLOSE; }
   "NOCOMPLEX"                 			{ return NOCOMPLEX; }
   "NODEFAULT"                			{ return NODEFAULT; }
   "NOEXTID"                			    { return NOEXTID; }
@@ -420,6 +422,7 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "NOSELECT"                			{ return NOSELECT; }
   "NOSETTINGS"                     	    { return NOSETTINGS; }
   "NOSTICKY"                     	    { return NOSTICKY; }
+  "NOTABBED"                     	    { return NOTABBED; }
   "NOT"                     			{ return NOT; }
   "WAIT"                                { return WAIT; }
   "NOWAIT"                              { return NOWAIT; }

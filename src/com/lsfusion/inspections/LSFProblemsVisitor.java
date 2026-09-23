@@ -240,6 +240,13 @@ public class LSFProblemsVisitor {
             if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.SEEK) {
                 reportWarning(firstChild, "7.0", "use ACTIVATE instead", sink);
             }
+        } else if (element instanceof LSFDockedWindowTypeLiteral) {
+            // SHOW / DIALOG ... DOCKED: the former spelling of WINDOW, which also names the window a form opens in
+            PsiElement firstChild = element.getFirstChild();
+            if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.DOCKED) {
+                sink.accept(firstChild, "7.0", "Deprecated since version 7.0. Use 'WINDOW' instead",
+                        new LSFReplaceFix(firstChild, "DOCKED", "WINDOW"));
+            }
         } else if (element instanceof LSFObjectPropertyDefinition) {
             PsiElement firstChild = element.getFirstChild();
             if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.VALUE) {
