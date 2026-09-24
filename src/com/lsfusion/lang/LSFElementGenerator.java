@@ -4,6 +4,7 @@ import com.intellij.formatting.FormatTextRanges;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.intellij.psi.*;
 import com.intellij.application.options.CodeStyle;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
@@ -12,6 +13,7 @@ import com.intellij.psi.impl.source.tree.CompositePsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
+import com.intellij.util.ConcurrencyUtil;
 import com.intellij.util.io.StringRef;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.meta.MetaChangeDetector;
@@ -149,52 +151,46 @@ public class LSFElementGenerator {
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFMetaCodeDeclBody.class).iterator().next();
     }
 
-    private static LSFExprParamDeclaration rowParamDecl = null;
+    private static final Key<LSFExprParamDeclaration> ROW_PARAM_DECL = Key.create("lsfusion.rowParamDecl");
     public static LSFExprParamDeclaration createRowParam(Project project) {
         final PsiFile dummyFile = createDummyFile(project, "MODULE " + genName + "; f(INTEGER row)=1");
         return PsiTreeUtil.findChildrenOfType(dummyFile, LSFExprParamDeclaration.class).iterator().next();
     }
     
     public static LSFExprParamDeclaration getRowParam(Project project) {
-        if(rowParamDecl == null) {
-            rowParamDecl = createRowParam(project);
-        }
-        return rowParamDecl;
+        return ConcurrencyUtil.computeIfAbsent(LSFElementGeneratorCache.getInstance(project), ROW_PARAM_DECL, () -> createRowParam(project));
     }
 
-    private static List<? extends LSFPropertyDrawDeclaration> builtInFormProps = null;
+    private static final Key<List<? extends LSFPropertyDrawDeclaration>> BUILT_IN_FORM_PROPS = Key.create("lsfusion.builtInFormProps");
 
     public static List<? extends LSFPropertyDrawDeclaration> getBuiltInFormProps(final Project project) {
-        if (builtInFormProps == null || builtInFormProps.iterator().next().getProject().isDisposed()) {
+        return ConcurrencyUtil.computeIfAbsent(LSFElementGeneratorCache.getInstance(project), BUILT_IN_FORM_PROPS, () -> {
             final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; FORM defaultForm PROPERTIES () formEdit,formRefresh,formApply,formCancel,formOk,formClose,formDrop,formShare;");
-            builtInFormProps = PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
-        }
-        return builtInFormProps;
+            return PsiTreeUtil.findChildrenOfType(dummyFile, LSFFormPropertiesNamesDeclList.class).iterator().next().getFormPropertyDrawNameDeclList();
+        });
     }
 
-    private static LSFClassReference staticObjectClassRef = null;
+    private static final Key<LSFClassReference> STATIC_OBJECT_CLASS_REF = Key.create("lsfusion.staticObjectClassRef");
     
     public static LSFClassReference getStaticObjectClassRef(Project project) {
 //        return createClassRefFromText("StaticObject", "System", file);
-        if (staticObjectClassRef == null || staticObjectClassRef.getProject().isDisposed()) {
+        return ConcurrencyUtil.computeIfAbsent(LSFElementGeneratorCache.getInstance(project), STATIC_OBJECT_CLASS_REF, () -> {
             final PsiFile dummyFile = createDummyFile(project, "MODULE lsFusionRulezzz; REQUIRE System; CLASS A : StaticObject;");
-            staticObjectClassRef = PsiTreeUtil.findChildrenOfType(dummyFile, LSFClassReference.class).iterator().next();
-        }
-        return staticObjectClassRef;
+            return PsiTreeUtil.findChildrenOfType(dummyFile, LSFClassReference.class).iterator().next();
+        });
     }
 
-    private static Collection<LSFWindowDeclaration> builtInWindows = null;
+    private static final Key<Collection<LSFWindowDeclaration>> BUILT_IN_WINDOWS = Key.create("lsfusion.builtInWindows");
 
     public static Collection<LSFWindowDeclaration> getBuiltInWindows(final Project project) {
-        if (builtInWindows == null || builtInWindows.iterator().next().getProject().isDisposed()) {
+        return ConcurrencyUtil.computeIfAbsent(LSFElementGeneratorCache.getInstance(project), BUILT_IN_WINDOWS, () -> {
             final PsiFile dummyFile = createDummyFile(project,
                     "MODULE System;" +
                             "WINDOW log 'log' PANEL;" +
                             "WINDOW status 'status' PANEL;" +
                             "WINDOW forms 'forms' PANEL;");
-            builtInWindows = PsiTreeUtil.findChildrenOfType(dummyFile, LSFWindowDeclaration.class);
-        }
-        return builtInWindows;
+            return PsiTreeUtil.findChildrenOfType(dummyFile, LSFWindowDeclaration.class);
+        });
     }
 
     public static void format(Project project, PsiElement element) {
