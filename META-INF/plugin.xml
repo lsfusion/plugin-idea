@@ -13,6 +13,7 @@
             <li>Forms windows: <code>WINDOW w FORMS [TABBED | NOTABBED] [CLOSE n | NOCLOSE]</code>, <code>EXTEND WINDOW w FORMS ...</code> and the <code>AUTOSIZE</code> window option; <code>SHOW</code> / <code>DIALOG ... WINDOW [w]</code> opens a form into a named window, <code>SHOW ... ACTIVATE [USER]</code> activates the form already open there instead of opening a second one, and <code>ACTIVATE FORM</code> / <code>CLOSE FORM</code> take <code>['label' =] [form] [WINDOW w]</code></li>
             <li>A single lsFusion warning can be silenced with <code>//noinspection LSFTypeMismatch</code> above the statement or <code>//file:noinspection LSFDeprecated70</code> at the top of the module, from Alt+Enter as in any other language</li>
             <li><code>DOCKED</code> in <code>SHOW</code> / <code>DIALOG</code> is deprecated, with a quick fix replacing it with <code>WINDOW</code></li>
+            <li>Fixed reading documentation articles through the IDE's MCP server</li>
         </ul>
     ]]>
     </change-notes>

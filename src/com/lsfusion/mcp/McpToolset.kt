@@ -381,23 +381,23 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         excludeIds: List<String>? = null,
         @McpDescription(description = "Name of the article to read instead of searching the whole corpus — one name, or a list of at most 12. Give it ALONE to WALK those articles from the top in DOCUMENT order; that is what you want when a chunk was on the right subject but plainly partial, because the constraint it depends on, the case it omits and the table it points at all sit elsewhere in the same article. Give it WITH `query` to SEARCH inside that set instead. Three shapes are accepted, all of which you are already holding: a published slug (`Interactive_view`); any chunk `id` verbatim (`Interactive_view::examples`) — everything from `::` names the section, the article is what gets read; or the DESTINATION of any `.md` link in chunk text (`../paradigm/Actions.md` and `Actions.md` both mean `Actions`) — the destination, never the visible label. Naming an article already picks its branch, so do not also pass `type`. Articles are PAGED, not delivered whole: every one named gets at least its next chunk, `status` says in words which of them are finished and which are not, and when any remain it gives you the exact call that continues — repeat it until `status` stops offering one.")
         article: String? = null,
+        @McpDescription(description = "At most 12 article names — instead of `article`, not alongside it. Same shapes and same behaviour as `article`: given alone the articles are WALKED in document order, given with `query` or `queries` the search runs inside them. When `status` says to repeat with `article=[...]`, that list goes here.")
+        articles: List<String>? = null,
     ): RetrieveDocsOutput {
-        // The central tool takes one field that is either a string or a list;
-        // Kotlin cannot express that as one typed parameter, so the two are
-        // separate here and folded back together for the call.
-        require((query == null) != (queries.isNullOrEmpty())) {
-            "pass either query or queries, not both and not neither"
-        }
+        // The central tool takes `query` and `article` as either a string or a list;
+        // Kotlin cannot express that as one typed parameter, so each is split in two
+        // here and folded back together for the call. Which selectors are required
+        // is the central tool's decision, so a call with neither is forwarded as is.
+        val hasQueries = !queries.isNullOrEmpty()
+        val hasArticles = !articles.isNullOrEmpty()
+        if (query != null && hasQueries || article != null && hasArticles)
+            throw mcpExpectedError("Pass `query` or `queries`, not both; likewise `article` or `articles`")
         val args = JSONObject()
-        if (query != null) {
-            args.put("query", query)
-        } else {
-            val qs = JSONArray()
-            queries!!.forEach { qs.put(it) }
-            args.put("query", qs)
-        }
+        if (query != null) args.put("query", query)
+        else if (hasQueries) args.put("query", JSONArray(queries))
         if (type != null) args.put("type", type)
         if (article != null) args.put("article", article)
+        else if (hasArticles) args.put("article", JSONArray(articles))
         if (excludeIds != null && excludeIds.isNotEmpty()) {
             val ids = JSONArray()
             excludeIds.forEach { ids.put(it) }
