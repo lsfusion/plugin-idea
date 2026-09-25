@@ -562,7 +562,8 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
             // that cost proportional to the number of edited files rather than to the number of metacode usages.
             if (!genUsages.isEmpty()) {
                 PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(myProject);
-                final Document document = psiDocumentManager.getDocument(file);
+                final Document document = ApplicationManager.getApplication().runReadAction(
+                        (Computable<Document>) () -> psiDocumentManager.getDocument(file));
 
                 final Result<Runnable> runMetaText = new Result<>();
                 runMetaText.setResult(() -> {
