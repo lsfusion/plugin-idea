@@ -18,8 +18,10 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.OrderEnumerator;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.lsfusion.LSFIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -109,7 +111,19 @@ public class LSFRecursiveCompileStepBeforeRun extends BeforeRunTaskProvider<LSFR
         Executor executor = DefaultRunExecutor.getRunExecutorInstance();
         ExecutionEnvironment mavenEnv = new ExecutionEnvironment(executor, runner, settings, myProject);
         mavenEnv.setExecutionId(env.getExecutionId());
-        return RunConfigurationBeforeRunProvider.doRunTask(executor.getId(), mavenEnv, runner);
+        if (!RunConfigurationBeforeRunProvider.doRunTask(executor.getId(), mavenEnv, runner)) {
+            return false;
+        }
+
+        // The server's classpath takes only the output directories the VFS already knows (OrderRootsEnumerator.collectPaths
+        // goes through VirtualFiles), and Maven has just recreated them behind its back: right after a clean the file
+        // watcher's asynchronous refresh can lose the race to the launch, and the server starts without the module classes.
+        String[] outputUrls = ApplicationManager.getApplication().runReadAction((Computable<String[]>) () ->
+                OrderEnumerator.orderEntries(module).recursively().withoutSdk().withoutLibraries().classes().getUrls());
+        for (String url : outputUrls) {
+            VirtualFileManager.getInstance().refreshAndFindFileByUrl(url);
+        }
+        return true;
     }
 
     public static class RecursiveCompileBeforeRunTask extends BeforeRunTask<RecursiveCompileBeforeRunTask> {

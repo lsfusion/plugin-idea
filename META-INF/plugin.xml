@@ -14,6 +14,7 @@
             <li>A single lsFusion warning can be silenced with <code>//noinspection LSFTypeMismatch</code> above the statement or <code>//file:noinspection LSFDeprecated70</code> at the top of the module, from Alt+Enter as in any other language</li>
             <li><code>DOCKED</code> in <code>SHOW</code> / <code>DIALOG</code> is deprecated, with a quick fix replacing it with <code>WINDOW</code></li>
             <li>Fixed reading documentation articles through the IDE's MCP server</li>
+            <li>Fixed <code>Recursive compile</code> launches failing right after a clean</li>
         </ul>
     ]]>
     </change-notes>
