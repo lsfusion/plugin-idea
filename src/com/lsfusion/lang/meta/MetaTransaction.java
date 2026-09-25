@@ -497,7 +497,7 @@ public class MetaTransaction {
                             result = merge(result, oldColTokens, error);
                             if(result==null) {
                                 String notificationText = decl.getGlobalName() + "\nFirst :" + usageParams + " " + error.getResult().first + "\nSecond :" + resultStatement.getUsageParams() + " " + error.getResult().second;
-                                Notifications.Bus.notify(new Notification("diffMeta", "Diff meta", notificationText, NotificationType.ERROR));
+                                Notifications.Bus.notify(new Notification("lsFusion META", "Diff meta", notificationText, NotificationType.ERROR));
                                 System.out.println(notificationText);
                                 break;
                             }

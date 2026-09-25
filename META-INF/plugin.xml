@@ -15,6 +15,7 @@
             <li><code>DOCKED</code> in <code>SHOW</code> / <code>DIALOG</code> is deprecated, with a quick fix replacing it with <code>WINDOW</code></li>
             <li>Fixed reading documentation articles through the IDE's MCP server</li>
             <li>Fixed <code>Recursive compile</code> launches failing right after a clean</li>
+            <li>lsFusion notifications are listed in Settings | Appearance &amp; Behavior | Notifications from the start and under readable names: <b>lsFusion</b>, <b>lsFusion errors</b>, <b>lsFusion warnings</b>, <b>lsFusion META</b>, <b>lsFusion refactoring</b></li>
         </ul>
     ]]>
     </change-notes>
@@ -367,7 +368,12 @@
         <httpRequestHandler implementation="com.lsfusion.mcp.McpServerService"/>
         <!-- "Open in IDE" links in the lsFusion clients: /api/lsfusion-open on the built-in web server -->
         <httpRequestHandler implementation="com.lsfusion.LSFOpenFileService"/>
-        <notificationGroup id="Custom protocol Group" displayType="BALLOON"/>
+        <!-- listed under these names in Settings > Appearance & Behavior > Notifications -->
+        <notificationGroup id="lsFusion" displayType="BALLOON"/>
+        <notificationGroup id="lsFusion errors" displayType="BALLOON"/>
+        <notificationGroup id="lsFusion warnings" displayType="BALLOON"/>
+        <notificationGroup id="lsFusion META" displayType="BALLOON"/>
+        <notificationGroup id="lsFusion refactoring" displayType="BALLOON"/>
 
         <langCodeStyleSettingsProvider implementation="com.lsfusion.formatter.LSFLanguageCodeStyleSettingsProvider"/>
         <lang.formatter language="Lsf" implementationClass="com.lsfusion.formatter.LSFFormattingModelBuilder"/>

@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 // project or the IDE is baked into it and it is done once per machine. The 7.0+ clients call the endpoint directly.
 public class InstallExternalCallsProtocolAction extends AnAction {
     private static final NotificationGroup NOTIFICATION_GROUP =
-            NotificationGroupManager.getInstance().getNotificationGroup("Custom protocol Group");
+            NotificationGroupManager.getInstance().getNotificationGroup("lsFusion");
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {

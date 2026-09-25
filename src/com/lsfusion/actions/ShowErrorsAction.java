@@ -92,7 +92,7 @@ public class ShowErrorsAction extends AnAction {
         NotificationsConfigurationImpl.getInstanceImpl().SHOW_BALLOONS = false;
 
         final Progressive progress = indicator -> {
-            Notifications.Bus.notify(new Notification("", "", "Searching for errors started", NotificationType.INFORMATION));
+            Notifications.Bus.notify(new Notification("lsFusion", "", "Searching for errors started", NotificationType.INFORMATION));
 
             ANNOTATOR.errorsSearchMode = true;
             ANNOTATOR.warningsSearchMode = warningsSearchMode;
@@ -111,7 +111,7 @@ public class ShowErrorsAction extends AnAction {
                 indicator.setFraction((double) index / files.size());
             }
 
-            Notifications.Bus.notify(new Notification("", "", "Searching for errors finished", NotificationType.INFORMATION));
+            Notifications.Bus.notify(new Notification("lsFusion", "", "Searching for errors finished", NotificationType.INFORMATION));
         };
 
         Task task = new Task.Modal(project, "Searching for errors", true) {
@@ -250,7 +250,7 @@ public class ShowErrorsAction extends AnAction {
 
         if (module != null) {
             Notifications.Bus.notify(new Notification(
-                            errorLevel == LSFErrorLevel.ERROR ? "LSF errors" : "LSF warnings",
+                            errorLevel == LSFErrorLevel.ERROR ? "lsFusion errors" : "lsFusion warnings",
                             "Error in " + module.getName() + " module:",
                             errorMessage,
                             errorLevel == LSFErrorLevel.ERROR ? NotificationType.ERROR : NotificationType.WARNING

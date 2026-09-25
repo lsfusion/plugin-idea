@@ -312,7 +312,7 @@ public class LSFRenameFullNameProcessor extends RenamePsiElementProcessor {
                 return;
         }
 
-        Notifications.Bus.notify(new Notification("rename", "Rename", "Cannot qualify reference " + ref.getText() + " to declaration" + (decl == null ? "null" : decl.getText()), NotificationType.ERROR));
+        Notifications.Bus.notify(new Notification("lsFusion refactoring", "Rename", "Cannot qualify reference " + ref.getText() + " to declaration" + (decl == null ? "null" : decl.getText()), NotificationType.ERROR));
     }
     
     @Override

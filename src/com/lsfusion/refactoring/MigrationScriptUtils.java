@@ -44,7 +44,7 @@ public class MigrationScriptUtils {
             for (ElementMigration migration : invalidMigrations) {
                 message.append("<br>").append(migration.getMigrationString());
             }
-            Notifications.Bus.notify(new Notification("rename", "Migration", message.toString(), NotificationType.ERROR));
+            Notifications.Bus.notify(new Notification("lsFusion refactoring", "Migration", message.toString(), NotificationType.ERROR));
         }
 
         if (validMigrations.isEmpty())
