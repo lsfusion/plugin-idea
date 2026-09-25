@@ -146,7 +146,6 @@
         <usageTypeProvider implementation="com.lsfusion.usage.LSFUsageTypeProvider"/>
         <usageFilteringRuleProvider implementation="com.lsfusion.usage.LSFUsageFilteringRuleProvider"/>
         <findUsagesHandlerFactory implementation="com.lsfusion.usage.LSFFindUsagesHandlerFactory"/>
-        <referencesSearch implementation="com.lsfusion.usage.LSFReferenceSearch"/>
         <actionPromoter implementation="com.lsfusion.actions.LSFActionPromoter"/>
 
         <callHierarchyProvider language="Lsf"
