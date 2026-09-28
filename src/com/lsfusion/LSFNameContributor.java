@@ -5,6 +5,7 @@ import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.codeStyle.MinusculeMatcher;
 import com.intellij.psi.codeStyle.NameUtil;
+import com.intellij.psi.search.DelegatingGlobalSearchScope;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.FindSymbolParameters;
@@ -64,7 +65,18 @@ public abstract class LSFNameContributor implements ChooseByNameContributorEx {
     }
 
     protected <G extends LSFStubbedElement> Collection<G> getItemsFromIndex(LSFStringStubIndex<G> index, String name, Project project, GlobalSearchScope scope) {
-        return LSFGlobalResolver.getItemsFromIndex(index, name, project, scope, LSFLocalSearchScope.GLOBAL);
+        return LSFGlobalResolver.getItemsFromIndex(index, name, project, withoutForcedLibrarySources(scope), LSFLocalSearchScope.GLOBAL);
+    }
+
+    // "All Places" (EverythingGlobalScope) forces library sources into the search, and LSFSourceFilterScope lets them
+    // through then, so a platform element would be listed twice: from the jar and from the -sources.jar next to it
+    private static GlobalSearchScope withoutForcedLibrarySources(GlobalSearchScope scope) {
+        return new DelegatingGlobalSearchScope(scope) {
+            @Override
+            public boolean isForceSearchingInLibrarySources() {
+                return false;
+            }
+        };
     }
 
     protected Collection<NavigationItem> getItemsWithParamsFromIndex(LSFStringStubIndex index, String name, Project project, GlobalSearchScope scope) {
