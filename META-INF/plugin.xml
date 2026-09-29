@@ -17,6 +17,7 @@
             <li>Fixed <code>Recursive compile</code> launches failing right after a clean</li>
             <li>lsFusion notifications are listed in Settings | Appearance &amp; Behavior | Notifications from the start and under readable names: <b>lsFusion</b>, <b>lsFusion errors</b>, <b>lsFusion warnings</b>, <b>lsFusion META</b>, <b>lsFusion refactoring</b></li>
             <li>Go to Class / Go to Symbol with the <b>All Places</b> scope no longer list the platform elements twice when the platform sources (<code>-sources.jar</code>) are downloaded</li>
+            <li>Go to Symbol (Ctrl+Alt+Shift+N) lists each property and action once instead of twice</li>
         </ul>
     ]]>
     </change-notes>

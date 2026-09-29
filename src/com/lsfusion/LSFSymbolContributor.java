@@ -137,9 +137,12 @@ public class LSFSymbolContributor extends LSFNameContributor {
     protected Collection<NavigationItem> getItemsWithParamsFromIndex(LSFStringStubIndex index, String name, Project project, GlobalSearchScope scope) {
         if (index instanceof ActionOrPropIndex) {
             List<NavigationItem> decls = getPropertyDeclarationsMap(name, false);
-            return decls != null
-                    ? decls
-                    : super.getItemsWithParamsFromIndex(index, name, project, scope);
+            if (decls == null) {
+                return super.getItemsWithParamsFromIndex(index, name, project, scope);
+            }
+            // the list holds the properties and the actions of that name together, and the items are asked for from both
+            // PropIndex and ActionIndex: it goes out once, on the PropIndex turn, or each of them would be listed twice
+            return index == PropIndex.getInstance() ? decls : Collections.emptyList();
         } else {
             return super.getItemsWithParamsFromIndex(index, name, project, scope);
         }
