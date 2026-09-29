@@ -1,7 +1,9 @@
 package com.lsfusion.design.view;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -9,12 +11,17 @@ import com.intellij.ui.KeyStrokeAdapter;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.jcef.JBCefBrowser;
+import com.intellij.ui.jcef.JBCefBrowserBase;
+import com.intellij.ui.jcef.JBCefJSQuery;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.KeyStrokes;
 import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.FlexConstraints;
 import com.lsfusion.design.ui.FlexPanel;
 import lsfusion.server.physics.dev.debug.DebuggerService;
+import org.cef.browser.CefBrowser;
+import org.cef.browser.CefFrame;
+import org.cef.handler.CefLoadHandlerAdapter;
 import org.jdesktop.swingx.prompt.PromptSupport;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,6 +48,27 @@ public class LiveDesign extends FormDesign {
         super(project, toolWindow);
         
         browser = new JBCefBrowser();
+        Disposer.register(this, browser);
+
+        // a form sent while the web client is loading reaches no connection, so resend it once the client has started
+        JBCefJSQuery clientStartedQuery = JBCefJSQuery.create((JBCefBrowserBase) browser);
+        clientStartedQuery.addHandler(s -> {
+            ApplicationManager.getApplication().invokeLater(this::updateFormUnderCaret, project.getDisposed());
+            return null;
+        });
+        browser.getJBCefClient().addLoadHandler(new CefLoadHandlerAdapter() {
+            @Override
+            public void onLoadEnd(CefBrowser cefBrowser, CefFrame frame, int httpStatusCode) {
+                if (frame.isMain()) {
+                    // main.nocache.js boots the web client (not a login page etc.), loadingWrapper is removed once its navigator is initialized
+                    cefBrowser.executeJavaScript("(function poll() {" +
+                            "  if (!document.querySelector('script[src$=\"main.nocache.js\"]')) return;" +
+                            "  if (document.getElementById('loadingWrapper')) setTimeout(poll, 200);" +
+                            "  else " + clientStartedQuery.inject("''") +
+                            "})();", cefBrowser.getURL(), 0);
+                }
+            }
+        }, browser.getCefBrowser());
 
         addressBar = new JBTextField();
         PromptSupport.setPrompt("Enter running web-client URL here", addressBar);
@@ -75,7 +103,7 @@ public class LiveDesign extends FormDesign {
 
         manualMode = PropertiesComponent.getInstance().getBoolean(MANUAL_MODE_PROPERTY_KEY);
         JButton updateFormButton = new JButton("Update form");
-        updateFormButton.addActionListener(e -> DesignView.openFormUnderCaretDesign(project, targetForm -> scheduleRebuild(targetForm.form, targetForm.file, false)));
+        updateFormButton.addActionListener(e -> updateFormUnderCaret());
         updateFormButton.setVisible(manualMode);
         
         JBCheckBox manualModeCB = new JBCheckBox("Manual update");
@@ -117,6 +145,10 @@ public class LiveDesign extends FormDesign {
         }
     }
     
+    private void updateFormUnderCaret() {
+        DesignView.openFormUnderCaretDesign(project, targetForm -> scheduleRebuild(targetForm.form, targetForm.file, false));
+    }
+
     private void changeBrowserUrl(String url) {
         browser.getCefBrowser().loadURL(url);
         
