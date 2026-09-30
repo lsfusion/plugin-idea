@@ -526,6 +526,55 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     }
 
     @Override
+    public void visitNewNavigatorElementStatement(@NotNull LSFNewNavigatorElementStatement o) {
+        super.visitNewNavigatorElementStatement(o);
+
+        checkNavigatorParentIsFolder(o, o.getNavigatorElementDescription());
+    }
+
+    @Override
+    public void visitMoveNavigatorElementStatement(@NotNull LSFMoveNavigatorElementStatement o) {
+        super.visitMoveNavigatorElementStatement(o);
+
+        checkNavigatorParentIsFolder(o, o.getNavigatorElementSelector());
+    }
+
+    @Override
+    public void visitSetupNavigatorElementStatement(@NotNull LSFSetupNavigatorElementStatement o) {
+        super.visitSetupNavigatorElementStatement(o);
+
+        // an element edited in place is put into its parent only when a position (BEFORE, AFTER, FIRST, LAST) is given
+        LSFNavigatorElementOptions options = o.getNavigatorElementOptions();
+        if (options != null && !options.getNavigatorElementInsertPositionList().isEmpty()) {
+            checkNavigatorParentIsFolder(o, o.getNavigatorElementSelector());
+        }
+    }
+
+    // NEW, MOVE and a positioned edit put the element into the one whose body they are written in, and only a folder has
+    // children; the body of NAVIGATOR itself is the root folder
+    private void checkNavigatorParentIsFolder(PsiElement statement, PsiElement errorElement) {
+        LSFNavigatorElementStatementBody body = PsiTreeUtil.getParentOfType(statement, LSFNavigatorElementStatementBody.class);
+        PsiElement owner = body != null ? body.getParent() : null;
+        LSFNewNavigatorElementStatement parent = null;
+        if (owner instanceof LSFNewNavigatorElementStatement newStatement) {
+            parent = newStatement;
+        } else if (owner instanceof LSFMoveNavigatorElementStatement moveStatement) {
+            parent = resolveNavigatorElement(moveStatement.getNavigatorElementSelector());
+        } else if (owner instanceof LSFSetupNavigatorElementStatement setupStatement) {
+            parent = resolveNavigatorElement(setupStatement.getNavigatorElementSelector());
+        }
+        if (errorElement != null && parent != null && parent.getNavigatorElementDescription().getNode().findChildByType(LSFTypes.FOLDER) == null) {
+            addUnderscoredErrorWithResolving(errorElement, format("Element '%s' can't be a parent element because it's not a navigator folder", parent.getDeclName()));
+        }
+    }
+
+    // the NEW statement that declares the element, null if it does not resolve (the root folder is not declared in lsf)
+    private static LSFNewNavigatorElementStatement resolveNavigatorElement(LSFNavigatorElementSelector selector) {
+        Object declaration = selector != null ? selector.getNavigatorElementUsage().resolveDecl() : null;
+        return declaration instanceof LSFNewNavigatorElementStatement statement ? statement : null;
+    }
+
+    @Override
     public void visitWindowDeclaration(@NotNull LSFWindowDeclaration o) {
         super.visitWindowDeclaration(o);
 

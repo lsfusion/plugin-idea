@@ -21,6 +21,7 @@
             <li>In lsFusion files Ctrl+Alt+W runs Fast Insert Composition instead of Kotlin's Run Scratch File, which has the same default shortcut</li>
             <li>Insert Composition puts the expression into the right argument of a property with several parameters when a parameter's class is a superclass of the expression's or two parameters have the same class, and no longer fails on a parameter of an unknown class</li>
             <li>Insert Composition (Ctrl+Alt+W / Ctrl+Alt+Shift+W) also offers the actions with <code>RETURN</code>, which can be used in an expression</li>
+            <li><code>NAVIGATOR</code>: adding an element into a form or action element (<code>NEW</code>, <code>MOVE</code> or a positioned edit inside its body) is reported as an error, as the server does - only a folder can have children</li>
         </ul>
     ]]>
     </change-notes>
