@@ -9,16 +9,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class LSFActionPromoter implements ActionPromoter {
-    private static final Comparator<AnAction> ACTIONS_COMPARATOR = (o1, o2) -> {
-        // UsagesSearchAction should be invoked before ShowUsagesAction and FindUsagesAction
-        if (o1 instanceof UsagesSearchAction) {
-            return -1;
-        }
-        if (o2 instanceof UsagesSearchAction) {
-            return 1;
-        }
-        return 0;
-    };
+    // UsagesSearchAction should be invoked before ShowUsagesAction and FindUsagesAction, and the insert composition
+    // actions before Kotlin's Run Scratch File, which takes Ctrl+Alt+W in the default keymap too. The insert composition
+    // actions are enabled in lsFusion files only, so in a Kotlin scratch the shortcut still runs the scratch
+    private static boolean isPromoted(AnAction action) {
+        return action instanceof UsagesSearchAction || action instanceof InsertCompositionAction;
+    }
+
+    private static final Comparator<AnAction> ACTIONS_COMPARATOR = (o1, o2) -> Boolean.compare(isPromoted(o2), isPromoted(o1));
 
     @Override
     public List<AnAction> promote(List<? extends AnAction> actions, DataContext context) {

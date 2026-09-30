@@ -167,29 +167,25 @@ public class InsertCompositionAction extends AnAction {
 
             List<LSFClassSet> paramClasses = composition.resolveParamClasses();
             int newCaretPosition;
-            if (paramClasses == null || paramClasses.size() == 1) {
+            if (paramClasses == null || paramClasses.size() <= 1) {
                 String newText = composition.getDeclName() + "(" + expr.getText() + ")";
                 document.replaceString(rangeMarker.getStartOffset(), rangeMarker.getEndOffset(), newText);
                 newCaretPosition = rangeMarker.getEndOffset();
             } else {
-                int exprIndex = -1;
-                String commaPrefix = "";
-                String commaPostfix = "";
+                // the parameter the popup offered the composition for (LSFPsiUtils.mapActionsOrPropertiesApplicableToClass):
+                // the first one whose class takes the expression's, a superclass as well; a parameter of an unknown class
+                // takes nothing
+                LSFClassSet exprClassSet = valueClass.getUpSet();
+                int exprIndex = 0;
                 for (int i = 0; i < paramClasses.size(); i++) {
-                    LSFValueClass paramClass = paramClasses.get(i).getCommonClass();
-                    if (valueClass.equals(paramClass)) {
+                    LSFClassSet paramClass = paramClasses.get(i);
+                    if (paramClass != null && paramClass.containsAll(exprClassSet, true)) {
                         exprIndex = i;
-                    } else {
-                        if (exprIndex == -1) {
-                            //доп. проверка, если почему-то не нашли параметра с соотв. классом
-                            if (i <= paramClasses.size() - 1) {
-                                commaPrefix += ", ";
-                            }
-                        } else {
-                            commaPostfix += ", ";
-                        }
+                        break;
                     }
                 }
+                String commaPrefix = ", ".repeat(exprIndex);
+                String commaPostfix = ", ".repeat(paramClasses.size() - exprIndex - 1);
 
                 document.insertString(rangeMarker.getStartOffset(), composition.getDeclName() + "(" + commaPrefix);
                 document.insertString(rangeMarker.getEndOffset(), commaPostfix + ")");

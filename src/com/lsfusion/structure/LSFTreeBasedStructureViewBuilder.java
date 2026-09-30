@@ -42,8 +42,9 @@ public class LSFTreeBasedStructureViewBuilder extends TreeBasedStructureViewBuil
         this(file, null, caretListener, null, ActionOrPropType.ACTION_OR_PROP);
     }
 
+    // Insert Composition: what the selected expression can be wrapped into
     public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFStructureViewNavigationHandler navigationHandler) {
-        this(file, valueClass, null, navigationHandler, ActionOrPropType.PROP);
+        this(file, valueClass, null, navigationHandler, ActionOrPropType.PROP_OR_VALUE_ACTION);
     }
 
     public LSFTreeBasedStructureViewBuilder(LSFFile file, LSFValueClass valueClass, LSFStructureFileCaretListener caretListener, LSFStructureViewNavigationHandler navigationHandler, ActionOrPropType type) {
