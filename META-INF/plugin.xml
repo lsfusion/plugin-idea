@@ -22,6 +22,7 @@
             <li>Insert Composition puts the expression into the right argument of a property with several parameters when a parameter's class is a superclass of the expression's or two parameters have the same class, and no longer fails on a parameter of an unknown class</li>
             <li>Insert Composition (Ctrl+Alt+W / Ctrl+Alt+Shift+W) also offers the actions with <code>RETURN</code>, which can be used in an expression</li>
             <li><code>NAVIGATOR</code>: adding an element into a form or action element (<code>NEW</code>, <code>MOVE</code> or a positioned edit inside its body) is reported as an error, as the server does - only a folder can have children</li>
+            <li>"Action parameters must be defined explicitly" is reported also when the operator that extends the context (<code>&lt;-</code>, <code>FOR</code>, <code>NEW</code>, ...) is nested in <code>IF</code>, <code>CASE</code>, <code>{ }</code>, <code>TRY</code> etc. of an action declared without parameters, and only once per action</li>
         </ul>
     ]]>
     </change-notes>

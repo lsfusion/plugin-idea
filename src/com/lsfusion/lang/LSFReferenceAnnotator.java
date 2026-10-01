@@ -459,19 +459,48 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         LSFPropertyDeclParams propertyDeclParams = propertyDecl.getPropertyDeclParams();
         if(propertyDeclParams == null) {
             LSFListActionPropertyDefinitionBody listActionPropertyDefinitionBody = o.getListActionPropertyDefinitionBody();
-            if(listActionPropertyDefinitionBody != null) {
-                List<LSFActionPropertyDefinitionBody> actionPropertyDefinitionBodyList = listActionPropertyDefinitionBody.getActionPropertyDefinitionBodyList();
-                for(LSFActionPropertyDefinitionBody action : actionPropertyDefinitionBodyList) {
-                    if (action.getRecursiveExtendContextActionPDB() != null || action.getLeafExtendContextActionPDB() != null) {
-                        //The same error as on the server.
-                        //There is also a hack for EXEC on the server (isKeepContext), but in the plugin EXEC is leafKeepContext, not leafExtendContext
-                        addUnderscoredError(propertyDecl, propertyDecl.getTextRange(), "Action parameters must be defined explicitly");
-                    }
-                }
+            if(listActionPropertyDefinitionBody != null && extendsImplicitContext(listActionPropertyDefinitionBody)) {
+                //The same error as on the server.
+                //There is also a hack for EXEC on the server (isKeepContext), but in the plugin EXEC is leafKeepContext, not leafExtendContext
+                addUnderscoredError(propertyDecl, propertyDecl.getTextRange(), "Action parameters must be defined explicitly");
             }
         }
 
         checkAlreadyDefined(o);
+    }
+
+    // The server passes "the parameters are not declared" on into the actions nested in the ones that keep the context,
+    // and fails on the first action there that extends it. CONFIRM and IMPORT start a new context for their DO, so the
+    // check stops at them
+    private static boolean extendsImplicitContext(PsiElement contextKeepingAction) {
+        List<LSFActionPropertyDefinitionBody> nestedActions = new ArrayList<>();
+        collectNestedActions(contextKeepingAction, nestedActions);
+        for (LSFActionPropertyDefinitionBody action : nestedActions) {
+            if (action.getRecursiveExtendContextActionPDB() != null || action.getLeafExtendContextActionPDB() != null) {
+                return true;
+            }
+            for (PsiElement passing : new PsiElement[]{action.getListActionPropertyDefinitionBody(), action.getIfActionPropertyDefinitionBody(),
+                    action.getCaseActionPropertyDefinitionBody(), action.getMultiActionPropertyDefinitionBody(), action.getTryActionPropertyDefinitionBody(),
+                    action.getApplyActionPropertyDefinitionBody(), action.getNewSessionActionPropertyDefinitionBody(), action.getRequestActionPropertyDefinitionBody(),
+                    action.getNewThreadActionPropertyDefinitionBody(), action.getNewExecutorActionPropertyDefinitionBody(),
+                    action.getNewConnectionActionPropertyDefinitionBody()}) {
+                if (passing != null && extendsImplicitContext(passing)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // the actions right inside the element, not the ones nested in them
+    private static void collectNestedActions(PsiElement element, List<LSFActionPropertyDefinitionBody> result) {
+        for (PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof LSFActionPropertyDefinitionBody action) {
+                result.add(action);
+            } else {
+                collectNestedActions(child, result);
+            }
+        }
     }
     
     @Override
