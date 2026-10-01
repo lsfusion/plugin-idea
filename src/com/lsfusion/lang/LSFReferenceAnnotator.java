@@ -980,19 +980,31 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    //based on server checkLocalizedStringFormat (added interpolation)
-    //The specifics of escaping and interpolation are not fully taken into account
+    //based on server checkLocalizedStringFormat
+    //the server checks an expression literal only after cutting out its interpolation blocks and inline sequences, so they are skipped here
+    //(in other literals, e.g. captions, '$' is an ordinary character)
+    //The specifics of escaping are not fully taken into account
     private void checkLocalizedStringFormat(PsiElement element) {
         char OPEN_CH = '{';
         char CLOSE_CH = '}';
 
         String error = null;
         String s = element.getText();
+        List<LSFStringUtils.SpecialBlock> skippedBlocks = new ArrayList<>();
+        for (LSFStringUtils.SpecialBlock block : LSFStringUtils.specialBlockList(s, element instanceof LSFExpressionStringValueLiteral)) {
+            if (block.type != LSFStringUtils.StringSpecialBlockType.LOCALIZATION) {
+                skippedBlocks.add(block);
+            }
+        }
+        int nextSkippedBlock = 0;
         boolean insideKey = false;
         boolean keyIsEmpty = true;
-        boolean interpolation = false;
         int i;
         for (i = 0; i < s.length(); i++) {
+            if (nextSkippedBlock < skippedBlocks.size() && skippedBlocks.get(nextSkippedBlock).start == i) {
+                i = skippedBlocks.get(nextSkippedBlock++).end;
+                continue;
+            }
             char ch = s.charAt(i);
             if (ch == '\\') {
                 if (i + 1 == s.length()) {
@@ -1010,29 +1022,24 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
                 }
                 ++i;
             } else if (ch == CLOSE_CH) {
-                if(!interpolation) {
-                    if (!insideKey) {
-                        error = String.format("invalid character '%c', should be escaped with '\\'", CLOSE_CH);
-                        break;
-                    } else if (keyIsEmpty) {
-                        error = "empty key is forbidden";
-                        break;
-                    } else {
-                        insideKey = false;
-                    }
+                if (!insideKey) {
+                    error = String.format("invalid character '%c', should be escaped with '\\'", CLOSE_CH);
+                    break;
+                } else if (keyIsEmpty) {
+                    error = "empty key is forbidden";
+                    break;
+                } else {
+                    insideKey = false;
                 }
             } else if (ch == OPEN_CH) {
-                interpolation = s.charAt(i - 1) == '$';
-                if(!interpolation) {
-                    if (insideKey) {
-                        error = String.format("invalid character '%c', should be escaped with '\\'", OPEN_CH);
-                        break;
-                    } else {
-                        insideKey = true;
-                        keyIsEmpty = true;
-                    }
+                if (insideKey) {
+                    error = String.format("invalid character '%c', should be escaped with '\\'", OPEN_CH);
+                    break;
+                } else {
+                    insideKey = true;
+                    keyIsEmpty = true;
                 }
-            } else if (insideKey && !interpolation && Character.isWhitespace(ch)) {
+            } else if (insideKey && Character.isWhitespace(ch)) {
                 error = "any whitespace is forbidden inside key";
                 break;
             } else if (insideKey) {
