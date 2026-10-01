@@ -16,6 +16,7 @@ public class LSFStringUtils {
     public static final char INTERP_CH = '$';
     public static final char INLINE_CH = 'I';
     public static final char RESOURCE_CH = 'R';
+    public static final char IMAGE_CH = 'M';
 
     public static final String INTERPOLATION_PREFIX = "${";
 
@@ -90,7 +91,7 @@ public class LSFStringUtils {
         return result.toString();
     }
     
-    public enum StringSpecialBlockType { NONE, LOCALIZATION, INTERPOLATION, INLINE, RESOURCE }
+    public enum StringSpecialBlockType { NONE, LOCALIZATION, INTERPOLATION, INLINE, RESOURCE, IMAGE }
 
     public static class SpecialBlock {
         public int start, end;
@@ -148,6 +149,8 @@ public class LSFStringUtils {
                 return StringSpecialBlockType.INLINE;
             if (compareChar(s, pos + 1, RESOURCE_CH) && compareChar(s, pos + 2, '{'))
                 return StringSpecialBlockType.RESOURCE;
+            if (compareChar(s, pos + 1, IMAGE_CH) && compareChar(s, pos + 2, '{'))
+                return StringSpecialBlockType.IMAGE;
         }
         return StringSpecialBlockType.NONE;
     }
@@ -161,6 +164,7 @@ public class LSFStringUtils {
                 return 1;
             case INLINE:
             case RESOURCE:
+            case IMAGE:
                 return 2;
         }
         return 0;

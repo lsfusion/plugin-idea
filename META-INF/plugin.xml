@@ -24,6 +24,7 @@
             <li><code>NAVIGATOR</code>: adding an element into a form or action element (<code>NEW</code>, <code>MOVE</code> or a positioned edit inside its body) is reported as an error, as the server does - only a folder can have children</li>
             <li>"Action parameters must be defined explicitly" is reported also when the operator that extends the context (<code>&lt;-</code>, <code>FOR</code>, <code>NEW</code>, ...) is nested in <code>IF</code>, <code>CASE</code>, <code>{ }</code>, <code>TRY</code> etc. of an action declared without parameters, and only once per action</li>
             <li>Fixed false localization key errors inside <code>${...}</code>, <code>$I{...}</code> and <code>$R{...}</code> in string literals, e.g. for a file name with spaces</li>
+            <li>Support the <code>$M{imageName}</code> inline sequence in string literals: the image name is no longer taken for a localization key</li>
         </ul>
     ]]>
     </change-notes>
