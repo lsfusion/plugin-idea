@@ -109,6 +109,8 @@ public class LSFStringUtils {
      */
     public static List<SpecialBlock> specialBlockList(@NotNull String literal, boolean isExpressionString) {
         List<SpecialBlock> blocks = new ArrayList<>();
+        if (isRawLiteral(literal)) // the content of a raw literal is taken as is: no localization, interpolation or inline sequences
+            return blocks;
         int pos = 0;
         int nestingDepth = 0;
         int blockStartPos = 0;

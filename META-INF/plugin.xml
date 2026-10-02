@@ -26,6 +26,7 @@
             <li>Fixed false localization key errors inside <code>${...}</code>, <code>$I{...}</code> and <code>$R{...}</code> in string literals, e.g. for a file name with spaces</li>
             <li>Support the <code>$M{imageName}</code> inline sequence in string literals: the image name is no longer taken for a localization key</li>
             <li>In the Java classes of the downloaded platform sources (<code>-sources.jar</code>) Ctrl+click on the names in <code>findClass</code> / <code>findProperty</code> / <code>findAction</code> goes to their lsFusion declarations</li>
+            <li>Raw string literals are taken as is: <code>${...}</code> and <code>{...}</code> in them are no longer treated as interpolation and localization keys</li>
         </ul>
     ]]>
     </change-notes>
