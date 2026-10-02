@@ -1,10 +1,15 @@
 package com.lsfusion.mcp;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.progress.EmptyProgressIndicator;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Condition;
@@ -13,6 +18,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.SmartPointerManager;
+import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.PsiSearchHelper;
@@ -21,6 +28,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.MergeQuery;
 import com.intellij.util.Processor;
 import com.intellij.util.Query;
+import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.CustomClassSet;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
@@ -98,6 +106,14 @@ public class MCPSearchUtils {
             this.withExtends = getElementWithExtends(decl, searchScope);
             this.json = getJsonFromStatement(this, 1);
             this.jsonSize = this.json.toString().length();
+        }
+
+        // write actions run during the search (see readAction), so the statement may have changed since it was selected
+        private boolean isValid() {
+            if (!decl.isValid()) return false;
+            for (LSFMCPStatement statement : withExtends)
+                if (!statement.isValid()) return false;
+            return true;
         }
     }
 
@@ -183,9 +199,12 @@ public class MCPSearchUtils {
 
         // Executor and dynamic scheduling support
         ExecutorService exec = createPriorityExecutor(Math.min(6, Math.max(1, Runtime.getRuntime().availableProcessors() - 1)));
-        Runnable awaitAll = createAwaitAll(exec, searchBudgetMillis, timeoutHit, state.stopRequested);
+        // Tasks run under this indicator: PSI / search code reacts to its cancellation (checkCanceled),
+        // while it ignores the Thread.interrupt() from exec.shutdownNow()
+        ProgressIndicator indicator = new EmptyProgressIndicator();
+        Runnable awaitAll = createAwaitAll(exec, searchBudgetMillis, timeoutHit, state.stopRequested, indicator);
         // helper to submit tasks with accounting
-        TaskSubmitter submit = createSubmit(exec, state, errors);
+        TaskSubmitter submit = createSubmit(exec, state, errors, indicator);
 
         GlobalSearchScope searchScope = run(project, query, seen, relatedCache, state, submit);
 
@@ -243,7 +262,7 @@ public class MCPSearchUtils {
         return resultObject;
     }
 
-    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, Set<LSFClassDeclaration> classDecls, Map<LSFMCPDeclaration, Direction> related, GlobalSearchScope searchScope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
+    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, QueryTargets targets, GlobalSearchScope searchScope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
         return st -> {
             if (state.stopRequested.get()) {
                 return false;
@@ -257,9 +276,15 @@ public class MCPSearchUtils {
 
             // already processed
 
-            if (matchesAllFilters(st, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache)) {
-                SelectedStatement selSt = new SelectedStatement(st, searchScope);
-
+            SelectedStatement selSt;
+            try {
+                selSt = matchesAllFilters(st, nameFilters, containsFilters, elementTypes, targets.getClasses(), targets.getRelated(), searchScope, relatedCache)
+                        ? new SelectedStatement(st, searchScope) : null;
+            } catch (RuntimeException | Error e) {
+                seen.remove(st); // read action cancelled by a write action - the restarted task has to process st again
+                throw e;
+            }
+            if (selSt != null) {
                 synchronized (state.statementsByPriority[p]) {
                     state.statementsByPriority[p].add(selSt);
                 }
@@ -270,7 +295,7 @@ public class MCPSearchUtils {
         };
     }
 
-    private static Runnable createAwaitAll(ExecutorService exec, long searchBudgetMillis, AtomicBoolean timeoutHit, AtomicBoolean stopRequested) {
+    private static Runnable createAwaitAll(ExecutorService exec, long searchBudgetMillis, AtomicBoolean timeoutHit, AtomicBoolean stopRequested, ProgressIndicator indicator) {
         return () -> {
             try {
                 exec.shutdown();
@@ -287,19 +312,21 @@ public class MCPSearchUtils {
                 }
             } finally {
                 stopRequested.set(true);
+                indicator.cancel();
                 exec.shutdownNow();
             }
         };
     }
 
-    private static TaskSubmitter createSubmit(ExecutorService exec, SearchState state, List<String> errors) {
+    private static TaskSubmitter createSubmit(ExecutorService exec, SearchState state, List<String> errors, ProgressIndicator indicator) {
         return (priority, r) -> {
             state.pendingTasksByPriority[priority].incrementAndGet();
             exec.execute(new PriorityTask(priority, () -> {
                 try {
-                    r.run();
-                } catch (com.intellij.openapi.progress.ProcessCanceledException e) {
-                    throw e; // Standard platform cancellation, must be rethrown or handled by the platform
+                    ProgressManager.getInstance().executeProcessUnderProgress(r, indicator);
+                } catch (ProcessCanceledException e) {
+                    // search budget timeout / explicit stop cancelled the indicator (see createAwaitAll);
+                    // this is the top of our own executor task, so there is nobody to rethrow to
                 } catch (Throwable t) {
                     // exec.shutdownNow() (search budget timeout / explicit stop, see createAwaitAll) interrupts
                     // in-flight tasks; the platform's concurrent PSI search surfaces that as a wrapped
@@ -316,13 +343,65 @@ public class MCPSearchUtils {
         };
     }
 
+    // Search tasks may run for a long time, and a long blocking read action delays every write action (VFS refresh,
+    // for example), with the EDT stuck behind that pending write action. A non-blocking read action is cancelled by
+    // a write action and restarted after it, so the tasks must tolerate repeating: statements are deduplicated by
+    // `seen` and related traversal results are memoized, so a restart mostly skips the work already done.
+    // inSmartMode: the change that caused the restart can also start indexing, and indices are unavailable then.
+    private static void readAction(Project project, Runnable r) {
+        ReadAction.nonBlocking(r).inSmartMode(project).executeSynchronously();
+    }
+
+    private static <T> T readAction(Project project, Callable<T> c) {
+        return ReadAction.nonBlocking(c).inSmartMode(project).executeSynchronously();
+    }
+
+    // Query targets (filter classes / related elements) are used in many later read actions with write actions in
+    // between, and PSI kept from an earlier read action can be invalidated by them. So the targets are stored as smart
+    // pointers created in the same read action that resolves them, and restored inside each read action using them.
+    private static final class QueryTargets {
+        final List<SmartPsiElementPointer<LSFClassDeclaration>> classes = new ArrayList<>();
+        final Map<SmartPsiElementPointer<LSFMCPDeclaration>, Direction> related = new LinkedHashMap<>();
+
+        QueryTargets(Set<LSFClassDeclaration> classes, Map<LSFMCPDeclaration, Direction> related) {
+            for (LSFClassDeclaration cls : classes)
+                this.classes.add(SmartPointerManager.createPointer(cls));
+            for (Map.Entry<LSFMCPDeclaration, Direction> entry : related.entrySet())
+                this.related.put(SmartPointerManager.createPointer(entry.getKey()), entry.getValue());
+        }
+
+        // null if there is no classes filter (empty if all its classes are gone)
+        @Nullable Set<LSFClassDeclaration> getClasses() {
+            if (classes.isEmpty()) return null;
+            Set<LSFClassDeclaration> result = new HashSet<>();
+            for (SmartPsiElementPointer<LSFClassDeclaration> pointer : classes) {
+                LSFClassDeclaration cls = pointer.getElement();
+                if (cls != null)
+                    result.add(cls);
+            }
+            return result;
+        }
+
+        // null if there is no related filter (empty if all its elements are gone)
+        @Nullable Map<LSFMCPDeclaration, Direction> getRelated() {
+            if (related.isEmpty()) return null;
+            Map<LSFMCPDeclaration, Direction> result = new HashMap<>();
+            for (Map.Entry<SmartPsiElementPointer<LSFMCPDeclaration>, Direction> entry : related.entrySet()) {
+                LSFMCPDeclaration decl = entry.getKey().getElement();
+                if (decl != null)
+                    result.put(decl, entry.getValue());
+            }
+            return result;
+        }
+    }
+
     private static boolean submitTypeTasks(Project project, GlobalSearchScope searchScope, Set<LSFMCPDeclaration.ElementType> elementTypes, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
         boolean typesFullyStreamable = !elementTypes.isEmpty();
         for (LSFMCPDeclaration.ElementType et : elementTypes.isEmpty() ? priorityTypes : (Collection<LSFMCPDeclaration.ElementType>) elementTypes) {
             GlobalDeclStubElementType<?, ?> stubType = et.stubType;
             if (stubType != null) { // only index-backed types
                 LSFStringStubIndex<? extends LSFGlobalDeclaration> index = stubType.getGlobalIndex();
-                submit.submit(getPriority(et), () -> ApplicationManager.getApplication().runReadAction(() -> {
+                submit.submit(getPriority(et), () -> readAction(project, () -> {
                     for (String key : index.getAllKeys(project)) {
                         Collection<? extends LSFGlobalDeclaration> items = LSFGlobalResolver.getItemsFromIndex(index, key, project, searchScope, LSFLocalSearchScope.GLOBAL);
                         for (LSFGlobalDeclaration<?, ?> it : items) {
@@ -338,10 +417,11 @@ public class MCPSearchUtils {
         return typesFullyStreamable;
     }
 
-    private static boolean submitClassTasks(GlobalSearchScope searchScope, Set<LSFClassDeclaration> classDecls, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit, boolean onlyPropertiesClassesActions) {
-        Project project = searchScope.getProject();
-        for (LSFClassDeclaration targetClass : classDecls) {
-            submit.submit(1, () -> ApplicationManager.getApplication().runReadAction(() -> {
+    private static boolean submitClassTasks(Project project, GlobalSearchScope searchScope, QueryTargets targets, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit, boolean onlyPropertiesClassesActions) {
+        for (SmartPsiElementPointer<LSFClassDeclaration> classPointer : targets.classes) {
+            submit.submit(1, () -> readAction(project, () -> {
+                LSFClassDeclaration targetClass = classPointer.getElement();
+                if (targetClass == null) return;
                 for (LSFValueClass vc : CustomClassSet.getClassParentsRecursively(targetClass)) {
                     if (vc instanceof LSFClassDeclaration cls && !processStatement(cls, processor)) return; // early stop
                 }
@@ -358,21 +438,26 @@ public class MCPSearchUtils {
                 }
             }));
         }
-        return !classDecls.isEmpty();
+        return !targets.classes.isEmpty();
     }
 
-    private static boolean submitRelatedTasks(Map<LSFMCPDeclaration, Direction> related, GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
+    private static boolean submitRelatedTasks(Project project, QueryTargets targets, GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
         // Global visited marks (single set for all directions)
         final Set<LSFMCPDeclaration> visitedRelated = Collections.newSetFromMap(new ConcurrentHashMap<>());
-        for (Map.Entry<LSFMCPDeclaration, Direction> unit : related.entrySet()) {
-            submit.submit(1, () -> ApplicationManager.getApplication().runReadAction(() -> streamRelated(unit.getKey(), unit.getValue(), searchScope, processor, visitedRelated)));
+        for (Map.Entry<SmartPsiElementPointer<LSFMCPDeclaration>, Direction> unit : targets.related.entrySet()) {
+            submit.submit(1, () -> streamRelated(project, unit.getKey(), unit.getValue(), searchScope, processor, visitedRelated)); // read actions per node inside
         }
-        return !related.isEmpty();
+        return !targets.related.isEmpty();
     }
 
-    private static void submitFileTasks(GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
-        for (LSFFile lsfFile : ApplicationManager.getApplication().runReadAction((Computable<List<LSFFile>>) () -> LSFFileUtils.getLsfFiles(searchScope))) {
-            submit.submit(5, () -> ApplicationManager.getApplication().runReadAction(() -> {
+    private static void submitFileTasks(Project project, GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
+        // pointers, since the files are used in later read actions (see QueryTargets)
+        List<SmartPsiElementPointer<LSFFile>> filePointers = ApplicationManager.getApplication().runReadAction((Computable<List<SmartPsiElementPointer<LSFFile>>>) () ->
+                ContainerUtil.map(LSFFileUtils.getLsfFiles(searchScope), file -> SmartPointerManager.createPointer(file)));
+        for (SmartPsiElementPointer<LSFFile> filePointer : filePointers) {
+            submit.submit(5, () -> readAction(project, () -> {
+                LSFFile lsfFile = filePointer.getElement();
+                if (lsfFile == null) return;
                 for (LSFMCPDeclaration st : LSFMCPDeclaration.getMCPDeclarations(lsfFile)) {
                     if (!processor.process(st)) break;
                 }
@@ -385,7 +470,7 @@ public class MCPSearchUtils {
         boolean fullyStreamable = true;
         for (NameFilter nf : filters) {
             if (nf.isWordStreamable()) {
-                submit.submit(5, () -> ApplicationManager.getApplication().runReadAction(() -> streamWord(project, nf, processor, searchScope)));
+                submit.submit(5, () -> readAction(project, () -> streamWord(project, nf, processor, searchScope)));
             } else {
                 fullyStreamable = false;
             }
@@ -404,11 +489,12 @@ public class MCPSearchUtils {
         List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
         Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
 
-        Set<LSFClassDeclaration> classDecls = ApplicationManager.getApplication().runReadAction((Computable<Set<LSFClassDeclaration>>) () -> parseClasses(project, searchScope, query.optString("classes")));
-        Map<LSFMCPDeclaration, Direction> related = ApplicationManager.getApplication().runReadAction((Computable<Map<LSFMCPDeclaration, Direction>>) () -> parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection")));
+        QueryTargets targets = ApplicationManager.getApplication().runReadAction((Computable<QueryTargets>) () -> new QueryTargets(
+                parseClasses(project, searchScope, query.optString("classes")),
+                parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection"))));
 
         // Shared processor that applies all filters and returns false to stop the current iteration
-        final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, classDecls, related, searchScope, relatedCache);
+        final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, targets, searchScope, relatedCache);
 
         // Track which blocks are fully streamable while assembling iterations.
         // Name/code filters are considered fully streamable only if ALL matchers are "word-only" with length >= 3.
@@ -420,14 +506,14 @@ public class MCPSearchUtils {
         boolean typesFullyStreamable = submitTypeTasks(project, searchScope, elementTypes, processor, submit);
 
         // Classes-based iterations
-        boolean classesFullyStreamable = submitClassTasks(searchScope, classDecls, processor, submit, isOnlyPropertiesClassesActions(elementTypes));
+        boolean classesFullyStreamable = submitClassTasks(project, searchScope, targets, processor, submit, isOnlyPropertiesClassesActions(elementTypes));
 
         // Related elements iterations: dynamically schedule traversal tasks
-        boolean relatedFullyStreamable = submitRelatedTasks(related, searchScope, processor, submit);
+        boolean relatedFullyStreamable = submitRelatedTasks(project, targets, searchScope, processor, submit);
 
         // Per-file iterations (fallback) — run only if no block is fully streamable
         if (!nameFullyStreamable && !containsFullyStreamable && !classesFullyStreamable && !relatedFullyStreamable && !typesFullyStreamable) {
-            submitFileTasks(searchScope, processor, submit);
+            submitFileTasks(project, searchScope, processor, submit);
         }
 
         return searchScope;
@@ -476,7 +562,8 @@ public class MCPSearchUtils {
             Set<LSFFile> files = new LinkedHashSet<>();
             for (SelectedStatement st : selected) {
                 added.add(st.decl);
-                files.add((LSFFile) st.decl.getContainingFile());
+                if (st.isValid())
+                    files.add((LSFFile) st.decl.getContainingFile());
             }
 
             for (LSFFile file : files) {
@@ -505,6 +592,7 @@ public class MCPSearchUtils {
 
             ArrayDeque<IndexRef> queue = new ArrayDeque<>();
             for (SelectedStatement st : selected) {
+                if (!st.isValid()) continue;
                 LSFFile file = (LSFFile) st.decl.getContainingFile();
 
                 Map<LSFMCPDeclaration, Integer> declToIndex = fileDeclToIndex.get(file);
@@ -579,7 +667,8 @@ public class MCPSearchUtils {
                     if (isTimedOut(deadlineMillis)) {
                         return best;
                     }
-                    JSONObject json = getJsonFromStatement(st, factor);
+                    // a changed statement keeps the json computed when it was selected
+                    JSONObject json = st.isValid() ? getJsonFromStatement(st, factor) : st.json;
                     cur.put(json);
                     totalLen += json.toString().length();
                     if (totalLen > maxSymbols) {
@@ -1031,20 +1120,20 @@ public class MCPSearchUtils {
                                              List<NameFilter> nameFilters,
                                              List<NameFilter> containsFilters,
                                              Set<LSFMCPDeclaration.ElementType> elementTypes,
-                                             Set<LSFClassDeclaration> classDecls,
-                                             Map<LSFMCPDeclaration, Direction> related,
+                                             @Nullable Set<LSFClassDeclaration> classDecls, // null - no filter
+                                             @Nullable Map<LSFMCPDeclaration, Direction> related, // null - no filter
                                              GlobalSearchScope scope,
                                              ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
         LSFMCPDeclaration.ElementType t;
         return (elementTypes.isEmpty() || ((t = stmt.getMCPType()) != null && elementTypes.contains(t))) &&
                 (nameFilters.isEmpty() || matchesNameFilters(stmt, nameFilters, scope, false)) &&
                 (containsFilters.isEmpty() || matchesNameFilters(stmt, containsFilters, scope, true)) &&
-                (classDecls.isEmpty() || matchesClassesFilter(stmt, classDecls, scope)) &&
-                (related.isEmpty() || matchesRelatedFilters(stmt, related, scope, relatedCache));
+                (classDecls == null || matchesClassesFilter(stmt, classDecls, scope)) &&
+                (related == null || matchesRelatedFilters(stmt, related, scope, relatedCache));
     }
 
     private static boolean matchesClassesFilter(LSFMCPDeclaration stmt, Set<LSFClassDeclaration> classDecls, GlobalSearchScope scope) {
-        if (classDecls.isEmpty()) return true;
+        if (classDecls.isEmpty()) return false; // all filter classes are gone (see QueryTargets)
         // Resolve candidate declarations (can be several)
 
         boolean hasClasses = false;
@@ -1092,7 +1181,7 @@ public class MCPSearchUtils {
                                                  Map<LSFMCPDeclaration, Direction> related,
                                                  GlobalSearchScope scope,
                                                  ConcurrentMap<RelatedKey, RelatedState> memo) {
-        if (related.isEmpty()) return true;
+        if (related.isEmpty()) return false; // all related elements are gone (see QueryTargets)
 
         class Rec {
             boolean memoized(RelatedKey key, java.util.function.Supplier<Boolean> calc) {
@@ -1101,7 +1190,13 @@ public class MCPSearchUtils {
                     return state == RelatedState.TRUE;
                 }
                 memo.put(key, RelatedState.IN_PROGRESS);
-                boolean result = calc.get();
+                boolean result;
+                try {
+                    result = calc.get();
+                } catch (RuntimeException | Error e) {
+                    memo.remove(key, RelatedState.IN_PROGRESS); // read action cancelled - otherwise IN_PROGRESS would be read as FALSE after the restart
+                    throw e;
+                }
                 memo.put(key, result ? RelatedState.TRUE : RelatedState.FALSE);
                 return result;
             }
@@ -1219,26 +1314,49 @@ public class MCPSearchUtils {
         return result;
     }
 
+    private record RelatedStep(@Nullable LSFMCPDeclaration decl, List<SmartPsiElementPointer<LSFMCPDeclaration>> next) {
+        static final RelatedStep SKIP = new RelatedStep(null, Collections.emptyList());
+    }
+
     // Unified streaming traversal with global visited marks
-    private static void streamRelated(LSFMCPDeclaration start,
+    private static void streamRelated(Project project,
+                                      SmartPsiElementPointer<LSFMCPDeclaration> start,
                                       Direction dir,
                                       GlobalSearchScope scope,
                                       Processor<LSFMCPDeclaration> out,
                                       Set<LSFMCPDeclaration> visitedRelated) {
-        Deque<LSFMCPDeclaration> dq = new ArrayDeque<>();
+        // A separate read action per node (the traversal can be long, see readAction), the queue is kept outside
+        // as smart pointers (see QueryTargets), so a restart after a write action repeats only the current node
+        Deque<SmartPsiElementPointer<LSFMCPDeclaration>> dq = new ArrayDeque<>();
         dq.add(start);
         while (!dq.isEmpty()) {
-            LSFMCPDeclaration cur = dq.removeFirst();
-            if (!visitedRelated.add(cur)) continue; // global across all related traversals
-            // emit enclosing statement
-            if (!out.process(cur)) return;
-            // enqueue neighbors according to direction
-            if (dir == Direction.USES || dir == Direction.BOTH) {
-                for (LSFMCPDeclaration n : nextUses(cur, scope)) dq.add(n);
-            }
-            if (dir == Direction.USED || dir == Direction.BOTH) {
-                for (LSFMCPDeclaration n : nextUsed(cur, scope)) dq.add(n);
-            }
+            SmartPsiElementPointer<LSFMCPDeclaration> curPointer = dq.removeFirst();
+            RelatedStep step = readAction(project, () -> {
+                LSFMCPDeclaration cur = curPointer.getElement();
+                if (cur == null || visitedRelated.contains(cur)) // element is gone / global across all related traversals
+                    return RelatedStep.SKIP;
+                // emit enclosing statement
+                if (!out.process(cur)) return null;
+                // collect neighbors according to direction
+                List<LSFMCPDeclaration> neighbors = new ArrayList<>();
+                if (dir == Direction.USES || dir == Direction.BOTH) {
+                    neighbors.addAll(nextUses(cur, scope));
+                }
+                if (dir == Direction.USED || dir == Direction.BOTH) {
+                    neighbors.addAll(nextUsed(cur, scope));
+                }
+                List<SmartPsiElementPointer<LSFMCPDeclaration>> next = new ArrayList<>();
+                for (LSFMCPDeclaration neighbor : neighbors) {
+                    if (!visitedRelated.contains(neighbor))
+                        next.add(SmartPointerManager.createPointer(neighbor));
+                }
+                return new RelatedStep(cur, next);
+            });
+            if (step == null) return;
+            // marked only when fully processed, so a cancelled node is not lost; a concurrent traversal may
+            // process the same node meanwhile, but only one of them enqueues its neighbors
+            if (step.decl() != null && visitedRelated.add(step.decl()))
+                dq.addAll(step.next());
         }
     }
 
