@@ -171,8 +171,18 @@ public class LSFPsiUtils {
                 else
                     upParams = getContextParams(context, upOffset, localScope, objectRef, ignoreUseBeforeDeclarationCheck);
                 result.addAll(upParams);
-            } else { // не extend - останавливаемся
-                upParams = new HashSet<>();
+            } else {
+                PsiFile file = current.getContainingFile();
+                LSFExpressionStringValueLiteral interpolationHost = file instanceof LSFFile ? ((LSFFile) file).getInterpolationHostLiteral() : null;
+                if (interpolationHost != null) {
+                    // string interpolation: the root statement of the injected fragment is not an ExtendParamContext, so
+                    // continue resolving in the real host context to bring in outer params (FOR/property) and params
+                    // declared in sibling interpolation literals of the same expression (issues #75, #79)
+                    upParams = getContextParams(interpolationHost, interpolationHost.getTextOffset(), localScope, objectRef, ignoreUseBeforeDeclarationCheck);
+                    result.addAll(upParams);
+                } else { // не extend - останавливаемся
+                    upParams = new HashSet<>();
+                }
             }
             List<LSFExprParamDeclaration> params = contextModifier.resolveParams(offset, upParams);
             if(params != null) {

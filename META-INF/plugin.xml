@@ -28,6 +28,8 @@
             <li>In the Java classes of the downloaded platform sources (<code>-sources.jar</code>) Ctrl+click on the names in <code>findClass</code> / <code>findProperty</code> / <code>findAction</code> goes to their lsFusion declarations</li>
             <li>Raw string literals are taken as is: <code>${...}</code> and <code>{...}</code> in them are no longer treated as interpolation and localization keys</li>
             <li>Inside <code>${...}</code> only the declarations above the string literal are visible, as on the server</li>
+            <li>Go to Declaration and Rename of a parameter used inside <code>${...}</code> of a string literal work with its real declaration, and renaming an element used before the string literal in the same statement no longer fails</li>
+            <li>A <code>LOCAL</code> property used inside <code>${...}</code> of a string literal is no longer reported as an ambiguous reference</li>
         </ul>
     ]]>
     </change-notes>
