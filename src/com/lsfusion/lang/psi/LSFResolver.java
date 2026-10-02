@@ -1,7 +1,10 @@
 package com.lsfusion.lang.psi;
 
+import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ReferenceRange;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
@@ -32,10 +35,19 @@ public class LSFResolver implements ResolveCache.AbstractResolver<LSFReference, 
     @Nullable
     @Override
     public LSFResolveResult resolve(@NotNull LSFReference reference, boolean incompleteCode) {
-        if (reference.isInLibrarySources()) {
+        // an lsf file from library sources repeats a module of the library's jar, and the lookups go to that one (see
+        // LSFSourceFilterScope), so nothing is resolved in it. A fragment injected into another language is resolved even
+        // there - a find* string in a Java class of the platform sources, say: it names its module itself
+        if (reference.isInLibrarySources() && !isInjectedIntoOtherLanguage(reference)) {
             return new LSFResolveResult(Collections.emptyList());
         }
         return reference.resolveNoCache();
+    }
+
+    private static boolean isInjectedIntoOtherLanguage(LSFReference reference) {
+        PsiFile file = reference.getContainingFile();
+        PsiLanguageInjectionHost host = InjectedLanguageManager.getInstance(file.getProject()).getInjectionHost(file);
+        return host != null && !(host.getContainingFile() instanceof LSFFile);
     }
 
     public static Query<PsiReference> searchWordUsages(PsiElement target, String compoundID) {
