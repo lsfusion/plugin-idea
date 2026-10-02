@@ -73,10 +73,6 @@ public abstract class LSFFullNameReferenceImpl<T extends LSFDeclaration, G exten
         LSFNamespaceUsage namespace = getCompoundID().getNamespaceUsage();
         return namespace == null ? null : namespace.getText();
     }
-    
-    public Integer getOffsetRef() {
-        return getTextOffset();
-    }
 
     protected Collection<FullNameStubElementType> getStubElementTypes() {
         return Collections.singleton(getStubElementType());

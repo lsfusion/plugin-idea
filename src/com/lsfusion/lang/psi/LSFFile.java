@@ -3,6 +3,7 @@ package com.lsfusion.lang.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
+import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -67,12 +68,31 @@ public class LSFFile extends PsiFileImpl implements ModifyParamContext {
         return LSFFileType.INSTANCE;
     }
 
+    // returns the host string literal if this file is a string-interpolation injection (see LSFStringInterpolationInjector), null otherwise
+    // (intentionally does not match other LSF injections such as jrxml or markdown, whose host is not a string literal).
+    // Not cached: the injected file is reused when its host literal is reparsed, and only the platform's pointer follows the new literal
+    @Nullable
+    public LSFExpressionStringValueLiteral getInterpolationHostLiteral() {
+        PsiElement host = InjectedLanguageManager.getInstance(getProject()).getInjectionHost(this);
+        return host instanceof LSFExpressionStringValueLiteral ? (LSFExpressionStringValueLiteral) host : null;
+    }
+
+    @Nullable
+    public LSFFile getInterpolationHostFile() {
+        LSFExpressionStringValueLiteral host = getInterpolationHostLiteral();
+        return host != null ? (LSFFile) host.getContainingFile() : null;
+    }
+
     public GlobalSearchScope getScope() {
         if (this instanceof LSFCodeFragment && getContext() != null) {
             PsiFile containingFile = getContext().getContainingFile();
             if (containingFile instanceof LSFFile && containingFile != this) {
                 return ((LSFFile) containingFile).getScope();
             }
+        }
+        LSFFile interpolationHostFile = getInterpolationHostFile();
+        if (interpolationHostFile != null) {
+            return interpolationHostFile.getScope();
         }
         Project project = getProject();
         
@@ -110,6 +130,10 @@ public class LSFFile extends PsiFileImpl implements ModifyParamContext {
     }
 
     public LSFModuleDeclaration getModuleDeclaration() {
+        LSFFile interpolationHostFile = getInterpolationHostFile();
+        if (interpolationHostFile != null) {
+            return interpolationHostFile.getModuleDeclaration();
+        }
         return getStubOrPsiChild(LSFStubElementTypes.MODULE);
     }
 

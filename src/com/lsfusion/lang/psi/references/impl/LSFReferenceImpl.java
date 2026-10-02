@@ -36,6 +36,23 @@ public abstract class LSFReferenceImpl<T extends LSFDeclaration> extends LSFElem
         return this;
     }
 
+    // inside a string-interpolation injection references must resolve against the real host file, not the virtual
+    // injected module, so that the require scope and use-before-declaration order match the real module (issue #80)
+    @Override
+    public LSFFile getLSFFile() {
+        LSFFile file = (LSFFile) getContainingFile();
+        LSFFile hostFile = file.getInterpolationHostFile();
+        return hostFile != null ? hostFile : file;
+    }
+
+    // the position of the reference in getLSFFile() for the use-before-declaration check (null - the order is not checked):
+    // inside a string-interpolation injection the host literal's position, so that only the declarations preceding the
+    // literal are visible (issue #80)
+    public Integer getOffsetRef() {
+        LSFExpressionStringValueLiteral hostLiteral = ((LSFFile) getContainingFile()).getInterpolationHostLiteral();
+        return hostLiteral != null ? hostLiteral.getTextOffset() : getTextOffset();
+    }
+
     @Override
     public PsiElement getElement() {
         return this;

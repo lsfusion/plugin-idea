@@ -93,6 +93,11 @@ public class LSFGlobalResolver {
             }
         }
 
+        LSFFile interpolationHostFile = lsfFile.getInterpolationHostFile();
+        if (interpolationHostFile != null) {
+            return getRequireScope(interpolationHostFile);
+        }
+
         Project project = lsfFile.getProject();
         LSFModuleDeclaration declaration = lsfFile.getModuleDeclaration();
         VirtualFile vfile = lsfFile.getVirtualFile();

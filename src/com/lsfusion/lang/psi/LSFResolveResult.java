@@ -68,9 +68,10 @@ public class LSFResolveResult {
 
         public LSFResolvingError resolveErrorAnnotation(AnnotationHolder holder) {
             String errorText = null;
+            Integer offset = ref.getOffsetRef();
             for(LSFDeclaration decl : decls) {
                 if(decl instanceof LSFFullNameDeclaration) {
-                    if(LSFGlobalResolver.isAfter(ref.getLSFFile(), ref.getTextOffset(), (LSFFullNameDeclaration) decl))
+                    if(offset != null && LSFGlobalResolver.isAfter(ref.getLSFFile(), offset, (LSFFullNameDeclaration) decl))
                         errorText = "Symbol '" + ref.getNameRef() + "' is declared after it is used";
                     else {
                         errorText = null;
