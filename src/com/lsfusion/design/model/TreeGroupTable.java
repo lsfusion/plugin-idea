@@ -2,7 +2,6 @@ package com.lsfusion.design.model;
 
 import com.intellij.ui.treeStructure.treetable.TreeTable;
 import com.intellij.ui.treeStructure.treetable.TreeTableModel;
-import org.jdesktop.swingx.JXTableHeader;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -35,7 +34,7 @@ public class TreeGroupTable extends TreeTable {
 
     @Override
     protected JTableHeader createDefaultTableHeader() {
-        return new JXTableHeader(columnModel) {
+        return new JTableHeader(columnModel) {
             @Override
             public Dimension getPreferredSize() {
                 Dimension pref = super.getPreferredSize();

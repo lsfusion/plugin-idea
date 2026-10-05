@@ -26,6 +26,7 @@ import com.intellij.ui.DarculaColors;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.ui.content.Content;
 import com.jgraph.layout.JGraphFacade;
 import com.jgraph.layout.JGraphLayout;
@@ -43,7 +44,6 @@ import com.lsfusion.design.ui.FlexAlignment;
 import com.lsfusion.design.ui.FlexPanel;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.util.LSFFileUtils;
-import org.jdesktop.swingx.VerticalLayout;
 import org.jetbrains.annotations.NotNull;
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;
@@ -156,7 +156,7 @@ public abstract class DependenciesView extends JPanel implements Disposable {
             }
         }, 0, 5 * 60 * 1000);
 
-        JPanel toolbar = new JPanel(new VerticalLayout());
+        JPanel toolbar = new JPanel(new VerticalLayout(0));
         toolbar.add(createFirstToolbar().getComponent());
         toolbar.add(createSecondToolbar());
         thirdToolbar = createThirdToolbar();

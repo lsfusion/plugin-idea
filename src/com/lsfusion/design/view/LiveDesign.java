@@ -22,7 +22,6 @@ import lsfusion.server.physics.dev.debug.DebuggerService;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.handler.CefLoadHandlerAdapter;
-import org.jdesktop.swingx.prompt.PromptSupport;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -71,7 +70,7 @@ public class LiveDesign extends FormDesign {
         }, browser.getCefBrowser());
 
         addressBar = new JBTextField();
-        PromptSupport.setPrompt("Enter running web-client URL here", addressBar);
+        addressBar.getEmptyText().setText("Enter running web-client URL here");
         addressBar.addKeyListener(new KeyStrokeAdapter() {
             @Override
             public void keyPressed(KeyEvent event) {

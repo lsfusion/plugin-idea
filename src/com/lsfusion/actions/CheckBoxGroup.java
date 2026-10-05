@@ -2,7 +2,7 @@ package com.lsfusion.actions;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.ui.components.JBScrollPane;
-import org.jdesktop.swingx.VerticalLayout;
+import com.intellij.ui.components.panels.VerticalLayout;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +41,7 @@ public class CheckBoxGroup extends JPanel {
 
         add(header, BorderLayout.NORTH);
 
-        JPanel content = new JPanel(new VerticalLayout());
+        JPanel content = new JPanel(new VerticalLayout(0));
 
         for (String moduleName : moduleNames) {
             JCheckBox cb = new JCheckBox(moduleName);

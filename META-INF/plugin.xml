@@ -31,6 +31,7 @@
             <li>Go to Declaration and Rename of a parameter used inside <code>${...}</code> of a string literal work with its real declaration, and renaming an element used before the string literal in the same statement no longer fails</li>
             <li>A <code>LOCAL</code> property used inside <code>${...}</code> of a string literal is no longer reported as an ambiguous reference</li>
             <li>Live design preview opens the form under the caret as soon as the web client page loads</li>
+            <li>Fixed Design and LSF Dependencies tool windows in IntelliJ IDEA 2026.3</li>
         </ul>
     ]]>
     </change-notes>
