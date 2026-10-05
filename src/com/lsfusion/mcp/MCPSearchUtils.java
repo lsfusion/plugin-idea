@@ -349,7 +349,10 @@ public class MCPSearchUtils {
     // `seen` and related traversal results are memoized, so a restart mostly skips the work already done.
     // inSmartMode: the change that caused the restart can also start indexing, and indices are unavailable then.
     private static void readAction(Project project, Runnable r) {
-        ReadAction.nonBlocking(r).inSmartMode(project).executeSynchronously();
+        readAction(project, () -> {
+            r.run();
+            return null;
+        });
     }
 
     private static <T> T readAction(Project project, Callable<T> c) {
