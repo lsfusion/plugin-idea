@@ -24,8 +24,9 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         target.activated = activated;
     }
 
-    public void setLsf(boolean lsf) {
-        target.lsf = lsf;
+    // `custom = NULL`, the platform's standard view, is the one value any component takes - and the standard view is
+    // what the preview draws a component that is not a container with anyway (a container takes a custom view too)
+    public void setCustom(Object custom) {
     }
 
     /* ========= constraints properties ========= */

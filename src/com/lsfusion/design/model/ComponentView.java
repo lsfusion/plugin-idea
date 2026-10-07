@@ -29,7 +29,6 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("span"),
             new ReflectionProperty("defaultComponent").setExpert(),
             new ReflectionProperty("activated").setExpert(),
-            new ReflectionProperty("lsf").setExpert(),
             new ReflectionProperty("fill").setExpert(),
             new ReflectionProperty("size"),
             new ReflectionProperty("height").setExpert(),
@@ -68,8 +67,6 @@ public abstract class ComponentView extends PropertiesContainer {
     public boolean defaultComponent;
 
     public boolean activated;
-
-    public boolean lsf;
 
     public Dimension size;
 

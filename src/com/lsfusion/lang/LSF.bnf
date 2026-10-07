@@ -1954,6 +1954,7 @@ formPropertyOptionsList ::= (    CHANGEABLE | READONLY | DISABLE | SELECTOR
                             |    OPTIMISTICASYNC
                             |    formOptionForce
                             |    formOptionCustomView
+                            |    NOCUSTOM
                             |    formOptionToDraw
                             |    formOptionEventId
                             |    formOptionColumns
@@ -2513,7 +2514,7 @@ navigatorElementOptions ::= (	(WINDOW windowUsage PARENT?)
                             |   CLASS propertyExpression
                             |	HEADER propertyExpression
                             |	SHOWIF propertyExpression
-                            |   LSF
+                            |   NOCUSTOM
                             |   changeKeySetting
                             |   changeMouseSetting
                             )*

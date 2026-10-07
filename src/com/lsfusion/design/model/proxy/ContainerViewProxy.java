@@ -91,8 +91,9 @@ public class ContainerViewProxy extends ComponentViewProxy<ContainerView> {
         target.resizeOverflow = resizeOverflow;
     }
 
-    public void setCustom(String custom) {
-        target.custom = custom;
+    @Override
+    public void setCustom(Object custom) { // NULL is the standard view, which drops a custom view given before
+        target.custom = custom != null ? custom.toString() : null;
     }
 
     //deprecated in 5.2, removed in 6.0
