@@ -324,8 +324,8 @@ public class LSFProblemsVisitor {
             case "valueAlignment": reportReplace(o, "6.0", "8.0", "valueAlignmentHorz", sink); break;
             case "showGroup": reportReplace(o, "6.0", "8.0", "showViews", sink); break;
             case "autoSize": reportWarning(o, "6.0", "Earlier versions: ignore this warning", sink); break;
-            case "changeKeyPriority": reportWarning(o, "6.0", "7.0", "Use parameter 'priority' in 'changeKey' instead", sink); break;
-            case "changeMousePriority": reportWarning(o, "6.0", "7.0", "Use parameter 'priority' in 'changeMouse' instead", sink); break;
+            case "changeKeyPriority": reportWarning(o, "5.2", "7.0", "Use parameter 'priority' in 'changeKey' instead", sink); break;
+            case "changeMousePriority": reportWarning(o, "5.2", "7.0", "Use parameter 'priority' in 'changeMouse' instead", sink); break;
             case "expandOnClick": reportWarning(o, "6.2", "7.0", "This will be default behaviour", sink); break;
             case "panelCaptionVertical": reportReplace(o, "6.0", "8.0", "captionVertical", sink); break;
             case "panelCaptionLast": reportReplace(o, "6.2", "8.0", "captionLast", sink); break;
