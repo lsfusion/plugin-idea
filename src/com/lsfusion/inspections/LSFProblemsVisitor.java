@@ -322,7 +322,7 @@ public class LSFProblemsVisitor {
             case "toolTip": reportReplace(o, "5.2", "6.0", "tooltip", sink); break;
             case "editOnSingleClick": reportReplace(o, "5.2", "6.0", "changeOnSingleClick", sink); break;
             case "valueAlignment": reportReplace(o, "6.0", "8.0", "valueAlignmentHorz", sink); break;
-            case "showGroup": reportReplace(o, "6.0", "8.0", "showViews", sink); break;
+            case "showGroup": reportReplace(o, "5.2", "7.0", "showViews", sink); break;
             case "autoSize": reportWarning(o, "6.0", "Earlier versions: ignore this warning", sink); break;
             case "changeKeyPriority": reportWarning(o, "5.2", "7.0", "Use parameter 'priority' in 'changeKey' instead", sink); break;
             case "changeMousePriority": reportWarning(o, "5.2", "7.0", "Use parameter 'priority' in 'changeMouse' instead", sink); break;
