@@ -238,7 +238,8 @@ public class LSFProblemsVisitor {
         } else if (element instanceof LSFSeekObjectActionPropertyDefinitionBody) {
             PsiElement firstChild = element.getFirstChild();
             if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.SEEK) {
-                reportWarning(firstChild, "7.0", "use ACTIVATE instead", sink);
+                sink.accept(firstChild, "6.2", "Deprecated since version 6.2. Use 'ACTIVATE' instead",
+                        new LSFReplaceFix(firstChild, "SEEK", "ACTIVATE"));
             }
         } else if (element instanceof LSFDockedWindowTypeLiteral) {
             // SHOW / DIALOG ... DOCKED: the former spelling of WINDOW, which also names the window a form opens in
