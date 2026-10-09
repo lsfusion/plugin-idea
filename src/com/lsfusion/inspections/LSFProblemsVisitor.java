@@ -236,23 +236,12 @@ public class LSFProblemsVisitor {
                 reportWarning(userFilters, "7.0", "Use FILTERS ... USER instead", sink);
             }
         } else if (element instanceof LSFSeekObjectActionPropertyDefinitionBody) {
-            PsiElement firstChild = element.getFirstChild();
-            if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.SEEK) {
-                sink.accept(firstChild, "6.2", "Deprecated since version 6.2. Use 'ACTIVATE' instead",
-                        new LSFReplaceFix(firstChild, "SEEK", "ACTIVATE"));
-            }
+            reportKeywordReplace(element, LSFTypes.SEEK, "6.2", "ACTIVATE", sink);
         } else if (element instanceof LSFDockedWindowTypeLiteral) {
             // SHOW / DIALOG ... DOCKED: the former spelling of WINDOW, which also names the window a form opens in
-            PsiElement firstChild = element.getFirstChild();
-            if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.DOCKED) {
-                sink.accept(firstChild, "7.0", "Deprecated since version 7.0. Use 'WINDOW' instead",
-                        new LSFReplaceFix(firstChild, "DOCKED", "WINDOW"));
-            }
+            reportKeywordReplace(element, LSFTypes.DOCKED, "7.0", "WINDOW", sink);
         } else if (element instanceof LSFObjectPropertyDefinition) {
-            PsiElement firstChild = element.getFirstChild();
-            if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.VALUE) {
-                reportWarning(firstChild, "7.0", "use ACTIVE instead", sink);
-            }
+            reportKeywordReplace(element, LSFTypes.VALUE, "6.2", "ACTIVE", sink);
         } else if (element instanceof LSFNewThreadActionPropertyDefinitionBody) {
             visitNewThreadDeprecations((LSFNewThreadActionPropertyDefinitionBody) element, sink);
         } else if (element instanceof LSFActionStatement) {
@@ -328,10 +317,10 @@ public class LSFProblemsVisitor {
             case "changeMousePriority": reportWarning(o, "5.2", "7.0", "Use parameter 'priority' in 'changeMouse' instead", sink); break;
             case "expandOnClick": reportWarning(o, "6.2", "7.0", "This will be default behaviour", sink); break;
             case "panelCaptionVertical": reportReplace(o, "6.0", "8.0", "captionVertical", sink); break;
-            case "panelCaptionLast": reportReplace(o, "6.2", "8.0", "captionLast", sink); break;
-            case "panelCaptionAlignment": reportReplace(o, "6.2", "8.0", "captionAlignmentHorz", sink); break;
-            case "imagePath": reportReplace(o, "6.2", "8.0", "image", sink); break;
-            case "headerHeight": reportReplace(o, "6.2", "8.0", "captionHeight", sink); break;
+            case "panelCaptionLast": reportReplace(o, "6.0", "8.0", "captionLast", sink); break;
+            case "panelCaptionAlignment": reportReplace(o, "6.0", "8.0", "captionAlignmentHorz", sink); break;
+            case "imagePath": reportReplace(o, "6.0", "8.0", "image", sink); break;
+            case "headerHeight": reportReplace(o, "6.0", "8.0", "captionHeight", sink); break;
             case "defaultCompare": reportDefaultCompareDeprecation(o, sink); break;
         }
     }
@@ -347,19 +336,27 @@ public class LSFProblemsVisitor {
         String defaultCompare = LSFStringUtils.unquote(element.getText());
         int idx = supportedDefaultCompares5.indexOf(defaultCompare);
         if (idx >= 0 && !supportedDefaultCompares.contains(defaultCompare)) { // v5 symbolic name -> deprecated since 5.2
-            String replacement = supportedDefaultCompares.get(idx);
-            sink.accept(element, "5.2",
-                    String.format("Deprecated since version 5.2, removed in version 6.0. Use '%s' instead", replacement),
-                    new LSFReplaceFix(element, defaultCompare, replacement));
+            reportReplace(element, "5.2", "6.0", defaultCompare, supportedDefaultCompares.get(idx), sink);
         }
     }
 
+    // removedVersion == null - not removed yet
+    private static String deprecatedText(String version, String removedVersion, String comment) {
+        String text = "Deprecated since version " + version + (removedVersion != null ? ", removed in version " + removedVersion : "") + ".";
+        return comment.isEmpty() ? text : text + " " + comment;
+    }
+
     private static void reportWarning(PsiElement element, String version, String removedVersion, String comment, DeprecationConsumer sink) {
-        sink.accept(element, version, String.format("Deprecated since version %s, removed in version %s. %s", version, removedVersion, comment), null);
+        sink.accept(element, version, deprecatedText(version, removedVersion, comment), null);
     }
 
     private static void reportWarning(PsiElement element, String version, String comment, DeprecationConsumer sink) {
-        sink.accept(element, version, String.format("Deprecated since version %s. %s", version, comment), null);
+        reportWarning(element, version, null, comment, sink);
+    }
+
+    private static void reportReplace(PsiElement element, String version, String removedVersion, String oldText, String replacement, DeprecationConsumer sink) {
+        sink.accept(element, version, deprecatedText(version, removedVersion, "Use '" + replacement + "' instead"),
+                new LSFReplaceFix(element, oldText, replacement));
     }
 
     private static void reportReplace(PsiElement element, String version, String removedVersion, String replacement, DeprecationConsumer sink) {
@@ -367,7 +364,14 @@ public class LSFProblemsVisitor {
         String elementText = element.getText();
         int eq = elementText.indexOf('=');
         String oldToken = (eq >= 0 ? elementText.substring(0, eq) : elementText).trim();
-        sink.accept(element, version, String.format("Deprecated since version %s, removed in version %s. Use '%s' instead", version, removedVersion, replacement),
-                new LSFReplaceFix(element, oldToken, replacement));
+        reportReplace(element, version, removedVersion, oldToken, replacement, sink);
+    }
+
+    // the leading keyword of the element is deprecated in favour of another keyword
+    private static void reportKeywordReplace(PsiElement element, IElementType keyword, String version, String replacement, DeprecationConsumer sink) {
+        PsiElement firstChild = element.getFirstChild();
+        if (firstChild != null && firstChild.getNode().getElementType() == keyword) {
+            reportReplace(firstChild, version, null, firstChild.getText(), replacement, sink);
+        }
     }
 }
