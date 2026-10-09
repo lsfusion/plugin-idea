@@ -2787,7 +2787,7 @@ literal ::= commonLiteral |	(<<noIDCheck>> localizedStringLiteral) // since ther
 expressionLiteral ::= commonLiteral | (<<noIDCheck>> expressionStringLiteral)
 {implements = "com.lsfusion.lang.psi.context.LSFExpression" methods = [ resolveInferredValueClass inferParamClasses getValueClassNames getValuePropertyNames getDocumentation]}
 
-objectPropertyDefinition ::= (VALUE | ACTIVE) groupObjectID
+objectPropertyDefinition ::= (VALUE | ACTIVE) objectID
 {
     implements = "com.lsfusion.documentation.LSFDocumentation"
     methods = [getDocumentation]
