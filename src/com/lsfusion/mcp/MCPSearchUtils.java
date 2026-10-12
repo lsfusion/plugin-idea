@@ -22,6 +22,7 @@ import com.intellij.psi.SmartPointerManager;
 import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
+import com.intellij.psi.search.PsiSearchScopeUtil;
 import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.psi.search.UsageSearchContext;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -158,6 +159,7 @@ public class MCPSearchUtils {
         AtomicBoolean timeoutHit = new AtomicBoolean(false);
 
         GlobalSearchScope searchScope = searchElements(project, query, state, searchBudgetMillis, timeoutHit, errors);
+        errors.addAll(state.unresolved);
 
         List<SelectedStatement> bestStatements = new ArrayList<>();
         JSONArray best = sortAndTruncate(state.statementsByPriority, maxSymbols, bestStatements);
@@ -179,7 +181,9 @@ public class MCPSearchUtils {
 
         final AtomicBoolean nonMatchingStatementsAdded = new AtomicBoolean(false);
         // 2) If still below minSymbols, append neighboring declarations (in-file PSI order) with full code.
-        if (!timeoutHit.get() && minSymbols > 0 && bestTotal < minSymbols && bestTotal < maxSymbols) {
+        // Not after an unresolved filter target: that request failed (see `errors`), and unrelated declarations would
+        // read as its answer.
+        if (!timeoutHit.get() && state.unresolved.isEmpty() && minSymbols > 0 && bestTotal < minSymbols && bestTotal < maxSymbols) {
             try {
                 // Neighbor fill ignores the original filter predicate by design; report this to the caller.
                 fillNeighborsUntilMinSymbols(bestStatements, best, bestTotal, searchScope, minSymbols, maxSymbols, deadlineMillis, nonMatchingStatementsAdded);
@@ -194,8 +198,6 @@ public class MCPSearchUtils {
 
     private static @NonNull GlobalSearchScope searchElements(@NonNull Project project, @NonNull JSONObject query, SearchState state, long searchBudgetMillis, AtomicBoolean timeoutHit, List<String> errors) {
         // Build iterations: run all applicable types simultaneously with in-iteration filtering
-        Set<LSFMCPDeclaration> seen = Collections.newSetFromMap(new ConcurrentHashMap<>());
-        ConcurrentMap<RelatedKey, RelatedState> relatedCache = new ConcurrentHashMap<>();
 
         // Executor and dynamic scheduling support
         ExecutorService exec = createPriorityExecutor(Math.min(6, Math.max(1, Runtime.getRuntime().availableProcessors() - 1)));
@@ -206,14 +208,14 @@ public class MCPSearchUtils {
         // helper to submit tasks with accounting
         TaskSubmitter submit = createSubmit(exec, state, errors, indicator);
 
-        GlobalSearchScope searchScope = run(project, query, seen, relatedCache, state, submit);
+        GlobalSearchScope searchScope = run(project, query, state, submit);
 
         String moreFiltersStr = query.optString("moreFilters", "");
         JSONArray moreFilters = !moreFiltersStr.isEmpty() ? new JSONArray(moreFiltersStr) : null;
 
         if (moreFilters != null && !moreFilters.isEmpty())
             for (int i = 0; i < moreFilters.length(); i++)
-                searchScope = searchScope.union(run(project, moreFilters.optJSONObject(i), seen, relatedCache, state, submit));
+                searchScope = searchScope.union(run(project, moreFilters.optJSONObject(i), state, submit));
 
         // Wait for all tasks to complete (but keep a reserve for post-processing)
         awaitAll.run();
@@ -262,7 +264,7 @@ public class MCPSearchUtils {
         return resultObject;
     }
 
-    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, QueryTargets targets, GlobalSearchScope searchScope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
+    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, QueryTargets targets, GlobalSearchScope searchScope, GlobalSearchScope baseScope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
         return st -> {
             if (state.stopRequested.get()) {
                 return false;
@@ -278,13 +280,13 @@ public class MCPSearchUtils {
 
             SelectedStatement selSt;
             try {
-                selSt = matchesAllFilters(st, nameFilters, containsFilters, elementTypes, targets.getClasses(), targets.getRelated(), searchScope, relatedCache)
+                selSt = matchesAllFilters(st, nameFilters, containsFilters, elementTypes, targets.getClasses(), targets.getRelated(), searchScope, baseScope, relatedCache)
                         ? new SelectedStatement(st, searchScope) : null;
             } catch (RuntimeException | Error e) {
                 seen.remove(st); // read action cancelled by a write action - the restarted task has to process st again
                 throw e;
             }
-            if (selSt != null) {
+            if (selSt != null && state.accepted.add(st)) {
                 synchronized (state.statementsByPriority[p]) {
                     state.statementsByPriority[p].add(selSt);
                 }
@@ -363,19 +365,23 @@ public class MCPSearchUtils {
     // between, and PSI kept from an earlier read action can be invalidated by them. So the targets are stored as smart
     // pointers created in the same read action that resolves them, and restored inside each read action using them.
     private static final class QueryTargets {
-        final List<SmartPsiElementPointer<LSFClassDeclaration>> classes = new ArrayList<>();
-        final Map<SmartPsiElementPointer<LSFMCPDeclaration>, Direction> related = new LinkedHashMap<>();
+        final @Nullable List<SmartPsiElementPointer<LSFClassDeclaration>> classes;
+        final @Nullable Map<SmartPsiElementPointer<LSFMCPDeclaration>, Direction> related;
 
-        QueryTargets(Set<LSFClassDeclaration> classes, Map<LSFMCPDeclaration, Direction> related) {
-            for (LSFClassDeclaration cls : classes)
-                this.classes.add(SmartPointerManager.createPointer(cls));
-            for (Map.Entry<LSFMCPDeclaration, Direction> entry : related.entrySet())
-                this.related.put(SmartPointerManager.createPointer(entry.getKey()), entry.getValue());
+        QueryTargets(@Nullable Set<LSFClassDeclaration> classes, @Nullable Map<LSFMCPDeclaration, Direction> related) {
+            this.classes = classes == null ? null : ContainerUtil.map(classes, cls -> SmartPointerManager.createPointer(cls));
+            if (related == null) {
+                this.related = null;
+            } else {
+                this.related = new LinkedHashMap<>();
+                for (Map.Entry<LSFMCPDeclaration, Direction> entry : related.entrySet())
+                    this.related.put(SmartPointerManager.createPointer(entry.getKey()), entry.getValue());
+            }
         }
 
-        // null if there is no classes filter (empty if all its classes are gone)
+        // null if there is no classes filter (empty if none of its classes resolved or all of them are gone)
         @Nullable Set<LSFClassDeclaration> getClasses() {
-            if (classes.isEmpty()) return null;
+            if (classes == null) return null;
             Set<LSFClassDeclaration> result = new HashSet<>();
             for (SmartPsiElementPointer<LSFClassDeclaration> pointer : classes) {
                 LSFClassDeclaration cls = pointer.getElement();
@@ -385,9 +391,9 @@ public class MCPSearchUtils {
             return result;
         }
 
-        // null if there is no related filter (empty if all its elements are gone)
+        // null if there is no related filter (empty if none of its elements resolved or all of them are gone)
         @Nullable Map<LSFMCPDeclaration, Direction> getRelated() {
-            if (related.isEmpty()) return null;
+            if (related == null) return null;
             Map<LSFMCPDeclaration, Direction> result = new HashMap<>();
             for (Map.Entry<SmartPsiElementPointer<LSFMCPDeclaration>, Direction> entry : related.entrySet()) {
                 LSFMCPDeclaration decl = entry.getKey().getElement();
@@ -421,6 +427,7 @@ public class MCPSearchUtils {
     }
 
     private static boolean submitClassTasks(Project project, GlobalSearchScope searchScope, QueryTargets targets, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit, boolean onlyPropertiesClassesActions) {
+        if (targets.classes == null) return false;
         for (SmartPsiElementPointer<LSFClassDeclaration> classPointer : targets.classes) {
             submit.submit(1, () -> readAction(project, () -> {
                 LSFClassDeclaration targetClass = classPointer.getElement();
@@ -441,16 +448,17 @@ public class MCPSearchUtils {
                 }
             }));
         }
-        return !targets.classes.isEmpty();
+        return true; // a filter with no targets matches nothing - nothing to stream, and no per-file scan
     }
 
     private static boolean submitRelatedTasks(Project project, QueryTargets targets, GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
+        if (targets.related == null) return false;
         // Global visited marks (single set for all directions)
         final Set<LSFMCPDeclaration> visitedRelated = Collections.newSetFromMap(new ConcurrentHashMap<>());
         for (Map.Entry<SmartPsiElementPointer<LSFMCPDeclaration>, Direction> unit : targets.related.entrySet()) {
             submit.submit(1, () -> streamRelated(project, unit.getKey(), unit.getValue(), searchScope, processor, visitedRelated)); // read actions per node inside
         }
-        return !targets.related.isEmpty();
+        return true; // see submitClassTasks
     }
 
     private static void submitFileTasks(Project project, GlobalSearchScope searchScope, Processor<LSFMCPDeclaration> processor, TaskSubmitter submit) {
@@ -483,21 +491,26 @@ public class MCPSearchUtils {
 
     private static @NotNull GlobalSearchScope run(@NotNull Project project,
                                                  @NotNull JSONObject query,
-                                                 @NotNull Set<LSFMCPDeclaration> seen,
-                                                 @NotNull ConcurrentMap<RelatedKey, RelatedState> relatedCache,
                                                  @NotNull SearchState state,
                                                  @NotNull TaskSubmitter submit) {
-        GlobalSearchScope searchScope = ApplicationManager.getApplication().runReadAction((Computable<GlobalSearchScope>) () -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
+        // Per filter, not shared with `moreFilters`: an element one filter rejects may be what another one matches,
+        // and whether an element is related depends on this filter's seeds
+        Set<LSFMCPDeclaration> seen = Collections.newSetFromMap(new ConcurrentHashMap<>());
+        ConcurrentMap<RelatedKey, RelatedState> relatedCache = new ConcurrentHashMap<>();
+        // Targets are resolved, and usages followed, in the base scope: `modules` restricts only the result (see
+        // matchesAllFilters), while a related seed is usually declared outside it - which elements of B and C does A use
+        GlobalSearchScope baseScope = ApplicationManager.getApplication().runReadAction((Computable<GlobalSearchScope>) () -> buildScope(project, query.optString("scope")));
+        GlobalSearchScope searchScope = ApplicationManager.getApplication().runReadAction((Computable<GlobalSearchScope>) () -> buildSearchScope(project, baseScope, query.optString("modules"), query.optBoolean("requiredModules", true)));
         List<NameFilter> nameFilters = parseMatchersCsv(query.optString("names"));
         List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
         Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
 
         QueryTargets targets = ApplicationManager.getApplication().runReadAction((Computable<QueryTargets>) () -> new QueryTargets(
-                parseClasses(project, searchScope, query.optString("classes")),
-                parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection"))));
+                parseClasses(project, baseScope, query.optString("classes"), state.unresolved),
+                parseRelated(project, baseScope, query.optString("relatedElements"), query.optString("relatedDirection"), state.unresolved)));
 
         // Shared processor that applies all filters and returns false to stop the current iteration
-        final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, targets, searchScope, relatedCache);
+        final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, targets, searchScope, baseScope, relatedCache);
 
         // Track which blocks are fully streamable while assembling iterations.
         // Name/code filters are considered fully streamable only if ALL matchers are "word-only" with length >= 3.
@@ -512,7 +525,7 @@ public class MCPSearchUtils {
         boolean classesFullyStreamable = submitClassTasks(project, searchScope, targets, processor, submit, isOnlyPropertiesClassesActions(elementTypes));
 
         // Related elements iterations: dynamically schedule traversal tasks
-        boolean relatedFullyStreamable = submitRelatedTasks(project, targets, searchScope, processor, submit);
+        boolean relatedFullyStreamable = submitRelatedTasks(project, targets, baseScope, processor, submit);
 
         // Per-file iterations (fallback) — run only if no block is fully streamable
         if (!nameFullyStreamable && !containsFullyStreamable && !classesFullyStreamable && !relatedFullyStreamable && !typesFullyStreamable) {
@@ -759,21 +772,25 @@ public class MCPSearchUtils {
 
     // region Parse + generate
 
-    private static Set<LSFClassDeclaration> parseClasses(Project project, GlobalSearchScope scope, @Nullable String classesCsv) {
-        if (classesCsv.isEmpty()) return Collections.emptySet();
+    // null if the filter is not given; a target that does not resolve is reported and gives no result, the filter
+    // stays in force - with none of its targets resolved it matches nothing
+    private static @Nullable Set<LSFClassDeclaration> parseClasses(Project project, GlobalSearchScope scope, @Nullable String classesCsv, List<String> unresolved) {
+        if (classesCsv.isEmpty()) return null;
 
         Set<LSFClassDeclaration> res = new HashSet<>();
         for (String name : parseCsv(classesCsv)) {
-            res.addAll(resolveClassesByName(project, scope, name));
+            res.addAll(reportIfUnresolved("classes", name, resolveClassesByName(project, scope, name), unresolved));
         }
         return res;
     }
 
-    private static Map<LSFMCPDeclaration, Direction> parseRelated(Project project,
-                                                                  GlobalSearchScope scope,
-                                                                  @Nullable String relatedElementsCsv,
-                                                                  @Nullable String relatedDirection) {
-        if (relatedElementsCsv.isEmpty()) return Collections.emptyMap();
+    // see parseClasses
+    private static @Nullable Map<LSFMCPDeclaration, Direction> parseRelated(Project project,
+                                                                            GlobalSearchScope scope,
+                                                                            @Nullable String relatedElementsCsv,
+                                                                            @Nullable String relatedDirection,
+                                                                            List<String> unresolved) {
+        if (relatedElementsCsv.isEmpty()) return null;
 
         Direction dir = Direction.BOTH;
         if ("uses".equals(relatedDirection)) {
@@ -784,11 +801,17 @@ public class MCPSearchUtils {
 
         Map<LSFMCPDeclaration, Direction> units = new HashMap<>();
         for (String token : parseCsv(relatedElementsCsv)) {
-            for (LSFMCPDeclaration stmt : getStatementsFromJson(project, scope, token)) {
+            for (LSFMCPDeclaration stmt : reportIfUnresolved("relatedElements", token, getStatementsFromJson(project, scope, token), unresolved)) {
                 units.put(stmt, dir);
             }
         }
         return units;
+    }
+
+    private static <T> Collection<T> reportIfUnresolved(String filter, String target, Collection<T> found, List<String> unresolved) {
+        if (found.isEmpty())
+            unresolved.add(filter + ": `" + target + "` resolves to nothing in the project or the given `scope`, so no result comes from it");
+        return found;
     }
 
     private static Set<LSFMCPDeclaration> getStatementsFromName(Project project, GlobalSearchScope scope, LSFMCPDeclaration.ElementType type, String canonicalName) {
@@ -1106,8 +1129,7 @@ public class MCPSearchUtils {
         return acc == null ? GlobalSearchScope.EMPTY_SCOPE : acc;
     }
 
-    private static GlobalSearchScope buildSearchScope(Project project, String modules, String scopeMode, boolean requiredModules) {
-        GlobalSearchScope baseScope = buildScope(project, scopeMode);
+    private static GlobalSearchScope buildSearchScope(Project project, GlobalSearchScope baseScope, String modules, boolean requiredModules) {
         if (modules == null || modules.isEmpty()) {
             return baseScope;
         }
@@ -1126,17 +1148,21 @@ public class MCPSearchUtils {
                                              @Nullable Set<LSFClassDeclaration> classDecls, // null - no filter
                                              @Nullable Map<LSFMCPDeclaration, Direction> related, // null - no filter
                                              GlobalSearchScope scope,
+                                             GlobalSearchScope baseScope, // where usages are followed - not narrowed by `modules`
                                              ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
         LSFMCPDeclaration.ElementType t;
-        return (elementTypes.isEmpty() || ((t = stmt.getMCPType()) != null && elementTypes.contains(t))) &&
+        // index, word and file iterations only see the scope, but a related traversal and a class's parents
+        // follow references wherever they lead
+        return PsiSearchScopeUtil.isInScope(scope, stmt) &&
+                (elementTypes.isEmpty() || ((t = stmt.getMCPType()) != null && elementTypes.contains(t))) &&
                 (nameFilters.isEmpty() || matchesNameFilters(stmt, nameFilters, scope, false)) &&
                 (containsFilters.isEmpty() || matchesNameFilters(stmt, containsFilters, scope, true)) &&
                 (classDecls == null || matchesClassesFilter(stmt, classDecls, scope)) &&
-                (related == null || matchesRelatedFilters(stmt, related, scope, relatedCache));
+                (related == null || matchesRelatedFilters(stmt, related, baseScope, relatedCache));
     }
 
     private static boolean matchesClassesFilter(LSFMCPDeclaration stmt, Set<LSFClassDeclaration> classDecls, GlobalSearchScope scope) {
-        if (classDecls.isEmpty()) return false; // all filter classes are gone (see QueryTargets)
+        if (classDecls.isEmpty()) return false; // no filter class resolved, or all of them are gone (see QueryTargets)
         // Resolve candidate declarations (can be several)
 
         boolean hasClasses = false;
@@ -1184,7 +1210,7 @@ public class MCPSearchUtils {
                                                  Map<LSFMCPDeclaration, Direction> related,
                                                  GlobalSearchScope scope,
                                                  ConcurrentMap<RelatedKey, RelatedState> memo) {
-        if (related.isEmpty()) return false; // all related elements are gone (see QueryTargets)
+        if (related.isEmpty()) return false; // no related element resolved, or all of them are gone (see QueryTargets)
 
         class Rec {
             boolean memoized(RelatedKey key, java.util.function.Supplier<Boolean> calc) {
@@ -1469,6 +1495,10 @@ public class MCPSearchUtils {
         final AtomicInteger[] pendingTasksByPriority = new AtomicInteger[6];
 
         final List<SelectedStatement>[] statementsByPriority = new List[6];
+        // what statementsByPriority holds, across the root filter and `moreFilters`: each element is returned once
+        final Set<LSFMCPDeclaration> accepted = Collections.newSetFromMap(new ConcurrentHashMap<>());
+        // filter targets that resolved to nothing (see parseClasses), reported in `errors`
+        final List<String> unresolved = new ArrayList<>();
 
         final int maxSymbols;
 
