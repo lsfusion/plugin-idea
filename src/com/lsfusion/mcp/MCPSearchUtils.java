@@ -216,6 +216,7 @@ public class MCPSearchUtils {
         if (moreFilters != null && !moreFilters.isEmpty())
             for (int i = 0; i < moreFilters.length(); i++)
                 searchScope = searchScope.union(run(project, moreFilters.optJSONObject(i), state, submit));
+        state.allSubmitted();
 
         // Wait for all tasks to complete (but keep a reserve for post-processing)
         awaitAll.run();
@@ -1502,6 +1503,11 @@ public class MCPSearchUtils {
 
         final int maxSymbols;
 
+        // While the tasks are being submitted, no pending tasks does not mean the search is done: the root filter's
+        // tasks can finish before those of `moreFilters` (or a filter's per-file tasks, submitted last) are submitted,
+        // and a stop requested then makes the processors of the later tasks reject everything.
+        private volatile boolean submitting = true;
+
         SearchState(int maxSymbols) {
             this.maxSymbols = maxSymbols;
             this.stopRequested = new AtomicBoolean(false);
@@ -1528,7 +1534,13 @@ public class MCPSearchUtils {
             }
         }
 
+        void allSubmitted() {
+            submitting = false;
+            checkAllPBetterDone(); // the tasks may have finished, or maxSymbols been hit, while the rest were submitted
+        }
+
         private void checkAllPBetterDone() {
+            if (submitting) return;
             int p = stopPriorityThreshold.get();
 
             boolean allPBetterDone = true;
