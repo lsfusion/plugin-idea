@@ -5,6 +5,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.OpenSourceUtil;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.IdFilter;
 import com.lsfusion.lang.classes.LSFClassSet;
@@ -86,7 +87,7 @@ public class LSFSymbolContributor extends LSFNameContributor {
 
         @Override
         public void navigate(boolean requestFocus) {
-            decl.navigate(requestFocus);
+            OpenSourceUtil.navigate(requestFocus, decl);
         }
 
         @Override

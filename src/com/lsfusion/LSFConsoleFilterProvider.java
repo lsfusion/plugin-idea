@@ -10,6 +10,7 @@ import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.OpenSourceUtil;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.LSFGlobalResolver;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
@@ -57,7 +58,7 @@ public class LSFConsoleFilterProvider extends ConsoleDependentFilterProvider {
                             if (document != null) {
                                 PsiElement element = lsfFile.findElementAt(SourcePosition.createFromOffset(lsfFile, document.getLineStartOffset(lineNum) + posNum).getOffset());
                                 if (element != null) {
-                                    ((Navigatable) element).navigate(true);
+                                    OpenSourceUtil.navigate((Navigatable) element);
                                 }
                             }
                         }

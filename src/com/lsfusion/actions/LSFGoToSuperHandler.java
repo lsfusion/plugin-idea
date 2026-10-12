@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.OpenSourceUtil;
 import com.lsfusion.lang.LSFLanguage;
 import com.lsfusion.lang.meta.MetaChangeDetector;
 import com.lsfusion.lang.psi.*;
@@ -70,7 +71,7 @@ public class LSFGoToSuperHandler implements LanguageCodeInsightActionHandler {
 
 
             if (targets.size() == 1) {
-                ((Navigatable) targets.get(0)).navigate(true);
+                OpenSourceUtil.navigate((Navigatable) targets.get(0));
             } else if (!targets.isEmpty()) {
                 NavigationUtil.getPsiElementPopup(() -> targets, new GoToSuperPresentationRenderer(mapped), "Choose Element", project).showInBestPositionFor(editor);
             }

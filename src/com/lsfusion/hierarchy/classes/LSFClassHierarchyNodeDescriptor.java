@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.SmartPointerManager;
 import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.ui.JBColor;
+import com.intellij.util.OpenSourceUtil;
 import com.lsfusion.lang.psi.declarations.LSFClassDeclaration;
 import com.lsfusion.util.BaseUtils;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +49,7 @@ public class LSFClassHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
     public void navigate(boolean requestFocus) {
         PsiElement psiElement = getTargetElement();
         if (psiElement != null) {
-            ((NavigationItem) psiElement).navigate(true);
+            OpenSourceUtil.navigate((NavigationItem) psiElement);
         }
     }
 

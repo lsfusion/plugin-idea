@@ -33,6 +33,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.OpenSourceUtil;
 import com.lsfusion.inspections.LSFProblemsVisitor;
 import com.lsfusion.lang.LSFErrorLevel;
 import com.lsfusion.lang.LSFFileType;
@@ -266,7 +267,7 @@ public class ShowErrorsAction extends AnAction {
 
     private static void navigate(PsiElement element, int offset) {
         if (element instanceof NavigationItem) {
-            ((NavigationItem) element).navigate(true);
+            OpenSourceUtil.navigate((NavigationItem) element);
             return;
         }
 

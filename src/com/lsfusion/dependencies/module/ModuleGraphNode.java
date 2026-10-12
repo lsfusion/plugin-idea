@@ -1,6 +1,7 @@
 package com.lsfusion.dependencies.module;
 
 import com.intellij.pom.Navigatable;
+import com.intellij.util.OpenSourceUtil;
 import com.lsfusion.dependencies.GraphNode;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 
@@ -33,6 +34,6 @@ public class ModuleGraphNode implements GraphNode {
 
     @Override
     public void navigate() {
-        ((Navigatable) module).navigate(false);    
+        OpenSourceUtil.navigate(false, (Navigatable) module);
     }
 }

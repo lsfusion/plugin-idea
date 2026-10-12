@@ -2,6 +2,7 @@ package com.lsfusion.dependencies.property;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.pom.Navigatable;
+import com.intellij.util.OpenSourceUtil;
 import com.lsfusion.dependencies.GraphNode;
 import com.lsfusion.lang.psi.cache.PropertyComplexityCache;
 import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
@@ -37,7 +38,7 @@ public class PropertyGraphNode implements GraphNode {
 
     @Override
     public void navigate() {
-        ((Navigatable) property).navigate(false);
+        OpenSourceUtil.navigate(false, (Navigatable) property);
     }
 
     @Override

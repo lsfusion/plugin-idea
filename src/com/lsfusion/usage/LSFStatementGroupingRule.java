@@ -12,6 +12,7 @@ import com.intellij.usages.UsageTarget;
 import com.intellij.usages.rules.PsiElementUsage;
 import com.intellij.usages.rules.SingleParentUsageGroupingRule;
 import com.intellij.usages.rules.UsageGroupingRule;
+import com.intellij.util.OpenSourceUtil;
 import com.lsfusion.util.LSFPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -79,7 +80,7 @@ public class LSFStatementGroupingRule extends SingleParentUsageGroupingRule impl
         @Override
         public void navigate(boolean requestFocus) {
             if (canNavigate()) {
-                ((NavigationItem) statementPointer.getElement()).navigate(requestFocus);
+                OpenSourceUtil.navigate(requestFocus, (NavigationItem) statementPointer.getElement());
             }
         }
 

@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.SmartPointerManager;
 import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.ui.JBColor;
+import com.intellij.util.OpenSourceUtil;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfaceActionOrPropStatement;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
@@ -58,7 +59,7 @@ public class LSFUsageHierarchyNodeDescriptor extends HierarchyNodeDescriptor imp
 
     @Override
     public void navigate(boolean requestFocus) {
-        ((NavigationItem) getTargetElement()).navigate(true);
+        OpenSourceUtil.navigate((NavigationItem) getTargetElement());
     }
 
     @Override

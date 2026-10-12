@@ -11,6 +11,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.Function;
+import com.intellij.util.OpenSourceUtil;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.LSFLineMarkerProviderDescriptor;
 import com.lsfusion.lang.psi.declarations.LSFFormDeclaration;
@@ -100,7 +101,7 @@ public class JrxmlLinkLineMarkerProvider extends LSFLineMarkerProviderDescriptor
                             .createMessage("Can't find related report files")
                             .show(new RelativePoint(e));
                 } else if (files.size() == 1) {
-                    files.get(0).navigate(true);
+                    OpenSourceUtil.navigate(files.get(0));
                 } else {
                     files.sort(PsiFileByPathComparator.INSTANCE);
 
@@ -134,7 +135,7 @@ public class JrxmlLinkLineMarkerProvider extends LSFLineMarkerProviderDescriptor
 
                 @Override
                 public PopupStep onChosen(PsiFile selectedFile, boolean finalChoice) {
-                    selectedFile.navigate(true);
+                    OpenSourceUtil.navigate(selectedFile);
                     return FINAL_CHOICE;
                 }
             };
