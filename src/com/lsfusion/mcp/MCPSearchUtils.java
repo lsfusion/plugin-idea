@@ -265,7 +265,7 @@ public class MCPSearchUtils {
         return resultObject;
     }
 
-    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, QueryTargets targets, GlobalSearchScope searchScope, GlobalSearchScope baseScope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
+    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, QueryTargets targets, GlobalSearchScope searchScope, GlobalSearchScope baseScope, ConcurrentMap<RelatedKey, Boolean> relatedCache) {
         return st -> {
             if (state.stopRequested.get()) {
                 return false;
@@ -497,7 +497,7 @@ public class MCPSearchUtils {
         // Per filter, not shared with `moreFilters`: an element one filter rejects may be what another one matches,
         // and whether an element is related depends on this filter's seeds
         Set<LSFMCPDeclaration> seen = Collections.newSetFromMap(new ConcurrentHashMap<>());
-        ConcurrentMap<RelatedKey, RelatedState> relatedCache = new ConcurrentHashMap<>();
+        ConcurrentMap<RelatedKey, Boolean> relatedCache = new ConcurrentHashMap<>();
         // Targets are resolved, and usages followed, in the base scope: `modules` restricts only the result (see
         // matchesAllFilters), while a related seed is usually declared outside it - which elements of B and C does A use
         GlobalSearchScope baseScope = ApplicationManager.getApplication().runReadAction((Computable<GlobalSearchScope>) () -> buildScope(project, query.optString("scope")));
@@ -1150,7 +1150,7 @@ public class MCPSearchUtils {
                                              @Nullable Map<LSFMCPDeclaration, Direction> related, // null - no filter
                                              GlobalSearchScope scope,
                                              GlobalSearchScope baseScope, // where usages are followed - not narrowed by `modules`
-                                             ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
+                                             ConcurrentMap<RelatedKey, Boolean> relatedCache) {
         LSFMCPDeclaration.ElementType t;
         // index, word and file iterations only see the scope, but a related traversal and a class's parents
         // follow references wherever they lead
@@ -1199,58 +1199,69 @@ public class MCPSearchUtils {
         return false;
     }
 
-    enum RelatedState {
-        IN_PROGRESS,
-        TRUE,
-        FALSE
-    }
-
     record RelatedKey(LSFMCPDeclaration stmt, Direction dir) {}
 
+    // memo holds final answers only: it is shared by the filter's tasks, and an element another task is still
+    // searching from may yet turn out to be related.
+    // Within one search, a cycle leads back to an element still being searched from, so the elements on the cycle
+    // can be answered only once that element is: the search finds the strongly connected components (Tarjan) and
+    // memoizes a component when its root is done, since all elements of a component reach the same elements.
     private static boolean matchesRelatedFilters(LSFMCPDeclaration stmt,
                                                  Map<LSFMCPDeclaration, Direction> related,
                                                  GlobalSearchScope scope,
-                                                 ConcurrentMap<RelatedKey, RelatedState> memo) {
+                                                 ConcurrentMap<RelatedKey, Boolean> memo) {
         if (related.isEmpty()) return false; // no related element resolved, or all of them are gone (see QueryTargets)
 
-        class Rec {
-            boolean memoized(RelatedKey key, java.util.function.Supplier<Boolean> calc) {
-                var state = memo.get(key);
-                if (state != null) {
-                    return state == RelatedState.TRUE;
-                }
-                memo.put(key, RelatedState.IN_PROGRESS);
-                boolean result;
-                try {
-                    result = calc.get();
-                } catch (RuntimeException | Error e) {
-                    memo.remove(key, RelatedState.IN_PROGRESS); // read action cancelled - otherwise IN_PROGRESS would be read as FALSE after the restart
-                    throw e;
-                }
-                memo.put(key, result ? RelatedState.TRUE : RelatedState.FALSE);
-                return result;
+        class Search {
+            static final int FOUND = -1;
+            static final int NOT_FOUND = Integer.MAX_VALUE;
+
+            final Direction dir;
+            final Map<LSFMCPDeclaration, Integer> indices = new HashMap<>(); // visit order
+            final List<LSFMCPDeclaration> stack = new ArrayList<>(); // visited, with the component not done yet
+
+            Search(Direction dir) {
+                this.dir = dir;
             }
 
-            boolean dfs(java.util.Collection<LSFMCPDeclaration> cur, Direction dir) {
-                for (var c : cur) {
-                    if (c == null) continue;
-                    if (memoized(new RelatedKey(c, dir), () -> {
-                        Direction relatedDir = related.get(c);
-                        if (relatedDir != null && (relatedDir == Direction.BOTH || relatedDir != dir)) return true;
+            // FOUND if c reaches a related element, otherwise the lowest index on the stack that c reaches
+            int visit(LSFMCPDeclaration c) {
+                Boolean known = memo.get(new RelatedKey(c, dir));
+                if (known != null) return known ? FOUND : NOT_FOUND;
+                Direction relatedDir = related.get(c);
+                if (relatedDir != null && (relatedDir == Direction.BOTH || relatedDir != dir)) return FOUND;
+                Integer index = indices.get(c);
+                if (index != null) return index; // on the stack: a visited element off it is memoized
 
-                        return dfs((dir == Direction.USES)
-                                ? nextUses(c, scope)
-                                : nextUsed(c, scope), dir);
-                    })) {
-                        return true;
-                    }
+                index = indices.size();
+                indices.put(c, index);
+                stack.add(c);
+                int low = index;
+                for (LSFMCPDeclaration next : dir == Direction.USES ? nextUses(c, scope) : nextUsed(c, scope)) {
+                    int nextLow = visit(next);
+                    if (nextLow == FOUND) return FOUND;
+                    low = Math.min(low, nextLow);
                 }
-                return false;
+                if (low == index) { // c is the root of a component, and none of its elements reaches a related one
+                    LSFMCPDeclaration member;
+                    do {
+                        member = stack.remove(stack.size() - 1);
+                        memo.put(new RelatedKey(member, dir), false);
+                    } while (member != c);
+                }
+                return low;
+            }
+
+            boolean matches() {
+                if (visit(stmt) != FOUND) return false;
+                // each element on the stack reaches one being searched from, and so the related element found
+                for (LSFMCPDeclaration c : stack)
+                    memo.put(new RelatedKey(c, dir), true);
+                return true;
             }
         }
 
-        var rec = new Rec();
-        return rec.dfs(Collections.singletonList(stmt), Direction.USES) || rec.dfs(Collections.singletonList(stmt), Direction.USED);
+        return new Search(Direction.USES).matches() || new Search(Direction.USED).matches();
     }
 
     private static boolean processStatement(LSFFullNameDeclaration element, Processor<LSFMCPDeclaration> out) {

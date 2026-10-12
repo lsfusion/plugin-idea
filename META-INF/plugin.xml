@@ -11,6 +11,7 @@
         <b>Version 1.0.316</b><br>
         <ul>
             <li>Fixed MCP <code>lsfusion_find_elements</code> occasionally returning nothing for a <code>moreFilters</code> entry or dropping part of the result</li>
+            <li>Fixed MCP <code>lsfusion_find_elements</code> with <code>relatedElements</code> missing elements related through a cycle, e.g. mutually recursive actions, and occasionally many others</li>
         </ul>
     ]]>
     </change-notes>
