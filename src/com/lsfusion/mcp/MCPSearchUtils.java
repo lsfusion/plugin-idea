@@ -50,6 +50,7 @@ import com.lsfusion.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.jspecify.annotations.NonNull;
 
@@ -197,6 +198,9 @@ public class MCPSearchUtils {
     }
 
     private static @NonNull GlobalSearchScope searchElements(@NonNull Project project, @NonNull JSONObject query, SearchState state, long searchBudgetMillis, AtomicBoolean timeoutHit, List<String> errors) {
+        // Parsed first: a malformed `moreFilters` fails the call before any search task is started
+        List<JSONObject> moreFilters = parseMoreFilters(query.optString("moreFilters"));
+
         // Build iterations: run all applicable types simultaneously with in-iteration filtering
 
         // Executor and dynamic scheduling support
@@ -204,24 +208,27 @@ public class MCPSearchUtils {
         // Tasks run under this indicator: PSI / search code reacts to its cancellation (checkCanceled),
         // while it ignores the Thread.interrupt() from exec.shutdownNow()
         ProgressIndicator indicator = new EmptyProgressIndicator();
-        Runnable awaitAll = createAwaitAll(exec, searchBudgetMillis, timeoutHit, state.stopRequested, indicator);
+        Runnable awaitAll = createAwaitAll(exec, searchBudgetMillis, timeoutHit);
         // helper to submit tasks with accounting
         TaskSubmitter submit = createSubmit(exec, state, errors, indicator);
 
-        GlobalSearchScope searchScope = run(project, query, state, submit);
+        try {
+            GlobalSearchScope searchScope = run(project, query, state, submit);
+            for (JSONObject filter : moreFilters)
+                searchScope = searchScope.union(run(project, filter, state, submit));
+            state.allSubmitted();
 
-        String moreFiltersStr = query.optString("moreFilters", "");
-        JSONArray moreFilters = !moreFiltersStr.isEmpty() ? new JSONArray(moreFiltersStr) : null;
+            // Wait for all tasks to complete (but keep a reserve for post-processing)
+            awaitAll.run();
 
-        if (moreFilters != null && !moreFilters.isEmpty())
-            for (int i = 0; i < moreFilters.length(); i++)
-                searchScope = searchScope.union(run(project, moreFilters.optJSONObject(i), state, submit));
-        state.allSubmitted();
-
-        // Wait for all tasks to complete (but keep a reserve for post-processing)
-        awaitAll.run();
-
-        return searchScope;
+            return searchScope;
+        } finally {
+            // Stops the tasks still running past the search budget - and those submitted before a filter failed, which
+            // would otherwise run on with no deadline, with the executor's threads never ending
+            state.stopRequested.set(true);
+            indicator.cancel();
+            exec.shutdownNow();
+        }
     }
 
     private static JSONArray sortAndTruncate(List<SelectedStatement>[] state, int maxSymbols, List<SelectedStatement> bestStatements) {
@@ -298,25 +305,19 @@ public class MCPSearchUtils {
         };
     }
 
-    private static Runnable createAwaitAll(ExecutorService exec, long searchBudgetMillis, AtomicBoolean timeoutHit, AtomicBoolean stopRequested, ProgressIndicator indicator) {
+    private static Runnable createAwaitAll(ExecutorService exec, long searchBudgetMillis, AtomicBoolean timeoutHit) {
         return () -> {
+            exec.shutdown();
             try {
-                exec.shutdown();
-                try {
-                    // Reserve time for post-processing by waiting only for the search budget.
-                    boolean terminated = exec.awaitTermination(searchBudgetMillis, TimeUnit.MILLISECONDS);
-                    if (!terminated) {
-                        timeoutHit.set(true);
-                    }
-                } catch (InterruptedException ie) {
-                    // Requested: treat interruption of awaitTermination as a timeout hit.
+                // Reserve time for post-processing by waiting only for the search budget.
+                boolean terminated = exec.awaitTermination(searchBudgetMillis, TimeUnit.MILLISECONDS);
+                if (!terminated) {
                     timeoutHit.set(true);
-                    Thread.currentThread().interrupt();
                 }
-            } finally {
-                stopRequested.set(true);
-                indicator.cancel();
-                exec.shutdownNow();
+            } catch (InterruptedException ie) {
+                // Requested: treat interruption of awaitTermination as a timeout hit.
+                timeoutHit.set(true);
+                Thread.currentThread().interrupt();
             }
         };
     }
@@ -328,10 +329,10 @@ public class MCPSearchUtils {
                 try {
                     ProgressManager.getInstance().executeProcessUnderProgress(r, indicator);
                 } catch (ProcessCanceledException e) {
-                    // search budget timeout / explicit stop cancelled the indicator (see createAwaitAll);
+                    // search budget timeout / explicit stop cancelled the indicator (see searchElements);
                     // this is the top of our own executor task, so there is nobody to rethrow to
                 } catch (Throwable t) {
-                    // exec.shutdownNow() (search budget timeout / explicit stop, see createAwaitAll) interrupts
+                    // exec.shutdownNow() (search budget timeout / explicit stop, see searchElements) interrupts
                     // in-flight tasks; the platform's concurrent PSI search surfaces that as a wrapped
                     // InterruptedException rather than ProcessCanceledException. That's expected cancellation,
                     // not a real failure, so don't log it as an error.
@@ -1079,6 +1080,25 @@ public class MCPSearchUtils {
             if (t != null) res.add(t);
         }
         return res;
+    }
+
+    private static @NotNull List<JSONObject> parseMoreFilters(@NotNull String moreFiltersJson) {
+        if (moreFiltersJson.isEmpty()) return Collections.emptyList();
+
+        JSONArray array;
+        try {
+            array = new JSONArray(moreFiltersJson);
+        } catch (JSONException e) {
+            throw new IllegalArgumentException("`moreFilters` is not a JSON array: " + e.getMessage());
+        }
+        List<JSONObject> filters = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject filter = array.optJSONObject(i);
+            if (filter == null)
+                throw new IllegalArgumentException("`moreFilters[" + i + "]` is not a filter object: " + JSONObject.valueToString(array.opt(i)));
+            filters.add(filter);
+        }
+        return filters;
     }
 
     // endregion

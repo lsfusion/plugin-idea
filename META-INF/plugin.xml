@@ -12,6 +12,7 @@
         <ul>
             <li>Fixed MCP <code>lsfusion_find_elements</code> occasionally returning nothing for a <code>moreFilters</code> entry or dropping part of the result</li>
             <li>Fixed MCP <code>lsfusion_find_elements</code> with <code>relatedElements</code> missing elements related through a cycle, e.g. mutually recursive actions, and occasionally many others</li>
+            <li>Fixed MCP <code>lsfusion_find_elements</code> leaving its search running in the background when <code>moreFilters</code> is not a JSON array of filter objects; the error now says what is wrong with it</li>
         </ul>
     ]]>
     </change-notes>
