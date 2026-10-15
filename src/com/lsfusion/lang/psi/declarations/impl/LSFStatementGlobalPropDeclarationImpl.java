@@ -217,7 +217,8 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
                 Set<LSFActionOrGlobalPropDeclaration<?, ?>> dependencies = PropertyDependenciesCache.getInstance(prop.getProject()).resolveWithCaching((LSFGlobalPropDeclaration<?, ?>) prop);
                 if(dependencies != null) {
                     for (LSFActionOrGlobalPropDeclaration<?, ?> dependency : dependencies) {
-                        complexity += getPropComplexity((LSFGlobalPropDeclaration<?, ?>) dependency, processed);
+                        if (dependency instanceof LSFGlobalPropDeclaration<?, ?> propDependency)
+                            complexity += getPropComplexity(propDependency, processed);
                     }
                 }
             }
@@ -280,7 +281,9 @@ public abstract class LSFStatementGlobalPropDeclarationImpl extends LSFActionOrG
         Set<LSFActionOrGlobalPropDeclaration<?, ?>> dependencies = PropertyDependenciesCache.getInstance(statementProp.getProject()).resolveWithCaching(statementProp);
         if (dependencies != null) {
             for (LSFActionOrGlobalPropDeclaration<?, ?> dependency : dependencies) {
-                complexity = Math.max(complexity, 1 + getPropComplexity((LSFGlobalPropDeclaration<?, ?>) dependency, processed));
+                // an implementation may call an action with RETURN, e.g. "foo(a) += act(a);"
+                if (dependency instanceof LSFGlobalPropDeclaration<?, ?> propDependency)
+                    complexity = Math.max(complexity, 1 + getPropComplexity(propDependency, processed));
             }
         }
         return complexity;
