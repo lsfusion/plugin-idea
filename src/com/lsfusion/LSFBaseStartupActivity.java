@@ -1,7 +1,12 @@
 package com.lsfusion;
 
+import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.fileTypes.UnknownFileType;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -28,6 +33,15 @@ public class LSFBaseStartupActivity implements ProjectActivity, DumbAware {
         // fileOpened() subscription would miss.
         EditorFactory.getInstance().getEventMulticaster()
                 .addCaretListener(new LSFFileEditorCaretListener(project), pluginScope);
+
+        // Versions 1.0.310-1.0.315 declared jrxml for the XML file type once more. Unloading the plugin (an update without
+        // a restart) dropped jrxml from XML, and settings saved meanwhile kept that as the user's own removal, so .jrxml
+        // reports open as plain text, with no lsFusion injections. Unknown means that no file type claims jrxml at all.
+        FileTypeManager fileTypeManager = FileTypeManager.getInstance();
+        if (fileTypeManager.getFileTypeByExtension("jrxml") == UnknownFileType.INSTANCE) {
+            ApplicationManager.getApplication().invokeLater(() ->
+                    WriteAction.run(() -> fileTypeManager.associateExtension(XmlFileType.INSTANCE, "jrxml")));
+        }
 
         return Unit.INSTANCE;
     }

@@ -8,33 +8,9 @@
     <description>Plugin provides lsFusion language support.</description>
 
     <change-notes><![CDATA[
-        <b>Version 1.0.315</b><br>
+        <b>Version 1.0.316</b><br>
         <ul>
-            <li>Forms windows: <code>WINDOW w FORMS [TABBED | NOTABBED] [CLOSE n | NOCLOSE]</code>, <code>EXTEND WINDOW w FORMS ...</code> and the <code>AUTOSIZE</code> window option; <code>SHOW</code> / <code>DIALOG ... WINDOW [w]</code> opens a form into a named window, <code>SHOW ... ACTIVATE [USER]</code> activates the form already open there instead of opening a second one, and <code>ACTIVATE FORM</code> / <code>CLOSE FORM</code> take <code>['label' =] [form] [WINDOW w]</code></li>
-            <li>A single lsFusion warning can be silenced with <code>//noinspection LSFTypeMismatch</code> above the statement or <code>//file:noinspection LSFDeprecated70</code> at the top of the module, from Alt+Enter as in any other language</li>
-            <li><code>DOCKED</code> in <code>SHOW</code> / <code>DIALOG</code> is deprecated, with a quick fix replacing it with <code>WINDOW</code></li>
-            <li><code>SEEK</code> and the object value <code>VALUE</code> are reported as deprecated since 6.2, where <code>ACTIVATE</code> / <code>ACTIVE</code> appeared, with quick fixes replacing them</li>
-            <li>Deprecation warnings show the version the construct was actually replaced in: <code>showGroup</code>, <code>changeKeyPriority</code> and <code>changeMousePriority</code> since 5.2 (removed in 7.0), <code>panelCaptionLast</code>, <code>panelCaptionAlignment</code>, <code>imagePath</code> and <code>headerHeight</code> since 6.0</li>
-            <li>Fixed <code>ACTIVE form.object</code> / <code>VALUE form.object</code> reporting the object as an unresolved symbol: the operand is resolved as a form object, not as a group object</li>
-            <li>Fixed reading documentation articles through the IDE's MCP server</li>
-            <li>Fixed <code>Recursive compile</code> launches failing right after a clean</li>
-            <li>lsFusion notifications are listed in Settings | Appearance &amp; Behavior | Notifications from the start and under readable names: <b>lsFusion</b>, <b>lsFusion errors</b>, <b>lsFusion warnings</b>, <b>lsFusion META</b>, <b>lsFusion refactoring</b></li>
-            <li>Go to Class / Go to Symbol with the <b>All Places</b> scope no longer list the platform elements twice when the platform sources (<code>-sources.jar</code>) are downloaded</li>
-            <li>Go to Symbol (Ctrl+Alt+Shift+N) lists each property and action once instead of twice</li>
-            <li>In lsFusion files Ctrl+Alt+W runs Fast Insert Composition instead of Kotlin's Run Scratch File, which has the same default shortcut</li>
-            <li>Insert Composition puts the expression into the right argument of a property with several parameters when a parameter's class is a superclass of the expression's or two parameters have the same class, and no longer fails on a parameter of an unknown class</li>
-            <li>Insert Composition (Ctrl+Alt+W / Ctrl+Alt+Shift+W) also offers the actions with <code>RETURN</code>, which can be used in an expression</li>
-            <li><code>NAVIGATOR</code>: adding an element into a form or action element (<code>NEW</code>, <code>MOVE</code> or a positioned edit inside its body) is reported as an error, as the server does - only a folder can have children</li>
-            <li>"Action parameters must be defined explicitly" is reported also when the operator that extends the context (<code>&lt;-</code>, <code>FOR</code>, <code>NEW</code>, ...) is nested in <code>IF</code>, <code>CASE</code>, <code>{ }</code>, <code>TRY</code> etc. of an action declared without parameters, and only once per action</li>
-            <li>Fixed false localization key errors inside <code>${...}</code>, <code>$I{...}</code> and <code>$R{...}</code> in string literals, e.g. for a file name with spaces</li>
-            <li>Support the <code>$M{imageName}</code> inline sequence in string literals: the image name is no longer taken for a localization key</li>
-            <li>In the Java classes of the downloaded platform sources (<code>-sources.jar</code>) Ctrl+click on the names in <code>findClass</code> / <code>findProperty</code> / <code>findAction</code> goes to their lsFusion declarations</li>
-            <li>Raw string literals are taken as is: <code>${...}</code> and <code>{...}</code> in them are no longer treated as interpolation and localization keys</li>
-            <li>Inside <code>${...}</code> only the declarations above the string literal are visible, as on the server</li>
-            <li>Go to Declaration and Rename of a parameter used inside <code>${...}</code> of a string literal work with its real declaration, and renaming an element used before the string literal in the same statement no longer fails</li>
-            <li>A <code>LOCAL</code> property used inside <code>${...}</code> of a string literal is no longer reported as an ambiguous reference</li>
-            <li>Live design preview opens the form under the caret as soon as the web client page loads</li>
-            <li>Fixed Design and LSF Dependencies tool windows in IntelliJ IDEA 2026.3</li>
+            <li>Fixed <code>.jrxml</code> reports opening as plain text after a plugin update</li>
         </ul>
     ]]>
     </change-notes>
@@ -338,8 +314,8 @@
                                         implementationClass="com.lsfusion.dependencies.property.PropertyTableLineMarkerProvider"/>
 
         <!-- reports related stuff -->
-        <!-- Associate the .jrxml extension with the platform's built-in XML file type (name-reference form: no implementationClass). -->
-        <fileType name="XML" extensions="jrxml"/>
+        <!-- No <fileType name="XML" extensions="jrxml"/>: the platform's XML file type already lists jrxml, and the platform
+             removes the extensions such an entry adds whenever the plugin is unloaded, including the ones it had anyway -->
         <codeInsight.lineMarkerProvider language="Lsf"
                                         implementationClass="com.lsfusion.reports.JrxmlLinkLineMarkerProvider"/>
 
