@@ -9,6 +9,7 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -33,6 +34,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import com.intellij.util.containers.ContainerUtil;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.lsfusion.lang.LSFElementGenerator;
 import com.lsfusion.lang.LSFFileType;
 import com.lsfusion.lang.LSFReferenceAnnotator;
@@ -85,6 +87,23 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         // AST-backed, so the parsed trees of those files cannot be released while the entry lives. Dropping the
         // whole cache when the IDE runs low on memory costs one usage search per declaration edited afterwards.
         LowMemoryWatcher.register(cacheUsages::clear, this);
+
+        // Library modules can't be saved, so the metacode inlined into them lives in unsaved documents only, and their
+        // stubs - in the in-memory index of unsaved documents. Whenever any document leaves the unsaved list without a
+        // write (an edit undone and then saved, say), the IDE wipes that whole in-memory index but may go on treating the
+        // remaining unsaved documents as indexed, so lookups in those modules read the jar's text without the inlined code
+        // ("PSI and index do not match") until something else resets that state. Reindexing them resets it at once.
+        ApplicationManager.getApplication().getMessageBus().connect(this).subscribe(FileDocumentManagerListener.TOPIC, new FileDocumentManagerListener() {
+            @Override
+            public void unsavedDocumentsDropped() {
+                FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+                for (Document document : fileDocumentManager.getUnsavedDocuments()) {
+                    VirtualFile file = fileDocumentManager.getFile(document);
+                    if (file != null && !file.isWritable() && file.getFileType() == LSFFileType.INSTANCE)
+                        FileBasedIndex.getInstance().requestReindex(file); // only queues the file, the next index lookup reindexes it
+                }
+            }
+        });
     }
 
     // Plugin unload disposes the service but leaves the project alive, so myProject.isDisposed() cannot be
