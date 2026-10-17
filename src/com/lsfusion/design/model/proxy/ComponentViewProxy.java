@@ -24,9 +24,10 @@ public class ComponentViewProxy<T extends ComponentView> extends ViewProxy<T> {
         target.activated = activated;
     }
 
-    // `custom = NULL`, the platform's standard view, is the one value any component takes - and the standard view is
-    // what the preview draws a component that is not a container with anyway (a container takes a custom view too)
+    // a component's custom view - a React component, a container's design, a property's render function -, which the
+    // preview draws with the standard view all the same; NULL, the standard view, drops the one given before
     public void setCustom(Object custom) {
+        target.custom = custom != null ? custom.toString() : null;
     }
 
     /* ========= constraints properties ========= */

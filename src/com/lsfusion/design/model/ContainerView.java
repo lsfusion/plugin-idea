@@ -42,7 +42,6 @@ public class ContainerView extends ComponentView {
             new ReflectionProperty("grid"),
             new ReflectionProperty("wrap"),
             new ReflectionProperty("resizeOverflow"),
-            new ReflectionProperty("custom").setExpert(),
             new ReflectionProperty("columns").setExpert(), //deprecated in 5.2, removed in 6.0
             new ReflectionProperty("lines"),
             new ReflectionProperty("reversed").setExpert(),
@@ -86,8 +85,6 @@ public class ContainerView extends ComponentView {
     public boolean wrap;
 
     public boolean resizeOverflow;
-
-    public String custom;
 
     public int lines = 1;
 

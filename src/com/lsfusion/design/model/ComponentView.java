@@ -54,7 +54,8 @@ public abstract class ComponentView extends PropertiesContainer {
             new ReflectionProperty("background"),
             new ReflectionProperty("foreground"),
             new ReflectionProperty("imagePath").setExpert(), //removed in v6
-            new ReflectionProperty("showIf")
+            new ReflectionProperty("showIf"),
+            new ReflectionProperty("custom").setExpert()
     );
 
     @Override
@@ -99,6 +100,10 @@ public abstract class ComponentView extends PropertiesContainer {
     public String imagePath;
 
     public boolean showIf;
+
+    // its custom view, which the preview does not draw: a React component's name, a container's design, a property's
+    // render function - none for the standard view
+    public String custom;
 
     public ComponentView() {
         this("");
