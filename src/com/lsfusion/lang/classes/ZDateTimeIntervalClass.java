@@ -10,6 +10,11 @@ public class ZDateTimeIntervalClass extends DateTimeIntervalClass {
     }
 
     @Override
+    public String getCanonicalName() {
+        return "ZDATETIMEINTERVAL";
+    }
+
+    @Override
     public String getCaption() {
         return "Zoned Datetime Interval";
     }

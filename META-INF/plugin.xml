@@ -11,6 +11,7 @@
         <b>Version 1.0.316</b><br>
         <ul>
             <li>Fixed <code>.jrxml</code> reports opening as plain text after a plugin update</li>
+            <li><code>migration.script</code>: signatures accept every canonical class name (<code>DATEINTERVAL</code>, <code>JSONTEXT</code>, <code>XML</code>, ...), and a rename writes interval classes by their canonical names</li>
         </ul>
     ]]>
     </change-notes>

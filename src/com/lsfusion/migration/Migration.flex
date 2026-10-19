@@ -29,18 +29,20 @@ LINE_WS = [ \t\f]
 DIGITS = [0-9]+
 FIRST_ID_LETTER	= [a-zA-Z_]
 NEXT_ID_LETTER = [a-zA-Z_0-9]
-INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
 
 %%
 <YYINITIAL> {
     ({LINE_WS} | {EOL})+                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
     "//" [^\n\r]*                         { return COMMENTS; }
     
+    // the canonical class names, then the names of files and links of a specific format, which the server accepts with a warning
     "INTEGER" | "DOUBLE" | "LONG" | "BOOLEAN" | "TBOOLEAN"
-    | "DATETIME" | "DATE" | "YEAR" | "TIME" | "ZDATETIME" | "INTERVAL" ("["{INTERVAL_TYPE}"]")
-    | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "VIDEOFILE" | "DBFFILE" | "RAWFILE" | "FILE" | "EXCELFILE" | "TEXTFILE" | "CSVFILE" | "HTMLFILE" | "JSONFILE" | "XMLFILE" | "TABLEFILE" | "NAMEDFILE"
-    | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "VIDEOLINK" | "DBFLINK" | "RAWLINK" | "LINK" | "EXCELLINK" | "TEXTLINK" | "CSVLINK" | "HTMLLINK" | "JSONLINK" | "XMLLINK" | "TABLELINK" | HTML
-    | "STRING" | "NUMERIC" | "COLOR"      { return PRIMITIVE_TYPE; }
+    | "DATE" | "TIME" | "DATETIME" | "ZDATETIME" | "YEAR"
+    | "DATEINTERVAL" | "DATETIMEINTERVAL" | "TIMEINTERVAL" | "ZDATETIMEINTERVAL"
+    | "STRING" | "NUMERIC" | "COLOR" | "JSON" | "JSONTEXT" | "XML" | "HTML" | "TSVECTOR" | "TSQUERY"
+    | "FILE" | "RAWFILE" | "NAMEDFILE" | "LINK" | "RAWLINK"
+    | "WORDFILE" | "IMAGEFILE" | "PDFFILE" | "VIDEOFILE" | "DBFFILE" | "EXCELFILE" | "TEXTFILE" | "CSVFILE" | "HTMLFILE" | "JSONFILE" | "XMLFILE" | "TABLEFILE"
+    | "WORDLINK" | "IMAGELINK" | "PDFLINK" | "VIDEOLINK" | "DBFLINK" | "EXCELLINK" | "TEXTLINK" | "CSVLINK" | "HTMLLINK" | "JSONLINK" | "XMLLINK" | "TABLELINK"      { return PRIMITIVE_TYPE; }
                       
     "V" {DIGITS} ("." {DIGITS})*          { return VERSION; }
   

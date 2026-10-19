@@ -15,6 +15,11 @@ public class DateTimeIntervalClass extends FormatClass {
     }
 
     @Override
+    public String getCanonicalName() {
+        return "DATETIMEINTERVAL";
+    }
+
+    @Override
     public String getCaption() {
         return "Datetime Interval";
     }

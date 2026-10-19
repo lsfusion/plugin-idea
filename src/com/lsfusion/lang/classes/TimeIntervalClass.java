@@ -15,6 +15,11 @@ public class TimeIntervalClass extends FormatClass {
     }
 
     @Override
+    public String getCanonicalName() {
+        return "TIMEINTERVAL";
+    }
+
+    @Override
     public String getCaption() {
         return "Time Interval";
     }
