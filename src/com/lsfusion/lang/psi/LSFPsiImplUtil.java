@@ -1007,7 +1007,7 @@ public class LSFPsiImplUtil {
             case "JSONFILE":
                 return JSONFileClass.instance;
             case "XMLFILE":
-                return XMLClass.instance;
+                return XMLFileClass.instance;
             case "TABLEFILE":
                 return TableClass.instance;
             case "NAMEDFILE":
@@ -1056,6 +1056,10 @@ public class LSFPsiImplUtil {
                 return ColorClass.instance;
             case "JSON":
                 return JSONClass.instance;
+            case "JSONTEXT":
+                return JSONTextClass.instance;
+            case "XML":
+                return XMLClass.instance;
             case "TSVECTOR":
                 return TSVectorClass.instance;
             case "TSQUERY":
@@ -1657,12 +1661,12 @@ public class LSFPsiImplUtil {
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFJsonFormPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
-        return LSFExClassSet.json;
+        return sourceStatement.getNode().findChildByType(LSFTypes.JSONTEXT) != null ? LSFExClassSet.jsonText : LSFExClassSet.json;
     }
 
     @Nullable
     public static LSFExClassSet resolveInferredValueClass(@NotNull LSFJsonPropertyDefinition sourceStatement, @Nullable InferExResult inferred) {
-        return LSFExClassSet.json;
+        return sourceStatement.getNode().findChildByType(LSFTypes.JSONTEXT) != null ? LSFExClassSet.jsonText : LSFExClassSet.json;
     }
 
     @Nullable

@@ -29,6 +29,7 @@ public class LSFExClassSet {
     public final static LSFExClassSet logical = new LSFExClassSet(LogicalClass.instance);
     public final static LSFExClassSet text = new LSFExClassSet(new StringClass(false, false, ExtInt.UNLIMITED));
     public final static LSFExClassSet json = new LSFExClassSet(JSONClass.instance);
+    public final static LSFExClassSet jsonText = new LSFExClassSet(JSONTextClass.instance);
 
     public LSFExClassSet(LSFClassSet classSet, boolean orAny) {
         assert classSet!=null; 
