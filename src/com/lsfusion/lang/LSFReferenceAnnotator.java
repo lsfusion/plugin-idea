@@ -53,6 +53,7 @@ import com.lsfusion.lang.psi.references.impl.LSFReferenceImpl;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
 import com.lsfusion.util.BaseUtils;
 import com.lsfusion.inspections.LSFProblemsVisitor;
+import com.lsfusion.util.LSFPsiUtils;
 import com.lsfusion.util.LSFStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -1409,6 +1410,41 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private void addTypeMismatchError(LSFAssignActionPropertyDefinitionBody o, LSFClassSet class1, LSFClassSet class2) {
         addUnderscoredErrorWithResolving(o, String.format("Type mismatch: can't cast %s to %s", class1.getCanonicalName(), class2.getCanonicalName())); // uses resolving
+    }
+
+    @Override
+    public void visitNewWhereActionPropertyDefinitionBody(@NotNull LSFNewWhereActionPropertyDefinitionBody o) {
+        super.visitNewWhereActionPropertyDefinitionBody(o);
+
+        LSFPropertyExpression where = o.getPropertyExpression();
+        LSFMappedPropertyExprParam to = o.getMappedPropertyExprParam();
+        if (where == null || to == null)
+            return;
+
+        // an object is created for every set of the WHERE parameters, so TO takes each of them once and nothing else
+        List<LSFExprParamDeclaration> whereParams = LSFPsiUtils.resolveParams(where, LSFPsiUtils.getContextParams(o, new LSFLocalSearchScope(o), false, false));
+        Set<LSFExprParamDeclaration> toParams = new HashSet<>();
+        for (LSFExprParameterUsage param : to.getExprParameterUsageList().getExprParameterUsageList()) {
+            LSFExprParamDeclaration decl = param.getExprParameterNameUsage().resolveDecl();
+            if (decl == null)
+                continue;
+            if (!whereParams.contains(decl))
+                addUnderscoredErrorWithResolving(param, param.getTextRange(), "TO clause should use only local parameters introduced in WHERE clause");
+            else if (!toParams.add(decl))
+                addUnderscoredErrorWithResolving(param, param.getTextRange(), "names of parameters should be distinct");
+        }
+        for (LSFExprParamDeclaration whereParam : whereParams)
+            if (!toParams.contains(whereParam))
+                addUnderscoredErrorWithResolving(to, to.getTextRange(), format("local param '%s' introduced in WHERE clause must be used in TO clause", whereParam.getDeclName()));
+
+        LSFPropertyUsage toProperty = to.getPropertyUsage();
+        if (toProperty.resolveDecl() instanceof LSFPropertyStatement toDecl) {
+            LSFExpressionUnfriendlyPD unfriendlyPD = toDecl.getPropertyCalcStatement().getExpressionUnfriendlyPD();
+            // NATIVE and the form properties (FILTER, SELECT PROPERTY) may be data properties, so they are not reported
+            if (unfriendlyPD == null || unfriendlyPD.getAbstractPropertyDefinition() != null || unfriendlyPD.getFormulaPropertyDefinition() != null
+                    || unfriendlyPD.getGroupPropertyDefinition() != null || unfriendlyPD.getAggrPropertyDefinition() != null || unfriendlyPD.getReflectionPropertyDefinition() != null)
+                addUnderscoredErrorWithResolving(toProperty, toProperty.getTextRange(), format("'%s' is only allowed to be DATA property", toProperty.getCompoundID().getText()));
+        }
     }
 
     @Override

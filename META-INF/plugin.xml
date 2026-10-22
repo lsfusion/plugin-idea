@@ -15,6 +15,7 @@
             <li><code>JSONTEXT</code> and <code>XML</code> are classes of their own: <code>JSONTEXT FROM ...</code> and <code>JSONTEXT(form)</code> give <code>JSONTEXT</code>, not <code>JSON</code>, and both names are offered in completion</li>
             <li>Support resizeShrink design option</li>
             <li>Accept expressions for the CSV separator and CHARSET of IMPORT / EXPORT</li>
+            <li><code>NEW ... WHERE ... TO</code>: errors for an invalid <code>TO</code> list or a non-<code>DATA</code> <code>TO</code> property</li>
         </ul>
     ]]>
     </change-notes>
