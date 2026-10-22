@@ -34,6 +34,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
             new ReflectionProperty("headerHeight").setExpert(), //deprecated since 6.2
             new ReflectionProperty("captionHeight").setExpert(),
             new ReflectionProperty("resizeOverflow").setExpert(),
+            new ReflectionProperty("resizeShrink").setExpert(),
             new ReflectionProperty("lineWidth").setExpert(),
             new ReflectionProperty("lineHeight").setExpert()
     );
@@ -63,6 +64,7 @@ public class TreeGroupView extends ComponentView implements PropertyGroupContain
     public int captionHeight;
 
     public boolean resizeOverflow;
+    public boolean resizeShrink;
 
     public int lineWidth;
     public int lineHeight;

@@ -40,6 +40,10 @@ public class GridViewProxy extends ComponentViewProxy<GridView> {
         target.resizeOverflow = resizeOverflow;
     }
 
+    public void setResizeShrink(boolean resizeShrink) {
+        target.resizeShrink = resizeShrink;
+    }
+
     public void setLineWidth(int lineWidth) {
         target.lineWidth = lineWidth;
     }

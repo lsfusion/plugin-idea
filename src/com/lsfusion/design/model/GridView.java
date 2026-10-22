@@ -32,6 +32,7 @@ public class GridView extends ComponentView {
             new ReflectionProperty("captionHeight"),
             new ReflectionProperty("captionCharHeight"),
             new ReflectionProperty("resizeOverflow"),
+            new ReflectionProperty("resizeShrink"),
             new ReflectionProperty("lineWidth"),
             new ReflectionProperty("lineHeight"),
             new ReflectionProperty("enableManualUpdate").setExpert()
@@ -54,6 +55,7 @@ public class GridView extends ComponentView {
     public int captionCharHeight;
 
     public boolean resizeOverflow;
+    public boolean resizeShrink;
 
     public int lineWidth = 0;
     public int lineHeight = 0;
@@ -103,6 +105,11 @@ public class GridView extends ComponentView {
     @SuppressWarnings("unused")
     public boolean isResizeOverflow() {
         return resizeOverflow;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean isResizeShrink() {
+        return resizeShrink;
     }
 
     @SuppressWarnings("unused")

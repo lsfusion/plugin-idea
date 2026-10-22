@@ -181,6 +181,10 @@ public class PropertyDrawViewProxy extends ComponentViewProxy<PropertyDrawView> 
         target.valueFlex = valueFlex;
     }
 
+    public void setResizeShrink(Boolean resizeShrink) {
+        target.resizeShrink = resizeShrink;
+    }
+
     public void setChangeKey(KeyStroke changeKey) {
         target.setChangeKey(changeKey);
     }

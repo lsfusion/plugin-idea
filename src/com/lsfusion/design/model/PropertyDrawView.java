@@ -70,6 +70,7 @@ public class PropertyDrawView extends ComponentView {
             new ReflectionProperty("charHeight").setExpert(),
             new ReflectionProperty("charWidth").setExpert(),
             new ReflectionProperty("valueFlex"),
+            new ReflectionProperty("resizeShrink").setExpert(),
             new ReflectionProperty("panelCustom").setExpert(),
             new ReflectionProperty("changeKey"),
             new ReflectionProperty("changeKeyPriority"),
@@ -165,6 +166,8 @@ public class PropertyDrawView extends ComponentView {
     public int charWidth;
 
     public Boolean valueFlex;
+
+    public Boolean resizeShrink;
 
     public boolean panelCustom;
 

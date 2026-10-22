@@ -40,6 +40,10 @@ public class TreeGroupProxy extends ComponentViewProxy<TreeGroupView> {
         target.resizeOverflow = resizeOverflow;
     }
 
+    public void setResizeShrink(boolean resizeShrink) {
+        target.resizeShrink = resizeShrink;
+    }
+
     public void setLineWidth(int lineWidth) {
         target.lineWidth = lineWidth;
     }
