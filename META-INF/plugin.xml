@@ -13,7 +13,8 @@
             <li>Fixed <code>.jrxml</code> reports opening as plain text after a plugin update</li>
             <li><code>migration.script</code>: signatures accept every canonical class name (<code>DATEINTERVAL</code>, <code>JSONTEXT</code>, <code>XML</code>, ...), and a rename writes interval classes by their canonical names</li>
             <li><code>JSONTEXT</code> and <code>XML</code> are classes of their own: <code>JSONTEXT FROM ...</code> and <code>JSONTEXT(form)</code> give <code>JSONTEXT</code>, not <code>JSON</code>, and both names are offered in completion</li>
-            <li>The <code>resizeShrink</code> design option of <code>GRID</code> / <code>TREE</code> and <code>PROPERTY</code> (a column can be dragged narrower than its width) is offered in completion and shown in the design preview</li>
+            <li>Support resizeShrink design option</li>
+            <li>Accept expressions for the CSV separator and CHARSET of IMPORT / EXPORT</li>
         </ul>
     ]]>
     </change-notes>

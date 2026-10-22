@@ -983,8 +983,8 @@ exportActionPropertyDefinitionBody ::=
 	    EXPORT mappedForm contextFiltersClause?
         (
             (
-                (   CSV (stringLiteral)? hasHeaderOption? noEscapeOption? (CHARSET stringLiteral)?
-                |   DBF (CHARSET stringLiteral)?
+                (   CSV propertyExpression? hasHeaderOption? noEscapeOption? charsetExpression?
+                |   DBF charsetExpression?
                 |   XLS sheetExpression? hasHeaderOption?
                 |   XLSX sheetExpression? hasHeaderOption?
                 |   TABLE
@@ -994,8 +994,8 @@ exportActionPropertyDefinitionBody ::=
             )
         |
             (
-                (   JSON (CHARSET stringLiteral)?
-                |   XML hasHeaderOption? (CHARSET stringLiteral)?
+                (   JSON charsetExpression?
+                |   XML hasHeaderOption? charsetExpression?
                 )?
                 selectTops?
                 staticDestination?
@@ -1009,6 +1009,12 @@ exportActionPropertyDefinitionBody ::=
 
 sheetExpression ::= SHEET propertyExpression
 
+importSheetExpression ::= SHEET (propertyExpression | ALL)
+
+charsetExpression ::= CHARSET propertyExpression
+
+rootExpression ::= ROOT propertyExpression
+
 contextFiltersClause ::= FILTERS propertyExpression (COMMA propertyExpression)* {
     pin = 1
     implements="com.lsfusion.lang.psi.context.ExtendParamContext"
@@ -1019,12 +1025,12 @@ propertyExpressionWithOrder ::= propertyExpression (DESC)?
 
 exportDataActionPropertyDefinitionBody ::=
 	    EXPORT
-        (   CSV (stringLiteral)? hasHeaderOption? noEscapeOption? (CHARSET stringLiteral)?
-        |   DBF (CHARSET stringLiteral)?
+        (   CSV propertyExpression? hasHeaderOption? noEscapeOption? charsetExpression?
+        |   DBF charsetExpression?
         |   XLS sheetExpression? hasHeaderOption?
         |   XLSX sheetExpression? hasHeaderOption?
-        |   JSON (CHARSET stringLiteral)?
-        |   XML hasHeaderOption? (ROOT propertyExpression)? (TAG propertyExpression)? ATTR? (CHARSET stringLiteral)?
+        |   JSON charsetExpression?
+        |   XML hasHeaderOption? rootExpression? (TAG propertyExpression)? ATTR? charsetExpression?
         |   TABLE
         )?
         FROM nonEmptyAliasedPropertyExpressionList
@@ -1327,20 +1333,20 @@ importFormActionPropertyDefinitionBody ::= IMPORT formUsage (
     methods = [inferActionParamClasses resolveFormDecl getDocumentation]
 }
 
-importActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
-                        |   DBF (MEMO propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
-                        |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))? (WHERE propertyExpression)?
-                        |   JSON (ROOT propertyExpression)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
-                        |   XML (ROOT propertyExpression)? (ATTR)? (WHERE propertyExpression)? (CHARSET stringLiteral)?
-                        |   TABLE (WHERE propertyExpression)?
+importActionSourceType ::=  CSV propertyExpression? hasHeaderOption? noEscapeOption? wherePropertyExpression? charsetExpression?
+                        |   DBF (MEMO propertyExpression)? wherePropertyExpression? charsetExpression?
+                        |   XLS hasHeaderOption? importSheetExpression? wherePropertyExpression?
+                        |   JSON rootExpression? wherePropertyExpression? charsetExpression?
+                        |   XML rootExpression? (ATTR)? wherePropertyExpression? charsetExpression?
+                        |   TABLE wherePropertyExpression?
 
-importFormPlainActionSourceType ::=  CSV (stringLiteral)? (HEADER|NOHEADER)? (ESCAPE|NOESCAPE)? (CHARSET stringLiteral)?
-                                 |   DBF (CHARSET stringLiteral)?
-                                 |   XLS (HEADER|NOHEADER)? (SHEET (propertyExpression | ALL))?
+importFormPlainActionSourceType ::=  CSV propertyExpression? hasHeaderOption? noEscapeOption? charsetExpression?
+                                 |   DBF charsetExpression?
+                                 |   XLS hasHeaderOption? importSheetExpression?
                                  |   TABLE
 
-importFormHierarchicalActionSourceType ::=  JSON (ROOT propertyExpression)? (CHARSET stringLiteral)?
-                                        |   XML (ROOT propertyExpression)? (CHARSET stringLiteral)?
+importFormHierarchicalActionSourceType ::=  JSON rootExpression? charsetExpression?
+                                        |   XML rootExpression? charsetExpression?
 
 newThreadActionPropertyDefinitionBody ::= NEWTHREAD actionPropertyDefinitionBody
                                         (   (   CONNECTION propertyExpression
