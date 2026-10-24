@@ -16,6 +16,7 @@
             <li>Support resizeShrink design option</li>
             <li>Accept expressions for the CSV separator and CHARSET of IMPORT / EXPORT</li>
             <li><code>NEW ... WHERE ... TO</code>: errors for an invalid <code>TO</code> list or a non-<code>DATA</code> <code>TO</code> property</li>
+            <li><code>DESIGN</code>: a component option value that starts with a logical literal, e.g. <code>showIf = TRUE IF flag(i);</code>, is no longer flagged as an error</li>
         </ul>
     ]]>
     </change-notes>

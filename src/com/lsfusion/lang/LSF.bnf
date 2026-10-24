@@ -2648,8 +2648,8 @@ componentPropertyValue ::= //commented literals are in designCalcPropertyObject
                         //|	intLiteral
                         //|	doubleLiteral
                             dimensionLiteral
-                        |	booleanLiteral
-                        |	tbooleanLiteral
+                        |	booleanLiteral &SEMI
+                        |	tbooleanLiteral &SEMI
                         |	boundsIntLiteral
                         |	boundsDoubleLiteral
                         |   containerTypeLiteral
