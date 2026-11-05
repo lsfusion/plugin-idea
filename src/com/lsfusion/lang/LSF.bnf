@@ -2450,7 +2450,7 @@ dockPosition ::= POSITION LBRAC intLiteral COMMA intLiteral COMMA intLiteral COM
 /////////////////////////////// NAVIGATOR STATEMENT ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-navigatorStatement ::= NAVIGATOR navigatorElementStatementBody
+navigatorStatement ::= NAVIGATOR (CUSTOM propertyExpression)? navigatorElementStatementBody
 {
     pin=1
     implements = "com.lsfusion.documentation.LSFDocumentation,com.lsfusion.lang.psi.context.ModifyParamContext,com.lsfusion.mcp.LSFMCPDeclaration"
