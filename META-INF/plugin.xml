@@ -18,6 +18,7 @@
             <li><code>NEW ... WHERE ... TO</code>: errors for an invalid <code>TO</code> list or a non-<code>DATA</code> <code>TO</code> property</li>
             <li><code>DESIGN</code>: a component option value that starts with a logical literal, e.g. <code>showIf = TRUE IF flag(i);</code>, is no longer flagged as an error</li>
             <li><code>NAVIGATOR CUSTOM 'Component'</code>: the React component that lays the windows out</li>
+            <li><code>.jrxml</code>: field names with a <code>.font</code>, <code>.background</code>, <code>.foreground</code> or <code>.image</code> suffix, e.g. <code>nameSku(d).background</code>, are no longer flagged as errors</li>
         </ul>
     ]]>
     </change-notes>

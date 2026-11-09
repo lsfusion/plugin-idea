@@ -22,10 +22,9 @@ import java.util.regex.Pattern;
 import static com.lsfusion.references.FormDeclByReportNameResolver.resolveFormFullNameAndRequires;
 
 public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
-    public static final String headerPostfix = ".header";
-    public static final String footerPostfix = ".footer";
-    public static final String showifPostfix = ".showif";
     public static final String objectPostfix = ".object";
+    // property draw extra types, as ReportConstants in the platform names them
+    private static final String[] propertyPostfixes = {".header", ".footer", ".showif", ".font", ".background", ".foreground", ".image"};
     public static final Pattern fieldExprPattern = Pattern.compile("(\\$F\\s*\\{\\s*)([\\w\\(\\)\\,\\.]+)(\\s*\\})");
 
     @Override
@@ -90,15 +89,18 @@ public class LSFToJrxmlLanguageInjector implements MultiHostInjector {
             private void resolveAndAddInjection(PsiElement host, String refText, int startOffset, int endOffset) {
                 assert host instanceof PsiLanguageInjectionHost;
                 
-                String[] postfixes = {objectPostfix, headerPostfix, footerPostfix, showifPostfix};
-                for (String postfix : postfixes) {
-                    if (refText.endsWith(postfix)) {
-                        endOffset -= postfix.length();
-                        break;
+                boolean isObjRef = refText.endsWith(objectPostfix);
+                if (isObjRef) {
+                    endOffset -= objectPostfix.length();
+                } else {
+                    for (String postfix : propertyPostfixes) {
+                        if (refText.endsWith(postfix)) {
+                            endOffset -= postfix.length();
+                            break;
+                        }
                     }
                 }
-                
-                boolean isObjRef = refText.endsWith(objectPostfix);
+
                 injections.add(new Injection(isObjRef, (PsiLanguageInjectionHost) host, new TextRange(startOffset, endOffset)));
             }
         });
