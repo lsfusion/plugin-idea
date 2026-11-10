@@ -19,6 +19,7 @@
             <li><code>DESIGN</code>: a component option value that starts with a logical literal, e.g. <code>showIf = TRUE IF flag(i);</code>, is no longer flagged as an error</li>
             <li><code>NAVIGATOR CUSTOM 'Component'</code>: the React component that lays the windows out</li>
             <li><code>.jrxml</code>: field names with a <code>.font</code>, <code>.background</code>, <code>.foreground</code> or <code>.image</code> suffix, e.g. <code>nameSku(d).background</code>, are no longer flagged as errors</li>
+            <li>Form property options <code>PIVOT SUM | MAX | MIN</code>, <code>PIVOT LAST [DESC] (...)</code> and <code>PIVOT FORMULA '...' (...)</code> are no longer marked as errors, and references inside them resolve</li>
         </ul>
     ]]>
     </change-notes>
