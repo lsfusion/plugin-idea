@@ -218,7 +218,7 @@ public class LSFProblemsVisitor {
             }
         } else if (element instanceof LSFCustomOptionsLiteral) {
             if ("HEADER".equals(element.getText())) {
-                reportReplace(element, "5.2", "6.0", "OPTIONS", sink);
+                reportReplace(element, "6.0", "8.0", "OPTIONS", sink);
             }
         } else if (element instanceof LSFAutorefreshLiteral) {
             reportWarning(element, "5.2", "6.0", "Use EVENTS ON SCHEDULE PERIOD n formRefresh() instead", sink);
