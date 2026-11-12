@@ -319,6 +319,7 @@ public class LSFProblemsVisitor {
             case "changeKeyPriority": reportWarning(o, "5.2", "7.0", "Use parameter 'priority' in 'changeKey' instead", sink); break;
             case "changeMousePriority": reportWarning(o, "5.2", "7.0", "Use parameter 'priority' in 'changeMouse' instead", sink); break;
             case "expandOnClick": reportWarning(o, "6.2", "7.0", "This will be default behaviour", sink); break;
+            case "boxed": reportWarning(o, "7.0", "Ignored since 7.0", sink); break;
             case "panelCaptionVertical": reportReplace(o, "6.0", "8.0", "captionVertical", sink); break;
             case "panelCaptionLast": reportReplace(o, "6.0", "8.0", "captionLast", sink); break;
             case "panelCaptionAlignment": reportReplace(o, "6.0", "8.0", "captionAlignmentHorz", sink); break;
