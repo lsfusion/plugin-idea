@@ -177,6 +177,7 @@ object RemoteMcpClient {
     /**
      * Calls a remote tool and returns the text from the first content item.
      * Useful for tools that return a single text block (which might be a JSON string).
+     * An error result (`isError`) is thrown as [McpExpectedError] carrying that text.
      */
     @JvmStatic
     @JvmOverloads
@@ -233,7 +234,7 @@ object RemoteMcpClient {
             val text = firstContent.optString("text", null)
                 ?: throw IllegalStateException("Missing 'text' in remote content")
 
-            if (text.startsWith("Error executing tool")) {
+            if (result.optBoolean("isError")) {
                 throw mcpExpectedError(text)
             }
 
