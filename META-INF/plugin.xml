@@ -20,6 +20,7 @@
             <li><code>NAVIGATOR CUSTOM 'Component'</code>: the React component that lays the windows out</li>
             <li><code>.jrxml</code>: field names with a <code>.font</code>, <code>.background</code>, <code>.foreground</code> or <code>.image</code> suffix, e.g. <code>nameSku(d).background</code>, are no longer flagged as errors</li>
             <li>Form property options <code>PIVOT SUM | MAX | MIN</code>, <code>PIVOT LAST [DESC] (...)</code> and <code>PIVOT FORMULA '...' (...)</code> are no longer marked as errors, and references inside them resolve</li>
+            <li>Improved the schema of the <code>lsfusion_report_feedback</code> MCP tool</li>
         </ul>
     ]]>
     </change-notes>

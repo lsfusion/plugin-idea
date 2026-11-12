@@ -8,11 +8,16 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.util.io.HttpRequests
 import com.lsfusion.lang.meta.MetaChangeDetector
 import com.lsfusion.util.LSFFileUtils
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -97,93 +102,174 @@ data class RetrieveDocsOutput(
 )
 
 
-// report_feedback DTOs — mirror mcp/tools/feedback.py (central validates authoritatively).
-// Enum-valued fields are typed as String here (allowed values documented inline) to keep
-// the JSON keys aligned via @SerialName without enum-name mapping.
+// report_feedback DTOs — mirror mcp/tools/feedback.py. The input ones only describe the tool's schema:
+// the report itself is forwarded as the agent sent it (see FeedbackReportArg) and central validates it.
+// The IDE schema has no `default` keyword, so the descriptions state the defaults.
+// Descriptions need the `property:` target: on a constructor `val` a plain annotation goes to
+// the parameter, and the schema reads only the property's serial annotations.
 @Serializable
 data class FbExpectation(
-    @McpDescription(description = "What the agent expected (depersonalized).") val expected: String,
-    @McpDescription(description = "What actually happened (depersonalized).") val actual: String,
+    @property:McpDescription(description = "What the agent expected (depersonalized).") val expected: String,
+    @property:McpDescription(description = "What actually happened (depersonalized).") val actual: String,
 )
 
 @Serializable
 data class FbEvalError(
-    @McpDescription(description = "The error text (depersonalized).") val message: String,
-    @McpDescription(description = "Where it surfaced: syntax|semantic|runtime|unknown.") val phase: String = "unknown",
+    @property:McpDescription(description = "The error text (depersonalized).") val message: String,
+    @property:McpDescription(description = "Where it surfaced. Default: unknown.") val phase: FbEvalPhase = FbEvalPhase.UNKNOWN,
     @SerialName("code_excerpt")
-    @McpDescription(description = "Tiny abstracted snippet if essential — NO full source / project code.") val codeExcerpt: String? = null,
+    @property:McpDescription(description = "Tiny abstracted snippet if essential — NO full source / project code.") val codeExcerpt: String? = null,
     @SerialName("normalized_message")
-    @McpDescription(description = "Optional normalized form (ids/literals stripped) for clustering.") val normalizedMessage: String? = null,
+    @property:McpDescription(description = "Optional normalized form (ids/literals stripped) for clustering.") val normalizedMessage: String? = null,
 )
 
 @Serializable
 data class FbRetrieveQuery(
-    @McpDescription(description = "The query text.") val query: String,
+    @property:McpDescription(description = "The query text.") val query: String,
     @SerialName("returned_sources")
-    @McpDescription(description = "Doc branches/files it surfaced, if noted.") val returnedSources: List<String>? = null,
-    @McpDescription(description = "How useful: helpful|irrelevant|misleading|incomplete.") val usefulness: String? = null,
+    @property:McpDescription(description = "Doc branches/files it surfaced, if noted.") val returnedSources: List<String>? = null,
+    @property:McpDescription(description = "How useful the result was for this error.") val usefulness: FbUsefulness? = null,
 )
 
 @Serializable
 data class FbRecommendation(
     @SerialName("primary_target")
-    @McpDescription(description = "Main artifact to change: how-to|rules|brief|paradigm|language|code-bug|rag-retrieval|eval-error-message.") val primaryTarget: String,
+    @property:McpDescription(description = "Main artifact to change.") val primaryTarget: FbTargetArtifact,
     @SerialName("secondary_targets")
-    @McpDescription(description = "Other plausibly-affected artifacts (same value set as primary_target).") val secondaryTargets: List<String> = emptyList(),
+    @property:McpDescription(description = "Other plausibly-affected artifacts.") val secondaryTargets: List<FbTargetArtifact> = emptyList(),
     @SerialName("suggested_change")
-    @McpDescription(description = "Concrete suggestion (depersonalized).") val suggestedChange: String,
-    @McpDescription(description = "Confidence: low|medium|high.") val confidence: String = "medium",
-    @McpDescription(description = "Why, briefly.") val rationale: String? = null,
+    @property:McpDescription(description = "Concrete suggestion (depersonalized).") val suggestedChange: String,
+    @property:McpDescription(description = "How confident the agent is. Default: medium.") val confidence: FbConfidence = FbConfidence.MEDIUM,
+    @property:McpDescription(description = "Why, briefly.") val rationale: String? = null,
 )
 
 @Serializable
 data class FbToolContext(
     @SerialName("eval_server_kind")
-    @McpDescription(description = "Eval server kind.") val evalServerKind: String? = null,
+    @property:McpDescription(description = "Eval server kind.") val evalServerKind: String? = null,
     @SerialName("eval_server_version")
-    @McpDescription(description = "Eval server version.") val evalServerVersion: String? = null,
+    @property:McpDescription(description = "Eval server version.") val evalServerVersion: String? = null,
 )
 
 @Serializable
 data class FeedbackReportInput(
     @SerialName("agent_journey_id")
-    @McpDescription(description = "Agent-generated id grouping this task's errors/queries.") val agentJourneyId: String,
+    @property:McpDescription(description = "Agent-generated id grouping this task's errors/queries.") val agentJourneyId: String,
     @SerialName("signal_type")
-    @McpDescription(description = "Signal kind: doc-gap|expectation-mismatch|unclear-error|missing-capability|rag-retrieval|other.") val signalType: String,
+    @property:McpDescription(description = "What kind of reinforcement signal this is (routing hint, not the decision).") val signalType: FbSignalType,
     @SerialName("problem_summary")
-    @McpDescription(description = "Short depersonalized task description.") val problemSummary: String,
-    @McpDescription(description = "Suggested fix (a hint for triage, not a decision).") val recommendation: FbRecommendation,
-    @McpDescription(description = "For expectation-mismatch/unclear-error: expected vs actual.") val expectation: FbExpectation? = null,
+    @property:McpDescription(description = "Short depersonalized task description.") val problemSummary: String,
+    @property:McpDescription(description = "Suggested fix (a hint for triage, not a decision).") val recommendation: FbRecommendation,
+    @property:McpDescription(description = "For expectation-mismatch/unclear-error: expected vs actual.") val expectation: FbExpectation? = null,
     @SerialName("eval_errors")
-    @McpDescription(description = "Errors hit while running lsFusion code via eval.") val evalErrors: List<FbEvalError> = emptyList(),
+    @property:McpDescription(description = "Errors hit while running lsFusion code via eval.") val evalErrors: List<FbEvalError> = emptyList(),
     @SerialName("retrieve_queries")
-    @McpDescription(description = "retrieve_docs queries tried while fixing the error.") val retrieveQueries: List<FbRetrieveQuery> = emptyList(),
+    @property:McpDescription(description = "retrieve_docs queries tried while fixing the error.") val retrieveQueries: List<FbRetrieveQuery> = emptyList(),
     @SerialName("retrieved_docs_summary")
-    @McpDescription(description = "Short PUBLIC summaries of retrieved docs (no chunk bodies).") val retrievedDocsSummary: List<String> = emptyList(),
+    @property:McpDescription(description = "Short PUBLIC summaries of retrieved docs (no chunk bodies).") val retrievedDocsSummary: List<String> = emptyList(),
     @SerialName("final_outcome")
-    @McpDescription(description = "How the task ended: fixed|not_fixed|workaround|abandoned|unknown.") val finalOutcome: String = "unknown",
+    @property:McpDescription(description = "How the task ended (guards against survivorship bias). Default: unknown.") val finalOutcome: FbFinalOutcome = FbFinalOutcome.UNKNOWN,
     @SerialName("tool_context")
-    @McpDescription(description = "Optional eval-server context.") val toolContext: FbToolContext? = null,
+    @property:McpDescription(description = "Optional eval-server context.") val toolContext: FbToolContext? = null,
     @SerialName("client_dedup_hint")
-    @McpDescription(description = "Optional agent hint; the SERVER computes the canonical dedup_fingerprint.") val clientDedupHint: String? = null,
+    @property:McpDescription(description = "Optional agent hint; the SERVER computes the canonical dedup_fingerprint.") val clientDedupHint: String? = null,
     @SerialName("lsfusion_version")
-    @McpDescription(description = "lsFusion version, if known.") val lsfusionVersion: String? = null,
+    @property:McpDescription(description = "lsFusion version, if known.") val lsfusionVersion: String? = null,
     @SerialName("deployment_kind")
-    @McpDescription(description = "Deployment kind, if known.") val deploymentKind: String? = null,
-    @McpDescription(description = "Reporting client name/version, e.g. claude-code.") val agent: String? = null,
+    @property:McpDescription(description = "Deployment kind, if known.") val deploymentKind: String? = null,
+    @property:McpDescription(description = "Reporting client name/version, e.g. claude-code.") val agent: String? = null,
     @SerialName("n_eval_attempts")
-    @McpDescription(description = "Number of eval attempts.") val nEvalAttempts: Int? = null,
+    @property:McpDescription(description = "Number of eval attempts.") val nEvalAttempts: Int? = null,
 )
 
 @Serializable
 data class FeedbackOutput(
     @SerialName("report_id")
-    @McpDescription(description = "Server-assigned id for this submission.") val reportId: String,
-    @McpDescription(description = "Outcome: recorded|disabled|rejected.") val status: String,
+    @property:McpDescription(description = "Server-assigned id for this submission.") val reportId: String,
+    // A String, not an enum: a status the central server adds later must still decode.
+    @property:McpDescription(description = "Outcome: recorded|disabled|rejected.") val status: String,
     @SerialName("dedup_fingerprint")
-    @McpDescription(description = "Server-computed clustering fingerprint (when recorded).") val dedupFingerprint: String? = null,
-    @McpDescription(description = "Reason when disabled/rejected.") val detail: String? = null,
+    @property:McpDescription(description = "Server-computed clustering fingerprint (when recorded).") val dedupFingerprint: String? = null,
+    @property:McpDescription(description = "Reason when disabled/rejected.") val detail: String? = null,
 )
+
+// The value sets of the fields above; each entry's @SerialName is the wire value. They stay below
+// `data class FbExpectation`: central's drift test (mcp/tools/tests/test_proxy_schema_drift.py)
+// looks for the report_feedback declarations from there to the toolset class.
+@Serializable
+enum class FbSignalType {
+    @SerialName("doc-gap") DOC_GAP,
+    @SerialName("expectation-mismatch") EXPECTATION_MISMATCH,
+    @SerialName("unclear-error") UNCLEAR_ERROR,
+    @SerialName("missing-capability") MISSING_CAPABILITY,
+    @SerialName("rag-retrieval") RAG_RETRIEVAL,
+    @SerialName("other") OTHER,
+}
+
+@Serializable
+enum class FbTargetArtifact {
+    @SerialName("how-to") HOW_TO,
+    @SerialName("rules") RULES,
+    @SerialName("brief") BRIEF,
+    @SerialName("paradigm") PARADIGM,
+    @SerialName("language") LANGUAGE,
+    @SerialName("code-bug") CODE_BUG,
+    @SerialName("rag-retrieval") RAG_RETRIEVAL,
+    @SerialName("eval-error-message") EVAL_ERROR_MESSAGE,
+}
+
+@Serializable
+enum class FbConfidence {
+    @SerialName("low") LOW,
+    @SerialName("medium") MEDIUM,
+    @SerialName("high") HIGH,
+}
+
+@Serializable
+enum class FbEvalPhase {
+    @SerialName("syntax") SYNTAX,
+    @SerialName("semantic") SEMANTIC,
+    @SerialName("runtime") RUNTIME,
+    @SerialName("unknown") UNKNOWN,
+}
+
+@Serializable
+enum class FbUsefulness {
+    @SerialName("helpful") HELPFUL,
+    @SerialName("irrelevant") IRRELEVANT,
+    @SerialName("misleading") MISLEADING,
+    @SerialName("incomplete") INCOMPLETE,
+}
+
+@Serializable
+enum class FbFinalOutcome {
+    @SerialName("fixed") FIXED,
+    @SerialName("not_fixed") NOT_FIXED,
+    @SerialName("workaround") WORKAROUND,
+    @SerialName("abandoned") ABANDONED,
+    @SerialName("unknown") UNKNOWN,
+}
+
+// The tool parameter: FeedbackReportInput's schema, while the value is the report object exactly as
+// the agent sent it, forwarded unchanged. A value or field central adds after this plugin's release
+// then still reaches it, and central's validation error, which names every bad field with its
+// allowed values, reaches the agent. mcpserver reports any decoding exception other than
+// McpExpectedError as an IDE error blamed on the plugin, so a report that is not an object becomes
+// a tool error here.
+@Serializable(with = FeedbackReportArg.Serializer::class)
+class FeedbackReportArg(val raw: JsonObject) {
+    object Serializer : KSerializer<FeedbackReportArg> {
+        override val descriptor: SerialDescriptor =
+            SerialDescriptor("com.lsfusion.mcp.FeedbackReportArg", FeedbackReportInput.serializer().descriptor)
+
+        override fun serialize(encoder: Encoder, value: FeedbackReportArg) = (encoder as JsonEncoder).encodeJsonElement(value.raw)
+
+        override fun deserialize(decoder: Decoder): FeedbackReportArg = FeedbackReportArg(
+            (decoder as JsonDecoder).decodeJsonElement() as? JsonObject
+                ?: throw RemoteMcpClient.mcpExpectedError("Invalid report: expected a JSON object")
+        )
+    }
+}
 
 
 /**
@@ -441,9 +527,9 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     @Suppress("unused")
     suspend fun reportFeedback(
         @McpDescription(description = "The depersonalized feedback report. NO code, paths, schema/table/customer names, or secrets.")
-        report: FeedbackReportInput,
+        report: FeedbackReportArg,
     ): FeedbackOutput {
-        val args = JSONObject().put("report", JSONObject(json.encodeToString(report)))
+        val args = JSONObject().put("report", JSONObject(report.raw.toString()))
         val resultEl = callRemoteToolResultJson("lsfusion_report_feedback", args)
         return json.decodeFromJsonElement<FeedbackOutput>(resultEl)
     }

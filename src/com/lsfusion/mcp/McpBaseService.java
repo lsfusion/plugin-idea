@@ -430,7 +430,7 @@ public abstract class McpBaseService extends RestService {
                         .put("primary_target", feEnum("Main artifact to change.", targets))
                         .put("secondary_targets", feArrOf(feEnum("", targets), "Other plausibly-affected artifacts."))
                         .put("suggested_change", feStr("Concrete suggestion (depersonalized)."))
-                        .put("confidence", feEnum("How confident the agent is.", feArr("low", "medium", "high")))
+                        .put("confidence", feEnum("How confident the agent is. Default: medium.", feArr("low", "medium", "high")).put("default", "medium"))
                         .put("rationale", feStr("Why, briefly.")))
                 .put("required", feArr("primary_target", "suggested_change"));
         JSONObject expectation = new JSONObject()
@@ -443,7 +443,7 @@ public abstract class McpBaseService extends RestService {
                 .put("type", "object")
                 .put("properties", new JSONObject()
                         .put("message", feStr("The error text (depersonalized)."))
-                        .put("phase", feEnum("Where it surfaced.", feArr("syntax", "semantic", "runtime", "unknown")))
+                        .put("phase", feEnum("Where it surfaced. Default: unknown.", feArr("syntax", "semantic", "runtime", "unknown")).put("default", "unknown"))
                         .put("code_excerpt", feStr("Tiny abstracted snippet if essential — NO full source / project code."))
                         .put("normalized_message", feStr("Optional normalized form (ids/literals stripped) for clustering.")))
                 .put("required", feArr("message"));
@@ -471,8 +471,8 @@ public abstract class McpBaseService extends RestService {
                         .put("eval_errors", feArrOf(evalError, "Errors hit while running lsFusion code via eval."))
                         .put("retrieve_queries", feArrOf(retrieveQuery, "retrieve_docs queries tried while fixing the error."))
                         .put("retrieved_docs_summary", feArrOf(new JSONObject().put("type", "string"), "Short PUBLIC summaries of retrieved docs (no chunk bodies)."))
-                        .put("final_outcome", feEnum("How the task ended (guards against survivorship bias).",
-                                feArr("fixed", "not_fixed", "workaround", "abandoned", "unknown")))
+                        .put("final_outcome", feEnum("How the task ended (guards against survivorship bias). Default: unknown.",
+                                feArr("fixed", "not_fixed", "workaround", "abandoned", "unknown")).put("default", "unknown"))
                         .put("tool_context", toolContext)
                         .put("client_dedup_hint", feStr("Optional agent hint; the SERVER computes the canonical dedup_fingerprint."))
                         .put("lsfusion_version", feStr("lsFusion version, if known."))
