@@ -225,7 +225,10 @@ public class LSFProblemsVisitor {
         } else if (element instanceof LSFDrawRoot) {
             reportWarning(element, "5.2", "6.0", "", sink);
         } else if (element instanceof LSFWindowType) {
-            if (!"NATIVE".equals(element.getText())) {
+            String windowType = element.getText();
+            if ("TOOLBAR".equals(windowType)) { // still accepted (and ignored) by the platform in 6.x
+                reportWarning(element, "5.2", "7.0", "Ignore until 7.0", sink);
+            } else if (!"NATIVE".equals(windowType)) {
                 reportWarning(element, "5.2", "6.0", "Ignore until 6.0", sink);
             }
         } else if (element instanceof LSFSetObjectPropertyStatement) {
