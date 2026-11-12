@@ -342,14 +342,14 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     @McpDescription(description = "Find and inspect lsFusion elements. Results are prioritized (modules/classes > properties > actions > forms > others) and automatically truncated to a 'brief' (keeping key parts) to fit maxSymbols. If elements cannot be found (e.g. by name), search with minimal filters to explore.")
     @Suppress("unused")
     suspend fun findElements(
-        @McpDescription(description = "Module filter as CSV (comma-separated), e.g. `ModuleA, ModuleB`.")
+        @McpDescription(description = "lsFusion module filter as CSV (comma-separated), e.g. `ModuleA, ModuleB`. A name that matches no lsFusion module in `scope` is an error.")
         modules: String? = null,
         @McpDescription(
             description = "Include required lsFusion modules for specified lsFusion modules (only if 'modules' is provided). Default: true."
         )
         requiredModules: Boolean = true,
         @McpDescription(
-            description = "Scope filter (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."
+            description = "Scope filter (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names (not lsFusion modules, see `modules`). A name that is not an IDEA module is an error."
         )
         scope: String? = null,
         @McpDescription(
@@ -365,11 +365,11 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         )
         elementTypes: String? = null,
         @McpDescription(
-            description = "Class filter as CSV (with namespace `MyNS.MyClass` or without `MyClass`). For property/action: matches parameter classes (best-effort)."
+            description = "Class filter as CSV (with namespace `MyNS.MyClass` or without `MyClass`). For property/action: matches parameter classes (best-effort). A name that matches no class in the search scope (`scope`, `modules`) is an error."
         )
         classes: String? = null,
         @McpDescription(
-            description = "Related elements filter (usage-graph traversal seeds) as CSV. Each item is either `type:name` (named element) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`."
+            description = "Related elements filter (usage-graph traversal seeds) as CSV. Each item is either `type:name` (named element; a property or action name may carry its signature, e.g. `property:MyNS.myProp[MyNS.A,MyNS.B]`) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`. An item that matches no element in the search scope (`scope`, `modules`) is an error."
         )
         relatedElements: String? = null,
         @McpDescription(description = "Direction for ALL `relatedElements` seeds. Allowed values: `both`, `uses`, `used`. Default: `both`.")

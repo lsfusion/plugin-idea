@@ -30,6 +30,7 @@ import com.intellij.util.Processor;
 import com.intellij.util.Query;
 import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.lang.classes.CustomClassSet;
+import com.lsfusion.lang.classes.DataClass;
 import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.classes.LSFValueClass;
 import com.lsfusion.lang.psi.*;
@@ -136,6 +137,8 @@ public class MCPSearchUtils {
      *   moreFilters: [ { ... }, { ... } ], // optional: additional filter objects; results are merged (OR)
      *   maxSymbols: 100000 // approximate cap for total result code length
      * }
+     * A name in scope / modules / classes / relatedElements (of any filter object) that does not resolve fails the
+     * query with an InvalidQueryException naming it.
      */
     public static JSONObject findElements(@NotNull Project project, @NotNull JSONObject query) {
         // Parse everything
@@ -192,7 +195,28 @@ public class MCPSearchUtils {
         return assembleResult(best, meta, errors);
     }
 
+    // A query that cannot be applied as given: the caller's mistake, not an internal error
+    static final class InvalidQueryException extends IllegalArgumentException {
+        InvalidQueryException(String message) {
+            super(message);
+        }
+    }
+
     private static @NonNull GlobalSearchScope searchElements(@NonNull Project project, @NonNull JSONObject query, SearchState state, long searchBudgetMillis, AtomicBoolean timeoutHit, List<String> errors) {
+        // An invalid query fails before the executor is created: after a throw nothing would shut it down, and the
+        // tasks of the filters before the invalid one would keep running
+        List<String> problems = new ArrayList<>();
+        List<Filter> filters = new ArrayList<>();
+        filters.add(parseFilter(project, query, "", problems));
+        String moreFiltersStr = query.optString("moreFilters", "");
+        if (!moreFiltersStr.isEmpty()) {
+            JSONArray moreFilters = new JSONArray(moreFiltersStr);
+            for (int i = 0; i < moreFilters.length(); i++)
+                filters.add(parseFilter(project, moreFilters.getJSONObject(i), "moreFilters[" + i + "].", problems));
+        }
+        if (!problems.isEmpty())
+            throw new InvalidQueryException("Unresolved names in filters:\n" + String.join("\n", problems));
+
         // Build iterations: run all applicable types simultaneously with in-iteration filtering
         Set<LSFMCPDeclaration> seen = Collections.newSetFromMap(new ConcurrentHashMap<>());
         ConcurrentMap<RelatedKey, RelatedState> relatedCache = new ConcurrentHashMap<>();
@@ -206,19 +230,13 @@ public class MCPSearchUtils {
         // helper to submit tasks with accounting
         TaskSubmitter submit = createSubmit(exec, state, errors, indicator);
 
-        GlobalSearchScope searchScope = run(project, query, seen, relatedCache, state, submit);
-
-        String moreFiltersStr = query.optString("moreFilters", "");
-        JSONArray moreFilters = !moreFiltersStr.isEmpty() ? new JSONArray(moreFiltersStr) : null;
-
-        if (moreFilters != null && !moreFilters.isEmpty())
-            for (int i = 0; i < moreFilters.length(); i++)
-                searchScope = searchScope.union(run(project, moreFilters.optJSONObject(i), seen, relatedCache, state, submit));
+        for (Filter filter : filters)
+            run(project, filter, seen, relatedCache, state, submit);
 
         // Wait for all tasks to complete (but keep a reserve for post-processing)
         awaitAll.run();
 
-        return searchScope;
+        return GlobalSearchScope.union(ContainerUtil.map(filters, Filter::searchScope));
     }
 
     private static JSONArray sortAndTruncate(List<SelectedStatement>[] state, int maxSymbols, List<SelectedStatement> bestStatements) {
@@ -481,20 +499,68 @@ public class MCPSearchUtils {
         return fullyStreamable;
     }
 
-    private static @NotNull GlobalSearchScope run(@NotNull Project project,
-                                                 @NotNull JSONObject query,
-                                                 @NotNull Set<LSFMCPDeclaration> seen,
-                                                 @NotNull ConcurrentMap<RelatedKey, RelatedState> relatedCache,
-                                                 @NotNull SearchState state,
-                                                 @NotNull TaskSubmitter submit) {
-        GlobalSearchScope searchScope = ApplicationManager.getApplication().runReadAction((Computable<GlobalSearchScope>) () -> buildSearchScope(project, query.optString("modules"), query.optString("scope"), query.optBoolean("requiredModules", true)));
-        List<NameFilter> nameFilters = parseMatchersCsv(query.optString("names"));
-        List<NameFilter> containsFilters = parseMatchersCsv(query.optString("contains"));
-        Set<LSFMCPDeclaration.ElementType> elementTypes = parseElementTypes(query.optString("elementTypes"));
+    // One filter object of the query (the root or an entry of `moreFilters`) with its names resolved
+    private record Filter(GlobalSearchScope searchScope,
+                          List<NameFilter> nameFilters,
+                          List<NameFilter> containsFilters,
+                          Set<LSFMCPDeclaration.ElementType> elementTypes,
+                          QueryTargets targets) {}
 
-        QueryTargets targets = ApplicationManager.getApplication().runReadAction((Computable<QueryTargets>) () -> new QueryTargets(
-                parseClasses(project, searchScope, query.optString("classes")),
-                parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection"))));
+    // Each name in `scope`, `modules`, `classes` and `relatedElements` must resolve, or the query fails: a name dropped
+    // unnoticed would narrow the filter, and with none left `classes` / `relatedElements` would filter nothing, while
+    // `scope` / `modules` would match nothing. Classes and related elements are resolved in the search scope, so they
+    // are checked only once the `scope` and `modules` names resolve: in a scope the caller did not mean they could be
+    // reported in vain.
+    private static @Nullable Filter parseFilter(@NotNull Project project, @NotNull JSONObject query, @NotNull String paramPrefix, @NotNull List<String> problems) {
+        return ApplicationManager.getApplication().runReadAction((Computable<Filter>) () -> {
+            List<String> unknownScope = new ArrayList<>();
+            GlobalSearchScope searchScope = buildScope(project, query.optString("scope"), unknownScope);
+            if (addUnresolved(problems, paramPrefix + "scope", unknownScope, "not an IDEA module of the project (lsFusion modules go to `modules`)"))
+                return null;
+
+            String modules = query.optString("modules");
+            if (!modules.isEmpty()) {
+                List<String> unknownModules = new ArrayList<>();
+                searchScope = searchScope.intersectWith(buildModulesFilter(project, modules, query.optBoolean("requiredModules", true), searchScope, unknownModules));
+                if (addUnresolved(problems, paramPrefix + "modules", unknownModules, "no such lsFusion module in `scope`"))
+                    return null;
+            }
+
+            List<String> unknownClasses = new ArrayList<>();
+            List<String> builtInClasses = new ArrayList<>();
+            Set<LSFClassDeclaration> classes = parseClasses(project, searchScope, query.optString("classes"), unknownClasses, builtInClasses);
+            addUnresolved(problems, paramPrefix + "classes", unknownClasses, "no such class in the search scope (see `scope`, `modules`)");
+            addUnresolved(problems, paramPrefix + "classes", builtInClasses, "a built-in class; only custom classes (declared with `CLASS`) filter here");
+
+            List<String> unknownRelated = new ArrayList<>();
+            Map<LSFMCPDeclaration, Direction> related = parseRelated(project, searchScope, query.optString("relatedElements"), query.optString("relatedDirection"), unknownRelated);
+            addUnresolved(problems, paramPrefix + "relatedElements", unknownRelated, "no such element in the search scope (see `scope`, `modules`); an item is `type:name` or `<module>(<line>:<col>)`");
+
+            return new Filter(searchScope,
+                    parseMatchersCsv(query.optString("names")),
+                    parseMatchersCsv(query.optString("contains")),
+                    parseElementTypes(query.optString("elementTypes")),
+                    new QueryTargets(classes, related));
+        });
+    }
+
+    private static boolean addUnresolved(List<String> problems, String param, List<String> names, String reason) {
+        if (names.isEmpty()) return false;
+        problems.add("`" + param + "`: " + String.join(", ", ContainerUtil.map(names, name -> "`" + name + "`")) + " - " + reason);
+        return true;
+    }
+
+    private static void run(@NotNull Project project,
+                            @NotNull Filter filter,
+                            @NotNull Set<LSFMCPDeclaration> seen,
+                            @NotNull ConcurrentMap<RelatedKey, RelatedState> relatedCache,
+                            @NotNull SearchState state,
+                            @NotNull TaskSubmitter submit) {
+        GlobalSearchScope searchScope = filter.searchScope();
+        List<NameFilter> nameFilters = filter.nameFilters();
+        List<NameFilter> containsFilters = filter.containsFilters();
+        Set<LSFMCPDeclaration.ElementType> elementTypes = filter.elementTypes();
+        QueryTargets targets = filter.targets();
 
         // Shared processor that applies all filters and returns false to stop the current iteration
         final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, targets, searchScope, relatedCache);
@@ -518,8 +584,6 @@ public class MCPSearchUtils {
         if (!nameFullyStreamable && !containsFullyStreamable && !classesFullyStreamable && !relatedFullyStreamable && !typesFullyStreamable) {
             submitFileTasks(project, searchScope, processor, submit);
         }
-
-        return searchScope;
     }
 
     private static boolean isOnlyPropertiesClassesActions(Set<LSFMCPDeclaration.ElementType> elementTypes) {
@@ -759,12 +823,45 @@ public class MCPSearchUtils {
 
     // region Parse + generate
 
-    private static Set<LSFClassDeclaration> parseClasses(Project project, GlobalSearchScope scope, @Nullable String classesCsv) {
+    // A signature `property:MyNS.myProp[MyNS.A, MyNS.B]`, a class `NUMERIC[10,2]` or a class set `(MyNS.A,MyNS.B)` has
+    // commas of its own, so only the commas outside brackets separate the items. The end of the list ends the last item
+    // even inside an unclosed bracket: that item then fails to resolve and is reported, instead of being lost with the
+    // items after it
+    private static @NotNull List<String> splitOutsideBrackets(@NotNull String csv) {
+        List<String> res = new ArrayList<>();
+        int depth = 0;
+        int start = 0;
+        for (int i = 0; i <= csv.length(); i++) {
+            boolean end = i == csv.length();
+            char c = end ? ',' : csv.charAt(i);
+            if (c == '[' || c == '(') {
+                depth++;
+            } else if (c == ']' || c == ')') {
+                depth = Math.max(0, depth - 1);
+            } else if (c == ',' && (depth == 0 || end)) {
+                String v = csv.substring(start, i).trim();
+                if (!v.isEmpty()) res.add(v);
+                start = i + 1;
+            }
+        }
+        return res;
+    }
+
+    // A built-in class name such as `DATE` goes to `builtIn`: the filter takes only custom classes, so it would never
+    // resolve, in any scope
+    private static Set<LSFClassDeclaration> parseClasses(Project project, GlobalSearchScope scope, @Nullable String classesCsv, List<String> unresolved, List<String> builtIn) {
         if (classesCsv.isEmpty()) return Collections.emptySet();
 
         Set<LSFClassDeclaration> res = new HashSet<>();
-        for (String name : parseCsv(classesCsv)) {
-            res.addAll(resolveClassesByName(project, scope, name));
+        for (String name : splitOutsideBrackets(classesCsv)) {
+            if (resolveBuiltInClass(name) != null) {
+                builtIn.add(name);
+                continue;
+            }
+            Collection<LSFClassDeclaration> classes = resolveClassesByName(project, scope, name);
+            if (classes.isEmpty())
+                unresolved.add(name);
+            res.addAll(classes);
         }
         return res;
     }
@@ -772,7 +869,8 @@ public class MCPSearchUtils {
     private static Map<LSFMCPDeclaration, Direction> parseRelated(Project project,
                                                                   GlobalSearchScope scope,
                                                                   @Nullable String relatedElementsCsv,
-                                                                  @Nullable String relatedDirection) {
+                                                                  @Nullable String relatedDirection,
+                                                                  List<String> unresolved) {
         if (relatedElementsCsv.isEmpty()) return Collections.emptyMap();
 
         Direction dir = Direction.BOTH;
@@ -783,8 +881,11 @@ public class MCPSearchUtils {
         }
 
         Map<LSFMCPDeclaration, Direction> units = new HashMap<>();
-        for (String token : parseCsv(relatedElementsCsv)) {
-            for (LSFMCPDeclaration stmt : getStatementsFromJson(project, scope, token)) {
+        for (String token : splitOutsideBrackets(relatedElementsCsv)) {
+            Collection<LSFMCPDeclaration> stmts = getStatementsFromJson(project, scope, token);
+            if (stmts.isEmpty())
+                unresolved.add(token);
+            for (LSFMCPDeclaration stmt : stmts) {
                 units.put(stmt, dir);
             }
         }
@@ -810,19 +911,33 @@ public class MCPSearchUtils {
                 int r = name.lastIndexOf(PropertyCanonicalNameUtils.signatureRBracket);
                 if (r < bracketPos) return Collections.emptyList();
 
-                List<LSFClassSet> signature = new ArrayList<>();
-                for (String part : name.substring(bracketPos + 1, r).split(",", -1)) {
-                    String canonicalOrData = part.trim();
-                    LSFClassSet result = LSFPsiImplUtil.resolveDataClass(canonicalOrData, true);
-                    if (result == null) {
-                        Collection<LSFClassDeclaration> decls = resolveClassesByName(project, scope, canonicalOrData);
-                        if (!decls.isEmpty())
-                            result = new CustomClassSet(decls.iterator().next());
-                    }
-                    signature.add(result);
+                // A parameter matches by its class name as the canonical name writes it (`STRING` for every string
+                // class, `NUMERIC` for every numeric one, ...), so the names this tool returns resolve back. A class
+                // written as in the code (`STRING[10]`, `NUMERIC[10,2]`, a class without its namespace) matches too
+                List<Set<String>> signature = new ArrayList<>();
+                for (String part : splitOutsideBrackets(name.substring(bracketPos + 1, r))) {
+                    Set<String> classNames = new HashSet<>();
+                    classNames.add(part);
+                    DataClass dataClass = resolveBuiltInClass(part);
+                    if (dataClass != null)
+                        classNames.add(PropertyCanonicalNameUtils.createSignatureClassName(dataClass));
+                    else
+                        for (LSFClassDeclaration classDecl : resolveClassesByName(project, scope, part))
+                            classNames.add(PropertyCanonicalNameUtils.createSignatureClassName(new CustomClassSet(classDecl)));
+                    signature.add(classNames);
                 }
                 name = name.substring(0, bracketPos);
-                condition = decl -> signature.equals(((LSFActionOrGlobalPropDeclaration<?, ?>) decl).resolveParamClasses());
+                condition = decl -> {
+                    List<LSFClassSet> params = ((LSFActionOrGlobalPropDeclaration<?, ?>) decl).resolveParamClasses();
+                    if (params == null) // the canonical name writes such a signature as `[]`
+                        params = Collections.emptyList();
+                    if (params.size() != signature.size())
+                        return false;
+                    for (int i = 0; i < params.size(); i++)
+                        if (!signature.get(i).contains(PropertyCanonicalNameUtils.createSignatureClassName(params.get(i))))
+                            return false;
+                    return true;
+                };
             }
         }
 
@@ -959,6 +1074,15 @@ public class MCPSearchUtils {
         return (Collection<LSFClassDeclaration>) getElementsFromName(project, scope, LSFMCPDeclaration.ElementType.CLASS, canonicalName);
     }
 
+    // null for a name that is not a built-in class, a malformed size (`STRING[x]`, `NUMERIC[10]`) included
+    private static @Nullable DataClass resolveBuiltInClass(@NotNull String name) {
+        try {
+            return LSFPsiImplUtil.resolveDataClass(name, true);
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
 
     private static void handleError(Throwable t, String logMessage, List<String> errors) {
         LOG.error(logMessage, t);
@@ -1061,7 +1185,7 @@ public class MCPSearchUtils {
 
     // region Scope by modules
 
-    private static GlobalSearchScope buildScope(@NotNull Project project, @Nullable String scopeMode) {
+    private static GlobalSearchScope buildScope(@NotNull Project project, @Nullable String scopeMode, List<String> unresolved) {
         if (scopeMode == null || scopeMode.isEmpty() || "project and libraries".equals(scopeMode)) {
             return ProjectScope.getAllScope(project);
         }
@@ -1076,16 +1200,20 @@ public class MCPSearchUtils {
             if (module != null) {
                 GlobalSearchScope moduleScope = module.getModuleContentScope();
                 acc = (acc == null) ? moduleScope : acc.union(moduleScope);
+            } else {
+                unresolved.add(moduleName);
             }
         }
         return acc != null ? acc : GlobalSearchScope.EMPTY_SCOPE;
     }
 
-    private static GlobalSearchScope buildModulesFilter(@NotNull Project project, @NotNull String modules, boolean requiredModules, @NotNull GlobalSearchScope baseScope) {
+    private static GlobalSearchScope buildModulesFilter(@NotNull Project project, @NotNull String modules, boolean requiredModules, @NotNull GlobalSearchScope baseScope, List<String> unresolved) {
         GlobalSearchScope acc = null;
         for (String moduleName : parseCsv(modules)) {
             // We search for modules within the baseScope (which respects the 'scope' parameter)
             Collection<LSFModuleDeclaration> decls = LSFGlobalResolver.findModules(moduleName, project, baseScope);
+            if (decls.isEmpty())
+                unresolved.add(moduleName);
             for (LSFModuleDeclaration md : decls) {
                 LSFFile file = md.getLSFFile();
 
@@ -1104,15 +1232,6 @@ public class MCPSearchUtils {
         }
 
         return acc == null ? GlobalSearchScope.EMPTY_SCOPE : acc;
-    }
-
-    private static GlobalSearchScope buildSearchScope(Project project, String modules, String scopeMode, boolean requiredModules) {
-        GlobalSearchScope baseScope = buildScope(project, scopeMode);
-        if (modules == null || modules.isEmpty()) {
-            return baseScope;
-        }
-        GlobalSearchScope modulesFilter = buildModulesFilter(project, modules, requiredModules, baseScope);
-        return baseScope.intersectWith(modulesFilter);
     }
 
     // endregion

@@ -197,6 +197,8 @@ public abstract class McpBaseService extends RestService {
         try {
             JSONObject payloadObj = MCPSearchUtils.findElements(project, arguments);
             return rpcResult(jsonrpc, id, buildLocalToolCallResult(payloadObj));
+        } catch (MCPSearchUtils.InvalidQueryException e) {
+            return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_NAME, e.getMessage()));
         } catch (Exception e) {
             getLogger().warn(TOOL_NAME + " failed", e);
             return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_NAME, e.getMessage()));
@@ -512,7 +514,7 @@ public abstract class McpBaseService extends RestService {
                 .put("properties", new JSONObject()
                         .put("modules", new JSONObject()
                                 .put("type", "string")
-                                .put("description", "Module filter as CSV (comma-separated), e.g. `ModuleA, ModuleB`."))
+                                .put("description", "lsFusion module filter as CSV (comma-separated), e.g. `ModuleA, ModuleB`. A name that matches no lsFusion module in `scope` is an error."))
                         .put("requiredModules", new JSONObject()
                                 .put("type", "boolean")
                                 .put("default", true)
@@ -520,7 +522,7 @@ public abstract class McpBaseService extends RestService {
                         .put("scope", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Scope filter (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names."))
+                                        "Scope filter (IDEA concept): omitted = project + libraries; `project` = project content only; otherwise, a CSV list of IDEA module names (not lsFusion modules, see `modules`). A name that is not an IDEA module is an error."))
                         .put("names", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
@@ -535,11 +537,11 @@ public abstract class McpBaseService extends RestService {
                         .put("classes", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Class filter as CSV (with namespace `MyNS.MyClass` or without `MyClass`). For property/action: matches parameter classes (best-effort)."))
+                                        "Class filter as CSV (with namespace `MyNS.MyClass` or without `MyClass`). For property/action: matches parameter classes (best-effort). A name that matches no class in the search scope (`scope`, `modules`) is an error."))
                         .put("relatedElements", new JSONObject()
                                 .put("type", "string")
                                 .put("description",
-                                        "Related elements filter (usage-graph traversal seeds) as CSV. Each item is either `type:name` (named element) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`."))
+                                        "Related elements filter (usage-graph traversal seeds) as CSV. Each item is either `type:name` (named element; a property or action name may carry its signature, e.g. `property:MyNS.myProp[MyNS.A,MyNS.B]`) or `location` (unnamed element). `location` format: `<module>(<line>:<col>)`, 1-based, e.g. `MyModule(10:5)`. An item that matches no element in the search scope (`scope`, `modules`) is an error."))
                         .put("relatedDirection", new JSONObject()
                                 .put("type", "string")
                                 .put("default", "both")
