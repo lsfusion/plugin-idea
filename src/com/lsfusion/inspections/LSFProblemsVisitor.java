@@ -216,6 +216,11 @@ public class LSFProblemsVisitor {
             } else if ("GRIDBOX".equals(text)) {
                 reportReplace(element, "5.2", "6.0", "GRID", sink);
             }
+        } else if (element instanceof LSFFormEventType) {
+            PsiElement firstChild = element.getFirstChild();
+            if (firstChild != null && firstChild.getNode().getElementType() == LSFTypes.CHANGEWYS) {
+                reportWarning(firstChild, "5.0", "8.0", "Ignored, use LIST clause in INPUT / DIALOG instead", sink);
+            }
         } else if (element instanceof LSFCustomOptionsLiteral) {
             if ("HEADER".equals(element.getText())) {
                 reportReplace(element, "6.0", "8.0", "OPTIONS", sink);
