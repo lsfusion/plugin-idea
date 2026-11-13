@@ -31,73 +31,73 @@ import kotlin.coroutines.coroutineContext
 
 @Serializable
 data class FindElementCodePart(
-    @McpDescription(description = "Element location in source. Format: `<module>(<line>:<col>)` (1-based), e.g. `MyModule(10:5)`.")
+    @property:McpDescription(description = "Element location in source. Format: `<module>(<line>:<col>)` (1-based), e.g. `MyModule(10:5)`.")
     val location: String? = null,
-    @McpDescription(description = "Element source code snippet. May be shortened depending on output size limits.")
+    @property:McpDescription(description = "Element source code snippet. May be shortened depending on output size limits.")
     val code: String? = null,
-    @McpDescription(description = "Stack of enclosing `META` blocks (headers), from nearest to farthest. Omitted when element is not inside `META`.")
+    @property:McpDescription(description = "Stack of enclosing `META` blocks (headers), from nearest to farthest. Omitted when element is not inside `META`.")
     val metacodeStack: List<String>? = null,
 )
 
 @Serializable
 data class FindElementItem(
     /** `LSFMCPDeclaration.ElementType.apiName` (e.g. `property`, `class`, ...). */
-    @McpDescription(description = "Element type, e.g. `property`, `class`, `action`, ...")
+    @property:McpDescription(description = "Element type, e.g. `property`, `class`, `action`, ...")
     val type: String? = null,
     /** Canonical name (best-effort), when available. */
-    @McpDescription(description = "Canonical element name (best-effort). Omitted for unnamed statements.")
+    @property:McpDescription(description = "Canonical element name (best-effort). Omitted for unnamed statements.")
     val name: String? = null,
     /** Additional names (e.g. from `EXTEND`), canonical names. */
-    @McpDescription(description = "Additional canonical names for the same declaration (e.g. from `EXTEND`).")
+    @property:McpDescription(description = "Additional canonical names for the same declaration (e.g. from `EXTEND`).")
     val moreNames: List<String>? = null,
 
     // Main statement code part (same fields as in `extends[*]`).
-    @McpDescription(description = "Location of the main statement. Format: `<module>(<line>:<col>)` (1-based).")
+    @property:McpDescription(description = "Location of the main statement. Format: `<module>(<line>:<col>)` (1-based).")
     val location: String? = null,
-    @McpDescription(description = "Main statement code snippet. May be shortened depending on output size limits.")
+    @property:McpDescription(description = "Main statement code snippet. May be shortened depending on output size limits.")
     val code: String? = null,
-    @McpDescription(description = "Stack of enclosing `META` blocks for the main statement (headers), from nearest to farthest.")
+    @property:McpDescription(description = "Stack of enclosing `META` blocks for the main statement (headers), from nearest to farthest.")
     val metacodeStack: List<String>? = null,
 
     /** Code fragments for `EXTEND`-ed declarations (without `type`/`name`). */
-    @McpDescription(description = "Code fragments for `EXTEND`-ed declarations of the same element. Each entry contains its own `location`, `code`, and `metacodeStack`.")
+    @property:McpDescription(description = "Code fragments for `EXTEND`-ed declarations of the same element. Each entry contains its own `location`, `code`, and `metacodeStack`.")
     val extends: List<FindElementCodePart>? = null,
 )
 
 @Serializable
 data class FindElementsResult(
-    @McpDescription(description = "Found elements (each item represents one declaration plus optional `EXTEND` fragments).")
+    @property:McpDescription(description = "Found elements (each item represents one declaration plus optional `EXTEND` fragments).")
     val items: List<FindElementItem>,
-    @McpDescription(description = "Optional single-line meta reason (e.g. `too long - timeout hit`, `too large - max symbols hit`, `too small - non matching elements added`).")
+    @property:McpDescription(description = "Optional single-line meta reason (e.g. `too long - timeout hit`, `too large - max symbols hit`, `too small - non matching elements added`).")
     val meta: String? = null,
-    @McpDescription(description = "List of errors encountered during search (e.g. timeouts, internal errors).")
+    @property:McpDescription(description = "List of errors encountered during search (e.g. timeouts, internal errors).")
     val errors: List<String>? = null,
 )
 
 @Serializable
 data class RemoteDocItem(
-    @McpDescription(description = "Chunk origin (e.g. documentation-language, documentation-paradigm).")
+    @property:McpDescription(description = "Chunk origin (e.g. documentation-language, documentation-paradigm).")
     val source: String,
-    @McpDescription(description = "Retrieved text snippet.")
+    @property:McpDescription(description = "Retrieved text snippet.")
     val text: String,
-    @McpDescription(description = "Cosine similarity to the query. It orders THIS response and means nothing outside it: the number has no absolute scale, so comparing it against one from another call, or against a remembered figure, compares nothing. Read it as rank, not as confidence — a high score does not establish that a chunk answers the question, and a low one does not establish that the documentation lacks it. That is measured, not cautious: among chunks whose retrieval agents later reported on, the ones they called misleading did not score lower than the ones they called helpful. Whether a chunk answers your question is decided by reading it. NULL when no query was given — an article traversal has nothing to be similar to, and inventing a number would make document order look like a ranking; when it is null the list is in document order, when it is set the list is ranked by it, descending.")
+    @property:McpDescription(description = "Cosine similarity to the query. It orders THIS response and means nothing outside it: the number has no absolute scale, so comparing it against one from another call, or against a remembered figure, compares nothing. Read it as rank, not as confidence — a high score does not establish that a chunk answers the question, and a low one does not establish that the documentation lacks it. That is measured, not cautious: among chunks whose retrieval agents later reported on, the ones they called misleading did not score lower than the ones they called helpful. Whether a chunk answers your question is decided by reading it. NULL when no query was given — an article traversal has nothing to be similar to, and inventing a number would make document order look like a ranking; when it is null the list is in document order, when it is set the list is ranked by it, descending.")
     val score: Double? = null,
     // Nullable for the same reason `id` is: an older server does not send it.
-    @McpDescription(description = "Which of the submitted queries this chunk answers; null when only one was submitted.")
+    @property:McpDescription(description = "Which of the submitted queries this chunk answers; null when only one was submitted.")
     val query: String? = null,
     // Nullable with a default, deliberately: `ignoreUnknownKeys = true` protects an old
     // plugin talking to a new server, and the nullable default protects a new plugin
     // talking to an older server that does not send `id` yet — a non-null field would
     // make the new plugin fail to decode the old server's response.
-    @McpDescription(description = "Stable chunk id, shaped `<article>::<section>`. Two uses, and the second is the one worth knowing: pass it in `exclude_ids` to keep this chunk out of a follow-up call, or pass it as `article` — unchanged, section and all — to read the WHOLE article this chunk came from. A chunk cannot show you the constraint it depends on, the case it omits, or the table it points at; those sit elsewhere in the same article. Reaching for the article is the cheap move there. Searching again with different wording is the expensive one.")
+    @property:McpDescription(description = "Stable chunk id, shaped `<article>::<section>`. Two uses, and the second is the one worth knowing: pass it in `exclude_ids` to keep this chunk out of a follow-up call, or pass it as `article` — unchanged, section and all — to read the WHOLE article this chunk came from. A chunk cannot show you the constraint it depends on, the case it omits, or the table it points at; those sit elsewhere in the same article. Reaching for the article is the cheap move there. Searching again with different wording is the expensive one.")
     val id: String? = null,
 )
 
 @Serializable
 data class RetrieveDocsOutput(
-    @McpDescription(description = "Relevant chunks returned from the RAG store.")
+    @property:McpDescription(description = "Relevant chunks returned from the RAG store.")
     val docs: List<RemoteDocItem>,
-    @McpDescription(description = "Whether this response is the whole answer, and what to do when it is not. Always present, always a sentence, because the decision it drives — page again, or stop — is one a number leaves the reader to infer. It opens with a fixed label: COMPLETE, MORE, ARTICLE_COMPLETE, ARTICLE_PARTIAL or ARTICLE_NONE. Counts stay inside it; the log keeps them separately for us.")
+    @property:McpDescription(description = "Whether this response is the whole answer, and what to do when it is not. Always present, always a sentence, because the decision it drives — page again, or stop — is one a number leaves the reader to infer. It opens with a fixed label: COMPLETE, MORE, ARTICLE_COMPLETE, ARTICLE_PARTIAL or ARTICLE_NONE. Counts stay inside it; the log keeps them separately for us.")
     val status: String = "",
 )
 
@@ -279,7 +279,7 @@ class FeedbackReportArg(val raw: JsonObject) {
  * for schema generation) can expose stable parameter names in `tools/list`.
  *
  * TODO (AI agent task): Keep the list of proxied tools from https://ai.lsfusion.org/mcp up to date.
- * IMPORTANT: When updating AI tools, ensure that both McpServerService.java and McpToolset.kt are synchronized.
+ * IMPORTANT: When updating AI tools, ensure that both McpBaseService.java and McpToolset.kt are synchronized.
  * These tools are proxied from https://ai.lsfusion.org, and their descriptors must be manually updated in both files.
  *
  * Background:
@@ -295,10 +295,11 @@ class FeedbackReportArg(val raw: JsonObject) {
  *    - POST https://ai.lsfusion.org/mcp method=`initialize` to obtain `mcp-session-id` header.
  *    - POST method=`tools/list` with `mcp-session-id` and required Accept header.
  * 2) Compare remote `tools[*].name`, `description`, `inputSchema`, and `outputSchema` with the local
- *    wrappers (currently: `lsfusion_retrieve_docs`, `lsfusion_get_guidance`).
+ *    wrappers (currently: `lsfusion_retrieve_docs`, `lsfusion_get_guidance`, `lsfusion_report_feedback`).
  * 3) For each tool:
  *    - Update/add a corresponding `@McpTool` wrapper method.
- *    - Update/add `@Serializable` DTOs with `@McpDescription` on ALL fields so output schema is not empty.
+ *    - Update/add `@Serializable` DTOs with `@property:McpDescription` on ALL fields: on a constructor `val`
+ *      a plain annotation goes to the parameter, and the schema never shows that description.
  *    - Keep parsing tolerant (`ignoreUnknownKeys = true`) because remote schemas can evolve.
  * 4) Validate manually by running IDEA MCP `tools/list` and checking that parameter names and
  *    input/output schemas match expectations.
