@@ -302,6 +302,16 @@ public abstract class McpBaseService extends RestService {
                 .put("outputSchema", outputSchema);
     }
 
+    // A field the central server sends as an explicit null, declared as central declares it: a type that leaves null
+    // out makes a client validating structuredContent drop the whole result.
+    private static JSONObject nullable(String type, String description) {
+        return new JSONObject()
+                .put("anyOf", new JSONArray()
+                        .put(new JSONObject().put("type", type))
+                        .put(new JSONObject().put("type", "null")))
+                .put("description", description);
+    }
+
     private static JSONObject buildRetrieveDocsToolDescriptor() {
         JSONObject typeProp = new JSONObject()
                 // anyOf, not a bare enum: the description offers `null` as a way to
@@ -351,9 +361,9 @@ public abstract class McpBaseService extends RestService {
                         .put("id", new JSONObject().put("type", "string").put("description", "Stable chunk id, shaped `<article>::<section>`. Two uses, and the second is the one worth knowing: pass it in `exclude_ids` to keep this chunk out of a follow-up call, or pass it as `article` — unchanged, section and all — to read the WHOLE article this chunk came from. A chunk cannot show you the constraint it depends on, the case it omits, or the table it points at; those sit elsewhere in the same article. Reaching for the article is the cheap move there. Searching again with different wording is the expensive one."))
                         .put("source", new JSONObject().put("type", "string").put("description", "Chunk origin (e.g. documentation-language, documentation-paradigm)."))
                         .put("text", new JSONObject().put("type", "string").put("description", "Retrieved text snippet."))
-                        .put("score", new JSONObject().put("type", "number").put("description", "Cosine similarity to the query. It orders THIS response and means nothing outside it: the number has no absolute scale, so comparing it against one from another call, or against a remembered figure, compares nothing. Read it as rank, not as confidence — a high score does not establish that a chunk answers the question, and a low one does not establish that the documentation lacks it. That is measured, not cautious: among chunks whose retrieval agents later reported on, the ones they called misleading did not score lower than the ones they called helpful. Whether a chunk answers your question is decided by reading it. NULL when no query was given — an article traversal has nothing to be similar to, and inventing a number would make document order look like a ranking; when it is null the list is in document order, when it is set the list is ranked by it, descending."))
+                        .put("score", nullable("number", "Cosine similarity to the query. It orders THIS response and means nothing outside it: the number has no absolute scale, so comparing it against one from another call, or against a remembered figure, compares nothing. Read it as rank, not as confidence — a high score does not establish that a chunk answers the question, and a low one does not establish that the documentation lacks it. That is measured, not cautious: among chunks whose retrieval agents later reported on, the ones they called misleading did not score lower than the ones they called helpful. Whether a chunk answers your question is decided by reading it. NULL when no query was given — an article traversal has nothing to be similar to, and inventing a number would make document order look like a ranking; when it is null the list is in document order, when it is set the list is ranked by it, descending."))
                         // Like `id`, deliberately not required: an older server does not send it.
-                        .put("query", new JSONObject().put("type", "string").put("description", "Which of the submitted queries this chunk answers; null when only one was submitted."))
+                        .put("query", nullable("string", "Which of the submitted queries this chunk answers; null when only one was submitted."))
                 )
                 // `id`, `query` and `score` are all absent in some shape of response,
                 // so only these two are required.
@@ -492,8 +502,8 @@ public abstract class McpBaseService extends RestService {
                 .put("properties", new JSONObject()
                         .put("report_id", feStr("Server-assigned id for this submission."))
                         .put("status", feEnum("Outcome.", feArr("recorded", "disabled", "rejected")))
-                        .put("dedup_fingerprint", feStr("Server-computed clustering fingerprint (when recorded)."))
-                        .put("detail", feStr("Reason when disabled/rejected.")))
+                        .put("dedup_fingerprint", nullable("string", "Server-computed clustering fingerprint (when recorded)."))
+                        .put("detail", nullable("string", "Reason when disabled/rejected.")))
                 .put("required", feArr("report_id", "status"))
                 .put("additionalProperties", false);
 
