@@ -22,6 +22,7 @@
             <li>Form property options <code>PIVOT SUM | MAX | MIN</code>, <code>PIVOT LAST [DESC] (...)</code> and <code>PIVOT FORMULA '...' (...)</code> are no longer marked as errors, and references inside them resolve</li>
             <li>Improved the schemas of the <code>lsfusion_report_feedback</code>, <code>lsfusion_find_elements</code> and <code>lsfusion_retrieve_docs</code> MCP tools</li>
             <li>Improved filter handling in the <code>lsfusion_find_elements</code> MCP tool</li>
+            <li>Fixed missing results in the <code>lsfusion_find_elements</code> MCP tool</li>
         </ul>
     ]]>
     </change-notes>

@@ -218,8 +218,9 @@ public class MCPSearchUtils {
             throw new InvalidQueryException("Unresolved names in filters:\n" + String.join("\n", problems));
 
         // Build iterations: run all applicable types simultaneously with in-iteration filtering
-        Set<LSFMCPDeclaration> seen = Collections.newSetFromMap(new ConcurrentHashMap<>());
-        ConcurrentMap<RelatedKey, RelatedState> relatedCache = new ConcurrentHashMap<>();
+        // The statements already in the result, needed only with moreFilters: each filter object evaluates every
+        // statement its tasks reach (an OR), so a statement several of them match is added by the first one
+        Set<LSFMCPDeclaration> selected = filters.size() > 1 ? Collections.newSetFromMap(new ConcurrentHashMap<>()) : null;
 
         // Executor and dynamic scheduling support
         ExecutorService exec = createPriorityExecutor(Math.min(6, Math.max(1, Runtime.getRuntime().availableProcessors() - 1)));
@@ -231,7 +232,8 @@ public class MCPSearchUtils {
         TaskSubmitter submit = createSubmit(exec, state, errors, indicator);
 
         for (Filter filter : filters)
-            run(project, filter, seen, relatedCache, state, submit);
+            run(project, filter, selected, state, submit);
+        state.allSubmitted();
 
         // Wait for all tasks to complete (but keep a reserve for post-processing)
         awaitAll.run();
@@ -280,7 +282,12 @@ public class MCPSearchUtils {
         return resultObject;
     }
 
-    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, Set<LSFMCPDeclaration> seen, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, QueryTargets targets, GlobalSearchScope searchScope, ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
+    // selected - the statements already in the result, null if the query has a single filter object
+    private static Processor<LSFMCPDeclaration> createSearchProcessor(SearchState state, @Nullable Set<LSFMCPDeclaration> selected, List<NameFilter> nameFilters, List<NameFilter> containsFilters, Set<LSFMCPDeclaration.ElementType> elementTypes, QueryTargets targets, GlobalSearchScope searchScope) {
+        // Per filter object: a statement another filter object rejected can match this one, and the related traversal
+        // results depend on the filter's related elements and search scope
+        Set<LSFMCPDeclaration> seen = Collections.newSetFromMap(new ConcurrentHashMap<>());
+        ConcurrentMap<RelatedKey, Boolean> relatedCache = new ConcurrentHashMap<>();
         return st -> {
             if (state.stopRequested.get()) {
                 return false;
@@ -290,9 +297,8 @@ public class MCPSearchUtils {
                 return true;
             }
             assert getStatement(st) == st; // is not extend
-            if (!seen.add(st)) return true;
-
-            // already processed
+            if ((selected != null && selected.contains(st)) || !seen.add(st))
+                return true; // already in the result / already processed
 
             SelectedStatement selSt;
             try {
@@ -302,7 +308,7 @@ public class MCPSearchUtils {
                 seen.remove(st); // read action cancelled by a write action - the restarted task has to process st again
                 throw e;
             }
-            if (selSt != null) {
+            if (selSt != null && (selected == null || selected.add(st))) {
                 synchronized (state.statementsByPriority[p]) {
                     state.statementsByPriority[p].add(selSt);
                 }
@@ -552,8 +558,7 @@ public class MCPSearchUtils {
 
     private static void run(@NotNull Project project,
                             @NotNull Filter filter,
-                            @NotNull Set<LSFMCPDeclaration> seen,
-                            @NotNull ConcurrentMap<RelatedKey, RelatedState> relatedCache,
+                            @Nullable Set<LSFMCPDeclaration> selected,
                             @NotNull SearchState state,
                             @NotNull TaskSubmitter submit) {
         GlobalSearchScope searchScope = filter.searchScope();
@@ -563,7 +568,7 @@ public class MCPSearchUtils {
         QueryTargets targets = filter.targets();
 
         // Shared processor that applies all filters and returns false to stop the current iteration
-        final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, seen, nameFilters, containsFilters, elementTypes, targets, searchScope, relatedCache);
+        final Processor<LSFMCPDeclaration> processor = createSearchProcessor(state, selected, nameFilters, containsFilters, elementTypes, targets, searchScope);
 
         // Track which blocks are fully streamable while assembling iterations.
         // Name/code filters are considered fully streamable only if ALL matchers are "word-only" with length >= 3.
@@ -1245,7 +1250,7 @@ public class MCPSearchUtils {
                                              @Nullable Set<LSFClassDeclaration> classDecls, // null - no filter
                                              @Nullable Map<LSFMCPDeclaration, Direction> related, // null - no filter
                                              GlobalSearchScope scope,
-                                             ConcurrentMap<RelatedKey, RelatedState> relatedCache) {
+                                             ConcurrentMap<RelatedKey, Boolean> relatedCache) {
         LSFMCPDeclaration.ElementType t;
         return (elementTypes.isEmpty() || ((t = stmt.getMCPType()) != null && elementTypes.contains(t))) &&
                 (nameFilters.isEmpty() || matchesNameFilters(stmt, nameFilters, scope, false)) &&
@@ -1291,58 +1296,65 @@ public class MCPSearchUtils {
         return false;
     }
 
-    enum RelatedState {
-        IN_PROGRESS,
-        TRUE,
-        FALSE
-    }
-
     record RelatedKey(LSFMCPDeclaration stmt, Direction dir) {}
 
+    // Whether stmt reaches a related element along the `uses` or along the `used` references, the element's direction
+    // permitting. The memo is shared by the concurrent tasks of a filter object, so it gets final results only: a
+    // statement whose search is not finished must not be read as FALSE, neither by a cycle back to it nor by another
+    // task. The search is Tarjan's SCC algorithm: the statements of a strongly connected component reach the same
+    // elements, so FALSE becomes final for a whole component once its search is finished, and once a related element
+    // is found, each statement left on the stack reaches it.
     private static boolean matchesRelatedFilters(LSFMCPDeclaration stmt,
                                                  Map<LSFMCPDeclaration, Direction> related,
                                                  GlobalSearchScope scope,
-                                                 ConcurrentMap<RelatedKey, RelatedState> memo) {
+                                                 ConcurrentMap<RelatedKey, Boolean> memo) {
         if (related.isEmpty()) return false; // all related elements are gone (see QueryTargets)
 
-        class Rec {
-            boolean memoized(RelatedKey key, java.util.function.Supplier<Boolean> calc) {
-                var state = memo.get(key);
-                if (state != null) {
-                    return state == RelatedState.TRUE;
-                }
-                memo.put(key, RelatedState.IN_PROGRESS);
-                boolean result;
-                try {
-                    result = calc.get();
-                } catch (RuntimeException | Error e) {
-                    memo.remove(key, RelatedState.IN_PROGRESS); // read action cancelled - otherwise IN_PROGRESS would be read as FALSE after the restart
-                    throw e;
-                }
-                memo.put(key, result ? RelatedState.TRUE : RelatedState.FALSE);
-                return result;
+        class Search {
+            final Direction dir;
+            final Map<LSFMCPDeclaration, Integer> index = new HashMap<>(); // the visit order of this search
+            final Deque<LSFMCPDeclaration> stack = new ArrayDeque<>(); // visited and not in the memo yet
+
+            Search(Direction dir) {
+                this.dir = dir;
             }
 
-            boolean dfs(java.util.Collection<LSFMCPDeclaration> cur, Direction dir) {
-                for (var c : cur) {
-                    if (c == null) continue;
-                    if (memoized(new RelatedKey(c, dir), () -> {
-                        Direction relatedDir = related.get(c);
-                        if (relatedDir != null && (relatedDir == Direction.BOTH || relatedDir != dir)) return true;
+            // -1 if cur reaches a related element, otherwise the lowest index of a statement on the stack it reaches
+            int visit(LSFMCPDeclaration cur) {
+                Boolean memoized = memo.get(new RelatedKey(cur, dir));
+                if (memoized != null) return memoized ? -1 : Integer.MAX_VALUE;
+                Integer onStack = index.get(cur); // a visited statement is in the memo once it leaves the stack
+                if (onStack != null) return onStack;
+                Direction relatedDir = related.get(cur);
+                if (relatedDir != null && (relatedDir == Direction.BOTH || relatedDir != dir)) return -1;
 
-                        return dfs((dir == Direction.USES)
-                                ? nextUses(c, scope)
-                                : nextUsed(c, scope), dir);
-                    })) {
-                        return true;
-                    }
+                int curIndex = index.size();
+                index.put(cur, curIndex);
+                stack.push(cur);
+                int low = curIndex;
+                for (LSFMCPDeclaration next : dir == Direction.USES ? nextUses(cur, scope) : nextUsed(cur, scope)) {
+                    int nextLow = visit(next);
+                    if (nextLow < 0) return -1;
+                    low = Math.min(low, nextLow);
                 }
-                return false;
+                if (low == curIndex) { // cur is the root of its component, which reaches no related element
+                    LSFMCPDeclaration member;
+                    do {
+                        member = stack.pop();
+                        memo.put(new RelatedKey(member, dir), false);
+                    } while (member != cur);
+                }
+                return low;
+            }
+
+            boolean reaches(LSFMCPDeclaration start) {
+                if (visit(start) >= 0) return false;
+                for (LSFMCPDeclaration member : stack)
+                    memo.put(new RelatedKey(member, dir), true);
+                return true;
             }
         }
-
-        var rec = new Rec();
-        return rec.dfs(Collections.singletonList(stmt), Direction.USES) || rec.dfs(Collections.singletonList(stmt), Direction.USED);
+        return new Search(Direction.USES).reaches(stmt) || new Search(Direction.USED).reaches(stmt);
     }
 
     private static boolean processStatement(LSFFullNameDeclaration element, Processor<LSFMCPDeclaration> out) {
@@ -1591,6 +1603,11 @@ public class MCPSearchUtils {
 
         final int maxSymbols;
 
+        // While the tasks are being submitted, no pending tasks does not mean the search is done: the root filter's
+        // tasks can finish before those of `moreFilters` (or a filter's per-file tasks, submitted last) are submitted,
+        // and a stop requested then makes the processors of the later tasks reject everything.
+        private volatile boolean submitting = true;
+
         SearchState(int maxSymbols) {
             this.maxSymbols = maxSymbols;
             this.stopRequested = new AtomicBoolean(false);
@@ -1617,7 +1634,13 @@ public class MCPSearchUtils {
             }
         }
 
+        void allSubmitted() {
+            submitting = false;
+            checkAllPBetterDone(); // the tasks may have finished, or maxSymbols been hit, while the rest were submitted
+        }
+
         private void checkAllPBetterDone() {
+            if (submitting) return;
             int p = stopPriorityThreshold.get();
 
             boolean allPBetterDone = true;
