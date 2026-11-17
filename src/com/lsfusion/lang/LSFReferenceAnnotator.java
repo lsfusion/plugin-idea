@@ -1535,7 +1535,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private static final List<String> allowedFontStyles = Arrays.asList("bold", "italic");
     private void checkFontStyle(LSFComponentPropertyValue element, String fontStyle) {
-        for (String style : LSFStringUtils.unquote(fontStyle).split(" ")) {
+        for (String style : LSFStringUtils.unquoteLiteral(fontStyle).split(" ")) {
             if (!allowedFontStyles.contains(style)) {
                 addUnderscoredError(element, "fontStyle value must be a combination of strings bold and italic");
                 break;
@@ -1545,17 +1545,17 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
 
     private static final List<String> supportedSelects = Arrays.asList("button", "buttonGroup", "dropdown", "input", "list");
     private void checkSelect(PsiElement element, String select) {
-        if (!supportedSelects.contains(LSFStringUtils.unquote(select))) {
-            addUnderscoredError(element, format("%s is not supported select value, use on of: %s", select, supportedSelects));
+        if (!supportedSelects.contains(LSFStringUtils.unquoteLiteral(select))) {
+            addUnderscoredError(element, format("%s is not supported select value, use one of: %s", select, supportedSelects));
         }
     }
 
     private static final List<String> supportedDefaultCompares = Arrays.asList("=", ">", "<", ">=", "<=", "!=", "=*", "=@");
     private static final List<String> supportedDefaultCompares5 = Arrays.asList("EQUALS", "GREATER", "LESS", "GREATER_EQUALS", "LESS_EQUALS", "NOT_EQUALS", "LIKE", "CONTAINS");
     private void checkDefaultCompare(LSFComponentPropertyValue element, String defaultCompare) {
-        defaultCompare = LSFStringUtils.unquote(defaultCompare);
+        defaultCompare = LSFStringUtils.unquoteLiteral(defaultCompare);
         if (!supportedDefaultCompares.contains(defaultCompare) && !supportedDefaultCompares5.contains(defaultCompare)) {
-            addUnderscoredError(element, format("'%s' is not supported defaultCompare, use on of: %s", defaultCompare, supportedDefaultCompares));
+            addUnderscoredError(element, format("'%s' is not supported defaultCompare, use one of: %s", defaultCompare, supportedDefaultCompares));
         }
     }
 
@@ -1590,7 +1590,7 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         LSFSimpleName simpleName = annotation.getSimpleName();
         String name = simpleName.getName();
         if(!supportedAnnotations.contains(name)) {
-            addErrorAnnotation(annotation, annotation.getTextRange(), format("'%s' is not supported annotation, use on of: %s", name, supportedAnnotations));
+            addErrorAnnotation(annotation, annotation.getTextRange(), format("'%s' is not supported annotation, use one of: %s", name, supportedAnnotations));
         } else if("deprecated".equals(name)) {
             addSilentInfoAnnotation(new TextRange(annotation.getTextRange().getStartOffset(), simpleName.getTextRange().getEndOffset()), LSFHighlightingColors.DEPRECATED_ANNOTATION);
         }
@@ -1719,8 +1719,8 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitMapOptions(@NotNull LSFMapOptions o) {
         super.visitMapOptions(o);
         String option = o.getFirstChild().getText();
-        if (!supportedMapTileProviders.contains(LSFStringUtils.unquote(option))) {
-            addUnderscoredError(o, format("%s is not supported map option definition, use on of: %s", option, supportedMapTileProviders));
+        if (!supportedMapTileProviders.contains(LSFStringUtils.unquoteLiteral(option))) {
+            addUnderscoredError(o, format("%s is not supported map option definition, use one of: %s", option, supportedMapTileProviders));
         }
     }
 

@@ -342,7 +342,7 @@ public class LSFProblemsVisitor {
         if (element == null || "NULL".equals(element.getText())) {
             return;
         }
-        String defaultCompare = LSFStringUtils.unquote(element.getText());
+        String defaultCompare = LSFStringUtils.unquoteLiteral(element.getText());
         int idx = supportedDefaultCompares5.indexOf(defaultCompare);
         if (idx >= 0 && !supportedDefaultCompares.contains(defaultCompare)) { // v5 symbolic name -> deprecated since 5.2
             reportReplace(element, "5.2", "6.0", defaultCompare, supportedDefaultCompares.get(idx), sink);

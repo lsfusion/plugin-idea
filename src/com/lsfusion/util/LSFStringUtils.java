@@ -218,6 +218,11 @@ public class LSFStringUtils {
         assert isRawLiteral(literal);
         return getSimpleLiteralValue(removeRawLiteralSyntax(literal), "", false);
     }
+
+    // unquote() that also accepts a raw literal (r'text', r$'text'$): the server takes both forms of a string literal
+    public static String unquoteLiteral(@NotNull String literal) {
+        return isRawLiteral(literal) ? getRawLiteralValue(literal) : unquote(literal);
+    }
     
     // returns "simple" literal
     // r'text' -> 'text'
