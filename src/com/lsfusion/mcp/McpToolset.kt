@@ -11,6 +11,7 @@ import com.lsfusion.util.LSFFileUtils
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -26,6 +27,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import org.json.JSONArray
 import org.json.JSONObject
+import org.json.JSONTokener
 import java.net.HttpURLConnection
 import kotlin.coroutines.coroutineContext
 
@@ -100,6 +102,21 @@ data class RetrieveDocsOutput(
     @property:McpDescription(description = "Whether this response is the whole answer, and what to do when it is not. Always present, always a sentence, because the decision it drives — page again, or stop — is one a number leaves the reader to infer. It opens with a fixed label: COMPLETE, MORE, ARTICLE_COMPLETE, ARTICLE_PARTIAL or ARTICLE_NONE. Counts stay inside it; the log keeps them separately for us.")
     val status: String = "",
 )
+
+// `query` / `article`: a string in the schema, as their descriptions say, while the value is forwarded as the
+// agent sent it. Central also takes a list there, and its `status` asks for one (`article=[...]`); decoded as a
+// String, a list fails inside mcpserver with an IDE error. The descriptor is String's own, so the schema is
+// exactly a String parameter's.
+@Serializable(with = RetrieveSelectorArg.Serializer::class)
+class RetrieveSelectorArg(val raw: JsonElement) {
+    object Serializer : KSerializer<RetrieveSelectorArg> {
+        override val descriptor: SerialDescriptor = String.serializer().descriptor
+
+        override fun serialize(encoder: Encoder, value: RetrieveSelectorArg) = (encoder as JsonEncoder).encodeJsonElement(value.raw)
+
+        override fun deserialize(decoder: Decoder) = RetrieveSelectorArg((decoder as JsonDecoder).decodeJsonElement())
+    }
+}
 
 
 // report_feedback DTOs — mirror mcp/tools/feedback.py. The input ones only describe the tool's schema:
@@ -458,38 +475,37 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     @McpDescription(description = "Search official lsFusion documentation, or read articles of it by name. TWO SELECTORS, at least one required, and which you pass decides what you get: `query` (or `queries`) alone searches all three branches by meaning and returns ranked chunks; `article` (or `articles`) alone WALKS the named articles from the top in document order — omit both `query` and `queries` to traverse; both together search inside them. Keeping a query while adding an article gets you a ranked search, not a traversal. Returns `{docs:[{id,source,text,score,query}], status}`; `status` is one sentence saying whether this response is the whole answer and, when it is not, the exact call that continues it. `score` is cosine similarity and is NULL in a traversal, which has nothing to be similar to; when it is null the list is in document order. ROUTING: reach for `article` after a search, when a chunk is on the right subject but visibly partial — the constraint it depends on, the case it omits and the table it points at are elsewhere in the SAME article and invisible from inside the chunk. Its name is already in front of you: the part of the chunk `id` before `::`, or the basename of any `.md` link in the text. Searching again with different wording is the move this replaces. Omit `type` by default: each branch has its own share of the response, so setting `type` only removes the other two branches — it does not improve the branch it keeps — and naming an article picks its branch already. For capability maps and coding rules use `lsfusion_get_guidance`, which returns whole articles; reading the rules of an area you are about to work in is mandatory. The corpus is English-only (`docs/en/`) — cross-lingual embeddings make non-English queries work, but English wording gives the best recall.")
     @Suppress("unused")
     suspend fun retrieveDocs(
-        @McpDescription(description = "One short technical question, or a list of at most 16 DISTINCT queries for independent needs already known before this call — beyond that each one gets too small a share of one call's result budget to be worth asking, so split larger sets across calls. State what you need to learn or achieve; include a construct or module name when you know it, plus the behaviour or constraint that matters. Prefer `NEWSESSION APPLY behaviour when a nested session is canceled` to `sessions`: a bare noun is what every article in a branch is about, and the search answers it with whichever one is closest to that whole topic. Search is semantic, not literal — exact documentation wording is not required, and rephrasing beats retrying the same query. Batch only independent lookups, never alternative phrasings of one need; when one answer can determine or refine the next query, call again instead. In a batch, `type` and `exclude_ids` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to.")
-        query: String? = null,
-        @McpDescription(description = "At most 16 DISTINCT queries for independent needs already known before this call — instead of `query`, not alongside it. Batch only lookups that do not depend on one another; when one answer can determine or refine the next query, call the tool again instead. Do not batch alternative phrasings of one need. `type` and `excludeIds` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to.")
+        @McpDescription(description = "One short technical question; several independent ones go in `queries`. State what you need to learn or achieve; include a construct or module name when you know it, plus the behaviour or constraint that matters. Prefer `NEWSESSION APPLY behaviour when a nested session is canceled` to `sessions`: a bare noun is what every article in a branch is about, and the search answers it with whichever one is closest to that whole topic. Search is semantic, not literal — exact documentation wording is not required, and rephrasing beats retrying the same query.")
+        query: RetrieveSelectorArg? = null,
+        @McpDescription(description = "At most 16 DISTINCT queries, each worded as for `query`, for independent needs already known before this call — beyond that each one gets too small a share of one call's result budget to be worth asking, so split larger sets across calls. Pass them instead of `query`, not alongside it. Batch only lookups that do not depend on one another; when one answer can determine or refine the next query, call the tool again instead. Do not batch alternative phrasings of one need. `type` and `exclude_ids` apply to every query, all queries share one result cap, a chunk answering two of them is returned once, and each result names the query it is credited to.")
         queries: List<String>? = null,
         @McpDescription(description = "Optional branch filter; in a batch it applies to every query. Omit or pass null unless you specifically need answers from one branch. Choose by the ANSWER you need, not by the words in your query: `language` — the exact syntax, parameters and behaviour of a construct; `paradigm` — how the platform works: its concepts, its mechanisms and how they relate; `how-to` — a worked recipe for a task. An operator name in the query does not by itself justify `language`. For a mixed or uncertain need, omit the filter. `brief` and `rules` are not here at all: an area's capability map and its coding rules are read whole, by name, with `lsfusion_get_guidance`.")
         type: String? = null,
         @McpDescription(description = "Chunk `id` values you already hold. They are excluded server-side BEFORE ranking, so the quota is spent on material you do not have. Use this to page deeper on the same information need. Do NOT use it to rephrase a query for a better ranking, or to ask a different question about the same area: the filter ignores the new query, so a chunk that is now the most relevant one would be dropped before ranking. Leave empty on the first call.")
-        excludeIds: List<String>? = null,
-        @McpDescription(description = "Name of the article to read instead of searching the whole corpus — one name, or a list of at most 12. Give it ALONE to WALK those articles from the top in DOCUMENT order; that is what you want when a chunk was on the right subject but plainly partial, because the constraint it depends on, the case it omits and the table it points at all sit elsewhere in the same article. Give it WITH `query` to SEARCH inside that set instead. Three shapes are accepted, all of which you are already holding: a published slug (`Interactive_view`); any chunk `id` verbatim (`Interactive_view::examples`) — everything from `::` names the section, the article is what gets read; or the DESTINATION of any `.md` link in chunk text (`../paradigm/Actions.md` and `Actions.md` both mean `Actions`) — the destination, never the visible label. Naming an article already picks its branch, so do not also pass `type`. Articles are PAGED, not delivered whole: every one named gets at least its next chunk, `status` says in words which of them are finished and which are not, and when any remain it gives you the exact call that continues — repeat it until `status` stops offering one.")
-        article: String? = null,
+        exclude_ids: List<String>? = null,
+        @McpDescription(description = "Name of the article to read instead of searching the whole corpus; several go in `articles`. Give it ALONE to WALK the article from the top in DOCUMENT order; that is what you want when a chunk was on the right subject but plainly partial, because the constraint it depends on, the case it omits and the table it points at all sit elsewhere in the same article. Give it WITH `query` to SEARCH inside it instead. Three shapes are accepted, all of which you are already holding: a published slug (`Interactive_view`); any chunk `id` verbatim (`Interactive_view::examples`) — everything from `::` names the section, the article is what gets read; or the DESTINATION of any `.md` link in chunk text (`../paradigm/Actions.md` and `Actions.md` both mean `Actions`) — the destination, never the visible label. Naming an article already picks its branch, so do not also pass `type`. Articles are PAGED, not delivered whole: every one named gets at least its next chunk, `status` says in words which of them are finished and which are not, and when any remain it gives you the exact call that continues — repeat it until `status` stops offering one.")
+        article: RetrieveSelectorArg? = null,
         @McpDescription(description = "At most 12 article names — instead of `article`, not alongside it. Same shapes and same behaviour as `article`: given alone the articles are WALKED in document order, given with `query` or `queries` the search runs inside them. When `status` says to repeat with `article=[...]`, that list goes here.")
         articles: List<String>? = null,
     ): RetrieveDocsOutput {
         // The central tool takes `query` and `article` as either a string or a list;
-        // Kotlin cannot express that as one typed parameter, so each is split in two
-        // here and folded back together for the call. Which selectors are required
-        // is the central tool's decision, so a call with neither is forwarded as is.
+        // the schema here cannot say that of one parameter, so each is split in two
+        // and folded back together for the call. Apart from those list halves, every
+        // parameter is named exactly as central's: mcpserver names an argument after
+        // its parameter and drops any key that matches none. Which selectors are
+        // required is the central tool's decision, so a call with neither is
+        // forwarded as is.
         val hasQueries = !queries.isNullOrEmpty()
         val hasArticles = !articles.isNullOrEmpty()
         if (query != null && hasQueries || article != null && hasArticles)
             throw mcpExpectedError("Pass `query` or `queries`, not both; likewise `article` or `articles`")
         val args = JSONObject()
-        if (query != null) args.put("query", query)
+        if (query != null) args.put("query", JSONTokener(query.raw.toString()).nextValue())
         else if (hasQueries) args.put("query", JSONArray(queries))
         if (type != null) args.put("type", type)
-        if (article != null) args.put("article", article)
+        if (article != null) args.put("article", JSONTokener(article.raw.toString()).nextValue())
         else if (hasArticles) args.put("article", JSONArray(articles))
-        if (excludeIds != null && excludeIds.isNotEmpty()) {
-            val ids = JSONArray()
-            excludeIds.forEach { ids.put(it) }
-            args.put("exclude_ids", ids)
-        }
+        if (!exclude_ids.isNullOrEmpty()) args.put("exclude_ids", JSONArray(exclude_ids))
         val resultEl = callRemoteToolResultJson("lsfusion_retrieve_docs", args)
         return json.decodeFromJsonElement<RetrieveDocsOutput>(resultEl)
     }

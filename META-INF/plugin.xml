@@ -24,6 +24,7 @@
             <li>Improved filter handling in the <code>lsfusion_find_elements</code> MCP tool</li>
             <li>Fixed missing results in the <code>lsfusion_find_elements</code> MCP tool</li>
             <li>Fixed reading documentation and sending feedback through the plugin's <code>/lsfusion</code> MCP endpoint in clients that validate tool results</li>
+            <li>Fixed paging in the <code>lsfusion_retrieve_docs</code> tool of the IDE's MCP server: <code>exclude_ids</code> is no longer ignored, and a list in <code>query</code> or <code>article</code> no longer fails with an IDE error</li>
         </ul>
     ]]>
     </change-notes>
