@@ -6,11 +6,18 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 
 object RemoteMcpClient {
-    private const val URL = "https://ai.lsfusion.org/mcp"
+    // `via` names the access path to the center: it gives each path its own first get_guidance answer.
+    private const val URL = "https://ai.lsfusion.org/mcp?via=idedev"
     private const val DEFAULT_TIMEOUT_SECONDS = 30
+    // The agent's own initialize waits on this one, so a center that does not answer must not hold it long.
+    private const val INSTRUCTIONS_TIMEOUT_SECONDS = 5
 
     @Volatile
     private var sessionId: String? = null
+
+    // `instructions` of the center's initialize answer for the current session.
+    @Volatile
+    private var upstreamInstructions: String? = null
 
     private fun extractJsonFromSseOrPlain(body: String): String {
         val idx = body.indexOf("data:")
@@ -169,8 +176,29 @@ object RemoteMcpClient {
                 throw mcpExpectedError("Remote MCP initialize did not return 'mcp-session-id'. Body: ${responseBody.take(2_000)}")
             }
 
+            upstreamInstructions = try {
+                JSONObject(extractJsonFromSseOrPlain(responseBody)).optJSONObject("result")
+                    ?.optString("instructions")?.takeIf { it.isNotBlank() }
+            } catch (_: Exception) {
+                null
+            }
             sessionId = headerSessionId
             return headerSessionId!!
+        }
+    }
+
+    /**
+     * The center's `instructions` (its pointer to read the guidance first), for the plugin's own initialize
+     * answer to relay; opens the upstream session when there is none yet. Null when the center does not
+     * answer or gives none.
+     */
+    @JvmStatic
+    fun instructions(): String? {
+        return try {
+            ensureSessionId(INSTRUCTIONS_TIMEOUT_SECONDS)
+            upstreamInstructions
+        } catch (_: Exception) {
+            null
         }
     }
 

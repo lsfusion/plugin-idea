@@ -64,6 +64,10 @@ public abstract class McpBaseService extends RestService {
                         .put("tools", new JSONObject().put("listChanged", false))
                         .put("resources", new JSONObject().put("listChanged", false))
                         .put("prompts", new JSONObject().put("listChanged", false)));
+        String instructions = RemoteMcpClient.instructions();
+        if (instructions != null) {
+            result.put("instructions", instructions);
+        }
         return rpcResult(jsonrpc, id, result);
     }
 
