@@ -1,702 +1,554 @@
 package com.lsfusion.actions.generate;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.JDOMUtil;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBScrollPane;
+import com.lsfusion.lang.LSFLexerAdapter;
+import com.lsfusion.lang.psi.LSFTypes;
 import com.lsfusion.util.BaseUtils;
 import net.gcardone.junidecode.Junidecode;
-import org.apache.commons.lang3.StringUtils;
+import org.jdom.Attribute;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.beans.Introspector;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.DateTimeException;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public abstract class GenerateFormAction extends AnAction {
-
-    private Project project;
-
-    private Set<String> usedObjectIds = new HashSet<>();
-    private Set<String> usedObjectsIds = new HashSet<>();
-    private Set<String> usedGroupIds = new HashSet<>();
-    private Set<String> usedNamespacePrefixes = new HashSet<>();
-    private Set<String> usedFilterProperties = new HashSet<>();
-
-    private boolean fullNamespaceInExtId = false;
-
-    private final Set<String> keywords = new HashSet<>(Arrays.asList("TRUE", "FALSE", "TTRUE", "TFALSE", "INTEGER", "LONG", "NUMERIC", "DOUBLE", "DATE", "DATETIME", "TIME", "YEAR",
-            "ZDATETIME", "INTERVAL", "BPSTRING", "BPISTRING", "STRING", "ISTRING", "TEXT", "RICHTEXT", "HTMLTEXT",
-            "WORDFILE", "IMAGEFILE", "PDFFILE", "VIDEOFILE", "DBFFILE", "RAWFILE", "FILE", "EXCELFILE", "TEXTFILE",
-            "CSVFILE", "HTMLFILE", "JSONFILE", "XMLFILE", "TABLEFILE", "NAMEDFILE",
-            "WORDLINK", "IMAGELINK", "PDFLINK", "VIDEOLINK", "DBFLINK", "RAWLINK", "LINK", "EXCELLINK", "TEXTLINK",
-            "CSVLINK", "HTMLLINK", "JSONLINK", "XMLLINK", "TABLELINK",
-            "BOOLEAN", "TBOOLEAN", "COLOR", "ABSTRACT", "ACTIVATE", "ACTIVE", "ATTR", "ASK", "NATIVE",
-            "ACTION", "ACTIONS", "AFTER", "GOAFTER", "AGGR", "NAGGR", "ALL", "AND", "APPEND", "APPLY", "AS", "ASON", "ASYNCUPDATE", "ATTACH", "AUTO", "AUTOREFRESH", "AUTOSET", "AUTOSIZE", "BACKGROUND",
-            "BCC", "BEFORE", "BODY", "BODYPARAMNAMES", "BODYPARAMHEADERS", "BODYURL", "BOTTOM", "BOX", "BREAK",
-            "BY", "CANCEL", "CASE", "CC", "CATCH", "CALENDAR", "CENTER", "CHANGE", "CHANGECLASS", "CHANGEABLE", "CHANGEKEY", "CHANGED", "CHANGEMOUSE", "CHANGEWYS", "CHARSET",
-            "CHARWIDTH", "CHECK", "CHECKED", "CLASS", "CLASSCHOOSER", "CLASSES", "CLIENT", "CLOSE", "COLUMN", "COLUMNS",
-            "COMPLEX", "CONNECTION", "CONTEXTMENU", "CONTINUE", "NOHINT", "COLLAPSE",
-            "CONCAT", "CONFIG", "CONFIRM", "CONSTRAINT", "CONTAINER", "CONTAINERH", "CONTAINERV", "COOKIES", "COOKIESTO", "STRETCH",
-            "CANONICALNAME", "CSV", "CUSTOM", "CYCLES", "DATA", "DB", "DBF", "DEFAULT", "DEFAULTCOMPARE", "DELAY", "DELETE",
-            "DESC", "DESIGN", "DIALOG", "DISABLE", "DISABLEIF", "DO", "DOC", "DOCKED", "DOCX", "DOWN", "DRAWROOT", "DRILLDOWN",
-            "DROP", "DROPCHANGED", "DROPPED", "ECHO", "EDIT", "ELSE", "EMAIL", "EMBEDDED", "END", "ERROR", "ESCAPE", "EVAL",
-            "EVENTID", "EVENTS", "EXCLUSIVE", "EXEC", "EXPAND", "EXTERNAL", "NEWEXECUTOR", "EXPORT",
-            "EXTEND", "EXTKEY", "EXTID", "EXTNULL", "FIELDS", "FILTER", "FILTERBOX", "FILTERCONTROLS", "FILTERGROUP", "FILTERGROUPS", "FILTERS", "FINALLY",
-            "FIRST", "FIXED", "FLEX", "FOCUSED", "FLOAT", "FOLDER", "FOOTER", "FOR", "FOREGROUND",
-            "FORM", "FORMEXTID", "FORMS", "FORMULA", "FROM", "FULL", "GET", "GLOBAL", "GRID", "GRIDBOX", "GROUP", "GROUPCHANGE", "EQUAL", "HALIGN", "HEADER", "HEADERS",
-            "HEADERSTO", "HIDE", "HIDESCROLLBARS", "HIDETITLE", "HINT", "HINTNOUPDATE", "HINTTABLE", "HOVER", "HORIZONTAL", "HTML", "HTTP", "IF", "IMAGE", "IMPORT", "IMPOSSIBLE", "IN",
-            "INDEX", "INDEXED", "INFO", "INIT", "INLINE", "INPUT", "INTERNAL", "IS", "JAVA", "JOIN", "JSON", "JSONTEXT", "KEY",
-            "KEYPRESS", "LAST", "LAZY", "LEFT", "LIKE", "LIMIT", "LIST", "LOCAL",
-            "LOCALASYNC", "LOG", "LOGGABLE", "LSF", "MANAGESESSION", "NOMANAGESESSION", "MAP", "MATCH", "MATERIALIZED",
-            "MAX", "MEASURE", "MEASURES", "MENU", "MEMO", "MESSAGE", "META", "MIN",
-            "MODULE", "MOVE", "MOUSE", "MS", "MULTI", "NAME", "NAMESPACE", "NAVIGATOR", "NESTED", "NESTEDSESSION",
-            "NEW", "NEWCONNECTION", "NEWEDIT", "NEWSESSION", "NEWSQL", "NEWTHREAD", "NO", "NOCANCEL", "NOCLOSE",
-            "NOCOMPLEX", "NODEFAULT", "NOEXTID", "NOESCAPE", "NOFLEX", "NOCHANGE", "NOCONSTRAINTFILTER", "NOCUSTOM", "NOENCODE",
-            "NOIMAGE", "NOINLINE", "NOHEADER", "NOSELECT", "NOSETTINGS", "NOT", "WAIT", "NOWAIT",
-            "NULL", "NONULL", "NOSTICKY", "NOTABBED", "OBJECT", "OBJECTS", "CONSTRAINTFILTER", "OK", "ON", "OPTIMISTICASYNC", "OPTIONS", "OR", "ORDER", "ORDERS", "OVERRIDE", "PAGESIZE", "PANEL", "PARENT",
-            "PARTITION", "PASSWORD", "PATCH", "PATTERN", "PDF", "PERIOD", "PIVOT", "PG", "POPUP", "POSITION", "POST",
-            "PREREAD", "PREV", "PREVIEW", "NOPREVIEW", "PARAMS", "PRINT", "PRIORITY", "PROPERTIES",
-            "PROPERTY", "PROPERTYDRAW", "PROPORTION", "PUT", "QUERYCLOSE", "QUERYOK", "QUICKFILTER", "READ", "READONLY",
-            "READONLYIF", "RECALCULATE", "RECURSION", "REFLECTION", "REGEXP", "REMOVE", "REPLACE", "NOREPLACE",
-            "REPORT", "REPORTS", "REPORTFILES", "REQUEST", "REQUIRE", "RESOLVE", "RETURN", "RGB", "RIGHT", "ROUND", "ROOT", "ROW",
-            "ROWS", "RTF", "SCREENSHOT", "SCROLL", "SEEK", "SELECT", "SELECTED", "SELECTOR", "SERIALIZABLE", "SERVER",
-            "SET", "SETCHANGED", "SETDROPPED", "SETTINGS", "SCHEDULE", "SHOW", "SHOWDEP", "SHOWIF", "SINGLE", "SHEET", "SPLITH", "SPLITV", "SQL", "START", "STEP", "STICKY",
-            "STRICT", "STRONG", "STRUCT", "SUBJECT", "SUBREPORT", "SUCCESS", "SUM", "TAB", "TABBED", "TABLE", "TAG",
-            "TCP", "TEXTHALIGN", "TEXTVALIGN", "THEN", "THREADS", "TO", "DRAW", "TOOLBAR",
-            "TOOLBARBOX", "TOOLBARLEFT", "TOOLBARRIGHT", "TOOLBARSYSTEM", "TOP", "TREE", "TRY", "TSQUERY", "TSVECTOR",
-            "UDP", "UNGROUP", "UP", "USER", "USERFILTER", "USERFILTERS", "VALIGN", "VALUE", "VERTICAL", "VIEW", "VIEWTYPE", "WARN", "WEAK",
-            "WHEN", "WHERE", "WHILE", "WITHIN", "WRITE", "WINDOW", "XLS", "XLSX", "XML", "XOR", "YES", "YESNO"));
-
-    abstract String getExtension();
-
-    abstract boolean showFullNamespaceCheckBox();
-
-    abstract Object getRootElement(String file) throws Exception;
-
-    abstract List<ParseNode> generateHierarchy(Object element, String key);
+public class GenerateFormAction extends AnAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        this.project = getEventProject(e);
-        new GenerateFormDialog().show();
+        new GenerateFormDialog(getEventProject(e)).show();
     }
 
-    public class GenerateFormDialog extends DialogWrapper {
-        JTextPane sourceTextPane;
-        JTextPane targetTextPane;
-        JButton generateFromTextButton;
+    // XML namespaces are the only part of the generated script that depends on the platform version
+    enum Platform {
+        // the form's FORMEXTID declares every namespace of the document ('ns=uri:root;p=uri'), an EXTID names only a prefix
+        V7("7.0"),
+        // FORMEXTID takes one namespace only (the ';' list is 7.0), and an import resolves a prefix against the document,
+        // where it may be declared deeper than the element read: an EXTID outside the root's namespace carries its uri
+        V6("6.x");
 
-        public GenerateFormDialog() {
-            super(project);
-            init();
-            setTitle("Generate form");
+        final String caption;
+
+        Platform(String caption) {
+            this.caption = caption;
         }
 
-        private GridBagConstraints getGridBagConstraints(int row) {
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridy = row;
-            gbc.fill = GridBagConstraints.BOTH;
-            gbc.weightx = 0.1;
-            gbc.weighty = 1.0;
-            return gbc;
+        @Override
+        public String toString() {
+            return caption;
+        }
+    }
+
+    private static final String PLATFORM_KEY = "lsfusion.generateForm.platform";
+
+    private static class GenerateFormDialog extends DialogWrapper {
+        private final Project project;
+        private JTextPane sourceTextPane;
+        private JTextPane targetTextPane;
+        private ComboBox<Platform> platformComboBox;
+
+        GenerateFormDialog(Project project) {
+            super(project);
+            this.project = project;
+            setTitle("Generate Form");
+            setOKButtonText("Close");
+            init();
+        }
+
+        @Override
+        protected Action @NotNull [] createActions() {
+            return new Action[]{getOKAction()};
         }
 
         private void generate(String text) {
             try {
-                if (text != null && !text.isEmpty()) {
-                    Object rootElement = getRootElement(text);
-                    if (rootElement != null) {
-                        usedObjectIds = new HashSet<>();
-                        usedObjectsIds = new HashSet<>();
-                        usedGroupIds = new HashSet<>();
-                        usedNamespacePrefixes = new HashSet<>();
-                        List<ParseNode> hierarchy = generateHierarchy(rootElement, null);
-                        CodeBlock formCodeBlock = generateForm(hierarchy, null, null, null, null, null);
-                        showFormScript(formCodeBlock);
-                    }
-                }
+                Platform platform = (Platform) platformComboBox.getSelectedItem();
+                PropertiesComponent.getInstance().setValue(PLATFORM_KEY, platform.name());
+                targetTextPane.setText(new ScriptGenerator(platform).generate(parse(text)));
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Generation failed", JOptionPane.ERROR_MESSAGE);
+                Messages.showErrorDialog(project, String.valueOf(e.getMessage()), "Generation Failed");
             }
         }
 
-        private void enableGenerateButton() {
-            generateFromTextButton.setEnabled(!sourceTextPane.getText().isEmpty());
-        }
-
-        private void onGenerateFromFile() {
-            try {
-                final FileChooserDescriptor fileChooser = FileChooserDescriptorFactory.createSingleFileDescriptor(getExtension());
-                VirtualFile file = FileChooser.chooseFile(fileChooser, project, null);
-                if (file != null) {
-                    String inputFile = readFile(Paths.get(file.getPath()));
-                    if (inputFile != null) {
-                        generate(inputFile);
-                    } else {
-                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Unknown charset", "Read file failed", JOptionPane.ERROR_MESSAGE);
-                    }
+        private void generateFromFile() {
+            VirtualFile file = FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFileDescriptor()
+                    .withExtensionFilter("JSON / XML", "json", "xml"), project, null);
+            if (file != null) {
+                String text;
+                try {
+                    // reading a file is not allowed on the EDT
+                    text = ProgressManager.getInstance().runProcessWithProgressSynchronously(
+                            () -> VfsUtilCore.loadText(file), "Reading " + file.getName(), false, project);
+                } catch (Exception e) {
+                    Messages.showErrorDialog(project, String.valueOf(e.getMessage()), "Read File Failed");
+                    return;
                 }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(), "Read file failed", JOptionPane.ERROR_MESSAGE);
+                generate(text);
             }
-        }
-
-        String[] extraCharsets = new String[]{"cp1251"};
-
-        private String readFile(Path file) {
-            String result = null;
-            try {
-                result = Files.readString(file);
-            } catch (IOException e) {
-                for (String charset : extraCharsets) {
-                    try {
-                        result = Files.readString(file, Charset.forName(charset));
-                        break;
-                    } catch (IOException ignored) {
-                    }
-                }
-            }
-            return result;
-        }
-
-        private void showFormScript(CodeBlock formCodeBlock) {
-            Form form = generateFormFromCodeBlocks(formCodeBlock);
-
-            String formScript = (form.groupDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.groupDeclarationScripts, "\n") + "\n\n")) +
-                    (form.propertyDeclarationScripts.isEmpty() ? "" : (StringUtils.join(form.propertyDeclarationScripts, "\n") + "\n\n")) +
-                    form.formNameScript + "\n" + (form.formScripts.isEmpty() ? "" : StringUtils.join(form.formScripts, "\n")) + ";";
-
-            targetTextPane.setText(formScript);
         }
 
         @Override
         protected @Nullable JComponent createCenterPanel() {
             sourceTextPane = new JTextPane();
             sourceTextPane.setBackground(null);
-            JBScrollPane sourceScrollPane = new JBScrollPane(sourceTextPane);
 
-            generateFromTextButton = new JButton("Generate from text");
+            JButton generateFromTextButton = new JButton("Generate from text");
             generateFromTextButton.addActionListener(e -> generate(sourceTextPane.getText()));
             generateFromTextButton.setEnabled(false);
+            sourceTextPane.getDocument().addDocumentListener(new DocumentAdapter() {
+                @Override
+                protected void textChanged(@NotNull DocumentEvent e) {
+                    generateFromTextButton.setEnabled(!sourceTextPane.getText().isEmpty());
+                }
+            });
 
             JButton generateFromFileButton = new JButton("Generate from file");
-            generateFromFileButton.addActionListener(e -> onGenerateFromFile());
+            generateFromFileButton.addActionListener(e -> generateFromFile());
 
-            fullNamespaceInExtId = false;
-            JCheckBox fullNamespaceCheckBox = new JCheckBox("Full namespace in EXTID");
-            fullNamespaceCheckBox.addActionListener(e -> fullNamespaceInExtId = !fullNamespaceInExtId);
-            fullNamespaceCheckBox.setVisible(showFullNamespaceCheckBox());
+            platformComboBox = new ComboBox<>(Platform.values());
+            platformComboBox.setSelectedItem(Platform.valueOf(PropertiesComponent.getInstance().getValue(PLATFORM_KEY, Platform.V7.name())));
+            platformComboBox.setToolTipText("XML only: 6.x does not accept the FORMEXTID 'ns=uri:root;p=uri' list, so each EXTID names its namespace's uri");
+            JLabel platformLabel = new JLabel("Platform:");
 
             targetTextPane = new JTextPane();
             targetTextPane.setBackground(null);
             targetTextPane.setEditable(false);
-            JBScrollPane targetScrollPane = new JBScrollPane(targetTextPane);
 
-            JPanel mainPanel = new JPanel();
-            mainPanel.setMinimumSize(new Dimension(600, 800));
-            mainPanel.setLayout(new GridBagLayout());
-            mainPanel.add(sourceScrollPane, getGridBagConstraints(0));
-            JPanel buttonsPanel = new JPanel();
-            buttonsPanel.add(fullNamespaceCheckBox, BorderLayout.EAST);
-            buttonsPanel.add(generateFromTextButton, BorderLayout.WEST);
-            buttonsPanel.add(generateFromFileButton, BorderLayout.WEST);
+            JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            buttonsPanel.add(generateFromTextButton);
+            buttonsPanel.add(generateFromFileButton);
+            buttonsPanel.add(platformLabel);
+            buttonsPanel.add(platformComboBox);
 
-            buttonsPanel.setMinimumSize(new Dimension());
-
-            JPanel bottomPanel = new JPanel();
-            bottomPanel.setLayout(new BorderLayout());
+            JPanel bottomPanel = new JPanel(new BorderLayout());
             bottomPanel.add(buttonsPanel, BorderLayout.NORTH);
-            bottomPanel.add(targetScrollPane, BorderLayout.CENTER);
+            bottomPanel.add(new JBScrollPane(targetTextPane), BorderLayout.CENTER);
 
-            mainPanel.add(bottomPanel, getGridBagConstraints(1));
-
-            sourceTextPane.getDocument().addDocumentListener(new DocumentListener() {
-                @Override
-                public void insertUpdate(DocumentEvent e) {
-                    enableGenerateButton();
-                }
-
-                @Override
-                public void removeUpdate(DocumentEvent e) {
-                    enableGenerateButton();
-                }
-
-                @Override
-                public void changedUpdate(DocumentEvent e) {
-                    enableGenerateButton();
-                }
-            });
+            JPanel mainPanel = new JPanel(new GridLayout(2, 1));
+            mainPanel.setPreferredSize(new Dimension(700, 800));
+            mainPanel.add(new JBScrollPane(sourceTextPane));
+            mainPanel.add(bottomPanel);
             return mainPanel;
         }
     }
 
-    private Form generateFormFromCodeBlocks(CodeBlock codeBlock) {
-        Set<String> groupDeclarationScripts = new LinkedHashSet<>(codeBlock.groupDeclarationScripts);
-        Set<String> propertyDeclarationScripts = new LinkedHashSet<>(codeBlock.propertyDeclarationScripts);
-        List<String> formScripts = new ArrayList<>(codeBlock.objectsScripts);
+    // parse tree
 
-        if (codeBlock.namespacePropertiesScript != null) {
-            formScripts.add(codeBlock.namespacePropertiesScript);
+    record Namespace(String prefix, String uri) {
+    }
+
+    abstract static class Node {
+        final String name; // a JSON key or an XML local name
+        final Namespace namespace; // XML only
+
+        Node(String name, Namespace namespace) {
+            this.name = name;
+            this.namespace = namespace;
         }
-        if (codeBlock.propertiesScript != null) {
-            formScripts.add(codeBlock.propertiesScript);
+    }
+
+    // a value: a JSON primitive, an XML attribute or the text of an XML element
+    static class PropertyNode extends Node {
+        final String type; // null when no value says what it is (JSON null)
+        final boolean attr;
+        final boolean text; // the text of an XML element that has attributes too, read by the EXTID 'value'
+
+        PropertyNode(String name, Namespace namespace, String type, boolean attr, boolean text) {
+            super(name, namespace);
+            this.type = type;
+            this.attr = attr;
+            this.text = text;
         }
-        if (codeBlock.filtersScript != null) {
-            formScripts.add(codeBlock.filtersScript);
+    }
+
+    // a JSON object, an XML element with children or attributes
+    static class GroupNode extends Node {
+        final List<Node> children = new ArrayList<>();
+        final List<Namespace> namespaces = new ArrayList<>(); // root only: every namespace the document declares or uses
+
+        GroupNode(String name, Namespace namespace) {
+            super(name, namespace);
+        }
+    }
+
+    // a JSON array, a repeated XML element
+    static class ObjectNode extends Node {
+        final GroupNode element; // the rows merged; null when they are values
+        final String valueType;
+
+        ObjectNode(String name, Namespace namespace, GroupNode element, String valueType) {
+            super(name, namespace);
+            this.element = element;
+            this.valueType = valueType;
         }
 
-        if (codeBlock.children != null) {
-            for (CodeBlock child : codeBlock.children) {
-                Form blocks = generateFormFromCodeBlocks(child);
-                groupDeclarationScripts.addAll(blocks.groupDeclarationScripts);
-                propertyDeclarationScripts.addAll(blocks.propertyDeclarationScripts);
-                for (String formScript : blocks.formScripts) {
-                    if (!formScripts.contains(formScript)) { //temp check
-                        formScripts.add(formScript);
-                    }
-                }
+        boolean isValues() {
+            return element == null || element.children.isEmpty();
+        }
+    }
+
+    static String mergeType(String a, String b) {
+        return a == null ? b : b == null || a.equals(b) ? a : "STRING";
+    }
+
+    // merges the rows of an array: a key may be missing in some of them, hold an object in one and a value in another
+    static Node merge(Node a, Node b) {
+        if (a == null)
+            return b;
+        if (a instanceof PropertyNode pa && b instanceof PropertyNode pb)
+            return new PropertyNode(pa.name, pa.namespace, mergeType(pa.type, pb.type), pa.attr, pa.text);
+        if (a instanceof GroupNode ga && b instanceof GroupNode gb) {
+            GroupNode result = new GroupNode(ga.name, ga.namespace);
+            result.children.addAll(ga.children);
+            for (Node child : gb.children) {
+                int index = indexOf(result.children, child);
+                if (index < 0)
+                    result.children.add(child);
+                else
+                    result.children.set(index, merge(result.children.get(index), child));
             }
+            return result;
         }
-        return new Form(codeBlock.formNameScript, groupDeclarationScripts, propertyDeclarationScripts, formScripts);
-
+        if (a instanceof ObjectNode oa && b instanceof ObjectNode ob)
+            return new ObjectNode(oa.name, oa.namespace, (GroupNode) merge(oa.element, ob.element), mergeType(oa.valueType, ob.valueType));
+        // a value loses to a structure, a single object to an array
+        if (a instanceof ObjectNode || b instanceof PropertyNode)
+            return a;
+        return b;
     }
 
-    private CodeBlock generateForm(List<ParseNode> elements, ElementKey key, ParseNode parentElement, ElementKey parentKey, ElementKey parentInGroupKey, ElementKey lastGroupObjectParent) {
-        String formNameScript = null;
-        Set<String> groupDeclarationScripts = new LinkedHashSet<>();
-        Set<String> propertyDeclarationScripts = new LinkedHashSet<>();
-        Set<String> objectsScripts = new LinkedHashSet<>();
-        List<ElementNamespace> namespaces = new ArrayList<>();
-        Set<ElementProperty> properties = new LinkedHashSet<>();
-        String propertiesScript = null;
-        String filtersScript = null;
-        List<CodeBlock> children = new ArrayList<>();
+    private static int indexOf(List<Node> nodes, Node node) {
+        for (int i = 0; i < nodes.size(); i++) {
+            Node n = nodes.get(i);
+            if (n.name.equals(node.name) && Objects.equals(n.namespace, node.namespace) &&
+                    (n instanceof PropertyNode pn && pn.attr) == (node instanceof PropertyNode p && p.attr))
+                return i;
+        }
+        return -1;
+    }
 
-        for (ParseNode element : elements) {
+    // the root is a group: the JSON top-level object, or the XML root element
+    static GroupNode parse(String text) throws Exception {
+        if (text.startsWith("\uFEFF"))
+            text = text.substring(1);
+        return text.stripLeading().startsWith("<") ? parseXML(text) : parseJSON(text);
+    }
 
-            if (element instanceof GroupObjectParseNode) {
+    private static GroupNode parseJSON(String text) {
+        // Gson keeps the order of the keys, so the form lists them as the document does
+        JsonElement root = JsonParser.parseString(text);
+        if (!root.isJsonObject()) { // the platform reads a top-level array or value as the key "value"
+            JsonObject wrapper = new JsonObject();
+            wrapper.add("value", root);
+            root = wrapper;
+        }
+        return (GroupNode) parseJSON(root, null);
+    }
 
-                String filterProperty;
-                if (((GroupObjectParseNode) element).isIndex()) {
-                    filterProperty = getFilterProperty(parentKey, key);
-                    propertyDeclarationScripts.add(getStringPropertyDeclarationScript(key));
-                    objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentInGroupKey));
-                    propertiesScript = getPropertiesScript(key, null, new LinkedHashSet<>(Collections.singletonList(new ElementProperty(new ElementKey("value", key.ID), null, false))));
-                } else {
-                    filterProperty = getFilterProperty(lastGroupObjectParent, key);
-                    objectsScripts.add(getObjectsScript(key, ((GroupObjectParseNode) element).namespace, parentInGroupKey));
-
-                    for (ParseNode childElement : element.children) {
-                        children.add(generateForm(Collections.singletonList(childElement), key, element, parentKey, parentElement instanceof PropertyGroupParseNode ? key : null, key));
-                    }
-                }
-
-                if (filterProperty != null) {
-                    filtersScript = getFiltersScript(filterProperty, key, lastGroupObjectParent);
-                    propertyDeclarationScripts.add(getIntegerPropertyDeclarationScript(filterProperty));
-                }
-
-            } else if (element instanceof PropertyGroupParseNode) {
-                PropertyGroupParseNode propertyGroupElement = ((PropertyGroupParseNode) element);
-                formNameScript = parentElement == null ? getFormNameScript(propertyGroupElement) : null;
-
-                if (hasPropertyGroupParseNodeChildren(element)) {
-                    if (lastGroupObjectParent != null) {
-                        if(lastGroupObjectParent.equals(key)) {
-                            objectsScripts.add(getObjectsScript(key, propertyGroupElement.namespace, parentInGroupKey));
-                        }
-                        if (parentKey != null) {
-                            groupDeclarationScripts.add(getGroupDeclarationScript(parentKey, propertyGroupElement.namespace, null));
-                        }
-                    }
-                }
-
-                if (parentElement instanceof PropertyGroupParseNode) {
-                    groupDeclarationScripts.add(getGroupDeclarationScript(key, propertyGroupElement.namespace, parentInGroupKey));
-                }
-
-                for (ParseNode childElement : element.children) {
-                    ElementKey childElementKey = new ElementKey(childElement.key);
-
-                    if (childElement instanceof NamespaceParseNode) {
-                        namespaces.add(((NamespaceParseNode) childElement).namespace);
-                    } else {
-                        if (childElement instanceof PropertyParseNode) {
-                            properties.add(new ElementProperty(childElementKey, ((PropertyParseNode) childElement).namespace, ((PropertyParseNode) childElement).attr));
-                        }
-
-                        children.add(generateForm(Collections.singletonList(childElement), childElementKey, element, key, parentElement instanceof PropertyGroupParseNode ? key : null, lastGroupObjectParent));
-                    }
-                }
-
-            } else {
-                assert element instanceof PropertyParseNode;
-                propertyDeclarationScripts.add(getPropertyDeclarationScript(key, ((PropertyParseNode) element).type, lastGroupObjectParent == null ? null : "INTEGER"));
+    private static Node parseJSON(JsonElement element, String key) {
+        if (element.isJsonObject()) {
+            GroupNode group = new GroupNode(key, null);
+            for (Map.Entry<String, JsonElement> entry : ((JsonObject) element).entrySet())
+                group.children.add(parseJSON(entry.getValue(), entry.getKey()));
+            return group;
+        }
+        if (element.isJsonArray()) {
+            GroupNode rows = null;
+            String valueType = null;
+            for (JsonElement row : (JsonArray) element) {
+                if (row.isJsonObject())
+                    rows = (GroupNode) merge(rows, parseJSON(row, key));
+                else
+                    valueType = mergeType(valueType, row.isJsonArray() ? "STRING" : getJSONValueType(row));
             }
+            return new ObjectNode(key, null, rows, valueType);
         }
-
-        String namespacePropertiesScript = getNamespacePropertiesScript(parentElement instanceof PropertyGroupParseNode ? key : null, namespaces);
-        propertiesScript = propertiesScript != null ? propertiesScript : getPropertiesScript(lastGroupObjectParent, parentElement instanceof PropertyGroupParseNode ? key : null, properties);
-        return new CodeBlock(formNameScript, groupDeclarationScripts, propertyDeclarationScripts, objectsScripts, namespacePropertiesScript, propertiesScript, filtersScript, children);
+        return new PropertyNode(key, null, getJSONValueType(element), false, false);
     }
 
-    private boolean hasPropertyGroupParseNodeChildren(ParseNode element) {
-        for (ParseNode childElement : element.children) {
-            if (childElement instanceof PropertyGroupParseNode) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    ParseNode deepMerge(List<ParseNode> children) {
-        ParseNode mergedObject = null;
-        for (ParseNode obj : children) {
-            mergedObject = mergedObject == null ? obj : deepMerge(mergedObject, obj);
-        }
-        return mergedObject;
-    }
-
-    private ParseNode deepMerge(ParseNode source, ParseNode target) throws JSONException {
-        //swap source and target - GroupParseNode has more priority
-        if (source instanceof PropertyParseNode && target instanceof GroupParseNode) {
-            ParseNode buffer = target;
-            target = source;
-            source = buffer;
-        }
-        for (ParseNode targetChild : target.children) {
-            ParseNode sourceChild = source.getChild(targetChild);
-            if (sourceChild == null) {
-                source.children.add(targetChild);
-            } else {
-                source.removeChild(targetChild);
-                source.children.add(deepMerge(sourceChild, targetChild));
-            }
-        }
-        return source;
-    }
-
-    private String getFilterProperty(ElementKey key, ElementKey childKey) {
-        return key != null ? (key.ID + BaseUtils.capitalize(childKey.ID)) : null;
-    }
-
-    private String getGroupDeclarationScript(ElementKey groupKey, ElementNamespace groupNamespace, ElementKey parentGroupKey) {
-        if (groupKey != null && !usedGroupIds.contains(groupKey.ID)) {
-            usedGroupIds.add(groupKey.ID);
-            String extID = getExtIDScript(groupKey, groupNamespace);
-            String parent = parentGroupKey != null ? (" : " + parentGroupKey.ID) : "";
-            return "GROUP " + groupKey.ID + extID + parent + ";";
-        } else return null;
-    }
-
-    private String getPropertyDeclarationScript(ElementKey propertyKey, String propertyType, String parameter) {
-        return getPropertyDeclarationScript(propertyKey.ID, propertyType, parameter);
-    }
-
-    private String getStringPropertyDeclarationScript(ElementKey propertyKey) {
-        return getPropertyDeclarationScript(propertyKey.ID, "STRING", "INTEGER");
-    }
-
-    private String getIntegerPropertyDeclarationScript(String property) {
-        return getPropertyDeclarationScript(property, "INTEGER", "INTEGER");
-    }
-
-    private String getPropertyDeclarationScript(String property, String type, String parameter) {
-        if (property != null) {
-            return property + " = DATA LOCAL " + type + "(" + (parameter != null ? parameter : "") + ");";
-        } else return null;
-    }
-
-    private String generateObjectId(String id) {
-        id = Introspector.decapitalize(id);
-        if (id != null) {
-            if (id.matches("[^a-zA-Z].*")) {
-                id = "v" + id;
-            }
-            id = Junidecode.unidecode(id).replaceAll("[^a-zA-Z0-9_]", "_");
-        }
-        int count = 0;
-        while (notUniqueId(id, count)) {
-            count++;
-        }
-        id = id + (count == 0 ? "" : count);
-        usedObjectIds.add(id);
-        return id;
-    }
-
-    private boolean notUniqueId(String id, int count) {
-        String newId = id + (count == 0 ? "" : count);
-        return keywords.contains(newId) || usedObjectIds.contains(newId);
-    }
-
-    private String getObjectsScript(ElementKey elementKey, ElementNamespace namespace, ElementKey inGroupKey) {
-        if (elementKey != null && !usedObjectsIds.contains(elementKey.ID)) {
-            usedObjectsIds.add(elementKey.ID);
-            String extID = getExtIDScript(elementKey, namespace);
-            String inGroup = (inGroupKey == null || inGroupKey.ID == null ? "" : (" IN " + inGroupKey.ID));
-            return "\nOBJECTS " + elementKey.ID + " = INTEGER" + extID + inGroup;
-        } else return null;
-    }
-
-    private String getExtIDScript(ElementKey key, ElementNamespace namespace) {
-        String namespaceScript = getNamespaceScript(namespace);
-        return !key.ID.equals(key.extID) || namespace != null ? (" EXTID '" + (namespaceScript.isEmpty() ? "" : (namespaceScript + ":")) + key.extID + "'") : "";
-    }
-
-    private String getFormNameScript(PropertyGroupParseNode propertyGroupElement) {
-        String formId = propertyGroupElement.formName == null ? "generated" : generateObjectId(propertyGroupElement.formName);
-        List<String> namespaceScripts = new ArrayList<>();
-        if(propertyGroupElement.namespace != null) {
-            namespaceScripts.add(getNamespaceScript(propertyGroupElement.namespace) + ":" + propertyGroupElement.formName);
-        }
-        for(ElementNamespace namespace : propertyGroupElement.extraNamespaces) {
-            namespaceScripts.add(getNamespaceScript(namespace));
-        }
-        String formExtId = (propertyGroupElement.formName == null || formId.equals(propertyGroupElement.formName)) && namespaceScripts.isEmpty() ? "" : (" FORMEXTID '" + StringUtils.join(namespaceScripts, ";") + "'");
-        return "FORM " + formId + formExtId;
-    }
-
-    private String getNamespaceScript(ElementNamespace namespace) {
-        String namespaceScript = "";
-        if (namespace != null) {
-            String prefixOrUri = namespace.prefix.isEmpty() ? namespace.uri : namespace.prefix;
-            if (!usedNamespacePrefixes.contains(prefixOrUri)) {
-                usedNamespacePrefixes.add(prefixOrUri);
-                namespaceScript =  (fullNamespaceInExtId ? ("=" + namespace.uri) : (namespace.prefix + "=" + namespace.uri));
-            } else {
-                namespaceScript = (fullNamespaceInExtId ? ("=" + namespace.uri) : namespace.prefix);
-            }
-        }
-        return namespaceScript;
-    }
-
-    private String getPropertiesScript(ElementKey object, ElementKey inGroup, Set<ElementProperty> properties) {
-        if (!properties.isEmpty()) {
-            String filtersScript = (object != null ? "\nFILTERS " + "imported(" + object.ID + ")" : "");
-            return "PROPERTIES" +
-                    "(" + (object == null ? "" : object.ID) + ") " +
-                    (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) +
-                    properties.stream().map(ElementProperty::getScript).collect(Collectors.joining(", ")) +
-                    (usedFilterProperties.add(filtersScript) ? filtersScript : "");
-        } else return null;
-    }
-
-    private String getNamespacePropertiesScript(ElementKey inGroup, List<ElementNamespace> namespaces) {
-        if (!namespaces.isEmpty()) {
-            String namespacesScript = namespaces.stream().filter(ns -> {
-                String prefixOrUri = ns.prefix.isEmpty() ? ns.uri : ns.prefix;
-                return usedNamespacePrefixes.add(prefixOrUri); //true if didn't already contain
-            }).map(ns -> "='" + ns.uri + "' EXTID 'xmlns:" + ns.prefix + "'").collect(Collectors.joining(", "));
-
-            if (!namespacesScript.isEmpty()) {
-                return "PROPERTIES ATTR " + (inGroup == null ? "" : ("IN " + inGroup.ID + " ")) + namespacesScript;
-            }
-        }
-        return null;
-    }
-
-    private String getFiltersScript(String name, ElementKey parameterKey, ElementKey parentKey) {
-        if (name != null && parameterKey != null && parentKey != null) {
-            return "FILTERS " + name + "(" + parameterKey.ID + ") == " + parentKey.ID;
-        } else return null;
-    }
-
-    protected String getPropertyType(Object element) {
-        if (element instanceof Number) {
+    private static String getJSONValueType(JsonElement value) {
+        if (value.isJsonNull())
+            return null;
+        JsonPrimitive primitive = (JsonPrimitive) value;
+        if (primitive.isNumber())
             return "NUMERIC";
-        } else if (element instanceof Boolean) {
+        if (primitive.isBoolean())
             return "BOOLEAN";
-        } else if (element instanceof String) {
-            try {
-                String dateType = DateConverter.smartParse((String) element);
-                if (dateType != null) {
-                    return dateType;
+        return getPropertyType(primitive.getAsString());
+    }
+
+    private static GroupNode parseXML(String text) throws Exception {
+        Element rootElement = JDOMUtil.load(text);
+        Node root = parseXML(rootElement);
+        GroupNode rootGroup;
+        if (root instanceof GroupNode group)
+            rootGroup = group;
+        else { // <a>text</a>: the root's text is read by the EXTID 'value'
+            rootGroup = new GroupNode(root.name, root.namespace);
+            rootGroup.children.add(new PropertyNode(root.name, null, ((PropertyNode) root).type, false, true));
+        }
+        Set<Namespace> namespaces = new LinkedHashSet<>();
+        collectXMLNamespaces(rootElement, namespaces);
+        rootGroup.namespaces.addAll(namespaces);
+        return rootGroup;
+    }
+
+    private static Node parseXML(Element element) {
+        Namespace namespace = getXMLNamespace(element.getNamespacePrefix(), element.getNamespaceURI());
+        List<Element> children = element.getChildren();
+        List<Attribute> attributes = element.getAttributes();
+        String text = element.getTextTrim();
+        if (children.isEmpty() && attributes.isEmpty())
+            return new PropertyNode(element.getName(), namespace, getPropertyType(text), false, false);
+
+        GroupNode group = new GroupNode(element.getName(), namespace);
+        for (Attribute attribute : attributes)
+            group.children.add(new PropertyNode(attribute.getName(), getXMLNamespace(attribute.getNamespacePrefix(), attribute.getNamespaceURI()), getPropertyType(attribute.getValue()), true, false));
+        if (children.isEmpty() && !text.isEmpty())
+            group.children.add(new PropertyNode(element.getName(), null, getPropertyType(text), false, true));
+
+        // an element met more than once among its siblings is a row of an object, otherwise a group or a value
+        Map<String, List<Element>> sameNameChildren = new LinkedHashMap<>();
+        for (Element child : children)
+            sameNameChildren.computeIfAbsent(child.getNamespaceURI() + ":" + child.getName(), k -> new ArrayList<>()).add(child);
+        for (List<Element> rows : sameNameChildren.values()) {
+            Element first = rows.get(0);
+            if (rows.size() == 1) {
+                group.children.add(parseXML(first));
+            } else {
+                GroupNode merged = null;
+                String valueType = null;
+                for (Element row : rows) {
+                    Node rowNode = parseXML(row);
+                    if (rowNode instanceof GroupNode rowGroup)
+                        merged = (GroupNode) merge(merged, rowGroup);
+                    else if (!row.getTextTrim().isEmpty()) // an empty row says nothing about the text of the others
+                        valueType = mergeType(valueType, ((PropertyNode) rowNode).type);
                 }
-            } catch (DateTimeException ignored) {
+                Namespace rowNamespace = getXMLNamespace(first.getNamespacePrefix(), first.getNamespaceURI());
+                if (merged != null && valueType != null) { // some rows have attributes, others only text
+                    GroupNode textRow = new GroupNode(first.getName(), rowNamespace);
+                    textRow.children.add(new PropertyNode(first.getName(), null, valueType, false, true));
+                    merged = (GroupNode) merge(merged, textRow);
+                }
+                group.children.add(new ObjectNode(first.getName(), rowNamespace, merged, valueType));
             }
+        }
+        return group;
+    }
+
+    private static Namespace getXMLNamespace(String prefix, String uri) {
+        return uri.isEmpty() ? null : new Namespace(prefix, uri);
+    }
+
+    private static void collectXMLNamespaces(Element element, Set<Namespace> namespaces) {
+        Namespace namespace = getXMLNamespace(element.getNamespacePrefix(), element.getNamespaceURI());
+        if (namespace != null)
+            namespaces.add(namespace);
+        for (org.jdom.Namespace declared : element.getAdditionalNamespaces()) {
+            Namespace additional = getXMLNamespace(declared.getPrefix(), declared.getURI());
+            if (additional != null)
+                namespaces.add(additional);
+        }
+        for (Attribute attribute : element.getAttributes()) {
+            Namespace attributeNamespace = getXMLNamespace(attribute.getNamespacePrefix(), attribute.getNamespaceURI());
+            if (attributeNamespace != null)
+                namespaces.add(attributeNamespace);
+        }
+        for (Element child : element.getChildren())
+            collectXMLNamespaces(child, namespaces);
+    }
+
+    private static String getPropertyType(String value) {
+        try {
+            String dateType = DateConverter.smartParse(value);
+            if (dateType != null)
+                return dateType;
+        } catch (java.time.DateTimeException ignored) {
         }
         return "STRING";
     }
 
-    private class ElementKey {
-        String extID;
-        String ID;
+    // one generation: the names given are unique within it
+    static class ScriptGenerator {
+        private final Platform platform;
 
-        ElementKey(String extID) {
-            this(extID, generateObjectId(extID));
+        private final Set<String> usedIds = new HashSet<>();
+        private final List<String> groupScripts = new ArrayList<>();
+        private final List<String> propertyScripts = new ArrayList<>();
+        private final List<String> formScripts = new ArrayList<>();
+
+        private Namespace rootNamespace;
+        private final Map<String, String> declaredNamespaces = new LinkedHashMap<>(); // prefix -> uri, declared once for the whole form
+
+        ScriptGenerator(Platform platform) {
+            this.platform = platform;
         }
 
-        ElementKey(String extID, String ID) {
-            this.extID = extID;
-            this.ID = ID;
-        }
-
-        @Override
-        public String toString() {
-            return "ElementKey{" + "extID='" + extID + '\'' + ", ID='" + ID + '\'' + '}';
-        }
-    }
-
-    private static class CodeBlock {
-        String formNameScript;
-        Set<String> groupDeclarationScripts;
-        Set<String> propertyDeclarationScripts;
-        Set<String> objectsScripts;
-        String namespacePropertiesScript;
-        String propertiesScript;
-        String filtersScript;
-
-        List<CodeBlock> children;
-
-        CodeBlock(String formNameScript, Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts,
-                  Set<String> objectsScripts, String namespacePropertiesScript, String propertiesScript, String filtersScript,
-                  List<CodeBlock> children) {
-            this.formNameScript = formNameScript;
-            this.groupDeclarationScripts = groupDeclarationScripts;
-            this.propertyDeclarationScripts = propertyDeclarationScripts;
-            this.objectsScripts = objectsScripts;
-            this.namespacePropertiesScript = namespacePropertiesScript;
-            this.propertiesScript = propertiesScript;
-            this.filtersScript = filtersScript;
-            this.children = children;
-        }
-    }
-
-    private static class Form {
-        String formNameScript;
-        Set<String> groupDeclarationScripts;
-        Set<String> propertyDeclarationScripts;
-        List<String> formScripts;
-
-        Form(String formNameScript, Set<String> groupDeclarationScripts, Set<String> propertyDeclarationScripts, List<String> formScripts) {
-            this.formNameScript = formNameScript;
-            this.groupDeclarationScripts = groupDeclarationScripts;
-            this.propertyDeclarationScripts = propertyDeclarationScripts;
-            this.formScripts = formScripts;
-        }
-    }
-
-    abstract static class ParseNode {
-        String key;
-        List<ParseNode> children;
-
-        ParseNode(String key, List<ParseNode> children) {
-            this.key = key;
-            this.children = children;
-        }
-
-        ParseNode getChild(ParseNode child) {
-            for (ParseNode c : children) {
-                if (c.key != null && c.key.equals(child.key))
-                    return c;
+        String generate(GroupNode root) {
+            String formScript;
+            if (root.name == null) { // JSON
+                formScript = "FORM generated";
+            } else {
+                rootNamespace = root.namespace;
+                if (platform == Platform.V7) {
+                    Map<String, Set<String>> uris = new LinkedHashMap<>();
+                    for (Namespace namespace : root.namespaces)
+                        uris.computeIfAbsent(namespace.prefix(), k -> new LinkedHashSet<>()).add(namespace.uri());
+                    uris.forEach((prefix, prefixUris) -> {
+                        // a prefix bound to different uris, and the default namespace of an element below the root, are named where they are used
+                        if (!prefix.isEmpty() && prefixUris.size() == 1 && (rootNamespace == null || !prefix.equals(rootNamespace.prefix())))
+                            declaredNamespaces.put(prefix, prefixUris.iterator().next());
+                    });
+                }
+                // the root declares its namespace, the elements below it name only its prefix
+                StringBuilder formExtId = new StringBuilder(rootNamespace == null ? root.name :
+                        rootNamespace.prefix() + "=" + rootNamespace.uri() + ":" + root.name);
+                declaredNamespaces.forEach((prefix, uri) -> formExtId.append(';').append(prefix).append('=').append(uri));
+                // without FORMEXTID 7.0 exports the root as <export>
+                formScript = "FORM " + generateId(root.name, Collections.emptySet()) + " FORMEXTID " + literal(formExtId.toString());
             }
-            return null;
+
+            generateGroup(root, null, null);
+
+            StringBuilder script = new StringBuilder();
+            if (!groupScripts.isEmpty())
+                script.append(String.join("\n", groupScripts)).append("\n\n");
+            if (!propertyScripts.isEmpty())
+                script.append(String.join("\n", propertyScripts)).append("\n\n");
+            script.append(formScript);
+            for (String formPart : formScripts)
+                script.append("\n").append(formPart);
+            return script.append(";").toString();
         }
 
-        void removeChild(ParseNode child) {
-            children.removeIf(c -> c.key != null && c.key.equals(child.key));
+        // the form follows the document's order, which EXPORT keeps (an XML schema may require it)
+        private void generateGroup(GroupNode group, String groupId, String objectId) {
+            List<String> properties = new ArrayList<>();
+            for (Node child : group.children) {
+                if (child instanceof PropertyNode property) {
+                    properties.add(generateProperty(property, objectId));
+                    continue;
+                }
+                addProperties(properties, groupId, objectId);
+                if (child instanceof GroupNode childGroup) {
+                    if (hasContent(childGroup)) {
+                        String childGroupId = generateId(childGroup.name);
+                        groupScripts.add("GROUP " + childGroupId + getExtIDScript(childGroupId, childGroup.name, childGroup.namespace) + (groupId != null ? " : " + groupId : "") + ";");
+                        generateGroup(childGroup, childGroupId, objectId);
+                    }
+                } else
+                    generateObject((ObjectNode) child, groupId, objectId);
+            }
+            addProperties(properties, groupId, objectId);
+        }
+
+        private void addProperties(List<String> properties, String groupId, String objectId) {
+            if (!properties.isEmpty()) {
+                formScripts.add("PROPERTIES(" + (objectId != null ? objectId : "") + ") " + (groupId != null ? "IN " + groupId + " " : "") + String.join(", ", properties));
+                properties.clear();
+            }
+        }
+
+        private static boolean hasContent(GroupNode group) {
+            for (Node child : group.children)
+                if (!(child instanceof GroupNode childGroup) || hasContent(childGroup))
+                    return true;
+            return false;
+        }
+
+        private String generateProperty(PropertyNode property, String objectId) {
+            String id = generateId(property.name);
+            propertyScripts.add(id + " = DATA LOCAL " + (property.type != null ? property.type : "STRING") + "(" + (objectId != null ? "INTEGER" : "") + ");");
+            return id + (property.text ? " EXTID 'value'" : getExtIDScript(id, property.name, property.namespace)) + (property.attr ? " ATTR" : "");
+        }
+
+        private void generateObject(ObjectNode object, String groupId, String parentObjectId) {
+            String id = generateId(object.name);
+            formScripts.add("\nOBJECTS " + id + " = INTEGER" + getExtIDScript(id, object.name, object.namespace) + (groupId != null ? " IN " + groupId : ""));
+
+            // IMPORT sets the property of a filter for every row it adds, so each object needs one of its own:
+            // the row numbers of different objects overlap, and EXPORT would find the rows of one object in another
+            if (parentObjectId != null) {
+                String parentProperty = generateId(parentObjectId + BaseUtils.capitalize(id));
+                propertyScripts.add(parentProperty + " = DATA LOCAL INTEGER(INTEGER);");
+                formScripts.add("FILTERS " + parentProperty + "(" + id + ") == " + parentObjectId);
+            } else {
+                String importedProperty = generateId("imported" + BaseUtils.capitalize(id));
+                propertyScripts.add(importedProperty + " = DATA LOCAL BOOLEAN(INTEGER);");
+                formScripts.add("FILTERS " + importedProperty + "(" + id + ")");
+            }
+
+            if (object.isValues()) {
+                propertyScripts.add(id + " = DATA LOCAL " + (object.valueType != null ? object.valueType : "STRING") + "(INTEGER);");
+                formScripts.add("PROPERTIES(" + id + ") " + id + " EXTID 'value'");
+            } else
+                generateGroup(object.element, null, id);
+        }
+
+        private String getExtIDScript(String id, String name, Namespace namespace) {
+            String extID = getExtID(name, namespace);
+            return extID.equals(id) ? "" : " EXTID " + literal(extID);
+        }
+
+        private String getExtID(String name, Namespace namespace) {
+            if (namespace == null)
+                return name;
+            if (namespace.equals(rootNamespace) || namespace.uri().equals(declaredNamespaces.get(namespace.prefix())))
+                return namespace.prefix().isEmpty() ? name : namespace.prefix() + ":" + name;
+            return namespace.prefix() + "=" + namespace.uri() + ":" + name;
+        }
+
+        // properties, groups and objects share one set of names, the form has a namespace of its own
+        private String generateId(String name) {
+            String id = generateId(name, usedIds);
+            usedIds.add(id);
+            return id;
+        }
+
+        private static String generateId(String name, Set<String> usedIds) {
+            String id = Junidecode.unidecode(name).replaceAll("[^a-zA-Z0-9_]", "_");
+            id = id.equals(id.toUpperCase()) ? id.toLowerCase() : Character.toLowerCase(id.charAt(0)) + id.substring(1);
+            if (!id.matches("[a-zA-Z].*"))
+                id = "v" + id;
+            String result = id;
+            for (int i = 1; usedIds.contains(result) || !isId(result); i++)
+                result = id + i;
+            return result;
+        }
+
+        // keywords, type names and literals (TRUE, INTEGER, ...) are not ids
+        private static boolean isId(String id) {
+            LSFLexerAdapter lexer = new LSFLexerAdapter();
+            lexer.start(id);
+            return lexer.getTokenType() == LSFTypes.ID && lexer.getTokenEnd() == id.length();
+        }
+
+        private static String literal(String value) {
+            return "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'";
         }
     }
-
-    abstract static class GroupParseNode extends ParseNode {
-        ElementNamespace namespace;
-
-        GroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace) {
-            super(key, children);
-            this.namespace = namespace;
-        }
-    }
-
-    static class GroupObjectParseNode extends GroupParseNode {
-        private final boolean integrationKey; // key (key in JSON, tag in XML, fields in plain formats) or index (array in JSON, multiple object name tags in xml, order in plain formats)
-
-        GroupObjectParseNode(String key, List<ParseNode> children, ElementNamespace namespace, boolean integrationKey) {
-            super(key, children, namespace);
-            this.integrationKey = integrationKey;
-        }
-
-        public boolean isIndex() {
-            return !integrationKey;
-        }
-    }
-
-    static class PropertyGroupParseNode extends GroupParseNode {
-        List<ElementNamespace> extraNamespaces;
-        String formName;
-
-        PropertyGroupParseNode(String key, List<ParseNode> children, ElementNamespace namespace, List<ElementNamespace> extraNamespaces, String formName) {
-            super(key, children, namespace);
-            this.extraNamespaces = extraNamespaces;
-            this.formName = formName;
-        }
-    }
-
-    static class PropertyParseNode extends ParseNode {
-        ElementNamespace namespace;
-        String type;
-        boolean attr;
-
-        PropertyParseNode(String key, ElementNamespace namespace, String type, boolean attr) {
-            super(key, new ArrayList<>());
-            this.namespace = namespace;
-            this.type = type;
-            this.attr = attr;
-        }
-    }
-
-    static class NamespaceParseNode extends ParseNode {
-        ElementNamespace namespace;
-
-        NamespaceParseNode(ElementNamespace namespace) {
-            super(null, new ArrayList<>());
-            this.namespace = namespace;
-        }
-    }
-
-    class ElementProperty {
-        ElementKey key;
-        ElementNamespace namespace;
-        boolean attr;
-
-        ElementProperty(ElementKey key, ElementNamespace namespace, boolean attr) {
-            this.key = key;
-            this.namespace = namespace;
-            this.attr = attr;
-        }
-
-        public String getScript() {
-            //attr don't need namespace
-            return key.ID + getExtIDScript(key, attr ? null : namespace) + (attr ? " ATTR" : "");
-        }
-    }
-
-    static class ElementNamespace {
-        String prefix;
-        String uri;
-
-        ElementNamespace(String prefix, String uri) {
-            this.prefix = prefix;
-            this.uri = uri;
-        }
-    }
-
 }
