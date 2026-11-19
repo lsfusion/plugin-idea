@@ -765,7 +765,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitChangeInputPropertyCustomView(@NotNull LSFChangeInputPropertyCustomView changeInputPropertyCustomView) {
         super.visitChangeInputPropertyCustomView(changeInputPropertyCustomView);
 
-        if (changeInputPropertyCustomView.getStringLiteral().getValue().isEmpty())
+        // the grammar takes INPUT ... CUSTOM without a function, the platform does not
+        LSFStringLiteral changeFunction = changeInputPropertyCustomView.getStringLiteral();
+        if (changeFunction == null || changeFunction.getValue().isEmpty())
             addUnderscoredError(changeInputPropertyCustomView, "Wrong custom CHANGE function definition. 'changeFunction' can't be empty.");
     }
 
@@ -802,7 +804,9 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
     public void visitChangePropertyCustomView(@NotNull LSFChangePropertyCustomView changePropertyCustomView) {
         super.visitChangePropertyCustomView(changePropertyCustomView);
 
-        if (changePropertyCustomView.getStringLiteral().getValue().isEmpty())
+        // CHANGE without a function is the platform's default editor
+        LSFStringLiteral changeFunction = changePropertyCustomView.getStringLiteral();
+        if (changeFunction != null && changeFunction.getValue().isEmpty())
             addUnderscoredError(changePropertyCustomView, "Wrong custom change function definition. 'changeFunction' can't be empty. Expected:" +
                     (changePropertyCustomView.getParent().getChildren().length > 1 ? "" : "CUSTOM ") + "CHANGE 'changeFunction'");
     }
