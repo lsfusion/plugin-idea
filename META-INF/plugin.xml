@@ -33,6 +33,7 @@
             <li>Told agents connected to the plugin's <code>/lsfusion</code> MCP endpoint to read the lsFusion guidance first</li>
             <li>Quick Documentation: code examples keep their indentation</li>
             <li>In an IDE without JCEF the <b>Dependencies</b> and <b>Design</b> tool windows open, with a notice in place of the class diagram and the Live tab</li>
+            <li>Fixed the <code>lsfusion_set_meta_visibility</code> MCP tool overwriting changes made to the file outside the IDE</li>
         </ul>
     ]]>
     </change-notes>

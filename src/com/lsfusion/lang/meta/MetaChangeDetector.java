@@ -5,6 +5,7 @@ import com.intellij.codeInsight.completion.CompletionPhaseListener;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.editor.Document;
@@ -24,8 +25,11 @@ import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.LowMemoryWatcher;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.openapi.vcs.FileStatusManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
@@ -50,6 +54,9 @@ import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -1036,38 +1043,102 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         addForcedUsageProcessing(file, file.getMetaCodeStatementList(), enabled);
     }
 
+    // The reason an MCP call changed nothing, worded for the caller.
+    public static class McpFileException extends RuntimeException {
+        public McpFileException(String message) {
+            super(message);
+        }
+    }
+
     // Synchronous show/hide for one file, for MCP tool calls: unlike reprocessFile (fire-and-forget
     // via invokeLater, meant for the "Show/Hide Meta for File" editor actions), this blocks until the
     // edit is actually applied and explicitly saves the document - needed because there may be no open
     // editor/autosave to flush the change to disk, and the caller (an AI agent doing e.g. svn diff or
     // a commit right after) needs the result to already be on disk when the call returns.
-    public void reprocessFileForMcp(LSFFile file, boolean show) {
+    // Called without a read lock: it refreshes the file, and the caller has typically just written it with
+    // its own tools, so the IDE may not have re-read it yet. Working on the IDE's earlier copy would save
+    // that copy over the change.
+    public void reprocessFileForMcp(String path, boolean show) {
+        String basePath = myProject.getBasePath();
+        String fullPath = FileUtil.isAbsolute(path) || basePath == null ? path : basePath + "/" + path;
+        VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByPath(FileUtil.toCanonicalPath(FileUtil.toSystemIndependentName(fullPath)));
+        if (vFile == null || vFile.getFileType() != LSFFileType.INSTANCE)
+            throw new McpFileException("Not an lsFusion file, or file not found in the project: " + path);
+
+        FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+        Document unsavedDocument = ApplicationManager.getApplication().runReadAction((Computable<Document>) () -> {
+            Document document = fileDocumentManager.getCachedDocument(vFile);
+            return document != null && fileDocumentManager.isDocumentUnsaved(document) ? document : null;
+        });
+        if (unsavedDocument != null) {
+            // the refresh would not reload a document with unsaved changes, and saving it would overwrite the disk;
+            // the IDE asks about such a conflict only when it re-reads the file, and not at all while an MCP session is open
+            if (isChangedOnDisk(vFile, unsavedDocument))
+                throw new McpFileException("The file has unsaved changes in the IDE and was also changed on disk: " + path +
+                        ". Nothing was changed: the file on disk and the IDE's copy are left as they were. Save or discard the IDE's changes, then call again.");
+        } else
+            VfsUtil.markDirtyAndRefresh(false, false, false, vFile); // also reloads the document from disk
+
         List<Runnable> inlines = new ArrayList<>();
         InlineProcessor collector = inlines::add;
-
-        ApplicationManager.getApplication().runReadAction(() -> {
-            List<LSFMetaCodeStatement> statements = show ? file.getDisabledMetaCodeStatementList() : file.getMetaCodeStatementList();
-            syncUsageProcessing(file, collector, null, show, statements, Collections.emptyList(), null);
-        });
+        // inSmartMode: a file just created on disk is indexed after the refresh, and the processing needs indices
+        LSFFile file = ReadAction.nonBlocking(() -> {
+            inlines.clear(); // a write action restarts the computation
+            if (!(PsiManager.getInstance(myProject).findFile(vFile) instanceof LSFFile lsfFile))
+                return null;
+            List<LSFMetaCodeStatement> statements = show ? lsfFile.getDisabledMetaCodeStatementList() : lsfFile.getMetaCodeStatementList();
+            syncUsageProcessing(lsfFile, collector, null, show, statements, Collections.emptyList(), null);
+            return lsfFile;
+        }).inSmartMode(myProject).withDocumentsCommitted(myProject).executeSynchronously();
+        if (file == null)
+            throw new McpFileException("Not an lsFusion file, or file not found in the project: " + path);
 
         if (inlines.isEmpty())
             return;
 
+        Result<Boolean> notSaved = new Result<>(false);
         ApplicationManager.getApplication().invokeAndWait(() ->
             CommandProcessor.getInstance().runUndoTransparentAction(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+                Document document = PsiDocumentManager.getInstance(myProject).getDocument(file);
+                String before = document != null ? document.getText() : null;
                 boolean prevEnabled = enabled;
                 enabled = false; // suppress cascading reprocessing from our own PSI change events (see fireChanged)
                 try {
                     for (Runnable inline : inlines)
                         inline.run();
+
+                    if (document != null && fileDocumentManager.isDocumentUnsaved(document)) {
+                        fileDocumentManager.saveDocumentAsIs(document);
+                        // the IDE refuses to save without telling - while a conflict between its copy and the disk it
+                        // has already re-read is pending, but also on a write error or a veto of another plugin
+                        if (fileDocumentManager.isDocumentUnsaved(document)) {
+                            document.setText(before);
+                            notSaved.setResult(true);
+                        }
+                    }
                 } finally {
                     enabled = prevEnabled;
                 }
-
-                Document document = PsiDocumentManager.getInstance(myProject).getDocument(file);
-                if (document != null && FileDocumentManager.getInstance().isDocumentUnsaved(document))
-                    FileDocumentManager.getInstance().saveDocumentAsIs(document);
             })));
+        if (notSaved.getResult())
+            throw new McpFileException("The IDE did not save the file: " + path + " (usually because it has unsaved changes in the IDE and was also changed on disk)." +
+                    " Nothing was changed: the file on disk and the IDE's copy are left as they were. Resolve it in the IDE, then call again.");
+    }
+
+    // whether the disk is no longer what a document with unsaved changes was read from
+    private static boolean isChangedOnDisk(VirtualFile file, Document document) {
+        // the IDE has already re-read the file and kept the document: a re-read gives the file a new stamp, a document
+        // takes the file's stamp when it is loaded or saved, and both stamps come from one counter. Not seen once the
+        // document is edited again after the re-read (its stamp moves past the file's; the IDE's own save would then
+        // overwrite the disk too), and the counter wraps at 24 bits, which can rarely flag a document in sync
+        if (file.getModificationStamp() > document.getModificationStamp())
+            return true;
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(file.toNioPath(), BasicFileAttributes.class);
+            return attributes.lastModifiedTime().toMillis() != file.getTimeStamp() || attributes.size() != file.getLength();
+        } catch (IOException e) {
+            return true; // deleted or unreadable: not what the IDE read either
+        }
     }
 
     public void reprocessAllDocuments() {

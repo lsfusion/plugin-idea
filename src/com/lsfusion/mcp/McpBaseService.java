@@ -7,8 +7,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.BufferExposingByteArrayOutputStream;
 import com.lsfusion.lang.meta.MetaChangeDetector;
-import com.lsfusion.lang.psi.LSFFile;
-import com.lsfusion.util.LSFFileUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import org.jetbrains.annotations.NotNull;
@@ -228,15 +226,12 @@ public abstract class McpBaseService extends RestService {
                 return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_SET_META_VISIBILITY, "`action` must be `show` or `hide`, got: " + action));
             }
 
-            LSFFile file = LSFFileUtils.findLsfFile(project, path);
-            if (file == null) {
-                return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_SET_META_VISIBILITY, "Not an lsFusion file, or file not found in the project: " + path));
-            }
-
-            MetaChangeDetector.getInstance(project).reprocessFileForMcp(file, show);
+            MetaChangeDetector.getInstance(project).reprocessFileForMcp(path, show);
 
             JSONObject payloadObj = new JSONObject().put("status", show ? "shown" : "hidden").put("path", path);
             return rpcResult(jsonrpc, id, buildLocalToolCallResult(payloadObj));
+        } catch (MetaChangeDetector.McpFileException e) {
+            return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_SET_META_VISIBILITY, e.getMessage()));
         } catch (Exception e) {
             getLogger().warn(TOOL_SET_META_VISIBILITY + " failed", e);
             return rpcResult(jsonrpc, id, buildToolCallErrorResult(TOOL_SET_META_VISIBILITY, e.getMessage()));
@@ -277,7 +272,8 @@ public abstract class McpBaseService extends RestService {
             "Show (expand) or hide (collapse) generated `META` code bodies for ONE lsFusion file, without touching other files or the project-wide meta-code toggle. " +
             "`hide` collapses `@name(args){ ... }` usages back to bare `@name(args);` (the form that must be committed - a raised code-review rule rejects commits with expanded meta bodies). " +
             "`show` re-expands previously collapsed usages back to their generated body (e.g. to inspect or edit the generated code). " +
-            "Works regardless of whether the file is currently open in the editor, and saves the file to disk before returning, so a `hide` call is immediately safe to commit.";
+            "Works regardless of whether the file is currently open in the editor: it re-reads the file from disk first, so edits just made outside the IDE are kept, and saves the file to disk before returning, so a `hide` call is immediately safe to commit. " +
+            "If the file has unsaved changes in the IDE and was also changed on disk, the call fails and changes nothing.";
 
     protected static JSONObject buildSetMetaVisibilityToolDescriptor() {
         JSONObject inputSchema = new JSONObject()

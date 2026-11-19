@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.util.io.HttpRequests
 import com.lsfusion.lang.meta.MetaChangeDetector
-import com.lsfusion.util.LSFFileUtils
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -445,7 +444,8 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         description = "Show (expand) or hide (collapse) generated `META` code bodies for ONE lsFusion file, without touching other files or the project-wide meta-code toggle. " +
             "`hide` collapses `@name(args){ ... }` usages back to bare `@name(args);` (the form that must be committed - a raised code-review rule rejects commits with expanded meta bodies). " +
             "`show` re-expands previously collapsed usages back to their generated body (e.g. to inspect or edit the generated code). " +
-            "Works regardless of whether the file is currently open in the editor, and saves the file to disk before returning, so a `hide` call is immediately safe to commit."
+            "Works regardless of whether the file is currently open in the editor: it re-reads the file from disk first, so edits just made outside the IDE are kept, and saves the file to disk before returning, so a `hide` call is immediately safe to commit. " +
+            "If the file has unsaved changes in the IDE and was also changed on disk, the call fails and changes nothing."
     )
     @Suppress("unused")
     suspend fun setMetaVisibility(
@@ -464,10 +464,11 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
             else -> throw mcpExpectedError("`action` must be `show` or `hide`, got: $action")
         }
 
-        val file = LSFFileUtils.findLsfFile(project, path)
-            ?: throw mcpExpectedError("Not an lsFusion file, or file not found in the project: $path")
-
-        MetaChangeDetector.getInstance(project).reprocessFileForMcp(file, show)
+        try {
+            MetaChangeDetector.getInstance(project).reprocessFileForMcp(path, show)
+        } catch (e: MetaChangeDetector.McpFileException) {
+            throw mcpExpectedError(e.message.orEmpty())
+        }
         return if (show) "Meta code shown for $path" else "Meta code hidden for $path"
     }
 
