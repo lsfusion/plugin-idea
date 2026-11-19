@@ -1533,13 +1533,11 @@ public class LSFReferenceAnnotator extends LSFVisitor implements Annotator {
         }
     }
 
-    private static final List<String> allowedFontStyles = Arrays.asList("bold", "italic");
+    // the server's ComponentViewProxy.setFontStyle takes exactly these strings
+    private static final List<String> allowedFontStyles = Arrays.asList("", "bold", "italic", "bold italic", "italic bold");
     private void checkFontStyle(LSFComponentPropertyValue element, String fontStyle) {
-        for (String style : LSFStringUtils.unquoteLiteral(fontStyle).split(" ")) {
-            if (!allowedFontStyles.contains(style)) {
-                addUnderscoredError(element, "fontStyle value must be a combination of strings bold and italic");
-                break;
-            }
+        if (!allowedFontStyles.contains(LSFStringUtils.unquoteLiteral(fontStyle))) {
+            addUnderscoredError(element, "fontStyle value must be a combination of strings bold and italic");
         }
     }
 
