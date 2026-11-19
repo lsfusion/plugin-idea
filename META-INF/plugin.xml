@@ -30,6 +30,7 @@
             <li>Fixed the check of <code>fontStyle</code> values in <code>DESIGN</code></li>
             <li>The <code>lsfusion_get_guidance</code> MCP tool now gives the guidance for working in the IDE</li>
             <li>Told agents connected to the plugin's <code>/lsfusion</code> MCP endpoint to read the lsFusion guidance first</li>
+            <li>Quick Documentation: code examples keep their indentation</li>
         </ul>
     ]]>
     </change-notes>

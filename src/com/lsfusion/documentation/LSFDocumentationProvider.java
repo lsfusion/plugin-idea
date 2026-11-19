@@ -157,20 +157,20 @@ public class LSFDocumentationProvider extends AbstractDocumentationProvider {
             Elements styles = codeElements.isEmpty() ? oldCodeElements : codeElements;
             styles.attr("style", cssColor);
 
+            // wrapped in the DOM, not through html(): a detached element is printed as outside <pre>, with its spaces
+            // collapsed, which drops the indentation of the code line, and newer jsoup also adds a line break before <br>
             for (Element style : styles) {
-                Element div = new Element("code");
-                div.html(style.html());
-                style.html(div.outerHtml());
+                Element code = new Element("code");
+                code.appendChildren(style.childNodes());
+                style.appendChild(code);
                 style.appendElement("br");
             }
 
             //wrap headers with built in class
             Elements headers = article.select("h1, h2, h3, h4, h5, h6");
             for (Element header : headers) {
-                Element div = new Element("div");
-                div.attr("class", "definition");
-                div.html(header.outerHtml());
-                header.html(div.outerHtml());
+                Element copy = header.clone();
+                header.empty().appendElement("div").attr("class", "definition").appendChild(copy);
             }
 
             return Jsoup.clean(article.html(), "https://docs.lsfusion.org/",
