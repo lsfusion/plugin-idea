@@ -1,11 +1,7 @@
 package com.lsfusion.design.properties.converters;
 
 import com.lsfusion.design.model.FontInfo;
-import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.beanutils.converters.AbstractConverter;
 import org.apache.commons.lang3.math.NumberUtils;
-
-import java.awt.*;
 
 /**
  * <p>Конвертирует значение в значение типа FontInfo. </p>
@@ -14,7 +10,7 @@ import java.awt.*;
  * При этом слова italic, bold - добавляют к стилю ITALIC и BOLD соответственно,
  * число интерпретируется как размер,
  * оставшееся слово - как имя шрифта.
- * При присутствии нескольких токенов для представления размера или имени - выбрасывается ConversionException. </p>
+ * При присутствии нескольких токенов для представления размера или имени - выбрасывается IllegalArgumentException. </p>
  * Имя шрифта из нескольких слов можно указывать в кавычках
  * <p>Примеры:</p>
  * <p>Tahoma bold italic 12</p>
@@ -23,17 +19,12 @@ import java.awt.*;
  * <p>15 italic "MS Sans Serif"</p>
  * <p>37</p>
  */
-public class FontInfoConverter extends AbstractConverter {
-    @Override
-    protected Object convertToType(Class type, Object value) {
-        if (value instanceof Font) {
-            return value;
-        }
-
+public final class FontInfoConverter {
+    public static FontInfo convert(String value) {
         String name = null;
 
         // Название шрифта состоит из нескольких слов
-        String sValue = value.toString();
+        String sValue = value;
         if(sValue.contains("\"")) {
             int start = sValue.indexOf('"');
             int end = sValue.indexOf('"', start + 1) + 1;
@@ -59,11 +50,11 @@ public class FontInfoConverter extends AbstractConverter {
                     //числовой токен
 
                     if (sz <= 0) {
-                        throw new ConversionException("Size must be > 0");
+                        throw new IllegalArgumentException("Size must be > 0");
                     }
                     if (size != 0) {
                         //уже просетали size
-                        throw new ConversionException("Incorrect format: several number tokens specified");
+                        throw new IllegalArgumentException("Incorrect format: several number tokens specified");
                     }
 
                     size = sz;
@@ -71,7 +62,7 @@ public class FontInfoConverter extends AbstractConverter {
                     //текстовый токен
                     if (name != null) {
                         //уже просетали name
-                        throw new ConversionException("Incorrect format: several name tokens specified");
+                        throw new IllegalArgumentException("Incorrect format: several name tokens specified");
                     }
 
                     name = part;
@@ -80,23 +71,5 @@ public class FontInfoConverter extends AbstractConverter {
         }
 
         return new FontInfo(name, size, bold, italic);
-    }
-
-    @Override
-    protected String convertToString(Object value) throws Throwable {
-        if (value instanceof FontInfo) {
-            FontInfo f = (FontInfo) value;
-            return f.getFontFamily()
-                   + (f.isBold() ? " bold" : "")
-                   + (f.isItalic() ? " italic" : "")
-                   + " " + f.getFontSize();
-        } else {
-            return super.convertToString(value);
-        }
-    }
-
-    @Override
-    protected Class getDefaultType() {
-        return FontInfo.class;
     }
 }

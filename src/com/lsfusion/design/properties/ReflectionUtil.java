@@ -1,52 +1,38 @@
 package com.lsfusion.design.properties;
 
-import com.lsfusion.design.model.FontInfo;
-import com.lsfusion.design.properties.converters.FontInfoConverter;
-import com.lsfusion.design.properties.converters.KeyStrokeConverter;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.PropertyUtils;
-
-import javax.swing.*;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 
 public class ReflectionUtil {
-    static {
-        ConvertUtils.register(new FontInfoConverter(), FontInfo.class);
-        ConvertUtils.register(new KeyStrokeConverter(), KeyStroke.class);
-    }
-
-    /**
-     * not thread-safe
-     */
-    public static void setObjectProperty(Object propertyReceiver, String propertyName, Object propertyValue) {
-        if (propertyReceiver == null) {
-            throw new RuntimeException("object is undefined");
-        }
-
-        if (!PropertyUtils.isWriteable(propertyReceiver, propertyName)) {
-            throw new RuntimeException("property doesn't exist");
-        }
-
+    // a JavaBeans property, as Introspector sees it: a getter and a setter of different types are not one property
+    public static PropertyDescriptor getPropertyDescriptor(Class<?> beanClass, String propertyName) {
         try {
-            BeanUtils.setProperty(propertyReceiver, propertyName, propertyValue);
-        } catch (Exception e) {
-            throw new RuntimeException("property can't be set: " + e.getMessage());
+            for (PropertyDescriptor descriptor : Introspector.getBeanInfo(beanClass).getPropertyDescriptors())
+                if (descriptor.getName().equals(propertyName))
+                    return descriptor;
+        } catch (IntrospectionException e) {
+            throw new RuntimeException(e);
         }
+        return null;
     }
 
+    // the property table shows a value as its text
     public static Object getObjectProperty(Object propertySource, String propertyName) {
         if (propertySource == null) {
             throw new RuntimeException("object is undefined");
         }
 
-        if (!PropertyUtils.isReadable(propertySource, propertyName)) {
+        PropertyDescriptor descriptor = getPropertyDescriptor(propertySource.getClass(), propertyName);
+        if (descriptor == null || descriptor.getReadMethod() == null) {
             throw new RuntimeException("property doesn't exist");
         }
 
         try {
-            return BeanUtils.getProperty(propertySource, propertyName);
-        } catch (Exception e) {
-            throw new RuntimeException("property can't be set: " + e.getMessage());
+            Object value = descriptor.getReadMethod().invoke(propertySource);
+            return value != null ? value.toString() : null;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("property can't be read: " + e.getMessage());
         }
     }
 }

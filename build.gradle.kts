@@ -116,7 +116,6 @@ dependencies {
     grammarKitConfig(files("buildLib/grammar-kit.jar"))
 
     // Libraries previously in lib/
-    implementation("commons-beanutils:commons-beanutils:1.8.0")
     implementation("org.apache.commons:commons-lang3:3.4")
     implementation("jgraph:jgraph:5.13.0.0")
     implementation("org.jgrapht:jgrapht-core:0.9.0")
