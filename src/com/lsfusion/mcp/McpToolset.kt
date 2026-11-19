@@ -194,7 +194,7 @@ data class FeedbackReportInput(
     @property:McpDescription(description = "lsFusion version, if known.") val lsfusionVersion: String? = null,
     @SerialName("deployment_kind")
     @property:McpDescription(description = "Deployment kind, if known.") val deploymentKind: String? = null,
-    @property:McpDescription(description = "Reporting client name/version, e.g. claude-code.") val agent: String? = null,
+    @property:McpDescription(description = "Reporting agent and model, e.g. 'claude-code, claude-opus-4-5'.") val agent: String? = null,
     @SerialName("n_eval_attempts")
     @property:McpDescription(description = "Number of eval attempts.") val nEvalAttempts: Int? = null,
 )

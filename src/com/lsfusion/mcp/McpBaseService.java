@@ -489,7 +489,7 @@ public abstract class McpBaseService extends RestService {
                         .put("client_dedup_hint", feStr("Optional agent hint; the SERVER computes the canonical dedup_fingerprint."))
                         .put("lsfusion_version", feStr("lsFusion version, if known."))
                         .put("deployment_kind", feStr("Deployment kind, if known."))
-                        .put("agent", feStr("Reporting client name/version, e.g. claude-code."))
+                        .put("agent", feStr("Reporting agent and model, e.g. 'claude-code, claude-opus-4-5'."))
                         .put("n_eval_attempts", new JSONObject().put("type", "integer").put("description", "Number of eval attempts.")))
                 .put("required", feArr("agent_journey_id", "signal_type", "problem_summary", "recommendation"));
         JSONObject inputSchema = new JSONObject()
