@@ -129,9 +129,6 @@ dependencies {
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
 
-    // Annotations used in Java sources (e.g. `@NonNull`).
-    compileOnly("org.jspecify:jspecify:1.0.0")
-
     // IntelliJ Platform + required bundled plugins.
     // NOTE: In IntelliJ Platform Gradle Plugin 2.x, the IntelliJ SDK is declared as a dependency.
     intellijPlatform {

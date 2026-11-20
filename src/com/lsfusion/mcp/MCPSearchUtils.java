@@ -51,7 +51,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -202,7 +201,7 @@ public class MCPSearchUtils {
         }
     }
 
-    private static @NonNull GlobalSearchScope searchElements(@NonNull Project project, @NonNull JSONObject query, SearchState state, long searchBudgetMillis, AtomicBoolean timeoutHit, List<String> errors) {
+    private static @NotNull GlobalSearchScope searchElements(@NotNull Project project, @NotNull JSONObject query, SearchState state, long searchBudgetMillis, AtomicBoolean timeoutHit, List<String> errors) {
         // An invalid query fails before the executor is created: after a throw nothing would shut it down, and the
         // tasks of the filters before the invalid one would keep running
         List<String> problems = new ArrayList<>();
@@ -599,7 +598,7 @@ public class MCPSearchUtils {
         return onlyPropertiesClassesActions;
     }
 
-    private static void streamWord(@NonNull Project project, NameFilter nf, Processor<LSFMCPDeclaration> processor, GlobalSearchScope searchScope) {
+    private static void streamWord(@NotNull Project project, NameFilter nf, Processor<LSFMCPDeclaration> processor, GlobalSearchScope searchScope) {
         PsiSearchHelper helper = PsiSearchHelper.getInstance(project);
         helper.processElementsWithWord((element, offsetInElement) -> processStatement(element, processor),
                 searchScope,
