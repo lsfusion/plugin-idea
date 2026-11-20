@@ -118,7 +118,10 @@ dependencies {
     // Libraries previously in lib/
     implementation("jgraph:jgraph:5.13.0.0")
     implementation("org.jgrapht:jgrapht-core:0.9.0")
-    implementation("org.jgrapht:jgrapht-ext:0.9.0")
+    implementation("org.jgrapht:jgrapht-ext:0.9.0") {
+        // only JGraphXAdapter needs it; the dependencies view uses JGraphModelAdapter, which works on jgraph
+        exclude(group = "org.tinyjee.jgraphx", module = "jgraphx")
+    }
     implementation("org.json:json:20260814")
     implementation("net.gcardone.junidecode:junidecode:0.5.2")
 
