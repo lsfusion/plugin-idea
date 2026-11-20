@@ -119,7 +119,7 @@ dependencies {
     implementation("jgraph:jgraph:5.13.0.0")
     implementation("org.jgrapht:jgrapht-core:0.9.0")
     implementation("org.jgrapht:jgrapht-ext:0.9.0")
-    implementation("org.json:json:20180813")
+    implementation("org.json:json:20260814")
     implementation("net.gcardone.junidecode:junidecode:0.5.2")
 
     // Needed by MCP toolset DTOs; compiler plugin generates serializers.
