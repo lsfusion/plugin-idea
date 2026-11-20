@@ -7,12 +7,13 @@ import com.lsfusion.lang.psi.declarations.LSFActionOrGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFExplicitInterfacePropStatement;
 import com.lsfusion.lang.psi.declarations.LSFExplicitValuePropStatement;
 import com.lsfusion.lang.psi.stubs.interfaces.ExplicitInterfacePropStubElement;
-import org.apache.commons.lang3.StringUtils;
+import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class LSFExplicitInterfacePropStatementImpl extends LSFExplicitInterfaceActionOrPropStatementImpl<LSFExplicitInterfacePropStatement, ExplicitInterfacePropStubElement> implements LSFExplicitInterfacePropStatement {
     public LSFExplicitInterfacePropStatementImpl(@NotNull ExplicitInterfacePropStubElement stub, @NotNull IStubElementType nodeType) {
@@ -55,7 +56,7 @@ public abstract class LSFExplicitInterfacePropStatementImpl extends LSFExplicitI
         Set<String> paramExplicitValues = getExplicitValues();
         String valueText = "";
         if(paramExplicitValues != null) {
-            valueText = StringUtils.join(paramExplicitValues,",");
+            valueText = paramExplicitValues.stream().map(StringUtil::notNullize).collect(Collectors.joining(","));
         }
         return ": " + valueText + "?";
 //        return ((LSFGlobalPropDeclarationImpl)getPropertyStatement()).getValuePresentableText();

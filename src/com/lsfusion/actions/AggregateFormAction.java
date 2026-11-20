@@ -33,7 +33,6 @@ import com.lsfusion.lang.psi.extend.LSFFormExtend;
 import com.lsfusion.lang.psi.references.LSFFullNameReference;
 import com.lsfusion.lang.psi.stubs.types.LSFStubElementTypes;
 import com.lsfusion.util.DesignUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,7 +79,7 @@ public class AggregateFormAction extends AnAction {
         });
 
         if (!codeBlocks.isEmpty())
-            new AggregateFormDialog(StringUtils.join(codeBlocks, "\n\n")).show();
+            new AggregateFormDialog(String.join("\n\n", codeBlocks)).show();
     }
 
     public static List<String> getFormText(PsiElement sourceElement, boolean skipCreatingNotes) {

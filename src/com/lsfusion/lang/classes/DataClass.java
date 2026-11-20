@@ -4,7 +4,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.lsfusion.design.model.PropertyDrawView;
 import com.lsfusion.util.BaseUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.intellij.openapi.util.text.StringUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public abstract class DataClass implements LSFClassSet, LSFValueClass {
         String name = getName();
         List<String> result = new ArrayList<>();
         result.add(name);
-        result.add(StringUtils.capitalize(name.toLowerCase()));
+        result.add(StringUtil.capitalize(name.toLowerCase()));
         result.addAll(getExtraNames());
         return result;
     }

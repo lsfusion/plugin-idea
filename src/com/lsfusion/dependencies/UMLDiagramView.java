@@ -23,7 +23,6 @@ import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.impl.LSFClassStatementImpl;
 import groovyjarjarantlr4.v4.misc.OrderedHashMap;
 import groovyjarjarantlr4.v4.runtime.misc.OrderedHashSet;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -198,8 +197,8 @@ public class UMLDiagramView implements Disposable {
 
                 StringBuilder mermaid = new StringBuilder();
                 for (Map.Entry<String, List<PropertyOrAction>> entry : classPropOrActionMap.entrySet()) {
-                    String properties = StringUtils.join(entry.getValue().stream().filter(p -> !p.isAction).toList(), '\n');
-                    String actions = StringUtils.join(entry.getValue().stream().filter(p -> p.isAction).toList(), '\n');
+                    String properties = entry.getValue().stream().filter(p -> !p.isAction).map(String::valueOf).collect(Collectors.joining("\n"));
+                    String actions = entry.getValue().stream().filter(p -> p.isAction).map(String::valueOf).collect(Collectors.joining("\n"));
                     String fields = (properties.isEmpty() && actions.isEmpty() ? "" : ("{\n" + properties + actions + "\n}"));
                     String classEntry = "class " + getClassName(entry.getKey()) + fields + "\n";
                     mermaid.append(classEntry);

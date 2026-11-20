@@ -8,7 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
+import com.intellij.openapi.util.SystemInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -34,17 +34,17 @@ public class InstallExternalCallsProtocolAction extends AnAction {
             String customProtocolPath = Paths.get(PathManager.getPluginsPath(), "lsfusion-idea-plugin", "custom-protocol").toString();
             try {
                 int exitCode = -1;
-                if (SystemUtils.IS_OS_LINUX) {
+                if (SystemInfo.isLinux) {
                     File execFile = copyFile(customProtocolPath, "lsfusion-open.sh");
                     exitCode = Runtime.getRuntime().exec(new String[]{"chmod", "+x", execFile.getPath()}).waitFor();
                     if (exitCode == 0)
                         exitCode = registerLinuxProtocol(execFile.getPath());
-                } else if (SystemUtils.IS_OS_MAC) {
+                } else if (SystemInfo.isMac) {
                     File execFile = copyFile(customProtocolPath, "lsfusion-open.sh");
                     exitCode = Runtime.getRuntime().exec(new String[]{"chmod", "+x", execFile.getPath()}).waitFor();
                     if (exitCode == 0)
                         exitCode = registerMacProtocol(customProtocolPath, execFile.getPath());
-                } else if (SystemUtils.IS_OS_WINDOWS) {
+                } else if (SystemInfo.isWindows) {
                     File execFile = copyFile(customProtocolPath, "lsfusion-open.ps1");
                     exitCode = registerWindowsProtocol(customProtocolPath, execFile.getPath());
                 }

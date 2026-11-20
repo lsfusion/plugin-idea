@@ -1,7 +1,7 @@
 package com.lsfusion.design.properties.converters;
 
 import com.lsfusion.design.model.FontInfo;
-import org.apache.commons.lang3.math.NumberUtils;
+import com.intellij.openapi.util.text.StringUtil;
 
 /**
  * <p>Конвертирует значение в значение типа FontInfo. </p>
@@ -45,7 +45,7 @@ public final class FontInfoConverter {
             } else if (part.equalsIgnoreCase("bold")) {
                 bold = true;
             } else {
-                int sz = NumberUtils.toInt(part, -1);
+                int sz = StringUtil.parseInt(part, -1);
                 if (sz != -1) {
                     //числовой токен
 

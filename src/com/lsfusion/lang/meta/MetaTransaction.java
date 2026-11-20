@@ -14,7 +14,7 @@ import com.lsfusion.lang.LSFParserDefinition;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.LSFMetaDeclaration;
 import com.lsfusion.util.BaseUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.intellij.openapi.util.text.StringUtil;
 
 import java.util.*;
 
@@ -100,7 +100,7 @@ public class MetaTransaction {
             for(int k=0;k<2;k++) {
                 boolean capitalized = k==1;
                 if(capitalized)
-                    usageParam = StringUtils.capitalize(usageParam);
+                    usageParam = StringUtil.capitalize(usageParam);
                 if(token.startsWith(usageParam, i)) { // парсим, будем считать что usageParam больше одного раза вставлять не будем
                     String declParam = declParams.get(j);
                     if(usageParam.isEmpty()) {

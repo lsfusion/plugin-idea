@@ -34,6 +34,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SortedComboBoxModel;
 import com.intellij.ui.components.JBOptionButton;
+import com.intellij.util.ExceptionUtil;
 import com.intellij.util.PlatformIcons;
 import com.intellij.util.text.VersionComparatorUtil;
 import org.apache.http.HttpEntity;
@@ -57,7 +58,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 /**
  * based on com.intellij.facet.impl.ui.libraries.LibraryOptionsPanel
@@ -257,7 +257,7 @@ public class LibraryOptionsPanel {
                 }
             }
         } catch (Exception e) {
-            Messages.showErrorDialog(getProject(), getStackTrace(e), "Saving lsFusion server failed");
+            Messages.showErrorDialog(getProject(), ExceptionUtil.getThrowableText(e), "Saving lsFusion server failed");
         }
     }
 
@@ -354,7 +354,7 @@ public class LibraryOptionsPanel {
                             }
                         }
                     } catch (Exception e) {
-                        ApplicationManager.getApplication().invokeAndWait(() -> Messages.showErrorDialog(getProject(), getStackTrace(e), "Download lsFusion server failed"));
+                        ApplicationManager.getApplication().invokeAndWait(() -> Messages.showErrorDialog(getProject(), ExceptionUtil.getThrowableText(e), "Download lsFusion server failed"));
                     }
                 }
             }

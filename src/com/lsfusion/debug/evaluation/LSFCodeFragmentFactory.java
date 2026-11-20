@@ -20,7 +20,7 @@ import com.lsfusion.lang.psi.LSFCodeFragment;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.declarations.LSFModuleDeclaration;
 import com.lsfusion.lang.psi.references.LSFNamespaceReference;
-import org.apache.commons.lang3.StringEscapeUtils;
+import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -71,7 +71,7 @@ public class LSFCodeFragmentFactory extends DefaultCodeFragmentFactory {
             
             String evalMethod = item.getKind() == CodeFragmentKind.EXPRESSION ? "eval" : "evalAction";
 
-            String evalString = "\"" + StringEscapeUtils.escapeJava(text) + "\"";
+            String evalString = "\"" + StringUtil.escapeStringCharacters(text) + "\"";
             String javaEvalString = DebugUtils.ACTION_DEBUGGER_FQN + ".getInstance()" +
                                     "." + evalMethod + "(action, context," + namespace + ", " + require + ", " + priorities + ", " + evalString + ")";
             return JavaCodeFragmentFactory.getInstance(project).createCodeBlockCodeFragment(javaEvalString, null, true);

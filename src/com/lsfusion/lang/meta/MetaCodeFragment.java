@@ -4,7 +4,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.tree.IElementType;
 import com.lsfusion.lang.psi.LSFTypes;
 import com.lsfusion.lang.psi.Result;
-import org.apache.commons.lang3.StringUtils;
+import com.intellij.openapi.util.text.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,7 +186,7 @@ public class MetaCodeFragment {
                 }
 
                 if (capitalize)
-                    part = StringUtils.capitalize(part);
+                    part = StringUtil.capitalize(part);
 
                 result += part;
             }

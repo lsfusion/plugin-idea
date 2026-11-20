@@ -21,7 +21,6 @@ import com.lsfusion.design.ui.FlexPanel;
 import com.lsfusion.lang.psi.LSFFile;
 import com.lsfusion.lang.psi.extend.LSFExtend;
 import com.lsfusion.util.Pair;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -52,7 +51,7 @@ public abstract class FormDesign implements Disposable {
             PsiElement element = file.findElementAt(TargetElementUtil.adjustOffset(file, document, selectedTextEditor.getCaretModel().getOffset()));
             LSFExtend parentOfType = PsiTreeUtil.getParentOfType(element, LSFExtend.class);
             if (parentOfType != null && element.getContainingFile() instanceof LSFFile)
-                return new Pair<>(parentOfType.getGlobalName(), StringUtils.join(AggregateFormAction.getFormText(element, true), "\n\n"));
+                return new Pair<>(parentOfType.getGlobalName(), String.join("\n\n", AggregateFormAction.getFormText(element, true)));
         }
         return null;
     }

@@ -4,10 +4,10 @@ import com.intellij.util.containers.ContainerUtil;
 import com.lsfusion.design.model.FontInfo;
 import com.lsfusion.design.properties.ReflectionUtil;
 import com.lsfusion.design.properties.converters.FontInfoConverter;
-import org.apache.commons.lang3.ClassUtils;
 
 import javax.swing.*;
 import java.beans.PropertyDescriptor;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -56,7 +56,7 @@ public class ViewProxyUtil {
             return NOT_CONVERTED;
         }
 
-        Class<?> boxedType = ClassUtils.primitiveToWrapper(type);
+        Class<?> boxedType = MethodType.methodType(type).wrap().returnType();
         if (boxedType.isInstance(value)) {
             return value;
         }

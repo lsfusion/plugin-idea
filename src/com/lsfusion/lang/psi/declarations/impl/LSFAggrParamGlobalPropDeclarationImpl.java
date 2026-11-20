@@ -12,7 +12,7 @@ import com.lsfusion.lang.psi.declarations.LSFAggrParamGlobalPropDeclaration;
 import com.lsfusion.lang.psi.declarations.LSFGlobalPropDeclaration;
 import com.lsfusion.lang.psi.stubs.AggrParamPropStubElement;
 import com.lsfusion.lang.typeinfer.LSFExClassSet;
-import org.apache.commons.lang3.StringUtils;
+import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +20,7 @@ import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 // здесь не надо городить огород со стабами так как тут все явно и можно использовать одну реализацию как для heavy так и для light
 public abstract class LSFAggrParamGlobalPropDeclarationImpl extends LSFFullNameDeclarationImpl<LSFAggrParamGlobalPropDeclaration, AggrParamPropStubElement> implements LSFAggrParamGlobalPropDeclaration {
@@ -91,7 +92,7 @@ public abstract class LSFAggrParamGlobalPropDeclarationImpl extends LSFFullNameD
         Set<String> paramExplicitValues = getExplicitValues();
         String valueText = "?";
         if(paramExplicitValues != null) {
-            valueText = StringUtils.join(paramExplicitValues,",");
+            valueText = paramExplicitValues.stream().map(StringUtil::notNullize).collect(Collectors.joining(","));
         }
         return ": " + valueText;
     }
