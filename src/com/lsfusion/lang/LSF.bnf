@@ -2647,16 +2647,9 @@ groupSelector ::= groupUsage
 
 setObjectPropertyStatement ::= ID EQUALS componentPropertyValue SEMI {pin = 2}
 
-componentPropertyValue ::= //commented literals are in designCalcPropertyObject
-                        //colorLiteral
-                        //|	(<<noIDCheck>> localizedStringLiteral) // since there is a propertyExpression afterwards, first ID would be matched
-                        //|	intLiteral
-                        //|	doubleLiteral
-                            dimensionLiteral
+componentPropertyValue ::= dimensionLiteral
                         |	booleanLiteral &SEMI
                         |	tbooleanLiteral &SEMI
-                        |	boundsIntLiteral
-                        |	boundsDoubleLiteral
                         |   containerTypeLiteral
                         |   flexAlignmentLiteral
                         |   designCalcPropertyObject
@@ -2997,8 +2990,6 @@ equalsSign ::= EQUALS
 }
 
 dimensionLiteral ::= LBRAC intLiteral COMMA intLiteral RBRAC
-boundsIntLiteral ::= LBRAC intLiteral COMMA intLiteral COMMA intLiteral COMMA intLiteral RBRAC
-boundsDoubleLiteral ::= LBRAC doubleLiteral COMMA doubleLiteral COMMA doubleLiteral COMMA doubleLiteral RBRAC
 
 insertRelativePositionLiteral ::= BEFORE | AFTER
 

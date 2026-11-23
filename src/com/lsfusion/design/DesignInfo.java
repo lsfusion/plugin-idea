@@ -161,30 +161,11 @@ public class DesignInfo {
             return null;
         }
         
-        /*if (valueStatement.getColorLiteral() != null) {
-            LSFColorLiteral colorLiteral = valueStatement.getColorLiteral();
-            List<LSFUintLiteral> literalList = colorLiteral.getUintLiteralList();
-            if (!literalList.isEmpty()) {
-                //noinspection UseJBColor
-                return new Color(Integer.decode(literalList.get(0).getText()), Integer.decode(literalList.get(1).getText()), Integer.decode(literalList.get(2).getText()));
-            } else {
-                return Color.decode(colorLiteral.getFirstChild().getText());
-            }
-        } else if (valueStatement.getLocalizedStringLiteral() != null) {
-            return valueStatement.getLocalizedStringLiteral().getValue();
-        } else if (valueStatement.getIntLiteral() != null) {
-            return Integer.decode(valueStatement.getIntLiteral().getText());
-        } else if (valueStatement.getDoubleLiteral() != null) {
-            return Double.parseDouble(valueStatement.getDoubleLiteral().getText());
-        } else */if (valueStatement.getDimensionLiteral() != null) {
+        if (valueStatement.getDimensionLiteral() != null) {
             List<LSFIntLiteral> literalList = valueStatement.getDimensionLiteral().getIntLiteralList();
             return new Dimension(Integer.decode(literalList.get(0).getText()), Integer.decode(literalList.get(1).getText()));
         } else if (valueStatement.getBooleanLiteral() != null) {
             return "TRUE".equals(valueStatement.getBooleanLiteral().getText());
-        } else if (valueStatement.getBoundsIntLiteral() != null) {
-            return null; //??????????
-        } else if (valueStatement.getBoundsDoubleLiteral() != null) {
-            return null; //??????????
         } else if (valueStatement.getContainerTypeLiteral() != null) { //deprecated in 5.2, removed in 6.0
             return ContainerType.valueOf(valueStatement.getContainerTypeLiteral().getText());
         } else if (valueStatement.getFlexAlignmentLiteral() != null) {
