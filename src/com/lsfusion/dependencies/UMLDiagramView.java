@@ -36,6 +36,10 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.joining;
 
 public class UMLDiagramView implements Disposable {
+    // an exact version with its subresource integrity hash, so that the CDN cannot hand over different code
+    private static final String MERMAID_URL = "https://cdn.jsdelivr.net/npm/mermaid@10.9.8/dist/mermaid.min.js";
+    private static final String MERMAID_INTEGRITY = "sha384-N3QqR/7q+xm3BGX+CBbNI8AUmRRqcsDzToy+0z1NLDI0QmTKW8zvwLvqulJgk3dP";
+
     private final Project project;
     // null when the IDE runs without JCEF: the diagram is not shown, the Mermaid export still works
     private final @Nullable JBCefBrowser browser;
@@ -121,10 +125,6 @@ public class UMLDiagramView implements Disposable {
                             "<html>\n" +
                             "<head>\n" +
                             "  <meta charset=\"UTF-8\">\n" +
-                            "  <script type=\"module\">\n" +
-                            "    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';\n" +
-                            "    mermaid.initialize({ maxTextSize: 150000, startOnLoad: true });\n" +
-                            "  </script>\n" +
                             "  <style>\n" +
                             "    #diagram-container {\n" +
                             "      overflow: auto;\n" +
@@ -142,6 +142,12 @@ public class UMLDiagramView implements Disposable {
                             "      <div class=\"mermaid\">\n" + uml + "</div>\n" +
                             "    </div>\n" +
                             "  </div>\n" +
+                            // after the container, so that onerror finds it; it also fires when the integrity check fails
+                            "  <script src=\"" + MERMAID_URL + "\" integrity=\"" + MERMAID_INTEGRITY + "\" crossorigin=\"anonymous\"\n" +
+                            "          onerror=\"document.getElementById('diagram-container').textContent = 'Mermaid could not be loaded from " + MERMAID_URL + ". The class diagram needs access to it.'\"></script>\n" +
+                            "  <script>\n" +
+                            "    if (window.mermaid) mermaid.initialize({ maxTextSize: 150000, startOnLoad: true });\n" +
+                            "  </script>\n" +
                             "</body>\n" +
                             "</html>") : "");
                 });
