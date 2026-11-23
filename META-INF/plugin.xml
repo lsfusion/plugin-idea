@@ -32,6 +32,7 @@
             <li>The <code>lsfusion_get_guidance</code> MCP tool now gives the guidance for working in the IDE</li>
             <li>Told agents connected to the plugin's <code>/lsfusion</code> MCP endpoint to read the lsFusion guidance first</li>
             <li>Quick Documentation: code examples keep their indentation</li>
+            <li>In an IDE without JCEF the <b>Dependencies</b> and <b>Design</b> tool windows open, with a notice in place of the class diagram and the Live tab</li>
         </ul>
     ]]>
     </change-notes>

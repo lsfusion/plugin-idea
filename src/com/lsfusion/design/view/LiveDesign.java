@@ -9,7 +9,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.KeyStrokeAdapter;
 import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.ui.jcef.JBCefBrowser;
 import com.intellij.ui.jcef.JBCefBrowserBase;
 import com.intellij.ui.jcef.JBCefJSQuery;
@@ -23,6 +25,7 @@ import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.handler.CefLoadHandlerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -39,13 +42,20 @@ public class LiveDesign extends FormDesign {
     private static final String LATEST_WEB_CLIENT_URL_PROPERTY_KEY = "lsfLiveDesignLatestWebClientUrl";
     private static final String MANUAL_MODE_PROPERTY_KEY = "lsfLiveDesignManualMode";
     
-    private JBCefBrowser browser;
+    // null when the IDE runs without JCEF: the tab shows only a notice
+    private @Nullable JBCefBrowser browser;
     private JBTextField addressBar;
     private boolean manualMode;
     
     public LiveDesign(@NotNull Project project, final ToolWindowEx toolWindow) {
         super(project, toolWindow);
         
+        if (!JBCefApp.isSupported()) {
+            mainPanel = new FlexPanel(true);
+            mainPanel.add(new JBLabel("Live design needs JCEF, which is not available in this IDE", SwingConstants.CENTER), new FlexConstraints(FlexAlignment.STRETCH, 1));
+            return;
+        }
+
         browser = new JBCefBrowser();
         Disposer.register(this, browser);
 
@@ -131,7 +141,7 @@ public class LiveDesign extends FormDesign {
     }
     
     public void onActivated() {
-        if (!wasActivated) {
+        if (browser != null && !wasActivated) {
             wasActivated = true;
             String latestUrl = PropertiesComponent.getInstance().getValue(LATEST_WEB_CLIENT_URL_PROPERTY_KEY);
             if (latestUrl != null) {
@@ -191,7 +201,8 @@ public class LiveDesign extends FormDesign {
     }
 
     public void scheduleRebuild(PsiElement element, PsiFile file, boolean checkFormEquility) {
-        if (element != null && file != null) {
+        // without the browser the form would still be shown in every client connected to the debugged server
+        if (browser != null && element != null && file != null) {
             scheduleRebuild("rebuildLive", file, checkFormEquility, formWithName -> {
                 try {
                     DebuggerService debuggerService = getDebuggerService();

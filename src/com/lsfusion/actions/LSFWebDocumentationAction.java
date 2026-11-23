@@ -7,11 +7,13 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.ui.jcef.JBCefBrowser;
 import com.intellij.ui.popup.AbstractPopup;
 import com.lsfusion.documentation.LSFDocumentationProvider;
@@ -45,7 +47,9 @@ public class LSFWebDocumentationAction extends AnAction {
                 }
                 hideToolWindow(project);
                 
-                WebDocumentationDialog.showDialog(project, url);  
+                if (JBCefApp.isSupported()) {
+                    WebDocumentationDialog.showDialog(project, url);
+                }
             }
         }
     }
@@ -79,6 +83,7 @@ public class LSFWebDocumentationAction extends AnAction {
             setTitle(title);
 
             JBCefBrowser browser = new JBCefBrowser(url);
+            Disposer.register(getDisposable(), browser);
             myContentPanel = browser.getComponent();
             //noinspection UseJBColor
             myContentPanel.setBackground(Color.WHITE);

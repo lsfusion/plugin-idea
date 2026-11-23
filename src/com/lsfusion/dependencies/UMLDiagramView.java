@@ -13,7 +13,9 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.*;
 import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.ui.jcef.JBCefBrowser;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.ui.FlexPanel;
@@ -35,14 +37,15 @@ import static java.util.stream.Collectors.joining;
 
 public class UMLDiagramView implements Disposable {
     private final Project project;
-    private final JBCefBrowser browser;
+    // null when the IDE runs without JCEF: the diagram is not shown, the Mermaid export still works
+    private final @Nullable JBCefBrowser browser;
     private final JPanel mainPanel;
 
     JBCheckBox requiredCheckBox;
 
     public UMLDiagramView(Project project) {
         this.project = project;
-        this.browser = new JBCefBrowser();
+        this.browser = JBCefApp.isSupported() ? new JBCefBrowser() : null;
 
         mainPanel = new JPanel(new BorderLayout());
 
@@ -73,6 +76,10 @@ public class UMLDiagramView implements Disposable {
         toolboxPanel.add(exportButton);
 
         mainPanel.add(toolboxPanel, BorderLayout.NORTH);
+        if (browser == null) {
+            mainPanel.add(new JBLabel("The class diagram needs JCEF, which is not available in this IDE", SwingConstants.CENTER), BorderLayout.CENTER);
+            return;
+        }
         mainPanel.add(browser.getComponent(), BorderLayout.CENTER);
 
         updateDiagram();
@@ -87,7 +94,9 @@ public class UMLDiagramView implements Disposable {
 
     @Override
     public void dispose() {
-        Disposer.dispose(browser);
+        if (browser != null) {
+            Disposer.dispose(browser);
+        }
     }
 
     public void redraw() {
@@ -99,6 +108,9 @@ public class UMLDiagramView implements Disposable {
     }
 
     private void updateDiagram() {
+        if (browser == null) {
+            return;
+        }
         new Task.Backgroundable(project, "Updating UML Diagram", true) {
             @Override
             public void run(@NotNull ProgressIndicator progressIndicator) {
@@ -216,6 +228,9 @@ public class UMLDiagramView implements Disposable {
     double zoomLevel = 1;
 
     private void zoom(int iterations) {
+        if (browser == null) {
+            return;
+        }
         switch (iterations) {
             case 1:
                 zoomLevel = zoomLevel * 1.2;
