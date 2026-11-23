@@ -230,7 +230,6 @@ INTERVAL_TYPE = "DATE" | "TIME" | "DATETIME" | "ZDATETIME"
   "CHECK"                   			{ return CHECK; }
   "CHECKED"                 			{ return CHECKED; }
   "CLASS"                   			{ return CLASS; }
-  "CLASSCHOOSER"                   		{ return CLASSCHOOSER; }
   "CLASSES"                   		    { return CLASSES; }
   "CLIENT"                   		    { return CLIENT; }
   "CLOSE"                   			{ return CLOSE; }

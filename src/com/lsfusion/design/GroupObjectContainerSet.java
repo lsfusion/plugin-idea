@@ -10,7 +10,6 @@ public class GroupObjectContainerSet {
         public static final String FILTERBOX_CONTAINER = "FILTERBOX";
             public static final String FILTERS_CONTAINER = "FILTERS";
             public static final String FILTERCONTROLS_COMPONENT = "FILTERCONTROLS";
-        public static final String CLASSCHOOSER_COMPONENT = "CLASSCHOOSER"; // COMPONENT
         public static final String GRID_COMPONENT = "GRID"; // COMPONENT
         public static final String TOOLBARBOX_CONTAINER = "TOOLBARBOX";
             public static final String TOOLBARLEFT_CONTAINER = "TOOLBARLEFT";

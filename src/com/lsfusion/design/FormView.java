@@ -334,10 +334,6 @@ public class FormView {
         return GroupObjectContainerSet.TOOLBAR_SYSTEM_COMPONENT + "(" + sID + ")";
     }
 
-    public static String getClassChooserSID(String sID) {
-        return GroupObjectContainerSet.CLASSCHOOSER_COMPONENT + "(" + sID + ")";
-    }
-
     public static String getPropertyDrawSID(String name) {
         return "PROPERTY(" + name + ")";
     }

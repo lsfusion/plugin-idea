@@ -36,6 +36,7 @@
             <li>Fixed the <code>lsfusion_set_meta_visibility</code> MCP tool overwriting changes made to the file outside the IDE</li>
             <li>Class diagram: a notice instead of the raw diagram text when Mermaid cannot be loaded from <code>cdn.jsdelivr.net</code></li>
             <li>Fixed Meta mode overwriting changes made to files outside the IDE</li>
+            <li><code>DESIGN</code>: <code>CLASSCHOOSER(g)</code> is no longer offered or accepted, as the class chooser it named was removed in lsFusion 5.0</li>
         </ul>
     ]]>
     </change-notes>

@@ -244,8 +244,6 @@ public class DesignInfo {
                     case "FILTERS" :
                     case "USERFILTER" : // deprecated in 5.2, removed in 6.0
                         return FormView.getFiltersContainerSID(groupName);
-                    case "CLASSCHOOSER" : 
-                        return FormView.getClassChooserSID(groupName);
                     case "GRID" :
                     case "GRIDBOX": // backward compatibility
                         return FormView.getGridSID(groupName);

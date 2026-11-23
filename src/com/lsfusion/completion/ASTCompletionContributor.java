@@ -152,8 +152,6 @@ public class ASTCompletionContributor extends CompletionContributor {
                     return selector.getTreeGroupSelector() != null ? TreeGroupView.class : GridView.class;
                 case "TOOLBARSYSTEM":
                     return ToolbarView.class;
-                case "CLASSCHOOSER":
-                    return ClassChooserView.class;
                 case "FILTERCONTROLS":
                     return ComponentView.class;
                 case "BOX":

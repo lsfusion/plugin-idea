@@ -18,7 +18,6 @@ public class ViewProxyFactory {
     public static final Map<Class<?>, Class<? extends ViewProxy>> PROXY_CLASSES = new LinkedHashMap(){
         {
             put(ComponentView.class, ComponentViewProxy.class);
-            put(ClassChooserView.class, ClassChooserViewProxy.class);
             put(ContainerView.class, ContainerViewProxy.class);
             put(FormView.class, FormViewProxy.class);
             put(GridView.class, GridViewProxy.class);

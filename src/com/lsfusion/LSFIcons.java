@@ -59,7 +59,6 @@ public final class LSFIcons {
         public static final Icon DESIGN = AllIcons.FileTypes.UiForm;
         public static final Icon COMPONENT = AllIcons.RunConfigurations.Application; //todo:
         public static final Icon CONTAINER = AllIcons.RunConfigurations.Applet; //todo:
-        public static final Icon CLASS_CHOOSER = GROUP_BY_CLASS;
         public static final Icon FILTER = loadIcon("/images/design/filt.png");
         public static final Icon FILTER_ADD = loadIcon("/images/design/filtadd.png");
         public static final Icon FILTER_APPLY = loadIcon("/images/design/ok.png");

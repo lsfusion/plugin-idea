@@ -237,8 +237,6 @@ public class DefaultFormView extends FormView {
         registerComponent(set.getFilterGroupsContainer(), filterGroupsContainers, goView);
         registerComponent(set.getToolbarContainer(), toolbarContainers, goView);
 
-        //todo classChoosers
-
         if (goView.entity.isFixedPanel()) {
             set.getBoxContainer().setFlex(0);
         }

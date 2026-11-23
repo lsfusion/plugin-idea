@@ -17,7 +17,6 @@ import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import com.lsfusion.LSFIcons;
 import com.lsfusion.design.DesignInfo;
-import com.lsfusion.design.model.ClassChooserView;
 import com.lsfusion.design.model.ComponentView;
 import com.lsfusion.design.model.ContainerView;
 import com.lsfusion.design.model.FilterControlsView;
@@ -287,7 +286,7 @@ public class EmbeddedDesign extends FormDesign {
     }
 
     private boolean defaultSelection(ComponentView component) {
-        return !(component instanceof ClassChooserView) && !(component instanceof FilterControlsView);
+        return !(component instanceof FilterControlsView);
     }
 
     private void redrawComponents() {
