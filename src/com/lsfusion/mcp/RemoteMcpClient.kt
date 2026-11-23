@@ -1,6 +1,8 @@
 package com.lsfusion.mcp
 
+import com.intellij.ide.plugins.cl.PluginAwareClassLoader
 import com.intellij.mcpserver.McpExpectedError
+import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.util.io.HttpRequests
 import org.json.JSONObject
 import java.net.HttpURLConnection
@@ -11,6 +13,16 @@ object RemoteMcpClient {
     private const val DEFAULT_TIMEOUT_SECONDS = 30
     // The agent's own initialize waits on this one, so a center that does not answer must not hold it long.
     private const val INSTRUCTIONS_TIMEOUT_SECONDS = 5
+
+    // Through the plugin's class loader: PluginManager.getPluginByClass and PluginManagerCore.getPlugin are internal
+    // API since 2026.2.
+    @JvmField
+    val PLUGIN_VERSION: String =
+        (RemoteMcpClient::class.java.classLoader as? PluginAwareClassLoader)?.pluginDescriptor?.version ?: "unknown"
+
+    // The center logs it with every call. The IDE build goes here, not into `clientInfo.version`, which stays the
+    // plugin version: the same plugin version behaves differently on different IDE builds.
+    private val USER_AGENT = "lsfusion-intellij/$PLUGIN_VERSION ${ApplicationInfo.getInstance().build.asString()}"
 
     @Volatile
     private var sessionId: String? = null
@@ -59,6 +71,7 @@ object RemoteMcpClient {
         return HttpRequests.post(URL, "application/json")
             .connectTimeout(safeTimeout * 1000)
             .readTimeout(safeTimeout * 1000)
+            .userAgent(USER_AGENT)
             .accept("application/json, text/event-stream")
             .tuner { connection ->
                 if (session != null) {
@@ -149,7 +162,7 @@ object RemoteMcpClient {
                             "clientInfo",
                             JSONObject()
                                 .put("name", "lsfusion-intellij")
-                                .put("version", "0")
+                                .put("version", PLUGIN_VERSION)
                         )
                 )
                 .toString()
@@ -158,6 +171,7 @@ object RemoteMcpClient {
             val responseBody = HttpRequests.post(URL, "application/json")
                 .connectTimeout(timeoutSeconds * 1000)
                 .readTimeout(timeoutSeconds * 1000)
+                .userAgent(USER_AGENT)
                 .accept("application/json, text/event-stream")
                 .connect { req ->
                     val connection = req.connection as HttpURLConnection

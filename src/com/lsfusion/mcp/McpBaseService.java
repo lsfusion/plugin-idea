@@ -57,7 +57,7 @@ public abstract class McpBaseService extends RestService {
                 .put("protocolVersion", MCP_PROTOCOL_VERSION)
                 .put("serverInfo", new JSONObject()
                         .put("name", "lsfusion-intellij")
-                        .put("version", "1.0.0"))
+                        .put("version", RemoteMcpClient.PLUGIN_VERSION))
                 .put("capabilities", new JSONObject()
                         .put("tools", new JSONObject().put("listChanged", false))
                         .put("resources", new JSONObject().put("listChanged", false))
