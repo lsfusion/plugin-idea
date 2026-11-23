@@ -398,7 +398,7 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
         minSymbols: Int = MCPSearchUtils.DEFAULT_MIN_SYMBOLS,
         @McpDescription(description = "Hard cap for total output size in JSON chars (>= 1). Default: ${MCPSearchUtils.DEFAULT_MAX_SYMBOLS}.")
         maxSymbols: Int = MCPSearchUtils.DEFAULT_MAX_SYMBOLS,
-        @McpDescription(description = "Best-effort wall-clock timeout in seconds (>= 1). Default: ${MCPSearchUtils.DEFAULT_TIMEOUT_SECS}.")
+        @McpDescription(description = "Best-effort wall-clock timeout in seconds (>= 1). A larger value than ${MCPSearchUtils.MAX_TIMEOUT_SECS} is lowered to ${MCPSearchUtils.MAX_TIMEOUT_SECS}. Default: ${MCPSearchUtils.DEFAULT_TIMEOUT_SECS}.")
         timeoutSeconds: Int = MCPSearchUtils.DEFAULT_TIMEOUT_SECS,
     ): FindElementsResult {
         // Prefer project from MCP call context (correct when multiple projects are open).

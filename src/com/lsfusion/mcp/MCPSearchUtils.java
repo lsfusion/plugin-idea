@@ -94,6 +94,11 @@ public class MCPSearchUtils {
     public static final int DEFAULT_MAX_SYMBOLS = 200_000; // fail-safe
     public static final int DEFAULT_MIN_SYMBOLS = 1_000; // fail-safe
     public static final int DEFAULT_TIMEOUT_SECS = 10; // default 10 seconds
+    // A larger timeoutSeconds is lowered to it, not rejected: a client that aborts a long call leaves the agent with
+    // nothing, not even what the search has found by then. Many clients abort a call after 60 s (Claude Code over HTTP,
+    // Cursor CLI, the MCP SDK default); the answer comes by this deadline, so 40 keeps a third of that for the work
+    // outside the timer
+    public static final int MAX_TIMEOUT_SECS = 40;
 
     private static final class SelectedStatement {
         private final @NotNull LSFMCPDeclaration decl;
@@ -146,7 +151,7 @@ public class MCPSearchUtils {
 
         // Timeout parsing simplified: only timeoutSeconds is supported; default to 10s
         int sec = query.optInt("timeoutSeconds", DEFAULT_TIMEOUT_SECS);
-        final long timeoutMillis = (long) Math.max(1, sec) * 1000L;
+        final long timeoutMillis = (long) Math.min(MAX_TIMEOUT_SECS, Math.max(1, sec)) * 1000L;
 
         // Allocate 90% of timeout for the search stage and 10% for post-processing (expand / minSymbols fill).
         // Do NOT sprinkle timeout checks through the search loops: keep the search logic as-is and only bound it

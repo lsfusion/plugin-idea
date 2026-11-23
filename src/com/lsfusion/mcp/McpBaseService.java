@@ -584,7 +584,7 @@ public abstract class McpBaseService extends RestService {
                                 .put("type", "integer")
                                 .put("minimum", 1)
                                 .put("default", MCPSearchUtils.DEFAULT_TIMEOUT_SECS)
-                                .put("description", "Best-effort wall-clock timeout in seconds (>= 1). Default: " + MCPSearchUtils.DEFAULT_TIMEOUT_SECS + ".")))
+                                .put("description", "Best-effort wall-clock timeout in seconds (>= 1). A larger value than " + MCPSearchUtils.MAX_TIMEOUT_SECS + " is lowered to " + MCPSearchUtils.MAX_TIMEOUT_SECS + ". Default: " + MCPSearchUtils.DEFAULT_TIMEOUT_SECS + ".")))
                 .put("additionalProperties", false);
 
         JSONObject inputSchema = new JSONObject()
