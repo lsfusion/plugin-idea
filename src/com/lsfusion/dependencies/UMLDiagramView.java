@@ -21,8 +21,6 @@ import com.lsfusion.lang.classes.LSFClassSet;
 import com.lsfusion.lang.psi.*;
 import com.lsfusion.lang.psi.declarations.*;
 import com.lsfusion.lang.psi.impl.LSFClassStatementImpl;
-import groovyjarjarantlr4.v4.misc.OrderedHashMap;
-import groovyjarjarantlr4.v4.runtime.misc.OrderedHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -152,10 +150,10 @@ public class UMLDiagramView implements Disposable {
         if (editor != null) {
             PsiFile file = PsiManager.getInstance(project).findFile(editor.getVirtualFile());
             if (file instanceof LSFFile) {
-                Map<String, List<PropertyOrAction>> classPropOrActionMap = new OrderedHashMap<>();
-                Map<String, List<String>> classExtendsMap = new OrderedHashMap<>();
+                Map<String, List<PropertyOrAction>> classPropOrActionMap = new LinkedHashMap<>();
+                Map<String, List<String>> classExtendsMap = new LinkedHashMap<>();
 
-                for (LSFFile moduleFile : getModuleFiles((LSFFile) file, requiredCheckBox.isSelected(), new OrderedHashSet<>())) {
+                for (LSFFile moduleFile : getModuleFiles((LSFFile) file, requiredCheckBox.isSelected(), new LinkedHashSet<>())) {
                     for (PsiElement child : (moduleFile).getStatements()) {
                         if (child instanceof LSFClassStatementImpl cls) {
                             if (!cls.isInMetaDecl()) {
@@ -235,7 +233,7 @@ public class UMLDiagramView implements Disposable {
         );
     }
 
-    private OrderedHashSet<LSFFile> getModuleFiles(LSFFile file, boolean required, OrderedHashSet<LSFFile> files) {
+    private LinkedHashSet<LSFFile> getModuleFiles(LSFFile file, boolean required, LinkedHashSet<LSFFile> files) {
         if (!files.contains(file)) {
             files.add(file);
             if (required) {
