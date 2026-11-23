@@ -35,7 +35,6 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.indexing.FileBasedIndex;
@@ -625,6 +624,19 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
                             changedDocs.put(document, current);
                         }
 
+                        // The file was changed on disk (by an AI agent's own file tools, say) and the IDE has not re-read
+                        // it yet: the generated code would go into the IDE's old copy, and the next save (Save All,
+                        // autosave, any MCP tool call with side effects) would write that copy over the change - without
+                        // asking while an MCP session is open. Re-read the file and regenerate from what is on disk.
+                        VirtualFile vFile = file.getVirtualFile();
+                        if (vFile != null && vFile.isInLocalFileSystem() && !rereadDocuments.remove(document) && isChangedOnDisk(vFile, document)) {
+                            for (int i = 0; i < genUsages.size(); i++)
+                                inlineProceed(true, file);
+                            genUsages.clear();
+                            reloadAndReprocess(vFile, document, forcedEnabled);
+                            return;
+                        }
+
                         for (int i = 0; i < genUsages.size(); i++)
                             inlineProceed(false, file);
 
@@ -666,6 +678,33 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
             if (!usages.isEmpty())
                 inlinePostpone(this, false); // еще раз запустим, так как некоторые в Dumb выполнялись
         }
+    }
+
+    // Documents whose re-read found nothing to reload although the disk check above said otherwise (a file system whose
+    // timestamps the check reads differently from the IDE, say): their next batch skips the check once, instead of
+    // re-reading the file again and again. Touched on the EDT only.
+    private final Set<Document> rereadDocuments = ContainerUtil.createWeakSet();
+
+    private void reloadAndReprocess(VirtualFile vFile, Document document, Boolean forcedEnabled) {
+        long stamp = document.getModificationStamp();
+        VfsUtil.markDirty(false, false, vFile);
+        vFile.refresh(true, false, () -> {
+            // a document with unsaved changes is not reloaded: what happens to it is up to the IDE's conflict handling,
+            // and the generated code would only be added to the copy that conflicts with the disk
+            if (disposed || FileDocumentManager.getInstance().isDocumentUnsaved(document))
+                return;
+            if (document.getModificationStamp() == stamp)
+                rereadDocuments.add(document);
+            PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(myProject);
+            psiDocumentManager.performForCommittedDocument(document, () -> {
+                if (psiDocumentManager.getPsiFile(document) instanceof LSFFile lsfFile) {
+                    if (forcedEnabled != null)
+                        addForcedUsageProcessing(lsfFile, lsfFile.getMetaCodeStatementList(), forcedEnabled);
+                    else
+                        addUsageProcessing(lsfFile.getMetaCodeStatementList());
+                }
+            });
+        });
     }
 
     private abstract class CompletionRunner implements Runnable {
@@ -1211,7 +1250,11 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
 
             GlobalSearchScope searchScope = LSFFileUtils.getScope(modulesToInclude, myProject);
 
-            List<LSFFile> lsfFiles = ApplicationManager.getApplication().runReadAction((Computable<List<LSFFile>>) () -> getLsfFiles(searchScope));
+            // files changed on disk that the IDE has not re-read would get the generated code applied to their old text,
+            // and flushPostponed saves that over the change
+            List<VirtualFile> virtualFiles = ApplicationManager.getApplication().runReadAction((Computable<List<VirtualFile>>) () -> getLsfVirtualFiles(searchScope));
+            VfsUtil.markDirtyAndRefresh(false, false, false, virtualFiles.toArray(VirtualFile.EMPTY_ARRAY));
+            List<LSFFile> lsfFiles = ApplicationManager.getApplication().runReadAction((Computable<List<LSFFile>>) () -> getLsfFiles(virtualFiles));
 
             ReprocessInlineProcessor inlineProcessor = new ReprocessInlineProcessor(indicator);
 
@@ -1243,15 +1286,20 @@ public final class MetaChangeDetector extends PsiTreeChangeAdapter implements Di
         ProgressManager.getInstance().run(task);
     }
 
-    private List<LSFFile> getLsfFiles(GlobalSearchScope searchScope) {
-        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope);
+    private List<VirtualFile> getLsfVirtualFiles(GlobalSearchScope searchScope) {
+        List<VirtualFile> virtualFiles = new ArrayList<>();
+        for(VirtualFile virtualFile : FileTypeIndex.getFiles(LSFFileType.INSTANCE, searchScope)) {
+            if(FileStatusManager.getInstance(myProject).getStatus(virtualFile) != FileStatus.IGNORED)
+                virtualFiles.add(virtualFile);
+        }
+        return virtualFiles;
+    }
+
+    private List<LSFFile> getLsfFiles(List<VirtualFile> virtualFiles) {
         List<LSFFile> lsfFiles = new ArrayList<>();
         for(VirtualFile virtualFile : virtualFiles) {
-            if(FileStatusManager.getInstance(myProject).getStatus(virtualFile) != FileStatus.IGNORED) {
-                PsiFile psiFile = PsiUtilBase.getPsiFile(myProject, virtualFile);
-                if(psiFile instanceof LSFFile)
-                    lsfFiles.add((LSFFile) psiFile);
-            }
+            if(virtualFile.isValid() && PsiManager.getInstance(myProject).findFile(virtualFile) instanceof LSFFile lsfFile)
+                lsfFiles.add(lsfFile);
         }
         return lsfFiles;
     }

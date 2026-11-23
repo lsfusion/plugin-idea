@@ -35,6 +35,7 @@
             <li>In an IDE without JCEF the <b>Dependencies</b> and <b>Design</b> tool windows open, with a notice in place of the class diagram and the Live tab</li>
             <li>Fixed the <code>lsfusion_set_meta_visibility</code> MCP tool overwriting changes made to the file outside the IDE</li>
             <li>Class diagram: a notice instead of the raw diagram text when Mermaid cannot be loaded from <code>cdn.jsdelivr.net</code></li>
+            <li>Fixed Meta mode overwriting changes made to files outside the IDE</li>
         </ul>
     ]]>
     </change-notes>
