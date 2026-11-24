@@ -78,7 +78,7 @@ No maintained version or backport branches; the release line is `master`. Featur
 
 ## Releases
 
-Pushing a `<version>` bump to `master` *is* a release. One Jenkins run publishes it to both distribution channels and tags it (see *Release tags*):
+Pushing a `<version>` bump to `master` *is* a release. One Jenkins run publishes it to both distribution channels, tags it and gives it a GitHub release (see *Release tags*):
 
 1. **JetBrains Marketplace** ([plugin/7601](https://plugins.jetbrains.com/plugin/7601)). Every update goes through JetBrains review; Marketplace users get it once it is approved.
 2. **`lsfusion.org` download / IDE auto-update channel.** `exe/ext/lsfusion-idea-plugin.zip`, the file `IDE → Settings → Plugins → Manage Plugin Repositories → https://www.lsfusion.org/...` pulls. Uploaded as soon as the Marketplace accepts the upload, without waiting for the review.
@@ -88,7 +88,7 @@ Pushing a `<version>` bump to `master` *is* a release. One Jenkins run publishes
 - GitHub push webhook → Jenkins job `buildAndUploadPluginTrigger` (freestyle, watches any branch) → triggers the `buildAndUploadPlugin` pipeline (`vars/buildAndUploadPlugin.groovy` in the `lsfusion/jenkins` shared library), which always builds `master`.
 - It compares `<version>` from `META-INF/plugin.xml` with the newest update listed by `https://plugins.jetbrains.com/api/plugins/7601/updates`; an update still in review is not listed. If they match, it logs `Version <X.Y.Z> matches the latest version in Marketplace. Skipping build.` and succeeds — pushes that don't bump are no-ops.
 - Otherwise it runs `./gradlew buildPlugin` and `./gradlew publishPlugin`. `publishPlugin` depends on `verifyPlugin`, which checks the plugin against the `recommended()` IDEs, the newest EAP included, and fails on compatibility problems and on internal or override-only API usages — what Marketplace review rejects. Then:
-  - the upload is accepted: the built commit is tagged `vX.Y.Z`, the zip goes over FTP to lsfusion.org, and Slack #jenkins gets the change-notes bullets;
+  - the upload is accepted: the built commit is tagged `vX.Y.Z`, the zip is published in the GitHub release of the tag and goes over FTP to lsfusion.org, and Slack #jenkins gets a link to the release (to the change notes in `plugin.xml` if the release failed);
   - the Marketplace answers `already contains version`: an earlier run uploaded this version and it is still in review, so every push until the approval ends here. The build succeeds with the description `<X.Y.Z>: already uploaded, not approved yet`; nothing is uploaded, no Slack message;
   - any other failure (verification, a rejected token, network): nothing reaches either channel, the build fails, and Slack gets Gradle's "What went wrong" text. The version stays unpublished, so the next push or a manual run of `buildAndUploadPlugin` retries it.
 
@@ -97,9 +97,16 @@ Pushing a `<version>` bump to `master` *is* a release. One Jenkins run publishes
 Each release has an annotated tag `vX.Y.Z` (message `Release X.Y.Z`) on the commit that the Marketplace's update of that version was built from, so the sources of a version users have can be found from the version, and `git log vX.Y.Z..master` for the latest X.Y.Z is what is not released yet. The `buildAndUploadPlugin` run pushes the tag as soon as the Marketplace accepts the upload, before the FTP step.
 
 - The tag follows the Marketplace. When a version is uploaded again (the Marketplace rejected the update, it was deleted there, and the fix was pushed with the same `<version>`), the run that uploads it moves the tag to its commit.
-- Failing to tag (push refused, GitHub unreachable) leaves the release published: the build turns unstable, its description ends in `, not tagged`, Slack #jenkins gets a warning, and the build log has `Tagging <commit> as vX.Y.Z failed`. No later run tags the version, as they end on `already contains version` until the review is over, so tag that commit by hand: `git tag -f -a vX.Y.Z -m 'Release X.Y.Z' <commit>`, then `git push --force origin vX.Y.Z`.
+- Failing to tag (push refused, GitHub unreachable) leaves the release published: the build turns unstable, its description ends in `, not tagged`, Slack #jenkins gets a warning, and the build log has `Tagging <commit> as vX.Y.Z failed`. No later run tags the version, as they end on `already contains version` until the review is over, so tag that commit by hand: `git tag -f -a vX.Y.Z -m 'Release X.Y.Z' <commit>`, then `git push --force origin vX.Y.Z`. If the GitHub release of the version was published all the same, GitHub has already put a lightweight `vX.Y.Z` on that commit for it; the commands replace it with the annotated tag, and the release stays.
 - The tag push fires the push webhook too. Whatever the trigger job then does, the pipeline builds `master` and ends on `already contains version` or `Skipping build`, which tag nothing.
 - Releases uploaded before the pipeline tagged them have a tag only if someone added it by hand.
+
+Each tag has a [GitHub release](https://github.com/lsfusion/plugin-idea/releases) of the same name, titled `X.Y.Z`, with the built zip as `lsfusion-idea-plugin-X.Y.Z.zip` and the `<change-notes>` block as its notes: the HTML as it is, with the indentation stripped, as Markdown would show indented lines as code. The releases keep every version for download, while lsfusion.org has the latest one only; a downloaded zip installs with *Settings → Plugins → ⚙ → Install Plugin from Disk…*. The run publishes the release right after the tag, with the Jenkins credential `api.github.com.token`, a token of `nomojenkins` that needs write access to the contents of plugin-idea.
+
+- It is a full release from the start, the latest one, not a prerelease until the review is over: lsfusion.org serves the version from the start too.
+- It follows the tag: a run that uploads the version again updates the notes and replaces the zip.
+- Failing to publish it (a token without the access, GitHub unreachable) leaves the rest published: the build turns unstable, its description ends in `, no GitHub release`, Slack #jenkins gets a warning with GitHub's answer, and the build archives `build/release-notes.md` and `build/distributions/lsfusion-idea-plugin-X.Y.Z.zip`. No later run publishes the release, so download those two files from the build's artifacts and publish them by hand, once the tag is there: `gh release delete vX.Y.Z -R lsfusion/plugin-idea -y` if the release was created, then `gh release create vX.Y.Z -R lsfusion/plugin-idea --verify-tag -t X.Y.Z -F release-notes.md lsfusion-idea-plugin-X.Y.Z.zip`.
+- Releases uploaded before the pipeline published them have no GitHub release.
 
 ### Bumping the version
 
@@ -107,13 +114,13 @@ Each release has an annotated tag `vX.Y.Z` (message `Release X.Y.Z`) on the comm
 2. Verify every user-visible change since the last release has a `<li>` bullet in the block (see *Release notes* below). Add any that are missing.
 3. Run `./gradlew verifyPlugin` (the first run downloads the recommended IDEs): a finding fails the release in both channels.
 4. Commit. Subject like `Release X.Y.Z` is fine; the body should list what's shipping, mirroring the change-notes bullets. Don't squash this with unrelated work — the release commit should diff cleanly to `plugin.xml` (and only `plugin.xml` unless the rollout literally needs another file).
-5. Push to `master`. Jenkins publishes to both channels and tags the release as described above; Marketplace users get the version after JetBrains approves it.
+5. Push to `master`. Jenkins publishes to both channels, tags the release and gives it a GitHub release as described above; Marketplace users get the version after JetBrains approves it.
 
 The change-notes block is intentionally **not** reset by the release commit — it keeps showing what shipped in `X.Y.Z` until the next contributor with a user-visible change does the rollover (see below).
 
 ### Release notes (`<change-notes>`)
 
-The CDATA block in `META-INF/plugin.xml` is the **only** source of release notes; both channels render it verbatim, and there is no parallel CHANGELOG.md. The block is HTML — basic tags only (`<b>`, `<br>`, `<ul>`, `<li>`, `<code>`).
+The CDATA block in `META-INF/plugin.xml` is the **only** source of release notes; both channels and the GitHub release render it verbatim, and there is no parallel CHANGELOG.md. The block is HTML — basic tags only (`<b>`, `<br>`, `<ul>`, `<li>`, `<code>`).
 
 **What to write.** One terse `<li>` bullet per user-visible improvement, in past-or-imperative tense, framed as what the developer-of-lsFusion sees in the IDE — not as what the plugin internally does. Mention concrete syntax (`<code>NEWEXECUTOR ... CLIENT conn</code>`), inspection names, settings paths. Skip plugin-internal mechanics (BNF rule names, PSI class names, mixin wiring) — those belong in the commit body, not in the marketplace listing.
 
