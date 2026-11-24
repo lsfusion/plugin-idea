@@ -1,16 +1,19 @@
 package com.lsfusion.design.view;
 
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiTreeChangeEvent;
 import com.intellij.ui.content.impl.ContentImpl;
+import org.jetbrains.annotations.NotNull;
 
-public class DesignViewFactory {
-    private static final DesignViewFactory INSTANCE = new DesignViewFactory();
-
-    public static DesignViewFactory getInstance() {
-        return INSTANCE;
+// One per project: the Design tool window and the PSI events that update it belong to a project, and an
+// application-wide instance let the project that opened the window last take over the other projects' events.
+@Service(Service.Level.PROJECT)
+public final class DesignViewFactory {
+    public static DesignViewFactory getInstance(@NotNull Project project) {
+        return project.getService(DesignViewFactory.class);
     }
 
     private DesignView designView;
@@ -24,8 +27,7 @@ public class DesignViewFactory {
 
         ContentImpl content = new ContentImpl(view, "", true);
         // Dispose the design tabs together with the tool window content (project close), and drop the
-        // application-level singleton references so the closed project's view is neither leaked nor
-        // reachable from another project's PSI events.
+        // references to them, so that a disposed view gets no more events.
         content.setDisposer(() -> {
             Disposer.dispose(view);
             if (designView == view) {

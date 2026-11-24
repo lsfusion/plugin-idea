@@ -135,7 +135,7 @@ public class DesignPreviewLineMarkerProvider extends LSFLineMarkerProviderDescri
                     file = (LSFFile) formExtend.getResult().getContainingFile();
                 }
 
-                DesignViewFactory.getInstance().updateView(new DesignView.TargetForm(formDecl, 
+                DesignViewFactory.getInstance(formDecl.getProject()).updateView(new DesignView.TargetForm(formDecl, 
                         ((LSFFile) psi.getContainingFile()).getModuleDeclaration(), 
                         LSFLocalSearchScope.createFrom(formExtend.getResult()),
                         file

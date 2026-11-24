@@ -1,5 +1,6 @@
 package com.lsfusion.design;
 
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiTreeChangeAdapter;
 import com.intellij.psi.PsiTreeChangeEvent;
 import com.lsfusion.design.view.DesignViewFactory;
@@ -39,6 +40,9 @@ public class FormDesignChangeDetector extends PsiTreeChangeAdapter {
     }
 
     private void fireChildChanged(PsiTreeChangeEvent event) {
-        DesignViewFactory.getInstance().designCodeChanged(event);
+        // the event comes from the PsiManager of the project it belongs to
+        if (event.getSource() instanceof PsiManager psiManager) {
+            DesignViewFactory.getInstance(psiManager.getProject()).designCodeChanged(event);
+        }
     }
 }

@@ -39,6 +39,7 @@
             <li><code>DESIGN</code>: <code>CLASSCHOOSER(g)</code> is no longer offered or accepted, as the class chooser it named was removed in lsFusion 5.0</li>
             <li><code>DESIGN</code>: a four-number property value, such as <code>caption = (1, 2, 3, 4)</code>, is reported as a syntax error, as no property has taken one since lsFusion 1.1.0</li>
             <li>The <code>lsfusion_find_elements</code> MCP tool caps <code>timeoutSeconds</code> at 40 seconds</li>
+            <li><b>Design</b> tool window: with several projects open, each window follows the forms of its own project, not of the project that opened its window last</li>
         </ul>
     ]]>
     </change-notes>

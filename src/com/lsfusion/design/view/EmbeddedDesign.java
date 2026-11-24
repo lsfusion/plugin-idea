@@ -118,7 +118,7 @@ public class EmbeddedDesign extends FormDesign {
     }
 
     public void scheduleRebuild(PsiElement element, PsiFile file) {
-        if (element == null || file == null || !DesignViewFactory.getInstance().windowIsVisible() || PsiDocumentManager.getInstance(project).getDocument(file) == null || DumbService.isDumb(project)) {
+        if (element == null || file == null || !DesignViewFactory.getInstance(project).windowIsVisible() || PsiDocumentManager.getInstance(project).getDocument(file) == null || DumbService.isDumb(project)) {
             return;
         }
 

@@ -9,7 +9,7 @@ import com.intellij.openapi.wm.ex.ToolWindowEx;
 public class DesignViewToolWindowFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
-        DesignViewFactory factory = DesignViewFactory.getInstance();
+        DesignViewFactory factory = DesignViewFactory.getInstance(project);
         DumbService.getInstance(project).smartInvokeLater(() -> factory.initToolWindow(project, (ToolWindowEx) toolWindow));
     }
 }
