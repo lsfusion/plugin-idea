@@ -78,7 +78,7 @@ No maintained version or backport branches; the release line is `master`. Featur
 
 ## Releases
 
-Pushing a `<version>` bump to `master` *is* a release. One Jenkins run publishes it to both distribution channels:
+Pushing a `<version>` bump to `master` *is* a release. One Jenkins run publishes it to both distribution channels and tags it (see *Release tags*):
 
 1. **JetBrains Marketplace** ([plugin/7601](https://plugins.jetbrains.com/plugin/7601)). Every update goes through JetBrains review; Marketplace users get it once it is approved.
 2. **`lsfusion.org` download / IDE auto-update channel.** `exe/ext/lsfusion-idea-plugin.zip`, the file `IDE → Settings → Plugins → Manage Plugin Repositories → https://www.lsfusion.org/...` pulls. Uploaded as soon as the Marketplace accepts the upload, without waiting for the review.
@@ -88,9 +88,18 @@ Pushing a `<version>` bump to `master` *is* a release. One Jenkins run publishes
 - GitHub push webhook → Jenkins job `buildAndUploadPluginTrigger` (freestyle, watches any branch) → triggers the `buildAndUploadPlugin` pipeline (`vars/buildAndUploadPlugin.groovy` in the `lsfusion/jenkins` shared library), which always builds `master`.
 - It compares `<version>` from `META-INF/plugin.xml` with the newest update listed by `https://plugins.jetbrains.com/api/plugins/7601/updates`; an update still in review is not listed. If they match, it logs `Version <X.Y.Z> matches the latest version in Marketplace. Skipping build.` and succeeds — pushes that don't bump are no-ops.
 - Otherwise it runs `./gradlew buildPlugin` and `./gradlew publishPlugin`. `publishPlugin` depends on `verifyPlugin`, which checks the plugin against the `recommended()` IDEs, the newest EAP included, and fails on compatibility problems and on internal or override-only API usages — what Marketplace review rejects. Then:
-  - the upload is accepted: the zip goes over FTP to lsfusion.org, and Slack #jenkins gets the change-notes bullets;
+  - the upload is accepted: the built commit is tagged `vX.Y.Z`, the zip goes over FTP to lsfusion.org, and Slack #jenkins gets the change-notes bullets;
   - the Marketplace answers `already contains version`: an earlier run uploaded this version and it is still in review, so every push until the approval ends here. The build succeeds with the description `<X.Y.Z>: already uploaded, not approved yet`; nothing is uploaded, no Slack message;
   - any other failure (verification, a rejected token, network): nothing reaches either channel, the build fails, and Slack gets Gradle's "What went wrong" text. The version stays unpublished, so the next push or a manual run of `buildAndUploadPlugin` retries it.
+
+### Release tags
+
+Each release has an annotated tag `vX.Y.Z` (message `Release X.Y.Z`) on the commit that the Marketplace's update of that version was built from, so the sources of a version users have can be found from the version, and `git log vX.Y.Z..master` for the latest X.Y.Z is what is not released yet. The `buildAndUploadPlugin` run pushes the tag as soon as the Marketplace accepts the upload, before the FTP step.
+
+- The tag follows the Marketplace. When a version is uploaded again (the Marketplace rejected the update, it was deleted there, and the fix was pushed with the same `<version>`), the run that uploads it moves the tag to its commit.
+- Failing to tag (push refused, GitHub unreachable) leaves the release published: the build turns unstable, its description ends in `, not tagged`, Slack #jenkins gets a warning, and the build log has `Tagging <commit> as vX.Y.Z failed`. No later run tags the version, as they end on `already contains version` until the review is over, so tag that commit by hand: `git tag -f -a vX.Y.Z -m 'Release X.Y.Z' <commit>`, then `git push --force origin vX.Y.Z`.
+- The tag push fires the push webhook too. Whatever the trigger job then does, the pipeline builds `master` and ends on `already contains version` or `Skipping build`, which tag nothing.
+- Releases uploaded before the pipeline tagged them have a tag only if someone added it by hand.
 
 ### Bumping the version
 
@@ -98,7 +107,7 @@ Pushing a `<version>` bump to `master` *is* a release. One Jenkins run publishes
 2. Verify every user-visible change since the last release has a `<li>` bullet in the block (see *Release notes* below). Add any that are missing.
 3. Run `./gradlew verifyPlugin` (the first run downloads the recommended IDEs): a finding fails the release in both channels.
 4. Commit. Subject like `Release X.Y.Z` is fine; the body should list what's shipping, mirroring the change-notes bullets. Don't squash this with unrelated work — the release commit should diff cleanly to `plugin.xml` (and only `plugin.xml` unless the rollout literally needs another file).
-5. Push to `master`. Jenkins publishes to both channels as described above; Marketplace users get the version after JetBrains approves it.
+5. Push to `master`. Jenkins publishes to both channels and tags the release as described above; Marketplace users get the version after JetBrains approves it.
 
 The change-notes block is intentionally **not** reset by the release commit — it keeps showing what shipped in `X.Y.Z` until the next contributor with a user-visible change does the rollover (see below).
 
