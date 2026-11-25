@@ -415,6 +415,8 @@ public abstract class McpBaseService extends RestService {
     }
 
     // --- report_feedback schema helpers (mirror mcp/tools/feedback.py; central validates) ---
+    // The maxLength / maxItems below are central's caps on a report, and central refuses a report over one. mcp's
+    // drift test compares them with central's, and the tool description with central's word for word.
     private static JSONArray feArr(String... values) {
         JSONArray a = new JSONArray();
         for (String v : values) a.put(v);
@@ -440,56 +442,56 @@ public abstract class McpBaseService extends RestService {
                 .put("type", "object")
                 .put("properties", new JSONObject()
                         .put("primary_target", feEnum("Main artifact to change.", targets))
-                        .put("secondary_targets", feArrOf(feEnum("", targets), "Other plausibly-affected artifacts."))
-                        .put("suggested_change", feStr("Concrete suggestion (depersonalized)."))
+                        .put("secondary_targets", feArrOf(feEnum("", targets), "Other plausibly-affected artifacts.").put("maxItems", 30))
+                        .put("suggested_change", feStr("Concrete suggestion (depersonalized).").put("maxLength", 4000))
                         .put("confidence", feEnum("How confident the agent is. Default: medium.", feArr("low", "medium", "high")).put("default", "medium"))
-                        .put("rationale", feStr("Why, briefly.")))
+                        .put("rationale", feStr("Why, briefly.").put("maxLength", 2000)))
                 .put("required", feArr("primary_target", "suggested_change"));
         JSONObject expectation = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
-                        .put("expected", feStr("What the agent expected (depersonalized)."))
-                        .put("actual", feStr("What actually happened (depersonalized).")))
+                        .put("expected", feStr("What the agent expected (depersonalized).").put("maxLength", 2000))
+                        .put("actual", feStr("What actually happened (depersonalized).").put("maxLength", 2000)))
                 .put("required", feArr("expected", "actual"));
         JSONObject evalError = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
-                        .put("message", feStr("The error text (depersonalized)."))
+                        .put("message", feStr("The error text (depersonalized).").put("maxLength", 4000))
                         .put("phase", feEnum("Where it surfaced. Default: unknown.", feArr("syntax", "semantic", "runtime", "unknown")).put("default", "unknown"))
-                        .put("code_excerpt", feStr("Tiny abstracted snippet if essential — NO full source / project code."))
-                        .put("normalized_message", feStr("Optional normalized form (ids/literals stripped) for clustering.")))
+                        .put("code_excerpt", feStr("Tiny abstracted snippet if essential — NO full source / project code.").put("maxLength", 2000))
+                        .put("normalized_message", feStr("Optional normalized form (ids/literals stripped) for clustering.").put("maxLength", 2000)))
                 .put("required", feArr("message"));
         JSONObject retrieveQuery = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
-                        .put("query", feStr("The query text."))
-                        .put("returned_sources", feArrOf(new JSONObject().put("type", "string"), "Doc branches/files it surfaced, if noted."))
+                        .put("query", feStr("The query text.").put("maxLength", 2000))
+                        .put("returned_sources", feArrOf(new JSONObject().put("type", "string"), "Doc branches/files it surfaced, if noted.").put("maxItems", 30))
                         .put("usefulness", feEnum("How useful the result was for this error.", feArr("helpful", "irrelevant", "misleading", "incomplete"))))
                 .put("required", feArr("query"));
         JSONObject toolContext = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
-                        .put("eval_server_kind", feStr("Eval server kind."))
-                        .put("eval_server_version", feStr("Eval server version.")));
+                        .put("eval_server_kind", feStr("Eval server kind.").put("maxLength", 100))
+                        .put("eval_server_version", feStr("Eval server version.").put("maxLength", 100)));
         JSONObject report = new JSONObject()
                 .put("type", "object")
                 .put("properties", new JSONObject()
-                        .put("agent_journey_id", feStr("Agent-generated id grouping this task's errors/queries."))
+                        .put("agent_journey_id", feStr("Agent-generated id grouping this task's errors/queries.").put("maxLength", 200))
                         .put("signal_type", feEnum("What kind of reinforcement signal this is (routing hint, not the decision).",
                                 feArr("doc-gap", "expectation-mismatch", "unclear-error", "missing-capability", "rag-retrieval", "other")))
-                        .put("problem_summary", feStr("Short depersonalized task description."))
+                        .put("problem_summary", feStr("Short depersonalized task description.").put("maxLength", 2000))
                         .put("recommendation", recommendation)
                         .put("expectation", expectation)
-                        .put("eval_errors", feArrOf(evalError, "Errors hit while running lsFusion code via eval."))
-                        .put("retrieve_queries", feArrOf(retrieveQuery, "retrieve_docs queries tried while fixing the error."))
-                        .put("retrieved_docs_summary", feArrOf(new JSONObject().put("type", "string"), "Short PUBLIC summaries of retrieved docs (no chunk bodies)."))
+                        .put("eval_errors", feArrOf(evalError, "Errors hit while running lsFusion code via eval.").put("maxItems", 50))
+                        .put("retrieve_queries", feArrOf(retrieveQuery, "retrieve_docs queries tried while fixing the error.").put("maxItems", 50))
+                        .put("retrieved_docs_summary", feArrOf(new JSONObject().put("type", "string"), "Short PUBLIC summaries of retrieved docs (no chunk bodies).").put("maxItems", 30))
                         .put("final_outcome", feEnum("How the task ended (guards against survivorship bias). Default: unknown.",
                                 feArr("fixed", "not_fixed", "workaround", "abandoned", "unknown")).put("default", "unknown"))
                         .put("tool_context", toolContext)
-                        .put("client_dedup_hint", feStr("Optional agent hint; the SERVER computes the canonical dedup_fingerprint."))
-                        .put("lsfusion_version", feStr("lsFusion version, if known."))
-                        .put("deployment_kind", feStr("Deployment kind, if known."))
-                        .put("agent", feStr("Reporting agent and model, e.g. 'claude-code, claude-opus-4-5'."))
+                        .put("client_dedup_hint", feStr("Optional agent hint; the SERVER computes the canonical dedup_fingerprint.").put("maxLength", 200))
+                        .put("lsfusion_version", feStr("lsFusion version, if known.").put("maxLength", 100))
+                        .put("deployment_kind", feStr("Deployment kind, if known.").put("maxLength", 100))
+                        .put("agent", feStr("Reporting agent and model, e.g. 'claude-code, claude-opus-4-5'.").put("maxLength", 100))
                         .put("n_eval_attempts", new JSONObject().put("type", "integer").put("description", "Number of eval attempts.")))
                 .put("required", feArr("agent_journey_id", "signal_type", "problem_summary", "recommendation"));
         JSONObject inputSchema = new JSONObject()
@@ -512,7 +514,7 @@ public abstract class McpBaseService extends RestService {
         return new JSONObject()
                 .put("name", TOOL_REPORT_FEEDBACK)
                 .put("description",
-                        "Submit ONE anonymous, depersonalized reinforcement-quality signal so lsFusion docs / RAG / eval diagnostics / the platform can be improved. Use `signal_type` to say what kind: a documentation gap, an expectation-mismatch (you expected lsFusion to behave/mean X but it was actually Y — fill `expectation`), an unclear/unactionable `eval` error, a missing capability, a RAG miss, or other. Call this ONLY per the workflow rule from `lsfusion_get_guidance` (the friction was action-affecting) AND only after the user explicitly consents. Send NO source code, file paths, schema/table/customer names, or secrets — only the depersonalized journey and a recommendation. The feedback is a suggestion, not a decision. Returns `{report_id, status, dedup_fingerprint}`.")
+                        "Submit ONE anonymous, depersonalized reinforcement-quality signal so lsFusion docs / RAG / eval diagnostics / the platform can be improved. Use `signal_type` to say what kind: a documentation gap, an expectation-mismatch (you expected lsFusion to behave/mean X but it was actually Y — fill `expectation`), an unclear/unactionable `eval` error, a missing capability, a RAG miss, or other. Follow the workflow rule from `lsfusion_get_guidance`: at the end of a task that hit action-affecting friction, OFFER the report in one line instead of silently skipping it, and call this after the user consents (consent may be given in advance, by the user or by the project's rules). One call per finding. Send NO source code, file paths, schema/table/customer names, or secrets — only the depersonalized journey (eval errors, the doc queries you tried, expected-vs-actual, how you resolved it) and a recommendation. The feedback is a suggestion, not a decision. LIMITS: the schema gives the cap on the length of each text field and list — `code_excerpt` takes at most 2000 characters, `eval_errors` at most 50 entries, `retrieve_queries` at most 50 — and the whole report, as UTF-8 JSON, may take at most 64 KiB. Returns `{report_id, status, dedup_fingerprint, detail}`. `status` is one of three: `recorded` — the report is stored; `rejected` — it is not, and `detail` says why: when a part of the report is over its limit, shorten that part and send the report again, while any other reason is a problem on the server's side, so do not keep resending; `disabled` — this server takes no reports, so send none.")
                 .put("inputSchema", inputSchema)
                 .put("outputSchema", outputSchema);
     }

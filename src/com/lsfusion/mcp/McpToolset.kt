@@ -120,30 +120,32 @@ class RetrieveSelectorArg(val raw: JsonElement) {
 
 // report_feedback DTOs — mirror mcp/tools/feedback.py. The input ones only describe the tool's schema:
 // the report itself is forwarded as the agent sent it (see FeedbackReportArg) and central validates it.
-// The IDE schema has no `default` keyword, so the descriptions state the defaults.
+// The IDE schema has no `default`, `maxLength` or `maxItems` keyword, so the descriptions state the
+// defaults, and central's caps on a report as `At most <n> characters` / `At most <n> entries`
+// (central refuses a report over one; mcp's drift test compares these with central's).
 // Descriptions need the `property:` target: on a constructor `val` a plain annotation goes to
 // the parameter, and the schema reads only the property's serial annotations.
 @Serializable
 data class FbExpectation(
-    @property:McpDescription(description = "What the agent expected (depersonalized).") val expected: String,
-    @property:McpDescription(description = "What actually happened (depersonalized).") val actual: String,
+    @property:McpDescription(description = "What the agent expected (depersonalized). At most 2000 characters.") val expected: String,
+    @property:McpDescription(description = "What actually happened (depersonalized). At most 2000 characters.") val actual: String,
 )
 
 @Serializable
 data class FbEvalError(
-    @property:McpDescription(description = "The error text (depersonalized).") val message: String,
+    @property:McpDescription(description = "The error text (depersonalized). At most 4000 characters.") val message: String,
     @property:McpDescription(description = "Where it surfaced. Default: unknown.") val phase: FbEvalPhase = FbEvalPhase.UNKNOWN,
     @SerialName("code_excerpt")
-    @property:McpDescription(description = "Tiny abstracted snippet if essential — NO full source / project code.") val codeExcerpt: String? = null,
+    @property:McpDescription(description = "Tiny abstracted snippet if essential — NO full source / project code. At most 2000 characters.") val codeExcerpt: String? = null,
     @SerialName("normalized_message")
-    @property:McpDescription(description = "Optional normalized form (ids/literals stripped) for clustering.") val normalizedMessage: String? = null,
+    @property:McpDescription(description = "Optional normalized form (ids/literals stripped) for clustering. At most 2000 characters.") val normalizedMessage: String? = null,
 )
 
 @Serializable
 data class FbRetrieveQuery(
-    @property:McpDescription(description = "The query text.") val query: String,
+    @property:McpDescription(description = "The query text. At most 2000 characters.") val query: String,
     @SerialName("returned_sources")
-    @property:McpDescription(description = "Doc branches/files it surfaced, if noted.") val returnedSources: List<String>? = null,
+    @property:McpDescription(description = "Doc branches/files it surfaced, if noted. At most 30 entries.") val returnedSources: List<String>? = null,
     @property:McpDescription(description = "How useful the result was for this error.") val usefulness: FbUsefulness? = null,
 )
 
@@ -152,48 +154,48 @@ data class FbRecommendation(
     @SerialName("primary_target")
     @property:McpDescription(description = "Main artifact to change.") val primaryTarget: FbTargetArtifact,
     @SerialName("secondary_targets")
-    @property:McpDescription(description = "Other plausibly-affected artifacts.") val secondaryTargets: List<FbTargetArtifact> = emptyList(),
+    @property:McpDescription(description = "Other plausibly-affected artifacts. At most 30 entries.") val secondaryTargets: List<FbTargetArtifact> = emptyList(),
     @SerialName("suggested_change")
-    @property:McpDescription(description = "Concrete suggestion (depersonalized).") val suggestedChange: String,
+    @property:McpDescription(description = "Concrete suggestion (depersonalized). At most 4000 characters.") val suggestedChange: String,
     @property:McpDescription(description = "How confident the agent is. Default: medium.") val confidence: FbConfidence = FbConfidence.MEDIUM,
-    @property:McpDescription(description = "Why, briefly.") val rationale: String? = null,
+    @property:McpDescription(description = "Why, briefly. At most 2000 characters.") val rationale: String? = null,
 )
 
 @Serializable
 data class FbToolContext(
     @SerialName("eval_server_kind")
-    @property:McpDescription(description = "Eval server kind.") val evalServerKind: String? = null,
+    @property:McpDescription(description = "Eval server kind. At most 100 characters.") val evalServerKind: String? = null,
     @SerialName("eval_server_version")
-    @property:McpDescription(description = "Eval server version.") val evalServerVersion: String? = null,
+    @property:McpDescription(description = "Eval server version. At most 100 characters.") val evalServerVersion: String? = null,
 )
 
 @Serializable
 data class FeedbackReportInput(
     @SerialName("agent_journey_id")
-    @property:McpDescription(description = "Agent-generated id grouping this task's errors/queries.") val agentJourneyId: String,
+    @property:McpDescription(description = "Agent-generated id grouping this task's errors/queries. At most 200 characters.") val agentJourneyId: String,
     @SerialName("signal_type")
     @property:McpDescription(description = "What kind of reinforcement signal this is (routing hint, not the decision).") val signalType: FbSignalType,
     @SerialName("problem_summary")
-    @property:McpDescription(description = "Short depersonalized task description.") val problemSummary: String,
+    @property:McpDescription(description = "Short depersonalized task description. At most 2000 characters.") val problemSummary: String,
     @property:McpDescription(description = "Suggested fix (a hint for triage, not a decision).") val recommendation: FbRecommendation,
     @property:McpDescription(description = "For expectation-mismatch/unclear-error: expected vs actual.") val expectation: FbExpectation? = null,
     @SerialName("eval_errors")
-    @property:McpDescription(description = "Errors hit while running lsFusion code via eval.") val evalErrors: List<FbEvalError> = emptyList(),
+    @property:McpDescription(description = "Errors hit while running lsFusion code via eval. At most 50 entries.") val evalErrors: List<FbEvalError> = emptyList(),
     @SerialName("retrieve_queries")
-    @property:McpDescription(description = "retrieve_docs queries tried while fixing the error.") val retrieveQueries: List<FbRetrieveQuery> = emptyList(),
+    @property:McpDescription(description = "retrieve_docs queries tried while fixing the error. At most 50 entries.") val retrieveQueries: List<FbRetrieveQuery> = emptyList(),
     @SerialName("retrieved_docs_summary")
-    @property:McpDescription(description = "Short PUBLIC summaries of retrieved docs (no chunk bodies).") val retrievedDocsSummary: List<String> = emptyList(),
+    @property:McpDescription(description = "Short PUBLIC summaries of retrieved docs (no chunk bodies). At most 30 entries.") val retrievedDocsSummary: List<String> = emptyList(),
     @SerialName("final_outcome")
     @property:McpDescription(description = "How the task ended (guards against survivorship bias). Default: unknown.") val finalOutcome: FbFinalOutcome = FbFinalOutcome.UNKNOWN,
     @SerialName("tool_context")
     @property:McpDescription(description = "Optional eval-server context.") val toolContext: FbToolContext? = null,
     @SerialName("client_dedup_hint")
-    @property:McpDescription(description = "Optional agent hint; the SERVER computes the canonical dedup_fingerprint.") val clientDedupHint: String? = null,
+    @property:McpDescription(description = "Optional agent hint; the SERVER computes the canonical dedup_fingerprint. At most 200 characters.") val clientDedupHint: String? = null,
     @SerialName("lsfusion_version")
-    @property:McpDescription(description = "lsFusion version, if known.") val lsfusionVersion: String? = null,
+    @property:McpDescription(description = "lsFusion version, if known. At most 100 characters.") val lsfusionVersion: String? = null,
     @SerialName("deployment_kind")
-    @property:McpDescription(description = "Deployment kind, if known.") val deploymentKind: String? = null,
-    @property:McpDescription(description = "Reporting agent and model, e.g. 'claude-code, claude-opus-4-5'.") val agent: String? = null,
+    @property:McpDescription(description = "Deployment kind, if known. At most 100 characters.") val deploymentKind: String? = null,
+    @property:McpDescription(description = "Reporting agent and model, e.g. 'claude-code, claude-opus-4-5'. At most 100 characters.") val agent: String? = null,
     @SerialName("n_eval_attempts")
     @property:McpDescription(description = "Number of eval attempts.") val nEvalAttempts: Int? = null,
 )
@@ -535,12 +537,9 @@ class McpToolset : com.intellij.mcpserver.McpToolset {
     }
 
     @McpTool(name = "lsfusion_report_feedback")
+    // Central's description verbatim, in one literal: mcp's drift test compares it word for word.
     @McpDescription(
-        description = "Submit ONE anonymous, depersonalized reinforcement-quality signal so lsFusion docs / RAG / eval diagnostics / the platform can be improved. " +
-            "Use `signal_type` to say what kind: a documentation gap, an expectation-mismatch (you expected lsFusion to behave/mean X but it was actually Y — fill `expectation`), " +
-            "an unclear/unactionable `eval` error, a missing capability, a RAG miss, or other. " +
-            "Call this ONLY per the workflow rule from `lsfusion_get_guidance` (the friction was action-affecting) AND only after the user explicitly consents. " +
-            "Send NO source code, file paths, schema/table/customer names, or secrets — only the depersonalized journey and a recommendation. The feedback is a suggestion, not a decision."
+        description = "Submit ONE anonymous, depersonalized reinforcement-quality signal so lsFusion docs / RAG / eval diagnostics / the platform can be improved. Use `signal_type` to say what kind: a documentation gap, an expectation-mismatch (you expected lsFusion to behave/mean X but it was actually Y — fill `expectation`), an unclear/unactionable `eval` error, a missing capability, a RAG miss, or other. Follow the workflow rule from `lsfusion_get_guidance`: at the end of a task that hit action-affecting friction, OFFER the report in one line instead of silently skipping it, and call this after the user consents (consent may be given in advance, by the user or by the project's rules). One call per finding. Send NO source code, file paths, schema/table/customer names, or secrets — only the depersonalized journey (eval errors, the doc queries you tried, expected-vs-actual, how you resolved it) and a recommendation. The feedback is a suggestion, not a decision. LIMITS: the schema gives the cap on the length of each text field and list — `code_excerpt` takes at most 2000 characters, `eval_errors` at most 50 entries, `retrieve_queries` at most 50 — and the whole report, as UTF-8 JSON, may take at most 64 KiB. Returns `{report_id, status, dedup_fingerprint, detail}`. `status` is one of three: `recorded` — the report is stored; `rejected` — it is not, and `detail` says why: when a part of the report is over its limit, shorten that part and send the report again, while any other reason is a problem on the server's side, so do not keep resending; `disabled` — this server takes no reports, so send none."
     )
     @Suppress("unused")
     suspend fun reportFeedback(

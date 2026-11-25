@@ -11,6 +11,7 @@
         <b>Version 1.0.317</b><br>
         <ul>
             <li>Plugin errors and UI freezes can be reported to the plugin authors</li>
+            <li>The <code>lsfusion_report_feedback</code> MCP tool tells agents to offer a report rather than wait to be asked, gives the server's limits on a report, and says what each answer means</li>
         </ul>
     ]]>
     </change-notes>
