@@ -2968,7 +2968,6 @@ expressionStringLiteral ::= LEX_STRING_LITERAL | LEX_RAW_STRING_LITERAL | ID
 }
 
 intLiteral ::= (MINUS)? uintLiteral
-doubleLiteral ::= (MINUS)? unumericLiteral
 dateLiteral ::= LEX_DATE_LITERAL
 dateTimeLiteral ::= LEX_DATETIME_LITERAL
 timeLiteral ::= LEX_TIME_LITERAL
