@@ -196,15 +196,21 @@ public class LSFFileUtils {
 
     public static List<String> getPossibleTopModules(PsiElement element) {
         List<PsiFile> propertyFiles = findFilesByPath(element, "lsfusion.properties");
-        String possibleTopModulesString = getPropertyValue(propertyFiles, "logics.possibleTopModules");
-        if (possibleTopModulesString != null && !possibleTopModulesString.trim().isEmpty()) {
-            return Arrays.stream(possibleTopModulesString.split(","))
-                    .map(String::trim)
-                    .collect(Collectors.toList());
-        }
+        List<String> possibleTopModules = splitModuleNames(getPropertyValue(propertyFiles, "logics.possibleTopModules"));
+        return possibleTopModules.isEmpty()
+               ? splitModuleNames(getPropertyValue(propertyFiles, "logics.topModule"))
+               : possibleTopModules;
+    }
 
-        String topModuleName = getPropertyValue(propertyFiles, "logics.topModule");
-        return topModuleName == null ? Collections.emptyList() : Collections.singletonList(topModuleName);
+    // logics.topModule is a comma-separated list too, see the platform's ModuleList.filterWithTopModule
+    private static List<String> splitModuleNames(String moduleNames) {
+        if (moduleNames == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(moduleNames.split(","))
+                .map(String::trim)
+                .filter(name -> !name.isEmpty())
+                .collect(Collectors.toList());
     }
      
     public static String getDBNamingPolicy(PsiElement element) {

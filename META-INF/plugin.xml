@@ -12,6 +12,7 @@
         <ul>
             <li>Plugin errors and UI freezes can be reported to the plugin authors</li>
             <li>The <code>lsfusion_report_feedback</code> MCP tool tells agents to offer a report rather than wait to be asked, gives the server's limits on a report, and says what each answer means</li>
+            <li>Fixed migration entries on rename when <code>logics.topModule</code> lists several modules</li>
         </ul>
     ]]>
     </change-notes>
